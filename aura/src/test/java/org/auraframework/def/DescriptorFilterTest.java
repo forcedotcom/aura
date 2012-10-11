@@ -343,7 +343,7 @@ public class DescriptorFilterTest extends UnitTestCase {
         }
 
         @Override
-        public int compareTo(DefDescriptor other) {
+        public int compareTo(DefDescriptor<?> other) {
             // Can't use the helper on DefDescriptorImpl in this non-impl test
             // package...
             return getQualifiedName().compareToIgnoreCase(other.getQualifiedName());

@@ -18,10 +18,12 @@ package org.auraframework.service;
 import java.util.Collection;
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -69,8 +71,10 @@ public interface DefinitionService extends AuraService {
     <T extends Definition> DefDescriptor<T> getDefDescriptor(DefDescriptor<?> desc, String prefix, Class<T> defClass);
 
     /**
-     * Get the Definition associated with the descriptor passed in.
+     * Get the Definition associated with the descriptor passed in, compiling if
+     * necessary.
      * 
+     * @param descriptor the descriptor to get/compile
      * @return The named definition
      * @throws DefinitionNotFoundException if definition does not exist
      * @throws QuickFixException
@@ -104,13 +108,20 @@ public interface DefinitionService extends AuraService {
             QuickFixException;
 
     /**
-     * Get the latest timestamp for a given definition. This will check all
-     * dependencies of the definition, and if it is an application, the
-     * preloads, to ensure that preloaded data is not stale.
+     * Get the master def registry.
      * 
-     * @param def the definition to check.
+     * @return the master def registry.
      */
-    <T extends Definition> long getLastMod(DefDescriptor<T> def) throws QuickFixException;
+    MasterDefRegistry getDefRegistry();
+
+    /**
+     * Get the latest timestamp for a given descriptor.
+     * 
+     * This will check all dependencies of the definition.
+     * 
+     * @param descriptor the descriptor to check.
+     */
+    <T extends Definition> long getLastMod(String uid) throws QuickFixException;
 
     /**
      * Given a set of preload namespaces, calculate the last mod time. This will

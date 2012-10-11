@@ -43,7 +43,6 @@ import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidEventTypeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -114,11 +113,7 @@ public class AuraContextImpl implements AuraContext {
                 json.writeMapEntry("requestedLocales", locales);
             }
             if (ctx.getSerializeLastMod()) {
-                try {
-                    json.writeMapEntry("lastmod", Long.toString(AuraBaseServlet.getLastMod()));
-                } catch (QuickFixException e) {
-                    throw new AuraRuntimeException(e);
-                }
+                json.writeMapEntry("lastmod", Long.toString(AuraBaseServlet.getLastMod()));
             }
 
             if (forClient) {

@@ -444,35 +444,6 @@ public class AuraServlet extends AuraBaseServlet {
         return imgURLs;
     }
 
-    public static String getManifest() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        Set<String> preloads = context.getPreloads();
-        String contextPath = context.getContextPath();
-
-        String ret = new String();
-
-        if (preloads != null && !preloads.isEmpty()) {
-            boolean serPreloads = context.getSerializePreLoad();
-            boolean serLastMod = context.getSerializeLastMod();
-            context.setSerializePreLoad(false);
-            context.setSerializeLastMod(false);
-            StringBuilder defs = new StringBuilder(contextPath).append("/l/");
-            StringBuilder sb = new StringBuilder();
-            try {
-                Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
-            } catch (IOException e) {
-                throw new AuraRuntimeException(e);
-            }
-            context.setSerializePreLoad(serPreloads);
-            context.setSerializeLastMod(serLastMod);
-            String contextJson = AuraTextUtil.urlencode(sb.toString());
-            defs.append(contextJson);
-            defs.append("/app.manifest");
-            ret = defs.toString();
-        }
-        return ret;
-    }
-
     private Map<String, Object> getComponentAttributes(HttpServletRequest request) {
         Enumeration<String> attributeNames = request.getParameterNames();
         Map<String, Object> attributes = new HashMap<String, Object>();

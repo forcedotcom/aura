@@ -124,21 +124,12 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
 
     /**
      * DefinitionService.getLastMod() accepts a collection of descriptors and
-     * gives the last modified time of the group. It can accept wild characters
-     * in descriptor name.
+     * gives the last modified time of the group.
      */
     public void testGetLastMod() throws Exception {
         Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.PUBLIC);
-        DefDescriptor<ComponentDef> def;
-        // 1. Handle non existing defs
-        // Generate a descriptor but do not add it to the source loader in order
-        // to guarantee we
-        // have a handle to a non-existing definition.
-        DefDescriptor<ComponentDef> nonExisting = StringSourceLoader.getInstance().createStringSourceDescriptor(
-                "nonExisting", ComponentDef.class);
-        def = definitionService.getDefDescriptor(nonExisting.getQualifiedName(), ComponentDef.class);
-        assertEquals("Expected to see 0 when searching for non existing defs.", 0, Aura.getDefinitionService()
-                .getLastMod(def));
+        String uid;
+
         // 3. Handle non existing namespace
         try {
             Aura.getDefinitionService().getNamespaceLastMod(Sets.newHashSet("foo"));
@@ -146,10 +137,6 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         } catch (AuraRuntimeException e) {
             assertEquals("No definitions found by *://foo:*[APPLICATION, COMPONENT]", e.getMessage());
         }
-        // 4. Just a wild character
-
-        DefDescriptor<ComponentDef> matcher = definitionService.getDefDescriptor("markup://*", ComponentDef.class);
-        assertEquals(0, Aura.getDefinitionService().getLastMod(matcher));
 
         // 5. Non existing def as reference
         // Create a descriptor but don't add it.
@@ -180,10 +167,6 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
          * ("java://java.lang.String", TypeDef.class)); assertEquals(0 ,
          * Aura.getDefinitionService().getLastMod(typeMatchers));
          */
-
-        // 6. Defs with null location
-        DefDescriptor<TypeDef> td = definitionService.getDefDescriptor("test://foo.bar", TypeDef.class);
-        assertEquals(0, Aura.getDefinitionService().getLastMod(td));
     }
 
     /**

@@ -85,7 +85,7 @@ public class XMLParserTest extends AuraImplTestCase{
             Location location = e.getLocation();
             assertTrue("Wrong filename.", location.getFileName().endsWith("parserFragment.cmp"));
             assertEquals(18, location.getLine());
-            assertEquals(16, location.getColumn());
+            assertEquals(15, location.getColumn());
         }
     }
 

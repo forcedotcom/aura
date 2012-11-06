@@ -15,12 +15,6 @@
  */
 package org.auraframework.http;
 
-import org.junit.Ignore;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.auraframework.Aura;
 import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.def.ApplicationDef;
@@ -32,6 +26,12 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.annotation.UnAdaptableTest;
+import org.junit.Ignore;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * What should you see when something goes wrong.
@@ -252,7 +252,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
                 "<aura:application securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows''></aura:application>",
                 ApplicationDef.class);
         openNoAura(String.format("/%s/%s.app", add.getNamespace(), add.getName()));
-        assertStacktrace("org.auraframework.throwable.AuraUnhandledException: "+ String.format("markup://%s:%s:1,113: ParseError at [row,col]:[2,113]", add.getNamespace(), add.getName()));
+        assertStacktrace("org.auraframework.throwable.AuraUnhandledException: "+ String.format("markup://%s:%s:1,111: ParseError at [row,col]:[2,111]", add.getNamespace(), add.getName()));
     }
 
     /**

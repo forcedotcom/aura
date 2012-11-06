@@ -2,36 +2,36 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>aura-impl</artifactId>
     <parent>
-        <groupId>org.plumeframework</groupId>
+        <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
         <version>0.0.368-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
         <dependency>
-            <groupId>org.plumeframework</groupId>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.plumeframework</groupId>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura-util</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.plumeframework</groupId>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura-impl-expression</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.plumeframework</groupId>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura-components</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.plumeframework</groupId>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.plumeframework</groupId>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura-util</artifactId>
             <type>test-jar</type>
             <scope>test</scope>

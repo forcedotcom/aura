@@ -2,44 +2,44 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>aura-jetty</artifactId>
     <parent>
-        <groupId>org.plumeframework</groupId>
+        <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
         <version>0.0.368-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
         <dependency>
-            <groupId>org.plumeframework</groupId>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura-util</artifactId>
             <type>test-jar</type>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.plumeframework</groupId>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura</artifactId>
             <type>test-jar</type>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.plumeframework</groupId>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura-impl</artifactId>
             <type>test-jar</type>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.plumeframework</groupId>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura-impl-expression</artifactId>
             <type>test-jar</type>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.plumeframework</groupId>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura-integration-test</artifactId>
             <type>test-jar</type>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.plumeframework</groupId>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura-resources</artifactId>
             <scope>runtime</scope>
         </dependency>

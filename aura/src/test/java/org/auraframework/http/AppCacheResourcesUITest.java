@@ -78,6 +78,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
             new Request("/auraResource", null, null, "js"),
             new Request("/aura", TARGET_NAME, null, null),
             new Request("/auraResource", null, null, "manifest"));
+	private static final String AURA = "aura";
 
     private enum Status {
         UNCACHED, IDLE, CHECKING, DOWNLOADING, UPDATEREADY, OBSOLETE;
@@ -284,7 +285,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         // update a framework js file
         String replacement = getName()+System.currentTimeMillis();
-        DirectiveBasedJavascriptGroup jsGroup = new DirectiveBasedJavascriptGroup("aura",
+        DirectiveBasedJavascriptGroup jsGroup = new DirectiveBasedJavascriptGroup(AURA,
                 auraTestingUtil.getAuraJavascriptSourceDirectory(), "aura.test/Test.js", DirectiveTypes.DEFAULT_TYPES,
                 EnumSet.of(JavascriptGeneratorMode.TESTING,
                         JavascriptGeneratorMode.AUTOTESTING,
@@ -425,7 +426,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
             Request toAdd = new Request(log.get("auraRequestURI").toString(), null, null, null);
             for(String part:AuraTextUtil.urldecode(log.get("auraRequestQuery").toString()).split("&")){
                 String[] parts = part.split("=", 2);
-                String key = parts[0].substring(6);
+                String key = parts[0].substring(AURA.length() + 1);
                 String v = parts[1];
                 toAdd.put(key, (v!=null && !v.isEmpty())?v:null);
             }

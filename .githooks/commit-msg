@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+
+import sys
+import re
+import os
+
+def main():
+    message_file = sys.argv[1]
+    message = open(message_file).read()
+    lines = re.split("\n+", message)
+
+    checks = [checkSubject, checkDescription, checkBugNumber, checkReviewer]
+
+    for check in checks:
+        check(message, lines)
+
+def checkSubject(message, lines):
+    line = lines[0]
+    if line == "" or len(line) > 80:
+        fail(message, "First line should be a short descriptive title, fewer than 80 characters.")
+
+def checkDescription(message, lines):
+    length = len(lines[1])
+    if length == 0:
+        fail(message, "Second section should be a longer description of the change.")
+
+def checkBugNumber(message, lines):
+    regex = "@bug ([-\w]*)@"
+    result = re.search(regex, message)
+    if result == None:
+        fail(message, "Commit message should contain a bug token of the format @bug <bugNumber>@")
+    else:
+        bug_number = result.group(1)
+        bug_regex = "^W-[0-9]{5,12}$"
+        if re.search(bug_regex, bug_number) == None:
+            fail(message, "'%s' is not a valid bug number." % bug_number)
+
+def checkReviewer(message, lines):
+    # TODO: look elsewhere for the source of reviewer truth, as this will eventually get pretty slow
+    command = "git log --all --format='%cE' | sort -u"
+    s = os.popen(command)
+
+    if s == None:
+        print "Problem communicating with git: Could not obtain list of valid reviewers."
+        exit(1)
+    else:
+        valid_reviewers = s.read()
+        s.close()
+        valid_reviewers = valid_reviewers.split("\n")[:-1]
+
+        regex = "@rev ([-\w\s.]*)@"
+        result = re.search(regex, message)
+        if result == None:
+            fail(message, "Commit message should contain a reviewer token of the format @rev <reviewer>[ <reviewer>...]@")
+        else:
+            format_email = "%s@salesforce.com"
+            reviewers = re.split("\s", result.group(1))
+            for reviewer in reviewers:
+                if format_email % reviewer not in valid_reviewers:
+                    fail(message, "'%s' is not a valid reviewer.  For a list valid reviewers run:\n\n %s" % (reviewer, command))
+
+def fail(message, error):
+    tmp_file = "/tmp/COMMIT_MESSAGE"
+    f = open(tmp_file, 'w')
+    print "Invalid commit message!\n\n%s\n(Commit message saved to temp file: %s)" % (error, tmp_file)
+    exit(1)
+
+if __name__ == "__main__":
+    main()

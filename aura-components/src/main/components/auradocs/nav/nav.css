@@ -1,0 +1,119 @@
+/*
+ * Copyright (C) 2012 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.THIS{
+	position: fixed;
+	top:0;
+	left:0;
+	right:0;
+	height: 60px;
+	display: inline-block;
+	padding:0;
+	margin: 0;
+	background-color: #424951;
+	font-family: "runda", sans-serif;
+	min-width: 500px;
+}
+
+.THIS .logo{
+	position: absolute;
+	top: 10px;
+	left: 50px;
+	bottom: 0;
+	width: auto;
+}
+
+.THIS .logo a{
+	font-size: 24px;
+	font-weight: bold;
+	color: #000;
+}
+
+.THIS .logo small{
+	color: #90AD5E;
+	font-size: 12px;
+	text-transform: uppercase;
+	display: block;
+}
+
+.THIS .navList {
+	position: absolute;
+	top: 0;
+	right: 50px;
+	bottom: 0;
+	list-style: none;
+	margin: 0;
+}
+
+.THIS h1 {
+	margin: 0;
+    line-height: .9;
+}
+
+.THIS li{
+	display: inline-block;	
+	padding: 20px 30px;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	height: 60px;
+}
+
+.THIS li > a{
+	color: #fff;
+	font-size: 17px;
+}
+
+.THIS li[active=true] {
+	background-color: #2d3035;
+}
+
+.THIS .spinner{
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	width: 32px;
+	height: 32px;
+	background-image: url(/auraFW/resources/img/msg_icons/info32.png);
+	display: none;
+}
+
+.THIS.waiting .spinner{
+	display: block;
+	-moz-animation-iteration-count: infinite;
+    -moz-animation-name: spinner;
+    -moz-animation-duration: .3s;
+    -moz-animation-timing-function: ease-in-out;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-name: spinner;
+	-webkit-animation-duration: .3s;
+	-webkit-animation-timing-function: ease-in-out;
+}
+
+@-moz-keyframes spinner {
+    from { -moz-transform:rotate(0deg);}
+    to {-moz-transform: rotate(720deg);}
+}
+
+@-webkit-keyframes spinner {
+    from { -webkit-transform:rotate(0deg);}
+    to {-webkit-transform: rotate(720deg);}
+}
+
+.THIS .fuelGauge {
+    position: absolute;
+    right: 400px;
+    top: 23px;
+}

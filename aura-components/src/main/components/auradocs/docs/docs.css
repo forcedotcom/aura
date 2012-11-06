@@ -1,0 +1,185 @@
+/*
+ * Copyright (C) 2012 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ .THIS body {
+    overflow: hidden;
+ }
+ 
+.THIS.container {
+	position: absolute;
+	top: 80px;
+	right: 50px;
+	bottom: 40px;
+	left: 50px;
+	border-radius: 4px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, .4);
+	background-color: #fff;
+	min-height: 500px;
+	min-width: 800px;
+}
+
+.THIS article.content{
+	position: absolute;
+	padding: 30px;
+    top: 0;
+    right: 0;
+    left: 280px;
+	bottom: 0;
+	overflow: auto;
+}
+.THIS aside.sidebar {
+	position: absolute;
+	background-color: #495058;
+	border-top-left-radius: 4px;
+	border-bottom-left-radius: 4px;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 280px;
+	overflow: auto;
+}
+footer.THIS{
+	text-align: center;
+	position: fixed;
+	bottom: 10px;
+	left: 0;
+	right: 0;
+	font-size: 10px;
+	color: #ccc;
+}
+
+/*pre & code blocks */
+.THIS pre,.THIS code {
+	color: #333;
+	padding: 1px 2px;
+	margin: 1px;
+	display: inline-block;
+	background-color: #F7F7F9;
+	border: 1px solid #e1e1e8;
+	border-radius: 3px;
+}
+.THIS code {
+	color: #D14;
+}
+.THIS pre {
+	display: block;
+	padding: 20px;
+}
+
+/*tabset overrides */
+.THIS .uiTabset {
+	height: 100%;
+	width: 100%;
+}
+.THIS .uiTabset > *{
+	height: 100%;
+}
+
+
+/*tables */
+.THIS table {
+	max-width: 100%;
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+.THIS table {
+	width: 100%;
+	margin-bottom: 18px;
+}
+.THIS table th,.THIS table td {
+	padding: 8px;
+	line-height: 18px;
+	text-align: left;
+	vertical-align: top;
+	border-top: 1px solid #ddd;
+}
+.THIS table th {
+	font-weight: bold;
+}
+.THIS table thead th {
+	vertical-align: bottom;
+}
+.THIS table thead:first-child tr th,.THIS table thead:first-child tr td
+	{
+	border-top: 0;
+}
+.THIS table tbody+tbody {
+	border-top: 2px solid #ddd;
+}
+.THIS table.bordered {
+	border: 1px solid #ddd;
+	border-collapse: separate;
+	*border-collapse: collapsed;
+	border-radius: 4px;
+}
+.THIS table.bordered th+th,.THIS table.bordered td+td,.THIS table.bordered th+td,.THIS table.bordered td+th
+	{
+	border-left: 1px solid #ddd;
+}
+.THIS table.bordered thead:first-child tr:first-child th,.THIS table.bordered tbody:first-child tr:first-child th,.THIS table.bordered tbody:first-child tr:first-child td
+	{
+	border-top: 0;
+}
+.THIS table.bordered thead:first-child tr:first-child th:first-child,.THIS table.bordered tbody:first-child tr:first-child td:first-child
+	{
+	border-radius: 4px 0 0 0;
+}
+.THIS table.bordered thead:first-child tr:first-child th:last-child,.THIS table.bordered tbody:first-child tr:first-child td:last-child
+	{
+	border-radius: 0 4px 0 0;
+}
+.THIS table.bordered thead:last-child tr:last-child th:first-child,.THIS table.bordered tbody:last-child tr:last-child td:first-child
+	{
+	border-radius: 0 0 0 4px;
+}
+.THIS table.bordered thead:last-child tr:last-child th:last-child,.THIS table.bordered tbody:last-child tr:last-child td:last-child
+	{
+	border-radius: 0 0 4px 0;
+}
+.THIS table.striped tbody tr:nth-child(odd) td,.THIS table.striped tbody tr:nth-child(odd) th
+	{
+	background-color: #f9f9f9;
+}
+.THIS table tbody tr:hover td,.THIS table tbody tr:hover th {
+	background-color: #f5f5f5;
+}
+.THIS h1,.THIS h2,.THIS h3,.THIS h4,.THIS h5,.THIS h6,.THIS .h1,.THIS .h2,.THIS .h3,.THIS .h4,.THIS .h5,.THIS .h6{
+  	font-weight: 300;
+  	color: #2f3438;
+	margin-top: 14px;
+	margin-bottom: 14px;
+}
+.THIS h1,.THIS .h1 {
+	font-size: 40px;
+}
+.THIS h2,.THIS .h2 {
+	font-size: 32px;
+}
+.THIS h3,.THIS .h3 {
+	font-size: 26px;
+}
+.THIS h4,.THIS .h4 {
+	font-size: 22px;
+}
+.THIS h5,.THIS .h5 {
+  font-size: 20px;
+  font-weight: 400;
+  margin-top: 20px;
+}
+.THIS h6,.THIS .h6 {
+  font-size: 18px;
+  font-weight: 400;
+  margin-top: 20px;
+}

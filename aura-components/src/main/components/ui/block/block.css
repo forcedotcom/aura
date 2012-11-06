@@ -1,0 +1,61 @@
+/*
+ * Copyright (C) 2012 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/** Layout Block
+ * 	This handy component is based on Nicole Sullivan's media object
+ *  http://www.stubbornella.org/content/2010/06/25/the-media-object-saves-hundreds-of-lines-of-code/ 
+ * **/
+ 
+.uiBlock, .uiBlock .bBody {
+    overflow: hidden;
+    vertical-align: top;
+}
+.uiBlock .bLeft {
+    float: left;
+}
+.uiBlock .bLeft img{
+	display: block;
+}
+.uiBlock .bRight {
+    float: right;
+}
+
+/*When overflow = true is specified on ui:block, we add 
+  the class "overflow" to the uiBlock and these overrides address 
+  the overflow:hidden problem 
+*/
+.uiBlock.overflow > .bBody{
+	display: table-cell;
+	vertical-align: top;
+	width: 10000px;
+}
+.uiBlock.overflow,
+.uiBlock.overflow > .bBody{
+	overflow:visible
+}
+/* micro clearfix */
+.uiBlock.overflow:before,
+.uiBlock.overflow:after {
+	content:"";display:table;
+}
+.uiBlock.overflow:after {
+	clear:both;
+}
+.uiBlock.overflow > .bLeft{
+	float:left;
+}
+.uiBlock.overflow > .bRight{
+	float:right;
+}

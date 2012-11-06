@@ -1,0 +1,109 @@
+Test:testGetPatternConverter_locale_pattern
+Invalid format: "1970.01.01 西元 at 08:00:00 +08:00" is malformed at "+08:00"
+Input date:Date(1)		Formatted date:星期四, 一月 1, '70		Parsed date:-28800000		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:EEE, MMM d, ''yy
+Input date:Date(1)		Formatted date:8:00 上午		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:h:mm a
+Invalid format: "08 o'clock 上午, +08:00" is malformed at "+08:00"
+Invalid format: "8:00 上午, +08:00" is malformed at "+08:00"
+Input date:Date(1)		Formatted date:01970.一月.01 西元 08:00 上午		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:yyyyy.MMMMM.dd GGG hh:mm aaa
+Input date:Date(1)		Formatted date:星期四, 1 一月 1970 08:00:00 +0800		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:EEE, d MMM yyyy HH:mm:ss Z
+Input date:Date(1)		Formatted date:700101080000+0800		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:yyMMddHHmmssZ
+Input date:Date(1)		Formatted date:1970-01-01T08:00:00.001+0800		Parsed date:1		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:yyyy-MM-dd'T'HH:mm:ss.SSSZ
+Invalid format: "1970.01.01 西元 at 08:00:01 +08:00" is malformed at "+08:00"
+Input date:Date(1000)		Formatted date:星期四, 一月 1, '70		Parsed date:-28800000		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:EEE, MMM d, ''yy
+Input date:Date(1000)		Formatted date:8:00 上午		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:h:mm a
+Invalid format: "08 o'clock 上午, +08:00" is malformed at "+08:00"
+Invalid format: "8:00 上午, +08:00" is malformed at "+08:00"
+Input date:Date(1000)		Formatted date:01970.一月.01 西元 08:00 上午		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:yyyyy.MMMMM.dd GGG hh:mm aaa
+Input date:Date(1000)		Formatted date:星期四, 1 一月 1970 08:00:01 +0800		Parsed date:1000		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:EEE, d MMM yyyy HH:mm:ss Z
+Input date:Date(1000)		Formatted date:700101080001+0800		Parsed date:1000		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:yyMMddHHmmssZ
+Input date:Date(1000)		Formatted date:1970-01-01T08:00:01.000+0800		Parsed date:1000		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:yyyy-MM-dd'T'HH:mm:ss.SSSZ
+Invalid format: "2012.04.02 西元 at 07:27:52 +08:00" is malformed at "+08:00"
+Input date:Date(1333322872649)		Formatted date:星期一, 四月 2, '12		Parsed date:1333296000000		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:EEE, MMM d, ''yy
+Input date:Date(1333322872649)		Formatted date:7:27 上午		Parsed date:-1980000		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:h:mm a
+Invalid format: "07 o'clock 上午, +08:00" is malformed at "+08:00"
+Invalid format: "7:27 上午, +08:00" is malformed at "+08:00"
+Input date:Date(1333322872649)		Formatted date:02012.四月.02 西元 07:27 上午		Parsed date:1333322820000		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:yyyyy.MMMMM.dd GGG hh:mm aaa
+Input date:Date(1333322872649)		Formatted date:星期一, 2 四月 2012 07:27:52 +0800		Parsed date:1333322872000		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:EEE, d MMM yyyy HH:mm:ss Z
+Input date:Date(1333322872649)		Formatted date:120402072752+0800		Parsed date:1333322872000		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:yyMMddHHmmssZ
+Input date:Date(1333322872649)		Formatted date:2012-04-02T07:27:52.649+0800		Parsed date:1333322872649		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:yyyy-MM-dd'T'HH:mm:ss.SSSZ
+Invalid format: "1970.01.01 西元 at 08:00:00 +08:00" is malformed at "+08:00"
+Input date:Date(0)		Formatted date:星期四, 一月 1, '70		Parsed date:-28800000		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:EEE, MMM d, ''yy
+Input date:Date(0)		Formatted date:8:00 上午		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:h:mm a
+Invalid format: "08 o'clock 上午, +08:00" is malformed at "+08:00"
+Invalid format: "8:00 上午, +08:00" is malformed at "+08:00"
+Input date:Date(0)		Formatted date:01970.一月.01 西元 08:00 上午		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:yyyyy.MMMMM.dd GGG hh:mm aaa
+Input date:Date(0)		Formatted date:星期四, 1 一月 1970 08:00:00 +0800		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:EEE, d MMM yyyy HH:mm:ss Z
+Input date:Date(0)		Formatted date:700101080000+0800		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:yyMMddHHmmssZ
+Input date:Date(0)		Formatted date:1970-01-01T08:00:00.000+0800		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone:GMT+08:00		SimpleDateFormat pattern:yyyy-MM-dd'T'HH:mm:ss.SSSZ
+Invalid format: "1969.12.31 AD at 19:00:00 EST" is malformed at "EST"
+Input date:Date(1)		Formatted date:Wed, Dec 31, '69		Parsed date:-68400000		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:EEE, MMM d, ''yy
+Input date:Date(1)		Formatted date:7:00 PM		Parsed date:86400000		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:h:mm a
+Invalid format: "07 o'clock PM, Eastern Standard Time" is malformed at "Eastern Standard Time"
+Invalid format: "7:00 PM, EST" is malformed at "EST"
+Input date:Date(1)		Formatted date:01969.December.31 AD 07:00 PM		Parsed date:0		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:yyyyy.MMMMM.dd GGG hh:mm aaa
+Input date:Date(1)		Formatted date:Wed, 31 Dec 1969 19:00:00 -0500		Parsed date:0		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:EEE, d MMM yyyy HH:mm:ss Z
+Input date:Date(1)		Formatted date:691231190000-0500		Parsed date:0		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:yyMMddHHmmssZ
+Input date:Date(1)		Formatted date:1969-12-31T19:00:00.001-0500		Parsed date:1		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:yyyy-MM-dd'T'HH:mm:ss.SSSZ
+Invalid format: "1969.12.31 AD at 19:00:01 EST" is malformed at "EST"
+Input date:Date(1000)		Formatted date:Wed, Dec 31, '69		Parsed date:-68400000		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:EEE, MMM d, ''yy
+Input date:Date(1000)		Formatted date:7:00 PM		Parsed date:86400000		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:h:mm a
+Invalid format: "07 o'clock PM, Eastern Standard Time" is malformed at "Eastern Standard Time"
+Invalid format: "7:00 PM, EST" is malformed at "EST"
+Input date:Date(1000)		Formatted date:01969.December.31 AD 07:00 PM		Parsed date:0		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:yyyyy.MMMMM.dd GGG hh:mm aaa
+Input date:Date(1000)		Formatted date:Wed, 31 Dec 1969 19:00:01 -0500		Parsed date:1000		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:EEE, d MMM yyyy HH:mm:ss Z
+Input date:Date(1000)		Formatted date:691231190001-0500		Parsed date:1000		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:yyMMddHHmmssZ
+Input date:Date(1000)		Formatted date:1969-12-31T19:00:01.000-0500		Parsed date:1000		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:yyyy-MM-dd'T'HH:mm:ss.SSSZ
+Invalid format: "2012.04.01 AD at 19:27:52 EDT" is malformed at "EDT"
+Input date:Date(1333322872649)		Formatted date:Sun, Apr 1, '12		Parsed date:1333252800000		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:EEE, MMM d, ''yy
+Input date:Date(1333322872649)		Formatted date:7:27 PM		Parsed date:88020000		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:h:mm a
+Invalid format: "07 o'clock PM, Eastern Daylight Time" is malformed at "Eastern Daylight Time"
+Invalid format: "7:27 PM, EDT" is malformed at "EDT"
+Input date:Date(1333322872649)		Formatted date:02012.April.01 AD 07:27 PM		Parsed date:1333322820000		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:yyyyy.MMMMM.dd GGG hh:mm aaa
+Input date:Date(1333322872649)		Formatted date:Sun, 1 Apr 2012 19:27:52 -0400		Parsed date:1333322872000		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:EEE, d MMM yyyy HH:mm:ss Z
+Input date:Date(1333322872649)		Formatted date:120401192752-0400		Parsed date:1333322872000		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:yyMMddHHmmssZ
+Input date:Date(1333322872649)		Formatted date:2012-04-01T19:27:52.649-0400		Parsed date:1333322872649		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:yyyy-MM-dd'T'HH:mm:ss.SSSZ
+Invalid format: "1969.12.31 AD at 19:00:00 EST" is malformed at "EST"
+Input date:Date(0)		Formatted date:Wed, Dec 31, '69		Parsed date:-68400000		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:EEE, MMM d, ''yy
+Input date:Date(0)		Formatted date:7:00 PM		Parsed date:86400000		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:h:mm a
+Invalid format: "07 o'clock PM, Eastern Standard Time" is malformed at "Eastern Standard Time"
+Invalid format: "7:00 PM, EST" is malformed at "EST"
+Input date:Date(0)		Formatted date:01969.December.31 AD 07:00 PM		Parsed date:0		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:yyyyy.MMMMM.dd GGG hh:mm aaa
+Input date:Date(0)		Formatted date:Wed, 31 Dec 1969 19:00:00 -0500		Parsed date:0		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:EEE, d MMM yyyy HH:mm:ss Z
+Input date:Date(0)		Formatted date:691231190000-0500		Parsed date:0		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:yyMMddHHmmssZ
+Input date:Date(0)		Formatted date:1969-12-31T19:00:00.000-0500		Parsed date:0		Locale:English (United States)		TimeZone:EST		SimpleDateFormat pattern:yyyy-MM-dd'T'HH:mm:ss.SSSZ
+Invalid format: "1970.01.01 AD at 00:00:00 UTC" is malformed at "UTC"
+Input date:Date(1)		Formatted date:Thu, Jan 1, '70		Parsed date:0		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:EEE, MMM d, ''yy
+Input date:Date(1)		Formatted date:12:00 AM		Parsed date:0		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:h:mm a
+Invalid format: "12 o'clock AM, Coordinated Universal Time" is malformed at "Coordinated Universal Time"
+Invalid format: "0:00 AM, UTC" is malformed at "UTC"
+Input date:Date(1)		Formatted date:01970.January.01 AD 12:00 AM		Parsed date:0		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:yyyyy.MMMMM.dd GGG hh:mm aaa
+Input date:Date(1)		Formatted date:Thu, 1 Jan 1970 00:00:00 +0000		Parsed date:0		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:EEE, d MMM yyyy HH:mm:ss Z
+Input date:Date(1)		Formatted date:700101000000+0000		Parsed date:0		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:yyMMddHHmmssZ
+Input date:Date(1)		Formatted date:1970-01-01T00:00:00.001+0000		Parsed date:1		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:yyyy-MM-dd'T'HH:mm:ss.SSSZ
+Invalid format: "1970.01.01 AD at 00:00:01 UTC" is malformed at "UTC"
+Input date:Date(1000)		Formatted date:Thu, Jan 1, '70		Parsed date:0		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:EEE, MMM d, ''yy
+Input date:Date(1000)		Formatted date:12:00 AM		Parsed date:0		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:h:mm a
+Invalid format: "12 o'clock AM, Coordinated Universal Time" is malformed at "Coordinated Universal Time"
+Invalid format: "0:00 AM, UTC" is malformed at "UTC"
+Input date:Date(1000)		Formatted date:01970.January.01 AD 12:00 AM		Parsed date:0		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:yyyyy.MMMMM.dd GGG hh:mm aaa
+Input date:Date(1000)		Formatted date:Thu, 1 Jan 1970 00:00:01 +0000		Parsed date:1000		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:EEE, d MMM yyyy HH:mm:ss Z
+Input date:Date(1000)		Formatted date:700101000001+0000		Parsed date:1000		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:yyMMddHHmmssZ
+Input date:Date(1000)		Formatted date:1970-01-01T00:00:01.000+0000		Parsed date:1000		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:yyyy-MM-dd'T'HH:mm:ss.SSSZ
+Invalid format: "2012.04.01 AD at 23:27:52 UTC" is malformed at "UTC"
+Input date:Date(1333322872649)		Formatted date:Sun, Apr 1, '12		Parsed date:1333238400000		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:EEE, MMM d, ''yy
+Input date:Date(1333322872649)		Formatted date:11:27 PM		Parsed date:84420000		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:h:mm a
+Invalid format: "11 o'clock PM, Coordinated Universal Time" is malformed at "Coordinated Universal Time"
+Invalid format: "11:27 PM, UTC" is malformed at "UTC"
+Input date:Date(1333322872649)		Formatted date:02012.April.01 AD 11:27 PM		Parsed date:1333322820000		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:yyyyy.MMMMM.dd GGG hh:mm aaa
+Input date:Date(1333322872649)		Formatted date:Sun, 1 Apr 2012 23:27:52 +0000		Parsed date:1333322872000		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:EEE, d MMM yyyy HH:mm:ss Z
+Input date:Date(1333322872649)		Formatted date:120401232752+0000		Parsed date:1333322872000		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:yyMMddHHmmssZ
+Input date:Date(1333322872649)		Formatted date:2012-04-01T23:27:52.649+0000		Parsed date:1333322872649		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:yyyy-MM-dd'T'HH:mm:ss.SSSZ
+Invalid format: "1970.01.01 AD at 00:00:00 UTC" is malformed at "UTC"
+Input date:Date(0)		Formatted date:Thu, Jan 1, '70		Parsed date:0		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:EEE, MMM d, ''yy
+Input date:Date(0)		Formatted date:12:00 AM		Parsed date:0		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:h:mm a
+Invalid format: "12 o'clock AM, Coordinated Universal Time" is malformed at "Coordinated Universal Time"
+Invalid format: "0:00 AM, UTC" is malformed at "UTC"
+Input date:Date(0)		Formatted date:01970.January.01 AD 12:00 AM		Parsed date:0		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:yyyyy.MMMMM.dd GGG hh:mm aaa
+Input date:Date(0)		Formatted date:Thu, 1 Jan 1970 00:00:00 +0000		Parsed date:0		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:EEE, d MMM yyyy HH:mm:ss Z
+Input date:Date(0)		Formatted date:700101000000+0000		Parsed date:0		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:yyMMddHHmmssZ
+Input date:Date(0)		Formatted date:1970-01-01T00:00:00.000+0000		Parsed date:0		Locale:English (United States)		TimeZone:GMT		SimpleDateFormat pattern:yyyy-MM-dd'T'HH:mm:ss.SSSZ

@@ -1,0 +1,33 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" support="GA" description="An image that is rendered as an HTML &lt;img&gt; element.">
+    <aura:attribute name="src" type="String" default="/auraFW/resources/aura/s.gif" description="The absolute or relative URL of the image."/>
+    <aura:attribute name="class" type="String" description="The CSS style used to display the image."/>
+    <aura:attribute name="href" type="String" description="The URL that the image directs to when clicked."/>
+    <aura:attribute name="linkClass" type="String" description="The CSS style used to display the URL link."/>
+    <aura:attribute name="alt" type="String" default="" description="The alternate text description of the image."/>
+    <aura:attribute name="target" type="String" default="_self" description="The target URL to display when the image is clicked. Default value is &#8220;_self&#8221;. Valid options: _blank, _parent, _top, _self"/>
+    <aura:if isTrue="{!v.href != null &amp;&amp; v.href != ''}">
+        <a class="{!v.linkClass}" href="{!v.href}" target="{!v.target}" aura:id="link">
+            <img src="{!v.src}" class="{!v.class}" alt="{!v.alt}"/>
+        </a>
+        <aura:set attribute="else">
+            <img src="{!v.src}" class="{!v.class}" alt="{!v.alt}"/>
+        </aura:set>
+    </aura:if>
+</aura:component>

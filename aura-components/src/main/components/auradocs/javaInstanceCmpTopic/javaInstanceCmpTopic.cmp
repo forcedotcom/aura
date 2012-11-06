@@ -1,0 +1,56 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+<aura:set attribute="title" value="Getting an Instance of a Component"/>
+
+<p>An instance represents the data for a component.</p>
+
+<h2>Goal</h2>
+
+<p>You want to get an instance of a component in Java code.</p>
+
+<h2>Code</h2>
+
+<auradocs:codeblock><![CDATA[
+    // listAttributes is a map of attributes for the component
+    Map<String, Object> listAttributes = new HashMap();
+    listAttributes.put("sort", "asc");
+    Component cmpInstance =
+        Aura.getInstanceService().getInstance("auranote:noteList",
+            ComponentDef.class, listAttributes);
+]]>
+</auradocs:codeblock>
+
+<h2>Discussion</h2>
+
+<p>Use the <code>InstanceService</code> class to create a new component instance.</p>
+
+<p>The first parameter to the <code>getInstance</code> method is <code>auranote:noteList</code>, which is the qualified name for a <code>noteList</code> component in the <code>auranote</code> namespace.</p>
+
+<p>The second parameter is <code>ComponentDef.class</code>, which indicates the class for the instance.</p>
+
+<p>The third parameter is <code>listAttributes</code>, which contains a map of attributes for the component instance. In this case, we only have one <code>sort</code> attribute, but you can add more attributes to the map, if needed.</p>
+
+<p>The <code>InstanceService</code> class also has other overloaded <code>getInstance</code> methods that take either a <code>Definition</code> or a <code>DefDescriptor</code> as their first parameter instead of a qualified name.</p>
+
+<p><b>See also:</b><br/>
+    <auradocs:topicLink topic="cycleRefs">Component Request Glossary</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="javaDefDesc">Getting a DefDescriptor</auradocs:topicLink>
+</p>
+
+</aura:component>

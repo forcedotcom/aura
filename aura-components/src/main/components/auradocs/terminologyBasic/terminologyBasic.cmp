@@ -1,0 +1,61 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Term</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Definition</td>
+                    <td>Each definition describes metadata for an element, such as a component, event, controller, or model.
+                         A large part of Aura is a registry of definitions for its various elements.
+                        <p>A definition's metadata can include a name, location of origin, and descriptor (DefDescriptor, the primary key of the definition).
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>DefDescriptor</td>
+                    <td>A DefDescriptor acts as a key for a definition in a registry. It's a Aura class that contains the metadata for any definition used in Aura, such as a component, action, or event.
+                         In the example of a model, it is a nicely parsed description of <code>model="java://myPackage.MyClass"</code> with methods to retrieve the language, class name, and package name.
+
+                         Rather than passing a more heavyweight definition around in code, Aura usually passes around a DefDescriptor instead.
+                         <p>The qualified name for a DefDescriptor has the format <code>prefix://namespace:name</code>.
+                            <ul>
+                                <li>prefix: Defines the language, such as JavaScript or Java</li>
+                                <li>namespace: Corresponds to the package name or XML namespace</li>
+                                <li>name: Corresponds to the class name or local name</li>
+                            </ul>
+                         </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Instance</td>
+                    <td>An instance represents the data for a component.</td>
+                </tr>
+                <tr>
+                    <td>Registry</td>
+                    <td>Registries store metadata definitions. Some registries last for the duration of a request, while others are cached for the lifetime of an app.
+                    They may be created during the request process and destroyed when the server completes the request. A master definition registry contains a list of registries for each Aura element.</td>
+                </tr>
+            </tbody>
+    </table>
+</aura:component>

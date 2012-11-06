@@ -1,0 +1,70 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+       <aura:set attribute="title" value="aura:renderIf "/>
+
+       <p>Renders the content within the tag if the <code>isTrue</code> attribute evaluates to true.</p>
+
+       <p>
+       <table class="table table-bordered table-striped">
+          <thead>
+              <tr>
+                     <td><b>Attribute Name</b></td>
+                     <td><b>Type</b></td>
+                     <td><b>Description</b></td>
+                     <td><b>Required?</b></td>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                     <td><code>else</code></td>
+                     <td>Component[]</td>
+                     <td>The markup to render when <code>isTrue</code> evaluates to false. Set this attribute using the <code>aura:set</code> tag.</td>
+                     <td></td>
+              </tr>
+              <tr>
+                     <td><code>isTrue</code></td>
+                     <td>String</td>
+                     <td>An expression that determines whether the content is displayed. If it evaluates to true, the content is displayed.</td>
+                     <td>Y</td>
+              </tr>
+          </tbody>
+       </table>
+       </p>
+
+       <h2>Usage</h2>
+       <p>The following components in the auradocs namespace show how to use <code>aura:renderIf</code> to conditionally render markup based on the result of evaluating an expression.</p>
+
+       <p><b>sampleRender.cmp</b></p>
+
+       <p>The <b>Component source</b> tab shows the markup for <code>sampleRender.cmp</code>, which extends <code>sampleRenderMe.cmp</code>.</p>
+
+       <auradocs:example descriptor="auradocs:sampleRender" />
+
+       <p>See the source for <code>sampleRenderMe.cmp</code> to understand the output.</p>
+
+       <p><b>sampleRenderMe.cmp</b></p>
+
+       <auradocs:example descriptor="auradocs:sampleRenderMe" />
+
+        <p>The <code>aura:renderIf</code> component displays the  elements in the body
+       only if the <code>desc</code> attribute contains a value.
+       In other words, the content of the <code>aura:renderIf</code> component will be displayed if the
+       <code>isTrue</code> attribute evaluates to true. The <code>desc</code> attribute is set in <code>sampleRender.cmp</code>, which extends <code>sampleRenderMe.cmp</code>.</p>
+
+</aura:component>

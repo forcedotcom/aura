@@ -1,0 +1,79 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="aura:set"/>
+
+
+
+    <p>Use the <code>&lt;aura:set&gt;</code> system tag to set the value of an inherited or nested attribute.</p>
+
+    <h2>Inherited <code>body</code> Attribute</h2>
+
+    <p>Every component inherits the <code>body</code> attribute from <code>&lt;aura:component&gt;</code> so <code>body</code> has some special behavior with <code>&lt;aura:set&gt;</code>. See <auradocs:topicLink topic="helloFacets">Component Body and Facets</auradocs:topicLink>.</p>
+
+    <h2>Inherited Attributes</h2>
+
+    <p>As well as the <code>body</code> attribute, you can use <code>&lt;aura:set&gt;</code> with other inherited attributes. Use <code>&lt;aura:set&gt;</code> in a sub-component to set the value of any attribute that is inherited from the parent component. For example, if you have a component <code>cmpA</code> that has an attribute called <code>address1</code>, and you have a component <code>cmpB</code> that extends component <code>cmpA</code>, use <code>&lt;aura:set&gt;</code> in component <code>cmpB</code> to set the value of the inherited <code>address1</code> attribute.</p>
+
+
+    <p>Here is <code>sample/cmpA/cmpA.cmp</code>.</p>
+
+<auradocs:codeblock><![CDATA[<aura:component abstract="true"
+         extensible="true">
+    <aura:attribute name="address1" type="String" />
+</aura:component>
+]]></auradocs:codeblock>
+
+    <p>Here is the <code>sample/cmpB/cmpB.cmp</code> component that extends <code>cmpA</code>.</p>
+
+<auradocs:codeblock><![CDATA[<aura:component extends="sample:cmpA">
+    <aura:set attribute="address1" value="808 State St" />
+</aura:component>
+]]></auradocs:codeblock>
+
+    <auradocs:warning>This usage of <code>&lt;aura:set&gt;</code> works for components and abstract components, but it doesn’t work for interfaces. If you want to set the value of an attribute inherited from an interface, you must redefine the attribute in the sub-component using <code>&lt;aura:attribute&gt;</code> and set the value in its <code>default</code> attribute.</auradocs:warning>
+
+
+    <h2>Attributes on Component References</h2>
+
+    <p>When you include another component, such as <code>&lt;ui:button&gt;</code>, in a component, we call that a component reference to <code>&lt;ui:button&gt;</code>. You can use <code>&lt;aura:set&gt;</code> to set an attribute on the component reference. For example, if your component includes a reference to <code>&lt;ui:button&gt;</code>:</p>
+
+<auradocs:codeblock><![CDATA[<ui:button label="">
+    <aura:set attribute="label" value="hello"/>
+</ui:button>
+]]></auradocs:codeblock>
+
+
+    <p>This is equivalent to:</p>
+
+<auradocs:codeblock><![CDATA[<ui:button label="hello"/>
+]]></auradocs:codeblock>
+
+    <p>A more powerful example is setting markup within <code>&lt;aura:set&gt;</code> instead of using the <code>value</code> attribute. In the <a href="https://github.com/forcedotcom/aura-note/blob/master/src/main/webapp/WEB-INF/components/auranote/notes/notes.app" target="_new">Aura Note sample app</a>, the <code>&lt;aura:set&gt;</code> tag specifies the markup for the <code>left</code> attribute of the <code>ui:block</code> element.</p>
+
+<auradocs:codeblock><![CDATA[<ui:block class="wrapper" aura:id="block">
+    <aura:set attribute="left">
+        <auranote:sidebar aura:id="sidebar" />
+    </aura:set>
+    <auranote:details aura:id="details" />
+</ui:block>
+]]></auradocs:codeblock>
+
+
+</aura:component>

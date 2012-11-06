@@ -1,0 +1,36 @@
+{
+  "serId":1,
+  "value":{
+    "descriptor":"js://test.testJSController",
+    "actionDefs":[
+      {
+        "serId":2,
+        "value":{
+          "descriptor":"js://test.testJSController/ACTION$functionName1",
+          "name":"functionName1",
+          "code":
+function test$testJSController_functionName1(args1, args2) {
+        
+
+        
+
+        var str = 'do Nothing';
+    },
+          "actionType":"CLIENT"
+        }
+      },
+      {
+        "serId":3,
+        "value":{
+          "descriptor":"js://test.testJSController/ACTION$functionName2",
+          "name":"functionName2",
+          "code":
+function test$testJSController_functionName2(args1, args2, args3) {
+        var str = 'Still do Nothing';
+    },
+          "actionType":"CLIENT"
+        }
+      }
+    ]
+  }
+}

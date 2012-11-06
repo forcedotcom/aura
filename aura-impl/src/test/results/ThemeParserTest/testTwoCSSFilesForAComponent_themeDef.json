@@ -1,0 +1,8 @@
+{
+  "serId":1,
+  "value":{
+    "descriptor":"css://test.testTwoCSSFiles",
+    "code":".testTestTwoCSSFiles .requiredLegend {\n  color: #000000;\n  font-weight: normal;\n  float: right;\n}\n",
+    "className":"testTestTwoCSSFiles"
+  }
+}

@@ -1,0 +1,119 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Events Demo"/>
+
+    <p><auradocs:topicLink topic="eventsOverview">Events Handling Lifecycle</auradocs:topicLink> gives an overview of how events are handled in Aura.</p>
+
+    <p>This topic leads you through an events demo. Before we see a component wired up to events, let's look at the individual files involved.</p>
+
+    <p>This table summarizes the roles of the various files used in the demo. The source code for these files is included after the table.</p>
+
+    <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>File</th>
+                    <th>File Name</th>
+                    <th>Usage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Event files</td>
+                    <td>Component event (<code>compEvent.evt</code>) and application event (<code>appEvent.evt</code>)</td>
+                    <td>Defines the component and application events in separate files. <code>eventsContainer.cmp</code> shows how to use both container and application events.</td>
+                </tr>
+                <tr>
+                    <td>Notifier</td>
+                    <td>Component (<code>eventsNotifier.cmp</code>) and its controller (<code>eventsNotifierController.js</code>)</td>
+                    <td>The notifier contains an <code>onclick</code> browser event to initiate the event. The controller fires the event.</td>
+
+                </tr>
+                <tr>
+                    <td>Handler</td>
+                    <td>Component (<code>eventsHandler.cmp</code>) and its controller (<code>eventsHandlerController.js</code>)</td>
+                    <td>Handler component contains the notifier component (or a <code>&lt;aura:handler&gt;</code> tag for application events), and calls the controller action that is executed after the event is fired.</td>
+                </tr>
+                <tr>
+                    <td>Container Component</td>
+                    <td><code>eventsContainer.cmp</code></td>
+                    <td>Displays the event handlers on the UI for the complete demo.</td>
+                </tr>
+            </tbody>
+    </table>
+
+    <h2>Source Files</h2>
+
+    <p>The definitions of component and application events are stored in separate event <code>.evt</code> files, but individual notifier and handler components can contain code to work with both types of events.</p>
+
+    <p>The component and application events both contain a <code>context</code> attribute that defines the shape of the event. This is the data that is passed to handlers of the event.</p>
+
+    <h3>Component Event</h3>
+    <p><b>compEvent.evt</b></p>
+    <auradocs:codeblock>
+<![CDATA[<aura:event type="COMPONENT">
+    <aura:attribute name="context" type="String"/>
+</aura:event>]]>
+</auradocs:codeblock><br/>
+
+    <h3>Application Event</h3>
+    <p><b>appEvent.evt</b></p>
+<auradocs:codeblock>
+<![CDATA[<aura:event type="APPLICATION">
+    <aura:attribute name="context" type="String"/>
+</aura:event>]]>
+</auradocs:codeblock><br/>
+
+    <h3>Notifier Component</h3>
+    <p><b>eventsNotifier.cmp</b></p>
+
+    <p>The notifier component contains an <code>onclick</code> browser event to initiate the event. The controller fires the event.</p>
+
+    <auradocs:example descriptor="auradocs:eventsNotifier" />
+
+    <p>The component uses <code>aura:registerevent</code> to declare that it may fire the component event. Note that we don't need the <code>aura:registerevent</code> tag to use the application event.</p>
+
+    <p>The <code>parentName</code> attribute is not set so the text in the first line of the Output tab is incomplete. We will see how this attribute is set and surfaced in the UI in <code>eventsContainer.cmp</code>.</p>
+
+    <p>You can click the buttons to fire component and application events but there is no change to the output because we haven't wired up the handler component to react to the events yet.</p>
+
+    <p>The controller sets the <code>context</code> attribute of the component or application event to the <code>parentName</code> of the notifier component before firing the event. We will see how this affects the output when we look at the handler component.</p>
+
+    <h3>Handler Component</h3>
+    <p><b>eventsHandler.cmp</b></p>
+
+    <p>The handler component contains the notifier component (or a <code>&lt;aura:handler&gt;</code> tag for application events), and calls the controller action that is executed after the event is fired.</p>
+
+    <auradocs:example descriptor="auradocs:eventsHandler" />
+
+    <p>The <code>name</code> attribute is not set so the text in the Output tab is incomplete. We will see how this attribute is set and surfaced in the UI in <code>eventsContainer.cmp</code>.</p>
+
+    <p>You can click buttons and the UI now changes to indicate the type of event and the click count is incremented to indicate whether it's a component or application event. We aren't finished yet though. Notice that the source of the event is undefined as the event <code>context</code> attribute hasn't been set yet.</p>
+
+    <h3>Container Component</h3>
+    <p><b>eventsContainer.cmp</b></p>
+
+    <auradocs:example descriptor="auradocs:eventsContainer" />
+
+    <p>The container component contains two handler components. It sets the <code>name</code> attribute of both handler components, which is passed through to set the <code>parentName</code> attribute of the notifier components. This fills in the gaps in the UI text that we saw when we looked at the notifier or handler components directly.</p>
+
+    <p>Click the <b>Click here to fire a component event</b> button for either of the event handlers. Notice that the <b># component events handled</b> counter is only incremented for that component because only the firing component's handler is notified.</p>
+
+    <p>Click the <b>Click here to fire an application event</b> button for either of the event handlers. Notice that the <b># application events handled</b> counter is incremented for both the components this time because all the handling components are notified.</p>
+
+</aura:component>

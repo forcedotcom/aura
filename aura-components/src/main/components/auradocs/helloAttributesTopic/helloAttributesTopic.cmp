@@ -1,0 +1,66 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Component Attributes"/>
+
+    <p>So far all the content we've seen is strictly static, which doesn't make for the most exciting web application.  Let's see how we can make this more dynamic by using attributes.</p>
+
+    <p>If you look at <code>helloAttributes.cmp</code>, you should notice something new: our first component metadata tag.</p>
+    <auradocs:example descriptor="auradocs:helloAttributes" />
+    <p>The <code>&lt;aura:attribute name="whom" type="String" default="world"/&gt;</code> tag may look like a component, but it's actually a special tag that describes an attribute available on this component.  </p>
+    <auradocs:info>You'll see similar metadata tags later.  Though not a strict requirement, as a convention, these component metadata tags are usually the first things listed in a <code>.cmp</code> file, as it provides an easy way to read the component's shape at a glance.</auradocs:info>
+
+    <p>Attributes on a component in Aura are like member variables on a class in Java: they are typed fields that are set on a specific instance of a component, and can be referenced from within the component's markup using an expression syntax (which we will see in a moment).</p>
+
+    <p>All attributes have a name and a type. For a list of valid attribute types, see <auradocs:topicLink topic="attrTypesOverview">Supported aura:attribute types</auradocs:topicLink>.</p>
+
+    <p>Attributes may be marked as required by specifying <code>required="true"</code>, and may also specify a default value.</p>
+
+    <p>In this case we've got an attribute named <code>whom</code> of type String. If no value is specified, it defaults to "world".</p>
+
+    <p>Try loading <code>helloAttributes.cmp</code> in your browser.  You'll probably notice that it doesn't look any different from <code>helloWorld.cmp</code>.</p>
+
+    <p>Now, append <code>?whom=you</code> to the URL and reload the page.  The component is now greeting you personally.  Supplying attribute values via the query string when requesting a component is one way to set the attributes on that component.</p>
+
+    <auradocs:warning>Note: this only works for attributes of type String.</auradocs:warning>
+
+    <p>Let's take a look at how that worked.</p>
+
+    <h2>Expressions</h2>
+
+    <p>In the markup for <code>helloAttributes.cmp</code> you'll see a line <code>Hello <aura:text value="{!"/>v.whom}!</code>. This is what's responsible for the component's dynamic output.</p>
+
+    <p>We learned earlier that <code><aura:text value="{!"/>&lt;expression&gt;}</code> is Aura's expression syntax. In this case, the expression we are evaluating is <code>v.whom</code>.  The name of the attribute we defined is <code>whom</code>, while <code>v.</code> (for "view", as in "model-view-controller") is the value provider for a component's attribute set.  We'll see examples of the model and controller value providers later.</p>
+
+    <h2>Attribute Validation</h2>
+
+    <p>We defined the set of valid attributes in <code>helloAttributes.cmp</code>, so Aura will automatically validate that only valid attributes are passed to that component.</p>
+
+    <p>Try requesting <code>helloAttributes.cmp</code> with the query string <code>?fakeAttribute=fakeValue</code>. You should receive an error that there is no such attribute on <code>helloAttributes.cmp</code>.</p>
+
+    <h2>Summary</h2>
+
+    <ul>
+        <li>Attributes are like variables on a component.  They are added via the <code>&lt;aura:attribute&gt;</code> tag.</li>
+        <li>Attributes have a name and a type, and may optionally be required or have default values.</li>
+        <li>Attributes of type String can be specified via the query string when requesting a specific component.</li>
+        <li>Attribute values are referenced from within component markup via <code><aura:text value="{!"/>v.&lt;attributeName&gt;}</code>.</li>
+        <li>Aura throws an error if a component is provided an attribute it does not advertise.</li>
+    </ul>
+</aura:component>

@@ -1,0 +1,40 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" support="BETA" description="A single tab that is nested in a &lt;ui:tabset&gt; component.">
+    <aura:attribute name="title" type="String" description="The text to display as a tooltip when the mouse hovers over the tab."/>
+    <aura:attribute name="icon" type="Aura.Component[]" description="The graphical image displayed on the tab."/>
+    <aura:attribute name="scroll" type="Boolean" description="Specified whether scrolling is enabled (true) or not (false) on the tab." default="true"/>
+    <aura:attribute name="active" type="Boolean" description="Specifies whether a tab is active (true) or not (false)."/>
+    <aura:attribute name="iconClass" type="String" description="The CSS style used to display the icon on the tab."/>
+    <aura:registerEvent name="activated" type="ui:activated" description="The event fired when the tab is activated."/>
+
+    <li aura:id="li" class="{!(v.active? 'active' : '')}" role="presentation">
+        <ui:vbox>
+            <aura:set attribute="north">
+                <a class="tabHeader" href="javascript:void(0);" onclick="{!c.activate}" aura:id="a" role="tab">
+                    <aura:if isTrue="{!v.iconClass != null}">
+                        <div aura:id="icon" class="{!v.iconClass + ' icon'}">&nbsp;</div>
+                    </aura:if>
+                    {!v.icon}
+                    {!v.title}
+                </a>
+            </aura:set>
+            <div class="{!'tabBody' + (v.scroll == 'true' ? ' scrolling' : '')}" aura:id="tabBody" role="tabpanel">{!v.body}</div>
+        </ui:vbox>
+    </li>
+</aura:component>

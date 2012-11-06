@@ -1,0 +1,82 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
+    <div aura:id="null">
+        <aura:iteration items="{!m.stringListNull}" var="x">
+            {!x+7} ghost in this shell
+        </aura:iteration>
+    </div>
+
+    <div aura:id="empty">
+        <aura:iteration items="{!m.emptyList}" var="x">
+            {!x+9} boo!
+        </aura:iteration>
+    </div>
+
+    <div aura:id="strings">
+        <aura:iteration items="{!m.stringList}" var="x" indexVar="i">
+            <ui:inputText value="{!x+7}"/>
+        </aura:iteration>
+    </div>
+
+    <div aura:id="numbers">
+        <aura:iteration items="{!m.integerList}" var="x" indexVar="i">
+            <ui:inputText size="{!i+3}" value="{!i+3}" maxlength="{!x+3}"/>
+        </aura:iteration>
+    </div>
+
+    <div aura:id="booleans">
+        <aura:iteration items="{!m.booleanList}" var="x" indexVar="i">
+            <ui:inputText value="{!i}" disabled="{!x}"/>
+        </aura:iteration>
+    </div>
+
+    <div aura:id="lists">
+        <aura:iteration items="{!m.listOfList}" var="x" indexVar="i">
+            <aura:iteration items="{!x}" var="y" indexVar="j">
+                <ui:inputText value="{!y + ' is from [' + i + ',' + j + ']'}"/>
+            </aura:iteration>
+        </aura:iteration>
+    </div>
+
+    <!-- no longer working again :(
+    <div aura:id="barecomponents">
+        <aura:iteration items="{!m.textComponents}" var="x">
+            {!x}
+        </aura:iteration>
+    </div>
+    -->
+
+    <!-- W-1300578 can't pass components?
+    <div aura:id="innercomponents">
+        <aura:iteration items="{!m.textComponents}" var="x">
+            <div>{!x}</div>
+        </aura:iteration>
+    </div>
+    -->
+    <div>
+        <iterationTest:componentIteration start="0" end="2" aura:id="componentArray">
+            <aura:set attribute="cmps">
+                <aura:text value="textOnBody" aura:id="text"/>
+                <div title="divOnBody" aura:id="localdiv"/>
+            </aura:set>
+        </iterationTest:componentIteration>
+        <iterationTest:componentIteration start="0" end="0" aura:id="emptyComponentArray">
+        </iterationTest:componentIteration>
+    </div>
+</aura:component>

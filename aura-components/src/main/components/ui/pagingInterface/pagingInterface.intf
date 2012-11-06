@@ -1,0 +1,26 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:interface support="GA" description="The standard interface for paging components.">
+    <aura:attribute name="currentPage" type="Integer" default="0"      description="Gets or sets the current page of the pager. The first page is 1, the last page is pageCount."/>
+    <aura:attribute name="endIndex" type="Integer" default="-1"         description="Gets the index of the last item in the current page based on pageSize and totalItems."/>
+    <aura:attribute name="pageCount" type="Integer" default="0"        description="Gets the total number of pages based on pageSize and totalItems."/>
+    <aura:attribute name="pageSize" type="Integer" default="25"        description="Gets or sets the number of items per page."/>
+    <aura:attribute name="startIndex" type="Integer" default="-1"       description="Gets the index of the first item in the current page based on pageSize and totalItems."/>
+    <aura:attribute name="totalItems" type="Integer" default="0"       description="Gets or sets the total number of items the pager is describing."/>
+    <aura:attribute name="type" type="String"                          description="The concrete type of the pager. Accepted values are 'JumpToPage', 'NextPrevious', 'PageInfo', 'PageSize', or any namespaced component descriptor, e.g. ns:CustomPager."/>
+</aura:interface>

@@ -1,0 +1,25 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component implements="ui:elementInterface,ui:listViewColumnInterface" abstract="true" extensible="true" provider="java://org.auraframework.component.ui.ListViewColumnProvider,js://ui.listViewColumn" support="GA" description="An abstract column template component, used to specify column display information in ui:listView.">
+    <aura:attribute name="column" type="Object"                description="Read only. Gets the template used to define this column field."/>
+    <aura:attribute name="index" type="Integer"                description="Read only. Gets the index of the item being used to populate this column field."/>
+    <aura:attribute name="item" type="Object"                  description="Read only. Gets the item being used to populate this column field."/>
+    <aura:attribute name="scope" type="String" default="col"   description="Gets or sets the scope of this column field."/>
+    <aura:attribute name="type" type="String"                  description="The concrete type of the column. Accepted values are 'Checkbox', 'Email', 'Header', 'Html', 'Index', 'Link', 'Text', or any namespaced component descriptor, e.g. ns:CustomColumn."/>
+    {!v.body}
+</aura:component>

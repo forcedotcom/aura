@@ -1,0 +1,71 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+  <aura:set attribute="title" value="URL-Centric Navigation"/>
+
+    <p>It's useful to understand how Aura handles page requests. The initial GET request for an app retrieves a template containing all the Aura JavaScript and a skeletal HTML response. All subsequent changes to everything after the <code>#</code> in the URL trigger an XMLHttpRequest (XHR) request for the content. The client service makes the request, and returns the result to the browser.</p>
+
+    <p>The portion of the URL before the <code>#</code> value doesn't change after the initial app request. The app is long-lived with subsequent actions causing incremental changes to the DOM for the lifetime of the app.</p>
+
+  <h2>Navigation Events</h2>
+
+  <p>Aura uses its event model to manage content change in response to URL changes. The client-side <code>AuraHistoryService</code> monitors the location of the current window for changes. If the <code>#</code> value in a URL changes, the <code>AuraHistoryService</code> fires a Aura application event of type <code>aura:locationChange</code>.  The <code>locationChange</code> event has a single attribute called <code>token</code>.</p>
+
+  <p>For example, if the URL changes from <code>/demo/test.app#</code> to <code>/demo/test.app#foo</code>, a <code>aura:locationChange</code> event is fired, and the <code>token</code> attribute on that event is set to <code>foo</code>.</p>
+
+  <h3>Creating Custom Events</h3>
+
+  <p>If your application requires a more complex URL schema, with name-value pairs that you want to tokenize, you can extend <code>aura:locationChange</code> to add your own event type. For example, you could create the <code>demo/myLocationChange/myLocationChange.evt</code> event so that Aura automatically parses the <code>thing1</code> and <code>thing2</code> attributes in the URL.</p>
+
+<auradocs:codeblock>
+  <![CDATA[<aura:event type="application" extends="aura:locationChange">
+    <aura:attribute name="thing1" type="String"/>
+    <aura:attribute name="thing2" type="Boolean"/>
+  </aura:event>]]>
+</auradocs:codeblock>
+
+  <p>Update the <code>locationChangeEvent</code> attribute in your <code>&lt;aura:application&gt;</code> component to indicate to <code>AuraHistoryService</code> that you want to parse the hash of the URL into the custom event.</p>
+
+<auradocs:codeblock>
+  <![CDATA[<aura:application locationChangeEvent="demo:myLocationChange">]]>
+</auradocs:codeblock>
+
+  <p>Now, when the URL changes to <code>/demo/test.app#foo?thing1=Howdy&amp;thing2=true</code>, the <code>AuraHistoryService</code> fires an event of type <code>demo:myLocationChange</code> with <code>token</code> set to <code>foo</code>, <code>thing1</code> set to <code>Howdy</code> and <code>thing2</code> set to <code>true</code>.</p>
+
+  <auradocs:info>The attributes after the <code>#</code> value use the same format as a query string: <code>#foo?thing1=Howdy&amp;thing2=true</code>.
+
+  <p>However, a real request query string starts before the <code>#</code> value. A sample query string that sets the Aura mode to <code>PROD</code> (production) is <code>/demo/test.app?aura.mode=PROD&amp;queryStrParam2=val2#foo</code>.</p></auradocs:info>
+
+  <h3>Accessing Tokenized Event Attributes</h3>
+
+  <p>To see how you'd access the tokenized attributes, imagine a scenario where a component uses a <code>getHomeComponents</code> server-side action to retrieve components. You can write the <code>getHomeComponents</code> action to accept arguments that match the attributes in your custom location change event. The arguments are automatically mapped from the location change event to the action call.</p>
+
+<auradocs:codeblock>
+  @AuraEnabled
+  public static Aura.Component[] getHomeComponents(String token, String thing1, Boolean thing2){...}
+</auradocs:codeblock>
+
+
+  <p><b>See also:</b><br/>
+      <auradocs:topicLink topic="appOverview">aura:application</auradocs:topicLink><br/>
+      <auradocs:topicLink topic="layouts">Using Layouts for Metadata-Driven Navigation</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="faqInit">What happens when I make an initial request?</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink>
+    </p>
+</aura:component>

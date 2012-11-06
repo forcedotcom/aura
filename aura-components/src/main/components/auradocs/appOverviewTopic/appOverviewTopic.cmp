@@ -1,0 +1,101 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="aura:application"/>
+
+    <!-- Reused in faqAppTopic too. Consider single sourcing -->
+    <p>A Aura app is a special top-level component whose markup is in a <code>.app</code> file. The markup looks similar to HTML and can contain Aura components as well as a set of supported HTML tags. The <code>.app</code> file is a standalone entry point for the app and enables you to define the overall application layout, style sheets, and global JavaScript includes. It starts with the top-level <code>&lt;aura:application&gt;</code> tag, which contains optional system attributes. These system attributes tell the framework how to configure the app.</p>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>System Attribute</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Note: not documenting the full list of system attributes at this time. Concentrating on ones with heavy usage for now.  -->
+            <tr>
+                <td><code>access</code></td>
+                <td>Reserved for future usage.</td>
+            </tr>
+
+            <tr>
+                <td><code>controller</code></td>
+                <td>The Java server-side class for the app. The format is <code>java://&lt;package.class&gt;</code>.</td>
+            </tr>
+
+            <tr>
+                <td><code>locationChangeEvent</code></td>
+                <td>The client-side <code>AuraHistoryService</code> monitors the location of the current window for changes. If the <code>#</code> value in a URL changes, the <code>AuraHistoryService</code> fires a Aura application event. The <code>locationChangeEvent</code> defines this event. The default value is <code>aura:locationChange</code>. The <code>locationChange</code> event has a single attribute called <code>token</code>, which is set with everything after the <code>#</code> value in the URL. For more information, see <auradocs:topicLink topic="urlNav">URL-Centric Navigation</auradocs:topicLink>.</td>
+            </tr>
+
+            <tr>
+                <td><code>model</code></td>
+                <td>The Java model class used to initial data for the app. The format is <code>java://&lt;package.class&gt;</code>.</td>
+            </tr>
+
+            <tr>
+                <td><code>preload</code></td>
+                <td>A comma-separated list of namespaces. Aura preloads the definitions for all the components in these namespaces on a user's initial request to the app. By default, Aura always preloads the <code>aura</code> and <code>ui</code> namespaces.</td>
+            </tr>
+
+            <tr>
+                <td><code>renderer</code></td>
+                <td>Only use this system attribute if you want a Java renderer and a JavaScript renderer. If you don't define this system attribute, your application is autowired to a client-side renderer named <code><em>&lt;appName&gt;</em>Renderer.js</code>. If you don't create this renderer, Aura uses its default rendering, which is sufficient for most use cases.</td>
+            </tr>
+
+            <tr>
+                <td><code>securityProvider</code></td>
+                <td>The name of the Java class that controls access to the app. The default value is <code>java://org.auraframework.components.DefaultSecurityProvider</code>. For more information, see <auradocs:topicLink topic="securityProviders">Controlling Access with Security Providers</auradocs:topicLink>.</td>
+            </tr>
+
+            <tr>
+                <td><code>template</code></td>
+                <td>The name of the template used to bootstrap the loading of the Aura framework and the app. The default value is <code>aura:template</code>. You can customize the template by creating your own component that extends the default template. For example:
+                <p><code>&lt;aura:component extends="aura:template" ... &gt;</code></p></td>
+            </tr>
+            <tr>
+             <td><code>useAppcache</code></td>
+             <td>Specifies whether to use the application cache. Valid options are <code>true</code> or <code>false</code>. Defaults to <code>false</code>.
+                     See <auradocs:topicLink topic="appcache">Using AppCache </auradocs:topicLink> for more information.
+              </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p><code>aura:application</code> also includes a <code>body</code> attribute defined in a <code>&lt;aura:attribute&gt;</code> tag. Attributes usually control the output or behavior of a component, as opposed to the configuration information in system attributes.</p>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Attribute</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>body</code></td>
+                <td><code>Component[]</code></td>
+                <td>The body of the app. In markup, this is everything in the body of the tag.</td>
+            </tr>
+        </tbody>
+    </table>
+
+</aura:component>

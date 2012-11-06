@@ -1,0 +1,25 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Components"/>
+
+    <p>Aura includes out-of-the-box components that can simplify your job by taking care of some of the plumbing that you would otherwise have to create yourself. You can use these components or extend them to build more complex components. See the <b>Components</b> folder in the <auradocs:navLink location="reference">Reference tab</auradocs:navLink> for all the components that come out-of-the-box with Aura. The <code>UI</code> folder includes many components that are common on Web pages.</p>
+    
+    <p>This section covers the basics of how you can build your own components, including component markup, component attributes, and component composition.</p>
+
+</aura:component>

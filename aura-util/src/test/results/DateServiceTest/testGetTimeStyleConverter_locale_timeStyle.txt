@@ -1,0 +1,49 @@
+Test:testGetTimeStyleConverter_locale_timeStyle
+Input date:Date(1)		Formatted date:上午 8:00		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Time style: 3
+Input date:Date(1)		Formatted date:上午 08:00:00		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Time style: 2
+Input date:Date(1)		Formatted date:上午08時00分00秒		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Time style: 1
+Invalid format: "上午08時00分00秒 +08:00" is malformed at "+08:00"
+Input date:Date(1000)		Formatted date:上午 8:00		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Time style: 3
+Input date:Date(1000)		Formatted date:上午 08:00:01		Parsed date:1000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Time style: 2
+Input date:Date(1000)		Formatted date:上午08時00分01秒		Parsed date:1000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Time style: 1
+Invalid format: "上午08時00分01秒 +08:00" is malformed at "+08:00"
+Input date:Date(1333322872649)		Formatted date:上午 7:27		Parsed date:-1980000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Time style: 3
+Input date:Date(1333322872649)		Formatted date:上午 07:27:52		Parsed date:-1928000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Time style: 2
+Input date:Date(1333322872649)		Formatted date:上午07時27分52秒		Parsed date:-1928000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Time style: 1
+Invalid format: "上午07時27分52秒 +08:00" is malformed at "+08:00"
+Input date:Date(0)		Formatted date:上午 8:00		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Time style: 3
+Input date:Date(0)		Formatted date:上午 08:00:00		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Time style: 2
+Input date:Date(0)		Formatted date:上午08時00分00秒		Parsed date:0		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Time style: 1
+Invalid format: "上午08時00分00秒 +08:00" is malformed at "+08:00"
+Input date:Date(1)		Formatted date:7:00 PM		Parsed date:86400000		Locale:English (United States)		TimeZone: EST		Time style: 3
+Input date:Date(1)		Formatted date:7:00:00 PM		Parsed date:86400000		Locale:English (United States)		TimeZone: EST		Time style: 2
+Invalid format: "7:00:00 PM EST" is malformed at "EST"
+Invalid format: "7:00:00 PM EST" is malformed at "EST"
+Input date:Date(1000)		Formatted date:7:00 PM		Parsed date:86400000		Locale:English (United States)		TimeZone: EST		Time style: 3
+Input date:Date(1000)		Formatted date:7:00:01 PM		Parsed date:86401000		Locale:English (United States)		TimeZone: EST		Time style: 2
+Invalid format: "7:00:01 PM EST" is malformed at "EST"
+Invalid format: "7:00:01 PM EST" is malformed at "EST"
+Input date:Date(1333322872649)		Formatted date:7:27 PM		Parsed date:88020000		Locale:English (United States)		TimeZone: EST		Time style: 3
+Input date:Date(1333322872649)		Formatted date:7:27:52 PM		Parsed date:88072000		Locale:English (United States)		TimeZone: EST		Time style: 2
+Invalid format: "7:27:52 PM EDT" is malformed at "EDT"
+Invalid format: "7:27:52 PM EDT" is malformed at "EDT"
+Input date:Date(0)		Formatted date:7:00 PM		Parsed date:86400000		Locale:English (United States)		TimeZone: EST		Time style: 3
+Input date:Date(0)		Formatted date:7:00:00 PM		Parsed date:86400000		Locale:English (United States)		TimeZone: EST		Time style: 2
+Invalid format: "7:00:00 PM EST" is malformed at "EST"
+Invalid format: "7:00:00 PM EST" is malformed at "EST"
+Input date:Date(1)		Formatted date:12:00 AM		Parsed date:0		Locale:English (United States)		TimeZone: GMT		Time style: 3
+Input date:Date(1)		Formatted date:12:00:00 AM		Parsed date:0		Locale:English (United States)		TimeZone: GMT		Time style: 2
+Invalid format: "12:00:00 AM UTC" is malformed at "UTC"
+Invalid format: "12:00:00 AM UTC" is malformed at "UTC"
+Input date:Date(1000)		Formatted date:12:00 AM		Parsed date:0		Locale:English (United States)		TimeZone: GMT		Time style: 3
+Input date:Date(1000)		Formatted date:12:00:01 AM		Parsed date:1000		Locale:English (United States)		TimeZone: GMT		Time style: 2
+Invalid format: "12:00:01 AM UTC" is malformed at "UTC"
+Invalid format: "12:00:01 AM UTC" is malformed at "UTC"
+Input date:Date(1333322872649)		Formatted date:11:27 PM		Parsed date:84420000		Locale:English (United States)		TimeZone: GMT		Time style: 3
+Input date:Date(1333322872649)		Formatted date:11:27:52 PM		Parsed date:84472000		Locale:English (United States)		TimeZone: GMT		Time style: 2
+Invalid format: "11:27:52 PM UTC" is malformed at "UTC"
+Invalid format: "11:27:52 PM UTC" is malformed at "UTC"
+Input date:Date(0)		Formatted date:12:00 AM		Parsed date:0		Locale:English (United States)		TimeZone: GMT		Time style: 3
+Input date:Date(0)		Formatted date:12:00:00 AM		Parsed date:0		Locale:English (United States)		TimeZone: GMT		Time style: 2
+Invalid format: "12:00:00 AM UTC" is malformed at "UTC"
+Invalid format: "12:00:00 AM UTC" is malformed at "UTC"

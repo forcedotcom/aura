@@ -1,0 +1,53 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Interfaces"/>
+
+    <p>Object-oriented languages, such as Java, support the concept of an interface that defines a set of method signatures. A class that implements the interface must provide the method implementations. An interface in Java can't be instantiated directly, but a class that implements the interface can.</p>
+
+    <p>Similarly, Aura supports the concept of interfaces that define a component's shape by defining its attributes.</p>
+
+    <p>A Aura interface starts with the <code>&lt;aura:interface&gt;</code> tag. It can only contain <code>&lt;aura:attribute&gt;</code> tags that define the interface's attributes. You can't use markup, renderers, controllers, models or anything else in an interface.</p>
+
+    <p>To use an interface, you must implement it or add a <auradocs:topicLink topic="oodProviders">provider</auradocs:topicLink>. An interface can't be used directly in markup otherwise. Set the <code>implements</code> system attribute in the <code>&lt;aura:component&gt;</code> tag to the name of the interface that you are implementing: for example, <code>&lt;aura:component implements="mynamespace:myinterface" &gt;</code>.</p>
+
+    <p>A component can implement an interface and extend another component. For example, <code>&lt;aura:component extends="ns1:cmp1" implements="ns2:intf1" &gt;</code>.</p>
+
+    <p>An interface can extend multiple interfaces using a comma-separated list. For example, <code>&lt;aura:interface extends="ns:intf1,ns:int2" &gt;</code>.</p>
+
+    <auradocs:warning>
+    Use <code>&lt;aura:set&gt;</code> in a sub-component to set the value of any attribute that is inherited from the parent component. This works for components and abstract components, but it doesn't work for interfaces. To set the value of an attribute inherited from an interface, you must redefine the attribute in the sub-component using <code>&lt;aura:attribute&gt;</code> and set the value in its default attribute.
+    </auradocs:warning>
+
+    <h2>Interfaces versus Abstract Components</h2>
+
+    <p>Since there are fewer restrictions on the content of abstract components, they are more common than interfaces. Since a component can implement multiple interfaces but can only extend one abstract component, interfaces can be more useful for some design patterns.</p>
+
+    <p>You can use an interface as a marker interface that is implemented by a set of components that you want to easily identify for specific usage in your app.</p>
+
+    <p>In JavaScript, you can determine if a component implements an interface by using <code>myCmp.isInstanceOf("mynamespace:myinterface")</code>.</p>
+
+    <p>In Java, use the <code>isInstanceOf()</code> method in <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/def/ComponentDef.html" target="_new">ComponentDef</a> or <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/def/ApplicationDef.html" target="_new">ApplicationDef</a>.</p>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="tagAuraSet">aura:set</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="oodCmpAbstract">Abstract Components</auradocs:topicLink>
+    </p>
+
+</aura:component>

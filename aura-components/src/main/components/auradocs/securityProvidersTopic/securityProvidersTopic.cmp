@@ -1,0 +1,53 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+  <aura:set attribute="title" value="Controlling Access with Security Providers"/>
+
+  <p>A security provider centralizes the security logic to control access to your app, including components and actions. The default security provider is <code>aura/components/DefaultSecurityProvider.java</code>. It doesn't allow access to any resources when the app is in <code>PROD</code> (production) mode so you must write a Java class to implement your own security provider to enable access in <code>PROD</code> mode.</p>
+
+  <p>Set the <code>securityProvider</code> system attribute in <code>aura:application</code> in the <code>.app</code> file to point to the security provider for your app.</p>
+
+  <h2>SecurityProvider Interface</h2>
+
+  <p>A security provider must implement the <code>SecurityProvider</code> interface.</p>
+
+  <p>This sample code shows a skeletal outline for a Java security provider.</p>
+
+<auradocs:codeblock>
+  <![CDATA[public class SkeletalSecurityProvider
+    implements SecurityProvider {
+
+    public boolean isAllowed(DefDescriptor<?> descriptor) {
+      // add access logic here
+    }
+  }]]>
+</auradocs:codeblock>
+
+  <p>The <code>securityProvider</code> interface has a <code><![CDATA[public boolean isAllowed(DefDescriptor<?> descriptor)]]></code> method that you must implement with the custom logic for controlling access to the app.</p>
+
+  <p><code>DefDescriptor</code> is a Aura class that contains the metadata for any definition used in Aura, including a component, action, or event. In the example of a model, it is a nicely parsed description of <code>model="java://myPackage.MyClass"</code> with methods to retrieve the language, class name, and package name.</p>
+
+  <auradocs:info><b>Note</b>: A security provider class can't have any member variables as it can't maintain state. Security providers are instantiated effectively as singleton classes, and its methods are called from multiple threads in unrelated contexts.</auradocs:info>
+
+  <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="appOverview">aura:application</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink>
+    </p>
+
+</aura:component>

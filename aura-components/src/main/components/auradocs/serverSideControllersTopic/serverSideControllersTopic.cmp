@@ -1,0 +1,147 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+  <aura:set attribute="title" value="Server-Side Controllers"/>
+
+
+
+  <p>You can use client-side and server-side controllers in Aura. An event is always wired to a client-side controller action, which can in turn call a server-side controller action. For example, a client-side controller might handle an event and call a server-side controller action to persist data to a database.</p>
+
+  <p>You can create a server-side controller in Java.</p>
+
+  <auradocs:info>To implement the controller in another programming language, write an adapter that enables Aura to communicate with the target language through Java. This will be documented in more detail at a later time.</auradocs:info>
+
+  <p>Aura requires that all methods on server-side controllers are static. This restriction is in place to remind you that Aura doesn’t create a controller instance per component instance. Instead, all instances of a given component share one static controller. This means that any state stored on the controller is shared across all instances of a component definition. This is unlikely to be what you want.</p>
+
+  <p>In contrast, one model instance is created for each component instance. This means that models are the appropriate place to store state that is specific to one instance of a component.</p>
+
+  <p>This diagram shows the flow from browser to client-side controller to server-side controller.</p>
+
+    <p><ui:image src="/auraFW/resources/aura/images/serverSideActions.png" alt="Server-Side Controller Action Call Flow" /></p>
+
+  <p>The <code>press</code> attribute wires the button to the <code>handlePress</code> action of the client-side controller by using <code>c.handlePress</code>. The client-side action name must match everything after the <code>c.</code></p>
+
+  <p>In the client-side controller, we again use the value provider of <code>c</code> to invoke a server-side controller action. The <code>cmp.get("c.doSomething")</code> call indicates that we are calling the <code>doSomething</code> method in the server-side controller. The method name in the server-side controller must match everything after the <code>c.</code> in the client-side call.</p>
+
+  <h2>Calling a Server-Side Action</h2>
+
+  <p>You can only call a server-side controller from a client-side controller. In the client-side controller, you set a callback, which is called after the server-side action is completed. A server-side action can return any object containing serializable JSON data.</p>
+
+  <p>A client-side controller is a JSON object containing name-value pairs. Each name corresponds to a client-side action. Its value is the JavaScript function associated with the action.</p>
+
+  <p>The following client-side controller includes an <code>echo</code> action that executes a <code>serverEcho</code> action on a server-side controller. The client-side controller sets a callback action that is invoked after the server-side action returns. In this case, the callback function alerts the user with the value returned from the server. The sample code demonstrates the steps to invoke a simple server-side action.</p>
+
+<auradocs:codeblock>
+{
+    "echo" : function(component) {
+        // create a one-time use instance of the serverEcho action
+        // in the server-side controller
+        var a = component.get("c.serverEcho");
+        a.setParams({ firstName : component.get("v.firstName") });
+
+        // Create a callback that is executed after the server-side action returns
+        a.setCallback(this, function(action) {
+            if (action.getState() === "ERROR") {
+                alert("Server Error: " + action.getError()[0].message));
+            }
+            else {
+              // Alert the user with the value returned from the server
+              alert("From server: " + action.getReturnValue());
+
+              // You would typically fire a event here to trigger client-side
+              // notification that the server-side action is complete
+            }
+        });
+
+        // A client-side action could cause multiple events, which could trigger
+        // other events and other server-side action calls.
+        // runAfter() adds the server-side action to the queue.
+        // Rather than send a separate request for each individual action,
+        // Aura processes the event chain and
+        // executes the action in the queue after batching up related requests.
+        a.runAfter(a);
+    }
+}
+</auradocs:codeblock>
+
+  <p>The component must include a controller attribute that wires it to the server-side Java controller. For example:</p>
+
+<auradocs:codeblock>
+  <![CDATA[<aura:component controller="java://org.auraframework.demo.controllers.TrivialServerSideController">]]>
+</auradocs:codeblock>
+
+  <h2>Java Controller</h2>
+
+  <p>This Java controller contains a <code>serverEcho</code> action that simply prepends a string to the value passed in. This is a simple example that allows us to verify in the client that the value was returned by the server.</p>
+
+<auradocs:codeblock>
+  package org.auraframework.demo.controllers;
+
+  @Controller
+  public class TrivialServerSideController {
+
+      //Use @AuraEnabled to enable client- and server-side access to the method
+      @AuraEnabled
+      public static String serverEcho(@Key("firstName")String firstName) {
+          return ("From server: " + firstName);
+      }
+  }
+</auradocs:codeblock>
+
+  <h3>Java Annotations</h3>
+
+  <p>These annotations are available in server-side controllers.</p>
+
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Annotation</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>@Controller</code></td>
+        <td>Denotes that a Java class is a server-side controller.</td>
+      </tr>
+
+      <tr>
+        <td><code>@AuraEnabled</code></td>
+        <td>Enables client- and server-side access to a controller method. This means that you only expose data that you have explicitly annotated. Other methods are not available.</td>
+      </tr>
+
+      <tr>
+        <td><code>@Key</code></td>
+        <td>Sets a key for each argument in a method for a server-side action. When you use <code>setParams</code> to set parameters in the client-side controller, match the JSON element name with the identifier for the <code>@Key</code> annotation. Note that we used <code>a.setParams({ firstName : component.get("v.firstName") });</code> in the client-side controller that calls our sample server-side controller.
+
+        <p>The <code>@Key</code> annotation means that you don’t have to create an overloaded version of the method if you want to call it with different numbers of arguments. Aura simply passes in <code>null</code> for any unspecified arguments.</p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Learn More</h3>
+
+  <p>For a more in-depth example of a server-side controller that interacts with a database, see the <a href="https://github.com/forcedotcom/aura-note/blob/master/src/main/java/org/auraframework/demo/notes/controllers/NoteViewController.java" target="_new">NoteViewController class</a> in the Aura Note sample app. (Log in to GitHub if you get a 404 error.)</p>
+
+  <p><b>See also:</b><br/>
+      <auradocs:topicLink topic="models">Models</auradocs:topicLink>
+    </p>
+
+</aura:component>

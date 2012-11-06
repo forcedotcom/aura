@@ -1,0 +1,65 @@
+/*
+ * Copyright (C) 2012 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+@-webkit-keyframes jstestCaseThrob {
+  from,to {
+  	box-shadow: inset 4px 4px 16px #B40404;
+  }
+  50% {
+  	box-shadow: inset 4px 4px 8px #B40404;
+  }
+}
+
+.aurajstestJstestCase .rerun.fail{
+	box-shadow: inset 4px 4px 8px #B40404;
+	-webkit-animation-iteration-count:infinite;
+    -webkit-animation-name: jstestCaseThrob;
+    -webkit-animation-duration:1s;
+    -webkit-animation-timing-function:linear;
+}
+.aurajstestJstestCase .rerun.pass{
+	box-shadow: inset 4px 4px 4px #088A29;
+}
+
+.aurajstestJstestCase .rerun{
+	box-shadow: inset 1px 2px 2px #666;
+	border-radius : 10px;
+	display:inline-block;
+	width:16px;
+	height:16px;
+	margin-right:4px;
+	margin-left:-4px;
+	float:left;
+}
+
+@-webkit-keyframes jstestCaseSpin {
+  from {
+  	-webkit-transform: rotate(0deg);
+  	
+  }
+  to {
+  	-webkit-transform: rotate(360deg);
+  }
+} 
+.aurajstestJstestCase .spin{
+    -webkit-animation-iteration-count:infinite;
+    -webkit-animation-name: jstestCaseSpin;
+    -webkit-animation-duration:1s;
+    -webkit-animation-timing-function:linear;
+}
+
+.aurajstestJstestCase h1{
+	font-size:18px;
+}

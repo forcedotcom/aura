@@ -1,0 +1,71 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Event Handling Lifecycle"/>
+
+    <p>Aura events are declared by the <code>aura:event</code> tag in a <code>.evt</code> file, and they can have one of two types: component or application.
+    Application and component events are declared in separate files, for example, <code>drawApp/pickBrushComp/pickBrushComp.evt</code>
+    and <code>drawApp/pickBrushApp/pickBrushApp.evt</code>.
+    The event type is set by either <code>type="COMPONENT"</code> or <code>type="APPLICATION"</code> in the <code>aura:event</code> tag. Aura events are
+    fired from JavaScript controller actions. They can contain attributes that can be set before the event is fired and read when the event is handled.
+    </p>
+
+    <p>The following chart summarizes how Aura handles events. See <auradocs:topicLink topic="eventsDemo">Events Demo</auradocs:topicLink> to see examples using component
+    and application events.</p>
+    <p><ui:image src="/auraFW/resources/aura/images/eventsOverview.jpg" alt="Events Overview" /></p>
+
+     <h3>1 Detect Firing of Event</h3>
+     <p>Aura detects the firing of an event on a page. For example, the event could be triggered by a browser executing on the client or a button click in the notifier component.
+        The controller for the notifier component fires the event.
+     </p>
+
+     <h3>2 Determine the Event Type</h3>
+     <p><b>2.1 Component Event</b></p>
+     <p>If <code>type="COMPONENT"</code> is set in the <code>.evt</code> file, the parent or container component instance that fired the event is identified.
+     This container component locates all relevant event handlers for further processing.
+     </p>
+
+     <p><b>2.2 Application Event</b></p>
+     <p>If <code>type="APPLICATION"</code> is set in the <code>.evt</code> file, any component can have an event handler for this event. All relevant event handlers
+     are located.</p>
+
+     <h3>3 Execute each Handler</h3>
+
+     <p><b>3.1 Executing a Component Event Handler</b></p>
+     <p>Each of the event handlers defined in the container component for the event are executed by the handler controller, which can also:</p>
+     <p><!--temp style before ul style gets fixed-->
+        <ul style="list-style-type:square; list-style-position:inside;">
+            <li>Pass an event instance and event source component into each event handler.</li>
+            <li>Set attributes or modify data on the component (causing a re-rendering of the component).</li>
+            <li>Fire another event or invoke a client-side or server-side action.</li>
+        </ul>
+    </p>
+
+     <p><b>3.2 Executing an Application Event Handler</b></p>
+     <p>All event handlers are executed. When the event handler is executed, the event instance is passed into the event handler.</p>
+
+     <h3>4 Re-render Component (optional)</h3>
+     <p>After the event handlers and any callback actions are executed, a component re-render method may be used, if necessary. The component may be re-rendered depending
+      on whether the component instance has been modified during the event handling procedure, but any re-rendering done is quick since the DOM tree is retained.</p>
+
+    <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="eventsComp">Component Events</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="eventsApp">Application Events</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="onchange">Detecting a Value Object Change</auradocs:topicLink>
+    </p>
+</aura:component>

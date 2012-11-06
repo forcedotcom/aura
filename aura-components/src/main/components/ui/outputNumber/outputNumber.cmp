@@ -1,0 +1,23 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="ui:output" extensible="true" model="java://org.auraframework.component.ui.OutputNumberModel" support="GA" description="Displays the number in the default or specified format. Supports up to 18 digits before the decimal place.">
+    <aura:attribute name="value" type="Decimal" required="true" description="The number displayed when this component is rendered."/>
+    <aura:attribute name="format" type="String" description="The format of the number. For example, format=&ldquo;.00&rdquo; displays the number followed by two decimal places. If not specified, the Locale default format will be used."/>
+    <aura:attribute name="grouping" type="Boolean" description="If no format is specified, whether or not to separate thousands groups." default="true"/>
+    <span aura:id="span" class="{!v.class}">{!m.text}</span>
+</aura:component>

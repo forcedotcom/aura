@@ -1,0 +1,33 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="What happens when I make an initial request?"/>
+
+
+    <p>When you make a request to load an application on a browser, Aura returns an HTTP response with a default template, denoted by the template attribute in the .app file. The template contains JavaScript tags that make requests to get your application data.</p>
+
+    <p>The browser renders the specified template and loads the Aura engine and the component definitions for any preloaded namespaces. The Aura engine renders the requested application.
+The Aura engine processes the application markup, and translates the component markup to HTML objects, returning the DOM elements that are rendered to the browser.</p>
+
+     <p><ui:image src="/auraFW/resources/aura/images/aura-init.png" alt="Aura Initial Request" /></p>
+
+     <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="cycleComp">Component Request Overview</auradocs:topicLink><br/>
+     </p>
+
+</aura:component>

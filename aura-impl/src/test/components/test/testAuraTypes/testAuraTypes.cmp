@@ -1,0 +1,34 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:attribute name="intName" type="Integer" default="12"/>
+    <aura:attribute name="longName" type="Long" default="1212312412142"/>
+    <aura:attribute name="doubleName" type="Double" default="12.30"/>
+    <aura:attribute name="decimalName" type="Decimal" default="2.5"/>
+    <aura:attribute name="boolName" type="Boolean" default="true"/>
+    <aura:attribute name="stringName" type="String" default="stringValue"/>
+    <aura:attribute name="objectName" type="Object" default="true"/>
+    <aura:attribute name="mapName" type="Map" default="{}"/>
+    <aura:attribute name="listName" type="List" default="bald"/>
+    <aura:attribute name="setName" type="Set" default="indifferent"/>
+    <aura:attribute name="componentArrayName" type="Aura.Component[]"><div>Data Type</div></aura:attribute>
+    <aura:attribute name="componentName" type="Aura.Component"/>
+    <aura:attribute name="componentDefRefArrayName" type="Aura.ComponentDefRef[]"/>
+    <aura:attribute name="actionName" type="Aura.Action"/>
+
+</aura:component>

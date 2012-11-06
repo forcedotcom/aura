@@ -1,0 +1,27 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component support="BETA" implements="aura:rootComponent"
+    provider="java://org.auraframework.components.aura.IfProvider, js://aura.if"
+    renderer="java://org.auraframework.components.aura.ProvidedBodyRenderer, js://aura.providedBody"
+    description="Conditionally instantiates and renders either the body or the components in the else attribute.">
+<aura:attribute name="isTrue" type="String" required="true" description="An expression that must be fulfilled in order to display the body."/>
+<aura:attribute name="body" type="Aura.ComponentDefRef[]" required="true" description="The components to render when isTrue evaluates to true."/>
+<aura:attribute name="else" type="Aura.ComponentDefRef[]" description="The alternative to render when isTrue evaluates to false, and the body is not rendered.  Should always be set using the aura:set tag."/>
+<aura:attribute name="realbody" type="Aura.Component[]" description="Internal use only. Any value set will be ignored."/>
+<aura:handler name="change" value="{!v.isTrue}" action="{!c.handleTheTruth}"/>
+</aura:component>

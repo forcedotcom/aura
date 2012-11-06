@@ -1,0 +1,2 @@
+cd `dirname $0`/../aura-jetty
+mvn org.mortbay.jetty:jetty-maven-plugin:stop $@ &

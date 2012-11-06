@@ -1,0 +1,87 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Providers"/>
+
+    <p>A provider enables you to use an abstract component or an interface in markup by using an Inversion of Control pattern. Aura uses the provider to determine the concrete component to use at runtime. Set the <code>provider</code> system attribute in the <code>&lt;aura:component&gt;</code> tag of an abstract component or interface to point to the provider Java class.</p>
+
+    <p>The syntax of the <code>provider</code> system attribute is <code>provider="java://package.class"</code> where <code>package.class</code> is the fully qualified name for the class.</p>
+
+    <p>A Java provider must:</p>
+
+    <ul>
+        <li>Include the <code>@Provider</code> annotation above the class definition</li>
+        <li>Implement either the <code>ComponentDescriptorProvider</code> or <code>ComponentConfigProvider</code> interface</li>
+    </ul>
+
+    <auradocs:info>Current code hasn’t been refactored to use the interfaces. The older method of creating a provider doesn’t use interfaces and uses a static <code>provide()</code> method to return the concrete component. For an example, see  <a href="https://github.com/forcedotcom/aura-beta/blob/master/aura-impl/java/src/aura/component/ui/InputOptionProvider.java" target="_new">InputOptionProvider</a>. Use the provider interfaces when you are creating a new provider.
+    </auradocs:info>
+
+    <p>At runtime, a provider has access to a shell of the abstract component or interface, including any attribute values that have been set. The model isn't constructed yet so you can't access it. The <code>provide()</code> method can examine the attribute values that are set on the component, and return a descriptor of the non-abstract component type that should be used.</p>
+
+    <auradocs:info>A provider should only return concrete components that are sub-components of a single base component or implement an interface. Aura doesn't currently enforce this restriction, but will in a future release.
+    </auradocs:info>
+
+    <h2>ComponentDescriptorProvider</h2>
+
+    <p>Use the <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/def/ComponentDescriptorProvider.html" target="_new">ComponentDescriptorProvider</a> interface to return a <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/def/DefDescriptor.html" target="_new">DefDescriptor</a> describing the concrete component to use when you don’t need to set attributes for the component. For example:</p>
+
+<auradocs:codeblock>
+<![CDATA[
+@Provider
+public class SampleDescProvider implements ComponentDescriptorProvider {
+
+    public DefDescriptor<ComponentDef> provide() {
+        DefDescriptor defDesc = null;
+
+        // logic to determine DefDescriptor to set and return.
+
+        return defDesc;
+    }
+}]]>
+</auradocs:codeblock>
+
+    <h2>ComponentConfigProvider</h2>
+
+    <p>Use the <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/def/ComponentConfigProvider.html" target="_new">ComponentConfigProvider</a> interface to return a <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/instance/ComponentConfig.html" target="_new">ComponentConfig</a>, which describes the concrete component to use in a DefDescriptor and enables you to set attributes for the component. For example:</p>
+
+<auradocs:codeblock>
+<![CDATA[
+@Provider
+public class SampleConfigProvider implements ComponentConfigProvider {
+
+    public ComponentConfig<ComponentDef> provide() {
+        ComponentConfig cmpConfig = null;
+
+        // logic to determine DefDescriptor
+        // and attributes to set.
+
+        return cmpConfig;
+    }
+}]]>
+</auradocs:codeblock>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="oodCmpAbstract">Abstract Components</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="oodInterfaces">Interfaces</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="javaDefDesc">Getting a DefDescriptor</auradocs:topicLink>
+
+    </p>
+
+</aura:component>

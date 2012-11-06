@@ -1,0 +1,26 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="ui:inputNumber" extensible="true" support="BETA" description="The range used in the input.">
+    <aura:attribute name="min" type="Integer" default="0" description="Specifies the minimum integer allowed. Default value is &#8220;0&#8221;."/>
+    <aura:attribute name="max" type="Integer" default="100" description="Specifies the maximum integer allowed. Default value is &#8220;100&#8221;."/>
+    <aura:attribute name="step" type="Integer" default="1" description="Specifies the allowed integer intervals. Default value is &#8220;1&#8221;."/>
+    <aura:attribute name="value" type="Integer" default="0" description="The input value of the integer."/>
+    <aura:set attribute="type" value="range"/>
+    <!--aura:registerevent name="change" type="osproto:valueChange"/-->
+    <input type="range" class="{!v.class}" min="{!v.min}" max="{!v.max}" step="{!v.step}" value="{!v.value}" onchange="{!c.change}"/>
+</aura:component>

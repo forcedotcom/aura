@@ -1,0 +1,42 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Adding Components"/>
+
+    <p>When you're ready to add components to your app, you should first look at the out-of-the-box components that come with Aura. You'll save yourself development time if you can directly use existing components. You can also leverage these components by extending them or using composition to add them to custom components that you're building.</p>
+    
+    <p>See the <b>Components</b> folder in the <auradocs:navLink location="reference">Reference tab</auradocs:navLink> for all the components that come out-of-the-box with Aura. The <code>UI</code> folder includes many components that are common on Web pages.</p>
+    
+    <p>The <auradocs:topicLink topic="nestedComponents">Component Composition</auradocs:topicLink> topic shows you how to combine components to build more complex components.</p>
+    
+    <p>The <auradocs:topicLink topic="oodIntro">Object-Oriented Development</auradocs:topicLink> section shows you how to extend components.</p>
+    
+    <h2>Designing New Components</h2>
+    
+    <p>Components are encapsulated and their internals stay private, while their public shape is visible to consumers of the component. This strong separation gives component authors freedom to change the internal implementation details and insulates component consumers from those changes.</p>
+    
+    <p>The public shape of a component is defined by the attributes that can be set and the events that interact with the component. The shape is essentially the API for developers to interact with the component. To design a new component, think about the attributes that you want to expose and the events that the component should initiate or respond to.</p>
+    
+    <p>Once you have defined the shape of any new components, developers can work on the components in parallel. This is a useful approach if you have a team working on an app.</p>
+    
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="helloAttributes">Component Attributes</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="helloEvents">Events</auradocs:topicLink>
+    </p>
+        
+  </aura:component>

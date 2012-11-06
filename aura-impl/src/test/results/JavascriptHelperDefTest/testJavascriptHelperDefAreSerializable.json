@@ -1,0 +1,16 @@
+{
+  "serId":1,
+  "value":{
+    "descriptor":"js://test.test_SimpleHelper",
+    "functions":{
+      "methodAOfSimpleHelper":
+function methodAOfSimpleHelper(arg1) {
+        return "method A of simple helper";
+    },
+      "methodBOfSimpleHelper":
+function methodBOfSimpleHelper(arg1, arg2) {
+        return "method B of simple helper";
+    }
+    }
+  }
+}

@@ -1,0 +1,57 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<aura:component model="java://org.auraframework.components.auradocs.SearchFilterTreeTestModel" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <auradocs:searchFilterTree aura:id='searchTree'>
+	    <ui:tree aura:id="tree">
+		    <ui:treeNode aura:id="root" title="root">
+		        <ui:treeNode aura:id="iota" href="#iota" title="Iota is lonely" />
+		        <ui:treeNode aura:id="A" title="A">
+		            <ui:treeNode aura:id="mu" href="#mu" title="Moo cows" />
+		            <ui:treeNode aura:id="B" title="VHS or Beta?">
+		                <ui:treeNode aura:id="lambda" href="#lambda" title="Lambda is after moo" />
+		                <ui:treeNode aura:id="D" title="D">
+		                    <ui:treeNode aura:id="gamma" href="#gamma" title="Gamma rays" />
+		                    <ui:treeNode aura:id="G" title="G has Rho as a child">
+		                        <ui:treeNode aura:id="pi" href="#pi" title="Pi is delicious" />
+		                        <ui:treeNode aura:id="rho" href="#rho" title="Rho Rho Rho your boat" />
+		                        <ui:treeNode aura:id="tau" href="#tau" title="Some argue Tau is better than Pi" />
+		                    </ui:treeNode>
+		                </ui:treeNode>
+		                <ui:treeNode aura:id="E" title="E">
+		                    <ui:treeNode aura:id="alpha" href="#alpha" title="The alpha and the omega" />
+		                    <ui:treeNode aura:id="beta" href="#beta" title="Beta means Ship it" />
+		                </ui:treeNode>
+		                <ui:treeNode aura:id="F" title="F" />
+		                <ui:treeNode aura:id="H" title="H">
+		                    <ui:treeNode aura:id="chi" href="#chi" title="Tea" />
+		                    <ui:treeNode aura:id="psi" href="#psi" title="Pressure Bars" />
+		                    <ui:treeNode aura:id="omega" href="#omega" title="Where's alpha?" />
+		                </ui:treeNode>
+		            </ui:treeNode>
+		            <ui:treeNode aura:id="C" title="C is lonely" />
+		        </ui:treeNode>
+		    </ui:treeNode>
+		    <ui:treeNode aura:id="secondRoot" title="secondRoot">
+		       <ui:treeNode aura:id="foo" href="#foo" title="foo" />
+		       <ui:treeNode aura:id="bar" href="#bar" title="bar" />
+		    </ui:treeNode>
+	    </ui:tree>
+    </auradocs:searchFilterTree>
+</aura:component>

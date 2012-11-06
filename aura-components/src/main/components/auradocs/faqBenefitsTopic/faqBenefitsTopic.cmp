@@ -1,0 +1,48 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="What are the benefits of using Aura?"/>
+
+
+    <p>
+    <ul>
+        <li><b>Performance</b></li>
+        <p>Aura uses a stateful client and stateless server architecture that relies on JavaScript on the client-side to manage UI component metadata and application data.
+        Aura uses JSON to exchange data between the server and the client.
+        To maximize efficiency, the server only sends data that is needed by the user.</p>
+
+        <li><b>Flexible integration</b></li>
+        <p>Aura components can be used with HTML (with exceptions), JavaScript, and any code that can execute within an HTML page. Server-side controllers  can be written in any language.
+        Aura easily integrates with third-party libraries and frameworks, such as JQuery Mobile, Google Web Toolkit, and Ext.js.</p>
+
+        <li><b>Event-driven architecture</b></li>
+        <p>Aura uses an event-driven architecture for better decoupling between components. Any component can subscribe to an application  event, or to a component event they can see.</p>
+
+        <li><b>Model-View-Controller (MVC) architecture</b></li>
+        <p>Aura markup represents the view and defines the component's public shape via attributes and events. Components have models and controllers to represent the data set and logic respectively.</p>
+
+        <li><b>Parallel design and development</b></li>
+        <p>Building an app with components facilitates parallel design, improving overall development efficiency. Aura provides the basic constructs of inheritance, polymorphism, and encapsulation from classic object-oriented programming and applies them to presentation layer development. With Aura, you can extend a component or implement a component interface. Components are encapsulated and their internals stay private, while their public shape is visible to consumers of the component. This strong separation gives component authors freedom to change the internal implementation details and insulates component consumers from those changes.</p>
+    </ul>
+    </p>
+<p><b>See also:</b><br/>
+            <auradocs:topicLink topic="helloWorld">Components Overview</auradocs:topicLink><br />
+            <auradocs:topicLink topic="serverSideControllers">Server-side controllers</auradocs:topicLink><br />
+            <auradocs:topicLink topic="faqEvents">How do I use Events in Aura?</auradocs:topicLink>
+        </p>
+</aura:component>

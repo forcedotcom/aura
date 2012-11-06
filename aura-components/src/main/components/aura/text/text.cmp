@@ -1,0 +1,26 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component renderer="js://aura.text, java://org.auraframework.renderer.TextRenderer" template="auradev:blankTemplate" implements="aura:rootComponent"
+        support="GA" description="Renders plain text.  When any free text (not a tag or attribute value) is found in markup,
+                                        an instance of this component is created with the value attribute set to the text found in the markup.">
+    <aura:attribute name="body" type="Aura.Component[]" description="Do not use."/>
+    <aura:attribute name="value" type="String" description="The String to be rendered."/>
+    <aura:attribute name="truncate" type="Integer" description="The maximum number of characters to render.  Any additional characters is not displayed."/>
+    <aura:attribute name="truncateByWord" type="Boolean" default="false" description="When the truncate attribute is enabled and the value is truncated, truncation never occurs in the middle of a word if this attribute is true."/>
+    <aura:attribute name="ellipsis" type="Boolean" default="true" description="If truncation is enabled, and the value is truncated, an ellipsis will be appended to the truncated value if this is true. The truncate value takes the 3 additional characters of the ellipsis into account when counting characters."/>
+</aura:component>

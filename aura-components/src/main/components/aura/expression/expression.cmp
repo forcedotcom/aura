@@ -1,0 +1,24 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component renderer="js://aura.expression, java://org.auraframework.renderer.ExpressionRenderer" template="aura:template" implements="aura:rootComponent" support="GA"
+                        description="Renders the value to which an expression evaluates.  When any expressions are found in free text
+                                        (not a tag or attribute value) is found in markup,
+                                        an instance of this component is created with the value attribute set to the expression found in the markup.">
+    <aura:attribute name="body" type="Aura.Component[]" description="Do not use."/>
+    <aura:attribute name="value" type="String" description="The expression to evaluate and render."/>
+</aura:component>

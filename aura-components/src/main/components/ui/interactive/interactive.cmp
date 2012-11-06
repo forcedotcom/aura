@@ -1,0 +1,27 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" abstract="true" implements="ui:visible" description="An abstract component which capsulates common events." support="GA">
+    <aura:attribute name="disabled" type="Boolean" default="false" description="Specifies whether the component should be displayed in a disabled state. Default value is &quot;false&quot;."/>
+
+    <aura:registerEvent name="blur" type="ui:blur" description="The event fired when the user moves off from the component."/>
+    <aura:registerEvent name="focus" type="ui:focus" description="The event fired when the user focuses on the component."/>
+    <aura:registerEvent name="keydown" type="ui:keydown" description="The event fired when the user presses a keyboard key on the component."/>
+    <aura:registerEvent name="keypress" type="ui:keypress" description="The event fired when the user presses or holds down a keyboard key on the component."/>
+    <aura:registerEvent name="keyup" type="ui:keyup" description="The event fired when the user releases a keyboard key on the component."/>
+    <aura:registerEvent name="select" type="ui:select" description="The event fired when the user selects some text."/>
+</aura:component>

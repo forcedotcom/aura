@@ -1,0 +1,99 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Basic Types"/>
+
+    <p>This table lists the supported type values for basic types. Some of these types correspond to the wrapper objects for primitives in Java. Since Aura is written in Java, defaults, such as maximum size for a number, for these basic types are defined by the Java objects that they map to.</p>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <!-- Note: Kept type lower init to match actual usage in code -->
+                <th>type</th>
+                <th>Example</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>Boolean</code></td>
+                <td><code>&lt;aura:attribute name="showDetail" type="Boolean" /&gt;</code></td>
+                <td>Valid values are <code>true</code> or <code>false</code>. To set a default value of <code>true</code>, add <code>default="<aura:text value="{!"/>true}"</code>. Note that <code><aura:text value="{!"/>true}</code> evaluates as an expression and should not be confused with the <code>!</code> (NOT) logical operator.</td>
+            </tr>
+
+            <tr>
+                <td><code>Date</code></td>
+                <td><code>&lt;aura:attribute name="startDate" type="Date" /&gt;</code></td>
+                <td>A date corresponding to a calendar day. The hh:mm:ss portion of the date is not stored. To include time fields, use <code>DateTime</code> instead.</td>
+            </tr>
+
+            <tr>
+                <td><code>DateTime</code></td>
+                <td><code>&lt;aura:attribute name="lastModifiedDate" type="DateTime" /&gt;</code></td>
+                <td>A date corresponding to a timestamp. It includes date and time details with millisecond precision.</td>
+            </tr>
+
+            <tr>
+                <td><code>Decimal</code></td>
+                <td><code>&lt;aura:attribute name="totalPrice" type="Decimal" /&gt;</code></td>
+                <td><code>Decimal</code> values can contain fractional portions (digits to the right of the decimal). Maps to <a href="http://docs.oracle.com/javase/6/docs/api/java/math/BigDecimal.html" target="_new">java.math.BigDecimal</a>.
+
+                    <p><code>Decimal</code> is better than <code>Double</code> for maintaining precision for floating-point calculations. It’s preferable for currency fields.</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td><code>Double</code></td>
+                <td><code>&lt;aura:attribute name="widthInchesFractional" type="Double" /&gt;</code></td>
+                <td><code>Double</code> values can contain fractional portions. Maps to <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Double.html" target="_new">java.lang.Double</a>. Use <code>Decimal</code> for currency fields instead.</td>
+            </tr>
+
+            <tr>
+                <td><code>Integer</code></td>
+                <td><code>&lt;aura:attribute name="numRecords" type="Integer" /&gt;</code></td>
+                <td><code>Integer</code> values can contain numbers with no fractional portion. Maps to <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Integer.html" target="_new">java.lang.Integer</a>, which defines its limits, such as maximum size.</td>
+            </tr>
+
+            <tr>
+                <td><code>Long</code></td>
+                <td><code>&lt;aura:attribute name="numSwissBankAccount" type="Long" /&gt;</code></td>
+                <td><code>Long</code> values can contain numbers with no fractional portion. Maps to <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Long.html" target="_new">java.lang.Long</a>, which defines its limits, such as maximum size.
+
+                    <p>Use this data type when you need a range of values wider than those provided by <code>Integer</code>.</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td><code>String</code></td>
+                <td><code>&lt;aura:attribute name="message" type="String" /&gt;</code></td>
+                <td>A sequence of characters.</td>
+            </tr>
+            <!-- ML 5/29/12: Not documenting type="Object" for now as can't find valid use cases -->
+
+        </tbody>
+    </table>
+
+    <h2>Support for Arrays</h2>
+
+    <p>You can also use arrays for each of these basic types. For example:</p>
+
+
+<auradocs:codeblock><![CDATA[<aura:attribute name="favoriteColors" type="String[]" />
+]]></auradocs:codeblock>
+
+</aura:component>

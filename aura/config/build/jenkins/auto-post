@@ -1,0 +1,41 @@
+#!/bin/sh
+# Auto-Integrate Jenkins 'post' script.
+# Input to this script includes 'GIT_BRANCH'
+# See auto-pre for more documentation.
+#
+#
+# Start by doing exit on fail.
+#
+set -e -x
+#
+# Some basic variables:
+#  GIT: The full path to git (only needed if git can't be found)
+#  INTEGRATE: the branch to which we will integrate
+#  COPY_TO: a set of branches to which we will copy this branch
+GIT=/usr/bin/git
+INTEGRATE=alpha
+COPY_TO="beta-branch gamma-branch"
+#
+# Local variables.
+#
+LCL_BRANCH=`echo $GIT_BRANCH | sed 's/^origin\///'`
+LCL_POST_PREFIX=`echo $LCL_BRANCH | sed 's/^[^\/]*\///'`
+#
+# Now, make sure that we are up to date (there is some risk here,
+# and if we fail, someone will have to fix it the hard way).
+#
+${GIT} pull origin ${INTEGRATE}
+${GIT} push origin ${INTEGRATE}
+if test -n "${COPY_TO}"; then
+    ${GIT} checkout ${LCL_BRANCH};
+    ${GIT} rebase ${INTEGRATE};
+    # These should not really fail, but there is some chance.
+    # If so, someone will have to manually do the right thing.
+    for cb in ${COPY_TO}; do
+        ${GIT} push origin HEAD:${cb}/integrate/${LCL_POST_PREFIX}
+    done
+fi
+#
+# Finally erase the remote branch.
+#
+${GIT} push origin :${LCL_BRANCH}

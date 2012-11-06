@@ -1,0 +1,8 @@
+<aura:layouts default="default" catchall="default">
+    <aura:layout name="default" title="default">
+        <aura:layoutItem container="box1">On default layout</aura:layoutItem>
+    </aura:layout>
+    <aura:layout name="newLayout" title="newLayout">
+        <aura:layoutItem container="box1" action="{!c.getComponents}"/>
+    </aura:layout>
+</aura:layouts>

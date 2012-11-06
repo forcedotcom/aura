@@ -1,0 +1,25 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="ui:pager" extensible="true" support="GA" description="A purely presentational pager implementation, used to display the current and total items.">
+    <aura:attribute name="Labels_Of" type="String" default=" of "  description="The text to display between the endItem and totalItems."/>
+    <aura:attribute name="Labels_To" type="String" default=" - "   description="The text to display between the startItem and endItem."/>
+
+    <div class="{!v.class+' pagerContainer pagerPageInfo'+(v.totalItems==0?' empty':'')}">
+        <span>{!v.totalItems!=0?v.startIndex--1:0}{!v.Labels_To}{!v.totalItems!=0?v.endIndex--1:0}{!v.Labels_Of}{!v.totalItems}</span>
+    </div>
+</aura:component>

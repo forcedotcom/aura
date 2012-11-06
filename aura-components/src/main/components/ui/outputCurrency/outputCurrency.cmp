@@ -1,0 +1,25 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="ui:output" extensible="true" model="java://org.auraframework.component.ui.OutputCurrencyModel" support="GA" description="Displays the currency in the default or specified format.">
+    <aura:attribute name="value" type="Decimal" required="true" description="The output value of the currency, which is defined as type Decimal."/>
+    <!-- fractionDigits is the number of digits to the right of the decimal place, the max value supported is 340-->
+    <aura:attribute name="fractionDigits" type="Integer" default="2" description="The maximum number of digits to the right of the decimal place. Default value is &#8220;2&#8221;. The maximum number allowed is 340."/>
+    <!-- An ISO 4217 code, eg. "USD" -->
+    <aura:attribute name="currencyCode" type="String" description="The currency code specified as a String."/>
+    <span aura:id='span' class="{!v.class}">{!m.text}</span>
+</aura:component>

@@ -1,0 +1,82 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Creating App Templates"/>
+
+    <p>An app template bootstraps the loading of the Aura framework and the app. The default template is <code>aura:template</code>. Customize the default template by creating your own component that extends the default template. For example, the Aura Note sample app has a <code>auranote:template</code> template that extends <code>aura:template</code>. <code>auranote:template</code> looks like:</p>
+    
+<auradocs:codeblock><![CDATA[<aura:component extends="aura:template">
+    <aura:set attribute="title" value="Aura Notes"/>    
+    ...    
+</aura:component>]]>
+</auradocs:codeblock>
+
+    <p>Note how the component extends <code>aura:template</code> and sets the <code>title</code> attribute using <code>aura:set</code>. Take a look at <code>aura:template</code> to see the other template attributes that you can customize.</p>
+    
+    <p>The <code>notes.app</code> file points at the custom template by setting the <code>template</code> system attribute in <code>&lt;aura:application&gt;</code>.</p>
+    
+<auradocs:codeblock><![CDATA[<aura:application template="auranote:template">    
+    ...    
+</aura:application>]]>
+</auradocs:codeblock>           
+
+    <h2>JavaScript Libraries</h2>
+    
+    <p>To use a JavaScript library, you must reference it in your app's template. See <auradocs:topicLink topic="jsLibs">Using JavaScript Libraries</auradocs:topicLink>.</p>
+        
+    <h2>External CSS</h2>
+        
+    <p>To use an external style sheet, you must link to it in your app's template. Use <code>aura:set</code> to set the <code>extraStyleTags</code> attribute in the template component. This sets the <code>extraStyleTags</code> attribute in <code>aura:template</code>, which your app's template extends.</p>
+    
+    <p>For example:</p>
+    
+<auradocs:codeblock><![CDATA[
+    <aura:set attribute="extraStyleTags">
+        <link href="/aura/external/google-code-prettify/prettify.css" rel="stylesheet" type="text/css" />
+    </aura:set>]]>
+</auradocs:codeblock>    
+
+    <p>You can link to multiple external style sheets. For example:</p>
+    
+<auradocs:codeblock><![CDATA[
+    <aura:set attribute="extraStyleTags">
+        <link href="/aura/external/google-code-prettify/prettify.css" rel="stylesheet" type="text/css" />
+        <link href="/aura/external/morecss/morecss.css" rel="stylesheet" type="text/css" />
+    </aura:set>]]>
+</auradocs:codeblock>
+
+    <p>You can also use inline style in your template, but we recommend using an external style sheet instead. To use inline style, use <code>aura:set</code> to set the <code>inlineStyle</code> attribute in the template component. For example:</p>    
+
+<auradocs:codeblock><![CDATA[
+	<aura:set attribute="inlineStyle">
+		<style>
+			body {
+			 background-color: #6cc4e3;
+			}
+		</style>
+	</aura:set>]]>
+</auradocs:codeblock> 
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="buildApp">Aura Note Demo App</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="appOverview">aura:application</auradocs:topicLink><br/>
+        <auradocs:defLink descriptor="aura:template">aura:template</auradocs:defLink><br/>
+        <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>
+    </p>
+    
+</aura:component>

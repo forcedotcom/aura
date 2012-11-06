@@ -1,0 +1,37 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component render="client">
+    <aura:attribute type="String" name="stringValue" default="London"/>
+
+    <aura:registerevent name="A" type="handleEventTest:event"/>
+    <aura:handler name="A" action="{!c.handler3}"/>
+    <!--aura:registerevent type="handleEventTest:applicationEvent" name="anApplicationEvent"/-->
+
+    <aura:handler event="handleEventTest:applicationEvent" action="{!c.handler1}"/>
+    <aura:handler event="handleEventTest:applicationEvent" action="{!c.handler2}"/>
+
+    <renderingTest:arrayValues aura:id="arrayFacet" simpleValueArray="{!m.stringList}">
+        <aura:set attribute="componentArray">
+            <input type="text" class="{!v.stringValue+' input insideFacet'}" aura:id="input" value="{!v.stringValue}"/>
+            <div title="divInsideFacet" aura:id="div">{!v.stringValue}</div>
+        </aura:set>
+    </renderingTest:arrayValues>
+
+    <div aura:id='divOnBody'>{!v.stringValue}</div>
+
+</aura:component>

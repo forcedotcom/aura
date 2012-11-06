@@ -1,0 +1,59 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:attribute name='labelSection' type='String' default='AccountSplashr'/>
+
+
+    <auratest:test_button label="{!$Label.AccountSplash.title}" class="SectionKey"/>
+    <auratest:test_button label="{!$Label.AccSalesTeam.salesTeam}" class="SectionKeyWithGrammar"/>
+    <auratest:test_button label="{!$Label.Home.casesSolutionsButton}" class="SectionKeyWithEscapedHTML"/>
+
+<div class="TextSubstitution">
+<!-- Text value to be used for substitution in a label-->
+<aura:label value="{!$Label.ViralInvite.viralInviteSubjectGroup}">
+{!m.testUser}
+</aura:label>
+</div>
+
+<div class="MultipleSubstitutions">
+<!-- Multiple substitutions in Label -->
+<aura:label value="{!$Label.Page_RecordTypeSelect.pageTitle}">
+{!m.acc} {!m.perAcc}
+</aura:label>
+</div>
+
+<div class="MissingArgument">
+<!-- Label expects two substitutions, but is provided with only 1 -->
+<aura:label value="{!$Label.Page_RecordTypeSelect.pageTitle}">
+{!m.acc}
+</aura:label>
+</div>
+
+<div class="NumberAsArgument">
+<!-- Number value used as substitution for a label -->
+<aura:label value="{!$Label.ViralInvite.viralInviteSubjectGroup}">
+{!m.eight}
+</aura:label>
+</div>
+
+<!-- someday...
+    <auratest:test_button label="{!$Label('{!v.labelSection}', 'title')}" class="SectionKeyUsingLocalVariables"/>
+    <auratest:test_button label="{!$Label('Page_RecordTypeSelect', 'Entities.Event', 'selectTitle')}" class="EntityAsArgument"/>
+    <auratest:test_button label="{!$Label('Report_CustEnt_Common', 'Entities.Account', 'titleCustomEntityLookup', '1')}" class="EntityAsArgumentWithTextSubstitutions"/>
+ -->
+</aura:component>

@@ -1,0 +1,24 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:interface support="GA" description="Common interface across output date components">
+    <aura:attribute name="value" type="Date" description="The input value of the date/time."/>
+    <aura:attribute name="max" type="Date" description="Specifies the maximum date allowed. Works with HTML5 only."/>
+    <aura:attribute name="min" type="Date" description="Specifies the minimum date allowed. Works with HTML5 only."/>
+    <aura:attribute name="step" type="Integer" description="Specifies the legal date intervals. Works with HTML5 only."/>
+    <aura:attribute name="updateOn" type="String" default="blur" description="Default value is &#8220;blur&#8221;."/>
+</aura:interface>

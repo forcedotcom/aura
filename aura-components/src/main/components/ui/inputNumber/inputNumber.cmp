@@ -1,0 +1,29 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="ui:inputText" extensible="true" support="GA" description="An input field for entering a number, taking advantage of client input assistance and validation when available. Generates an input element of type number.">
+    <aura:attribute name="value" type="Decimal" description="The input value of the number."/>
+    <aura:attribute name="max" type="Decimal" default="99999999999999" description="Specifies the maximum value allowed. Setting this higher than the default value can result in rounding of the value in some clients. Works with HTML5 only."/>
+    <aura:attribute name="min" type="Decimal" default="-99999999999999" description="Specifies the minimum value allowed. Setting this lower than the default value can result in rounding of the value in some clients. Works with HTML5 only."/>
+    <aura:attribute name="step" type="Decimal" default="1" description="Specifies the legal intervals. Decimals are allowed, but for maximum client compatibility, only set this to positive integers. Works with HTML5 only."/>
+    <aura:renderif isTrue="{!v.body.length == 0}">
+       <input type="{!v.type}" class="{!v.class}" value="{!v.value}" max="{!v.max}" min="{!v.min}" step="{!v.step}" placeholder="{!v.placeholder}" required="{!v.required}" disabled="{!v.disabled}"/>
+       <aura:set attribute="else">
+           {!v.body}
+       </aura:set>
+    </aura:renderif>
+</aura:component>

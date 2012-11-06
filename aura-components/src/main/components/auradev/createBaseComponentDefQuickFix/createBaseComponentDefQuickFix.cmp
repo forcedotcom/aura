@@ -1,0 +1,105 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradev:quickFix" abstract="true">
+    <aura:attribute name="defType" type="String" default="Component"/>
+
+        {!v.defType} Name(s) : <textarea name="descriptor" cols="50">{!v.quickFix.attributes.descriptor}</textarea><br/>
+
+        <h1>What would you like to include in the {!v.defType} bundle?</h1>
+
+        <table width="100%">
+            <tr>
+                <td>
+                    <h2>Client</h2>
+                </td>
+                <td>
+                    <h2>Java</h2>
+                </td>
+            </tr>
+            <tr>
+                <td valign="top">
+                    <table>
+                        <tr>
+                            <aura:if isTrue="{!v.defType == 'Component'}">
+                                <td>
+                                    <input name="client.cmp" type="checkbox" checked="true" />
+                                </td>
+                                <td>.cmp</td>
+                                <aura:set attribute="else">
+                                <td>
+                                    <input name="client.app" type="checkbox" checked="true" />
+                                </td>
+                                <td>.app</td>
+                                </aura:set>
+                            </aura:if>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input name="client.controller" type="checkbox" disabled="true" />
+                            </td>
+                            <td>Controller.js</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input name="client.renderer" type="checkbox" disabled="true"/>
+                            </td>
+                            <td>Renderer.js</td>
+                        </tr>
+                        <aura:if isTrue="{!v.defType == 'Component'}">
+                            <tr>
+                                <td>
+                                    <input name="client.provider" type="checkbox" disabled="true"/>
+                                </td>
+                                <td>Provider.js</td>
+                            </tr>
+                        </aura:if>
+                        <tr>
+                            <td>
+                                <input name="client.css" type="checkbox" />
+                            </td>
+                            <td>.css</td>
+                        </tr>
+                    </table>
+                </td>
+                <td valign="top">
+                    <table>
+                        <tr>
+                            <td>
+                                <input name="java.controller" type="checkbox" disabled="true"/>
+                            </td>
+                            <td>Controller.java</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input name="java.renderer" type="checkbox" disabled="true"/>
+                            </td>
+                            <td>Renderer.java</td>
+                        </tr>
+                        <aura:if isTrue="{!v.defType == 'Component'}">
+                            <tr>
+                                <td>
+                                    <input name="java.provider" type="checkbox" disabled="true"/>
+                                </td>
+                                <td>Provider.java</td>
+                            </tr>
+                        </aura:if>
+                    </table>
+                </td>
+            </tr>
+        </table>
+</aura:component>

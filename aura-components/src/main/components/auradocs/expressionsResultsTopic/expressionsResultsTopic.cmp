@@ -1,0 +1,62 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+<aura:set attribute="title" value="Expression Results"/>
+
+<p>Although you will generally use expressions as though they resolve to simple values, under the hood expressions resolve to a <em>value object</em>. This thin wrapper around the actual data is used by Aura to notice changes to data and selectively re-render and update the user interface in response.</p>
+
+<p>When writing Aura component markup you don't need to deal with value objects to display output and pass values to other components. Treat expressions as though they resolve to the value you expect.</p>
+
+<p>However, when you want to access a component's attributes in JavaScript, most likely in a controller or helper, and the attribute is assigned an expression, you do need to deal with the difference.</p>
+
+<h2>Accessing the Primitive Value</h2>
+
+<p>Most of the time you probably want to access the underlying data directly, without the value object wrapper. To do this, use the component's <code>get()</code> method to access the value of the expression.</p>
+
+<p>Let's look at the <code>ui:button</code> example again. In the component's controller, if the reference to the button is <code>cmp</code>, use the following JavaScript code to retrieve the button's label:</p>
+
+<auradocs:codeblock>var theLabel = cmp.get("v.label");</auradocs:codeblock>
+
+<p>Although this is JavaScript code, and not Aura markup, accessing the component's label attribute triggers a fresh evaluation of the expression assigned to <code>v.label</code>. If that expression has changed, for example if the user has changed their preferred language, then this variable assignment will access the updated value for <code>v.label</code>.</p>
+
+<h2>Using the Value Object</h2>
+
+<p>In other cases, for example when dealing with editing values displayed in a component, you will want to work with the value object, to accept or cancel updates, and so on. To work with the value object, use the component's <code>getValue()</code> method.</p>
+
+<p>Here's an example of a controller action method to save changes entered by the user on screen:</p>
+
+<auradocs:codeblock>save : function(cmp){
+    var note = cmp.getValue("v.note");
+    note.getValue("title").commit();
+    note.getValue("body").commit();
+
+    var action = cmp.get("c.saveNote");
+    action.setParams({
+        title : note.get("title"),
+        body : note.get("body")
+        // rest of Note attributes
+    });
+
+    // rest of action handling and queuing
+}</auradocs:codeblock>
+
+<p><code>cmp</code> represents the Note component in edit mode, and this action is called when the user clicks the save button after making changes. In response to the user interface button click, a series of actions take place. Of interest here, the new values the user entered are committed to the component that holds the Note. This requires using the <code>commit()</code> method on the value objects for each property of the Note, for example, <code>note.getValue("title").commit()</code>. This method call may trigger re-rendering of other components currently being displayed. Aura handles this for you automatically.</p>
+
+<p>Value objects are also important to understand if you are writing a renderer for a component. For more information, see <auradocs:topicLink topic="valueObjects">Value Objects</auradocs:topicLink>.</p>
+
+</aura:component>

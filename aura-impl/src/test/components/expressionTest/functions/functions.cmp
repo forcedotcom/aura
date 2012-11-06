@@ -1,0 +1,341 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="expressionTest:suite" render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
+    <aura:attribute name="integer" type="int"/>
+    <aura:attribute name="double" type="double"/>
+    <aura:attribute name="doubleString" type="String"/>
+    <aura:attribute name="string" type="String"/>
+    <aura:attribute name="emptyString" type="String"/>
+
+    <aura:attribute name="Infinity" type="double"/>
+    <aura:attribute name="NegativeInfinity" type="double"/>
+    <aura:attribute name="NaN" type="double"/>
+
+    <!-- asserts -->
+    <expressionTest:test expression="{!v.integer}" exprText="v.integer" expected="7"/>
+    <expressionTest:test expression="{!v.double}" exprText="v.double" expected="3.1"/>
+    <expressionTest:test expression="{!v.doubleString}" exprText="v.doubleString" expected="'2.1'"/>
+    <expressionTest:test expression="{!v.string}" exprText="v.string" expected="'Component'"/>
+    <expressionTest:test expression="{!v.emptyString}" exprText="v.emptyString" expected="''"/>
+    <expressionTest:test expression="{!v.Infinity}" exprText="v.Infinity" expected="Infinity"/>
+    <expressionTest:test expression="{!v.NegativeInfinity}" exprText="v.NegativeInfinity" expected="-Infinity"/>
+    <expressionTest:test expression="{!v.NaN}" exprText="v.NaN" expected="NaN"/>
+    <expressionTest:test expression="{!m.date}" exprText="m.date" expected="'2004-09-23T16:30:00.000Z'"/>
+    <!-- W-1075522 https://gus.soma.salesforce.com/a07B0000000GCLaIAO
+    <expressionTest:test expression="{!m.calendar}" exprText="m.calendar" expected="1098549000000"/>
+    -->
+
+    <!-- equals -->
+    <expressionTest:test expression="{!true == false}" exprText="true == false" expected="false"/>
+    <expressionTest:test expression="{!false eq false}" exprText="false eq false" expected="true"/>
+    <expressionTest:test expression="{!equals(false, false)}" exprText="equals(false, false)" expected="true"/>
+    <expressionTest:test expression="{!2 == '2'}" exprText="2 == '2'" expected="false"/>
+    <expressionTest:test expression="{!'' == false}" exprText="'' == false" expected="false"/>
+    <expressionTest:test expression="{!(1/0) == (2/0)}" exprText="(1/0) == (2/0)" expected="true"/>
+    <expressionTest:test expression="{!m.integer == 411}" exprText="m.integer == 411" expected="true"/>
+    <expressionTest:test expression="{!m.integerString == 511}" exprText="m.integerString == 511" expected="false"/>
+    <expressionTest:test expression="{!m.integerString == '511'}" exprText="m.integerString == '511'" expected="true"/>
+    <expressionTest:test expression="{!v.Infinity == v.Infinity}" exprText="v.Infinity == v.Infinity" expected="true"/>
+    <expressionTest:test expression="{!m.NaN == v.NaN}" exprText="m.NaN == v.NaN" expected="false"/>
+    <expressionTest:test expression="{!m.NaN == m.NaN}" exprText="m.NaN == m.NaN" expected="false"/>
+    <expressionTest:test expression="{!m.date == '2004-09-23T16:30:00.000Z'}" exprText="m.date == '2004-09-23T16:30:00.000Z'" expected="true"/>
+
+    <!-- notequals -->
+    <expressionTest:test expression="{!true != false}" exprText="true != false" expected="true"/>
+    <expressionTest:test expression="{!m.booleanFalse ne false}" exprText="m.booleanFalse ne false" expected="false"/>
+    <expressionTest:test expression="{!notequals(false, m.booleanTrue)}" exprText="notequals(false, m.booleanTrue)" expected="true"/>
+    <expressionTest:test expression="{!2 != '2'}" exprText="2 != '2'" expected="true"/>
+    <expressionTest:test expression="{!0 != false}" exprText="0 != false" expected="true"/>
+    <expressionTest:test expression="{!v.NaN != v.NaN}" exprText="v.NaN != v.NaN" expected="true"/>
+
+    <!-- and -->
+    <expressionTest:test expression="{!true &amp;&amp; false}" exprText="true &amp;&amp; false" expected="false"/>
+    <expressionTest:test expression="{!and(true, m.booleanTrue)}" exprText="and(true, m.booleanTrue)" expected="true"/>
+    <expressionTest:test expression="{!1 &amp;&amp; 2}" exprText="1 &amp;&amp; 2" expected="2"/>
+    <expressionTest:test expression="{!0 &amp;&amp; 2}" exprText="0 &amp;&amp; 2" expected="0"/>
+    <expressionTest:test expression="{!'0' &amp;&amp; 2}" exprText="'0' &amp;&amp; 2" expected="2"/>
+    <expressionTest:test expression="{!'false' &amp;&amp; 2}" exprText="'false' &amp;&amp; 2" expected="2"/>
+    <expressionTest:test expression="{!'' &amp;&amp; 2}" exprText="'' &amp;&amp; 2" expected="''"/>
+    <expressionTest:test expression="{!v.NaN &amp;&amp; 2}" exprText="v.NaN &amp;&amp; 2" expected="NaN"/>
+    <expressionTest:test expression="{!9 &amp;&amp; v.integer}" exprText="9 &amp;&amp; v.integer" expected="7"/>
+    <expressionTest:test expression="{!9 &amp;&amp; v.double}" exprText="9 &amp;&amp; v.double" expected="3.1"/>
+    <expressionTest:test expression="{!9 &amp;&amp; v.doubleString}" exprText="9 &amp;&amp; v.doubleString" expected="'2.1'"/>
+    <expressionTest:test expression="{!9 &amp;&amp; v.string}" exprText="9 &amp;&amp; v.string" expected="'Component'"/>
+    <expressionTest:test expression="{!9 &amp;&amp; v.emptyString}" exprText="9 &amp;&amp; v.emptyString" expected="''"/>
+
+    <!-- or -->
+    <expressionTest:test expression="{!false || false}" exprText="false || false" expected="false"/>
+    <expressionTest:test expression="{!or(true, false)}" exprText="or(true, false)" expected="true"/>
+    <expressionTest:test expression="{!0 || 2}" exprText="0 || 2" expected="2"/>
+    <expressionTest:test expression="{!1 || 2}" exprText="1 || 2" expected="1"/>
+    <expressionTest:test expression="{!'0' || 2}" exprText="'0' || 2" expected="'0'"/>
+    <expressionTest:test expression="{!'false' || 2}" exprText="'false' || 2" expected="'false'"/>
+    <expressionTest:test expression="{!'' || m.double}" exprText="'' || m.double" expected="4.1"/>
+    <expressionTest:test expression="{!v.NaN || m.string}" exprText="v.NaN || m.string" expected="'Model'"/>
+
+    <!-- not -->
+    <expressionTest:test expression="{!!true}" exprText="!true" expected="false"/>
+    <expressionTest:test expression="{!not(false)}" exprText="not(false)" expected="true"/>
+    <expressionTest:test expression="{!!0}" exprText="!0" expected="true"/>
+    <expressionTest:test expression="{!!7}" exprText="!7" expected="true"/>
+    <expressionTest:test expression="{!!'0'}" exprText="!'0'" expected="true"/>
+    <expressionTest:test expression="{!!'false'}" exprText="!'false'" expected="true"/>
+    <expressionTest:test expression="{!!''}" exprText="!''" expected="true"/>
+    <expressionTest:test expression="{!!v.NaN}" exprText="!v.NaN" expected="true"/>
+    <expressionTest:test expression="{!!v.string}" exprText="!v.string" expected="true"/>
+
+    <!-- ternary -->
+    <expressionTest:test expression="{!true ? 'yes' : 'no'}" exprText="true ? 'yes' : 'no'" expected="'yes'"/>
+    <expressionTest:test expression="{!false ? 'yes' : 'no'}" exprText="false ? 'yes' : 'no'" expected="'no'"/>
+    <expressionTest:test expression="{!if(true, 'yes', 'no')}" exprText="if(true, 'yes', 'no')" expected="'yes'"/>
+    <expressionTest:test expression="{!if(false, 'yes', 'no')}" exprText="if(false, 'yes', 'no')" expected="'no'"/>
+    <expressionTest:test expression="{!0 ? 'yes' : 'no'}" exprText="0 ? 'yes' : 'no'" expected="'no'"/>
+    <expressionTest:test expression="{!2.1 ? 'yes' : 'no'}" exprText="2.1 ? 'yes' : 'no'" expected="'yes'"/>
+    <expressionTest:test expression="{!'0' ? 'yes' : 'no'}" exprText="'0' ? 'yes' : 'no'" expected="'yes'"/>
+    <expressionTest:test expression="{!'false' ? 'yes' : 'no'}" exprText="'false' ? 'yes' : 'no'" expected="'yes'"/>
+    <expressionTest:test expression="{!'' ? 'yes' : 'no'}" exprText="'' ? 'yes' : 'no'" expected="'no'"/>
+    <expressionTest:test expression="{!v.NaN ? 'yes' : 'no'}" exprText="v.NaN ? 'yes' : 'no'" expected="'no'"/>
+
+    <!-- add -->
+    <expressionTest:test expression="{!0 + 0}" exprText="0 + 0" expected="0"/>
+    <expressionTest:test expression="{!add(m.integer, 2.0)}" exprText="add(m.integer, 2.0)" expected="413"/>
+    <expressionTest:test expression="{!concat(4.1,v.integer)}" exprText="concat(4.1,v.integer)" expected="11.1"/>
+    <expressionTest:test expression="{!0 + 'x'}" exprText="0 + 'x'" expected="'0x'"/>
+    <expressionTest:test expression="{!'a' + v.double}" exprText="'a' + v.double" expected="'a3.1'"/>
+    <expressionTest:test expression="{!'a' + 'x'}" exprText="'a' + 'x'" expected="'ax'"/>
+    <expressionTest:test expression="{!3 + ''}" exprText="3 + ''" expected="'3'"/>
+    <expressionTest:test expression="{!m.emptyString + '3'}" exprText="m.emptyString + '3'" expected="'3'"/>
+    <expressionTest:test expression="{!'3' + '3'}" exprText="'3' + '3'" expected="'33'"/>
+    <expressionTest:test expression="{!v.Infinity + 2}" exprText="v.Infinity + 2" expected="Infinity"/>
+    <expressionTest:test expression="{!v.Infinity + v.NegativeInfinity}" exprText="v.Infinity + v.NegativeInfinity" expected="NaN"/>
+    <expressionTest:test expression="{!v.Infinity + 'AndBeyond'}" exprText="v.Infinity + 'AndBeyond'" expected="'InfinityAndBeyond'"/>
+    <expressionTest:test expression="{!'To' + v.NegativeInfinity}" exprText="'To' + v.NegativeInfinity" expected="'To-Infinity'"/>
+    <expressionTest:test expression="{!1 + v.NaN}" exprText="1 + v.NaN" expected="NaN"/>
+    <expressionTest:test expression="{!'100' + v.NaN}" exprText="'100' + v.NaN" expected="'100NaN'"/>
+    <expressionTest:test expression="{!m.date + 5}" exprText="m.date + 5" expected="'2004-09-23T16:30:00.000Z5'"/>
+    <expressionTest:test expression="{!m.date + '8'}" exprText="m.date + '8'" expected="'2004-09-23T16:30:00.000Z8'"/>
+
+    <!-- subtract -->
+    <expressionTest:test expression="{!3 - 1}" exprText="3 - 1" expected="2"/>
+    <expressionTest:test expression="{!sub(2, 2.0)}" exprText="sub(2, 2.0)" expected="0"/>
+    <expressionTest:test expression="{!subtract(4, 2)}" exprText="subtract(4, 2)" expected="2"/>
+    <expressionTest:test expression="{!2 - null}" exprText="2 - null" expected="2"/>
+    <expressionTest:test expression="{!3 - '5o'}" exprText="3 - '5o'" expected="NaN"/>
+    <expressionTest:test expression="{!3 - ''}" exprText="3 - ''" expected="3"/>
+    <expressionTest:test expression="{!'5o' - 3}" exprText="'5o' - 3" expected="NaN"/>
+    <expressionTest:test expression="{!'' - 3}" exprText="'' - 3" expected="-3"/>
+    <expressionTest:test expression="{!'5o' - '5o'}" exprText="'5o' - '5o'" expected="NaN"/>
+    <expressionTest:test expression="{!'' - ''}" exprText="'' - ''" expected="0"/>
+    <expressionTest:test expression="{!v.Infinity - 2}" exprText="v.Infinity - 2" expected="Infinity"/>
+    <expressionTest:test expression="{!3 - v.Infinity}" exprText="3 - v.Infinity" expected="-Infinity"/>
+    <expressionTest:test expression="{!3 - v.NaN}" exprText="3 - v.NaN" expected="NaN"/>
+    <expressionTest:test expression="{!3 - '1'}" exprText="3 - '1'" expected="2"/>
+    <expressionTest:test expression="{!'4' - 1}" exprText="'4' - 1" expected="3"/>
+    <expressionTest:test expression="{!'3' - '5'}" exprText="'3' - '5'" expected="-2"/>
+    <expressionTest:test expression="{!m.double - m.integerString}" exprText="m.double - m.integerString" expected="-506.9"/>
+
+    <!-- multiply -->
+    <expressionTest:test expression="{!1 * 1.1}" exprText="1 * 1.1" expected="1.1"/>
+    <expressionTest:test expression="{!mult(0, 3)}" exprText="mult(0, 3)" expected="0"/>
+    <expressionTest:test expression="{!multiply(-2, -.1)}" exprText="multiply(-2, -.1)" expected=".2"/>
+    <expressionTest:test expression="{!5 * '5o'}" exprText="5 * '5o'" expected="NaN"/>
+    <expressionTest:test expression="{!'5o' * 9}" exprText="'5o' * 9" expected="NaN"/>
+    <expressionTest:test expression="{!'5o' * '5o'}" exprText="'5o' * '5o'" expected="NaN"/>
+    <expressionTest:test expression="{!1e200 * 1e200}" exprText="1e200 * 1e200" expected="Infinity"/>
+    <expressionTest:test expression="{!-1e200 * 1e200}" exprText="-1e200 * 1e200" expected="-Infinity"/>
+    <expressionTest:test expression="{!v.Infinity * v.Infinity}" exprText="v.Infinity * v.Infinity" expected="Infinity"/>
+    <expressionTest:test expression="{!0 * v.Infinity}" exprText="0 * v.Infinity" expected="NaN"/>
+    <expressionTest:test expression="{!2 * '1.1'}" exprText="2 * '1.1'" expected="2.2"/>
+    <expressionTest:test expression="{!'1.3' * 4}" exprText="'1.3' * 4" expected="5.2"/>
+    <expressionTest:test expression="{!'7' * '3.1'}" exprText="'7' * '3.1'" expected="21.7"/>
+    <expressionTest:test expression="{!1 * v.NaN}" exprText="1 * v.NaN" expected="NaN"/>
+    <expressionTest:test expression="{!m.double * '2'}" exprText="m.double * '2'" expected="8.2"/>
+
+    <!-- divide -->
+    <expressionTest:test expression="{!3 / 2}" exprText="3 / 2" expected="1.5"/>
+    <expressionTest:test expression="{!div(4, 2)}" exprText="div(4, 2)" expected="2"/>
+    <expressionTest:test expression="{!divide(5, 2)}" exprText="divide(5, 2)" expected="2.5"/>
+    <expressionTest:test expression="{!0 / 0}" exprText="0 / 0" expected="NaN"/>
+    <expressionTest:test expression="{!5 / 0}" exprText="5 / 0" expected="Infinity"/>
+    <expressionTest:test expression="{!-1 / 0}" exprText="-1 / 0" expected="-Infinity"/>
+    <expressionTest:test expression="{!3 / '5o'}" exprText="3 / '5o'" expected="NaN"/>
+    <expressionTest:test expression="{!'5o' / 3}" exprText="'5o' / 3" expected="NaN"/>
+    <expressionTest:test expression="{!'5o' / '5o'}" exprText="'5o' / '5o'" expected="NaN"/>
+    <expressionTest:test expression="{!'5.5' / '1.1'}" exprText="'5.5' / '1.1'" expected="5"/>
+    <expressionTest:test expression="{!5 / v.NegativeInfinity}" exprText="5 / v.NegativeInfinity" expected="0"/>
+    <expressionTest:test expression="{!v.Infinity / v.Infinity}" exprText="v.Infinity / v.Infinity" expected="NaN"/>
+    <expressionTest:test expression="{!1 / v.NaN}" exprText="1 / v.NaN" expected="NaN"/>
+    <expressionTest:test expression="{!m.double / '2'}" exprText="m.double / '2'" expected="2.05"/>
+
+    <!-- modulus -->
+    <expressionTest:test expression="{!23 % 4}" exprText="23 % 4" expected="3"/>
+    <expressionTest:test expression="{!mod(23, 4)}" exprText="mod(23, 4)" expected="3"/>
+    <expressionTest:test expression="{!modulus(23, 4)}" exprText="modulus(23, 4)" expected="3"/>
+    <expressionTest:test expression="{!3 % 0}" exprText="3 % 0" expected="NaN"/>
+    <expressionTest:test expression="{!0 % 3}" exprText="0 % 3" expected="0"/>
+    <expressionTest:test expression="{!0 % 0}" exprText="0 % 0" expected="NaN"/>
+    <expressionTest:test expression="{!3 % '5o'}" exprText="3 % '5o'" expected="NaN"/>
+    <expressionTest:test expression="{!'5o' % 3}" exprText="'5o' % 3" expected="NaN"/>
+    <expressionTest:test expression="{!'5o' % '5o'}" exprText="'5o' % '5o'" expected="NaN"/>
+    <expressionTest:test expression="{!'23' % '4'}" exprText="'23' % '4'" expected="3"/>
+    <expressionTest:test expression="{!3 % v.Infinity}" exprText="3 % v.Infinity" expected="3"/>
+    <expressionTest:test expression="{!v.Infinity % 3}" exprText="v.Infinity % 3" expected="NaN"/>
+    <expressionTest:test expression="{!1 % v.NaN}" exprText="1 % v.NaN" expected="NaN"/>
+    <expressionTest:test expression="{!m.integer % '2'}" exprText="m.integer % '2'" expected="1"/>
+
+    <!-- greater than -->
+    <expressionTest:test expression="{!5 > 2}" exprText="5 > 2" expected="true"/>
+    <expressionTest:test expression="{!2 gt 2}" exprText="2 gt 2" expected="false"/>
+    <expressionTest:test expression="{!greaterthan(3, 2)}" exprText="greaterthan(3, 2)" expected="true"/>
+    <expressionTest:test expression="{!9000 > '5o'}" exprText="9000 > '5o'" expected="false"/>
+    <expressionTest:test expression="{!'5o' > 4}" exprText="'5o' > 4" expected="false"/>
+    <expressionTest:test expression="{!'5o' > '4o'}" exprText="'5o' > '4o'" expected="true"/>
+    <expressionTest:test expression="{!'5' > '3.9'}" exprText="'5' > '3.9'" expected="true"/>
+    <expressionTest:test expression="{!'5b' > '5a'}" exprText="'5b' > '5a'" expected="true"/>
+    <expressionTest:test expression="{!'5A' > '5a'}" exprText="'5A' > '5a'" expected="false"/>
+    <expressionTest:test expression="{!v.Infinity > v.Infinity}" exprText="v.Infinity > v.Infinity" expected="false"/>
+    <expressionTest:test expression="{!true > false}" exprText="true > false" expected="true"/>
+    <expressionTest:test expression="{!0 > ''}" exprText="0 > ''" expected="false"/>
+    <expressionTest:test expression="{!true > 0}" exprText="true > 0" expected="true"/>
+    <expressionTest:test expression="{!true > 1}" exprText="true > 1" expected="false"/>
+    <expressionTest:test expression="{!v.Infinity > -v.Infinity}" exprText="v.Infinity > -v.Infinity" expected="true"/>
+    <expressionTest:test expression="{!0 > v.NaN}" exprText="0 > v.NaN" expected="false"/>
+    <expressionTest:test expression="{!'zz' > v.NaN}" exprText="'zz' > v.NaN" expected="false"/>
+    <expressionTest:test expression="{!v.Infinity > v.NaN}" exprText="v.Infinity > v.NaN" expected="false"/>
+    <expressionTest:test expression="{!v.NaN > 0}" exprText="v.NaN > 0" expected="false"/>
+    <expressionTest:test expression="{!v.NaN > '5o'}" exprText="v.NaN > '5o'" expected="false"/>
+    <expressionTest:test expression="{!v.NaN > v.Infinity}" exprText="v.NaN > v.Infinity" expected="false"/>
+    <expressionTest:test expression="{!m.dateLater > m.date}" exprText="m.dateLater > m.date" expected="true"/>
+    <expressionTest:test expression="{!m.date > m.dateLater}" exprText="m.date > m.dateLater" expected="false"/>
+    <expressionTest:test expression="{!m.calendarLater > m.calendar}" exprText="m.calendarLater > m.calendar" expected="true"/>
+    <expressionTest:test expression="{!m.calendar > m.calendarLater}" exprText="m.calendar > m.calendarLater" expected="false"/>
+    <expressionTest:test expression="{!m.calendar > m.date}" exprText="m.calendar > m.date" expected="true"/>
+
+    <!-- greater than or equal-->
+    <expressionTest:test expression="{!5 >= 2}" exprText="5 >= 2" expected="true"/>
+    <expressionTest:test expression="{!2 ge 2}" exprText="2 ge 2" expected="true"/>
+    <expressionTest:test expression="{!greaterthanorequal(3, 2)}" exprText="greaterthanorequal(3, 2)" expected="true"/>
+    <expressionTest:test expression="{!9000 >= '5o'}" exprText="9000 >= '5o'" expected="false"/>
+    <expressionTest:test expression="{!'5o' >= 4}" exprText="'5o' >= 4" expected="false"/>
+    <expressionTest:test expression="{!'5o' >= '4o'}" exprText="'5o' >= '4o'" expected="true"/>
+    <expressionTest:test expression="{!'5' >= '3.9'}" exprText="'5' >= '3.9'" expected="true"/>
+    <expressionTest:test expression="{!'5b' >= '5a'}" exprText="'5b' >= '5a'" expected="true"/>
+    <expressionTest:test expression="{!'5A' >= '5a'}" exprText="'5A' >= '5a'" expected="false"/>
+    <expressionTest:test expression="{!v.Infinity >= v.Infinity}" exprText="v.Infinity >= v.Infinity" expected="true"/>
+    <expressionTest:test expression="{!true >= false}" exprText="true >= false" expected="true"/>
+    <expressionTest:test expression="{!0 >= ''}" exprText="0 >= ''" expected="true"/>
+    <expressionTest:test expression="{!true >= 0}" exprText="true >= 0" expected="true"/>
+    <expressionTest:test expression="{!true >= 1}" exprText="true >= 1" expected="true"/>
+    <expressionTest:test expression="{!v.Infinity >= -v.Infinity}" exprText="v.Infinity >= -v.Infinity" expected="true"/>
+    <expressionTest:test expression="{!0 >= v.NaN}" exprText="0 >= v.NaN" expected="false"/>
+    <expressionTest:test expression="{!'5o' >= v.NaN}" exprText="'5o' >= v.NaN" expected="false"/>
+    <expressionTest:test expression="{!'zz' >= v.NaN}" exprText="'zz' >= v.NaN" expected="false"/>
+    <expressionTest:test expression="{!v.Infinity >= v.NaN}" exprText="v.Infinity >= v.NaN" expected="false"/>
+    <expressionTest:test expression="{!v.NaN >= 0}" exprText="v.NaN >= 0" expected="false"/>
+    <expressionTest:test expression="{!v.NaN >= '5o'}" exprText="v.NaN >= '5o'" expected="false"/>
+    <expressionTest:test expression="{!v.NaN >= v.Infinity}" exprText="v.NaN >= v.Infinity" expected="false"/>
+    <expressionTest:test expression="{!m.DateLater >= m.Date}" exprText="m.DateLater >= m.Date" expected="true"/>
+    <expressionTest:test expression="{!m.Date >= m.DateLater}" exprText="m.Date >= m.DateLater" expected="false"/>
+    <expressionTest:test expression="{!m.CalendarLater >= m.Calendar}" exprText="m.CalendarLater >= m.Calendar" expected="true"/>
+    <expressionTest:test expression="{!m.Calendar >= m.CalendarLater}" exprText="m.Calendar >= m.CalendarLater" expected="false"/>
+    <expressionTest:test expression="{!m.Calendar >= m.Date}" exprText="m.Calendar >= m.Date" expected="true"/>
+
+    <!-- less than -->
+    <expressionTest:test expression="{!5 &lt; 2}" exprText="5 &lt; 2" expected="false"/>
+    <expressionTest:test expression="{!2 lt 2}" exprText="2 lt 2" expected="false"/>
+    <expressionTest:test expression="{!lessthan(3, 2)}" exprText="lessthan(3, 2)" expected="false"/>
+    <expressionTest:test expression="{!9000 &lt; '5o'}" exprText="9000 &lt; '5o'" expected="false"/>
+    <expressionTest:test expression="{!'5o' &lt; 4}" exprText="'5o' &lt; 4" expected="false"/>
+    <expressionTest:test expression="{!'5o' &lt; '4o'}" exprText="'5o' &lt; '4o'" expected="false"/>
+    <expressionTest:test expression="{!'5' &lt; '3.9'}" exprText="'5' &lt; '3.9'" expected="false"/>
+    <expressionTest:test expression="{!'5b' &lt; '5a'}" exprText="'5b' &lt; '5a'" expected="false"/>
+    <expressionTest:test expression="{!'5A' &lt; '5a'}" exprText="'5A' &lt; '5a'" expected="true"/>
+    <expressionTest:test expression="{!v.Infinity &lt; v.Infinity}" exprText="v.Infinity &lt; v.Infinity" expected="false"/>
+    <expressionTest:test expression="{!true &lt; false}" exprText="true &lt; false" expected="false"/>
+    <expressionTest:test expression="{!0 &lt; ''}" exprText="0 &lt; ''" expected="false"/>
+    <expressionTest:test expression="{!true &lt; 0}" exprText="true &lt; 0" expected="false"/>
+    <expressionTest:test expression="{!true &lt; 1}" exprText="true &lt; 1" expected="false"/>
+    <expressionTest:test expression="{!v.Infinity &lt; -v.Infinity}" exprText="v.Infinity &lt; -v.Infinity" expected="false"/>
+    <expressionTest:test expression="{!0 &lt; v.NaN}" exprText="0 &lt; v.NaN" expected="false"/>
+    <expressionTest:test expression="{!'5o' &lt; v.NaN}" exprText="'5o' &lt; v.NaN" expected="false"/>
+    <expressionTest:test expression="{!'zz' &lt; v.NaN}" exprText="'zz' &lt; v.NaN" expected="false"/>
+    <expressionTest:test expression="{!v.Infinity &lt; v.NaN}" exprText="v.Infinity &lt; v.NaN" expected="false"/>
+    <expressionTest:test expression="{!v.NaN &lt; 0}" exprText="v.NaN &lt; 0" expected="false"/>
+    <expressionTest:test expression="{!v.NaN &lt; '5o'}" exprText="v.NaN &lt; '5o'" expected="false"/>
+    <expressionTest:test expression="{!v.NaN &lt; v.Infinity}" exprText="v.NaN &lt; v.Infinity" expected="false"/>
+    <expressionTest:test expression="{!m.DateLater &lt; m.Date}" exprText="m.DateLater &lt; m.Date" expected="false"/>
+    <expressionTest:test expression="{!m.Date &lt; m.DateLater}" exprText="m.Date &lt; m.DateLater" expected="true"/>
+    <expressionTest:test expression="{!m.CalendarLater &lt; m.Calendar}" exprText="m.CalendarLater &lt; m.Calendar" expected="false"/>
+    <expressionTest:test expression="{!m.Calendar &lt; m.CalendarLater}" exprText="m.Calendar &lt; m.CalendarLater" expected="true"/>
+    <expressionTest:test expression="{!m.Calendar &lt; m.Date}" exprText="m.Calendar &lt; m.Date" expected="false"/>
+
+    <!-- less than or equal -->
+    <expressionTest:test expression="{!5 &lt;= 2}" exprText="5 &lt;= 2" expected="false"/>
+    <expressionTest:test expression="{!2 le 2}" exprText="2 le 2" expected="true"/>
+    <expressionTest:test expression="{!lessthanorequal(3, 2)}" exprText="lessthanorequal(3, 2)" expected="false"/>
+    <expressionTest:test expression="{!9000 &lt;= '5o'}" exprText="9000 &lt;= '5o'" expected="false"/>
+    <expressionTest:test expression="{!'5o' &lt;= 4}" exprText="'5o' &lt;= 4" expected="false"/>
+    <expressionTest:test expression="{!'5o' &lt;= '4o'}" exprText="'5o' &lt;= '4o'" expected="false"/>
+    <expressionTest:test expression="{!'5' &lt;= '3.9'}" exprText="'5' &lt;= '3.9'" expected="false"/>
+    <expressionTest:test expression="{!'5b' &lt;= '5a'}" exprText="'5b' &lt;= '5a'" expected="false"/>
+    <expressionTest:test expression="{!'5A' &lt;= '5a'}" exprText="'5A' &lt;= '5a'" expected="true"/>
+    <expressionTest:test expression="{!v.Infinity &lt;= v.Infinity}" exprText="v.Infinity &lt;= v.Infinity" expected="true"/>
+    <expressionTest:test expression="{!true &lt;= false}" exprText="true &lt;= false" expected="false"/>
+    <expressionTest:test expression="{!0 &lt;= ''}" exprText="0 &lt;= ''" expected="true"/>
+    <expressionTest:test expression="{!true &lt;= 0}" exprText="true &lt;= 0" expected="false"/>
+    <expressionTest:test expression="{!true &lt;= 1}" exprText="true &lt;= 1" expected="true"/>
+    <expressionTest:test expression="{!v.Infinity &lt;= -v.Infinity}" exprText="v.Infinity &lt;= -v.Infinity" expected="false"/>
+    <expressionTest:test expression="{!0 &lt;= v.NaN}" exprText="0 &lt;= v.NaN" expected="false"/>
+    <expressionTest:test expression="{!'5o' &lt;= v.NaN}" exprText="'5o' &lt;= v.NaN" expected="false"/>
+    <expressionTest:test expression="{!'zz' &lt;= v.NaN}" exprText="'zz' &lt;= v.NaN" expected="false"/>
+    <expressionTest:test expression="{!v.Infinity &lt;= v.NaN}" exprText="v.Infinity &lt;= v.NaN" expected="false"/>
+    <expressionTest:test expression="{!v.NaN &lt;= 0}" exprText="v.NaN &lt;= 0" expected="false"/>
+    <expressionTest:test expression="{!v.NaN &lt;= '5o'}" exprText="v.NaN &lt;= '5o'" expected="false"/>
+    <expressionTest:test expression="{!v.NaN &lt;= v.Infinity}" exprText="v.NaN &lt;= v.Infinity" expected="false"/>
+    <expressionTest:test expression="{!m.DateLater &lt;= m.Date}" exprText="m.DateLater &lt;= m.Date" expected="false"/>
+    <expressionTest:test expression="{!m.Date &lt;= m.DateLater}" exprText="m.Date &lt;= m.DateLater" expected="true"/>
+    <expressionTest:test expression="{!m.CalendarLater &lt;= m.Calendar}" exprText="m.CalendarLater &lt;= m.Calendar" expected="false"/>
+    <expressionTest:test expression="{!m.Calendar &lt;= m.CalendarLater}" exprText="m.Calendar &lt;= m.CalendarLater" expected="true"/>
+    <expressionTest:test expression="{!m.Calendar &lt;= m.Date}" exprText="m.Calendar &lt;= m.Date" expected="false"/>
+
+    <!-- negate -->
+    <expressionTest:test expression="{!-1}" exprText="-1" expected="-1"/>
+    <expressionTest:test expression="{!neg(2)}" exprText="neg(2)" expected="-2"/>
+    <expressionTest:test expression="{!negate(3)}" exprText="negate(3)" expected="-3"/>
+    <expressionTest:test expression="{!-v.NaN}" exprText="-v.NaN" expected="NaN"/>
+    <expressionTest:test expression="{!-v.Infinity}" exprText="-v.Infinity" expected="-Infinity"/>
+    <expressionTest:test expression="{!-'5o'}" exprText="-'5o'" expected="NaN"/>
+    <expressionTest:test expression="{!-'5'}" exprText="-'5'" expected="-5"/>
+    <expressionTest:test expression="{!-''}" exprText="-''" expected="0"/>
+    <expressionTest:test expression="{!-m.double}" exprText="-m.double" expected="-4.1"/>
+
+    <!-- absolute -->
+    <expressionTest:test expression="{!abs(3)}" exprText="abs(3)" expected="3"/>
+    <expressionTest:test expression="{!abs(-2.1)}" exprText="abs(-2.1)" expected="2.1"/>
+    <expressionTest:test expression="{!abs('-5')}" exprText="abs('-5')" expected="5"/>
+    <expressionTest:test expression="{!abs('-5o')}" exprText="abs('-5o')" expected="NaN"/>
+    <expressionTest:test expression="{!abs('')}" exprText="abs('')" expected="0"/>
+    <expressionTest:test expression="{!abs(-v.Infinity)}" exprText="abs(-v.Infinity)" expected="Infinity"/>
+    <expressionTest:test expression="{!abs(m.NaN)}" exprText="abs(m.NaN)" expected="NaN"/>
+    <expressionTest:test expression="{!abs(v.double)}" exprText="abs(v.double)" expected="3.1"/>
+
+    <!-- misc -->
+    <expressionTest:test expression="{!m.booleanTrue &amp;&amp; v.string == 'Model' ? null : abs(v.Infinity) >= m.double &amp;&amp; (m.double + m.doubleString + 1)}" exprText="m.booleanTrue &amp;&amp; v.string == 'Model' ? null : abs(v.Infinity) >= m.double &amp;&amp; (m.double + m.doubleString + 1)" expected="'4.15.11'"/>
+    <expressionTest:test expression="{!concat(abs((div(mult(4,((sub((neg(v.double)),'1.1')))),v.doubleString-.1))),' magnitude')}" exprText="concat(abs((div(mult(4,((sub((neg(v.double)),'1.1')))),v.doubleString-.1))),' magnitude')" expected="'8.4 magnitude'"/>
+    <expressionTest:test expression="{!if(or(m.calendar gt m.infinity,m.double*m.date lt m.emptyString),v.double/m.dateLater,7*'11'-4*2)}" exprText="if(or(m.calendar gt m.infinity,m.double*m.date lt m.emptyString),v.double/m.dateLater,7*'11'-4*2)" expected="69"/>
+</aura:component>

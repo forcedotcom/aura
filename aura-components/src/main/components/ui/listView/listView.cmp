@@ -1,0 +1,120 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component implements="ui:elementInterface" extensible="true" support="GA"            description="A column based listview with comprehensive event support.">
+    <aura:attribute name="id" type="String" default="default"                              description="The unique id of the listview instance."/>
+
+    <aura:attribute name="alternateRowClass" type="String" required="false"                description="Optional. The css class to use for alternating rows."/>
+    <aura:attribute name="blockSize" type="Integer" default="50"                           description="The size of the initial block of rows to render."/>
+    <aura:attribute name="columns" type="List"                                             description="Read-only. Gets the list of column components that are generated based on the supplied or generated column templates."/>
+    <aura:attribute name="dataColumns" type="List"                                         description="Read-only. Gets the list of column components corresponding to the fields describing data that are generated based on the supplied or generated column templates."/>
+    <aura:attribute name="dataTemplates" type="List"                                       description="Read-only. Gets the list of specified or generated column templates corresponding to the fields describing data."/>
+    <aura:attribute name="emptyMessage" type="String" default="No records to display."     description="The message to display when no items are specified."/>
+    <aura:attribute name="footer" type="Aura.Component[]"                                 description="Optional. A facet wherein to specify tfoot level components. Care should be taken to match the columns described in dataColumns."/>
+    <aura:attribute name="items" type="List"                                               description="Gets or sets the list of items to display in the listView."/>
+    <aura:attribute name="rowClass" type="String"                                          description="Optional. The css class to use for rows."/>
+    <aura:attribute name="rowTooltip" type="String"                                        description="The tooltip to display when hovering over rows. Accepts delayed attribute expansion of the form {#v.item}"/>
+
+    <aura:registerEvent name="oncolumnsready" type="ui:listViewEvent"                      description="The event that fires when all column templates have been processed and the columns, dataColumns and dataTemplates attributes are all available."/>
+    <aura:registerEvent name="onitemsready" type="ui:listViewEvent"                        description="The event that fires when all item rows have been processed, column types instantiated, data formatters run, and the corresponding component trees have been generated."/>
+
+    <aura:registerEvent name="oncellclick" type="ui:listViewEvent"                         description="The event that fires when a data cell is clicked."/>
+    <aura:registerEvent name="onheaderclick" type="ui:listViewEvent"                       description="The event that fires when a header cell is clicked."/>
+    <aura:registerEvent name="onrowclick" type="ui:listViewEvent"                          description="The event that fires when a row is clicked."/>
+    <aura:registerEvent name="onclick" type="ui:listViewEvent"                             description="The event that fires when the table is clicked."/>
+
+    <aura:registerEvent name="oncelldblclick" type="ui:listViewEvent"                      description="The event that fires when a data cell is double clicked."/>
+    <aura:registerEvent name="onheaderdblclick" type="ui:listViewEvent"                    description="The event that fires when a header cell is double clicked."/>
+    <aura:registerEvent name="onrowdblclick" type="ui:listViewEvent"                       description="The event that fires when a row is double clicked."/>
+    <aura:registerEvent name="ondblclick" type="ui:listViewEvent"                          description="The event that fires when the table is double clicked."/>
+
+    <aura:registerEvent name="oncellmousedown" type="ui:listViewEvent"                     description="The event that fires when a data cell mousedown occurs."/>
+    <aura:registerEvent name="onheadermousedown" type="ui:listViewEvent"                   description="The event that fires when a header cell mousedown occurs."/>
+    <aura:registerEvent name="onrowmousedown" type="ui:listViewEvent"                      description="The event that fires when a row mousedown occurs."/>
+    <aura:registerEvent name="onmousedown" type="ui:listViewEvent"                         description="The event that fires when a table mousedown occurs."/>
+
+    <aura:registerEvent name="oncellmouseup" type="ui:listViewEvent"                       description="The event that fires when a data cell mouseup occurs."/>
+    <aura:registerEvent name="onheadermouseup" type="ui:listViewEvent"                     description="The event that fires when a header cell mouseup occurs."/>
+    <aura:registerEvent name="onrowmouseup" type="ui:listViewEvent"                        description="The event that fires when a row mouseup occurs."/>
+    <aura:registerEvent name="onmouseup" type="ui:listViewEvent"                           description="The event that fires when a table mouseup occurs."/>
+
+    <aura:registerEvent name="oncellmouseover" type="ui:listViewEvent"                     description="The event that fires when a data cell mouseover occurs."/>
+    <aura:registerEvent name="onheadermouseover" type="ui:listViewEvent"                   description="The event that fires when a header cell mouseover occurs."/>
+    <aura:registerEvent name="onrowmouseover" type="ui:listViewEvent"                      description="The event that fires when a row mouseover occurs."/>
+    <aura:registerEvent name="onmouseover" type="ui:listViewEvent"                         description="The event that fires when a table mouseover occurs."/>
+
+    <aura:registerEvent name="oncellmouseout" type="ui:listViewEvent"                      description="The event that fires when a data cell mouseout occurs."/>
+    <aura:registerEvent name="onheadermouseout" type="ui:listViewEvent"                    description="The event that fires when a header cell mouseout occurs."/>
+    <aura:registerEvent name="onrowmouseout" type="ui:listViewEvent"                       description="The event that fires when a row mouseout occurs."/>
+    <aura:registerEvent name="onmouseout" type="ui:listViewEvent"                          description="The event that fires when a table mouseout occurs."/>
+
+    <aura:registerEvent name="oncellkeydown" type="ui:listViewEvent"                       description="The event that fires when a data cell keydown occurs."/>
+    <aura:registerEvent name="onheaderkeydown" type="ui:listViewEvent"                     description="The event that fires when a header cell keydown occurs."/>
+    <aura:registerEvent name="onrowkeydown" type="ui:listViewEvent"                        description="The event that fires when a row keydown occurs."/>
+    <aura:registerEvent name="onkeydown" type="ui:listViewEvent"                           description="The event that fires when a table keydown occurs."/>
+
+    <aura:registerEvent name="oncellkeyup" type="ui:listViewEvent"                         description="The event that fires when a data cell keyup occurs."/>
+    <aura:registerEvent name="onheaderkeyup" type="ui:listViewEvent"                       description="The event that fires when a header cell keyup occurs."/>
+    <aura:registerEvent name="onrowkeyup" type="ui:listViewEvent"                          description="The event that fires when a row keyup occurs."/>
+    <aura:registerEvent name="onkeyup" type="ui:listViewEvent"                             description="The event that fires when a table keyup occurs."/>
+
+    <aura:registerEvent name="oncellkeypress" type="ui:listViewEvent"                      description="The event that fires when a data cell keypress occurs."/>
+    <aura:registerEvent name="onheaderkeypress" type="ui:listViewEvent"                    description="The event that fires when a header cell keypress occurs."/>
+    <aura:registerEvent name="onrowkeypress" type="ui:listViewEvent"                       description="The event that fires when a row keypress occurs."/>
+    <aura:registerEvent name="onkeypress" type="ui:listViewEvent"                          description="The event that fires when a table keypress occurs."/>
+
+    <aura:registerEvent name="oncelltouchstart" type="ui:listViewEvent"                    description="The event that fires when a data cell touchstart occurs."/>
+    <aura:registerEvent name="onheadertouchstart" type="ui:listViewEvent"                  description="The event that fires when a header cell touchstart occurs."/>
+    <aura:registerEvent name="onrowtouchstart" type="ui:listViewEvent"                     description="The event that fires when a row touchstart occurs."/>
+    <aura:registerEvent name="ontouchstart" type="ui:listViewEvent"                        description="The event that fires when a table touchstart occurs."/>
+
+    <aura:registerEvent name="oncelltouchmove" type="ui:listViewEvent"                     description="The event that fires when a data cell touchmove occurs."/>
+    <aura:registerEvent name="onheadertouchmove" type="ui:listViewEvent"                   description="The event that fires when a header cell touchmove occurs."/>
+    <aura:registerEvent name="onrowtouchmove" type="ui:listViewEvent"                      description="The event that fires when a row touchmove occurs."/>
+    <aura:registerEvent name="ontouchmove" type="ui:listViewEvent"                         description="The event that fires when a table touchmove occurs."/>
+
+    <aura:registerEvent name="oncelltouchend" type="ui:listViewEvent"                      description="The event that fires when a data cell touchend occurs."/>
+    <aura:registerEvent name="onheadertouchend" type="ui:listViewEvent"                    description="The event that fires when a header cell touchend occurs."/>
+    <aura:registerEvent name="onrowtouchend" type="ui:listViewEvent"                       description="The event that fires when a row touchend occurs."/>
+    <aura:registerEvent name="ontouchend" type="ui:listViewEvent"                          description="The event that fires when a table touchend occurs."/>
+
+    <table aura:id="listView:table"
+           id="{!'ui:listView:'+(v.id!='default'?v.id:globalId)}"
+           class="{!'listView '+v.class}"
+
+           onclick="{!c.clickHandler}"
+           ondblclick="{!c.dblclickHandler}"
+
+           onkeydown="{!c.keydownHandler}"
+           onkeyup="{!c.keyupHandler}"
+           onkeypress="{!c.keypressHandler}"
+
+           onmousedown="{!c.mousedownHandler}"
+           onmouseup="{!c.mousedownHandler}"
+           onmouseover="{!c.mouseoverHandler}"
+           onmouseout="{!c.mouseoutHandler}"
+
+           ontouchstart="{!c.touchstartHandler}"
+           ontouchmove="{!c.touchmoveHandler}"
+           ontouchend="{!c.touchendHandler}"
+    >
+        <thead aura:id="listView:header" class="listViewHeader"></thead>
+        <tfoot aura:id="listView:footer" class="listViewFooter">{!v.footer}</tfoot>
+        <tbody aura:id="listView:body" tabIndex="0" class="listViewBody"></tbody>
+    </table>
+
+</aura:component>

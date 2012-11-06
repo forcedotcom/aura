@@ -1,0 +1,153 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+  <aura:set attribute="title" value="Models"/>
+
+  <p>A model is a component's main source for dynamic data. Use a model to read your initial component data in Aura. For example, the model could read the component's data from a database. The component generates an appropriate user interface from the model's data.</p>
+
+  <p>The value provider for a model is denoted by <code>m</code>. For example, the label in this button component is retrieved from the model of the component containing the <code>&lt;ui:button&gt;</code> tag. The value for the label is evaluated when the component renders.</p>
+
+<auradocs:codeblock>
+  &lt;ui:button label="<aura:text value="{!"/>m.myLabel}"/&gt;
+</auradocs:codeblock>
+
+  <p>On the server side, Aura's model is more of a model initializer compared to the usage of models in other MVC frameworks. The model is instantiated when the component is first requested. Perform any necessary operations to gather state, such as making database queries or external API callouts, in the model's constructor.</p>
+
+  <p>When the component is serialized to the client, the <code>@AuraEnabled</code> getters are executed, and their results are serialized as name-value pairs. This serialized map becomes the basis for the initial state of the model on the client.</p>
+
+  <auradocs:info><b>Note</b>: You can't create a new component dynamically in a model class using <code>Aura.getInstanceService().getInstance()</code>. To do this, use a provider instead.
+  </auradocs:info>
+
+  <h2>Client-Side Model Access</h2>
+
+  <p>Let's look at simple usage of a model in a component.</p>
+
+<auradocs:codeblock>
+  &lt;aura:component model="java://org.auraframework.demo.notes.models.TrivialModel"&gt;
+      &lt;aura:attribute name="name" type="String" required="true" default="Michelle" /&gt;
+
+      &lt;!-- Use the "m." prefix to access any fields that are annotated with
+      @AuraEnabled in the model class --&gt;
+      &lt;h1&gt;Title : <aura:text value="{!"/>m.title}&lt;/h1&gt;
+
+      &lt;!-- Use v.name to directly access the component's name attribute.
+        Remember that you use v to access the component's attribute values --&gt;
+      &lt;h2&gt;Name : <aura:text value="{!"/>v.name}&lt;/h2&gt;
+  &lt;/aura:component&gt;
+</auradocs:codeblock>
+
+  <p>The model attribute in <code>&lt;aura:component&gt;</code> wires the component to its Java model class.</p>
+
+  <p>The <code><aura:text value="{!"/>m.title}</code> expression returns the result of the <code>getTitle()</code> getter method in the component's model class. The <code>getTitle()</code> method must be prefixed with the the <code>@AuraEnabled</code> annotation.</p>
+
+  <h3>Accessing the Model in JavaScript</h3>
+
+  <p>You can also use the value provider, <code>m</code>, to access the model in JavaScript. For example:</p>
+
+<auradocs:codeblock>
+  var title = cmp.get("m.title");
+  alert("Title: " + title);
+</auradocs:codeblock>
+
+  <auradocs:info><b>Note</b>: You can update the model in client-side code by using <code>setValue()</code>. For example:<br/>
+  <code>cmp.getValue("m.myLabel").setValue("updated label");</code>
+  </auradocs:info>
+
+  <h2>Java Model class</h2>
+
+  <p>You can create a model in Java.</p>
+
+  <auradocs:info><b>Note</b>: To implement the model in another programming language, write an adapter that enables Aura to communicate with the target language through Java. This will be documented in more detail at a later time.
+  </auradocs:info>
+
+  <p>This model in Java is trivial as it doesn’t read in data from a persistent data store but it demonstrates some basics, including accessing a component's attribute in the model.</p>
+
+<auradocs:codeblock>
+<![CDATA[package org.auraframework.demo.models;
+
+import org.auraframework.instance.BaseComponent;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Model;
+import org.auraframework.throwable.quickfix.QuickFixException;
+
+@Model
+public class TrivialModel throws QuickFixException {
+
+    private String title;
+
+    // The constructor is called during the construction of each instance of the model
+    // The constructor must be public
+    public TrivialModel() {
+       // This retrieves the component for this model as a Java object
+       BaseComponent cmp =
+      Aura.getContextService().getCurrentContext().getCurrentComponent();
+
+       // Retrieve the name attribute of the component
+       String name = (String)cmp.getAttributes().getValue("name");
+
+       /* Do any queries or data generation in the constructor of your model.
+        * In this sample, we have a trivial initialization for the title field.
+        * A real-world scenario would read the data from a persistent data store. */
+       title = "Welcome to " + name;
+    }
+
+    // Use @AuraEnabled to enable client- and server-side access to the title field
+    @AuraEnabled
+    public String getTitle() {
+       return title;
+    }
+}]]><br/>
+</auradocs:codeblock>
+
+  <h3>Java Annotations</h3>
+
+  <p>These annotations are available in models.</p>
+
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Annotation</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>@Model</code></td>
+        <td>Denotes that a Java class is a model.</td>
+      </tr>
+
+      <tr>
+        <td><code>@AuraEnabled</code></td>
+        <td>Enables client- and server-side access to a getter method. This means that you only expose data that you have explicitly annotated and avoids accidentally exposing fields. Other fields are not available.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Learn More</h3>
+
+  <p>For a more in-depth example of a model that initializes its data from a database, see the <a href="https://github.com/forcedotcom/aura-note/blob/master/src/main/java/org/auraframework/demo/notes/models/NoteListModel.java" target="_new">NoteListModel class</a> in the Aura Note sample app. (Log in to GitHub if you get a 404 error.)</p>
+
+  <p>The associated noteList.cmp component is <a href="https://github.com/forcedotcom/aura-note/blob/master/src/main/webapp/WEB-INF/components/auranote/noteList/noteList.cmp" target="_new">here</a>.</p>
+
+  <p><b>See also:</b><br/>
+      <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink><br/>
+      <auradocs:topicLink topic="oodProviders">Providers</auradocs:topicLink>
+    </p>
+
+</aura:component>

@@ -1,0 +1,42 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="ui:pager" extensible="true" support="GA" description="A pager implementation that allows the user to navigate sequentially between pages or jump to the first or last page.">
+    <aura:attribute name="Labels_First" type="String" default="First"          description="The text to display in the label of the link used to jump to the first page."/>
+    <aura:attribute name="Labels_Last" type="String" default="Last"            description="The text to display in the label of the link used to jump to the last page."/>
+    <aura:attribute name="Labels_Next" type="String" default="Next"            description="The text to display in the label of the link used to jump to the next page."/>
+    <aura:attribute name="Labels_Previous" type="String" default="Previous"    description="The text to display in the label of the link used to jump to the previous page."/>
+
+    <div class="{!v.class+' pagerContainer pagerNextPrevious'+(v.totalItems==0?' empty':'')}">
+        <a aura:id="pager:first" class="pagerControl first" onclick="{!c.firstPage}" href="javascript:void('First')">
+            <span class="visualization"></span>
+            <span class="label">{!v.Labels_First}</span>
+        </a>
+        <a aura:id="pager:previous" class="pagerControl previous" onclick="{!c.previousPage}" href="javascript:void('Previous')">
+            <span class="visualization"></span>
+            <span class="label">{!v.Labels_Previous}</span>
+        </a>
+        <a aura:id="pager:next" class="pagerControl next" onclick="{!c.nextPage}" href="javascript:void('Next')">
+            <span class="label">{!v.Labels_Next}</span>
+            <span class="visualization"></span>
+        </a>
+        <a aura:id="pager:last" class="pagerControl last" onclick="{!c.lastPage}" href="javascript:void('Last')">
+            <span class="label">{!v.Labels_Last}</span>
+            <span class="visualization"></span>
+        </a>
+    </div>
+</aura:component>

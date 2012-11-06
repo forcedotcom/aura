@@ -1,0 +1,60 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component support="BETA"
+    description="This component creates a scrollable view, complete with scroll bars and pull-to-refresh behaviors. The &lt;ui:scroller&gt; expands vertically to fill the space available within its parent component. You can set the width, and enable or disable both vertical and horizontal scrolling. Adding pull-to-refresh behavior is as simple as writing an action method to handle the event. Everything else is automatic. You can customize the status display for pull-to-refresh behavior, or accept the defaults.">
+
+    <aura:attribute name="hScroll" type="Boolean" default="false" description="Enables horizontal scrolling on the component. Default value is &quot;false&quot;."/>
+    <aura:attribute name="vScroll" type="Boolean" default="true" description="Enables vertical scrolling on the component. Default value is &quot;true&quot;."/>
+    <aura:attribute name="showScrollbars" type="Boolean" default="true" description="Shows or hides scroll bars. Default value is &quot;true&quot;, which shows the scroll bars."/>
+    <aura:attribute name="enabled" type="Boolean" default="true" description="Displays the scroller in an enabled state. Default value is &quot;true&quot;."/>
+    <aura:attribute name="useTransform" type="Boolean" default="true" description="Denotes whether to use transform scrollers and usually used with nested scrollers. Default value is &quot;true&quot;."/>
+    <aura:attribute name="snap" type="String" description="The CSS style used to display the snap area. Locks the scroller to predefined positions."/>
+    <aura:attribute name="width" type="String" description="The width of the scroll area in pixels (px) or percentage (%). Default value is &quot;100px&quot;."/>
+    <aura:attribute name="class" type="String" description="A CSS style to be attached to the scroll area. This style is added in addition to base styles output by the component."/>
+    <aura:attribute name="scrollContentClass" type="String" description="A CSS style to be attached to the scroll content area. This style is added in addition to base styles output by the component."/>
+    <aura:attribute name="onScrollStart" type="Aura.Action" description="The action invoked when the user starts scrolling."/>
+    <aura:attribute name="onScrollEnd" type="Aura.Action" description="The action invoked when the user stops scrolling."/>
+    <aura:attribute name="onScrollMove" type="Aura.Action" description="The action invoked when the user is scrolling."/>
+    <aura:attribute name="onPullToRefresh" type="Aura.Action" description="The action invoked when the user pulls to refresh the scroller area."/>
+    <aura:attribute name="pullToRefreshPull" type="String" default="Pull down to refresh..." description="The text to display in the top cell before the user pulls to refresh the page. Default value is &quot;Pull down to refresh...&quot;."/>
+    <aura:attribute name="pullToRefreshRelease" type="String" default="Release to refresh..." description="The text to display in the revealed area above the scroller contents when the user pulls to refresh the scroller area, but has not yet released the pull. Default value is &quot;Release to refresh...&quot;."/>
+    <aura:attribute name="pullToRefreshUpdating" type="String" default="Loading..." description="The text to display while the scroller component is updating after the user pulls to refresh the scroller. Default value is &quot;Loading...&quot;."/>
+    <aura:attribute name="pullToRefreshSubtitle" type="String" description="The text to display in the top cell when the user pulls the scroller area to refresh the content."/>
+    <aura:attribute name="stopEventPropagation" type="Boolean" default="false" description="Disables DOM event propagation. (This probably isn't something you want to enable.)"/>
+
+    <aura:registerEvent name="refreshed" type="ui:scrollerRefreshed"/>
+    <ui:resizeObserver onresize="{!c.refresh}"/>
+
+    <div aura:id="scrollWrapper" class="{!v.class + ' scrollWrapper'}">
+        <div aura:id="scrollContent" class="{!v.scrollContentClass}">
+            <aura:renderif isTrue="{!v.onPullToRefresh != null}">
+                <div aura:id="pullDown" class="pullToRefresh pullDown">
+                    <a class="refreshLabel" onclick="{!v.onPullToRefresh}" href="javascript:void(0)">Refresh</a>
+                    <span class="pullDownIcon"></span>
+                    <div>
+                        <div class="label pullLabel">{!v.pullToRefreshPull}</div>
+                        <div class="label releaseLabel">{!v.pullToRefreshRelease}</div>
+                        <div class="label loadingLabel">{!v.pullToRefreshUpdating}</div>
+                        <span class="subtitle">{!v.pullToRefreshSubtitle}</span>
+                    </div>
+                </div>
+            </aura:renderif>
+            {!v.body}
+        </div>
+    </div>
+</aura:component>

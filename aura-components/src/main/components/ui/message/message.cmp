@@ -1,0 +1,38 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" implements="ui:visible" support="GA" description="Styles for confirm, info, warning and error messages.">
+    <aura:attribute name="title" type="String" description="The title text for the message."/>
+    <aura:attribute name="severity" type="String" default="message" description="The severity of the message. Possible values:  message (default), confirm, info, warning, error"/>
+    <aura:attribute name="closable" type="Boolean" default="false" description="Specifies whether to display an 'x' that will close the alert when clicked. Default value is 'false'."/>
+    <div class="{!v.severity +' '+ v.class}" role="alert" aria-live="assertive" aria-atomic="true">
+        <ui:block>
+            <aura:set attribute="right">
+                <aura:renderif isTrue="{!v.closable}">
+                    <a href="javascript:void(0);" class="close" onclick="{!c.press}">&times;</a>
+                </aura:renderif>
+            </aura:set>
+            <aura:set attribute="left"><ui:image class="icon" alt="{!v.severity}"/></aura:set>
+            <aura:renderif isTrue="{!v.title &amp;&amp; v.title !=''}">
+                <h4>{!v.title}</h4>
+            </aura:renderif>
+            <aura:renderif isTrue="{!v.body.length > 0}">
+                {!v.body}
+            </aura:renderif>
+        </ui:block>
+    </div>
+</aura:component>

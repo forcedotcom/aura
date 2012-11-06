@@ -1,0 +1,50 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" support="GA"
+    description="This component creates a button that executes an action defined by a controller. The visual appearance of buttons is highly configurable, as are text and accessibility attributes.
+
+    &lt;ui:button&gt; responds to a single user interface event. Clicking the button triggers the client-side controller method set for the press event.">
+
+    <aura:attribute name="theme" type="String" default="default" description="The default CSS style used to display the button."/>
+    <aura:attribute name="buttonTitle" type="String" description="The text displayed in a tooltip when the mouse pointer hovers over the button."/>
+    <aura:attribute name="buttonType" type="String" default="button" description="Specifies the type attribute in the HTML input element. Default value is &quot;button&quot;."/>
+    <aura:attribute name="class" type="String" default="" description="A CSS style to be attached to the button. This style is added in addition to base styles output by the component."/>
+    <aura:attribute name="label" type="String" required="true" description="The text displayed on the button. Corresponds to the value attribute of the rendered HTML input element."/>
+    <aura:attribute name="labelClass" type="String" default="" description="A CSS style to be attached to the label. This style is added in addition to base styles output by the component."/>
+    <aura:attribute name="labelDisplay" type="Boolean" default="{!true}" description="Specifies whether the label is displayed. If not, we add a hidden text for accessibility purpose."/>
+    <aura:attribute name="iconImgSrc" type="String" default="/auraFW/resources/aura/s.gif" description="The absolute or relative URL of the icon to display on the button. The image's alt attribute is set to the value of the button’s label attribute."/>
+    <aura:attribute name="iconClass" type="String" default="" description="A CSS style to be attached to the button's icon. This style is added in addition to base styles output by the component."/>
+    <aura:attribute name="disabled" type="Boolean" default="false" description="Specifies whether this button should be displayed in a disabled state. Disabled buttons can't be clicked. Default value is &quot;false&quot;."/>
+    <aura:attribute name="accesskey" type="String" default="" description="The keyboard access key that puts the button in focus. When the button is in focus, pressing Enter clicks the button."/>
+    <aura:attribute name="labelDir" type="String" default="ltr" description="The direction in which the label should be read. Possible values are &quot;rtl&quot; (right to left) and &quot;ltr&quot; (left to right). Default value is &quot;ltr&quot;."/>
+
+    <aura:registerevent name="press" type="ui:press" description="The controller method that runs when the button is clicked. For example, press=&quot;{!c.showMsg}&quot; references the showMsg method in the controller."/>
+
+    <button type="{!v.buttonType}" aura:id="button" class="{!v.class +' '+v.theme+' uiBlock'}" onclick="{!c.press}" disabled="{!v.disabled}" accesskey="{!v.accesskey}" title="{!v.buttonTitle}">
+        <aura:if isTrue="{!v.iconImgSrc != null || v.iconClass != null}">
+            <img src="{!v.iconImgSrc}" class="{!v.iconClass+' icon bLeft'}" alt="{!v.label}"/>
+        </aura:if>
+        <aura:if isTrue="{!v.labelDisplay}">
+            <span aura:id="span" class="{!v.labelClass+' label bBody truncate'}" dir="{!v.labelDir}">{!v.label}</span>
+            <aura:set attribute="else">
+                <span aura:id="hidden" class="assistiveText">{!v.label}</span>
+            </aura:set>
+        </aura:if>
+        {!v.body}
+    </button>
+</aura:component>

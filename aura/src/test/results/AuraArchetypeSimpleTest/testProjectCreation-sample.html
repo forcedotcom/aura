@@ -1,0 +1,188 @@
+
+    <!DOCTYPE html><html><head><title>Aura</title><script>var pageStartTime = (new Date()).getTime();</script><style>
+	html, body, div, span, applet, object, iframe,
+	h1, h2, h3, h4, h5, h6, p, blockquote,
+	a, abbr, acronym, address, big, cite, code,
+	del, dfn, em, font, img, ins, kbd, q, s, samp,
+	small, strike, strong, sub, sup, tt, var,
+	dl, dt, dd, ol, ul, li,
+	fieldset, form, label, legend,
+	table, caption, tbody, tfoot, thead, tr, th, td {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		outline: 0;
+		font-weight: inherit;
+		font-style: inherit;
+		font-size: 100%;
+		font-family: inherit;
+		vertical-align: baseline;
+	    
+	    font-family:Arial,Helvetica,sans-serif;
+	}
+	a{
+	    text-decoration: none;
+	    color: #015BA7;
+	}
+	/* remember to define focus styles! */
+	:focus {
+		outline: 0;
+	}
+	body {
+		line-height: 1;
+		color: black;
+		background: white;
+	}
+	html,body{
+		height : 100%;
+	}
+	ol, ul {
+		list-style: none;
+	}
+	/* tables still need 'cellspacing="0"' in the markup */
+	table {
+		border-collapse: separate;
+		border-spacing: 0;
+	}
+	caption, th, td {
+		text-align: left;
+		font-weight: normal;
+	}
+	blockquote:before, blockquote:after,
+	q:before, q:after {
+		content: "";
+	}
+	blockquote, q {
+		quotes: "" "";
+	}
+			</style><style>
+    	.auraMsgMask{
+    		position: absolute;
+    		top: 0;
+    		bottom: 0;
+    		left: 0;
+    		right: 0;
+			background:-webkit-radial-gradient(circle, rgba(0,0,0,0.2), #000);
+    		z-index: 1000;
+    		display: none;
+    	}
+    	.auraMsgBox{
+			display: none;
+			width:100%;
+			margin: 120px auto 0;
+		    background-color: slategray;
+		    z-index: 1002;
+		    border-radius: 5px;
+		    box-shadow: 0 20px 40px rgba(0,0,0,.8), inset 0 1px 1px rgba(255, 255, 255, .3);
+		    overflow: hidden;
+		}
+		.auraMsgBox h2{
+			font-weight:bold;
+			font-size: 1.2em;
+			line-height: 1.5em;
+			margin: 0;
+			padding:10px;
+			overflow: hidden;
+		}
+		.auraErrorBox h2{
+			text-shadow: 1px 1px 1px rgba(0,0,0,.5);
+			color: #fff;
+		}		
+		.auraMsgBox a.close{
+			float: right;
+			font-weight: bold;
+			font-size: 20px;
+			line-height: 1em;
+			color: #fff;
+			background-color: transparent;
+			border: 1px solid #666;
+			box-shadow: inset 0 1px 1px rgba(255, 255, 255, .2), 0 1px 1px rgba(0, 0, 0, .4);
+			border-radius: 4px;
+			padding: 0 6px 4px;
+			margin:0;
+		}
+		.auraLoadingBox{
+			text-align: center;
+			width:200px;
+			line-height: 80px;
+		}
+		.auraErrorBox{
+			position: relative;
+			width: 80%;
+			z-index: 999;
+		}
+		.auraError #auraErrorMessage{
+			background-color: gainsboro;
+			margin: 0 10px 10px;
+			padding: 10px;
+			color: #333;
+			min-height: 200px;
+			max-height: 300px;
+			overflow: auto;
+			white-space: pre-wrap;
+			font-family: monospace;
+			box-shadow: inset 0 0 10px rgba(0,0,0,.4);
+			border: 1px solid #666;
+		}
+		.auraForcedErrorBox.auraMsgMask,
+		.auraForcedErrorBox .auraErrorBox,
+		body.auraError .auraMsgMask,
+		body.loading .auraLoadingBox,
+		body.auraError .auraErrorBox{
+			display:block;
+		}
+	
+		#auraAppcacheProgress{
+			display:none;
+     		position: absolute;
+     		width: 120px;
+     		height: 26px;
+     		top: -10px;
+     		left: 50%;
+     		margin-left: -60px;
+     		background-color: gray;
+			border-radius:5px;
+			overflow:hidden;
+			z-index:9999;
+		}
+		#auraAppcacheProgress .progressBox{
+     		position: absolute;
+     		top:14px;
+     		left:10px;
+			width:100px;
+			height:6px;
+			overflow:hidden;
+			background-color:white;
+			border-style:solid;
+			border-color:#999;
+			border-width:1px;
+		}
+		#auraAppcacheProgress .progressBar{
+			width:1px;
+			height:8px;
+			overflow:hidden;
+			background-color:blue;
+			border-style:solid;
+			border-color:black;
+			border-width:1px;
+		}
+		#auraAppcacheProgress.error .progressBar{
+			border-color:red;
+			background-color:pink;
+		}
+    </style>        <link href="/l/%7B%22mode%22%3A%22DEV%22%2C%22app%22%3A%22myArtifactId%3AmyArtifactId%22%2C%22preloads%22%3A%5B%22aura%22%2C%22ui%22%2C%22auradev%22%5D%2C%22requestedLocales%22%3A%5B%22en_US%22%5D%2C%22%22%7D/app.css" rel="stylesheet" type="text/css"/>
+<style></style></head><body class=" "><div id="auraAppcacheProgress"><div class="progressBox"><div class="progressBar"></div></div></div><div class="auraMsgBox auraLoadingBox" id="auraLoadingBox" id="auraLoading"><div class="logo"></div><div class="spinner"></div><h2>Loading</h2></div><div class="auraMsgMask" id="auraErrorMask"><div class="auraMsgBox auraErrorBox" id="auraError"><h2><a class="close" href="javascript:void(0);" onclick="dismissError();">×</a>
+						Oh dear, something's gone wrong:
+					</h2><div id="auraErrorMessage">CSS Error</div></div></div>
+hello web, from myArtifactId
+<script>
+	        if (false) {
+	    		$L.initAsync();
+    		}else if(false){
+    			$L.initConfig();
+    		}	        
+	        function dismissError() {
+	        	$F.util.removeClass(document.body,'auraError');
+	        	$F.util.removeClass(auraErrorMask,'auraForcedErrorBox');
+	        }
+        	</script></body></html>

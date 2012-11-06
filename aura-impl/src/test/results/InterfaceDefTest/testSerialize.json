@@ -1,0 +1,17 @@
+{
+  "serId":1,
+  "value":{
+    "descriptor":"markup://aura:testinterfacechild",
+    "attributes":{
+      "Fake Attribute":{
+        "serId":2,
+        "value":{
+          "descriptor":"Fake Attribute",
+          "required":false,
+          "serializeTo":"BOTH"
+        }
+      }
+    },
+    "isAbstract":true
+  }
+}

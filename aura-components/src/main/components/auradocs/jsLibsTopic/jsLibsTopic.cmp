@@ -1,0 +1,48 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Using JavaScript Libraries"/>
+
+    <p>To use a JavaScript library, you must reference it in your app's template. Use <code>aura:set</code> to set the <code>extraScriptTags</code> attribute in the template component. This sets the <code>extraScriptTags</code> attribute in <code>aura:template</code>, which your app's template extends.</p>
+    
+    <p>For example, the Aura Note sample app uses <code>ckeditor.js</code>, which is a third-party JavaScript library. <code>auranote:template</code> includes this markup to include the library.</p>
+    
+<auradocs:codeblock><![CDATA[
+    <aura:set attribute="extraScriptTags">
+        <script type="text/javascript" src="/aura/ckeditor/ckeditor.js"></script>
+    </aura:set>]]>
+</auradocs:codeblock>    
+
+    <p>This enables your code to use the library at <code>lumen-note/src/main/webapp/aura/ckeditor/ckeditor.js</code>.</p>
+    
+    <p>You can use multiple <code>&lt;script&gt;</code> tags to include more than one library. For example:</p>
+    
+<auradocs:codeblock><![CDATA[
+    <aura:set attribute="extraScriptTags">
+        <script type="text/javascript" src="/aura/ckeditor/ckeditor.js"></script>
+        <script type="text/javascript" src="/aura/codemirror/codemirror.js"></script>
+    </aura:set>]]>
+</auradocs:codeblock>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="buildApp">Aura Note Demo App</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="createAppTemplate">Creating an App Template</auradocs:topicLink><br/>
+        <auradocs:defLink descriptor="aura:template">aura:template</auradocs:defLink>
+    </p>
+            
+</aura:component>

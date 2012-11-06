@@ -1,0 +1,49 @@
+/****** resetCSS.css has been temporarily 'inlined' in template.cmp.   Talk to ibogdanov for more details
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+dl, dt, dd,fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-weight: inherit;
+	font-style: inherit;
+	font-size: 100%;
+	vertical-align: baseline; 
+}
+a{
+    text-decoration: none;
+    color: #015BA7;
+}
+
+body {
+	line-height: 1;
+	color: black;
+	background: white;
+    font-family:"HelveticaNeue", Helvetica, Arial, sans-serif;
+}
+html,body{
+	height : 100%;
+}*/
+/* tables still need 'cellspacing="0"' in the markup */
+/*
+table {
+	border-collapse: separate;
+	border-spacing: 0;
+}
+caption, th, td {
+	text-align: left;
+	font-weight: normal;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: "";
+}
+blockquote, q {
+	quotes: "" "";
+}
+*/

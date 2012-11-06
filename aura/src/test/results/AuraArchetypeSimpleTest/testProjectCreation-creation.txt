@@ -1,0 +1,28 @@
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Maven Stub Project (No POM) 1
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] >>> maven-archetype-plugin:2.2:generate (default-cli) @ standalone-pom >>>
+[INFO] 
+[INFO] <<< maven-archetype-plugin:2.2:generate (default-cli) @ standalone-pom <<<
+[INFO] 
+[INFO] --- maven-archetype-plugin:2.2:generate (default-cli) @ standalone-pom ---
+[INFO] Generating project in Batch mode
+[INFO] Archetype defined by properties
+[INFO] ----------------------------------------------------------------------------
+[INFO] Using following parameters for creating project from Archetype: aura-archetype-simple:1.2.001
+[INFO] ----------------------------------------------------------------------------
+[INFO] Parameter: groupId, Value: myGroupId
+[INFO] Parameter: artifactId, Value: myArtifactId
+[INFO] Parameter: version, Value: 1.0-SNAPSHOT
+[INFO] Parameter: package, Value: .
+[INFO] Parameter: packageInPathFormat, Value: /
+[INFO] Parameter: package, Value: .
+[INFO] Parameter: version, Value: 1.0-SNAPSHOT
+[INFO] Parameter: groupId, Value: myGroupId
+[INFO] Parameter: artifactId, Value: myArtifactId
+[INFO] project created from Archetype in dir: TEMPDIR/myArtifactId
+[INFO] ------------------------------------------------------------------------
+[INFO] 

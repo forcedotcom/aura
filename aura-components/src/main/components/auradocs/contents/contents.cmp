@@ -1,0 +1,185 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <auradocs:openTopicTree aura:id="topicTree" layoutToken="help" catchAllHref="#help?topic=welcome" />
+    <auradocs:searchFilterTree aura:id="searchTree" />
+    <ui:tree aura:id="tree">
+        <auradocs:contentsNode text="Getting Started" expanded="true">
+            <auradocs:contentsNode text="Welcome" id="welcome" />
+            <auradocs:contentsNode text="Overview" id="gettingStarted" />
+            <auradocs:contentsNode text="FAQs" >
+                <auradocs:contentsNode text="What are the benefits of using Aura?" id="faqBenefits" />
+                <auradocs:contentsNode text="What is a Aura Component?" id="faqComp" />
+                <auradocs:contentsNode text="What is a Aura App?" id="faqApp" />
+                <auradocs:contentsNode text="How do I use Events in Aura?" id="faqEvents" />
+                <auradocs:contentsNode text="What happens when I make an initial request?" id="faqInit" />
+                <auradocs:contentsNode text="Which browsers does Aura support?" id="faqBrowsers" />
+                <auradocs:contentsNode text="What do Aura version numbers mean?" id="faqVersions" />
+            </auradocs:contentsNode>
+
+            <auradocs:contentsNode text="Quick Start" expanded="true" >
+                <auradocs:contentsNode text="Introduction" id="qsIntro" />
+                <auradocs:contentsNode text="Quick Start: Command Line" id="qsCmdLine" />
+                <auradocs:contentsNode text="Quick Start: Eclipse">
+                    <auradocs:contentsNode text="Create a Aura App in Eclipse" id="eclipseCreateApp" />
+                    <auradocs:contentsNode text="Install the Aura Assist Eclipse Plugin" id="auraPlugin" />
+                    <auradocs:contentsNode text="Add a Component" id="eclipseCreateCmp" />
+                </auradocs:contentsNode>
+                <auradocs:contentsNode text="Next Steps" >
+                    <auradocs:contentsNode text="Introduction" id="qsNextSteps" />
+                    <auradocs:contentsNode text="Build Aura from Source" id="buildFromSource" />
+                    <auradocs:contentsNode text="Aura Demo" id="buildApp" />
+                </auradocs:contentsNode>
+            </auradocs:contentsNode>
+        </auradocs:contentsNode>
+
+        <auradocs:contentsNode text="The Basics" expanded="true" >
+            <auradocs:contentsNode text="Overview" id="basics"/>
+            <auradocs:contentsNode text="Components" >
+                <auradocs:contentsNode text="Introduction" id="components"/>
+                <auradocs:contentsNode text="Components Overview" id="helloWorld"/>
+                <auradocs:contentsNode text="Component Bundles" id="compBundle"/>
+                <auradocs:contentsNode text="Component IDs" id="compIds"/>
+                <auradocs:contentsNode text="Applying HTML and CSS" id="helloHTML"/>
+                <auradocs:contentsNode text="Component Attributes" id="helloAttributes"/>
+                <auradocs:contentsNode text="Component Composition" id="nestedComponents"/>
+                <auradocs:contentsNode text="Component Body and Facets" id="helloFacets"/>
+                <auradocs:contentsNode text="Lazy Loading a Component" id="lazyload"/>
+            </auradocs:contentsNode>
+            <auradocs:contentsNode text="Expressions" >
+                <auradocs:contentsNode text="Introduction" id="expressions"/>
+                <auradocs:contentsNode text="Example Expressions" id="expressionsExamples"/>
+                <auradocs:contentsNode text="Accessing Data using Expressions" id="expressionsSourceValues"/>
+                <auradocs:contentsNode text="Expression Results" id="expressionsResults"/>
+                <auradocs:contentsNode text="Expression Evaluation" id="expressionsEvaluation"/>
+                <auradocs:contentsNode text="Operator Reference" id="expressionsOperators"/>
+            </auradocs:contentsNode>
+            <auradocs:contentsNode text="Events" >
+                <auradocs:contentsNode text="Introduction" id="helloEvents"/>
+                <auradocs:contentsNode text="Client-Side Controllers" id="helloActions"/>
+                <auradocs:contentsNode text="Event Handling Lifecycle" id="eventsOverview"/>
+                <auradocs:contentsNode text="Component Events" id="eventsComp"/>
+                <auradocs:contentsNode text="Application Events" id="eventsApp"/>
+                <auradocs:contentsNode text="Events Demo" id="eventsDemo"/>
+            </auradocs:contentsNode>
+        </auradocs:contentsNode>
+
+        <auradocs:contentsNode text="Creating Apps">
+            <auradocs:contentsNode text="Overview" id="createApps"/>
+            <auradocs:contentsNode text="Designing App UI" id="designAppLayout"/>
+            <auradocs:contentsNode text="Creating App Templates" id="createAppTemplate"/>
+            <auradocs:contentsNode text="Adding App Components" id="addAppComponents"/>
+            <auradocs:contentsNode text="Styling Apps" id="styleApp"/>
+            <auradocs:contentsNode text="Handling App Navigation" >
+                <auradocs:contentsNode text="Introduction" id="urlNav" />
+                <auradocs:contentsNode text="Using Layouts for Metadata-Driven Navigation" id="layouts"/>
+            </auradocs:contentsNode>
+            <auradocs:contentsNode text="Using AppCache" id="appcache" />
+            <auradocs:contentsNode text="Controlling App Access with Security Providers" id="securityProviders" />
+        </auradocs:contentsNode>
+
+        <auradocs:contentsNode text="Code" >
+            <auradocs:contentsNode text="Overview" id="code"/>
+            <auradocs:contentsNode text="JavaScript" >
+                <auradocs:contentsNode text="Introduction" id="codeJavaScriptIntro"/>
+                <auradocs:contentsNode text="Accessing the DOM" id="domAccess"/>
+                <auradocs:contentsNode text="Using JavaScript Libraries" id="jsLibs" />
+                <auradocs:contentsNode text="Helpers" id="helper"/>
+                <auradocs:contentsNode text="Renderers" id="renderers" />
+                <auradocs:contentsNode text="Error Handling" id="error"/>
+                <auradocs:contentsNode text="Component Tests" >
+                    <auradocs:contentsNode text="Introduction" id="docTests" />
+                    <auradocs:contentsNode text="Assertions" id="testsAssert" />
+                    <auradocs:contentsNode text="User Interactions" id="testsUser" />
+                    <auradocs:contentsNode text="Utility Functions" id="testsUtility" />
+                    <auradocs:contentsNode text="Sample Test Cases" id="testsCases" />
+                </auradocs:contentsNode>
+                <auradocs:contentsNode text="Value Objects" >
+                    <auradocs:contentsNode text="Introduction" id="valueObjects" />
+                    <auradocs:contentsNode text="Value Object Types" id="valueObjectTypes" />
+                    <auradocs:contentsNode text="Detecting a Value Object Change" id="onchange" />
+                </auradocs:contentsNode>
+                <auradocs:contentsNode text="JavaScript Cookbook" >
+                    <auradocs:contentsNode text="Introduction" id="jsCookbook" />
+                    <auradocs:contentsNode text="Finding Components by ID" id="findById" />
+                    <auradocs:contentsNode text="Dynamically Showing or Hiding Markup" id="hideMarkup" />
+                </auradocs:contentsNode>
+            </auradocs:contentsNode>
+
+            <auradocs:contentsNode text="Java" >
+                <auradocs:contentsNode text="Introduction" id="codeJavaIntro" />
+                <auradocs:contentsNode text="Models" id="models" />
+                <auradocs:contentsNode text="Server-Side Controllers" id="serverSideControllers" />
+                <auradocs:contentsNode text="Java Cookbook">
+                    <auradocs:contentsNode text="Introduction" id="javaCookbook" />
+                    <auradocs:contentsNode text="Getting a DefDescriptor" id="javaDefDesc" />
+                    <auradocs:contentsNode text="Getting an Instance of a Component" id="javaInstanceCmp" />
+                </auradocs:contentsNode>
+            </auradocs:contentsNode>
+        </auradocs:contentsNode>
+
+        <auradocs:contentsNode text="Beyond the Basics">
+            <auradocs:contentsNode text="Overview" id="basicsBeyond"/>
+            <auradocs:contentsNode text="Object-Oriented Development" >
+                <auradocs:contentsNode text="Introduction" id="oodIntro" />
+                <auradocs:contentsNode text="What is Inherited?" id="oodWhatsInherited" />
+                <auradocs:contentsNode text="Inheritance Rules" id="oodInheritanceRules" />
+                <auradocs:contentsNode text="Inherited Component Attributes" id="oodInheritedAttributes" />
+                <auradocs:contentsNode text="Traversing a Component’s Extension Hierarchy" id="oodCmpTraverse" />
+                <auradocs:contentsNode text="Abstract Components" id="oodCmpAbstract" />
+                <auradocs:contentsNode text="Interfaces" id="oodInterfaces" />
+                <auradocs:contentsNode text="Providers" id="oodProviders" />
+            </auradocs:contentsNode>
+            <auradocs:contentsNode text="Modes" >
+                <auradocs:contentsNode text="Introduction" id="modesIntro" />
+                <auradocs:contentsNode text="Setting the Mode for a Request" id="modesSetRequest"/>
+                <auradocs:contentsNode text="Modes Reference" id="modesReference" />
+                <auradocs:contentsNode text="Controlling Available Modes" id="modesAvailableSet" />
+                <auradocs:contentsNode text="Setting the Default Mode" id="modesSetDefault" />
+            </auradocs:contentsNode>
+            <auradocs:contentsNode text="Component Request Lifecycle" >
+                <auradocs:contentsNode text="Introduction" id="cycleOverview" />
+                <auradocs:contentsNode text="Component Request Overview" id="cycleComp" />
+                <auradocs:contentsNode text="Server-Side Process" id="cycleInit" />
+                <auradocs:contentsNode text="Client-Side Process" id="clientInit" />
+                <auradocs:contentsNode text="Component Request Glossary" id="cycleRefs" />
+            </auradocs:contentsNode>
+        </auradocs:contentsNode>
+
+        <auradocs:contentsNode text="Reference" >
+            <auradocs:contentsNode text="Overview" id="reference"/>
+            <auradocs:contentsNode text="Javadoc" id="javadoc"/>
+            <auradocs:contentsNode text="aura:renderIf " id="tagRenderIf" />
+            <auradocs:contentsNode text="aura:iteration" id="tagIteration" />
+            <auradocs:contentsNode text="System Tags">
+                <auradocs:contentsNode text="aura:application" id="appOverview"/>
+                <auradocs:contentsNode text="aura:set" id="tagAuraSet"/>
+            </auradocs:contentsNode>
+            <auradocs:contentsNode text="Supported HTML Tags" id="htmlTags"/>
+            <auradocs:contentsNode text="Supported aura:attribute Types" >
+                <auradocs:contentsNode text="Introduction" id="attrTypesOverview" />
+                <auradocs:contentsNode text="Basic Types" id="attrTypesBasic"/>
+                <auradocs:contentsNode text="Collection Types" id="attrTypesCollection"/>
+                <auradocs:contentsNode text="Custom Java Class Types" id="attrTypesJava"/>
+                <auradocs:contentsNode text="Aura-Specific Types" id="attrTypesAuraSpecific"/>
+            </auradocs:contentsNode>
+        </auradocs:contentsNode>
+    </ui:tree>
+</aura:component>

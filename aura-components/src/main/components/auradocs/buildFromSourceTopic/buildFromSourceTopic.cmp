@@ -1,0 +1,100 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Build Aura from Source"/>
+
+    <p>You don't have to build Aura from source to use it. However, if you want to customize the source code or submit a pull request with enhancements to the framework, here's how to do it.
+    </p>
+
+    <h2>Prerequisites</h2>
+        <ol>
+
+            <li><a href="http://www.oracle.com/technetwork/java/javase/downloads/" target="_blank">JDK 1.6</a></li>
+            <li><a href="http://maven.apache.org/download.html" target="_blank">Maven 3</a></li>
+        </ol>
+
+
+    <h2>Step 1: Install git</h2>
+
+    <p>The Aura source code is available on GitHub. To download the source code, you need an account on GitHub and the <code>git</code> command-line tool.</p>
+
+    <ol>
+        <li>Create a GitHub account at <a href="https://github.com/signup/free" target="_blank">https://github.com/signup/free</a>.</li>
+        <li>Follow the instructions at <a href="https://help.github.com/articles/set-up-git" target="_blank">https://help.github.com/articles/set-up-git</a> to install and configure <code>git</code> and <code>ssh</code> keys.</li>
+    </ol>
+
+    <p>You don't have to create your own repository. You'll be cloning the Aura source next.</p>
+
+    <h2>Step 2: Get and Build Aura Source</h2>
+
+    <ol>
+        <li>On the command line, navigate to the directory where you want to keep the Aura source code.</li>
+        <li>Run the following commands to clone the source with <code>git</code> and build it with Maven:<br/>
+        <auradocs:codeblock>
+git clone git@github.com:forcedotcom/lumen-beta.git
+cd lumen-beta
+mvn install
+        </auradocs:codeblock>
+        </li>
+    </ol>
+
+    <p>You should see a message that the build completed successfully.</p>
+
+    <h2>Step 3: Import Aura Source into Eclipse</h2>
+
+    <p>You can use your IDE of choice. These instructions show you how to import the Aura source into Eclipse.</p>
+
+    <ol>
+        <li>Install <a href="http://www.eclipse.org/downloads/" target="_blank">Eclipse 3.7</a>. Choose the Eclipse distribution for Java EE Developers. This includes JavaScript editing and other Web UI tools.</li>
+        <li>Open Eclipse and install the Eclipse Maven plugin, m2eclipse, by clicking <b>Help > Install New Software ...</b></li>
+        <li>Enter <code>http://download.eclipse.org/technology/m2e/releases</code> and click <b>Add</b>.</li>
+        <li>Select Maven Integration for Eclipse and click <b>Next</b>.</li>
+        <li>Import the Aura source by clicking <b>File > Import > Maven > Existing Maven Projects</b>.</li>
+        <li>Click <b>Next</b>.</li>
+        <li>In the <b>Root Directory</b> field, browse to the <code>lumen-beta</code> directory that you cloned.</li>
+        <li>Click <b>Next</b>.</li>
+        <li>Click <b>Finish</b>.</li>
+    </ol>
+
+    <p>You should see the source in the Package Explorer.</p>
+
+    <h2>Step 4: Run Aura from Eclipse</h2>
+
+    <p>To run Aura's Jetty server from Eclipse:</p>
+
+    <ol>
+        <li>Click <b>Window > Preferences > Maven > Installations > Add...</b></li>
+        <li>Navigate to your Maven installation and select it.</li>
+        <li>Click <b>Run > Debug Configurations...</b></li>
+        <li>Right click <b>Maven Build</b> and select <b>New</b>.</li>
+        <li>Enter <code>Aura Jetty</code> in the Name field.</li>
+        <li>In the <b>Base directory</b> field, click <b>Browse Workspace...</b></li>
+        <li>Select <code>aura-jetty</code> and click <b>OK</b>.</li>
+        <li>Enter <code>jetty:run</code> in the <b>Goals</b> field.</li>
+        <li>Click <b>Apply</b>.</li>
+        <li>Click <b>Debug</b>.</li>
+    </ol>
+
+    <p>In the Console window, you should see a message that the Jetty server started. In a browser, navigate to <a href="http://localhost:9090/" target="_blank">http://localhost:9090/</a> to access the server.</p>
+
+    <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="auraPlugin">Install the Aura Assist Eclipse Plugin</auradocs:topicLink> <br/>
+    </p>
+
+</aura:component>

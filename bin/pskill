@@ -1,0 +1,7 @@
+#!/bin/bash
+PID=`ps -ef | grep " $@" | tr -s " " | cut -d " " -f2`
+if [ "X$PID" = "X" ]; then
+ echo Process not found.
+ exit 0
+fi
+kill -s TERM $PID

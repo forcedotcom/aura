@@ -1,0 +1,22 @@
+{
+  "serId":1,
+  "value":{
+    "descriptor":"markup://fake:component",
+    "superDef":{
+      "serId":2,
+      "value":{
+        "descriptor":"markup://aura:component"
+      }
+    },
+    "attributeDefs":[
+      {
+        "serId":3,
+        "value":{
+          "descriptor":"body",
+          "typeDefDescriptor":"aura://Aura.Component[]",
+          "required":false
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Finding Components by ID"/>
+
+<h2>Goal</h2>
+
+    <p>You want to retrieve a component by its ID in JavaScript code. For example, a component has a local ID of <code>button1</code>.</p>
+
+<auradocs:codeblock><![CDATA[<div>
+    <ui:button aura:id="button1" label="button1"/>
+</div>]]></auradocs:codeblock>
+
+<h2>Code</h2>
+
+    <p>You can find the button component by calling <code>cmp.find("button1")</code>, where <code>cmp</code> is a reference to the button component in your JavaScript code. The <code>find()</code> function has one parameter, which is the local ID of a component within the markup.</p>
+
+    <p>You can also retrieve the button by calling the <code>get("button1")</code> function.</p>
+
+<h2>Discussion</h2>
+
+    <!-- TODO: left out mention of def, e, or "var" of a loop in lookup path for get() as we don't cover these in doc yet. Revisit later. -->
+    <p>The <code>get()</code> function does more extensive searching than <code>find()</code>. The <code>find()</code> function only looks up components by local ID.  The <code>get()</code> function first checks for the component in the component's value providers: <code>m</code>, <code>v</code>, and <code>c</code>. If the component isn't found in the value providers, <code>find()</code> is called.</p>
+
+    <p>You can also retrieve a component by its global ID if you already have a value for the component's <code>globalId</code> in your code.</p>
+
+<auradocs:codeblock>var comp = $A.getCmp(globalId);</auradocs:codeblock>
+
+<p><b>See also:</b><br/>
+    <auradocs:topicLink topic="compIds">Component IDs</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="expressionsSourceValues">Value Providers</auradocs:topicLink>
+</p>
+
+</aura:component>

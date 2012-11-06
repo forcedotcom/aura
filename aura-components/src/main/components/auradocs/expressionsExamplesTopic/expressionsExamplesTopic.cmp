@@ -1,0 +1,82 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+<aura:set attribute="title" value="Example Aura Expressions"/>
+
+<p>Here are a few examples of expressions used in Aura code that illustrate various interesting aspects of Aura expressions. Don't worry if you understand them completely yet, later sections will explain.</p>
+
+<h2>Dynamic Output</h2>
+
+<p>The simplest way to use expressions is to simply output them. Values used in the expression can be from attributes in the view, or property values on a model object retrieved from a server, literal values, and so on.</p>
+
+<code>&lt;p class="desc truncate"&gt;<aura:text value="{!"/>v.desc}&lt;/p&gt;</code>
+
+<p>In the expression <code><aura:text value="{!"/>v.desc}</code>, <code>v</code> represents the view, which is the component itself, and <code>desc</code> is an attribute of the component. The expression is simply outputting the <code>desc</code> attribute value for the component that contains this markup.</p>
+
+<auradocs:codeblock>&lt;div>
+    &lt;h2><aura:text value="{!"/> 'Title: ' + m.title}&lt;/h2>
+    &lt;p class="note-body"><aura:text value="{!"/>m.body}&lt;/p>
+&lt;/div></auradocs:codeblock>
+
+<p>The expressions here display values retrieved from the server, held in an object <code>m</code>, the component's model. More details on using <code>m</code> and <code>v</code> in <auradocs:topicLink topic="expressionsSourceValues">Sources for Values Available for Use in Expressions</auradocs:topicLink>. The title attribute is concatenated with the literal value "Title: ".</p>
+
+<h2>Passing Values</h2>
+
+<p>Use expressions to pass values around in Aura. For example:</p>
+
+<code>&lt;ui:button label="<aura:text value="{!"/>m.myLabel}"/&gt;</code>
+
+<p>The <code><aura:text value="{!"/>m.myLabel}</code> expression passes the <code>myLabel</code> field from the model to the <code>ui:button</code> component. <strong>The expression is not evaluated yet.</strong> When the <code>ui:button</code> component renders, it evaluates the expression to retrieve the label. See <auradocs:topicLink topic="expressionsEvaluation">Expression Evaluation</auradocs:topicLink> for more details on when expressions are evaluated.</p>
+
+<code>&lt;ui:button aura:id="newNote" label="New Note" press="<aura:text value="{!"/>c.createNote}"/&gt;</code>
+
+<p>The expression <code><aura:text value="{!"/>c.createNote}</code> is used to assign a controller action to the <code>press</code> attribute of a button component. <code>c</code> represents the controller for the component, and <code>createNote</code> is the action.</p>
+
+<h2>Conditional Expressions</h2>
+
+<p>Although conditional expressions are really just a special case of the previous two, it's worth seeing a few examples.</p>
+
+<code>&lt;option value="createdOn.desc"
+    selected="<aura:text value="{!"/>v.sort == 'createdOn.desc'}"&gt;Newest First&lt;/option&gt;</code>
+
+<p>The expression <code><aura:text value="{!"/>v.sort == 'createdOn.desc'}</code> is used to conditionally set the <code>selected</code> attribute of an HTML <code>&lt;option&gt;</code> tag, by comparing the component's <code>sort</code> attribute with the value of the specific option. The expression simply outputs true or false, which the HTML tag uses to show the option as selected or not.</p>
+
+<auradocs:codeblock>&lt;!-- Like button and annotation text --&gt;
+&lt;ui:image class="likeIcon"/&gt;
+&lt;aura:renderif isTrue="<aura:text value="{!"/>m.likeId != null}"&gt;
+    &lt;!-- you liked it --&gt;
+    &lt;aura:renderif isTrue="<aura:text value="{!"/>m.othersLikeCount == 0}"&gt;
+        &lt;!-- only you liked it --&gt;
+        &lt;aura:label value="<aura:text value="{!"/>$Label.SocialApp.YouLike}"/&gt;
+    &lt;aura:set attribute="else"&gt;
+        &lt;!-- other people liked it too --&gt;
+        &lt;aura:label value="<aura:text value="{!"/>$Label.SocialApp.YouAndOthersLike}"&gt;
+            <aura:text value="{!"/>m.othersLikeCount}
+            &lt;/aura:label&gt;
+        &lt;/aura:set&gt;
+    &lt;/aura:renderif&gt;
+    &lt;aura:set attribute="else"&gt;
+        &lt;!-- other people have liked it, not you (yet) --&gt;
+        <aura:text value="{!"/> m.othersLikeCount &gt; 0 ? m.othersLikeCount : ''}
+        &lt;/aura:set&gt;
+&lt;/aura:renderif&gt;
+</auradocs:codeblock>
+
+<p>This complex looking snippet uses many expressions, along with the <code>&lt;aura:renderif&gt;</code> component, to conditionally display the right message depending on whether you and other people have liked whatever is being displayed.</p>
+
+</aura:component>

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Find the binary, by substituting "/bin/whatever" of this command
+# with "target/bin/chromedriver"
+binary="${0%/bin/*}/target/bin/chromedriver"
+chmod 775 $binary
+$binary $@ 1> chromedriver.log 2>&1

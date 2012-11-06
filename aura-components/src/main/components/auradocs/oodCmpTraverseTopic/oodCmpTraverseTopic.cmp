@@ -1,0 +1,53 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Traversing a Component’s Extension Hierarchy"/>
+
+    <p>When you instantiate a component that extends a super component, the super component is instantiated as a separate component object. You can access the super component by calling <code>getSuper()</code> on the component.</p>
+
+    <p>For the rest of this topic, when we refer to a component, it could be a component or an app. In JavaScript, you can get a collection of all the attribute values for a component or app by calling <code>getAttributes()</code> on the component or app.</p>
+
+    <p>Some of the attributes may be inherited from super components, so this collection only gives us access to attribute values that are set in the concrete component's scope. The super component may have different values for attributes with the same name, or may also have values for attributes that we have no value for at this level of the extension hierarchy.</p>
+
+    <p>Now that we know that for any given component, an attribute may have different values at different extension levels, let’s look at a JavaScript code sample that traverses to the root of the extension hierarchy and looks at the <code>body</code> attribute for that <code>&lt;aura:component&gt;</code>.</p>
+
+
+<auradocs:codeblock>
+<![CDATA[
+    var cmp;
+    var superCmp = cmp.getSuper();
+    while (superCmp) {
+        cmp = superCmp;
+        superCmp= cmp.getSuper();
+    }
+
+    // Now, cmp points to the root of the hierarchy.
+    // We can get the body array from it.
+    var bodyArray = cmp.get("v.body");
+    for(var i=0; i < bodyArray.length; i++) {
+        var bodyCmp = bodyArray[i];
+        // do something with this component
+    }
+]]>
+</auradocs:codeblock>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="helloFacets">Component Body and Facets</auradocs:topicLink>
+    </p>
+</aura:component>

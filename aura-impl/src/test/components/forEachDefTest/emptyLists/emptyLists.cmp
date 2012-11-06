@@ -1,0 +1,43 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
+    <aura:attribute name="string" type="String[]"/>
+    <aura:attribute name="number" type="Integer[]"/>
+    <aura:attribute name="bool" type="Boolean[]"/>
+
+    <forEachDefTest:forEachDefDisplay aura:id="start" number="0"/>
+    <aura:forEach items="{!m.stringListNull}" var="i">
+        <forEachDefTest:forEachDefDisplay aura:id="modelStringListNull" number="{!i}"/>
+    </aura:forEach>
+    <aura:forEach items="{!m.integerListNull}" var="i">
+        <forEachDefTest:forEachDefDisplay aura:id="modelIntegerListNull" number="{!i}"/>
+    </aura:forEach>
+    <aura:forEach items="{!m.doubleListNull}" var="i">
+        <forEachDefTest:forEachDefDisplay aura:id="modelDoubleListNull" number="{!i}"/>
+    </aura:forEach>
+    <aura:forEach items="{!m.booleanListNull}" var="i">
+        <forEachDefTest:forEachDefDisplay aura:id="modelBooleanListNull" number="{!i}"/>
+    </aura:forEach>
+    <aura:forEach items="{!m.objectNull}" var="i">
+        <forEachDefTest:forEachDefDisplay aura:id="modelNull" number="{!i}"/>
+    </aura:forEach>
+    <aura:forEach items="{!m.emptyList}" var="i">
+        <forEachDefTest:forEachDefDisplay aura:id="modelEmptyList" number="{!i}"/>
+    </aura:forEach>
+    <forEachDefTest:forEachDefDisplay aura:id="end" number="1"/>
+</aura:component>

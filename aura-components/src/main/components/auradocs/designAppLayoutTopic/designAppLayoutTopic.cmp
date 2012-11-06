@@ -1,0 +1,55 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Designing App UI"/>
+
+    <p>A Aura app is a special top-level component whose markup is in a <code>.app</code> file. The markup looks similar to HTML and can contain components as well as a set of supported HTML tags. Design your app's UI by including markup in the <code>.app</code> file, which starts with the <code>&lt;aura:application&gt;</code> tag.</p>
+    
+    <h2>Sample App</h2>
+
+    <p>Let's take a look at the <code>notes.app</code> file for the Aura Note sample app.</p>
+
+<auradocs:codeblock>
+    <![CDATA[<aura:application preload="auranote" template="auranote:template">
+    <div>
+      <header>
+          <h1>aura:note</h1>
+      </header>
+      <ui:block class="wrapper" aura:id="block">
+        <aura:set attribute="left">
+             <auranote:sidebar aura:id="sidebar" />
+        </aura:set>
+             <auranote:details aura:id="details" />
+      </ui:block>
+    </div>
+    </aura:application>]]>
+</auradocs:codeblock>
+
+    <p>To learn about system attributes of <code>&lt;aura:application&gt;</code>, such as <code>preload</code> and <code>template</code>, see <auradocs:topicLink topic="appOverview">aura:application</auradocs:topicLink>.</p>
+     
+    <p><code>notes.app</code> contains HTML tags, such as <code>&lt;h1&gt;</code> and <code>&lt;div&gt;</code>, as well as components, such as <code>&lt;ui:block&gt;</code>. We won't go into the details for all the components here but note how simple the markup is. The <code>&lt;auranote:sidebar&gt;</code> and <code>&lt;auranote:details&gt;</code> components encapsulate the layout for the page.</p>
+
+    <p>
+    <ui:image src="/auraFW/resources/aura/images/auraNoteComps.png" alt="auranote components" />
+    </p>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="buildApp">Aura Note Demo App</auradocs:topicLink><br/>
+    </p>
+
+</aura:component>

@@ -1,0 +1,50 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="What is a Aura Component?"/>
+
+
+    <p>Components are the self-contained and reusable units of a Aura app.
+    They represent a reusable section of the UI, and can range in granularity from a single line of text to an entire app.
+    Components are rendered to produce HTML DOM elements within the browser.
+    The framework includes a rich set of prebuilt components.
+    You can assemble and configure components to form new components in an app.</p>
+
+    <p>A component can contain other components, as well as HTML, CSS,  JavaScript, or any other Web-enabled code.
+    This enables you to build apps  with sophisticated UIs.
+    Component files contain the markup used to build that UI and have a .cmp suffix.
+    The markup can contain text or references to other components, and also declares metadata about the component.
+    Components that contain data models are initialized on the server.</p>
+
+    <p>The details of a component's implementation are encapsulated.
+    This allows the consumer of a component to focus on building their app,
+    while the component author can innovate and make changes without breaking consumers.
+    You configure components by setting the named attributes that they expose in their definition.
+    Components interact with their environment by listening to or publishing events.</p>
+
+    <p><ui:image src="/auraFW/resources/aura/images/app.png" alt="Aura App" /></p>
+
+
+    <p><b>See also:</b><br/>
+
+    <auradocs:topicLink topic="eclipseCreateCmp">Add a Component</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="helloWorld">Components Overview</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="nestedComponents">Component Composition</auradocs:topicLink>
+        </p>
+
+</aura:component>

@@ -1,0 +1,26 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Component Request Lifecycle"/>
+
+    <p>This section shows how Aura handles a component request. You can use Aura without knowing these details but read on if you are curious about how things work under the covers.</p>
+
+    <p>We saw in an earlier topic how Aura processes an <auradocs:topicLink topic="faqInit">initial request for an app</auradocs:topicLink>.</p>
+
+    <p>When a component is requested, Aura retrieves the relevant metadata and data to construct the component from the server. The framework uses the metadata and data to construct the component on the client, enabling the client to render the component.</p>
+</aura:component>

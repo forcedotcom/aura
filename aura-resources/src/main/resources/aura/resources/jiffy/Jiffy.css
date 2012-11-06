@@ -1,0 +1,132 @@
+.jiffyAbsolute {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 99%;
+    cursor: move;
+    z-index: 999;
+}
+
+.jiffyContainer {
+    border: 1px solid black;
+    padding: 5px;
+    background-color: white;
+}
+
+.jiffyContainer .buttonBar {
+    width: 100%;
+    background-color: #666;
+}
+
+.jiffyContainer .hidden {
+    display: none;
+}
+
+.jiffyContainer table.measures {
+    font-weight: bold;
+    border-width: 0px;
+    border-style: none;
+    border-collapse: collapse;
+    table-layout: fixed;
+    color:#666;
+}
+
+.jiffyContainer td.unhover {
+}
+
+.jiffyContainer span.onhover {
+    position: relative;
+    z-index: 99;
+}
+
+.jiffyContainer table.measures th,
+.jiffyContainer table.measures td {
+    border-color: #efefef;
+    border-style: solid none;
+    border-width: 1px 0;
+    padding: 4px 0px;
+}
+
+.jiffyContainer td {
+    white-space: nowrap;
+}
+
+.jiffyContainer tr.showRow {
+    display: table-row;
+}
+
+.jiffyContainer tr.hideRow {
+    display: none;
+}
+
+.jiffyContainer td.open {
+    background-image: url(/img/jiffy/twistyOpen.png);
+    background-repeat: no-repeat;
+    background-position: 3px 5px;
+}
+
+.jiffyContainer td.closed {
+    background-image: url(/img/jiffy/twistyClosed.png);
+    background-repeat: no-repeat;
+    background-position: 4px 4px;
+}
+
+.jiffyContainer td.toggle {
+    cursor: pointer;
+}
+
+/* Label column width */
+.jiffyContainer td.mark,
+.jiffyContainer td.measure {
+    width: 150px;
+}
+
+.jiffyContainer tr.markRow td.mark {
+    padding-left: 20px;
+}
+
+.jiffyContainer tr.evtRow td.measure {
+    padding-left: 29px;
+    background-image: url(/img/jiffy/bracket.png);
+    background-repeat: no-repeat;
+    background-position: 21px 5px;
+}
+
+.jiffyContainer tr.evtRow td {
+    font-size: 0.9em;
+}
+
+.jiffyContainer .bar,
+.jiffyContainer .durationBar {
+    float: left;
+}
+
+.jiffyContainer .oddRow {
+    background: #f4f4f4;
+}
+
+.jiffyContainer .evenRow {
+    background: white;
+}
+
+.jiffyContainer .bar {
+    background-image: url(/img/jiffy/bluegradient.png);
+    background-repeat: repeat;
+    background-position: 0px 0px;
+    text-align: right;
+}
+
+.jiffyContainer .durationBar {
+    background-image: url(/img/jiffy/grayflat.png);
+    background-repeat: repeat;
+    background-position: 0px 0px;
+}
+
+.jiffyContainer .elapsed {
+    margin-left: 4px;
+}
+
+.jiffyContainer .statsView{
+    height : 200px;
+    overflow : auto;
+}

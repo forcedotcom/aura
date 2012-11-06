@@ -1,0 +1,37 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="What is a Aura App?"/>
+
+    <!-- Reused in appOverviewTopic too. Consider single sourcing -->
+    <p>A Aura app is a special top-level component whose markup is in a <code>.app</code> file. The markup looks similar to HTML and can contain Aura components as well as a set of supported HTML tags. The <code>.app</code> file is a standalone entry point for the app and enables you to define the overall application layout, style sheets, and global JavaScript includes. It starts with the top-level <code>&lt;aura:application&gt;</code> tag, which contains optional system attributes. These system attributes tell the framework how to configure the app.</p>
+
+    <p>The <code>.app</code> file is the only addressable unit in a browser URL on a production server. Access a Aura app using the URL scheme:</p>
+    <p><code>http://&lt;yourServer&gt;/&lt;namespace&gt;/&lt;application&gt;.app</code></p>
+
+    <auradocs:info>You can access components directly in a browser URL in development mode by using the component's <code>.cmp</code> extension.</auradocs:info>
+
+
+
+    <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="createApps">Creating Apps</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="eclipseCreateCmp">Add a Component</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="appOverview">aura:application</auradocs:topicLink>
+    </p>
+
+</aura:component>

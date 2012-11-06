@@ -1,0 +1,6 @@
+pid=`ps -ef | grep "Xephyr* .* -I $@ X" | tr -s " " | cut -d " " -f2`
+if [ "X${pid}X" = "XX" ]; then
+	echo No Xephyr instance with id $@ found
+	exit 1
+fi
+kill -s TERM $pid

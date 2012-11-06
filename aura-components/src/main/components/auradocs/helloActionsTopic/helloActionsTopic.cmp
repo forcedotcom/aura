@@ -1,0 +1,54 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Client-Side Controllers"/>
+
+    <p>It's time to look in the component bundle again.  <code>aura-components/components/helloActions/</code> contains a file called <code>helloActionsController.js</code>.  Through the benevolence of auto-wiring, just by virtue of having a file named <code>&lt;component&gt;Controller.js</code> in the component bundle, we have added a client-side controller to this component.  As the file extension suggests, this controller is a JavaScript file containing all the component's actions, which are used to handle events within the component.</p>
+
+    <p>The syntax of a client-side controller file is just a simple JavaScript object that defines action functions.  Each action function takes in two parameters: the component to which the controller belongs, and the event that the action is handling.</p>
+
+    <p>The contents of an action can be any valid JavaScript.  There's nothing stopping you from writing <code>alert()</code> statements here except the ridicule of your peers.  However, it's typically more useful to actually change something about the UI, so let's see how we might go about that.</p>
+
+    <h2>Calling Client-Side Controller Actions</h2>
+
+    <p>Let's start by looking at events on an HTML tag.  You can see the contents of <code>helloActions.cmp</code> in the <b>Component source</b> tab.</p>
+
+    <auradocs:example descriptor="auradocs:helloActions" />
+
+    <p>If you know some JavaScript, you might be tempted to write something like the first "Flawed" button in <code>helloActions.cmp</code> because you know that HTML tags are first-class citizens.</p>
+
+    <p>You'd be close, but that button won't do anything in Aura when you click it.  The reason is that Aura has its own event system.  Even though this markup looks like you're coding to a native browser onclick event (and should thus be able to write inline JavaScript to handle it), you're actually coding to a Aura event. Remember how we said HTML tags are actually mapped to Aura components?  This is one of the side effects of that.</p>
+
+    <p>Aura events must be handled by <em>client-side actions</em> in client-side component controllers.</p>
+
+    <p>Next, let's look at the syntax for the <code>onclick</code> attribute in the "Auraized" button. The expression should look a little familiar, but now we see a new value provider prefix, <code>c</code>. Aura is an MVC framework, and <code>v</code> stands for "view", so it's a safe bet that <code>c</code> stands for "controller".  So we're referring to something called <code>handleClick</code> on a controller. The "Native" button uses the same syntax with the <code>press</code> attribute in the <code>&lt;ui:button&gt;</code> component.</p>
+
+    <p>In this simple scenario, there is little difference between working with the "Native" button or the "Auraized" HTML button. It's a matter of preference whether you prefer to work with HTML or Aura markup. However, when you start working with more complex reusable components, the components that come out-of-the-box with Aura can simplify your job by taking care of some of the plumbing that you would otherwise have to create yourself. See the Components folder in the <auradocs:navLink location="reference">Reference tab</auradocs:navLink> for all the components that come out-of-the-box with Aura. The <code>&lt;ui:button&gt;</code> component is under the <code>UI</code> folder.</p>
+
+    <p>Click the <b>js://controller source</b> tab to view the code for <code>helloActionsController.js</code>.
+    In the <code>handleClick</code> function, notice that the first argument to every action is the component to which the controller belongs. And one of the most common things you'll want to do with this component is look at and change its attribute values.</p>
+
+    <p><code>component.getAttributes()</code> returns an AttributeSet object, which enables you to access individual attribute values by calling <code>getRawValue("&lt;attributeName&gt;")</code>.  The <code>aura.log()</code> utility function attempts to find a browser console and logs the attribute value to it.</p>
+
+    <auradocs:info>For more information on Aura's JavaScript API, see JavaScript API in the <auradocs:navLink location="reference">Reference tab</auradocs:navLink>.</auradocs:info>
+
+    <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="eventsOverview">Event Handling Lifecycle</auradocs:topicLink></p>
+
+</aura:component>

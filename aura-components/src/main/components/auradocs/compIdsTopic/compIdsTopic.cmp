@@ -1,0 +1,57 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+<aura:set attribute="title" value="Component IDs"/>
+
+<p>A component has two types of IDs: a local ID and a global ID.</p>
+
+<h2>Local IDs</h2>
+
+<p>A local ID is unique within a component and is only scoped to the component.</p>
+
+    <p>Create a local ID by using the <code>aura:id</code> attribute. For example:</p>
+
+<auradocs:codeblock><![CDATA[<div>
+    <ui:button aura:id="button1" label="button1"/>
+</div>]]></auradocs:codeblock>
+
+    <p><code>aura:id</code> doesn't support expressions. You can only assign literal string values to a <code>aura:id</code>.</p>
+
+    <p>To retrieve a component by local ID in JavaScript code, such as a controller, renderer, or helper, use the <code>find()</code> or <code>get()</code> methods in the <code>Component</code> object. For more information, see the <auradocs:referenceTopicLink topic="api:Component">JavaScript API</auradocs:referenceTopicLink>.</p>
+
+<h2>Global IDs</h2>
+
+    <p>Every component has a unique <code>globalId</code>, which is the generated runtime-unique ID of the component instance. A global ID is not guaranteed to be the same beyond the lifetime of a component, so it should never be relied on for tests.</p>
+
+    <p>If you want to create a unique ID for an HTML element, you can use the <code>globalId</code> as a prefix or suffix for your element. For example:</p>
+
+<auradocs:codeblock>&lt;div id="<aura:text value="{!"/>globalId + '_footer'}"&gt;&lt;/div&gt;</auradocs:codeblock>
+
+    <p>You can use the <code>getGlobalId()</code> function in JavaScript to get a component's global ID.</p>
+
+<auradocs:codeblock>var globalId = cmp.getGlobalId();</auradocs:codeblock>
+
+    <p>You can also do the reverse operation and get a component if you have its global ID.</p>
+
+<auradocs:codeblock>var comp = $A.getCmp(globalId);</auradocs:codeblock>
+
+<p><b>See also:</b><br/>
+    <auradocs:topicLink topic="findById">Finding Components by ID</auradocs:topicLink>
+</p>
+
+</aura:component>

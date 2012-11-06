@@ -1,0 +1,137 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Component Request Glossary"/>
+    <p>This glossary explains terms related to Aura definitions and registries.</p>
+
+    <h3>Definition-related Terms</h3>
+     <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Term</th>
+                    <th>Example</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Definition</td>
+                    <td>aura:component</td>
+                    <td><p>Each definition describes metadata for an object, such as a component, event, controller, or model. A large part of Aura is a registry of definitions for its various objects.</p>
+                        <p>A definition's metadata can include a name, location of origin, and descriptor (<code>DefDescriptor</code>, the primary key of the definition).</p>
+                         <p>A component definition can be used by other component definitions and can extend another component definition.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Root Definition</td>
+                    <td>
+                        <code>ComponentDef</code><br/>
+                        <code>InterfaceDef</code><br/>
+                        <code>EventDef</code>
+                    </td>
+                    <td>Top-level definition. Markup language for a root definition can include a pointer to another definition, and references to the descriptors of associate definitions.</td>
+                </tr>
+                <tr>
+                    <td>Associate Definition</td>
+                    <td>
+                        <code>ControllerDef</code><br/>
+                        <code>ModelDef</code><br/>
+                        <code>ProviderDef</code><br/>
+                        <code>RendererDef</code><br/>
+                        <code>ThemeDef</code><br/>
+                        <code>TestSuiteDef</code>
+                    </td>
+                    <td>Associate definitions represent objects that are associated with a root definition.
+                    An instance of an associate definition can be shared by multiple root definitions.
+                    Associate definitions have their own factories, parsers, and caching layers.</td>
+                </tr>
+                <tr>
+                    <td>Subdefinition</td>
+                    <td>
+                        <code>AttributeDef</code><br/>
+                        <code>RegisterEventDef</code><br/>
+                        <code>ActionDef</code><br/>
+                        <code>TestCaseDef</code><br/>
+                        <code>ValueDef</code>
+                    </td>
+                    <td>Subdefinitions can be used to define root definitions or associate definitions. They are stored directly on their parent definitions.
+                        <p>For example, a <code>ComponentDef</code> can include multiple <code>AttributeDef</code> objects, and a <code>ControllerDef</code> can include multiple <code>ActionDef</code> objects.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Definition Reference</td>
+                    <td>
+                        <code>DefRef</code><br/>
+                        <code>ComponentDefRef</code><br/>
+                        <code>AttributeDefRef</code></td>
+                    <td>A subdefinition that points to another definition. At runtime, it can be turned into an instance of the definition to which it points.
+                    <p>For example, when a component is instantiated, the component definition can include attribute definition references for each component attribute. The attribute definition reference points to the underlying attribute definition.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Provider</td>
+                    <td></td>
+                    <td>For abstract definition types. A provider determines the concrete <code>ComponentDef</code> to instantiate for each abstract <code>ComponentDef</code>. A provider enables an abstract component definition to be used directly in markup.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Registry-related Terms</h3>
+         <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Term</th>
+                    <th>Example</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Master Definition Registry</td>
+                    <td><code>MasterDefRegistry</code></td>
+                    <td><code>MasterDefRegistry</code> is a top-level <code>DefRegistry</code> that lives for the duration of a request. It is a thin redirector to various long-lived definition registries that load and cache definitions.</td>
+                </tr>
+                <tr>
+                    <td>Definition Registry</td>
+                    <td><code>DefRegistry</code></td>
+                    <td>A <code>DefRegistry</code> loads and caches a list of definitions, such as <code>ActionDef</code>, <code>ApplicationDef</code>, <code>ComponentDef</code>, or <code>ControllerDef</code>. A separate registry is used for all Aura objects. If the definition is not found, the request is passed to a factory, which builds the definition.</td>
+                </tr>
+                <tr>
+                    <td>Definition Descriptor</td>
+                    <td><code>DefDescriptor</code></td>
+                    <td>A <code>DefDescriptor</code> acts as a key for a definition in a registry. It's a class that contains the metadata for any definition used in Aura, such as a component, action, or event. In the example of a model, it is a nicely parsed description of <code>model="java://myPackage.MyClass"</code> with methods to retrieve the language, class name, and package name.
+
+                         Rather than passing a more heavyweight definition around in code, Aura usually passes around a <code>DefDescriptor</code> instead.
+                          <p>The qualified name for a <code>DefDescriptor</code> has the format <code>prefix://namespace:name</code>.
+                            <ul>
+                                <li>prefix: Defines the language, such as JavaScript or Java</li>
+                                <li>namespace: Corresponds to the package name or XML namespace</li>
+                                <li>name: Corresponds to the class name or local name</li>
+                            </ul>
+                         </p>
+                    </td>
+                </tr>
+            </tbody>
+    </table>
+
+    <p><b>See also:</b><br/>
+    <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/Aura.html" target="_blank">Javadoc</a>
+     </p>
+</aura:component>
+
+

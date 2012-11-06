@@ -1,0 +1,24 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component support="GA"
+    description="This component allows you to conditionally renders its contents. It will render its body only if isTrue evaluates to true. This has no effect on component creation, only on the actual rendering. The else attribute allows you to render an alternative when isTrue evaluates to false. The expression in isTrue is re-evaluated every time any value used in the expression changes. When the results of the expression change, it triggers a re-rendering of the component.">
+
+<aura:attribute name="isTrue" type="String" required="true" description="An expression that must evaluate to true to display the body of the component."/>
+<aura:attribute name="else" type="Aura.Component[]" description="The alternative content to render when isTrue evaluates to false, and the body is not rendered. Set using the &lt;aura:set&gt; tag."/>
+<aura:expression value="{!v.isTrue==true || v.isTrue=='true'?v.body:v.else}" aura:id="expression"/>
+</aura:component>

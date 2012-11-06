@@ -1,0 +1,32 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component model="java://org.auraframework.docs.DefDependenciesModel">
+    <aura:attribute name="descriptor" type="String" required="true"/>
+    <aura:attribute name="defType" type="String" default="Component"/>
+    <aside>
+        <aura:forEach items="{!m.dependencies}" var="config">
+            <h3>{!config.type}s</h3>
+            <ul class="nav nav-list">
+                <aura:forEach items="{!config.list}" var="dep">
+                    <li><auradocs:defLink descriptor="{!dep.fullName}" defType="{!dep.defType}"/></li>
+                </aura:forEach>
+            </ul>
+        </aura:forEach>
+        <br/>
+    </aside>
+</aura:component>

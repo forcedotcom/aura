@@ -1,0 +1,83 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Detecting a Value Object Change"/>
+
+    <p>
+    You can configure a component to automatically invoke a client-side controller action when a value in one of the
+    component's model or attributes changes.
+    </p>
+    <p>
+    When the value changes, the <code>valueChange.evt</code> event is automatically fired.
+    In contrast, other component and application events are fired manually by <code>event.fire()</code> in <auradocs:topicLink topic="helloActions">client-side controllers</auradocs:topicLink>.
+    </p>
+
+    <h2>Usage</h2>
+    <p>In the component, define a handler with <code>name="change"</code>.<br/>
+     <code>&lt;aura:handler name="change" value="<aura:text value="{!"/>v.items}" action="<aura:text value="{!"/>c.itemsChange}"/&gt;</code></p>
+    <p>Besides the <code>name</code> attribute, <code>aura:handler</code> includes the <code>value</code> and <code>action</code> attributes.
+    <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Attribute Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>value</td>
+                    <td>Object</td>
+                    <td>The value for which you want to detect changes.</td>
+                </tr>
+                <tr>
+                    <td>action</td>
+                    <td>Object</td>
+                    <td>The client-side controller action that is run when a change is detected.</td>
+                </tr>
+            </tbody>
+    </table>
+    </p>
+    <auradocs:info>A component can have multiple <code>&lt;aura:handler name="change"&gt;</code> tags to detect changes to different attributes.
+    See <auradocs:defLink descriptor="aura:iteration">aura:iteration</auradocs:defLink> for an example.</auradocs:info>
+    <p>
+    In the controller, define the action for the handler.</p>
+
+<auradocs:codeblock>({
+    itemsChange: function(cmp, evt) {
+        var v = evt.getParam("value");
+        if (v === cmp.getValue("v.items")) {
+        //do something
+        }
+    }
+})
+</auradocs:codeblock>
+
+    <p>When a change occurs to a value that is represented by the <code>change</code> handler, Aura handles the firing of the event and rerendering of the component. </p>
+    <auradocs:info>For examples of detecting value object changes, see <auradocs:defLink descriptor="aura:iteration">aura:iteration</auradocs:defLink> and <auradocs:defLink descriptor="ui:inputSelect">ui:inputSelect</auradocs:defLink>.</auradocs:info>
+
+     <h3>valueChange.evt</h3>
+    <p><code>valueChange.evt</code> is an event with <code>type="VALUE"</code> that takes in two attributes, <code>value</code> and <code>index</code>.</p>
+      <auradocs:info>For more information on this event type, see <auradocs:defLink descriptor="aura:valueChange" defType="event">aura:valueChange</auradocs:defLink> for more information.</auradocs:info>
+
+
+    <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="eventsOverview">Event Handling Lifecycle</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="valueObjectTypes">Value Object Types</auradocs:topicLink>
+     </p>
+</aura:component>

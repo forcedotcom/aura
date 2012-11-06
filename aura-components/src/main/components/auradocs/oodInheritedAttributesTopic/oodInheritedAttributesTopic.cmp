@@ -1,0 +1,62 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Inherited Component Attributes"/>
+
+    <p>Inherited attributes behave differently in Aura than, for example, inherited class fields in Java. Aura uses a decorator pattern for component extension so an attribute that is inherited from a base component can have different values in the sub-component and the base component. This will be clearer when we walk through an example.</p>
+
+    <p>Use <code>&lt;aura:set&gt;</code> in a sub-component to set the value of any attribute that is inherited from the parent component or to set an attribute on a component reference. For more information, see <auradocs:topicLink topic="tagAuraSet">aura:set</auradocs:topicLink>.</p>
+
+    <p>We will be looking at the <code>body</code> attribute for each of our sample components so now is a good time for a quick refresher. <code>&lt;aura:component&gt;</code> has a <code>body</code> attribute that is inherited by all components. Any free markup that is not enclosed in another tag is assumed to be part of the <code>body</code>. It's equivalent to wrapping that free markup inside <code>&lt;aura:set attribute="body"&gt;</code>. <code><aura:text value="{!"/>v.body}</code> outputs the body of the component. For more information, see <auradocs:topicLink topic="helloFacets">Component Body and Facets</auradocs:topicLink>.</p>
+
+    <h2>Sample Component Extension</h2>
+
+    <p>Let's look at a simple example to understand how the <code>body</code> attribute behaves at different levels of component extension. We have three components.</p>
+
+    <p><code>auradocs/sampleBase.cmp</code> is the base or super component. It inherently extends <code>&lt;aura:component&gt;</code>.</p>
+
+    <auradocs:example descriptor="auradocs:sampleBase" />
+
+    <p>You can only extend a component that has its <code>extensible</code> system attribute explicitly set to <code>true</code>. The <code>extensible</code> system attribute is defined in <code>&lt;aura:component&gt;</code>. <code>sampleBase.cmp</code> can be extended because it sets <code>extensible="true"</code>.</p>
+
+    <p><code>auradocs/sampleBaseEx.cmp</code> extends <code>sampleBase.cmp</code> by setting <code>extends="auradocs:sampleBase"</code> in its <code>&lt;aura:component&gt;</code> tag.</p>
+
+    <auradocs:example descriptor="auradocs:sampleBaseEx" />
+
+    <p><code>sampleBaseEx.cmp</code> sets the <code>body</code> attribute of its super component, <code>sampleBase.cmp</code>, to a <code>&lt;span&gt;</code> tag wrapped around "Added in sampleBaseEx:" and the <code>body</code> attribute of <code>sampleBaseEx.cmp</code>. So, when Aura renders <code>sampleBase.cmp</code>, the value of its <code>body</code> attribute differs from the <code>body</code> attribute of <code>sampleBaseEx.cmp</code>, even though <code>sampleBaseEx.cmp</code> extends <code>sampleBase.cmp</code>.</p>
+
+    <p><code>auradocs/sampleExtension.cmp</code> contains a reference to <code>sampleBaseEx.cmp</code>.</p>
+
+    <auradocs:example descriptor="auradocs:sampleExtension" />
+
+    <p>In <code>sampleExtension.cmp</code>, we set the <code>body</code> attribute of <code>sampleBaseEx.cmp</code> to <code>&lt;p&gt;Hello, extension!&lt;/p&gt;</code> so the <code>body</code> attribute of <code>sampleBase.cmp</code> is <code>&lt;span&gt;Added in sampleBaseEx: &lt;p&gt;Hello, extension!&lt;/p&gt;&lt;/span&gt;</code>.</p>
+
+    <p><code>sampleBase.cmp</code> sets the <code>body</code> on its super component, <code>&lt;aura:component&gt;</code>, to "Added in sampleBase: " followed by the <code>body</code> attribute of <code>sampleBase.cmp</code>.</p>
+
+    <p><code>&lt;aura:component&gt;</code> has a <code>body</code> attribute so it renders the <code>body</code> that is passed to it. Click the <b>Output</b> tab of <code>sampleExtension.cmp</code> to see how it's rendered.</p>
+
+    <p>If you use <code>&lt;aura:attribute&gt;</code> to add a new attribute to a component, you need to provide markup or code to render the attribute. For example, if you add a new attribute called <code>attribute1</code>, you can display it in the markup by adding <code><aura:text value="{!"/>v.attribute1}</code> to the markup in the component.</p>
+
+    <p>You can always override the rendering logic of the components you extend too.</p>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="renderers">Renderers</auradocs:topicLink>
+    </p>
+
+</aura:component>

@@ -1,0 +1,58 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" implements="ui:visitable">
+	<aura:attribute name="href" type="String"
+	   description="For a leaf node, the link associated with the element. Unsupported for non-leaf nodes." />
+	<aura:attribute name="title" type="String" description="The label to display in the UI." />
+	<aura:attribute name="leafClass" type="String" description="A custom class to apply if the node is a leaf" />
+	<aura:attribute name="class" type="String" description="A custom class to apply to this node" />
+	<aura:attribute name="expanded" type="Boolean" default="{!false}"
+	   description="The expansion state of the node. Changing this is a no-op for leaf nodes." />
+    <aura:attribute name="active" type="Boolean"
+       description="The active state of the node. If true, then this node's &lt;li&gt; will have the DOM attribute active='true' and the node will scroll into view if necessary. "/>
+	<aura:attribute name="hidden" type="Boolean" default="{!false}"
+	   description="Controls whether this node should render into the DOM. Currently unsupported." />
+	<aura:attribute name="item" type="java://org.auraframework.components.ui.TreeNode"
+	   description="For nodes generated via a server-side model, the dictionary representing the TreeNode object." />
+	
+	<aura:handler name="traverse" action="{!c.traverse}" />
+	<aura:handler name="makeVisitor" action="{!c.makeVisitor}" />
+	<aura:registerEvent name="getChildren" type="ui:getChildren" />
+	<aura:handler name="getChildren" action="{!c.getChildren}" />
+	
+	<aura:if isTrue="{!!v.hidden}">
+		<li class="{!(v.item.href != null || v.href != null ? 'file' : 'folder') + ' ' + v.class}" expanded='{!v.expanded}'>
+			<aura:if isTrue="{!v.item.href != null || v.href != null}">
+				<a href="{!v.item.href + v.href}" class="{!v.leafClass}">{!v.item.title + v.title}</a>
+				<aura:set attribute="else">
+					<label for="{!'node_' + globalId}">{!v.item.title + v.title}</label>
+	    		    <input type="checkbox" checked="{!v.expanded}" id="{!'node_' + globalId}"
+	    		        onchange="{!c.handleInputChange}"/>
+				</aura:set>
+			</aura:if>
+			
+			<ol>
+				<aura:iteration items="{!v.item.children}" var="child">
+					<ui:treeNode item="{!child}" aura:id="modelNode" />
+				</aura:iteration>
+				{!v.body}
+			</ol>
+		</li>
+	</aura:if>
+</aura:component>
+

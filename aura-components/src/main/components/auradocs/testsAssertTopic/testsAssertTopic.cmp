@@ -1,0 +1,70 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Assertions"/>
+
+    <p>Assertions evaluates an object or expression for expected results and are the foundation of Aura Component testing.
+    Each JavaScript test can contain one or more assertions. The test passes only when all the assertions are successful.
+    Assertions should be prefixed with <code>aura.test</code> or <code>$A.test</code>. Aura supports these assertions.</p>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Assertion</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>aura.test.assert(condition, assertMessage)</code></td>
+                <td>Checks that the condition is true.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.assertNull(arg1, assertMessage)</code></td>
+                <td>Checks that <code>arg1</code> is null.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.assertNotNull(arg1, assertMessage)</code></td>
+                <td>Checks that <code>arg1</code> is not null.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.assertTrue(condition, assertMessage)</code></td>
+                <td>Checks that the condition is true.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.assertTruthy(condition, assertMessage)</code></td>
+                <td>Checks that the condition is true, null, or defined. Throws an error if the condition is false or undefined.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.assertFalse(condition, assertMessage)</code></td>
+                <td>Checks that the condition is false.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.assertFalsy(condition, assertMessage)</code></td>
+                <td>Checks that the condition is false, null, or undefined. Throws an error if the condition is true or defined.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.assertEquals(arg1, arg2, assertMessage)</code></td>
+                <td>Checks that <code>arg1 == arg2</code> is true.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.fail(assertMessage)</code></td>
+                <td>Checks for failure. Usually used to mark an incomplete test.</td>
+            </tr>
+        </tbody>
+    </table>
+</aura:component>

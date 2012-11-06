@@ -1,0 +1,51 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Client-Side Process"/>
+    <p>In <auradocs:topicLink topic="cycleInit">Server-Side Process</auradocs:topicLink>, we looked at what happens on the server when the client sends a request for a component. After the server processes the request, it returns the component definitions (metadata for the all required components) and instance tree (data) in JSON format.</p>
+
+    <p>The client performs these tasks:</p>
+    <ol>
+        <li>Deserializes the response to create a metadata tree</li>
+        <li>Traverses the metadata tree to create an instance tree</li>
+        <li>Traverses the instance tree to render the component</li>
+        <li>Renders the components</li>
+    </ol>
+
+    <h4>1. Deserialize the response to create a metadata tree</h4>
+    <p>The JSON representation of the component definition is deserialized to create a metadata structure (JavaScript objects or maps).</p>
+
+    <h4>2. Traverse the metadata tree to create an instance tree</h4>
+    <p>The client traverses the JavaScript tree to initialize objects from the deserialized tree.
+    The tree may contain:
+    <ul>
+        <li>Definition: The client initializes the definition.</li>
+        <li>Descriptor only: The client knows that definition has been pre-loaded and cached.</li>
+    </ul>
+    </p>
+
+    <h4>3. Traverse the instance tree to render the component</h4>
+    <p>The client traverses the instance tree to render the component instance. The reference IDs are used to recreate the component references, which can point to a <code>ComponentDef</code>, a model, or a controller.</p>
+
+    <h4>4. Render the components</h4>
+    <p>The client locates the renderer definition in the component bundle, or uses the default renderer method to render the component and any sub-components.</p>
+
+    <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="renderers">Renderers</auradocs:topicLink><br/>
+        </p>
+</aura:component>

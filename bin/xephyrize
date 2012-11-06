@@ -1,0 +1,29 @@
+#!/bin/bash
+NUM_TRIES=0;
+unset XUP;
+until [ $XUP ] || (( $NUM_TRIES > 2 ));
+do
+ SEED=$(date +%N);
+ DISPLAY_NUM=`expr $SEED % 64535 + 1000`;
+ Xephyr :$DISPLAY_NUM -ac -screen 1024x768 &
+ PID=$!;
+ jobs >>/dev/null;
+ sleep 1; #assume that process would have died by now
+ jobs >>/dev/null;
+ if jobs -p | grep $PID;
+ then
+   XUP=1;
+ else
+   let NUM_TRIES=$NUM_TRIES+1;
+ fi;
+done;
+
+if [ "X$XUP" = "X" ];
+then
+ echo Failed to start Xephyr after $NUM_TRIES tries.
+ exit 1;
+fi;
+
+export DISPLAY=:$DISPLAY_NUM;
+$@;
+kill -s TERM $PID;

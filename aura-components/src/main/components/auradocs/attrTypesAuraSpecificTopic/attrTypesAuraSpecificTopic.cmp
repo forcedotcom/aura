@@ -1,0 +1,97 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Aura-Specific Types"/>
+
+    <p>This table lists the supported type values for types that are specific to Aura.</p>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>type</th>
+                <th>Example</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>Aura.Component</code></td>
+                <td>N/A</td>
+                <td>A single Aura component. We recommend using <code>Aura.Component[]</code> instead.</td>
+            </tr>
+
+            <tr>
+                <td><code>Aura.Component[]</code></td>
+                <td><code>&lt;aura:attribute name="detail" type="Aura.Component[]"/&gt;</code>
+                    <p>To set a default value for <code>type"Aura.Component[]"</code>, put the default markup in the body of <code>aura:attribute</code>. For example:</p>
+
+<auradocs:codeblock>
+&lt;aura:component&gt;
+    &lt;aura:attribute name="detail" type="Aura.Component[]"&gt;
+    &lt;p&gt;default paragraph1&lt;/p&gt;
+    &lt;/aura:attribute&gt;
+    Default value is: <aura:text value="{!"/>v.detail}
+&lt;/aura:component&gt;
+</auradocs:codeblock>
+                </td>
+                <td>Use this type to set blocks of markup. For more information, see <auradocs:topicLink topic="helloFacets">Component Body and Facets</auradocs:topicLink>.</td>
+            </tr>
+
+            <tr>
+                <td><code>Aura.Action</code></td>
+                <td><code>&lt;aura:attribute name="onclick" type="Aura.Action"/&gt;</code></td>
+                <td>Use this type to pass a Aura action to a component.</td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    <h2>Using Aura.Action</h2>
+
+    <p>A <code>Aura.Action</code> is a reference to an action in Aura. You can pass a <code>Aura.Action</code> around so the receiving component can execute the action in its client-side controller. Use <code>run()</code> to execute client-side controller actions, and <code>runAfter()</code> to execute server-side controller actions.</p>
+
+    <auradocs:info>Note: The underlying value object for an attribute of type <code>Aura.Action</code> is <code>ActionReferenceValue</code>.</auradocs:info>
+
+    <p>The Aura Note sample app uses <code>Aura.Action</code> in the <a href="https://github.com/forcedotcom/aura-note/blob/master/src/main/webapp/WEB-INF/components/auranote/listRow/listRow.cmp" target="_new">listRow.cmp</a> component.</p>
+
+    <p><b>listRow.cmp</b></p>
+
+<auradocs:codeblock>&lt;aura:component extensible="true"&gt;
+   ...
+   &lt;aura:attribute name="onclick" type="Aura.Action"/&gt;
+   ...
+   &lt;li onclick="<aura:text value="{!"/>v.onclick}"&gt;
+       ...
+   &lt;/li&gt;
+&lt;/aura:component&gt;
+</auradocs:codeblock>
+
+    <p>The <code>onclick</code> attribute has <code>type="Aura.Action"</code>.</p>
+
+    <p><b>noteListRow.cmp</b></p>
+
+<auradocs:codeblock>&lt;aura:component extends="auranote:listRow"&gt;
+    ...
+    &lt;aura:set attribute="onclick" value="<aura:text value="{!"/>c.openNote}"/&gt;
+   ...
+&lt;/aura:component&gt;
+</auradocs:codeblock>
+
+    <p>The <a href="https://github.com/forcedotcom/aura-note/blob/master/src/main/webapp/WEB-INF/components/auranote/noteListRow/noteListRow.cmp" target="_new">noteListRow.cmp</a> component extends listRow.cmp and sets the value for the <code>onclick</code> attribute in <code>listRow.cmp</code> to <code><aura:text value="{!"/>c.openNote}</code>, which is a reference to an action in the client-side controller for <code>noteListRow.cmp</code>. The action is executed when a user clicks the bullet associated with <code>&lt;li onclick="<aura:text value="{!"/>v.onclick}"&gt;</code> in <code>listRow.cmp</code>.</p>
+
+</aura:component>

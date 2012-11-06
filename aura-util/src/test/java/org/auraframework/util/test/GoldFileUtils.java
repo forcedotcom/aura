@@ -1,0 +1,57 @@
+/*
+ * Copyright (C) 2012 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.auraframework.util.test;
+
+import java.net.URL;
+
+import junit.framework.AssertionFailedError;
+
+/**
+ */
+public class GoldFileUtils {
+    public static class NewGoldFileException extends RuntimeException {
+        private static final long serialVersionUID = -5288394880186418728L;
+
+        private NewGoldFileException(URL url, Throwable t) {
+            super(String.format("Differences were found. Review new gold file before committing: %s%n%s%n", url,
+                    t.getMessage()), t);
+        }
+    }
+
+    public void assertTextDiff(Class<?> testClass, String resultsBaseFilename, String testResults) throws Exception {
+        TextDiffUtils diff = new TextDiffUtils(testClass, resultsBaseFilename);
+        assertDiffInternal(testResults, diff);
+    }
+
+    public void assertJsonDiff(Class<?> testClass, String resultsBaseFilename, String testResults) throws Exception {
+        TextDiffUtils diff = new JsonDiffUtils(testClass, resultsBaseFilename);
+        assertDiffInternal(testResults, diff);
+    }
+
+    private <T> void assertDiffInternal(T testResults, DiffUtils<T> diff) throws Exception {
+        try {
+            diff.assertDiff(testResults, null);
+            return;
+        } catch (Throwable t) {
+            try {
+                diff.writeGoldFile(testResults);
+            } catch (Throwable tw) {
+                throw new AssertionFailedError("Differences were found with " + diff.getUrl() + " - " + t.getMessage());
+            }
+            throw new NewGoldFileException(diff.getUrl(), t);
+        }
+    }
+}

@@ -1,0 +1,27 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component support="GA"
+    description="The value assigned to this component will be rendered as-is, without altering its contents. It's intended for outputting pre-formatted HTML, for example, where the formatting is arbitrary, or expensive to calculate. The body of this component is ignored, and won't be rendered. Warning: this component outputs value as unescaped HTML, which introduces the possibility of security vulnerabilities in your code. You must sanitize user input before rendering it unescaped, or you will create a cross-site scripting (XSS) vulnerability. Only use &lt;aura:unescapedHtml&gt; with trusted or sanitized sources of data.">
+
+    <!--
+        Warning: this component outputs "value" string as a piece of unescaped HTML codes and
+        the caller has to make sure it doesn't create any security concern.
+    -->
+    <aura:attribute name="body" type="Aura.Component[]" description="The body of &lt;aura:unescapedHtml&gt; is ignored and won't be rendered."/>
+    <aura:attribute name="value" type="String" description="The string that should be rendered as unescaped HTML."/>
+</aura:component>

@@ -1,0 +1,105 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Create a Aura App from the Command Line"/>
+
+    <p>You can generate a basic Aura app quickly using the command line.</p>
+
+ <p>Many of the commands in this quick start trigger downloads of additional Maven dependencies. If you have never used Maven before or if you are going through this quick start
+    on a new machine or with a new user account, this can be slow initially. However, once the dependent artifacts are downloaded, they are cached in a local repository and subsequent commands
+    execute more quickly. See <a href="http://maven.apache.org/guides/introduction/introduction-to-archetypes.html" target="_blank">Introduction to Maven archetypes</a>. </p>
+
+    <h5>Prerequisites</h5>
+    <p>
+        <ol>
+            <li><a href="http://www.oracle.com/technetwork/java/javase/downloads/" target="_blank">JDK 1.6</a></li>
+            <li><a href="http://maven.apache.org/download.html" target="_blank">Maven 3</a></li>
+        </ol>
+    </p>
+
+
+    <h5>Step 1: Generate a Template from the Aura Archetype</h5>
+        <ol>
+            <li>Open a command line window.</li>
+            <li>Navigate to the directory where you want to create your project template and run:<br/>
+            <code>mvn archetype:generate -DarchetypeCatalog=http://maven.auraframework.org/libs-release-local/archetype-catalog.xml</code></li>
+            <li>When prompted to choose an archetype, enter <code>1</code>.</li>
+            <li>Select the latest archetype version, or press enter for the default version.
+    <p>The archetype is downloaded to your machine.</p></li>
+            <li>Enter these values:<br/>
+            <b>Define value for property 'groupId'</b>: <code>org.myGroup</code><br/>
+            <b>Define value for property 'artifactId'</b>: <code>helloWorld</code><br/>
+            <b>Define value for property 'version'</b>: <code>1.0-SNAPSHOT</code><br/>
+            <b>Define value for property 'package'</b>: <code>org.myGroup</code><br/>
+            </li>
+            <auradocs:info>The artifactId is also the name of the project as it appears in the Package Explorer. It can only contain alphanumeric characters.</auradocs:info>
+
+            <li>When prompted to confirm properties configuration, enter <code>Y</code>.</li>
+        </ol>
+
+    <p>The following output confirms that your template has been generated successfully.</p>
+
+        <auradocs:codeblock>
+[INFO] ----------------------------------------------------------------------------
+[INFO] Using following parameters for creating project from Archetype: aura-archetype:0.0.1-SNAPSHOT
+[INFO] ----------------------------------------------------------------------------
+[INFO] Parameter: groupId, Value: org.myGroup
+[INFO] Parameter: artifactId, Value: helloWorld
+[INFO] Parameter: version, Value: 1.0-SNAPSHOT
+[INFO] Parameter: package, Value: org.myGroup
+[INFO] Parameter: packageInPathFormat, Value: org.myGroup
+[INFO] Parameter: package, Value: org.myGroup
+[INFO] Parameter: version, Value: 1.0-SNAPSHOT
+[INFO] Parameter: groupId, Value: org.myGroup
+[INFO] Parameter: artifactId, Value: foo
+[INFO] project created from Archetype in dir: /home/&lt;project-path&gt;
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 33.656s
+[INFO] Finished at: Mon Feb 27 14:39:07 PST 2012
+[INFO] Final Memory: 10M/180M
+[INFO] ------------------------------------------------------------------------
+        </auradocs:codeblock>
+
+
+    <h5>Step 2: Build and Run Your Project</h5>
+
+        <ol>
+            <li>On the command line, navigate to the directory for your new app.<br/>
+            <code>cd helloWorld</code></li>
+            <!-- TODO re-enable this step when archetype fixed - temporary workaround
+            <li>Download the latest version of each of the dependent artifacts for your project.<br/>
+            <code>mvn versions:use-latest-versions -DallowSnapshots=true -DgenerateBackupPoms=false</code></li>
+            -->
+            <li>Start the Jetty server on port 8080.<br/>
+            <code>mvn jetty:run</code><br/>
+            To use another port, append: <code> -Djetty.port=portNumber</code>. For example, <code>mvn jetty:run -Djetty.port=9877</code>.</li>
+            <li>Test your app in a browser.<br/>
+            <code>http://localhost:8080/helloWorld/helloWorld.app</code><br/>
+            You should see a simple greeting in your browser.</li>
+        </ol>
+
+        <p>You created a simple app from the command line. You are probably more used to working with an IDE. The <auradocs:topicLink topic="eclipseCreateApp">Eclipse quick start</auradocs:topicLink> shows you how to create a similar app with an IDE. It also introduces the concept of modular and reusable components, which is one of the main advantages of using Aura.</p>
+
+<p><b>See also:</b><br/>
+            <auradocs:topicLink topic="qsNextSteps">Next Steps</auradocs:topicLink><br/>
+        </p>
+
+</aura:component>

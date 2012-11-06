@@ -1,0 +1,132 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="expressionTest:suite" render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
+    <aura:attribute name="isNotSet" type="String[]"/>
+    <aura:attribute name="stringArray" type="String[]" default="one,two,three"/>
+    <aura:attribute name="arrayAsObject" type="Object"/>
+	<aura:attribute name="componentArray" type="Aura.Component[]">
+		<div/><span/>text<p/>
+	</aura:attribute>
+	
+    <!-- "undefined" in following expressions is not the literal, but from a reference to nothing -->
+
+    <!-- arrays -->
+    <expressionTest:test expression="{!m.stringArray}" exprText="m.stringArray" expected="['red','green','blue']"/>
+    <expressionTest:test expression="{!m.stringArray[0]}" exprText="m.stringArray[0]" expected="'red'"/>
+    <expressionTest:test expression="{!m.stringArray[1]}" exprText="m.stringArray[1]" expected="'green'"/>
+    <expressionTest:test expression="{!m.stringArray[2]=='blue'}" exprText="m.stringArray[2]=='blue'" expected="true"/>
+    <expressionTest:test expression="{!m.stringArray[2]=='BLUE'}" exprText="m.stringArray[2]=='BLUE'" expected="false"/>
+    <expressionTest:test expression="{!m.stringArray.length}" exprText="m.stringArray.length" expected="3"/>
+    <expressionTest:test expression="{!m.stringArray.length &gt; 3}" exprText="m.stringArray.length &gt; 3" expected="false"/>
+    <expressionTest:test expression="{!m.stringArray.length &lt;= 3}" exprText="m.stringArray.length &lt;= 3" expected="true"/>
+    <expressionTest:test expression="{!m.stringArray[3]}" exprText="m.stringArray[3]" expected="undefined"/>
+
+    <expressionTest:test expression="{!v.componentArray.length}" exprText="v.componentArray.length" expected="4"/>
+    <expressionTest:test expression="{!v.componentArray.length &gt; 2}" exprText="v.componentArray.length &gt; 2" expected="true"/>
+
+    <expressionTest:test expression="{!v.stringArray}" exprText="v.stringArray" expected="['one','two','three']"/>
+    <expressionTest:test expression="{!v.stringArray[2]}" exprText="v.stringArray[2]" expected="'three'"/>
+    <expressionTest:test expression="{!v.stringArray.length}" exprText="v.stringArray.length" expected="3"/>
+
+    <!-- Object is always SimpleValue
+    <expressionTest:test expression="{!v.arrayAsObject}" exprText="v.arrayAsObject" expected="['red','green','blue']"/>
+    <expressionTest:test expression="{!v.arrayAsObject[2]}" exprText="v.arrayAsObject[2]" expected="'blue'"/>
+    <expressionTest:test expression="{!v.arrayAsObject.length}" exprText="v.arrayAsObject.length" expected="3"/>
+    -->
+
+    <expressionTest:test expression="{!v.isNotSet}" exprText="v.isNotSet" expected="[]"/>
+    <expressionTest:test expression="{!v.isNotSet.length}" exprText="v.isNotSet.length" expected="0"/>
+    <expressionTest:test expression="{!v.isNotSet[0]}" exprText="v.isNotSet[0]" expected="undefined"/>
+
+    <expressionTest:test expression="{!m.emptyArray}" exprText="m.emptyArray" expected="[]"/>
+    <expressionTest:test expression="{!m.emptyArray.length}" exprText="m.emptyArray.length" expected="0"/>
+    <expressionTest:test expression="{!m.emptyArray[0]}" exprText="m.emptyArray[0]" expected="undefined"/>
+
+    <!-- lists -->
+    <expressionTest:test expression="{!m.stringList}" exprText="m.stringList" expected="['one','two','three']"/>
+    <expressionTest:test expression="{!m.stringList[0]}" exprText="m.stringList[0]" expected="'one'"/>
+    <expressionTest:test expression="{!m.stringList[0] + ' chance'}" exprText="m.stringList[0]" expected="'one chance'"/>
+    <expressionTest:test expression="{!m.stringList.length}" exprText="m.stringList.length" expected="3"/>
+    <expressionTest:test expression="{!m.stringList.length == 3}" exprText="m.stringList.length == 3" expected="true"/>
+    <expressionTest:test expression="{!m.stringList[4]}" exprText="m.stringList[4]" expected="undefined"/>
+
+    <expressionTest:test expression="{!m.emptyList}" exprText="m.emptyList" expected="[]"/>
+    <expressionTest:test expression="{!m.emptyList.length}" exprText="m.emptyList.length" expected="0"/>
+    <expressionTest:test expression="{!m.emptyList[0]}" exprText="m.emptyList[0]" expected="undefined"/>
+
+    <!-- lists of lists -->
+    <expressionTest:test expression="{!m.listOfList}" exprText="m.listOfList" expected="[['one','two','three'],['un','do','tres'],['ek','do','theen']]"/>
+    <expressionTest:test expression="{!m.listOfList.length}" exprText="m.listOfList.length" expected="3"/>
+    <expressionTest:test expression="{!m.listOfList[1][0]}" exprText="m.listOfList[1][0]" expected="'un'"/>
+    <expressionTest:test expression="{!m.listOfList[1].length}" exprText="m.listOfList[1].length" expected="3"/>
+
+    <!-- multi-dimensional array -->
+    <expressionTest:test expression="{!m.stringMultiArray}" exprText="m.stringMultiArray" expected="[[['one'],['two','three']],[],[['a','b'],[]]]"/>
+    <expressionTest:test expression="{!m.stringMultiArray.length}" exprText="m.stringMultiArray.length" expected="3"/>
+    <expressionTest:test expression="{!m.stringMultiArray[0]}" exprText="m.stringMultiArray[0]" expected="[['one'],['two','three']]"/>
+    <expressionTest:test expression="{!m.stringMultiArray[0].length}" exprText="m.stringMultiArray[0].length" expected="2"/>
+    <expressionTest:test expression="{!m.stringMultiArray[0][0]}" exprText="m.stringMultiArray[0][0]" expected="['one']"/>
+    <expressionTest:test expression="{!m.stringMultiArray[0][0][0]}" exprText="m.stringMultiArray[0][0][0]" expected="'one'"/>
+    <expressionTest:test expression="{!m.stringMultiArray[1]}" exprText="m.stringMultiArray[1]" expected="[]"/>
+    <expressionTest:test expression="{!m.stringMultiArray[1].length}" exprText="m.stringMultiArray[1].length" expected="0"/>
+
+    <!-- try length and brackets on non-arrays -->
+    <!-- W-1092578 https://gus.salesforce.com/a07B0000000KXHxIAO expression evaluates to the base value, e.g. m.string.length -> "Model"
+    <expressionTest:test expression="{!m.string.length}" exprText="m.string.length" expected="undefined"/>
+    <expressionTest:test expression="{!m.string[1]}" exprText="m.string[1]" expected="undefined"/>
+    <expressionTest:test expression="{!m.integer.length}" exprText="m.integer.length" expected="undefined"/>
+    <expressionTest:test expression="{!m.integer[2]}" exprText="m.integer[2]" expected="undefined"/>
+    <expressionTest:test expression="{!m.booleanTrue.length}" exprText="m.booleanTrue.length" expected="undefined"/>
+    <expressionTest:test expression="{!m.booleanTrue[3]}" exprText="m.booleanTrue[3]" expected="undefined"/>
+    -->
+    
+    <!-- W-1092610 https://gus.salesforce.com/a07B0000000KXK8IAO
+    Some of these pass, but depending on how comparisons will utlimately work, the expected result may change anyways
+    <expressionTest:test expression="{!m.emptyArray == m.emptyArray}" exprText="m.emptyArray == m.emptyArray" expected="true"/>
+    <expressionTest:test expression="{!m.emptyArray == null}" exprText="m.emptyArray == null" expected="false"/>
+    <expressionTest:test expression="{!m.emptyArray == undefined}" exprText="m.emptyArray == undefined" expected="false"/>
+    <expressionTest:test expression="{!m.emptyArray == '[]'}" exprText="m.emptyArray == '[]'" expected="false"/>
+    <expressionTest:test expression="{!m.emptyArray == m.emptyList}" exprText="m.emptyArray == m.emptyList" expected="false"/>
+    <expressionTest:test expression="{!m.stringList == m.stringList}" exprText="m.stringList == m.stringList" expected="true"/>
+    <expressionTest:test expression="{!m.stringList == m.listOfLists[0]}" exprText="m.stringList == m.listOfLists[0]" expected="false"/>
+
+    <expressionTest:test expression="{!m.emptyArray != null}" exprText="m.emptyArray != null" expected="true"/>
+    <expressionTest:test expression="{!undefined != m.emptyArray}" exprText="undefined != m.emptyArray" expected="true"/>
+    <expressionTest:test expression="{!m.emptyArray != m.emptyArray}" exprText="m.emptyArray != m.emptyArray" expected="false"/>
+    <expressionTest:test expression="{!m.emptyArray != '[]'}" exprText="m.emptyArray != '[]'" expected="true"/>
+    -->
+
+    <!-- W-1053812 https://gus.salesforce.com/a07B0000000FuoO will have to figure out what to do with array concats
+    <expressionTest:test expression="{!m.stringArray + 1}" exprText="m.stringArray + 1" expected="['red','green','blue',1]"/>
+    <expressionTest:test expression="{!'string' + m.stringArray}" exprText="'string' + m.stringArray" expected="['string','red','green','blue']"/>
+    <expressionTest:test expression="{!m.stringList + m.stringArray}" exprText="m.stringList + m.stringArray" expected="['one','two','three','red','green','blue']"/>
+    -->
+
+    <expressionTest:test expression="{!true &amp;&amp; m.stringArray}" exprText="true &amp;&amp; m.stringArray" expected="['red','green','blue']"/>
+    <expressionTest:test expression="{!m.stringList || true}" exprText="m.stringList || true" expected="['one','two','three']"/>
+    <expressionTest:test expression="{!m.stringArray - 1}" exprText="m.stringArray - 1" expected="NaN"/>
+    <expressionTest:test expression="{!2 * m.stringArray}" exprText="2 * m.stringArray" expected="NaN"/>
+    <expressionTest:test expression="{!m.stringArray / 2}" exprText="m.stringArray / 2" expected="NaN"/>
+    <expressionTest:test expression="{!3 % m.stringArray}" exprText="3 % m.stringArray" expected="NaN"/>
+    <expressionTest:test expression="{!m.stringArray > -1}" exprText="m.stringArray > -1" expected="false"/>
+    <expressionTest:test expression="{!m.stringArray >= -1}" exprText="m.stringArray >= -1" expected="false"/>
+    <expressionTest:test expression="{!m.stringArray &lt; 0}" exprText="m.stringArray &lt; 0" expected="false"/>
+    <expressionTest:test expression="{!m.stringArray &lt;= 0}" exprText="m.stringArray &lt;= 0" expected="false"/>
+    <expressionTest:test expression="{!-m.stringArray}" exprText="-m.stringArray" expected="NaN"/>
+    <expressionTest:test expression="{!abs(m.stringArray)}" exprText="abs(m.stringArray)" expected="NaN"/>
+</aura:component>

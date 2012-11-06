@@ -1,0 +1,50 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="What is Inherited?"/>
+
+    <p>This topic lists what is inherited in Aura.</p>
+
+    <h2>Component Attributes</h2>
+
+    <p>All attributes are inherited. You can override an attribute in a sub-component using <code>&lt;aura:attribute&gt;</code>. However, you should only do this if you want to change the attribute's default value in the sub-component.</p>
+
+    <p>Use <code>&lt;aura:set&gt;</code> in a sub-component to set an attribute on the parent component.</p>
+
+    <h2>Events</h2>
+
+    <p>A sub-component can handle component events fired by the super component. The super and sub-component can handle the same event in different ways. Aura doesn't guarantee the order of event handling.</p>
+
+    <p>When an event fires, handlers for the event are executed. Handlers for any event that extend the event are also fired.</p>
+
+    <h2>Helpers</h2>
+
+    <p>A sub-component can call a function from a helper file in a super component.</p>
+
+    <h2>What Isn't Inherited?</h2>
+
+    <p>Neither controllers nor the model are inherited by a sub-component.</p>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="tagAuraSet">aura:set</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="helloEvents">Events Overview</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="helper">Helpers</auradocs:topicLink>
+    </p>
+
+</aura:component>

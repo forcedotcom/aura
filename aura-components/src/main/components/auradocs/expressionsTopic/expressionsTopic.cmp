@@ -1,0 +1,44 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+<aura:set attribute="title" value="Expressions"/>
+
+<p>Aura expressions allow you to make calculations and access property values and other data within Aura markup. Use expressions for dynamic output or passing values into components by assigning them to attributes.</p>
+
+<p>A Aura expression is any set of literal values, variables, sub-expressions, or operators that can be resolved to a single value. Method calls are not allowed in expressions.</p>
+
+<p>The resulting value can be a primitive (integer, string, and so on), a boolean, a JavaScript or Aura object, a Aura component or collection, a controller method such as an action method, and other useful results.</p>
+
+<p>The expression syntax in Aura is:</p>
+
+<code><aura:text value="{!"/><em>&lt;expression&gt;</em>}</code>
+
+<p><code><em>&lt;expression&gt;</em></code> is a placeholder for the expression and you can see some examples in <auradocs:topicLink topic="expressionsExamples">Example Expressions</auradocs:topicLink>.</p>
+
+<p>Anything inside the <code><aura:text value="{!"/> }</code> delimiters is evaluated and dynamically replaced when the component is rendered or when the value is used by the component. Whitespace is ignored.</p>
+
+<auradocs:warning><p>If you're familiar with Visualforce, this syntax will look familiar. Aura expressions are different in many ways, though, so keep reading.</p>
+
+<p>If you're familiar with other languages, you may be tempted to read the <code>!</code> as the "bang" operator, which negates boolean values in many programming languages. In Aura, <code><aura:text value="{!"/></code> is simply the delimiter used to begin an expression in Aura.</p></auradocs:warning>
+
+<p>Only use the <code><aura:text value="{!"/> }</code> syntax in markup in <code>.app</code> or <code>.cmp</code> files. In JavaScript, use string syntax to evaluate an expression. For example:</p>
+
+<auradocs:codeblock>var theLabel = cmp.get("v.label");
+</auradocs:codeblock>
+
+</aura:component>

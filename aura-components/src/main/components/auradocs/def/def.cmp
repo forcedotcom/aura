@@ -1,0 +1,81 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:defLayout" model="java://org.auraframework.docs.ComponentDefModel">
+    <aura:attribute name="descriptor" type="String" required="true"/>
+    <aura:attribute name="defType" type="String" default="component"/>
+
+    <aura:set attribute="scrollContentClass" value="scrollContent"/>
+    <aura:set attribute="title" value="{!m.namespace + ':' + m.name}"/>
+    <aura:set attribute="subtitle"><aura:if isTrue="{!m.type != null}">{!m.type}</aura:if>&nbsp;{!m.defType}</aura:set>
+    <aura:set attribute="labels">
+        <aura:if isTrue="{!m.abstract}">
+            &nbsp;<ui:stamp severity="inverse">Abstract</ui:stamp>
+        </aura:if>
+        <aura:if isTrue="{!m.abstract}">
+            &nbsp;<ui:stamp severity="inverse">Extensible</ui:stamp>
+        </aura:if>
+    </aura:set>
+    <aura:set attribute="description">
+        <aura:if isTrue="{!m.super != null}">
+            <ui:message severity="info">Extends <auradocs:defLink descriptor="{!m.super}" defType="{!m.defType}">{!m.super}</auradocs:defLink></ui:message><br/>
+        </aura:if>
+        <aura:if isTrue="{!m.interfaces.length > 0}">
+            <ui:message severity="info">Implements
+                <aura:foreach items="{!m.interfaces}" var="intf">
+                    <auradocs:defLink descriptor="{!intf}" defType="interface">{!intf}</auradocs:defLink>
+                </aura:foreach>
+            </ui:message><br/>
+        </aura:if>
+        <aura:if isTrue="{!m.description != null}">
+            <p>{!m.description}</p>
+        </aura:if>
+    </aura:set>
+    <aura:set attribute="status">
+        <aura:if isTrue="{!m.support != null}">
+            <ui:stamp severity="{!m.support=='PROTO'?'important':m.support=='BETA'?'warning':m.support=='GA'?'success':''}">{!m.support}</ui:stamp>
+        </aura:if>
+    </aura:set>
+    <ui:tabset class="subtabs">
+        <ui:tab title="overview">
+            <aura:if isTrue="{!m.attributes.length > 0}">
+                <auradocs:defMemberList title="Attributes" list="{!m.attributes}"/>
+            </aura:if>
+
+            <aura:if isTrue="{!m.handledEvents.length > 0}">
+                <auradocs:defMemberList title="Handled Events" list="{!m.handledEvents}"/>
+            </aura:if>
+
+            <aura:if isTrue="{!m.events.length > 0}">
+                <auradocs:defMemberList title="Events" list="{!m.events}"/>
+            </aura:if>
+        </ui:tab>
+
+        <!--<ui:tab title="examples" scroll="false">examples</ui:tab>-->
+
+        <auradocs:editorPanel title="source" descriptor="{!v.descriptor}" defType="{!v.defType}"/>
+
+        <aura:forEach items="{!m.defs}" var="def">
+            <auradocs:editorPanel title="{!def.name}" descriptor="{!def.descriptor}" defType="{!def.defType}"/>
+        </aura:forEach>
+
+        <ui:tab title="dependencies">
+            <auradocs:defDependencies descriptor="{!v.descriptor}" defType="{!v.defType}"/>
+        </ui:tab>
+    </ui:tabset>
+
+</aura:component>

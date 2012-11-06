@@ -1,0 +1,145 @@
+/*
+ * Copyright (C) 2012 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * Default styles
+ */
+
+@def TOP_MENU_PADDING  1px;
+@def TOP_MENU_HEIGHT  15px;
+
+.THIS .default {
+    border: 1px solid;
+}
+
+.THIS {
+    margin: 5px;
+}
+
+.THIS .color {
+    background-color: white;
+}
+
+
+
+
+/**
+ * FIREFOX only
+ */
+@if (FIREFOX) {
+    .THIS .color {
+        background-color: yellow;
+    }
+}
+
+
+
+
+
+/**
+ * WEBKIT only
+ */
+@if (WEBKIT) {
+	.THIS .color {
+	    background-color: red;
+	}
+}
+
+
+
+
+/**
+ * IE7 only
+ */
+@if (IE7) {
+	.THIS .color {
+	    background-color: blue;
+	}
+}
+
+
+
+
+/**
+ * Miscellaneous rules
+ */
+@if (WEBKIT) {
+	@if (IE6) {
+    	.THIS .stackOrder {
+    		z-index: 100;
+    	}
+  	} 
+  	@elseif (IE7) {
+    	.THIS .stackOrder {
+    		z-index: 200;
+    	}
+  	}
+  	@elseif (IE8) {
+    	.THIS .stackOrder {
+    		z-index: 300;
+    	}
+  	} 
+  	@else {
+    	.THIS .stackOrder {
+    		z-index: 400;
+    	}
+  	}
+}
+
+
+@if (WEBKIT) {
+  	@def DISPLAY_STYLE  inline;
+  	.THIS .stackOrder {
+    	z-index: 500;
+    }
+} 
+@else {
+  	.THIS .stackOrder {
+    	z-index: 600;
+    }
+}
+
+.THIS .displayStyle {
+	display: DISPLAY_STYLE
+}
+
+@if (WEBKIT) {
+  	.THIS .pLeft {
+    	padding-left: add(TOP_MENU_HEIGHT,
+    					  TOP_MENU_PADDING);
+    }
+} 
+
+@if (WEBKIT) {
+	.THIS h1+h2 {
+		font-weight: bold;
+	}
+
+	.THIS h1~p{
+		font-size: 2em;
+	}
+	
+	.THIS #content{
+		margin: 0 auto;
+	}
+	
+	.THIS a[href*=".com"] { 
+		color: blue;
+	}
+	
+	.THIS ~foo1 +foo2 -foo3 :foo4 #foo5 _foo6 {
+		margin: 0px;
+	}
+}

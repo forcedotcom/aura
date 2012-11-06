@@ -1,0 +1,102 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component render="client">
+    <div class="gt" aura:id="gt">&gt;</div>
+    <div class="lt" aura:id="lt">&lt;</div>
+    <div class="amp" aura:id="amp">&amp;</div>
+    <div class="apos" aura:id="apos">&apos;</div>
+    <div class="quot" aura:id="quot">&quot;</div>
+    <div class="nbsp" aura:id="nbsp">&nbsp;</div>
+    <div class="ensp" aura:id="ensp">in&ensp;side</div>
+    <div class="emsp" aura:id="emsp">in&emsp;side</div>
+    <div class="mdash" aura:id="mdash">&mdash;</div>
+    <div class="copy" aura:id="copy">&copy;</div>
+    <div class="trade" aura:id="trade">&trade;</div>
+    <div class="reg" aura:id="reg">&reg;</div>
+    <div class="laquo" aura:id="laquo">&laquo;</div>
+    <div class="deg" aura:id="deg">&deg;</div>
+    <div class="acute" aura:id="acute">&acute;</div>
+    <div class="raquo" aura:id="raquo">&raquo;</div>
+    <div class="cent" aura:id="cent">&cent;</div>
+    <div class="euro" aura:id="euro">&euro;</div>
+    <div class="yen" aura:id="yen">&yen;</div>
+    <div class="pound" aura:id="pound">&pound;</div>
+
+    <div class="gt" aura:id="gt">{!'&gt;'}</div>
+    <div class="lt" aura:id="lt">{!'&lt;'}</div>
+    <div class="amp" aura:id="amp">{!'&amp;'}</div>
+    <div class="apos" aura:id="apos">{!'\&apos;'}</div>
+    <div class="quot" aura:id="quot">{!'&quot;'}</div>
+    <div class="nbsp" aura:id="nbsp">{!'&nbsp;'}</div>
+    <div class="ensp" aura:id="ensp">{!'&ensp;'}</div>
+    <div class="emsp" aura:id="emsp">{!'&emsp;'}</div>
+    <div class="mdash" aura:id="mdash">{!'&mdash;'}</div>
+    <div class="copy" aura:id="copy">{!'&copy;'}</div>
+    <div class="trade" aura:id="trade">{!'&trade;'}</div>
+    <div class="reg" aura:id="reg">{!'&reg;'}</div>
+    <div class="laquo" aura:id="laquo">{!'&laquo;'}</div>
+    <div class="deg" aura:id="deg">{!'&deg;'}</div>
+    <div class="acute" aura:id="acute">{!'&acute;'}</div>
+    <div class="raquo" aura:id="raquo">{!'&raquo;'}</div>
+    <div class="cent" aura:id="cent">{!'&cent;'}</div>
+    <div class="euro" aura:id="euro">{!'&euro;'}</div>
+    <div class="yen" aura:id="yen">{!'&yen;'}</div>
+    <div class="pound" aura:id="pound">{!'&pound;'}</div>
+
+    <aura:text  aura:id="gt" value="&gt;"/>
+    <aura:text  aura:id="lt" value="&lt;"/>
+    <aura:text  aura:id="amp" value="&amp;"/>
+    <aura:text  aura:id="apos" value="&apos;"/>
+    <aura:text  aura:id="quot" value="&quot;"/>
+    <aura:text  aura:id="nbsp" value="&nbsp;"/>
+    <aura:text  aura:id="ensp" value="&ensp;"/>
+    <aura:text  aura:id="emsp" value="&emsp;"/>
+    <aura:text  aura:id="mdash" value="&mdash;"/>
+    <aura:text  aura:id="copy" value="&copy;"/>
+    <aura:text  aura:id="trade" value="&trade;"/>
+    <aura:text  aura:id="reg" value="&reg;"/>
+    <aura:text  aura:id="laquo" value="&laquo;"/>
+    <aura:text  aura:id="deg" value="&deg;"/>
+    <aura:text  aura:id="acute" value="&acute;"/>
+    <aura:text  aura:id="raquo" value="&raquo;"/>
+    <aura:text  aura:id="cent" value="&cent;"/>
+    <aura:text  aura:id="euro" value="&euro;"/>
+    <aura:text  aura:id="yen" value="&yen;"/>
+    <aura:text  aura:id="pound" value="&pound;"/>
+
+    <ui:outputText class="gt" aura:id="gt" value="{!'&gt;'}"/>
+    <ui:outputText class="lt" aura:id="lt" value="{!'&lt;'}"/>
+    <ui:outputText class="amp" aura:id="amp" value="{!'&amp;'}"/>
+    <ui:outputText class="apos" aura:id="apos" value="{!'\&apos;'}"/>
+    <ui:outputText class="quot" aura:id="quot" value="{!'&quot;'}"/>
+    <ui:outputText class="nbsp" aura:id="nbsp" value="{!'&nbsp;'}"/>
+    <ui:outputText class="ensp" aura:id="ensp" value="{!'&ensp;'}"/>
+    <ui:outputText class="emsp" aura:id="emsp" value="{!'&emsp;'}"/>
+    <ui:outputText class="mdash" aura:id="mdash" value="{!'&mdash;'}"/>
+    <ui:outputText class="copy" aura:id="copy" value="{!'&copy;'}"/>
+    <ui:outputText class="trade" aura:id="trade" value="{!'&trade;'}"/>
+    <ui:outputText class="reg" aura:id="reg" value="{!'&reg;'}"/>
+    <ui:outputText class="laquo" aura:id="laquo" value="{!'&laquo;'}"/>
+    <ui:outputText class="deg" aura:id="deg" value="{!'&deg;'}"/>
+    <ui:outputText class="acute" aura:id="acute" value="{!'&acute;'}"/>
+    <ui:outputText class="raquo" aura:id="raquo" value="{!'&raquo;'}"/>
+    <ui:outputText class="cent" aura:id="cent" value="{!'&cent;'}"/>
+    <ui:outputText class="euro" aura:id="euro" value="{!'&euro;'}"/>
+    <ui:outputText class="yen" aura:id="yen" value="{!'&yen;'}"/>
+    <ui:outputText class="pound" aura:id="pound" value="{!'&pound;'}"/>
+</aura:component>

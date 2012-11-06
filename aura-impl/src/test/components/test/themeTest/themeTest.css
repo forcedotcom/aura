@@ -1,0 +1,50 @@
+/*
+ * Copyright (C) 2012 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+@def BODY_MARGIN  10px;
+@def BODY_PADDING  10px;
+
+.testThemeTest {
+	margin-left: 6px;
+	margin-right: 6px;
+}
+
+.THIS p {
+	word-spacing: 10px;
+}
+
+.THIS .br {
+	border: 1px solid black;
+}
+
+.THIS .color {
+	background-color: white;
+}
+
+@if (FIREFOX) {
+	.THIS .color {
+		background-color: yellow;
+	}
+}
+
+.THIS .div4 {
+	border: 1px solid;
+	margin: add(BODY_MARGIN, 
+				BODY_PADDING);
+}
+
+.THIS .div5 {
+	border: 1px solid;
+}

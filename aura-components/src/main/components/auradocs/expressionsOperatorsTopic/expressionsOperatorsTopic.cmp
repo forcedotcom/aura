@@ -1,0 +1,303 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+<aura:set attribute="title" value="Expression Operators Reference"/>
+
+<p>The following operators are available in the Aura expression language.</p>
+
+<h2>Arithmetic Operators</h2>
+
+<p>Expressions based on arithmetic operators result in numerical values.</p>
+
+<table class="table table-bordered table-striped">
+<thead>
+    <tr>
+        <th>Operator</th>
+        <th>Usage</th>
+        <th>Description</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>+</td>
+        <td>1 + 1</td>
+        <td>Add two numbers.</td>
+    </tr>
+    <tr>
+        <td>-</td>
+        <td>2 - 1</td>
+        <td>Subtract one number from the other.</td>
+    </tr>
+    <tr>
+        <td>*</td>
+        <td>2 * 2</td>
+        <td>Multiply two numbers.</td>
+    </tr>
+    <tr>
+        <td>/</td>
+        <td>4 / 2</td>
+        <td>Divide one number by the other.</td>
+    </tr>
+    <tr>
+        <td>%</td>
+        <td>5 % 2</td>
+        <td>Return the integer remainder of dividing the first number by the second.</td>
+    </tr>
+    <tr>
+        <td>abs()</td>
+        <td>abs(m.sales - m.expenses)</td>
+        <td>Written as a function, rather than an operator. Returns the absolute value of a number.</td>
+    </tr>
+    <tr>
+        <td>-</td>
+        <td>-m.expenses</td>
+        <td>Unary operator. Reverses the sign of the succeeding number. For example if the value of expenses is 100, then -expenses is -100.</td>
+    </tr>
+</tbody>
+</table>
+
+<h2>Numeric Literals</h2>
+
+<table class="table table-bordered table-striped">
+<thead>
+    <tr>
+        <th>Literal</th>
+        <th>Usage</th>
+        <th>Description</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>Integer</td>
+        <td>2</td>
+        <td>Integers are numbers without a decimal point or exponent.</td>
+    </tr>
+    <tr>
+        <td>Float</td>
+        <td>3.14<br/>
+            -1.1e10</td>
+        <td>Numbers with a decimal point, or numbers with an exponent.</td>
+    </tr>
+    <tr>
+        <td>Null</td>
+        <td>null</td>
+        <td>A literal null number. Matches the explicit null value <em>and</em> numbers with an undefined value.</td>
+    </tr>
+</tbody>
+</table>
+
+<h2>String Operators</h2>
+
+<p>Expressions based on string operators result in string values.</p>
+
+<table class="table table-bordered table-striped">
+<thead>
+    <tr>
+        <th>Operator</th>
+        <th>Usage</th>
+        <th>Description</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>+</td>
+        <td>'Title: ' + m.note.title</td>
+        <td>Concatenates two strings together.</td>
+    </tr>
+</tbody>
+</table>
+
+<h2>String Literals</h2>
+
+<p>String literals must be enclosed in single quotation marks 'like this'.</p>
+
+<table class="table table-bordered table-striped">
+<thead>
+    <tr>
+        <th>Literal</th>
+        <th>Usage</th>
+        <th>Description</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>string</td>
+        <td>'hello world'</td>
+        <td>Literal strings must be enclosed in single quotation marks. Double quotation marks are reserved for enclosing Aura attributes, and must be escaped in strings.</td>
+    </tr>
+    <tr>
+        <td>\&lt;escape&gt;</td>
+        <td>'\n'</td>
+        <td>Whitespace characters:
+        <ul>
+            <li>\t (tab)</li>
+            <li>\n (newline)</li>
+            <li>\r (carriage return)</li>
+        </ul>
+
+        <p>Escaped characters:</p>
+        <ul>
+            <li>\" (literal ")</li>
+            <li>\' (literal ')</li>
+            <li>\\ (literal \)</li>
+        </ul>
+        </td>
+    </tr>
+    <tr>
+        <td>Unicode</td>
+        <td>'\u####'</td>
+        <td>A Unicode code point. The # symbols are hexadecimal digits. A Unicode literal requires four digits.</td>
+    </tr>
+    <tr>
+        <td>null</td>
+        <td>null</td>
+        <td>A literal null string. Matches the explicit null value and strings with an undefined value.</td>
+    </tr>
+</tbody>
+</table>
+
+<h2>Comparison Operators</h2>
+
+<p>Expressions based on comparison operators result in a true or false value.
+For comparison purposes, numbers are treated as the same type (internally, all numbers are represented as doubles, but this may change in the future). In all other cases, comparisons check both value and type.</p>
+
+<table class="table table-bordered table-striped">
+<thead>
+    <tr>
+        <th>Operator</th>
+        <th>Usage</th>
+        <th>Description</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>==</td>
+        <td>1 == 1<br/>
+            1 == 1.0</td>
+        <td>True if the operands are equal. This comparison is valid for all data types.</td>
+    </tr>
+    <tr>
+        <td>!=</td>
+        <td>1 != 2<br/>
+            1 != true<br/>
+            1 != '1'<br/>
+            null != false</td>
+        <td>True if the operands are not equal. This comparison is valid for all data types.</td>
+    </tr>
+    <tr>
+        <td>&lt;</td>
+        <td>1 &lt; 2</td>
+        <td>True if the first operand is numerically less than the second.</td>
+    </tr>
+    <tr>
+        <td>&gt;</td>
+        <td>42 &gt; 2</td>
+        <td>True if the first operand is numerically greater than the second.</td>
+    </tr>
+    <tr>
+        <td>&lt;=</td>
+        <td>2 &lt;= 42</td>
+        <td>True if the first operand is numerically less than or equal to the second.</td>
+    </tr>
+    <tr>
+        <td>&gt;=</td>
+        <td>42 &gt;= 42</td>
+        <td>True if the first operand is numerically greater than or equal to the second.</td>
+    </tr>
+</tbody>
+</table>
+
+<h2>Logical Operators</h2>
+
+<p>Expressions based on logical operators result in a true or false value.</p>
+
+<table class="table table-bordered table-striped">
+<thead>
+    <tr>
+        <th>Operator</th>
+        <th>Usage</th>
+        <th>Description</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>&amp;&amp;</td>
+        <td>isEnabled &amp;&amp; hasPermission</td>
+        <td>True if both operands are individually true.</td>
+    </tr>
+    <tr>
+        <td>||</td>
+        <td>hasPermission || isRequired</td>
+        <td>True if either operand is individually true.</td>
+    </tr>
+    <tr>
+        <td>!</td>
+        <td>!isRequired</td>
+        <td>Unary operator. True if the operand is false.</td>
+    </tr>
+</tbody>
+</table>
+
+<h2>Logical Literals</h2>
+
+<p>Logical values are never equivalent to non-logical values. That is, only true == true, and only false == false; 1 != true, and 0 != false, and null != false.</p>
+
+<table class="table table-bordered table-striped">
+<thead>
+    <tr>
+        <th>Literal</th>
+        <th>Usage</th>
+        <th>Description</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>true</td>
+        <td>true</td>
+        <td>A boolean true value.</td>
+    </tr>
+    <tr>
+        <td>false</td>
+        <td>false</td>
+        <td>A boolean false value.</td>
+    </tr>
+</tbody>
+</table>
+
+<h2>Conditional Operator</h2>
+
+<p>There is only one conditional operator, the traditional ternary operator.</p>
+
+<table class="table table-bordered table-striped">
+<thead>
+    <tr>
+        <th>Operator</th>
+        <th>Usage</th>
+        <th>Description</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>? :</td>
+        <td>(1 != 2) ? "Obviously" : "Black is White"</td>
+        <td>The operand before the ? operator is evaluated as a boolean. If true, the second operand is returned. If false, the third operand is returned.</td>
+    </tr>
+</tbody>
+</table>
+
+</aura:component>

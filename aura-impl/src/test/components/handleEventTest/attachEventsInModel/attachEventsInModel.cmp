@@ -1,0 +1,4 @@
+<aura:component model="java://org.auraframework.impl.java.model.TestModelToAttachEvents">
+    <!--This component is used by TestControllerToAttachEvents. A event is attached to the context in the java model. -->
+    <div aura:id="test_id">New Component</div>
+</aura:component>

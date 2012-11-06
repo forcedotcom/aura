@@ -1,0 +1,74 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Sample Test Cases"/>
+
+    <p>The following test case uses the utility function <code>runAfterIf</code> and assert statements to check that the right buttons are displayed in order.</p>
+    <auradocs:codeblock>
+testButtons:{
+    test:function(cmp){
+    // render Cancel and Save buttons in view
+    $A.test.runAfterIf(
+        //check condition function before running callback function
+        function(){ return buttons[0].getElement() !== null; },
+        function(){
+            // check the right buttons are displayed
+            $A.test.assertEquals(2, buttons.length, "expected cancel and save");
+            $A.test.assertEquals("Cancel", buttons[0].find("div").getElement().innerText, "Cancel button not first");
+            $A.test.assertEquals("Save", buttons[1].find("div").getElement().innerText, "Save button not second");
+           }
+    };
+
+    </auradocs:codeblock>
+
+    <p>The following test case checks that the attribute <code>maxLength</code> is set on initial render and rerender.</p>
+
+    <auradocs:codeblock>
+testMaxLength:{
+    attributes : {maxLength:"10", value:"1234567890extra"},
+    test : function(component){
+        var input = component.find("input").getElement();
+        $A.test.assertEquals("10", input.getAttribute("maxLength"), "unexpected maxLength");
+
+        component.getAttributes().setValue("maxLength","5");
+        $A.renderingService.rerender(component);
+
+        $A.test.assertEquals("5", input.getAttribute("maxLength"), "unexpected maxLength after rerender");
+    }
+},
+    </auradocs:codeblock>
+
+    <p>The following test case checks that the specified class is set on initial render and rerender.</p>
+
+    <auradocs:codeblock>
+testClass:{
+    attributes : {"class":"initial"},
+    test : function(component){
+        var div = component.find("bg").getElement();
+        $A.test.assertTrue($A.util.hasClass(div, "initial"), "class not set");
+
+        component.getAttributes().setValue("class","first");
+        $A.renderingService.rerender(component);
+
+        $A.test.assertFalse($A.util.hasClass(div, "initial"), "original class not removed after rerender");
+        $A.test.assertTrue($A.util.hasClass(div, "first"), "new class not set after rerender");
+    }
+},
+    </auradocs:codeblock>
+
+</aura:component>

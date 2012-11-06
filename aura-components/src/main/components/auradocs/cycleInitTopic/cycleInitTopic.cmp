@@ -1,0 +1,124 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Server-Side Process"/>
+
+    <p>A component lifecycle starts when the client sends an HTTP request to the server, which can be in the form <code>http://&lt;yourServer&gt;/&lt;namespace&gt;/&lt;component&gt;.cmp</code>.
+    Attributes can be included in the query string, such as <code>http://&lt;yourServer&gt;/&lt;namespace&gt;/&lt;component&gt;.cmp?title=Component1</code>.
+    If attributes are not specified, the defaults that are defined in the attribute definition are used.
+    </p>
+
+    <p>For a component request, the server:</p>
+    <ol>
+        <li>Loads registries and locates component definitions</li>
+        <li>Builds or retrieves component definitions</li>
+        <li>Instantiates component definitions</li>
+        <li>Serializes component definitions and instances</li>
+        <li>Sends serialized component definitions and instances to the client</li>
+    </ol>
+
+    <auradocs:info>See the <auradocs:topicLink topic="cycleRefs">Component Request Glossary</auradocs:topicLink> section for a glossary of component request terms.</auradocs:info>
+
+    <h4>1. Load registries and locate component definitions</h4>
+    <p>When the server receives an HTTP request, the Aura framework is loaded according to the specified mode. <code>AuraContextFilter</code> creates a <code>AuraContext</code>, which contains the mode denoted by the <code>aura.mode</code> parameter in the URL, such as in <code>http://&lt;yourServer&gt;/namespace/&lt;component&gt;.cmp?aura.mode=PROD</code>. Aura uses the default mode if the <code>aura.mode</code> parameter is not included in the query string. See <auradocs:topicLink topic="modesReference">Modes</auradocs:topicLink> for more information.</p>
+
+   <p>The server receives and parses the request for an instance of a component definition (<code>ComponentDef</code>). If attributes are included, Aura converts them to strongly typed attributes for the component definition.</p>
+
+   <p>Next, the registries are loaded. Registries store metadata for Aura objects. They may be created during the request process and destroyed when the server completes the request.</p>
+
+    <p>A master definition registry (<code>MasterDefRegistry</code>) contains a list of registries (<code>DefRegistry</code>) that are used to load and cache definitions. A separate registry is used for each Aura object, such as actions, or controllers.</p>
+
+   <h4>2. Build or retrieve component definitions</h4>
+
+   <p>This stage of the process retrieves the component's metadata, known as the <code>ComponentDef</code>.</p>
+
+   <p>After the relevant registries are identified, the server determines if the requested <code>ComponentDef</code> is already cached.
+
+    <ul>
+        <li>If it's cached in a registry or found in other locations, the <code>ComponentDef</code> is returned and the component definition tree is updated to include the definition. The <code>ComponentDef</code> is cached, including its references to other <code>ComponentDef</code>s, attributes, events, controller, and resources, such as CSS styles.</li>
+        <li>If the <code>ComponentDef</code> is not cached, the server locates and parses the source code to construct the <code>ComponentDef</code>. The server also identifies the language and definition type of the <code>ComponentDef</code>.</li>
+   </ul>
+   </p>
+
+   <p>Any dependencies on other definitions are also determined. Dependencies may include definitions for interfaces, controllers, actions, and models. A <code>DefRegistry</code> that doesn't contain the <code>ComponentDef</code> passes the request to a <code>DefFactory</code>, which builds the definition.</p>
+
+   <p>Each component definition in the tree is parsed iteratively. The process is completed when the <code>ComponentDef</code> tree doesn't contain any unparsed <code>ComponentDef</code>s.</p>
+
+
+  <h4>3. Instantiate component definitions</h4>
+   <p>Once the server completes the component definition process, it can create a component instance. To start this instantiation, the <code>ComponentDef</code> (a root definition) is retrieved along with any attribute definitions and references to other components. The next steps are:
+   </p>
+   <ul>
+        <li><b>Determine component definition type</b>: Aura determines whether the root component definition is abstract or concrete.</li>
+        <li><b>Create component instances</b>:
+            <ul>
+                <li><b>Abstract</b>: Aura can instantiate abstract component definitions using a provider to determine the concrete component to use at runtime.</li>
+                <li><b>Concrete</b>: Aura constructs a component instance and any properties associated with it, along with its super component. Attribute values of the component definitions are loaded, and can consist of other component definitions, which are instantiated recursively.</li>
+            </ul>
+        </li>
+        <li><b>Create model instances</b>: After the super component definition is instantiated, Aura creates any associated component model that hasn't been instantiated.</li>
+        <li><b>Create attribute instances</b>: Aura instantiates all remaining attributes. If the attribute refers to an uninstantiated component definition, the latter is instantiated. Non-component attribute values may come from a client request as a literal or expression, which can be derived from a super component definition, a model, or other component definitions. Expressions can be resolved on the client side to allow data to be refreshed dynamically.</li>
+   </ul>
+
+   <p>The instantiation process terminates when the component and all its child nodes have been instantiated. Note that controllers are not instantiated since they are static and don't have any state.</p>
+
+<h4>4. Serialize component definition and instances</h4>
+   <p>Aura enables dynamic rendering on the client side through a JSON serialization process, which begins after instantiation completes. Aura serializes:</p>
+   <ul>
+        <li>The component instance tree</li>
+        <li>Data for the component instance tree</li>
+        <li>Metadata for the component instance tree</li>
+   </ul>
+
+   <p>When the current object has been serialized but it's not the root object corresponding to the requested component, its parent objects are serialized recursively.</p>
+
+  <h4>5. Send serialized component definitions and instances to client</h4>
+
+   <p>The server sends the serialized component definitions and instances to the client. Definitions are cached but the instance data is not cached.</p>
+
+   <p>The definitions are transmitted in the following format:</p>
+
+   <auradocs:codeblock>
+{"descriptor":"markup://aura:component",
+"rendererDef":{ "serRefId":2},
+"attributeDefs":[{ "serId":20,
+                    "value":{ "descriptor":"body",
+                    "typeDefDescriptor":"aura://Aura.Component[]",
+                    "required":false} } ],
+                    "interfaces":["markup://aura:rootComponent"],
+                    "isAbstract":true}
+   </auradocs:codeblock>
+
+   <p>The component instance tree is transmitted in the following format:</p>
+
+   <auradocs:codeblock>
+$A.initAsync({"context":{"mode":"DEV","app":"auradocs:ide","preloads":
+       ["aura","ui"],
+       "requestedLocales":["en_US","en"]},
+       "deftype":"APPLICATION",
+       "descriptor":"markup://auradocs:ide",
+       "host":"",
+       "lastmod":1323498293847});
+   </auradocs:codeblock>
+
+   <p>Next, we'll see what happens during the <auradocs:topicLink topic="clientInit">Client-Side Process</auradocs:topicLink>.</p>
+
+   <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="oodProviders">Providers</auradocs:topicLink>
+     </p>
+</aura:component>

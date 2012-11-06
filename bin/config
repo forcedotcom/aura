@@ -1,0 +1,21 @@
+#!/bin/sh
+
+echo "Configuring Aura repository..."
+
+if which python >/dev/null; then
+    :
+else
+    echo "${0##*/}: Python not found. Please install Python." >&2
+    exit 1
+fi
+
+git_root=$(git rev-parse --show-toplevel)
+
+# alias repo hooks to .githooks dir in project
+rm -r $git_root/.git/hooks
+ln -s ../.githooks $git_root/.git/hooks
+
+# add some repo-specific configs
+git config commit.template $git_root/.githooks/commit_template
+
+echo "Configuration complete."

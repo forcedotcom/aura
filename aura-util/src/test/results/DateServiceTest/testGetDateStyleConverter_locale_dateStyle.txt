@@ -1,0 +1,49 @@
+Test:testGetDateStyleConverter_locale_dateStyle
+Input date:Date(1)		Formatted date:1970/1/1		Parsed date:-28800000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Date style: 3
+Input date:Date(1)		Formatted date:1970/1/1		Parsed date:-28800000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Date style: 2
+Input date:Date(1)		Formatted date:1970年1月1日		Parsed date:-28800000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Date style: 1
+Input date:Date(1)		Formatted date:1970年1月1日 星期四		Parsed date:-28800000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Date style: 0
+Input date:Date(1000)		Formatted date:1970/1/1		Parsed date:-28800000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Date style: 3
+Input date:Date(1000)		Formatted date:1970/1/1		Parsed date:-28800000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Date style: 2
+Input date:Date(1000)		Formatted date:1970年1月1日		Parsed date:-28800000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Date style: 1
+Input date:Date(1000)		Formatted date:1970年1月1日 星期四		Parsed date:-28800000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Date style: 0
+Input date:Date(1333322872649)		Formatted date:2012/4/2		Parsed date:1333296000000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Date style: 3
+Input date:Date(1333322872649)		Formatted date:2012/4/2		Parsed date:1333296000000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Date style: 2
+Input date:Date(1333322872649)		Formatted date:2012年4月2日		Parsed date:1333296000000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Date style: 1
+Input date:Date(1333322872649)		Formatted date:2012年4月2日 星期一		Parsed date:1333296000000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Date style: 0
+Input date:Date(0)		Formatted date:1970/1/1		Parsed date:-28800000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Date style: 3
+Input date:Date(0)		Formatted date:1970/1/1		Parsed date:-28800000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Date style: 2
+Input date:Date(0)		Formatted date:1970年1月1日		Parsed date:-28800000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Date style: 1
+Input date:Date(0)		Formatted date:1970年1月1日 星期四		Parsed date:-28800000		Locale:Chinese (Taiwan)		TimeZone: GMT+08:00		Date style: 0
+Input date:Date(1)		Formatted date:12/31/69		Parsed date:-68400000		Locale:English (United States)		TimeZone: EST		Date style: 3
+Input date:Date(1)		Formatted date:Dec 31, 1969		Parsed date:-68400000		Locale:English (United States)		TimeZone: EST		Date style: 2
+Input date:Date(1)		Formatted date:December 31, 1969		Parsed date:-68400000		Locale:English (United States)		TimeZone: EST		Date style: 1
+Input date:Date(1)		Formatted date:Wednesday, December 31, 1969		Parsed date:-68400000		Locale:English (United States)		TimeZone: EST		Date style: 0
+Input date:Date(1000)		Formatted date:12/31/69		Parsed date:-68400000		Locale:English (United States)		TimeZone: EST		Date style: 3
+Input date:Date(1000)		Formatted date:Dec 31, 1969		Parsed date:-68400000		Locale:English (United States)		TimeZone: EST		Date style: 2
+Input date:Date(1000)		Formatted date:December 31, 1969		Parsed date:-68400000		Locale:English (United States)		TimeZone: EST		Date style: 1
+Input date:Date(1000)		Formatted date:Wednesday, December 31, 1969		Parsed date:-68400000		Locale:English (United States)		TimeZone: EST		Date style: 0
+Input date:Date(1333322872649)		Formatted date:4/1/12		Parsed date:1333252800000		Locale:English (United States)		TimeZone: EST		Date style: 3
+Input date:Date(1333322872649)		Formatted date:Apr 1, 2012		Parsed date:1333252800000		Locale:English (United States)		TimeZone: EST		Date style: 2
+Input date:Date(1333322872649)		Formatted date:April 1, 2012		Parsed date:1333252800000		Locale:English (United States)		TimeZone: EST		Date style: 1
+Input date:Date(1333322872649)		Formatted date:Sunday, April 1, 2012		Parsed date:1333252800000		Locale:English (United States)		TimeZone: EST		Date style: 0
+Input date:Date(0)		Formatted date:12/31/69		Parsed date:-68400000		Locale:English (United States)		TimeZone: EST		Date style: 3
+Input date:Date(0)		Formatted date:Dec 31, 1969		Parsed date:-68400000		Locale:English (United States)		TimeZone: EST		Date style: 2
+Input date:Date(0)		Formatted date:December 31, 1969		Parsed date:-68400000		Locale:English (United States)		TimeZone: EST		Date style: 1
+Input date:Date(0)		Formatted date:Wednesday, December 31, 1969		Parsed date:-68400000		Locale:English (United States)		TimeZone: EST		Date style: 0
+Input date:Date(1)		Formatted date:1/1/70		Parsed date:0		Locale:English (United States)		TimeZone: GMT		Date style: 3
+Input date:Date(1)		Formatted date:Jan 1, 1970		Parsed date:0		Locale:English (United States)		TimeZone: GMT		Date style: 2
+Input date:Date(1)		Formatted date:January 1, 1970		Parsed date:0		Locale:English (United States)		TimeZone: GMT		Date style: 1
+Input date:Date(1)		Formatted date:Thursday, January 1, 1970		Parsed date:0		Locale:English (United States)		TimeZone: GMT		Date style: 0
+Input date:Date(1000)		Formatted date:1/1/70		Parsed date:0		Locale:English (United States)		TimeZone: GMT		Date style: 3
+Input date:Date(1000)		Formatted date:Jan 1, 1970		Parsed date:0		Locale:English (United States)		TimeZone: GMT		Date style: 2
+Input date:Date(1000)		Formatted date:January 1, 1970		Parsed date:0		Locale:English (United States)		TimeZone: GMT		Date style: 1
+Input date:Date(1000)		Formatted date:Thursday, January 1, 1970		Parsed date:0		Locale:English (United States)		TimeZone: GMT		Date style: 0
+Input date:Date(1333322872649)		Formatted date:4/1/12		Parsed date:1333238400000		Locale:English (United States)		TimeZone: GMT		Date style: 3
+Input date:Date(1333322872649)		Formatted date:Apr 1, 2012		Parsed date:1333238400000		Locale:English (United States)		TimeZone: GMT		Date style: 2
+Input date:Date(1333322872649)		Formatted date:April 1, 2012		Parsed date:1333238400000		Locale:English (United States)		TimeZone: GMT		Date style: 1
+Input date:Date(1333322872649)		Formatted date:Sunday, April 1, 2012		Parsed date:1333238400000		Locale:English (United States)		TimeZone: GMT		Date style: 0
+Input date:Date(0)		Formatted date:1/1/70		Parsed date:0		Locale:English (United States)		TimeZone: GMT		Date style: 3
+Input date:Date(0)		Formatted date:Jan 1, 1970		Parsed date:0		Locale:English (United States)		TimeZone: GMT		Date style: 2
+Input date:Date(0)		Formatted date:January 1, 1970		Parsed date:0		Locale:English (United States)		TimeZone: GMT		Date style: 1
+Input date:Date(0)		Formatted date:Thursday, January 1, 1970		Parsed date:0		Locale:English (United States)		TimeZone: GMT		Date style: 0

@@ -1,0 +1,30 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component support="BETA"
+    description="This container component creates a vertical box area on a page. It doesn't produce any default content for the component itself, beyond simple wrapper HTML. You can insert content into the top and bottom of the &lt;ui:vbox&gt; by adding it to the north and south attributes respectively. The body of the component is inserted in the middle of the &lt;ui:vbox&gt;.
+
+    north, body, and south are facets of the &lt;ui:vbox&gt; component. The north and south facets, if set, are contained in their own HTML wrapper markup.
+
+    &lt;ui:vbox&gt; is a lightweight component that attempts to add the minimum markup possible to the DOM, and use minimal memory. To achieve this efficiency you must set each facet to a single component only. That component can itself contain multiple child components, &quot;wrapping&quot; them for the &lt;ui:vbox&gt;.
+
+    You can use &lt;ui:vbox&gt; with &lt;ui:block&gt;, another &quot;structural&quot; component, to create a box-oriented layout that can be fine-tuned using CSS to produce virtually any page or section layout you desire.">
+
+    <aura:attribute name="north" type="Aura.Component[]" description="The top facet of the component."/>
+    <aura:attribute name="south" type="Aura.Component[]" description="The bottom facet of the component."/>
+    <aura:attribute name="centerClass" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by &lt;ui:vbox&gt;."/>
+</aura:component>

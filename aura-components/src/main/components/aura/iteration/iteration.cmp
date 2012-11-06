@@ -1,0 +1,39 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component implements="aura:rootComponent"
+    provider="java://org.auraframework.impl.root.component.IterationProvider, js://aura.iteration"
+    renderer="js://aura.providedBody, java://org.auraframework.components.aura.ProvidedBodyRenderer"
+    support="BETA" description="Renders a view of a collection of items">
+<aura:attribute name="items" type="List" required="true" description="The collection of data to iterate over"/>
+<aura:attribute name="var" type="String" required="true" description="The name of the variable to use for each item inside the iteration"/>
+<aura:attribute name="indexVar" type="String" description="The name of variable to use for the index of each item inside the iteration"/>
+<aura:attribute name="start" type="Integer" description="The index of the collection to start at (inclusive)"/>
+<aura:attribute name="end" type="Integer" description="The index of the collection to stop at (exclusive)"/>
+<aura:attribute name="body" type="Aura.ComponentDefRef[]" required="true" description="Template to use when creating components for each iteration."/>
+<aura:attribute name="realbody" type="Aura.Component[]" description="Internal use only. Any value set will be ignored."/>
+
+<aura:handler name="change" value="{!v.items}" action="{!c.itemsChange}"/>
+<aura:handler name="change" value="{!v.start}" action="{!c.rangeChange}"/>
+<aura:handler name="change" value="{!v.end}" action="{!c.rangeChange}"/>
+
+<!--
+<aura:attribute name="page" type="Integer"/>
+<aura:attribute name="pageSize" type="Integer"/>
+<aura:attribute name="reverse" type="Boolean"/>
+-->
+</aura:component>

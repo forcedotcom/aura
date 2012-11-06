@@ -1,0 +1,57 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+<aura:set attribute="title" value="JavaScript"/>
+
+<p>Use JavaScript for client-side Aura code. </p>
+
+<p>The Aura object is the top-level object in the JavaScript framework code. For all the methods available in the Aura class, see <a href="/auradocs#api:Aura">Aura</a> in the JavaScript API in the Reference tab. You can use <code>$A</code> in JavaScript code to denote the Aura object.</p>
+
+<p>A component bundle can contain JavaScript code in a client-side controller, renderer, helper, or test file. We introduced <auradocs:topicLink topic="helloActions">client-side controllers</auradocs:topicLink> earlier as they are the most commonly used of these JavaScript files. To learn more about the other different types of JavaScript files, see:</p>
+
+<ul>
+    <li><auradocs:topicLink topic="helper">Helpers</auradocs:topicLink> for code that's shared between files</li>
+    <li><auradocs:topicLink topic="renderers">Renderers</auradocs:topicLink> for customizing component rendering</li>
+    <li><auradocs:topicLink topic="docTests">Component tests</auradocs:topicLink> for unit and performance tests</li>
+</ul>
+
+<p>Learn about <auradocs:topicLink topic="valueObjects">value objects</auradocs:topicLink>, which are a thin wrapper around the actual data in Aura.</p>
+
+<p>Read these guidelines about <auradocs:topicLink topic="domAccess">accessing the DOM</auradocs:topicLink>.</p>
+
+<p>The <auradocs:topicLink topic="jsCookbook">JavaScript cookbook</auradocs:topicLink> includes more granular code snippets and samples that could be used in various JavaScript files.</p>
+
+<h2>Publicly Accessible JavaScript Methods</h2>
+
+<p>The JavaScript API section in the <auradocs:navLink location="reference">Reference tab</auradocs:navLink> lists the publicly accessible methods for each JavaScript object.</p>
+
+<p>When you are writing code, it's important to understand which methods are publicly accessible for a JavaScript object. Each object has an associated <code>_export.js</code> file that lists the public methods that can be called. For example, <code>ArrayValue.js</code> has a corresponding <code>ArrayValue_export.js</code>. You should only call JavaScript methods that are advertised in an object's <code>_export.js</code> file. If you don't, you might get hard-to-debug bugs when you run your code in <code>PROD</code> mode.</p>
+
+<h2>Expressions in JavaScript Code</h2>
+
+<p>In JavaScript, use string syntax to evaluate an expression. For example:</p>
+
+<auradocs:codeblock>var theLabel = cmp.get("v.label");
+</auradocs:codeblock>
+
+<auradocs:info>Only use the <code><aura:text value="{!"/> }</code> expression syntax in markup in <code>.app</code> or <code>.cmp</code> files.</auradocs:info>
+
+<p><b>See also:</b><br/>
+    <auradocs:topicLink topic="expressions">Expressions</auradocs:topicLink>
+</p>
+</aura:component>

@@ -1,0 +1,106 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <div class="test">
+        <ui:scroller aura:id="basic">
+            <img aura:id="dynamicImage"/>
+
+            When I walk on by, girls be looking like damn he fly
+            I pimp to the beat, walking down the street in my new lafreak, yeah
+            This is how I roll, animal print, pants out control,
+            It's RedFoo with the big afro
+            And like Bruce Lee I've got the claw
+
+            Girl look at that body (x3)
+            I work out
+            Girl look at that body (x3)
+            I work out
+
+            When I walk in the spot, this is what I see
+            Everybody stops and they staring at me
+            I got passion in my pants and I ain't afraid to show it
+
+            I'm sexy and I know it (x2)
+
+            When I'm at the mall, security just can't fight 'em off
+            When I'm at the beach, I'm in a speedo trying to tan my cheeks
+            This is how I roll, come on ladies it's time to go
+            We headed to the bar, baby don't be nervous
+            No shoes, no shirt, and I still get service
+
+            Girl look at that body (x3)
+            I work out
+        </ui:scroller>
+    </div>
+
+    <div class="test">
+        <uitest:badRenderer skipAfterRender="true">
+            <ui:scroller aura:id="missingAfterRender">
+                <p>I haz no afterRender</p>
+                <p>and should not have a scroller instance created for me!</p>
+            </ui:scroller>
+        </uitest:badRenderer>
+    </div>
+
+    <div class="test">
+        <ui:scroller aura:id="rubberbanding">
+            Some short content that should rubberband.
+        </ui:scroller>
+    </div>
+
+    <div class="test">
+        <ui:scroller aura:id="rubberbandingBecauseMissingRefresh">
+            Some long content that rubberbands because of a missing call to refresh after container resized.
+
+            I let it fall, my heart
+            And as it fell, you rose to claim it
+            It was dark and I was over
+            Until you kissed my lips and you saved me
+            My hands, they were strong, but my knees were far too weak
+            To stand in your arms without falling to your feet
+
+            But there's a side to you that I never knew, never knew
+            All the things you'd say, they were never true, never true
+            And the games you'd play, you would always win, always win
+
+            But I set fire to the rain
+            Watched it pour as I touched your face
+            Well, it burned while I cried
+            'Cause I heard it screaming out your name, your name
+
+            When laying with you I could stay there
+            Close my eyes, feel you here forever
+            You and me together, nothing is better
+
+            'Cause there's a side to you that I never knew, never knew
+            All the things you'd say, they were never true, never true
+            And the games you's play, you would always win, always win
+
+            But I set fire to the rain
+            Watched it pour as I touched your face
+        </ui:scroller>
+    </div>
+
+    <div class="test">
+        <ui:scroller aura:id="pullToRefresh" onPullToRefresh="{!c.replaceBodyContent}">
+            This is pull-to-refresh enabled.  That means my content height is bigger
+            than my scroller height, but don't call me an invalid.
+        </ui:scroller>
+    </div>
+
+</aura:component>

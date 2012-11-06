@@ -1,0 +1,98 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Component Events"/>
+
+    <p>
+    Component events have attributes to pass relevant data from the firing component to any handling components. They have these characteristics:
+    </p>
+    <p><!--temp style before ul style gets fixed-->
+    <ul style="list-style-type:square; list-style-position:inside;">
+        <li>A component event is fired from an instance of a component.</li>
+        <li>A component registers that it may fire an event by using <code>&lt;aura:registerevent&gt;</code>.</li>
+        <li>A component event can be handled by the component itself or its parent. A component that extends another component can also handle events fired by the super component.</li>
+        <li>An event handler contains the firing component and declares how the event will be handled</li>
+        <li>Component events are akin to DOM events that bubble up the DOM tree and component event handlers are akin to inline HTML JavaScript handlers, with the caveat that they only bubble up one level; only the parent node can handle the thrown event, as opposed to the multi-level event bubbling and handling model in HTML.</li>
+   </ul></p>
+   <p>The following chart summarizes how Aura processes component events, with minor differences to <auradocs:topicLink topic="eventsApp">application events</auradocs:topicLink>.</p>
+    <p><ui:image src="/auraFW/resources/aura/images/compEvents.jpg" alt="Component Event Overview" /></p>
+
+
+    <h2>File Resources for Component Events</h2>
+    <p>Component events are handled by the files listed here. Note that only the controller files must follow the file name convention
+    <code>&lt;notifier&gt;Controller.js</code> and <code>&lt;handler&gt;Controller.js</code>.  The controllers are auto-wired to the notifier component and handler component.
+    View <auradocs:topicLink topic="eventsDemo">source files and demo</auradocs:topicLink> to see how Aura events work.</p>
+
+     <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>File Type</th>
+                <th>File Name</th>
+                <th>Description</th>
+                <th>Usage</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Component Event</td>
+                <td><code>compEvent.evt</code></td>
+                <td>Defines the event. </td>
+                <td>Uses <code>type="COMPONENT"</code> in the <code>aura:event</code> tag and contains attribute <code>name="context"</code>.The <code>context</code> attribute passes the context of where the event was fired to the handler. We'll learn more about this in <code>eventsNotifierController.js</code>.<br/></td>
+            </tr>
+            <tr>
+                <td>Notifier Component</td>
+                <td><code>eventsNotifier.cmp</code></td>
+                <td>Initiates the event. </td>
+                <td>Uses <code>aura:registerevent</code> to declare that it may fire this event.<br/>
+                    The firing component then defines when the event is fired: in this case, an <code>onclick</code> browser event.
+                    Any browser DOM element event starting with "on" such as <code>onclick</code> or <code>onkeypress</code>, can be wired to a controller action.
+                    You can only wire browser events to controller actions. Arbitrary JavaScript in the component is ignored.
+                </td>
+            </tr>
+            <tr>
+                <td>Notifier JavaScript Controller</td>
+                <td><code>eventsNotifierController.js</code></td>
+                <td>Fires the event.</td>
+                <td>The <code>onclick</code> action in the notifier has a value of <code><aura:text value="{!"/>c.fireComponentEvent}</code>, so the corresponding action in the controller is executed.
+                The event is fired by the <code>fire()</code> method. The <code>context</code> attribute is used to pass the context of where the event was fired to the handler.
+
+           </td>
+            </tr>
+            <tr>
+                <td>Handler Component</td>
+                <td><code>eventsHandler.cmp</code></td>
+                <td>Contains the notifier component. The handler is the parent component.</td>
+                <td>
+                The <code>parentName</code> attribute is set to the name of the handler component. This attribute was used to set the <code>context</code> attribute in the notifier controller.
+                <code>
+    &lt;auradocs:eventsNotifier parentName="<aura:text value="{!"/>v.name}" componentEventFired="<aura:text value="{!"/>c.handleComponentEventFired}"/&gt;
+                </code>
+                Note that <code>componentEventFired</code> matches the name attribute in the <code>aura:registerevent</code> tag in the notifier component. The value of the <code>componentEventFired</code> attribute is <code><aura:text value="{!"/>c.handleComponentEventFired}"</code> so the corresponding action in the handler controller is executed.
+                The <code>parentName</code> attribute is set to the name of the handler component. We saw earlier that this attribute was used to set the <code>context</code> attribute in the notifier controller.
+                </td>
+            </tr>
+            <tr>
+                <td>Handler JavaScript Controller</td>
+                <td><code>eventsHandlerController.js</code></td>
+                <td>Contains a function that is executed after the event is fired. </td>
+                <td>The controller function is executed when the event is fired, and may be used to set attributes that are displayed in the handler component.</td>
+            </tr>
+        </tbody>
+    </table>
+
+</aura:component>

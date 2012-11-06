@@ -1,0 +1,12 @@
+{
+  "serId":1,
+  "value":{
+    "descriptor":"js://test.testJSControllerParent/ACTION$functionName1",
+    "name":"functionName1",
+    "code":
+function test$testJSControllerParent_functionName1(args1, args2) {
+        var str = 'do Nothing';
+    },
+    "actionType":"CLIENT"
+  }
+}

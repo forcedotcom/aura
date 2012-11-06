@@ -1,0 +1,107 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="expressionTest:suite" render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
+    <aura:attribute name="isNull" type="String"/>
+
+    <!-- W-1002517 https://gus.soma.salesforce.com/a07B0000000FSRL
+    <expressionTest:test expression="{!null}" exprText="null" expected="null"/>
+    -->
+    <expressionTest:test expression="{!v.isNull}" exprText="v.isNull" expected="null"/>
+    <expressionTest:test expression="{!undefined}" exprText="undefined" expected="undefined"/>
+
+    <expressionTest:test expression="{!!null}" exprText="!null" expected="true"/>
+
+    <expressionTest:test expression="{!null == true}" exprText="null == true" expected="false"/>
+    <expressionTest:test expression="{!null == false}" exprText="null == false" expected="false"/>
+    <expressionTest:test expression="{!null == ''}" exprText="null == ''" expected="false"/>
+    <expressionTest:test expression="{!null == 0}" exprText="null == 0" expected="false"/>
+    <expressionTest:test expression="{!null == null}" exprText="null == null" expected="true"/>
+    <expressionTest:test expression="{!null == undefined}" exprText="null == undefined" expected="true"/>
+    <expressionTest:test expression="{!null == m.NaN}" exprText="null == m.NaN" expected="false"/>
+
+    <expressionTest:test expression="{!null != null}" exprText="null != null" expected="false"/>
+    <expressionTest:test expression="{!null != undefined}" exprText="null != undefined" expected="false"/>
+    <expressionTest:test expression="{!null != m.NaN}" exprText="null != m.NaN" expected="true"/>
+
+    <expressionTest:test expression="{!true &amp;&amp; null}" exprText="true &amp;&amp; null" expected="null"/>
+    <expressionTest:test expression="{!null &amp;&amp; null}" exprText="null &amp;&amp; null" expected="null"/>
+    <expressionTest:test expression="{!null &amp;&amp; true}" exprText="null &amp;&amp; true" expected="null"/>
+
+    <expressionTest:test expression="{!false || null}" exprText="false || null" expected="null"/>
+    <expressionTest:test expression="{!null || true}" exprText="null || true" expected="true"/>
+    <expressionTest:test expression="{!null || null}" exprText="null || null" expected="null"/>
+
+    <expressionTest:test expression="{!null ? 'yes' : 'no'}" exprText="null ? 'yes' : 'no'" expected="'no'"/>
+    <expressionTest:test expression="{!true ? null : 'no'}" exprText="true ? null : 'no'" expected="null"/>
+    <expressionTest:test expression="{!false ? 'yes' : null}" exprText="false ? 'yes' : null" expected="null"/>
+
+    <expressionTest:test expression="{!null + 1}" exprText="null + 1" expected="1"/>
+    <expressionTest:test expression="{!null + 'b'}" exprText="null + 'b'" expected="'b'"/>
+    <expressionTest:test expression="{!2.5 + null}" exprText="2.5 + null" expected="2.5"/>
+    <expressionTest:test expression="{!'c' + null}" exprText="'c' + null" expected="'c'"/>
+    <expressionTest:test expression="{!null + null}" exprText="null + null" expected="''"/>
+
+    <expressionTest:test expression="{!2 - null}" exprText="2 - null" expected="2"/>
+    <expressionTest:test expression="{!null - 3.1}" exprText="null - 3.1" expected="-3.1"/>
+    <expressionTest:test expression="{!null - null}" exprText="null - null" expected="0"/>
+
+    <expressionTest:test expression="{!3 * null}" exprText="3 * null" expected="0"/>
+    <expressionTest:test expression="{!null * -.1}" exprText="null * -.1" expected="0"/>
+    <expressionTest:test expression="{!null * null}" exprText="null * null" expected="0"/>
+
+    <expressionTest:test expression="{!3 / null}" exprText="3 / null" expected="Infinity"/>
+    <expressionTest:test expression="{!null / 3}" exprText="null / 3" expected="0"/>
+    <expressionTest:test expression="{!null / null}" exprText="null / null" expected="NaN"/>
+
+    <expressionTest:test expression="{!3 % null}" exprText="3 % null" expected="NaN"/>
+    <expressionTest:test expression="{!null % 3}" exprText="null % 3" expected="0"/>
+    <expressionTest:test expression="{!null % null}" exprText="null % null" expected="NaN"/>
+
+    <expressionTest:test expression="{!1 > null}" exprText="1 > null" expected="true"/>
+    <expressionTest:test expression="{!null > 0}" exprText="null > 0" expected="false"/>
+    <expressionTest:test expression="{!null > null}" exprText="null > null" expected="false"/>
+
+    <expressionTest:test expression="{!0 >= null}" exprText="0 >= null" expected="true"/>
+    <expressionTest:test expression="{!null >= 1}" exprText="null >= 1" expected="false"/>
+    <expressionTest:test expression="{!null >= null}" exprText="null >= null" expected="true"/>
+
+    <expressionTest:test expression="{!0 &lt; null}" exprText="0 &lt; null" expected="false"/>
+    <expressionTest:test expression="{!null &lt; 1}" exprText="null &lt; 1" expected="true"/>
+    <expressionTest:test expression="{!null &lt; null}" exprText="null &lt; null" expected="false"/>
+
+    <expressionTest:test expression="{!1 &lt;= null}" exprText="1 &lt;= null" expected="false"/>
+    <expressionTest:test expression="{!null &lt;= 0}" exprText="null &lt;= 0" expected="true"/>
+    <expressionTest:test expression="{!null &lt;= null}" exprText="null &lt;= null" expected="true"/>
+
+    <expressionTest:test expression="{!-null}" exprText="-null" expected="0"/>
+
+    <expressionTest:test expression="{!abs(null)}" exprText="abs(null)" expected="0"/>
+
+    <!-- W-1005793 https://gus.soma.salesforce.com/a07B0000000FTi7IAG
+    <expressionTest:test expression="{!m.stringNull}" exprText="m.stringNull" expected="null"/>
+    <expressionTest:test expression="{!m.integerNull}" exprText="m.integerNull" expected="null"/>
+    <expressionTest:test expression="{!m.doubleNull}" exprText="m.doubleNull" expected="null"/>
+    <expressionTest:test expression="{!m.objectNull}" exprText="m.objectNull" expected="null"/>
+    <expressionTest:test expression="{!!m.stringNull}" exprText="!m.stringNull" expected="true"/>
+    <expressionTest:test expression="{!!m.objectNull}" exprText="!m.objectNull" expected="true"/>
+    <expressionTest:test expression="{!null == m.stringNull}" exprText="null == m.stringNull" expected="true"/>
+    <expressionTest:test expression="{!null == m.integerNull}" exprText="null == m.integerNull" expected="true"/>
+    <expressionTest:test expression="{!null == m.doubleNull}" exprText="null == m.doubleNull" expected="true"/>
+    <expressionTest:test expression="{!null == m.objectNull}" exprText="null == m.objectNull" expected="true"/>
+    -->
+</aura:component>

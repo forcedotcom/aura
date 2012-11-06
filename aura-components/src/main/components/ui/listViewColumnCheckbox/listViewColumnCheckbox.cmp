@@ -1,0 +1,26 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="ui:listViewColumnCell" extensible="true" support="GA" description="A checkbox column template definition, describes a checkbox in a table data cell.">
+    <aura:attribute name="label" type="String" default=""            description="The label text by which to refer to the checkbox."/>
+    <aura:attribute name="labelClass" type="String" default=""       description="The css class to apply to the label element."/>
+    <aura:attribute name="checked" type="Boolean" default="false"    description="The checked state of the checkbox."/>
+    <aura:registerEvent name="onchange" type="ui:listViewEvent"    description="The event fired when the checkbox selection is changed."/>
+
+    <label class="{!v.labelClass?v.labelClass:null}" for="{!'ui:listViewColumnCheckbox:'+globalId}">{!v.label}</label>
+    <input class="{!v.class?v.class:null}" id="{!'ui:listViewColumnCheckbox:'+globalId}" type="checkbox" checked="{!v.checked=='true'||v.checked==true?'checked':null}" onclick="{!c.changeHandler}" />
+</aura:component>

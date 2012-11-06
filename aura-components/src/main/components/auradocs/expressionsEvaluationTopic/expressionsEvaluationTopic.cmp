@@ -1,0 +1,43 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+<aura:set attribute="title" value="Expression Evaluation"/>
+
+<p>Expressions are evaluated much the same way that expressions in JavaScript or other programming languages are evaluated. Operators are a subset of those available in JavaScript, and evaluation order and precedence are generally the same as JavaScript. Parentheses enable you to ensure a specific evaluation order.</p>
+
+<p>What you may find surprising about expressions is <em>how often</em> they are evaluated. The simplistic answer is, as often as they need to be.</p>
+
+<p>A more complete answer is that the value objects described in <auradocs:topicLink topic="expressionsResults">Expression Results</auradocs:topicLink> wrap component values so that Aura can notice when things change, and trigger re-rendering of any components that are affected. Dependencies are handled automatically. This is one of the fundamental benefits of the Aura framework--it knows when to re-render something on the page. When a component is re-rendered, any expressions it uses will be re-evaluated.</p>
+
+<p>One specific case is worth discussing in a bit more detail.</p>
+
+<h2>Action Methods</h2>
+
+<p>Expressions are used to provide action methods for user interface events: onclick, onhover, and any other component attributes beginning with "on". Some components simplify assigning actions to user interface events using other attributes, such as the <code>press</code> attribute on <code>&lt;ui:button&gt;</code>.</p>
+
+<p>Action methods must be assigned to attributes using an expression, for example <code><aura:text value="{!"/>c.theAction}</code>. This assigns a <code>Aura.Action</code>, which is a reference to the controller function that handles the action.</p>
+
+<p>Assigning action methods via expressions allows you to assign them conditionally, based on the state of the application or user interface:</p>
+
+<code>&lt;ui:button aura:id="likeBtn"
+    label="<aura:text value="{!"/>(m.likeId == null) ? 'Like It' : 'Unlike It'}"
+    press="<aura:text value="{!"/>(m.likeId == null) ? c.likeIt  : c.unlikeIt}" /&gt;</code>
+
+<p>This button will show "Like It" for items that have not yet been liked, and clicking it will call the <code>likeIt</code> action method. Then the component will re-render, and the opposite user interface display and method assignment will be in place. Clicking a second time will unlike the item, and so on.</p>
+
+</aura:component>

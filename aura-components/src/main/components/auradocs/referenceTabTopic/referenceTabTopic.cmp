@@ -1,0 +1,51 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Reference Overview"/>
+
+    <p>The Reference tab enables you to browse API information as well as source code for all the definitions, such as components, in Aura.</p>
+
+    <h2>APIs</h2>
+
+    <p>Click <b>JavaScript API</b> to see the publicly accessible method for each JavaScript object.</p>
+
+    <p>Click <b>Java API</b> to see the Javadoc for all the Java classes.</p>
+
+    <h2>Definitions</h2>
+
+    <p>You can browse the source for all the applications, components, interfaces, events, and tests in Aura by expanding the sidebar folders. The definitions are grouped in sub-folders for each namespace. For example, click <b>Components > Aura > Component</b> to find information about <code>&lt;aura:component&gt;</code>, which is the root of the component hierarchy.</p>
+
+    <p>There are multiple tabs available for each of the definitions. For components, the <b>overview</b> tab lists the component's attributes. For <code>&lt;aura:component&gt;</code>, you can see that there's only one attribute called <code>body</code>. Click the <b>source</b> tab to see the attribute defined in a <code>&lt;aura:attribute&gt;</code> tag. The source shows all the markup, including the system attributes, such as <code>abstract</code>, which are properties of the top-level <code>&lt;aura:component&gt;</code> tag.</p>
+
+    <p>The other tabs vary depending on the type of definition. For components, you might see tabs for the client-side renderer and client-side controller if they're included in the component's bundle.</p>
+
+    <h3>Support Level for Definitions</h3>
+
+    <p>Each definition has a support level indicating whether it is fully supported or not. The support level is defined in the <code>support</code> system attribute in the root tag of the definition.</p>
+
+    <p>We will explain the support levels in terms of components, which are the most common definitions to have different support levels. The support levels in ascending order are:</p>
+
+    <ol>
+        <li><code>PROTO</code>&mdash;The component is still in development and is unsupported.</li>
+        <li><code>BETA</code>&mdash;The component is ready for beta use but don't use it in a GA app.</li>
+        <li><code>GA</code>&mdash;The component is generally available for use in apps and is supported.</li>
+    </ol>
+
+    <p>If you extend a component, you can't give the child component a higher support level than the parent component. For example, if cmpA is <code>BETA</code> and cmpB extends cmpA, cmpB can't have a support level of <code>GA</code>. It can have a support level of <code>BETA</code> or <code>PROTO</code>.</p>
+
+</aura:component>

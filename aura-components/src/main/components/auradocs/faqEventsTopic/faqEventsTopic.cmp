@@ -1,0 +1,37 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="How do I use Events in Aura?"/>
+
+
+    <p>You may be familiar with event-driven programming as it's used in many languages and frameworks, such as JavaScript and Java Swing.
+    The idea is that you write handlers that respond to interface events as they occur.
+    In Aura, you write the handlers in client-side controller actions with JavaScript.</p>
+
+    <p>There are two types of events in Aura:
+        <ul>
+            <li><b>Component events</b> are handled by the component itself or a parent component. Components can subscribe to a component event that they can see.</li>
+            <li><b>Application events</b>  are essentially a traditional publish-subscribe model. All components that provide a handler for the event are notified.</li>
+        </ul>
+    </p>
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="helloEvents">Events</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>
+    </p>
+
+</aura:component>

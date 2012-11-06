@@ -1,0 +1,145 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Using Layouts for Metadata-Driven Navigation"/>
+
+
+
+    <p>Layouts are a metadata-driven description of navigation in an application. You can describe in an XML file how you want the application to respond to changes to everything after the <code>#</code> (hash) in the URL. You can use Aura without layouts, but they offer a centralized location for managing URL-centric navigation.</p>
+
+  <h2>Layouts Metadata File</h2>
+
+  <p>Each app can have a layouts file that describes navigation in the app. The name of the layouts file is derived from the name of the app. If the app is <code>demo.app</code>, the layouts file is <code>demoLayouts.xml</code> and it's in the same directory as <code>demo.app</code>.</p>
+
+  <p>The layouts file contains a <code>&lt;aura:layouts&gt;</code> system tag that can contain one or more <code>&lt;aura:layout&gt;</code> system tags. Each <code>&lt;aura:layout&gt;</code> is a matching rule for everything after the <code>#</code> in the URL.</p>
+
+  <p>A <code>&lt;aura:layout&gt;</code> system tag contains one or more <code>&lt;aura:layoutItem&gt;</code> system tags. Each <code>&lt;aura:layoutItem&gt;</code> is a template that populates a container with markup or the results of an action.</p>
+
+  <p>A container is dynamically populated when a <code>&lt;aura:layout&gt;</code> tag is matched. The container must have a <code>aura:id</code> attribute that is findable in the app. If an app contains components with attributes of <code>aura:id="sidebar"</code> and <code>aura:id="content"</code>, you can refer to the <code>sidebar</code> and <code>content</code> containers in a <code>&lt;aura:layoutItem&gt;</code> tag in the layouts file.</p>
+
+<p>For example, consider <code>demo.app</code> that contains components with attributes of <code>aura:id="sidebar"</code> and <code>aura:id="content"</code>.</p>
+
+<auradocs:codeblock>
+    <![CDATA[
+  <aura:set attribute="left">
+    <div class="sidebar" aura:id="sidebar"></div>
+  </aura:set>
+  <div class="content" aura:id="content"></div>]]>
+</auradocs:codeblock>
+
+<p>You can refer to the <code>sidebar</code> and <code>content</code> containers in a <code>&lt;aura:layoutItem&gt;</code> system tag in the associated <code>demoLayouts.xml</code> file.</p>
+
+<!-- Note: couldn't use CDATA for this as need to escape the "{!" characters -->
+<auradocs:codeblock>
+  &lt;aura:layout name="sample" match="^.{3}$"&gt;
+    &lt;aura:layoutItem container="sidebar" action="<aura:text value="{!"/>c.getList}"/&gt;
+    &lt;aura:layoutItem container="content"&gt;&lt;p&gt;You can put markup here though it normally would be dynamic&lt;/p&gt;&lt;/aura:layoutItem&gt;
+  &lt;/aura:layout&gt;
+</auradocs:codeblock>
+
+<p>Each <code>&lt;aura:layout&gt;</code> first compares everything after the <code>#</code> in the URL with the name attribute. If it doesn't match, it compares the <code>#</code> value in the URL with the optional match attribute, which is a regular expression. In this case, the name attribute would match <code>#sample</code> in the URL and would then fall back to matching any three characters based on the <code>^.{3}$</code> regular expression.</p>
+
+<p>You would normally have more than one <code>&lt;aura:layout&gt;</code> in a layouts file. In that case, Aura attempts to match against each <code>name</code> attribute first. If there is no match for any <code>&lt;aura:layout&gt;</code>, the framework attempts to match against each <code>match</code> attribute.</p>
+
+<p>The first <code>&lt;aura:layoutItem&gt;</code> populates the <code>sidebar</code> container with the results of the <code>getList</code> action on the server-side controller. The controller is defined in the <code>&lt;aura:application&gt;</code> tag in the associated <code>.app</code> file. A controller action is useful in this scenario because returning a list may need security checks and other processing that can't be expressed statically in markup.</p>
+
+<auradocs:info>You can only reference a server-side action in a <code>&lt;aura:layoutItem&gt;</code>. You can't reference a client-side action.</auradocs:info>
+
+<p>The next <code>&lt;aura:layoutItem&gt;</code> populates the <code>content</code> container with some markup. In this case, it's static markup, but it would usually be dynamic and can include any Aura components.</p>
+
+<p>The <code>&lt;aura:layouts&gt;</code> system tag supports the following optional attributes:</p>
+
+        <dl>
+            <dt>default</dt>
+            <dd>This is the layout to use when the app is initially loaded and there is no <code>#</code> value in the URL.</dd>
+
+            <dt>catchall</dt>
+            <dd>This is the layout to use when the <code>#</code> value doesn't match any <code>&lt;aura:layout&gt;</code>.</dd>
+        </dl>
+
+  <h2>Custom Events</h2>
+
+  <p>We saw how to create a custom event to tokenize multiple name-value pairs in <auradocs:topicLink topic="urlNav">URL-Centric Navigation</auradocs:topicLink>. If your app has a layouts file, the layout service automatically handles the location change events that are fired.</p>
+
+
+  <p>Let's look at how layouts work with the same <code>demo/myLocationChange/myLocationChange.evt</code> event.</p>
+
+<auradocs:codeblock>
+  <![CDATA[<aura:event type="application" extends="aura:locationChange">
+    <aura:attribute name="thing1" type="String"/>
+    <aura:attribute name="thing2" type="Boolean"/>
+  </aura:event>]]>
+</auradocs:codeblock>
+
+<p>To see how you'd access the tokenized attributes, let's look at a <code>&lt;aura:layoutItem&gt;</code> that uses a server-side action to retrieve components.</p>
+
+<!-- Note: couldn't use CDATA for this as need to escape the "{!" characters -->
+<auradocs:codeblock>
+    &lt;aura:layoutItem container="center" action="<aura:text value="{!"/>c.getHomeComponents}"/&gt;
+</auradocs:codeblock>
+
+<p>You can write the <code>getHomeComponents</code> action to accept arguments that match the attributes in your custom location change event. The arguments are automatically mapped from the location change event to the action call.</p>
+
+<auradocs:codeblock>
+  @AuraEnabled
+  public static Aura.Component[] getHomeComponents(String token, String thing1, Boolean thing2){...}
+</auradocs:codeblock>
+
+
+<h2>Overriding Layout Handling</h2>
+
+<p>Instead of using <code>AuraHistoryService</code>, you can advertise from a component that you want to handle layouts instead of using a layouts file. For example, you may want to make a dynamic layout decision based on conditional logic, which you can't do in a layouts file.</p>
+
+<p>A component advertises that it wants to handle its own layouts by implementing the <code>aura:layoutHandler</code> interface. For example: </p>
+
+<!-- Note: couldn't use CDATA for this as need to escape the "{!" characters -->
+<auradocs:codeblock>
+  &lt;aura:component implements="aura:layoutHandler"&gt;
+    &lt;aura:handler name="layout" action="<aura:text value="{!"/>c.layout}" /&gt;
+  &lt;/aura:component&gt;
+</auradocs:codeblock>
+
+<p>The layout for this component is handled in the <code>layout</code> function in its controller.</p>
+
+<p>The layout events have a <code>defaultAction</code> parameter that you can run if you want to conditionally use the layouts defined in your app's layout file instead of your custom layout processing. This is a simple examle but it shows you how you can conditionally handle your layouts.</p>
+
+<auradocs:codeblock>
+    layout: function(component, event, helper) {
+      // Get the default layout event handling
+        var defaultAction = event.getParam("defaultAction");
+        var newLocation = event.getParam("location");
+        // Use the default handling for some criteria
+        if (newLocation == 'home') {
+            defaultAction();
+        }...
+        else {
+            // add your custom layout handling here
+        }
+    }
+</auradocs:codeblock>
+
+<p>The layout service has a <code>changeLocation</code> method you can call to pass some extra parameters to the layout function.  For example, you could have a helper file that uses <code><aura:text value="$A"/>.layoutService.changeLocation</code> to set a parameter that is passed to the layout function in the controller of the components that implement <code>aura:layoutHandler</code>. For example, to add an <code>extraParam</code> parameter to the <code>#</code> value in the URL:</p>
+
+<auradocs:codeblock>
+  <![CDATA[$A.layoutService.changeLocation(c._location, {
+    extraParam : true }
+  ]]>
+</auradocs:codeblock>
+
+</aura:component>

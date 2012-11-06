@@ -1,0 +1,7 @@
+exec=`which Xephyr`
+if [ "X${exec}X" = "XX" ]; then
+	echo Xephyr not found on system
+	exit 1
+fi
+echo Calling $exec $@
+`$exec -ac $@`

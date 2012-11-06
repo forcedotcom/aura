@@ -1,0 +1,56 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+     <aura:set attribute="title" value="Using AppCache"/>
+
+    <p>Application cache (AppCache) speeds up app response time and reduces server load by only downloading resources that have changed.
+       It  improves page loads affected by limited browser cache persistence on some devices. You can take advantage of application cache capabilities in Aura.
+    </p>
+    <p>See <a href="http://www.html5rocks.com/en/tutorials/appcache/beginner/" target="_blank">an introduction to AppCache</a> for more information.</p>
+
+    <p>Aura disables the use of AppCache by default. To enable AppCache in your application, set the <code>useAppcache="true"</code> system attribute in the <code>aura:application</code> tag.
+            We recommend disabling AppCache during initial development while your app's resources are still changing. Enable AppCache when you are finished developing the app and before you start using it in production to see whether AppCache improves the app's response time..
+    </p>
+    <auradocs:info>AppCache can be useful if you're developing apps for mobile devices, which sometimes have very limited browser cache.
+      Apps built for desktop clients may not benefit from the AppCache.</auradocs:info>
+
+    <h3>Loading Resources with AppCache</h3>
+     <p><ui:image src="/auraFW/resources/aura/images/appcache.png" alt="AppCache and Aura" /></p>
+      <p>A cache manifest file is a simple text file that defines the web resources to be cached offline in the AppCache.
+       This file is auto-generated for you at runtime if you have enabled AppCache in your <code>.app</code> file. If there are any changes to the resources, Aura updates the timestamp to trigger a refetch of all resources.
+    </p>
+    <p>When a browser initially requests an app, the server-side rendered template is returned with your <code>.app</code> file and a link to the manifest file.
+       The browser retrieves the resource files that are listed in the manifest file, such as the JavaScript and CSS files, and they are cached in the browser cache.
+       Finally, the browser fetches a copy of the manifest file and downloads all resources as listed in the manifest file and store them in the AppCache.
+    </p>
+
+    <auradocs:info>You must set the <code>preload</code> attribute to specify the namespaces to be preloaded for the AppCache. The top-level namespace is typically specified, such as <code>preload="auradocs"</code>
+                    in the case of our Aura documentation app. To specify multiple preloads, separate the namespaces with a comma.
+    </auradocs:info>
+
+    <p>The <code>preload</code> attribute in the <code>aura:application</code> tag specifies the namespaces to be preloaded. If it's not set, any metadata for components, app, interfaces,
+    events, and so on are not preloaded. Instead, these metadata are served during every subsequent request. Set the <code>preload</code> attribute to improve performance by preloading all
+    relevant metadata.
+    </p>
+
+    <p>Preloads are used regardless of whether the AppCache is enabled. If you don't use AppCache, preloads are stored in the browser cache instead of the AppCache. </p>
+    <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="cycleComp">Component Request Overview</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="appOverview">aura:application</auradocs:topicLink>
+        </p>
+</aura:component>

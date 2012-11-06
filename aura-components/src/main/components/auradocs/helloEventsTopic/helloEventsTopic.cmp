@@ -1,0 +1,27 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Events"/>
+
+    <p>You've seen how to build apps with components in Aura. Now, it's time to add a layer of interactivity to a component.</p>
+
+    <p>If you have ever developed with JavaScript or Java Swing, you should be familiar with the idea of event-driven programming. You write handlers that respond to interface events as they occur. The events may or may not have been triggered by user interaction.</p>
+
+    <auradocs:info>It's important to understand the event-driven programming concept, as it forms the foundation for not only how users interact with your application, but also how Aura components interact with themselves.  Start by reviewing an introduction to <a href="http://en.wikipedia.org/wiki/Event-driven_programming">event-driven programming</a> and <a href="http://en.wikipedia.org/wiki/Publish/subscribe">the publish-subscribe model</a> to have an understanding of this concept.</auradocs:info>
+
+</aura:component>

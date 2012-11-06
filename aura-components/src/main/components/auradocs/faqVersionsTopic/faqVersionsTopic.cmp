@@ -1,0 +1,67 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="What do Aura version numbers mean?"/>
+
+    <p>Aura uses version numbers that are consistent with other <a href="http://mojo.codehaus.org/versions-maven-plugin/version-rules.html">
+    Maven projects</a>. This makes it easy for projects built with Maven
+    to express their dependency on Aura.</p>
+
+    <p>The version number scheme is:</p>
+    
+    <p><code><em>major</em>.<em>minor</em>.<em>incremental</em>[-<em>qualifier</em>]</code></p>
+    
+    <p>The <code>major</code>, <code>minor</code>, and <code>incremental</code> parts are all numeric, and
+    the <code>qualifier</code> string is optional. For example, <code>1.2.0</code> or <code>2.5.0-SNAPSHOT</code> are both valid.</p>
+    
+    <p>The <code>major</code>
+    number advances and the <code>minor</code> and <code>incremental</code> counters reset to zero
+    for releases with large functional changes.  Within a major
+    release, the <code>minor</code> number advances for small updates with enhancements
+    and bug fixes. The <code>incremental</code> counter is only used only for
+    targeted fixes, usually for critical bugs.</p>
+
+    <p>The <code>qualifier</code> string is largely arbitrary.
+    A version number that includes a <code>qualifier</code> is a non-release build. 
+    The compatibility guarantee is weaker, because the build
+    is stabilizing towards a release.  In order of increasing stability, the qualifier may be:
+
+    <ul>
+    <li><tt>SNAPSHOT</tt>&mdash;An arbitrary development build. There are no assurances
+        for such a build, as its under active development.</li>
+    <li><tt>ms<em>N</em></tt>&mdash;A milestone build. Some features can at least be demonstrated, but the build isn't
+        ready for a full release. Feature behavior may change as the milestone progresses towards a release.</li>
+    <li><tt>rc<em>N</em></tt>&mdash;A release candidate, which is
+        a build we think is <em>pretty close</em> to a final 
+        release. However, it's still undergoing final checking and may change
+        before an unqualified release.</li>
+    </ul></p>
+
+    <p>A release build has a fixed <code>major</code>, <code>minor</code>, and <code>incremental</code> version.
+    It's newer and preferable to any unqualified version with the same version number.
+    For example, <code>x.y.z</code> is newer than <code>x.y.z-SNAPSHOT</code>.</p>
+    
+    <p>Release candidates are always newer than
+    any milestone, and a release candidate or milestone with a higher number
+    is newer than others with lower numbers.</p>
+
+    <p>Although it will rarely be important, you can use
+    <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/org/auraframework/adapter/ConfigAdapter.html#getAuraVersion()">
+    <tt>ConfigAdapter.getAuraVersion()</tt></a> to
+    see what version of Aura is running your code.</p>
+</aura:component>

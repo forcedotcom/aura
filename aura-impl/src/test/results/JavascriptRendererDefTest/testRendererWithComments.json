@@ -1,0 +1,18 @@
+{
+  "serId":1,
+  "value":{
+    "descriptor":"js://test.test_JSRenderer_WithComments",
+    "render":
+function render_test_test_JSRenderer_WithComments(cmp) {
+        
+
+        
+
+        var str = 'do Nothing';
+    },
+    "rerender":
+function rerender_test_test_JSRenderer_WithComments(cmp) {
+        var str = 'Still do Nothing';
+    }
+  }
+}

@@ -1,0 +1,10 @@
+desc=$@
+echo $desc
+base=`dirname $0`/..
+log=$base/aura.log
+cd $base/aura-impl
+mvn -q exec:java -Dexec.mainClass="aura.Aura" -Dexec.classpathScope=runtime -Dexec.args="$desc" 2> $log
+if [ "$?" -ne "0" ]; then
+   echo "Failed.  See $log"
+   tail $log
+fi

@@ -1,0 +1,17 @@
+This directory contains the two scripts needed to do a Jenkins
+auto-integrate build, along with a test script, and duplication
+for a current bug in git.
+
+To use this, set up an auto-build in Jenkins, with the follwoing
+config:
+ * the github repository
+ * a branch spec something like '**/dev-branch/**'
+ * "Build when a change is pushed to GitHub"
+ * Pre step: paste contents of auto-pre here. (add 'mkdir -p ${WORKSPACE}/tmp' for aura)
+ * Post step (only if build succeeds): paste contents of auto-post here.
+
+The parameters are in shell variables in the auto-pre and auto-post:
+ * GIT: the path to the git command
+ * INTEGRATE: the integration branch
+ * COPY_TO: a list of integration 'branch' prefixes
+   (e.g. touch-dev-branch would use "dev-branch")

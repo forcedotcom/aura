@@ -1,0 +1,37 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" abstract="true" extends="ui:interactive"
+    description="An HTML input element that gets user input for processing." support="GA">
+    <aura:attribute name="required" type="Boolean" default="false" description="Specifies whether the input is required. Default value is &quot;false&quot;."/>
+    <aura:attribute name="updateOn" type="String" default="change" description="Updates the component's value binding if the updateOn attribute is set to the handled event. Default value is &quot;change&quot;."/>
+    <aura:attribute name="value" type="String" description="The value currently in the input field."/>
+    <aura:attribute name="type" type="String" description="Specifies the input type. Possible values: button, checkbox, file, hidden, image, password, radio, reset, submit, text, textarea. Corresponds to the type attribute of the rendered HTML input element. Override type in a component that extends this component to set it to a different HTML input type."/>
+    <aura:attribute name="errorComponent" type="Aura.Component[]" description="A component that displays any error messages, such as validation errors, associated with the input field."/>
+
+    <aura:registerEvent name="change" type="ui:change" description="The event fired when the user changes the content of the input."/>
+    <aura:registerEvent name="input" type="ui:inputEvent" description="The event fired when the user enters an input."/>
+
+    <aura:registerEvent name="onError" type="ui:validationError" description="The event fired when there is validation error(s) on the component."/>
+    <aura:registerEvent name="onClearErrors" type="ui:clearErrors" description="The event fired when we should clean up the validation error(s)."/>
+
+    <aura:registerEvent name="updateError" type="ui:updateError" description="The event fired to trigger the default error component and messages."/>
+    <aura:handler name="updateError" action="{!c.updateDefaultError}"/>
+
+    {!v.body}
+    {!v.errorComponent}
+</aura:component>

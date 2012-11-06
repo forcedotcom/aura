@@ -1,0 +1,48 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+
+<aura:renderIf isTrue="{!true}">
+    <div id="ifDiv">
+        div inside renderIf
+    </div>
+</aura:renderIf>
+
+<aura:renderIf isTrue="{!false}">
+<aura:set attribute="else">
+    <div id="elseDiv">
+        div inside else
+    </div>
+</aura:set>
+</aura:renderIf>
+
+<div>
+    <div>
+        <table>
+            <tr><td><ui:outputText aura:id="burriedOutputText" value="column-1"/></td></tr>
+            <tr><td><div id="burriedDiv">column-2</div></td></tr>
+        </table>
+    </div>
+</div>
+
+<ui:block aura:id="blockCmp">
+ <aura:set attribute="left"><div id="leftBlockDiv">Div inside left block</div></aura:set>
+ <div id="bodyBlockDiv">div in block body</div>
+</ui:block>
+
+</aura:component>

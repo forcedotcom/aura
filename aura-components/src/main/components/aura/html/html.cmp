@@ -1,0 +1,24 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component renderer="js://aura.html, java://org.auraframework.renderer.HtmlRenderer" template="auradev:blankTemplate" implements="aura:rootComponent"
+                     support="GA" description="A meta component that represents all html elements.  Any html found in your markup causes the creation of one of these.">
+    <aura:attribute name="body" type="Aura.Component[]"/>
+    <aura:attribute name="tag" type="String" description="The name of the html element that should be rendered."/>
+    <aura:attribute name="HTMLAttributes" type="Map" description="A Map of attributes to set on the html element."/>
+    <!--<aura:attribute name="markup" type="Object[]" description="As an alternative to the tag and HTMLAttributes attributes, this allows Strings of raw markup to be rendered."/>-->
+</aura:component>

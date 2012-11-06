@@ -1,0 +1,50 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Component Request Overview"/>
+    <p>Aura performs initial construction of a component on the server. The client completes the initialization process and manages any rendering or rerendering.</p>
+
+    <p>Before we explore the component request process, it is important to understand these terms.</p>
+    <auradocs:terminologyBasic/>
+
+    <auradocs:info>See <auradocs:topicLink topic="cycleRefs">Component Request Glossary</auradocs:topicLink> for a more complete list of definitions related to a component request.</auradocs:info>
+
+    <p>Let's see what happens when a client requests a component at the server via an HTTP request in the form <code>http://&lt;yourServer&gt;/namespace/&lt;component&gt;.cmp</code>.</p>
+
+    <p><ui:image src="/auraFW/resources/aura/images/initCompDef.png" alt="Component Request Process" /></p>
+
+    <p>Her's how a component request is processed on the server and client:</p>
+    <ol><b>Server</b>:
+        <li>Loads registries and locates component definitions</li>
+        <li>Builds or retrieves component definitions</li>
+        <li>Instantiates component definitions</li>
+        <li>Serializes component definitions and instances</li>
+        <li>Sends serialized component definitions and instances to the client</li>
+    </ol>
+    <ol><b>Client:</b>
+        <li>Deserializes the response to create a metadata tree</li>
+        <li>Traverses the metadata tree to create an instance tree</li>
+        <li>Traverses the instance tree to render the component</li>
+        <li>Renders the component</li>
+    </ol>
+
+    <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="cycleInit">Server-Side Process</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="clientInit">Client-Side Process</auradocs:topicLink>
+     </p>
+</aura:component>

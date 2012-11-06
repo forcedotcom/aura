@@ -1,0 +1,37 @@
+{
+  "serId":1,
+  "value":{
+    "descriptor":"markup://fake:event",
+    "type":"COMPONENT",
+    "superDef":{
+      "serId":2,
+      "value":{
+        "descriptor":"markup://aura:componentEvent",
+        "type":"COMPONENT",
+        "attributes":{
+
+        }
+      }
+    },
+    "attributes":{
+      "testString":{
+        "serId":3,
+        "value":{
+          "descriptor":"testString",
+          "typeDefDescriptor":"aura://String",
+          "required":true,
+          "serializeTo":"BOTH"
+        }
+      },
+      "testInt":{
+        "serId":4,
+        "value":{
+          "descriptor":"testInt",
+          "typeDefDescriptor":"aura://Integer",
+          "required":true,
+          "serializeTo":"BOTH"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:interface support="GA" description="The column template interface definition, describes properties shared by all column templates and instances.">
+    <aura:attribute name="formatters" type="String"                    description="A comma separated list of formatter functions, in dot notation, through which the field data will be processed sequentially."/>
+
+    <aura:attribute name="name" type="String"                          description="The name of the column."/>
+    <aura:attribute name="fieldName" type="String"                     description="The name of the field or property on the current item to which this column refers."/>
+    <aura:attribute name="title" type="Object"                         description="The title text to be displayed in the header instance for this column. Accepts text or markup."/>
+
+    <aura:attribute name="reorderable" type="Boolean" default="true"   description="Gets or sets whether this column can be reordered."/>
+    <aura:attribute name="resizable" type="Boolean" default="true"     description="Gets or sets whether this column can be resized."/>
+    <aura:attribute name="sortable" type="Boolean" default="false"     description="Gets or sets whether this column can be sorted."/>
+
+    <aura:attribute name="headers" type="String" default=""            description="Gets the accessibility header ids associated with this column."/>
+    <aura:attribute name="colSpan" type="Integer" default="1"          description="Gets the number of categories and data fields the header instance of this column will span."/>
+    <aura:attribute name="rowSpan" type="Integer" default="1"          description="Gets the number of categories and data fields the header instance of this column will span."/>
+    <aura:attribute name="width" type="String"                         description="Gets or sets the width of this column."/>
+</aura:interface>

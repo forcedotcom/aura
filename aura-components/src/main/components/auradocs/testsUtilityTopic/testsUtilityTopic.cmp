@@ -1,0 +1,99 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Utility Functions"/>
+
+    <p>Utility functions provides additional support for Aura's unit testing and should be prefixed with <code>aura.test</code> or <code>$A.test</code>.</p>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Utility</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>aura.test.addFunctionHandler(instance, originalFunction, newFunction, postProcess)</code></td>
+                <td>Adds a new function handler and overrides the original function.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.addWaitFor(expected, actual, callback)</code></td>
+                <td>Waits for expected === actual. If <code>actual</code> is not provided, expected === true.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.callServerAction(action)</code></td>
+                <td>Runs <code>action</code>. If running <code>action</code> fails, throw an error.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.getDump()</code></td>
+                <td>Returns the list of errors.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.getErrors()</code></td>
+                <td>Returns errors as JSON encoded strings. If no errors are found, return an empty string.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.getOuterHTML(node)</code></td>
+                <td>Returns the outer HTML of an element.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.getPrototype(instance)</code></td>
+                <td>Returns <code>instance</code> and the prototype of the instance or object.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.getServerControllerInstance(cmp, name, params, callback)</code></td>
+                <td>Returns an instance of a server controller by name, given the parameters and call back function.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.getText(node)</code></td>
+                <td>Returns text as a string.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.isComplete()</code></td>
+                <td>Sets the complete counter to 0 to denote that a test run is completed.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.overrideFunction(instance, originalFunction, newFunction)</code></td>
+                <td>Overrides an existing function.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.print(value)</code></td>
+                <td>Returns <code>value</code> as a string.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.runAfterIf(conditionFunction, callback, intervalInMs)</code></td>
+                <td>If test has not started running, call <code>callback</code> if <code>conditionFunction</code> is provided.
+                    Executes <code>runAfterIf</code> after the interval denoted by <code>intervalInMs</code>.
+                    If <code>intervalInMs</code> is not specified, it is set to 500 milliseconds by default.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.select()</code></td>
+                <td>Returns a list of elements within the document that matches the given arguments.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.setTestTimeout(timeoutMsec)</code></td>
+                <td>Sets the timeout in milliseconds.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.uiDriver()</code></td>
+                <td>Returns the functions associated with user interactions. See <a href="https://github.com/forcedotcom/aura-beta/blob/master/aura-impl/javascript/src/aura.test/SynDriver.js" target="_blank">SynDriver.js</a> for more details.</td>
+            </tr>
+        </tbody>
+    </table>
+
+</aura:component>

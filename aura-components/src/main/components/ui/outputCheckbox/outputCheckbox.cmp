@@ -1,0 +1,28 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="ui:output" extensible="true" support="GA" description="Displays a checkbox in a checked or unchecked state.">
+    <aura:attribute name="value" type="Boolean" required="true" description="Specifies whether the checkbox is checked."/>
+    <aura:attribute name="altChecked" type="String" default="checkbox checked" description="The alternate text description when the checkbox is checked. Default value is &#8220;checkbox checked&#8221;."/>
+    <aura:attribute name="altUnchecked" type="String" default="checkbox unchecked" description="The alternate text description when the checkbox is unchecked. Default value is &#8220;checkbox unchecked&#8221;."/>
+    <aura:if isTrue="{!v.value}">
+        <ui:image class="{!v.class + ' checked'}" aura:id="img1" alt="{!v.altChecked}"/>
+        <aura:set attribute="else">
+            <ui:image class="{!v.class + ' unchecked'}" aura:id="img2" alt="{!v.altUnchecked}"/>
+        </aura:set>
+    </aura:if>
+</aura:component>

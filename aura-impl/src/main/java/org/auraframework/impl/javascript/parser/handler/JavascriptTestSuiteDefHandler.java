@@ -1,0 +1,117 @@
+/*
+ * Copyright (C) 2012 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.auraframework.impl.javascript.parser.handler;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.TestCaseDef;
+import org.auraframework.def.TestSuiteDef;
+import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.javascript.testsuite.JavascriptTestCaseDef;
+import org.auraframework.impl.javascript.testsuite.JavascriptTestSuiteDef;
+import org.auraframework.impl.javascript.testsuite.JavascriptTestSuiteDef.Builder;
+import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.system.Source;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.util.json.JsFunction;
+
+import com.google.common.collect.Sets;
+
+/**
+ * Javascript handler for test suite defs
+ *
+ *
+ * @since 0.0.194
+ */
+public class JavascriptTestSuiteDefHandler extends
+        JavascriptHandler<DefDescriptor<TestSuiteDef>, JavascriptTestSuiteDef> {
+
+    private Builder builder = new Builder();
+
+    public JavascriptTestSuiteDefHandler(DefDescriptor<TestSuiteDef> descriptor, Source<?> source) {
+        super(descriptor, source);
+        builder.code = source.getContents();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected JavascriptTestSuiteDef createDefinition(Map<String, Object> map) {
+        builder.setDescriptor(descriptor);
+        builder.setLocation(getLocation());
+        builder.caseDefs = new ArrayList<TestCaseDef>();
+
+        Map<String, Object> defaultAttributes = (Map<String, Object>)map.get("attributes");
+        List<String> browserListForTestSet = (List<String>)(List<?>)map.get("browsers");
+        for (Entry<String, Object> entry : map.entrySet()) {
+            String key = entry.getKey();
+            if (key.startsWith("test")) {
+                Map<String, Object> value = (Map<String, Object>)entry.getValue();
+                Object t = value.get("test");
+                if (!(t instanceof JsFunction)) {
+                    if (t instanceof List) {
+                        List<Object> functions = (List<Object>)t;
+                        for (Object i : functions) {
+                            if (!(i instanceof JsFunction)) {
+                                throw new AuraRuntimeException(key
+                                        + " 'test' must be a function or an array of functions");
+                            }
+                        }
+                    } else {
+                        throw new AuraRuntimeException(key + " 'test' must be a function or an array of functions");
+                    }
+                }
+
+                Map<String, Object> attributes = (Map<String, Object>)value.get("attributes");
+                DefDescriptor<TestCaseDef> caseDescriptor = DefDescriptorImpl.getInstance(key, TestCaseDef.class);
+
+                List<String> labelsList = (List<String>)(List<?>)value.get("testLabels");
+                Set<String> labels = labelsList == null ? Collections.EMPTY_SET : Sets.newHashSet(labelsList);
+
+                List<String> browserListForTestCase = (List<String>)(List<?>)value.get("browsers");
+                Set<String> browsers = browserListForTestCase == null? 
+                                        (browserListForTestSet == null ? Collections.EMPTY_SET : Sets.newHashSet(browserListForTestSet)) 
+                                         : Sets.newHashSet(browserListForTestCase);
+                DefDescriptor<? extends BaseComponentDef> compDesc = DefDescriptorImpl.getAssociateDescriptor(
+                        descriptor, ComponentDef.class, DefDescriptor.MARKUP_PREFIX);
+                if (compDesc == null || !compDesc.exists()) {
+                    compDesc = DefDescriptorImpl.getAssociateDescriptor(descriptor, ApplicationDef.class,
+                            DefDescriptor.MARKUP_PREFIX);
+                }
+                DefType defType = compDesc.getDefType();
+
+                builder.caseDefs.add(new JavascriptTestCaseDef(caseDescriptor, null, attributes != null ? attributes
+                        : defaultAttributes, defType, labels, browsers));
+            }
+        }
+
+        return builder.build();
+    }
+
+    @Override
+    public void addExpressionReferences(Set<PropertyReference> propRefs) {
+        // ignore these
+    }
+}

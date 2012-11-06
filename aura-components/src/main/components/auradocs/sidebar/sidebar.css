@@ -1,0 +1,64 @@
+/*
+ * Copyright (C) 2012 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.THIS.searchBox {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    top: 20px;
+    height: 20px;
+    max-width: 200px;
+    background-color: white;
+}
+
+.THIS.uiTree {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    top: 40px;
+    bottom: 20px;
+	color: #999;
+	padding: 0;
+}
+
+.THIS.uiTree li {
+	margin: 0;
+}
+
+.THIS.uiTree li label {
+	color: #999;
+	font-weight: bold;
+	text-transform: uppercase;
+	font-size: 12px;
+	background: none;
+	padding: 0;
+}
+
+.THIS.uiTree li input+ol {
+	background: none;
+}
+
+.THIS.uiTree li.file a {
+	background: none;
+	font-weight: normal;
+	color: #fff;
+	padding: 0;
+	display: block;
+}
+
+.THIS.uiTree li.file[active=true] a {
+	color: orange;
+}

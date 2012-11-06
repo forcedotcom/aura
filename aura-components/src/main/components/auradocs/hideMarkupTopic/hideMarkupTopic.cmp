@@ -1,0 +1,44 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Dynamically Showing or Hiding Markup"/>
+
+<h2>Goal</h2>
+
+    <p>You want to show or hide markup when a button is pressed.</p>
+
+
+<h2>Code</h2>
+
+    <auradocs:example descriptor="auradocs:sampleHideMarkup" />
+
+<h2>Discussion</h2>
+
+<p>Let's look at the <b>Component source</b> tab to see how this works. We added an attribute called <code>visible</code> to control whether the markup is visible. It's set to <code>false</code> by default so that the markup is not visible. Under the covers, there are no DOM elements created for the markup.</p>
+
+<p>The <code>aura:renderIf</code> tag selectively display the markup in its body if the <code>visible</code> attribute evaluates to <code>true</code>.</p>
+
+<p>The <code>ui:button</code> triggers the <code>showHide</code> action in the client-side controller. Click the <b>js://controller source</b> to see the JavaScript code. It simply toggles the value of the <code>visible</code> attribute.</p>
+
+<p><b>See also:</b><br/>
+    <auradocs:topicLink topic="helloAttributes">Component Attributes</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="tagRenderIf">aura:renderIf</auradocs:topicLink>
+</p>
+
+</aura:component>

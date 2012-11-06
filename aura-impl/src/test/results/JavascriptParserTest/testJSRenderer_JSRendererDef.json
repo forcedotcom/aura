@@ -1,0 +1,22 @@
+{
+  "serId":1,
+  "value":{
+    "descriptor":"js://test.testJSRenderer",
+    "render":
+function render_test_testJSRenderer(component) {
+    
+
+    
+        var ret = document.createElement('div');
+        ret.className = 'button';
+        ret.id = component.getGlobalId();
+        ret.innerHTML = component.getAttributes().getValue('label').getValue();
+        return [ret];
+    },
+    "rerender":
+function rerender_test_testJSRenderer(component) {
+        var div = component.getElements().element;
+        div.innerHTML = component.getAttributes().getValue('label').getValue();
+    }
+  }
+}

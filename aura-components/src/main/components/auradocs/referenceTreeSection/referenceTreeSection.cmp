@@ -1,0 +1,32 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:attribute name="title" type="String" required="true"/>
+    <aura:attribute name="namespaces" type="List" required="true"/>
+    <section>
+        <h2>{!v.title}</h2>
+        <aura:forEach items="{!v.namespaces}" var="namespace">
+            <h3 class="title">{!namespace.title}</h3>
+            <ul class="nav nav-list">
+                <aura:forEach items="{!namespace.children}" var="def">
+                    <li><a href="{!'#'+def.name+'?defType='+def.defType}">{!def.title}</a></li>
+                </aura:forEach>
+            </ul>
+        </aura:forEach>
+    </section>
+</aura:component>

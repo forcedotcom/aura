@@ -1,0 +1,33 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="ui:pager" extensible="true" support="GA" description="A pager implementation that allows the user to change the size of pages in items.">
+    <aura:attribute name="Labels_All" type="String" default="All"                      description="The text to display in the option to show all items."/>
+    <aura:attribute name="Labels_Records" type="String" default="Records per page: "   description="The text to display in the label before the pageSize input."/>
+
+    <div class="{!v.class+' pagerContainer pagerPageSize'+(v.totalItems==0?' empty':'')}">
+        <label for="{!'ui:pagerPageSize:'+globalId}">{!v.Labels_Records}</label>
+        <select id="{!'ui:pagerPageSize:'+globalId}" aura:id="pager:pageSize" onchange="{!c.changePageSize}">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="200">200</option>
+            <option value="-1">{!v.Labels_All}</option>
+        </select>
+    </div>
+</aura:component>

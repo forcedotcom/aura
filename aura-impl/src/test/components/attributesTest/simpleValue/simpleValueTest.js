@@ -1,0 +1,77 @@
+/*
+ * Copyright (C) 2012 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+({
+    testSimpleValueProperties:{
+        attributes:{intAttribute:3},
+        test:function(cmp){
+            var valueObj = cmp.getAttributes().getValue('strAttribute');
+            $A.test.assertTruthy(valueObj, "Simple attribute is not defined by a value object.");
+            $A.test.assertEquals('SimpleValue', valueObj.toString(),
+                    "Simple attribute should be represented using SimpleValue");
+            $A.test.assertEquals('Value', valueObj.auraType,
+                    "Simple value object has wrong value for auraType attribute");
+            $A.test.assertFalsy(valueObj.getValue(), "Uninitialized simple attribute should be represented as undefined.");
+
+            $A.test.assertTruthy(cmp.getAttributes().getValue('intAttribute'),
+                    "Initialized simple attribute should not be represented as undefined.");
+            $A.test.assertEquals(3, cmp.getAttributes().getValue('intAttribute').getValue(),
+            "Simple value object failed to retrieve assigned value.");
+        }
+    },
+    testErrorFunctionsOnSimpleValueObject:{
+        attributes:{intAttribute:3},
+        test:function(cmp){
+            //Attribute with no default value
+            var valueObj = cmp.getAttributes().getValue('strAttribute');
+            valueObj.clearErrors();
+            this.verifyErrors(valueObj,[]);
+
+            //Boundary cases for argument
+            valueObj.addErrors(undefined);
+            valueObj.addErrors();
+            valueObj.addErrors(null);
+            this.verifyErrors(valueObj,[]);
+
+            //Attribute with default value
+            valueObj = cmp.getAttributes().getValue('intAttribute');
+            valueObj.clearErrors();
+
+            //Add 1 valid error message
+            valueObj.addErrors('Something went wrong!');
+            this.verifyErrors(valueObj,['Something went wrong!']);
+
+            //Add multiple error messages
+            valueObj.clearErrors();
+            valueObj.addErrors(['I know what went wrong!', 'fooBared']);
+            this.verifyErrors(valueObj,['I know what went wrong!', 'fooBared']);
+
+            //Add a non-literal, non-array error message
+            valueObj.clearErrors();
+            valueObj.addErrors({1:'I know what went wrong!', 2:'fooBared'});
+            var err = valueObj.getErrors();
+            $A.test.assertEquals( err.length, 1);
+            $A.test.assertTrue( $A.util.isObject(err[0]));
+        }
+    },
+    verifyErrors:function(valueObj, expectedErrors){
+        var err = valueObj.getErrors();
+        $A.test.assertTrue($A.util.isArray(err));
+        $A.test.assertEquals( expectedErrors.length, err.length);
+        for(var i in expectedErrors){
+            $A.test.assertEquals( expectedErrors[i], err[i]);
+        }
+    }
+})

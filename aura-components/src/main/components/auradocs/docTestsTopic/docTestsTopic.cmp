@@ -1,0 +1,55 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Testing Components"/>
+
+    <p>Aura's loosely coupled components facilitate maintainability, enable efficient testing,
+    and isolate each component from their application context for easier testing.
+    Aura supports JavaScript testing for components and applications in production mode when you develop using
+    the framework.</p>
+
+    <h2>Setting Up Your Tests</h2>
+
+    <p>Add component tests to a JavaScript file in the component bundle. For example, a component <code>inputAddr.cmp</code> in the ui namespace is saved in the folder inputPhone, which
+    can contain a test file <code>inputAddrTest.js</code>. Add a test case as a new function in the component's test file. See <auradocs:topicLink topic="compBundle">Component Bundles</auradocs:topicLink> for more information.
+    </p>
+
+    <p>Note that your test functions must follow the naming convention <code>test&lt;testName&gt;</code>.
+    Individual test cases can share code by putting them in a shared function in the format <code>this.sharedMethod()</code>.
+    The functions <code>setUp</code> and <code>tearDown</code> are optional and let you quickly set up and remove objects.
+    They are called before and after a test method is run.
+    Aura's unit testing framework may be viewed <a href="https://github.com/forcedotcom/aura-beta/blob/master/aura-impl/javascript/src/aura.test/Test.js" target="_blank">here</a>.
+    </p>
+
+    <p>You may want to use <auradocs:topicLink topic="testAssert">assertions</auradocs:topicLink>, <auradocs:topicLink topic="testsUser">user interactions</auradocs:topicLink>, and <auradocs:topicLink topic="testsUtility">utility functions</auradocs:topicLink> available to you for unit testing.</p>
+
+
+    <h2>The Test Environment</h2>
+    <p>You can run JavaScript tests in a Web browser by appending <code>?aura.mode=JSTEST</code> to your production component.
+    For example, if you have a component <code>inputAddr.cmp</code> in the ui namespace, you can run test cases on <code>
+    http://&lt;your server&gt;/ui/inputAddr.cmp?aura.mode=JSTEST</code> and the test results are displayed in the same tab on the browser.</p>
+
+    <h2>Debugging Components</h2>
+    <p>Use the <code>debugger;</code> statement to debug your JavaScript test. You can view your debug output by appending
+    <code>?aura.mode=JSTESTDEBUG</code> to your production component. Remove or comment out the <code>debugger</code> statement after you finish debugging.</p>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink>
+    </p>
+
+</aura:component>

@@ -1,0 +1,279 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" support="GA" description="The default template used to bootstrap the loading of the aura framework and an application or component. To use another template, extend aura:template and set attributes using aura:set.">
+    <aura:attribute name="title" type="String" default="Aura" description="The title of the template. Default value is &#8220;Aura&#8221;."/>
+    <aura:attribute name="auraStyleTags" type="String" description="Loads Aura CSS files."/>
+    <aura:attribute name="auraScriptTags" type="String" description="Loads the js framework, preloads the definitions of all preload namespaces, and any other script that is needed by the framework."/>
+    <aura:attribute name="auraBaseScriptTags" type="String"/>
+    <aura:attribute name="auraNamespacesScriptTags" type="String"/>
+    <aura:attribute name="auraInlineStyle" type="String" description="Loads Aura inline style from template.css."/>
+    <aura:attribute name="auraInit" type="String" description="Creates an XMLHttpRequest object and retrieves the components from the server without reloading the page. Preferred over auraInitSync."/>
+    <aura:attribute name="auraInitSync" type="String" description="Denotes synchronous initialization of Aura. Returns the same value as auraInit."/>
+    <aura:attribute name="auraInitBlock" type="String" description="The block of content that is rendered when initialization is complete."/>
+    <aura:attribute name="autoInitialize" type="String" default="true" description="Denotes whether Aura should auto-initialize (true) or not (false). Default value is &#8220;true&#8221;."/>
+    <aura:attribute name="autoInitializeSync" type="String" default="false" description="Default value is &#8220;false&#8221;."/>
+    <aura:attribute name="afterAuraInit" type="String" description="Not used."/>
+    <aura:attribute name="loadingText" type="String" default="Loading" description="The text displayed on the page when the template is loading. Default value is &#8220;Loading&#8221;."/>
+    <aura:attribute name="errorMessage" type="String" default="CSS Error" description="The error message displayed when an error has occured while loading. Default value is &#8220;CSS Error&#8221;."/>
+    <aura:attribute name="forceError" type="Boolean" default="false" description="Set this to true to force the display of an error that would otherwise be hidden because of nesting.."/>
+    <aura:attribute name="extraScriptTags" type="String" description="Additional &lt;script&gt; elements, such as JavaScript libraries. Use multiple &lt;script&gt; elements to include more than one JavaScript library. Set this attribute using aura:set if overriding the template."/>
+    <aura:attribute name="extraMetaTags" type="String" description="Additional &lt;meta&gt; elements such as description, keywords, author, etc. Set this attribute using aura:set if overriding the template."/>
+    <aura:attribute name="defaultBodyClass" type="String" default="loading" description="The default CSS style used to display the body of the template. Default value is &#8220;loading&#8221;."/>
+    <aura:attribute name="bodyClass" type="String" description="The CSS style used to display the body of the template. May be used with defaultBodyClass."/>
+    <aura:attribute name="manifest" type="String" description="Specifies the location of the document's cache manifest. Works with HTML5 only."/>
+    <aura:attribute name="lastMod" type="String" description="The last modified date."/>
+    <aura:attribute name="doctype" type="String" default="&lt;!DOCTYPE html&gt;" description="The DOCTYPE declaration for the template. Default value is &lt;!DOCTYPE html&gt;."/>
+    <aura:attribute name="extraStyleTags" type="String" description="Additional &lt;link&gt; elements for external CSS. Use multiple &lt;link&gt; elements to include more than one external CSS file. Set this attribute using aura:set if overriding the template."/>
+    <aura:attribute name="inlineStyle" type="Aura.Component[]" description="The CSS style used to display inline elements. We recommend using external CSS with extraStyleTags instead.">
+        .auraMsgMask{
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background:-webkit-radial-gradient(circle, rgba(0,0,0,0.2), #000);
+            z-index: 1000;
+            display: none;
+        }
+        .auraMsgBox{
+            display: none;
+            width:100%;
+            margin: 120px auto 0;
+            background-color: slategray;
+            z-index: 1002;
+            border-radius: 5px;
+            box-shadow: 0 20px 40px rgba(0,0,0,.8), inset 0 1px 1px rgba(255, 255, 255, .3);
+            overflow: hidden;
+        }
+        .auraMsgBox h2{
+            font-weight:bold;
+            font-size: 1.2em;
+            line-height: 1.5em;
+            margin: 0;
+            padding:10px;
+            overflow: hidden;
+        }
+        .auraErrorBox h2{
+            text-shadow: 1px 1px 1px rgba(0,0,0,.5);
+            color: #fff;
+        }
+        .auraMsgBox a.close{
+            float: right;
+            font-weight: bold;
+            font-size: 20px;
+            line-height: 1em;
+            color: #fff;
+            background-color: transparent;
+            border: 1px solid #666;
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, .2), 0 1px 1px rgba(0, 0, 0, .4);
+            border-radius: 4px;
+            padding: 0 6px 4px;
+            margin:0;
+        }
+        .auraLoadingBox{
+            text-align: center;
+            width:200px;
+            line-height: 80px;
+        }
+        .auraErrorBox{
+            position: relative;
+            width: 80%;
+            z-index: 999;
+        }
+        .auraError #auraErrorMessage{
+            background-color: gainsboro;
+            margin: 0 10px 10px;
+            padding: 10px;
+            color: #333;
+            min-height: 200px;
+            max-height: 300px;
+            overflow: auto;
+            white-space: pre-wrap;
+            font-family: monospace;
+            box-shadow: inset 0 0 10px rgba(0,0,0,.4);
+            border: 1px solid #666;
+        }
+        .auraForcedErrorBox.auraMsgMask,
+        .auraForcedErrorBox .auraErrorBox,
+        body.auraError .auraMsgMask,
+        body.loading .auraLoadingBox,
+        body.auraError .auraErrorBox{
+            display:block;
+        }
+    </aura:attribute>
+    <aura:attribute name="appcacheProgressBarStyle" type="Aura.Component[]" description="The CSS style used to display appcache progress bar.">
+        <!-- appcache progressbar proto -->
+        #auraAppcacheProgress{
+            display:none;
+            position: absolute;
+            width: 120px;
+            height: 26px;
+            top: -10px;
+            left: 50%;
+            margin-left: -60px;
+            background-color: gray;
+            border-radius:5px;
+            overflow:hidden;
+            z-index:9999;
+        }
+        #auraAppcacheProgress .progressBox{
+            position: absolute;
+            top:14px;
+            left:10px;
+            width:100px;
+            height:6px;
+            overflow:hidden;
+            background-color:white;
+            border-style:solid;
+            border-color:#999;
+            border-width:1px;
+        }
+        #auraAppcacheProgress .progressBar{
+            width:1px;
+            height:8px;
+            overflow:hidden;
+            background-color:blue;
+            border-style:solid;
+            border-color:black;
+            border-width:1px;
+        }
+        #auraAppcacheProgress.error .progressBar{
+            border-color:red;
+            background-color:pink;
+        }
+    </aura:attribute>
+    {!v.doctype}
+    <html manifest="{!v.manifest}" data-lm="{!v.lastMod}">
+        <head>
+            <title>{!v.title}</title>
+            <script>var pageStartTime = (new Date()).getTime();</script>
+            {!v.extraMetaTags}
+            <!--
+            <link href="/auraFW/resources/aura/resetCSS.css" rel="stylesheet" type="text/css"/>
+            -->
+            <!-- This is a quick solution before resetCSS.css gets removed -->
+            <style>
+    html, body, div, span, applet, object, iframe,
+    h1, h2, h3, h4, h5, h6, p, blockquote,
+    a, abbr, acronym, address, big, cite, code,
+    del, dfn, em, font, img, ins, kbd, q, s, samp,
+    small, strike, strong, sub, sup, tt, var,
+    dl, dt, dd, fieldset, form, label, legend,
+    table, caption, tbody, tfoot, thead, tr, th, td {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        outline: 0;
+        font-weight: inherit;
+        font-style: inherit;
+        font-size: 100%;
+        vertical-align: baseline;
+    }
+    a{
+        text-decoration: none;
+        color: #015BA7;
+    }
+    body {
+        line-height: 1;
+        color: black;
+        background: white;
+        font-family:"HelveticaNeue", Helvetica, Arial, sans-serif;
+    }
+    html,body{
+        height : 100%;
+    }
+    /* tables still need 'cellspacing="0"' in the markup */
+    table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    caption, th, td {
+        text-align: left;
+        font-weight: normal;
+    }
+    blockquote:before, blockquote:after,
+    q:before, q:after {
+        content: "";
+    }
+    blockquote, q {
+        quotes: "" "";
+    }
+    /* For hidden text used by accessibility */
+    .assistiveText {
+        position: absolute !important;
+        height: 1px;
+        width: 1px;
+        overflow: hidden;
+        clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+        clip: rect(1px, 1px, 1px, 1px);
+    }
+            </style>
+            <style>
+                {!v.inlineStyle}
+                {!v.appcacheProgressBarStyle}
+            </style>
+            {!v.auraStyleTags}
+            {!v.extraStyleTags}
+            <style>
+                {!v.auraInlineStyle}
+            </style>
+        </head>
+        <body class="{!v.bodyClass+' '+v.defaultBodyClass}">
+            <div id="auraAppcacheProgress"><div class="progressBox"><div class="progressBar"></div></div></div>
+            <div class="auraMsgBox auraLoadingBox" aura:id="auraLoadingBox">
+                <div class="logo"/>
+                <div class="spinner"/>
+                <h2>{!v.loadingText}</h2>
+            </div>
+            <div class="{!'auraMsgMask'+((v.forceError == true||v.forceError =='true')?' auraForcedErrorBox':'')}" aura:id="auraErrorMask">
+                <div class="auraMsgBox auraErrorBox" aura:id="auraError">
+                    <h2>
+                        <a class="close" onclick="dismissError();" href="javascript:void(0);">&times;</a>
+                        Oh dear, something's gone wrong:
+                    </h2>
+                    <div id="auraErrorMessage">{!v.errorMessage}</div>
+                </div>
+            </div>
+
+            {!v.body}
+
+            {!v.extraScriptTags}
+            {!v.auraScriptTags}
+            {!v.auraBaseScriptTags}
+
+
+            <script>
+            if ({!v.autoInitialize}) {
+                $A.initAsync({!v.auraInit});
+            }else if({!v.autoInitializeSync}){
+                $A.initConfig({!v.auraInitSync});
+            }
+            function dismissError() {
+                $A.util.removeClass(document.body,'auraError');
+                $A.util.removeClass(auraErrorMask,'auraForcedErrorBox');
+            }
+            </script>
+
+            {!v.auraNamespacesScriptTags}
+
+
+            {!v.auraInitBlock}
+
+        </body>
+    </html>
+</aura:component>

@@ -1,0 +1,33 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Abstract Components"/>
+
+    <p>Object-oriented languages, such as Java, support the concept of an abstract class that provides a partial implementation for an object but leaves the remaining implementation to concrete sub-classes. An abstract class in Java can't be instantiated directly, but a non-abstract subclass can.</p>
+
+    <p>Similarly, Aura supports the concept of abstract components that have a partial implementation but leave the remaining implementation to concrete sub-components.</p>
+
+    <p>To use an abstract component, you must either extend it and fill out the remaining implementation, or add a <auradocs:topicLink topic="oodProviders">provider</auradocs:topicLink>. An abstract component can't be used directly in markup unless you define a provider.</p>
+
+    <p>The <code>&lt;aura:component&gt;</code> tag has a boolean attribute called <code>abstract</code>. Set <code>abstract="true"</code> to make the component abstract.</p>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="oodInterfaces">Interfaces</auradocs:topicLink>
+    </p>
+</aura:component>

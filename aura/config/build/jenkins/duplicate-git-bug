@@ -1,0 +1,134 @@
+#!/bin/sh
+set -ex
+BASE=`pwd`
+ORIG=${BASE}/theorigin
+E1=${BASE}/edit1
+E2=${BASE}/edit2
+TDIR=${BASE}/foodir
+MERGE=${BASE}/merge
+PRE=${BASE}/auto-pre
+POST=${BASE}/auto-post
+
+auto_integrate() {
+    cd ${BASE}
+    rm -rf ${MERGE}
+    git clone ${ORIG} ${MERGE}
+    cd ${MERGE}
+    env GIT_BRANCH="$1" ${PRE}
+    env GIT_BRANCH="$1" ${POST}
+    cat README
+    cd ${BASE}
+}
+
+rm -rf ${E1} ${E2} ${ORIG} ${TDIR} ${MERGE}
+#
+# Create a basic setup.
+#
+mkdir ${TDIR}
+git init ${TDIR}
+cd ${TDIR}
+touch README
+git add README
+git commit -m initial
+cd ${BASE}
+git clone --bare ${TDIR} ${ORIG}
+rm -rf ${TDIR}
+
+#
+# Create the basic branches.
+#
+cd ${BASE}
+git clone ${ORIG} ${E1}
+cd ${E1}
+git push origin HEAD:alpha
+git push origin HEAD:beta
+git push origin HEAD:gamma
+
+git checkout alpha
+git checkout -b e1_1
+cat > README <<EOF
+line1
+EOF
+git add README
+cat README
+git commit -m "edit readme 1:1"
+git push origin HEAD:alpha-branch/e1/e1
+
+#
+# Now do an auto-integrate
+#
+auto_integrate "origin/alpha-branch/e1/e1"
+
+#
+# Now do a second checkout
+#
+cd ${BASE}
+git clone ${ORIG} ${E2}
+cd ${E2}
+git checkout alpha
+git pull origin alpha
+git checkout -b e2_1
+cat >>README <<EOF
+line 2
+EOF
+cat README
+git add README
+git commit -m "edit readme 2:1"
+git push origin HEAD:alpha-branch/e2/e1
+#
+# Now do an auto-integrate
+#
+auto_integrate "origin/alpha-branch/e2/e1"
+
+#
+# Now we want to create conflict...
+# Edit readme in two separate branches.
+#
+cd ${E1}
+git checkout alpha
+git pull origin alpha
+git checkout -b e1_2
+cat >> README <<EOF
+line3
+EOF
+cat README
+git add README
+git commit -m "edit readme 1:2"
+git push origin HEAD:alpha-branch/e1/e2
+
+cd ${E2}
+git checkout alpha
+git pull origin alpha
+git checkout -b e2_2
+#
+# To reproduce the git bug, replace the next three lines with the following
+# commented out lines.
+#
+#cat >> README <<EOF
+#line 3 take 2
+#EOF
+cat >> README <<EOF
+line 3
+EOF
+cat README
+git add README
+git commit -m "edit readme 2:2"
+git push origin HEAD:alpha-branch/e2/e2
+
+auto_integrate "origin/alpha-branch/e1/e2"
+
+cd ${BASE}
+rm -rf ${MERGE}
+git clone ${ORIG} ${MERGE}
+cd ${MERGE}
+#
+# The following should say 'PRE failed' but doesn't
+#
+if env GIT_BRANCH="origin/alpha-branch/e2/e2" ${PRE}; then
+    env GIT_BRANCH="origin/alpha-branch/e2/e2" ${POST}
+else
+    echo "PRE failed"
+fi
+cd ${BASE}
+
+#rm -rf ${ORIG} ${E1} ${E2} ${MERGE}

@@ -1,0 +1,31 @@
+#!/bin/sh
+# Auto-Integrate Jenkins 'pre' script.
+# Input to this script includes 'GIT_BRANCH'
+# Note that this is used in conjuction with auto-post
+# to do a full merge-test-commit cycle. if you don't
+# want the test, all of this can be collapsed in a
+# single script.
+#
+# Start by doing exit on fail.
+#
+set -e -x
+#
+# Some basic variables:
+#  GIT: The full path to git (only needed if git can't be found)
+#  INTEGRATE: the branch to which we will integrate
+#  COPY_TO: a set of branches to which we will copy this branch
+GIT=/usr/bin/git
+INTEGRATE=alpha
+#
+# Local Variables
+#
+LCL_BRANCH=`echo $GIT_BRANCH | sed 's/^origin\///'`
+#
+# Now, the real stuff.
+#  - Checkout our branch, and merge to the integration
+#  - The remaining stuff will occur in post.
+${GIT} checkout ${INTEGRATE}
+${GIT} checkout ${LCL_BRANCH}
+${GIT} rebase ${INTEGRATE} 
+${GIT} checkout ${INTEGRATE}
+${GIT} merge --no-ff ${LCL_BRANCH}

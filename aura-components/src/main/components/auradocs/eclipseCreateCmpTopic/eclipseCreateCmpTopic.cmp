@@ -1,0 +1,92 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Add a Component"/>
+
+
+
+    <p>A Aura app is represented by a .app file composed of a series of Aura components and HTML tags.</p>
+
+    <p>Components are the building blocks in your app and are grouped in a namespace. In addition to the required top-level <code>
+    &lt;aura:component&gt;</code> tag in a component or <code>&lt;aura:application&gt;</code> tag in an application, you can insert user interface components
+    using tags defined in the Aura component library.</p>
+
+    <p>In Eclipse, we'll add a component to the simple app that we just created. The following diagram shows the folder structure for the project created from the Maven archetype. Under the <code>components</code> folder, there is a <code>helloWorldEclipse</code> folder representing the namespace. Under that folder is a sub-folder, also called <code>helloWorldEclipse</code>, which represents the application, which is a special type of component. This folder can also contain resources, such as CSS and JavaScript files. We will add a new component to the <code>helloWorldEclipse</code> namespace.</p>
+
+    <p><ui:image src="/auraFW/resources/aura/images/eclipseProjectStructure.png" alt="Eclipse project structure" /></p>
+
+    <h2>Step 1: Make a New Component</h2>
+            <ol>
+                <li>In Eclipse Package Explorer, right-click the <code>helloWorldEclipse</code> namespace folder under <code>components</code> and select <b>New</b> &gt; <b>File</b>.</li>
+                <li>Create a new <code>hello</code> component in the namespace by entering these values:<br/>
+                <b>Parent folder</b>:
+                <code>helloWorldEclipse/src/main/webapp/WEB-INF/components/helloWorldEclipse/hello</code><br/>
+                     <b>File name</b>: hello.cmp<br/>
+
+                     <auradocs:info>Note that we added the new component to a new <code>hello</code> folder under the <code>helloWorldEclipse</code> namespace folder. For more information on the file structure for components, see <auradocs:topicLink topic="helloWorld">Components Overview</auradocs:topicLink>.</auradocs:info>
+                </li>
+                 <li>Click <b>Finish</b>.</li>
+                <li>Open <code>hello.cmp</code> and enter:</li>
+<auradocs:codeblock>
+<![CDATA[<aura:component>
+    Hello, world!
+</aura:component>]]>
+</auradocs:codeblock>
+                <li> Save the file.</li>
+
+            <li>View the component in a browser by navigating to
+            <code>http://localhost:8080/helloWorldEclipse/hello.cmp</code>.</li>
+            <p><ui:image src="/auraFW/resources/aura/images/eclipseBrowseComponent.png" alt="hello.cmp" /></p>
+            </ol>
+
+    <h2>Step 2: Add the Component to the App</h2>
+
+    <p>Now, we're going to add our new component to the app. In this case, the component is simple, but the intent is to demonstrate how you can create a component that is reusable in multiple apps.</p>
+
+        <ol>
+            <li>Open <code>helloWorldEclipse.app</code> and replace its contents with:</li>
+
+            <pre>
+                <code>
+<![CDATA[<aura:application>
+
+    <h1>My First Aura App</h1>
+        <helloWorldEclipse:hello />
+
+</aura:application>]]>
+                </code>
+            </pre>
+            <li>Save the file.</li>
+            <li>View the app in a browser by navigating to  <code>http://localhost:8080/helloWorldEclipse/helloWorldEclipse.app</code>.</li>
+            <p><ui:image src="/auraFW/resources/aura/images/eclipseBrowseApp.png" alt="hello.app" /></p>
+        </ol>
+
+    <h2>Next Steps</h2>
+
+        <p>You created an app and added a simple component using Eclipse but you might be wondering why you had to install Eclipse as you haven't seen a line of Java code yet. Aura enables you to use JavaScript on the client and Java on the server to create rich applications.</p>
+
+        <p>To learn about how Aura uses events and works with JavaScript client-side controllers, see <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>.</p>
+
+        <p>To learn about how Aura uses Java and works with server-side controllers, see <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink>.</p>
+
+        <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="appOverview">aura:application</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="helloFacets">Component Body and Facets</auradocs:topicLink>
+        </p>
+
+</aura:component>

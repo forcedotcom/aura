@@ -1,0 +1,1 @@
+git log  --pretty=format:'%ae : %s' --no-merges  aura-framework-$1..aura-framework-$2 | grep -v "\[maven-release-plugin\]" | sed "s/gus.*\//\[GUS\]\//g" | sed "s/@rev\([^@]*\)@/[REVIEWED BY: \1]/g" | sed ':a;N;$!ba;s/\n/    ;    /g'

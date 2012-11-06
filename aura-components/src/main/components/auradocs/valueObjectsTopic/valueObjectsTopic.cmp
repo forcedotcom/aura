@@ -1,0 +1,107 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Value Objects"/>
+
+    <p>All expressions resolve to a "value object", which is a thin wrapper around the actual data. The wrapper layer around the literal JavaScript objects enables you to modify data in a transactional manner and selectively rerender and update the UI in response to data changes.</p>
+
+    <p>There are a few different types of value objects. The most common ones are <code>SimpleValue</code>, <code>ArrayValue</code>, and <code>MapValue</code>. See <auradocs:topicLink topic="valueObjectTypes">Value Object Types</auradocs:topicLink> for more information.</p>
+
+    <p>To access a value object in JavaScript, use <code>component.getValue("<em>expression</em>")</code>.</p>
+
+    <p>Let's look at a component that refers to itself as <code>cmp</code> in its renderer, use the following code in JavaScript to retrieve the label attribute for the component:</p>
+
+<auradocs:codeblock>
+    var labelValue = cmp.getValue("v.label");
+</auradocs:codeblock>
+
+    <p>In this case, the value object is a <code>SimpleValue</code> because it wraps the label, which is a string. You can use <code>unwrap()</code> to retrieve the native object or <code>get()</code> to return the unwrapped value. Refer to <auradocs:topicLink topic="valueObjectTypes">Value Object Types</auradocs:topicLink> to learn more about these methods.</p>
+
+    <h2>Introspection Methods</h2>
+
+    <p>These methods give you information about the underlying data in a value object.</p>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Method</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <!-- ML 7/20/12 Commenting out as it's a bit confusing to talk about unwrap() generically.
+            It's better explained for each value object.
+            <tr>
+                <td><code>unwrap()</code></td>
+                <td>Returns the underlying data (native JavaScript object) for the value object. For maps and arrays, it performs a deep copy. This can be an expensive operation so only use this for maps and arrays if you have no other alternatives.</td>
+            </tr>
+            -->
+            <tr>
+                <td><code>isLiteral()</code></td>
+                <td>Returns <code>true</code> for a <code>SimpleValue</code>; <code>false</code> otherwise.</td>
+            </tr>
+
+            <tr>
+                <td><code>isExpression()</code></td>
+                <td>Returns <code>true</code> for property references and function calls; <code>false</code> otherwise.
+
+                <p>In the expression <code><aura:text value="{!"/>v.foo + 10}</code>, <code>v.foo</code> is a property reference. <code>v.foo + 10</code> is a function call that has a tree of children. The first child is the property reference for <code>v.foo</code> and the second child is a simple value wrapping <code>10</code>.</p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Transaction Methods</h2>
+
+    <p>These methods are used by Aura to rerender components.</p>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Method</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>isDirty()</code></td>
+                <td>Returns <code>true</code> if this value has been modified but not yet committed. The dirty flag is set in the value object whenever data changes. Aura automatically rerenders the component that owns the data, and calls <code>commit()</code> to remove the dirty flag.</td>
+            </tr>
+
+            <tr>
+                <td><code>commit()</code></td>
+                <td>Commits the modified value and removes the dirty flag on the value object. This method doesn't return a value.
+                <auradocs:warning>Aura automatically calls <code>commit()</code> after rerendering a component. You can call <code>commit()</code> yourself if you want to avoid triggering the rerendering phase. You should only do this for data that changes but is not rendered or passed into another component that could render it.</auradocs:warning>
+                </td>
+            </tr>
+
+            <tr>
+                <td><code>rollback()</code></td>
+                <td>Removes the current uncommitted value if there is one. <code>isDirty()</code> returns <code>false</code> after <code>rollback()</code> is called. This method doesn't return a value.</td>
+            </tr>
+
+            <tr>
+                <td><code>getPreviousValue()</code></td>
+                <td>Returns the previous value if there is one; <code>undefined</code> otherwise.</td>
+            </tr>
+        </tbody>
+    </table>
+
+</aura:component>

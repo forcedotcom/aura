@@ -1,0 +1,76 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Inheritance Rules"/>
+
+    <p>This table describes the inheritance rules for various elements in Aura.</p>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Element</th>
+                <th>extends</th>
+                <th>implements</th>
+                <th>Default Base Element</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>component</strong></td>
+                <td>one extensible component</td>
+                <td>multiple interfaces</td>
+                <td><code>&lt;aura:component&gt;</code></td>
+            </tr>
+
+            <tr>
+                <td><strong>app</strong></td>
+                <td>one extensible app</td>
+                <td>N/A</td>
+                <td><code>&lt;aura:application&gt;</code></td>
+            </tr>
+
+            <tr>
+                <td><strong>interface</strong></td>
+                <td>multiple interfaces using a comma-separated list  (<code>extends="ns:intf1,ns:int2"</code>)</td>
+                <td>N/A</td>
+                <td>N/A</td>
+            </tr>
+            <tr>
+                <td><strong>component event</strong></td>
+                <td>one component event</td>
+                <td>N/A</td>
+                <td><code>&lt;aura:componentEvent&gt;</code></td>
+            </tr>
+
+            <tr>
+                <td><strong>application event</strong></td>
+                <td>one application event</td>
+                <td>N/A</td>
+                <td><code>&lt;aura:applicationEvent&gt;</code></td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="oodInterfaces">Interfaces</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="helloEvents">Events Overview</auradocs:topicLink>
+    </p>
+
+</aura:component>

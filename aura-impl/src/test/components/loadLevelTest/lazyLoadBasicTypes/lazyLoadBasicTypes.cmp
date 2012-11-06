@@ -1,0 +1,43 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component render="client" extends="loadLevelTest:lazyLoadHelper">
+    <aura:attribute name="stringAttribute" type="String" default="lazyLoading"/>
+
+    <!--This component is just to help the tests. Since basic components come back really fast, having this component here
+    slows down the server response and helps testing. Also this will only work when lazy loading requests are batched-->
+    <loadLevelTest:serverComponent aura:id="lazy" aura:load="lazy" waitId="lazyLoadBasicTypes"/>
+
+    <!-- HTML-->
+    <div aura:id="simpleHtml" aura:load="lazy" title="div element"/>
+    <div aura:id="htmlWithFacet" aura:load="lazy" title="div element as facet">
+        <div aura:id="facetInsideDiv" dir="ltr" style="width:34px;background-color:#ffffff;" title="div element inside facet"/>
+    </div>
+
+    <!-- aura:label -->
+    <aura:label value="one {0} two" aura:id="labelWithoutBody" aura:load="lazy"></aura:label>
+    <!--Currently lazyily loaded components can specify only simple attributes, enable this part when that's done. LazyComponentDefRef.validateReferences()-->
+    <!--aura:label value="one {0} two" aura:id="label" aura:load="lazy"><div>logout</div></aura:label-->
+
+    <!-- aura:attribute, no way to specify aura:load attribute -->
+    {!v.stringAttribute+'expression'}
+
+    <!-- aura:text-->
+    <aura:text value="lazyLoading"  aura:id="text" aura:load="lazy"/>
+
+
+</aura:component>

@@ -1,0 +1,43 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Accessing the DOM"/>
+
+    <p>The Document Object Model (DOM) is the language-independent model for representing and interacting with objects in HTML and XML documents. The Aura rendering service takes in-memory component state and updates the component in the DOM. Aura automatically renders your components so you don't have to know anything more about rendering unless you need to customize the default rendering behavior for a component.</p>
+    
+    <p>There are two very important guidelines for accessing the DOM from Aura.</p>
+    
+    <ul>
+		<li>You should never modify the DOM outside a renderer. However, you can read from the DOM outside a renderer.</li>
+		<li>Use expressions, whenever possible, instead of trying to set a DOM element directly.</li>
+    </ul>
+
+    <h2>Using Renderers</h2>
+    
+    <p>The rendering service is the bridge from the framework to update the DOM. If you modify the DOM from a client-side controller, the changes may be overwritten when the components are rendered, depending on how the component renderers behave.</p> 
+
+    <h2>Using Expressions</h2>
+
+    <p>You can often avoid writing a custom renderer by using expressions in the markup instead. For example, see <auradocs:topicLink topic="hideMarkup">Dynamically Showing or Hiding Markup</auradocs:topicLink>.</p>    
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="renderers">Renderers</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="expressions">Expressions</auradocs:topicLink>        
+    </p>
+
+</aura:component>

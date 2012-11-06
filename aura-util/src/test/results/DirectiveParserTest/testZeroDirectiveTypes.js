@@ -1,0 +1,4 @@
+
+function donothing(){
+    return "noGood";
+}

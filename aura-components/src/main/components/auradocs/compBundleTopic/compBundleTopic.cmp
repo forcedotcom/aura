@@ -1,0 +1,80 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Component Bundles"/>
+
+    <p>A component bundle is a folder containing a component or an app and all related resources for that component or app. It can contain the following files.</p>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>File</th>
+                <th>File Name</th>
+                <th>Usage</th>
+                <th>See Also</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Component or Application</td>
+                <td><code>sample.cmp</code> or <code>sample.app</code></td>
+                <td>The only required resource in a bundle. Contains markup for the component or app file. Each bundle contains only one component or app file.</td>
+                <td><auradocs:topicLink topic="helloWorld">Components Overview</auradocs:topicLink> <br/>
+                    <auradocs:topicLink topic="appOverview">aura:application</auradocs:topicLink></td>
+            </tr>
+            <tr>
+                <td>CSS Styles</td>
+                <td><code>sample.css</code></td>
+                <td>Contains styles for the component. </td>
+                <td><auradocs:topicLink topic="helloHTML">Applying CSS</auradocs:topicLink></td>
+            </tr>
+            <tr>
+                <td>Controller</td>
+                <td><code>sampleController.js</code></td>
+                <td>Contains client-side controller methods to handle events in the component.</td>
+                <td><auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink></td>
+            </tr>
+            <tr>
+                <td>Renderer</td>
+                <td><code>sampleRenderer.js</code></td>
+                <td>Contains a client-side renderer to override default rendering for a component. </td>
+                <td><auradocs:topicLink topic="renderers">Renderers</auradocs:topicLink></td>
+            </tr>
+            <tr>
+                <td>Helper</td>
+                <td><code>sampleHelper.js</code></td>
+                <td>Contains helper methods that are shared by the controller and renderer.</td>
+                <td><auradocs:topicLink topic="helper">Helpers</auradocs:topicLink></td>
+            </tr>
+            <!--Irrelevant at this point <tr>
+                <td>Provider</td>
+                <td><code>sampleProvider.js</code></td>
+                <td>Contains a provider method that returns the concrete component to use at runtime.</td>
+                <td><auradocs:topicLink topic="oodProviders">Providers</auradocs:topicLink></td>
+            </tr>-->
+            <tr>
+                <td>Test Cases</td>
+                <td><code>sampleTest.js</code></td>
+                <td>Contains a test suite to be run in the browser.</td>
+                <td><auradocs:topicLink topic="docTests">Testing Components</auradocs:topicLink></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>All files in the component bundle must follow the naming convention as described in the table to enable auto-wiring of the resource files to the components. For example, a renderer file must be named <code>&lt;componentName&gt;Renderer.js</code> and so on.</p>
+
+</aura:component>

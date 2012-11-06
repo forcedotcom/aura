@@ -1,0 +1,120 @@
+/*
+ * Copyright (C) 2012 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+@def MYVAR '/auraFW/resources/qa/images/auralogo.png?myvar';
+@def MYURL url(/auraFW/resources/qa/images/auralogo.png?myurl);
+@defmixin mixbackground(URL){
+    background: URL;
+}
+
+.appCacheNopreload.background {
+    background: url(/auraFW/resources/qa/images/s.gif) 0 0 no-repeat;
+}
+
+.appCacheNopreload.limark {
+    list-style-image:url(/auraFW/resources/qa/images/auralogo.png)
+}
+
+.appCacheNopreload.nonexistant {
+    background: url(/auraFW/resources/qa/images/imaginary.png) 0 0 no-repeat;
+}
+
+.appCacheNopreload.absolute {
+    background: url(http://www.facebook.com/ipo.jpg) 0 0 no-repeat;
+}
+
+.appCacheNopreload.whitespacestart {
+    background: url( /auraFW/resources/qa/images/auralogo.png?wsstart) 0 0 no-repeat;
+}
+
+.appCacheNopreload.whitespaceend {
+    background: url(/auraFW/resources/qa/images/auralogo.png?wsend	) 0 0 no-repeat;
+}
+
+.appCacheNopreload.whitespaceboth {
+    background: url(
+        /auraFW/resources/qa/images/auralogo.png?wsboth
+    ) 0 0 no-repeat;
+}
+
+.appCacheNopreload.singlequotes {
+    background: url('/auraFW/resources/qa/images/auralogo.png?singlequotes') 0 0 no-repeat;
+}
+
+.appCacheNopreload.doublequotes {
+    background: url("/auraFW/resources/qa/images/auralogo.png?doublequotes") 0 0 no-repeat;
+}
+
+.appCacheNopreload.invalidhost {
+    background: url(http://dummy.salesforce.com/invalidhost) 0 0 no-repeat;
+}
+
+.appCacheNopreload.noprotocol {
+    background: url(//dummy.salesforce.com/noprotocol) 0 0 no-repeat;
+}
+
+.appCacheNopreload.nohost {
+    background: url(http:///nohost) 0 0 no-repeat;
+}
+
+.appCacheNopreload.unrooted {
+    background: url(/auraFW/resources/qa/images/auralogo.png?unrooted) 0 0 no-repeat;
+}
+
+.appCacheNopreload.notanimage {
+    background: url(/index.jsp) 0 0 no-repeat;
+}
+
+.appCacheNopreload.myvar {
+    background: url(MYVAR) 0 0 no-repeat;
+}
+
+.appCacheNopreload.myurl {
+    background: MYURL 0 0 no-repeat;
+}
+
+/* not currenty supported */
+.appCacheNopreload.mymixin {
+    @mixin mixbackground('/auraFW/resources/qa/images/auralogo.png?mymixin');
+}
+
+.appCacheNopreload.emptyurl {
+    background: url() 0 0 no-repeat;
+}
+
+.appCacheNopreload.emptyurl {
+    background: url() 0 0 no-repeat;
+}
+
+.appCacheNopreload.queryonlyurl {
+    background: url(?query=only) 0 0 no-repeat;
+}
+
+.appCacheNopreload.hashonlyurl {
+    background: url(#hashonly) 0 0 no-repeat;
+}
+
+.appCacheNopreload.hashqueryonlyurl {
+    background: url(#hash?query=only) 0 0 no-repeat;
+}
+
+.appCacheNopreload.hashurl {
+    background: url(/auraFW/resources/qa/images/auralogo.png#hash) 0 0 no-repeat;
+}
+
+.appCacheNopreload.hashqueryurl {
+    background: url(/auraFW/resources/qa/images/auralogo.png#hash?query=) 0 0 no-repeat;
+}
+

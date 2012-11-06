@@ -1,0 +1,36 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Setting the Default Mode"/>
+
+    <p>The default mode is <code>DEV</code>. This is defined in <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/impl/adapter/ConfigAdapterImpl.html" target="_new">ConfigAdapterImpl</a>.</p>
+
+    <p>You can change the default mode to <code>PROD</code> by setting the <code>aura.production</code> Java system property to <code>true</code>. Do this by adding <code>-Daura.production=true</code> to the arguments when you are starting your server.</p>
+
+    <p>To set an alternate default mode, write a Java class that implements the <code>getDefaultMode()</code> method in <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/adapter/ConfigAdapter.html" target="_new">ConfigAdapter</a>.</p>
+
+    <p>The default mode is not used if it’s not also included in the list of available modes.</p>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="modesAvailableSet">Controlling Available Modes</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="modesSetRequest">Setting the Mode for a Request</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink>
+    </p>
+
+</aura:component>

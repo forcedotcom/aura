@@ -1,0 +1,40 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" implements="ui:visible" support="BETA"
+    description="This container component creates a horizontal box area on a page. It doesn't produce any default content for the component itself, beyond simple wrapper HTML. You can insert content into the left and right sides of the &lt;ui:block&gt; by adding it to the left and right attributes respectively. The body of the component is inserted in the middle of the &lt;ui:block&gt;.
+
+    left, body, and right are facets of the &lt;ui:block&gt; component. The left and right facets, if set, are contained in their own HTML wrapper markup. &lt;ui:block&gt; always adds markup to the page, wrapping the entire component in a &lt;div&gt; tag, along with child &lt;div&gt; tags for each of the left, body, and right facets.
+
+    You can use &lt;ui:block&gt; with &lt;ui:vbox&gt;, another 'structural' component, to create a box-oriented layout that can be fine-tuned using CSS to produce virtually any page or section layout you desire.">
+
+    <aura:attribute name="overflow" type="Boolean" default="false" description="Allows you to specify whether the &lt;ui:block&gt; permits overflow for its contents. Defaults to false, which means that content that overflows the boundaries of the component will be clipped."/>
+    <aura:attribute name="left" type="Aura.Component[]" description="The left facet of the component. Components added to left are aligned to the left side of the &lt;ui:block&gt;. The left facet, if set, is wrapped in a &lt;div&gt; tag with the CSS class &quot;bLeft&quot; for individual styling."/>
+    <aura:attribute name="right" type="Aura.Component[]" description="The right facet of the component. Components added to right are aligned to the right side of the &lt;ui:block&gt;. The right facet, if set, is wrapped in a &lt;div&gt; tag with the CSS class &quot;bRight&quot; for individual styling."/>
+
+    <div class="{!v.class+(v.overflow == 'true' ?' overflow':'')}">
+        <aura:if isTrue="{!v.left.length > 0}">
+            <div class="bLeft">{!v.left}</div>
+        </aura:if>
+        <aura:if isTrue="{!v.right.length > 0}">
+            <div class="bRight">{!v.right}</div>
+        </aura:if>
+        <div class="bBody">
+            {!v.body}
+        </div>
+    </div>
+</aura:component>

@@ -1,0 +1,97 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+       <aura:set attribute="title" value="Install the Aura Assist Plugin"/>
+
+       <p>The Aura Assist Eclipse Plugin enables Aura code highlighting and auto-completion of namespaces,
+       components, and attributes.</p>
+
+       <h2>Download Aura Assist</h2>
+
+       <ol>
+           <li>In Eclipse, click <b>Help</b> &gt; <b>Install New Software...</b>.</li>
+           <li>Enter the value:<br/>
+           <b>Work with</b>: http://download.auraframework.org/update/</li>
+           <li>Select the <b>Aura Assist Feature</b> checkbox.</li>
+           <li>Click <b>Next</b>.</li> The plugin will be installed.
+       </ol>
+
+       <auradocs:info>
+           All .cmp and .app files will be automatically associated with the plugin.
+           If you have any opened files, you must close and reopen them to use the plugin.
+       </auradocs:info>
+
+       <h2>Using Aura Assist</h2>
+
+       <p>
+        <table class="table table-bordered table-striped">
+              <thead>
+                  <tr>
+                    <th><b>Elements</b></th>
+                    <th><b>Usage/Shortcut</b></th>
+                </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                      <td>Namespace</td>
+                      <td>Ctrl + Space</td>
+                  </tr>
+                  <tr>
+                      <td>Components</td>
+                      <td>Triggered when you type <code>&lt;NAMESPACE:</code>, or Ctrl + Space</td>
+                  </tr>
+                  <tr>
+                      <td>Attributes</td>
+                      <td>Triggered when you type <code>&lt;NAMESPACE:COMPONENT</code>, or Ctrl + Space</td>
+                  </tr>
+              </tbody>
+        </table>
+       </p>
+       <p>
+       </p>
+
+        <!-- ML comment out as usage is not clear
+       <h2>Override Aura Registry (Optional)</h2>
+
+       <p>The plugin uses auraRegistry by default. You may want to override the auraRegistry if
+       you have created new components and would like to test them.
+       <ol>
+           <li>1. In a browser, go to <code>http://localhost:9090/auradocs/docs.app</code> or
+           <code>http://&lt;yourserver&gt;/auradocs/docs.app</code> and click <b>Serialize Aura Registry</b>.<br />
+           A <code>auraRegistry.json</code> file is generated in your <code>tmp</code> directory.</li>
+           <li>2. In Eclipse, go to <b>Windows</b> &gt; <b>Preferences</b> &gt; <b>Aura Assist</b>.</li>
+           <li>3. Select the <b>Override aura registry</b> checkbox, and ensure that the plugin directory is correct.</li>
+           <li>4. Click <b>Reload Aura Registry</b> in the Eclipse menu.</li>
+           <li>5. Click <b>Apply</b>.</li>
+       </ol>
+       <auradocs:info>
+       To refresh the registry, repeat steps 1 and 4.
+       </auradocs:info>
+       </p>
+       -->
+
+    <p>Next: <auradocs:topicLink topic="eclipseCreateCmp">create a component and add it to the app</auradocs:topicLink>.</p>
+
+</aura:component>
+
+
+
+
+
+
+

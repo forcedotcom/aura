@@ -1,0 +1,64 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Component Composition"/>
+
+    <p>So far we've only seen one component acting by itself, but the strength of a component-based UI framework is in combining components to make a more interesting application.  Let's take a look at how components fit together.</p>
+
+    <h2>Components Within Components</h2>
+
+    <p><code>nestedComponents.cmp</code> shows an example of including components inside other components.</p>
+
+    <auradocs:example descriptor="auradocs:nestedComponents" />
+
+    <p>Including an existing component is similar to including an HTML tag: we just reference the component by its "descriptor", which is of the form &lt;namespace&gt;:&lt;component&gt;. <code>nestedComponents.cmp</code> references the <code>helloHTML.cmp</code> component, which lives in the <code>auradocs</code> namespace. Hence, its descriptor is <code>auradocs:helloHTML</code>. Here is the source for <code>helloHTML.cmp</code>.</p>
+
+    <auradocs:example descriptor="auradocs:helloHTML" />
+
+    <p>Granted this is not the most exciting application one could build with component composition, but it illustrates a few concepts.</p>
+
+    <p>The next component adds something new. Note how <code>nestedComponents.cmp</code> also references <code>auradocs:helloAttributes</code>. Just like adding attributes to an HTML tag, you can specify attribute values to a Aura component as part of the component tag. <code>nestedComponents.cmp</code> sets the <code>whom</code> attribute of <code>helloAttributes.cmp</code> to "component composition", which affects the output of the component. Here is the source for <code>helloAttributes.cmp</code>.</p>
+
+    <auradocs:example descriptor="auradocs:helloAttributes" />
+
+    <h2>Attribute Passing</h2>
+
+    <p>You can also pass attributes to nested components. <code>nestedComponents2.cmp</code> is similar to <code>nestedComponents.cmp</code>, except that it includes an extra <code>passthrough</code> attribute. This value is passed through as the attribute value for <code>auradocs:helloAttributes</code>.</p>
+
+    <auradocs:example descriptor="auradocs:nestedComponents2" />
+
+    <p>Notice that <code>helloAttributes</code> is now using the passed through attribute value. Passing attribute values around is that easy.</p>
+
+    <h2>Definitions versus Instances</h2>
+
+    <p>If you're familiar with object-oriented programming, you know the difference between a class and an instance of that class.  Aura works the same way: when you create a <code>.cmp</code> file, you are providing the definition (class) of that component.  When you put a component tag in a .cmp file, you are creating a reference to (instance of) that component.</p>
+
+    <p>It shouldn't be surprising that we can add multiple instances of the same component with different attributes.  <code>nestedComponents3.cmp</code> adds another instance of <code>auradocs:helloAttributes</code> with a different attribute value. The two instances of the <code>auradocs:helloAttributes</code> component have different values for their <code>whom</code> attribute .</p>
+
+    <auradocs:example descriptor="auradocs:nestedComponents3" />
+
+    <h2>Summary</h2>
+
+    <ul>
+    <li>Components can be defined in terms of other components--this is how applications are built.</li>
+    <li>Attribute values can be passed through from component to component.</li>
+    <li>A component's <code>.cmp</code> file is akin to an object-oriented class. A reference to that component is akin to an instance of that class.</li>
+    </ul>
+
+</aura:component>

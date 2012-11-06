@@ -1,0 +1,32 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+    <aura:attribute name="symbol" type="Object"/>
+    <aura:attribute name="params" type="Aura.Component[]"/>
+    <aura:attribute name="name" type="Aura.Component[]"/>
+    <aura:attribute name="collapsible" type="Boolean" default="false"/>
+    <aura:attribute name="extra" type="Boolean" default="false"/>
+        <li>
+            <b>{!' ' + v.symbol.name}</b> : {!v.symbol.type}
+            <p><aura:unescapedHtml value="{!v.symbol.classDesc + v.symbol.desc}"/></p>
+            <!--
+            <p>Required?</p>
+            <p>Visibility: public, private, etc..</p>
+            -->
+        </li>
+</aura:component>

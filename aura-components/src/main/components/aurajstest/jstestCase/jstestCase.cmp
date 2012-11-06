@@ -1,0 +1,43 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component model="java://org.auraframework.components.aurajstest.JSTestCaseModel" extends="ui:tab">
+    <aura:attribute name="case" type="java://org.auraframework.def.TestCaseDef"/>
+    <aura:attribute name="suite" type="java://org.auraframework.def.TestSuiteDef"/>
+    <aura:attribute name="url" type="String"/>
+
+    <aura:set attribute="scroll" value="false"/>
+    <aura:set attribute="title" value="{!v.case.descriptor}"/>
+
+    <aura:registerevent name="done" type="aurajstest:testStatus"/>
+
+    <aura:set attribute="icon">
+        <a href="javascript:void(0);" onclick="{!c.rerun}" class="rerun spin" aura:id="rerun"></a>
+    </aura:set>
+
+    <aura:set attribute="body">
+        <section class="content">
+            <h1>Content</h1>
+            <div aura:id="content"/>
+        </section>
+        <section class="results">
+            <h1>Results</h1>
+            <p aura:id="results"></p>
+        </section>
+    </aura:set>
+
+</aura:component>

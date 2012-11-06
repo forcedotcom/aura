@@ -1,0 +1,13 @@
+Test:testGetDateTimeISO8601Converter
+Input date:Date(1)		Formatted date:1970-01-01T08:00:00.001+08:00		Parsed date:1		Timezone:GMT+08:00
+Input date:Date(1000)		Formatted date:1970-01-01T08:00:01.000+08:00		Parsed date:1000		Timezone:GMT+08:00
+Input date:Date(1333322872649)		Formatted date:2012-04-02T07:27:52.649+08:00		Parsed date:1333322872649		Timezone:GMT+08:00
+Input date:Date(0)		Formatted date:1970-01-01T08:00:00.000+08:00		Parsed date:0		Timezone:GMT+08:00
+Input date:Date(1)		Formatted date:1969-12-31T19:00:00.001-05:00		Parsed date:1		Timezone:EST
+Input date:Date(1000)		Formatted date:1969-12-31T19:00:01.000-05:00		Parsed date:1000		Timezone:EST
+Input date:Date(1333322872649)		Formatted date:2012-04-01T19:27:52.649-04:00		Parsed date:1333322872649		Timezone:EST
+Input date:Date(0)		Formatted date:1969-12-31T19:00:00.000-05:00		Parsed date:0		Timezone:EST
+Input date:Date(1)		Formatted date:1970-01-01T00:00:00.001Z		Parsed date:1		Timezone:GMT
+Input date:Date(1000)		Formatted date:1970-01-01T00:00:01.000Z		Parsed date:1000		Timezone:GMT
+Input date:Date(1333322872649)		Formatted date:2012-04-01T23:27:52.649Z		Parsed date:1333322872649		Timezone:GMT
+Input date:Date(0)		Formatted date:1970-01-01T00:00:00.000Z		Parsed date:0		Timezone:GMT

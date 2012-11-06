@@ -1,0 +1,32 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+<aura:set attribute="title" value="A Guide to Aura Development"/>
+    <p>Aura is a UI framework for developing dynamic web apps for mobile and desktop devices. It provides you with a rich and extensible component set to kick start building apps. The framework supports partitioned multi-tier component development that bridges the client and server.</p>
+
+    <p>We have not set out to make another jQuery or YUI. The framework can easily integrate with those toolkits or whatever else comes along. Aura provides a scaleable long-lived lifecycle to support building apps engineered for growth.</p>
+
+    <p>Aura provides a lightweight and scalable architectural foundation by using two key building blocks: components and events.</p>
+
+    <p>Components use markup that looks similar to HTML. You can also use HTML (with exceptions), or any other code that can execute within an HTML page. Aura uses JavaScript on the client side and Java on the server side. You can build your user interface at a granular level and easily integrate with popular toolkits and libraries.</p>
+
+    <p>Aura supports a robust event model, a powerful expression language, and embedded testing, performance, and security features. The framework intelligently utilizes your server, browser, devices, and network so you can focus on the logic and interactions of your apps.</p>
+
+    <p>This guide shows you how to get started and then dig deeper into the rich functionality of Aura. It assumes basic familiarity with HTML, CSS, JavaScript, and Java.</p>
+
+</aura:component>

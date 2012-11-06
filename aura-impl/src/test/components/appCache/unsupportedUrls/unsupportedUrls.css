@@ -1,0 +1,38 @@
+/*
+ * Copyright (C) 2012 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.appCacheUnsupportedUrls.nonexistant {
+    background: url(/auraFW/resources/qa/images/imaginary.png) 0 0 no-repeat;
+}
+
+.appCacheUnsupportedUrls.absolute {
+    background: url(http://www.facebook.com/ipo.jpg) 0 0 no-repeat;
+}
+
+.appCacheUnsupportedUrls.invalidhost {
+    background: url(http://dummy.salesforce.com/invalidhost) 0 0 no-repeat;
+}
+
+.appCacheUnsupportedUrls.noprotocol {
+    background: url(//dummy.salesforce.com/noprotocol) 0 0 no-repeat;
+}
+
+.appCacheUnsupportedUrls.nohost {
+    background: url(http:///nohost) 0 0 no-repeat;
+}
+
+.appCacheUnsupportedUrls.unrooted {
+    background: url(/auraFW/resources/qa/images/auralogo.png?unrooted) 0 0 no-repeat;
+}

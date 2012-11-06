@@ -1,0 +1,154 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>aura-resources</artifactId>
+    <parent>
+        <groupId>org.auraframework</groupId>
+        <artifactId>aura-framework</artifactId>
+        <version>0.0.368-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <dependencies>
+        <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-tools</artifactId>
+        </dependency>
+    </dependencies>
+    <build>
+        <resources>
+            <resource>
+                <!-- We generate resources into a separate directory from
+                     target/classes, so Eclipse can look for it with C-S-r if
+                     anyone wants that for debugging. -->
+                <directory>target/src-gen/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>target/resources-gen</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                <!--
+                    <execution>
+                        <id>serialize-components</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <target>
+                                <java classname="org.auraframework.tools.definition.RegistrySerializer" classpathref="maven.runtime.classpath" fork="true" failonerror="true">
+                                    <jvmarg value="-Daura.home=${basedir}/.." />
+                                    <arg value="${basedir}/target/src-gen/main/resources/registries" />
+                                    <arg value="aura" />
+                                    <arg value="ui" />
+                                    <arg value="auraide" />
+                                    <arg value="auradocs" />
+                                    <arg value="aurajstest" />
+                                </java>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    -->
+                    <execution>
+                        <id>generate-javascript</id>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <target>
+                                <java classname="org.auraframework.tools.javascript.GenerateJavascript" classpathref="maven.runtime.classpath" fork="true" failonerror="true">
+                                    <jvmarg value="-Daura.home=${basedir}/.." />
+                                </java>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings
+                    only. It has no influence on the Maven build itself. -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>nl.windgazer</groupId>
+                                        <artifactId>
+                                            jsdoctk-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [2.3.2,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>jsdoc</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    <profiles>
+        <profile>
+            <id>jsDoc</id>
+            <activation>
+                <property>
+                    <name>!skipJsDoc</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>nl.windgazer</groupId>
+                        <artifactId>jsdoctk-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>do-jsdoc</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>jsdoc</goal>
+                                </goals>
+                                <configuration>
+                                    <srcDir>${basedir}/target/src-gen/main/resources</srcDir>
+                                    <recurse>10</recurse>
+                                    <template>${basedir}/../aura/config/jsdoc/templates</template>
+                                    <directory>${basedir}/target/src-gen/main/resources/jsdoc</directory>
+                                    <exclude>
+                                        <param>^.*/aura_(?!doc)\w+\.js$</param>
+                                    </exclude>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

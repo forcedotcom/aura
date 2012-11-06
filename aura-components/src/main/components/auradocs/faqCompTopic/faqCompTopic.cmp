@@ -16,10 +16,10 @@
 
 -->
 <aura:component extends="auradocs:topicPanel">
-    <aura:set attribute="title" value="What is a Aura Component?"/>
+    <aura:set attribute="title" value="What is an Aura Component?"/>
 
 
-    <p>Components are the self-contained and reusable units of a Aura app.
+    <p>Components are the self-contained and reusable units of an Aura app.
     They represent a reusable section of the UI, and can range in granularity from a single line of text to an entire app.
     Components are rendered to produce HTML DOM elements within the browser.
     The framework includes a rich set of prebuilt components.

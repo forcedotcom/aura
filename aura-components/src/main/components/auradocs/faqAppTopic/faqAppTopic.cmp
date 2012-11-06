@@ -16,12 +16,12 @@
 
 -->
 <aura:component extends="auradocs:topicPanel">
-    <aura:set attribute="title" value="What is a Aura App?"/>
+    <aura:set attribute="title" value="What is an Aura App?"/>
 
     <!-- Reused in appOverviewTopic too. Consider single sourcing -->
-    <p>A Aura app is a special top-level component whose markup is in a <code>.app</code> file. The markup looks similar to HTML and can contain Aura components as well as a set of supported HTML tags. The <code>.app</code> file is a standalone entry point for the app and enables you to define the overall application layout, style sheets, and global JavaScript includes. It starts with the top-level <code>&lt;aura:application&gt;</code> tag, which contains optional system attributes. These system attributes tell the framework how to configure the app.</p>
+    <p>An Aura app is a special top-level component whose markup is in a <code>.app</code> file. The markup looks similar to HTML and can contain Aura components as well as a set of supported HTML tags. The <code>.app</code> file is a standalone entry point for the app and enables you to define the overall application layout, style sheets, and global JavaScript includes. It starts with the top-level <code>&lt;aura:application&gt;</code> tag, which contains optional system attributes. These system attributes tell the framework how to configure the app.</p>
 
-    <p>The <code>.app</code> file is the only addressable unit in a browser URL on a production server. Access a Aura app using the URL scheme:</p>
+    <p>The <code>.app</code> file is the only addressable unit in a browser URL on a production server. Access an Aura app using the URL scheme:</p>
     <p><code>http://&lt;yourServer&gt;/&lt;namespace&gt;/&lt;application&gt;.app</code></p>
 
     <auradocs:info>You can access components directly in a browser URL in development mode by using the component's <code>.cmp</code> extension.</auradocs:info>

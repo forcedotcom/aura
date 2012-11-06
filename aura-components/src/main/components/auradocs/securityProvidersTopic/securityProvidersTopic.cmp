@@ -41,7 +41,7 @@
 
   <p>The <code>securityProvider</code> interface has a <code><![CDATA[public boolean isAllowed(DefDescriptor<?> descriptor)]]></code> method that you must implement with the custom logic for controlling access to the app.</p>
 
-  <p><code>DefDescriptor</code> is a Aura class that contains the metadata for any definition used in Aura, including a component, action, or event. In the example of a model, it is a nicely parsed description of <code>model="java://myPackage.MyClass"</code> with methods to retrieve the language, class name, and package name.</p>
+  <p><code>DefDescriptor</code> is an Aura class that contains the metadata for any definition used in Aura, including a component, action, or event. In the example of a model, it is a nicely parsed description of <code>model="java://myPackage.MyClass"</code> with methods to retrieve the language, class name, and package name.</p>
 
   <auradocs:info><b>Note</b>: A security provider class can't have any member variables as it can't maintain state. Security providers are instantiated effectively as singleton classes, and its methods are called from multiple threads in unrelated contexts.</auradocs:info>
 

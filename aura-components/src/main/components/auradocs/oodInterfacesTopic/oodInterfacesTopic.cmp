@@ -23,7 +23,7 @@
 
     <p>Similarly, Aura supports the concept of interfaces that define a component's shape by defining its attributes.</p>
 
-    <p>A Aura interface starts with the <code>&lt;aura:interface&gt;</code> tag. It can only contain <code>&lt;aura:attribute&gt;</code> tags that define the interface's attributes. You can't use markup, renderers, controllers, models or anything else in an interface.</p>
+    <p>An Aura interface starts with the <code>&lt;aura:interface&gt;</code> tag. It can only contain <code>&lt;aura:attribute&gt;</code> tags that define the interface's attributes. You can't use markup, renderers, controllers, models or anything else in an interface.</p>
 
     <p>To use an interface, you must implement it or add a <auradocs:topicLink topic="oodProviders">provider</auradocs:topicLink>. An interface can't be used directly in markup otherwise. Set the <code>implements</code> system attribute in the <code>&lt;aura:component&gt;</code> tag to the name of the interface that you are implementing: for example, <code>&lt;aura:component implements="mynamespace:myinterface" &gt;</code>.</p>
 

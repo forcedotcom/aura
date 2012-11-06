@@ -17,7 +17,7 @@
 -->
 <aura:component extends="auradocs:topicPanel">
 
-    <aura:set attribute="title" value="Create a Aura App from the Command Line"/>
+    <aura:set attribute="title" value="Create an Aura App from the Command Line"/>
 
     <p>You can generate a basic Aura app quickly using the command line.</p>
 

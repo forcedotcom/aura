@@ -19,7 +19,7 @@
     <aura:set attribute="title" value="aura:application"/>
 
     <!-- Reused in faqAppTopic too. Consider single sourcing -->
-    <p>A Aura app is a special top-level component whose markup is in a <code>.app</code> file. The markup looks similar to HTML and can contain Aura components as well as a set of supported HTML tags. The <code>.app</code> file is a standalone entry point for the app and enables you to define the overall application layout, style sheets, and global JavaScript includes. It starts with the top-level <code>&lt;aura:application&gt;</code> tag, which contains optional system attributes. These system attributes tell the framework how to configure the app.</p>
+    <p>An Aura app is a special top-level component whose markup is in a <code>.app</code> file. The markup looks similar to HTML and can contain Aura components as well as a set of supported HTML tags. The <code>.app</code> file is a standalone entry point for the app and enables you to define the overall application layout, style sheets, and global JavaScript includes. It starts with the top-level <code>&lt;aura:application&gt;</code> tag, which contains optional system attributes. These system attributes tell the framework how to configure the app.</p>
 
     <table class="table table-bordered table-striped">
         <thead>
@@ -42,7 +42,7 @@
 
             <tr>
                 <td><code>locationChangeEvent</code></td>
-                <td>The client-side <code>AuraHistoryService</code> monitors the location of the current window for changes. If the <code>#</code> value in a URL changes, the <code>AuraHistoryService</code> fires a Aura application event. The <code>locationChangeEvent</code> defines this event. The default value is <code>aura:locationChange</code>. The <code>locationChange</code> event has a single attribute called <code>token</code>, which is set with everything after the <code>#</code> value in the URL. For more information, see <auradocs:topicLink topic="urlNav">URL-Centric Navigation</auradocs:topicLink>.</td>
+                <td>The client-side <code>AuraHistoryService</code> monitors the location of the current window for changes. If the <code>#</code> value in a URL changes, the <code>AuraHistoryService</code> fires an Aura application event. The <code>locationChangeEvent</code> defines this event. The default value is <code>aura:locationChange</code>. The <code>locationChange</code> event has a single attribute called <code>token</code>, which is set with everything after the <code>#</code> value in the URL. For more information, see <auradocs:topicLink topic="urlNav">URL-Centric Navigation</auradocs:topicLink>.</td>
             </tr>
 
             <tr>

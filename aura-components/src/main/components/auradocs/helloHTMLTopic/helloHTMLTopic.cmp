@@ -27,24 +27,24 @@
 
     <auradocs:warning>Note: Aura disallows a few HTML tags deemed to be unsafe or unnecessary, like <code>&lt;applet&gt;</code> and <code>&lt;font&gt;</code>.  For a full list of supported tags, see <auradocs:topicLink topic="htmlTags">Supported HTML Tags</auradocs:topicLink>.</auradocs:warning>
 
-    <p>An HTML tag is treated as a first-class component in Aura.  In fact, each HTML tag is translated into a Aura component, allowing it to enjoy the same rights and privileges as any component defined in the filesystem.  This might not mean much to you right now, but you'll see some benefits later.</p>
+    <p>An HTML tag is treated as a first-class component in Aura.  In fact, each HTML tag is translated into an Aura component, allowing it to enjoy the same rights and privileges as any component defined in the filesystem.  This might not mean much to you right now, but you'll see some benefits later.</p>
 
     <h2>CSS in Components</h2>
 
     <p>To add CSS to a component, add a new file to the component bundle called <code>&lt;componentName&gt;.css</code>.  Aura automatically picks up this new resource and auto-wires it when the component is used in a page.</p>
 
     <p>All top-level elements in a component have a special <code>THIS</code> CSS class added to them. This, effectively, adds namespacing to CSS and helps prevent one component's CSS from blowing away another component's styling. Aura throws an error if a CSS file doesn't follow this convention.</p>
-    
+
     <p>Let's look at a sample <code>helloHTML.cmp</code> component. The CSS is in <code>helloHTML.css</code> and you can see it in the <code>css://style</code> tab. If you need a CSS refresher, see <a href="http://reference.sitepoint.com/css">http://reference.sitepoint.com/css</a>.</p>
-    
+
     <p>The top-level elements match the <code>THIS</code> class and render with a grey background.</p>
-    
+
     <p>The <code>&lt;div class="white"&gt;</code> element matches the <code>.THIS.white</code> selector and renders with a white background. Note that there is no space in the selector as this rule is for top-level elements.</p>
-    
+
     <p>The <code>&lt;li class="red"&gt;</code> element matches the <code>.THIS .red</code> selector and renders with a red background. Note that this is a descendant selector and it contains a space as the <code>&lt;li&gt;</code> element is not a top-level element.</p>
-    
-	<auradocs:example descriptor="auradocs:helloHTML" />
-	
+
+    <auradocs:example descriptor="auradocs:helloHTML" />
+
     <h2>Summary</h2>
 
     <ul>

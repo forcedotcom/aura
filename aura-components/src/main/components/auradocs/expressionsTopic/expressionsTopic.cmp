@@ -20,9 +20,9 @@
 
 <p>Aura expressions allow you to make calculations and access property values and other data within Aura markup. Use expressions for dynamic output or passing values into components by assigning them to attributes.</p>
 
-<p>A Aura expression is any set of literal values, variables, sub-expressions, or operators that can be resolved to a single value. Method calls are not allowed in expressions.</p>
+<p>An Aura expression is any set of literal values, variables, sub-expressions, or operators that can be resolved to a single value. Method calls are not allowed in expressions.</p>
 
-<p>The resulting value can be a primitive (integer, string, and so on), a boolean, a JavaScript or Aura object, a Aura component or collection, a controller method such as an action method, and other useful results.</p>
+<p>The resulting value can be a primitive (integer, string, and so on), a boolean, a JavaScript or Aura object, an Aura component or collection, a controller method such as an action method, and other useful results.</p>
 
 <p>The expression syntax in Aura is:</p>
 

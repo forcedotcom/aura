@@ -32,7 +32,7 @@
     <p>Languages in Aura are each mapped to a prefix on DefDescriptors. For example: <code>java://foo.Bar</code> vs. <code>apex://foo.Bar</code></p>.
     If you wanted to add the ability to use <code>ruby://foo.Bar</code> for specifying, ControllerDefs,
     first you will need to create a DefFactory that knows how to construct the appropriate implementations of
-    ControllerDefinitions (see the DefFactories topic).  Since something like Ruby will probably be a Aura plugin
+    ControllerDefinitions (see the DefFactories topic).  Since something like Ruby will probably be an Aura plugin
     that may or may not be available within a particular runtime, we probably want to create a new Registry Provider
     for this purpose.  The existance/non-existance of that Registry Provider in your classpath will dictate whether RubyComponentDefs
     work on the current runtime.

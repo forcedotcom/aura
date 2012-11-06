@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <name>Aura Framework</name>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.auraframework</groupId>
+    <groupId>org.plumeframework</groupId>
     <artifactId>aura-framework</artifactId>
     <version>0.0.368-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -123,66 +123,66 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.auraframework</groupId>
+                <groupId>org.plumeframework</groupId>
                 <artifactId>aura</artifactId>
                 <version>0.0.368-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>org.auraframework</groupId>
+                <groupId>org.plumeframework</groupId>
                 <artifactId>aura</artifactId>
                 <version>0.0.368-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
-                <groupId>org.auraframework</groupId>
+                <groupId>org.plumeframework</groupId>
                 <artifactId>aura-util</artifactId>
                 <version>0.0.368-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>org.auraframework</groupId>
+                <groupId>org.plumeframework</groupId>
                 <artifactId>aura-util</artifactId>
                 <version>0.0.368-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
-                <groupId>org.auraframework</groupId>
+                <groupId>org.plumeframework</groupId>
                 <artifactId>aura-impl</artifactId>
                 <version>0.0.368-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>org.auraframework</groupId>
+                <groupId>org.plumeframework</groupId>
                 <artifactId>aura-impl</artifactId>
                 <version>0.0.368-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
-                <groupId>org.auraframework</groupId>
+                <groupId>org.plumeframework</groupId>
                 <artifactId>aura-impl-expression</artifactId>
                 <version>0.0.368-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>org.auraframework</groupId>
+                <groupId>org.plumeframework</groupId>
                 <artifactId>aura-impl-expression</artifactId>
                 <version>0.0.368-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
-                <groupId>org.auraframework</groupId>
+                <groupId>org.plumeframework</groupId>
                 <artifactId>aura-components</artifactId>
                 <version>0.0.368-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>org.auraframework</groupId>
+                <groupId>org.plumeframework</groupId>
                 <artifactId>aura-tools</artifactId>
                 <version>0.0.368-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>org.auraframework</groupId>
+                <groupId>org.plumeframework</groupId>
                 <artifactId>aura-resources</artifactId>
                 <version>0.0.368-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>org.auraframework</groupId>
+                <groupId>org.plumeframework</groupId>
                 <artifactId>aura-integration-test</artifactId>
                 <type>test-jar</type>
                 <version>0.0.368-SNAPSHOT</version>

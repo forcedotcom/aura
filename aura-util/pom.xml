@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>aura-util</artifactId>
     <parent>
-        <groupId>org.auraframework</groupId>
+        <groupId>org.plumeframework</groupId>
         <artifactId>aura-framework</artifactId>
         <version>0.0.368-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>

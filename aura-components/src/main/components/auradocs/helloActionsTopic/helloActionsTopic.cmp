@@ -33,7 +33,7 @@
 
     <p>If you know some JavaScript, you might be tempted to write something like the first "Flawed" button in <code>helloActions.cmp</code> because you know that HTML tags are first-class citizens.</p>
 
-    <p>You'd be close, but that button won't do anything in Aura when you click it.  The reason is that Aura has its own event system.  Even though this markup looks like you're coding to a native browser onclick event (and should thus be able to write inline JavaScript to handle it), you're actually coding to a Aura event. Remember how we said HTML tags are actually mapped to Aura components?  This is one of the side effects of that.</p>
+    <p>You'd be close, but that button won't do anything in Aura when you click it.  The reason is that Aura has its own event system.  Even though this markup looks like you're coding to a native browser onclick event (and should thus be able to write inline JavaScript to handle it), you're actually coding to anAura event. Remember how we said HTML tags are actually mapped to Aura components?  This is one of the side effects of that.</p>
 
     <p>Aura events must be handled by <em>client-side actions</em> in client-side component controllers.</p>
 

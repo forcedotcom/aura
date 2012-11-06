@@ -18,8 +18,8 @@
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Designing App UI"/>
 
-    <p>A Aura app is a special top-level component whose markup is in a <code>.app</code> file. The markup looks similar to HTML and can contain components as well as a set of supported HTML tags. Design your app's UI by including markup in the <code>.app</code> file, which starts with the <code>&lt;aura:application&gt;</code> tag.</p>
-    
+    <p>An Aura app is a special top-level component whose markup is in a <code>.app</code> file. The markup looks similar to HTML and can contain components as well as a set of supported HTML tags. Design your app's UI by including markup in the <code>.app</code> file, which starts with the <code>&lt;aura:application&gt;</code> tag.</p>
+
     <h2>Sample App</h2>
 
     <p>Let's take a look at the <code>notes.app</code> file for the Aura Note sample app.</p>
@@ -41,7 +41,7 @@
 </auradocs:codeblock>
 
     <p>To learn about system attributes of <code>&lt;aura:application&gt;</code>, such as <code>preload</code> and <code>template</code>, see <auradocs:topicLink topic="appOverview">aura:application</auradocs:topicLink>.</p>
-     
+
     <p><code>notes.app</code> contains HTML tags, such as <code>&lt;h1&gt;</code> and <code>&lt;div&gt;</code>, as well as components, such as <code>&lt;ui:block&gt;</code>. We won't go into the details for all the components here but note how simple the markup is. The <code>&lt;auranote:sidebar&gt;</code> and <code>&lt;auranote:details&gt;</code> components encapsulate the layout for the page.</p>
 
     <p>

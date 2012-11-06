@@ -50,7 +50,7 @@
     <p>So we've got a component, but the point of Aura is to build web applications--how do we actually view this thing in a web browser?</p>
     <p>In development mode, you can address any Aura component using the URL scheme <code>http://&lt;yourServer&gt;/&lt;namespace&gt;/&lt;component&gt;.cmp</code></p>
 
-    <auradocs:info>Development mode is the default mode when you are developing. When Aura is running in production, you can't directly address a Aura component using a <code>.cmp</code> suffix. However, you can directly address an application with a <code>.app</code> suffix.</auradocs:info>
+    <auradocs:info>Development mode is the default mode when you are developing. When Aura is running in production, you can't directly address an Aura component using a <code>.cmp</code> suffix. However, you can directly address an application with a <code>.app</code> suffix.</auradocs:info>
 
     <p>Open up a new tab in your browser and try it yourself.  Navigate to <code>/auradocs/helloWorld.cmp</code>.  Or better yet, create your own practice namespace in your filesystem and follow along, creating your own versions of the sample components.  Either way, at the end you should see a heart-warming "Hello world!" in your browser.</p>
 

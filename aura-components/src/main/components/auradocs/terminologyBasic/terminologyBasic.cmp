@@ -34,7 +34,7 @@
                 </tr>
                 <tr>
                     <td>DefDescriptor</td>
-                    <td>A DefDescriptor acts as a key for a definition in a registry. It's a Aura class that contains the metadata for any definition used in Aura, such as a component, action, or event.
+                    <td>A DefDescriptor acts as a key for a definition in a registry. It's an Aura class that contains the metadata for any definition used in Aura, such as a component, action, or event.
                          In the example of a model, it is a nicely parsed description of <code>model="java://myPackage.MyClass"</code> with methods to retrieve the language, class name, and package name.
 
                          Rather than passing a more heavyweight definition around in code, Aura usually passes around a DefDescriptor instead.

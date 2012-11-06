@@ -55,7 +55,7 @@
             <tr>
                 <td><code>Aura.Action</code></td>
                 <td><code>&lt;aura:attribute name="onclick" type="Aura.Action"/&gt;</code></td>
-                <td>Use this type to pass a Aura action to a component.</td>
+                <td>Use this type to pass an Aura action to a component.</td>
             </tr>
 
         </tbody>

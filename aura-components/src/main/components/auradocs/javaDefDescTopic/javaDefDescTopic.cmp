@@ -18,7 +18,7 @@
 <aura:component extends="auradocs:topicPanel">
 <aura:set attribute="title" value="Getting a DefDescriptor"/>
 
-<p>A <code>DefDescriptor</code> is a Aura class that contains the metadata for any definition used in Aura, such as a component, action, or event. In the example of a model, it is a nicely parsed description of <code>model="java://myPackage.MyClass"</code> with methods to retrieve the language, class name, and package name. Rather than passing a more heavyweight definition around in code, Aura usually passes around a DefDescriptor instead.</p>
+<p>A <code>DefDescriptor</code> is an Aura class that contains the metadata for any definition used in Aura, such as a component, action, or event. In the example of a model, it is a nicely parsed description of <code>model="java://myPackage.MyClass"</code> with methods to retrieve the language, class name, and package name. Rather than passing a more heavyweight definition around in code, Aura usually passes around a DefDescriptor instead.</p>
 
 <h2>Goal</h2>
 

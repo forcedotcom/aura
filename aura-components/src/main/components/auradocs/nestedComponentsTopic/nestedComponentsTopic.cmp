@@ -33,7 +33,7 @@
 
     <p>Granted this is not the most exciting application one could build with component composition, but it illustrates a few concepts.</p>
 
-    <p>The next component adds something new. Note how <code>nestedComponents.cmp</code> also references <code>auradocs:helloAttributes</code>. Just like adding attributes to an HTML tag, you can specify attribute values to a Aura component as part of the component tag. <code>nestedComponents.cmp</code> sets the <code>whom</code> attribute of <code>helloAttributes.cmp</code> to "component composition", which affects the output of the component. Here is the source for <code>helloAttributes.cmp</code>.</p>
+    <p>The next component adds something new. Note how <code>nestedComponents.cmp</code> also references <code>auradocs:helloAttributes</code>. Just like adding attributes to an HTML tag, you can specify attribute values to an Aura component as part of the component tag. <code>nestedComponents.cmp</code> sets the <code>whom</code> attribute of <code>helloAttributes.cmp</code> to "component composition", which affects the output of the component. Here is the source for <code>helloAttributes.cmp</code>.</p>
 
     <auradocs:example descriptor="auradocs:helloAttributes" />
 

@@ -17,10 +17,10 @@
 -->
 <aura:component extends="auradocs:topicPanel">
 
-    <aura:set attribute="title" value="Create a Aura App in Eclipse"/>
+    <aura:set attribute="title" value="Create an Aura App in Eclipse"/>
 
     <p>
-    This section shows you how to create a Aura app in Eclipse using a Maven remote archetype.
+    This section shows you how to create anAura app in Eclipse using a Maven remote archetype.
     </p>
 
     <h2>Prerequisites</h2>

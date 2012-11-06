@@ -20,7 +20,7 @@
 
 
 
-    <p>A Aura app is represented by a .app file composed of a series of Aura components and HTML tags.</p>
+    <p>An Aura app is represented by a .app file composed of a series of Aura components and HTML tags.</p>
 
     <p>Components are the building blocks in your app and are grouped in a namespace. In addition to the required top-level <code>
     &lt;aura:component&gt;</code> tag in a component or <code>&lt;aura:application&gt;</code> tag in an application, you can insert user interface components

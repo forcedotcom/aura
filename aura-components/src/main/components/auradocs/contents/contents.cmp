@@ -26,8 +26,8 @@
             <auradocs:contentsNode text="Overview" id="gettingStarted" />
             <auradocs:contentsNode text="FAQs" >
                 <auradocs:contentsNode text="What are the benefits of using Aura?" id="faqBenefits" />
-                <auradocs:contentsNode text="What is a Aura Component?" id="faqComp" />
-                <auradocs:contentsNode text="What is a Aura App?" id="faqApp" />
+                <auradocs:contentsNode text="What is an Aura Component?" id="faqComp" />
+                <auradocs:contentsNode text="What is an Aura App?" id="faqApp" />
                 <auradocs:contentsNode text="How do I use Events in Aura?" id="faqEvents" />
                 <auradocs:contentsNode text="What happens when I make an initial request?" id="faqInit" />
                 <auradocs:contentsNode text="Which browsers does Aura support?" id="faqBrowsers" />
@@ -38,7 +38,7 @@
                 <auradocs:contentsNode text="Introduction" id="qsIntro" />
                 <auradocs:contentsNode text="Quick Start: Command Line" id="qsCmdLine" />
                 <auradocs:contentsNode text="Quick Start: Eclipse">
-                    <auradocs:contentsNode text="Create a Aura App in Eclipse" id="eclipseCreateApp" />
+                    <auradocs:contentsNode text="Create an Aura App in Eclipse" id="eclipseCreateApp" />
                     <auradocs:contentsNode text="Install the Aura Assist Eclipse Plugin" id="auraPlugin" />
                     <auradocs:contentsNode text="Add a Component" id="eclipseCreateCmp" />
                 </auradocs:contentsNode>

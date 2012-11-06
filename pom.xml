@@ -7,7 +7,7 @@
     <version>0.0.368-SNAPSHOT</version>
     <packaging>pom</packaging>
     <organization>
-        <url>http://www.auraframework.org</url>
+        <url>http://www.plumeframework.org</url>
         <name>Aura Framework</name>
     </organization>
     <licenses>
@@ -45,19 +45,19 @@
             </snapshots>
             <id>central</id>
             <name>libs-release</name>
-            <url>http://maven.auraframework.org/libs-release</url>
+            <url>http://maven.plumeframework.org/libs-release</url>
         </repository>
         <repository>
             <snapshots />
             <id>jenkins-build-artifacts</id>
             <name>jenkins-build-artifacts</name>
-            <url>http://maven.auraframework.org/jenkins-build-artifacts</url>
+            <url>http://maven.plumeframework.org/jenkins-build-artifacts</url>
         </repository>
         <repository>
             <snapshots />
             <id>snapshots</id>
             <name>libs-snapshot</name>
-            <url>http://maven.auraframework.org/libs-snapshot</url>
+            <url>http://maven.plumeframework.org/libs-snapshot</url>
         </repository>
         <repository>
             <id>jsdoctk1</id>
@@ -71,13 +71,13 @@
             </snapshots>
             <id>central</id>
             <name>plugins-release</name>
-            <url>http://maven.auraframework.org/plugins-release</url>
+            <url>http://maven.plumeframework.org/plugins-release</url>
         </pluginRepository>
         <pluginRepository>
             <snapshots />
             <id>snapshots</id>
             <name>plugins-snapshot</name>
-            <url>http://maven.auraframework.org/plugins-snapshot</url>
+            <url>http://maven.plumeframework.org/plugins-snapshot</url>
         </pluginRepository>
         <pluginRepository>
             <id>jsdoctk2</id>
@@ -89,12 +89,12 @@
         <repository>
             <id>maven.auraframework.org</id>
             <name>maven.auraframework.org-releases</name>
-            <url>http://maven.auraframework.org/libs-release-local</url>
+            <url>http://maven.plumeframework.org/libs-release-local</url>
         </repository>
         <snapshotRepository>
             <id>maven.auraframework.org</id>
             <name>maven.auraframework.org-snapshots</name>
-            <url>http://maven.auraframework.org/libs-snapshot-local</url>
+            <url>http://maven.plumeframework.org/libs-snapshot-local</url>
         </snapshotRepository>
     </distributionManagement>
     <modules>

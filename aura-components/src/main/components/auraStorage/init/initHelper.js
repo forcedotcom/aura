@@ -44,14 +44,16 @@
 		var defaultAutoRefreshInterval = parseInt(cmp
 				.get("v.defaultAutoRefreshInterval"));
 		var maxSize = cmp.get("v.maxSize") * 1024.0;
+		
+		var clearStorageOnInit = cmp.getValue("v.clearStorageOnInit").getBooleanValue();
 
 		if (debugLoggingEnabled) {
 			$A.log("auraStorage:init initializing storage adapter using { implementation: \""
 				+ implementation + "\", defaultExpiration: " + defaultExpiration
-				+ ", defaultAutoRefreshInterval: " + defaultAutoRefreshInterval + " }");
+				+ ", defaultAutoRefreshInterval: " + defaultAutoRefreshInterval + ", clearStorageOnInit: " + clearStorageOnInit + " }");
 		}
 
 		$A.clientService.setStorage(implementation, maxSize, defaultExpiration,
-				defaultAutoRefreshInterval, debugLoggingEnabled);
+				defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit);
 	}
 })

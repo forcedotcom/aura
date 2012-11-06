@@ -172,8 +172,8 @@ var AuraClientService = function(){
         	return priv.storage;
         },
         
-        setStorage : function(implementation, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled) {
-        	priv.storage = new AuraStorage(implementation, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled);
+        setStorage : function(implementation, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit) {
+        	priv.storage = new AuraStorage(implementation, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit);
         }
 
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

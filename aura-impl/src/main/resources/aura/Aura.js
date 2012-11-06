@@ -86,10 +86,11 @@ var clientService;
 //#include aura.value.ExpressionFunctions
 //#include aura.model.Model
 //#include aura.storage.Storage
-//#include aura.storage.MemoryAdapter
-//#include aura.storage.IndexedDBAdapter
-//#include aura.storage.SmartStoreAdapter
-//#include aura.storage.LocalStorageAdapter
+//#include aura.storage.adapters.MemoryAdapter
+//#include aura.storage.adapters.IndexedDBAdapter
+//#include aura.storage.adapters.SmartStoreAdapter
+//#include aura.storage.adapters.WebSQLAdapter
+
 
 /**
  * @class The Aura framework.  Default global instance name is $A.

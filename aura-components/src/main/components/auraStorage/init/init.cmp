@@ -16,7 +16,8 @@
 
 -->
 <aura:component support="GA">
-	<aura:attribute name="implementation" type="String" default="memory" description="The specific type of storage to use. Valid values are: memory, local, websql, indexeddb, smartstore."/>
+	<aura:attribute name="implementation" type="String" default="memory" description="The specific type of storage to use. Valid values are: memory, websql, indexeddb, smartstore."/>
+	<aura:attribute name="clearStorageOnInit" type="Boolean" default="{!true}" description="For persistent storage delete all previous data on initialization."/>
 	<aura:attribute name="defaultExpiration" type="Integer" default="10" description="The default number of seconds that an object will be retained in storage if a request specific expiration has not been specified in the call to Action.setStorable()."/>
 	<aura:attribute name="defaultAutoRefreshInterval" type="Integer" default="30" description="The default number of seconds before an auto refresh request will be initiated if a request specific interval has not been specified in the call to Action.setStorable()."/>
     <aura:attribute name="maxSize" type="Integer" default="1000" description="Maximum size in kilobytes that will be used in the memory adapter's storage. Existing items will be evicted to make room for new items using LRU and expiry strategies."/>

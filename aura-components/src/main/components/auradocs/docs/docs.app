@@ -27,7 +27,7 @@
     <aura:handler event="aura:doneWaiting" action="{!c.doneWaiting}"/>
 
 	<auraStorage:init implementation="memory" maxSize="1024" defaultExpiration="86400" 
-		defaultAutoRefreshInterval="86400" debugLoggingEnabled="false"/>
+		defaultAutoRefreshInterval="86400" debugLoggingEnabled="false" clearStorageOnInit="true"/>
 	
     <auradocs:nav aura:id="navbar"/>
 

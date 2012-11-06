@@ -21,14 +21,17 @@
  * @param {Decimal} maxSize The physical cap on the amount of space the service will use before it attempts evictions.
  * @param {Decimal} defaultExpiration The default value of TTL in seconds.
  */
-var AuraStorage = function Storage(implementation, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled) {
+var AuraStorage = function AuraStorage(implementation, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit) {
     this.adapter = this.createAdapter(implementation);
-    this.metadata = {};
-    this.size = 0;
     this.maxSize = maxSize;
     this.defaultExpiration = defaultExpiration * 1000;
     this.defaultAutoRefreshInterval = defaultAutoRefreshInterval * 1000;
     this.debugLoggingEnabled = debugLoggingEnabled;
+    
+    if (clearStorageOnInit) {
+    	this.log("AuraStorage.ctor(): clearing " + this.getName() + " storage on init");
+    	this.adapter.clear();
+    }
 };
 
 AuraStorage.prototype.getName = function() {
@@ -36,7 +39,7 @@ AuraStorage.prototype.getName = function() {
 };
 
 AuraStorage.prototype.getSize = function() {
-	return this.size / 1024.0;
+	return this.adapter.getSize() / 1024.0;
 };
 
 AuraStorage.prototype.getMaxSize = function() {
@@ -47,60 +50,49 @@ AuraStorage.prototype.getDefaultAutoRefreshInterval = function() {
 	return this.defaultAutoRefreshInterval;
 };
 
-AuraStorage.prototype.get = function(key) {
+AuraStorage.prototype.get = function(key, resultCallback) {
 	this.sweep();
 
-	// DCHASMAN TODO We need to switch this to be asynchronous (callback) based to map to IndexedDB, WebSQL, SmartStore that are all async worlds
+	// This needs to also be asynchronous (callback) based to map to IndexedDB, WebSQL, SmartStore that are all async worlds
+	var that = this;
+	this.adapter.getItem(key, function(item) {
+		var value;
+		if (item && item.value) {
+			value = item.value;
+			
+			that.log("AuraStorage.get(): using action found in " + that.getName() + " storage", [key, item]);
+		}
 	
-	var value = this.adapter.getItem(key);
-
-	if (!$A.util.isUndefined(value)) {
-		this.log("Storage.get(): using action found in " + this.getName() + " storage (" + this.getSize() + "K)", [ key, value ]);
-	}
-
-	return value;
+		resultCallback(value);
+	});
 };
 
 AuraStorage.prototype.put = function(key, value) {
 	this.sweep();
 
-	this.remove(key, true);
-
-	var cost = key.length + this.calculateSize(value);
-	
-	if (this.size + cost > this.maxSize) {
+	// DCHASMAN TODO Revive cost based eviction
+	/*if (this.size + cost > this.maxSize) {
 		this.evict(cost);
-	}
-	
-	this.adapter.setItem(key, value);
-
-	this.size += cost;
+	}*/
 	
 	var expiration = this.defaultExpiration;
 	var now = new Date().getTime();
-	this.metadata[key] = {
-		created : now,
-		expires : now + this.defaultExpiration
+	
+	var item = {
+		"value": value,	
+		"created": now,
+		"expires": now + this.defaultExpiration
 	};
+	
+	this.adapter.setItem(key, item);
 
-	this.log("Storage.put(): persisting action to " + this.getName() + " storage (" + this.getSize() + "K)", [ key, cost / 1024.0, value ]);
+	this.log("AuraStorage.put(): persisting action to " + this.getName() + " storage", [key, item]);
 	
 	this.fireModified();
 };
 
 AuraStorage.prototype.remove = function(key, doNotFireModified) {
-	var value = this.adapter.getItem(key);
-
 	this.adapter.removeItem(key);
-
-	delete this.metadata[key];
-
-	if (!$A.util.isUndefined(value)) {
-		this.size -= key.length;
-		if (value) {
-			this.size -= this.calculateSize(value);
-		}
-	}
 	
 	if (!doNotFireModified) {
 		this.fireModified();
@@ -114,12 +106,14 @@ AuraStorage.prototype.sweep = function() {
 		// Check simple expirations
 		var removedSomething;
 		var now = new Date().getTime();
-		for ( var toCheck in this.metadata) {
-			if (now > this.metadata[toCheck].expires) {
-				this.log("Storage.sweep(): expiring action from " + this.getName() + " storage adapter (" + this.getSize() + "K)", toCheck);
-				this.remove(toCheck, true);
-				removedSomething = true;
-			}
+		
+		var expired = this.adapter.getExpired();
+		for (var n = 0; n < expired.length; n++) {
+			var key = expired[n];
+
+			this.log("AuraStorage.sweep(): expiring action from " + this.getName() + " storage adapter", key);
+			this.remove(key, true);
+			removedSomething = true;
 		}
 		
 		if (removedSomething) {
@@ -129,30 +123,23 @@ AuraStorage.prototype.sweep = function() {
 };
 
 AuraStorage.prototype.suspendSweeping = function() {
-	this.log("Storage.suspendSweeping()");
+	this.log("AuraStorage.suspendSweeping()");
 
 	this._sweepingSuspended = true;
 };
 
 AuraStorage.prototype.resumeSweeping = function() {
-	this.log("Storage.resumeSweeping()");
+	this.log("AuraStorage.resumeSweeping()");
 
 	this._sweepingSuspended = false;
 	this.sweep();
 };
 
 AuraStorage.prototype.evict = function(spaceNeeded) {
-	this.log("Storage.evict(): Exceeded maximum space usage allowed in storage: DCHASMAN TODO implement LRU/expiry eviction strategy!", [spaceNeeded / 1024.0, this.getMaxSize() / 1024.0, this.getSize()]);
-};
-
-AuraStorage.prototype.calculateSize = function(value) {
-	// DCHASMAN TODO create an object graph traversal size
-	// algorithm
-	return value ? $A.util["json"].encode(value).length : 0;
+	this.log("AuraStorage.evict(): Exceeded maximum space usage allowed in storage: DCHASMAN TODO implement LRU/expiry eviction strategy!", [spaceNeeded / 1024.0, this.getMaxSize() / 1024.0, this.getSize()]);
 };
 
 AuraStorage.prototype.fireModified = function() {
-	// DCHASMAN TODO Only fire the event when in debug modes
 	var e = $A.get("e.auraStorage:modified");
 	if (e) {
 		e.fire();
@@ -179,9 +166,6 @@ AuraStorage.prototype.createAdapter = function(implementation) {
 		case "memory":
 			adapter = new MemoryStorageAdapter();
 			break;
-		case "local":
-			adapter = new LocalStorageAdapter();
-			break;
 		case "websql":
 			adapter = new WebSQLStorageAdapter();
 			break;
@@ -192,7 +176,7 @@ AuraStorage.prototype.createAdapter = function(implementation) {
 			adapter = new SmartStoreAdapter();
 			break;
 		default:
-            throw new Error ("Unknown storage adapter: " + implementation);
+            throw new Error ("AuraStorage: Unknown storage adapter '" + implementation + "'");
 	}
 	
 	return adapter;

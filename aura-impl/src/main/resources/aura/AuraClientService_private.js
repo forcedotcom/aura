@@ -318,12 +318,48 @@ var priv = {
     request : function(actions, scope, callback, exclusive){
         $A.mark("AuraClientService.request");
         var queue = this.requestQueue;
-        var number = this.actionGroupCounter++;
+        var actionGroup = this.actionGroupCounter++;
 
-        var numIncremented = false;
         var fireDoneWaiting = false;
         var actionsToSend = [];
         var actionsToComplete = [];
+        
+        // Aura Storage.get() requires an async/callback invocation flow
+        var clientService = this;
+        var actionsToCollect = actions.length;
+        var actionCollected = function() {
+        	if(--actionsToCollect <= 0) {
+        		// We're done waiting for pending async operations to complete, let's light this candle!
+	            if(fireDoneWaiting) {
+	            	setTimeout(function(){ priv.fireDoneWaiting(); }, 1);
+	            }
+	
+	            if(actionsToComplete.length > 0) {
+        			// Bump num in order to isolate the locally satisfied actions from those that actually go to the server
+        			$A.getContext().incrementNum();
+	            	
+	            	var that = this;
+	        		setTimeout(function() {
+	        			for(var n = 0; n < actionsToComplete.length; n++) {
+	        				var info = actionsToComplete[n];
+	        				
+	        				clientService.sanitizeStoredResponse(info.response);
+	        				
+	        				info.action.complete(info.response);
+	        			}
+	        			
+	        			clientService.fireDoneWaiting();
+	        		}, 300);
+	            }
+	            
+	            if(actionsToSend.length > 0){
+	                queue.push({actions : actionsToSend, scope : scope, callback : callback, number : actionGroup, exclusive : exclusive});
+	                $A.measure("Action Group " + actionGroup + " enqueued", "AuraClientService.request");
+	                clientService.doRequest();
+	            }
+        	}
+        };
+        
         for(var i = 0; i < actions.length; i++){
             var action = actions[i];
             $A.assert(action.def.isServerAction(), "RunAfter() cannot be called on a client action. Use run() on a client action instead.");
@@ -331,82 +367,71 @@ var priv = {
             // For cacheable actions check the storage service to see if we already have a viable cached action response we can complete immediately
             if(action.isStoreable() && priv.storage){
             	var key = action.getStorageKey();
-            	var response = priv.storage.get(key);
-            	if(response) {
-            		if (!numIncremented) {
-            			// Only bump num if we need to in order to isolate the locally satisfied actions from those that actually go to the server
-            			numIncremented = true;
-            			$A.getContext().incrementNum();
-            		}
-
-            		// Sanitize generation number references
-            		var santizedComponents = {};
-            		
-        	        var num = $A.getContext().getNum();
-            		var globalId;
-            		var components = response["components"];
-            		for(globalId in components) {
-            			var newGlobalId = globalId.substr(0, globalId.indexOf(":") + 1) + num;
-            			
-            			// Rewrite the globalId
-            			var c = components[globalId]; 
-            			c["globalId"] = newGlobalId;
-            			
-            			santizedComponents[newGlobalId] = c; 
-            		}
-            		
-            		response["components"] = santizedComponents;
-            		
-            		var returnValue = response["returnValue"];
-            		if(returnValue) {
-	            		globalId = returnValue["globalId"];
-	            		if(globalId) {
-	            			returnValue["globalId"] = globalId.substr(0, globalId.indexOf(":") + 1) + num;
-	            		}
-            		}
-            		
-            		actionsToComplete.push({
-            			action: action,
-            			response: response
-            		});
-
-            		continue;
-            	}
-            }
-            
-            if(action.isAbortable()){
-                this.newestAbortableGroup = number;
-            }
-            
-            if(action.isExclusive()){
-                action.setExclusive(false);
-                this.request([action], scope, callback, true);
+            	
+            	priv.storage.get(key, this.createResultCallback(action, scope, actionGroup, callback, actionsToComplete, actionsToSend, actionCollected));
             } else {
-                actionsToSend.push(action);
+            	this.collectAction(action, scope, actionGroup, callback, actionsToSend, actionCollected);
             }
         }
+    },
 
-        if (fireDoneWaiting) {
-        	setTimeout(function(){ priv.fireDoneWaiting(); }, 1);
-        }
-
-        if(actionsToComplete.length > 0) {
-        	var that = this;
-    		setTimeout(function() {
-    			for(var n = 0; n < actionsToComplete.length; n++) {
-    				var info = actionsToComplete[n];
-    				info.action.complete(info.response);
-    			}
-    			
-    			that.fireDoneWaiting();
-    		}, 300);
+    createResultCallback: function(action, scope, actionGroup, callback, actionsToComplete, actionsToSend, actionCollected) {
+        var that = this;
+    	return function(response) {
+        	if(response) {  
+        		actionsToComplete.push({
+        			action: action,
+        			response: response
+        		});
+        		
+        		actionCollected();
+        	} else {
+        		that.collectAction(action, scope, actionGroup, callback, actionsToSend, actionCollected);
+        	}
+    	};    	
+    },
+    
+    collectAction: function(action, scope, actionGroup, callback, actionsToSend, actionCollectedCallback) {
+        if(action.isAbortable()){
+            this.newestAbortableGroup = actionGroup;
         }
         
-        if(actionsToSend.length > 0){
-            queue.push({actions : actionsToSend, scope : scope, callback : callback, number : number, exclusive : exclusive});
-            $A.measure("Action Group " + number + " enqueued", "AuraClientService.request");
-            this.doRequest();
+        if(action.isExclusive()){
+            action.setExclusive(false);
+            this.request([action], scope, callback, true);
+        } else {
+            actionsToSend.push(action);
         }
+        
+        actionCollectedCallback();
+    },
+    
+    sanitizeStoredResponse: function(response) {
+		// Sanitize generation number references
+		var santizedComponents = {};
+		
+        var num = $A.getContext().getNum();
+		var globalId;
+		var components = response["components"];
+		for(globalId in components) {
+			var newGlobalId = globalId.substr(0, globalId.indexOf(":") + 1) + num;
+			
+			// Rewrite the globalId
+			var c = components[globalId]; 
+			c["globalId"] = newGlobalId;
+			
+			santizedComponents[newGlobalId] = c; 
+		}
+		
+		response["components"] = santizedComponents;
+		
+		var returnValue = response["returnValue"];
+		if(returnValue) {
+    		globalId = returnValue["globalId"];
+    		if(globalId) {
+    			returnValue["globalId"] = globalId.substr(0, globalId.indexOf(":") + 1) + num;
+    		}
+		}
     },
 
     doRequest : function(){

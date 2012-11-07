@@ -15,15 +15,12 @@
  */
 package org.auraframework.impl.css.parser;
 
+import java.util.*;
+
 import com.google.common.css.*;
-import com.google.common.css.compiler.ast.CssTree;
-import com.google.common.css.compiler.ast.ErrorManager;
-import com.google.common.css.compiler.ast.GssError;
-import com.google.common.css.compiler.ast.GssParser;
+import com.google.common.css.compiler.ast.*;
 import com.google.common.css.compiler.passes.CompactPrinter;
 import com.google.common.css.compiler.passes.PrettyPrinter;
-
-import java.util.*;
 
 /**
  * Parses CSS using Google Closure Stylesheets.
@@ -203,6 +200,7 @@ public class AuraCSSParser {
     private static class ClosureErrorManager implements ErrorManager {
 
         private List<GssError> gssErrors = new ArrayList<GssError>();
+        private List<GssError> gssWarnings = new ArrayList<GssError>();
         private List<String> otherErrors = new ArrayList<String>();
 
         @Override
@@ -234,6 +232,11 @@ public class AuraCSSParser {
                 sb.append(error).append("\n");
             }
             return sb.toString();
+        }
+
+        @Override
+        public void reportWarning(GssError warning) {
+            gssWarnings.add(warning);
         }
     }
 

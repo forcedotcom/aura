@@ -23,15 +23,37 @@
 
     <p>There are a few different types of value objects. The most common ones are <code>SimpleValue</code>, <code>ArrayValue</code>, and <code>MapValue</code>. See <auradocs:topicLink topic="valueObjectTypes">Value Object Types</auradocs:topicLink> for more information.</p>
 
+    <h3>Accessing the Value Object</h3>
     <p>To access a value object in JavaScript, use <code>component.getValue("<em>expression</em>")</code>.</p>
 
-    <p>Let's look at a component that refers to itself as <code>cmp</code> in its renderer, use the following code in JavaScript to retrieve the label attribute for the component:</p>
+    <p>Let's look at a component that refers to itself as <code>cmp</code> in its renderer, use the following code in JavaScript to retrieve the <code>label</code> attribute for the component:</p>
 
 <auradocs:codeblock>
     var labelValue = cmp.getValue("v.label");
 </auradocs:codeblock>
 
-    <p>In this case, the value object is a <code>SimpleValue</code> because it wraps the label, which is a string. You can use <code>unwrap()</code> to retrieve the native object or <code>get()</code> to return the unwrapped value. Refer to <auradocs:topicLink topic="valueObjectTypes">Value Object Types</auradocs:topicLink> to learn more about these methods.</p>
+    <p>In this case, the value object is a <code>SimpleValue</code> because it wraps the label, which is a string. You can use <code>unwrap()</code> to retrieve the native object or <code>get()</code> to return the unwrapped value.
+    </p>
+
+    <h3>Setting the Value Object</h3>
+    <p>To set the  value object, use <code>component.setValue("expression")</code>. Let's take a look at the component with an <code>errorMsg</code> attribute:</p>
+    <auradocs:codeblock>
+    &lt;aura:attribute name="errorMsg" type="String"/>
+
+    &lt;ui:inputText aura:id="inputCmp" value="" onError="<aura:text value="{!"/>c.handleError}" onClearErrors="<aura:text value="{!"/>c.handleClearError}"/&gt;
+    Error message: &lt;div id="errorDiv"&gt;<aura:text value="{!"/>v.errorMsg}&lt;/div&gt;
+    Error Status: &lt;ui:outputText aura:id="status" value=""/&gt;
+    </auradocs:codeblock>
+
+    <p>The following code shows how the <code>handleClearError</code> controller uses <code>setValue()</code> to set the value object:</p>
+    <auradocs:codeblock>
+    var inputCmp = component.find("inputCmp");
+    component.getValue("v.errorMsg").setValue("");
+    component.find("status").getAttributes().setValue("value", "Cleared error");
+    </auradocs:codeblock>
+
+    <p>The controller retrieves the <code>errorMsg</code> attribute and sets an empty string in the component body denoted by<code><aura:text value="{!"/>v.errorMsg}</code>.
+    Similarly, <code>find("status").getAttributes().setValue("value", "Cleared error")</code> finds the component with an ID of <code>status</code> and sets its value with the string <code>"Cleared error"</code>.</p>
 
     <h2>Introspection Methods</h2>
 
@@ -106,7 +128,8 @@
 
     <p><b>See also:</b><br/>
     <auradocs:topicLink topic="valueObjectTypes">Value Object Types</auradocs:topicLink><br/>
-    <auradocs:topicLink topic="onchange">Detecting a Value Object Change</auradocs:topicLink>
+    <auradocs:topicLink topic="onchange">Detecting a Value Object Change</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="error">Error Handling</auradocs:topicLink>
     </p>
 
 </aura:component>

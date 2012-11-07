@@ -18,5 +18,6 @@ var p = AuraStorage.prototype;
 exp(p,
     "getName", p.getName,
     "getSize", p.getSize,
-    "getMaxSize", p.getMaxSize
+    "getMaxSize", p.getMaxSize,
+    "suspendSweeping", p.suspendSweeping    
 );

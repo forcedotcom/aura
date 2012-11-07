@@ -61,6 +61,8 @@ WebSQLStorageAdapter.prototype.getItem = function(key, resultCallback) {
 WebSQLStorageAdapter.prototype.setItem = function(key, item) {
 	var that = this;
 	this.db.transaction(function(tx) {
+		tx.executeSql("DELETE FROM cache WHERE key = ?;", [key]);
+		
 		var value = $A.util["json"].encode(item["value"]);
 		tx.executeSql("INSERT INTO cache (key, value, created, expires, size) VALUES (?, ?, ?, ?, ?);", 
 				[key, value, item["created"], item["expires"], value.length], function() {

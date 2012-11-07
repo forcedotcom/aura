@@ -2,7 +2,7 @@
   "serId":1,
   "value":{
     "descriptor":"css://test.testThemeValidParent",
-    "code":".testTestThemeValidParent {\n  color: #1797c0;\n  font-family: Arial,Helvetica,sans-serif;\n  background: #1797c0 url(/img/alohaSkin/gradient_body.png) repeat-x;\n  overflow: hidden;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  padding: 0;\n  margin: 0;\n}\n.testTestThemeValidParent #mask {\n  position: absolute;\n  right: 0;\n  left: 0;\n  top: 25px;\n  bottom: 25px;\n  margin: 15px;\n  background-color: white;\n  opacity: .60;\n  -moz-border-radius: 20px;\n  -webkit-border-radius: 20px;\n}\n.testTestThemeValidParent .east {\n  width: 200px;\n  margin: 25px;\n  margin-top: 20px;\n  left: 0;\n}\n.testTestThemeValidParent .center {\n  margin: 25px;\n  left: 210px;\n  right: 0;\n}\n",
+    "code":".testTestThemeValidParent {\n  color: #1797c0;\n  font-family: Arial , Helvetica , sans-serif;\n  background: #1797c0 url(/img/alohaSkin/gradient_body.png) repeat-x;\n  overflow: hidden;\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  padding: 0;\n  margin: 0;\n}\n.testTestThemeValidParent #mask {\n  position: absolute;\n  right: 0;\n  left: 0;\n  top: 25px;\n  bottom: 25px;\n  margin: 15px;\n  background-color: white;\n  opacity: .60;\n  -moz-border-radius: 20px;\n  -webkit-border-radius: 20px;\n}\n.testTestThemeValidParent .east {\n  width: 200px;\n  margin: 25px;\n  margin-top: 20px;\n  left: 0;\n}\n.testTestThemeValidParent .center {\n  margin: 25px;\n  left: 210px;\n  right: 0;\n}\n",
     "className":"testTestThemeValidParent"
   }
 }

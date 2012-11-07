@@ -27,38 +27,38 @@ MemoryStorageAdapter.prototype.getName = function() {
 };
 
 MemoryStorageAdapter.prototype.getSize = function() {
-	return this.size;
+	return this.currentSize;
 };
 
 MemoryStorageAdapter.prototype.getItem = function(key, resultCallback) {
-	resultCallback(this.cache[key]);
+	resultCallback(this.backingStore[key]);
 };
 
 MemoryStorageAdapter.prototype.setItem = function(key, item) {
 	item.size = key.length + this.calculateSize(item["value"]);
 
-	this.size += item.size;
-	this.cache[key] = item;
+	this.currentSize += item.size;
+	this.backingStore[key] = item;
 };
 
 MemoryStorageAdapter.prototype.removeItem = function(key) {
-	var item = this.cache[key];
-	this.size -= item.size;
+	var item = this.backingStore[key];
+	this.currentSize -= item.size;
 	
-	delete this.cache[key];
+	delete this.backingStore[key];
 };
 
 MemoryStorageAdapter.prototype.clear = function(key) {
-	this.cache = {};
-    this.size = 0;
+	this.backingStore = {};
+    this.currentSize = 0;
 };
 
 MemoryStorageAdapter.prototype.getExpired = function(resultCallback) {
 	var now = new Date().getTime();
 	var expired = [];
 	
-	for (var key in this.cache) {
-		var expires = this.cache[key]["expires"];
+	for (var key in this.backingStore) {
+		var expires = this.backingStore[key]["expires"];
 		if (now > expires) {
 			expired.push(key);
 		}

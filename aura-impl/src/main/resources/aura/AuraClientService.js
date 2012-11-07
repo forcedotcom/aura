@@ -166,14 +166,6 @@ var AuraClientService = function(){
 
         runActions : function(actions, scope, callback){
             priv.request(actions, scope, callback);
-        },
-        
-        getStorage : function() {
-        	return priv.storage;
-        },
-        
-        setStorage : function(implementation, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit) {
-        	priv.storage = new AuraStorage(implementation, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit);
         }
 
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

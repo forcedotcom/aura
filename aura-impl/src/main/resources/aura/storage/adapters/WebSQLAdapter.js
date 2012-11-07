@@ -84,9 +84,23 @@ WebSQLStorageAdapter.prototype.clear = function() {
 	this.createSchema(true);
 };
 
-WebSQLStorageAdapter.prototype.getExpired = function() {
-	// DCHASMAN TODO Implement this using a SELECT
-	return [];
+WebSQLStorageAdapter.prototype.getExpired = function(resultCallback) {
+	this.db.readTransaction(function(tx) {
+		var now = new Date().getTime();
+		tx.executeSql("SELECT key FROM cache WHERE expires < ?;", [now],
+			function(tx, results) {
+				var rows = results.rows;
+
+				var expired = [];
+				for (var n = 0; n < rows.length; n++) {
+					var row = rows.item(n);
+					expired.push(row["key"]);
+				}
+				
+				resultCallback(expired);
+			}
+		);
+	});
 };
 
 // Internals
@@ -101,7 +115,7 @@ WebSQLStorageAdapter.prototype.updateSize = function() {
 				var rows = results.rows;
 				that.size = rows.item(0)["totalSize"];
 				
-				$A.clientService.getStorage().fireModified();
+				$A.storageService.getStorage().fireModified();
 			},
 			function(tx, error) {
 				throw new Error("WebSQLStorageAdapter.updateSize() failed: " + error.message);

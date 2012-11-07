@@ -19,7 +19,7 @@
 		cmp.getValue("v.enabled").setValue(enabled);
 		
 		if (enabled) {
-    		var storage = $A.clientService.getStorage();
+    		var storage = $A.storageService.getStorage();
 			cmp.getValue("v.implementation").setValue(storage.getName());
 		}
 		

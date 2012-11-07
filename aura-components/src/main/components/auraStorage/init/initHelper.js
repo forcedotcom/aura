@@ -15,7 +15,7 @@
  */
 ({
 	init : function(cmp) {
-		if ($A.clientService.getStorage()) {
+		if ($A.storageService.getStorage()) {
 			return;
 		}
 
@@ -41,19 +41,10 @@
 
 		var implementation = cmp.get("v.implementation");
 		var defaultExpiration = parseInt(cmp.get("v.defaultExpiration"));
-		var defaultAutoRefreshInterval = parseInt(cmp
-				.get("v.defaultAutoRefreshInterval"));
+		var defaultAutoRefreshInterval = parseInt(cmp.get("v.defaultAutoRefreshInterval"));
 		var maxSize = cmp.get("v.maxSize") * 1024.0;
-		
 		var clearStorageOnInit = cmp.getValue("v.clearStorageOnInit").getBooleanValue();
 
-		if (debugLoggingEnabled) {
-			$A.log("auraStorage:init initializing storage adapter using { implementation: \""
-				+ implementation + "\", defaultExpiration: " + defaultExpiration
-				+ ", defaultAutoRefreshInterval: " + defaultAutoRefreshInterval + ", clearStorageOnInit: " + clearStorageOnInit + " }");
-		}
-
-		$A.clientService.setStorage(implementation, maxSize, defaultExpiration,
-				defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit);
+		$A.storageService.setStorage(implementation, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit);
 	}
 })

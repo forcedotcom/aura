@@ -16,6 +16,6 @@
 ({
 	isEnabled: function() {
 	    var mode = $A.getContext().getMode();
-	    return !$A.util.isUndefinedOrNull($A.clientService.getStorage()) && (mode !== "PROD");
+	    return !$A.util.isUndefinedOrNull($A.storageService.getStorage()) && (mode !== "PROD");
 	}
 })

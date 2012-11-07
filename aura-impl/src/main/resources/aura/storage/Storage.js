@@ -28,6 +28,10 @@ var AuraStorage = function AuraStorage(implementation, maxSize, defaultExpiratio
     this.defaultAutoRefreshInterval = defaultAutoRefreshInterval * 1000;
     this.debugLoggingEnabled = debugLoggingEnabled;
     
+	this.log("AuraStorage:ctor() initializing storage adapter using { implementation: \""
+			+ implementation + "\", defaultExpiration: " + defaultExpiration
+			+ ", defaultAutoRefreshInterval: " + defaultAutoRefreshInterval + ", clearStorageOnInit: " + clearStorageOnInit + " }");
+    
     if (clearStorageOnInit) {
     	this.log("AuraStorage.ctor(): clearing " + this.getName() + " storage on init");
     	this.adapter.clear();
@@ -106,19 +110,20 @@ AuraStorage.prototype.sweep = function() {
 		// Check simple expirations
 		var removedSomething;
 		var now = new Date().getTime();
-		
-		var expired = this.adapter.getExpired();
-		for (var n = 0; n < expired.length; n++) {
-			var key = expired[n];
-
-			this.log("AuraStorage.sweep(): expiring action from " + this.getName() + " storage adapter", key);
-			this.remove(key, true);
-			removedSomething = true;
-		}
-		
-		if (removedSomething) {
-			this.fireModified();
-		}
+		var that = this;
+		this.adapter.getExpired(function(expired) {
+			for (var n = 0; n < expired.length; n++) {
+				var key = expired[n];
+	
+				that.log("AuraStorage.sweep(): expiring action from " + that.getName() + " storage adapter", key);
+				that.remove(key, true);
+				removedSomething = true;
+			}
+			
+			if (removedSomething) {
+				that.fireModified();
+			}
+		});
 	}
 };
 

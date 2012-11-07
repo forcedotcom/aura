@@ -16,7 +16,7 @@
 {
     update : function(cmp, event, helper){
     	if (helper.isEnabled()) {
-    		var storage = $A.clientService.getStorage();
+    		var storage = $A.storageService.getStorage();
 	    	var size = storage.getSize();
 	    	var maxSize = storage.getMaxSize();
 	    	

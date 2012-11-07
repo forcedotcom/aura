@@ -24,7 +24,5 @@ exp(clientService,
     "throwExceptionEvent", clientService.throwExceptionEvent,
     "resetToken", clientService.resetToken,
     "hardRefresh", clientService.hardRefresh,
-    "setOutdated", clientService.setOutdated,
-    "getStorage", clientService.getStorage,
-    "setStorage", clientService.setStorage
+    "setOutdated", clientService.setOutdated
 );

@@ -34,7 +34,7 @@ var priv = {
                 return null;
             }
             
-    		var storage = $A.clientService.getStorage();
+    		var storage = $A.storageService.getStorage();
             
             // failure to communicate with server
             if (priv.isDisconnectedOrCancelled(response)) {
@@ -365,10 +365,11 @@ var priv = {
             $A.assert(action.def.isServerAction(), "RunAfter() cannot be called on a client action. Use run() on a client action instead.");
         
             // For cacheable actions check the storage service to see if we already have a viable cached action response we can complete immediately
-            if(action.isStoreable() && priv.storage){
+    		var storage = $A.storageService.getStorage();
+            if(action.isStoreable() && storage){
             	var key = action.getStorageKey();
             	
-            	priv.storage.get(key, this.createResultCallback(action, scope, actionGroup, callback, actionsToComplete, actionsToSend, actionCollected));
+            	storage.get(key, this.createResultCallback(action, scope, actionGroup, callback, actionsToComplete, actionsToSend, actionCollected));
             } else {
             	this.collectAction(action, scope, actionGroup, callback, actionsToSend, actionCollected);
             }

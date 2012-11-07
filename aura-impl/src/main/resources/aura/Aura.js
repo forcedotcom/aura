@@ -85,6 +85,7 @@ var clientService;
 //#include aura.value.ValueFactory
 //#include aura.value.ExpressionFunctions
 //#include aura.model.Model
+//#include aura.storage.AuraStorageService
 //#include aura.storage.Storage
 //#include aura.storage.adapters.MemoryAdapter
 //#include aura.storage.adapters.IndexedDBAdapter
@@ -113,6 +114,8 @@ function Aura(){
     this.eventService = new AuraEventService();
     this.layoutService = new AuraLayoutService();
     this.localizationService = new AuraLocalizationService();
+    this.storageService = new AuraStorageService();
+    
     //#if {"excludeModes" : ["PRODUCTION"]}
         this.devToolService = new AuraDevToolService();
     //#end
@@ -166,6 +169,15 @@ function Aura(){
          * @borrows AuraLocalizationService
          */
         localization : aura.localizationService,
+
+        /**
+         * Storage Service
+         * @public
+         * @type AuraStorageService
+         * @memberOf Aura.prototype
+         * @borrows AuraStorageService
+         */
+        storage : aura.storageService,
 
         /**
          * Alias of Component Service
@@ -267,6 +279,7 @@ function Aura(){
             "localizationService", aura.localizationService,
             "eventService", aura.eventService,
             "layoutService", aura.layoutService,
+            "storageService", aura.storageService,
             "services", aura.services,
             "render", aura.render,
             "rerender", aura.rerender,
@@ -288,6 +301,7 @@ function Aura(){
             "client", services.client,
             "history", services.history,
             "l10n", services.localization,
+            "storage", services.storage,
             "cmp", services.cmp,
             "e", services.e,
             "getValue", services.getValue,

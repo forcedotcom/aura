@@ -188,7 +188,7 @@ Action.prototype.complete = function(response) {
         this.callback.call(this.callbackScope, this);
     }
     
-    var storage = $A.clientService.getStorage();
+    var storage = $A.storageService.getStorage();
     if (storage && this._isStoreable() && this.getState() === "SUCCESS") {
     	var storageName = storage.getName();
     	var key = this.getStorageKey();
@@ -327,7 +327,7 @@ Action.prototype.refresh = function() {
     // If this action was served from storage let's automatically try to get the latest from the server too
     var storage = this.getStorage();
     if (storage) {
-		var storageService = $A.clientService.getStorage();
+		var storageService = $A.storageService.getStorage();
     	var autoRefreshInterval = this.storeableConfig ? this.storeableConfig["refresh"] * 1000 : storageService.getDefaultAutoRefreshInterval();
 
     	// Only auto refresh if the data we have is more than v.autoRefreshInterval seconds old

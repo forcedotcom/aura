@@ -53,7 +53,7 @@ MemoryStorageAdapter.prototype.clear = function(key) {
     this.size = 0;
 };
 
-MemoryStorageAdapter.prototype.getExpired = function() {
+MemoryStorageAdapter.prototype.getExpired = function(resultCallback) {
 	var now = new Date().getTime();
 	var expired = [];
 	
@@ -64,7 +64,7 @@ MemoryStorageAdapter.prototype.getExpired = function() {
 		}
 	}
 	
-	return expired;
+	resultCallback(expired);
 };
 
 // Internals

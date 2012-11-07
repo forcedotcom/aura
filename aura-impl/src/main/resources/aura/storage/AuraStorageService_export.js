@@ -13,15 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-	init: function(cmp, event, helper) {
-		helper.init(cmp);
-	},
-	
-	noConnection: function(cmp) {
-		var storage = $A.storageService.getStorage();
-		if (storage) {
-			storage.suspendSweeping();
-		}
-	}
-})
+/*jslint sub: true */
+exp(storageService,
+    "getStorage", storageService.getStorage,
+    "setStorage", storageService.setStorage
+);

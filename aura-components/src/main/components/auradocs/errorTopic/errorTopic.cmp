@@ -53,7 +53,7 @@
 
      <p><b>See also:</b><br/>
     <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
-    <auradocs:topicLink topic="eventsComp">Component Events</auradocs:topicLink>
+    <auradocs:topicLink topic="eventsComp">Component Events</auradocs:topicLink><br/>
     <auradocs:topicLink topic="valueObjects">Value Objects</auradocs:topicLink>
     </p>
     </aura:component>

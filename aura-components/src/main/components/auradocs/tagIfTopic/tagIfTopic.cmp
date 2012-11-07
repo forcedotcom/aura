@@ -16,11 +16,10 @@
 
 -->
 <aura:component extends="auradocs:topicPanel">
-       <aura:set attribute="title" value="aura:renderIf "/>
+       <aura:set attribute="title" value="aura:If "/>
 
-       <p>Renders the content within the tag if the <code>isTrue</code> attribute evaluates to true.
-        Use <code>plume:renderIf</code> only if you need to instantiate the components in both the <code>body</code> and <code>else</code> attributes,
-        regardless of the value of <code>isTrue</code>.</p>
+       <p>Renders the content within the tag if the <code>isTrue</code> attribute evaluates to true. Aura evaluates the <code>isTrue</code> expression server-side and instantiate components
+       either in its <code>body</code> or <code>else</code> attribute. Use <code>aura:if</code> if you don't need to instantiate the components for both <code>body</code> and <code>else</code> attributes.</p>
 
        <p>
        <table class="table table-bordered table-striped">
@@ -50,23 +49,22 @@
        </p>
 
        <h2>Usage</h2>
-       <p>The following components in the auradocs namespace show how to use <code>aura:renderIf</code> to conditionally render markup based on the result of evaluating an expression.</p>
+       <p>The following components in the auradocs namespace show how to use <code>aura:If</code> to conditionally render markup based on the result of evaluating an expression.</p>
 
-       <p><b>sampleRender.cmp</b></p>
+       <p><b>sampleIf.cmp</b></p>
 
-       <p>The <b>Component source</b> tab shows the markup for <code>sampleRender.cmp</code>, which extends <code>sampleRenderMe.cmp</code>.</p>
+       <p>The <b>Component source</b> tab shows the markup for <code>sampleIf.cmp</code>, which extends <code>sampleIfDemo.cmp</code>.</p>
 
-       <auradocs:example descriptor="auradocs:sampleRender" />
+       <auradocs:example descriptor="auradocs:sampleIf" />
 
-       <p>See the source for <code>sampleRenderMe.cmp</code> to understand the output.</p>
 
-       <p><b>sampleRenderMe.cmp</b></p>
+       <p><b>sampleIfDemo.cmp</b></p>
 
-       <auradocs:example descriptor="auradocs:sampleRenderMe" />
+       <auradocs:example descriptor="auradocs:sampleIfDemo" />
 
-        <p>The <code>aura:renderIf</code> component displays the  elements in the body
-       only if the <code>desc</code> attribute contains a value.
-       In other words, the content of the <code>aura:renderIf</code> component will be displayed if the
-       <code>isTrue</code> attribute evaluates to true. The <code>desc</code> attribute is set in <code>sampleRender.cmp</code>, which extends <code>sampleRenderMe.cmp</code>.</p>
+        <p>The <code>aura:If</code> component displays the  elements in the body
+       only if the <code>show</code> attribute contains a value.
+       In other words, the content of the <code>aura:If</code> component will be displayed if the
+       <code>isTrue</code> attribute evaluates to true. The <code>show</code> attribute is set in <code>sampleIf.cmp</code>, which extends <code>sampleIfDemo.cmp</code>.</p>
 
 </aura:component>

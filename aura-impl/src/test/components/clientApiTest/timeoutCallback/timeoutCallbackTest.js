@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 ({
+    timeSlice : 120,
 
     /**
      * Just sanity check a simple usage.
      */
     testBasicWait : {
         test : function(cmp) {
+            var self = this;
             var invoked = false;
             var start = new Date();
             var cb = function() {
                 invoked = true;
-                $A.test.assertTrue(new Date() - start > 60);
+                var delta = new Date() - start;
+                $A.test.assertTrue(delta >= self.timeSlice);
             };
-            var timeoutCallback = $A.util.createTimeoutCallback(cb, 60);
+            var timeoutCallback = $A.util.createTimeoutCallback(cb, self.timeSlice);
             timeoutCallback();
 
             $A.test.addWaitFor(true, function() {
@@ -41,6 +44,7 @@
      */
     testRepeatedInvoke : {
         test : function(cmp) {
+            var self = this;
             var finished = false;
             var count = 0;
             var start = new Date();
@@ -48,13 +52,13 @@
                 count += 1;
             };
 
-            var timeoutCallback = $A.util.createTimeoutCallback(cb, 60);
+            var timeoutCallback = $A.util.createTimeoutCallback(cb, self.timeSlice);
             // Invoke several tijmes
             timeoutCallback();
             timeoutCallback();
             // Invoke async too.
-            setTimeout(timeoutCallback, 10);
-            setTimeout(timeoutCallback, 30);
+            setTimeout(timeoutCallback, self.timeSlice/4);
+            setTimeout(timeoutCallback, self.timeSlice/2);
 
             // Finish the test some time after we might expect an erroneous
             // second invocation.
@@ -62,7 +66,7 @@
                 $A.test.assertEquals(1, count,
                         "callback should have only been invoked once");
                 finished = true;
-            }, 500);
+            }, self.timeSlice * 4);
 
             $A.test.addWaitFor(true, function() {
                 return finished;
@@ -78,6 +82,7 @@
      */
     testPeriodReset : {
         test : function(cmp) {
+            var self = this;
             var invoked = false;
             var start = new Date();
             var halfway = null;
@@ -86,24 +91,24 @@
                 var now = new Date();
                 $A.test.assertTrue(halfway != null);
                 var secondPeriod = now - halfway;
-                $A.test.assertTrue(secondPeriod > 60,
-                        "timeout should have waited at least 60ms");
+                $A.test.assertTrue(secondPeriod >= self.timeSlice,
+                        "timeout should have waited at least " + self.timeSlice);
                 // window.setTimeout guarantees it will wait at least as long as
                 // we ask. Historically, javascript timers have had ~15ms
                 // resolution. So, allow the secondPeriod to be a bit more than
                 // the original time but assume anything more than 15ms overage
                 // is a scheduling bug.
-                $A.test.assertTrue(secondPeriod < 75,
+                $A.test.assertTrue(secondPeriod < self.timeSlice * 1.5,
                         "timeout window was unnecessarily expanded");
             };
-            var timeoutCallback = $A.util.createTimeoutCallback(cb, 60);
+            var timeoutCallback = $A.util.createTimeoutCallback(cb, self.timeSlice);
             timeoutCallback();
 
             setTimeout(function() {
                 // now invoke halfway through the period.
                 halfway = new Date();
                 timeoutCallback();
-            }, 30);
+            }, self.timeSlice / 2);
 
             $A.test.addWaitFor(true, function() {
                 return invoked;

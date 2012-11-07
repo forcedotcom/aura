@@ -16,5 +16,6 @@
 /*jslint sub: true */
 exp(storageService,
     "getStorage", storageService.getStorage,
-    "setStorage", storageService.setStorage
+    "setStorage", storageService.setStorage,
+    "suspendSweeping", storageService.suspendSweeping
 );

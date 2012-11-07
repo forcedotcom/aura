@@ -104,4 +104,9 @@
         </tbody>
     </table>
 
+    <p><b>See also:</b><br/>
+    <plumedocs:topicLink topic="valueObjectTypes">Value Object Types</plumedocs:topicLink><br/>
+    <plumedocs:topicLink topic="onchange">Detecting a Value Object Change</plumedocs:topicLink>
+    </p>
+
 </aura:component>

@@ -33,21 +33,22 @@ package org.auraframework.impl.css.parser;
 /*
  */
 
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.css.*;
-import com.google.common.css.compiler.ast.*;
+import com.google.common.css.JobDescription;
+import com.google.common.css.PrefixingSubstitutionMap;
+import com.google.common.css.RecordingSubstitutionMap;
+import com.google.common.css.SubstitutionMap;
+import com.google.common.css.compiler.ast.CssCompilerPass;
+import com.google.common.css.compiler.ast.CssTree;
+import com.google.common.css.compiler.ast.ErrorManager;
+import com.google.common.css.compiler.ast.GssFunction;
 import com.google.common.css.compiler.passes.*;
-import com.google.common.css.compiler.passes.CreateComponentNodes;
-import com.google.common.css.compiler.passes.CreateConditionalNodes;
-import com.google.common.css.compiler.passes.CreateConstantReferences;
-import com.google.common.css.compiler.passes.CreateDefinitionNodes;
+
+import javax.annotation.Nullable;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * {@link StandardPassRunner} runs applies a sequence of {@link CssCompilerPass}es to a
@@ -109,8 +110,8 @@ public class StandardPassRunner {
         new HandleUnknownAtRuleNodes(cssTree.getMutatingVisitController(),
                 errorManager, job.allowedAtRules,
                 true /* report */, false /* remove */).runPass();
-        new ProcessKeyframes(cssTree.getMutatingVisitController(), errorManager, 
-                job.allowKeyframes || job.allowWebkitKeyframes, job.simplifyCss).runPass();
+        new ProcessWebkitKeyframes(cssTree.getMutatingVisitController(),
+                errorManager, job.allowWebkitKeyframes, job.simplifyCss).runPass();
         new ProcessRefiners(cssTree.getMutatingVisitController(), errorManager,
                 job.simplifyCss).runPass();
 
@@ -185,7 +186,7 @@ public class StandardPassRunner {
         }
         // Perform BiDi flipping if required.
         if (job.needsBiDiFlipping()) {
-            new MarkNonFlippableNodes(cssTree.getVisitController(), errorManager).runPass();
+            new MarkNonFlippableNodes(cssTree.getVisitController()).runPass();
             new BiDiFlipper(cssTree.getMutatingVisitController(),
                     job.swapLtrRtlInUrl, job.swapLeftRightInUrl).runPass();
         }

@@ -23,96 +23,114 @@
     
     <p>You should never modify the DOM outside a renderer. However, you can read from the DOM outside a renderer. For more information, see <auradocs:topicLink topic="domAccess">Accessing the DOM</auradocs:topicLink>.</p>
 
-    <h2>Rendering Functions</h2>
-
-    <p>You don't normally have to write your own rendering functions, but if you want to customize rendering behavior, you can create a client-side renderer in a component bundle. For file naming conventions, see <auradocs:topicLink topic="compBundle">Component Bundles</auradocs:topicLink>. There are four functions that you can override.</p>
-
-    <h4>render()</h4>
-
-    <p>This is the function that updates the DOM. The <code>render()</code> function typically returns a DOM node, an array of DOM nodes, or nothing. The base HTML component expects DOM nodes when it renders a component. If you call <code>superRender()</code> to invoke the render function for the base component, it creates the DOM nodes specified in the markup.</p>
-
-    <p>The return value from <code>render()</code> represents the current component, which may or may not, use, modify, or ignore its subtree renderings. In advanced scenarios, <code>render()</code> can also return a Map or Map[]. This will be documented later in an advanced section.<!-- TODO: Add a link to another section or maybe an entire advanced rendering chapter. There we can explain exactly what the default renderers for cmp, expression, text, and html do and that render only has to return what the parent wants it to return.] --></p>
-
-    <h4>rerender()</h4>
-
-    <p>Aura calls <code>rerender()</code> as part of its lifecycle. When an event is fired, it may trigger actions to change data and call <code>rerender()</code> on affected components.
-    It enables components to update themselves based on updates to other components since they were last rendered. This function doesn't return a value.</p>
-   <p>When rerendering is completed, Aura fires the <code>doneRendering</code> event.</p>
-
-    <auradocs:info>You should only call <code>rerender()</code> from a renderer. For example, your component might have facets that are not rendered in the body so you have to explicitly rerender them.</auradocs:info>
-     <p>If you are using a custom renderer, call <code>rerender()</code> manually  to chain it through your child components, or call <code>superRender()</code> to rerender the components in your component's <code>body</code> attribute. </p>
-    <h4>unrender()</h4>
-
-    <p>This function is for advanced use cases that we will document later. It can be useful when you are working with third-party libraries that are not native to Aura.</p>
-
-    <h4>afterRender()</h4>
-
-
-    <p>This function enables you to interact with the DOM tree after the Aura rendering service has inserted DOM elements. It is not necessarily the final call in the rendering lifecycle; it is simply called after <code>render()</code>. <code>afterRender()</code> doesn't return a value.</p>
+    <h2>Rendering Lifecycle</h2>
+    
+    <p>The rendering lifecycle automatically handles rendering and rerendering of components whenever the underlying data changes. Here is an outline of the rendering lifecycle.</p>
+    
+    <ol>
+        <li>A browser event triggers one or more Aura events.</li>
+        <li>Each Aura event triggers one or more actions that can update data. The updated data can fire more events.</li>
+        <li>The rendering service tracks the stack of events that are fired.</li>
+        <li>When all the data updates from the events are processed, the framework rerenders all the components that own modified data.</li>
+    </ol>
 
     <h2>Base Component Rendering</h2>
 
-    <p>The base component in Aura is <code>aura-components/components/aura/component/component.cmp</code>. Every Aura component extends this base component.</p>
+    <p>The base component in Aura is <code>aura:component</code>. Every component extends this base component. Aura looks for a renderer in each component bundle at <code>&lt;componentName&gt;Renderer.js</code>, where <code>&lt;componentName&gt;</code> is the name of the component. For example, the renderer for <code>sample.cmp</code> would be in <code>sampleRenderer.js</code>. You don't normally have to write your own rendering functions, but if you want to customize rendering behavior, you can create a client-side renderer in a component bundle.</p>
 
-    <p>The renderer for this component is in <code>componentRenderer.js</code>. This file has base implementations for the four rendering functions.</p>
+    <p>The renderer for <code>aura:component</code> is in <code>componentRenderer.js</code>. This renderer has base implementations for the <code>render()</code>, <code>rerender()</code>, <code>afterRender()</code>, and <code>unrender()</code> functions. The framework calls these functions as part of the rendering lifecycle. We will learn more about them in this topic. You can override the base rendering functions in a custom renderer.</p>
+    
+    <h2>Customizing Component Rendering</h2>
+
+    <p>Customize rendering by creating a <code>render()</code> function in your component's renderer to override the base <code>render()</code> function, which updates the DOM.</p>
+    
+    <p>The <code>render()</code> function typically returns a DOM node, an array of DOM nodes, or nothing. The base HTML component expects DOM nodes when it renders a component.</p>
+    
+    <p>You generally want to extend default rendering by calling <code>superRender()</code> from your <code>render()</code> function before you add your custom rendering code. Calling <code>superRender()</code> creates the DOM nodes specified in the markup.</p>
+    
+    <auradocs:info>These guidelines are very important when you customize rendering.
+    <ul>
+        <li>A renderer should only modify DOM elements that are part of the component. You should never break component encapsulation by reaching in to another component and changing its DOM elements, even if you are reaching in from the parent component.</li>
+        <li>A renderer should never fire an event.</li>
+    </ul>
+    </auradocs:info>
+
+    <h2>Rerendering Components</h2>
+
+    <p>When an event is fired, it may trigger actions to change data and call <code>rerender()</code> on affected components.
+    The <code>rerender()</code> function enables components to update themselves based on updates to other components since they were last rendered. This function doesn't return a value.</p>
+
+    <p>The framework automatically calls <code>rerender()</code> if you update a value object in a component. You only have to explicitly call <code>rerender()</code> if you haven't updated a value object but you still want to rerender the component.</p>
+
+    <p>You generally want to extend default rerendering by calling <code>superRerender()</code> from your <code>renderer()</code> function before you add your custom rerendering code. Calling <code>superRerender()</code> chains the rerendering to the components in the <code>body</code> attribute.</p>
+        
+    <h2>Accessing the DOM After Rendering</h2>
+
+    <p>The <code>afterRender()</code> function enables you to interact with the DOM tree after the Aura rendering service has inserted DOM elements. It's not necessarily the final call in the rendering lifecycle; it's simply called after <code>render()</code> and it doesn't return a value.</p>
+    
+    <p>If you want to use a library, such as jQuery, to access the DOM, use it in <code>afterRender()</code>.</p>
+
+    <h2>Unrendering Components</h2>
+
+    <p>The <code>unrender()</code> function is for advanced use cases that we will document later. It can be useful when you are working with third-party libraries that are not native to the framework.</p>
 
     <h2>Rendering Example</h2>
 
-    <p>We will now look at the button component to see how it customizes the base rendering behavior. It is important to know that every tag in Aura, including standard HTML tags, has an underlying Aura component representation. Therefore, the Aura rendering service uses the same process to render standard HTML tags or custom components that you create.</p>
+    <p>Let's look at the button component to see how it customizes the base rendering behavior. It is important to know that every tag in Aura, including standard HTML tags, has an underlying Aura component representation. Therefore, the Aura rendering service uses the same process to render standard HTML tags or custom components that you create.</p>
+    
+    <p>View the source for <auradocs:defLink descriptor="ui:button">ui:button</auradocs:defLink>. Note that the button component includes a <code>disabled</code> attribute that enables Aura to track the disabled status for the component in a <code>Boolean</code>.</p>
 
-    <p>View the source for <auradocs:defLink descriptor="ui:button">ui:button</auradocs:defLink>. Note that the button component includes a <code>disabled</code> attribute that enables Aura to track the disabled status for the component in a Boolean.</p>
+<auradocs:codeblock><![CDATA[<aura:attribute name="disabled" type="Boolean" default="false"/>]]><br/>
+</auradocs:codeblock>
 
-<code>
-    <![CDATA[<aura:attribute name="disabled" type="Boolean" default="false"/>]]><br/>
-</code>
+    <p>In <code>button.cmp</code>, <code>onclick</code> is set to <code><aura:text value="{!"/>c.press}</code>.</p>
 
-    <p class="note">Any browser DOM element event starting with "on", such as <code>onclick</code>, can be wired to a controller action. You can only wire browser events to controller actions. In <code>button.cmp</code>, onclick is set to <code><aura:text value="{!"/>c.press}</code>. Arbitrary JavaScript in the component is ignored.</p>
+    <p>The renderer for the button component is <code>buttonRenderer.js</code>. The button component overrides the default <code>render()</code> function.</p>
 
-    <p>The renderer for the button component is <code>buttonRenderer.js</code>. Aura looks for a default renderer for each component at <code><em>&lt;componentName&gt;</em>Renderer.js</code>.</p>
+<auradocs:codeblock>render : function(cmp, helper) {
+    var ret = this.superRender();
+    helper.updateDisabled(cmp);
+    return ret;
+},</auradocs:codeblock>
 
-    <p>The button component overrides the default <code>render</code> function.</p>
+    <p>The first line calls the <code>superRender()</code> function to invoke the default rendering behavior. The <code>helper.updateDisabled(cmp)</code> call invokes a helper function to customize the rendering.</p>
 
-<auradocs:codeblock>render : function(cmp, helper){
-        var ret = this.superRender();
-        helper.updateDisabled(cmp);
-        return ret;
-    },</auradocs:codeblock>
+    <p>Let's look at the <code>updateDisabled(cmp)</code> function in <code>buttonHelper.js</code>.</p>
 
-    <p>The first line calls the <code>superRender()</code> function to invoke the default rendering behavior. The <code>helper.updateDisabled(cmp)</code> call invokes a helper to perform the customized rendering.</p>
-
-    <p>Aura looks for a default helper file at <code><em>&lt;componentName&gt;</em>Helper.js</code>. Functions in a helper file can have any signature. You can call helper functions from many places, including controllers and providers. Let's look at the <code>updateDisabled(cmp)</code> function in <code>buttonHelper.js</code>.</p>
-
-<auradocs:codeblock>updateDisabled: function(cmp){
-        if (cmp.getAttributes().getValue("disabled")) {
-            var disabled = cmp.getAttributes().getValue("disabled").getBooleanValue();
-            var button = cmp.find("button");
-            if (button) {
-                var element = button.getElement();
-                if (element) {
-                    if (disabled) {
-                        element.setAttribute('disabled', 'disabled');
-                    } else {
-                        element.removeAttribute('disabled');
-                    }
+<auradocs:codeblock>updateDisabled: function(cmp) {
+    if (cmp.getAttributes().getValue("disabled")) {
+        var disabled = cmp.getAttributes().getValue("disabled").getBooleanValue();
+        var button = cmp.find("button");
+        if (button) {
+            var element = button.getElement();
+            if (element) {
+                if (disabled) {
+                    element.setAttribute('disabled', 'disabled');
+                } else {
+                    element.removeAttribute('disabled');
                 }
             }
         }
-    }</auradocs:codeblock>
+    }
+}</auradocs:codeblock>
 
-    <p>The <code>updateDisabled(cmp)</code> function translates the Boolean <code>disabled</code> value to the value expected in HTML, where the attribute doesn't exist or is set to "disabled". </p>
+    <p>The <code>updateDisabled(cmp)</code> function translates the <code>Boolean</code> <code>disabled</code> value to the value expected in HTML, where the attribute doesn't exist or is set to <code>disabled</code>. </p>
 
-    <p>It uses <code>cmp.find("button")</code> to retrieve a unique component. Note that <code>button.cmp</code> uses <code>aura:id="button"</code> to uniquely identify the component. </p>
-
-    <p>The <code>rerender</code> function in <code>buttonRenderer.js</code> is very similar to the <code>render</code> function. Note how it also calls <code>updateDisabled(cmp)</code>.</p>
+    <p>It uses <code>cmp.find("button")</code> to retrieve a unique component. Note that <code>button.cmp</code> uses <code>aura:id="button"</code> to uniquely identify the component. <code>button.getElement()</code> returns the DOM element.</p>
+    
+    <p>The <code>rerender()</code> function in <code>buttonRenderer.js</code> is very similar to the <code>render()</code> function. Note that it also calls <code>updateDisabled(cmp)</code>.</p>
 
 <auradocs:codeblock>rerender : function(cmp, helper){
-        this.superRerender();
-        helper.updateDisabled(cmp);
-    }</auradocs:codeblock>
+    this.superRerender();
+    helper.updateDisabled(cmp);
+}</auradocs:codeblock>
 
-    <p> Rendering components is part of the lifecycle of the Aura framework and it's a bit trickier to demonstrate than some of the other concepts in Aura. The takeaway is that you don't need to think about it unless you need to customize the default rendering behavior for a component. If you are writing a renderer for a component, take a look at <auradocs:topicLink topic="valueObjects">value objects</auradocs:topicLink> to learn more about how Aura selectively rerenders and updates the UI in response to data changes.</p>
+    <p> Rendering components is part of the lifecycle of the framework and it's a bit trickier to demonstrate than some other concepts in Aura. The takeaway is that you don't need to think about it unless you need to customize the default rendering behavior for a component. If you are writing a renderer for a component, take a look at <auradocs:topicLink topic="valueObjects">value objects</auradocs:topicLink> to learn more about how Aura selectively rerenders and updates the UI in response to data changes.</p>
 
     <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="compBundle">Component Bundles</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="helloEvents">Events</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="helper">Helpers</auradocs:topicLink><br/>
     <auradocs:topicLink topic="onchange">Detecting a Value Object Change</auradocs:topicLink>
     </p>
 </aura:component>

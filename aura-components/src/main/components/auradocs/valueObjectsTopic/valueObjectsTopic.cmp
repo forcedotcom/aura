@@ -104,4 +104,9 @@
         </tbody>
     </table>
 
+    <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="valueObjectTypes">Value Object Types</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="onchange">Detecting a Value Object Change</auradocs:topicLink>
+    </p>
+
 </aura:component>

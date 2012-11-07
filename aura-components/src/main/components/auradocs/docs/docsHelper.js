@@ -20,7 +20,14 @@
 
     hideWaiting : function(cmp){
         $A.util.removeClass(cmp.find('navbar').getElement(), "waiting");
-    }
+    },
+    
+    showRefreshing : function(cmp){
+        $A.util.addClass(cmp.find('navbar').getElement(), "refreshing");
+    },
 
+    hideRefreshing : function(cmp){
+        $A.util.removeClass(cmp.find('navbar').getElement(), "refreshing");
+    }
 })
 

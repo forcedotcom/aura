@@ -35,4 +35,12 @@
     doneWaiting : function(cmp, event, helper){
         helper.hideWaiting(cmp);
     },
+
+    refreshBegin : function(cmp, event, helper){
+        helper.showRefreshing(cmp);
+    },
+
+    refreshEnd : function(cmp, event, helper){
+        helper.hideRefreshing(cmp);
+    },
 }

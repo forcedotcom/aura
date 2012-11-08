@@ -77,6 +77,6 @@ MemoryStorageAdapter.prototype.calculateSize = function(value) {
 };
 
 
-$A.storageService.registerAdapter(MemoryStorageAdapter);
+$A.storageService.registerAdapter(MemoryStorageAdapter.NAME, MemoryStorageAdapter);
 
 

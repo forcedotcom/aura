@@ -143,4 +143,4 @@ WebSQLStorageAdapter.prototype.createSchema = function(dropFirst) {
 	this.updateSize();
 };
 
-$A.storageService.registerAdapter(WebSQLStorageAdapter);
+$A.storageService.registerAdapter(WebSQLStorageAdapter.NAME, WebSQLStorageAdapter);

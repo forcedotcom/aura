@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component support="BETA">
+<aura:component support="GA">
 	<aura:attribute name="value" type="Decimal" default="0.0"/>
 	<aura:attribute name="enabled" type="Boolean"/>
 	<aura:attribute name="implementation" type="String"/>

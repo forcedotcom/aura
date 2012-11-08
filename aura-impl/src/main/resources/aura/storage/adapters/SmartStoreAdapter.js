@@ -58,5 +58,5 @@ SmartStoreAdapter.prototype.getExpired = function(resultCallback) {
 	resultCallback(expired);
 };
 
-$A.storageService.registerAdapter(SmartStoreAdapter);
+$A.storageService.registerAdapter(SmartStoreAdapter.NAME, SmartStoreAdapter);
 

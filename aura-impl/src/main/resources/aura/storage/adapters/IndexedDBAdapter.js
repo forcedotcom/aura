@@ -58,4 +58,4 @@ IndexedDBStorageAdapter.prototype.getExpired = function(resultCallback) {
 	resultCallback(expired);
 };
 
-$A.storageService.registerAdapter(IndexedDBStorageAdapter);
+$A.storageService.registerAdapter(IndexedDBStorageAdapter.NAME, IndexedDBStorageAdapter);

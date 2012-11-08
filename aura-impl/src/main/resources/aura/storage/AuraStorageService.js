@@ -31,8 +31,7 @@ var AuraStorageService = function(){
         	storage = new AuraStorage(implementation, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit);
         },
         
-        registerAdapter : function(adapterClass) {
-        	var name = adapterClass.NAME;
+        registerAdapter : function(name, adapterClass) {
         	if (adapters[name]) {
         		throw new Error("StorageService.registerAdapter() adapter '" + name + "' already registered!");
         	}

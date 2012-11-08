@@ -21,6 +21,7 @@ import java.util.*;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
+import org.apache.commons.httpclient.URI;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.*;
@@ -129,7 +130,27 @@ public class AuraServlet extends AuraBaseServlet {
             if (nocache != null && !nocache.isEmpty()) {
                 response.setContentType("text/plain");
                 response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
-                response.setHeader("Location", nocache);
+                
+                String newLocation =  "/";
+                
+                try{
+                	URI uri = new URI(nocache,true);
+                	String fragment = uri.getEscapedFragment();
+                    StringBuilder sb = new StringBuilder(uri.getEscapedPathQuery());
+                    if(fragment != null && !fragment.isEmpty()){
+                        sb.append("#");
+                    	sb.append(fragment);
+                    }
+                    newLocation = sb.toString();
+                }
+                catch(Exception e){
+                	// This exception should never happen.
+                	// If happened: log a gack and redirect
+                    Aura.getExceptionAdapter().handleException(e);
+                }                
+                
+                response.setHeader("Location", newLocation);
+                
                 setNoCache(response);
                 return;
             }

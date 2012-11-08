@@ -21,18 +21,20 @@
     <aura:attribute name="description" type="Aura.Component[]"/>
     <aura:attribute name="labels" type="Aura.Component[]"/>
     <aura:attribute name="status" type="Aura.Component[]"/>
-    <header>
-        <ui:block>
-            <aura:set attribute="right">{!v.status}</aura:set>
+    <div>
+        <header>
+            <ui:block>
+                <aura:set attribute="right">{!v.status}</aura:set>
                 <h2>
                     {!v.title}&nbsp;
                     <small>{!v.subtitle}&nbsp;</small>
                     {!v.labels}
                 </h2>
                 <p>{!v.description}</p>
-        </ui:block>
-    </header>
-    <section>
-        {!v.body}
-    </section>
+            </ui:block>
+        </header>
+        <section>
+            {!v.body}
+        </section>
+    </div>
 </aura:component>

@@ -13,32 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-div.THIS {
-	overflow: auto;
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	padding: 30px;
-}
-
-.THIS header {
-	border-bottom: 1px solid #ddd;
-	padding-bottom: 16px;
-	margin-bottom: 30px;
-}
-
-.THIS header h2{
-	line-height: 1.1;
-	color: #2F3438;
-}
-.THIS p{
-	line-height: 1.6;
-	margin-bottom: 17px;
-}
-
-
-
-	
+({
+    provide : function TopicPanelProvider(cmp, localCreation) {
+        var topic = cmp.get('v.topic');
+        $A.assert(!$A.util.isUndefinedOrNull(topic));
+        return 'markup://auradocs:' + topic + 'Topic';
+    }
+});

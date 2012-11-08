@@ -22,7 +22,7 @@
     </aura:layout>
     <aura:layout name="help" title="Help" match=".*Topic">
         <aura:layoutItem container="sidebar" cache="loaded"><auradocs:tutorialsNav/></aura:layoutItem>
-        <aura:layoutItem container="content" action="{!c.getTopic}"/>
+        <aura:layoutItem container="content" cache="loaded"><auradocs:helpPanel/> </aura:layoutItem>
     </aura:layout>
     <aura:layout name="demos" title="Demos">
         <aura:layoutItem container="sidebar" cache="loaded"><auradocs:demosNav/></aura:layoutItem>

@@ -32,12 +32,11 @@
 
 .THIS article.content{
 	position: absolute;
-	padding: 30px;
+	padding: 0px;
     top: 0;
     right: 0;
     left: 280px;
 	bottom: 0;
-	overflow: auto;
 }
 .THIS aside.sidebar {
 	position: absolute;

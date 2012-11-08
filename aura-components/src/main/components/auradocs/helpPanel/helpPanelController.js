@@ -13,32 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-div.THIS {
-	overflow: auto;
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	padding: 30px;
-}
-
-.THIS header {
-	border-bottom: 1px solid #ddd;
-	padding-bottom: 16px;
-	margin-bottom: 30px;
-}
-
-.THIS header h2{
-	line-height: 1.1;
-	color: #2F3438;
-}
-.THIS p{
-	line-height: 1.6;
-	margin-bottom: 17px;
-}
-
-
-
-	
+({
+    handleLocationChange : function(cmp, event, helper) {
+        // Only respond to changes within the help place.
+        if (event.getParam('token') === 'help') {
+            var topic = event.getParam("topic") || 'welcome';
+            helper.setTopicPanelFacet(cmp, topic);
+        }
+    }
+});

@@ -20,19 +20,24 @@
 
     <p>A lazily loaded component is rendered after its parent component is loaded. This can improve the apparent response time of your app if you have many components that users don't need all at once.
     </p>
-    <p> When a component is lazily loaded, the app renders a placeholder spinner component, <code>lumen:placeholder</code>.
+    
+    <p> When a component is lazily loaded, the app renders a placeholder spinner component, <code>aura:placeholder</code>.
             The framework makes an asynchronous request and replaces the placeholder component once the  request returns the component.
     </p>
-    <p>To enable lazy loading on a component, add the <code>lumen:load="lazy"</code> attribute to your component tag.
+    
+    <p>To enable lazy loading on a component, add the <code>aura:load="lazy"</code> attribute to your component tag.
     <auradocs:info>When you enable lazy loading on a component, you can't pass a body or other non-primitive attribute values into the component.</auradocs:info>
     </p>
+    
     <h3>Loading a Component Exclusively</h3>
-    <p>If you want to load the component in its own request, add the <code>lumen:load="exclusive"</code> attribute to your component tag.
+    
+    <p>If you want to load the component in its own request, add the <code>aura:load="exclusive"</code> attribute to your component tag.
     This is similar to lazy loading except that the request to get the component won't be grouped with any other actions or the retrieval of other lazy-loaded components.
     The component will have its own request so that it doesn't block the loading of anything else.
     </p>
-     <p><b>See also:</b><br/>
-          <auradocs:topicLink topic="attrTypesOverview">Supported lumen:attribute Types</auradocs:topicLink><br/>
-      </p>
+    
+    <p><b>See also:</b><br/>
+          <auradocs:topicLink topic="attrTypesOverview">Supported aura:attribute Types</auradocs:topicLink><br/>
+    </p>
 
 </aura:component>

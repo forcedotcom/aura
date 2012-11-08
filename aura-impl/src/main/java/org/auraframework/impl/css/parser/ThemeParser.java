@@ -70,22 +70,26 @@ public class ThemeParser implements Parser {
             builder.setDescriptor((DefDescriptor<ThemeDef>) descriptor);
             builder.setLocation(source.getSystemId(), source.getLastModified());
             builder.setClassName(className);
-            ThemeParserResultHolder resultHolder = new ThemeParserResultHolder();
-            Set<String> foundConditions = new HashSet<String>();
-            AuraCSSParser parser = new AuraCSSParser(className, source.getContents(), resultHolder, allowedConditions, foundConditions);
+            
 
-            // create the default css - no conditions passed in
-            String defaultCss = parser.parse(doValidation);
+            CSSParser parser = new CSSParser(doValidation, className, source.getContents(), allowedConditions);
+            ThemeParserResultHolder resultHolder = parser.parse();
 
             // scram if we found errors
             if (parser.hasErrors()) {
                 throw new ThemeParserException(parser.getErrorMessage(), builder.getLocation());
             }
 
-            builder.setCode(defaultCss);
+            //PlumeCSSParser parser = new PlumeCSSParser(className, source.getContents(), resultHolder, allowedConditions);
+
+            // create the default css - no conditions passed in
+            //String defaultCss = parser.parse(doValidation);
+
+
+            builder.setCode(resultHolder.getDefaultCss());
 
             // create the permutation css
-            Map<Client.Type, String> browserCssMap = createCssPermutations(parser, defaultCss, foundConditions);
+            //Map<Client.Type, String> browserCssMap = createCssPermutations(parser, defaultCss, resultHolder.getFoundConditions());
 
             // not likely because the default css check will catch most everything
             if (parser.hasErrors()) {
@@ -93,29 +97,13 @@ public class ThemeParser implements Parser {
             }
 
 
-            builder.setCode(browserCssMap);
+            builder.setCode(resultHolder.getBrowserCssMap());
             builder.setImageURLs(resultHolder.getImageURLs());
 
+            //System.err.println(descriptor.getName() + " this long: " + Long.toString(System.currentTimeMillis() - t));
             return (D)builder.build();
         }
         return null;
-    }
-
-    /**
-     * Iterate throw each TrueCondition permutation, and generate the CSS.  If the CSS
-     * is exactly the same as the defaultCSS (css without any true conditions), don't save the
-     * permutation - aka only store a permutation if it is indeed different.
-     */
-    private Map<Client.Type, String> createCssPermutations(AuraCSSParser parser, String defaultCss, Set<String> foundConditions) {
-        ImmutableMap.Builder<Client.Type, String> builder = ImmutableMap.builder();
-        for (String condition : foundConditions) {
-            String cssPermutation = parser.parse(doValidation, condition);
-            // only save off this permutation if it is different from our default
-            if (!defaultCss.equals(cssPermutation)) {
-                builder.put(Client.Type.valueOf(condition), cssPermutation);
-            }
-        }
-        return builder.build();
     }
 
 }

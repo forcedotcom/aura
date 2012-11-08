@@ -31,13 +31,13 @@ public class VerifyConditions extends DefaultTreeVisitor
     private final MutatingVisitController visitController;
     private final Set<String> allowedConditions;
     private final ErrorManager errorManager;
-    private final Set<String> foundConditions;
+    private final ThemeParserResultHolder resultHolder;
 
     public VerifyConditions(MutatingVisitController visitController,
-                                     Set<String> allowedConditions, Set<String> foundConditions, ErrorManager errorManager) {
+                                     Set<String> allowedConditions, ThemeParserResultHolder resultHolder, ErrorManager errorManager) {
         this.visitController = visitController;
         this.allowedConditions = allowedConditions;
-        this.foundConditions = foundConditions;
+        this.resultHolder = resultHolder;
         this.errorManager = errorManager;
     }
 
@@ -53,9 +53,7 @@ public class VerifyConditions extends DefaultTreeVisitor
                     GssError error = new GssError("Unknown conditional: [" + conditional + "]. The allowed conditionals are: " + allowedConditions, scl);
                     errorManager.report(error);
                 } else {
-                    if (foundConditions!=null) {
-                        foundConditions.add(conditional);
-                    }
+                    resultHolder.addFoundConditions(conditional);
                 }
             }
         }

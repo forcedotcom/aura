@@ -126,9 +126,7 @@ public class StandardPassRunner {
         new ProcessComponents<Object>(cssTree.getMutatingVisitController(),
                 errorManager).runPass();
         // Check that the conditionals are valid before eliminating conditional nodes
-        new VerifyConditions(
-                cssTree.getMutatingVisitController(),
-                allowedConditions, foundConditions, errorManager).runPass();
+      //  new VerifyConditions(                cssTree.getMutatingVisitController(),  allowedConditions, foundConditions, errorManager).runPass();
         // Eliminate conditional nodes.
         new EliminateConditionalNodes(
                 cssTree.getMutatingVisitController(),

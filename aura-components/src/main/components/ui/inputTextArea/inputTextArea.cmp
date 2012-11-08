@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" extensible="true" support="GA" description="An HTML textarea element that can be editable or read-only.">
+<aura:component extends="ui:input" extensible="true" support="GA" description="An HTML textarea element that can be editable or read-only. Scroll bars may not appear on Chrome browsers in Android devices, but you can select focus in the textarea to activate scrolling.">
     <aura:attribute name="rows" type="Integer" default="2" description="The height of the text area, which is defined by the number of rows to display at a time. Default value is &#8220;2&#8221;." />
     <aura:attribute name="cols" type="Integer" default="20" description="The width of the text area, which is defined by the number of characters to display in a single row at a time. Default value is &#8220;20&#8221;." />
     <aura:attribute name="readonly" type="Boolean" default="false" description="Specifies whether the text area should be rendered as read-only. Default value is &#8220;false&#8221;." />

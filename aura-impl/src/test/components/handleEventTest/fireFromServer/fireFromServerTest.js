@@ -58,7 +58,7 @@
 										"Failed to attach multiple events at server");
 								//Verify the response of action itself
 								$A.test.assertEquals("New Component", 
-										$A.test.getText(cmp.find("response").getElement()));
+										$A.test.getText(cmp.find("response").getElement()).trim());
 							})
 		}
 	},

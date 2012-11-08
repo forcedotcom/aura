@@ -177,14 +177,13 @@ Action.prototype.complete = function(response) {
     this.error = response.error;
 	this.storage = response["storage"];
     
+	// Add in any Action scoped components /or partial configs
     var components = response["components"];
+	if (components) {
+		$A.getContext().joinComponentConfigs(components);
+	}
 
     if (this.callback && (this.cmp === undefined || this.cmp.isValid())) {
-    	// Add in any Action scoped components /or partial configs
-    	if (components) {
-    		$A.getContext().joinComponentConfigs(components);
-    	}
-
         this.callback.call(this.callbackScope, this);
     }
     

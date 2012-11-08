@@ -173,7 +173,39 @@ public class AuraContextImplTest extends AuraImplTestCase {
         String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
         assertEquals("{\"mode\":\"PROD\",\"preloads\":[],\"globalValueProviders\":[{\"type\":\"$Locale\"}]}", res);
     }
-    
+
+    /**
+     * Verify setting a Context's DefDescriptor.
+     */
+    @UnAdaptableTest
+    public void testSetApplicationDescriptor() throws Exception {
+        DefDescriptor<ApplicationDef> descApp1 = Aura.getDefinitionService().getDefDescriptor("arbitrary:appnameApp1",
+                ApplicationDef.class);
+        DefDescriptor<ApplicationDef> descApp2 = Aura.getDefinitionService().getDefDescriptor("arbitrary:appnameApp2",
+                ApplicationDef.class);
+        DefDescriptor<ComponentDef> descCmp = Aura.getDefinitionService().getDefDescriptor("arbitrary:cmpname",
+                ComponentDef.class);
+
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.PUBLIC);
+        ctx.setSerializeLastMod(false);
+
+        ctx.setApplicationDescriptor(descCmp);
+        assertEquals("ComponentDef should override a Context's null DefDescriptor", descCmp,
+                ctx.getApplicationDescriptor());
+
+        ctx.setApplicationDescriptor(descApp1);
+        assertEquals("ApplicationDef should override a Context's ComponentDef", descApp1,
+                ctx.getApplicationDescriptor());
+
+        ctx.setApplicationDescriptor(descApp2);
+        assertEquals("ApplicationDef should override current Context's ApplicationDef", descApp2,
+                ctx.getApplicationDescriptor());
+
+        ctx.setApplicationDescriptor(descCmp);
+        assertEquals("ComponentDef should not override current Context's ApplicationDef", descApp2,
+                ctx.getApplicationDescriptor());
+    }
+
     /**
      * Add events to context.
      * Technique used by controllers to add events and send them down with action response.

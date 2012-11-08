@@ -200,7 +200,7 @@
                 result = $A.getQueryStatement().field('getDef().getDescriptor().toString()', 'desc').query();
                 $A.test.fail('should not accept literals as derived field');
             }catch(e){
-                $A.test.assertEquals('desc is not defined',e.message);
+                $A.test.assertTrue($A.test.checkUndefinedMsg('desc', e.message), "desc should not be defined");
             }
 
         // 2. Specify a invalid function as derived field
@@ -208,7 +208,7 @@
                 result = $A.getQueryStatement().field('foo', 'bar()').query();
                 $A.test.fail('Should not accept arbitraty functions as derived field')
             }catch(e){
-                $A.test.assertEquals('bar is not defined',e.message);
+                $A.test.assertTrue($A.test.checkUndefinedMsg('bar', e.message), "bar should not be defined");
             }
 
         // 3. Specify explicit function with return value
@@ -337,7 +337,7 @@
                 result = $A.getQueryStatement().from("component").where("foo").query();
                 $A.test.fail("Should not be able to use literals in where clause");
             }catch(e){
-                $A.test.assertEquals("foo is not defined", e.message);
+                $A.test.assertTrue($A.test.checkUndefinedMsg('foo', e.message), "foo should not be defined");
             }
 
         // 2. Verify that null, undefined and empty values for where clause

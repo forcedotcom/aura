@@ -20,3 +20,43 @@
  */
 var SmartStoreAdapter = function SmartStoreAdapter() {
 };
+
+SmartStoreAdapter.NAME = "smartstore";
+
+SmartStoreAdapter.prototype.getName = function() {
+	return SmartStoreAdapter.NAME;
+};
+
+SmartStoreAdapter.prototype.getSize = function() {
+	return 0;
+};
+
+SmartStoreAdapter.prototype.getItem = function(key, resultCallback) {
+	// DCHASMAN TODO
+	
+	resultCallback(undefined);
+};
+
+SmartStoreAdapter.prototype.setItem = function(key, item) {
+	// DCHASMAN TODO
+};
+
+SmartStoreAdapter.prototype.removeItem = function(key) {
+	// DCHASMAN TODO
+};
+
+SmartStoreAdapter.prototype.clear = function(key) {
+	// DCHASMAN TODO
+};
+
+SmartStoreAdapter.prototype.getExpired = function(resultCallback) {
+	var now = new Date().getTime();
+	var expired = [];
+
+	// DCHASMAN TODO
+	
+	resultCallback(expired);
+};
+
+$A.storageService.registerAdapter(SmartStoreAdapter);
+

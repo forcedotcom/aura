@@ -20,3 +20,42 @@
  */
 var IndexedDBStorageAdapter = function IndexedDBStorageAdapter() {
 };
+
+IndexedDBStorageAdapter.NAME= "indexeddb";
+
+IndexedDBStorageAdapter.prototype.getName = function() {
+	return IndexedDBStorageAdapter.NAME;
+};
+
+IndexedDBStorageAdapter.prototype.getSize = function() {
+	return 0;
+};
+
+IndexedDBStorageAdapter.prototype.getItem = function(key, resultCallback) {
+	// DCHASMAN TODO
+	
+	resultCallback(undefined);
+};
+
+IndexedDBStorageAdapter.prototype.setItem = function(key, item) {
+	// DCHASMAN TODO
+};
+
+IndexedDBStorageAdapter.prototype.removeItem = function(key) {
+	// DCHASMAN TODO
+};
+
+IndexedDBStorageAdapter.prototype.clear = function(key) {
+	// DCHASMAN TODO
+};
+
+IndexedDBStorageAdapter.prototype.getExpired = function(resultCallback) {
+	var now = new Date().getTime();
+	var expired = [];
+
+	// DCHASMAN TODO
+	
+	resultCallback(expired);
+};
+
+$A.storageService.registerAdapter(IndexedDBStorageAdapter);

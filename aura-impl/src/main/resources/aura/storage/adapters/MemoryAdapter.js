@@ -22,8 +22,10 @@ var MemoryStorageAdapter = function MemoryStorageAdapter() {
 	this.clear();
 };
 
+MemoryStorageAdapter.NAME = "memory";
+
 MemoryStorageAdapter.prototype.getName = function() {
-	return "memory";
+	return MemoryStorageAdapter.NAME;
 };
 
 MemoryStorageAdapter.prototype.getSize = function() {
@@ -73,5 +75,8 @@ MemoryStorageAdapter.prototype.calculateSize = function(value) {
 	// DCHASMAN TODO create an object graph traversal size algorithm
 	return value ? $A.util["json"].encode(value).length : 0;
 };
+
+
+$A.storageService.registerAdapter(MemoryStorageAdapter);
 
 

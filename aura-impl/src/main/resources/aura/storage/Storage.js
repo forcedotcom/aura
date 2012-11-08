@@ -22,7 +22,7 @@
  * @param {Decimal} defaultExpiration The default value of TTL in seconds.
  */
 var AuraStorage = function AuraStorage(implementation, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit) {
-    this.adapter = this.createAdapter(implementation);
+    this.adapter = $A.storageService.createAdapter(implementation);
     this.maxSize = maxSize;
     this.defaultExpiration = defaultExpiration * 1000;
     this.defaultAutoRefreshInterval = defaultAutoRefreshInterval * 1000;
@@ -164,28 +164,5 @@ AuraStorage.prototype.log = function() {
 		$A.log(arguments[0], arguments.length > 1 ? arguments[1] : undefined);
 	}
 };
-
-AuraStorage.prototype.createAdapter = function(implementation) {
-	var adapter;
-	switch (implementation.toLowerCase()) {
-		case "memory":
-			adapter = new MemoryStorageAdapter();
-			break;
-		case "websql":
-			adapter = new WebSQLStorageAdapter();
-			break;
-		case "indexeddb":
-			adapter = new IndexedDBStorageAdapter();
-			break;
-		case "smartstore":
-			adapter = new SmartStoreAdapter();
-			break;
-		default:
-            throw new Error ("AuraStorage: Unknown storage adapter '" + implementation + "'");
-	}
-	
-	return adapter;
-};
-
 
 //#include aura.storage.Storage_export

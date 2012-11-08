@@ -24,4 +24,6 @@
 			storage.suspendSweeping();
 		}
 	}
+	
+	// DCHASMAN TODO Need to introduce a new connectionRestored event I think!
 })

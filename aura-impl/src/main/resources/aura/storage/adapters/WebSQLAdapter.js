@@ -27,8 +27,10 @@ var WebSQLStorageAdapter = function WebSQLStorageAdapter() {
 	this.createSchema(false);
 };
 
+WebSQLStorageAdapter.NAME = "websql";
+
 WebSQLStorageAdapter.prototype.getName = function() {
-	return "websql";
+	return WebSQLStorageAdapter.NAME;
 };
 
 WebSQLStorageAdapter.prototype.getSize = function() {
@@ -141,3 +143,4 @@ WebSQLStorageAdapter.prototype.createSchema = function(dropFirst) {
 	this.updateSize();
 };
 
+$A.storageService.registerAdapter(WebSQLStorageAdapter);

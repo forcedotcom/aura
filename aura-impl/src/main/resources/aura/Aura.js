@@ -87,11 +87,6 @@ var clientService;
 //#include aura.model.Model
 //#include aura.storage.AuraStorageService
 //#include aura.storage.Storage
-//#include aura.storage.adapters.MemoryAdapter
-//#include aura.storage.adapters.IndexedDBAdapter
-//#include aura.storage.adapters.SmartStoreAdapter
-//#include aura.storage.adapters.WebSQLAdapter
-
 
 /**
  * @class The Aura framework.  Default global instance name is $A.
@@ -718,3 +713,9 @@ var eventService = aura.eventService;
 var layoutService = aura.layoutService;
 
 var services = aura.services;
+
+//#include aura.storage.adapters.MemoryAdapter
+//#include aura.storage.adapters.IndexedDBAdapter
+//#include aura.storage.adapters.SmartStoreAdapter
+//#include aura.storage.adapters.WebSQLAdapter
+

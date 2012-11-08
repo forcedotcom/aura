@@ -20,6 +20,7 @@
  */
 var AuraStorageService = function(){
 	var storage = null;
+	var adapters = {};
 	
     var storageService = {
         getStorage : function() {
@@ -28,8 +29,26 @@ var AuraStorageService = function(){
         
         setStorage : function(implementation, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit) {
         	storage = new AuraStorage(implementation, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit);
+        },
+        
+        registerAdapter : function(adapterClass) {
+        	var name = adapterClass.NAME;
+        	if (adapters[name]) {
+        		throw new Error("StorageService.registerAdapter() adapter '" + name + "' already registered!");
+        	}
+        	
+        	adapters[name] = adapterClass;
+        },
+        
+        createAdapter : function(name) {
+        	var AdapterClass = adapters[name];
+        	if (!AdapterClass) {
+        		throw new Error("StorageService.getAdapter() unknown adapter '" + name + "'!");
+        	}
+        
+        	return new AdapterClass();
         }
-
+        
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         ,"storage" : storage
         //#end

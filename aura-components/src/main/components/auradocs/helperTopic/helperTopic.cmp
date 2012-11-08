@@ -28,21 +28,23 @@
     call <code>open</code> in the helper method.</p>
 
     <p><b>detailsRenderer.js</b></p>
-    <auradocs:codeblock>({
-        afterRender : function(component, helper){
-            helper.open(component, null, "new");
-        }
-    })</auradocs:codeblock>
+    
+<auradocs:codeblock>({
+	afterRender : function(component, helper){
+	    helper.open(component, null, "new");
+	}
+})</auradocs:codeblock>
 
     <p><b>detailsHelper.js</b></p>
-    <auradocs:codeblock>({
-        open : function(component, note, mode, sort){
-            if(mode === "new") {
-                //do something
-            }
-            // do something else, such as firing an event
-        }
-    })</auradocs:codeblock>
+    
+<auradocs:codeblock>({
+	open : function(component, note, mode, sort){
+	    if(mode === "new") {
+	        //do something
+	    }
+	    // do something else, such as firing an event
+	}
+})</auradocs:codeblock>
 
         <p>For an example on using helper methods to customize renderers, see
     <auradocs:topicLink topic="renderers">Customizing Renderers</auradocs:topicLink>.</p>
@@ -54,16 +56,15 @@
     The following code shows you how to reuse the <code>open</code> function in a controller.</p>
 
     <p><b>detailsController.js</b></p>
-    <auradocs:codeblock>
-    ({
-        openNote: function(component, event, helper) {
-            var note = event.getParam("note");
-            var mode = event.getParam("mode");
-            var sort = event.getParam("sort");
-            helper.open(component, note, mode, sort);
-        }
-    })
-    </auradocs:codeblock>
+    
+<auradocs:codeblock>({
+    openNote: function(component, event, helper) {
+        var note = event.getParam("note");
+        var mode = event.getParam("mode");
+        var sort = event.getParam("sort");
+        helper.open(component, note, mode, sort);
+    }
+})</auradocs:codeblock>
 
     <p><b>See also:</b><br/>
         <auradocs:topicLink topic="compBundle">Component Bundles</auradocs:topicLink>

@@ -36,7 +36,7 @@
 
 <p>For example, if a component has an attribute <code>note</code>, access a note value such as <code>title</code> using the <code>v.note.title</code> syntax. This example shows usage of this nested syntax for a few attributes.</p>
 
-<code>&lt;aura:component&gt;
+<auradocs:codeblock>&lt;aura:component&gt;
     &lt;aura:attribute name="note" type="java://org.auraframework.demo.notes.Note"/&gt;
     &lt;ui:block&gt;
         &lt;aura:set attribute="left"&gt;
@@ -47,7 +47,7 @@
         &lt;/aura:set&gt;
     &lt;/ui:block&gt;
     &lt;aura:unescapedHtml value="<aura:text value="{!"/>v.note.body}"/&gt;
-&lt;/aura:component&gt;</code>
+&lt;/aura:component&gt;</auradocs:codeblock>
 
 <p>For deeply nested objects and attributes, continue adding dots to traverse the structure and access the nested values.</p>
 

@@ -32,23 +32,23 @@
   wasBehaviorOverridden?<div class="wasBehaviorOverridden"><aura:renderIf isTrue="{!v.wasBehaviorOverridden}">Yes<aura:set attribute="else">No</aura:set></aura:renderIf></div>
 
   <div>
-    <button onclick="{!c.selectLayout2WithDefaultAction}" aura:id="buttonWithDirectCallWithDefaultAction" class="buttonWithDirectCallWithDefaultAction">Change to layout2 with $layoutService.changeLocation() with default action</button>
+    <ui:button press="{!c.selectLayout2WithDefaultAction}" aura:id="buttonWithDirectCallWithDefaultAction" class="buttonWithDirectCallWithDefaultAction" label="Change to layout2 with $layoutService.changeLocation() with default action" />
   </div>
   <div>
-    <button onclick="{!c.selectLayout2WithOverride}" aura:id="buttonWithDirectCallWithOverride" class="buttonWithDirectCallWithOverride">Change to layout2 with $layoutService.changeLocation() with override</button>
+    <ui:button press="{!c.selectLayout2WithOverride}" aura:id="buttonWithDirectCallWithOverride" class="buttonWithDirectCallWithOverride" label="Change to layout2 with $layoutService.changeLocation() with override" />
   </div>
   <div>
-    <button onclick="{!c.selectLayout2WithSetWindowLocation}" aura:id="buttonWithSetWindowLocationLayout2" class="buttonWithSetWindowLocationLayout2">Change to layout2 with window.location</button>
+    <ui:button press="{!c.selectLayout2WithSetWindowLocation}" aura:id="buttonWithSetWindowLocationLayout2" class="buttonWithSetWindowLocationLayout2" label="Change to layout2 with window.location" />
   </div>
   <div>
-    <button onclick="{!c.selectLayout1WithSetWindowLocation}" aura:id="buttonWithSetWindowLocationLayout1" class="buttonWithSetWindowLocationLayout1">Change to layout1 with window.location</button>
+    <ui:button press="{!c.selectLayout1WithSetWindowLocation}" aura:id="buttonWithSetWindowLocationLayout1" class="buttonWithSetWindowLocationLayout1" label="Change to layout1 with window.location" />
   </div>
   <div>
-    <button onclick="{!c.selectDefaultLayoutWithSetWindowLocation}" aura:id="buttonWithSetWindowLocationDefaultLayout" class="buttonWithSetWindowLocationDefaultLayout">Change to default layout with window.location</button>
+    <ui:button press="{!c.selectDefaultLayoutWithSetWindowLocation}" aura:id="buttonWithSetWindowLocationDefaultLayout" class="buttonWithSetWindowLocationDefaultLayout" label="Change to default layout with window.location" />
   </div>
 
   <div>
-    <button onclick="{!c.selectLayout2WithParams}" aura:id="selectLayout2WithParams" class="selectLayout2WithParams">Change to layout2 with $layoutService.changeLocation() and some parameters</button>
+    <ui:button press="{!c.selectLayout2WithParams}" aura:id="selectLayout2WithParams" class="selectLayout2WithParams" label="Change to layout2 with $layoutService.changeLocation() and some parameters" />
   </div>
 
     <aura:handler event="layoutServiceTest:locChangeEvent" action="{!c.locationCange}"/>

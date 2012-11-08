@@ -18,26 +18,26 @@
      * Test $A.layoutService.changeLocationWithOverrideParams.
      */
     testChangeLocationWithOverride: {
-        attributes : { __layout : "#layout1?param1=go&param2=stop" },
-        test: [function(component){
+        attributes: { __layout: "#layout1?param1=go&param2=stop" },
+        test: [function(component) {
                 $A.test.addWaitFor("Welcome to layout1", function(){return component.find("content").get("v.body")[0] && $A.test.getText(component.find("content").get("v.body")[0].getElement());});
-            }, function(component){
-                aura.log("Clicking to change layout to #layout2");
-                component.find("buttonWithDirectCallWithOverride").getElement().click();
+            }, function(component) {
+                component.find("buttonWithDirectCallWithOverride").get("e.press").fire();
                 $A.test.addWaitFor(true, function(){return component.get("v.wasLayoutHandlerCalled");});
                 $A.test.addWaitFor(true, function(){return component.get("v.wasBehaviorOverridden"); /*The app does not think the layout behavior was overridden*/});
             }
         ]
     },
 
-    testChangeLocationBysettingWindowLocationAndHaveOverride:{
-        attributes : { __layout : "#layout1?param1=go&param2=stop" },
-        test: [function(component){
+    testChangeLocationBysettingWindowLocation: {
+        attributes: { __layout: "#layout1?param1=go&param2=stop" },
+        test: [function(component) {
                 $A.test.addWaitFor("Welcome to layout1", function(){return component.find("content").get("v.body")[0] && $A.test.getText(component.find("content").get("v.body")[0].getElement());});
-            }, function(component){
-                component.find("buttonWithSetWindowLocationLayout1").getElement().click();
-                $A.test.addWaitFor(true, function(){return component.get("v.wasLayoutHandlerCalled");});
-                $A.test.addWaitFor(false, function(){return component.get("v.wasBehaviorOverridden"); /*The layout handler was apparently not invoked when setting window.location*/});
+            }, function(component) {
+                component.find("buttonWithSetWindowLocationLayout2").get("e.press").fire();
+                $A.test.addWaitFor("Welcome to layout2", function(){return $A.test.getText(component.find("content").getElement())}) /*New layout never loaded*/
+                $A.test.addWaitFor(true, function(){return component.get("v.wasLayoutHandlerCalled");}); /*The layout handler was apparently not invoked when setting window.location*/
+                $A.test.addWaitFor(false, function(){return component.get("v.wasBehaviorOverridden");});
             }
         ]
     },
@@ -46,10 +46,10 @@
      * Verify that LayoutFailed event is thrown only once, even if multiple failing LayoutItem's'.
      */
     testLayoutFailedEventCount: {
-        attributes : { __layout : "#layout3" },
-        test: [function(component){
+        attributes: { __layout: "#layout3" },
+        test: [function(component) {
                 $A.test.addWaitFor("Welcome to layout3", function(){return component.find("content").get("v.body")[0] && $A.test.getText(component.find("content").get("v.body")[0].getElement());});
-            }, function(component){
+            }, function(component) {
                 $A.test.assertEquals(1, component.get("v.layoutFailedCount"), "LayoutFailed event should be fired once.");
             }
         ]

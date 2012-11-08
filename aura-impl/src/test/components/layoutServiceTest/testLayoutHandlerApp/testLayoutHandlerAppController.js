@@ -23,16 +23,18 @@
         $A.layoutService.changeLocation('layout2', { overrideBehavior : true });
     },
 
-    selectLayout2WithSetWindowLocation : function() {
+    selectLayout2WithSetWindowLocation : function(component) {
         window.location = '#layout2';
     },
 
     selectLayout1WithSetWindowLocation : function() {
         window.location = '#layout1';
     },
+
     selectDefaultLayoutWithSetWindowLocation : function(component, event){
         window.location = '';
     },
+
     handleTestLayoutHandlerEvent : function(component, event) {
         component.getAttributes().setValue("wasLayoutHandlerCalled", event.getParam("wasLayoutHandlerCalled"));
         component.getAttributes().setValue("wasBehaviorOverridden", event.getParam("wasBehaviorOverridden"));

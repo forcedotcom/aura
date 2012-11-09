@@ -34,7 +34,8 @@ function AuraContext(config) {
     var globalValueProviders = {};
     this.globalValueProviders = globalValueProviders;
     this.app = config["app"];
-
+    this.cmp = config["cmp"];
+    
     var gvp = config["globalValueProviders"];
     if (gvp) {
         var l = gvp.length;
@@ -90,7 +91,7 @@ AuraContext.prototype.encodeForServer = function(includePreloads) {
         }
     }
 
-    return aura.util.json.encode({"mode" : this.mode, "preloads" : preloads, "app" : this.app, "lastmod" : this.lastmod});
+    return aura.util.json.encode({"mode" : this.mode, "preloads" : preloads, "app" : this.app, "cmp" : this.cmp,"lastmod" : this.lastmod});
 };
 
 /**

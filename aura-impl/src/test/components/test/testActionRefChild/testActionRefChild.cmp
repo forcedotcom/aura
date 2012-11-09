@@ -17,5 +17,5 @@
 -->
 <aura:component>
 <aura:attribute name="put" type="Aura.Action"/>
-<button onclick="{!v.put}">put sand in pants</button>
+<ui:button press="{!v.put}" aura:id="button" label="put sand in pants" />
 </aura:component>

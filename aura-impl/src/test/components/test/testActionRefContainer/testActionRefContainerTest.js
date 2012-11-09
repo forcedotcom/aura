@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     /*
      * passing an actionref as an attribute to another cmp
      */
@@ -21,32 +21,29 @@
         test: [function(component){
             // the text node for pants
             var text = component.find("actionref").getElements()[1];
-            var getButton = component.find("getButton").getElement();
-            var evt = document.createEvent("Events");
-            evt.initEvent("click", true, true);
+            var getButton = component.find("getButton");
 
             $A.test.assertEquals("0", text.nodeValue, "initial value for pants wasn't 0");
 
             var mar = component.get("v.myActionRef");
             $A.test.assertEquals(undefined, mar, "there should no actionref yet");
 
-            getButton.dispatchEvent(evt);
+            //getButton.dispatchEvent(evt);
+            getButton.get("e.press").fire();
             mar = component.get("v.myActionRef");
 
             $A.test.assertTrue(mar && mar.auraType === "Value", "there should be an actionref");
 
         }, function(component) {
             var text = component.find("actionref").getElements()[1];
-            var runButton = component.find("runButton").getElement();
-            var evt = document.createEvent("Events");
-            evt.initEvent("click",true,true);
+            var runButton = component.find("runButton");
 
-            runButton.dispatchEvent(evt);
+            runButton.get("e.press").fire();
             $A.test.assertEquals("1", text.nodeValue, "action was not called");
-            runButton.dispatchEvent(evt);
+            runButton.get("e.press").fire();
             $A.test.assertEquals("2", text.nodeValue, "action should have been called twice");
-            runButton.dispatchEvent(evt);
+            runButton.get("e.press").fire();
             $A.test.assertEquals("3", text.nodeValue, "action should have been called thrice");
         }]
     }
-}
+})

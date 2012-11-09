@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     /*
      * verify type of actionref passed around
      */
@@ -38,20 +38,17 @@
             // the text node for pants
             var text = component.getElements()[1];
             var child = component.find("sandputter");
-            var btn = child.getElement();
-
-            var evt = document.createEvent("Events");
-            evt.initEvent("click",true,true);
+            var btn = child.find("button");
 
             $A.test.assertEquals("0", text.nodeValue, "initial value for pants wasn't 0");
 
-            btn.dispatchEvent(evt);
+            btn.get("e.press").fire();
             $A.test.assertEquals("1", text.nodeValue, "action was not called");
             // click again to make sure the actionref can run twice
-            btn.dispatchEvent(evt);
+            btn.get("e.press").fire();
             $A.test.assertEquals("2", text.nodeValue, "action should have been called twice");
-            btn.dispatchEvent(evt);
+            btn.get("e.press").fire();
             $A.test.assertEquals("3", text.nodeValue, "action should have been called thrice");
         }
     }
-}
+})

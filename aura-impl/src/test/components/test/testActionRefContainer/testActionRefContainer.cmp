@@ -20,6 +20,6 @@
 
     <test:testActionRef aura:id="actionref"/>
 
-    <button aura:id="getButton" onclick="{!c.getSand}">getSand</button>
-    <button aura:id="runButton" onclick="{!c.runSand}">runSand</button>
+    <ui:button aura:id="getButton" press="{!c.getSand}" label="getSand" />
+    <ui:button aura:id="runButton" press="{!c.runSand}" label="runSand" />
 </aura:component>

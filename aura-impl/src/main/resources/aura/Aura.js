@@ -283,7 +283,7 @@ function Aura(){
             "getCmp", aura.getCmp,
             //#if {"excludeModes" : ["PRODUCTION"]}
                 "devToolService", aura.devToolService,
-                "q", aura.devToolService.newStatement,
+                "getQueryStatement", aura.devToolService.newStatement,
                 "qhelp", function(){return aura.devToolService.help()},
             //#end
             "newCmp", aura.newCmp,

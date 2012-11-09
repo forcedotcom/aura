@@ -39,7 +39,7 @@ exp(p,
     //#if {"excludeModes" : ["PRODUCTION"]}
         ,
         "devToolService", p.devToolService,
-        "q", p.q,
+        "getQueryStatement", p.getQueryStatement,
         "qhelp", p.qhelp
     //#end
 

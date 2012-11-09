@@ -21,7 +21,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
 import org.auraframework.util.IOUtil;
@@ -62,10 +63,6 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             else if (root.equals("javascript")) {
                 resStr = String.format("/aura/javascript%s", matcher.group(3));
             }
-            else if (root.equals("ext-js")) {
-                resStr = path;
-            }
-
         }
 
         return resStr == null ? null : resourceLoader.getResourceAsStream(resStr);

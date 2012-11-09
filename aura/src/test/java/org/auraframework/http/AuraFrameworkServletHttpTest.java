@@ -36,6 +36,7 @@ import org.auraframework.test.AuraHttpTestCase;
 public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     public final String sampleBinaryResourcePath = "/auraFW/resources/aura/auraIdeLogo.png";
     public final String sampleTextResourcePath = "/auraFW/resources/aura/resetCSS.css";
+    public final String sampleJavascriptResourcePath = "/auraFW/javascript/aura_dev.js";
     public final String sampleBinaryResourcePathWithNonce = "/auraFW/resources/123456/aura/auraIdeLogo.png";
     public final String sampleTextResourcePathWithNonce = "/auraFW/resources/123456/aura/resetCSS.css";
     private final long timeWindowExpiry = 60000; // one minute expiration test window
@@ -184,6 +185,27 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
                 get.getResponseCharSet());
         assertTrue("Framework servlet not responding with correct mime type",
                 get.getResponseHeader(HttpHeaders.CONTENT_TYPE).getValue().startsWith("text/css;"));
+        SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+        Date currentDate = new Date();
+        long expirationMillis = ((df.parse(get.getResponseHeader(HttpHeaders.EXPIRES).getValue()).getTime() + 5000) - currentDate
+                .getTime());
+        assertTrue("AuraFrameworkServlet is not setting the right value for expires header.",
+                ApproximatelyEqual(expirationMillis, AuraBaseServlet.SHORT_EXPIRE, timeWindowExpiry));
+    }
+
+    /**
+     * Verify that AuraFrameworkServlet responds successfully to valid request for a javascript resource.
+     */
+    public void testRequestJavascriptResourceShortExpire() throws Exception {
+        GetMethod get = obtainGetMethod(sampleJavascriptResourcePath);
+        int statusCode = getHttpClient().executeMethod(get);
+        assertEquals("AuraResourceServlet failed to fetch a valid resource request.", HttpStatus.SC_OK, statusCode);
+        assertNotNull(get.getResponseBodyAsString());
+
+        assertEquals("Framework servlet not responding with correct encoding type.", AuraBaseServlet.UTF_ENCODING,
+                get.getResponseCharSet());
+        assertTrue("Framework servlet not responding with correct mime type",
+                get.getResponseHeader(HttpHeaders.CONTENT_TYPE).getValue().startsWith("text/javascript;"));
         SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
         Date currentDate = new Date();
         long expirationMillis = ((df.parse(get.getResponseHeader(HttpHeaders.EXPIRES).getValue()).getTime() + 5000) - currentDate

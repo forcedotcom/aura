@@ -77,6 +77,8 @@ public abstract class BaseSourceLoader implements SourceLoader{
         String qname;
         if(defType == DefType.STYLE){
             qname = String.format("css://%s.%s", namespace, name);
+        } else if (defType == DefType.TESTSUITE) {
+            qname = String.format("js://%s.%s", namespace, name);
         }else{
             qname = String.format("markup://%s:%s", namespace, name);
         }
@@ -89,7 +91,11 @@ public abstract class BaseSourceLoader implements SourceLoader{
     }
 
     protected static boolean isValidNameForDefType(DefType defType, String name){
-        return name.endsWith(extensions.get(defType));
+        String ext = extensions.get(defType);
+        if (ext == null) {
+            return false;
+        }
+        return name.endsWith(ext);
     }
 
 }

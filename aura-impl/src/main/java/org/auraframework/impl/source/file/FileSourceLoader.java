@@ -22,14 +22,12 @@ import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.source.BaseSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
-
 import org.auraframework.system.DescriptorMatcher;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.IOUtil;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  */
@@ -216,10 +214,6 @@ public class FileSourceLoader extends BaseSourceLoader {
 
     }
 
-    private static Set<DefType> allTypes = Sets.immutableEnumSet(DefType.APPLICATION, DefType.COMPONENT,
-                                                                 DefType.EVENT, DefType.INTERFACE,
-                                                                 DefType.STYLE, DefType.LAYOUTS);
-
     /**
      * This is a twisted filter that actually does the work as it progresses.
      *
@@ -261,7 +255,7 @@ public class FileSourceLoader extends BaseSourceLoader {
          * @return the def type, or null if there is none.
          */
         private DefType getDefType(String name) {
-            for (DefType dt : allTypes) {
+            for (DefType dt : DefType.values()) {
                 if (isValidNameForDefType(dt, name)) {
                     return dt;
                 }

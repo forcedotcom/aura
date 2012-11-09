@@ -26,12 +26,12 @@ import org.auraframework.impl.context.AuraRegistryProviderImpl;
 import org.auraframework.impl.system.DefFactoryImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
-import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.throwable.NoAccessException;
+import org.auraframework.system.*;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -173,7 +173,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
 
         // Look in NonCachingDefRegistry
         assertEquals("find() should find a single component", 1, definitionService.find("markup://ui:outputNumber").size());
-        assertEquals("find() fails with wildcard as prefix", 2, definitionService.find("*://ui:outputNumber").size());
+        assertEquals("find() fails with wildcard as prefix", 3, definitionService.find("*://ui:outputNumber").size());
         assertEquals("find() is finding non-existent items", 0, definitionService.find("markup://ui:doesntexist").size());
 
         // Look in AuraStaticTypeDefRegistry (StaticDefRegistry)

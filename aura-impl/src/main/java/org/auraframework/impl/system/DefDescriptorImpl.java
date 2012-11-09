@@ -30,7 +30,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
-import com.google.common.cache.*;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 /**
  */
@@ -156,9 +157,9 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                             name += matcher.group(4);
                             if (defType == org.auraframework.def.DefDescriptor.DefType.TYPE ) {
                                nameParameters = matcher.group(4);
-                               }
+                            }
                         }
-                    }else{
+                    } else {
                         throw new AuraRuntimeException(String.format("Invalid Descriptor Format: %s", qualifiedName));
                     }
 

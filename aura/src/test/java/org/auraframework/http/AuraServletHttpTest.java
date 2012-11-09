@@ -15,16 +15,20 @@
  */
 package org.auraframework.http;
 
-import java.util.*;
-
-import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.AuraHttpTestCase;
-import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.json.*;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.test.AuraHttpTestCase;
+import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.json.JsFunction;
+import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonReader;
 
 /**
  * Automation to verify the handling of AuraServlet requests.
@@ -135,5 +139,46 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         Object f = json.get("defaultHandler");
         assertEquals(JsFunction.class, f.getClass());
         assertEquals("try{$A.clientService.setOutdated()}catch(e){$L.clientService.setOutdated()}", ((JsFunction)f).getBody());
+    }
+
+    private void assertNoCacheRequest(String inputUrl, String expectedRedirect) throws Exception {
+        GetMethod get = obtainGetMethod(inputUrl);
+        get.setFollowRedirects(false);
+        getHttpClient().executeMethod(get);
+        assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, get.getStatusCode());
+        assertEquals(expectedRedirect, get.getResponseHeader("Location").getValue());
+        assertEquals("no-cache, no-store", get.getResponseHeader("Cache-Control").getValue());
+        //assertEquals("no-cache", get.getResponseHeader("Pragma").getValue());
+    }
+
+    /**
+     * nocache in the request will redirect to the input url (minus the protocol and host)
+     */
+    public void testNoCache() throws Exception {
+        assertNoCacheRequest(String.format("/aura?aura.tag&nocache=%s", URLEncoder.encode(
+                "http://any.host/m?aura.mode=PROD&aura.format=HTML#someidinhere?has=someparam", "UTF-8")),
+                "/m?aura.mode=PROD&aura.format=HTML#someidinhere?has=someparam");
+    }
+
+    public void testNoCacheNoFragment() throws Exception {
+        assertNoCacheRequest(
+                String.format("/aura?aura.tag&nocache=%s", URLEncoder.encode("http://any.host/m?chatter", "UTF-8")),
+                "/m?chatter");
+    }
+
+    public void testNoCacheNoQuery() throws Exception {
+        assertNoCacheRequest(
+                String.format("/aura?aura.tag&nocache=%s",
+                        URLEncoder.encode("http://any.host/m#someid?param=extra", "UTF-8")), "/m#someid?param=extra");
+    }
+
+    public void testNoCacheNoValue() throws Exception {
+        GetMethod get = obtainGetMethod("/aura?aura.tag&nocache");
+        get.setFollowRedirects(false);
+        getHttpClient().executeMethod(get);
+        assertEquals(HttpStatus.SC_OK, get.getStatusCode());
+        assertTrue(get.getResponseBodyAsString().startsWith(
+                String.format("%s*/{\n  \"message\":\"QualifiedName is required for descriptors\"",
+                        AuraServlet.CSRF_PROTECT)));
     }
 }

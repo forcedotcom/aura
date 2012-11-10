@@ -115,6 +115,7 @@ public abstract class AuraXMLQuickFix extends AuraQuickFix {
         XPathExpression expr = xpath.compile(xPathExpr);
         NodeList nodes = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
         if(nodes == null || nodes.getLength()==0){
+            // FIXME: EXCEPTIONINFO
             throw new AuraRuntimeException(String.format("Unable to find node: %s", xPathExpr));
         }
         return nodes.item(0);
@@ -164,6 +165,5 @@ public abstract class AuraXMLQuickFix extends AuraQuickFix {
                 writer.close();
             }
         }
-}
-
+    }
 }

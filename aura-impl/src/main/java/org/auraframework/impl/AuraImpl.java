@@ -64,6 +64,7 @@ public class AuraImpl {
         try {
             ret = (FormatAdapter<T>)formatAdapterCache.get(new IndexKey(format, type));
         } catch (ExecutionException ee) {
+            //FIXME: EXCEPTIONINFO
             throw new AuraRuntimeException(ee);
         }
 

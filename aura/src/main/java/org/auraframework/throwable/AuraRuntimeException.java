@@ -25,50 +25,66 @@ import org.auraframework.system.Location;
  * @see AuraException
  * @see AuraError
  */
-public class AuraRuntimeException extends RuntimeException {
+public class AuraRuntimeException extends RuntimeException implements AuraExceptionInfo {
     private static final long serialVersionUID = -1196068206703611084L;
     private final Location location;
+    private final String extraMessage;
 
     public AuraRuntimeException(String message) {
-        super(message);
-        location = null;
+        this(message, null, null, null);
     }
 
     public AuraRuntimeException(String message, Location location) {
-        super(message);
-        this.location = location;
-        AuraExceptionUtil.addLocation(location, this);
+        this(message, location, null, null);
     }
 
     public AuraRuntimeException(String message, Throwable cause) {
-        super(message, cause);
-        this.location = null;
+        this(message, null, cause, null);
     }
 
     public AuraRuntimeException(String message, Location location, Throwable cause) {
+        this(message, location, cause, null);
+    }
+
+    public AuraRuntimeException(Throwable cause) {
+        this(cause.toString(), null, cause, null);
+    }
+
+    public AuraRuntimeException(Throwable cause, Location location) {
+        this(cause.toString(), location, cause, null);
+    }
+
+    public AuraRuntimeException(String message, Location location, Throwable cause, String extraMessage) {
         super(message, cause);
-        this.location = location;
-        AuraExceptionUtil.addLocation(location, this);
-    }
+        if (cause != null && cause instanceof AuraExceptionInfo) {
+            AuraExceptionInfo info = (AuraExceptionInfo)cause;
 
-    public AuraRuntimeException(Throwable ex) {
-        super(ex);
-        if (ex instanceof AuraException) {
-            this.location = ((AuraException)ex).getLocation();
-            AuraExceptionUtil.addLocation(location, this);
-        } else {
-            this.location = null;
+            if (location == null) {
+                location = info.getLocation();
+            }
+            if (extraMessage == null) {
+                extraMessage = info.getExtraMessage();
+            }
         }
-    }
-
-    public AuraRuntimeException(Throwable ex, Location location) {
-        super(ex);
+        if (location != null) {
+            AuraExceptionUtil.addLocation(location, this);
+        }
         this.location = location;
-        AuraExceptionUtil.addLocation(location, this);
+        this.extraMessage = extraMessage;
     }
 
+    public AuraRuntimeException(String message, Location location, String extraMessage) {
+        this(message, location, null, extraMessage);
+    }
+
+    @Override
     public Location getLocation() {
         return location;
+    }
+
+    @Override
+    public String getExtraMessage() {
+        return this.extraMessage;
     }
 
     /**

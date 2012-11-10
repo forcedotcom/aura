@@ -29,7 +29,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 public class InvalidSessionException extends ClientSideEventException {
-
     private static final long serialVersionUID = -2007734227131769994L;
 
     private final String newToken;
@@ -63,5 +62,4 @@ public class InvalidSessionException extends ClientSideEventException {
     public int getStatusCode() {
         return HttpStatus.SC_NOT_FOUND;
     }
-
 }

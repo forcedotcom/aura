@@ -60,7 +60,8 @@ public class IfProvider implements ComponentConfigProvider {
             for (ComponentDefRef cdr : facet) {
                 List<Component> ls = cdr.newInstance(vp);
                 if (ls.size() > 1) {
-                    throw new AuraRuntimeException("foreach inside of an if doesn't work yet");
+                    throw new AuraRuntimeException("foreach inside of an if doesn't work yet", cdr.getLocation(),
+                                                   String.format("globalId=%s", component.getGlobalId()));
                 }
                 components.addAll(ls);
             }

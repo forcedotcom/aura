@@ -173,7 +173,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
         //}
         if (!written) {
             // Should we only delete for JSON?
-            deleteManifestCookie(response);
+            addManifestErrorCookie(response);
             setNoCache(response);
         }
         if (mappedEx instanceof IOException) {

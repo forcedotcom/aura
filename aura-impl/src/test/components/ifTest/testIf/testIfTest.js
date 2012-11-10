@@ -18,7 +18,15 @@
         attributes : {thang : ''},
         
         test: function(component){
-            this.whatItIs(component, "Empty string", false);
+        	this.whatItIs(component, "Empty string", false);
+        	
+        	// bug W-1427153
+        	//Making sure that globalId for client side component ends with 'c'
+            newCmp = $A.componentService.newComponent({
+                "componentDef": "markup://ifTest:testIf"
+            });
+            var reg = /:c/; 
+            aura.test.assertNotNull(newCmp.getGlobalId().match(reg),"GlobalId for clientSide cmp should be ending with c but it is " + newCmp.getGlobalId());
         }
     },
     

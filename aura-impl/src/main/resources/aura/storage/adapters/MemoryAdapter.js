@@ -73,7 +73,7 @@ MemoryStorageAdapter.prototype.getExpired = function(resultCallback) {
 
 MemoryStorageAdapter.prototype.calculateSize = function(value) {
 	// DCHASMAN TODO create an object graph traversal size algorithm
-	return value ? $A.util["json"].encode(value).length : 0;
+	return value ? $A.util.json.encode(value).length : 0;
 };
 
 

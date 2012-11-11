@@ -285,6 +285,7 @@ Action.prototype.isExclusive = function() {
  * For server-side Actions only.
  */
 Action.prototype.setStoreable = function(config) {
+	$A.assert(this.def.isServerAction(), "setStoreable() cannot be called on a client action.");
     this.storeable = true;
     this.storeableConfig = config;
     

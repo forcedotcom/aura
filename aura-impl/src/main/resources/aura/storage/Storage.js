@@ -79,7 +79,6 @@ AuraStorage.prototype.put = function(key, value) {
 		this.evict(cost);
 	}*/
 	
-	var expiration = this.defaultExpiration;
 	var now = new Date().getTime();
 	
 	var item = {

@@ -20,7 +20,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
 /**
  * Automation for COQL (Component Query Language).
- * COQL is available all modes except PRODUCTION
+ * COQL is available in all modes except PRODUCTION
  *
  * @since 0.0.302
  */
@@ -35,7 +35,7 @@ public class ComponentQueryLanguageUITest extends WebDriverTestCase {
     public void testQueryLanguageNotAvailableInprodMode() throws Exception{
         ServletConfigController.setProductionConfig(true);
         open("/test/laxSecurity.app", Mode.PROD);
-        Object query = getEval("return window.$A.q");
+        Object query = getEval("return window.$A.getQueryStatement");
         assertNull("Query language should not be available in PROD mode.", query);
     }
     /**
@@ -45,9 +45,9 @@ public class ComponentQueryLanguageUITest extends WebDriverTestCase {
      */
     public void testQueryLanguageNotAvailableInNonprodMode() throws Exception{
         open("/test/laxSecurity.app");
-        Object query = getEval("return window.$A.q");
+        Object query = getEval("return window.$A.getQueryStatement");
         assertNotNull("Query language should be available in non PROD mode.", query);
-        query = getEval("return window.$A.q()");
+        query = getEval("return window.$A.getQueryStatement()");
         assertNotNull("$A.q() failed to return query", query);
     }
 }

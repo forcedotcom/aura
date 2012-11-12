@@ -97,7 +97,7 @@
 
     supportsTouchEvents : function () {
         // cache the result--it's not going to change
-        return this.supportsTouchEvents.cache || (this.supportsTouchEvents.cache = !$A.util.isUndefined(document.ontouchstart) && $A.getContext().getMode() !== 'PTEST');
+        return this.supportsTouchEvents.cache || (this.supportsTouchEvents.cache = !$A.util.isUndefined(document.ontouchstart) && $A.getContext().getMode() !== 'PTEST' && $A.getContext().getMode() !== 'CADENCE');
     },
 
     initFastClick : function() {

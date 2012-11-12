@@ -23,12 +23,10 @@ import com.google.common.collect.ImmutableList;
 import org.auraframework.Aura;
 import org.auraframework.def.EventDef;
 import org.auraframework.instance.Event;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsFunction;
 
 public class ClientOutOfSyncException extends ClientSideEventException {
-
     private static final long serialVersionUID = 7178941169236716678L;
 
     /**
@@ -36,7 +34,6 @@ public class ClientOutOfSyncException extends ClientSideEventException {
      *
      * @param message the message.
      */
-
     public ClientOutOfSyncException(String message) {
         super(message);
     }
@@ -45,8 +42,6 @@ public class ClientOutOfSyncException extends ClientSideEventException {
     public Event getEvent() {
         try {
             return Aura.getInstanceService().getInstance("aura:clientOutOfSync", EventDef.class);
-        } catch (DefinitionNotFoundException x) {
-            throw new AuraRuntimeException(x);
         } catch (QuickFixException x) {
             throw new AuraRuntimeException(x);
         }
@@ -61,5 +56,4 @@ public class ClientOutOfSyncException extends ClientSideEventException {
     public int getStatusCode() {
         return HttpStatus.SC_NOT_FOUND;
     }
-
 }

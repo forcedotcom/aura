@@ -25,7 +25,6 @@ import com.google.common.collect.Maps;
 import org.auraframework.Aura;
 import org.auraframework.def.EventDef;
 import org.auraframework.instance.Event;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsFunction;
 
@@ -59,8 +58,6 @@ public class NoAccessException extends ClientSideEventException {
             attrs.put("redirectURL", redirectURL);
 
             return Aura.getInstanceService().getInstance("aura:noAccess", EventDef.class, attrs);
-        } catch (DefinitionNotFoundException x) {
-            throw new AuraRuntimeException(x);
         } catch (QuickFixException x) {
             throw new AuraRuntimeException(x);
         }
@@ -79,5 +76,4 @@ public class NoAccessException extends ClientSideEventException {
     public int getStatusCode() {
         return HttpStatus.SC_NOT_FOUND;
     }
-
 }

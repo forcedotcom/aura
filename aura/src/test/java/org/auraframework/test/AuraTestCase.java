@@ -102,7 +102,7 @@ public abstract class AuraTestCase extends UnitTestCase {
         if (clazz != null) {
             assertEquals("Exception must be "+clazz.getSimpleName(), clazz, e.getClass());
         }
-        assertTrue("unexpected message: "+e.getMessage(), e.getMessage().startsWith(message));
+        assertTrue("unexpected message: "+e.getMessage()+"!="+message, e.getMessage().startsWith(message));
         if (filename != null) {
             Location l = null;
 

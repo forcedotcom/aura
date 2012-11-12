@@ -95,7 +95,7 @@ public class ThemeParserTest extends AuraImplTestCase {
             descriptor.getDef();
             fail("Should have caught the bad css");
         } catch (ThemeParserException expected) {
-            assertTrue(expected.getMessage().contains(CSSParser.ISSUE_MESSAGE));
+            assertTrue(expected.getMessage().contains("Parse error"));
         }
     }
 

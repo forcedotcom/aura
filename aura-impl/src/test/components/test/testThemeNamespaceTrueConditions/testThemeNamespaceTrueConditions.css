@@ -17,9 +17,6 @@
  * Default styles
  */
 
-@def TOP_MENU_PADDING  1px;
-@def TOP_MENU_HEIGHT  15px;
-
 .THIS .default {
     border: 1px solid;
 }
@@ -100,7 +97,6 @@
 
 
 @if (WEBKIT) {
-  	@def DISPLAY_STYLE  inline;
   	.THIS .stackOrder {
     	z-index: 500;
     }
@@ -112,13 +108,13 @@
 }
 
 .THIS .displayStyle {
-	display: DISPLAY_STYLE
+	display: inline
 }
 
 @if (WEBKIT) {
   	.THIS .pLeft {
-    	padding-left: add(TOP_MENU_HEIGHT,
-    					  TOP_MENU_PADDING);
+    	padding-left: add(15px,
+    					  1px);
     }
 } 
 

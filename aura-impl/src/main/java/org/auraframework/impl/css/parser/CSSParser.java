@@ -23,6 +23,7 @@ import com.google.common.css.*;
 import com.google.common.css.JobDescription.OutputFormat;
 import com.google.common.css.compiler.ast.*;
 import com.google.common.css.compiler.passes.*;
+import com.google.common.css.compiler.passes.CreateConditionalNodes;
 
 /**
  * @since 0.0.369
@@ -62,100 +63,54 @@ public class CSSParser {
     /**
      * Parse the css and return the results.  If errors are found @see #hasErrors will return
      * true, and the error message will be found here @see #getErrorMessage
+     * @throws GssParserException 
      */
+    public ThemeParserResultHolder parse() throws GssParserException {
+        ThemeParserResultHolder resultHolder = new ThemeParserResultHolder();
+        SourceCode sc = new SourceCode(namespace, contents);
+        // parse the css tree
+        GssParser parser = new GssParser(ImmutableList.of(sc));
+        CssTree cssTree = parser.parse();
 
-    public ThemeParserResultHolder parse() {
-        try {
-            boolean meh = "mobileMobile".equals(namespace);
-            long t = System.currentTimeMillis();
-            ThemeParserResultHolder resultHolder = new ThemeParserResultHolder();
-            SourceCode sc = new SourceCode(namespace, contents);
-            // parse the css tree
-            GssParser parser = new GssParser(ImmutableList.of(sc));
-            long t2 = System.currentTimeMillis();
-            if (meh) {
-                System.err.println(namespace + " GssParser construction: " + Long.toString(t2 - t));
-            }
-            CssTree cssTree = parser.parse();
+        // creates conditional nodes out of @if and @else and such
+        new CreateConditionalNodes(cssTree.getMutatingVisitController(), errorManager).runPass();
 
-            long t3 = System.currentTimeMillis();
-            if (meh) {
-                System.err.println(namespace + " parsing tree: " + Long.toString(t3 - t2));
-            }
+        // replaces .THIS with the current component class
+        new CssClassRenaming(cssTree.getMutatingVisitController(), new ThisSubstitutionMap(namespace), null).runPass();
 
-            // replaces .THIS with the current component class
-            new CssClassRenaming(cssTree.getMutatingVisitController(), new ThisSubstitutionMap(namespace), null).runPass();
-
-            long t4 = System.currentTimeMillis();
-            if (meh) {
-                System.err.println(namespace + " CssClassRenaming: " + Long.toString(t4 - t3));
-            }
-            if (validateNamespace) {
-                // verifies all classes are namespaced
-                long tt = System.currentTimeMillis();
-                new VerifyComponentClass(namespace, cssTree.getMutatingVisitController(), errorManager).runPass();
-                long tt2 = System.currentTimeMillis();
-                if (meh) {
-                    System.err.println(namespace + " VerifyComponentClass: " + Long.toString(tt2 - tt));
-                }
-            }
-
-            // finds all the images referenced and adds cache busters
-            new GetComponentImageURLs(cssTree.getMutatingVisitController(), resultHolder).runPass();
-
-            long t5 = System.currentTimeMillis();
-            if (meh) {
-                System.err.println(namespace + " GetComponentImageURLs: " + Long.toString(t5 - t4));
-            }
-            // finds what conditionals are being used in this file
-            new VerifyConditions(cssTree.getMutatingVisitController(), allowedConditions, resultHolder, errorManager).runPass();
-
-            long t6 = System.currentTimeMillis();
-            if (meh) {
-                System.err.println(namespace + " VerifyConditions: " + Long.toString(t6 - t5));
-            }
-            if (resultHolder.getFoundConditions() != null) {
-                CssRootNode rootNode = cssTree.getRoot();
-                for (String condition : resultHolder.getFoundConditions()) {
-                    // need a copy of the tree, as eliminating the conditionals will modify it
-
-                    long tc = System.currentTimeMillis();
-                    CssTree treeCopy = new CssTree(sc, rootNode.deepCopy());
-                    System.err.println(namespace + " treecopy: " + Long.toString(System.currentTimeMillis() - tc));
-
-                    // eliminate everything but this condition
-                    new EliminateConditionalNodes(treeCopy.getMutatingVisitController(),
-                            ImmutableSet.of(condition)).runPass();
-                    // generate the css for this browser condition
-                    resultHolder.putBrowserCss(condition, this.print(OutputFormat.PRETTY_PRINTED, treeCopy));
-                }
-                // operate on clones.
-            }
-
-            long t7 = System.currentTimeMillis();
-            if (meh) {
-                System.err.println(namespace + " browser permutations: " + Long.toString(t7 - t6));
-            }
-            // eliminate all conditional nodes for the default output
-            new EliminateConditionalNodes(cssTree.getMutatingVisitController(),
-                    Collections.<String>emptySet()).runPass();
-
-            long t8 = System.currentTimeMillis();
-            if (meh) {
-                System.err.println(namespace + " default permutation: " + Long.toString(t8 - t7));
-            }
-            // generate the default css
-            resultHolder.setDefaultCss(this.print(OutputFormat.PRETTY_PRINTED, cssTree));
-            long t9 = System.currentTimeMillis();
-            if (meh) {
-                System.err.println(namespace + " default output: " + Long.toString(t9 - t8));
-                System.err.println(namespace + " totalt: " + Long.toString(t9 - t));
-            }
-            return resultHolder;
-        } catch (GssParserException g) {
-            errorManager.report(g);
-            return null;
+        if (validateNamespace) {
+            // verifies all classes are namespaced
+            new VerifyComponentClass(namespace, cssTree.getMutatingVisitController(), errorManager).runPass();
         }
+
+        // finds all the images referenced and adds cache busters
+        new GetComponentImageURLs(cssTree.getMutatingVisitController(), resultHolder).runPass();
+
+        // finds what conditionals are being used in this file
+        new VerifyConditions(cssTree.getMutatingVisitController(), allowedConditions, resultHolder, errorManager).runPass();
+
+        if (resultHolder.getFoundConditions() != null) {
+            CssRootNode rootNode = cssTree.getRoot();
+            for (String condition : resultHolder.getFoundConditions()) {
+                // need a copy of the tree, as eliminating the conditionals will modify it
+
+                CssTree treeCopy = new CssTree(sc, rootNode.deepCopy());
+                // eliminate everything but this condition
+                new EliminateConditionalNodes(treeCopy.getMutatingVisitController(),
+                        ImmutableSet.of(condition)).runPass();
+                // generate the css for this browser condition
+                resultHolder.putBrowserCss(condition, this.print(OutputFormat.PRETTY_PRINTED, treeCopy));
+            }
+            // operate on clones.
+        }
+
+        // eliminate all conditional nodes for the default output
+        new EliminateConditionalNodes(cssTree.getMutatingVisitController(),
+                Collections.<String>emptySet()).runPass();
+
+        // generate the default css
+        resultHolder.setDefaultCss(this.print(OutputFormat.PRETTY_PRINTED, cssTree));
+        return resultHolder;
     }
 
     /**
@@ -239,16 +194,10 @@ public class CSSParser {
     private static class ClosureErrorManager implements ErrorManager {
 
         private List<GssError> gssErrors = new ArrayList<GssError>();
-        private List<String> otherErrors = new ArrayList<String>();
 
         @Override
         public void report(GssError error) {
             gssErrors.add(error);
-        }
-
-        public void report(Throwable error) {
-            String cause = error.getCause()!=null ? error.getCause().getMessage() : error.getMessage();
-            otherErrors.add(cause);
         }
 
         @Override
@@ -258,7 +207,7 @@ public class CSSParser {
 
         @Override
         public boolean hasErrors() {
-            return gssErrors.size()+otherErrors.size()>0;
+            return !gssErrors.isEmpty();
         }
 
         public String formatErrors() {
@@ -266,10 +215,13 @@ public class CSSParser {
             for(GssError error : gssErrors) {
                 sb.append(error.format()).append("\n");
             }
-            for(String error : otherErrors) {
-                sb.append(error).append("\n");
-            }
             return sb.toString();
+        }
+
+        @Override
+        public void reportWarning(GssError warning) {
+            // what this do? just throw an error until we figure it out
+            gssErrors.add(warning);
         }
     }
 }

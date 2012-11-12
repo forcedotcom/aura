@@ -15,10 +15,7 @@
  */
 package org.auraframework.impl.css.parser;
 
-import java.util.*;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import java.util.Set;
 
 import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -26,6 +23,9 @@ import org.auraframework.impl.css.theme.ThemeDefImpl;
 import org.auraframework.system.*;
 import org.auraframework.throwable.ThemeParserException;
 import org.auraframework.util.AuraTextUtil;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.css.compiler.ast.GssParserException;
 
 /**
  */
@@ -73,34 +73,22 @@ public class ThemeParser implements Parser {
             
 
             CSSParser parser = new CSSParser(doValidation, className, source.getContents(), allowedConditions);
-            ThemeParserResultHolder resultHolder = parser.parse();
+            ThemeParserResultHolder resultHolder;
+            try {
+                resultHolder = parser.parse();
+            } catch (GssParserException e) {
+                throw new ThemeParserException(e.getMessage(), builder.getLocation());
+            }
 
             // scram if we found errors
             if (parser.hasErrors()) {
                 throw new ThemeParserException(parser.getErrorMessage(), builder.getLocation());
             }
 
-            //PlumeCSSParser parser = new PlumeCSSParser(className, source.getContents(), resultHolder, allowedConditions);
-
-            // create the default css - no conditions passed in
-            //String defaultCss = parser.parse(doValidation);
-
-
             builder.setCode(resultHolder.getDefaultCss());
-
-            // create the permutation css
-            //Map<Client.Type, String> browserCssMap = createCssPermutations(parser, defaultCss, resultHolder.getFoundConditions());
-
-            // not likely because the default css check will catch most everything
-            if (parser.hasErrors()) {
-                throw new ThemeParserException(parser.getErrorMessage(), builder.getLocation());
-            }
-
-
             builder.setCode(resultHolder.getBrowserCssMap());
             builder.setImageURLs(resultHolder.getImageURLs());
 
-            //System.err.println(descriptor.getName() + " this long: " + Long.toString(System.currentTimeMillis() - t));
             return (D)builder.build();
         }
         return null;

@@ -27,6 +27,7 @@ import org.auraframework.test.WebDriverTestCase;
 public class InputMultiSelectUITest extends WebDriverTestCase {
     private final String URL = "/uitest/inputMultiSelectTest.cmp";
     private Select inputSelect;
+    private WebElement selectElement;
     private WebElement submit;
     private WebElement output;
     private WebDriver d;
@@ -39,7 +40,8 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
         d = getDriver();
         open(URL);
 
-        inputSelect = new Select(d.findElement(By.xpath("//select[1]")));
+        selectElement = d.findElement(By.xpath("//select[1]"));
+        inputSelect = new Select(selectElement);
         submit = d.findElement(By.xpath("//button"));
         output = d.findElement(By.xpath("//span[@class='uiOutputText']"));
     }
@@ -53,7 +55,7 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
     }
 
     private void selectDeselectOption(String optionLabel, boolean isSelect) {
-        if (isSelect) {
+    	if (isSelect) {
             inputSelect.selectByVisibleText(optionLabel);
             verifyOptionSelected(optionLabel);
         } else {
@@ -91,7 +93,8 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
         openTestPage();
 
         // select
-        selectOption("Option1");
+        focusSelectElement();
+        selectOption("Option1"); 
         verifyOptionDeselected("Option2");
         verifyOptionDeselected("Option3");
 
@@ -102,6 +105,7 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
         verifyOptionDeselected("Option3");
 
         // deselect
+        focusSelectElement();
         deselectOption("Option1");
         selectOption("Option3");
         verifyOptionDeselected("Option2");
@@ -121,6 +125,7 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
         openTestPage();
 
         // select multiple
+        focusSelectElement();
         selectOption("Option1");
         selectOption("Option2");
         verifyOptionDeselected("Option3");
@@ -132,6 +137,7 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
         verifyOptionDeselected("Option3");
 
         // deselect
+        focusSelectElement();
         deselectOption("Option2");
         verifyOptionSelected("Option1");
 
@@ -149,6 +155,7 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
         openTestPage();
 
         // select all
+        focusSelectElement();
         selectOption("Option1");
         selectOption("Option2");
         selectOption("Option3");
@@ -178,8 +185,7 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
      * to picklist.
      * Initial load. Initially load multi picklist.
      */
-    // Uncomment after Bug: https://gus.salesforce.com/a07B0000000MmcbIAC
-    public void _testInputSelectMultipleWithInvalidOption() throws Exception {
+    public void testInputSelectMultipleWithInvalidOption() throws Exception {
         openTestPage();
         verifyOptionDeselected("Option1");
         verifyOptionDeselected("Option2");
@@ -192,5 +198,21 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
         verifyOptionDeselected("Option2");
         verifyOptionDeselected("Option3");
         verifyOptionSelected("Model");
+    }
+    
+    private void focusSelectElement() {
+        // Only for IE10 we need to explicitly bring focus on to select input
+    	// selectBy() does not do it. But clicking on select element corrupts
+    	// selected/unselected options so we need to preserve the state
+    	List<WebElement> selectedOptions = inputSelect.getAllSelectedOptions();
+    	selectElement.click();
+    	int checkNum = inputSelect.getAllSelectedOptions().size();
+    	
+    	if (checkNum != selectedOptions.size()) {
+	    	inputSelect.deselectAll();
+	    	for (int i=0; i<selectedOptions.size(); i++) {
+	    		inputSelect.selectByVisibleText(selectedOptions.get(i).getText());
+	    	}
+    	}
     }
 }

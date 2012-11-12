@@ -200,7 +200,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>11.0.1</version>
+                <version>13.0.1</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -302,7 +302,7 @@
             <dependency>
                 <groupId>com.google</groupId>
                 <artifactId>closure-stylesheets</artifactId>
-                <version>20120321</version>
+                <version>20121026</version>
             </dependency>
             <dependency>
                 <groupId>joda-time</groupId>

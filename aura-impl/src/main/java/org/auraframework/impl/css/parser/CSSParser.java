@@ -81,7 +81,7 @@ public class CSSParser {
         if (validateNamespace) {
             // verifies all classes are namespaced
             new VerifyComponentClass(namespace, cssTree.getMutatingVisitController(), errorManager).runPass();
-        }
+    }
 
         // finds all the images referenced and adds cache busters
         new GetComponentImageURLs(cssTree.getMutatingVisitController(), resultHolder).runPass();
@@ -182,14 +182,14 @@ public class CSSParser {
             this.namespace = namespace;
         }
 
-        @Override
-        public String get(String key) {
+            @Override
+            public String get(String key) {
             if (THIS_NAMESPACE.equals(key)) {
                 return namespace;
             }
             return null;
-        }
-    };
+            }
+        };
 
     private static class ClosureErrorManager implements ErrorManager {
 

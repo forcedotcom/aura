@@ -454,6 +454,9 @@ Aura.prototype.error = function(e){
     $A.util.removeClass(document.body, "loading");
     $A.util.addClass(document.body, "auraError");
 
+    if ($A.test) {
+        $A.test.fail(str);
+    }
     if (!$A.initialized) {
         $A["hasErrors"] = true;
     }

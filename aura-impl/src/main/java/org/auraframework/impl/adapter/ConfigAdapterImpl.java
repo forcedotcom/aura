@@ -27,7 +27,10 @@ import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraError;
+import org.auraframework.throwable.AuraException;
+import org.auraframework.throwable.AuraExceptionUtil;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.AuraValidationException;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.resource.ResourceLoader;
 
@@ -42,6 +45,7 @@ public class ConfigAdapterImpl implements ConfigAdapter{
     private final ResourceLoader resourceLoader;
     private final Long buildTimestamp;
     private String auraVersionString;
+    private boolean hasCompilationErrors = false;
 
 
     public ConfigAdapterImpl(){
@@ -120,7 +124,7 @@ public class ConfigAdapterImpl implements ConfigAdapter{
 
     @Override
     public synchronized void regenerateAuraJS() {
-        if (!isProduction() && jsGroup != null && jsGroup.isStale()) {
+        if (!isProduction() && jsGroup != null && (jsGroup.isStale() || hasCompilationErrors) ) {
             try {
                 File dest = AuraImplFiles.AuraResourceJavascriptDirectory.asFile();
                 File resourceDest = AuraImplFiles.AuraResourceJavascriptClassDirectory.asFile();
@@ -135,8 +139,11 @@ public class ConfigAdapterImpl implements ConfigAdapter{
                     is.close();
                     os.close();
                 }
-            } catch (IOException x) {
-                throw new AuraError("Unable to regenerate aura javascript", x);
+            	hasCompilationErrors = false;                
+            } catch (Exception x) {
+            	hasCompilationErrors = true; 
+                throw new AuraRuntimeException("Unable to regenerate aura javascript", x);
+
             }
         }
     }

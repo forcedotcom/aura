@@ -18,7 +18,7 @@ package org.auraframework.impl.css;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.css.parser.AuraCSSParser;
+import org.auraframework.impl.css.parser.CSSParser;
 import org.auraframework.impl.css.parser.ThemeParser;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Client;
@@ -68,7 +68,7 @@ public class ThemeParserTest extends AuraImplTestCase {
             descriptor.getDef();
             fail("Should have caught the css selector in caps.");
         } catch (ThemeParserException expected) {
-            assertTrue(expected.getMessage().contains(AuraCSSParser.ISSUE_MESSAGE));
+            assertTrue(expected.getMessage().contains(CSSParser.ISSUE_MESSAGE));
         }
     }
 
@@ -95,7 +95,7 @@ public class ThemeParserTest extends AuraImplTestCase {
             descriptor.getDef();
             fail("Should have caught the bad css");
         } catch (ThemeParserException expected) {
-            assertTrue(expected.getMessage().contains(AuraCSSParser.ISSUE_MESSAGE));
+            assertTrue(expected.getMessage().contains("Parse error"));
         }
     }
 

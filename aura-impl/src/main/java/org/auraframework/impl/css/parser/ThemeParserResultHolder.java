@@ -15,17 +15,50 @@
  */
 package org.auraframework.impl.css.parser;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+
+import org.auraframework.system.Client;
 
 public class ThemeParserResultHolder {
+    private String defaultCss;
+    private Map<Client.Type, String> browserCssMap = new EnumMap<Client.Type, String>(Client.Type.class);
     private Set<String> imageURLs;
+    private Set<String> foundConditions;
+
+    public String getDefaultCss() {
+        return defaultCss;
+    }
+
+    public void setDefaultCss(String defaultCss) {
+        this.defaultCss = defaultCss;
+    }
+
+    public Map<Client.Type, String> getBrowserCssMap() {
+        return browserCssMap;
+    }
+
+    public void putBrowserCss(String condition, String css) {
+        this.browserCssMap.put(Client.Type.valueOf(condition), css);
+    }
+    
+    public Set<String> getFoundConditions() {
+        return foundConditions;
+    }
+
+    public void addFoundConditions(String condition) {
+        if (this.foundConditions == null) {
+            this.foundConditions = new HashSet<String>();
+        }
+        this.foundConditions.add(condition);
+    }
+
     public Set<String> getImageURLs() {
         return imageURLs;
-    };
+    }
+
     public void addImageURL(String imageURL) {
-        if(imageURL != null && !imageURL.isEmpty()){
-            if(this.imageURLs == null){
+        if (imageURL != null && !imageURL.isEmpty()) {
+            if (this.imageURLs == null) {
                 this.imageURLs = new HashSet<String>();
             }
             this.imageURLs.add(imageURL);

@@ -22,7 +22,6 @@ import java.util.Calendar;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.http.HttpHeaders;
-
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.TestLabels;
 import org.auraframework.test.annotation.UnAdaptableTest;
@@ -55,10 +54,13 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         int statusCode = getHttpClient().executeMethod(get);
         assertEquals(HttpStatus.SC_OK, statusCode);
         String response = get.getResponseBodyAsString();
-        String expected = Arrays.toString("•".getBytes());
+        char expected = '•';
         String token = "content: '";
         int start = response.indexOf(token) + token.length();
-        String actual = Arrays.toString(response.substring(start, response.indexOf('\'',start)).getBytes());
+        
+        // Google closure-stylesheets now encodes unicode characters with the CSS unicode syntax '\FFFFFF'
+        // as a result, this character is now converted to '\2022' so to verify it's present, convert it to a char and compare
+        char actual = (char)Integer.parseInt(response.substring(start + 1, response.indexOf('\'', start)), 16);
         assertEquals(String.format("Failed to see the special character in the CSS file (%s)", url), expected, actual);
     }
     /**

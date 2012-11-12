@@ -93,6 +93,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     public static void setNoCache(HttpServletResponse response) {
         response.setHeader("Cache-Control", "no-cache, no-store");
+        response.setHeader("Pragma", "no-cache");
         response.setDateHeader("Expires", System.currentTimeMillis() - LONG_EXPIRE);
         response.setDateHeader("Last-Modified", System.currentTimeMillis() - LONG_EXPIRE);
     }
@@ -173,7 +174,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
         //}
         if (!written) {
             // Should we only delete for JSON?
-            deleteManifestCookie(response);
+            addManifestErrorCookie(response);
             setNoCache(response);
         }
         if (mappedEx instanceof IOException) {

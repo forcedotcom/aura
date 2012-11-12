@@ -15,12 +15,12 @@
  */
 package org.auraframework.impl.appCache;
 
-import org.openqa.selenium.By;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.*;
 import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.FreshBrowserInstance;
+import org.openqa.selenium.By;
 /**
  * UI automation for AppCache implementation.
  *
@@ -72,7 +72,7 @@ public class AppCacheProgressBarUITest extends WebDriverTestCase {
         getEval(String.format(APPCACHEPROGRESS, 50,100));
         waitForElementPresent("Progress bar for appCache is not visible visible.",
                 findDomElement(appCacheProgressDiv));
-        assertEquals("width: 50%; ",findDomElement(By.cssSelector("div[class~='progressBar']")).getAttribute("style"));
+        assertEquals("width: 50%;", findDomElement(By.cssSelector("div[class~='progressBar']")).getAttribute("style"));
 
         //Step 3: Fire a cached event and verify that progress bar has disappeared
         getEval(APPCACHECACHED);

@@ -45,6 +45,7 @@ public class ThemeDefImpl extends DefinitionImpl<ThemeDef> implements ThemeDef {
     protected ThemeDefImpl(Builder builder) {
         super(builder);
         this.code = builder.code;
+        // TODO: guava will have ImmutableEnumMap in v14
         this.browserCode = builder.browserCode;
         this.className = builder.className;
         if (builder.imageURLs == null) {

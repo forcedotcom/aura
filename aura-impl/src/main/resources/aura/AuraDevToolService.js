@@ -365,12 +365,12 @@ var AuraDevToolService = function() {
     s.helpText = [
         {
             title : 'Query all components',
-            code : '$A.q().query()',
+            code : '$A.getQueryStatement().query()',
             description : '"component" is the default view, and "*" is the default field'
         },
         {
             title : 'Choose a view to query',
-            code : '$A.q().from("componentDef").query()',
+            code : '$A.getQueryStatement().from("componentDef").query()',
             description : 'Available views are : '+function(views){
                 var ret = [];
                 for(var i in views){
@@ -381,22 +381,22 @@ var AuraDevToolService = function() {
         },
         {
             title : 'Choose fields to query',
-            code : '$A.q().from("component").field("toString").field("globalId").fields("def, super").query()',
+            code : '$A.getQueryStatement().from("component").field("toString").field("globalId").fields("def, super").query()',
             description : 'Any property or method on the view, any expression that can be resolved against the view may be specified. "get" and "is" are also tried as prefixes for resolving function names.  Multiple fields can be comma seperated or multiple calls to field() can be used.'
         },
         {
             title : 'Group results',
-            code : '$A.q().from("value").field("toString").groupBy("toString).query()',
+            code : '$A.getQueryStatement().from("value").field("toString").groupBy("toString).query()',
             description : 'The value of groupBy must be a selected field.'
         },
         {
             title : 'Define derived fields',
-            code : '$A.q().from("component").field("descriptor", "getDef().getDescriptor().toString()").query()',
+            code : '$A.getQueryStatement().from("component").field("descriptor", "getDef().getDescriptor().toString()").query()',
             description : 'The value of groupBy must be a selected field.'
         },
         {
             title : 'Diff the results of running a query twice',
-            code : 'var before = $A.q().query(); var after = $A.q().query(); after.diff(before);',
+            code : 'var before = $A.getQueryStatement().query(); var after = $A.getQueryStatement().query(); after.diff(before);',
             description : 'This is useful if you want to do something between running the before and after query.  Any options for queries can be used (fields, groupBy, etc...)'
         }
     ];

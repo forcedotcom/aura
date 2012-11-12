@@ -33,25 +33,27 @@ import org.auraframework.system.Location;
  * @see AuraError
  * @see AuraRuntimeException
  */
-public abstract class AuraException extends Exception {
+public abstract class AuraException extends Exception implements AuraExceptionInfo {
     private static final long serialVersionUID = 8678776658910679296L;
     private final Location location;
+    private final String extraMessage;
 
-    public AuraException(String msg, Location l, Throwable t) {
-        super(msg, t);
+    protected AuraException(String msg, Location l, Throwable t, String extraMessage) {
+        super(msg,t);
+        if (l != null) {
+            AuraExceptionUtil.addLocation(l, this);
+        }
         this.location = l;
-        AuraExceptionUtil.addLocation(l, this);
+        this.extraMessage = extraMessage;
     }
 
-    public AuraException(String msg) {
-        this(msg, null, null);
-    }
-
-    public AuraException(String msg, Location l) {
-        this(msg, l, null);
-    }
-
+    @Override
     public Location getLocation() {
-        return location;
+        return this.location;
+    }
+
+    @Override
+    public String getExtraMessage() {
+        return this.extraMessage;
     }
 }

@@ -479,7 +479,7 @@ public class AuraServlet extends AuraBaseServlet {
 
         try {
             if (context.getFormat() != Format.JSON) {
-                throw new AuraRuntimeException("Invalid request");
+                throw new AuraRuntimeException("Invalid request, post must use JSON");
             }
 
             Message<?> message;
@@ -495,7 +495,7 @@ public class AuraServlet extends AuraBaseServlet {
             String msg = messageParam.get(request);
 
             if (msg == null) {
-                throw new AuraRuntimeException("Invalid request");
+                throw new AuraRuntimeException("Invalid request, no message");
             }
             loggingService.startTimer(LoggingService.TIMER_DESERIALIZATION);
             try {

@@ -276,7 +276,6 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 Aura.getSerializationService().write(mappedEx, null, out);
             } catch (QuickFixException qfe) {
                 // TODO emit boilerplate "something bad happened" response
-                // throw new AuraRuntimeException(qfe);
                 Aura.getExceptionAdapter().handleException(qfe);
             }
             if (format == Format.JSON) {

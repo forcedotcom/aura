@@ -39,7 +39,7 @@ public abstract class QuickFixException extends AuraException implements JsonSer
     private final List<AuraQuickFix> quickFixes;
 
     public QuickFixException(String message, Location l, AuraQuickFix... quickFixes) {
-        super(message, l);
+        super(message, l, null, null);
         this.quickFixes = (quickFixes == null) ? null : ImmutableList.copyOf(quickFixes);
     }
 

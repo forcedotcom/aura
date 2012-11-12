@@ -185,10 +185,9 @@ public class AuraResourceServlet extends AuraBaseServlet {
             Component tmpl = instanceService.getInstance(tmplDesc, attribs);
             Aura.getRenderingService().render(tmpl, response.getWriter());
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            Aura.getExceptionAdapter().handleException(e);
             // Can't throw exception here: to set manifest OBSOLETE
-            // is there any way to log properly errors?
-            // throw new AuraRuntimeException(e);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
@@ -417,7 +416,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 try {
                     writeCss(request, response);
                 } catch (Throwable t) {
-                    handleServletException(t, false, context, request, response, true);
+                    handleServletException(t, true, context, request, response, true);
                 }
                 break;
             case JS:
@@ -425,7 +424,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
                     ret = writeDefinitions(request, response);
                     response.getWriter().println(ret);
                 } catch (Throwable t) {
-                    handleServletException(t, false, context, request, response, ret != null);
+                    handleServletException(t, true, context, request, response, ret != null);
                 }
                 break;
             case JSON:
@@ -433,7 +432,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
                     Aura.getConfigAdapter().validateCSRFToken(csrfToken.get(request));
                     writeComponents(request, response);
                 } catch (Throwable t) {
-                    handleServletException(t, false, context, request, response, true);
+                    handleServletException(t, true, context, request, response, true);
                 }
                 break;
             default:

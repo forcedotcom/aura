@@ -243,7 +243,7 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      * Topmost AuraRuntimeException is rethrown.
      */
     public void testPassQuickFixInstanceOfAuraRuntimeException() throws Exception {
-        Throwable child = new AuraRuntimeException(getName(), null, null);
+        Throwable child = new AuraRuntimeException(getName());
         Throwable t = new AuraRuntimeException(getName(), null, child);
         try {
             AuraExceptionUtil.passQuickFix(t);

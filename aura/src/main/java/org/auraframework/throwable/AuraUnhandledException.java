@@ -27,7 +27,13 @@ import org.auraframework.system.Location;
  */
 public class AuraUnhandledException extends AuraRuntimeException {
     private static final long serialVersionUID = 567465869440612069L;
-    private String extraInfo = "";
+
+    /**
+     * An unhandled exception that is a root exception
+     */
+    public AuraUnhandledException(String message) {
+        super(message);
+    }
 
     /**
      * An unhandled exception that does not have a location.
@@ -42,14 +48,4 @@ public class AuraUnhandledException extends AuraRuntimeException {
     public AuraUnhandledException(String message, Location l, Throwable e) {
         super(message, l, e);
     }
-
-    @Override
-    public String getMessage() {
-        return super.getMessage() + "\n" + extraInfo;
-    }
-
-    public void setExtraInfo(String extraInfo) {
-        this.extraInfo = extraInfo;
-    }
-
 }

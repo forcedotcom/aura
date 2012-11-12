@@ -234,16 +234,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
             // Actions run on servers need special handling because their call back methods are called
             // asynchronously.
             // This check is to make sure all such calls were complete
-            waitForCondition("return window.aura.test.isComplete()", 30);
-            String errors = (String)getEval("return window.aura.test.getErrors()");
-            if (!"".equals(errors)) {
-                @SuppressWarnings("unchecked")
-                List<Map<String, Object>> e = (List<Map<String, Object>>)new JsonReader().read(errors);
-                StringBuffer errorMessage = new StringBuffer();
-                for (int i = 0; i < e.size(); i++)
-                    errorMessage.append(e.get(i).get("message") + "\n");
-                fail(errorMessage.toString());
-            }
+            waitForCondition("return window.aura.test.isComplete()", 30); 
         }
         
         @Override

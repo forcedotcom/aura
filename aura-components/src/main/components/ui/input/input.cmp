@@ -25,6 +25,9 @@
 
     <aura:registerEvent name="change" type="ui:change" description="The event fired when the user changes the content of the input."/>
     <aura:registerEvent name="input" type="ui:inputEvent" description="The event fired when the user enters an input."/>
+    <aura:registerEvent name="copy" type="ui:copy" description="The event fired when the user copies content to the clipboard."/>
+    <aura:registerEvent name="cut" type="ui:cut" description="The event fired when the user cuts content to the clipboard."/>
+    <aura:registerEvent name="paste" type="ui:paste" description="The event fired when the user pastes content from the clipboard."/>
 
     <aura:registerEvent name="onError" type="ui:validationError" description="The event fired when there is validation error(s) on the component."/>
     <aura:registerEvent name="onClearErrors" type="ui:clearErrors" description="The event fired when we should clean up the validation error(s)."/>

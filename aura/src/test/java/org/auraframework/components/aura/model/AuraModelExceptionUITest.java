@@ -45,7 +45,7 @@ public class AuraModelExceptionUITest extends WebDriverTestCase {
 
     public void testModelSerializationException() throws Exception {
         openNoAura("/auratest/testModelThatThrows.cmp");
-        waitForAuraInit();
+        waitForAuraError();
         List<WebElement> errorBoxes = getDriver().findElements(By.cssSelector(".auraForcedErrorBox"));
         assertEquals("Renderer element found", 0, errorBoxes.size());
         errorBoxes = getDriver().findElements(By.cssSelector(".auraErrorBox"));

@@ -93,7 +93,8 @@ public class DefDescriptorImplTest extends AuraImplTestCase{
 
         assertNull(testDescriptorNullTag);
 
-        // test getting type instances
+        // test getting type instances.
+        // Why did qualified name EVER match?? --fka3
         testDescriptor = DefDescriptorImpl.getInstance("Aura.Component", TypeDef.class);
         assertSame(testDescriptor, (DefDescriptorImpl.getInstance("aura://Aura.Component", TypeDef.class)));
 

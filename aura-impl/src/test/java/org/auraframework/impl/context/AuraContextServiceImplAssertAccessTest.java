@@ -40,8 +40,7 @@ public class AuraContextServiceImplAssertAccessTest extends AuraImplTestCase {
     }
 
     public AuraContextServiceImplAssertAccessTest(String name) {
-        super(name);
-        shouldSetupContext = false;
+        super(name, false);
     }
 
     private Throwable assertException(DefDescriptor<?> desc, Class<? extends Throwable> exClass, String message) {

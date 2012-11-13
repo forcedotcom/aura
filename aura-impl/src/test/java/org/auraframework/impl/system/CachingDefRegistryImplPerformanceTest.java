@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestSuite;
+
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -185,10 +186,9 @@ public class CachingDefRegistryImplPerformanceTest extends TestSuite {
         PerformanceTestUtil ptestUtil;
 
         public CachingDefRegistryImplPerformanceTestCases(String name){
-            super(name);
             // The behavior of caching Def registry changes based on Context.
             // So it is necessary to let each test case set its own context
-            shouldSetupContext = false;
+            super(name, false);
             URL resultsURL = getClass().getResource("/results/"+this.getClass().getSimpleName());
             File resultsDir = null;
             if (resultsURL != null) {

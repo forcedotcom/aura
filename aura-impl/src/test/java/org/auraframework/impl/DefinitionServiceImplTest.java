@@ -46,8 +46,7 @@ import com.google.common.collect.Sets;
  */
 public class DefinitionServiceImplTest extends AuraImplTestCase {
     public DefinitionServiceImplTest(String name) {
-        super(name);
-        shouldSetupContext = false;
+        super(name, false);
     }
 
     @Override

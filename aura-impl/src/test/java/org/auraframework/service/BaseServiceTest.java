@@ -19,9 +19,6 @@ import java.io.IOException;
 import java.lang.reflect.*;
 import java.util.List;
 
-
-import com.google.common.collect.Lists;
-
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
@@ -29,6 +26,8 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
+
+import com.google.common.collect.Lists;
 
 /**
  */
@@ -42,8 +41,7 @@ public abstract class BaseServiceTest<T extends AuraService, C extends BaseServi
     protected Method auraMethod;
 
     public BaseServiceTest(String name) {
-        super(name);
-        shouldSetupContext = false;
+        super(name, false);
     }
 
     @Override

@@ -18,7 +18,6 @@ package org.auraframework.impl.root;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -144,39 +143,6 @@ public class AttributeSetImplTest extends AuraImplTestCase {
         }
         assertTrue(body instanceof ArrayList);
         return ((ArrayList<Component>)body);
-    }
-    /**
-     * Verify that expressions can be used to specify default values of attributes of top level components.
-     */
-    //TODO W-1276960
-    @Ignore
-    public void testExpressionsAsAttributeDefaultValuesAtTopLevel() throws Exception{
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
-                String.format(
-                        baseComponentTag,
-                        "model='java://org.auraframework.impl.java.model.TestJavaModel'",
-                        "<aura:attribute name='valueFromModel' type='String' default='{!m.string}'/>"
-                                + "<aura:attribute name='stringAttr' type='String' default='fooBar'/>"
-                                + "<aura:attribute name='valueFromAttr' type='String' default='{!v.stringAttr}'/>"
-                                + "<aura:attribute name='flag' type='Boolean' default='false'/>"
-                                + "<aura:attribute name='valueFromExpressionUsingAttr' type='String' default='{!v.flag?true:false}'/>"),
-            ComponentDef.class);
-        Component childCmp = Aura.getInstanceService().getInstance(cmpDesc);
-        assertEquals("Model", childCmp.getValue(new PropertyReferenceImpl("m.string", AuraUtil
-                .getExternalLocation("direct attributeset access"))));
-        assertEquals("Failed to evaluate expression(using model values) for attribute default value.", "Model",
-                childCmp.getValue(new PropertyReferenceImpl("v.valueFromModel", AuraUtil
-                        .getExternalLocation("direct attributeset access"))));
-
-        assertEquals("foobar", childCmp.getValue(new PropertyReferenceImpl("v.stringAttr", AuraUtil
-                .getExternalLocation("direct attributeset access"))));
-        assertEquals("Failed to evaluate expression(using attribute values) for attribute default value.", "foobar",
-                childCmp.getValue(new PropertyReferenceImpl("v.valueFromAttr", AuraUtil
-                        .getExternalLocation("direct attributeset access"))));
-
-        assertEquals("Failed to evaluate conditional expression(using attribute values) for attribute default value.",
-                "false", childCmp.getValue(new PropertyReferenceImpl("v.valueFromExpressionUsingAttrr", AuraUtil
-                        .getExternalLocation("direct attributeset access"))));
     }
 
     /**

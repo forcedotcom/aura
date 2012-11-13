@@ -18,9 +18,10 @@
 <aura:component extends="auradocs:topicPanel">
        <aura:set attribute="title" value="aura:renderIf "/>
 
-       <p>Renders the content within the tag if the <code>isTrue</code> attribute evaluates to true.
-        Use <code>plume:renderIf</code> only if you need to instantiate the components in both the <code>body</code> and <code>else</code> attributes,
+       <p><code>aura:renderIf</code> renders the content within the tag if the <code>isTrue</code> attribute evaluates to true.
+        Use <code>aura:renderIf</code> only if you need to instantiate the components in both the <code>body</code> and <code>else</code> attributes,
         regardless of the value of <code>isTrue</code>.</p>
+        <p>See <auradocs:defLink descriptor="aura:renderIf" defType="component">aura:renderIf</auradocs:defLink> for source files.</p>
 
        <p>
        <table class="table table-bordered table-striped">
@@ -29,21 +30,18 @@
                      <td><b>Attribute Name</b></td>
                      <td><b>Type</b></td>
                      <td><b>Description</b></td>
-                     <td><b>Required?</b></td>
               </tr>
           </thead>
           <tbody>
               <tr>
                      <td><code>else</code></td>
-                     <td>Component[]</td>
+                     <td>component[]</td>
                      <td>The markup to render when <code>isTrue</code> evaluates to false. Set this attribute using the <code>aura:set</code> tag.</td>
-                     <td></td>
               </tr>
               <tr>
                      <td><code>isTrue</code></td>
-                     <td>String</td>
-                     <td>An expression that determines whether the content is displayed. If it evaluates to true, the content is displayed.</td>
-                     <td>Y</td>
+                     <td>string</td>
+                     <td>Required. An expression that determines whether the content is displayed. If it evaluates to true, the content is displayed.</td>
               </tr>
           </tbody>
        </table>
@@ -64,9 +62,8 @@
 
        <auradocs:example descriptor="auradocs:sampleRenderMe" />
 
-        <p>The <code>aura:renderIf</code> component displays the  elements in the body
-       only if the <code>desc</code> attribute contains a value.
-       In other words, the content of the <code>aura:renderIf</code> component will be displayed if the
-       <code>isTrue</code> attribute evaluates to true. The <code>desc</code> attribute is set in <code>sampleRender.cmp</code>, which extends <code>sampleRenderMe.cmp</code>.</p>
+        <p>The <code>aura:renderIf</code> component displays the  elements in the body when the <code>isTrue</code> attribute evaluates to true.
+       In this case, the body displays only if the <code>desc</code> attribute contains a value.
+       The <code>desc</code> attribute is set in <code>sampleRender.cmp</code>, which extends <code>sampleRenderMe.cmp</code>.</p>
 
 </aura:component>

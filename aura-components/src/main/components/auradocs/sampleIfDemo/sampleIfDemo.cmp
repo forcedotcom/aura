@@ -18,7 +18,7 @@
 <aura:component extensible="true">
     <aura:attribute name="show" type="String"/>
 
-    <aura:If isTrue="{!v.show != null}">
+    <aura:if isTrue="{!v.show != null}">
 
     <p>isTrue evaluates to  true: {!v.show}</p>
 
@@ -28,5 +28,5 @@
 
        <p> {!v.else}</p>
 
-    </aura:If>
+    </aura:if>
 </aura:component>

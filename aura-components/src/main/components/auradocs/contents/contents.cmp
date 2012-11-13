@@ -166,7 +166,7 @@
         <auradocs:contentsNode text="Reference" >
             <auradocs:contentsNode text="Overview" id="reference"/>
             <auradocs:contentsNode text="Javadoc" id="javadoc"/>
-            <auradocs:contentsNode text="aura:If " id="tagIf" />
+            <auradocs:contentsNode text="aura:if " id="tagIf" />
             <auradocs:contentsNode text="aura:renderIf " id="tagRenderIf" />
             <auradocs:contentsNode text="aura:iteration" id="tagIteration" />
             <auradocs:contentsNode text="System Tags">

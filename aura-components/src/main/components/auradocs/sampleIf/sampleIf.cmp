@@ -19,7 +19,7 @@
 <aura:component extends="auradocs:sampleIfDemo">
 
 <aura:set attribute="show">
-      <p>so this component from sampleIfDemo is rendered.</p>
+      <p>So this component from sampleIfDemo is rendered.</p>
   </aura:set>
 
 </aura:component>

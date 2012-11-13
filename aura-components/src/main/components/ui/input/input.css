@@ -30,3 +30,15 @@
 .uiInput.hide {
     display: none;
 }
+
+.uiInput:invalid {
+  box-shadow: none;
+}
+ 
+.uiInput:-moz-submit-invalid {
+  box-shadow: none;
+}
+ 
+.uiInput:-moz-ui-invalid {
+  box-shadow:none;
+}

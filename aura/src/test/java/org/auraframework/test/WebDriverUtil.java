@@ -21,6 +21,7 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.internal.BuildInfo;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
@@ -39,7 +40,8 @@ public final class WebDriverUtil {
         PHONE("deviceType", "phone"),
         TABLET("deviceType", "tablet"),
         LANDSCAPE("deviceOrientation", "landscape"),
-        PORTRAIT("deviceOrientation", "portrait");
+        PORTRAIT("deviceOrientation", "portrait"),
+        DISABLE_NATIVE_EVENTS("webdriverEnableNativeEvents", "false");
 
         private String value;
         private String name;
@@ -59,7 +61,7 @@ public final class WebDriverUtil {
     }
     
     public enum BrowserType {
-        FIREFOX(DesiredCapabilities.firefox(), null, Platform.ANY),
+        FIREFOX(DesiredCapabilities.firefox(), null, Platform.ANY, ExtraCapability.DISABLE_NATIVE_EVENTS),
         IE10(DesiredCapabilities.internetExplorer(), "10", "Windows 2012"),
         IE9(DesiredCapabilities.internetExplorer(), "9", Platform.VISTA),
         IE8(DesiredCapabilities.internetExplorer(), "8", Platform.WINDOWS),
@@ -75,28 +77,38 @@ public final class WebDriverUtil {
         private String version;
 
         private BrowserType(DesiredCapabilities capabilities, String version, String platform, ExtraCapability... extraCapabilities) {
-            this.capability = capabilities;
+        	this.capability = capabilities;
             this.version = version;
-            if (capabilities != null) {
+        	if (capabilities != null) {
                 this.capability.setCapability("platform", platform);
             }
-            for (ExtraCapability extra : extraCapabilities) {
-                this.capability.setCapability(extra.getCapabilityName(), extra.getValue());
-            }
+            initExtraCapabilities(extraCapabilities);
         }
 
         private BrowserType(DesiredCapabilities capabilities, String version, Platform platform, ExtraCapability... extraCapabilities) {
-            this.capability = capabilities;
+        	this.capability = capabilities;
             this.version = version;
-            if (capabilities != null) {
+        	if (capabilities != null) {
                 this.capability.setPlatform(platform);
             }
-            for (ExtraCapability extra : extraCapabilities) {
-                this.capability.setCapability(extra.getCapabilityName(), extra.getValue());
-            }
+        	initExtraCapabilities(extraCapabilities);
         }
 
-        public DesiredCapabilities getCapability() {
+        private void initExtraCapabilities(ExtraCapability... extraCapabilities) {            
+            for (ExtraCapability extra : extraCapabilities) {
+            	// newer versions of firefox no longer support native events
+                if (extra.getCapabilityName().equals(ExtraCapability.DISABLE_NATIVE_EVENTS.getCapabilityName()) 
+                		&& this.capability.getBrowserName().equals("firefox")) {
+                	FirefoxProfile firefoxProfile = new FirefoxProfile();
+                	firefoxProfile.setEnableNativeEvents(Boolean.parseBoolean(extra.getValue()));
+                	this.capability.setCapability("firefox_profile", firefoxProfile);
+                } else {
+                	this.capability.setCapability(extra.getCapabilityName(), extra.getValue());
+                }
+            }
+        }
+        
+        public DesiredCapabilities getCapability() {            
             return new DesiredCapabilities(this.capability);
         }
 

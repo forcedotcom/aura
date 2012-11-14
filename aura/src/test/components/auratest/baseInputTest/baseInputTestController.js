@@ -14,36 +14,39 @@
  * limitations under the License.
  */
 {
-	submit : function(component, event) {
+	submit : function(component, event) {		
 		var cmpType = component.get("v.cmpType");
 		var inputCmpValue = component.get('v.ref');
-		
-		var a = component.get("c.echo" + cmpType);
-		
-		a.setParams({
-            inVar : inputCmpValue
-        });
-		
-        a.setCallback(component, function(action){
-        	var retValue;
-			var inputCmp = $A.getRoot().getSuper().getConcreteComponent().find(cmpType);
-			var value = inputCmp.getValue("v.value");
-	      	
-	        if (action.getState() === "SUCCESS") {
-	        	retValue = action.getReturnValue();
-	        	
-	        	// clean error
-	        	if (!value.isValid()) {
-	        		value.setValid(true);
-	        	}
-	        } else {
-	        	retValue = "Got Error!";
-	        	var errors = action.getError();
-	        	value.setValid(false);
-                value.addErrors(errors);
-	        }
-	        component.find("outputValue").getAttributes().setValue("value", retValue);
-        });
+
+		try {
+			var a = component.get("c.echo" + cmpType);
+			
+			a.setParams({
+	            inVar : inputCmpValue
+	        });
+	        
+	        a.setCallback(component, function(action){
+	        	var retValue;
+				var inputCmp = $A.getRoot().getSuper().getConcreteComponent().find(cmpType);
+				var value = inputCmp.getValue("v.value");
+		      	
+		        if (action.getState() === "SUCCESS") {
+		        	retValue = action.getReturnValue();
+		        	
+		        	// clean error
+		        	if (!value.isValid()) {
+		        		value.setValid(true);
+		        	}
+		        } else {
+		        	retValue = "Got Error!";
+		        	value.setValid(false);
+		        	value.addErrors(action.getError());
+		        }
+		        component.find("outputValue").getAttributes().setValue("value", retValue);
+	        });
+        } catch(e) {
+        	$A.test.fail("Test fail! Unexpected error: " + e.message);       
+        }
         
         this.runAfter(a);
 	}

@@ -19,7 +19,7 @@
     <aura:attribute name="cmpType" type="string" default="Decimal" />
     <aura:attribute name="ref" type="Object" />
 
-    <ui:inputNumber aura:id="inputValue" value="{!m.decimal}" step="0.001"/>
+    <ui:inputNumber aura:id="inputValue" value="{!m.decimal}" step="0.001" updateOn="keyup"/> <!-- updateOn=keyup necessary for ipad automation. Webdriver does not handle updateOn=change well. -->
     <br/>
     <ui:button label="submit" press="{!c.submit}"/>
     <br/>

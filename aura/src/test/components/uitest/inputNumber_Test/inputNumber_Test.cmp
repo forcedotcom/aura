@@ -16,10 +16,9 @@
 
 -->
 <aura:component model="java://org.auraframework.impl.java.model.TestJavaModel">
-
     <aura:attribute name="testCmpName" type="string" default="Number"/>
 
-    <ui:inputNumber aura:id="Number" value="{!m.number}"/> <br/>
+    <ui:inputNumber aura:id="Number" value="{!m.number}" updateOn="keyup"/> <br/> <!-- updateOn=keyup necessary for ipad automation. Webdriver does not handle updateOn=change well. -->
 
     <auratest:baseInputTest cmpType="{!v.testCmpName}" ref="{!m.number}"/>
 

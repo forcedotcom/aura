@@ -134,7 +134,7 @@ var ComponentPriv = (function(){ // Scoping priv
                 }
             }        
             
-            return suffix ? id + ":" + suffix : id;
+            return suffix ? (id + ":" + suffix) : id;
         } else {
             return (nextClientCreatedComponentId++) + ":c";
         }

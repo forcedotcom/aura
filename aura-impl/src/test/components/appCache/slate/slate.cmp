@@ -16,5 +16,7 @@
 
 -->
 <aura:component>
+	<aura:attribute name="output" type="String"/>
     <div class="clickableme" onclick="{!c.cssalert}">@@@TOKEN@@@</div>
+    <div class="attroutput">{!v.output}</div>
 </aura:component>

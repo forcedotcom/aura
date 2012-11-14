@@ -99,4 +99,5 @@ public interface Action extends Instance<ActionDef> {
 
 	public void registerComponent(BaseComponent<?, ?> component);
 	public Map<String, BaseComponent<?, ?>> getComponents();
+	public int getNextId();
 }

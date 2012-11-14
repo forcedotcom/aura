@@ -117,15 +117,24 @@ var ComponentPriv = (function(){ // Scoping priv
     };
 
     ComponentPriv.prototype.nextGlobalId = function(localCreation){
-        var ctx = $A.getContext();
-        var suffix = "";
-        var num = ctx.getNum();
-        if (num > 0) {
-            suffix = ":" + (num);
-        }
-
         if (!localCreation) {
-            return ctx.getNextGlobalId() + suffix;
+        	var context = $A.getContext();
+            var currentAction = context.getCurrentAction();
+            
+            var id;
+            var suffix;
+            if (currentAction){
+            	id = currentAction.getNextGlobalId();
+            	suffix = currentAction.getId();
+            } else {
+            	id = context.getNextGlobalId();
+            	var num = context.getNum();
+                if (num > 0) {
+                    suffix = num;
+                }
+            }        
+            
+            return suffix ? id + ":" + suffix : id;
         } else {
             return (nextClientCreatedComponentId++) + ":c";
         }

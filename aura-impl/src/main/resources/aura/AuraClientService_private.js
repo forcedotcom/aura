@@ -335,16 +335,12 @@ var priv = {
 	            }
 	
 	            if(actionsToComplete.length > 0) {
-        			// Bump num in order to isolate the locally satisfied actions from those that actually go to the server
-        			$A.getContext().incrementNum();
-	            	
 	            	var that = this;
 	        		setTimeout(function() {
 	        			for(var n = 0; n < actionsToComplete.length; n++) {
 	        				var info = actionsToComplete[n];
 	        				
-	        				clientService.sanitizeStoredResponse(info.response);
-	        				
+	        				clientService.sanitizeStoredResponse(info.action, info.response);		        				
 	        				info.action.complete(info.response);
 	        			}
 	        			
@@ -407,15 +403,15 @@ var priv = {
         actionCollectedCallback();
     },
     
-    sanitizeStoredResponse: function(response) {
+    sanitizeStoredResponse: function(action, response) {
 		// Sanitize generation number references
 		var santizedComponents = {};
 		
-        var num = $A.getContext().getNum();
+        var suffix = action.getId();
 		var globalId;
 		var components = response["components"];
 		for(globalId in components) {
-			var newGlobalId = globalId.substr(0, globalId.indexOf(":") + 1) + num;
+			var newGlobalId = globalId.substr(0, globalId.indexOf(":") + 1) + suffix;
 			
 			// Rewrite the globalId
 			var c = components[globalId]; 
@@ -430,7 +426,7 @@ var priv = {
 		if(returnValue) {
     		globalId = returnValue["globalId"];
     		if(globalId) {
-    			returnValue["globalId"] = globalId.substr(0, globalId.indexOf(":") + 1) + num;
+    			returnValue["globalId"] = globalId.substr(0, globalId.indexOf(":") + 1) + suffix;
     		}
 		}
     },

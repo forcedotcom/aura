@@ -148,7 +148,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, get.getStatusCode());
         assertEquals(expectedRedirect, get.getResponseHeader("Location").getValue());
         assertEquals("no-cache, no-store", get.getResponseHeader("Cache-Control").getValue());
-        //assertEquals("no-cache", get.getResponseHeader("Pragma").getValue());
+        assertEquals("no-cache", get.getResponseHeader("Pragma").getValue());
     }
 
     /**

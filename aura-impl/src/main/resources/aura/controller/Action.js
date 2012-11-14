@@ -45,8 +45,6 @@ Action.prototype.auraType = "Action";
 Action.prototype.getId = function() {
 	if (!this.id) {
 		this.id = (Action.prototype.nextActionId++) + "." + $A.getContext().getNum();
-		
-		$A.log("Action", this.id);
 	}
 
     return this.id;
@@ -133,7 +131,7 @@ Action.prototype.run = function(evt) {
     } catch (e) {
         $A.log("Action "+this.getDef().toString()+"Failed", e);
     } finally {
-        if (!finished) {
+        if (!finished){
             this.state = "FAILURE";
         }
     }

@@ -190,4 +190,15 @@ public class InputTextUITest extends WebDriverTestCase {
         String value = (String) getEval(valueExpression);
         return value;
     }
+    
+    public void testNullValue() throws Exception{
+        String cmpSource = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> " +
+                            "<ui:inputText value=\"{!m.StringNull}\"/>" +
+                         "</aura:component>";
+        addSource("inputtextnullvalue", cmpSource, ComponentDef.class);
+        open("/string/inputtextnullvalue.cmp");
+
+        WebElement input = getDriver().findElement(By.tagName("input"));
+        assertEquals("Value of input is incorrect", "", input.getText());
+    }
 }

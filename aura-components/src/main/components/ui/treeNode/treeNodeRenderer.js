@@ -38,7 +38,12 @@
             var elem = cmp.getElement();
             if (active) {
                 elem.setAttribute('active', 'true');
-                elem.scrollIntoViewIfNeeded();
+                if(elem.scrollIntoViewIfNeeded){
+	                elem.scrollIntoViewIfNeeded();                
+                }
+                else{
+					elem.scrollIntoView(false);
+                }
             } else {
                 elem.removeAttribute('active');
             }

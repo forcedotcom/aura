@@ -47,20 +47,20 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     private final int hashCode;
 
     private static final class DescriptorKey {
-        private final String qualifiedName;
+        private final String name;
         private final Class<? extends Definition> clazz;
 
-        public DescriptorKey(String qualifiedName, Class<? extends Definition> clazz) {
+        public DescriptorKey(String name, Class<? extends Definition> clazz) {
             // FIXME: this case flattening would remove the extra copies of definitions.
             // If we go case sensitive, we won't want it though.
             //this.qualifiedName = qualifiedName.toLowerCase();
-            this.qualifiedName = qualifiedName;
+            this.name = name;
             this.clazz = clazz;
         }
 
         @Override
         public int hashCode() {
-            return this.qualifiedName.hashCode() + this.clazz.hashCode();
+            return this.name.hashCode() + this.clazz.hashCode();
         }
 
         @Override
@@ -72,7 +72,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                 return false;
             }
             DescriptorKey dk = (DescriptorKey)obj;
-            return dk.clazz.equals(this.clazz) && dk.qualifiedName.equals(this.qualifiedName);
+            return dk.clazz.equals(this.clazz) && dk.name.equals(this.name);
         }
     }
 
@@ -307,19 +307,33 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     /**
      * FIXME: this method is ambiguous about wanting a qualified, simple, or descriptor name.
      *
-     * @param qualifiedName The simple String representation of the instance requested ("foo:bar" or java://foo.Bar)
+     * @param name The simple String representation of the instance requested ("foo:bar" or "java://foo.Bar")
      * @param defClass The Interface's Class for the DefDescriptor being requested.
      * @return An instance of a AuraDescriptor for the provided tag
      */
-    public static <E extends Definition> DefDescriptor<E> getInstance(String qualifiedName, Class<E> defClass) {
-        if(qualifiedName == null || defClass == null){
+    public static <E extends Definition> DefDescriptor<E> getInstance(String name, Class<E> defClass) {
+        if(name == null || defClass == null){
             throw new AuraRuntimeException("descriptor is null");
         }
-        DescriptorKey dk = new DescriptorKey(qualifiedName, defClass);
+        DescriptorKey dk = new DescriptorKey(name, defClass);
         @SuppressWarnings("unchecked")
         DefDescriptor<E> result = (DefDescriptor<E>)cache.getIfPresent(dk);
         if (result == null) {
-            result = buildInstance(qualifiedName, defClass);
+            result = buildInstance(name, defClass);
+            // Our input names may not be qualified, but we should ensure that the fully-qualified
+            // is properly cached to the same object.  I'd like an unqualified name to either
+            // throw or be resolved first, but that's breaking or non-performant respectively.
+            if (!dk.name.equals(result.getQualifiedName())) {
+                DescriptorKey fullDK = new DescriptorKey(result.getQualifiedName(), defClass);
+                @SuppressWarnings("unchecked")
+                DefDescriptor<E> fullResult = (DefDescriptor<E>) cache.getIfPresent(fullDK);
+                if (fullResult == null) {
+                    cache.put(fullDK, result);
+                } else {
+                    // We already had one, just under the proper name
+                    result = fullResult;
+                }
+            }
             cache.put(dk, result);
         }
         return result;

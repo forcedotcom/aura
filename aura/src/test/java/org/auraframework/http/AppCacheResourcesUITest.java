@@ -21,13 +21,8 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.junit.Ignore;
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.auraframework.Aura;
 import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.def.ComponentDef;
@@ -45,16 +40,22 @@ import org.auraframework.test.annotation.FreshBrowserInstance;
 import org.auraframework.test.annotation.TestLabels;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.controller.TestLoggingAdapterController;
-import org.auraframework.util.IOUtil;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.IOUtil;
 import org.auraframework.util.javascript.directive.DirectiveBasedJavascriptGroup;
 import org.auraframework.util.javascript.directive.DirectiveTypes;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
+import org.junit.Ignore;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * Tests for AppCache functionality by watching the requests received at the server and verifying that the updated
@@ -63,9 +64,11 @@ import com.google.common.collect.Lists;
  *
  * @since 0.0.224
  */
+//FF pops a dialog for appCache
+//IE < 10 don't support appCache
+@ExcludeBrowsers({ BrowserType.FIREFOX, BrowserType.IE7, BrowserType.IE8, BrowserType.IE9, BrowserType.IE10 })
 @UnAdaptableTest
 @FreshBrowserInstance
-@ExcludeBrowsers({BrowserType.FIREFOX, BrowserType.IE7, BrowserType.IE8, BrowserType.IE9, BrowserType.IE10})
 public class AppCacheResourcesUITest extends WebDriverTestCase {
     private final static String TARGET_NAME = "appCache:withpreload";
     private final static String COOKIE_NAME = "SELENIUM_appCache_withpreload_lm";
@@ -180,13 +183,10 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, replacement, TOKEN);
         List<Request> expected = Lists.newArrayList(
-                new Request("/aura", TARGET_NAME, null, null), // initAsync (cached)
-                new Request("/auraResource", null, null, "manifest"), // check manifest
-                new Request("/auraResource", null, null, "manifest"), // new manifest
-                new Request("/aura", TARGET_NAME, null, "HTML"), // rest are cache updates
+                new Request("/aura", TARGET_NAME, null, null),
+                new Request("/aura", TARGET_NAME, null, "HTML"),
                 new Request("/auraResource", null, null, "css"),
                 new Request("/auraResource", null, null, "js"),
-                new Request("/aura", TARGET_NAME, null, null),
                 new Request("/auraResource", null, null, "manifest"));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
@@ -222,12 +222,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         logs = loadMonitorAndValidateApp(TOKEN, replacement, TOKEN, TOKEN);
         List<Request> expected = Lists.newArrayList(
                 new Request("/aura", TARGET_NAME, null, null), // initAsync (cached)
-                new Request("/auraResource", null, null, "manifest"), // check manifest
-                new Request("/auraResource", null, null, "manifest"), // new manifest
                 new Request("/aura", TARGET_NAME, null, "HTML"), // rest are cache updates
                 new Request("/auraResource", null, null, "css"),
                 new Request("/auraResource", null, null, "js"),
-                new Request("/aura", TARGET_NAME, null, null),
                 new Request("/auraResource", null, null, "manifest"));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
@@ -256,12 +253,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         logs = loadMonitorAndValidateApp(replacement, TOKEN, TOKEN, TOKEN);
         List<Request> expected = Lists.newArrayList(
                 new Request("/aura", TARGET_NAME, null, null), // initAsync (cached)
-                new Request("/auraResource", null, null, "manifest"), // check manifest
-                new Request("/auraResource", null, null, "manifest"), // new manifest
                 new Request("/aura", TARGET_NAME, null, "HTML"), // rest are cache updates
                 new Request("/auraResource", null, null, "css"),
                 new Request("/auraResource", null, null, "js"),
-                new Request("/aura", TARGET_NAME, null, null),
                 new Request("/auraResource", null, null, "manifest"));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
@@ -308,12 +302,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
             logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, replacement);
             List<Request> expected = Lists.newArrayList(
                     new Request("/aura", TARGET_NAME, null, null), // initAsync (cached)
-                    new Request("/auraResource", null, null, "manifest"), // check manifest
-                    new Request("/auraResource", null, null, "manifest"), // new manifest
                     new Request("/aura", TARGET_NAME, null, "HTML"), // rest are cache updates
                     new Request("/auraResource", null, null, "css"),
                     new Request("/auraResource", null, null, "js"),
-                    new Request("/aura", TARGET_NAME, null, null),
                     new Request("/auraResource", null, null, "manifest"));
             assertRequests(expected, logs);
             assertAppCacheStatus(Status.IDLE);
@@ -358,8 +349,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
             System.out.println("A: "+r);
         }
 
-
-        List<Request> actualCopy = Lists.newArrayList(actual);
+        Set<Request> actualCopy = Sets.newHashSet(actual);
         for (Request r : expected) {
             actualCopy.remove(r);
         }
@@ -397,9 +387,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         });
         List<Request> logs = endMonitoring();
         elem.click();
-        Alert alert = getDriver().switchTo().alert();
-        alert.accept();
-        assertEquals("Unexpected alert text", String.format("%s\n%s\n%s", jsToken, cssToken, fwToken), alert.getText());
+        WebElement output = findDomElement(By.cssSelector("div.attroutput"));
+        assertEquals("Unexpected alert text", String.format("%s%s%s", jsToken, cssToken, fwToken), output.getText());
 
         return logs;
     }

@@ -18,12 +18,14 @@
      * Adds an event handler for input specific DOM event for which this input has a Aura-equivalent handler
      */
     addInputDomEvents : function(component) {
-        if (component.hasEventHandler("input")) {
-            this.addDomHandler(component, "input");
-        }
-        if (component.hasEventHandler("change")) {
-            this.addDomHandler(component, "change");
-        }
+    	var events = ["input", "change", "paste", "copy", "cut"];
+    	
+    	for (var i=0, len=events.length; i < len; i++) {
+            if (component.hasEventHandler(events[i])) {
+                this.addDomHandler(component, events[i]);
+            }    		
+    	}
+
         var updateOn = this.getUpdateOn(component);
         if (updateOn) {
             var handledEvents = this.getHandledDOMEvents(component);

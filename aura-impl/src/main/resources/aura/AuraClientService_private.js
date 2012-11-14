@@ -614,7 +614,7 @@ var priv = {
 
         if(priv.appcacheDownloadingEventFired && priv.isOutdated){
             // No one should get here.
-            alert('Outdated.');
+            $A.log('Outdated.');
         }
     },
 

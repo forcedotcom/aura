@@ -244,7 +244,7 @@
                 <div class="auraMsgBox auraErrorBox" aura:id="auraError">
                     <h2>
                         <a class="close" onclick="dismissError();" href="javascript:void(0);">&times;</a>
-                        Oh dear, something's gone wrong:
+                        Oops, there's a problem:
                     </h2>
                     <div id="auraErrorMessage">{!v.errorMessage}</div>
                 </div>

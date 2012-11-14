@@ -116,6 +116,16 @@ Json.prototype._resolveRefs = function(config, cache, newValue) {
  */
 Json.prototype.encode = function(obj, replacer, whiteSpace){
     if (typeof(JSON) !== "undefined") {
+        if ($A.util.isUndefinedOrNull(replacer)) {
+            return JSON.stringify(obj, function(key, value) { 
+                return aura.util.json.encodeFunction(value); // We have to do this as JSON.stringify removes the property from the resulted JSON string if its value is a function 
+            }, whiteSpace);
+        } else {
+            return JSON.stringify(obj, replacer, whiteSpace);
+        }
+    }
+    
+    if (typeof(JSON) !== "undefined") {
         return JSON.stringify(obj, replacer, whiteSpace);
     }
 
@@ -158,4 +168,14 @@ Json.prototype.encode = function(obj, replacer, whiteSpace){
     }
 };
 
+/**
+ * Encode function to String.
+ * @param {Function} value The function to be encoded.
+ */
+Json.prototype.encodeFunction = function(value) { 
+    if (typeof value === 'function') {
+        return value + '';
+    }
+    return value;
+};
 //#include aura.util.Json_export

@@ -40,9 +40,9 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
+import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -174,7 +174,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
         //}
         if (!written) {
             // Should we only delete for JSON?
-            addManifestErrorCookie(response);
+            deleteManifestCookie(response);
             setNoCache(response);
         }
         if (mappedEx instanceof IOException) {

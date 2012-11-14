@@ -15,11 +15,16 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.impl.java.model.TestJavaModel">
-    <aura:attribute name="testCmpName" type="string" default="Number"/>
+<aura:component extensible="true">
+    <aura:attribute name="show" type="String"/>
 
-    <ui:inputNumber aura:id="Number" value="{!m.number}" updateOn="keyup"/> <br/> <!-- updateOn=keyup necessary for ipad automation. Webdriver does not handle updateOn=change well. -->
+    <aura:if isTrue="{!v.show != null}">
 
-    <auratest:baseInputTest cmpType="{!v.testCmpName}" ref="{!m.number}"/>
+    <p>isTrue evaluates to  true: {!v.show}</p>
 
+        <aura:set attribute="else">
+        <p>isTrue evaluates to false</p>
+        </aura:set>
+
+    </aura:if>
 </aura:component>

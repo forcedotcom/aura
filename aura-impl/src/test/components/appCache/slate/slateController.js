@@ -15,7 +15,21 @@
  */
 {
     cssalert:function(c){
-        var style = $A.test.getStyle(c.getElement(),"background-image");
-        alert('@@@TOKEN@@@\n' + style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')')) + '\n' + $A.test.dummyFunction());
+    	function getStyle(elem, style){
+            var val = "";
+            if(document.defaultView && document.defaultView.getComputedStyle){
+                val = document.defaultView.getComputedStyle(elem, "").getPropertyValue(style);
+            }
+            else if(elem.currentStyle){
+                style = style.replace(/\-(\w)/g, function (s, ch){
+                    return ch.toUpperCase();
+                });
+                val = elem.currentStyle[style];
+            }
+            return val;
+        };
+
+        var style = getStyle(c.getElement(),"background-image");
+        c.getValue("v.output").setValue('@@@TOKEN@@@' + style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')')) + ($A.test ? $A.test.dummyFunction() : "@@@TOKEN@@@"));
     }
 }

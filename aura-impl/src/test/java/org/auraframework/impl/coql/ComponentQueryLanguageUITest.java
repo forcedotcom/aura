@@ -43,7 +43,7 @@ public class ComponentQueryLanguageUITest extends WebDriverTestCase {
      * For the rest of the test cases, look at js://cmpQueryLanguage.query
      * @throws Exception
      */
-    public void testQueryLanguageNotAvailableInNonprodMode() throws Exception{
+    public void testQueryLanguageAvailableInNonprodMode() throws Exception{
         open("/test/laxSecurity.app");
         Object query = getEval("return window.$A.getQueryStatement");
         assertNotNull("Query language should be available in non PROD mode.", query);

@@ -23,10 +23,8 @@
     <p>isTrue evaluates to  true: {!v.show}</p>
 
         <aura:set attribute="else">
-        <p>isTrue is false</p>
+        <p>isTrue evaluates to false</p>
         </aura:set>
-
-       <p> {!v.else}</p>
 
     </aura:if>
 </aura:component>

@@ -19,7 +19,7 @@
        <aura:set attribute="title" value="aura:if "/>
 
        <p><code>aura:if</code> renders the content within the tag if the <code>isTrue</code> attribute evaluates to true. Aura evaluates the <code>isTrue</code> expression on the server and instantiate components
-       either in its <code>body</code> or <code>else</code> attribute. Use <code>aura:if</code> if you don't need to instantiate the components for both <code>body</code> and <code>else</code> attributes.</p>
+       either in its <code>body</code> or <code>else</code> attribute. </p>
         <p>See <auradocs:defLink descriptor="aura:if" defType="component">aura:if</auradocs:defLink> for source files.</p>
        <p>
        <table class="table table-bordered table-striped">
@@ -62,4 +62,5 @@
         <p>The <code>aura:if</code> component displays the  elements in the body when the <code>isTrue</code> attribute evaluates to true. In this case, the body displays when the <code>show</code> attribute contains a value.
          The <code>show</code> attribute is set in <code>sampleIf.cmp</code>, which extends <code>sampleIfDemo.cmp</code>.</p>
 
+        <auradocs:info>To instantiate the components for both <code>body</code> and <code>else</code> attributes, use <auradocs:defLink descriptor="aura:renderIf" defType="component">aura:renderIf</auradocs:defLink> instead.</auradocs:info>
 </aura:component>

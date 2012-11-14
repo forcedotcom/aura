@@ -72,7 +72,8 @@ public class AppCacheProgressBarUITest extends WebDriverTestCase {
         getEval(String.format(APPCACHEPROGRESS, 50,100));
         waitForElementPresent("Progress bar for appCache is not visible visible.",
                 findDomElement(appCacheProgressDiv));
-        assertEquals("width: 50%;", findDomElement(By.cssSelector("div[class~='progressBar']")).getAttribute("style"));
+        
+        assertEquals("width: 50%;", findDomElement(By.cssSelector("div[class~='progressBar']")).getAttribute("style").trim());
 
         //Step 3: Fire a cached event and verify that progress bar has disappeared
         getEval(APPCACHECACHED);

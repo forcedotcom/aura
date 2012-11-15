@@ -47,5 +47,6 @@ exp(p,
     "getNonCommentNodes", p.getNonCommentNodes,
     "isNodeDeleted", p.isNodeDeleted,
     "select", p.select,
-    "dummyFunction", p.dummyFunction
+    "dummyFunction", p.dummyFunction,
+    "checkUndefinedMsg", p.checkUndefinedMsg
 );

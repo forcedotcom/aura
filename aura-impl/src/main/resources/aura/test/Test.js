@@ -537,6 +537,19 @@ var Test = function(){
         // Used by tests to modify framework source to trigger JS last mod update
         dummyFunction : function(){
             return '@@@TOKEN@@@';
+        },
+
+        // Checks if undefined variable message is correct. Message varies across browsers.
+        checkUndefinedMsg : function(variable, msg) {
+            var chromeMsg = variable + " is not defined";
+            var ieMsg = "\'" + variable + "\' is undefined";
+            var iosMsg = "Can't find variable: " + variable;
+
+            if (msg == chromeMsg || msg == ieMsg || msg == iosMsg) {
+                return true;
+            } else {
+                return false;
+            }
         }
     };
 

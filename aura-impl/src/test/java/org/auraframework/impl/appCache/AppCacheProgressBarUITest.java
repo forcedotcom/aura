@@ -16,8 +16,8 @@
 package org.auraframework.impl.appCache;
 
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.*;
-import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.FreshBrowserInstance;
 import org.openqa.selenium.By;
@@ -28,7 +28,7 @@ import org.openqa.selenium.By;
  * @userStory a07B0000000LyOe
  * @since 0.0.224
  */
-@ExcludeBrowsers({BrowserType.FIREFOX, BrowserType.IE7, BrowserType.IE8, BrowserType.IE9, BrowserType.IE10})
+@TargetBrowsers({BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET})
 public class AppCacheProgressBarUITest extends WebDriverTestCase {
     private final String PROGRESSEVENTSCRIPT = "var evt = new ProgressEvent('%s', {%s});"+
                                                 "window.applicationCache.dispatchEvent(evt);";
@@ -58,6 +58,7 @@ public class AppCacheProgressBarUITest extends WebDriverTestCase {
      * Verify that progress bar shows true progress by simulating the progress event.
      * @throws Exception
      */
+    @ExcludeBrowsers({BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE})
     public void testProgressBarBySimulatingProgressEvents() throws Exception{
         open("/appCache/testApp.app", Mode.DEV);
         waitForElementAbsent("Progress bar for appCache is visible even after aura is ready.",
@@ -84,6 +85,7 @@ public class AppCacheProgressBarUITest extends WebDriverTestCase {
      * Verify that when a noupdate event is fired for appcache, the progress bar doesn't show up.
      * @throws Exception
      */
+    @ExcludeBrowsers({BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE})
     public void testNoUpdateBySimulatingEvents() throws Exception{
         open("/appCache/testApp.app", Mode.DEV);
 
@@ -103,6 +105,7 @@ public class AppCacheProgressBarUITest extends WebDriverTestCase {
      * @throws Exception
      */
     @FreshBrowserInstance
+    @ExcludeBrowsers({BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE})
     public void testProgressbarNotVisibleInPRODMode()throws Exception{
         openNoAura("/appCache/testApp.app?aura.mode=PROD");
         assertFalse("Progress bar for appCache should not show up in PROD mode.",

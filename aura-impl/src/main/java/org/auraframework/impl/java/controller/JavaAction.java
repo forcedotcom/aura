@@ -192,6 +192,10 @@ public class JavaAction implements Action {
         return componentRegistry;
     }
 
+	@Override
+	public int getNextId() {
+		return nextId++;
+	}
 
     private final DefDescriptor<ControllerDef> controllerDescriptor;
     private final JavaActionDef actionDef;
@@ -202,4 +206,5 @@ public class JavaAction implements Action {
     private State state;
     private String id;
     private final Map<String, BaseComponent<?, ?>> componentRegistry = Maps.newLinkedHashMap();
+    private int nextId = 1;
 }

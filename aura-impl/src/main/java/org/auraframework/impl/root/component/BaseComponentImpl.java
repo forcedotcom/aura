@@ -328,10 +328,24 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
      */
     private static String getNextGlobalId() {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        Integer i = context.getNextId();
         String num = Aura.getContextService().getCurrentContext().getNum();
-        String suffix = num == null ? "" : ":" + num;
-        return i.toString() + suffix;
+        Action action = context.getCurrentAction();
+        int id;
+        String suffix;
+        if (action != null) {
+        	id = action.getNextId();
+        	suffix = action.getId();
+        } else {
+        	id = context.getNextId();
+        	suffix = num;
+        }
+        
+        String globalId = String.valueOf(id);
+        if (suffix != null) {
+        	globalId = String.format("%s:%s", globalId, suffix);
+        }
+        
+        return globalId;    
     }
 
     @Override

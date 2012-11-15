@@ -32,10 +32,9 @@ var Action = function Action(def, method, paramDefs, cmp) {
     this.cmp = cmp;
     this.params = {};
     this.state = "NEW";
-    this.id = (Action.prototype.nextActionId++) + ":" + $A.getContext().getNum();
 };
 
-Action.prototype.nextActionId = 0;
+Action.prototype.nextActionId = 1;
 Action.prototype.auraType = "Action";
 
 /**
@@ -44,7 +43,24 @@ Action.prototype.auraType = "Action";
  * @returns {String}
  */
 Action.prototype.getId = function() {
+	if (!this.id) {
+		this.id = (Action.prototype.nextActionId++) + "." + $A.getContext().getNum();
+	}
+
     return this.id;
+};
+
+/**
+ * Gets the next action scoped Id.
+ * @private
+ * @returns {String}
+ */
+Action.prototype.getNextGlobalId = function() {
+	if (!this.nextGlobalId) {
+		this.nextGlobalId = 1;
+	}
+	
+    return this.nextGlobalId++;
 };
 
 /**
@@ -115,7 +131,7 @@ Action.prototype.run = function(evt) {
     } catch (e) {
         $A.log("Action "+this.getDef().toString()+"Failed", e);
     } finally {
-        if (!finished) {
+        if (!finished){
             this.state = "FAILURE";
         }
     }
@@ -171,55 +187,61 @@ Action.prototype.runAfter = function(action) {
  * @private
  * @param {Object} response
  */
-Action.prototype.complete = function(response) {
+Action.prototype.complete = function(response) {	
     this.state = response["state"];
     this.returnValue = response.returnValue;
     this.error = response.error;
 	this.storage = response["storage"];
     
-	// Add in any Action scoped components /or partial configs
-    var components = response["components"];
-	if (components) {
-		$A.getContext().joinComponentConfigs(components);
+	var context = $A.getContext();
+	var previous = context.setCurrentAction(this);
+	try {
+		// Add in any Action scoped components /or partial configs
+	    var components = response["components"];
+		if (components) {
+			context.joinComponentConfigs(components);
+		}
+	
+	    if (this.callback && (this.cmp === undefined || this.cmp.isValid())) {
+	        this.callback.call(this.callbackScope, this);
+	    }
+	    
+	    var storage = $A.storageService.getStorage();
+	    if (storage && this._isStoreable() && this.getState() === "SUCCESS") {
+	    	var storageName = storage.getName();
+	    	var key = this.getStorageKey();
+	    	if (!this.storage) {
+	    		// Rewrite any embedded ComponentDef from object to descriptor only
+		    	for(var globalId in components) {
+	    			var c = components[globalId];
+	    			if (c) {
+		    			var def = c["componentDef"];
+		    			c["componentDef"] = { "descriptor": def["descriptor"] };
+	    			}
+		    	}    		
+		    	
+		    	var stored = { 
+		    		"returnValue": response.returnValue, 
+		    		"components": components,
+		    		"state": "SUCCESS",
+		    		"storage": {
+		    			"name": storageName,
+		    			"created": new Date().getTime()
+		    		}
+				};
+		    	
+		    	storage.put(key, stored);
+	    	} else {
+	    		// DCHASMAN TODO Just update the last accessed timestamp for the item
+		    	//storage.log("Updating last accessed timestamp for action in " + storageName + " storage adapter", key);
+	    		
+	    		// Initiate auto refresh if configured to do so
+	    		this.refresh();
+	    	}
+	    }
+	} finally {
+		context.setCurrentAction(previous);
 	}
-
-    if (this.callback && (this.cmp === undefined || this.cmp.isValid())) {
-        this.callback.call(this.callbackScope, this);
-    }
-    
-    var storage = $A.storageService.getStorage();
-    if (storage && this._isStoreable() && this.getState() === "SUCCESS") {
-    	var storageName = storage.getName();
-    	var key = this.getStorageKey();
-    	if (!this.storage) {
-    		// Rewrite any embedded ComponentDef from object to descriptor only
-	    	for(var globalId in components) {
-    			var c = components[globalId];
-    			if (c) {
-	    			var def = c["componentDef"];
-	    			c["componentDef"] = { "descriptor": def["descriptor"] };
-    			}
-	    	}    		
-	    	
-	    	var stored = { 
-	    		"returnValue": response.returnValue, 
-	    		"components": components,
-	    		"state": "SUCCESS",
-	    		"storage": {
-	    			"name": storageName,
-	    			"created": new Date().getTime()
-	    		}
-			};
-	    	
-	    	storage.put(key, stored);
-    	} else {
-    		// DCHASMAN TODO Just update the last accessed timestamp for the item
-	    	//storage.log("Updating last accessed timestamp for action in " + storageName + " storage adapter", key);
-    		
-    		// Initiate auto refresh if configured to do so
-    		this.refresh();
-    	}
-    }
 };
 
 /**

@@ -350,6 +350,11 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 	        return componentRegistry;
 	    }
 		
+		@Override
+		public int getNextId() {
+			return nextId++;
+		}
+		
 		
         private String qualifiedName;
         private Map<String, Object> actionParams;
@@ -359,5 +364,6 @@ public abstract class IntegrationTestCase extends AuraTestCase {
         private PostMethod post;
         private String rawResponse;
         private final Map<String, BaseComponent<?, ?>> componentRegistry = Maps.newLinkedHashMap();
+        private int nextId = 1;
     }
 }

@@ -198,4 +198,20 @@ AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs){
     }
 };
 
+/**
+ * @private
+ */
+AuraContext.prototype.setCurrentAction = function(action){
+	var previous = this.currentAction;
+    this.currentAction = action;
+    return previous;
+};
+
+/**
+ * @private
+ */
+AuraContext.prototype.getCurrentAction = function(action){
+    return this.currentAction;
+};
+
 //#include aura.context.AuraContext_export

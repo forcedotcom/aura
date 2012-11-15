@@ -1,0 +1,111 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5">
+
+	<display-name>Aura Sample</display-name>
+
+	<filter>
+		<filter-name>AuraContextFilter</filter-name>
+		<filter-class>org.auraframework.http.AuraContextFilter</filter-class>
+		<init-param>
+			<param-name>componentDir</param-name>
+			<param-value>/WEB-INF/components</param-value>
+		</init-param>
+	</filter>
+
+	<!-- Begin Aura Servlet -->
+
+	<filter>
+		<filter-name>AuraRewriteFilter</filter-name>
+		<filter-class>org.auraframework.http.AuraRewriteFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<url-pattern>*.cmp</url-pattern>
+		<filter-name>AuraRewriteFilter</filter-name>
+	</filter-mapping>
+
+	<filter-mapping>
+		<url-pattern>*.app</url-pattern>
+		<filter-name>AuraRewriteFilter</filter-name>
+	</filter-mapping>
+
+
+	<servlet>
+		<servlet-name>AuraServlet</servlet-name>
+		<servlet-class>org.auraframework.http.AuraServlet</servlet-class>
+		<load-on-startup>0</load-on-startup>
+	</servlet>
+
+	<filter-mapping>
+		<filter-name>AuraContextFilter</filter-name>
+		<url-pattern>/aura</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+	</filter-mapping>
+
+	<servlet-mapping>
+		<servlet-name>AuraServlet</servlet-name>
+		<url-pattern>/aura</url-pattern>
+	</servlet-mapping>
+
+
+	<!-- Begin Aura ResourceServlet -->
+
+	<filter>
+		<filter-name>AuraResourceRewriteFilter</filter-name>
+		<filter-class>org.auraframework.http.AuraResourceRewriteFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<url-pattern>/l/*</url-pattern>
+		<filter-name>AuraResourceRewriteFilter</filter-name>
+	</filter-mapping>
+
+	<servlet>
+		<servlet-name>AuraResourceServlet</servlet-name>
+		<servlet-class>org.auraframework.http.AuraResourceServlet</servlet-class>
+		<load-on-startup>0</load-on-startup>
+	</servlet>
+
+	<filter-mapping>
+		<filter-name>AuraContextFilter</filter-name>
+		<url-pattern>/auraResource</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+	</filter-mapping>
+
+	<servlet-mapping>
+		<servlet-name>AuraResourceServlet</servlet-name>
+		<url-pattern>/auraResource</url-pattern>
+	</servlet-mapping>
+
+	<!-- Begin Aura Framework Servlet -->
+	<servlet>
+		<servlet-name>AuraFrameworkServlet</servlet-name>
+		<servlet-class>org.auraframework.http.AuraFrameworkServlet</servlet-class>
+		<load-on-startup>0</load-on-startup>
+	</servlet>
+	<filter>
+		<filter-name>CompressingFilter</filter-name>
+		<filter-class>com.planetj.servlet.filter.compression.CompressingFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>CompressingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<servlet-mapping>
+		<servlet-name>AuraFrameworkServlet</servlet-name>
+		<url-pattern>/auraFW/*</url-pattern>
+	</servlet-mapping>
+
+</web-app>
+
+

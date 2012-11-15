@@ -72,7 +72,9 @@
 
     <h2>Unrendering Components</h2>
 
-    <p>The <code>unrender()</code> function is for advanced use cases that we will document later. It can be useful when you are working with third-party libraries that are not native to the framework.</p>
+    <p>The base <code>unrender()</code> function deletes all the DOM nodes rendered by a component's <code>render()</code> function. It is called by the framework when a component is being destroyed. Customize this behavior by overriding <code>unrender()</code> in your component's renderer. This can be useful when you are working with third-party libraries that are not native to the framework.</p>
+
+    <p>You generally want to extend default unrendering by calling <code>superUnrender()</code> from your <code>unrender()</code> function before you add your custom code.</p>
 
     <h2>Rendering Example</h2>
 

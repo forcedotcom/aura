@@ -246,11 +246,7 @@
                 function(){
                     var serverCmp = this.extractCmpFromPlaceholder(body[0],"markup://loadLevelTest:clientWithLazyClientChild");
 
-                    var makeServer = serverCmp.find('makeServer');
-                    var btn = makeServer.getElement();
-                    var evt = document.createEvent("Events");
-                    evt.initEvent("click",true,true);
-                    btn.dispatchEvent(evt);
+                    serverCmp.find('makeServer').get('e.press').fire();
 
                     var innerCmpBody = serverCmp.get('v.body');
                     $A.test.assertEquals("markup://aura:placeholder", innerCmpBody[0].getDef().getDescriptor().getQualifiedName());

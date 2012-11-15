@@ -453,7 +453,10 @@ Aura.prototype.error = function(e){
     $A.util.getElement("auraErrorMessage").innerHTML = str;
     $A.util.removeClass(document.body, "loading");
     $A.util.addClass(document.body, "auraError");
-
+   
+    if ($A.test) {
+        $A.test.fail(str);
+    }
     if (!$A.initialized) {
         $A["hasErrors"] = true;
     }

@@ -15,23 +15,19 @@
  */
 package org.auraframework.components.ui;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.auraframework.test.WebDriverTestCase;
 
 public class ButtonUITest extends WebDriverTestCase {
 
-	public ButtonUITest(String name) {
-		super(name);
-	}
+    public ButtonUITest(String name) {
+        super(name);
+    }
 
-	public void testButtonLabelRequired() throws Exception {
-		String errorMsg = "COMPONENT markup://uitest:buttonLabelRequiredTest is missing required attribute 'label'";
-		openNoAura("/uitest/buttonLabelRequiredTest.cmp");
-		waitForAuraError();
-        
-        WebElement errorBox = getDriver().findElement(By.id("auraErrorMessage"));
-        String actualError = errorBox.getText();
+    public void testButtonLabelRequired() throws Exception {
+        String errorMsg = "COMPONENT markup://uitest:buttonLabelRequiredTest is missing required attribute 'label'";
+        openNoAura("/uitest/buttonLabelRequiredTest.cmp");
+        waitForDocumentReady();
+        String actualError = getQuickFixMessage();
         assertTrue("Required label error not displayed", actualError.contains(errorMsg));
     }
 }

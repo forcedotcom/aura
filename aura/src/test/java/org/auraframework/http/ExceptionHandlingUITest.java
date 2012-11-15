@@ -63,26 +63,16 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     private void assertNoStacktrace() throws Exception {
-        String baseSelector = "div#auraErrorMessage";
-        WebElement elem = findDomElement(By.cssSelector(baseSelector));
-        if (elem == null) {
-            fail("error message not found");
-        }
-        String actual = elem.getText().replaceAll("\\s+", " ");
+        String actual = getQuickFixMessage().replaceAll("\\s+", " ");
         assertEquals("Unable to process your request", actual);
     }
 
     private void assertStacktrace(String messageStartsWith, String... causeStartsWith) throws Exception {
-        String baseSelector = "div#auraErrorMessage";
-        WebElement elem = findDomElement(By.cssSelector(baseSelector));
-        if (elem == null) {
-            fail("error message not found");
-        }
-        String actual = elem.getText().replaceAll("\\s+", " ");
+        String actual = getQuickFixMessage().replaceAll("\\s+", " ");
         if (!actual.contains(messageStartsWith)) {
             fail("unexpected error message - expected <" + messageStartsWith + "> but got <" + actual + ">");
         }
-        String childSelector = baseSelector;
+        String childSelector = "#auraErrorMessage";
         for (String expectedCause : causeStartsWith) {
             childSelector = childSelector + " > init";
             WebElement childElem = findDomElement(By.cssSelector(childSelector));

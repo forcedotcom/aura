@@ -44,10 +44,9 @@
         <div aura:id="scrollContent" class="{!v.scrollContentClass}">
             <aura:renderif isTrue="{!v.onPullToRefresh != null}">
                 <div aura:id="pullDown" class="pullToRefresh pullDown">
-                    <a class="refreshLabel" onclick="{!v.onPullToRefresh}" href="javascript:void(0)">Refresh</a>
                     <span class="pullDownIcon"></span>
                     <div>
-                        <div class="label pullLabel">{!v.pullToRefreshPull}</div>
+                        <div class="label pullLabel"><a onclick="{!v.onPullToRefresh}" href="javascript:void('scroller')">{!v.pullToRefreshPull}</a></div>
                         <div class="label releaseLabel">{!v.pullToRefreshRelease}</div>
                         <div class="label loadingLabel">{!v.pullToRefreshUpdating}</div>
                         <span class="subtitle">{!v.pullToRefreshSubtitle}</span>

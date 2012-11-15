@@ -25,12 +25,6 @@
     padding: 10px;
 }
 
-.uiScroller .refreshLabel {
-    position: absolute;
-    top: -10000px;
-    left: -10000px
-}
-
 .uiScroller .pullToRefresh .subtitle {
     font-weight: normal;
     font-size: 13px;

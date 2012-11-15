@@ -20,13 +20,12 @@ import java.net.URI;
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.auraframework.test.annotation.ThreadHostileTest;
 
 /**
  * Base class with some helper methods specific to Aura.
- *
- *
- *
  */
+@ThreadHostileTest
 public abstract class AuraHttpTestCase extends IntegrationTestCase {
     public AuraHttpTestCase(String name) {
         super(name);

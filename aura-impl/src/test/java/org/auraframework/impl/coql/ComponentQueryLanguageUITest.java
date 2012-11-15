@@ -18,18 +18,23 @@ package org.auraframework.impl.coql;
 import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.annotation.ThreadHostileTest;
+
 /**
  * Automation for COQL (Component Query Language).
  * COQL is available in all modes except PRODUCTION
  *
  * @since 0.0.302
  */
+@ThreadHostileTest
 public class ComponentQueryLanguageUITest extends WebDriverTestCase {
     public ComponentQueryLanguageUITest(String name){
         super(name);
     }
+
     /**
      * Verify that query language is not available in PROD mode.
+     * 
      * @throws Exception
      */
     public void testQueryLanguageNotAvailableInprodMode() throws Exception{
@@ -38,9 +43,11 @@ public class ComponentQueryLanguageUITest extends WebDriverTestCase {
         Object query = getEval("return window.$A.getQueryStatement");
         assertNull("Query language should not be available in PROD mode.", query);
     }
+
     /**
-     * Verify that query language is available in non prod mode.
-     * For the rest of the test cases, look at js://cmpQueryLanguage.query
+     * Verify that query language is available in non prod mode. For the rest of the test cases, look at
+     * js://cmpQueryLanguage.query
+     * 
      * @throws Exception
      */
     public void testQueryLanguageAvailableInNonprodMode() throws Exception{

@@ -24,10 +24,17 @@ import org.auraframework.impl.root.RootDefFactory;
 import org.auraframework.impl.source.SourceFactory;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.SourceLoader;
+import org.auraframework.test.annotation.ThreadHostileTest;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
+/**
+ * ThreadHostile because it relies on exclusive control of the string source loader.
+ * 
+ * @see org.auraframework.impl.registry.RootDefFactoryTest
+ */
+@ThreadHostileTest
 public class MasterDefRegistryImplTest extends AuraImplTestCase {
     private String baseContents = "<aura:application></aura:application>";
     private Set<String> prefixes = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
@@ -39,24 +46,36 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     @SuppressWarnings("unchecked")
     public void testFindRegex() throws Exception {
-        SourceLoader stringLoader = StringSourceLoader.getInstance();
-        List<SourceLoader> stringLoaders = Lists.newArrayList(stringLoader);
+        StringSourceLoader stringLoader = StringSourceLoader.getInstance();
+        List<SourceLoader> stringLoaders = Lists.newArrayList((SourceLoader)stringLoader);
         RootDefFactory factory = new RootDefFactory(new SourceFactory(stringLoaders));
         NonCachingDefRegistryImpl nonCachDefReg = new NonCachingDefRegistryImpl(factory, defTypes, prefixes);
         MasterDefRegistryImpl masterDefReg = new MasterDefRegistryImpl(nonCachDefReg);
-        
-        addSource("houseboat", baseContents, ApplicationDef.class);
-        addSource("houseparty", baseContents, ApplicationDef.class);
-        addSource("pantsparty", baseContents, ApplicationDef.class);
 
+        DefDescriptor<ApplicationDef> houseboat = stringLoader.createStringSourceDescriptor("houseboat",
+                ApplicationDef.class);
+        DefDescriptor<ApplicationDef> houseparty = stringLoader.createStringSourceDescriptor("houseparty",
+                ApplicationDef.class);
+        DefDescriptor<ApplicationDef> pantsparty = stringLoader.createStringSourceDescriptor("pantsparty",
+                ApplicationDef.class);
+        addSourceAutoCleanup(houseboat, baseContents);
+        addSourceAutoCleanup(houseparty, baseContents);
+        addSourceAutoCleanup(pantsparty, baseContents);
         assertEquals("find() not finding all sources", 3, masterDefReg.find("markup://string:*").size());
-        assertEquals("find() fails with wildcard as prefix", 1, masterDefReg.find("*://string:houseboat").size());
-        assertEquals("find() fails with wildcard as namespace", 1, masterDefReg.find("markup://*:houseboat").size());
-        assertEquals("find() fails with wildcard as name", 1, masterDefReg.find("markup://string:houseboat").size());
+        assertEquals("find() fails with wildcard as prefix", 1,
+                masterDefReg.find("*://" + houseboat.getDescriptorName()).size());
+        assertEquals("find() fails with wildcard as namespace", 1,
+                masterDefReg.find("markup://*:" + houseboat.getName()).size());
+        assertEquals("find() fails with wildcard as name", 1, masterDefReg.find(houseboat.getQualifiedName()).size());
         assertEquals("find() fails with wildcard at end of name", 2, masterDefReg.find("markup://string:house*").size());
-        assertEquals("find() fails with wildcard at beginning of name", 2, masterDefReg.find("markup://string:*party").size());
-        assertEquals("find() should not find nonexistent name", 0, masterDefReg.find("markup://string:househunters").size());
-        assertEquals("find() should not find nonexistent name with preceeding wildcard",
-                0, masterDefReg.find("markup://string:*notherecaptain").size());
+        assertEquals("find() fails with wildcard at beginning of name", 2, masterDefReg.find("markup://string:*party*")
+                .size());
+
+        assertEquals("find() should not find nonexistent name", 0, masterDefReg.find("markup://string:househunters")
+                .size());
+        assertEquals("find() should not find nonexistent name ending with wildcard", 0,
+                masterDefReg.find("markup://string:househunters*").size());
+        assertEquals("find() should not find nonexistent name with preceeding wildcard", 0,
+                masterDefReg.find("markup://string:*notherecaptain").size());
     }
 }

@@ -33,10 +33,9 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 /**
  * Automation for java Controllers.
+ * 
  * @hierarchy Aura.Unit Tests.Components.Controller.Java Controller
  * @priority high
- *
- *
  */
 public class JavaControllerTest extends AuraImplTestCase {
     public JavaControllerTest(String name){
@@ -59,8 +58,8 @@ public class JavaControllerTest extends AuraImplTestCase {
         }
     }
 
-    private void checkPassAction(ControllerDef controller, String name, Map<String,Object> args,
-                                 State expState, Object returnValue) {
+    private void checkPassAction(ControllerDef controller, String name, Map<String, Object> args, State expState,
+            Object returnValue) {
         Action action = controller.createAction(name, args);
         action.run();
         assertEquals(name+" State", expState, action.getState());
@@ -80,13 +79,13 @@ public class JavaControllerTest extends AuraImplTestCase {
 
     /**
      * Verify that class level annotation is required for a java Controller.
+     * 
      * @userStory a07B0000000FAmj
      */
     public void testClassLevelAnnotationForJavaController()throws Exception{
         assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerWithoutAnnotation",
-                               InvalidDefinitionException.class,
-                               "@Controller annotation is required on all Controllers.",
-                               "org.auraframework.impl.java.controller.TestControllerWithoutAnnotation");
+                InvalidDefinitionException.class, "@Controller annotation is required on all Controllers.",
+                "org.auraframework.impl.java.controller.TestControllerWithoutAnnotation");
     }
 
     /**
@@ -94,18 +93,14 @@ public class JavaControllerTest extends AuraImplTestCase {
      */
     public void testMissingKeyAnnotation() throws Exception {
         assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerMissingKey",
-                               InvalidDefinitionException.class,
-                               "@Key annotation is required on all action parameters",
-                               "org.auraframework.impl.java.controller.TestControllerMissingKey.appendStrings");
+                InvalidDefinitionException.class, "@Key annotation is required on all action parameters",
+                "org.auraframework.impl.java.controller.TestControllerMissingKey.appendStrings");
     }
 
     /**
-     * Ensure that an action must be public.
-     *
-     * Currently, we do not actualy process non-public members. This is due to
-     * a limitation in the way java returns methods. If we do want to do this,
-     * we'd have to process all methods in a rather complex way (walking up the
-     * class hierarchy).
+     * Ensure that an action must be public. Currently, we do not actualy process non-public members. This is due to a
+     * limitation in the way java returns methods. If we do want to do this, we'd have to process all methods in a
+     * rather complex way (walking up the class hierarchy).
      */
     public void testProtectedAction() throws Exception {
         ControllerDef cont = getJavaController("java://org.auraframework.impl.java.controller.TestControllerWithProtectedAction");
@@ -122,9 +117,8 @@ public class JavaControllerTest extends AuraImplTestCase {
      */
     public void testNonStaticAction() throws Exception {
         assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerWithNonStaticAction",
-                               InvalidDefinitionException.class,
-                               "Actions must be public static methods",
-                               "org.auraframework.impl.java.controller.TestControllerWithNonStaticAction.appendStrings");
+                InvalidDefinitionException.class, "Actions must be public static methods",
+                "org.auraframework.impl.java.controller.TestControllerWithNonStaticAction.appendStrings");
     }
 
     public void testActionNoParameters() throws Exception {
@@ -138,11 +132,10 @@ public class JavaControllerTest extends AuraImplTestCase {
         // FIXME: extra arguments probably should fail.
         checkPassAction(controller, "doSomething", hasOne, State.SUCCESS, null);
         checkPassAction(controller, "getString", empty, State.SUCCESS, "TestController");
-        checkFailAction(controller, "throwException", empty, State.ERROR,
-                        AuraExecutionException.class,
-    "java://org.auraframework.impl.java.controller.TestController: java.lang.RuntimeException: intentionally generated");
-        checkFailAction(controller, "imNotHere", empty, State.ERROR,
-                        InvalidDefinitionException.class, "No action found");
+        checkFailAction(controller, "throwException", empty, State.ERROR, AuraExecutionException.class,
+                "java://org.auraframework.impl.java.controller.TestController: java.lang.RuntimeException: intentionally generated");
+        checkFailAction(controller, "imNotHere", empty, State.ERROR, InvalidDefinitionException.class,
+                "No action found");
     }
 
     /**
@@ -166,7 +159,7 @@ public class JavaControllerTest extends AuraImplTestCase {
 
         args.clear();
         checkFailAction(controller, "sumValues", args, State.ERROR, AuraExecutionException.class,
-              "java://org.auraframework.impl.java.controller.TestControllerWithParameters: java.lang.NullPointerException");
+                "java://org.auraframework.impl.java.controller.TestControllerWithParameters: java.lang.NullPointerException");
 
         args.put("a", "x");
         args.put("b", "y");
@@ -182,7 +175,8 @@ public class JavaControllerTest extends AuraImplTestCase {
      * Verify that nice exception is thrown if controller def doesn't exist
      */
     public void testControllerNotFound() throws Exception {
-        DefDescriptor<ComponentDef> dd = addSource("<aura:component controller='java://goats'/>", ComponentDef.class);
+        DefDescriptor<ComponentDef> dd = addSourceAutoCleanup("<aura:component controller='java://goats'/>",
+                ComponentDef.class);
         try {
             Aura.getInstanceService().getInstance(dd);
             fail("Expected DefinitionNotFoundException");

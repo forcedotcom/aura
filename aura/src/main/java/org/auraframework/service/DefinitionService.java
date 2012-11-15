@@ -41,7 +41,7 @@ public interface DefinitionService extends AuraService {
      * <p>
      * The class must be retrieved from DefDescriptor.DefType.getPrimaryInterface()
      * </p>
-     *
+     * 
      * @param qualifiedName
      *            the name of the Definition
      * @param defClass
@@ -49,16 +49,16 @@ public interface DefinitionService extends AuraService {
      * @return a descriptor. Never returns null.
      */
     <T extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName, Class<T> defClass);
-
+    
     /**
      * <p>
-     * Create a {@link DefDescriptor} that has the same namespace and name as the provided descriptor
-     * but a different DefType and prefix.
+     * Create a {@link DefDescriptor} that has the same namespace and name as the provided descriptor but a different
+     * DefType and prefix.
      * </p>
      * <p>
      * The class must be retrieved from DefDescriptor.DefType.getPrimaryInterface()
      * </p>
-     *
+     * 
      * @param desc
      *            the descriptor of the Definition
      * @param defClass
@@ -69,56 +69,55 @@ public interface DefinitionService extends AuraService {
 
     /**
      * Get the Definition associated with the descriptor passed in.
-     *
+     * 
      * @return The named definition
      * @throws DefinitionNotFoundException
      *             if definition does not exist
-     * @throws QuickFixException
+     * @throws QuickFixException 
      */
-    <T extends Definition> T getDefinition(DefDescriptor<T> descriptor) throws DefinitionNotFoundException, QuickFixException;
+    <T extends Definition> T getDefinition(DefDescriptor<T> descriptor) throws DefinitionNotFoundException,
+            QuickFixException;
 
     /**
      * Creates a {@link DefDescriptor} from the qualified name passed in, retrieves the named Definition and then
-     * returns it.
-     *
+     * returns it. FIXME: some callers use a descriptorName instead of a qualifiedName here!
+     * 
      * @return The named definition
      * @throws DefinitionNotFoundException
      *             if definition does not exist
-     * @throws QuickFixException
+     * @throws QuickFixException 
      */
-    <T extends Definition> T getDefinition(String qualifiedName, Class<T> defType)
-            throws DefinitionNotFoundException, QuickFixException;
+    <T extends Definition> T getDefinition(String qualifiedName, Class<T> defType) throws DefinitionNotFoundException,
+            QuickFixException;
 
     /**
      * Creates a {@link DefDescriptor} from the qualified name passed in, retrieves the named Definition and then
      * returns it. This method should only be used if the caller doesn't know or care what type is returned.
-     *
+     * 
      * @param defTypes
      *            a list of DefTypes to check
      * @return The named definition
      * @throws DefinitionNotFoundException
      *             if definition does not exist
-     * @throws QuickFixException
+     * @throws QuickFixException 
      */
-    Definition getDefinition(String qualifiedName, DefType... defTypes) throws DefinitionNotFoundException, QuickFixException;
+    Definition getDefinition(String qualifiedName, DefType... defTypes) throws DefinitionNotFoundException,
+            QuickFixException;
 
     /**
-     * Get the latest timestamp for a given definition.
+     * Get the latest timestamp for a given definition. This will check all dependencies of the definition, and if it is
+     * an application, the preloads, to ensure that preloaded data is not stale.
      *
-     * This will check all dependencies of the definition, and if it is an application,
-     * the preloads, to ensure that preloaded data is not stale.
-     *
-     * @param def the definition to check.
+     * @param def
+     *            the definition to check.
      */
     <T extends Definition> long getLastMod(DefDescriptor<T> def) throws QuickFixException;
 
     /**
-     * Given a set of preload namespaces, calculate the last mod time.
+     * Given a set of preload namespaces, calculate the last mod time. This will calculate the last mod time of a set of
+     * namespaces and all dependencies of components/applications in that set of namespaces.
      *
-     * This will calculate the last mod time of a set of namespaces and all dependencies of components/applications
-     * in that set of namespaces.
-     *
-     * @throws QuickFixException
+     * @throws QuickFixException 
      */
     long getNamespaceLastMod(Collection<String> preloads) throws QuickFixException;
 
@@ -126,10 +125,11 @@ public interface DefinitionService extends AuraService {
      * Given a {@link DefDescriptor} that contains search patterns or wildcards, return a set of Descriptors for all
      * existing Definitions who have source that exists. Does not compile the definitions if they were not already
      * compiled, and does not guarantee that they can compile.
-     * @throws QuickFixException
+     * 
+     * @throws QuickFixException 
      */
     <D extends Definition> Set<DefDescriptor<D>> find(DefDescriptor<D> matcher) throws QuickFixException;
-
+    
     /**
      * Given a string that contains search patterns or wildcards, return a set of Descriptors for all
      * existing Definitions who have source that exists. Does not compile the definitions if they were not already
@@ -140,7 +140,8 @@ public interface DefinitionService extends AuraService {
 
     /**
      * Save the given Definition back to source code.
-     * @throws QuickFixException
+     * 
+     * @throws QuickFixException 
      */
     void save(Definition def) throws QuickFixException;
 }

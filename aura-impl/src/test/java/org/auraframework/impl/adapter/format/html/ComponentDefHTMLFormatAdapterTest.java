@@ -23,7 +23,6 @@ import org.auraframework.system.AuraContext;
 /**
 * Tests for BaseComponentDefHTMLFormatAdapter, as it relates to ComponentDef
 *
-*
 * @since 0.0.224
 */
 public class ComponentDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFormatAdapterTest<ComponentDef> {
@@ -44,7 +43,7 @@ public class ComponentDefHTMLFormatAdapterTest extends BaseComponentDefHTMLForma
         AuraContext context = Aura.getContextService().getCurrentContext();
         context.setPreloading(true); // clears out current preloads
         context.addPreload("aura");
-        DefDescriptor<ComponentDef> desc = addSource("<aura:component render='client'></aura:component>",
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup("<aura:component render='client'></aura:component>",
                 ComponentDef.class);
         String body = doWrite(desc.getDef());
         int start = body.indexOf("<html ");

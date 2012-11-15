@@ -32,23 +32,19 @@ import org.auraframework.util.json.Json;
 
 /**
  * subdef impl, passes most stuff except for name through to the parent descriptor
- *
- *
- *
  */
 public class SubDefDescriptorImpl<T extends Definition, P extends Definition> implements SubDefDescriptor<T, P> {
     private static final long serialVersionUID = -4922652464026095847L;
     protected final String name;
     protected final String qualifiedName;
+    protected final String descriptorName;
     protected final DefType defType;
     protected final DefDescriptor<P> parentDescriptor;
     private final int hashCode;
 
     /**
-     * Pattern for subDefDescriptors: java://foo.bar.baz/ACTION$getUser
-     * Group 1 = parent name = java://foo.bar.baz
-     * Group 2 = defType = ACTION
-     * Group 3 = name = getUser
+     * Pattern for subDefDescriptors: java://foo.bar.baz/ACTION$getUser Group 1 = parent name = java://foo.bar.baz Group
+     * 2 = defType = ACTION Group 3 = name = getUser
      */
     public static final Pattern SUBDEF_PATTERN = Pattern.compile("\\A((?:[\\w\\\\*]+://)?.*)/(\\w+)\\$(\\w+)\\z");
 
@@ -62,7 +58,10 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
             this.parentDescriptor = parentDescriptor;
             this.name = subName;
             this.defType = DefType.getDefType(defClass);
-            this.qualifiedName = String.format("%s/%s$%s", parentDescriptor.getQualifiedName(), defType.toString(),  name);
+            this.qualifiedName = String.format("%s/%s$%s", parentDescriptor.getQualifiedName(), defType.toString(),
+                    name);
+            this.descriptorName = String.format("%s/%s$%s", parentDescriptor.getDescriptorName(), defType.toString(),
+                    name);
             this.hashCode = this.qualifiedName.toLowerCase().hashCode();
         } finally {
             loggingService.stopTimer(LoggingService.TIMER_DEF_DESCRIPTOR_CREATION);
@@ -107,10 +106,15 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
     public String getNameParameters() {
         return null;
     }
-
+    
     @Override
     public String getQualifiedName() {
         return qualifiedName;
+    }
+
+    @Override
+    public String getDescriptorName() {
+        return descriptorName;
     }
 
     @Override
@@ -144,14 +148,14 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
 
     public static <Sub extends Definition, Par extends Definition> SubDefDescriptor<Sub, Par> getInstance(
             String qualifiedName, Class<Sub> defClass, Class<Par> parClass) {
-
+        
         Matcher matcher = SUBDEF_PATTERN.matcher(qualifiedName);
         if (matcher.matches()) {
             String parentName = matcher.group(1);
             String  name = matcher.group(3);
             DefDescriptor<Par> parentDescriptor = DefDescriptorImpl.getInstance(parentName, parClass);
             return getInstance(name, parentDescriptor, defClass);
-
+            
         }else{
             throw new AuraRuntimeException(String.format("Invalid Descriptor Format: %s", qualifiedName));
         }

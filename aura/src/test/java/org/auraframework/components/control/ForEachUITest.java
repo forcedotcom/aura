@@ -19,45 +19,34 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.annotation.ThreadHostileTest;
 
 import org.openqa.selenium.By;
 
 /**
- * Test components using ForEach loops.
- *
- * This is a web driver test case to check for foreach rendering.
- *
- *
+ * Test components using ForEach loops. This is a web driver test case to check for foreach rendering.
  */
+@ThreadHostileTest
 public class ForEachUITest extends WebDriverTestCase {
 
     public ForEachUITest(String name) {
         super(name);
     }
 
-    private static String FOREACH_COMPONENT =
-        "<aura:component model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
+    private static String FOREACH_COMPONENT = "<aura:component model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
             +"Result:"
             +"<div id=\"list_content\">"
-                +"<aura:foreach items=\"{!m.%s}\" var=\"i\">{!i}</aura:foreach>"
-            +"</div>\n"
-        +"</aura:component>";
+            + "<aura:foreach items=\"{!m.%s}\" var=\"i\">{!i}</aura:foreach>" + "</div>\n" + "</aura:component>";
 
-    private static String FOREACH_APP =
-        "<aura:application render=\"client\" model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
+    private static String FOREACH_APP = "<aura:application render=\"client\" model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
             +"Result:"
             +"<div id=\"list_content\">"
-                +"<aura:foreach items=\"{!m.%s}\" var=\"i\">{!i}</aura:foreach>"
-            +"</div>"
-        +"</aura:application>";
+            + "<aura:foreach items=\"{!m.%s}\" var=\"i\">{!i}</aura:foreach>" + "</div>" + "</aura:application>";
 
-    private static String FOREACH_APP_SERVER =
-        "<aura:application render=\"server\" model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
+    private static String FOREACH_APP_SERVER = "<aura:application render=\"server\" model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
             +"Result:"
             +"<div id=\"list_content\">"
-                +"<aura:foreach items=\"{!m.%s}\" var=\"i\">{!i}</aura:foreach>"
-            +"</div>"
-        +"</aura:application>";
+            + "<aura:foreach items=\"{!m.%s}\" var=\"i\">{!i}</aura:foreach>" + "</div>" + "</aura:application>";
 
     /**
      * Get the content of the 'list_content' div.
@@ -77,11 +66,9 @@ public class ForEachUITest extends WebDriverTestCase {
         String componentText = String.format(FOREACH_COMPONENT, "stringList");
 
         loadComponent("foreachstringlist_client", componentText, true);
-        assertEquals("foreach content text didn't match (Client)",
-                     "onetwothree", getListContent());
+        assertEquals("foreach content text didn't match (Client)", "onetwothree", getListContent());
         loadComponent("foreachstringlist_server", componentText, false);
-        assertEquals("foreach content text didn't match (Server)",
-                     "onetwothree", getListContent());
+        assertEquals("foreach content text didn't match (Server)", "onetwothree", getListContent());
     }
 
     /**
@@ -93,24 +80,19 @@ public class ForEachUITest extends WebDriverTestCase {
         String componentText = String.format(FOREACH_COMPONENT, "emptyList");
 
         loadComponent("foreachemptylist_client", componentText, true);
-        assertEquals("foreach content text didn't match (Client)",
-                     "", getListContent());
+        assertEquals("foreach content text didn't match (Client)", "", getListContent());
         loadComponent("foreachemptylist_server", componentText, false);
-        assertEquals("foreach content text didn't match (Server)",
-                     "", getListContent());
+        assertEquals("foreach content text didn't match (Server)", "", getListContent());
     }
 
     public void testForEachNull() throws Exception {
         String componentText = String.format(FOREACH_COMPONENT, "stringListNull");
 
         loadComponent("foreachnulllist_client", componentText, true);
-        assertEquals("foreach content text didn't match (Client)",
-                     "", getListContent());
+        assertEquals("foreach content text didn't match (Client)", "", getListContent());
         loadComponent("foreachnulllist_server", componentText, false);
-        assertEquals("foreach content text didn't match (Server)",
-                     "", getListContent());
+        assertEquals("foreach content text didn't match (Server)", "", getListContent());
     }
-
 
     public void testForEachApp() throws Exception{
         String appText = String.format(FOREACH_APP, "stringList");
@@ -126,13 +108,14 @@ public class ForEachUITest extends WebDriverTestCase {
 
 //    /**
 //     * Verifies that a component instantiation that is missing a required attribute that occurs
-//     * inside a aura:forEach tag results in a QuickFixException.
+    // * inside a aura:forEach tag results in a QuickFixException.
 //     *
 //     * @priority Low
 //     * @expectedResults QuickFixException text appears.
 //     */
 //    public void _testMissingRequiredAttributeInForEach() throws Exception{
-//        openNoAura("/apexauratest/testMissingRequiredAttributeInForEach.cmp");
-//        waitForTextPresent("QuickFixExcepton error message missing", "COMPONENT markup://ui:outputDateTime is missing required attribute 'value'");
+    // openNoAura("/apexauratest/testMissingRequiredAttributeInForEach.cmp");
+    // waitForTextPresent("QuickFixExcepton error message missing",
+    // "COMPONENT markup://ui:outputDateTime is missing required attribute 'value'");
 //    }
 }

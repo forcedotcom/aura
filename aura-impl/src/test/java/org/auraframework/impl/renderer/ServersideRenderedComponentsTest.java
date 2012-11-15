@@ -26,29 +26,33 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.BaseComponent;
+
 /**
- * This class has unit tests to verify rendering of components server side.
- * Components/applications can be renderer server side or client side. A detection logic checks if a component
- * can be rendered serverside. This detection logic can be forces by including a "render = 'server'" attribute on the
- * top level component tag. By default the detection logic is auto on.
- * This 'render' specification overrides the detection logic.
- * If render = 'server', the aura servlet assumes the component can be rendered serverside and tries to render it.
- * If render = 'client', the aura servlet assumes the component should be rendered clientside
+ * This class has unit tests to verify rendering of components server side. Components/applications can be renderer
+ * server side or client side. A detection logic checks if a component can be rendered serverside. This detection logic
+ * can be forces by including a "render = 'server'" attribute on the top level component tag. By default the detection
+ * logic is auto on.
+ * <ul>
+ * <li>This 'render' specification overrides the detection logic.
+ * <li>If render = 'server', the aura servlet assumes the component can be rendered serverside and tries to render it.</li>
+ * <li>If render = 'client', the aura servlet assumes the component should be rendered clientside.</li>
+ * </ul>
  */
 public class ServersideRenderedComponentsTest extends AuraImplTestCase {
-    public ServersideRenderedComponentsTest(String name){
+    public ServersideRenderedComponentsTest(String name) {
         super(name);
     }
-    
+
     private String ATTR_COMPONENT_ARRAY = "<aura:attribute name='componentArray' type='Aura.Component[]'><div>am a div</div>just text<span>am a span</span></aura:attribute>";
     private String ATTR_STRING_ARRAY = "<aura:attribute name='stringArray' type='String[]' default='first,second,third'/>";
     private String ATTR_STRING_ARRAY_WITHOUTDEFAULT = "<aura:attribute name='isNotSet' type='String[]'/>";
-    
+
     private String getRenderedHTML(String markup, Class<? extends BaseComponentDef> defType,
             Map<String, Object> attributes) throws Exception {
-        DefDescriptor<? extends BaseComponentDef> testCmpDef = addSource(markup, defType);
+        DefDescriptor<? extends BaseComponentDef> testCmpDef = addSourceAutoCleanup(markup, defType);
         assertTrue(testCmpDef.getDef().isLocallyRenderable());
-        BaseComponent instance = (BaseComponent)Aura.getInstanceService().getInstance(testCmpDef, attributes);
+        BaseComponent<?, ?> instance = (BaseComponent<?, ?>)Aura.getInstanceService().getInstance(testCmpDef,
+                attributes);
         StringWriter sw = new StringWriter();
         Aura.getRenderingService().render(instance, sw);
         return sw.toString().trim();
@@ -79,36 +83,35 @@ public class ServersideRenderedComponentsTest extends AuraImplTestCase {
     public void testForEachStringArray() throws Exception {
         assertRenderedHTML(
                 String.format(baseComponentTag, "", ATTR_STRING_ARRAY
-                        + "<aura:foreach items='{!v.stringArray}' var='x'>[{!x}]</aura:foreach>"),
-                ComponentDef.class, null, "[first][second][third]");
+                        + "<aura:foreach items='{!v.stringArray}' var='x'>[{!x}]</aura:foreach>"), ComponentDef.class,
+                null, "[first][second][third]");
     }
 
     public void testForEachStringList() throws Exception {
         assertRenderedHTML(String.format(baseComponentTag,
                 "model='java://org.auraframework.impl.java.model.TestJavaModel'",
-                "<aura:foreach items='{!m.stringList}' var='x'>{!'[' + x + ']'}</aura:foreach>"),
-                ComponentDef.class, null, "[one][two][three]");
+                "<aura:foreach items='{!m.stringList}' var='x'>{!'[' + x + ']'}</aura:foreach>"), ComponentDef.class,
+                null, "[one][two][three]");
     }
 
     public void testForEachUnsetArray() throws Exception {
         assertRenderedHTML(
                 String.format(baseComponentTag, "", ATTR_STRING_ARRAY_WITHOUTDEFAULT
-                        + "<aura:foreach items='{!v.isNotSet}' var='x'>[{!x}]</aura:foreach>"),
-                ComponentDef.class, null, "");
+                        + "<aura:foreach items='{!v.isNotSet}' var='x'>[{!x}]</aura:foreach>"), ComponentDef.class,
+                null, "");
     }
 
     public void testUnsetArrayLength() throws Exception {
         assertRenderedHTML(
                 String.format(baseComponentTag, "", ATTR_STRING_ARRAY_WITHOUTDEFAULT + "{!v.isNotSet.length}"),
-                ComponentDef.class, new HashMap<String,Object>(), "");
-        
+                ComponentDef.class, new HashMap<String, Object>(), "");
+
     }
 
     public void testForEachEmptyList() throws Exception {
         assertRenderedHTML(String.format(baseComponentTag,
                 "model='java://org.auraframework.impl.java.model.TestJavaModel'",
-                "<aura:foreach items='{!m.emptyList}' var='x'>[{!x}]</aura:foreach>"),
-                ComponentDef.class, null, "");
+                "<aura:foreach items='{!m.emptyList}' var='x'>[{!x}]</aura:foreach>"), ComponentDef.class, null, "");
     }
 
     public void testEmptyListLength() throws Exception {
@@ -124,14 +127,18 @@ public class ServersideRenderedComponentsTest extends AuraImplTestCase {
     }
 
     public void testForEachMultidimList() throws Exception {
-        assertRenderedHTML(String.format(baseComponentTag,
-                "model='java://org.auraframework.impl.java.model.TestJavaModel'", "<aura:foreach items='{!m.listOfList}' var='x'>{!x.length}:<aura:foreach items='{!x}' var='y'>[{!y}]</aura:foreach></aura:foreach>"),
+        assertRenderedHTML(
+                String.format(
+                        baseComponentTag,
+                        "model='java://org.auraframework.impl.java.model.TestJavaModel'",
+                        "<aura:foreach items='{!m.listOfList}' var='x'>{!x.length}:<aura:foreach items='{!x}' var='y'>[{!y}]</aura:foreach></aura:foreach>"),
                 ComponentDef.class, null, "3:[one][two][three]3:[un][do][tres]3:[ek][do][theen]");
     }
 
     public void testForEachMultidimListIndex() throws Exception {
         assertRenderedHTML(String.format(baseComponentTag,
-                "model='java://org.auraframework.impl.java.model.TestJavaModel'", "{!m.listOfList[2].length}:<aura:foreach items='{!m.listOfList[2]}' var='x'>[{!x}]</aura:foreach>"),
+                "model='java://org.auraframework.impl.java.model.TestJavaModel'",
+                "{!m.listOfList[2].length}:<aura:foreach items='{!m.listOfList[2]}' var='x'>[{!x}]</aura:foreach>"),
                 ComponentDef.class, null, "3:[ek][do][theen]");
     }
 }

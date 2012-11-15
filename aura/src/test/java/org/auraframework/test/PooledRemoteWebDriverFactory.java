@@ -17,11 +17,12 @@ package org.auraframework.test;
 
 import java.net.URL;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+
+import javax.annotation.concurrent.GuardedBy;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -31,22 +32,25 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Get pooled WebDriver instances for Aura tests.
  *
- *
  * @since 0.0.178
  */
 public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
-    private final Map<DesiredCapabilities, List<PooledRemoteWebDriver>> pools;
+    private final Map<DesiredCapabilities, List<PooledRemoteWebDriver>> pools = Maps.newHashMap();
 
     public PooledRemoteWebDriverFactory(URL serverUrl) throws Exception {
         super(serverUrl);
-        pools = new HashMap<DesiredCapabilities, List<PooledRemoteWebDriver>>();
     }
 
     public class PooledRemoteWebDriver extends RemoteWebDriver {
+        /**
+         * The pool containing this web driver instance.
+         */
+        @GuardedBy("PooledRemoteWebDriverFactory.this")
         private Collection<PooledRemoteWebDriver> pool;
 
         public PooledRemoteWebDriver(Collection<PooledRemoteWebDriver> pool, URL serverUrl,
@@ -57,7 +61,7 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
 
         // append a query param to avoid possible browser caching of pages
         @Override
-        public synchronized void get(String url) {
+        public void get(String url) {
             // save any fragment
             int hashLoc = url.indexOf('#');
             String hash = "";
@@ -65,7 +69,6 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
                 hash = url.substring(hashLoc);
                 url = url.substring(0, hashLoc);
             }
-
 
             // strip query string
             int qLoc = url.indexOf('?');
@@ -78,7 +81,6 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
             List<NameValuePair> newParams = Lists.newArrayList();
             URLEncodedUtils.parse(newParams, new Scanner(qs), "UTF-8");
 
-
             // update query with a nonce
 
             newParams.add(new BasicNameValuePair("browser.nonce", String.valueOf(System.currentTimeMillis())));
@@ -89,13 +91,13 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
         }
 
         @Override
-        public synchronized void close() {
+        public void close() {
             if (getWindowHandles().size() > 1) {
                 super.close();
             }
         }
 
-        private synchronized void dismissAlerts() {
+        private void dismissAlerts() {
             try {
                 // if more than 10 alerts, something must be wrong
                 for (int i = 0; i < 10; i++) {
@@ -107,7 +109,7 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
         }
 
         @Override
-        public synchronized void quit() {
+        public void quit() {
             dismissAlerts();
             // close all windows except one
             for (int i = 0; (getWindowHandles().size() > 1) && (i < 10); i--) {
@@ -118,14 +120,18 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
             // cleanup domain cookies (hopefully you're not on an external site)
             manage().deleteAllCookies();
 
+            synchronized (PooledRemoteWebDriverFactory.this) {
             // return to pool
             pool.add(this);
         }
+        }
 
-        public synchronized void reallyQuit() {
+        public void reallyQuit() {
             super.quit();
+            synchronized (PooledRemoteWebDriverFactory.this) {
             pool.remove(this);
         }
+    }
     }
 
     @Override

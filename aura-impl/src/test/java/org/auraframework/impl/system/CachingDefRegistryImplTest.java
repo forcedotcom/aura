@@ -17,19 +17,26 @@ package org.auraframework.impl.system;
 
 import java.io.*;
 import java.util.Date;
+import java.util.List;
 
 import org.auraframework.Aura;
 import org.auraframework.def.*;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
+import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 
+import com.google.common.collect.Lists;
+
 /**
- * This class has automation to verify behavior of {@link CachingDefRegistryImpl} .
+ * This class has automation to verify behavior of {@link aura.impl.system.CachingDefRegistryImpl} . ThreadHostile due
+ * to cache filling assumptions.
  */
+@ThreadHostileTest
 public class CachingDefRegistryImplTest extends AuraImplTestCase {
     private static final int CACHE_SIZE_MAX = 1024;
 
@@ -61,7 +68,8 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
     @UnAdaptableTest
     public void testDefinitionsFetchingInTestMode() throws Exception {
 
-        // Obtain the definition of an application without layout and make sure the layoutsDefDescriptor is null
+        // Obtain the definition of an application without layout and make sure the
+        // layoutsDefDescriptor is null
         ApplicationDef appWithNoLayout = definitionService.getDefinition("test:layoutNoLayout", ApplicationDef.class);
         assertNotNull("Test failed to retrieve definition of an application.", appWithNoLayout);
         assertNull("Application should not have had any layouts associted with it.",
@@ -77,8 +85,8 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         writer.write(layoutData);
         writer.close();
         try {
-            // We are still fetching definition in PROD mode, so it should fetch the definition from cache. So no layout
-            // def yet.
+            // We are still fetching definition in PROD mode, so it should fetch the definition from
+            // cache. So no layout def yet.
             appWithNoLayout = definitionService.getDefinition("test:layoutNoLayout", ApplicationDef.class);
             assertNotNull("Test failed to retrieve definition of an application.", appWithNoLayout);
             assertNull("In PROD mode, new layout file should not have been fetched.",
@@ -105,18 +113,17 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
      * @throws Exception
      */
     public void testFetchDefsAfterFillingUpCache() throws Exception {
-        String cmpName = getName();
-
-        fillCachingDefRegistryForComponents();
-        // Fetch the defs that were used to fill up the cache initially, chances are most of them were thrown out when
-        // the cache was full
+        List<DefDescriptor<ComponentDef>> dummyDefs = fillCachingDefRegistryForComponents();
+        // Fetch the defs that were used to fill up the cache initially, chances are most of them
+        // were thrown out when the cache was full
+        assertTrue(dummyDefs.size() >= CACHE_SIZE_MAX / 2);
         for (int i = 0; i < CACHE_SIZE_MAX / 2; i++) {
-            DefDescriptor<ComponentDef> dd = definitionService.getDefDescriptor("string:" + cmpName + "_" + i,
+            DefDescriptor<ComponentDef> dd = definitionService.getDefDescriptor(dummyDefs.get(i).getDescriptorName(),
                     ComponentDef.class);
             assertTrue(Aura.getContextService().getCurrentContext().getDefRegistry().exists(dd));
             assertNotNull("Failed to fetch def from caching def registry.", dd.getDef());
-            assertEquals("Definition service failed to retrieve the correct definition", "markup://string:" + cmpName
-                    + "_" + i, dd.getQualifiedName());
+            assertEquals("Definition service failed to retrieve the correct definition", dummyDefs.get(i)
+                    .getQualifiedName(), dd.getQualifiedName());
         }
     }
 
@@ -126,17 +133,17 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
      */
     public void _testForStaleCheckWhenRegistryPartiallyFull() throws Exception {
         String markup = "<aura:component> %s </aura:component>";
-        DefDescriptor<ComponentDef> dd = auraTestingUtil.addSource(String.format(markup, ""), ComponentDef.class);
+        DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(String.format(markup, ""), ComponentDef.class);
         ComponentDef initialDef = dd.getDef();
         long initialTimeStamp = initialDef.getLocation().getLastModified();
 
-        // Have to stop and start context because a given def is cached in MasterDefRegistry per request (context of the
-        // request)
+        // Have to stop and start context because a given def is cached in MasterDefRegistry per
+        // request (context of the request)
         Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.PROD, null, Format.JSON, Access.AUTHENTICATED, laxSecurityApp);
 
-        auraTestingUtil.addSource(dd.getName(),
-                String.format(markup, "<aura:attribute type=\"String\" name=\"attr\"/>"), ComponentDef.class);
+        StringSourceLoader.getInstance().updateSource(dd,
+                String.format(markup, "<aura:attribute type=\"String\" name=\"attr\"/>"), new Date());
         // Verify that the initial def object hasn't been updated
         assertEquals(initialTimeStamp, initialDef.getLocation().getLastModified());
 
@@ -159,19 +166,20 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
     public void testForStaleCheckWhenRegistryFull() throws Exception {
         long startTimeStamp = 1331246678985l;
         String markup = "<aura:component> %s </aura:component>";
-        DefDescriptor<ComponentDef> dd = auraTestingUtil.addSource(String.format(markup, ""), ComponentDef.class,
-                new Date(startTimeStamp));
+        DefDescriptor<ComponentDef> dd = StringSourceLoader.getInstance().createStringSourceDescriptor("staleCheck",
+                ComponentDef.class);
+        addSourceAutoCleanup(dd, String.format(markup, ""), new Date(startTimeStamp));
         ComponentDef initialDef = dd.getDef();
         long initialTimeStamp = initialDef.getLocation().getLastModified();
         assertEquals(startTimeStamp, initialTimeStamp);
         fillCachingDefRegistryForComponents();
 
-        // Have to stop and start context because a given def is cached in MasterDefRegistry per request (context of the
-        // request)
+        // Have to stop and start context because a given def is cached in MasterDefRegistry per
+        // request (context of the request)
         Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.PROD, null, Format.JSON, Access.AUTHENTICATED, laxSecurityApp);
-        auraTestingUtil.addSource(dd.getName(),
-                String.format(markup, "<aura:attribute type=\"String\" name=\"attr\"/>"), ComponentDef.class,
+        StringSourceLoader.getInstance()
+                .updateSource(dd, String.format(markup, "<aura:attribute type=\"String\" name=\"attr\"/>"),
                 new Date(startTimeStamp + 5));
         // Verify that the initial def object hasn't been updated
         assertEquals(initialTimeStamp, initialDef.getLocation().getLastModified());
@@ -203,7 +211,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
 
         // Assured non-resource has no caching set:
         String markup = "<aura:component> %s </aura:component>";
-        DefDescriptor<ComponentDef> dd = auraTestingUtil.addSource(String.format(markup, ""), ComponentDef.class);
+        DefDescriptor<ComponentDef> dd = auraTestingUtil.addSourceAutoCleanup(String.format(markup, ""), ComponentDef.class);
         component = definitionService.getDefinition(dd);
         assertFalse("string source has caching, but shouldn't",
                 component.getLocation().hasCacheEntry());
@@ -214,16 +222,19 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
     /**
      * There's can be multiple CachingDegRegistry. We will fill up the one used to store component defs (markup://xx:xx)
      */
-    private void fillCachingDefRegistryForComponents() throws Exception {
+    private List<DefDescriptor<ComponentDef>> fillCachingDefRegistryForComponents() throws Exception {
         // Fill up the cache
-        String markup = "<aura:component> %s </aura:component>";
-        String cmpName = getName();
+        String markup = "<aura:component> %d </aura:component>";
+        List<DefDescriptor<ComponentDef>> dummyDefs = Lists.newArrayList();
         // Fill up twice the capacity to make sure the initial set of defs are thrown out
         for (int i = 0; i < CACHE_SIZE_MAX * 2; i++) {
-            DefDescriptor<ComponentDef> dummyCmps = auraTestingUtil.addSource(cmpName + "_" + i, markup,
-                    ComponentDef.class);
+            DefDescriptor<ComponentDef> dummyCmps = StringSourceLoader.getInstance().createStringSourceDescriptor(
+                    getName(), ComponentDef.class);
+            addSourceAutoCleanup(dummyCmps, String.format(markup, i));
             dummyCmps.getDef();
+            dummyDefs.add(dummyCmps);
         }
+        return dummyDefs;
     }
 
     /**
@@ -231,14 +242,16 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
      */
     public void testExists() {
         String markup = "<aura:component></aura:component>";
-        DefDescriptor<ComponentDef> dd = auraTestingUtil.addSource(markup, ComponentDef.class);
+        DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(markup, ComponentDef.class);
         assertTrue("Failed to find an existing def.", dd.exists());
 
         // The value should be cached
         assertTrue("Should have fetched the def from the cache.", dd.exists());
 
-        DefDescriptor<ComponentDef> nonExisting = definitionService.getDefDescriptor(
-                "string:nonExisting" + System.currentTimeMillis(), ComponentDef.class);
+        // Create a descriptor but do not add it.
+        DefDescriptor<ComponentDef> nonExisting = StringSourceLoader.getInstance().createStringSourceDescriptor(
+                "nonExisting", ComponentDef.class);
+        definitionService.getDefDescriptor(nonExisting.getDescriptorName(), ComponentDef.class);
         assertFalse("How can a non existing def exist?", nonExisting.exists());
         /*
          * The cached value. Well, this test cannot really guarantee that the exists() really returned the value from

@@ -19,17 +19,13 @@ import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.MockConfigAdapter;
 import org.auraframework.http.AuraServlet;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.Annotations.AuraEnabled;
 
 /**
  * Let tests adjust servlet configuration.
  *
- *
  * @since 0.0.178
  */
-@Controller
 public class ServletConfigController {
     /**
      * Set the servlet production mode configuration. Don't forget to restore config after test.
@@ -37,10 +33,10 @@ public class ServletConfigController {
      * @param isProduction
      *            true/false
      */
-    @AuraEnabled
     public static void setProductionConfig(@Key("isProduction") boolean isProduction) {
         getMockConfigAdapter().setIsProduction(isProduction);
-        System.out.println("PROD : "+isProduction + " , " +  Aura.getConfigAdapter().isProduction() + " - " + Aura.getConfigAdapter());
+        System.out.println("PROD : " + isProduction + " , " + Aura.getConfigAdapter().isProduction() + " - "
+                + Aura.getConfigAdapter());
     }
 
     /**
@@ -49,7 +45,6 @@ public class ServletConfigController {
      * @param isAuraJSStatic
      *            true/false
      */
-    @AuraEnabled
     public static void setIsAuraJSStatic(@Key("isAuraJSStatic") boolean isAuraJSStatic) {
         getMockConfigAdapter().setIsAuraJSStatic(isAuraJSStatic);
     }
@@ -60,7 +55,6 @@ public class ServletConfigController {
      * @param isDisabled
      *            true/false
      */
-    @AuraEnabled
     public static Boolean setAppCacheDisabled(@Key("isDisabled") Boolean isDisabled) {
         String oldValue = System.getProperty(AuraServlet.DISABLE_APPCACHE_PROPERTY);
         if (isDisabled == null) {
@@ -78,26 +72,21 @@ public class ServletConfigController {
     /**
      * Get the servlet's current last modification timestamp.
      */
-    @AuraEnabled
     public static long getLastMod() throws Exception {
         return AuraServlet.getLastMod();
     }
 
-    @AuraEnabled
     public static long getBuildTimestamp() throws Exception {
         return Aura.getConfigAdapter().getBuildTimestamp();
     }
 
-    @AuraEnabled
     public static void resetMocks() throws Exception {
         getMockConfigAdapter().reset();
     }
 
     public static MockConfigAdapter getMockConfigAdapter(){
         ConfigAdapter adapter = Aura.getConfigAdapter();
-        if (adapter instanceof MockConfigAdapter) {
-            return (MockConfigAdapter)adapter;
-        }
+        if (adapter instanceof MockConfigAdapter) { return (MockConfigAdapter)adapter; }
         throw new Error("MockConfigAdapter is not configured!");
     }
 

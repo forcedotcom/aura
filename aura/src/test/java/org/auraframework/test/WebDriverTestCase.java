@@ -63,6 +63,16 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.ScreenshotException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.impl.source.StringSourceLoader;
+import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.annotation.FreshBrowserInstance;
+import org.auraframework.test.annotation.WebDriverTest;
+import org.auraframework.util.AuraUtil;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
@@ -102,10 +112,10 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * Setup specific to a test case but common for all browsers. Run only once per test case.
      */
     @Override
-    public void setUp() throws Exception {
+    public void setUp() throws Exception{
         super.setUp();
     }
-
+    
     /**
      * Teardown common stuff shared across all browsers while running a test case. Run only once per test case.
      */
@@ -114,11 +124,11 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         currentDriver = null;
         super.tearDown();
     }
-
+    
     /**
      * Setup specific to a test run against a particular browser. Run once per test case, per browser.
      */
-    public void perBrowserSetUp() {
+    public void perBrowserSetUp(){
         // re-initialize driver pointer here because test analysis might need it after perBrowserTearDown
         currentDriver = null;
     }
@@ -128,7 +138,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      */
 
     public void perBrowserTearDown() {}
-
+    
     private void superRunTest() throws Throwable {
         super.runTest();
     }
@@ -143,7 +153,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         }
 
     }
-
+    
     @SuppressWarnings("serial")
     private class AggregateFailure extends AssertionFailedError {
         private Collection<Throwable> failures;
@@ -154,7 +164,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         }
 
         @Override
-        public void printStackTrace(PrintWriter printer) {
+        public void printStackTrace(PrintWriter printer){
             printer.append(getMessage()).append('\n');
             for (Throwable e : failures) {
                 e.printStackTrace(printer);
@@ -163,16 +173,16 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     @Override
-    public void runTest() throws Throwable {
+    public void runTest() throws Throwable{
         List<Throwable> failures = Lists.newArrayList();
         for (BrowserType browser : WebDriverUtil.getBrowserListForTestRun(this.getTargetBrowsers(),
                 this.getExcludedBrowsers())) {
-            try {
+            try{
                 runTestWithBrowser(browser);
-            } catch (Throwable t) {
-                failures.add(addAuraInfoToTestFailure(t));
+            }catch (Throwable t){
+                failures.add(addAuraInfoToTestFailure(t));                
             } finally {
-                if (currentDriver != null) {
+            	if (currentDriver != null) {
                     try {
                         currentDriver.quit();
                     } catch (Exception e) {}
@@ -185,7 +195,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             throw new AggregateFailure(failures);
         }
     }
-
+    
     /**
      * Wrapper for non-asserted failures
      */
@@ -197,11 +207,11 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         }
     }
 
-    private static String WRAPPER_APP = "<aura:application render=\"%s\"><string:%s /></aura:application>";
+    private static String WRAPPER_APP = "<aura:application render=\"%s\"><%s/></aura:application>";
 
     /**
      * Load a string as a component in an app.
-     * 
+     *
      * @param name
      *            the name of the component
      * @param componentText
@@ -209,9 +219,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @param isClient
      *            Should we use client or server rendering.
      */
-    protected void loadComponent(String name, String componentText, boolean isClient) throws MalformedURLException,
-            URISyntaxException {
-        String appName = name + "app";
+    protected void loadComponent(String namePrefix, String componentText, boolean isClient)
+            throws MalformedURLException, URISyntaxException {
         String appText;
         String render;
 
@@ -220,29 +229,35 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         } else {
             render = "server";
         }
-        appText = String.format(WRAPPER_APP, render, name);
-        addSource(name, componentText, ComponentDef.class);
-        loadApplication(appName, appText, isClient);
+
+        DefDescriptor<ComponentDef> cmpDesc = StringSourceLoader.getInstance().createStringSourceDescriptor(namePrefix,
+                ComponentDef.class);
+        addSourceAutoCleanup(cmpDesc, componentText);
+        appText = String.format(WRAPPER_APP, render, cmpDesc.getDescriptorName());
+        loadApplication(namePrefix + "App", appText, isClient);
     }
 
     /**
      * A convienience routine to load a application string.
-     * 
+     *
      * @param name
      *            the application name.
      * @param appText
      *            the actual text of the application
      */
-    protected void loadApplication(String name, String appText, boolean isClient) throws MalformedURLException,
+    protected void loadApplication(String namePrefix, String appText, boolean isClient) throws MalformedURLException,
             URISyntaxException {
-        addSource(name, appText, ApplicationDef.class);
+        DefDescriptor<ApplicationDef> appDesc = StringSourceLoader.getInstance().createStringSourceDescriptor(
+                namePrefix, ApplicationDef.class);
+        addSourceAutoCleanup(appDesc, appText);
+        String openPath = String.format("/%s/%s.app", appDesc.getNamespace(), appDesc.getName());
         if (isClient) {
-            open("/string/" + name + ".app");
+            open(openPath);
         } else {
             //
             // when using server side rendering, we need to not wait for aura
             //
-            openNoAura("/string/" + name + ".app");
+            openNoAura(openPath);
         }
     }
 
@@ -254,13 +269,13 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * <li>running/waiting</li>
      * <li>a screenshot</li>
      * </ul>
-     * 
+     *
      * @param originalErr
      *            the test failure
      * @throws Throwable
      *             a new AssertionFailedError or UnexpectedError with the original and additional info
      */
-    private Throwable addAuraInfoToTestFailure(Throwable originalErr) {
+    private Throwable addAuraInfoToTestFailure(Throwable originalErr){
         StringBuffer description = new StringBuffer();
         if (originalErr != null) {
             String msg = originalErr.getMessage();
@@ -283,14 +298,14 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             } catch (Throwable t) {
                 description.append(t.getMessage());
             }
-
+    
             String screenshotsDirectory = System.getProperty("screenshots.directory");
             if (screenshotsDirectory != null) {
                 String img = getBase64EncodedScreenshot(originalErr, true);
                 if (img == null) {
                     description.append("\nScreenshot: {not available}");
                 } else {
-                    String fileName = getClass().getName() + "." + getName() + "_" + currentBrowserType + ".png";
+                    String fileName = getClass().getName() + "." + getName() +"_"+ currentBrowserType +".png";
                     File path = new File(screenshotsDirectory + "/" + fileName);
                     try {
                         path.getParentFile().mkdirs();
@@ -305,7 +320,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                     }
                 }
             }
-
+    
             try {
                 description.append("\nApplication cache status: ");
                 description
@@ -319,10 +334,10 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             if (SauceUtil.areTestsRunningOnSauce()) {
                 String linkToJob = SauceUtil.getLinkToPublicJobInSauce(currentDriver);
                 description.append("\nSauceLabs-recording: ");
-                description.append((linkToJob != null) ? linkToJob : "{not available}");
+                description.append((linkToJob != null)? linkToJob : "{not available}");
             }
         }
-
+        
         // replace original exception with new exception with additional info
         Throwable newFailure;
         if (originalErr instanceof AssertionFailedError) {
@@ -373,20 +388,20 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @return
      * @throws NoSuchMethodException
      */
-    public Set<BrowserType> getTargetBrowsers() {
+    public Set<BrowserType> getTargetBrowsers(){
         TargetBrowsers targetBrowsers = null;
-        try {
+        try{
             Method method = getClass().getMethod(getName());
             targetBrowsers = method.getAnnotation(TargetBrowsers.class);
             if (targetBrowsers == null) {
                 // Inherit defaults from the test class
                 targetBrowsers = getClass().getAnnotation(TargetBrowsers.class);
             }
-        } catch (NoSuchMethodException e) {
-            // Do nothing
+        }catch (NoSuchMethodException e){
+            //Do nothing
         }
         if (targetBrowsers == null) {
-            // If no target browsers are specified, default to ALL
+            //If no target browsers are specified, default to ALL
             return EnumSet.allOf(BrowserType.class);
         }
         return Sets.newEnumSet(Arrays.asList(targetBrowsers.value()), BrowserType.class);
@@ -398,17 +413,17 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @return
      * @throws NoSuchMethodException
      */
-    public Set<BrowserType> getExcludedBrowsers() {
+    public Set<BrowserType> getExcludedBrowsers(){
         ExcludeBrowsers excludeBrowsers = null;
-        try {
+        try{
             Method method = getClass().getMethod(getName());
             excludeBrowsers = method.getAnnotation(ExcludeBrowsers.class);
-            if (excludeBrowsers == null) {
+             if (excludeBrowsers == null) {
                 // Inherit defaults from the test class
                 excludeBrowsers = getClass().getAnnotation(ExcludeBrowsers.class);
             }
-        } catch (NoSuchMethodException e) {
-            // Do nothing
+        }catch (NoSuchMethodException e){
+            //Do nothing
         }
         if (excludeBrowsers == null) { return EnumSet.noneOf(BrowserType.class); }
         return Sets.newEnumSet(Arrays.asList(excludeBrowsers.value()), BrowserType.class);
@@ -423,15 +438,15 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             else
                 capabilities = currentBrowserType.getCapability();
             boolean reuseBrowser = true;
-            try {
+            try{
                 Class<?> clazz = getClass();
                 reuseBrowser = clazz.getAnnotation(FreshBrowserInstance.class) == null
                         && clazz.getMethod(getName()).getAnnotation(FreshBrowserInstance.class) == null;
-            } catch (NoSuchMethodException e) {
+            }catch(NoSuchMethodException e){
                 // happens for dynamic tests
             }
             capabilities.setCapability(WebDriverProvider.REUSE_BROWSER_PROPERTY, reuseBrowser);
-
+            
             logger.info(String.format("Requesting: %s", capabilities));
             currentDriver = provider.get(capabilities);
             if (currentDriver == null) {
@@ -463,24 +478,24 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     /**
      * Open a Aura URL with the default mode provided by {@link WebDriverTestCase#getAuraModeForCurrentBrowser()} and
      * wait for intialization as defined by {@link WebDriverTestCase#waitForAuraInit()}.
-     * 
+     *
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
     protected void open(String url) throws MalformedURLException, URISyntaxException {
-        open(url, getAuraModeForCurrentBrowser());
+    	open(url,getAuraModeForCurrentBrowser());
     }
-
+    
     /**
      * Return the default Aura Mode based on the browser type. IPAD and Android browsers return
      * {@link org.auraframework.system.AuraContext.Mode#PTEST} in order to disable fast click.
      */
-    protected Mode getAuraModeForCurrentBrowser() {
-        if (browsersForPtestMode.contains(currentBrowserType)) {
-            return Mode.PTEST;
+    protected Mode getAuraModeForCurrentBrowser(){
+    	if(browsersForPtestMode.contains(currentBrowserType)){
+    		return Mode.PTEST;
         } else {
-            return Mode.SELENIUM;
-        }
+    		return Mode.SELENIUM;
+    	}
     }
 
     protected void open(DefDescriptor<?> dd) throws MalformedURLException, URISyntaxException {
@@ -490,7 +505,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     /**
      * Open a Aura URL in given aura.mode and wait for intialization.
-     * 
+     *
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
@@ -527,7 +542,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      */
     protected boolean isAuraFrameworkReady() {
         return getBooleanEval("return window.$A ? window.$A.finishedInit === true : false;");
-    }
+        }
 
     /**
      * Process the results from $A.test.getErrors(). If there were any errors, then fail the test accordingly.
@@ -608,7 +623,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         }
         return errorBox.getText();
     }
-
     /**
      * Wait until Aura has finished initialization or encountered an error.
      */
@@ -641,7 +655,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     /**
      * Returns value of executing javascript in current window.
-     * 
+     *
      * @see org.openqa.selenium.JavscriptExecutor#executeSript(String, Object...)
      */
     protected Object getRawEval(String javascript, Object... args) {
@@ -730,9 +744,9 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     /**
      * Wait for a specified amount of time.
      */
-    public void waitFor(long timeout) {
+    public void waitFor(long timeout){
         WebDriverWait wait = new WebDriverWait(getDriver(), timeout);
-        try {
+        try{
             wait.until(new ExpectedCondition<Boolean>() {
                 @Override
                 public Boolean apply(WebDriver d) {
@@ -741,7 +755,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             });
         } catch (TimeoutException expected) {
             return;
-        }
+    }
     }
 
     /**
@@ -770,28 +784,28 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         }, timeoutInSecs);
     }
 
-    protected void waitForElementAbsent(String msg, final WebElement e) {
+    protected void waitForElementAbsent(String msg, final WebElement e){
         waitForElement(msg, e, false, timeoutInSecs);
     }
 
-    protected void waitForElementAbsent(final WebElement e) {
+    protected void waitForElementAbsent(final WebElement e){
         waitForElement("Timed out (" + timeoutInSecs + "ms) waiting for " + e + "to disappear.", e, false,
                 timeoutInSecs);
     }
 
-    protected void waitForElementPresent(String msg, final WebElement e) {
+    protected void waitForElementPresent(String msg, final WebElement e){
         waitForElement(msg, e, true, timeoutInSecs);
     }
 
-    protected void waitForElementPresent(final WebElement e) {
-        waitForElement("Timed out (" + timeoutInSecs + "ms) waiting for " + e, e, true, timeoutInSecs);
+    protected void waitForElementPresent(final WebElement e){
+        waitForElement("Timed out (" + timeoutInSecs + "ms) waiting for "+e, e, true, timeoutInSecs);
     }
 
     /**
      * short waitForElement to present or absent before executing the next command
      */
-    protected void waitForElement(String msg, final WebElement e, final boolean isDisplayed) {
-        waitForElement(msg, e, isDisplayed, timeoutInSecs);
+    protected void waitForElement(String msg, final WebElement e, final boolean isDisplayed){
+        waitForElement(msg, e,isDisplayed, timeoutInSecs);
     }
 
     /**

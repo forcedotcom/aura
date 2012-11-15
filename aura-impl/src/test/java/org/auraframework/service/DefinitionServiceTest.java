@@ -32,10 +32,9 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * @hierarchy Aura.Services.DefinitionService
  * @userStory a07B0000000Eb3M
- *
- *
  */
-public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, DefinitionServiceTest.Config> implements DefinitionService {
+public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, DefinitionServiceTest.Config> implements
+        DefinitionService {
 
     /**
      */
@@ -57,7 +56,8 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
 
         ContextService contextService = Aura.getContextService();
         try{
-            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService().getDefDescriptor("test:laxSecurity", ApplicationDef.class));
+            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
+                    .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
 
             Set<?> matches = service.find(config.matcher);
             assertNotNull(matches);
@@ -82,10 +82,12 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
     public <T extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName, Class<T> defClass) {
 
         DefDescriptor<?> desc = config.desc;
-        DefDescriptor<?> desc2 = service.getDefDescriptor(desc.getQualifiedName(), desc.getDefType().getPrimaryInterface());
+        DefDescriptor<?> desc2 = service.getDefDescriptor(desc.getQualifiedName(), desc.getDefType()
+                .getPrimaryInterface());
         assertEquals(desc, desc2);
 
-        DefDescriptor<ActionDef> actionDesc = service.getDefDescriptor("java://org.auraframework.impl.java.controller.TestController/ACTION$doSomething", ActionDef.class);
+        DefDescriptor<ActionDef> actionDesc = service.getDefDescriptor(
+                "java://org.auraframework.impl.java.controller.TestController/ACTION$doSomething", ActionDef.class);
         assertNotNull(actionDesc);
 
         return null;
@@ -123,14 +125,15 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
 
         ContextService contextService = Aura.getContextService();
         try{
-            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService().getDefDescriptor("test:laxSecurity", ApplicationDef.class));
-
+            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
+                    .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
 
             Definition def = service.getDefinition(config.desc);
             assertNotNull(def);
 
             try{
-                DefDescriptor<?> desc = service.getDefDescriptor(config.desc.getQualifiedName()+"foofoo", config.desc.getDefType().getPrimaryInterface());
+                DefDescriptor<?> desc = service.getDefDescriptor(config.desc.getQualifiedName() + "foofoo", config.desc
+                        .getDefType().getPrimaryInterface());
                 service.getDefinition(desc);
                 fail("Should have thrown DefinitionNotFoundException");
             }catch(DefinitionNotFoundException e){
@@ -145,8 +148,7 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
     }
 
     @Override
-    public <T extends Definition> T getDefinition(String qualifiedName, Class<T> defType)
-            throws QuickFixException {
+    public <T extends Definition> T getDefinition(String qualifiedName, Class<T> defType) throws QuickFixException {
 
         try{
             service.getDefinition(qualifiedName, defType);
@@ -157,14 +159,16 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
 
         ContextService contextService = Aura.getContextService();
         try{
-            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService().getDefDescriptor("test:laxSecurity", ApplicationDef.class));
+            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
+                    .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
 
-
-            Definition def = service.getDefinition(config.desc.getQualifiedName(), config.desc.getDefType().getPrimaryInterface());
+            Definition def = service.getDefinition(config.desc.getQualifiedName(), config.desc.getDefType()
+                    .getPrimaryInterface());
             assertNotNull(def);
 
             try{
-                service.getDefinition(config.desc.getQualifiedName()+"foofoo", config.desc.getDefType().getPrimaryInterface());
+                service.getDefinition(config.desc.getQualifiedName() + "foofoo", config.desc.getDefType()
+                        .getPrimaryInterface());
                 fail("Should have thrown DefinitionNotFoundException");
             }catch(DefinitionNotFoundException e){
                 //good
@@ -188,9 +192,8 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
 
         ContextService contextService = Aura.getContextService();
         try{
-            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService().getDefDescriptor("test:laxSecurity", ApplicationDef.class));
-
-
+            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
+                    .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
 
             Definition def = service.getDefinition("test:text", DefType.COMPONENT, DefType.APPLICATION);
             assertNotNull(def);
@@ -214,7 +217,6 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
         }finally{
             contextService.endContext();
         }
-
 
         return null;
     }
@@ -243,17 +245,18 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
 
         ContextService contextService = Aura.getContextService();
         try{
-            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService().getDefDescriptor("test:laxSecurity", ApplicationDef.class));
+            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
+                    .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
             //This creates the StringSource objects before they can be saved.
-            addSource("foo", "", ComponentDef.class);
+            DefDescriptor<ComponentDef> desc = addSourceAutoCleanup("", ComponentDef.class);
             ComponentDefBuilder builder = Aura.getBuilderService().getComponentDefBuilder();
-            builder.setDescriptor("string:foo");
+            builder.setDescriptor(desc.getDescriptorName());
             builder.setLocation("fake", 1, 1, 1);
             ComponentDef componentDef = builder.build();
 
             service.save(componentDef);
 
-            assertNotNull(service.getDefinition("string:foo", ComponentDef.class));
+            assertNotNull(service.getDefinition(desc.getDescriptorName(), ComponentDef.class));
         }catch(DefinitionNotFoundException e){
             fail("Definition did not save.");
         }finally{
@@ -269,8 +272,7 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
         Set<DefDescriptor<?>> descriptors = Sets.<DefDescriptor<?>>newHashSet(
                 defService.getDefDescriptor("test:text", ComponentDef.class),
                 defService.getDefDescriptor("js://test.testJSController", ControllerDef.class),
-                defService.getDefDescriptor("css://test.testValidCSS", ThemeDef.class)
-        );
+                defService.getDefDescriptor("css://test.testValidCSS", ThemeDef.class));
 
         for(DefDescriptor<?> desc : descriptors){
             Config config = new Config();

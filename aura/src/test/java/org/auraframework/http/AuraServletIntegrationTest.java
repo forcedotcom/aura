@@ -24,15 +24,16 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.IntegrationTestCase;
+import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.util.AuraPrivateAccessor;
 
 /**
  * Tests for AuraServlet.
  *
- *
  * @since 0.0.2.48
  */
+@ThreadHostileTest
 public class AuraServletIntegrationTest extends IntegrationTestCase {
     public AuraServletIntegrationTest(String name) {
         super(name);
@@ -153,7 +154,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
             boolean shouldLastModUpdate) throws Exception {
         long lastModBeforeUpdate = AuraServlet.getLastMod();
         assertTrue("failed to get valid lastmod: " + lastModBeforeUpdate, lastModBeforeUpdate > 0);
-        waitAtLeast(1000); // ensure lastMod changes despite system time resolution
+        Thread.sleep(1002); // ensure lastMod changes despite system time resolution
         update.run();
 
         // restart context as prior context will have old lastMod
@@ -254,7 +255,8 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "updateTest:updateWithoutPreload", ApplicationDef.class);
         Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.AUTHENTICATED, appDesc);
-        ApplicationDef depDef = Aura.getDefinitionService().getDefinition("updateTest:updateBase", ApplicationDef.class);
+        ApplicationDef depDef = Aura.getDefinitionService().getDefinition("updateTest:updateBase",
+                ApplicationDef.class);
         assertLastModAfterUpdate(Mode.DEV, appDesc, touchSource(depDef.getDescriptor()), true);
     }
 
@@ -310,8 +312,10 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
      * No manifest URL when context has no preloads.
      */
     public void testGetManifestWithoutPreloads() throws Exception {
-        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor("appPreloadTest:appCacheNoPreload", ApplicationDef.class);
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, desc);
+        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(
+                "appPreloadTest:appCacheNoPreload", ApplicationDef.class);
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED,
+                desc);
         context.setPreloading(true);
         String url = AuraServlet.getManifest();
         assertEquals("", url);
@@ -321,12 +325,16 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
      * Get a URL when context has preloads.
      */
     public void testGetManifestWithPreloads() throws Exception {
-        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor("appPreloadTest:appCacheNoPreload", ApplicationDef.class);
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, desc);
+        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(
+                "appPreloadTest:appCacheNoPreload", ApplicationDef.class);
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED,
+                desc);
         context.setPreloading(true);
         context.addPreload("aura");
         context.addPreload("ui");
         String url = AuraServlet.getManifest();
-        assertEquals("/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22appPreloadTest%3AappCacheNoPreload%22%7D/app.manifest", url);
+        assertEquals(
+                "/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22appPreloadTest%3AappCacheNoPreload%22%7D/app.manifest",
+                url);
     }
 }

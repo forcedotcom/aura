@@ -15,21 +15,15 @@
  */
 package org.auraframework.def;
 
+import java.util.Date;
+
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.MissingRequiredAttributeException;
 
-/**
- */
 public class ForEachDefTest extends DefinitionTest<ComponentDef> {
-
-    static private final String COMP_WITH_REQUIRED_ATTRIBUTE = "hasRequiredAttribute";
-    static private final String COMP_MISSING_REQUIRED_ATTRIBUTE = "missingRequiredAttribute";
-    static private final String QUALIFIED_NAME_COMP_WITH_REQUIRED_ATTRIBUTE = StringSourceLoader.NAMESPACE + ":" + COMP_WITH_REQUIRED_ATTRIBUTE;
-    static private final String QUALIFIED_NAME_COMP_MISSING_REQUIRED_ATTRIBUTE = StringSourceLoader.NAMESPACE + ":" + COMP_MISSING_REQUIRED_ATTRIBUTE;
-
     /**
      * @param name
      */
@@ -38,67 +32,73 @@ public class ForEachDefTest extends DefinitionTest<ComponentDef> {
     }
 
     public void testInnerRequiredAttribute1() throws Exception {
-        registerComponentMissingRequiredAttribute();
+        DefDescriptor<ComponentDef> required = registerComponentRequiredAttribute();
+        DefDescriptor<ComponentDef> missing = registerComponentMissingRequiredAttribute(required);
         try {
-            Aura.getInstanceService().getInstance(QUALIFIED_NAME_COMP_MISSING_REQUIRED_ATTRIBUTE, ComponentDef.class);
+            Aura.getInstanceService().getInstance(missing.getQualifiedName(), ComponentDef.class);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (MissingRequiredAttributeException expected) {}
     }
 
     public void testInnerRequiredAttribute2() throws Exception {
-        registerComponentMissingRequiredAttribute();
+        DefDescriptor<ComponentDef> required = registerComponentRequiredAttribute();
+        DefDescriptor<ComponentDef> missing = registerComponentMissingRequiredAttribute(required);
         try {
-            Aura.getInstanceService().getInstance(QUALIFIED_NAME_COMP_MISSING_REQUIRED_ATTRIBUTE, DefType.COMPONENT);
+            Aura.getInstanceService().getInstance(missing.getQualifiedName(), DefType.COMPONENT);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (MissingRequiredAttributeException expected) {}
     }
 
     public void testInnerRequiredAttribute3() throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = registerComponentMissingRequiredAttribute();
+        DefDescriptor<ComponentDef> required = registerComponentRequiredAttribute();
+        DefDescriptor<ComponentDef> missing = registerComponentMissingRequiredAttribute(required);
         try {
-            Aura.getInstanceService().getInstance(cmpDesc);
+            Aura.getInstanceService().getInstance(missing);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (MissingRequiredAttributeException expected) {}
     }
 
     public void testInnerRequiredAttribute4() throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = registerComponentMissingRequiredAttribute();
+        DefDescriptor<ComponentDef> required = registerComponentRequiredAttribute();
+        DefDescriptor<ComponentDef> missing = registerComponentMissingRequiredAttribute(required);
         try {
-            Aura.getInstanceService().getInstance(cmpDesc.getDef());
+            Aura.getInstanceService().getInstance(missing.getDef());
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (MissingRequiredAttributeException expected) {}
     }
 
     public void testInnerRequiredInheritedAttribute1() throws Exception {
-        registerComponentMissingInheritedRequiredAttribute();
+        DefDescriptor<ComponentDef> required = registerComponentInheritedRequiredAttribute();
+        DefDescriptor<ComponentDef> missing = registerComponentMissingInheritedRequiredAttribute(required);
         try {
-            Component cmp = Aura.getInstanceService().getInstance(QUALIFIED_NAME_COMP_MISSING_REQUIRED_ATTRIBUTE, ComponentDef.class);
-            StringBuilder out = new StringBuilder();
-            Aura.getRenderingService().render(cmp, out);
+            Aura.getInstanceService().getInstance(missing.getQualifiedName(), ComponentDef.class);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (MissingRequiredAttributeException expected) {}
     }
 
     public void testInnerRequiredInheritedAttribute2() throws Exception {
-        registerComponentMissingInheritedRequiredAttribute();
+        DefDescriptor<ComponentDef> required = registerComponentInheritedRequiredAttribute();
+        DefDescriptor<ComponentDef> missing = registerComponentMissingInheritedRequiredAttribute(required);
         try {
-            Aura.getInstanceService().getInstance(QUALIFIED_NAME_COMP_MISSING_REQUIRED_ATTRIBUTE, DefType.COMPONENT);
+            Aura.getInstanceService().getInstance(missing.getQualifiedName(), DefType.COMPONENT);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (MissingRequiredAttributeException expected) {}
     }
 
     public void testInnerRequiredInheritedAttribute3() throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = registerComponentMissingInheritedRequiredAttribute();
+        DefDescriptor<ComponentDef> required = registerComponentInheritedRequiredAttribute();
+        DefDescriptor<ComponentDef> missing = registerComponentMissingInheritedRequiredAttribute(required);
         try {
-            Aura.getInstanceService().getInstance(cmpDesc);
+            Aura.getInstanceService().getInstance(missing);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (MissingRequiredAttributeException expected) {}
     }
 
     public void testInnerRequiredInheritedAttribute4() throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = registerComponentMissingInheritedRequiredAttribute();
+        DefDescriptor<ComponentDef> required = registerComponentInheritedRequiredAttribute();
+        DefDescriptor<ComponentDef> missing = registerComponentMissingInheritedRequiredAttribute(required);
         try {
-            Aura.getInstanceService().getInstance(cmpDesc.getDef());
+            Aura.getInstanceService().getInstance(missing.getDef());
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
         } catch (MissingRequiredAttributeException expected) {}
     }
@@ -195,28 +195,46 @@ public class ForEachDefTest extends DefinitionTest<ComponentDef> {
      * assertEquals("three", child.getAttributes().getExpression("thing")); }
      */
 
-    private DefDescriptor<ComponentDef> registerComponentMissingRequiredAttribute() {
-        DefDescriptor<ComponentDef> cmpDesc;
-        addSource(COMP_WITH_REQUIRED_ATTRIBUTE,
+    private DefDescriptor<ComponentDef> registerComponentRequiredAttribute() {
+        DefDescriptor<ComponentDef> cmpDesc = StringSourceLoader.getInstance().createStringSourceDescriptor(
+                "HasRequiredAttribute", ComponentDef.class);
+        addSourceAutoCleanup(cmpDesc,
                 "<aura:component><aura:attribute name='req' type='String' required='true'/></aura:component>",
-                ComponentDef.class);
-        cmpDesc = addSource(
-                COMP_MISSING_REQUIRED_ATTRIBUTE,
-                "<aura:component model=\"java://org.auraframework.impl.java.model.TestJavaModel\"><aura:foreach items='{!m.stringList}' var='i'><" + QUALIFIED_NAME_COMP_WITH_REQUIRED_ATTRIBUTE + "/></aura:foreach></aura:component>",
-                ComponentDef.class);
+                new Date());
         return cmpDesc;
     }
 
-    private DefDescriptor<ComponentDef> registerComponentMissingInheritedRequiredAttribute() {
-        addSource(
-                "parent",
-                "<aura:component extensible='true'><aura:attribute name='req' type='String' required='true'/></aura:component>",
-                ComponentDef.class);
-        addSource(COMP_WITH_REQUIRED_ATTRIBUTE, "<aura:component extends='string:parent'/>", ComponentDef.class);
-        DefDescriptor<ComponentDef> cmpDesc = addSource(
-                COMP_MISSING_REQUIRED_ATTRIBUTE,
-                "<aura:component model=\"java://org.auraframework.impl.java.model.TestJavaModel\"><aura:foreach items='{!m.stringList}' var='i'><" + QUALIFIED_NAME_COMP_WITH_REQUIRED_ATTRIBUTE + "/></aura:foreach></aura:component>",
-                ComponentDef.class);
+    private DefDescriptor<ComponentDef> registerComponentMissingRequiredAttribute(
+            DefDescriptor<ComponentDef> withRequiredAttribute) {
+        DefDescriptor<ComponentDef> cmpDesc = StringSourceLoader.getInstance().createStringSourceDescriptor(
+                "_MissingRequiredAttribute", ComponentDef.class);
+        addSourceAutoCleanup(
+                cmpDesc,
+                "<aura:component model=\"java://org.auraframework.impl.java.model.TestJavaModel\"><aura:foreach items='{!m.stringList}' var='i'><"
+                        + withRequiredAttribute.getDescriptorName() + "/></aura:foreach></aura:component>");
         return cmpDesc;
+    }
+
+    private DefDescriptor<ComponentDef> registerComponentInheritedRequiredAttribute() {
+        DefDescriptor<ComponentDef> parentDesc = StringSourceLoader.getInstance().createStringSourceDescriptor(
+                "_Parent_", ComponentDef.class);
+        addSourceAutoCleanup(parentDesc,
+                "<aura:component extensible='true'><aura:attribute name='req' type='String' required='true'/></aura:component>");
+        DefDescriptor<ComponentDef> childDesc = StringSourceLoader.getInstance().createStringSourceDescriptor(
+                "_ChildHasRequired", ComponentDef.class);
+        addSourceAutoCleanup(childDesc,
+                String.format("<aura:component extends='%s'/>", parentDesc.getDescriptorName()));
+        return childDesc;
+    }
+
+    private DefDescriptor<ComponentDef> registerComponentMissingInheritedRequiredAttribute(
+            DefDescriptor<ComponentDef> required) {
+        String contents = "<aura:component model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
+                + "<aura:foreach items='{!m.stringList}' var='i'><" + required.getDescriptorName()
+                + "/></aura:foreach></aura:component>";
+        DefDescriptor<ComponentDef> missingDesc = StringSourceLoader.getInstance().createStringSourceDescriptor(
+                "_ChildMissingRequired", ComponentDef.class);
+        addSourceAutoCleanup(missingDesc, contents);
+        return missingDesc;
     }
 }

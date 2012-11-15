@@ -25,94 +25,52 @@ import org.auraframework.def.Definition;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.Source;
-import org.auraframework.system.SourceLoader;
 import org.auraframework.test.AuraTestingUtil;
 
 import com.google.common.collect.Sets;
 
+public class AuraTestingUtilImpl implements AuraTestingUtil {
+    private final Set<DefDescriptor<?>> cleanUpDds = Sets.newHashSet();
 
-public class AuraTestingUtilImpl implements AuraTestingUtil{
-    private DefUtil defUtil;
+    public AuraTestingUtilImpl() {}
 
-    public AuraTestingUtilImpl(){
-        defUtil = new DefUtil();
-    }
     @Override
     public void setUp() {
-        //Do nothing
-    }
-    @Override
-    public void tearDown(){
-        defUtil.tearDown();
+        // Do nothing
     }
 
     @Override
-    public File getAuraJavascriptSourceDirectory(){
+    public void tearDown() {
+        StringSourceLoader loader = StringSourceLoader.getInstance();
+        for (DefDescriptor<?> dd : cleanUpDds) {
+            loader.removeSource(dd);
+        }
+        cleanUpDds.clear();
+    }
+
+    @Override
+    public File getAuraJavascriptSourceDirectory() {
         return AuraImplFiles.AuraJavascriptSourceDirectory.asFile();
     }
 
     @Override
-    public Set<SourceLoader> getAdditionalLoaders(){
-        return defUtil.getAdditionalLoaders();
+    public Source<?> getSource(DefDescriptor<?> descriptor) {
+        return Aura.getContextService().getCurrentContext().getDefRegistry().getSource(descriptor);
     }
 
     @Override
-    public Source<?> getSource(DefDescriptor<?> descriptor){
-        return defUtil.getSource(descriptor);
+    public <T extends Definition> void addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents,
+            Date lastModified) {
+        StringSourceLoader.getInstance().addSource(descriptor, contents, lastModified);
+        cleanUpDds.add(descriptor);
     }
 
     @Override
-    public <T extends Definition> DefDescriptor<T> addSource(String contents, Class<T> defClass){
-        return addSource(null, contents, defClass);
+    public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(String contents, Class<T> defClass) {
+        StringSourceLoader loader = StringSourceLoader.getInstance();
+        DefDescriptor<T> desc = loader.createStringSourceDescriptor(null, defClass);
+        loader.addSource(desc, contents, new Date());
+        cleanUpDds.add(desc);
+        return desc;
     }
-
-    @Override
-    public <T extends Definition> DefDescriptor<T> addSource(String name, String contents, Class<T> defClass){
-        return defUtil.addSource(name, contents, defClass, new Date());
-    }
-
-    @Override
-    public <T extends Definition> DefDescriptor<T> addSource(String contents, Class<T> defClass, Date lastModified){
-        return defUtil.addSource(null, contents, defClass, lastModified);
-    }
-    @Override
-    public <T extends Definition> DefDescriptor<T> addSource(String name,String contents, Class<T> defClass, Date lastModified){
-        return defUtil.addSource(name, contents, defClass, lastModified);
-    }
-    /**
-     * Utility class to handle definitions.
-     *
-     *
-     */
-    private class DefUtil{
-        private StringSourceLoader stringSourceLoader = StringSourceLoader.getInstance();
-        private Set<SourceLoader> loaders = Sets.<SourceLoader>newHashSet(stringSourceLoader);
-        private Set<DefDescriptor<?>> cleanUpDds;
-
-        public void tearDown(){
-            if (cleanUpDds != null){
-                for (DefDescriptor<?> dd : cleanUpDds){
-                    removeSource(dd);
-                }
-            }
-        }
-        private Set<SourceLoader> getAdditionalLoaders(){
-            return loaders;
-        }
-        private void removeSource(DefDescriptor<?> descriptor){
-            stringSourceLoader.removeSource(descriptor);
-        }
-
-        private Source<?> getSource(DefDescriptor<?> descriptor){
-            return Aura.getContextService().getCurrentContext().getDefRegistry().getSource(descriptor);
-        }
-        private <T extends Definition> DefDescriptor<T> addSource(String name, String contents, Class<T> defClass, Date lastModified){
-            DefDescriptor<T> dd = stringSourceLoader.addSource(name, contents, defClass, lastModified);
-            if (cleanUpDds == null)
-                cleanUpDds = Sets.newHashSet();
-            cleanUpDds.add(dd);
-            return dd;
-        }
-    }
-
 }

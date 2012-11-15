@@ -15,27 +15,26 @@
  */
 package org.auraframework.component.aura;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import org.junit.Ignore;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Component;
-import org.auraframework.throwable.MissingRequiredAttributeException;
 import org.auraframework.throwable.AuraExecutionException;
+import org.auraframework.throwable.MissingRequiredAttributeException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
+
+import org.junit.Ignore;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
  * Server-side aura:iteration tests
+ * 
  * @userStory a07B0000000LAVl
- *
  * @since 0.0.254
  */
 public class IterationTest extends AuraImplTestCase {
@@ -49,15 +48,12 @@ public class IterationTest extends AuraImplTestCase {
         super.setUp();
     }
 
-    private Component getIterationComponent(String innerSource,
-            Map<String, Object> attributes) throws Exception {
-        DefDescriptor<ComponentDef> def = addSourceAutoCleanup(
-                String.format(
-                        "<aura:component><aura:attribute name='items' type='List'/>%s</aura:component>",
-                        innerSource), ComponentDef.class);
+    private Component getIterationComponent(String innerSource, Map<String, Object> attributes) throws Exception {
+        DefDescriptor<ComponentDef> def = addSourceAutoCleanup(String.format(
+                "<aura:component><aura:attribute name='items' type='List'/>%s</aura:component>", innerSource),
+                ComponentDef.class);
         Component cmp = Aura.getInstanceService().getInstance(def, attributes);
-        return (Component) ((List<?>) cmp.getSuper().getAttributes()
-                .getValue("body")).get(0);
+        return (Component)((List<?>)cmp.getSuper().getAttributes().getValue("body")).get(0);
     }
 
     public void testItemsMissing() throws Exception {
@@ -65,8 +61,7 @@ public class IterationTest extends AuraImplTestCase {
         try {
             getIterationComponent(source, null);
             fail("Expected MissingRequiredAttributeException");
-        } catch (MissingRequiredAttributeException e) {
-        }
+        } catch (MissingRequiredAttributeException e) {}
     }
 
     public void testItemsNull() throws Exception {
@@ -92,8 +87,7 @@ public class IterationTest extends AuraImplTestCase {
         try {
             getIterationComponent(source, attributes);
             fail("Expected MissingRequiredAttributeException");
-        } catch (MissingRequiredAttributeException e) {
-        }
+        } catch (MissingRequiredAttributeException e) {}
     }
 
     public void testVarEmpty() throws Exception {
@@ -138,8 +132,7 @@ public class IterationTest extends AuraImplTestCase {
         try {
             getRenderedBaseComponent(iteration);
             fail("Expected a AuraExecutionException");
-        } catch (AuraExecutionException e) {
-        }
+        } catch (AuraExecutionException e) {}
     }
 
     public void testIndexVarEmpty() throws Exception {
@@ -184,8 +177,7 @@ public class IterationTest extends AuraImplTestCase {
         try {
             getRenderedBaseComponent(iteration);
             fail("Expected a AuraExecutionException");
-        } catch (AuraExecutionException e) {
-        }
+        } catch (AuraExecutionException e) {}
     }
 
     public void testStartGreaterThanLength() throws Exception {
@@ -219,8 +211,7 @@ public class IterationTest extends AuraImplTestCase {
         try {
             getIterationComponent(source, attributes);
             fail("Expected a NumberFormatException");
-        } catch (NumberFormatException e) {
-        }
+        } catch (NumberFormatException e) {}
     }
 
     public void testStartDecimal() throws Exception {
@@ -255,8 +246,7 @@ public class IterationTest extends AuraImplTestCase {
         try {
             getIterationComponent(source, attributes);
             fail("Expected a NumberFormatException");
-        } catch (NumberFormatException e) {
-        }
+        } catch (NumberFormatException e) {}
     }
 
     public void testEndDecimal() throws Exception {
@@ -274,41 +264,50 @@ public class IterationTest extends AuraImplTestCase {
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         Component iteration = getIterationComponent(source, attributes);
         assertEquals("0q|1r|2s|", getRenderedBaseComponent(iteration));
-        List<?> realBody = (List<?>) iteration.getAttributes().getValue("realbody");
+        List<?> realBody = (List<?>)iteration.getAttributes().getValue("realbody");
         assertEquals(6, realBody.size());
         for (Object bodyPart : realBody) {
-            assertEquals("markup://aura:expression", ((Component) bodyPart)
-                    .getDescriptor().getQualifiedName());
+            assertEquals("markup://aura:expression", ((Component)bodyPart).getDescriptor().getQualifiedName());
         }
     }
+
     /**
      * Verify that iteams, var and body are required attributes.
      */
-    public void testRequiredAttributes() throws Exception{
+    public void testRequiredAttributes() throws Exception {
         ComponentDef def = Aura.getDefinitionService().getDefinition("aura:iteration", ComponentDef.class);
         assertNotNull(def);
-        assertTrue("Cannot use iteration component with something to iterate through.",
-                def.getAttributeDef("items").isRequired());
-        assertTrue("Require a reference variable to iterate.",
-                def.getAttributeDef("var").isRequired());
-        assertTrue("Require a template to put in components for each iteration.",
-                def.getAttributeDef("body").isRequired());
+        assertTrue("Cannot use iteration component with something to iterate through.", def.getAttributeDef("items")
+                .isRequired());
+        assertTrue("Require a reference variable to iterate.", def.getAttributeDef("var").isRequired());
+        assertTrue("Require a template to put in components for each iteration.", def.getAttributeDef("body")
+                .isRequired());
     }
+
     /**
      * Verify that marking iteration component as lazy won't skip required attribute validation.
+     * 
      * @throws Exception
      */
-    public void testRequiredAttributesWhenLazyLoading() throws Exception{
-        //Similar to BaseComponentDefTest.testLazyLoadingFacets()
+    public void testRequiredAttributesWhenLazyLoading() throws Exception {
+        /**
+         * W-1300925 This case is currently caught only at the client, would be good to have it validated at the server.
+         * Reference test case js://loacLevelTest.loadLevel$testMissingRequiredAttribute DefDescriptor<ComponentDef>
+         * desc = addSourceAutoCleanup(String.format(baseComponentTag, "",
+         * "<aura:iteration aura:load='LAZY'></aura:iteration>") ,ComponentDef.class); try{
+         * Aura.getInstanceService().getInstance(desc); fail(); }catch (Exception e){ assertNotNull(e); }
+         */
+        // Similar to BaseComponentDefTest.testLazyLoadingFacets()
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(String.format(baseComponentTag, "",
-                                            "<aura:iteration aura:load='LAZY'><aura:text/></aura:iteration>"),
-                                            ComponentDef.class);
-        try{
+                "<aura:iteration aura:load='LAZY'><aura:text/></aura:iteration>"), ComponentDef.class);
+        try {
             Aura.getInstanceService().getInstance(desc);
             fail("Should not be able to pass non simple attribute values to lazy loading facets.");
-        }catch (InvalidReferenceException e){
-            assertNotNull(e.getMessage().contains("Lazy Component References can only have attributes of simple types passed in (body is not simple)"));
+        } catch (InvalidReferenceException e) {
+            assertNotNull(e
+                    .getMessage()
+                    .contains(
+                            "Lazy Component References can only have attributes of simple types passed in (body is not simple)"));
         }
     }
 }
-

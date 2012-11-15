@@ -21,15 +21,15 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 
 /**
  * Test validation of attribute names in component markup.
+ * 
  * @hierarchy Aura.Unit Tests.Components.Attributes.Validation
  * @userStory a07B000000090oq
- *
- *
  */
 public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
     public ComponentAttributeNameValidationTest(String name) {
@@ -37,7 +37,7 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
     }
 
     private Component getComponentInstance(String markup) throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = addSource(markup, ComponentDef.class);
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(markup, ComponentDef.class);
         return Aura.getInstanceService().getInstance(cmpDesc);
     }
 
@@ -52,15 +52,20 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
 
     /**
      * Unknown attribute on a component tag
+     * 
      * @expectedResults AttributeNotFoundException thrown
      */
     public void testInlineUnknownAttribute() throws Exception {
-        addSource("myCmp", "<aura:component/>", ComponentDef.class);
-        assertAttributeNotFoundException("<aura:component><string:myCmp unknown=''/></aura:component>");
+        DefDescriptor<ComponentDef> myCmp = StringSourceLoader.getInstance().createStringSourceDescriptor(
+                "inlineUnknownAttribute_myCmp", ComponentDef.class);
+        addSourceAutoCleanup(myCmp, "<aura:component/>");
+        assertAttributeNotFoundException("<aura:component><" + myCmp.getDescriptorName()
+                + " unknown=''/></aura:component>");
     }
 
     /**
      * Unknown attribute from aura:set tag
+     * 
      * @expectedResults AttributeNotFoundException thrown
      */
     // https://gus.soma.salesforce.com/a07B000000091QAIAY
@@ -71,26 +76,32 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
 
     /**
      * Unknown attribute from aura:set tag on nested component
+     * 
      * @expectedResults AttributeNotFoundException thrown
      */
     public void testSetUnknownAttributeInNestedComponent() throws Exception {
-        addSource("myCmp", "<aura:component/>", ComponentDef.class);
-        assertAttributeNotFoundException("<aura:component><string:myCmp><aura:set attribute='unknown' value='error'/></string:myCmp></aura:component>");
+        DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup("<aura:component/>", ComponentDef.class);
+        assertAttributeNotFoundException("<aura:component><" + myCmp.getDescriptorName()
+                + "><aura:set attribute='unknown' value='error'/></" + myCmp.getDescriptorName()
+                + "></aura:component>");
     }
 
     /**
      * Unknown attribute prefix on a component tag
+     * 
      * @expectedResults AttributeNotFoundException thrown
      */
     // https://gus.soma.salesforce.com/a07B0000000Eys9IAC
     // fails with type error since it thinks other:body == body
     public void _testInlineUnknownAttributePrefix() throws Exception {
-        addSource("myCmp", "<aura:component/>", ComponentDef.class);
-        assertAttributeNotFoundException("<aura:component><string:myCmp other:body=''/></aura:component>");
+        DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup("<aura:component/>", ComponentDef.class);
+        assertAttributeNotFoundException(String.format("<aura:component><%s other:body=''/></aura:component>",
+                myCmp.getDescriptorName()));
     }
 
     /**
      * Unknown attribute prefix from aura:set tag
+     * 
      * @expectedResults AttributeNotFoundException thrown
      */
     // https://gus.soma.salesforce.com/a07B0000000Eys9IAC
@@ -102,23 +113,29 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
 
     /**
      * Unknown attribute prefix from aura:set tag on nested component
+     * 
      * @expectedResults AttributeNotFoundException thrown
      */
     public void testSetUnknownAttributePrefixInNestedComponent() throws Exception {
-        addSource("myCmp", "<aura:component><aura:attribute name='value' type='String'/></aura:component>", ComponentDef.class);
-        assertAttributeNotFoundException("<aura:component><string:myCmp><aura:set attribute='other:value' value=''/></string:myCmp></aura:component>");
+        DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup(
+                "<aura:component><aura:attribute name='value' type='String'/></aura:component>", ComponentDef.class);
+        assertAttributeNotFoundException(String.format(
+                "<aura:component><%1$s><aura:set attribute='other:value' value=''/></%1$s></aura:component>",
+                myCmp.getDescriptorName()));
     }
 
     /**
      * Simple attribute name may be referenced with "aura" prefix on component tag
+     * 
      * @expectedResults attribute value is retrieved
      */
     // https://gus.soma.salesforce.com/a07B0000000Eys9IAC
     // fails since attrib was not set
     public void _testInlineDefaultAttributePrefix() throws Exception {
-        addSource("myCmp", "<aura:component><aura:attribute name='title' type='String'/></aura:component>",
-                ComponentDef.class);
-        Component cmp = getComponentInstance("<aura:component><string:myCmp aura:title='new title'/></aura:component>");
+        DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup(
+                "<aura:component><aura:attribute name='title' type='String'/></aura:component>", ComponentDef.class);
+        Component cmp = getComponentInstance(String.format(
+                "<aura:component><%s aura:title='new title'/></aura:component>", myCmp.getDescriptorName()));
         @SuppressWarnings("unchecked")
         Component innerCmp = ((List<Component>)cmp.getSuper().getAttributes().getValue("body")).get(0);
         assertEquals("new title", innerCmp.getAttributes().getValue("title"));
@@ -126,6 +143,7 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
 
     /**
      * Simple attribute name may be referenced with "aura" prefix from aura:set tag
+     * 
      * @expectedResults attribute value is retrieved
      */
     // https://gus.soma.salesforce.com/a07B0000000Eys9IAC
@@ -140,14 +158,18 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
 
     /**
      * Simple attribute name may be referenced with "aura" prefix from aura:set tag on nested component
+     * 
      * @expectedResults attribute value is retrieved
      */
     // https://gus.soma.salesforce.com/a07B0000000Eys9IAC
     // https://gus.soma.salesforce.com/a07B000000091QAIAY
     // fails with attribute aura:value not found
     public void _testSetDefaultAttributePrefixInNestedComponent() throws Exception {
-        addSource("myCmp", "<aura:component><aura:attribute name='value' type='String'/></aura:component>", ComponentDef.class);
-        Component cmp = getComponentInstance("<aura:component><string:myCmp><aura:set attribute='aura:value' value='oops'/></string:myCmp></aura:component>");
+        DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup(
+                "<aura:component><aura:attribute name='value' type='String'/></aura:component>", ComponentDef.class);
+        Component cmp = getComponentInstance(String.format(
+                "<aura:component><%1$s><aura:set attribute='aura:value' value='oops'/></%1$s></aura:component>",
+                myCmp.getDescriptorName()));
         @SuppressWarnings("unchecked")
         Component innerCmp = ((List<Component>)cmp.getSuper().getAttributes().getValue("body")).get(0);
         assertEquals("oops", innerCmp.getAttributes().getValue("value"));
@@ -155,17 +177,19 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
 
     /**
      * Prefixed attribute name must be referenced with prefix on component tag
+     * 
      * @expectedResults attribute value is retrieved
      */
     // https://gus.soma.salesforce.com/a07B0000000Eys9IAC
     // fails for all cases since prefix is not included when validating on instance creation
     @SuppressWarnings("unchecked")
     public void _testInlineAttributePrefix() throws Exception {
-        addSource("myCmp", "<aura:component>" + "<aura:attribute name='aura:special1' type='String' default='hi'/>"
+        DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup("<aura:component>"
+                + "<aura:attribute name='aura:special1' type='String' default='hi'/>"
                 + "<aura:attribute name='other:special2' type='String' default='bye'/>" + "</aura:component>",
                 ComponentDef.class);
-
-        Component cmp = getComponentInstance("<aura:component><string:myCmp other:special2='down'/></aura:component>");
+        Component cmp = getComponentInstance(String.format(
+                "<aura:component><%s other:special2='down'/></aura:component>", myCmp.getDescriptorName()));
         Component innerCmp = ((List<Component>)cmp.getSuper().getAttributes().getValue("body")).get(0);
         assertEquals("down", innerCmp.getAttributes().getValue("other:special2"));
 
@@ -176,6 +200,7 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
 
     /**
      * Prefixed attribute name must be referenced with prefix from aura:set tag
+     * 
      * @expectedResults attribute value is retrieved
      */
     // https://gus.soma.salesforce.com/a07B0000000Eys9IAC
@@ -194,21 +219,25 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
 
     /**
      * Prefixed attribute name must be referenced with prefix from aura:set tag on nested component
+     * 
      * @expectedResults attribute value is retrieved
      */
     @SuppressWarnings("unchecked")
     public void testSetAttributePrefixInNestedComponent() throws Exception {
-        addSource("myCmp", "<aura:component>" + "<aura:attribute name='aura:special1' type='String' default='hi'/>"
+        DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup("<aura:component>"
+                + "<aura:attribute name='aura:special1' type='String' default='hi'/>"
                 + "<aura:attribute name='other:special2' type='String' default='bye'/>" + "</aura:component>",
                 ComponentDef.class);
 
-        Component cmp = getComponentInstance("<aura:component><string:myCmp>"
-                + "<aura:set attribute='other:special2' value='bye'/>" + "</string:myCmp></aura:component>");
+        Component cmp = getComponentInstance(String.format("<aura:component><%1$s>"
+                + "<aura:set attribute='other:special2' value='bye'/>" + "</%1$s></aura:component>",
+                myCmp.getDescriptorName()));
         Component innerCmp = ((List<Component>)cmp.getSuper().getAttributes().getValue("body")).get(0);
         assertEquals("bye", innerCmp.getAttributes().getValue("other:special2"));
 
-        cmp = getComponentInstance("<aura:component><string:myCmp>"
-                + "<aura:set attribute='aura:special1' value='bye'/>" + "</string:myCmp></aura:component>");
+        cmp = getComponentInstance(String.format("<aura:component><%1$s>"
+                + "<aura:set attribute='aura:special1' value='bye'/>" + "</%1$s></aura:component>",
+                myCmp.getDescriptorName()));
         innerCmp = ((List<Component>)cmp.getSuper().getAttributes().getValue("body")).get(0);
         assertEquals("bye", innerCmp.getAttributes().getValue("aura:special1"));
     }

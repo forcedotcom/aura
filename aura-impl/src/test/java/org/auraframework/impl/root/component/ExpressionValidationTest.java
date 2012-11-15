@@ -25,8 +25,6 @@ import org.auraframework.throwable.AuraRuntimeException;
  *
  * @hierarchy Aura.Unit Tests.Components.Expressions
  * @userStory a07B0000000E82y
- *
- *
  */
 public class ExpressionValidationTest extends AuraImplTestCase {
 
@@ -36,10 +34,11 @@ public class ExpressionValidationTest extends AuraImplTestCase {
 
     /**
      * Expressions are not allowed for top-level component attributes.
+     * 
      * @expectedResults AuraRuntimeException when instantiating the component
      */
     public void _testTopLevelComponentExpressionsNotAllowed() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = addSource(
+        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
                 "<aura:application><aura:attribute name='strAtt' type='String'>{!who.cares}</aura:attribute></aura:application>",
                 ApplicationDef.class);
         try {
@@ -51,8 +50,9 @@ public class ExpressionValidationTest extends AuraImplTestCase {
     }
 
     /**
-     * Exceptions from parsing by ExpressionAdapter are forwarded.
-     * See ExpressionParserTest for more tests that result in parse exceptions.
+     * Exceptions from parsing by ExpressionAdapter are forwarded. See ExpressionParserTest for more tests that result
+     * in parse exceptions.
+     * 
      * @expectedResults AuraRuntimeException with underlying parse exception when instantiating the component
      */
     public void testParseExceptions() throws Exception {
@@ -61,8 +61,8 @@ public class ExpressionValidationTest extends AuraImplTestCase {
     }
 
     /**
-     * Unknown value provider is not allowed.
-     * See ValueProviderType for acceptable providers.
+     * Unknown value provider is not allowed. See ValueProviderType for acceptable providers.
+     * 
      * @expectedResults AuraRuntimeException when instantiating the component
      */
     public void _testUnknownValueProvider() throws Exception {
@@ -70,9 +70,8 @@ public class ExpressionValidationTest extends AuraImplTestCase {
     }
 
     /**
-     * Note: this test doesn't pass when using aura-impl unit test target
+     * Note: this test doesn't pass when using aura-impl unit test target Undefined label references are not allowed.
      *
-     * Undefined label references are not allowed.
      * @expectedResults InvalidExpressionException when instantiating the component
      */
     public void _testUnknownLabel() throws Exception {
@@ -82,25 +81,28 @@ public class ExpressionValidationTest extends AuraImplTestCase {
 
     /**
      * Label references must have only section and name parts.
+     * 
      * @expectedResults InvalidExpressionException when instantiating the component
      */
     public void testInvalidLabelExpression() throws Exception {
-        verifyValidationException("{!$Label.SomeSection}", "",
-                "Labels should have a section and a name:");
+        verifyValidationException("{!$Label.SomeSection}", "", "Labels should have a section and a name:");
         verifyValidationException("{!$Label.SomeSection.ExtraPart.Name}", "",
                 "Labels should have a section and a name:");
     }
 
     /**
      * Nested expressions are not allowed.
+     * 
      * @expectedResults AuraRuntimeException when instantiating the component
      */
     public void testNestedExpressions() throws Exception {
-        verifyValidationException("{!$'test'{!'Attribute'}}", "", "Cannot mix expression and literal string in attribute value");
+        verifyValidationException("{!$'test'{!'Attribute'}}", "",
+                "Cannot mix expression and literal string in attribute value");
     }
 
     /**
      * Expression return type must match the attribute type.
+     * 
      * @expectedResults InvalidExpressionException when instantiating the component
      */
     public void _testTypeChecking() throws Exception {
@@ -110,6 +112,7 @@ public class ExpressionValidationTest extends AuraImplTestCase {
 
     /**
      * Expressions that directly or indirectly reference themselves are not allowed.
+     * 
      * @expectedResults InvalidExpressionException when instantiating the component
      */
     public void _testCyclicalReference() throws Exception {
@@ -123,6 +126,7 @@ public class ExpressionValidationTest extends AuraImplTestCase {
 
     /**
      * Keywords not allowed in property names.
+     * 
      * @expectedResults SomeMeaningfulException when instantiating the component
      */
     // W-1008453 https://gus.soma.salesforce.com/a07B0000000FVP8IAO
@@ -135,6 +139,7 @@ public class ExpressionValidationTest extends AuraImplTestCase {
 
     /**
      * Functions should validate the number of args passed in.
+     * 
      * @expectedResults SomeMeaningfulException when instantiating the component
      */
     // W-1008501 https://gus.soma.salesforce.com/a07B0000000FVSMIA4
@@ -210,6 +215,7 @@ public class ExpressionValidationTest extends AuraImplTestCase {
 
     /**
      * Undefined function referenced in expression.
+     * 
      * @expectedResults AuraRuntimeException when instantiating the component
      */
     public void testFunctionNotFound() throws Exception {
@@ -219,21 +225,15 @@ public class ExpressionValidationTest extends AuraImplTestCase {
         verifyValidationException("{!v.max > absolute(-1)}", "", noFunction + "absolute");
     }
 
-    private void verifyValidationException(String strExpr, String dblExpr, String expectedMessageStartsWith) throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = addSource(String.format(
-                "<aura:component>" +
-                    "<aura:attribute name='strAtt' type='String' default=\"%s\"/>" +
-                    "<aura:attribute name='dblAtt' type='Double' default=\"%s\"/>" +
-                "</aura:component>",
-                strExpr, dblExpr),
-                ComponentDef.class);
+    private void verifyValidationException(String strExpr, String dblExpr, String expectedMessageStartsWith)
+            throws Exception {
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(String.format("<aura:component>"
+                + "<aura:attribute name='strAtt' type='String' default=\"%s\"/>"
+                + "<aura:attribute name='dblAtt' type='Double' default=\"%s\"/>" + "</aura:component>", strExpr,
+                dblExpr), ComponentDef.class);
         String cmpName = cmpDesc.getNamespace() + ":" + cmpDesc.getName();
-        DefDescriptor<ApplicationDef> appDesc = addSource(String.format(
-                "<aura:application>" +
-                    "<%s/>" +
-                "</aura:application>",
-                cmpName),
-                ApplicationDef.class);
+        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(String.format("<aura:application>" + "<%s/>"
+                + "</aura:application>", cmpName), ApplicationDef.class);
         try {
             Aura.getInstanceService().getInstance(appDesc);
             fail("Expression validation did not result in a runtime exception for strAtt=\"" + strExpr + "\" dblAtt=\""
@@ -242,19 +242,11 @@ public class ExpressionValidationTest extends AuraImplTestCase {
             if (!e.getMessage().contains(expectedMessageStartsWith)) throw(e);
         }
 
-        cmpDesc = addSource(
-                "<aura:component>" +
-                    "<aura:attribute name='strAtt' type='String'/>" +
-                    "<aura:attribute name='dblAtt' type='Double'/>" +
-                "</aura:component>",
-                ComponentDef.class);
+        cmpDesc = addSourceAutoCleanup("<aura:component>" + "<aura:attribute name='strAtt' type='String'/>"
+                + "<aura:attribute name='dblAtt' type='Double'/>" + "</aura:component>", ComponentDef.class);
         cmpName = cmpDesc.getNamespace() + ":" + cmpDesc.getName();
-        appDesc = addSource(String.format(
-                "<aura:application>" +
-                    "<%s strAtt=\"%s\" dblAtt=\"%s\"/>" +
-                "</aura:application>",
-                cmpName, strExpr, dblExpr),
-                ApplicationDef.class);
+        appDesc = addSourceAutoCleanup(String.format("<aura:application>" + "<%s strAtt=\"%s\" dblAtt=\"%s\"/>"
+                + "</aura:application>", cmpName, strExpr, dblExpr), ApplicationDef.class);
         try {
             Aura.getInstanceService().getInstance(appDesc);
             fail("Expression validation did not result in a runtime exception for strAtt=\"" + strExpr + "\" dblAtt=\""

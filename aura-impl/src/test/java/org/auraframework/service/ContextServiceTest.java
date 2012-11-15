@@ -114,16 +114,15 @@ public class ContextServiceTest extends BaseServiceTest<ContextService, ContextS
     }
 
     @Override
-    public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Access access) throws QuickFixException {
+    public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Access access)
+            throws QuickFixException {
         StringSourceLoader loader = StringSourceLoader.getInstance();
         DefDescriptor<ComponentDef> desc = null;
         try{
-             desc = loader.addSource("<aura:component/>", ComponentDef.class, new Date());
-            //loaders = Sets.<SourceLoader>newHashSet(loader);
-
+            desc = loader.createStringSourceDescriptor(null, ComponentDef.class);
+            loader.addSource(desc, "<aura:component/>", new Date());
 
             assertNull(service.getCurrentContext());
-            //service.startContext(config.mode, loaders, config.format, config.access);
             service.startContext(config.mode, config.format, config.access);
             AuraContext context = service.getCurrentContext();
             assertNotNull(context);

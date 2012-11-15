@@ -21,6 +21,7 @@ import org.auraframework.def.BaseComponentDef.RenderType;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.root.component.LazyComponentDefRef;
+import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.*;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonStreamReader;
@@ -47,8 +48,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         assertNull(dd);
 
         @SuppressWarnings("unchecked")
-        DefDescriptor<T> ddParent = (DefDescriptor<T>)define(baseTag, "extensible='true' model='java://org.auraframework.impl.java.model.TestModel2'",
-                "").getDescriptor();
+        DefDescriptor<T> ddParent = (DefDescriptor<T>)define(baseTag,
+                "extensible='true' model='java://org.auraframework.impl.java.model.TestModel2'", "").getDescriptor();
         dd = define(
                 baseTag,
                 "model='java://org.auraframework.impl.java.model.TestModel' extends='" + ddParent.getNamespace() + ":"
@@ -66,8 +67,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         assertTrue(dds.isEmpty());
 
         @SuppressWarnings("unchecked")
-        DefDescriptor<T> ddParent = (DefDescriptor<T>)define(baseTag, "extensible='true' model='java://org.auraframework.impl.java.model.TestModel2'",
-                "").getDescriptor();
+        DefDescriptor<T> ddParent = (DefDescriptor<T>)define(baseTag,
+                "extensible='true' model='java://org.auraframework.impl.java.model.TestModel2'", "").getDescriptor();
         dds = define(
                 baseTag,
                 "model='java://org.auraframework.impl.java.model.TestModel' extends='" + ddParent.getNamespace() + ":"
@@ -92,8 +93,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         assertNull(d);
 
         @SuppressWarnings("unchecked")
-        DefDescriptor<T> ddParent = (DefDescriptor<T>)define(baseTag, "extensible='true' model='java://org.auraframework.impl.java.model.TestModel2'",
-                "").getDescriptor();
+        DefDescriptor<T> ddParent = (DefDescriptor<T>)define(baseTag,
+                "extensible='true' model='java://org.auraframework.impl.java.model.TestModel2'", "").getDescriptor();
         d = define(
                 baseTag,
                 "model='java://org.auraframework.impl.java.model.TestModel' extends='" + ddParent.getNamespace() + ":"
@@ -112,11 +113,12 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
         @SuppressWarnings("unchecked")
         DefDescriptor<T> ddParent = (DefDescriptor<T>)define(baseTag,
-                "extensible='true' controller='java://org.auraframework.impl.java.controller.TestController2'", "").getDescriptor();
+                "extensible='true' controller='java://org.auraframework.impl.java.controller.TestController2'", "")
+                .getDescriptor();
         dds = define(
                 baseTag,
-                "controller='java://org.auraframework.impl.java.controller.TestController' extends='" + ddParent.getNamespace()
-                        + ":" + ddParent.getName() + "'", "").getControllerDefDescriptors();
+                "controller='java://org.auraframework.impl.java.controller.TestController' extends='"
+                        + ddParent.getNamespace() + ":" + ddParent.getName() + "'", "").getControllerDefDescriptors();
         assertNotNull(dds);
         assertEquals(2, dds.size());
         List<String> names = Lists.transform(dds, new Function<DefDescriptor<?>, String>() {
@@ -138,11 +140,12 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
         @SuppressWarnings("unchecked")
         DefDescriptor<T> ddParent = (DefDescriptor<T>)define(baseTag,
-                "extensible='true' controller='java://org.auraframework.impl.java.controller.TestController2'", "").getDescriptor();
+                "extensible='true' controller='java://org.auraframework.impl.java.controller.TestController2'", "")
+                .getDescriptor();
         d = define(
                 baseTag,
-                "controller='java://org.auraframework.impl.java.controller.TestController' extends='" + ddParent.getNamespace()
-                        + ":" + ddParent.getName() + "'", "").getControllerDef();
+                "controller='java://org.auraframework.impl.java.controller.TestController' extends='"
+                        + ddParent.getNamespace() + ":" + ddParent.getName() + "'", "").getControllerDef();
         assertNotNull(d);
         String name = d.getDescriptor().getQualifiedName();
         assertTrue("Unexpected name: " + name, name.matches("compound://string\\..*"));
@@ -156,7 +159,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         assertNull(dd);
 
         @SuppressWarnings("unchecked")
-        DefDescriptor<T> ddParent = (DefDescriptor<T>)define(baseTag,
+        DefDescriptor<T> ddParent = (DefDescriptor<T>)define(
+                baseTag,
                 "extensible='true' renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestOverridingRenderer'",
                 "").getDescriptor();
         dd = define(
@@ -164,7 +168,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 "renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer' extends='"
                         + ddParent.getNamespace() + ":" + ddParent.getName() + "'", "").getRendererDescriptor();
         assertNotNull(dd);
-        assertEquals("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer", dd.getQualifiedName());
+        assertEquals("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer",
+                dd.getQualifiedName());
     }
 
     /**
@@ -182,9 +187,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Verify the render attribute specified on a component tag.
-     * Detection logic to render a component serverside or clientside is controlled by an attribute on the top level component.
-     * By default the rendering logic is turned on.
+     * Verify the render attribute specified on a component tag. Detection logic to render a component serverside or
+     * clientside is controlled by an attribute on the top level component. By default the rendering logic is turned on.
      * Test method for {@link BaseComponentDef#getRender()}.
      * @userStory a07B0000000EWWg
      */
@@ -193,14 +197,14 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         assertEquals( "By default, rendering detection logic should be on.", RenderType.AUTO, defaultRender);
 
         T serverRenderedComponentDef = define(baseTag, " render='server'", "");
-        assertEquals( "Rendering detection logic was expected to be forced to be serverside.",
-                RenderType.SERVER, serverRenderedComponentDef.getRender());
+        assertEquals("Rendering detection logic was expected to be forced to be serverside.", RenderType.SERVER,
+                serverRenderedComponentDef.getRender());
         assertTrue("A component which wishes to be rendered server side cannot be locally renderable?",
                 serverRenderedComponentDef.isLocallyRenderable());
 
         T clientRenderedComponentDef = define(baseTag, " render='client'", "");
-        assertEquals( "Rendering detection logic was expected to be forced to be clientside.",
-                RenderType.CLIENT, clientRenderedComponentDef.getRender());
+        assertEquals("Rendering detection logic was expected to be forced to be clientside.", RenderType.CLIENT,
+                clientRenderedComponentDef.getRender());
         assertFalse("A component which wishes to be rendered client side can be locally renderable?",
                 clientRenderedComponentDef.isLocallyRenderable());
 
@@ -256,115 +260,140 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         /**
          * Test Case 3: When component includes an interface as facet, the interface has a Javascript provider
          */
-        baseComponentDef  = define(baseTag, "", "Body: Includes an interface which has a JS provider. " +
-                                                " <test:test_JSProvider_Interface/>");
+        baseComponentDef = define(baseTag, "", "Body: Includes an interface which has a JS provider. "
+                + " <test:test_JSProvider_Interface/>");
         assertEquals("Rendering detection logic is not on.", RenderType.AUTO, baseComponentDef.getRender());
-        assertFalse("When a component has dependency on a clienside provider, the rendering should be done clientside.",
+        assertFalse(
+                "When a component has dependency on a clienside provider, the rendering should be done clientside.",
                 baseComponentDef.isLocallyRenderable());
 
         //Disabling this test, as currently any component that has a theme is not server-renderable.
-        //Since this includes aura:html, not much renders server-side at the moment.
+        // Since this includes aura:html, not much renders server-side at the moment.
         //W-922563
-        //Test Case 4: When component includes an interface as facet, the interface has local providers
-        /*baseComponentDef  = define(baseTag, "", "Body: Includes an interface which has a Java provider. " +
-        */
+        // Test Case 4: When component includes an interface as facet, the interface has local
+        // providers
         /**
          * Test Case 5: When component includes a Javascript controller
          */
-        baseComponentDef  = define(baseTag, "", "Body: Includes a component with a client controller. " +
-                " <test:testJSController/>");
+        baseComponentDef = define(baseTag, "", "Body: Includes a component with a client controller. "
+                + " <test:testJSController/>");
         assertEquals("Rendering detection logic is not on.", RenderType.AUTO, baseComponentDef.getRender());
         assertFalse("When a component has dependency on a controller, the rendering should be done clientside.",
         baseComponentDef.isLocallyRenderable());
 
         /**
-         * Test Case 6: When a component includes a Theme file
-         * W-922563
+         * Test Case 6: When a component includes a Theme file W-922563
          */
         baseComponentDef  = define(baseTag, "theme='css://test.testValidCSS'", "");
         assertEquals("Rendering detection logic is not on.", RenderType.AUTO, baseComponentDef.getRender());
         assertFalse("When a component has a theme, the rendering should be done clientside.",
                 baseComponentDef.isLocallyRenderable());
 
-        /**TODO : W-1228861
-         * Test Case 7: When a facet of a component has a component marked for LAZY loading, the component should always be
-         * rendered client side.
+        /**
+         * TODO : W-1228861 Test Case 7: When a facet of a component has a component marked for LAZY loading, the
+         * component should always be rendered client side.
          */
-//        addSource("lazyCmp","<aura:component> <aura:text aura:load='LAZY'/></aura:component>", ComponentDef.class);
+        // addSource("lazyCmp","<aura:component> <aura:text aura:load='LAZY'/></aura:component>",
+        // ComponentDef.class);
 //        baseComponentDef  = define(baseTag, "render='SERVER'", "<string:lazyCmp/>");
-//        assertEquals("Rendering detection logic is not on.", RenderType.SERVER, baseComponentDef.getRender());
-//        //TODO : W-1228861 ComponentDefRefHandler.readSystemAttributes() is not chaining up to root. its only going one level up
+        // assertEquals("Rendering detection logic is not on.", RenderType.SERVER,
+        // baseComponentDef.getRender());
+        // //TODO : W-1228861 ComponentDefRefHandler.readSystemAttributes() is not chaining up to
+        // root. its only going one level up
 //        assertFalse("When a component has a inner component set to lazy load, the parent should be rendered clientside.",
 //                baseComponentDef.isLocallyRenderable());
 
         /**
-         * W-1228861Test Case 7: Verify that lazy loading specification in parent is reflected in child and components which use the child.
+         * W-1228861Test Case 7: Verify that lazy loading specification in parent is reflected in child and components
+         * which use the child.
          */
-//        addSource("parentLazyCmp","<aura:component extensible='true'> <aura:text aura:load='LAZY'/></aura:component>", ComponentDef.class);
-//        DefDescriptor<ComponentDef> childLazyCmp = addSource("childLazyCmp","<aura:component extends='string:parentLazyCmp'></aura:component>", ComponentDef.class);
-//        assertFalse("Lazy loading information is not chained through inheritance.", childLazyCmp.getDef().isLocallyRenderable());
+        // addSource("parentLazyCmp","<aura:component extensible='true'> <aura:text aura:load='LAZY'/></aura:component>",
+        // ComponentDef.class);
+        // DefDescriptor<ComponentDef> childLazyCmp =
+        // addSource("childLazyCmp","<aura:component extends='string:parentLazyCmp'></aura:component>",
+        // ComponentDef.class);
+        // assertFalse("Lazy loading information is not chained through inheritance.",
+        // childLazyCmp.getDef().isLocallyRenderable());
 //        baseComponentDef  = define(baseTag, "render='SERVER'", "<string:childLazyCmp/>");
-//        assertEquals("Rendering detection logic is not on.", RenderType.SERVER, baseComponentDef.getRender());
-//        //TODO : W-1228861 ComponentDefRefHandler.readSystemAttributes() is not chaining up to root. its only going one level up
+        // assertEquals("Rendering detection logic is not on.", RenderType.SERVER,
+        // baseComponentDef.getRender());
+        // //TODO : W-1228861 ComponentDefRefHandler.readSystemAttributes() is not chaining up to
+        // root. its only going one level up
 //        assertFalse("Lazy loading information is not chained through inheritance.",
 //              baseComponentDef.isLocallyRenderable());
         
     }
     
     /**
-     * Test to verify that components are marked as having serverside dependencies appropriately.
-     * Components that have server side dependencies have a flag marked in its def.
-     * "hasServerDeps" is part of the component def.
+     * Test to verify that components are marked as having serverside dependencies appropriately. Components that have
+     * server side dependencies have a flag marked in its def. "hasServerDeps" is part of the component def.
      */
     public void testHasLocalDependencies()throws Exception{
         //1. Having a model
-        T baseComponentDef  = define(baseTag, "model='java://org.auraframework.impl.java.model.TestJavaModel'", "");
+        T baseComponentDef = define(baseTag, "model='java://org.auraframework.impl.java.model.TestJavaModel'", "");
         assertTrue("When a component has a model, the component has server dependencies .",
                 baseComponentDef.hasLocalDependencies());
         assertEquals(true,this.serializeAndReadAttributeFromDef(baseComponentDef,"hasServerDeps"));
 
         //2. Having a Java Renderer
-        baseComponentDef  = define(baseTag, "renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer'", "");
+        baseComponentDef = define(baseTag,
+                "renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer'", "");
         assertTrue("When a component has a server renderer only, the component has server dependencies.",
                 baseComponentDef.hasLocalDependencies());
         //3. Having a client renderer
-        baseComponentDef  = define(baseTag, "renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer,js://test.testJSRenderer'", "");
+        baseComponentDef = define(
+                baseTag,
+                "renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer,js://test.testJSRenderer'",
+                "");
         assertFalse("When a component has a client renderer, the component does not have server dependencies.",
                 baseComponentDef.hasLocalDependencies());
         assertEquals(null,this.serializeAndReadAttributeFromDef(baseComponentDef,"hasServerDeps"));
         //4. Having a Client side provider
         assertFalse("Abstract Component with client provider should not have any server dependencies.",
-                definitionService.getDefinition("test:test_JSProvider_AbstractBasic", ComponentDef.class).hasLocalDependencies());
+                definitionService.getDefinition("test:test_JSProvider_AbstractBasic", ComponentDef.class)
+                        .hasLocalDependencies());
 
         //5. Having only server side provider
-        assertTrue("Abstract Component with serverside providers have server dependecies.",
-                definitionService.getDefinition("test:test_Provider_AbstractBasic", ComponentDef.class).hasLocalDependencies());
+        assertTrue("Abstract Component with serverside providers have server dependecies.", definitionService
+                .getDefinition("test:test_Provider_AbstractBasic", ComponentDef.class).hasLocalDependencies());
 
         //6. Server dependency through component extension
         //Having a Parent who has server dependencies, should also make the child server dependent
-        addSource("parent", String.format(baseTag, "extensible='true' model='java://org.auraframework.impl.java.model.TestJavaModel' ", ""), this.getDefClass());
-        DefDescriptor<T> child = addSource("child", String.format(baseTag, "extends='string:parent'", ""), this.getDefClass());
-        assertTrue("When a component's parent has serverside dependency, the component should be marked as server dependent.",
+        StringSourceLoader loader = StringSourceLoader.getInstance();
+        DefDescriptor<T> parent = loader.createStringSourceDescriptor("parent", getDefClass());
+        String parentContent = String.format(baseTag,
+                "extensible='true' model='java://org.auraframework.impl.java.model.TestJavaModel' ", "");
+        addSourceAutoCleanup(parent, parentContent);
+
+        DefDescriptor<T> child = loader.createStringSourceDescriptor("localDeps_child", getDefClass());
+        addSourceAutoCleanup(child, String.format(baseTag, "extends='" + parent.getDescriptorName() + "'", ""));
+        assertTrue(
+                "When a component's parent has serverside dependency, the component should be marked as server dependent.",
                 child.getDef().hasLocalDependencies());
 
-        //7. When component has a facet with serverside dependency, should it be marked as having server dependency?
-        /**TODO: DP?
-         * baseComponentDef  = define(baseTag, "", "Body: Includes an interface which has a Java provider. " +
-                "<test:test_Provider_Interface implNumber='3'/>");
-        assertTrue("When a component's facet has serverside dependency, should the component also be marked as server dependent?",
-                baseComponentDef.hasLocalDependencies());*/
+        // 7. When component has a facet with serverside dependency, should it be marked as having
+        // server dependency?
+        /**
+         * TODO: DP? baseComponentDef = define(baseTag, "", "Body: Includes an interface which has a Java provider. " +
+         * "<test:test_Provider_Interface implNumber='3'/>"); assertTrue(
+         * "When a component's facet has serverside dependency, should the component also be marked as server dependent?"
+         * , baseComponentDef.hasLocalDependencies());
+         */
 
     }
 
     public void testComponentCannotExtendItself(){
-        DefDescriptor<T> d = addSource("cmpExtendsSelf", String.format(baseTag, "extensible='true' extends='string:cmpExtendsSelf'", ""), this.getDefClass());
+        DefDescriptor<T> extendsSelf = StringSourceLoader.getInstance().createStringSourceDescriptor("cmpExtendsSelf",
+                getDefClass());
+        addSourceAutoCleanup(extendsSelf,
+                String.format(baseTag, "extensible='true' extends='" + extendsSelf.getDescriptorName() + "'", ""));
         DefType defType = DefType.getDefType(this.getDefClass());
         try{
-            T componentDef = d.getDef();
+            T componentDef = extendsSelf.getDef();
             componentDef.validateReferences();
             fail(defType+" should not be able to extend itself.");
         }catch(InvalidDefinitionException expected){
-            assertEquals("markup://string:cmpExtendsSelf cannot extend itself", expected.getMessage());
+            assertEquals(extendsSelf.getQualifiedName() + " cannot extend itself", expected.getMessage());
         }catch(Exception e){
             fail("Unexpected Exception "+e);
         }
@@ -372,9 +401,15 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
     public void testIsInstanceOf() throws Exception{
         //Test cases for Abstract Component extensions
-        DefDescriptor<T> grandParent = addSource("grandParent", String.format(baseTag, "extensible='true' abstract='true'", ""), this.getDefClass());
-        DefDescriptor<T> parent = addSource("parent", String.format(baseTag, "extensible='true' extends='string:grandParent'", ""), this.getDefClass());
-        DefDescriptor<T> child = addSource("child", String.format(baseTag, "extensible='true' extends='string:parent'", ""), this.getDefClass());
+        StringSourceLoader loader = StringSourceLoader.getInstance();
+        DefDescriptor<T> grandParent = loader.createStringSourceDescriptor("instanceOf_grandParent", getDefClass());
+        addSourceAutoCleanup(grandParent, String.format(baseTag, "extensible='true' abstract='true'", ""), new Date());
+        DefDescriptor<T> parent = loader.createStringSourceDescriptor("instanceOf_parent", getDefClass());
+        addSourceAutoCleanup(parent,
+                String.format(baseTag, "extensible='true' extends='" + grandParent.getDescriptorName() + "'", ""));
+        DefDescriptor<T> child = loader.createStringSourceDescriptor("instanceOf_child", getDefClass());
+        addSourceAutoCleanup(child,
+                String.format(baseTag, "extensible='true' extends='" + parent.getDescriptorName() + "'", ""));
 
         assertTrue("Failed to assert inheritance across one level.", parent.getDef().isInstanceOf(grandParent));
         assertTrue("Failed to assert inheritance across one level.", child.getDef().isInstanceOf(parent));
@@ -382,17 +417,22 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
         //Test cases for Interface inheritance and implementations
         String interfaceTag = "<aura:interface %s> </aura:interface>";
-        DefDescriptor<InterfaceDef> grandParentInterface = addSource("grandParentInterface", String.format(interfaceTag, ""), InterfaceDef.class);
-        DefDescriptor<InterfaceDef> parentInterface = addSource("parentInterface",
-                String.format(interfaceTag, "extends='string:grandParentInterface'"), InterfaceDef.class);
-        DefDescriptor<T> interfaceImpl = addSource("interfaceImpl", String.format(baseTag, "implements='string:parentInterface'", ""), this.getDefClass());
-
+        DefDescriptor<InterfaceDef> grandParentInterface = loader.createStringSourceDescriptor(
+                "instanceOf_grandParentInterface", InterfaceDef.class);
+        addSourceAutoCleanup(grandParentInterface, String.format(interfaceTag, ""));
+        DefDescriptor<InterfaceDef> parentInterface = loader.createStringSourceDescriptor("instanceOf_parentInterface",
+                InterfaceDef.class);
+        addSourceAutoCleanup(parentInterface,
+                String.format(interfaceTag, "extends='" + grandParentInterface.getDescriptorName() + "'"));
+        DefDescriptor<T> interfaceImpl = loader.createStringSourceDescriptor("instanceOf_interfaceImpl", getDefClass());
+        addSourceAutoCleanup(interfaceImpl,
+                String.format(baseTag, "implements='" + parentInterface.getDescriptorName() + "'", ""));
         assertTrue("Failed to assert interface implementation one level.",
                 interfaceImpl.getDef().isInstanceOf(parentInterface));
         assertTrue("Failed to assert inherface extension across one level.",
                 parentInterface.getDef().isInstanceOf(grandParentInterface));
-        assertTrue("Failed to assert inheritance implementation across multiple levels.",
-                interfaceImpl.getDef().isInstanceOf(grandParentInterface));
+        assertTrue("Failed to assert inheritance implementation across multiple levels.", interfaceImpl.getDef()
+                .isInstanceOf(grandParentInterface));
 
     }
     /**
@@ -416,17 +456,19 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     @SuppressWarnings("unchecked")
     public void testLazyLoadingFacets() throws Exception{
         //1. When a facet is marked for Lazy/Exclusive loading, parentDef has a LazyComponentDefRef
-        DefDescriptor<T> desc = addSource(String.format(baseTag, "", "<aura:text aura:load='LAZY'/>" +
-                                                                     "<aura:label />" +
-                                                                     "<aura:text aura:load='Exclusive'/>")
-                                                ,this.getDefClass());
+        DefDescriptor<T> desc = StringSourceLoader.getInstance().createStringSourceDescriptor("lazy",
+                this.getDefClass());
+        addSourceAutoCleanup(desc, String.format(baseTag, "", "<aura:text aura:load='LAZY'/>" + "<aura:label />"
+                + "<aura:text aura:load='Exclusive'/>"));
+
         T def = desc.getDef();
         AttributeDefRef body = getBodyAttributeFromDef(def);
         assertTrue(body.getValue() instanceof List);
         List<?> bodyCmps = (List<?>)body.getValue();
         assertEquals(3, bodyCmps.size());
         assertTrue(bodyCmps.get(0) instanceof LazyComponentDefRef);
-        assertEquals("markup://aura:text",((DefDescriptor<ComponentDef>)((LazyComponentDefRef)bodyCmps.get(0)).getAttributeDefRef("refDescriptor").getValue()).getQualifiedName());
+        assertEquals("markup://aura:text", ((DefDescriptor<ComponentDef>)((LazyComponentDefRef)bodyCmps.get(0))
+                .getAttributeDefRef("refDescriptor").getValue()).getQualifiedName());
 
         assertTrue(bodyCmps.get(2) instanceof LazyComponentDefRef);
         assertEquals(true,((LazyComponentDefRef)bodyCmps.get(2)).getAttributeDefRef("exclusive").getValue());
@@ -434,7 +476,9 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         assertTrue(bodyCmps.get(1) instanceof ComponentDefRef);
 
         //3. When a bad component is specified to be loaded Lazily
-        desc = addSource(String.format(baseTag, "", "<aura:fooBar999 aura:load='LAZY'/>"),this.getDefClass());
+        StringSourceLoader loader = StringSourceLoader.getInstance();
+        desc = loader.createStringSourceDescriptor("lazy_bad", getDefClass());
+        addSourceAutoCleanup(desc, String.format(baseTag, "", "<aura:fooBar999 aura:load='LAZY'/>"));
         try{
             desc.getDef();
             fail("should not be able to use a non-existing component by marking it to be lazy loaded");
@@ -443,7 +487,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         }
 
         //4. When a component is requested with non-existing attribute
-        desc = addSource(String.format(baseTag, "", "<aura:text aura:load='LAZY' fooBar999='hoze'/>"),this.getDefClass());
+        desc = loader.createStringSourceDescriptor("lazy_nonexistingAttribute", getDefClass());
+        addSourceAutoCleanup(desc, String.format(baseTag, "", "<aura:text aura:load='LAZY' fooBar999='hoze'/>"));
         try{
             desc.getDef();
             fail("should not be able to use a non-existing attribute by marking it to be lazy loaded");
@@ -456,28 +501,35 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         }*/
 
         //6. Non basic data type for attribute specification.
-        addSource("cmpAttr","<aura:component><aura:attribute name='cmps' type='Aura.Component'/> </aura:component>",ComponentDef.class);
-        desc = addSource(String.format(baseTag, "", "<string:cmpAttr aura:load='LAZY'>" +
-                                                        "<aura:set attribute='cmps'>" +
-                                                            "<aura:text/>" +
-                                                        "</aura:set>"+
-                                                    "</string:cmpAttr>")
-                ,this.getDefClass());
+        DefDescriptor<ComponentDef> cmpAttr = loader.createStringSourceDescriptor("lazyLoadingFacets_cmpAttr",
+                ComponentDef.class);
+        addSourceAutoCleanup(cmpAttr,
+                "<aura:component><aura:attribute name='cmps' type='Aura.Component'/> </aura:component>");
+        desc = loader.createStringSourceDescriptor("lazyLoadingFacets_lazy", getDefClass());
+        addSourceAutoCleanup(
+                desc,
+                String.format(baseTag, "",
+                        "<" + cmpAttr.getDescriptorName() + " aura:load='LAZY'>" + "<aura:set attribute='cmps'>"
+                                + "<aura:text/>" + "</aura:set>" + "</" + cmpAttr.getDescriptorName() + ">"));
         try{
             desc.getDef();
             fail("should not be able to use a non-basic attribute type in lazy loaded component");
         }catch (InvalidReferenceException e){
-            assertTrue(e.getMessage().contains("Lazy Component References can only have attributes of simple types passed in (cmps is not simple)"));
+            assertTrue(e
+                    .getMessage()
+                    .contains(
+                            "Lazy Component References can only have attributes of simple types passed in (cmps is not simple)"));
         }
      }
 
     /**
-     * Components outside aura namespace cannot implement aura:rootComponent.  Test uses string namespace.
+     * Components outside aura namespace cannot implement aura:rootComponent. Test uses string namespace.
      */
     public void testNonAuraRootMarker() throws Exception {
-        DefDescriptor<T> d = addSource(String.format(baseTag, "implements='aura:rootComponent'", ""),
-                this.getDefClass());
-        DefType defType = DefType.getDefType(this.getDefClass());
+        DefDescriptor<T> d = StringSourceLoader.getInstance().createStringSourceDescriptor("nonAuraRootMarker",
+                getDefClass());
+        addSourceAutoCleanup(d, String.format(baseTag, "implements='aura:rootComponent'", ""));
+        DefType defType = DefType.getDefType(getDefClass());
         try {
             d.getDef();
             fail(defType + " should not be able to extend itself.");
@@ -493,33 +545,56 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      * Tests to verify validateReferences() on BaseComponentDefImpl.
      */
     public void testValidateReferences() throws Exception{
+        StringSourceLoader loader = StringSourceLoader.getInstance();
         //Grand parent with BETA support
-        addSource("grandParentDesc", String.format(baseTag, "extensible='true' support='BETA'", ""), getDefClass());
+        DefDescriptor<T> grandParentDesc = loader.createStringSourceDescriptor("validateReferences_grandParent",
+                getDefClass());
+        addSourceAutoCleanup(grandParentDesc, String.format(baseTag, "extensible='true' support='BETA'", ""));
         //Parent with GA support
-        DefDescriptor<T> parentDesc = addSource("parentDesc", String.format(baseTag, "extensible='true' extends='string:grandParentDesc' support='GA'", ""), getDefClass());
+        DefDescriptor<T> parentDesc = loader.createStringSourceDescriptor("validateReferences_parent", getDefClass());
+        addSourceAutoCleanup(
+                parentDesc,
+                String.format(baseTag, "extensible='true' extends='" + grandParentDesc.getDescriptorName()
+                        + "' support='GA'", ""));
         try{
             parentDesc.getDef().validateReferences();
             fail("A child cannot widen the support level of its parent.");
         }catch(InvalidDefinitionException e){
-            assertEquals("markup://string:parentDesc cannot widen the support level to GA from markup://string:grandParentDesc's level of BETA",e.getMessage());
+            assertEquals(
+                    String.format("%s cannot widen the support level to GA from %s's level of BETA",
+                            parentDesc.getQualifiedName(), grandParentDesc.getQualifiedName()), e.getMessage());
         }
         //Child with GA support
-        DefDescriptor<T> childDesc = addSource("childDesc", String.format(baseTag, "extensible='true' extends='string:parentDesc' support='GA'", ""), getDefClass());
+        DefDescriptor<T> childDesc = loader.createStringSourceDescriptor("validateReferences_child", getDefClass());
+        addSourceAutoCleanup(
+                childDesc,
+                String.format(baseTag, "extensible='true' extends='" + parentDesc.getDescriptorName()
+                        + "' support='GA'", ""));
         try{
             childDesc.getDef().validateReferences();
             fail("A child cannot widen the support level of its grand parent.");
         }catch(InvalidDefinitionException e){
-            assertEquals("markup://string:childDesc cannot widen the support level to GA from markup://string:grandParentDesc's level of BETA",e.getMessage());
+            assertEquals(
+                    childDesc.getQualifiedName() + " cannot widen the support level to GA from "
+                            + grandParentDesc.getQualifiedName() + "'s level of BETA", e.getMessage());
         }
         //Including a component, that violates support level restriction, as facet
-        addSource("parentCmp", "<aura:component extensible='true' support='BETA'></aura:component>", ComponentDef.class);
-        addSource("childCmp", "<aura:component extends='string:parentCmp' support='GA'></aura:component>", ComponentDef.class);
-        DefDescriptor<T> testDesc = addSource("testCmp", String.format(baseTag, "", "<string:childCmp/>"), getDefClass());
+        DefDescriptor<ComponentDef> parentCmp = loader.createStringSourceDescriptor("validateReferences_parentCmp",
+                ComponentDef.class);
+        addSourceAutoCleanup(parentCmp, "<aura:component extensible='true' support='BETA'></aura:component>");
+        DefDescriptor<ComponentDef> childCmp = loader.createStringSourceDescriptor("validateReferences_childCmp",
+                ComponentDef.class);
+        addSourceAutoCleanup(childCmp, "<aura:component extends='" + parentCmp.getDescriptorName()
+                + "' support='GA'></aura:component>");
+        DefDescriptor<T> testDesc = loader.createStringSourceDescriptor("validateReferences_testCmp", getDefClass());
+        addSourceAutoCleanup(testDesc, String.format(baseTag, "", "<" + childCmp.getDescriptorName() + "/>"));
         try{
             testDesc.getDef().validateReferences();
             fail("Test component's facet has a component which tries to widen the support level of its parent.");
         }catch(InvalidDefinitionException e){
-            assertEquals("markup://string:childCmp cannot widen the support level to GA from markup://string:parentCmp's level of BETA",e.getMessage());
+            assertEquals(
+                    String.format("%s cannot widen the support level to GA from %s's level of BETA",
+                            childCmp.getQualifiedName(), parentCmp.getQualifiedName()), e.getMessage());
         }
 
     }

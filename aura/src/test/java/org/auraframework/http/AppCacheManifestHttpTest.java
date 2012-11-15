@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.test.AuraHttpTestCase;
+import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.client.UserAgent;
 
@@ -35,6 +36,7 @@ import org.apache.http.HttpHeaders;
 import com.google.common.collect.Lists;
 import com.google.common.io.LineReader;
 
+@ThreadHostileTest
 public class AppCacheManifestHttpTest extends AuraHttpTestCase {
 
     private static final String APPCACHE_SUPPORTED_USERAGENT = UserAgent.GOOGLE_CHROME.getUserAgentString();
@@ -44,6 +46,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     private class ManifestInfo{
         String url;
         String lastmod;
+
         ManifestInfo(String url, String lastmod){
             this.url = url;
             this.lastmod = lastmod;
@@ -61,7 +64,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     }
 
     private ManifestInfo getManifestInfo(String appPath) throws HttpException, IOException, Exception{
-        GetMethod get = obtainGetMethod(appPath+"?aura.mode=PROD");
+        GetMethod get = obtainGetMethod(appPath + "?aura.mode=PROD");
         getHttpClient().executeMethod(get);
         String responseBody = get.getResponseBodyAsString();
         Matcher m = HTML_TAG_PATTERN.matcher(responseBody);
@@ -75,7 +78,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     }
 
     private String getManifestErrorUrl(String manifestURI){
-        return manifestURI+"?aura.error=true";
+        return manifestURI + "?aura.error=true";
     }
 
     private List<String> getManifestLinks(String manifestContents) throws IOException {
@@ -95,7 +98,6 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         required.add("/aura_prod.js");
         return required;
     }
-
 
     private void assertManifest(String manifestContent, List<String> requiredLinks, String lastMod) throws Exception {
         assertManifestFormat(manifestContent);
@@ -189,8 +191,8 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * GET app cache manifest for app with preloads returns a full manifest containing preloading resources.
-     * * note that invalid and absolute css urls are not included
+     * GET app cache manifest for app with preloads returns a full manifest containing preloading resources. * note that
+     * invalid and absolute css urls are not included
      */
     public void testGetManifestForAppWithPreloads() throws Exception {
         System.setProperty(HttpMethodParams.USER_AGENT, APPCACHE_SUPPORTED_USERAGENT);
@@ -198,10 +200,10 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         GetMethod get = obtainGetMethod(manifest.url);
         getHttpClient().executeMethod(get);
         String response = get.getResponseBodyAsString();
-        assertManifest(response, Lists.newArrayList(
-                String.format("%%22lastmod%%22%%3A%%22%s%%22%%7D/app.css", manifest.lastmod),
-                String.format("%%22lastmod%%22%%3A%%22%s%%22%%7D/app.js", manifest.lastmod)),
-                manifest.lastmod);
+        assertManifest(
+                response,
+                Lists.newArrayList(String.format("%%22lastmod%%22%%3A%%22%s%%22%%7D/app.css", manifest.lastmod),
+                        String.format("%%22lastmod%%22%%3A%%22%s%%22%%7D/app.js", manifest.lastmod)), manifest.lastmod);
     }
 
     /**
@@ -247,10 +249,10 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         getHttpClient().executeMethod(getClean);
 
         // Now, after one failed call a new manifest call should go thru.(Error cookie cleared);
-        assertManifest(getClean.getResponseBodyAsString(), Lists.newArrayList(
-                String.format("%%22lastmod%%22%%3A%%22%s%%22%%7D/app.css", manifest.lastmod),
-                String.format("%%22lastmod%%22%%3A%%22%s%%22%%7D/app.js", manifest.lastmod)),
-                manifest.lastmod);
+        assertManifest(
+                getClean.getResponseBodyAsString(),
+                Lists.newArrayList(String.format("%%22lastmod%%22%%3A%%22%s%%22%%7D/app.css", manifest.lastmod),
+                        String.format("%%22lastmod%%22%%3A%%22%s%%22%%7D/app.js", manifest.lastmod)), manifest.lastmod);
     }
 
     /**

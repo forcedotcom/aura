@@ -33,8 +33,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
  * @hierarchy Aura.Components.Renderer
  * @priority high
  * @userStory a07B0000000Doob
- *
- *
  */
 public class JavaRendererDefFactoryTest extends AuraImplTestCase {
     JavaRendererDefFactory factory;
@@ -67,7 +65,7 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
                 .getInstance("java://ClassNotFound", RendererDef.class);
         assertNull(factory.getDef(descriptor));
 
-        DefDescriptor<ComponentDef> cmpDesc = addSource(
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 "<aura:component renderer='java://ClassNotFound'></aura:component>", ComponentDef.class);
         try {
             cmpDesc.getDef();
@@ -89,7 +87,8 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
             assertTrue("render method on Renderer interface should be declared public.",
                     Modifier.isPublic(renderMethod.getModifiers()));
         } catch (NoSuchMethodException e) {
-            // The interface org.auraframework.def.Renderer should declare a render method to be overriden by Java renderers.
+            // The interface org.auraframework.def.Renderer should declare a render method to be overriden by Java
+            // renderers.
             fail("Renderer interface does not declare a render method.");
         }
     }
@@ -116,8 +115,9 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
      * Verify that a JavaRenderer extending Renderer interface cannot hide its constructor.
      */
     public void testRendererWithPrivateConstructor() throws Exception {
-        DefDescriptor<RendererDef> descriptor = DefDescriptorImpl.getInstance(
-                "java://org.auraframework.impl.renderer.sampleJavaRenderers.TestPrivateConstructorInRendererExtension",
+        DefDescriptor<RendererDef> descriptor = DefDescriptorImpl
+                .getInstance(
+                        "java://org.auraframework.impl.renderer.sampleJavaRenderers.TestPrivateConstructorInRendererExtension",
                 RendererDef.class);
         try {
             descriptor.getDef();

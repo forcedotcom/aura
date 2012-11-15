@@ -20,16 +20,23 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.context.AuraRegistryProviderImpl;
+import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.impl.system.DefFactoryImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.*;
+import org.auraframework.system.DefRegistry;
+import org.auraframework.system.SourceLoader;
+import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -39,11 +46,12 @@ import org.auraframework.util.json.Json;
 import com.google.common.collect.Sets;
 
 /**
- * Tests for DefinitionServiceImpl.
+ * Tests for DefinitionServiceImpl. ThreadHostile due to testGetLastMod ThreadHostile at least since
+ * {@link #testFindRegex()} requires exclusive control of the {@link StringSourceLoader}.
  *
- *
- * @since 0.0.178
+ * @see org.auraframework.impl.registry.RootDefFactoryTest
  */
+@ThreadHostileTest
 public class DefinitionServiceImplTest extends AuraImplTestCase {
     public DefinitionServiceImplTest(String name) {
         super(name, false);
@@ -60,7 +68,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      */
     public void testGetDefinition_DefDescriptor_assertAccess() throws Exception {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC);
-        DefDescriptor<ComponentDef> desc = addSource("<aura:component></aura:component>", ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup("<aura:component></aura:component>",
+                ComponentDef.class);
         try {
             Aura.getDefinitionService().getDefinition(desc);
             fail("Expected NoAccessException from assertAccess");
@@ -72,7 +81,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      */
     public void testGetDefinition_StringClass_assertAccess() throws Exception {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC);
-        DefDescriptor<ComponentDef> desc = addSource("<aura:component></aura:component>", ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup("<aura:component></aura:component>",
+                ComponentDef.class);
         try {
             Aura.getDefinitionService().getDefinition(desc.getName(), ComponentDef.class);
             fail("Expected NoAccessException from assertAccess");
@@ -84,7 +94,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      */
     public void testGetDefinition_StringDefType_assertAccess() throws Exception {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC);
-        DefDescriptor<ComponentDef> desc = addSource("<aura:component></aura:component>", ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup("<aura:component></aura:component>",
+                ComponentDef.class);
         try {
             Aura.getDefinitionService().getDefinition(desc.getName(), DefType.COMPONENT);
             fail("Expected NoAccessException from assertAccess");
@@ -96,7 +107,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      */
     public void testSave_assertAccess() throws Exception {
         Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.PUBLIC);
-        ComponentDef def = addSource("<aura:component></aura:component>", ComponentDef.class).getDef();
+        ComponentDef def = addSourceAutoCleanup("<aura:component></aura:component>", ComponentDef.class).getDef();
         Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC);
         try {
@@ -104,6 +115,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             fail("Expected NoAccessException from assertAccess");
         } catch (NoAccessException e) {}
     }
+
     /**
      * DefinitionService.getLastMod() accepts a collection of descriptors and gives the last modified time of the group.
      * It can accept wild characters in descriptor name.
@@ -112,9 +124,13 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.PUBLIC);
         DefDescriptor<ComponentDef> def;
         //1. Handle non existing defs
-        def = definitionService.getDefDescriptor("markup://string:fooBar", ComponentDef.class);
-        assertEquals("Expected to see 0 when searching for non existing defs.", 0,
-                     Aura.getDefinitionService().getLastMod(def));
+        // Generate a descriptor but do not add it to the source loader in order to guarantee we
+        // have a handle to a non-existing definition.
+        DefDescriptor<ComponentDef> nonExisting = StringSourceLoader.getInstance().createStringSourceDescriptor(
+                "nonExisting", ComponentDef.class);
+        def = definitionService.getDefDescriptor(nonExisting.getQualifiedName(), ComponentDef.class);
+        assertEquals("Expected to see 0 when searching for non existing defs.", 0, Aura.getDefinitionService()
+                .getLastMod(def));
         //3. Handle non existing namespace
         try{
             Aura.getDefinitionService().getNamespaceLastMod(Sets.newHashSet("foo"));
@@ -128,20 +144,29 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertEquals(0, Aura.getDefinitionService().getLastMod(matcher));
 
         //5. Non existing def as reference
-        this.addSource(String.format(baseComponentTag, "controller='js://string.barr'" ,""), ComponentDef.class);
+        // Create a descriptor but don't add it.
+        DefDescriptor<EventDef> nonExistingRef = StringSourceLoader.getInstance().createStringSourceDescriptor("barr",
+                EventDef.class);
+        addSourceAutoCleanup(
+                String.format(
+                        baseComponentTag,
+                        String.format("controller='js://%s.%s'", nonExistingRef.getNamespace(),
+                                nonExistingRef.getName()), ""), ComponentDef.class);
         try{
             Aura.getDefinitionService().getNamespaceLastMod(Sets.newHashSet("string"));
             fail("Cannot find last mod when definitions are uncompilable.");
         }catch (DefinitionNotFoundException e){
-            assertEquals("No CONTROLLER named js://string.barr found", e.getMessage());
+            assertEquals(
+                    String.format("No CONTROLLER named js://%s.%s found", nonExistingRef.getNamespace(),
+                            nonExistingRef.getName()), e.getMessage());
         }
 
-        /** TODO W-1312125
-         * This throws a UnsupportedOperationException. We should restrict the usage of getLastMod() to just ApplicationDef and ComponentDef
-         * This can be done by just changing the signature of the function to public <D extends RootDefinition> long getLastMod()
-        * Collection<DefDescriptor<TypeDef>> typeMatchers = Lists.newArrayList();
-        * typeMatchers.add(definitionService.getDefDescriptor("java://java.lang.String", TypeDef.class));
-        * assertEquals(0 , Aura.getDefinitionService().getLastMod(typeMatchers));
+        /**
+         * TODO W-1312125 This throws a UnsupportedOperationException. We should restrict the usage of getLastMod() to
+         * just ApplicationDef and ComponentDef This can be done by just changing the signature of the function to
+         * public <D extends RootDefinition> long getLastMod() Collection<DefDescriptor<TypeDef>> typeMatchers =
+         * Lists.newArrayList(); typeMatchers.add(definitionService.getDefDescriptor("java://java.lang.String",
+         * TypeDef.class)); assertEquals(0 , Aura.getDefinitionService().getLastMod(typeMatchers));
         */
 
         //6. Defs with null location
@@ -154,46 +179,59 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      */
     public void testFindRegex() throws Exception {
         Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.PUBLIC);
+        StringSourceLoader loader = StringSourceLoader.getInstance();
 
         String baseContents = "<aura:application></aura:application>";
-        addSource("houseboat", baseContents, ApplicationDef.class);
-        addSource("houseparty", baseContents, ApplicationDef.class);
-        addSource("pantsparty", baseContents, ApplicationDef.class);
+        DefDescriptor<ApplicationDef> houseboat = loader
+                .createStringSourceDescriptor("houseboat", ApplicationDef.class);
+        DefDescriptor<ApplicationDef> houseparty = loader.createStringSourceDescriptor("houseparty",
+                ApplicationDef.class);
+        DefDescriptor<ApplicationDef> pantsparty = loader.createStringSourceDescriptor("pantsparty",
+                ApplicationDef.class);
+        addSourceAutoCleanup(houseboat, baseContents);
+        addSourceAutoCleanup(houseparty, baseContents);
+        addSourceAutoCleanup(pantsparty, baseContents);
 
         // Test wildcards
-        assertEquals("find() fails with wildcard as prefix", 1, definitionService.find("*://string:houseboat").size());
-        assertEquals("find() fails with wildcard as namespace", 1, definitionService.find("markup://*:houseboat").size());
-        assertEquals("find() fails with wildcard as name", 1, definitionService.find("markup://string:houseboat").size());
-        assertEquals("find() fails with wildcard at end of name", 2, definitionService.find("markup://string:house*").size());
-        assertEquals("find() fails with wildcard at beginning of name", 
-                2, definitionService.find("markup://string:*party").size());
-        assertEquals("find() should not find nonexistent name with preceeding wildcard",
-                0, definitionService.find("markup://string:*notherecaptain").size());
+        assertEquals("find() fails with wildcard as prefix", 1, definitionService.find("*://" + houseboat.getDescriptorName()).size());
+        assertEquals("find() fails with wildcard as namespace", 1, definitionService.find("markup://*:" + houseboat.getName())
+                .size());
+        assertEquals("find() fails with wildcard as name", 1, definitionService.find(houseboat.getQualifiedName())
+                .size());
+        assertEquals("find() fails with wildcard at end of name", 2, definitionService.find("markup://string:house*")
+                .size());
+        assertEquals("find() fails with wildcard at beginning of name", 2,
+                definitionService.find("markup://string:*party*").size());
+        assertEquals("find() should not find nonexistent name with preceeding wildcard", 0,
+                definitionService.find("markup://string:*notherecaptain").size());
 
         // Look in NonCachingDefRegistry
-        assertEquals("find() should find a single component", 1, definitionService.find("markup://ui:outputNumber").size());
+        assertEquals("find() should find a single component", 1, definitionService.find("markup://ui:outputNumber")
+                .size());
         assertEquals("find() fails with wildcard as prefix", 3, definitionService.find("*://ui:outputNumber").size());
-        assertEquals("find() is finding non-existent items", 0, definitionService.find("markup://ui:doesntexist").size());
+        assertEquals("find() is finding non-existent items", 0, definitionService.find("markup://ui:doesntexist")
+                .size());
 
         // Look in AuraStaticTypeDefRegistry (StaticDefRegistry)
         assertEquals("find() fails looking in StaticDefRegistry", 1, definitionService.find("aura://*:String").size());
         // Look in AuraStaticControllerDefRegistry (StaticDefRegistry)
-        assertEquals("find() fails looking in StaticDefRegistry", 1, definitionService.find("aura://*:ComponentController").size());
+        assertEquals("find() fails looking in StaticDefRegistry", 1,
+                definitionService.find("aura://*:ComponentController").size());
         assertEquals("find() is finding non-existent items", 0, definitionService.find("aura://*:doesntexist").size());
 
         // Find css
         // This always returns 0 results - W-1426841
-        //assertEquals("find() fails with wildcard as prefix", 1, definitionService.find("css://test.themeTest").size());
+        // assertEquals("find() fails with wildcard as prefix", 1,
+        // definitionService.find("css://test.themeTest").size());
     }
 
     public static class AuraTestRegistryProviderWithNulls extends AuraRegistryProviderImpl {
 
         @Override
         public DefRegistry<?>[] getRegistries(Mode mode, Access access, Set<SourceLoader> extraLoaders) {
-            return new DefRegistry<?>[]{
-              createDefRegistry(new TestTypeDefFactory(), DefType.TYPE, "test")
-            };
+            return new DefRegistry<?>[] { createDefRegistry(new TestTypeDefFactory(), DefType.TYPE, "test") };
         }
+
         public static class TestTypeDefFactory extends DefFactoryImpl<TypeDef>{
 
             @Override
@@ -219,8 +257,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             }
 
             @Override
-            public void serialize(Json json) throws IOException {
-            }
+            public void serialize(Json json) throws IOException {}
 
             @Override
             public Object valueOf(Object stringRep) {
@@ -243,9 +280,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             }
 
             @Override
-            public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) throws QuickFixException {
-
-            }
+            public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) throws QuickFixException {}
 
             @Override
             public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {

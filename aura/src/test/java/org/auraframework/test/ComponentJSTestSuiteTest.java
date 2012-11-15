@@ -39,6 +39,7 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.annotation.WebDriverTest;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -48,9 +49,11 @@ import org.auraframework.util.json.JsonReader;
 import com.google.common.collect.Lists;
 
 /**
+ * TODO(W-1386863): investigate why/fix the thread hostile nature of these tests.
  */
 @UnAdaptableTest
 @WebDriverTest
+@ThreadHostileTest
 public class ComponentJSTestSuiteTest extends TestSuite {
 
     public static TestSuite suite() throws Exception {

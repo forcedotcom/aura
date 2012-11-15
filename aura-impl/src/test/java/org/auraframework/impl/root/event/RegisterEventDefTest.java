@@ -31,22 +31,30 @@ public class RegisterEventDefTest extends AuraImplTestCase {
         super(name);
     }
 
-
     public void testGetEventDescriptor() {
-        assertEquals(vendor.makeEventDefDescriptor("aura:testevent"),vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"),true,vendor.makeLocation("filename1", 5, 5, 0)).getDescriptor());
+        assertEquals(
+                vendor.makeEventDefDescriptor("aura:testevent"),
+                vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"), true,
+                        vendor.makeLocation("filename1", 5, 5, 0)).getDescriptor());
     }
 
     public void testIsGlobal() {
-        assertTrue(vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"),true,vendor.makeLocation("filename1", 5, 5, 0)).isGlobal());
-        assertFalse(vendor.makeRegisterEventDefWithNulls(vendor.makeEventDefDescriptor("aura:testevent"),false,vendor.makeLocation("filename1", 5, 5, 0)).isGlobal());
+        assertTrue(vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"), true,
+                vendor.makeLocation("filename1", 5, 5, 0)).isGlobal());
+        assertFalse(vendor.makeRegisterEventDefWithNulls(vendor.makeEventDefDescriptor("aura:testevent"), false,
+                vendor.makeLocation("filename1", 5, 5, 0)).isGlobal());
     }
 
     public void testGetLocation() {
-        assertEquals(vendor.makeLocation("filename1", 5, 5, 0),vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"),true,vendor.makeLocation("filename1", 5, 5, 0)).getLocation());
+        assertEquals(
+                vendor.makeLocation("filename1", 5, 5, 0),
+                vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"), true,
+                        vendor.makeLocation("filename1", 5, 5, 0)).getLocation());
     }
 
     public void testSerialize() throws Exception{
-        serializeAndGoldFile(vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("auratest:testEvent"),true,vendor.makeLocation("filename1", 5, 5, 0)));
+        serializeAndGoldFile(vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("auratest:testEvent"), true,
+                vendor.makeLocation("filename1", 5, 5, 0)));
     }
 
     public void testValidate() throws Exception {
@@ -68,23 +76,30 @@ public class RegisterEventDefTest extends AuraImplTestCase {
 
     public void testAppendDependencies() {
         Set<DefDescriptor<?>> descriptors = new HashSet<DefDescriptor<?>>();
-        vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"),true,vendor.makeLocation("filename1", 5, 5, 0)).appendDependencies(descriptors);
-        assertTrue(descriptors.contains(vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"),true,vendor.makeLocation("filename1", 5, 5, 0)).getDescriptor()));
+        vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"), true,
+                vendor.makeLocation("filename1", 5, 5, 0)).appendDependencies(descriptors);
+        assertTrue(descriptors.contains(vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"),
+                true, vendor.makeLocation("filename1", 5, 5, 0)).getDescriptor()));
     }
 
     public void testGetName() {
-        assertEquals("testevent",vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"),true,vendor.makeLocation("filename1", 5, 5, 0)).getName());
+        assertEquals(
+                "testevent",
+                vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("aura:testevent"), true,
+                        vendor.makeLocation("filename1", 5, 5, 0)).getName());
     }
 
     public void testEqualsWithDifferentObjects() {
-        assertFalse("Equals should have been false due to different object types",vendor.makeRegisterEventDef().equals(vendor.makeEventDef()));
+        assertFalse("Equals should have been false due to different object types", vendor.makeRegisterEventDef()
+                .equals(vendor.makeEventDef()));
     }
 
     public void testGetDescription()throws Exception{
         String cmpMarkup = "<aura:component >%s</aura:component>";
-        String markup = String.format(cmpMarkup, "<aura:registerevent name='eventName' type='aura:componentEvent' description='Describe the event'/>");
-        DefDescriptor<ComponentDef> cmpDesc = addSource(markup, ComponentDef.class);
-        assertEquals("Description of registerevent not processed",
-                "Describe the event",cmpDesc.getDef().getRegisterEventDefs().get("eventName").getDescription());
+        String markup = String.format(cmpMarkup,
+                "<aura:registerevent name='eventName' type='aura:componentEvent' description='Describe the event'/>");
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(markup, ComponentDef.class);
+        assertEquals("Description of registerevent not processed", "Describe the event", cmpDesc.getDef()
+                .getRegisterEventDefs().get("eventName").getDescription());
     }
 }

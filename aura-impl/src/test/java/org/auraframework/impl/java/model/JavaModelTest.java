@@ -31,6 +31,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.json.Json;
+
 /**
  * This class provides automation for Java models.
  * @hierarchy Aura.Unit Tests.Components.Model.Java Model
@@ -40,30 +41,42 @@ public class JavaModelTest extends AuraImplTestCase {
 
     private static final DefDescriptor<ModelDef> descriptor = new DefDescriptor<ModelDef>() {
         private static final long serialVersionUID = -2368424955441005888L;
+
         @Override
         public void serialize(Json json) throws IOException {
             json.writeValue(getQualifiedName());
         }
+
         @Override
         public String getPrefix() {
             return "java";
         }
+
         @Override
         public String getNamespace() {
             return TestModel.class.getPackage().getName();
         }
+
         @Override
         public String getName() {
             return TestModel.class.getSimpleName();
         }
+
         @Override
         public String getQualifiedName() {
             return getPrefix() + "://" + TestModel.class.getName();
         }
+
+        @Override
+        public String getDescriptorName() {
+            return TestModel.class.getName();
+        }
+
         @Override
         public boolean isParameterized() {
             return false;
         }
+
         @Override
         public String getNameParameters() {
             return null;
@@ -73,10 +86,12 @@ public class JavaModelTest extends AuraImplTestCase {
         public org.auraframework.def.DefDescriptor.DefType getDefType() {
             return DefType.MODEL;
         }
+
         @Override
         public ModelDef getDef() {
             return null;
         }
+
         @Override
         public boolean exists() {
             // TODO Auto-generated method stub
@@ -100,22 +115,25 @@ public class JavaModelTest extends AuraImplTestCase {
         Model model = def.newInstance();
         serializeAndGoldFile(model);
     }
+
     /**
      * Verify that class level annotation is required for a java model.
+     * 
      * @userStory a07B0000000FAmj
      */
     public void testClassLevelAnnotationForJavaModel()throws Exception{
-        DefDescriptor<ModelDef> javaModelDefDesc= DefDescriptorImpl.getInstance("java://org.auraframework.impl.java.model.TestModel", ModelDef.class);
+        DefDescriptor<ModelDef> javaModelDefDesc = DefDescriptorImpl.getInstance(
+                "java://org.auraframework.impl.java.model.TestModel", ModelDef.class);
         assertNotNull(javaModelDefDesc.getDef());
 
-        DefDescriptor<ModelDef> javaModelWOAnnotationDefDesc = DefDescriptorImpl.getInstance("java://org.auraframework.impl.java.model.TestModelWithoutAnnotation",
-                ModelDef.class);
+        DefDescriptor<ModelDef> javaModelWOAnnotationDefDesc = DefDescriptorImpl.getInstance(
+                "java://org.auraframework.impl.java.model.TestModelWithoutAnnotation", ModelDef.class);
         try{
             javaModelWOAnnotationDefDesc.getDef();
             fail("Expected InvalidDefinitionException");
         }catch(InvalidDefinitionException e){
-            assertTrue("Expected to see an error message pointing to missing annotation in model",
-                    e.getMessage().startsWith("@Model annotation is required on all Models."));
+            assertTrue("Expected to see an error message pointing to missing annotation in model", e.getMessage()
+                    .startsWith("@Model annotation is required on all Models."));
         }
     }
 
@@ -123,7 +141,8 @@ public class JavaModelTest extends AuraImplTestCase {
      * Test subclassing.
      */
     public void testModelSubclass() throws Exception {
-        DefDescriptor<ModelDef> javaModelDefDesc= DefDescriptorImpl.getInstance("java://org.auraframework.impl.java.model.TestModelSubclass", ModelDef.class);
+        DefDescriptor<ModelDef> javaModelDefDesc = DefDescriptorImpl.getInstance(
+                "java://org.auraframework.impl.java.model.TestModelSubclass", ModelDef.class);
         ModelDef def = javaModelDefDesc.getDef();
         assertNotNull(def);
         Model model = def.newInstance();
@@ -143,10 +162,8 @@ public class JavaModelTest extends AuraImplTestCase {
      * Verify that nice exception is thrown if model accessor is void
      */
     public void testModelMethodSignatures() throws Exception {
-        String [] failModels = new String [] {
-            "java://org.auraframework.impl.java.model.TestModelWithVoid",
-            "java://org.auraframework.impl.java.model.TestModelWithStatic"
-        };
+        String[] failModels = new String[] { "java://org.auraframework.impl.java.model.TestModelWithVoid",
+                "java://org.auraframework.impl.java.model.TestModelWithStatic" };
 
         for (String model : failModels) {
             try{
@@ -157,8 +174,8 @@ public class JavaModelTest extends AuraImplTestCase {
                 Aura.getDefinitionService().getDefinition(model, ModelDef.class);
                 fail("Expected InvalidDefinitionException on model " + model);
             } catch(InvalidDefinitionException e) {
-                assertTrue("Expected to see an error message pointing to broken annotation in model",
-                           e.getMessage().startsWith("@AuraEnabled"));
+                assertTrue("Expected to see an error message pointing to broken annotation in model", e.getMessage()
+                        .startsWith("@AuraEnabled"));
             }
         }
     }
@@ -167,7 +184,8 @@ public class JavaModelTest extends AuraImplTestCase {
      * Verify that nice exception is thrown if model def doesn't exist
      */
     public void testModelNotFound() throws Exception {
-        DefDescriptor<ComponentDef> dd = addSource("<aura:component model='java://goats'/>", ComponentDef.class);
+        DefDescriptor<ComponentDef> dd = addSourceAutoCleanup("<aura:component model='java://goats'/>",
+                ComponentDef.class);
         try {
             Aura.getInstanceService().getInstance(dd);
             fail("Expected DefinitionNotFoundException");
@@ -202,14 +220,13 @@ public class JavaModelTest extends AuraImplTestCase {
         try{
             model.getValue(new PropertyReferenceImpl("fooBar", new Location("test", 0)));
             fail("Model should not be able to getValue of a non existing property.");
-        }catch(AuraRuntimeException e){
+        } catch(AuraRuntimeException e){
             assertEquals("TestModel: no such property: fooBar", e.getMessage());
         }
-        
         try{
             model.getValue(new PropertyReferenceImpl("firstThi", new Location("test", 0)));
             fail("Model.getValue() on partial matches of property names should not be successful.");
-        }catch(AuraRuntimeException e){
+        } catch(AuraRuntimeException e){
             assertEquals("TestModel: no such property: firstThi", e.getMessage());
         }
     }

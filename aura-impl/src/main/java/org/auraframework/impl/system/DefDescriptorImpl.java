@@ -40,6 +40,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     protected final String namespace;
     protected final String name;
     protected final String qualifiedName;
+    protected final String descriptorName;
     protected final String prefix;
     protected final String nameParameters;
     protected final DefType defType;
@@ -83,23 +84,29 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                             .maximumSize(1024 * 10).build();
 
     /**
-     * Pattern for tag descriptors : foo:bar Group 0 = QName = foo:bar  Group 1 = prefix Group 2 = namespace = foo Group 3 = name = bar
-     * prefix = null
+     * Pattern for tag descriptors : foo:bar Group 0 = QName = foo:bar Group 1 = prefix Group 2 = namespace = foo Group
+     * 3 = name = bar prefix = null
      */
-    private static final Pattern TAG_PATTERN = Pattern.compile("\\A(?:([\\w\\*]+)://)?([\\w\\*]+)(?:\\:([\\w$\\:\\*]+))?");
+    private static final Pattern TAG_PATTERN = Pattern
+            .compile("\\A(?:([\\w\\*]+)://)?([\\w\\*]+)(?:\\:([\\w$\\:\\*]+))?");
 
     /**
      * Pattern for class descriptors: java://foo.bar.baz Group 0 = QName = java://foo.bar.baz Group 1 = prefix = java
      * Group 2 = namespace = foo.bar Group 3 = name = baz
      */
-    private static final Pattern CLASS_PATTERN = Pattern.compile("\\A(?:([\\w\\*]+)://)?((?:[\\w\\*]|\\.)*?)?\\.?+([\\w,$\\*]*?(?:\\[\\])?)(<[\\w.,(<[\\w.,]+>)]+>)?\\z");
+    private static final Pattern CLASS_PATTERN = Pattern
+            .compile("\\A(?:([\\w\\*]+)://)?((?:[\\w\\*]|\\.)*?)?\\.?+([\\w,$\\*]*?(?:\\[\\])?)(<[\\w.,(<[\\w.,]+>)]+>)?\\z");
 
     private static String buildQualifiedName(String prefix, String namespace, String name) {
-        if (namespace == null) {
-            return String.format("%s://%s", prefix, name);
-        }
+        if (namespace == null) { return String.format("%s://%s", prefix, name); }
         String format = MARKUP_PREFIX.equals(prefix) ? "%s://%s:%s" : "%s://%s.%s";
         return String.format(format, prefix, namespace, name);
+    }
+
+    private static String buildDescriptorName(String prefix, String namespace, String name) {
+        if (namespace == null) { return String.format("%s", name); }
+        String format = MARKUP_PREFIX.equals(prefix) ? "%s:%s" : "%s.%s";
+        return String.format(format, namespace, name);
     }
 
     protected DefDescriptorImpl(DefDescriptor<?> associate, Class<T> defClass, String newPrefix) {
@@ -111,6 +118,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             this.name = associate.getName();
             this.namespace = associate.getNamespace();
             this.qualifiedName = buildQualifiedName(prefix, namespace, name);
+            this.descriptorName = buildDescriptorName(prefix, namespace, name);
             int pos = name.indexOf('<');
             this.nameParameters = pos >= 0 ? name.substring(pos).replaceAll("\\s", "") : null;
             this.hashCode = createHashCode();
@@ -157,9 +165,9 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                             name += matcher.group(4);
                             if (defType == org.auraframework.def.DefDescriptor.DefType.TYPE ) {
                                nameParameters = matcher.group(4);
-                            }
+                               }
                         }
-                    } else {
+                    }else{
                         throw new AuraRuntimeException(String.format("Invalid Descriptor Format: %s", qualifiedName));
                     }
 
@@ -208,6 +216,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                 }
             }
             this.qualifiedName = qualifiedName;
+            this.descriptorName = buildDescriptorName(prefix, namespace, name);
             this.prefix = prefix;
             this.namespace = namespace;
             this.name = name;
@@ -239,6 +248,11 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     }
 
     @Override
+    public String getDescriptorName() {
+        return descriptorName;
+    }
+
+    @Override
     public DefType getDefType(){
         return this.defType;
     }
@@ -247,7 +261,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     public String getNameParameters() {
         return nameParameters;
     }
-
 
     @Override
     public void serialize(Json json) throws IOException {
@@ -302,7 +315,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
         }
         return new DefDescriptorImpl<E>(qualifiedName, defClass);
     }
-
 
     /**
      * FIXME: this method is ambiguous about wanting a qualified, simple, or descriptor name.

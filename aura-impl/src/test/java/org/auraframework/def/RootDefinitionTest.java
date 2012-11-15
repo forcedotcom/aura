@@ -16,8 +16,10 @@
 package org.auraframework.def;
 
 import java.lang.reflect.Method;
+import java.util.Date;
 
 import org.auraframework.def.RootDefinition.SupportLevel;
+import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -32,12 +34,14 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
         this.baseTag = "<" + tag + " %s>%s</" + tag + ">";
     }
 
-    Class<T> getDefClass() {
+    protected Class<T> getDefClass() {
         return defClass;
     }
 
     protected T define(String source) throws Exception {
-        DefDescriptor<T> desc = addSource(source, defClass);
+        StringSourceLoader loader = StringSourceLoader.getInstance();
+        DefDescriptor<T> desc = loader.createStringSourceDescriptor(null, getDefClass());
+        addSourceAutoCleanup(desc, source);
         return desc.getDef();
     }
 
@@ -132,7 +136,7 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
         try {
             define(String.format(baseTag, "support='fooBarBlah'", ""));
             fail("Support attribute should not accept invalid values.");
-        } catch (AuraRuntimeException e) {
+        }catch(AuraRuntimeException e){
             assertTrue("Exception did not have the correct string",
                     e.getMessage().contains("Invalid support level fooBarBlah"));
             assertTrue(e.getLocation().toString() + " should have started with markup://string:thing",
@@ -167,14 +171,17 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
             def = define(String.format(baseTag,
                     "description='<div>use html markup in description</div> <aura:text value='foo'/>'", ""));
             fail("Shouldnt allow markup in description. ");
-        } catch (AuraRuntimeException e) {
+        }catch (AuraRuntimeException e){
 
         }
+        StringSourceLoader loader = StringSourceLoader.getInstance();
+        DefDescriptor<T> parentDesc = loader.createStringSourceDescriptor("getDescription_parent", getDefClass());
+        DefDescriptor<T> childDesc = loader.createStringSourceDescriptor("getDescription_child", getDefClass());
 
-        DefDescriptor<T> parentDesc = addSource(
-                String.format(baseTag, "description='Parent markup' extensible='true'", ""), defClass);
-        DefDescriptor<T> childDesc = addSource(String.format(baseTag, "extends='" + parentDesc.getQualifiedName()
-                + "' description='Child markup'", ""), defClass);
+        addSourceAutoCleanup(parentDesc, String.format(baseTag, "description='Parent markup' extensible='true'", ""),
+                new Date());
+        addSourceAutoCleanup(childDesc, String.format(baseTag, "extends='" + parentDesc.getQualifiedName()
+                + "' description='Child markup'", ""));
         assertEquals("Description of parent def is wrong.", "Parent markup", parentDesc.getDef().getDescription());
         assertEquals("Description of child def is wrong.", "Child markup", childDesc.getDef().getDescription());
 

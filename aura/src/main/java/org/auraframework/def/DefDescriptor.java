@@ -23,8 +23,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
 
-/**
- */
 public interface DefDescriptor<T extends Definition> extends JsonSerializable, Serializable {
 
     public static final String MARKUP_PREFIX = "markup";
@@ -35,46 +33,46 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable, S
     public static final String JAVA_PREFIX = "java";
 
     public static enum DefType {
-        ATTRIBUTE(AttributeDef.class),
-        APPLICATION(ApplicationDef.class),
-        COMPONENT(ComponentDef.class),
-        EVENT(EventDef.class),
-        HELPER(HelperDef.class),
-        INTERFACE(InterfaceDef.class),
-        CONTROLLER(ControllerDef.class),
-        MODEL(ModelDef.class),
-        RENDERER(RendererDef.class),
-        SECURITY_PROVIDER(SecurityProviderDef.class),
-        ACTION(ActionDef.class),
-        TYPE(TypeDef.class),
-        STYLE(ThemeDef.class),
-        DOCUMENTATION(DocumentationDef.class),
-        TESTSUITE(TestSuiteDef.class),
-        TESTCASE(TestCaseDef.class),
-        PROVIDER(ProviderDef.class),
-        LAYOUTS(LayoutsDef.class),
-        LAYOUT(LayoutDef.class),
+        ATTRIBUTE(AttributeDef.class), //
+        APPLICATION(ApplicationDef.class), //
+        COMPONENT(ComponentDef.class), //
+        EVENT(EventDef.class), //
+        HELPER(HelperDef.class), //
+        INTERFACE(InterfaceDef.class), //
+        CONTROLLER(ControllerDef.class), //
+        MODEL(ModelDef.class), //
+        RENDERER(RendererDef.class), //
+        SECURITY_PROVIDER(SecurityProviderDef.class), //
+        ACTION(ActionDef.class), //
+        TYPE(TypeDef.class), //
+        STYLE(ThemeDef.class), //
+        DOCUMENTATION(DocumentationDef.class), //
+        TESTSUITE(TestSuiteDef.class), //
+        TESTCASE(TestCaseDef.class), //
+        PROVIDER(ProviderDef.class), //
+        LAYOUTS(LayoutsDef.class), //
+        LAYOUT(LayoutDef.class), //
         LAYOUT_ITEM(LayoutItemDef.class);
 
         private static Map<Class<? extends Definition>, DefType> defTypeMap;
 
         private final Class<? extends Definition> clz;
 
-        private DefType(Class<? extends Definition> clz){
+        private DefType(Class<? extends Definition> clz) {
             this.clz = clz;
 
             mapDefType(clz, this);
         }
 
-        private static void mapDefType(Class<? extends Definition> clz, DefType defType){
-            if(defTypeMap == null){
+        private static void mapDefType(Class<? extends Definition> clz, DefType defType) {
+            if (defTypeMap == null) {
                 defTypeMap = new HashMap<Class<? extends Definition>, DefType>();
             }
 
             defTypeMap.put(clz, defType);
         }
 
-        public Class<? extends Definition> getPrimaryInterface(){
+        public Class<? extends Definition> getPrimaryInterface() {
             return clz;
         }
 
@@ -82,10 +80,13 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable, S
             return defTypeMap.containsKey(primaryInterface);
         }
 
-        public static DefType getDefType(Class<? extends Definition> primaryInterface){
+        public static DefType getDefType(Class<? extends Definition> primaryInterface) {
             DefType ret = defTypeMap.get(primaryInterface);
-            if(ret == null){
-                throw new AuraRuntimeException(String.format("Unsupported Java Interface %s specified for DefDescriptor. Valid types are : %s", primaryInterface.getName(), defTypeMap.keySet().toString()));
+            if (ret == null) {
+                String message = String.format(
+                        "Unsupported Java Interface %s specified for DefDescriptor. Valid types are : %s",
+                        primaryInterface.getName(), defTypeMap.keySet().toString());
+                throw new AuraRuntimeException(message);
             }
             return ret;
         }
@@ -100,6 +101,11 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable, S
      * @return The pseudo-protocol, namespace, and name of this descriptor
      */
     String getQualifiedName();
+
+    /**
+     * @return the namespace and name portion of this descriptor for cases where the prefix/protocol is already known.
+     */
+    String getDescriptorName();
 
     /**
      * @return The prefix/protocol of this descriptor
@@ -117,10 +123,10 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable, S
     String getNameParameters();
 
     /**
-     * @return isParameterized - identifies if additional processing is warranted to consider generic collections should be considered
+     * @return isParameterized - identifies if additional processing is warranted to consider generic collections should
+     *         be considered
      */
     boolean isParameterized();
-
 
     /**
      * @return The type of this definition, which can be used to branch and parse serialized representations
@@ -129,7 +135,8 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable, S
 
     /**
      * @return the definition (compiles it if necessary)
-     * @throws QuickFixException if the definition is not found
+     * @throws QuickFixException
+     *             if the definition is not found
      */
     T getDef() throws QuickFixException;
 

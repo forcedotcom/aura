@@ -19,32 +19,34 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.AuraRuntimeException;
+
 /**
  * This test has automation to verify implementation of ui:ouputText component.
  *
  * @userStory a07T0000001isvq
  * @hierarchy Aura.Components.UI.OutputText
  * @priority medium
- *
- *
- *
  */
 public class OutputTextTest extends AuraImplTestCase {
     public OutputTextTest(String name){
         super(name);
     }
+
     /**
      * Verify injecting javascript using 'value' attribute.
+     * 
      * @throws Exception
      */
     public void testInjectingScriptTagIntoValue() throws Exception{
         String scriptTags = "<script>alert(\'blah\')</script>";
         String cmpMarkup = String.format(baseComponentTag, "", "<ui:outputText value='"+scriptTags+"'/>");
-        DefDescriptor<ComponentDef> testCmp = addSource(cmpMarkup, ComponentDef.class);
+        DefDescriptor<ComponentDef> testCmp = addSourceAutoCleanup(cmpMarkup, ComponentDef.class);
         try{
             testCmp.getDef();
             fail("XML should not be assigned as value.");
-        }catch(AuraRuntimeException e){assertNotNull(e);}
+        } catch (AuraRuntimeException e) {
+            assertNotNull(e);
+        }
 
     }
 }

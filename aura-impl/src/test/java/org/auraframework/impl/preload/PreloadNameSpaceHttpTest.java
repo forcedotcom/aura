@@ -21,33 +21,40 @@ import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.TestLabels;
+import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.util.json.JsonReader;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+
 /**
  * Basic HTTP retieve test for pre loading componentDefs from namespaces.
+ * 
  * @hierarchy Aura.Basic
  * @priority high
  * @userStory a07B0000000DfxB
- *
- *
  * @since 138
  */
+@ThreadHostileTest
 public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
     public PreloadNameSpaceHttpTest(String name){
         super(name);
     }
+
     /**
-     * Verify that when a component is serialized down to the client, the component Def only has the descriptor and nothing else.
-     * Step 1: Obtain a valid CSRF token to be used on a get request for a component in JSON format.
-     * Step 2: Request a component in JSON format.
+     * Verify that when a component is serialized down to the client, the component Def only has the descriptor and
+     * nothing else.
+     * <ol>
+     * <li>Obtain a valid CSRF token to be used on a get request for a component in JSON format.</li>
+     * <li>Request a component in JSON format.</li>
+     * </ol>
      */
     @SuppressWarnings("unchecked")
     @TestLabels("auraSanity")
     public void testComponentDef() throws Exception{
         //Obtain CSRF token
-        String url = String.format("/aura?aura.tag=preloadTest:test_Preload_Cmp_SameNameSpace&aura.format=JSON&aura.mode=FTEST&aura.lastmod=%s&aura.deftype=APPLICATION",
+        String url = String
+                .format("/aura?aura.tag=preloadTest:test_Preload_Cmp_SameNameSpace&aura.format=JSON&aura.mode=FTEST&aura.lastmod=%s&aura.deftype=APPLICATION",
                 getLastMod(Mode.FTEST, "preloadTest"));
         GetMethod get = obtainGetMethod(url);
         int statusCode = this.getHttpClient().executeMethod(get);

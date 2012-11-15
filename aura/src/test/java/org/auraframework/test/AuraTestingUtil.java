@@ -17,43 +17,34 @@ package org.auraframework.test;
 
 import java.io.File;
 import java.util.Date;
-import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.Source;
-import org.auraframework.system.SourceLoader;
 
 public interface AuraTestingUtil {
-    public static String UI_INPUT_TEXT = "markup://ui:inputText";
-    public static String UI_INPUT_NUMBER = "markup://ui:inputNumber";
-    public static String UI_INPUT_PHONE = "markup://ui:inputPhone";
-
-    public static String UI_OUTPUT_NUMBER = "markup://ui:outputNumber";
-    public static String UI_OUTPUT_TEXT = "markup://ui:outputText";
-    public static String UI_OUTPUT_PHONE = "markup://ui:outputPhone";
-    public static String UI_OUTPUT_PERCENT = "markup://ui:outputPercent";
-    public static String UI_OUTPUT_DATETIME = "markup://ui:outputDateTime";
-    public static String UI_OUTPUT_CURRENCY = "markup://ui:outputCurrency";
-
     public void setUp();
     public void tearDown();
-    public File getAuraJavascriptSourceDirectory();
-    public Set<SourceLoader> getAdditionalLoaders();
+
+    File getAuraJavascriptSourceDirectory();
 
     /**
-     * Retrieves the source of a component resource.
-     * Note: Works only for markup://string:XXXXX components and not for any other namespace.
-     *       By default, test util is aware of StringSourceLoader only.
-     * @param descriptor Descriptor of the resource you want to see the source of
+     * Retrieves the source of a component resource. Note: Works only for markup://string:XXXXX components and not for
+     * any other namespace. By default, test util is aware of StringSourceLoader only.
+     * 
+     * @param descriptor
+     *            Descriptor of the resource you want to see the source of
+     * @return
      */
-    public Source<?> getSource(DefDescriptor<?> descriptor);
+    Source<?> getSource(DefDescriptor<?> descriptor);
 
-    public <T extends Definition> DefDescriptor<T> addSource(String contents, Class<T> defClass);
+    /**
+     * Load the given definition in the {@link StringSourceLoader} and later remove it on {@link #tearDown()}.
+     */
+    <T extends Definition> void addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents, Date lastModified);
 
-    public <T extends Definition> DefDescriptor<T> addSource(String name, String contents, Class<T> defClass);
-
-    public <T extends Definition> DefDescriptor<T> addSource(String contents, Class<T> defClass, Date lastModified);
-
-    public <T extends Definition> DefDescriptor<T> addSource(String name,String contents, Class<T> defClass, Date lastModified);
+    /**
+     * Convenience method to create a description and load a source in one shot.
+     */
+    <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(String contents, Class<T> defClass);
 }

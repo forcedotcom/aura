@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
  * Note that for the moment, this is case insensitive...
  */
 public class GlobMatcher {
-    private static final Pattern stringPattern = Pattern.compile("[a-zA-Z*]*");
+    private static final Pattern stringPattern = Pattern.compile("[a-zA-Z0-9_*]*");
     private static final String ALL_STRING = "*";
     private static final Pattern STAR = Pattern.compile("\\*");
 

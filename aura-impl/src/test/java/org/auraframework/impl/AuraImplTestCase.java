@@ -23,8 +23,22 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.ModelDef;
 import org.auraframework.impl.java.model.JavaModelDef;
+import org.auraframework.impl.source.StringSourceLoader;
+import org.auraframework.impl.test.util.AuraImplUnitTestingUtil;
+import org.auraframework.instance.BaseComponent;
+import org.auraframework.instance.Model;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.Source;
+import org.auraframework.test.AuraTestCase;
+import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.impl.test.util.AuraImplUnitTestingUtil;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Model;
@@ -39,9 +53,6 @@ import org.auraframework.util.json.JsonSerializationContext;
 /**
  * Base class for Aura unit tests that establishes a AuraTestContext that looks up components in the
  * aura-test/components/ directory.
- *
- *
- *
  */
 
 public abstract class AuraImplTestCase extends AuraTestCase {
@@ -54,7 +65,8 @@ public abstract class AuraImplTestCase extends AuraTestCase {
 
     protected final static String baseComponentTag = "<aura:component %s>%s</aura:component>";
     protected final static String baseApplicationTag = "<aura:application %s>%s</aura:application>";
-    protected final DefDescriptor<ApplicationDef> laxSecurityApp = definitionService.getDefDescriptor("test:laxSecurity", ApplicationDef.class);
+    protected final DefDescriptor<ApplicationDef> laxSecurityApp = definitionService.getDefDescriptor(
+            "test:laxSecurity", ApplicationDef.class);
 
     public AuraImplTestCase(String name) {
         this(name, true);
@@ -69,8 +81,8 @@ public abstract class AuraImplTestCase extends AuraTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        if (shouldSetupContext)
-            Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        auraTestingUtil.setUp();
+        if (shouldSetupContext) Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
     }
 
     @Override
@@ -80,21 +92,17 @@ public abstract class AuraImplTestCase extends AuraTestCase {
         super.tearDown();
     }
 
-    protected <T extends Definition> DefDescriptor<T> addSource(String contents, Class<T> defClass) {
-        return addSource(null, contents, defClass, new Date());
-    }
-
-    protected <T extends Definition> DefDescriptor<T> addSource(String name, String contents, Class<T> defClass) {
-        return addSource(name, contents, defClass, new Date());
-    }
-
-    protected <T extends Definition> DefDescriptor<T> addSource(String contents, Class<T> defClass, Date lastModified) {
-        return addSource(null, contents, defClass, lastModified);
-    }
-
-    protected <T extends Definition> DefDescriptor<T> addSource(String name, String contents, Class<T> defClass,
+    protected <T extends Definition> void addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents,
             Date lastModified) {
-        return auraTestingUtil.addSource(name, contents, defClass, lastModified);
+        auraTestingUtil.addSourceAutoCleanup(descriptor, contents, lastModified);
+    }
+
+    protected <T extends Definition> void addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents) {
+        addSourceAutoCleanup(descriptor, contents, new Date());
+    }
+
+    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(String contents, Class<T> defClass) {
+        return auraTestingUtil.addSourceAutoCleanup(contents, defClass);
     }
 
     protected Source<?> getSource(DefDescriptor<?> descriptor) {

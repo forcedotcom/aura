@@ -105,13 +105,6 @@ public abstract class UnitTestCase extends TestCase {
         tearDownSteps.push(toRun);
     }
 
-    protected void waitAtLeast(long millis) throws Exception {
-        long start = System.currentTimeMillis();
-        do {
-            Thread.sleep(501);
-        } while ((System.currentTimeMillis() - start) < millis);
-    }
-
     protected String getGoldFileName() {
         return getName();
     }
@@ -176,7 +169,7 @@ public abstract class UnitTestCase extends TestCase {
     /**
      * Get a resource file for use in tests. If resource is not loaded from the filesystem, write it to a temp file and
      * use that.
-     *
+     * 
      * @param resourceName
      * @return File containing the resource content
      * @throws IOException
@@ -186,7 +179,7 @@ public abstract class UnitTestCase extends TestCase {
         // if it's local and exists, just return it
         if (url != null && url.getProtocol().equals("file")) return new File(url.getFile());
 
-        //otherwise, we'll map it to tmp filesystem
+        // otherwise, we'll map it to tmp filesystem
         if (!File.separator.equals("/")) {
             resourceName = resourceName.replace('/', File.separatorChar);
         }
@@ -197,7 +190,7 @@ public abstract class UnitTestCase extends TestCase {
         if (url == null) { return tempFile; }
 
         // if it's a dir, just create it
-        if(resourceName.endsWith(File.separator)){
+        if (resourceName.endsWith(File.separator)) {
             tempFile.mkdirs();
             return tempFile;
         }
@@ -214,7 +207,7 @@ public abstract class UnitTestCase extends TestCase {
     }
 
     // add annotation's value to current Set
-    private void addLabels(Set<String> labels, TestLabels anno){
+    private void addLabels(Set<String> labels, TestLabels anno) {
         if (anno != null) {
             String value = anno.value();
             if (value != null && !value.isEmpty()) {
@@ -230,7 +223,8 @@ public abstract class UnitTestCase extends TestCase {
         Set<String> labels;
         // get parent labels before adding own
         Class<?> supa = c.getSuperclass();
-        // could probably stop at UnitTestCase, but don't want to mess with tests not derived from, and there's only 3 more hops to Object (for now)
+        // could probably stop at UnitTestCase, but don't want to mess with tests not derived from, and there's only 3
+        // more hops to Object (for now)
         if (supa == null) {
             labels = Sets.newHashSet();
         } else {
@@ -242,17 +236,18 @@ public abstract class UnitTestCase extends TestCase {
     }
 
     /**
-     * Get a Set of Strings parsed from whitespace delimited TestLabels annotation values from the current test method and test class hierarchy.
-     * This will include only the current method's annotation and not those of any methods it happens to override.
+     * Get a Set of Strings parsed from whitespace delimited TestLabels annotation values from the current test method
+     * and test class hierarchy. This will include only the current method's annotation and not those of any methods it
+     * happens to override.
      */
     public Set<String> getTestLabels() {
         Class<?> clazz = getClass();
         Set<String> labels = getTestLabels(clazz);
-        try{
+        try {
             Method method = clazz.getMethod(getName());
             TestLabels anno = method.getAnnotation(TestLabels.class);
             addLabels(labels, anno);
-        } catch(NoSuchMethodException e){
+        } catch (NoSuchMethodException e) {
             // dynamic tests should override this function
         }
         return labels;

@@ -20,6 +20,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.UnAdaptableTest;
@@ -37,16 +38,13 @@ public class InputTextUITest extends WebDriverTestCase {
     @ExcludeBrowsers({BrowserType.IPAD,BrowserType.ANDROID_PHONE,BrowserType.ANDROID_TABLET,BrowserType.IPHONE})
     public void testUpdateOnAttribute_UsingStringSource() throws Exception{
         String event = "blur";
-        String baseTag = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> "+
-                            "<div id=\"%s\">"+event+":"+
-                                "<ui:inputText aura:id=\"%s\" value=\"{!m.String}\" updateOn=\"%s\"/>"+
-                            "</div>"+
-                            "<div id=\"output\">"+
-                                "output: <ui:outputText value=\"{!m.String}\"/>"+
-                            "</div>"+
-                        "</aura:component>"      ;
-        addSource("inputtextupdateontest_"+event, baseTag.replaceAll("%s", event), ComponentDef.class);
-        open("/string/inputtextupdateontest_"+event+".cmp");
+        String baseTag = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> "
+                + "<div id=\"%s\">" + event + ":"
+                + "<ui:inputText aura:id=\"%s\" value=\"{!m.String}\" updateOn=\"%s\"/>" + "</div>"
+                + "<div id=\"output\">" + "output: <ui:outputText value=\"{!m.String}\"/>" + "</div>"
+                + "</aura:component>";
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(baseTag.replaceAll("%s", event), ComponentDef.class);
+        open(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
 
         String value = getCurrentModelValue();
         WebElement input = AuraUITestingUtil.findElementAndTypeEventNameInIt(getDriver(), event);
@@ -195,8 +193,8 @@ public class InputTextUITest extends WebDriverTestCase {
         String cmpSource = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> " +
                             "<ui:inputText value=\"{!m.StringNull}\"/>" +
                          "</aura:component>";
-        addSource("inputtextnullvalue", cmpSource, ComponentDef.class);
-        open("/string/inputtextnullvalue.cmp");
+        DefDescriptor<ComponentDef> inputTextNullValue = addSourceAutoCleanup(cmpSource, ComponentDef.class);
+        open(String.format("/%s/%s.cmp", inputTextNullValue.getNamespace(), inputTextNullValue.getName()));
 
         WebElement input = getDriver().findElement(By.tagName("input"));
         assertEquals("Value of input is incorrect", "", input.getText());

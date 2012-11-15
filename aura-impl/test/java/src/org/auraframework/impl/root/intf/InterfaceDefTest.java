@@ -15,20 +15,11 @@
  */
 package org.auraframework.impl.root.intf;
 
+import java.util.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RegisterEventDef;
-import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.def.*;
 import org.auraframework.impl.FakeRegistry;
+import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
@@ -38,6 +29,10 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
+/**
+ * 
+ * 
+ */
 public class InterfaceDefTest extends AuraImplTestCase {
 
     public InterfaceDefTest(String name) {
@@ -236,11 +231,9 @@ public class InterfaceDefTest extends AuraImplTestCase {
         }
     }
 
-
     public void testInterfaceCannotImplementAnInterface() throws Exception {
-        DefDescriptor<InterfaceDef> d = StringSourceLoader.getInstance().createStringSourceDescriptor(
-                "interfaceImplementingInterface", InterfaceDef.class);
-        addSourceAutoCleanup(d, "<aura:interface implements='test:fakeInterface'> </aura:interface>");
+        DefDescriptor<InterfaceDef> d = addSourceAutoCleanup(
+                "<aura:interface implements='test:fakeInterface'> </aura:interface>", InterfaceDef.class);
         try {
             d.getDef();
             fail("An interface cannot implement another interface, it can only extend it.");
@@ -249,21 +242,15 @@ public class InterfaceDefTest extends AuraImplTestCase {
         }
     }
     /**
-     * Test to verify that InterfaceDef has information about server dependency.
-     * Creating instances of interface on the clientside would require server
-     * dependency information. Make sure this information is part of interface
-     * def.
+     * Test to verify that InterfaceDef has information about server dependency. Creating instances of interface on the
+     * clientside would require server dependency information. Make sure this information is part of interface def.
      */
     // TODO: BUG
     /*
      * public void testHasLocalDependencies(){ assertFalse(
      * "An interface with clientside provider does not depend on server.",
-     * definitionService.getDefinition("test:test_JSProvider_Interface",
-     * InterfaceDef.class).hasLocalDependencies());
-     * assertTrue("An interface with only serverside provider depends on server."
-     * , definitionService.getDefinition("test:test_Provider_Interface",
-     * InterfaceDef.class).hasLocalDependencies());
-     *
-     * }
+     * definitionService.getDefinition("test:test_JSProvider_Interface", InterfaceDef.class).hasLocalDependencies());
+     * assertTrue("An interface with only serverside provider depends on server." ,
+     * definitionService.getDefinition("test:test_Provider_Interface", InterfaceDef.class).hasLocalDependencies()); }
      */
 }

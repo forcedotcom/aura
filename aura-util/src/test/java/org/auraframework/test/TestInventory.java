@@ -169,7 +169,7 @@ public class TestInventory {
 
     /**
      * Check if class might be a valid test case. Must be public, non-abstract, named "*Test" and extend from
-     * {@link Test}
+     * {@link Test}.
      */
     private static Class<? extends Test> getTestClass(String className) {
         if (!className.endsWith(TEST_CLASS_SUFFIX)) return null;

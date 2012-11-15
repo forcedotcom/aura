@@ -34,6 +34,7 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.IntegrationTest;
+import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.configuration.TestServletConfig;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.util.AuraUtil;
@@ -53,6 +54,9 @@ import com.google.common.collect.*;
  */
 @IntegrationTest
 public abstract class IntegrationTestCase extends AuraTestCase {
+    /**
+     * Note, any tests that write to the servletConfig are {@link ThreadHostileTest}.
+     */
     protected static TestServletConfig servletConfig = AuraUtil.get(TestServletConfig.class);
     // Do not use the testUtil to add string source in WebDriver tests.
     protected final AuraTestingUtil auraTestingUtil;
@@ -67,6 +71,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        auraTestingUtil.setUp();
     }
 
     @Override
@@ -99,14 +104,10 @@ public abstract class IntegrationTestCase extends AuraTestCase {
         return servletConfig.getCsrfToken();
     }
 
-    protected static long getLastMod(String... preloads) throws Exception {
-        Mode mode = Mode.DEV;
-        if (Aura.getContextService().isEstablished()) {
-            mode = Aura.getContextService().getCurrentContext().getMode();
-        }
-        return getLastMod(mode, preloads);
-    }
-
+    /**
+     * Note: Any tests utilizing getLastMod are suspects for {@link ThreadHostileTest} since the last mod is shared
+     * global state.
+     */
     protected static long getLastMod(Mode mode, String... preloads) throws Exception {
         // AuraContextImpl adds aura & ui namespaces as default
         // SFDCAuraContext adds os namespace as default
@@ -190,32 +191,17 @@ public abstract class IntegrationTestCase extends AuraTestCase {
         return post;
     }
 
-    protected <T extends Definition> DefDescriptor<T> addSource(String contents, Class<T> defClass) {
-        return addSource(null, contents, defClass, new Date());
-    }
-
-    protected <T extends Definition> DefDescriptor<T> addSource(String name, String contents, Class<T> defClass) {
-        return addSource(name, contents, defClass, new Date());
-    }
-
-    protected <T extends Definition> DefDescriptor<T> addSource(String contents, Class<T> defClass, Date lastModified) {
-        return addSource(null, contents, defClass, lastModified);
-    }
-
-    /**
-     * Add a new String source def on the app server.
-     *
-     * @param name
-     *            name of the component/application/event. Any type of def with MARKUP://
-     */
-    protected <T extends Definition> DefDescriptor<T> addSource(String name, String contents, Class<T> defClass,
+    protected <T extends Definition> void addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents,
             Date lastModified) {
-        StringSourceLoader stringSourceLoader = StringSourceLoader.getInstance();
-        DefDescriptor<T> dd = stringSourceLoader.addSource(name, contents, defClass,
-                new Date(System.currentTimeMillis()));
-        if (cleanUpDds == null) cleanUpDds = Sets.newHashSet();
-        cleanUpDds.add(dd);
-        return dd;
+        auraTestingUtil.addSourceAutoCleanup(descriptor, contents, lastModified);
+    }
+
+    protected <T extends Definition> void addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents) {
+        addSourceAutoCleanup(descriptor, contents, new Date());
+    }
+
+    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(String contents, Class<T> defClass) {
+        return auraTestingUtil.addSourceAutoCleanup(contents, defClass);
     }
 
     /**

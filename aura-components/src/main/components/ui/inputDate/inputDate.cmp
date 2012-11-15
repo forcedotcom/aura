@@ -17,11 +17,17 @@
 -->
 <aura:component extends="ui:input" implements="ui:inputDateComponent" extensible="true" support="BETA" description="An input field for entering a date as specified by the format attribute.">
     <aura:attribute name="format" type="String" default="yyyy-MM-dd" description="The java.text.SimpleDateFormat style format string that does not include the time of day or timezone pattern letters. Default value is &#8220;yyyy-MM-dd&#8221;."/>
+    <aura:attribute name="placeholder" type="String" default="" description="The text that is displayed by default."/>
     <aura:set attribute="updateOn" value="blur"/>
     <aura:renderif isTrue="{!v.body.length == 0}">
-       <input type="date" value="{!v.value}" class="{!v.class}" max="{!v.max}" min="{!v.min}" step="{!v.step}" required="{!v.required}" disabled="{!v.disabled}"/>
-       <aura:set attribute="else">
-           {!v.body}
-       </aura:set>
+        <aura:renderif isTrue="{!$Browser.isTablet || $Browser.isPhone || $Browser.isContainer}">
+            <input type="date" value="{!v.value}" class="{!v.class}" max="{!v.max}" min="{!v.min}" step="{!v.step}" required="{!v.required}" disabled="{!v.disabled}"/>
+            <aura:set attribute="else"> 
+                <input type="text" value="{!v.value}" class="{!v.class}" placeholder="{!v.placeholder}" required="{!v.required}" disabled="{!v.disabled}"/>
+            </aura:set> 
+        </aura:renderif> 
+        <aura:set attribute="else">
+            {!v.body}
+        </aura:set>
     </aura:renderif>
 </aura:component>

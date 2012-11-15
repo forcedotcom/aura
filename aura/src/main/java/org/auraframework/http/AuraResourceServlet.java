@@ -134,18 +134,21 @@ public class AuraResourceServlet extends AuraBaseServlet {
     private void writeManifest(HttpServletRequest request,
                                HttpServletResponse response) throws IOException {
         setNoCache(response);
-        if (!isManifestEnabled(request)) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-        if (errorParam.get(request) != null) {
-            addManifestErrorCookie(response);
-            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-            return;
-        }
 
         try {
-            setPreloads();
+ 
+            if (errorParam.get(request) != null) {
+                addManifestErrorCookie(response);
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                return;
+            }
+        	
+            if (!isManifestEnabled(request)) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+        	
+        	setPreloads();
 
             String originalPath = (String)request.getAttribute(AuraResourceServlet.ORIG_REQUEST_URI);
             if(originalPath != null){

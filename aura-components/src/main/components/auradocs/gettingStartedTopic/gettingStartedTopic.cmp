@@ -18,8 +18,6 @@
 <aura:component extends="auradocs:topicPanel">
   <aura:set attribute="title" value="Getting Started"/>
 
-    <p>Aura is a UI framework for developing dynamic Web applications for desktop and mobile devices.</p>
-
     <p>This section gets you up and running with Aura.</p>
 
     <auradocs:gettingStartedOverview/>

@@ -21,6 +21,6 @@
         <li>Work through the <auradocs:topicLink topic="qsCmdLine">quick start</auradocs:topicLink> guide using the command line</li>
         <li>Work through an alternative quick start using <auradocs:topicLink topic="eclipseCreateApp">Eclipse</auradocs:topicLink></li>
         <li>Look at the Aura source code and <auradocs:topicLink topic="buildFromSource">build it from source</auradocs:topicLink> in Eclipse.</li>
-        <li>Check out a <auradocs:topicLink topic="buildApp">Aura demo app</auradocs:topicLink></li>
+        <li>Check out an <auradocs:topicLink topic="buildApp">Aura demo app</auradocs:topicLink></li>
     </ul>
 </aura:component>

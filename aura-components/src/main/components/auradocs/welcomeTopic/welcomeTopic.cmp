@@ -17,16 +17,20 @@
 -->
 <aura:component extends="auradocs:topicPanel">
 <aura:set attribute="title" value="A Guide to Aura Development"/>
-    <p>Aura is a UI framework for developing dynamic web apps for mobile and desktop devices. It provides you with a rich and extensible component set to kick start building apps. The framework supports partitioned multi-tier component development that bridges the client and server.</p>
+    <p>Aura is a UI framework for developing dynamic web apps for mobile and desktop devices. Aura provides a scalable long-lived lifecycle to support building apps engineered for growth.</p>
+    
+    <p>Aura comes with a rich and extensible component set to kick start building apps. You don't have to spend your time optimizing your apps for different devices as the components take care of that for you. The framework intelligently utilizes your server, browser, devices, and network so you can focus on the logic and interactions of your apps.</p>
+    
+    <p>Aura supports partitioned multi-tier component development that bridges the client and server. It uses JavaScript on the client side and Java on the server side.</p>
 
-    <p>We have not set out to make another jQuery or YUI. The framework can easily integrate with those toolkits or whatever else comes along. Aura provides a scaleable long-lived lifecycle to support building apps engineered for growth.</p>
+    <p>You can build your user interface at a granular level and easily integrate with popular toolkits and libraries, such as jQuery. Aura's lightweight and scalable architecture uses two key building blocks: components and events.</p>
 
-    <p>Aura provides a lightweight and scalable architectural foundation by using two key building blocks: components and events.</p>
-
-    <p>Components use markup that looks similar to HTML. You can also use HTML (with exceptions), or any other code that can execute within an HTML page. Aura uses JavaScript on the client side and Java on the server side. You can build your user interface at a granular level and easily integrate with popular toolkits and libraries.</p>
-
-    <p>Aura supports a robust event model, a powerful expression language, and embedded testing, performance, and security features. The framework intelligently utilizes your server, browser, devices, and network so you can focus on the logic and interactions of your apps.</p>
-
-    <p>This guide shows you how to get started and then dig deeper into the rich functionality of Aura. It assumes basic familiarity with HTML, CSS, JavaScript, and Java.</p>
+    <p>Components use markup that looks similar to HTML. You can also use HTML or any other code that can execute within an HTML page. Components are encapsulated and their internals stay private. You can extend existing components to customize their behavior.</p>
+    
+    <p>The robust event model enables you to develop loosely coupled components. Once you define the events that interact with your components, your team can work on the components in parallel to quickly build a powerful app.</p>
+    
+    <p>Aura also supports a powerful expression language, embedded testing, performance, and security features.</p>
+    
+    <p>This guide shows you how to get started and then dig deeper into Aura. It assumes basic familiarity with HTML, CSS, JavaScript, and Java.</p>
 
 </aura:component>

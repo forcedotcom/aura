@@ -25,7 +25,7 @@
 
   <h2>Navigation Events</h2>
 
-  <p>Aura uses its event model to manage content change in response to URL changes. The client-side <code>AuraHistoryService</code> monitors the location of the current window for changes. If the <code>#</code> value in a URL changes, the <code>AuraHistoryService</code> fires a Aura application event of type <code>aura:locationChange</code>.  The <code>locationChange</code> event has a single attribute called <code>token</code>.</p>
+  <p>Aura uses its event model to manage content change in response to URL changes. The client-side <code>AuraHistoryService</code> monitors the location of the current window for changes. If the <code>#</code> value in a URL changes, the <code>AuraHistoryService</code> fires an Aura application event of type <code>aura:locationChange</code>.  The <code>locationChange</code> event has a single attribute called <code>token</code>.</p>
 
   <p>For example, if the URL changes from <code>/demo/test.app#</code> to <code>/demo/test.app#foo</code>, a <code>aura:locationChange</code> event is fired, and the <code>token</code> attribute on that event is set to <code>foo</code>.</p>
 

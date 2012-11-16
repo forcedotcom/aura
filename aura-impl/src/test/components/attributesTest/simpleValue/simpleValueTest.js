@@ -31,6 +31,7 @@
             "Simple value object failed to retrieve assigned value.");
         }
     },
+    
     testErrorFunctionsOnSimpleValueObject:{
         attributes:{intAttribute:3},
         test:function(cmp){
@@ -66,6 +67,33 @@
             $A.test.assertTrue( $A.util.isObject(err[0]));
         }
     },
+    
+    // dirty value in action should not get overwritten in rerender when evaluating functions
+    testMakeDirtyIndirectly:{
+    	attributes:{intAttribute:100},
+    	test:function(cmp){
+    		var button = cmp.find("button");
+    		var val = cmp.getValue("v.intAttribute");
+    		$A.test.assertEquals(false, val.isDirty());
+    		$A.test.assertEquals(100, val.unwrap());
+    		var label = button.getValue("v.label");
+    		$A.test.assertEquals(false, label.isDirty());
+    		$A.test.assertEquals(100, label.unwrap());
+    		
+    		button.get("e.press").fire();
+    		$A.test.assertEquals(false, val.isDirty());
+    		$A.test.assertEquals(101, val.unwrap());
+    		$A.test.assertEquals(false, label.isDirty());
+    		$A.test.assertEquals(101, label.unwrap());
+
+    		button.get("e.press").fire();
+    		$A.test.assertEquals(false, val.isDirty());
+    		$A.test.assertEquals(102, val.unwrap());
+    		$A.test.assertEquals(false, label.isDirty());
+    		$A.test.assertEquals(102, label.unwrap());
+    	}
+    },
+    
     verifyErrors:function(valueObj, expectedErrors){
         var err = valueObj.getErrors();
         $A.test.assertTrue($A.util.isArray(err));

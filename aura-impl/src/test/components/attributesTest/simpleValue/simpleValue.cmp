@@ -18,4 +18,5 @@
 <aura:component render="client">
     <aura:attribute name="strAttribute" type="String"/>
     <aura:attribute name="intAttribute" type="Integer"/>
+    <ui:button aura:id="button" press="{!c.increment}" label="{!v.intAttribute ? v.intAttribute : 0}"/>
 </aura:component>

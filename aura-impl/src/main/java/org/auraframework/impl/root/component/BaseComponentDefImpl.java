@@ -21,9 +21,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 import org.auraframework.Aura;
 import org.auraframework.builder.BaseComponentDefBuilder;
 import org.auraframework.def.*;
@@ -41,6 +38,9 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.*;
 import org.auraframework.util.json.Json;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
@@ -284,7 +284,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
             } else if (vpt.isGlobal()) {
                 AuraContext lc = Aura.getContextService().getCurrentContext();
                 GlobalValueProvider gvp = lc.getGlobalProviders().get(vpt);
-                gvp.validate(e.getStem());
+                if (gvp != null) {
+                    gvp.validate(e.getStem());
+                }
             } else {
                 //validate against m v or c
             }

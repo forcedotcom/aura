@@ -50,6 +50,7 @@ var AuraStorageService = function(){
         
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         ,"storage" : storage
+        ,"adapters" : adapters
         //#end
     };
 

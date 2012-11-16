@@ -18,7 +18,7 @@
         var v = cmp.getValue(cmp.get("v.whichArray"));
         if (!v) { return; }
         var array = v.unwrap();
-        array.push($A.componentService.newLocalComponent({
+        array.push($A.componentService.newComponent({
             "componentDef": {
                 "descriptor": "markup://aura:text"
             },
@@ -36,7 +36,7 @@
         var v = cmp.getValue(cmp.get("v.whichArray"));
         if (!v) { return; }
         var array = v.unwrap();
-        array.push($A.componentService.newLocalComponent({
+        array.push($A.componentService.newComponent({
             "componentDef": {
                 "descriptor": "markup://auratest:rerenderChild"
             },

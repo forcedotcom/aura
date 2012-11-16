@@ -133,13 +133,6 @@ var AuraComponentService = function(){
             return ret;
         },
 
-        /**
-         * @deprecated use newComponent
-         */
-        newLocalComponent: function(config, attributeValueProvider) {
-            return $A.services.component.newComponent(config, attributeValueProvider);
-        },
-
         index: function(component){
             priv.indexes.globalId[component.getGlobalId()] = component;
         },

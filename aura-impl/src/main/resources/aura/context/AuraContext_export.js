@@ -17,8 +17,7 @@
 var p = AuraContext.prototype;
 exp(p,
     "getMode", p.getMode,
-    "getApp", p.getApp,
-    "setCurrentAction", p.setCurrentAction
+    "getApp", p.getApp
     //#if {"excludeModes" : ["PRODUCTION"]}
 	    ,
 	    "getPreloads", p.getPreloads

@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var p = AuraContext.prototype;
-exp(p,
-    "getMode", p.getMode,
-    "getApp", p.getApp,
-    "setCurrentAction", p.setCurrentAction
-    //#if {"excludeModes" : ["PRODUCTION"]}
-	    ,
-	    "getPreloads", p.getPreloads,
-	    "getNum", p.getNum
-    //#end
-);
+package org.auraframework.impl.java.model;
+
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Model;
+
+@Model
+public class TeamFacetModel {
+    @AuraEnabled
+    public String getTeamDivision(){
+        return "National League";
+    }
+}

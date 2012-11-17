@@ -32,49 +32,23 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
 
     private static final long serialVersionUID = 6034969764380397480L;
     private static final long lastModified = System.currentTimeMillis();
-    private static final ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
+    private static final ResourceLoader resourceLoader = Aura
+            .getConfigAdapter().getResourceLoader();
 
-    // RESOURCES_PATTERN format: /required_root/optional_nonce/required_rest_of_path
-    private static final Pattern RESOURCES_PATTERN = Pattern.compile("^/([^/]+)(/[0-9]+)?(/.*)$");
-    private boolean hasNonce = false;
+    // RESOURCES_PATTERN format:
+    // /required_root/optional_nonce/required_rest_of_path
+    private static final Pattern RESOURCES_PATTERN = Pattern
+            .compile("^/([^/]+)(/[0-9]+)?(/.*)$");
 
-    /**
-     * @param path - The requested resource path.
-     *    Currently must be prefixed with /ext-js/, /javascript/, or /resources/
-     *    Also sets the hasNonce boolean, if a numeric nonce is encountered in the path
-     * @return a valid stream containing the resource, or null if not found
-     * @throws IOException
-     */
-    private InputStream getTargetStream(String path) throws IOException
-    {
-        hasNonce = false;
-        String resStr = null;
-
-        // match entire path once, looking for root, optional nonce, and rest-of-path
-        Matcher matcher = RESOURCES_PATTERN.matcher(path);
-
-        if (matcher.matches()){
-            hasNonce = (matcher.group(2) != null);
-
-            String root = matcher.group(1);
-            if (root.equals("resources")) {
-                resStr = String.format("/aura/resources%s", matcher.group(3));
-            }
-            else if (root.equals("javascript")) {
-                resStr = String.format("/aura/javascript%s", matcher.group(3));
-            }
-        }
-
-        return resStr == null ? null : resourceLoader.getResourceAsStream(resStr);
-    }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
         // defend against directory traversal attack
-        // getPathInfo() has already resolved all ".." * "%2E%2E" relative references in the path
-        // and ensured that no directory reference has moved above the root (returns 404 if
-        // attempted).
+        // getPathInfo() has already resolved all ".." * "%2E%2E" relative
+        // references in the path
+        // and ensured that no directory reference has moved above the root
+        // (returns 404 if attempted).
         String path = request.getPathInfo();
         if (path == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -84,13 +58,34 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
         InputStream in = null;
         try {
             Aura.getConfigAdapter().regenerateAuraJS();
-            in = getTargetStream(path);
 
+            // process path (not in a function because can't use non-synced member vars in servlet)
+            boolean hasNonce = false;
+            String resStr = null;
+
+            // match entire path once, looking for root, optional nonce, and
+            // rest-of-path
+            Matcher matcher = RESOURCES_PATTERN.matcher(path);
+
+            if (matcher.matches()) {
+                hasNonce = (matcher.group(2) != null);
+
+                String root = matcher.group(1);
+                if (root.equals("resources")) {
+                    resStr = String.format("/aura/resources%s", matcher.group(3));
+                } else if (root.equals("javascript")) {
+                    resStr = String.format("/aura/javascript%s", matcher.group(3));
+                }
+            }
+            
+            in = (resStr == null) ? null : resourceLoader.getResourceAsStream(resStr);
+            
             // Check if it exists
             if (in == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
+            // end processing path
 
             // Check the cache headers
             // FIXME if(Aura.getContextService().getCurrentContext().getMode().isTestMode()){
@@ -106,8 +101,10 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             // handle any MIME content type, using only file name (not contents)
             String mimeType = mimeTypesMap.getContentType(path);
 
-            if (mimeType.equals("application/octet-stream")) /* unidentified */{
-                response.setContentType(AuraBaseServlet.JAVASCRIPT_CONTENT_TYPE);
+            if (mimeType.equals("application/octet-stream") || mimeType.equals(JAVASCRIPT_CONTENT_TYPE)) /* unidentified */{
+                response.setContentType(JAVASCRIPT_CONTENT_TYPE);
+                hasNonce = true; // nonce is eaten on Javascript requests, but
+                                 // all javascript requests should have one.
             } else {
                 response.setContentType(mimeType);
             }
@@ -120,10 +117,11 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             response.setBufferSize(10240);// 10kb
 
             if (hasNonce) {
-                response.setDateHeader("Expires", System.currentTimeMillis() + AuraBaseServlet.LONG_EXPIRE);
-            }
-            else {
-                response.setDateHeader("Expires", System.currentTimeMillis() + AuraBaseServlet.SHORT_EXPIRE);
+                response.setDateHeader("Expires", System.currentTimeMillis()
+                        + AuraBaseServlet.LONG_EXPIRE);
+            } else {
+                response.setDateHeader("Expires", System.currentTimeMillis()
+                        + AuraBaseServlet.SHORT_EXPIRE);
             }
 
             IOUtil.copyStream(in, response.getOutputStream());

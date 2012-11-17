@@ -37,4 +37,7 @@ exp(p,
     "isStoreable", p.isStoreable,
     "isFromStorage", p.isFromStorage,
     "toJSON", p.toJSON
+    //#if {"excludeModes" : ["PRODUCTION"]}
+     ,"getId", p.getId
+	//#end
 );

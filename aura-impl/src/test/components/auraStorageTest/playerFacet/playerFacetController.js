@@ -13,15 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var p = AuraContext.prototype;
-exp(p,
-    "getMode", p.getMode,
-    "getApp", p.getApp,
-    "setCurrentAction", p.setCurrentAction
-    //#if {"excludeModes" : ["PRODUCTION"]}
-	    ,
-	    "getPreloads", p.getPreloads,
-	    "getNum", p.getNum
-    //#end
-);
+({
+	revealMe:function(cmp){
+		cmp.find('msg').getElement().innerHTML = ("I am "+ cmp.get('v.name') +" the " +cmp.get('v.nickName')) ;
+	}
+})

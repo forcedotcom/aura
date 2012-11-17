@@ -17,8 +17,12 @@ package org.auraframework.impl.java.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.auraframework.Aura;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.instance.Component;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
@@ -26,6 +30,7 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 @Controller
 public class AuraStorageTestController {
@@ -49,6 +54,10 @@ public class AuraStorageTestController {
                 staticCounter.remove(s);
             }
         }
+    }
+    @AuraEnabled
+    public static void setCounter(@Key("testName") String testName, @Key("value") Integer value){
+        staticCounter.put(testName, value);
     }
     @AuraEnabled
     public static List<Integer> string(@Key("testName") String testName, @Key("param1") Integer param1){
@@ -93,4 +102,32 @@ public class AuraStorageTestController {
             json.writeMapEnd();
         }
     }
+    
+    @AuraEnabled
+    public static List<Component> getBaseball(@Key("testName") String testName) throws Exception{
+        List<Component> ret = Lists.newArrayList();
+        staticCounter.putIfAbsent(testName, 0);
+        Integer currentCount = staticCounter.get(testName);
+        //On even count get team and on odd count get players
+        if(currentCount.intValue()%2 == 0){
+            Map<String, Object> attr= Maps.newHashMap();
+            attr.put("name", "Giants");
+            attr.put("city", "San Francisco");
+            Component cmp = Aura.getInstanceService().getInstance("auraStorageTest:teamFacet", ComponentDef.class, attr ); 
+            ret.add(cmp);
+        }else{
+            Map<String, Object> attr= Maps.newHashMap();
+            attr.put("name", "Posey");
+            attr.put("nickName", "Buster");
+            Component cmp = Aura.getInstanceService().getInstance("auraStorageTest:playerFacet", ComponentDef.class, attr );
+            ret.add(cmp);
+            attr.put("name", "PSandavol");
+            attr.put("nickName", "Panda");
+            cmp = Aura.getInstanceService().getInstance("auraStorageTest:playerFacet", ComponentDef.class, attr ); 
+            ret.add(cmp);
+        }
+        staticCounter.put(testName, new Integer(currentCount.intValue() + 1));
+        return ret;
+    }
+    
 }

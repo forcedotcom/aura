@@ -16,8 +16,9 @@
 /*
  * client implementations of all the expression functions
  */
+/*jslint sub: true */
 var expressionFunctions = {
-    eq: function equals(args) {
+    "eq": function equals(args) {
     	var a = args[0];
     	var b = args[1];
     	a = a?a.unwrap():a;
@@ -28,8 +29,8 @@ var expressionFunctions = {
         return a === b;
     },
 
-    ne: function notequals(args) {
-        return !expressionFunctions.eq(args);
+    "ne": function notequals(args) {
+        return !expressionFunctions["eq"](args);
     },
 
     "if": function ternary(args) {
@@ -39,7 +40,7 @@ var expressionFunctions = {
     },
 
     // add also is string concatenate
-    add: function add(args) {
+    "add": function add(args) {
     	var a = args[0];
     	var b = args[1];
     	a = a?a.unwrap():a;
@@ -56,7 +57,7 @@ var expressionFunctions = {
         return a + b;
     },
 
-    sub: function subtract(args) {
+    "sub": function subtract(args) {
     	var a = args[0];
     	var b = args[1];
     	a = a?a.unwrap():a;
@@ -64,7 +65,7 @@ var expressionFunctions = {
         return a - b;
     },
 
-    mult: function multiply(args) {
+    "mult": function multiply(args) {
     	var a = args[0];
     	var b = args[1];
     	a = a?a.unwrap():a;
@@ -72,7 +73,7 @@ var expressionFunctions = {
         return a * b;
     },
 
-    div: function divide(args) {
+    "div": function divide(args) {
     	var a = args[0];
     	var b = args[1];
     	a = a?a.unwrap():a;
@@ -80,7 +81,7 @@ var expressionFunctions = {
         return a / b;
     },
 
-    mod: function modulus(args) {
+    "mod": function modulus(args) {
     	var a = args[0];
     	var b = args[1];
     	a = a?a.unwrap():a;
@@ -88,19 +89,19 @@ var expressionFunctions = {
         return a % b;
     },
 
-    neg: function negate(args) {
+    "neg": function negate(args) {
     	var a = args[0];
     	a = a?a.unwrap():a;
         return -a;
     },
 
-    abs: function absolutevalue(args) {
+    "abs": function absolutevalue(args) {
     	var a = args[0];
     	a = a?a.unwrap():a;
         return Math.abs(a);
     },
 
-    gt: function greaterthan(args) {
+    "gt": function greaterthan(args) {
     	var a = args[0];
     	var b = args[1];
     	a = a?a.unwrap():a;
@@ -108,7 +109,7 @@ var expressionFunctions = {
         return a > b;
     },
 
-    lt: function lessthan(args) {
+    "lt": function lessthan(args) {
     	var a = args[0];
     	var b = args[1];
     	a = a?a.unwrap():a;
@@ -116,7 +117,7 @@ var expressionFunctions = {
         return a < b;
     },
 
-    ge: function greaterthanorequalto(args) {
+    "ge": function greaterthanorequalto(args) {
     	var a = args[0];
     	var b = args[1];
     	a = a?a.unwrap():a;
@@ -124,7 +125,7 @@ var expressionFunctions = {
         return a >= b;
     },
 
-    le: function lessthanorequalto(args) {
+    "le": function lessthanorequalto(args) {
     	var a = args[0];
     	var b = args[1];
     	a = a?a.unwrap():a;
@@ -132,7 +133,7 @@ var expressionFunctions = {
         return a <= b;
     },
 
-    and: function and(args) {
+    "and": function and(args) {
     	var a = args[0];
     	var b = args[1];
     	a = a?a.unwrap():a;
@@ -140,7 +141,7 @@ var expressionFunctions = {
         return a && b;
     },
 
-    or: function or(args) {
+    "or": function or(args) {
     	var a = args[0];
     	var b = args[1];
     	a = a?a.unwrap():a;
@@ -148,11 +149,9 @@ var expressionFunctions = {
     	return a || b;
     },
 
-    not: function not(args) {                             
+    "not": function not(args) {                             
     	var a = args[0];
         a = a ? a.unwrap() : a;
         return a !== true;
     }
 };
-
-//#include aura.value.ExpressionFunctions_export

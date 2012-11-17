@@ -33,6 +33,7 @@
      * Html action can be passed as component attribute.
      */
     testAfterRenderTopLevelHtmlElement: {
+        browsers: ["-IPAD","-IPHONE"],
         test: function(component){
             var fixture = component.find("fixture");
             var div = fixture.find("theDiv");
@@ -66,6 +67,7 @@
      * Html action can be passed as component attribute function.
      */
     testAfterRenderTopLevelHtmlElementFunctionEvaluation: {
+        browsers: ["-IPAD","-IPHONE"],
         attributes: { push:true },
         test: function(component){
             var fixture = component.find("function");

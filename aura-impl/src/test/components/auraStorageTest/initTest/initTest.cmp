@@ -1,0 +1,37 @@
+<aura:component render="client" controller="java://org.auraframework.impl.java.controller.AuraStorageTestController" implements="auraStorage:refreshObserver">
+
+    <aura:attribute name="implementation" type="String" default="memory"/>
+    <aura:attribute name="clearStorageOnInit" type="Boolean"/>
+    <aura:attribute name="defaultExpiration" type="Integer" default="50"/>
+    <aura:attribute name="defaultAutoRefreshInterval" type="Integer" default="60"/>
+    <aura:attribute name="requireUseStorageQueryParam" type="Boolean"/>
+    
+    <!--Control the values per test case-->
+    <auraStorage:init debugLoggingEnabled="true" 
+                      implementation="{!v.implementation}" 
+                      clearStorageOnInit="{!v.clearStorageOnInit}"
+                      defaultExpiration="{!v.defaultExpiration}" 
+                      defaultAutoRefreshInterval="{!v.defaultAutoRefreshInterval}" 
+                      requireUseStorageQueryParam="{!v.requireUseStorageQueryParam}"/>
+                      
+    <ui:button label="Run action at Server Always" press="{!c.forceActionAtServer}" aura:id="ForceActionAtServer"/>
+    <p/>
+    <ui:button label="Run action at Server and mark as storeable" press="{!c.runActionAtServerAndStore}" aura:id="RunActionAndStore"/>
+    <p/>
+    <ui:button label="Re-run action and verify cached response" press="{!c.fetchActionFromStorage}"/>
+    <p/>
+    <ui:button label="Reset all counter" press="{!c.resetCounters}"/>
+    <p/>
+    Result: <p/>Static Counter:<div aura:id="staticCounter"/><p/>Response Data:<div aura:id="responseData"/>isFromStorage:<div aura:id="isFromStorage"/>
+    
+    <aura:handler event="aura:doneWaiting" action="{!c.doneWaiting}"/>
+    <aura:handler event="aura:waiting" action="{!c.waiting}"/>
+    <div aura:id="waiting"/>
+    <div aura:id="doneWaiting"/>
+    <aura:handler name="refreshBegin" action="{!c.refreshBegin}"/>
+    <aura:handler name="refreshEnd" action="{!c.refreshEnd}"/>
+    <div aura:id="refreshBegin"/>
+    <div aura:id="refreshEnd"/>
+    <aura:handler event="auraStorage:modified" action="{!c.storageModified}"/>
+    StorageModifiedAt:<div aura:id="storageModified"/>
+</aura:component>

@@ -1,7 +1,7 @@
 <aura:component render="client" controller="java://org.auraframework.impl.java.controller.AuraStorageTestController" implements="auraStorage:refreshObserver">
 
     <aura:attribute name="implementation" type="String" default="memory"/>
-    <aura:attribute name="clearStorageOnInit" type="Boolean"/>
+    <aura:attribute name="clearStorageOnInit" type="Boolean" default="true"/>
     <aura:attribute name="defaultExpiration" type="Integer" default="50"/>
     <aura:attribute name="defaultAutoRefreshInterval" type="Integer" default="60"/>
     <aura:attribute name="requireUseStorageQueryParam" type="Boolean"/>

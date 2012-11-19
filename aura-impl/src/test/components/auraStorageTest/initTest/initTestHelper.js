@@ -7,13 +7,21 @@
 		a.setExclusive();
 		a.runAfter(a);
 	},
-	executeAction:function(cmp, actionName, actionParam, callback, additionalProperties){
+	executeAction:function(cmp, actionName, actionParam, additionalProperties){
 		var a = cmp.get(actionName);
 		if(actionParam) a.setParams(actionParam);
-		a.setCallback(cmp, callback);
+		a.setCallback(cmp, function(a){
+			var returnValue = a.getReturnValue();
+			cmp.getDef().getHelper().findAndSetText(cmp, "staticCounter", returnValue.Counter); 
+			cmp.getDef().getHelper().findAndSetText(cmp, "responseData", returnValue.Data);
+			cmp.getDef().getHelper().findAndSetText(cmp, "isFromStorage", a.isFromStorage());
+		});
 		if(additionalProperties){
 			additionalProperties(a);
 		}
 		a.runAfter(a);
+	},
+	findAndSetText:function(cmp, targetCmpId, msg){
+		cmp.find(targetCmpId).getElement().innerHTML = msg;
 	}
 })

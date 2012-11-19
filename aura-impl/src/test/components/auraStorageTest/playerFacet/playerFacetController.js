@@ -15,6 +15,6 @@
  */
 ({
 	revealMe:function(cmp){
-		cmp.find('msg').getElement().innerHTML = ("I am "+ cmp.get('v.name') +" the " +cmp.get('v.nickName')) ;
+		cmp.find("msg").getElement().innerHTML = ("I am "+ cmp.get("v.name") +" the " +cmp.get("v.nickName")) ;
 	}
 })

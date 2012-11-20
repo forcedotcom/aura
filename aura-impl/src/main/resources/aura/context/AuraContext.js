@@ -199,7 +199,7 @@ AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs){
 };
 
 /**
- * @private
+ * DCHASMAN Will be private again soon as part of the second phase of W-1450251
  */
 AuraContext.prototype.setCurrentAction = function(action){
 	var previous = this.currentAction;

@@ -15,18 +15,18 @@
  */
 ({
 	resetCounters:function(cmp, _testName){
-		var a = cmp.get('c.resetCounter');
+		var a = cmp.get("c.resetCounter");
 		a.setParams({
-			testName: (!_testName?'baseBall':_testName)
+			testName: (!_testName?"baseBall":_testName)
 		}),
 		a.setExclusive();
 		a.runAfter(a);
 	},
 	setCounter:function(cmp, newValue){
 		var _testName = cmp._testName;
-		var a = cmp.get('c.setCounter');
+		var a = cmp.get("c.setCounter");
 		a.setParams({
-			testName: (!_testName?'baseBall':_testName),
+			testName: (!_testName?"baseBall":_testName),
 			value: newValue
 		}),
 		a.setExclusive();
@@ -35,7 +35,7 @@
 	getTeamAndPlayers:function(cmp, storeable){
 		var _testName = cmp._testName;
 		//First Action
-		var aTeam = cmp.get('c.getBaseball');
+		var aTeam = cmp.get("c.getBaseball");
 		aTeam.setCallback(cmp, function(action) {
             var teamFacet = $A.newCmp(action.getReturnValue()[0]);
             //Clear the old facet in team div
@@ -43,17 +43,17 @@
             //Insert newly fetched components
             cmp.find("Team").getValue("v.body").push(teamFacet);
             //Update the page with action number
-            cmp.find('Actions').getElement().innerHTML += aTeam.getId() +',';
+            cmp.getDef().getHelper().findAndAppendText(cmp, "Actions", aTeam.getId() +",");
         });
 		aTeam.setParams({
-			testName: (!_testName?'baseBall':_testName)
+			testName: (!_testName?"baseBall":_testName)
 		});
 		if(storeable)
 			aTeam.setStoreable();
 		aTeam.runAfter(aTeam);
 		
 		//Second Action
-		var aPlayers = cmp.get('c.getBaseball');
+		var aPlayers = cmp.get("c.getBaseball");
 		aPlayers.setCallback(cmp, function(action) {
             var ret = action.getReturnValue();
             //Clear the old facet in players div
@@ -64,10 +64,10 @@
                 cmp.find("Players").getValue("v.body").push(playerFacet);
             }
             //Update the page with action number
-            cmp.find('Actions').getElement().innerHTML += aPlayers.getId() +',';
+            cmp.getDef().getHelper().findAndAppendText(cmp, "Actions", aPlayers.getId() +",")
         });
 		aPlayers.setParams({
-			testName: (!_testName?'baseBall':_testName)
+			testName: (!_testName?"baseBall":_testName)
 		});
 		if(storeable)
 			aPlayers.setStoreable();
@@ -76,7 +76,7 @@
 	getTeamOnly:function(cmp,storeable){
 		this.setCounter(cmp,0);
 		var _testName = cmp._testName;
-		var a = cmp.get('c.getBaseball');
+		var a = cmp.get("c.getBaseball");
 		a.setCallback(cmp, function(action) {
 			var teamFacet = $A.newCmp(action.getReturnValue()[0]);
 			//Clear the old facet in team div
@@ -84,20 +84,20 @@
 			 //Insert newly fetched components
             cmp.find("Team").getValue("v.body").push(teamFacet);
             //Update the page with action number
-            cmp.find('Actions').getElement().innerHTML = a.getId();
+            cmp.getDef().getHelper().findAndSetText(cmp, "Actions", a.getId());
         });
 		a.setParams({
-			testName: (!_testName?'baseBall':_testName)
+			testName: (!_testName?"baseBall":_testName)
 		});
 		if(storeable)
 			a.setStoreable();
 		a.runAfter(a);
-		cmp.find('Actions').getElement().innerHTML = a.getId();
+		cmp.find("Actions").getElement().innerHTML = a.getId();
 	},
 	getPlayersOnly:function(cmp,storeable){
 		this.setCounter(cmp,1);
 		var _testName = cmp._testName;
-		var a = cmp.get('c.getBaseball');
+		var a = cmp.get("c.getBaseball");
 		a.setCallback(cmp, function(action) {
 			var ret = action.getReturnValue();
 			//Clear the old facet in players div
@@ -108,14 +108,20 @@
                 cmp.find("Players").getValue("v.body").push(playerFacet);
             }
             //Update the page with action number
-            cmp.find('Actions').getElement().innerHTML = a.getId();
+            cmp.getDef().getHelper().findAndSetText(cmp, "Actions", a.getId());
         });
 		a.setParams({
-			testName: (!_testName?'baseBall':_testName)
+			testName: (!_testName?"baseBall":_testName)
 		});
 		if(storeable)
 			a.setStoreable();
 		a.runAfter(a);
-		cmp.find('Actions').getElement().innerHTML = a.getId();
+		cmp.getDef().getHelper().findAndSetText(cmp, "Actions", a.getId());
+	},
+	findAndSetText:function(cmp, targetCmpId, msg){
+		cmp.find(targetCmpId).getElement().innerHTML = msg;
+	},
+	findAndAppendText:function(cmp, targetCmpId, msg){
+		cmp.find(targetCmpId).getElement().innerHTML += msg;
 	}
 })

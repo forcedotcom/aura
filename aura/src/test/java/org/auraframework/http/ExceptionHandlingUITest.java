@@ -27,7 +27,6 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
-import org.junit.Ignore;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -63,13 +62,45 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         return String.format("/%s/%s.app", add.getNamespace(), add.getName());
     }
 
+    /**
+    * Due to duplicate div#auraErrorMessage on exceptions from server rendering, use different CSS selector to check
+    * exception message.
+    * W-1308475 - Never'd removal/change of duplicate div#auraErrorMessage
+    */
+    private void assertNoStacktraceServerRendering() throws Exception {
+        WebElement elem = findDomElement(By.cssSelector("div.auraForcedErrorBox div#auraErrorMessage"));
+        if (elem == null) {
+            fail("error message not found");
+        }
+        String actual = elem.getText().replaceAll("\\s+", " ");
+        assertEquals("Unable to process your request", actual);
+    }
+
     private void assertNoStacktrace() throws Exception {
         String actual = getQuickFixMessage().replaceAll("\\s+", " ");
         assertEquals("Unable to process your request", actual);
     }
 
+    /**
+     * Due to duplicate div#auraErrorMessage on exceptions from server rendering, use different CSS selector to check
+     * exception message.
+     * W-1308475 - Never'd removal/change of duplicate div#auraErrorMessage
+     */
+    private void assertStacktraceServerRendering(String messageStartsWith, String... causeStartsWith) throws Exception {
+        WebElement elem = findDomElement(By.cssSelector("div.auraForcedErrorBox div#auraErrorMessage"));
+        if (elem == null) {
+            fail("error message not found");
+        }
+        String actual = elem.getText().replaceAll("\\s+", " ");
+        assertStacktraceCommon(actual, messageStartsWith, causeStartsWith);
+    }
+
     private void assertStacktrace(String messageStartsWith, String... causeStartsWith) throws Exception {
         String actual = getQuickFixMessage().replaceAll("\\s+", " ");
+        assertStacktraceCommon(actual, messageStartsWith, causeStartsWith);
+    }
+
+    private void assertStacktraceCommon(String actual, String messageStartsWith, String... causeStartsWith) throws Exception {
         if (!actual.contains(messageStartsWith)) {
             fail("unexpected error message - expected <" + messageStartsWith + "> but got <" + actual + ">");
         }
@@ -212,27 +243,31 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     /**
      * Generic error message displayed in PRODUCTION if component renderer throws.
      */
-    @Ignore("W-1308475: there is a dupe div#auraErrorMessage")
     public void testProdCmpRendererThrowsDuringRender() throws Exception {
         setProdConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(
                 "<aura:component renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestRendererThrowingException'></aura:component>",
                 ComponentDef.class);
         openNoAura(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
-        assertNoStacktrace();
+        assertNoStacktraceServerRendering();
     }
 
     /**
      * Stacktrace displayed in non-PRODUCTION if component renderer throws.
      */
-    @Ignore("W-1308475: there is a dupe div#auraErrorMessage")
     public void testCmpRendererThrowsDuringRender() throws Exception {
         setProdContextWithoutConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(
                 "<aura:component renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestRendererThrowingException'></aura:component>",
                 ComponentDef.class);
         openNoAura(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
-        assertStacktrace("org.auraframework.throwable.AuraExecutionException: org.auraframework.throwable.AuraExecutionException: org.auraframework.throwable.AuraExecutionException: org.auraframework.throwable.AuraExecutionException: org.auraframework.throwable.AuraExecutionException: org.auraframework.throwable.AuraExecutionException: java.lang.ArithmeticException at .(org.auraframework.renderer.ComponentRenderer)");
+        assertStacktraceServerRendering("org.auraframework.throwable.AuraExecutionException: org.auraframework."
+                + "renderer.ComponentRenderer: org.auraframework.throwable.AuraExecutionException: org.auraframework."
+                + "renderer.HtmlRenderer: org.auraframework.throwable.AuraExecutionException: org.auraframework."
+                + "renderer.HtmlRenderer: org.auraframework.throwable.AuraExecutionException: org.auraframework."
+                + "renderer.ExpressionRenderer: org.auraframework.throwable.AuraExecutionException: org.auraframework."
+                + "renderer.ComponentRenderer: org.auraframework.throwable.AuraExecutionException: org.auraframework."
+                + "impl.renderer.sampleJavaRenderers.TestRendererThrowingException: java.lang.ArithmeticException at");
     }
 
     /**

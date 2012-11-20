@@ -55,7 +55,7 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         String version = impl.getAuraVersion();
         if (!version.equals("development")) {
             assertTrue("Unexpected version format: " + version,
-                    version.matches("^\\d+\\.\\d+(.\\d+(-.*)?)?$"));
+                    version.matches("^\\d+\\.\\d+(\\.\\d+(_\\d+*)?(-.*)?)?$"));
         }
         assertTrue(impl.getBuildTimestamp() > 0);
     }

@@ -312,8 +312,13 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         wait.until(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                WebElement elem = findDomElement(By.cssSelector(".uiOutputText"));
-                return (elem != null) && "initial".equals(elem.getText());
+                //Wait for Page to be Aura ready after page refresh and only then assert the text on page
+                if(isAuraFrameworkReady()){
+                    WebElement elem = findDomElement(By.cssSelector(".uiOutputText"));
+                    return (elem != null) && "initial".equals(elem.getText());
+                }else{
+                    return false;
+                }
             }
         });
     }

@@ -38,6 +38,10 @@
 
         <li><b>Parallel design and development</b></li>
         <p>Building an app with components facilitates parallel design, improving overall development efficiency. Aura provides the basic constructs of inheritance, polymorphism, and encapsulation from classic object-oriented programming and applies them to presentation layer development. With Aura, you can extend a component or implement a component interface. Components are encapsulated and their internals stay private, while their public shape is visible to consumers of the component. This strong separation gives component authors freedom to change the internal implementation details and insulates component consumers from those changes.</p>
+
+        <li><b>Device-aware and cross browser compatibility</b></li>
+        <p>Apps built on the Aura framework are responsive and provides an enjoyable user experience. Aura supports the latest in browser technology such as HTML5 and CSS3, offline storage, and touch events.
+        </p>
     </ul>
     </p>
 <p><b>See also:</b><br/>

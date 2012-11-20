@@ -19,14 +19,37 @@
     <aura:set attribute="title" value="Which browsers does Aura support?"/>
 
 
-    <p>Aura supports the following browsers:
-    <ul>
-        <li>Google Chrome</li>
-        <li>Android Web Browser</li>
-        <li>Apple&reg; Safari&reg;</li>
-        <li>iOS Browser</li>
-        <li>Windows&reg; Internet Explorer&reg; version 9</li>
-    </ul>
-    </p>
-    <p>Unsupported browsers might not work correctly with Aura.</p>
+    <p>Aura supports  the most recent stable version of the following web browsers across major platforms, with exceptions noted:</p>
+       <table class="table table-bordered table-striped">
+          <thead>
+              <tr>
+                     <td><b>Browser</b></td>
+                     <td><b>Notes</b></td>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                     <td>Chrome</td>
+                     <td></td>
+              </tr>
+               <tr>
+                     <td>Android Browser</td>
+                     <td></td>
+              </tr>
+              <tr>
+                     <td>Safari 5+</td>
+                     <td>Mac OS X and iOS</td>
+              </tr>
+              <tr>
+                     <td>Firefox</td>
+                     <td></td>
+              </tr>
+              <tr>
+                     <td>Internet Explorer 9 &amp; 10</td>
+                     <td>Windows only</td>
+              </tr>
+          </tbody>
+       </table>
+
+    <p>We recommend enabling JavaScript and cookies in your web browsers to use the full functionality of Aura. Modern browsers can take advantage of Aura's HTML5 features and older ones default to available alternatives.</p>
 </aura:component>

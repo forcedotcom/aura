@@ -45,19 +45,19 @@
             <tr>
                 <td>Controller</td>
                 <td><code>sampleController.js</code></td>
-                <td>Contains client-side controller methods to handle events in the component.</td>
+                <td>Handles events in the component.</td>
                 <td><auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink></td>
             </tr>
             <tr>
                 <td>Renderer</td>
                 <td><code>sampleRenderer.js</code></td>
-                <td>Contains a client-side renderer to override default rendering for a component. </td>
+                <td>Overrides the default rendering method for a component. </td>
                 <td><auradocs:topicLink topic="renderers">Renderers</auradocs:topicLink></td>
             </tr>
             <tr>
                 <td>Helper</td>
                 <td><code>sampleHelper.js</code></td>
-                <td>Contains helper methods that are shared by the controller and renderer.</td>
+                <td>Provides helper methods that are shared by the controller and renderer.</td>
                 <td><auradocs:topicLink topic="helper">Helpers</auradocs:topicLink></td>
             </tr>
             <!--Irrelevant at this point <tr>

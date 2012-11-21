@@ -31,7 +31,7 @@
 
     <h2>CSS in Components</h2>
 
-    <p>To add CSS to a component, add a new file to the component bundle called <code>&lt;componentName&gt;.css</code>.  Aura automatically picks up this new resource and auto-wires it when the component is used in a page.</p>
+    <p>To add CSS to a component, add a new file to the component bundle called <code>&lt;componentName&gt;.css</code>.  Aura automatically picks up this new resource and auto-wires it when the component is used in a page. For external CSS resources, see <auradocs:topicLink topic="createAppTemplate">Creating App Templates</auradocs:topicLink>.</p>
 
     <p>All top-level elements in a component have a special <code>THIS</code> CSS class added to them. This, effectively, adds namespacing to CSS and helps prevent one component's CSS from blowing away another component's styling. Aura throws an error if a CSS file doesn't follow this convention.</p>
 

@@ -17,12 +17,11 @@ package org.auraframework.components.ui;
 
 import java.util.List;
 
+import org.auraframework.test.WebDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
-
-import org.auraframework.test.WebDriverTestCase;
 
 public class InputMultiSelectUITest extends WebDriverTestCase {
     private final String URL = "/uitest/inputMultiSelectTest.cmp";
@@ -74,14 +73,19 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
 
     private void verifyOptionSelectDeselct(String optionLabel, boolean isSelected) {
         List<WebElement> options = inputSelect.getOptions();
+        Boolean found = false;
         for (WebElement option : options) {
             if (optionLabel.equals(option.getText())) {
+                found = true;
                 if (isSelected) {
                     assertTrue("Option '" + optionLabel + "' should be selected", option.isSelected());
                 } else {
                     assertFalse("Option '" + optionLabel + "' should be deselected", option.isSelected());
                 }
             }
+        }
+        if (!found && isSelected) {
+            fail("Option '" + optionLabel + "' is not found in list");
         }
     }
 
@@ -179,27 +183,6 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
         verifyOptionDeselected("Option3");
     }
 
-    /**
-     * Load multi picklist with invalid value given. Load pick list when there
-     * is a value give that is not in the select options.Invalid value is added
-     * to picklist.
-     * Initial load. Initially load multi picklist.
-     */
-    public void testInputSelectMultipleWithInvalidOption() throws Exception {
-        openTestPage();
-        verifyOptionDeselected("Option1");
-        verifyOptionDeselected("Option2");
-        verifyOptionDeselected("Option3");
-        verifyOptionSelected("Model");
-
-        submit.click();
-        waitForElementTextPresent(output, "");
-        verifyOptionDeselected("Option1");
-        verifyOptionDeselected("Option2");
-        verifyOptionDeselected("Option3");
-        verifyOptionSelected("Model");
-    }
-    
     private void focusSelectElement() {
         // Only for IE10 we need to explicitly bring focus on to select input
     	// selectBy() does not do it. But clicking on select element corrupts

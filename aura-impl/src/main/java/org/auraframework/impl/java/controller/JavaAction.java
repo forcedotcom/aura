@@ -26,7 +26,6 @@ import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.*;
-
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -71,6 +70,9 @@ public class JavaAction implements Action {
                 return null;
             } catch (IllegalArgumentException iae) {
                 addException(new AuraUnhandledException("Invalid value for "+valueDef, iae), State.ERROR, false, false);
+                return null;
+            } catch (AuraHandledException lhe) { 
+                addException(lhe, State.ABORTED, false, false);
                 return null;
             } catch (Exception e) {
                 addException(new AuraUnhandledException("Error on parameter "+valueDef, e), State.ABORTED, false, false);

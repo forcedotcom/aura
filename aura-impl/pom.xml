@@ -47,7 +47,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.auraframework.external</groupId>
+            <groupId>com.google</groupId>
             <artifactId>closure-stylesheets</artifactId>
         </dependency>
         <dependency>

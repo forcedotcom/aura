@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.google</groupId>
+  <artifactId>closure-stylesheets</artifactId>
+  <versioning>
+    <release>20121026</release>
+    <versions>
+      <version>20120321</version>
+      <version>20121026</version>
+    </versions>
+    <lastUpdated>20121115000805</lastUpdated>
+  </versioning>
+</metadata>

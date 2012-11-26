@@ -1,0 +1,64 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Client-Side Providers"/>
+
+    <p>A provider enables you to use an abstract component or an interface in markup. The framework uses the provider to determine the concrete component to use at runtime.</p>
+    
+    <p><auradocs:topicLink topic="oodProviders">Server-side providers</auradocs:topicLink> are more common, but if you don't need to access the server when you're creating a component, you can use a client-side provider instead.</p>
+
+	<auradocs:warning>The framework behavior is undefined if you add a client-side provider for a component that also has a server-side renderer. Only user a server-side or a client-side provider.</auradocs:warning>
+	
+	<h2>Creating a Provider</h2>
+	
+	<p>A client-side provider is part of the component bundle and must follow the naming convention, <code>&lt;componentName&gt;Provider.js.</code></p> 
+	
+	<p>A client-side provider file is a simple JavaScript object that defines the <code>provide</code> function. For example, this provider returns a string that defines the topic to display.</p>
+	
+	<!-- not mentioning optional localCreation parameter until add more doc about local cmp creation -->
+<auradocs:codeblock>({
+    provide : function (cmp) {
+        var topic = cmp.get('v.topic');
+        return 'markup://auradocs:' + topic + 'Topic';
+    }
+})
+</auradocs:codeblock>
+
+<p>Instead of a string, a provider can return a JSON object.</p>
+
+<auradocs:codeblock>({
+    provide : function (cmp) {
+        var topic = cmp.get('v.topic');
+        return {
+            attributes: {
+                "topic": 'markup://auradocs:' + topic + 'Topic',
+                "type": "task"
+            }
+        }
+    }
+})
+</auradocs:codeblock>
+	
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="oodCmpAbstract">Abstract Components</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="oodInterfaces">Interfaces</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="compBundle">Component Bundles</auradocs:topicLink>
+    </p>
+
+</aura:component>

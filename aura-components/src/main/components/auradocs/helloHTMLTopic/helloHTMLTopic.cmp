@@ -22,7 +22,7 @@
 
     <h2>HTML in Components</h2>
 
-    <p>Use HTML in components like you would in a standard HTML file. You can also use HTML attributes and DOM events, such as <code>onclick</code>.
+    <p>You can add HTML markup in components. Note that you must use strict <a href="http://www.w3.org/TR/xhtml1/" target="_blank">XHTML</a>. For example, use <code>&lt;br/&gt;</code> instead of <code>&lt;br&gt;</code>. You can also use HTML attributes and DOM events, such as <code>onclick</code>.
     </p>
 
     <auradocs:warning>Note: Aura disallows a few HTML tags deemed to be unsafe or unnecessary, like <code>&lt;applet&gt;</code> and <code>&lt;font&gt;</code>.  For a full list of supported tags, see <auradocs:topicLink topic="htmlTags">Supported HTML Tags</auradocs:topicLink>.</auradocs:warning>

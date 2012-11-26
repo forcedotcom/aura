@@ -19,7 +19,11 @@
 
     <aura:set attribute="title" value="Providers"/>
 
-    <p>A provider enables you to use an abstract component or an interface in markup by using an Inversion of Control pattern. Aura uses the provider to determine the concrete component to use at runtime. Set the <code>provider</code> system attribute in the <code>&lt;aura:component&gt;</code> tag of an abstract component or interface to point to the provider Java class.</p>
+    <p>A provider enables you to use an abstract component or an interface in markup. The framework uses the provider to determine the concrete component to use at runtime.</p>
+    
+    <p>Server-side providers are more common, but if you don't need to access the server when you're creating a component, you can use a <auradocs:topicLink topic="providersClientSide">client-side provider</auradocs:topicLink> instead.</p>
+        
+    <p>Set the <code>provider</code> system attribute in the <code>&lt;aura:component&gt;</code> tag of an abstract component or interface to point to the server-side provider Java class.</p>
 
     <p>The syntax of the <code>provider</code> system attribute is <code>provider="java://package.class"</code> where <code>package.class</code> is the fully qualified name for the class.</p>
 
@@ -81,7 +85,6 @@ public class SampleConfigProvider implements ComponentConfigProvider {
         <auradocs:topicLink topic="oodCmpAbstract">Abstract Components</auradocs:topicLink><br/>
         <auradocs:topicLink topic="oodInterfaces">Interfaces</auradocs:topicLink><br/>
         <auradocs:topicLink topic="javaDefDesc">Getting a DefDescriptor</auradocs:topicLink>
-
     </p>
 
 </aura:component>

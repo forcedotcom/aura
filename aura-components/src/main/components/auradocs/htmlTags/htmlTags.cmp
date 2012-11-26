@@ -18,8 +18,11 @@
 <aura:component model="java://org.auraframework.docs.HtmlTagsModel">
 
     <p>HTML tags are implemented as Aura components. The majority of HTML5 tags are supported.</p>
+    
+    <p>Note that you must use strict <a href="http://www.w3.org/TR/xhtml1/" target="_blank">XHTML</a>. For example, use <code>&lt;br/&gt;</code> instead of <code>&lt;br&gt;</code>.</p>
+    
     <dl>
-        <dt>Aura supports these HTML Tags:</dt>
+        <dt>Aura supports these HTML tags:</dt>
         <dd>
             <ul>
                 <aura:forEach items="{!m.allowedTags}" var="tag">
@@ -30,7 +33,7 @@
     </dl>
     <br/>
     <dl>
-        <dt>These HTML Tags are not supported:</dt>
+        <dt>These HTML tags are not supported:</dt>
         <dd>
             <ul>
                 <aura:forEach items="{!m.disallowedTags}" var="tag">

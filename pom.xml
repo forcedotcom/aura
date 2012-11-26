@@ -112,7 +112,9 @@
         <module>aura-resources</module>
         <module>aura-jetty</module>
         <module>aura-integration-test</module>
-        <module>aura-archetype</module>
+        <!-- Jenkins doesn't like archetype 2.2
+           <module>aura-archetype</module>
+        -->
     </modules>
     <scm>
         <connection>scm:git:git@github.com:forcedotcom/lumen-beta.git</connection>

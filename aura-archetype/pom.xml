@@ -4,14 +4,14 @@
   <artifactId>simple-aura-archetype</artifactId>
   <packaging>maven-archetype</packaging>
   <name>simple-aura-archetype</name>
-
+<!-- Not a parent until Jenkins can work with archetypes 
   <parent>
     <groupId>org.auraframework</groupId>
     <artifactId>aura-framework</artifactId>
     <version>0.0.377-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-
+-->
   <dependencies>
     <dependency>
       <groupId>org.auraframework</groupId>

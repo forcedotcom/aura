@@ -41,4 +41,6 @@ public interface ApplicationDef extends BaseComponentDef {
 
     Boolean isAppcacheEnabled() throws QuickFixException;
 
+    Boolean isOnePageApp() throws QuickFixException;
+    
 }

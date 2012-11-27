@@ -284,6 +284,22 @@ public abstract class AuraBaseServlet extends HttpServlet {
         }
     }
 
+    public static boolean shouldCacheHTMLTemplate(HttpServletRequest request){
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        try {
+            DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getApplicationDescriptor();
+            if(appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)){
+                Boolean isOnePageApp = ((ApplicationDef)appDefDesc.getDef()).isOnePageApp();
+                if(isOnePageApp != null){
+                	return isOnePageApp.booleanValue();
+                }
+            }
+        } catch (QuickFixException e) {
+            throw new AuraRuntimeException(e);
+        }
+        return !isManifestEnabled(request);
+    }    
+    
     public static boolean isManifestEnabled(HttpServletRequest request){
         if(!Aura.getConfigAdapter().isClientAppcacheEnabled()){
             return false;

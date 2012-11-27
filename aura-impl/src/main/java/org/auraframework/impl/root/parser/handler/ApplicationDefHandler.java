@@ -54,7 +54,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     private static final String ATTRIBUTE_ACCESS = "access";
     private static final String ATTRIBUTE_SECURITY_PROVIDER = "securityProvider";
     private static final String ATTRIBUTE_APPCACHE_ENABLED = "useAppcache";
-
+    private static final String ATTRIBUTE_IS_ONE_PAGE_APP = "isOnePageApp";
 
     private final static Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
     .add(ATTRIBUTE_PRELOAD,
@@ -63,7 +63,8 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
          ATTRIBUTE_PRELOAD,
          ATTRIBUTE_ACCESS,
          ATTRIBUTE_SECURITY_PROVIDER,
-         ATTRIBUTE_APPCACHE_ENABLED)
+         ATTRIBUTE_APPCACHE_ENABLED,
+         ATTRIBUTE_IS_ONE_PAGE_APP)
     .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES)
     .build();
 

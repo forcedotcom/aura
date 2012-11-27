@@ -59,6 +59,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     private final DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
 
     private Boolean isAppcacheEnabled;
+    private Boolean isOnePageApp;
 
     protected ApplicationDefImpl(Builder builder) {
         super(builder);
@@ -75,6 +76,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         }
         this.securityProviderDescriptor = builder.securityProviderDescriptor;
         this.isAppcacheEnabled = builder.isAppcacheEnabled;
+        this.isOnePageApp = builder.isOnePageApp;
     }
 
     public static class Builder extends BaseComponentDefImpl.Builder<ApplicationDef> implements ApplicationDefBuilder {
@@ -84,6 +86,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         public Set<String> preloads;
         public String access;
         public Boolean isAppcacheEnabled;
+        public Boolean isOnePageApp;
         public DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
 
 
@@ -212,6 +215,11 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         return this.isAppcacheEnabled;
     }
 
+    @Override
+    public Boolean isOnePageApp() throws QuickFixException{
+        return this.isOnePageApp;
+    }    
+    
     @Override
     public void validateReferences() throws QuickFixException {
         super.validateReferences();

@@ -277,11 +277,10 @@ public class AuraServlet extends AuraBaseServlet {
         response.setCharacterEncoding(UTF_ENCODING);
 
         try {
-            if(isManifestEnabled(request)){
-                // TBD: FIND A BETTER WAY...
-                setNoCache(response);
-            } else {
+            if(shouldCacheHTMLTemplate(request)){
                 setLongCache(response);
+            } else {
+                setNoCache(response);
             }
             loggingService.startTimer(LoggingService.TIMER_SERIALIZATION);
             loggingService.startTimer(LoggingService.TIMER_SERIALIZATION_AURA);

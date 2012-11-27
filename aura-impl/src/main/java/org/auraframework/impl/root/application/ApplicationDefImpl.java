@@ -22,7 +22,11 @@ import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ApplicationDefBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.LayoutsDef;
+import org.auraframework.def.SecurityProviderDef;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -55,6 +59,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     private final DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
 
     private Boolean isAppcacheEnabled;
+    private Boolean isOnePageApp;
 
     protected ApplicationDefImpl(Builder builder) {
         super(builder);
@@ -71,6 +76,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         }
         this.securityProviderDescriptor = builder.securityProviderDescriptor;
         this.isAppcacheEnabled = builder.isAppcacheEnabled;
+        this.isOnePageApp = builder.isOnePageApp;
     }
 
     public static class Builder extends BaseComponentDefImpl.Builder<ApplicationDef> implements ApplicationDefBuilder {
@@ -80,6 +86,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         public Set<String> preloads;
         public String access;
         public Boolean isAppcacheEnabled;
+        public Boolean isOnePageApp;
         public DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
 
 
@@ -208,6 +215,11 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         return this.isAppcacheEnabled;
     }
 
+    @Override
+    public Boolean isOnePageApp() throws QuickFixException{
+        return this.isOnePageApp;
+    }    
+    
     @Override
     public void validateReferences() throws QuickFixException {
         super.validateReferences();

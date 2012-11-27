@@ -284,4 +284,26 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         }
 
     }
+    /**
+     * Verify the isOnePageApp() API on ApplicationDef 
+     * Applications who have the isOnePageApp attribute set, will have the template cached.
+     * @throws Exception
+     */
+    public void testIsOnePageApp()throws Exception{
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(String.format(baseTag, "isOnePageApp='true'", "")
+                , ApplicationDef.class);
+        ApplicationDef onePageApp = Aura.getDefinitionService().getDefinition(desc);
+        assertEquals(Boolean.TRUE, onePageApp.isOnePageApp());
+        
+        desc = addSourceAutoCleanup(String.format(baseTag, "isOnePageApp='false'","")
+                , ApplicationDef.class);
+        ApplicationDef nonOnePageApp = Aura.getDefinitionService().getDefinition(desc);
+        assertEquals(Boolean.FALSE, nonOnePageApp.isOnePageApp());
+        
+        //By default an application is not a onePageApp
+        desc = addSourceAutoCleanup(String.format(baseTag, "", ""), ApplicationDef.class);
+        ApplicationDef simpleApp = Aura.getDefinitionService().getDefinition(desc);
+        assertEquals(Boolean.FALSE, simpleApp.isOnePageApp());
+        
+    }
 }

@@ -46,6 +46,7 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.FreshBrowserInstance;
@@ -63,7 +64,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.ScreenshotException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.auraframework.impl.source.StringSourceLoader;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
@@ -479,11 +479,11 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     
     /**
      * Return the default Aura Mode based on the browser type. IPAD and Android browsers return
-     * {@link org.auraframework.system.AuraContext.Mode#PTEST} in order to disable fast click.
+     * {@link org.auraframework.system.AuraContext.Mode#CADENCE} in order to disable fast click.
      */
     protected Mode getAuraModeForCurrentBrowser(){
     	if(browsersForPtestMode.contains(currentBrowserType)){
-    		return Mode.PTEST;
+    		return Mode.CADENCE;
         } else {
     		return Mode.SELENIUM;
     	}

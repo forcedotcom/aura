@@ -16,14 +16,18 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamReader;
 
-import com.google.common.collect.*;
-
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.LayoutsDef;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Component;
@@ -33,6 +37,10 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  */
@@ -127,6 +135,12 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         String isAppcacheEnabled = getAttributeValue(ATTRIBUTE_APPCACHE_ENABLED);
         if(!AuraTextUtil.isNullEmptyOrWhitespace(isAppcacheEnabled)){
             appBuilder.isAppcacheEnabled = Boolean.parseBoolean(isAppcacheEnabled);
+        }
+        String isOnePageApp = getAttributeValue(ATTRIBUTE_IS_ONE_PAGE_APP);
+        if(!AuraTextUtil.isNullEmptyOrWhitespace(isOnePageApp)){
+            appBuilder.isOnePageApp = Boolean.parseBoolean(isOnePageApp);
+        }else{
+            appBuilder.isOnePageApp = false;
         }
     }
 

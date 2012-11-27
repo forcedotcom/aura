@@ -128,6 +128,7 @@
                 <auradocs:contentsNode text="Introduction" id="codeJavaIntro" />
                 <auradocs:contentsNode text="Models" id="models" />
                 <auradocs:contentsNode text="Server-Side Controllers" id="serverSideControllers" />
+                <auradocs:contentsNode text="Server-Side Renderers" id="renderersServerSide" />
                 <auradocs:contentsNode text="Java Cookbook">
                     <auradocs:contentsNode text="Introduction" id="javaCookbook" />
                     <auradocs:contentsNode text="Getting a DefDescriptor" id="javaDefDesc" />

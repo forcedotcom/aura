@@ -75,6 +75,6 @@
         </tbody>
     </table>
 
-    <p>All files in the component bundle must follow the naming convention as described in the table to enable auto-wiring of the resource files to the components. For example, a renderer file must be named <code>&lt;componentName&gt;Renderer.js</code> and so on.</p>
+    <p>All resources in the component bundle are auto-wired if you follow the naming conventions in the table. For example, a renderer file at <code>&lt;componentName&gt;Renderer.js</code> is auto-wired.</p>
 
 </aura:component>

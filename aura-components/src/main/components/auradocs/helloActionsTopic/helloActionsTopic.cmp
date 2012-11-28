@@ -19,12 +19,25 @@
 
     <aura:set attribute="title" value="Client-Side Controllers"/>
 
-    <p>It's time to look in the component bundle again.  <code>aura-components/components/helloActions/</code> contains a file called <code>helloActionsController.js</code>.  Through the benevolence of auto-wiring, just by virtue of having a file named <code>&lt;component&gt;Controller.js</code> in the component bundle, we have added a client-side controller to this component.  As the file extension suggests, this controller is a JavaScript file containing all the component's actions, which are used to handle events within the component.</p>
+    <p>A client-side controller is a JavaScript file containing all the component's actions, which are used to handle events within the component.</p>
 
-    <p>The syntax of a client-side controller file is just a simple JavaScript object that defines action functions.  Each action function takes in two parameters: the component to which the controller belongs, and the event that the action is handling.</p>
+    <p>The syntax of a client-side controller file is just a simple JavaScript object that defines action functions. Each action function takes in two parameters: the component to which the controller belongs, and the event that the action is handling.</p>
 
-    <p>The contents of an action can be any valid JavaScript.  There's nothing stopping you from writing <code>alert()</code> statements here except the ridicule of your peers.  However, it's typically more useful to actually change something about the UI, so let's see how we might go about that.</p>
+    <p>The contents of an action can be any valid JavaScript.  There's nothing stopping you from writing <code>alert()</code> statements here except the ridicule of your peers.  However, it's typically more useful to actually update the UI.</p>
 
+    <h2>Creating a Client-Side Controller </h2>
+    
+    <p>A client-side controller file is part of the component bundle and is auto-wired if you follow the naming convention, <code>&lt;componentName&gt;Controller.js</code>.</p>
+
+    <p>To reuse a client-side controller from another component, you can use the <code>controller</code> system attribute in <code>aura:component</code> instead. For example, this component uses the auto-wired client-side controller for <code>auradocs.sampleComponent</code> in <code>auradocs/sampleComponent/sampleComponentController.js</code>.</p> 
+    
+<auradocs:codeblock><![CDATA[
+<aura:component 
+    controller="js://auradocs.sampleComponent">
+    ... 
+</aura:component>]]>
+</auradocs:codeblock>     
+    
     <h2>Calling Client-Side Controller Actions</h2>
 
     <p>Let's start by looking at events on an HTML tag.  You can see the contents of <code>helloActions.cmp</code> in the <b>Component source</b> tab.</p>

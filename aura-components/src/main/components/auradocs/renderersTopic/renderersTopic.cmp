@@ -36,9 +36,22 @@
 
     <h2>Base Component Rendering</h2>
 
-    <p>The base component in Aura is <code>aura:component</code>. Every component extends this base component. Aura looks for a renderer in each component bundle at <code>&lt;componentName&gt;Renderer.js</code>, where <code>&lt;componentName&gt;</code> is the name of the component. For example, the renderer for <code>sample.cmp</code> would be in <code>sampleRenderer.js</code>. You don't normally have to write your own rendering functions, but if you want to customize rendering behavior, you can create a client-side renderer in a component bundle.</p>
+    <p>The base component in Aura is <code>aura:component</code>. Every component extends this base component.</p>
 
     <p>The renderer for <code>aura:component</code> is in <code>componentRenderer.js</code>. This renderer has base implementations for the <code>render()</code>, <code>rerender()</code>, <code>afterRender()</code>, and <code>unrender()</code> functions. The framework calls these functions as part of the rendering lifecycle. We will learn more about them in this topic. You can override the base rendering functions in a custom renderer.</p>
+
+    <h2>Creating a Renderer</h2>
+    
+    <p>You don't normally have to write a custom renderer, but if you want to customize rendering behavior, you can create a client-side renderer in a component bundle. A renderer file is part of the component bundle and is auto-wired if you follow the naming convention, <code>&lt;componentName&gt;Renderer.js</code>. For example, the renderer for <code>sample.cmp</code> would be in <code>sampleRenderer.js</code>.</p>
+    
+    <p>To reuse a renderer from another component, you can use the <code>renderer</code> system attribute in <code>aura:component</code> instead. For example, this component uses the auto-wired renderer for <code>auradocs.sampleComponent</code> in <code>auradocs/sampleComponent/sampleComponentRenderer.js</code>.</p> 
+    
+<auradocs:codeblock><![CDATA[
+<aura:component 
+    renderer="js://auradocs.sampleComponent">
+    ... 
+</aura:component>]]>
+</auradocs:codeblock>    
     
     <h2>Customizing Component Rendering</h2>
 

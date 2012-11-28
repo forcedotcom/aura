@@ -157,7 +157,7 @@ public class InputTextUITest extends WebDriverTestCase {
         a.doubleClick(input).build().perform();
         value = assertModelValue(eventName);
 }
-    //@ExcludeBrowsers({BrowserType.IPAD,BrowserType.ANDROID_PHONE,BrowserType.ANDROID_TABLET,BrowserType.IPHONE})
+    @ExcludeBrowsers({BrowserType.IPAD,BrowserType.ANDROID_PHONE,BrowserType.ANDROID_TABLET,BrowserType.IPHONE})
     //Issue with ipad Webdriver API ignores maxlength HTML5 attribute
     //http://code.google.com/p/selenium/issues/detail?id=4830
     public void testMaxLength() throws Exception{

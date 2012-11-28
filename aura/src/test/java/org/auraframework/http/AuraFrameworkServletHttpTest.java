@@ -25,7 +25,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.auraframework.test.AuraHttpTestCase;
-import org.junit.Ignore;
 
 /**
  * Automation to verify the implementation of AuraFrameworkServlet. AuraFrameworkServlet responds to requests of
@@ -197,8 +196,8 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     /**
      * Verify that AuraFrameworkServlet responds successfully to valid request for a javascript resource.
      */
-    @Ignore("W-1402893 - Until we predictable get the nonce (lastmod) in the path at auraFW, we will always return LONG_EXPIRES for javascript")
-    public void testRequestJavascriptResourceShortExpire() throws Exception {
+    //"W-1402893 - Until we predictable get the nonce (lastmod) in the path at auraFW, we will always return LONG_EXPIRES for javascript"
+    public void testRequestJavascriptResourceLongExpire() throws Exception {
         GetMethod get = obtainGetMethod(sampleJavascriptResourcePath);
         int statusCode = getHttpClient().executeMethod(get);
         assertEquals("AuraResourceServlet failed to fetch a valid resource request.", HttpStatus.SC_OK, statusCode);
@@ -213,6 +212,6 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         long expirationMillis = ((df.parse(get.getResponseHeader(HttpHeaders.EXPIRES).getValue()).getTime() + 5000) - currentDate
                 .getTime());
         assertTrue("AuraFrameworkServlet is not setting the right value for expires header.",
-                ApproximatelyEqual(expirationMillis, AuraBaseServlet.SHORT_EXPIRE, timeWindowExpiry));
+                ApproximatelyEqual(expirationMillis, AuraBaseServlet.LONG_EXPIRE, timeWindowExpiry));
     }
 }

@@ -20,7 +20,6 @@ import java.util.Date;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.source.StringSourceLoader;
-import org.auraframework.instance.Component;
 import org.auraframework.throwable.MissingRequiredAttributeException;
 
 public class ForEachDefTest extends DefinitionTest<ComponentDef> {

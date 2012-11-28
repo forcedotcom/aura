@@ -27,10 +27,7 @@ import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraError;
-import org.auraframework.throwable.AuraException;
-import org.auraframework.throwable.AuraExceptionUtil;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.AuraValidationException;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.resource.ResourceLoader;
 

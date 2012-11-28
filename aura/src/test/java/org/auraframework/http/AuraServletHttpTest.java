@@ -28,6 +28,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -272,5 +273,25 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertTrue("Expires header in response should be set to a date in the past.", 
                 expires.compareTo(expected)<0);
         
+    }
+    
+    /**
+     * Verify the Script tag to fetch the Aura Framework JS has nonce.
+     * The initial get request for an application gets a template as response.
+     * Part of the template response should be a script tag which fetches the Aura FW JS.
+     * The URL for the js file should have nonce indicating the last mod of the JS group. 
+     * @throws Exception
+     */
+    public void testJSFrameworkUrlHasNonce() throws Exception{
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup("<aura:application render='client'></aura:application>", 
+                ApplicationDef.class);
+        GetMethod get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
+        getHttpClient().executeMethod(get); 
+        assertEquals(HttpStatus.SC_OK, get.getStatusCode());
+        //Fetch the latest timestamp of the JS group and construct URL for DEV mode.
+        String expectedFWUrl = String.format("/auraFW/javascript/%d/aura_dev.js", Aura.getConfigAdapter().getAuraJSLastMod());
+        String scriptTag = "<script src=\"%s\" ></script>";
+        assertTrue("Expected Aura FW Script tag not found. Expected to see: "+String.format(scriptTag,expectedFWUrl), 
+                get.getResponseBodyAsString().contains(String.format(scriptTag,expectedFWUrl))) ;
     }
 }

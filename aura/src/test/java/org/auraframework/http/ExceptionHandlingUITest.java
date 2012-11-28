@@ -68,7 +68,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     * W-1308475 - Never'd removal/change of duplicate div#auraErrorMessage
     */
     private void assertNoStacktraceServerRendering() throws Exception {
-        WebElement elem = findDomElement(By.cssSelector("div.auraForcedErrorBox div#auraErrorMessage"));
+    	WebElement elem = findDomElement(By.xpath("//div[@class='auraMsgMask auraForcedErrorBox']//div[@id='auraErrorMessage']"));
         if (elem == null) {
             fail("error message not found");
         }
@@ -87,14 +87,14 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
      * W-1308475 - Never'd removal/change of duplicate div#auraErrorMessage
      */
     private void assertStacktraceServerRendering(String messageStartsWith, String... causeStartsWith) throws Exception {
-        WebElement elem = findDomElement(By.cssSelector("div.auraForcedErrorBox div#auraErrorMessage"));
+        WebElement elem = findDomElement(By.xpath("//div[@class='auraMsgMask auraForcedErrorBox']//div[@id='auraErrorMessage']"));
         if (elem == null) {
             fail("error message not found");
         }
         String actual = elem.getText().replaceAll("\\s+", " ");
         assertStacktraceCommon(actual, messageStartsWith, causeStartsWith);
     }
-
+  
     private void assertStacktrace(String messageStartsWith, String... causeStartsWith) throws Exception {
         String actual = getQuickFixMessage().replaceAll("\\s+", " ");
         assertStacktraceCommon(actual, messageStartsWith, causeStartsWith);

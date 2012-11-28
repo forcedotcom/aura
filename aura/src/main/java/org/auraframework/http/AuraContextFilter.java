@@ -103,7 +103,13 @@ public class AuraContextFilter implements Filter {
             System.setProperty("aura.componentDir", componentDir);
         }
         AuraContext context = Aura.getContextService().startContext(m, f, a, appDesc);
-        context.setContextPath(request.getContextPath());
+
+        String contextPath = request.getContextPath();
+        // some appservers (like tomcat) use "/" as the root path, others ""
+        if ("/".equals(contextPath)) {
+            contextPath = "";
+        }
+        context.setContextPath(contextPath);
         context.setNum(num.get(request));
         context.setRequestedLocales(Collections.list(request.getLocales()));
         context.setClient(new Client(request.getHeader("User-Agent")));

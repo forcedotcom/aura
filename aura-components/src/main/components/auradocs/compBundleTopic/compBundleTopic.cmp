@@ -39,33 +39,33 @@
             <tr>
                 <td>CSS Styles</td>
                 <td><code>sample.css</code></td>
-                <td>Contains styles for the component. </td>
+                <td>Styles for the component. </td>
                 <td><auradocs:topicLink topic="helloHTML">Applying CSS</auradocs:topicLink></td>
             </tr>
             <tr>
                 <td>Controller</td>
                 <td><code>sampleController.js</code></td>
-                <td>Handles events in the component.</td>
+                <td>Client-side controller methods to handle events in the component.</td>
                 <td><auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink></td>
             </tr>
             <tr>
                 <td>Renderer</td>
                 <td><code>sampleRenderer.js</code></td>
-                <td>Overrides the default rendering method for a component. </td>
+                <td>Client-side renderer to override default rendering for a component. </td>
                 <td><auradocs:topicLink topic="renderers">Renderers</auradocs:topicLink></td>
             </tr>
             <tr>
                 <td>Helper</td>
                 <td><code>sampleHelper.js</code></td>
-                <td>Provides helper methods that are shared by the controller and renderer.</td>
+                <td>Helper methods that are shared by the controller and renderer.</td>
                 <td><auradocs:topicLink topic="helper">Helpers</auradocs:topicLink></td>
             </tr>
-            <!--Irrelevant at this point <tr>
+            <tr>
                 <td>Provider</td>
                 <td><code>sampleProvider.js</code></td>
-                <td>Contains a provider method that returns the concrete component to use at runtime.</td>
-                <td><auradocs:topicLink topic="oodProviders">Providers</auradocs:topicLink></td>
-            </tr>-->
+                <td>Client-side provider that returns the concrete component to use at runtime.</td>
+                <td><auradocs:topicLink topic="providersClientSide">Client-Side Providers</auradocs:topicLink></td>
+            </tr>
             <tr>
                 <td>Test Cases</td>
                 <td><code>sampleTest.js</code></td>
@@ -75,6 +75,6 @@
         </tbody>
     </table>
 
-    <p>All files in the component bundle must follow the naming convention as described in the table to enable auto-wiring of the resource files to the components. For example, a renderer file must be named <code>&lt;componentName&gt;Renderer.js</code> and so on.</p>
+    <p>All resources in the component bundle are auto-wired if you follow the naming conventions in the table. For example, a renderer file at <code>&lt;componentName&gt;Renderer.js</code> is auto-wired.</p>
 
 </aura:component>

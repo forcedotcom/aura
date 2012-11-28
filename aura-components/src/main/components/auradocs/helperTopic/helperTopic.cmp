@@ -17,9 +17,21 @@
 -->
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Helpers"/>
-    <p>A helper file contains JavaScript functions that can be called from a client-side controller or renderer for a component. The helper file is part of
-    the component bundle and should follow
-    the naming convention <code>&lt;componentName&gt;Helper.js</code>. Put functions that you want to reuse and call from a controller and renderer in the component's helper file.</p>
+    
+    <p>A helper file contains JavaScript functions that can be called from a client-side controller or renderer for a component. Put functions that you want to reuse and call from a controller and renderer in the component's helper file.</p>
+
+    <h2>Creating a Helper</h2>
+    
+    <p>A helper file is part of the component bundle and is auto-wired if you follow the naming convention, <code>&lt;componentName&gt;Helper.js</code>.</p>
+
+    <p>To reuse a helper from another component, you can use the <code>helper</code> system attribute in <code>aura:component</code> instead. For example, this component uses the auto-wired helper for <code>auradocs.sampleComponent</code> in <code>auradocs/sampleComponent/sampleComponentHelper.js</code>.</p> 
+    
+<auradocs:codeblock><![CDATA[
+<aura:component 
+    helper="js://auradocs.sampleComponent">
+    ... 
+</aura:component>]]>
+</auradocs:codeblock>    
 
     <h2>Using a Helper in a Renderer</h2>
 

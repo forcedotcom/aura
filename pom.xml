@@ -29,17 +29,6 @@
     </properties>
     <repositories>
         <repository>
-            <id>repo</id>
-            <releases>
-                <enabled>true</enabled>
-                <checksumPolicy>ignore</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <url>file://${aura.home}/repo</url>
-        </repository>
-        <repository>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>

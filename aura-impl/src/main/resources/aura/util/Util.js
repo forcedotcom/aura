@@ -68,7 +68,7 @@ Util.prototype.isArray = typeof Array.isArray === "function" ? Array.isArray : f
  * @returns {Boolean} True if the object is a valid object, or false otherwise.
  */
 Util.prototype.isObject = function(obj){
-    return !!obj && this.objToString.apply(obj) === '[object Object]';
+    return typeof obj === "object" && obj !== null && !this.isArray(obj);
 };
 
 /**

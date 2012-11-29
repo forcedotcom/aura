@@ -17,6 +17,7 @@ package org.auraframework.def;
 
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.Map;
 
 import org.auraframework.def.RootDefinition.SupportLevel;
 import org.auraframework.impl.source.StringSourceLoader;
@@ -93,29 +94,57 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
     /**
      * Test method for {@link RootDefinition#getDeclaredAttributeDefs()}.
      */
-    public void _testGetDeclaredAttributeDefs() {
-        fail("Not yet implemented");
+    public void testGetDeclaredAttributeDefs() throws Exception {
+        String att1 = "<aura:attribute name=\"att1\" type=\"String\"/>";
+        String att2 = "<aura:attribute name=\"att2\" type=\"String\"/>";
+        T def = define(baseTag, "", att1 + att2);
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attMap = def.getDeclaredAttributeDefs();
+
+        DefDescriptor<AttributeDef> att1DefDesc = def.getAttributeDef("att1").getDescriptor();
+        DefDescriptor<AttributeDef> att2DefDesc = def.getAttributeDef("att2").getDescriptor();
+
+        assertEquals("Wrong number of declared attributes found in component", 2, attMap.size());
+        assertEquals("First declared attribute not found", "att1", attMap.get(att1DefDesc).getName());
+        assertEquals("Second declared attribute not found", "att2", attMap.get(att2DefDesc).getName());
     }
 
     /**
      * Test method for {@link RootDefinition#getAttributeDefs()}.
      */
-    public void _testGetAttributeDefs() {
-        fail("Not yet implemented");
+    public void testGetAttributeDefs() throws Exception {
+        String att1 = "<aura:attribute name=\"att1\" type=\"String\"/>";
+        String att2 = "<aura:attribute name=\"att2\" type=\"String\"/>";
+        T def = define(baseTag, "", att1 + att2);
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attMap = def.getAttributeDefs();
+
+        // should inherit aura:component body attribute as well as added attributes
+        assertEquals("Wrong number of AttributeDefs", 3, attMap.size());
     }
 
     /**
      * Test method for {@link RootDefinition#getAttributeDef(java.lang.String)}.
      */
-    public void _testGetAttributeDef() {
-        fail("Not yet implemented");
+    public void testGetAttributeDef() throws Exception {
+        String att1 = "<aura:attribute name=\"att1\" type=\"String\"/>";
+        String att2 = "<aura:attribute name=\"att2\" type=\"String\"/>";
+        T def = define(baseTag, "", att1 + att2);
+
+        assertEquals("First attribute not found", "att1", def.getAttributeDef("att1").getName());
+        assertEquals("Second attribute not found", "att2", def.getAttributeDef("att2").getName());
     }
 
     /**
      * Test method for {@link RootDefinition#getRegisterEventDefs()}.
      */
-    public void _testGetRegisterEventDefs() {
-        fail("Not yet implemented");
+    public void testGetRegisterEventDefs() throws Exception{
+        String event1 = "<aura:registerEvent name=\"copy\" type=\"ui:copy\"/>";
+        String event2 = "<aura:registerEvent name=\"cut\" type=\"ui:cut\"/>";
+        T def = define(baseTag, "", event1+ event2);
+        Map<String, RegisterEventDef> events = def.getRegisterEventDefs();
+
+        assertEquals("Wrong number of EventDefRefs found", 2, events.size());
+        assertEquals("First event not found", "markup://ui:cut", events.get("cut").getDescriptor().getQualifiedName());
+        assertEquals("Second event not found", "markup://ui:copy", events.get("copy").getDescriptor().getQualifiedName());
     }
 
     public void testGetSupport() throws Exception {

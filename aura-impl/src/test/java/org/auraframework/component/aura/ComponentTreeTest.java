@@ -17,16 +17,14 @@ package org.auraframework.component.aura;
 
 import java.util.Map;
 
-import org.junit.Ignore;
-
-import org.openqa.selenium.JavascriptExecutor;
-
 import org.auraframework.Aura;
 import org.auraframework.def.*;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
-
 import org.auraframework.test.WebDriverTestCase;
+import org.junit.Ignore;
+import org.openqa.selenium.JavascriptExecutor;
 
 /**
  * This class has tests to verify the component tree constructed on the client based on information sent from
@@ -70,7 +68,11 @@ public class ComponentTreeTest extends WebDriverTestCase {
      */
     private <T extends Definition> void checkServerVsClient(String name, Class<T> type) throws Exception {
         DefDescriptor<T> dd = Aura.getDefinitionService().getDefDescriptor(name, type);
-        Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.HTML,
+        ContextService contextService = Aura.getContextService();
+        if (contextService.isEstablished()) {
+            contextService.endContext();
+        }
+        contextService.startContext(AuraContext.Mode.DEV, AuraContext.Format.HTML,
                                                AuraContext.Access.AUTHENTICATED);
         open(String.format("/%s/%s.%s", dd.getNamespace(), dd.getName(),
                            DefDescriptor.DefType.APPLICATION.equals(dd.getDefType()) ? "app" : "cmp"));
@@ -78,7 +80,7 @@ public class ComponentTreeTest extends WebDriverTestCase {
         String clientIndex = getEval("return window.aura.componentService.getIndex();");
         String [] clientlines = clientIndex.split("\n");
 
-        AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = contextService.getCurrentContext();
         context.setNum("1");
         Aura.getInstanceService().getInstance(dd.getQualifiedName(), dd.getDefType().getPrimaryInterface());
 

@@ -20,6 +20,11 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.*;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.auraframework.Aura;
 import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.def.*;
@@ -40,12 +45,6 @@ import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.util.AuraUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
-
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
 
 import com.google.common.collect.*;
 
@@ -84,11 +83,6 @@ public abstract class IntegrationTestCase extends AuraTestCase {
         }
 
         ServletConfigController.resetMocks();
-
-        ContextService contextService = Aura.getContextService();
-        if(contextService.isEstablished()){
-            contextService.endContext();
-        }
 
         super.tearDown();
     }

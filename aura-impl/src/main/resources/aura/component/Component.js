@@ -426,6 +426,25 @@ Component.prototype.isRendered = function() {
 };
 
 /**
+ * Returns true if this component has been rendered but not unrendered
+ * (does not necessarily mean component is in the dom tree).
+ * @protected
+ */
+Component.prototype.setUnrendering = function(unrendering) {
+    this.priv.inUnrender = unrendering;
+};
+
+
+/**
+ * Returns true if this component has been rendered but not unrendered
+ * (does not necessarily mean component is in the dom tree).
+ * @protected
+ */
+Component.prototype.isUnrendering = function() {
+    return this.priv.inUnrender;
+};
+
+/**
  * Sets the rendered flag.
  * @param {Boolean} rendered Set to true if component is rendered, or false otherwise.
  * @protected

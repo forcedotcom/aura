@@ -37,14 +37,14 @@
     },
 
     /* unchecked -> checked checkbox */
-    // https://gus.soma.salesforce.com/a07B0000000FHAp - rerendered img is missing uiOutputCheckbox class
+    // W-978654, W-1014086 - rerendered img is missing uiOutputCheckbox class
     _testRerenderChecked: {
         attributes : {value : false},
         test: function(component){
             var expectedElem = component.find("img2").getElement();
             aura.test.assertTrue($A.util.hasClass(expectedElem, "unchecked"), "missing class: unchecked");
             aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
-            aura.test.assertNull(component.find("img1").getElement(), "img1 shouldn't be rendered");
+            aura.test.assertUndefinedOrNull(component.find("img1"), "img1 shouldn't be rendered");
 
             component.getAttributes().setValue("value",true);
             $A.renderingService.rerender(component);
@@ -64,14 +64,14 @@
     },
 
     /* unchecked -> checked checkbox */
-    // https://gus.soma.salesforce.com/a07B0000000FHAp - rerendered img is missing uiOutputCheckbox class
+    // W-978654, W-1014086 - rerendered img is missing uiOutputCheckbox class
     _testRerenderUnchecked: {
         attributes : {value : true},
         test: function(component){
             var expectedElem = component.find("img1").getElement();
             aura.test.assertTrue($A.util.hasClass(expectedElem, "checked"), "missing class: checked");
             aura.test.assertTrue($A.util.hasClass(expectedElem, "uiOutputCheckbox"), "missing class: uiOutputCheckbox");
-            aura.test.assertNull(component.find("img2").getElement(), "img2 shouldn't be rendered");
+            aura.test.assertUndefinedOrNull(component.find("img2"), "img2 shouldn't be rendered");
 
             component.getAttributes().setValue("value",false);
             $A.renderingService.rerender(component);

@@ -16,16 +16,14 @@
 
 -->
 <aura:component model="java://org.auraframework.impl.java.model.TestJavaModel" render="client">
-    <!--aura:attribute type="Aura.Component[]" name="cmps"/-->
     <aura:attribute type="String" name="stringAttribute" default="London"/>
     <aura:attribute type="Boolean" name="flag" default="true"/>
 
-    <!--There's a bug with default values of component type -->
-    <aura:attribute name="cmps" type="Aura.Component[]"/>
-    <aura:set attribute="cmps">
-            <aura:text value="textOnBody" aura:id="localtext"/>
-            <div title="divOnBody" aura:id="localdiv">divOnBody</div>
-    </aura:set>
+    <!-- There's a bug with default values of type component array: W-1198083
+    <aura:attribute name="cmps" type="Aura.Component[]">
+        <aura:text value="textOnBody" aura:id="localtext"/>
+        <div title="divOnBody" aura:id="localdiv">divOnBody</div>
+    </aura:attribute> -->
 
     <!--Render components within my own body -->
     {!v.cmps}

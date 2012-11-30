@@ -19,12 +19,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import junit.framework.Assert;
+
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.instance.Component;
-import org.auraframework.throwable.AuraRuntimeException;
 /**
  * .touch.3
  * @since 0.0.85
@@ -125,53 +125,6 @@ public class ForEachTest extends AuraImplTestCase {
         //Assert the Object list
         assertValuesInForEachBlock(cmp,"m.integerList", componentList, 3, "objectValue", "v.obj");
 
-    }
-
-    /**
-     * Verify iteration of a list of list, objects using aura:forEach
-     * @throws Exception
-     */
-    //TODO BUG FIXME W-1065148
-    public void _testIteratingListofCollections_valueByReference() throws Exception{
-        String namespace = "forEachDefTest";
-        String cmpName = "forEachDefParent";
-        Component topLevelCmp = (Component)Aura.getInstanceService().getInstance(String.format("%s:%s", namespace, cmpName), ComponentDef.class);
-        assertNotNull("Failed to create an instance of the forEach test component.", topLevelCmp);
-
-        Component facet2 = null;
-        Object body = topLevelCmp.getSuper().getAttributes().getValue("body");
-        Assert.assertNotNull(body);
-        @SuppressWarnings("unchecked")
-        Collection<Component> bodyList = (Collection<Component>)body;
-        for (Component c : bodyList) {
-            if(c.getLocalId().equals("collection")){
-                facet2 = c;
-            }
-        }
-
-        //Obtain a list of all components enclosed in forEach blocks in facet
-        Collection<Component> innerComponentList = getInnerComponents(facet2);
-        ArrayList<Component> componentList = new ArrayList<Component>();
-        //Trim the list to only consider test components
-        for (Component b : innerComponentList) {
-            if(b.getLocalId().equals("listValueByRef") ||  b.getLocalId().equals("objectValueByRef")){
-                assertEquals("markup://forEachDefTest:forEachDefDisplay", b.getDescriptor().getQualifiedName());
-                componentList.add(b);
-            }
-        }
-        assertEquals(6, componentList.size());
-        //Assert the list values
-        assertValuesInForEachBlock(topLevelCmp,"m.listOfList", componentList, 0, "listValueByRef", "v.list");
-        //Assert the Object list
-        assertValuesInForEachBlock(topLevelCmp,"m.integerList", componentList, 3, "objectValueByRef", "v.obj");
-
-    }
-    //TODO W-1065150 Won't do any type validation
-    public void _testIteratingNonLists() throws Exception{
-        try{
-            Aura.getInstanceService().getInstance("forEachDefTest:nonListDataType", ComponentDef.class);
-            fail("Should throw a runtime exception if you try to iterate through a non list.");
-        }catch(AuraRuntimeException expected){}
     }
 
     /**

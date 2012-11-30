@@ -107,7 +107,7 @@
         }
     },
 
-    // https://gus.soma.salesforce.com/a07B0000000FA87IAG
+    // W-966324 - aura:html doesn't rerender layout links properly
     _testValueFragmentDirty: {
         attributes : {label: 'link', value: '#top'},
         test: function(component){

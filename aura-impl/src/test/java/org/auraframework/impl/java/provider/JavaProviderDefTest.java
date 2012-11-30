@@ -18,18 +18,22 @@ package org.auraframework.impl.java.provider;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Ignore;
-
-import com.google.common.collect.Maps;
-
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.ProviderDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Component;
-import org.auraframework.throwable.*;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.AuraValidationException;
+import org.auraframework.throwable.MissingRequiredAttributeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Ignore;
+
+import com.google.common.collect.Maps;
 
 /**
  * @hierarchy Aura.Components.Interface.Providers
@@ -144,31 +148,24 @@ public class JavaProviderDefTest extends AuraImplTestCase {
                 + "<aura:attribute name=\"defaultAttr\" type=\"String\" default=\"meh\"/>" + "</aura:interface>";
         String markupTestCase;
         String[] runtimeTestCases = {
-                //TODO: W-1230701 this should throw a QuickFix.
                 "provider=\"\"", // Blank provider
         };
         String[] markupTestCases = { "", // No Provider
-                // TODO:W-770492
+                // TODO W-775818 - no validation for Java providers
+                // No provide method in the Java Provider
+                "provider=\"java://org.auraframework.impl.java.provider.TestProviderWithNoProvideMethod\"",
+                // Non static provide method in the Java Provider
+                "provider=\"java://org.auraframework.impl.java.provider.TestProviderWithNonStaticMethod\"",
+                // Javascript provider
                 // "provider=\"js://org.auraframework.impl.java.provider.TestComponentDescriptorProvider\"",
-                // //Javascript provider
-                // "provider=\"java://org.auraframework.impl.java.provider.meh\"", //Non existing provider
-                "provider=\"java://org.auraframework.impl.java.provider.TestProviderWithNoProvideMethod\"", // No
-                                                                                                             // provide
-                                                                                                             // method
-                                                                                                             // in
-                                                                                                // the Java Provider
-                "provider=\"java://org.auraframework.impl.java.provider.TestProviderWithNonStaticMethod\"", // Non
-                                                                                                             // static
-                                                                                                             // provide
-                                                                                                // method in the Java
-                                                                                                // Provider
-        // "provider=\"java://org.auraframework.impl.java.provider.TestProviderWithBadReturnType\"", //bad return type,
-        // basically
-        // forcing a class cast exception
-        // "provider=\"java://org.auraframework.impl.java.provider.TestProvideReturnNull\"", //Provider returns null
-        // "provider=\"java://org.auraframework.impl.java.provider.TestProvideNonExistingComponent\"" //Return a
-        // component which
-        // does not exist
+                // Non existing provider
+                // "provider=\"java://org.auraframework.impl.java.provider.meh\"",
+                // Bad return type, basically forcing a class cast exception
+                // "provider=\"java://org.auraframework.impl.java.provider.TestProviderWithBadReturnType\"",
+                // Provider returns null
+                // "provider=\"java://org.auraframework.impl.java.provider.TestProvideReturnNull\"",
+                //Return a component which does not exist
+                // "provider=\"java://org.auraframework.impl.java.provider.TestProvideNonExistingComponent\""
         };
         for (String testcase : runtimeTestCases) {
             markupTestCase = String.format(markupSkeleton, testcase);
@@ -199,7 +196,7 @@ public class JavaProviderDefTest extends AuraImplTestCase {
      * this interface. So the getComponent method should throw an exception because the attribute values cannot be
      * passed along to the component.
      */
-    @Ignore("W-775818")
+    @Ignore("W-775818 - no validation for Java providers")
     public void testComponentProviderImplementsInterface() throws Exception {
         try {
             Aura.getInstanceService().getInstance("test:test_Provider_InterfaceNoImplementation", ComponentDef.class);
@@ -271,8 +268,8 @@ public class JavaProviderDefTest extends AuraImplTestCase {
      *
      * @throws Exception
      */
-    // W-777620
-    public void _testInterfaceProviderProvidesInterface() throws Exception {
+    @Ignore("W-777620 - don't allow prividing abstract cmp or interface w/no provider")
+    public void testInterfaceProviderProvidesInterface() throws Exception {
         try {
             Aura.getInstanceService().getInstance("test:test_Provider_InterfaceChain", ComponentDef.class);
             fail("Interface providers should only provide concrete components");
@@ -292,8 +289,8 @@ public class JavaProviderDefTest extends AuraImplTestCase {
      *
      * @throws Exception
      */
-    // W-777675
-    public void _testCyclicInjection() throws Exception {
+    @Ignore("W-777675 - cyclic injection causes stack overflow")
+    public void testCyclicInjection() throws Exception {
         try {
             Aura.getInstanceService().getInstance("test:test_Provider_InterfaceCyclicComponentA", ComponentDef.class);
             fail("Cyclic injection should have been detected");
@@ -321,12 +318,13 @@ public class JavaProviderDefTest extends AuraImplTestCase {
 
     /**
      * Call provider for interface to get abstract component. Then call provider for abstract component to supply a
-     * component. TODO: Enable test after bug is fixed W-777620
+     * component.
      *
      * @TestLabels("ignore")
      * @throws Exception
      */
-    public void _testProviderForAbstractComponent() throws Exception {
+    @Ignore("W-777620")
+    public void testProviderForAbstractComponent() throws Exception {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("implNumber", "4");
         Component component = Aura.getInstanceService().getInstance("test:test_Provider_Interface",
@@ -343,11 +341,12 @@ public class JavaProviderDefTest extends AuraImplTestCase {
 
     /**
      * Call provider for interface to get abstract component. Then call provider for abstract component to supply a
-     * component. TODO: Enable test after bug is fixed W-777620
+     * component.
      *
      * @TestLabels("ignore")
      * @throws Exception
      */
+    // TODO W-777620
     public void testNoProviderForNonAbstractComponent() throws Exception {
         try {
             Aura.getInstanceService().getInstance("test:test_NoProvider_NonAbstract_Component", ComponentDef.class);
@@ -358,13 +357,13 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Call provider for of abstract component, which returns the same component. TODO: Enable test after bug is fixed
-     * W-777620
+     * Call provider for of abstract component, which returns the same component.
      *
      * @TestLabels("ignore")
      * @throws Exception
      */
-    public void _testProviderForCyclicReference() throws Exception {
+    @Ignore("W-777620")
+    public void testProviderForCyclicReference() throws Exception {
         try {
             Aura.getInstanceService().getInstance("test:test_Provider_AbstractCyclic", ComponentDef.class);
             fail("Should have thrown AuraRuntimeException for infinite recursion from component referencing itself");
@@ -374,12 +373,13 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Provider for abstract component supplies another abstract component. TODO: Enable test after bug is fixed
+     * Provider for abstract component supplies another abstract component.
      *
      * @TestLabels("ignore")
      * @throws Exception
      */
-    public void _testProviderForAbstractComponentProvidesAbstractComponent() throws Exception {
+    @Ignore("W-777620")
+    public void testProviderForAbstractComponentProvidesAbstractComponent() throws Exception {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("implNumber", "2");
         Component component = Aura.getInstanceService().getInstance("test:test_Provider_Abstract1",
@@ -396,13 +396,13 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Component provided by the provider should extend the Abstract component requested. TODO: Current there is no
-     * validation for Java Providers W-775818
+     * Component provided by the provider should extend the Abstract component requested.
      *
      * @TestLabels("ignore")
      * @throws Exception
      */
-    public void _testProviderComponentExtendsAbstract() throws Exception {
+    @Ignore("W-775818 - no validation for Java providers")
+    public void testProviderComponentExtendsAbstract() throws Exception {
         try {
             Aura.getInstanceService().getInstance("test:test_Provider_AbstractNoExtends", ComponentDef.class);
             fail("Should have checked that the component provided by the provider does not extend test:test_Provider_AbstractNoExtends");
@@ -526,8 +526,6 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     /**
      * Exception thrown during provider instantiation should ...(be wrapped in a AuraRuntimeException?).
      */
-    // W-1219319 - ultimately exceptions from instantiation should be caught in production mode, but it might still be
-    // visible at this point
     public void testProviderThrowsDuringInstantiation() throws Exception {
         DefDescriptor<ProviderDef> javaPrvdrDefDesc = DefDescriptorImpl
                 .getInstance("java://org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation",

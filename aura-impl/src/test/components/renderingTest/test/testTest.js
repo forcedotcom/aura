@@ -64,10 +64,9 @@
     },
 
     /**
-     * Verify rendering component array declared in the current component's
-     * markup.
+     * Verify rendering component array declared in the current component's markup.
      */
-    // W-1274319
+    // TODO: W-1198083 cannot set default values for Aura.Component[]
     _testRenderingComponentArrayInMyBody : {
         test : [ function(cmp) {
             var text = cmp.find('localtext');
@@ -82,11 +81,12 @@
             $A.test.assertEquals("divOnBody", div.getElement().title);
         } ]
     },
+
     /**
      * Verify rendering/rerendering expression intitialized with contitional
      * statements. Also verify that dom nodes are cleaned up after unrendering.
      */
-    // W-1274319
+    // TODO: W-1198083 cannot set default values for Aura.Component[]
     _testRenderRerenderOfExpressions : {
         attributes : {
             flag : false

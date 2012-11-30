@@ -25,7 +25,7 @@
     
     <h2>Creating a Java Server-Side Renderer</h2>
     
-	<p>Create a server-side renderer in Java by implementing the <code>org.auraframework.def.Renderer</code> interface. The interface contains one method:</p>
+	<p>If you've exhausted the alternatives, including a client-side renderer, create a server-side renderer in Java by implementing the <code>org.auraframework.def.Renderer</code> interface. The interface contains one method:</p>
 	
 <auradocs:codeblock><![CDATA[
 	public void render(BaseComponent<?,?> component, Appendable appendable)
@@ -46,7 +46,7 @@
 </aura:component>]]>
 </auradocs:codeblock>
 
-    <p>The framework behavior is undefined if you add a server-side renderer that also includes a client-side renderer. Use one or the other.</p>
+    <p>The framework behavior is undefined if you add a server-side renderer that also includes a client-side renderer. We recommend that you use one or the other.</p>
         
     <p><b>See also:</b><br/>
     <auradocs:topicLink topic="createAppTemplate">Creating App Templates</auradocs:topicLink>

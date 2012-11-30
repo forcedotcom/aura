@@ -37,14 +37,13 @@
     /**
      * Verify behavior when 'Value' attribute is assigned an empty string.
      */
-    //TODO W-1066030
+    //TODO W-984924 value must be set in markup. moved to js://uitest.outputCmps_EmptyStringValue for now.
     _testEmptyStringValue: {
         attributes: {value : ''},
         test: function(component){
             aura.test.assertEquals('', component.find('span').getElement().textContent, "Expected an empty span.");
         }
     },
-
     /**
      * Verify behavior when 'Value' attribute is assigned a Garbage value.
      */

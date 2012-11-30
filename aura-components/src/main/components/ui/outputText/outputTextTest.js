@@ -86,9 +86,6 @@
         attributes: {value: '\n'},
         test: function(component){
             aura.test.assertEquals('\n', component.find("span").getElement().textContent, "Failed to trim spaces");
-//            var children = component.find("span").getElement().childNodes;
-//            aura.test.assertEquals(1, children.length, "Expected only a single <br/>");
-//            aura.test.assertEquals('BR', children[0].tagName.toUpperCase(), "Expected a <br/>");
         }
     },
     /**
@@ -98,13 +95,6 @@
         attributes: {value: '\n1\n2\n'},
         test: function(component){
             aura.test.assertEquals('\n1\n2\n', component.find("span").getElement().textContent, "Failed to trim spaces");
-//            var children = component.find("span").getElement().childNodes;
-//            aura.test.assertEquals(5, children.length, "Expected 3 <br/> and 2 text nodes");
-//            aura.test.assertEquals('BR', children[0].tagName.toUpperCase(), "Expected a <br/> at index 0");
-//            aura.test.assertEquals('1', children[1].textContent, "Expected a '1' at index 1");
-//            aura.test.assertEquals('BR', children[2].tagName.toUpperCase(), "Expected a <br/> at index 2");
-//            aura.test.assertEquals('2', children[3].textContent, "Expected a '2' at index 3");
-//            aura.test.assertEquals('BR', children[4].tagName.toUpperCase(), "Expected a <br/> at index 4");
         }
     },
     /**
@@ -114,14 +104,6 @@
         attributes: {value: '\r\na\r\nb\r\n'},
         test: function(component){
             aura.test.assertEquals('\r\na\r\nb\r\n', component.find("span").getElement().textContent, "Failed to trim spaces");
-//            var children = component.find("span").getElement().childNodes;
-//            aura.test.assertEquals(6, children.length, "Expected 3 <br/> and 6 text nodes");
-//            aura.test.assertEquals('\n', children[0].textContent, "Expected a '\\n' at index 0");
-//            aura.test.assertEquals('BR', children[1].tagName.toUpperCase(), "Expected a <br/> at index 1");
-//            aura.test.assertEquals('a\n', children[2].textContent, "Expected a 'a\\n' at index 2");
-//            aura.test.assertEquals('BR', children[3].tagName.toUpperCase(), "Expected a <br/> at index 3");
-//            aura.test.assertEquals('b\n', children[4].textContent, "Expected a 'b\\n' at index 4");
-//            aura.test.assertEquals('BR', children[5].tagName.toUpperCase(), "Expected a <br/> at index 5");
         }
     },
 })

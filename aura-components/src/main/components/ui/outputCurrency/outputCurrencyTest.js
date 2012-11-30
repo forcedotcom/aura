@@ -45,7 +45,7 @@
      * Negative test case: Assign blank value for attribute 'value'.
      * Expect it to show nothing.
      */
-    //TODO W-1066030
+    //TODO W-984924 value must be set in markup. moved to js://uitest.outputCmps_EmptyStringValue for now.
     _testEmptyStringValue: {
         attributes : {value : ''},
         test: function(component){
@@ -111,8 +111,8 @@
     /**
      * Positive test case: Assign '  USD  ' for attribute 'currencyCode'
      */
-    //TODO: BUG
-    ___testCurrencyCodeWithSpaces: {
+    //TODO: W-1075402 (probably) - whitespace not trimmed
+    _testCurrencyCodeWithSpaces: {
         attributes : {value : 123, currencyCode : '   USD   '},
         test: function(component){
             aura.test.assertEquals('$123.00', component.find('span').getElement().textContent, "outputCurrency does not process currencyDode after trimming");

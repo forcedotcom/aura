@@ -18,12 +18,14 @@ package org.auraframework.component.aura;
 import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.test.WebDriverTestCase;
-import org.junit.Ignore;
 import org.openqa.selenium.JavascriptExecutor;
 
 /**
@@ -40,13 +42,12 @@ public class ComponentTreeTest extends WebDriverTestCase {
     }
 
     /**
-     * Verify client shape for ide.
+     * Verify client shape for application.
      *
      * @throws Exception
      */
-    @Ignore("W-1282352")
     public void testServerVSClientShape() throws Exception {
-        checkServerVsClient("auraide:ide.app", ApplicationDef.class);
+        checkServerVsClient("auratest:rerender.app", ApplicationDef.class);
     }
 
     /**

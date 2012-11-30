@@ -248,7 +248,7 @@ public class AuraServlet extends AuraBaseServlet {
 
             if(context.getLastMod() != null && !context.getLastMod().isEmpty() && !isUpToDate(Long.parseLong(context.getLastMod()))){
                 deleteManifestCookie(response);
-                //throw new ClientOutOfSyncException(OUTDATED_MESSAGE);
+                throw new ClientOutOfSyncException(OUTDATED_MESSAGE);
             }
             Map<String, Object> map = Maps.newHashMap();
             map.put("token", getToken());
@@ -486,7 +486,7 @@ public class AuraServlet extends AuraBaseServlet {
 
             if(context.getLastMod() != null && !context.getLastMod().isEmpty() && !isUpToDate(Long.parseLong(context.getLastMod()))){
                 AuraServlet.deleteManifestCookie(response);
-                //throw new ClientOutOfSyncException(OUTDATED_MESSAGE);
+                throw new ClientOutOfSyncException(OUTDATED_MESSAGE);
             }
 
             response.setContentType(getContentType(context.getFormat()));

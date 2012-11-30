@@ -41,4 +41,8 @@
 <auradocs:codeblock>var theLabel = cmp.get("v.label");
 </auradocs:codeblock>
 
+<p>If you want to escape <code><aura:text value="{!"/></code>, use this syntax:
+<auradocs:codeblock>&lt;aura:text value="{!"/&gt;
+</auradocs:codeblock>
+This specified value is rendered  in plain text. See <auradocs:defLink descriptor="aura:text" defType="component">aura:text</auradocs:defLink> for more information.</p>
 </aura:component>

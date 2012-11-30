@@ -45,11 +45,13 @@
 
     <auradocs:example descriptor="auradocs:helloHTML" />
 
-    <h2>Summary</h2>
+    <h2>Unescaping HTML</h2>
 
-    <ul>
-    <li> HTML tags are first-class citizens in Aura.</li>
-    <li> Add component-specific CSS to a component's bundle by creating a file with the same name as the component and a <code>.css</code> file extension.</li>
-    <li> Each top-level element in a component is rendered with a namespaced CSS class.</li>
-    </ul>
+    <p>To output pre-formatted  HTML, use <auradocs:defLink descriptor="aura:unescapedHtml" defType="component">aura:unescapedHTML</auradocs:defLink>. For example, this is useful if you want to display HTML that is generated on the server and add it to the DOM.
+    You must escape any HTML if necessary or your app might be exposed to security vulnerabilities.</p>
+    <p>
+    You can pass in values from a model or controller, such as in <code>&lt;aura:unescapedHtml value="<aura:text value="{!"/>m.htmlOutput}"/&gt;</code> and <code>&lt;aura:unescapedHtml value="<aura:text value="{!"/>v.note.body}"/&gt;</code>.
+    See <auradocs:topicLink topic="expressionsSourceValues">Accessing Data using Expressions</auradocs:topicLink> for more information.
+    </p>
+
 </aura:component>

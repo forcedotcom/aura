@@ -106,7 +106,7 @@
         <module>aura-resources</module>
         <module>aura-jetty</module>
         <module>aura-integration-test</module>
-        <module>aura-archetype</module>
+        <!-- <module>aura-archetype</module> -->
     </modules>
     <scm>
         <connection>scm:git:git@github.com:forcedotcom/lumen-beta.git</connection>

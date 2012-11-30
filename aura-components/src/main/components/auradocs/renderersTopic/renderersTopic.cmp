@@ -146,6 +146,7 @@
     <auradocs:topicLink topic="compBundle">Component Bundles</auradocs:topicLink><br/>
     <auradocs:topicLink topic="helloEvents">Events</auradocs:topicLink><br/>
     <auradocs:topicLink topic="helper">Helpers</auradocs:topicLink><br/>
-    <auradocs:topicLink topic="onchange">Detecting a Value Object Change</auradocs:topicLink>
+    <auradocs:topicLink topic="onchange">Detecting a Value Object Change</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="renderersServerSide">Server-Side Renderers</auradocs:topicLink>
     </p>
 </aura:component>

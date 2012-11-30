@@ -1,0 +1,54 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Server-Side Renderers"/>
+
+    <p>The Aura rendering service takes in-memory component state and updates the component in the Document Object Model (DOM). The DOM is the language-independent model for representing and interacting with objects in HTML and XML documents. Aura automatically renders your components so you don't have to know anything more about rendering unless you need to customize the default rendering behavior for a component.</p>
+
+    <auradocs:info>The preferred way to customize component rendering is to use a <auradocs:topicLink topic="renderers">client-side renderer</auradocs:topicLink>. You can also use a server-side renderer but it's not recommended as they don't degrade gracefully if an error, such as a network connection outage, occurs. The framework uses a server-side renderer to render an app's template and that is the primary use case for rendering on the server.</auradocs:info>
+    
+    <h2>Creating a Java Server-Side Renderer</h2>
+    
+	<p>If you've exhausted the alternatives, including a client-side renderer, create a server-side renderer in Java by implementing the <code>org.auraframework.def.Renderer</code> interface. The interface contains one method:</p>
+	
+<auradocs:codeblock><![CDATA[
+	public void render(BaseComponent<?,?> component, Appendable appendable)
+	        throws IOException, QuickFixException;]]>
+</auradocs:codeblock>	        
+	
+	<p>The <code>component</code> argument is the instance to render. The <code>appendable</code> argument is the output buffer.</p>
+	
+	<p>The class that implements the interface must have a no-argument constructor. The class is instantiated as a singleton, so no state should be stored in it.</p>
+	
+	<h2>Wiring Up a Server-Side Renderer</h2>
+	
+	<p>To wire up a server-side renderer for a component, add a <code>renderer</code> system attribute in <code>&lt;aura:component&gt;</code>. For example:</p>
+
+<auradocs:codeblock><![CDATA[
+<aura:component renderer="java://org.auraframework.demo.notes.renderers.ReallyNeedAServerSideRenderer">
+    ...
+</aura:component>]]>
+</auradocs:codeblock>
+
+    <p>The framework behavior is undefined if you add a server-side renderer that also includes a client-side renderer. We recommend that you use one or the other.</p>
+        
+    <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="createAppTemplate">Creating App Templates</auradocs:topicLink>
+    </p>
+</aura:component>

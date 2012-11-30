@@ -33,7 +33,7 @@
 
 <p>The <code>aura:renderIf</code> tag selectively display the markup in its body if the <code>visible</code> attribute evaluates to <code>true</code>.</p>
 
-<p>The <code>ui:button</code> triggers the <code>showHide</code> action in the client-side controller. Click the <b>js://controller source</b> to see the JavaScript code. It simply toggles the value of the <code>visible</code> attribute.</p>
+<p>The <code>ui:button</code> triggers the <code>showHide</code> action in the client-side controller. Click the <b>js://controller source</b> tab to see the JavaScript code. It simply toggles the value of the <code>visible</code> attribute.</p>
 
 <p><b>See also:</b><br/>
     <auradocs:topicLink topic="helloAttributes">Component Attributes</auradocs:topicLink><br/>

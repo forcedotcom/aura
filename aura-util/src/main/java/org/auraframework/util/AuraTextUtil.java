@@ -125,7 +125,7 @@ public class AuraTextUtil {
             return true;
 
         return str.length() == 0;
-        }
+    }
 
     public static boolean isEmptyOrWhitespace(CharSequence str) {
         int end = str.length();

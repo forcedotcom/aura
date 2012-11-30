@@ -359,25 +359,53 @@ Util.prototype.appendChild = function(newEl, referenceEl) {
 
 /**
  * Removes the specified element from the DOM.
+ *
+ * Careful that there be dragons here. Since we hijack the normal delete
+ * functionality, we need to be careful of odd event processing. Specifically
+ * we end up sending off some events that would not otherwise be sent.
+ *
+ * Also note that we currently remove nodes children first, which means we
+ * deconstruct our tree from the bottom up. If we reverse this, we might be
+ * able to add optimizations.
+ *
  * @param {Object} element The element to be removed.
  */
 Util.prototype.removeElement = function(element) {
-    if (element && element.parentNode !== this.trashcan) {
-        if (element.parentNode){
+    if (element && !(element.parentNode === this.trashcan)) {
+        if (element.parentNode) {
+            //
+            // We do a check to ensure that we don't try to add the element
+            // to the trashcan more than once. Though the check above _should_
+            // catch all cases, there are odd boundary conditions where people
+            // holding references could re-re-parent elements. That is very
+            // bad, so we yell early here. Note that long lived references
+            // might get past this as well, but they are likely to blow up
+            // on use. Not having this code allows things to break much later
+            // in an inobvious way. See W-1462733
+            //
+            // Note that we carefully protect aura_deleted from the compiler, so
+            // that we don't accidentally conflict with the element namespace,
+            // the property should never live longer than the delay between this
+            // reparenting and the gc below.
+            //
+            aura.assert(this.isUndefined(element["aura_deleted"]),"Element was reused after delete");
+            element["aura_deleted"] = true;
             this.trashcan.appendChild(element);
         } else{
-        	this.trash.push(element);
+            this.trash.push(element);
         }
         
         if (!this.gcPending) {
             this.gcPending = true;
             var that = this;
             setTimeout(function() {
-            	var trashcan = that.trashcan; 
-            	while (trashcan.hasChildNodes()) {
-            		trashcan.removeChild(trashcan.lastChild);
-            	}
-            	
+                var trashcan = that.trashcan;
+                while (trashcan.hasChildNodes()) {
+                    var node = trashcan.lastChild;
+                    delete node["aura_deleted"];
+                    trashcan.removeChild(node);
+                }
+
                 for (var i = 0, len = that.trash.length; i < len; i++){
                     that.trash[i] = null;
                 }

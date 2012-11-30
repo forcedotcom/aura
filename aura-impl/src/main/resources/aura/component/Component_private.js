@@ -24,6 +24,7 @@ var ComponentPriv = (function(){ // Scoping priv
         // setup some basic things
         this.concreteComponentId = config["concreteComponentId"];
         this.rendered = false;
+        this.inUnrender = false;
         this.localId = config["localId"];
 
         // create the globally unique id for this component

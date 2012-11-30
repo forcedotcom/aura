@@ -33,7 +33,18 @@ var AuraRenderingService = function AuraRenderingService(){
                     // uncomment this to see what's dirty and why.  (please don't delete me again.  it burns.)
 //                    $A.log(cmp.toString(), priv.dirtyComponents[id]);
                     if (cmp && cmp.isValid() && cmp.isRendered()) {
-                        cmps.push(cmp);
+                        //
+                        // We assert that we are not unrendering, as we should never be doing that,
+                        // but we then check again, as in production we want to avoid the bug.
+                        //
+                        // For the moment, don't fail miserably here. This really is bad policy to allow
+                        // things to occur on unrender that cause a re-render, but putting in the assert
+                        // breaks code, so leave it out for the moment.
+                        //
+                        // aura.assert(!cmp.isUnrendering(), "Rerendering a component during unrender");
+                        if (!cmp.isUnrendering()) {
+                            cmps.push(cmp);
+                        }
                     }else{
                         priv.cleanComponent(id);
                     }
@@ -126,8 +137,13 @@ var AuraRenderingService = function AuraRenderingService(){
                 var c = array[i];
                 if (c.isValid() && c.isRendered()) {
                     var renderer = c.getRenderer();
-                    renderer.def.unrender(renderer.renderable);
-                    c.setRendered(false);
+                    c.setUnrendering(true);
+                    try {
+                        renderer.def.unrender(renderer.renderable);
+                        c.setRendered(false);
+                    } finally {
+                        c.setUnrendering(false);
+                    }
                 }
             }
         },

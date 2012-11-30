@@ -19,6 +19,5 @@
                         description="Renders the value to which an expression evaluates.  When any expressions are found in free text
                                         (not a tag or attribute value) is found in markup,
                                         an instance of this component is created with the value attribute set to the expression found in the markup.">
-    <aura:attribute name="body" type="Aura.Component[]" description="Do not use."/>
     <aura:attribute name="value" type="String" description="The expression to evaluate and render."/>
 </aura:component>

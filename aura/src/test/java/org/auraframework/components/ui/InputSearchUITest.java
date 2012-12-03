@@ -15,10 +15,10 @@
  */
 package org.auraframework.components.ui;
 
+import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.UnAdaptableTest;
 
 /**
 * UI Tests for inputSearch Component
@@ -30,7 +30,7 @@ public class InputSearchUITest extends WebDriverTestCase {
 
     }
 
-    @UnAdaptableTest // because it fails in FIREFOX
+    @ExcludeBrowsers({BrowserType.ANDROID_PHONE,BrowserType.ANDROID_TABLET,BrowserType.IPAD,BrowserType.IPHONE})
     public void testSearch() throws Exception{
         final String valueExpression ="return window.$A.get('root.v.searched')";
         WebDriver d = getDriver();

@@ -25,16 +25,17 @@
 
       Aura can handle and display errors using the default error component, <auradocs:defLink descriptor ="ui:inputDefaultError">ui:inputDefaultError</auradocs:defLink>, without using custom error handlers.</p>
 
-    <p>The following demo shows how Aura handles a validation error and uses the default error component to display the error message:</p>
+    <p>The following demo shows how Aura handles a validation error and uses the default error component to display the error message.</p>
+     <p>When you enter a value and click <b>Submit</b>, an action in the controller validates the input and displays an error message if the input is not a number. Entering a valid input clears the error.
     <auradocs:example descriptor="auradocs:sampleError" />
 
-    <p>When you enter a value and click <b>Submit</b>, an action in the controller validates the input, and displays an error message if the input is not a number. The error is cleared if you enter a valid input.
+
     The controller uses a <auradocs:referenceTopicLink topic="api:SimpleValue">SimpleValue</auradocs:referenceTopicLink> object. It invalidates the input value using <code>setValid(false)</code> and clears any error using <code>setValid(true)</code>. You can add error messages to the input value using <code>addErrors()</code>. </p>
 
     <h2>Custom Error Handling</h2>
 
     <p><auradocs:defLink descriptor="ui:input">ui:input</auradocs:defLink> and its child components can handle errors using its <code>onError</code> and <code>onClearErrors</code> attributes, which are wired to your custom error handlers defined in a controller.
-    <code>onError</code> maps to a <code>ui:validationError</code> event and <code>onClearErrors</code> maps to <code>ui:clearErrors</code>.
+    <code>onError</code> maps to a <code>ui:validationError</code> event, and <code>onClearErrors</code> maps to <code>ui:clearErrors</code>.
   The input component can use the <code>ui:updateError</code> event to update the default error component, <auradocs:defLink descriptor ="ui:inputDefaultError">ui:inputDefaultError</auradocs:defLink>.</p>
 
     <p>The following demo shows how you can handle a validation error using custom error handlers and display the error message using the default error component.</p>
@@ -48,7 +49,7 @@
     You can fire the <code>updateError</code> event to update the default error component.
     See <auradocs:referenceTopicLink topic="api:Event">Event</auradocs:referenceTopicLink> for more information.</p>
 
-    <p>Similarly, you can customize how you want to clear the errors by using the <code>onClearErrors</code>event. See the <code>handleClearError</code> handler in the controller for an example.
+    <p>Similarly, you can customize how you want to clear the errors by using the <code>onClearErrors</code> event. See the <code>handleClearError</code> handler in the controller for an example.
     </p>
 
      <p><b>See also:</b><br/>

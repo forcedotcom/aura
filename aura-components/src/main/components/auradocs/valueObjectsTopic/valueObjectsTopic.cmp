@@ -26,7 +26,7 @@
     <h3>Accessing the Value Object</h3>
     <p>To access a value object in JavaScript, use <code>component.getValue("<em>expression</em>")</code>.</p>
 
-    <p>Let's look at a component that refers to itself as <code>cmp</code> in its renderer, use the following code in JavaScript to retrieve the <code>label</code> attribute for the component:</p>
+    <p>Let's look at a component that refers to itself as <code>cmp</code> in its renderer. Use the following code in JavaScript to retrieve the <code>label</code> attribute for that component:</p>
 
 <auradocs:codeblock>
     var labelValue = cmp.getValue("v.label");
@@ -36,7 +36,8 @@
     </p>
 
     <h3>Setting the Value Object</h3>
-    <p>To set the  value object, use <code>component.setValue("expression")</code>. Let's take a look at the component with an <code>errorMsg</code> attribute:</p>
+    <p>To set the  value object, use <code>component.setValue("expression")</code>.</p>
+    <p> Let's look at the component with an <code>errorMsg</code> attribute:</p>
     <auradocs:codeblock>
     &lt;aura:attribute name="errorMsg" type="String"/>
 

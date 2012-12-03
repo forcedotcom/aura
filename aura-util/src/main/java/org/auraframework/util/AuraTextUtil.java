@@ -302,10 +302,10 @@ public class AuraTextUtil {
     }
 
     /**
-     * PLEASE DON'T CALL THIS METHOD. Please use urlencodeStrict instead. Thanks :-)<br>
-     * <br>
-     * Properly encode a URL according to the standard. This is a convenience method users don't have to catch this
-     * exception everywhere (the exception should never be thrown anyway).
+     * Properly encode a URL according to the standard.
+     *
+     * This is a convenience method users don't have to catch this exception everywhere
+     * (the exception should never be thrown anyway).
      *
      * @see URLEncoder#encode(java.lang.String, java.lang.String)
      */

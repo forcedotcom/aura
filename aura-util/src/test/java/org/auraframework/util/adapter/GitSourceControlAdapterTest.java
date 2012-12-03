@@ -39,7 +39,6 @@ public class GitSourceControlAdapterTest extends UnitTestCase {
         //FIXME: nothing to test.
     }
 
-    @Ignore("W-1463478")
     public void testWriteIfDifferentInvalidFile() {
         StringBuilder sb = new StringBuilder("new data");
         File badFile = new File("/god/I/hope/this/file/doesnt/exist/and/no/one/creates/it");
@@ -47,6 +46,7 @@ public class GitSourceControlAdapterTest extends UnitTestCase {
 
         try {
             scai.writeIfDifferent(sb, badFile);
+            fail("should have thrown an IO exception");
         } catch (IOException expected) {
             // FIXME: Check for type of exception.
         }

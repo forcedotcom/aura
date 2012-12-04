@@ -8,11 +8,6 @@
       <includes>
         <include>**/*.xml</include>
         <include>**/*.html</include>
-      </includes>
-    </fileSet>
-    <fileSet encoding="UTF-8" filtered="true">
-      <directory>src/main/webapp</directory>
-      <includes>
         <include>**/*.app</include>
         <include>**/*.holder</include>
       </includes>

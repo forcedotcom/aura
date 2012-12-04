@@ -55,8 +55,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      * Get responses should have preloads serialized.
      */
     @SuppressWarnings("unchecked")
-    // this test needs to be updated because of preloads fix
-    public void _testGetContextHasPreloads() throws Exception {
+    public void testGetContextHasPreloads() throws Exception {
         String modeAndContext = "{'mode':'DEV','preloads':['preloadTest']}";
         String url = "/aura?aura.tag=test%3Atext.cmp&aura.context=" + AuraTextUtil.urlencode(modeAndContext)
                 + "&aura.lastmod=" + getLastMod(Mode.DEV, "preloadTest");

@@ -96,11 +96,12 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
      * on a controller. But the request does not have a valid CSRF token, hence the request should fail to fetch the
      * def.
      */
-    // NO CSRF validation currently
+    // W-1064983 - NO CSRF validation currently
     public void _testVerifyPostWithInvalidToken() throws Exception {
         Map<String, String> params = makeBasePostParams();
         // Invalid token
         params.put("aura.token", "invalid");
+        params.put("aura.context", "{\"mode\":\"FTEST\"}");
         PostMethod post = obtainPostMethod("/aura", params);
         int statusCode = this.getHttpClient().executeMethod(post);
         if (statusCode != HttpStatus.SC_NOT_FOUND) {

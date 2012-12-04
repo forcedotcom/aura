@@ -15,15 +15,20 @@
  */
 package org.auraframework.impl.root.component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.def.*;
-import org.auraframework.impl.FakeRegistry;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.FakeRegistry;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.AuraRuntimeException;
-
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
@@ -178,10 +183,6 @@ public class ComponentDefTest extends AuraImplTestCase {
                                                                    null, null, ComponentDefImpl.PROTOTYPE_COMPONENT,
                                                                    null, null,  false, false).getDescriptor()));
     }
-
-  //FIXME - there are no longer children.
-    /*
-    }*/
 
     public void testAppendDependencies() throws Exception {
         // try a component with no dependencies

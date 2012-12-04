@@ -37,8 +37,8 @@
         }
     },
 
-    _testSetAttributeAbsentFromProvidedComponent: {
-        attributes : {"a3" : "a3"},
+    testSetAttributeAbsentFromProvidedComponent: {
+        attributes : {"a3" : "a3", value : "aura"},
         test: function(component){
             //Provider sets an attribute on the concrete component based on a3
            aura.test.assertEquals("b2Provider", component.getAttributes().getValue("b2").getValue(), "b2 should have been set by provider");

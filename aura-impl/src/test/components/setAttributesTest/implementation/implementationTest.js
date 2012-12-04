@@ -17,6 +17,7 @@
     /**
      * Verify that setting simple attribute values of parent interface works.
      */
+    // TODO W-1468465 - cannot set attribute values on interface
     _testSettingValueOfInterfaceSimpleAttributes:{
         test:function(cmp){
             aura.test.assertEquals('implementationX',cmp.getValue('v.SimpleAttribute').getValue(), "Attribute value must have been overriden by aura:set tag");

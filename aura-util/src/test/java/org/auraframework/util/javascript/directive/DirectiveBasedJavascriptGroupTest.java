@@ -15,7 +15,12 @@
  */
 package org.auraframework.util.javascript.directive;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.EnumSet;
 
 import org.auraframework.test.UnitTestCase;
@@ -140,7 +145,7 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
     /**
      * Make sure the processor regeneration stops when there are errors in the source file
      */
-    public void _testJavascriptReGenerationFails() throws Exception {
+    public void testJavascriptReGenerationFails() throws Exception {
         File file = getResourceFile("/testdata/javascript/testJavascriptReGenerationFails.js");
         DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("regenerationFail", file.getParentFile(),
                 file.getName(), ImmutableList.<DirectiveType<?>>of(DirectiveFactory.getMockDirective()),

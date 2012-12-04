@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     getException: function(cmp, event){
         var a = cmp.get("c.throwsThrowable");
         a.setParams({
-            token: cmp.get("v.throwableClass"),
-            input: cmp.get("v.throwableCause")
+            type: cmp.get("v.throwableClass"),
+            cause: cmp.get("v.throwableCause")
         });
         a.setCallback(cmp, function(action){
             cmp.getAttributes().setValue("response", action);
         });
         this.runAfter(a);
     }
-}
+})

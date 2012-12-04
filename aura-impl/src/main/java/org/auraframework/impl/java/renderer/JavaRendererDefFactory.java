@@ -15,15 +15,21 @@
  */
 package org.auraframework.impl.java.renderer;
 
-import org.auraframework.builder.DefBuilder;
+import java.util.List;
 
+import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.java.BaseJavaDefFactory;
+import org.auraframework.system.SourceLoader;
 
 /**
  */
 public class JavaRendererDefFactory extends BaseJavaDefFactory<RendererDef> {
+
+    public JavaRendererDefFactory(List<SourceLoader> sourceLoaders) {
+        super(sourceLoaders);
+    }
 
     @Override
     protected DefBuilder<?, ? extends RendererDef> getBuilder(DefDescriptor<RendererDef> descriptor) {

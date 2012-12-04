@@ -44,7 +44,7 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        factory = new JavaRendererDefFactory();
+        factory = new JavaRendererDefFactory(null);
     }
 
     /**

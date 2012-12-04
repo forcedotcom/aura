@@ -15,14 +15,14 @@
  */
 package org.auraframework.impl.java.model;
 
-import org.auraframework.builder.DefBuilder;
+import java.util.List;
 
-import org.auraframework.def.*;
+import org.auraframework.builder.DefBuilder;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ModelDef;
 import org.auraframework.impl.java.BaseJavaDefFactory;
 import org.auraframework.system.Annotations.Model;
-
-import org.auraframework.system.Location;
-
+import org.auraframework.system.*;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -30,6 +30,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * def factory for the java model
  */
 public class JavaModelDefFactory extends BaseJavaDefFactory<ModelDef> {
+    public JavaModelDefFactory(List<SourceLoader> sourceLoaders) {
+        super(sourceLoaders);
+    }
+
     @Override
     protected DefBuilder<?, ? extends ModelDef> getBuilder(DefDescriptor<ModelDef> descriptor)
             throws QuickFixException {

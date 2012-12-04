@@ -15,35 +15,39 @@
  */
 package org.auraframework.impl.java;
 
-import java.io.File;
+import java.util.List;
 
 import org.auraframework.builder.DefBuilder;
-
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.impl.source.file.FileSource;
 import org.auraframework.impl.system.DefFactoryImpl;
-import org.auraframework.system.Parser.Format;
-import org.auraframework.system.Source;
-
+import org.auraframework.system.*;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
+
+import com.google.common.collect.Lists;
 
 /**
+ * Base class for {@link DefFactory} implementations for the java:// pseudo-protocol.
  */
 public abstract class BaseJavaDefFactory<D extends Definition> extends DefFactoryImpl<D> {
+
+    final List<SourceLoader> loaders;
+
+    public BaseJavaDefFactory(List<SourceLoader> sourceLoaders) {
+        loaders = (sourceLoaders == null || sourceLoaders.isEmpty()) ? null :
+            Lists.newArrayList(sourceLoaders);
+    }
+
     @Override
     public Source<D> getSource(DefDescriptor<D> descriptor) {
-        Class<?> clazz = getClazz(descriptor);
-        try {
-
-            File base = new File(clazz.getProtectionDomain().getCodeSource().getLocation().toURI());
-            base = new File(base, "../src");
-            String pkg = AuraTextUtil.replaceChar(descriptor.getNamespace(), '.', "/") + "/";
-            String clzFile = String.format("%s%s.java", pkg, descriptor.getName());
-            File file = new File(base, clzFile);
-            return new FileSource<D>(descriptor, file, Format.JAVA);
-        } catch (Throwable x) {
+        if (loaders == null) {
+            return null;
+        }
+        for (SourceLoader loader : loaders) {
+            Source<D> source = loader.getSource(descriptor);
+            if (source != null  && source.exists()) {
+                return source;
+            }
         }
         return null;
     }

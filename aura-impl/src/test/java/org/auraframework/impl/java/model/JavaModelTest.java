@@ -18,10 +18,7 @@ package org.auraframework.impl.java.model;
 import java.io.IOException;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.ModelDef;
-import org.auraframework.def.ValueDef;
+import org.auraframework.def.*;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -104,13 +101,13 @@ public class JavaModelTest extends AuraImplTestCase {
     }
 
     public void testSerializeMetadata() throws Exception {
-        JavaModelDefFactory factory = new JavaModelDefFactory();
+        JavaModelDefFactory factory = new JavaModelDefFactory(null);
         ModelDef def = factory.getDef(descriptor);
         serializeAndGoldFile(def);
     }
 
     public void testSerializeData() throws Exception {
-        JavaModelDefFactory factory = new JavaModelDefFactory();
+        JavaModelDefFactory factory = new JavaModelDefFactory(null);
         ModelDef def = factory.getDef(descriptor);
         Model model = def.newInstance();
         serializeAndGoldFile(model);

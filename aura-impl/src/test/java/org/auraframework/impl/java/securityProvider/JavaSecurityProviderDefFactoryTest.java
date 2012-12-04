@@ -22,7 +22,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.SecurityProviderDef;
 import org.auraframework.test.AuraTestCase;
 import org.auraframework.throwable.NoAccessException;
-
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
@@ -32,7 +31,7 @@ public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
     }
 
     private SecurityProviderDef getSecurityProviderDef(String className) throws QuickFixException {
-        return new JavaSecurityProviderDefFactory().getDef(Aura.getDefinitionService().getDefDescriptor(
+        return new JavaSecurityProviderDefFactory(null).getDef(Aura.getDefinitionService().getDefDescriptor(
                 "java://" + className, SecurityProviderDef.class));
     }
 

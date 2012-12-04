@@ -20,29 +20,31 @@ import java.lang.reflect.*;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import org.auraframework.builder.DefBuilder;
-
 import org.auraframework.def.*;
 import org.auraframework.impl.java.BaseJavaDefFactory;
 import org.auraframework.impl.java.model.JavaValueDef;
 import org.auraframework.impl.java.type.JavaTypeDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
+import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.Annotations.AuraEnabled;
-
-import org.auraframework.system.Location;
-
+import org.auraframework.system.*;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 /**
+ * A {@link DefFactory} for Java controllers.
  */
 public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> {
+
+    public JavaControllerDefFactory(List<SourceLoader> sourceLoaders) {
+        super(sourceLoaders);
+    }
 
     @Override
     protected DefBuilder<?, ? extends ControllerDef> getBuilder(DefDescriptor<ControllerDef> descriptor) throws QuickFixException {

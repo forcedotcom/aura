@@ -19,20 +19,21 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import org.auraframework.builder.DefBuilder;
-
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.java.BaseJavaDefFactory;
+import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 
 /**
  * Loads Java types for Aura components.
- *
- *
- *
  */
 public class JavaTypeDefFactory extends BaseJavaDefFactory<TypeDef> {
+    public JavaTypeDefFactory(List<SourceLoader> sourceLoaders) {
+        super(sourceLoaders);
+    }
+
     @Override
     protected DefBuilder<?, ? extends TypeDef> getBuilder(DefDescriptor<TypeDef> descriptor) {
         JavaTypeDef.Builder builder;

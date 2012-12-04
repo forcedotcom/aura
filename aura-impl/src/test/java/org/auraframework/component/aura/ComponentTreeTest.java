@@ -25,6 +25,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
 import org.openqa.selenium.JavascriptExecutor;
 
@@ -76,7 +77,7 @@ public class ComponentTreeTest extends WebDriverTestCase {
         contextService.startContext(AuraContext.Mode.DEV, AuraContext.Format.HTML,
                                                AuraContext.Access.AUTHENTICATED);
         open(String.format("/%s/%s.%s", dd.getNamespace(), dd.getName(),
-                           DefDescriptor.DefType.APPLICATION.equals(dd.getDefType()) ? "app" : "cmp"));
+                           DefDescriptor.DefType.APPLICATION.equals(dd.getDefType()) ? "app" : "cmp"),Mode.SELENIUM);
         //open(dd);
         String clientIndex = getEval("return window.aura.componentService.getIndex();");
         String [] clientlines = clientIndex.split("\n");

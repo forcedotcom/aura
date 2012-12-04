@@ -37,18 +37,29 @@ public class SourceControlAdapterImpl implements SourceControlAdapter{
 
     @Override
     public boolean writeIfDifferent(Appendable newData, File file) throws IOException {
+        FileWriter writer = null;
+
         if(file.exists()){
             file.delete();
         }
-        FileWriter writer = null;
+        writer = new FileWriter(file);
         try{
-            writer = new FileWriter(file);
             writer.write(newData.toString());
+            writer.close();
+            // For the finally clause.
+            writer = null;
             return true;
         }finally{
-            writer.close();
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (Throwable t) {
+                    // The only case in which we will call close here is when
+                    // we have had an exception. In that case, we want to ignore
+                    // this exception, and let the previous one bubble up.
+                }
+            }
         }
-
     }
 
 }

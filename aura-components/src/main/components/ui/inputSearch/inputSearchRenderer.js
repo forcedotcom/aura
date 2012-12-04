@@ -15,11 +15,11 @@
  */
 ({
     afterRender: function(component, helper) {
-        helper.addDomHandler(component, "search");
+        helper.addEventHandler(component, "search");
         return this.superAfterRender();
     },
     rerender: function(component, helper) {
-        helper.addDomHandler(component, "search");
+        helper.addEventHandler(component, "search");
         return this.superRerender();
     }
 })

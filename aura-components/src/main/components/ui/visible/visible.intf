@@ -19,6 +19,7 @@
     <aura:attribute name="class" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component."/>
     <aura:attribute name="dir" type="String" default="ltr" description="The direction in which the component should be read. Possible values are &quot;rtl&quot; (right to left) and &quot;ltr&quot; (left to right). Default value is &quot;ltr&quot;."/>
     <aura:attribute name="label" type="String" description="The text displayed on the component. In the rendered HTML output, where possible the label is associated with the HTML element to improve accessibility."/>
+    <aura:attribute name="namespaceOverride" type="String" description="Overrides the namespace for this component with the supplied text."/>
     <aura:attribute name="actionable" type="Boolean" default="true" description="Specifies whether the component can have an action performed on it. For example, to control whether the component can be clicked."/>
     <aura:attribute name="role" type="String" description="Defines the component to help orient the user. Use this attribute for accessibility or component description. Possible values: header, main, note, and so on."/>
     <aura:attribute name="aria-describedby" type="String" description="Identifies the HTML element (or elements) that describes the component. Use this attribute for accessibility or component description."/>

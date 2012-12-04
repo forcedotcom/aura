@@ -87,6 +87,13 @@
      * Pre-process the event before we fire it.
      */
     preEventFiring : function(component, event) {
+        this.handleUpdate(component, event);
+    },
+    
+    /**
+     * handle the value update.
+     */
+    handleUpdate : function(component, event) {
         var element = component.getElement();
         var helper = component.getDef().getHelper();
         var updateOn = helper.getUpdateOn(component);
@@ -169,5 +176,28 @@
         var test = document.createElement("input");
         test.setAttribute("type", type);
         return (this.isHTML5Input.cache[type] = (test.type === type));
+    },
+    
+    isEventSupported: function(eventName) {
+        // create the cache
+        if ($A.util.isUndefined(this.isEventSupported.cache)) {
+            this.isEventSupported.cache = {};
+        }
+
+        // check the cache
+        var cached = this.isEventSupported.cache[eventName];
+        if (!$A.util.isUndefined(cached)) {
+            return cached;
+        }
+        
+        var el = document.createElement('input');
+        var _eventName = 'on' + eventName;
+        var isSupported = (_eventName in el);
+        if (!isSupported) {
+            el.setAttribute(_eventName, 'return;');
+            isSupported = typeof el[_eventName] == 'function';
+        }
+        $A.util.removeElement(el); 
+        return (this.isEventSupported.cache[eventName] = isSupported);
     }
 })

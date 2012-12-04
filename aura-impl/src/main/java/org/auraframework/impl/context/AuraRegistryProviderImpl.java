@@ -18,8 +18,6 @@ package org.auraframework.impl.context;
 import java.io.File;
 import java.util.*;
 
-import com.google.common.collect.*;
-
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.def.*;
@@ -39,10 +37,12 @@ import org.auraframework.impl.source.file.*;
 import org.auraframework.impl.source.resource.*;
 import org.auraframework.impl.system.*;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
-import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.*;
 import org.auraframework.util.ServiceLocator;
+
+import com.google.common.collect.*;
 
 /**
  */
@@ -63,21 +63,28 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
             List<SourceLoader> markupLoaders = Lists.newArrayList();
             List<SourceLoader> jsLoaders = Lists.newArrayList();
             List<SourceLoader> themeLoaders = Lists.newArrayList();
+            List<SourceLoader> javaLoaders = Lists.newArrayList();
+            
             for (ComponentLocationAdapter location : markupLocations) {
                 if(location != null){
                 String pkg = location.getComponentSourcePackage();
                     if (pkg != null) {
                         jsLoaders.add(new ResourceJavascriptSourceLoader(pkg));
                         themeLoaders.add(new ResourceThemeSourceLoader(pkg));
-                        markupLoaders.add(new ResourceSourceLoader(pkg));
+                        ResourceSourceLoader rsl = new ResourceSourceLoader(pkg);
+                        markupLoaders.add(rsl);
+                        javaLoaders.add(rsl);
                     } else if(location.getComponentSourceDir() != null){
                         jsLoaders.add(new FileJavascriptSourceLoader(location.getComponentSourceDir()));
                         themeLoaders.add(new FileThemeSourceLoader(location.getComponentSourceDir()));
-                        SourceLoader fsl = new FileSourceLoader(location.getComponentSourceDir());
-                        markupLoaders.add(fsl);
-                        File javaBase = location.getJavaGeneratedSourceDir();
-                        if (javaBase != null) {
-                            markupLoaders.add(new FileJavaSourceLoader(javaBase, fsl.getNamespaces()));
+                        markupLoaders.add(new FileSourceLoader(location.getComponentSourceDir()));
+                        File javaBase = new File(location.getComponentSourceDir().getParent(), "java");
+                        javaLoaders.add(new FileSourceLoader(javaBase));
+                        File generatedJavaBase = location.getJavaGeneratedSourceDir();
+                        if (generatedJavaBase != null) {
+                            FileSourceLoader fsl = new FileSourceLoader(generatedJavaBase);
+                            markupLoaders.add(fsl);
+                            javaLoaders.add(fsl);
                         }
                     } else{
                         Set<SourceLoader> loaders = location.getSourceLoaders();
@@ -92,6 +99,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                 jsLoaders.addAll(extraLoaders);
                 themeLoaders.addAll(extraLoaders);
                 markupLoaders.addAll(extraLoaders);
+                javaLoaders.addAll(extraLoaders);
             }
 
             SourceFactory jsSourceFactory = new SourceFactory(jsLoaders);
@@ -101,9 +109,9 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                     AuraStaticControllerDefRegistry.INSTANCE,
                     createDefRegistry(new RootDefFactory(new SourceFactory(markupLoaders)), rootDefTypes, rootPrefixes),
                     AuraRegistryProviderImpl.<ControllerDef>createDefRegistry(new CompoundControllerDefFactory(), DefType.CONTROLLER, DefDescriptor.COMPOUND_PREFIX),
-                    AuraRegistryProviderImpl.<ControllerDef>createDefRegistry(new JavaControllerDefFactory(), DefType.CONTROLLER, DefDescriptor.JAVA_PREFIX),
-                    AuraRegistryProviderImpl.<RendererDef>createDefRegistry(new JavaRendererDefFactory(), DefType.RENDERER, DefDescriptor.JAVA_PREFIX),
-                    AuraRegistryProviderImpl.<SecurityProviderDef>createDefRegistry(new JavaSecurityProviderDefFactory(), DefType.SECURITY_PROVIDER, DefDescriptor.JAVA_PREFIX),
+                    AuraRegistryProviderImpl.<ControllerDef>createDefRegistry(new JavaControllerDefFactory(javaLoaders), DefType.CONTROLLER, DefDescriptor.JAVA_PREFIX),
+                    AuraRegistryProviderImpl.<RendererDef>createDefRegistry(new JavaRendererDefFactory(javaLoaders), DefType.RENDERER, DefDescriptor.JAVA_PREFIX),
+                    AuraRegistryProviderImpl.<SecurityProviderDef>createDefRegistry(new JavaSecurityProviderDefFactory(javaLoaders), DefType.SECURITY_PROVIDER, DefDescriptor.JAVA_PREFIX),
 
                     AuraRegistryProviderImpl.<ControllerDef>createJavascriptRegistry(jsSourceFactory, DefType.CONTROLLER),
                     AuraRegistryProviderImpl.<TestSuiteDef>createJavascriptRegistry(jsSourceFactory, DefType.TESTSUITE),
@@ -112,9 +120,9 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                     AuraRegistryProviderImpl.<ProviderDef>createJavascriptRegistry(jsSourceFactory, DefType.PROVIDER),
 
                     createDefRegistry(new ThemeDefFactory(new SourceFactory(themeLoaders)), Sets.newHashSet(DefType.STYLE), Sets.newHashSet(DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX)),
-                    createDefRegistry(new JavaTypeDefFactory(), DefType.TYPE, DefDescriptor.JAVA_PREFIX),
-                    createDefRegistry(new JavaModelDefFactory(), DefType.MODEL, DefDescriptor.JAVA_PREFIX),
-                    createDefRegistry(new JavaProviderDefFactory(), DefType.PROVIDER, DefDescriptor.JAVA_PREFIX)
+                    createDefRegistry(new JavaTypeDefFactory(javaLoaders), DefType.TYPE, DefDescriptor.JAVA_PREFIX),
+                    createDefRegistry(new JavaModelDefFactory(javaLoaders), DefType.MODEL, DefDescriptor.JAVA_PREFIX),
+                    createDefRegistry(new JavaProviderDefFactory(javaLoaders), DefType.PROVIDER, DefDescriptor.JAVA_PREFIX)
                 };
 
             if(registries == null && !mode.isTestMode()){

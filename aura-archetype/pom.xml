@@ -3,22 +3,14 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>simple-aura-archetype</artifactId>
   <packaging>maven-archetype</packaging>
-  <name>simple-aura-archetype</name>
+  <name>archetype for Aura-based "hello, world"</name>
 
   <parent>
     <groupId>org.auraframework</groupId>
     <artifactId>aura-framework</artifactId>
-    <version>0.0.380-SNAPSHOT</version>
+    <version>0.0.382-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.auraframework</groupId>
-      <artifactId>aura-framework</artifactId>
-      <version>0.0.380-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
 
   <build>
     <extensions>
@@ -31,8 +23,39 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-archetype-plugin</artifactId>
           <version>2.2</version>
+        </plugin>
+        <plugin>
+          <!-- We use the resources plugin to make the archetype-project's pom.xml depend
+               on the current Aura framework ${project.version} -->
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.6</version>
+          <executions>
+            <execution>
+              <id>copy-resources</id>
+              <phase>generate-sources</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>
+                  ${basedir}/target/classes/archetype-resources
+                </outputDirectory>
+                <escapeString>\</escapeString>
+                <resources>
+                  <resource>
+                    <directory>src/main/resources</directory>
+                    <filtering>true</filtering>
+                    <includes>
+                      <include>pom.xml</include>
+                    </includes>
+                  </resource>
+                </resources>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>

@@ -27,11 +27,14 @@ import org.auraframework.util.AuraTextUtil;
 import com.google.common.collect.ImmutableSet;
 
 /**
+ * Abstract superclass to {@link SourceLoader} implementations, providing common descriptor and
+ * filename utilities.ß
  */
 public abstract class BaseSourceLoader implements SourceLoader{
 
     protected static final EnumMap<DefType, String> extensions = new EnumMap<DefType, String>(DefType.class);
     public static final Set<String> PREFIXES = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
+    public static final String FILE_SEPARATOR = System.getProperty("file.separator");
 
     static {
         extensions.put(DefType.APPLICATION, ".app");
@@ -44,12 +47,22 @@ public abstract class BaseSourceLoader implements SourceLoader{
     }
 
     protected String getPath(DefDescriptor<?> descriptor){
-      //Get rid of the inner type qualifier.
+        // Get rid of the inner type qualifier.
         String name = AuraTextUtil.splitSimple("$",descriptor.getName()).get(0);
 
-        String filename = String.format("%s/%s/%s%s", descriptor.getNamespace(), name, name, extensions
-                .get(descriptor.getDefType()));
-
+        String filename = null;
+        if (extensions.containsKey(descriptor.getDefType())) {
+            // Alongside knowing the extension, we also know that namespace+name is a directory,
+            // and name+ext is the file inside that directory:
+            filename = String.format("%s/%s/%s%s", descriptor.getNamespace(), name, name,
+                    extensions.get(descriptor.getDefType()));
+        } else {
+            // Otherwise, the extension matches the expected implementation language, we need to
+            // convert the namespace from dotted-package to slash-filename, and we NOT repeat name:
+            filename = String.format("%s/%s.%s",
+                    descriptor.getNamespace().replace(".", FILE_SEPARATOR),
+                    name, descriptor.getPrefix());
+        }
         return filename;
     }
 

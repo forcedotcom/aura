@@ -15,21 +15,24 @@
  */
 package org.auraframework.impl.java.provider;
 
-import org.auraframework.builder.DefBuilder;
+import java.util.List;
 
+import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.impl.java.BaseJavaDefFactory;
 import org.auraframework.system.Annotations.Provider;
-
-import org.auraframework.system.Location;
-
+import org.auraframework.system.*;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  */
 public class JavaProviderDefFactory extends BaseJavaDefFactory<ProviderDef>{
+    public JavaProviderDefFactory(List<SourceLoader> sourceLoaders) {
+        super(sourceLoaders);
+    }
+
     @Override
     protected DefBuilder<?, ? extends ProviderDef> getBuilder(DefDescriptor<ProviderDef> descriptor)
             throws QuickFixException {

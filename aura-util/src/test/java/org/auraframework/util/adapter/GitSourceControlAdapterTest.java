@@ -20,8 +20,6 @@ import java.io.IOException;
 
 import org.auraframework.test.UnitTestCase;
 
-import org.junit.Ignore;
-
 public class GitSourceControlAdapterTest extends UnitTestCase {
     public GitSourceControlAdapterTest(String name){
         super(name);

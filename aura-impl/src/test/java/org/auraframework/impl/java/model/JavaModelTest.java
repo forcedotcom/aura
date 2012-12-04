@@ -181,8 +181,8 @@ public class JavaModelTest extends AuraImplTestCase {
      * Verify that nice exception is thrown if model def doesn't exist
      */
     public void testModelNotFound() throws Exception {
-        DefDescriptor<ComponentDef> dd = addSourceAutoCleanup("<aura:component model='java://goats'/>",
-                ComponentDef.class);
+        DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component model='java://goats'/>");
         try {
             Aura.getInstanceService().getInstance(dd);
             fail("Expected DefinitionNotFoundException");

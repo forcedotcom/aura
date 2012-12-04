@@ -125,8 +125,8 @@ public class EventHandlerDefTest extends AuraImplTestCase {
 
     public void testHandlerWithEmptyNameAttributeForComponentEvent() throws Exception {
         DefDescriptor<ComponentDef> componentDefDescriptor = addSourceAutoCleanup(
-                "<aura:component><aura:handler name='' action='{!c.handleIt}'/></aura:component>",
-                ComponentDef.class);
+                ComponentDef.class,
+                "<aura:component><aura:handler name='' action='{!c.handleIt}'/></aura:component>");
         try {
             componentDefDescriptor.getDef();
             fail("Expected InvalidReferenceException");
@@ -138,8 +138,8 @@ public class EventHandlerDefTest extends AuraImplTestCase {
 
     public void testHandlerWithEmptyEventAttributeForApplicationEvent() throws Exception {
         DefDescriptor<ComponentDef> componentDefDescriptor = addSourceAutoCleanup(
-                "<aura:component><aura:handler event='' action='{!c.handleIt}'/></aura:component>",
-                ComponentDef.class);
+                ComponentDef.class,
+                "<aura:component><aura:handler event='' action='{!c.handleIt}'/></aura:component>");
         try {
             componentDefDescriptor.getDef();
             fail("Expected InvalidDefinitionException");
@@ -154,7 +154,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         String markup = String
                 .format(cmpMarkup,
                         "<aura:handler event='aura:applicationEvent' description='Describe the event handler' action='{!c.dummy}'/>");
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(markup, ComponentDef.class);
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
         assertEquals("Description of registerevent not processed", "Describe the event handler", cmpDesc.getDef()
                 .getHandlerDefs().iterator().next().getDescription());
     }

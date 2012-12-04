@@ -15,18 +15,22 @@
  */
 package org.auraframework.service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
-import com.google.common.collect.Lists;
-
-import org.auraframework.def.*;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.source.StringSourceLoader;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.NoContextException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.collect.Lists;
 
 /**
  * @hierarchy Aura.Services.ContextService
@@ -119,8 +123,7 @@ public class ContextServiceTest extends BaseServiceTest<ContextService, ContextS
         StringSourceLoader loader = StringSourceLoader.getInstance();
         DefDescriptor<ComponentDef> desc = null;
         try{
-            desc = loader.createStringSourceDescriptor(null, ComponentDef.class);
-            loader.addSource(desc, "<aura:component/>", new Date());
+            desc = loader.addSource(ComponentDef.class, "<aura:component/>", null).getDescriptor();
 
             assertNull(service.getCurrentContext());
             service.startContext(config.mode, config.format, config.access);

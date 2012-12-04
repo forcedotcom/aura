@@ -42,12 +42,11 @@ public abstract class Source<D extends Definition> implements Serializable {
     }
 
     /**
-     * Gets the system ID of this source, which is a semi-arbitrary string to
-     * name this source.  In practice, it is typically a filename relative
-     * to one of the classpath roots ({@link ResourceSource}) or the working
-     * directory ({@link FileSource}), but it can be something else (e.g. for
-     * {@link StringSource}).
-     *
+     * Gets the system ID of this source, which is a semi-arbitrary string to name this source. In practice, it is
+     * typically a filename relative to one of the classpath roots ({@link org.auraframework.impl.source.ResourceSource}
+     * ) or the working directory ({@link org.auraframework.impl.source.FileSource}), but it can be something else (e.g.
+     * for {@link org.auraframework.impl.source.StringSource}).
+     * 
      * @return the system id.
      */
     public String getSystemId() {
@@ -63,26 +62,23 @@ public abstract class Source<D extends Definition> implements Serializable {
     public abstract Writer getWriter();
 
     /**
-     * Gets an absolute URL to the given source, typically with one of
-     * {@code file://}, {@code jar://}, or the non-standard {@code string://}
-     * protocols.
+     * Gets an absolute URL to the given source, typically with one of {@code file://}, {@code jar://}, or the
+     * non-standard {@code string://} protocols.
      * 
-     * Subclasses <em>SHOULD</em> override this, but existing legacy ones
-     * will not, so we have a lame concrete implementation here.
+     * Subclasses <em>SHOULD</em> override this, but existing legacy ones will not, so we have a lame concrete
+     * implementation here.
      * 
-     * @return String-format absolute representing this source.  This
-     *    might not be valid to {@link java.net.URL}, for example for the
-     *    {@code string://} protocol. 
+     * @return String-format absolute representing this source. This might not be valid to {@link java.net.URL}, for
+     *         example for the {@code string://} protocol.
      */
     public String getUrl() {
         return null;
     }
     
     /**
-     * Returns either {@code null}, or the URL to a cached copy of this source,
-     * if such a thing exists.  In most cases it will not, so the implementation
-     * here always returns {@code null}.
-     *
+     * Returns either {@code null}, or the URL to a cached copy of this source, if such a thing exists. In most cases it
+     * will not, so the implementation here always returns {@code null}.
+     * 
      * @return {@code null}, or in subclasses a URL to a cache copy.
      */
     public URL getCacheUrl() {
@@ -98,15 +94,16 @@ public abstract class Source<D extends Definition> implements Serializable {
     public abstract boolean exists();
 
     /**
-     * Due to case insensitivity, the best descriptor for this source may not be what was requested.
-     * The one returned by this method is "best"
+     * Due to case insensitivity, the best descriptor for this source may not be what was requested. The one returned by
+     * this method is "best"
      */
-    public DefDescriptor<?> getDescriptor(){
+    public DefDescriptor<D> getDescriptor(){
         return descriptor;
     }
+    
     /**
-     * Some Source types might want to clear their content before adding or updating
-     * the source. For example StringSource.
+     * Some Source types might want to clear their content before adding or updating the source. For example
+     * StringSource.
      */
     public void clearContents(){
         //Do nothing.

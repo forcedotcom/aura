@@ -15,28 +15,59 @@
  */
 package org.auraframework.impl.source;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 
-public class StringSource<D extends Definition> extends Source<D> implements Serializable{
+public class StringSource<D extends Definition> extends Source<D> {
 
     private static final long serialVersionUID = 8822758262106180101L;
-    private final transient StringWriter writer = new StringWriter();
+    private final transient StringWriter writer = new StringWriter() {
+        @Override
+        public void write(int c) {
+            super.write(c);
+            touch();
+        }
+
+        @Override
+        public void write(char[] cbuf) throws IOException {
+            super.write(cbuf);
+            touch();
+        }
+
+        @Override
+        public void write(String str) {
+            super.write(str);
+            touch();
+        }
+
+        @Override
+        public void write(char[] cbuf, int off, int len) {
+            super.write(cbuf, off, len);
+            touch();
+        }
+
+        @Override
+        public void write(String str, int off, int len) {
+            super.write(str, off, len);
+            touch();
+        }
+    };
+    
     private final StringBuffer sb = writer.getBuffer();
-    private final long lastModified;
+    private long lastModified;
 
     public StringSource(DefDescriptor<D> descriptor, String contents, String id, Format format) {
-        this(descriptor, contents, id, format, 0);
-    }
-
-    public StringSource(DefDescriptor<D> descriptor, String contents, String id, Format format, long lastModified) {
         super(descriptor, id, format);
         this.sb.append(contents);
-        this.lastModified = lastModified;
+        this.lastModified = 0;
     }
 
     @Override
@@ -73,12 +104,27 @@ public class StringSource<D extends Definition> extends Source<D> implements Ser
 
     @Override
     public boolean addOrUpdate(CharSequence newContents) {
-        sb.append(newContents);
+        if (newContents != null) {
+            clearContents();
+            sb.append(newContents);
+        }
+        touch();
         return true;
     }
 
     @Override
     public void clearContents() {
-        writer.getBuffer().setLength(0);
+        sb.setLength(0);
+        touch();
+    }
+    
+    public long setLastModified(long lastModified) {
+        long previous = this.lastModified;
+        this.lastModified = lastModified;
+        return previous;
+    }
+
+    private void touch() {
+        setLastModified(System.currentTimeMillis());
     }
 }

@@ -52,9 +52,9 @@ public class IterationTest extends AuraImplTestCase {
     private Component getIterationComponent(String innerSource,
             Map<String, Object> attributes) throws Exception {
         DefDescriptor<ComponentDef> def = addSourceAutoCleanup(
-                String.format(
-                        "<aura:component><aura:attribute name='items' type='List'/>%s</aura:component>",
-                        innerSource), ComponentDef.class);
+                ComponentDef.class, String.format(
+                                "<aura:component><aura:attribute name='items' type='List'/>%s</aura:component>",
+                                innerSource));
         Component cmp = Aura.getInstanceService().getInstance(def, attributes);
         return (Component) ((List<?>) cmp.getSuper().getAttributes()
                 .getValue("body")).get(0);
@@ -300,9 +300,9 @@ public class IterationTest extends AuraImplTestCase {
      */
     public void testRequiredAttributesWhenLazyLoading() throws Exception{
         //Similar to BaseComponentDefTest.testLazyLoadingFacets()
-        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(String.format(baseComponentTag, "",
-                                            "<aura:iteration aura:load='LAZY'><aura:text/></aura:iteration>"),
-                                            ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
+                                            String.format(baseComponentTag, "",
+                                                                                "<aura:iteration aura:load='LAZY'><aura:text/></aura:iteration>"));
         try{
             Aura.getInstanceService().getInstance(desc);
             fail("Should not be able to pass non simple attribute values to lazy loading facets.");

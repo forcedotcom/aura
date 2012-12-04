@@ -52,10 +52,10 @@ public class LayoutItemDefTest extends AuraImplTestCase {
     }
 
     public void testLayoutItemWithActionAndMarkup() throws Exception {
-        DefDescriptor<LayoutsDef> dd = util.addSourceAutoCleanup("<aura:layouts default='def'>"
-                + "<aura:layout name='def'>"
-                + "<aura:layoutItem container='target' action='{!c.act}'>text</aura:layoutItem>" + "</aura:layout>"
-                + "</aura:layouts>", LayoutsDef.class);
+        DefDescriptor<LayoutsDef> dd = util.addSourceAutoCleanup(LayoutsDef.class, "<aura:layouts default='def'>"
+                        + "<aura:layout name='def'>"
+                        + "<aura:layoutItem container='target' action='{!c.act}'>text</aura:layoutItem>" + "</aura:layout>"
+                        + "</aura:layouts>");
         try {
             Aura.getDefinitionService().getDefinition(dd);
             fail("Expected QuickFixException");
@@ -65,9 +65,9 @@ public class LayoutItemDefTest extends AuraImplTestCase {
     }
 
     public void testLayoutItemWithoutActionOrMarkup() throws Exception {
-        DefDescriptor<LayoutsDef> dd = util.addSourceAutoCleanup("<aura:layouts default='def'>"
-                + "<aura:layout name='def'>" + "<aura:layoutItem container='target'/>" + "</aura:layout>"
-                + "</aura:layouts>", LayoutsDef.class);
+        DefDescriptor<LayoutsDef> dd = util.addSourceAutoCleanup(LayoutsDef.class, "<aura:layouts default='def'>"
+                        + "<aura:layout name='def'>" + "<aura:layoutItem container='target'/>" + "</aura:layout>"
+                        + "</aura:layouts>");
         try {
             Aura.getDefinitionService().getDefinition(dd);
             fail("Expected QuickFixException");

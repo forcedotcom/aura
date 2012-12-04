@@ -16,14 +16,15 @@
 package org.auraframework.impl;
 
 import java.io.File;
-import java.util.Date;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.impl.util.AuraImplFiles;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.Source;
 import org.auraframework.test.AuraTestingUtil;
 
@@ -31,6 +32,7 @@ import com.google.common.collect.Sets;
 
 public class AuraTestingUtilImpl implements AuraTestingUtil {
     private final Set<DefDescriptor<?>> cleanUpDds = Sets.newHashSet();
+    private static AtomicLong nonce = new AtomicLong(System.currentTimeMillis());
 
     public AuraTestingUtilImpl() {}
 
@@ -54,23 +56,41 @@ public class AuraTestingUtilImpl implements AuraTestingUtil {
     }
 
     @Override
-    public Source<?> getSource(DefDescriptor<?> descriptor) {
-        return Aura.getContextService().getCurrentContext().getDefRegistry().getSource(descriptor);
+    public String getNonce() {
+        return Long.toString(nonce.incrementAndGet());
     }
 
     @Override
-    public <T extends Definition> void addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents,
-            Date lastModified) {
-        StringSourceLoader.getInstance().addSource(descriptor, contents, lastModified);
-        cleanUpDds.add(descriptor);
+    public <T extends Definition> Source<T> getSource(DefDescriptor<T> descriptor) {
+        // Look up in the registry if a context is available. Otherwise, we're probably running a context-less unit test
+        // and better be using StringSourceLoader
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        if (context != null) {
+            return context.getDefRegistry().getSource(descriptor);
+        } else {
+            return StringSourceLoader.getInstance().getSource(descriptor);
+        }
     }
 
     @Override
-    public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(String contents, Class<T> defClass) {
+    public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents) {
+        return addSourceAutoCleanup(defClass, contents, null);
+    }
+
+    @Override
+    public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents,
+            String namePrefix) {
         StringSourceLoader loader = StringSourceLoader.getInstance();
-        DefDescriptor<T> desc = loader.createStringSourceDescriptor(null, defClass);
-        loader.addSource(desc, contents, new Date());
-        cleanUpDds.add(desc);
-        return desc;
+        DefDescriptor<T> descriptor = loader.addSource(defClass, contents, namePrefix).getDescriptor();
+        cleanUpDds.add(descriptor);
+        return descriptor;
+    }
+    
+    @Override
+    public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents) {
+        StringSourceLoader loader = StringSourceLoader.getInstance();
+        loader.putSource(descriptor, contents, false);
+        cleanUpDds.add(descriptor);
+        return descriptor;
     }
 }

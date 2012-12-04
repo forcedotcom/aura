@@ -98,7 +98,7 @@ public class RegisterEventDefTest extends AuraImplTestCase {
         String cmpMarkup = "<aura:component >%s</aura:component>";
         String markup = String.format(cmpMarkup,
                 "<aura:registerevent name='eventName' type='aura:componentEvent' description='Describe the event'/>");
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(markup, ComponentDef.class);
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
         assertEquals("Description of registerevent not processed", "Describe the event", cmpDesc.getDef()
                 .getRegisterEventDefs().get("eventName").getDescription());
     }

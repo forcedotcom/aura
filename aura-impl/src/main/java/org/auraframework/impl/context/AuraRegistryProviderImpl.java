@@ -16,12 +16,22 @@
 package org.auraframework.impl.context;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.adapter.RegistryAdapter;
-import org.auraframework.def.*;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.SecurityProviderDef;
+import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.compound.controller.CompoundControllerDefFactory;
 import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
 import org.auraframework.impl.css.theme.ThemeDefFactory;
@@ -33,48 +43,58 @@ import org.auraframework.impl.java.securityProvider.JavaSecurityProviderDefFacto
 import org.auraframework.impl.java.type.JavaTypeDefFactory;
 import org.auraframework.impl.root.RootDefFactory;
 import org.auraframework.impl.source.SourceFactory;
-import org.auraframework.impl.source.file.*;
-import org.auraframework.impl.source.resource.*;
-import org.auraframework.impl.system.*;
+import org.auraframework.impl.source.file.FileJavascriptSourceLoader;
+import org.auraframework.impl.source.file.FileSourceLoader;
+import org.auraframework.impl.source.file.FileThemeSourceLoader;
+import org.auraframework.impl.source.resource.ResourceJavascriptSourceLoader;
+import org.auraframework.impl.source.resource.ResourceSourceLoader;
+import org.auraframework.impl.source.resource.ResourceThemeSourceLoader;
+import org.auraframework.impl.system.CacheableDefFactoryImpl;
+import org.auraframework.impl.system.CachingDefRegistryImpl;
+import org.auraframework.impl.system.NonCachingDefRegistryImpl;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.*;
+import org.auraframework.system.CacheableDefFactory;
+import org.auraframework.system.DefFactory;
+import org.auraframework.system.DefRegistry;
+import org.auraframework.system.SourceLoader;
 import org.auraframework.util.ServiceLocator;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
-/**
- */
 public class AuraRegistryProviderImpl implements RegistryAdapter {
 
     private DefRegistry<?>[] registries;
 
     private static final Set<String> rootPrefixes = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
-    private static final Set<DefType> rootDefTypes = EnumSet.of(DefType.APPLICATION, DefType.COMPONENT, DefType.INTERFACE, DefType.EVENT, DefType.LAYOUTS);
+    private static final Set<DefType> rootDefTypes = EnumSet.of(DefType.APPLICATION, DefType.COMPONENT,
+            DefType.INTERFACE, DefType.EVENT, DefType.LAYOUTS);
 
     @Override
     public DefRegistry<?>[] getRegistries(Mode mode, Access access, Set<SourceLoader> extraLoaders) {
         DefRegistry<?>[] ret = registries;
 
-        if(mode.isTestMode() || ret == null || (extraLoaders != null && !extraLoaders.isEmpty())){
+        if (mode.isTestMode() || ret == null || (extraLoaders != null && !extraLoaders.isEmpty())) {
             Collection<ComponentLocationAdapter> markupLocations = getAllComponentLocationAdapters();
 
             List<SourceLoader> markupLoaders = Lists.newArrayList();
             List<SourceLoader> jsLoaders = Lists.newArrayList();
             List<SourceLoader> themeLoaders = Lists.newArrayList();
             List<SourceLoader> javaLoaders = Lists.newArrayList();
-            
+
             for (ComponentLocationAdapter location : markupLocations) {
-                if(location != null){
-                String pkg = location.getComponentSourcePackage();
+                if (location != null) {
+                    String pkg = location.getComponentSourcePackage();
                     if (pkg != null) {
                         jsLoaders.add(new ResourceJavascriptSourceLoader(pkg));
                         themeLoaders.add(new ResourceThemeSourceLoader(pkg));
                         ResourceSourceLoader rsl = new ResourceSourceLoader(pkg);
                         markupLoaders.add(rsl);
                         javaLoaders.add(rsl);
-                    } else if(location.getComponentSourceDir() != null){
+                    } else if (location.getComponentSourceDir() != null) {
                         jsLoaders.add(new FileJavascriptSourceLoader(location.getComponentSourceDir()));
                         themeLoaders.add(new FileThemeSourceLoader(location.getComponentSourceDir()));
                         markupLoaders.add(new FileSourceLoader(location.getComponentSourceDir()));
@@ -88,10 +108,12 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                             markupLoaders.add(fsl);
                             javaLoaders.add(fsl);
                         }
-                    } else{
+                    } else {
                         Set<SourceLoader> loaders = location.getSourceLoaders();
-                        if(!loaders.isEmpty()){
-                            markupLoaders.addAll(location.getSourceLoaders());
+                        if (!loaders.isEmpty()) {
+                            markupLoaders.addAll(loaders);
+                            themeLoaders.addAll(loaders);
+                            jsLoaders.addAll(loaders);
                         }
                     }
                 }
@@ -127,7 +149,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                     createDefRegistry(new JavaProviderDefFactory(javaLoaders), DefType.PROVIDER, DefDescriptor.JAVA_PREFIX)
                 };
 
-            if(registries == null && !mode.isTestMode()){
+            if (registries == null && !mode.isTestMode()) {
                 registries = ret;
             }
         }
@@ -135,31 +157,34 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
         return ret;
     }
 
-    private Collection<ComponentLocationAdapter> getAllComponentLocationAdapters(){
-        Collection<ComponentLocationAdapter> ret =  ServiceLocator.get().getAll(ComponentLocationAdapter.class);
+    private Collection<ComponentLocationAdapter> getAllComponentLocationAdapters() {
+        Collection<ComponentLocationAdapter> ret = ServiceLocator.get().getAll(ComponentLocationAdapter.class);
         String prop = System.getProperty("aura.componentDir");
-        if(prop != null){
+        if (prop != null) {
             ret = Lists.newArrayList(ret);
             ret.add(new ComponentLocationAdapter.Impl(new File(prop)));
             return ret;
-        }else{
+        } else {
             return ret;
         }
     }
 
-    private static <T extends Definition> DefRegistry<T> createJavascriptRegistry(SourceFactory sourceFactory, DefType dt) {
+    private static <T extends Definition> DefRegistry<T> createJavascriptRegistry(SourceFactory sourceFactory,
+            DefType dt) {
         CacheableDefFactoryImpl<T> factory = new CacheableDefFactoryImpl<T>(sourceFactory);
         return createDefRegistry(factory, dt, DefDescriptor.JAVASCRIPT_PREFIX);
     }
 
-    protected static <T extends Definition> DefRegistry<T> createDefRegistry(DefFactory<T> factory, DefType defType, String prefix){
+    protected static <T extends Definition> DefRegistry<T> createDefRegistry(DefFactory<T> factory, DefType defType,
+            String prefix) {
         return createDefRegistry(factory, EnumSet.of(defType), Sets.newHashSet(prefix));
     }
 
-    protected static <T extends Definition> DefRegistry<T> createDefRegistry(DefFactory<T> factory, Set<DefType> defTypes, Set<String> prefixes){
-        if(factory instanceof CacheableDefFactory){
+    protected static <T extends Definition> DefRegistry<T> createDefRegistry(DefFactory<T> factory,
+            Set<DefType> defTypes, Set<String> prefixes) {
+        if (factory instanceof CacheableDefFactory) {
             return new CachingDefRegistryImpl<T>((CacheableDefFactory<T>)factory, defTypes, prefixes);
-        }else{
+        } else {
             return new NonCachingDefRegistryImpl<T>(factory, defTypes, prefixes);
         }
     }

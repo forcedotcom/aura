@@ -15,20 +15,28 @@
  */
 package org.auraframework.impl.source;
 
-import java.util.Date;
-import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
-import org.auraframework.system.DescriptorMatcher;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.GuardedBy;
 
-
 import org.auraframework.Aura;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.LayoutsDef;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.ThemeDef;
+import org.auraframework.system.DescriptorMatcher;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
@@ -43,25 +51,18 @@ import com.google.common.collect.Sets;
  * the classpath. This loader is a singleton to ensure that it can be authoritative for the "string" namespace.
  */
 public class StringSourceLoader implements SourceLoader{
-    public static final String NAMESPACE = "string";
+    public static final String DEFAULT_NAMESPACE = "string";
+    
     private static final String DEFAULT_NAME_PREFIX = "thing";
-    private static final Set<String> PREFIXES = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
-    private static final Set<String> NAMESPACES = ImmutableSet.of(NAMESPACE);
-    private static final Set<DefType> DEFTYPES = EnumSet.of(DefType.COMPONENT, DefType.INTERFACE, DefType.EVENT);
-
-    /**
-     * This map stores all of the sources owned by this loader.
-     */
-    @GuardedBy("this")
-    private final Map<DefDescriptor<?>, Source<?>> sources = Maps.newHashMap();
-
+    private static final Set<String> PREFIXES = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX,
+            DefDescriptor.JAVASCRIPT_PREFIX, DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX);
+    private static final Set<DefType> DEFTYPES = ImmutableSet.of(DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT,
+            DefType.INTERFACE, DefType.LAYOUTS, DefType.CONTROLLER, DefType.HELPER, DefType.RENDERER, DefType.STYLE);
+    
     /**
      * A counter that we can use to guarantee unique names across multiple calls to add a source.
      */
-    @GuardedBy("this")
-    private static int counter = 0;
-
-    private StringSourceLoader() {}
+    private static AtomicLong counter = new AtomicLong();
 
     /**
      * A helper to hold the singleton instance.
@@ -72,10 +73,24 @@ public class StringSourceLoader implements SourceLoader{
 
     public static StringSourceLoader getInstance(){
         return SingletonHolder.INSTANCE;
-            }
+    }
 
     /**
-     * Generate a {@link DefDescriptor} with a unique name in the 'string' namespace.
+     * This map stores all of the sources owned by this loader, split into namespaces.
+     */
+    @GuardedBy("this")
+    private final Map<String, Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>> namespaces = Maps
+            .newHashMap();
+
+    private StringSourceLoader() {
+        namespaces.put(DEFAULT_NAMESPACE,
+                new HashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>());
+    }
+
+    /**
+     * Generate a {@link DefDescriptor} with a unique name. If namePrefix does not contain a namespace, the descriptor
+     * will be created in the 'string' namespace. If namePrefix does not contain the name portion (i.e. it is null,
+     * empty, or just a namespace with the trailing delimiter), 'thing' will be used as the base name.
      * 
      * @param namePrefix
      *            if non-null, then generate some name with the given prefix for the descriptor.
@@ -83,53 +98,102 @@ public class StringSourceLoader implements SourceLoader{
      *            the interface of the type definition
      * @return a {@link DefDescriptor} with name that is guaranteed to be unique in the string: namespace.
      */
-    public final synchronized <T extends Definition> DefDescriptor<T> createStringSourceDescriptor(
-            @Nullable String namePrefix, Class<T> defClass) {
+    public final <D extends Definition> DefDescriptor<D> createStringSourceDescriptor(
+            @Nullable String namePrefix, Class<D> defClass) {
+        
+        DescriptorInfo descriptorInfo = DescriptorInfo.get(defClass);
+        
+        String namespace;
+        String name;
         if (namePrefix == null || namePrefix.isEmpty()) {
-            namePrefix = DEFAULT_NAME_PREFIX;
+            namespace = DEFAULT_NAMESPACE;
+            name = DEFAULT_NAME_PREFIX;
+        } else {
+            int idx = namePrefix.indexOf(descriptorInfo.getDelimiter());
+            if (idx < 0) {
+                namespace = DEFAULT_NAMESPACE;
+                name = namePrefix;
+            } else if (idx == namePrefix.length() - 1) {
+                namespace = namePrefix.substring(0, idx);
+                name = DEFAULT_NAME_PREFIX;
+            } else {
+                namespace = namePrefix.substring(0, idx);
+                name = namePrefix.substring(idx + 1);
+            }
         }
-        String name = namePrefix + "_" + counter++;
-        return Aura.getDefinitionService().getDefDescriptor(
-                String.format("%s://%s:%s", DefDescriptor.MARKUP_PREFIX, NAMESPACE, name), defClass);
+        return descriptorInfo.getDescriptor(namespace, name + counter.incrementAndGet());
     }
 
     /**
-     * Update the contents and lastModified of an already loaded definition.
+     * Load a new definition.
      * 
-     * @param descriptor
-     *            the descriptor pointing at the definition to update
-     * @param contents
-     *            the new source contents
-     * @param lastModified
-     *            the new last modification time
-     * @return the updated descriptor
-     */
-    public synchronized final <T extends Definition> DefDescriptor<T> updateSource(DefDescriptor<T> descriptor,
-            String contents, Date lastModified) {
-        Preconditions.checkArgument(descriptor.getNamespace().equals(NAMESPACE));
-        Preconditions.checkState(sources.get(descriptor) != null);
-
-        return putSource(descriptor, contents, lastModified);
-    }
-
-    /**
-     * Load a new definition
-     * 
-     * @param descriptor
-     *            a descriptor in the 'string' namespace that is not currently loaded.
+     * @param defClass
+     *            the definition class that this source will represent
      * @param contents
      *            the source contents
-     * @param lastModified
-     *            the last modification
+     * @param namePrefix
+     *            if non-null, then generate some name with the given prefix for the descriptor.
+     * @return the created {@link StringSource}
+     * @throws IllegalStateException
+     *            when loading a definition that already exists with the same descriptor.
      */
-    public synchronized final <T extends Definition> void addSource(DefDescriptor<T> descriptor, String contents,
-            Date lastModified) {
-        Preconditions.checkArgument(descriptor.getNamespace().equals(NAMESPACE));
-        Preconditions.checkState(sources.get(descriptor) == null);
-
-        putSource(descriptor, contents, lastModified);
+    public final <D extends Definition> StringSource<D> addSource(Class<D> defClass, String contents,
+            @Nullable String namePrefix) {
+        return putSource(defClass, contents, namePrefix, false);
     }
 
+    /**
+     * Load a definition.
+     * 
+     * @param defClass
+     *            the definition class that this source will represent
+     * @param contents
+     *            the source contents
+     * @param namePrefix
+     *            if non-null, then generate some name with the given prefix for the descriptor.
+     * @param overwrite
+     *            if true, overwrite any previously loaded definition
+     * @return the created {@link StringSource}
+     */
+    public final <D extends Definition> StringSource<D> putSource(Class<D> defClass, String contents,
+            @Nullable String namePrefix, boolean overwrite) {
+        DefDescriptor<D> descriptor = createStringSourceDescriptor(namePrefix, defClass);
+        return putSource(descriptor, contents, overwrite);
+    }
+    
+    /**
+     * Load a definition.
+     * 
+     * @param descriptor
+     *            the DefDescriptor key for the loaded definition
+     * @param contents
+     *            the source contents
+     * @param overwrite
+     *            if true, overwrite any previously loaded definition
+     * @return the created {@link StringSource}
+     */
+    public final <D extends Definition> StringSource<D> putSource(DefDescriptor<D> descriptor,
+            String contents, boolean overwrite) {
+        Format format = DescriptorInfo.get(descriptor.getDefType().getPrimaryInterface()).getFormat();
+        StringSource<D> source = new StringSource<D>(descriptor, contents, descriptor.getQualifiedName(), format);
+        return putSource(descriptor, source, overwrite);
+    }
+    
+    private synchronized final <D extends Definition> StringSource<D> putSource(DefDescriptor<D> descriptor,
+            StringSource<D> source, boolean overwrite) {
+        String namespace = descriptor.getNamespace();
+        Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
+                .get(namespace);
+        if (sourceMap == null) {
+            sourceMap = Maps.newHashMap();
+            namespaces.put(namespace, sourceMap);
+        } else {
+            Preconditions.checkState(overwrite || !sourceMap.containsKey(descriptor));
+        }
+        sourceMap.put(descriptor, source);
+        return source;
+    }
+    
     /**
      * Remove a definition from the source loader.
      * 
@@ -137,50 +201,52 @@ public class StringSourceLoader implements SourceLoader{
      *            the descriptor identifying the loaded definition to remove.
      */
     public synchronized final void removeSource(DefDescriptor<?> descriptor){
-        Preconditions.checkState(sources.get(descriptor) != null);
-        sources.remove(descriptor);
+        String namespace = descriptor.getNamespace();
+        Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
+                .get(namespace);
+        Preconditions.checkState(sourceMap != null);
+        Preconditions.checkState(sourceMap.remove(descriptor) != null);
+        if (!DEFAULT_NAMESPACE.equals(namespace) && sourceMap.isEmpty()) {
+            namespaces.remove(sourceMap);
+        }
     }
 
     /**
-     * Load the definition identified by the descriptor with the given contents and last modified time into this loader.
+     * Remove a definition from the source loader.
      * 
-     * @return the descriptor
+     * @param source
+     *            the loaded definition to remove.
      */
-    private synchronized final <T extends Definition> DefDescriptor<T> putSource(DefDescriptor<T> descriptor,
-            String contents, Date lastModified) {
-        Source<T> source = new StringSource<T>(descriptor, contents, descriptor.getQualifiedName(), Format.XML,
-                lastModified.getTime());
-        sources.put(descriptor, source);
-        return descriptor;
+    public final void removeSource(StringSource source){
+        removeSource(source.getDescriptor());
     }
 
     @Override
     public synchronized Set<DefDescriptor<?>> find(DescriptorMatcher matcher) {
         Set<DefDescriptor<?>> ret = Sets.newHashSet();
-
-        // Since we only have one namespace, we can easily exclude if we don't match.
-        if (!matcher.matchNamespace(NAMESPACE)) {
-            return ret;
-        }
-        for(DefDescriptor<?> desc : sources.keySet()){
-            if (matcher.matchPrefix(desc.getPrefix()) && matcher.matchName(desc.getName())) {
-                ret.add(desc);
+        for (String namespace : namespaces.keySet()) {
+            if (matcher.matchNamespace(namespace)) {
+                for (DefDescriptor<?> desc : namespaces.get(namespace).keySet()) {
+                    if (matcher.matchName(desc.getName()) && matcher.matchPrefix(desc.getPrefix())) {
+                        ret.add(desc);
+                    }
+                }
             }
         }
-
         return ret;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized <T extends Definition> Set<DefDescriptor<T>> find(Class<T> primaryInterface, String prefix,
+    public synchronized <D extends Definition> Set<DefDescriptor<D>> find(Class<D> primaryInterface, String prefix,
             String namespace) {
-        Set<DefDescriptor<T>> ret = Sets.newHashSet();
-
-        for(DefDescriptor<?> desc : sources.keySet()){
-            if (desc.getDefType().getPrimaryInterface() == primaryInterface && desc.getPrefix().equals(prefix)
-                    && desc.getNamespace().equals(namespace)) {
-                ret.add((DefDescriptor<T>)desc);
+        Set<DefDescriptor<D>> ret = Sets.newHashSet();
+        Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces.get(namespace);
+        if (sourceMap != null) {
+            for (DefDescriptor<? extends Definition> desc : sourceMap.keySet()) {
+                if (desc.getDefType().getPrimaryInterface() == primaryInterface && desc.getPrefix().equals(prefix)) {
+                    ret.add((DefDescriptor<D>)desc);
+                }
             }
         }
         return ret;
@@ -192,8 +258,8 @@ public class StringSourceLoader implements SourceLoader{
     }
 
     @Override
-    public Set<String> getNamespaces() {
-        return NAMESPACES;
+    public synchronized Set<String> getNamespaces() {
+        return ImmutableSet.copyOf(namespaces.keySet());
     }
 
     @Override
@@ -204,7 +270,63 @@ public class StringSourceLoader implements SourceLoader{
     @SuppressWarnings("unchecked")
     @Override
     public synchronized <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
-        Source<D> ret = (Source<D>)sources.get(descriptor);
-        return ret;
+        Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
+                .get(descriptor.getNamespace());
+        if (sourceMap != null) {
+            return (Source<D>)sourceMap.get(descriptor);
+        }
+        return null;
+    }
+
+    private static enum DescriptorInfo {
+        APPLICATION(ApplicationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        COMPONENT(ComponentDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        EVENT(EventDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        INTERFACE(InterfaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        LAYOUTS(LayoutsDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        CONTROLLER(ControllerDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
+        HELPER(HelperDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
+        RENDERER(RendererDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
+        STYLE(ThemeDef.class, Format.CSS, DefDescriptor.CSS_PREFIX, ".");
+        
+        private static Map<Class<? extends Definition>, DescriptorInfo> infoMap;
+
+        private final Class<? extends Definition> defClass;
+        private final Format format;
+        private final String prefix;
+        private final String delimiter;
+
+        private <D extends Definition> DescriptorInfo(Class<D> defClass, Format format, String prefix, String delimiter) {
+            this.defClass = defClass;
+            this.format = format;
+            this.prefix = prefix;
+            this.delimiter = delimiter;
+            map(defClass, this);
+        }
+
+        private void map(Class<? extends Definition> defClass, DescriptorInfo info) {
+            if (infoMap == null) {
+                infoMap = Maps.newHashMap();
+            }
+            infoMap.put(defClass, info);
+        }
+
+        private static DescriptorInfo get(Class<? extends Definition> defClass) {
+            return infoMap.get(defClass);
+        }
+
+        @SuppressWarnings("unchecked")
+        private <D extends Definition> DefDescriptor<D> getDescriptor(String namespace, String name) {
+            return (DefDescriptor<D>)Aura.getDefinitionService().getDefDescriptor(
+                    String.format("%s://%s%s%s", prefix, namespace, delimiter, name), defClass);
+        }
+
+        private Format getFormat() {
+            return format;
+        }
+        
+        private String getDelimiter() {
+            return delimiter;
+        }
     }
 }

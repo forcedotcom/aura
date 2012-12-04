@@ -16,11 +16,9 @@
 package org.auraframework.def;
 
 import java.lang.reflect.Method;
-import java.util.Date;
 import java.util.Map;
 
 import org.auraframework.def.RootDefinition.SupportLevel;
-import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -40,9 +38,7 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
     }
 
     protected T define(String source) throws Exception {
-        StringSourceLoader loader = StringSourceLoader.getInstance();
-        DefDescriptor<T> desc = loader.createStringSourceDescriptor(null, getDefClass());
-        addSourceAutoCleanup(desc, source);
+        DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(), source);
         return desc.getDef();
     }
 
@@ -203,14 +199,11 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
         }catch (AuraRuntimeException e){
 
         }
-        StringSourceLoader loader = StringSourceLoader.getInstance();
-        DefDescriptor<T> parentDesc = loader.createStringSourceDescriptor("getDescription_parent", getDefClass());
-        DefDescriptor<T> childDesc = loader.createStringSourceDescriptor("getDescription_child", getDefClass());
-
-        addSourceAutoCleanup(parentDesc, String.format(baseTag, "description='Parent markup' extensible='true'", ""),
-                new Date());
-        addSourceAutoCleanup(childDesc, String.format(baseTag, "extends='" + parentDesc.getQualifiedName()
-                + "' description='Child markup'", ""));
+        DefDescriptor<T> parentDesc = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "description='Parent markup' extensible='true'", ""));
+        DefDescriptor<T> childDesc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "extends='"
+                + parentDesc.getQualifiedName() + "' description='Child markup'", ""));
+        
         assertEquals("Description of parent def is wrong.", "Parent markup", parentDesc.getDef().getDescription());
         assertEquals("Description of child def is wrong.", "Child markup", childDesc.getDef().getDescription());
 

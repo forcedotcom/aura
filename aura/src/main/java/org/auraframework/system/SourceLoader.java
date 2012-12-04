@@ -17,8 +17,7 @@ package org.auraframework.system;
 
 import java.util.Set;
 
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 
 /**
@@ -41,7 +40,7 @@ public interface SourceLoader {
     Set<String> getPrefixes();
 
     /**
-     * Returns a list of DefTypes for which this loader is authoritiative within the
+     * Returns a list of DefTypes for which this loader is authoritative within the
      * namespaces returned by getNamespaces and the prefixes returned by getPrefixes.
      */
     Set<DefType> getDefTypes();
@@ -55,7 +54,7 @@ public interface SourceLoader {
     <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor);
 
     /**
-     * Match descriptors agains a matcher.
+     * Match descriptors against a matcher.
      */
     Set<DefDescriptor<?>> find(DescriptorMatcher dm);
 

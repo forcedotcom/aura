@@ -20,12 +20,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.TypeDef;
 import org.auraframework.impl.context.AuraRegistryProviderImpl;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.impl.system.DefFactoryImpl;
@@ -34,8 +30,7 @@ import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.DefRegistry;
-import org.auraframework.system.SourceLoader;
+import org.auraframework.system.*;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoAccessException;
@@ -68,8 +63,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      */
     public void testGetDefinition_DefDescriptor_assertAccess() throws Exception {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC);
-        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup("<aura:component></aura:component>",
-                ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component></aura:component>");
         try {
             Aura.getDefinitionService().getDefinition(desc);
             fail("Expected NoAccessException from assertAccess");
@@ -81,8 +76,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      */
     public void testGetDefinition_StringClass_assertAccess() throws Exception {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC);
-        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup("<aura:component></aura:component>",
-                ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component></aura:component>");
         try {
             Aura.getDefinitionService().getDefinition(desc.getName(), ComponentDef.class);
             fail("Expected NoAccessException from assertAccess");
@@ -94,8 +89,8 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      */
     public void testGetDefinition_StringDefType_assertAccess() throws Exception {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC);
-        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup("<aura:component></aura:component>",
-                ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component></aura:component>");
         try {
             Aura.getDefinitionService().getDefinition(desc.getName(), DefType.COMPONENT);
             fail("Expected NoAccessException from assertAccess");
@@ -107,7 +102,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      */
     public void testSave_assertAccess() throws Exception {
         Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.PUBLIC);
-        ComponentDef def = addSourceAutoCleanup("<aura:component></aura:component>", ComponentDef.class).getDef();
+        ComponentDef def = addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>").getDef();
         Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.PUBLIC);
         try {
@@ -148,10 +143,10 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         DefDescriptor<EventDef> nonExistingRef = StringSourceLoader.getInstance().createStringSourceDescriptor("barr",
                 EventDef.class);
         addSourceAutoCleanup(
-                String.format(
-                        baseComponentTag,
-                        String.format("controller='js://%s.%s'", nonExistingRef.getNamespace(),
-                                nonExistingRef.getName()), ""), ComponentDef.class);
+                ComponentDef.class, String.format(
+                                        baseComponentTag,
+                                        String.format("controller='js://%s.%s'", nonExistingRef.getNamespace(),
+                                                nonExistingRef.getName()), ""));
         try{
             Aura.getDefinitionService().getNamespaceLastMod(Sets.newHashSet("string"));
             fail("Cannot find last mod when definitions are uncompilable.");
@@ -179,29 +174,25 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      */
     public void testFindRegex() throws Exception {
         Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.PUBLIC);
-        StringSourceLoader loader = StringSourceLoader.getInstance();
 
         String baseContents = "<aura:application></aura:application>";
-        DefDescriptor<ApplicationDef> houseboat = loader
-                .createStringSourceDescriptor("houseboat", ApplicationDef.class);
-        DefDescriptor<ApplicationDef> houseparty = loader.createStringSourceDescriptor("houseparty",
-                ApplicationDef.class);
-        DefDescriptor<ApplicationDef> pantsparty = loader.createStringSourceDescriptor("pantsparty",
-                ApplicationDef.class);
-        addSourceAutoCleanup(houseboat, baseContents);
-        addSourceAutoCleanup(houseparty, baseContents);
-        addSourceAutoCleanup(pantsparty, baseContents);
+        
+        String nonce = auraTestingUtil.getNonce();
+        DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class, baseContents,
+                String.format("house%sboat", nonce));
+        addSourceAutoCleanup(ApplicationDef.class, baseContents, String.format("house%sparty", nonce));
+        addSourceAutoCleanup(ApplicationDef.class, baseContents, String.format("pants%sparty", nonce));
 
         // Test wildcards
-        assertEquals("find() fails with wildcard as prefix", 1, definitionService.find("*://" + houseboat.getDescriptorName()).size());
+        assertEquals("find() fails with wildcard as prefix", 1, definitionService.find("*://" + houseboat.getDescriptorName())
+                .size());
         assertEquals("find() fails with wildcard as namespace", 1, definitionService.find("markup://*:" + houseboat.getName())
                 .size());
-        assertEquals("find() fails with wildcard as name", 1, definitionService.find(houseboat.getQualifiedName())
-                .size());
-        assertEquals("find() fails with wildcard at end of name", 2, definitionService.find("markup://string:house*")
-                .size());
+        assertEquals("find() fails with wildcard as name", 1, definitionService.find(houseboat.getQualifiedName()).size());
+        assertEquals("find() fails with wildcard at end of name", 2,
+                definitionService.find(String.format("markup://string:house%s*", nonce)).size());
         assertEquals("find() fails with wildcard at beginning of name", 2,
-                definitionService.find("markup://string:*party*").size());
+                definitionService.find(String.format("markup://string:*%sparty*", nonce)).size());
         assertEquals("find() should not find nonexistent name with preceeding wildcard", 0,
                 definitionService.find("markup://string:*notherecaptain").size());
 

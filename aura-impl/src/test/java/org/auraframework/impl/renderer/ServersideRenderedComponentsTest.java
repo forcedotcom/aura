@@ -49,7 +49,7 @@ public class ServersideRenderedComponentsTest extends AuraImplTestCase {
 
     private String getRenderedHTML(String markup, Class<? extends BaseComponentDef> defType,
             Map<String, Object> attributes) throws Exception {
-        DefDescriptor<? extends BaseComponentDef> testCmpDef = addSourceAutoCleanup(markup, defType);
+        DefDescriptor<? extends BaseComponentDef> testCmpDef = addSourceAutoCleanup(defType, markup);
         assertTrue(testCmpDef.getDef().isLocallyRenderable());
         BaseComponent<?, ?> instance = (BaseComponent<?, ?>)Aura.getInstanceService().getInstance(testCmpDef,
                 attributes);

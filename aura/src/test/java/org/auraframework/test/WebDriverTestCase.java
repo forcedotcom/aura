@@ -44,7 +44,6 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.FreshBrowserInstance;
@@ -220,9 +219,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             render = "server";
         }
 
-        DefDescriptor<ComponentDef> cmpDesc = StringSourceLoader.getInstance().createStringSourceDescriptor(namePrefix,
-                ComponentDef.class);
-        addSourceAutoCleanup(cmpDesc, componentText);
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, componentText,
+                namePrefix);
         appText = String.format(WRAPPER_APP, render, cmpDesc.getDescriptorName());
         loadApplication(namePrefix + "App", appText, isClient);
     }
@@ -237,9 +235,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      */
     protected void loadApplication(String namePrefix, String appText, boolean isClient) throws MalformedURLException,
             URISyntaxException {
-        DefDescriptor<ApplicationDef> appDesc = StringSourceLoader.getInstance().createStringSourceDescriptor(
-                namePrefix, ApplicationDef.class);
-        addSourceAutoCleanup(appDesc, appText);
+        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, appText,
+                namePrefix);
         String openPath = String.format("/%s/%s.app", appDesc.getNamespace(), appDesc.getName());
         if (isClient) {
             open(openPath);

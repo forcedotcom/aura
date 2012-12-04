@@ -66,7 +66,7 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
         assertNull(factory.getDef(descriptor));
 
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
-                "<aura:component renderer='java://ClassNotFound'></aura:component>", ComponentDef.class);
+                ComponentDef.class, "<aura:component renderer='java://ClassNotFound'></aura:component>");
         try {
             cmpDesc.getDef();
             fail("Should not be able to retrieve component definition when specified renderer is invalid.");

@@ -45,11 +45,11 @@ public class AttributesInAbstractComponentsTest extends AuraImplTestCase {
     public void testSettingAttributeValuesInChildComponent()throws Exception{
         String markup = String
                 .format(abstractCmpMarkup, "<aura:attribute type='String' name='text' required='true'/>");
-        DefDescriptor<ComponentDef> abstractCmpDesc = addSourceAutoCleanup(markup, ComponentDef.class);
+        DefDescriptor<ComponentDef> abstractCmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
 
         markup = String.format(extensionCmpMarkup, abstractCmpDesc.getQualifiedName(),
                 "<aura:set attribute='text' value='Aura'/>");
-        DefDescriptor<ComponentDef> extensionCmpDesc = addSourceAutoCleanup(markup, ComponentDef.class);
+        DefDescriptor<ComponentDef> extensionCmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
         assertNotNull(
                 "Failed to retrieve definition of extension component which was setting value of inherited attribute",
                 extensionCmpDesc.getDef());
@@ -67,11 +67,11 @@ public class AttributesInAbstractComponentsTest extends AuraImplTestCase {
     public void testSettingAttributeUsingSetBodyInChildComponent()throws Exception{
         String markup = String.format(abstractCmpMarkup,
                 "<aura:attribute type='Aura.Component[]' name='innerBody' required='true'/>");
-        DefDescriptor<ComponentDef> abstractCmpDesc = addSourceAutoCleanup(markup, ComponentDef.class);
+        DefDescriptor<ComponentDef> abstractCmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
 
         markup = String.format(extensionCmpMarkup, abstractCmpDesc.getQualifiedName(),
                 "<aura:set attribute='innerBody'><aura:text value='Aura'/></aura:set>");
-        DefDescriptor<ComponentDef> extensionCmpDesc = addSourceAutoCleanup(markup, ComponentDef.class);
+        DefDescriptor<ComponentDef> extensionCmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
         assertNotNull(
                 "Failed to retrieve definition of extension component which was setting value of inherited attribute",
                 extensionCmpDesc.getDef());

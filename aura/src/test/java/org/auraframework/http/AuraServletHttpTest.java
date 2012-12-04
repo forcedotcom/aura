@@ -193,30 +193,30 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     
     public void testHTMLTemplateCaching()throws Exception{
         //An application with isOnePageApp set to true
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup("<aura:application isOnePageApp='true'></aura:application>", 
-                ApplicationDef.class);
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, 
+                "<aura:application isOnePageApp='true'></aura:application>");
         GetMethod get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
         //Expect the get request to be set for long cache
         assertResponseSetToLongCache(get);
         
         //An application with isOnePageApp set to false
-        desc = addSourceAutoCleanup("<aura:application isOnePageApp='false'></aura:application>", 
-                ApplicationDef.class);
+        desc = addSourceAutoCleanup(ApplicationDef.class, 
+                "<aura:application isOnePageApp='false'></aura:application>");
         get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
         //Expect the get request to be set for no caching
         assertResponseSetToNoCache(get);
         
         //An application with no specification
-        desc = addSourceAutoCleanup("<aura:application isOnePageApp='false'></aura:application>", 
-                ApplicationDef.class);
+        desc = addSourceAutoCleanup(ApplicationDef.class, 
+                "<aura:application isOnePageApp='false'></aura:application>");
         get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
         //Expect the get request to be set for no caching
         assertResponseSetToNoCache(get);
         
         //A component and AuraBaseServlet.isManifestEnabled() is false because UserAgent is not "AppleWebKit" based
         System.setProperty(HttpMethodParams.USER_AGENT, UserAgent.EMPTY.getUserAgentString());
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup("<aura:component ></aura:component>", 
-                ComponentDef.class);
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, 
+                "<aura:component ></aura:component>");
         get = obtainGetMethod(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
         //Expect the get request to be set for long cache
         assertResponseSetToLongCache(get);
@@ -227,22 +227,22 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         
         //An application with isOnePageApp set to true and useAppcache set to true
         // isOnePageApp overrides useAppCache specification
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup("<aura:application isOnePageApp='true' useAppcache='true'></aura:application>", 
-                ApplicationDef.class);
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, 
+                "<aura:application isOnePageApp='true' useAppcache='true'></aura:application>");
         GetMethod get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
         //Expect the get request to be set for long cache
         assertResponseSetToLongCache(get);
         
         //An application with useAppcache set to true and no specification for isOnePageApp
-        desc = addSourceAutoCleanup("<aura:application useAppcache='true'></aura:application>", 
-                ApplicationDef.class);
+        desc = addSourceAutoCleanup(ApplicationDef.class, 
+                "<aura:application useAppcache='true'></aura:application>");
         get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
         //Expect the get request to be set for no caching
         assertResponseSetToNoCache(get);
         
         //A component and AuraBaseServlet.isManifestEnabled() is false  
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup("<aura:component ></aura:component>", 
-                ComponentDef.class);
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, 
+                "<aura:component ></aura:component>");
         get = obtainGetMethod(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
         //Expect the get request to be set for long cache
         assertResponseSetToLongCache(get);
@@ -283,8 +283,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      * @throws Exception
      */
     public void testJSFrameworkUrlHasNonce() throws Exception{
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup("<aura:application render='client'></aura:application>", 
-                ApplicationDef.class);
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                "<aura:application render='client'></aura:application>");
         GetMethod get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
         getHttpClient().executeMethod(get); 
         assertEquals(HttpStatus.SC_OK, get.getStatusCode());

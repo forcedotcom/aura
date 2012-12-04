@@ -174,8 +174,8 @@ public class JavaControllerTest extends AuraImplTestCase {
      * Verify that nice exception is thrown if controller def doesn't exist
      */
     public void testControllerNotFound() throws Exception {
-        DefDescriptor<ComponentDef> dd = addSourceAutoCleanup("<aura:component controller='java://goats'/>",
-                ComponentDef.class);
+        DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component controller='java://goats'/>");
         try {
             Aura.getInstanceService().getInstance(dd);
             fail("Expected DefinitionNotFoundException");

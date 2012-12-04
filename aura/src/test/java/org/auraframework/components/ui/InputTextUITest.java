@@ -15,15 +15,13 @@
  */
 package org.auraframework.components.ui;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.UnAdaptableTest;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 
 /**
  * UI tests for inputText Component
@@ -43,7 +41,8 @@ public class InputTextUITest extends WebDriverTestCase {
                 + "<ui:inputText aura:id=\"%s\" value=\"{!m.String}\" updateOn=\"%s\"/>" + "</div>"
                 + "<div id=\"output\">" + "output: <ui:outputText value=\"{!m.String}\"/>" + "</div>"
                 + "</aura:component>";
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(baseTag.replaceAll("%s", event), ComponentDef.class);
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
+                baseTag.replaceAll("%s", event));
         open(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
 
         String value = getCurrentModelValue();
@@ -195,7 +194,7 @@ public class InputTextUITest extends WebDriverTestCase {
         String cmpSource = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> " +
                             "<ui:inputText value=\"{!m.StringNull}\"/>" +
                          "</aura:component>";
-        DefDescriptor<ComponentDef> inputTextNullValue = addSourceAutoCleanup(cmpSource, ComponentDef.class);
+        DefDescriptor<ComponentDef> inputTextNullValue = addSourceAutoCleanup(ComponentDef.class, cmpSource);
         open(String.format("/%s/%s.cmp", inputTextNullValue.getNamespace(), inputTextNullValue.getName()));
 
         WebElement input = getDriver().findElement(By.tagName("input"));

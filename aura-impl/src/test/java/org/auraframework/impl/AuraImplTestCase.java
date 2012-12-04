@@ -17,7 +17,6 @@ package org.auraframework.impl;
 
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Date;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
@@ -35,7 +34,7 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.*;
+import org.auraframework.system.Source;
 import org.auraframework.test.AuraTestCase;
 import org.auraframework.util.json.JsonSerializationContext;
 
@@ -81,20 +80,15 @@ public abstract class AuraImplTestCase extends AuraTestCase {
         super.tearDown();
     }
 
-    protected <T extends Definition> void addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents,
-            Date lastModified) {
-        auraTestingUtil.addSourceAutoCleanup(descriptor, contents, lastModified);
+    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents, String namePrefix) {
+        return auraTestingUtil.addSourceAutoCleanup(defClass, contents, namePrefix);
     }
 
-    protected <T extends Definition> void addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents) {
-        addSourceAutoCleanup(descriptor, contents, new Date());
+    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents) {
+        return auraTestingUtil.addSourceAutoCleanup(defClass, contents);
     }
-
-    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(String contents, Class<T> defClass) {
-        return auraTestingUtil.addSourceAutoCleanup(contents, defClass);
-    }
-
-    protected Source<?> getSource(DefDescriptor<?> descriptor) {
+    
+    protected <T extends Definition> Source<T> getSource(DefDescriptor<T> descriptor) {
         return auraTestingUtil.getSource(descriptor);
     }
 

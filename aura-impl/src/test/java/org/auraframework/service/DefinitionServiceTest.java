@@ -248,7 +248,7 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
             contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
                     .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
             //This creates the StringSource objects before they can be saved.
-            DefDescriptor<ComponentDef> desc = addSourceAutoCleanup("", ComponentDef.class);
+            DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, "");
             ComponentDefBuilder builder = Aura.getBuilderService().getComponentDefBuilder();
             builder.setDescriptor(desc.getDescriptorName());
             builder.setLocation("fake", 1, 1, 1);

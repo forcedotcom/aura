@@ -1,0 +1,14 @@
+<aura:component extensible="true" extends="performanceTest:parent">
+    <aura:attribute name="teamName" type="String"/>
+    <aura:attribute name="manager" type="String"/>
+    <aura:attribute name="generalManager" type="String"/>
+    <aura:attribute name="stadium" type="String"/>
+    
+        <div class="{!v.color + ' team'}" style="float:left">
+	        <div class="{!'teamName ' + v.color}" style="float:left">{!v.teamName}</div>
+	        <br/><span class="{! 'manager ' + v.color }">Managed by &nbsp;{!v.manager}</span>
+	        <br/><span class="{! 'generalManager ' + v.color }">General Manager: &nbsp;{!v.generalManager}</span><br/>
+	        <div class="{! 'stadium ' + v.color }" style="float:left">{!v.stadium}</div>
+        </div>
+        <br/>
+</aura:component>

@@ -1,0 +1,16 @@
+<aura:component extensible="true">
+    <aura:attribute name="color" default="white" type="String"/>
+    <aura:attribute name="city" type="String"/>
+    <aura:attribute name="country" type="String"/>
+    <aura:attribute name="state" type="String"/>
+    <aura:attribute name="nickname" type="String"/>
+    <aura:attribute name="geoLocation" type="String"/> 
+    
+    <div class="{!v.color}">
+        <div class="{!'city ' + v.color}" style="float:left">{!v.city} &nbsp;<span lumen:id="quote">"</span>{!v.nickname}<span lumen:id="quote">"</span></div>
+        <br/><span class="{! 'state ' + v.color }">{!v.geoLocation}<span lumen:id="comma">,&nbsp;</span>{!v.state}</span><br/>
+        <div class="{! 'country ' + v.color }" style="float:left">{!v.country}</div>
+    </div><br/>
+     <br/>
+    {!v.body}
+</aura:component>

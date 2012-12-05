@@ -399,6 +399,7 @@ Util.prototype.removeElement = function(element) {
             this.gcPending = true;
             var that = this;
             setTimeout(function() {
+            	$A.mark("Util.removeElement");
                 var trashcan = that.trashcan;
                 while (trashcan.hasChildNodes()) {
                     var node = trashcan.lastChild;
@@ -411,7 +412,7 @@ Util.prototype.removeElement = function(element) {
                 }
                 
                 that.trash = [];
-
+                $A.measure("Finished emptying element trashcan.", "Util.removeElement");
                 that.gcPending = false;
             }, 1000);
         }

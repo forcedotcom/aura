@@ -1,0 +1,11 @@
+<aura:component>
+    <aura:attribute name="color" default="white" type="String"/>
+    <aura:attribute name="start" type="Integer"/>
+    <aura:attribute name="end" type="Integer"/>
+    <aura:attribute name="cmps" type="Aura.Component[]"/>
+
+    <aura:iteration aura:id="iteration" items="{!v.cmps}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
+        {!var}
+    </aura:iteration>
+</aura:component>
+    

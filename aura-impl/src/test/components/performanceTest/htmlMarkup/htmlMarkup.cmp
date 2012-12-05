@@ -1,0 +1,20 @@
+<aura:component>
+    <aura:attribute name="color" default="white" type="String"/>
+    <div class="{! 'bkgColor ' + v.color}">
+        aura:html components 
+        <table> 
+	        <tr class="{!v.color + ' odd'}">
+	        <td><a > http://en.wikipedia.org/wiki/Eli_Manning</a></td><td>Eli Manning</td>
+	        </tr>
+	        <tr class="{!v.color + ' even'}">
+	        <td><a > http://en.wikipedia.org/wiki/Peyton_Manning</a></td><td>Peyton Manning</td>
+	        </tr>
+	        <tr class="{!v.color + ' odd'}">
+            <td><a > http://en.wikipedia.org/wiki/Colin_Kaepernick</a></td><td>Colin Kaepernick</td>
+            </tr>
+            <tr class="{!v.color + ' even'}">
+            <td><a > http://en.wikipedia.org/wiki/Alex_Smith</a></td><td>Alex Smith</td>
+            </tr>
+        </table>
+    </div>
+</aura:component>

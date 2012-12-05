@@ -1,0 +1,12 @@
+.performanceTestPerfApp.bkgColor{
+	background-color: white;
+}
+
+.performanceTestPerfApp.bkgColor.grey{
+	background-color: lightgrey;
+}
+
+.performanceTestPerfApp.placeholder{
+    opacity:0.3;
+}
+

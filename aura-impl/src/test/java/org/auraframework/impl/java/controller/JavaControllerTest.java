@@ -19,13 +19,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
-
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
-
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -129,7 +129,6 @@ public class JavaControllerTest extends AuraImplTestCase {
         assertNotNull("unable to load test controller", controller);
 
         checkPassAction(controller, "doSomething", empty, State.SUCCESS, null);
-        // FIXME: extra arguments probably should fail.
         checkPassAction(controller, "doSomething", hasOne, State.SUCCESS, null);
         checkPassAction(controller, "getString", empty, State.SUCCESS, "TestController");
         checkFailAction(controller, "throwException", empty, State.ERROR, AuraExecutionException.class,

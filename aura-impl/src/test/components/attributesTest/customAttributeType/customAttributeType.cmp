@@ -17,6 +17,4 @@
 -->
 <aura:component render="client">
     <aura:attribute name="pairAttr" type="java://org.auraframework.util.type.CustomPairType" default="HouseNo$300"/>
-    //TODO: WHy is this not allowed. This requires a new TypeDef to be registered
-    <!--aura:attribute name="pairArrayAttr" type="java://org.auraframework.util.type.CustomPairType[]" default="[lat#12890,long#5467]"/-->
 </aura:component>

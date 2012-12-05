@@ -16,14 +16,26 @@
 package org.auraframework.impl.test.util;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.def.*;
 import org.auraframework.def.AttributeDef.SerializeToType;
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.impl.root.*;
-import org.auraframework.impl.root.component.*;
-import org.auraframework.impl.root.event.*;
+import org.auraframework.impl.root.AttributeDefImpl;
+import org.auraframework.impl.root.AttributeDefRefImpl;
+import org.auraframework.impl.root.AttributeImpl;
+import org.auraframework.impl.root.RootDefinitionImpl;
+import org.auraframework.impl.root.component.ComponentDefImpl;
+import org.auraframework.impl.root.component.ComponentDefRefImpl;
+import org.auraframework.impl.root.component.ComponentImpl;
+import org.auraframework.impl.root.event.EventDefImpl;
+import org.auraframework.impl.root.event.EventHandlerDefImpl;
+import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -242,7 +254,6 @@ public class AuraImplUnitTestingUtil {
     /**
      * A null parameter indicates you don't care what the value is, and thus it replaces the parameter with a default object.
      * If you want null values for the parameter, you have to call the objects constructor directly.
-     * @param serializeTo TODO
      */
     public AttributeDefImpl makeAttributeDef(String name, DefDescriptor<TypeDef> typeDefDescriptor,
             AttributeDefRefImpl defaultValue, boolean required, SerializeToType serializeTo, Location location) {
@@ -368,18 +379,12 @@ public class AuraImplUnitTestingUtil {
         }
         builder.events = eventDefs;
 
-      //FIXME - there are no longer children.
-        /*
-        */
-
         if (interfaces == null) {
             interfaces = new HashSet<DefDescriptor<InterfaceDef>>();
             interfaces.add(getInterfaceDefDescriptor());
         }
         builder.interfaces = interfaces;
 
-        /*if (eventHandlers == null) {
-        }*/
         List<DefDescriptor<ControllerDef>> cd = new ArrayList<DefDescriptor<ControllerDef>>();
         cd.add(controllerDescriptor == null ? getControllerDescriptor() : controllerDescriptor);
         builder.controllerDescriptors = cd;

@@ -220,7 +220,6 @@ public class InterfaceDefTest extends AuraImplTestCase {
         serializeAndGoldFile(intDef2);
     }
 
-    // TODO:W-1021360
     public void testInterfaceCannotExtendItself() throws Exception {
 
         DefDescriptor<InterfaceDef> extendsSelf = StringSourceLoader.getInstance().createStringSourceDescriptor(
@@ -245,25 +244,6 @@ public class InterfaceDefTest extends AuraImplTestCase {
             d.getDef();
             fail("An interface cannot implement another interface, it can only extend it.");
         } catch (InvalidSystemAttributeException expected) {
-
         }
     }
-    /**
-     * Test to verify that InterfaceDef has information about server dependency.
-     * Creating instances of interface on the clientside would require server
-     * dependency information. Make sure this information is part of interface
-     * def.
-     */
-    // TODO: BUG
-    /*
-     * public void testHasLocalDependencies(){ assertFalse(
-     * "An interface with clientside provider does not depend on server.",
-     * definitionService.getDefinition("test:test_JSProvider_Interface",
-     * InterfaceDef.class).hasLocalDependencies());
-     * assertTrue("An interface with only serverside provider depends on server."
-     * , definitionService.getDefinition("test:test_Provider_Interface",
-     * InterfaceDef.class).hasLocalDependencies());
-     *
-     * }
-     */
 }

@@ -15,10 +15,20 @@
  */
 package org.auraframework.service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventHandlerDef;
+import org.auraframework.def.ModelDef;
+import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.Component;
@@ -42,11 +52,6 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
         assertEquals(true,component.getAttributes().getExpression("myBoolean")); //from the parent component
         assertEquals("Interface String",component.getAttributes().getExpression("interfaceString")); //from the interface
         assertEquals("1",component.getGlobalId());
-        /* FIXME uncomment when local ids work:
-         * not being an expression, or when expressions can be tested.
-
-           component.resolveAttributeValue("myString");
-        */
     }
 
     /**
@@ -82,9 +87,6 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
         ControllerDef controller = component.getControllerDef();
         assertEquals("testComponent1",controller.getName());
 
-      //FIXME - there are no longer children.
-        /*
-        */
         DefDescriptor<RendererDef> rd = component.getRendererDescriptor();
         assertEquals("testComponent1",rd.getName());
 

@@ -27,13 +27,6 @@
             $A.test.assertEquals(0.0003, component.get("v.min"), "min does not equal expected");
         }
     },
-    /** we don't have pattern anymore in the inputNumber cmp. The component is primarily used with type='text'*/
-    _testPattern: {
-        attributes : {pattern : "[0-9]*"},
-        test : function(component){
-            $A.test.assertEquals("[0-9]*", component.get("v.pattern"), "pattern does not equal expected");
-        }
-    },
 
     testStep: {
         attributes : {step : 1.23},
@@ -103,35 +96,5 @@
         test : function(component){
             $A.test.assertEquals(undefined, component.get("v.value"), "value does not equal expected");
         }
-//    },
-//
-//    testUpdateValue: {
-//        attributes : {updateOn : "click"},
-//        test : function(component){
-//            var input = component.getElement();
-//            $A.test.type(input, "789");
-//            $A.test.click(input.parentNode);
-//            $A.test.addWaitFor(function(){return input.value == 789});
-//        }
-//    },
-//
-//    testUpdateValueToString: {
-//        attributes : {updateOn : "click"},
-//        test : function(component){
-//            var input = component.getElement();
-//            $A.test.type(input, "one hundred");
-//            $A.test.click(input.parentNode);
-//            $A.test.addWaitFor(function(){return input.value == ""});
-//        }
-//    },
-//
-//    testClearValue: {
-//        attributes : {value : 1, updateOn : "click"},
-//        test : function(component){
-//            var input = component.getElement();
-//            $A.test.type(input, "[backspace]");
-//            $A.test.click(input.parentNode);
-//            $A.test.addWaitFor(function(){return input.value == ""});
-//        }
-    }
+    },
 })

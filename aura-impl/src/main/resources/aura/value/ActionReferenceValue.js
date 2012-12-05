@@ -96,6 +96,9 @@ ActionReferenceValue.prototype.destroy = function(){
     delete this.component;
 };
 
+/**
+ * Returns this type as a String.
+ */
 ActionReferenceValue.prototype.toString = function(){
     return "ActionReferenceValue";
 };

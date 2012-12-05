@@ -28,7 +28,7 @@
 
     <p><ui:image src="/auraFW/resources/aura/images/initCompDef.png" alt="Component Request Process" /></p>
 
-    <p>Her's how a component request is processed on the server and client:</p>
+    <p>Here's how a component request is processed on the server and client:</p>
     <ol><b>Server</b>:
         <li>Loads registries and locates component definitions</li>
         <li>Builds or retrieves component definitions</li>

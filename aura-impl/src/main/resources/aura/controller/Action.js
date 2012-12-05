@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace A base class for a Aura Action to be passed to an associated component.
+ * A base class for a Aura Action to be passed to an associated component.
  * An Action is created in a client-side or server-side controller.
  * Invoke a client-side Action in a controller by declaring cmp.get("c.actionName").
  * Call a server-side controller from a client-side controller.
@@ -43,9 +43,9 @@ Action.prototype.auraType = "Action";
  * @returns {String}
  */
 Action.prototype.getId = function() {
-	if (!this.id) {
-		this.id = (Action.prototype.nextActionId++) + "." + $A.getContext().getNum();
-	}
+    if (!this.id) {
+        this.id = (Action.prototype.nextActionId++) + "." + $A.getContext().getNum();
+    }
 
     return this.id;
 };
@@ -56,15 +56,15 @@ Action.prototype.getId = function() {
  * @returns {String}
  */
 Action.prototype.getNextGlobalId = function() {
-	if (!this.nextGlobalId) {
-		this.nextGlobalId = 1;
-	}
-	
+    if (!this.nextGlobalId) {
+        this.nextGlobalId = 1;
+    }
+
     return this.nextGlobalId++;
 };
 
 /**
- * Gets the ActionDef.
+ * Gets the ActionDef object.
  * Shorthand: get("def")
  * @returns {ActionDef}
  */
@@ -100,6 +100,10 @@ Action.prototype.getParams = function() {
     return this.params;
 };
 
+/**
+ * Gets the component for this Action.
+ * @private
+ */
 Action.prototype.getComponent = function() {
     return this.cmp;
 };
@@ -187,61 +191,61 @@ Action.prototype.runAfter = function(action) {
  * @private
  * @param {Object} response
  */
-Action.prototype.complete = function(response) {	
+Action.prototype.complete = function(response) {
     this.state = response["state"];
     this.returnValue = response.returnValue;
     this.error = response.error;
-	this.storage = response["storage"];
-    
-	var context = $A.getContext();
-	var previous = context.setCurrentAction(this);
-	try {
-		// Add in any Action scoped components /or partial configs
-	    var components = response["components"];
-		if (components) {
-			context.joinComponentConfigs(components);
-		}
-	
-	    if (this.callback && (this.cmp === undefined || this.cmp.isValid())) {
-	        this.callback.call(this.callbackScope, this);
-	    }
-	    
-	    var storage = $A.storageService.getStorage();
-	    if (storage && this._isStoreable() && this.getState() === "SUCCESS") {
-	    	var storageName = storage.getName();
-	    	var key = this.getStorageKey();
-	    	if (!this.storage) {
-	    		// Rewrite any embedded ComponentDef from object to descriptor only
-		    	for(var globalId in components) {
-	    			var c = components[globalId];
-	    			if (c) {
-		    			var def = c["componentDef"];
-		    			c["componentDef"] = { "descriptor": def["descriptor"] };
-	    			}
-		    	}    		
-		    	
-		    	var stored = { 
-		    		"returnValue": response.returnValue, 
-		    		"components": components,
-		    		"state": "SUCCESS",
-		    		"storage": {
-		    			"name": storageName,
-		    			"created": new Date().getTime()
-		    		}
-				};
-		    	
-		    	storage.put(key, stored);
-	    	} else {
-	    		// DCHASMAN TODO Just update the last accessed timestamp for the item
-		    	//storage.log("Updating last accessed timestamp for action in " + storageName + " storage adapter", key);
-	    		
-	    		// Initiate auto refresh if configured to do so
-	    		this.refresh();
-	    	}
-	    }
-	} finally {
-		context.setCurrentAction(previous);
-	}
+    this.storage = response["storage"];
+
+    var context = $A.getContext();
+    var previous = context.setCurrentAction(this);
+    try {
+        // Add in any Action scoped components /or partial configs
+        var components = response["components"];
+        if (components) {
+            context.joinComponentConfigs(components);
+        }
+
+        if (this.callback && (this.cmp === undefined || this.cmp.isValid())) {
+            this.callback.call(this.callbackScope, this);
+        }
+
+        var storage = $A.storageService.getStorage();
+        if (storage && this._isStoreable() && this.getState() === "SUCCESS") {
+            var storageName = storage.getName();
+            var key = this.getStorageKey();
+            if (!this.storage) {
+                // Rewrite any embedded ComponentDef from object to descriptor only
+                for(var globalId in components) {
+                    var c = components[globalId];
+                    if (c) {
+                        var def = c["componentDef"];
+                        c["componentDef"] = { "descriptor": def["descriptor"] };
+                    }
+                }
+
+                var stored = {
+                    "returnValue": response.returnValue,
+                    "components": components,
+                    "state": "SUCCESS",
+                    "storage": {
+                        "name": storageName,
+                        "created": new Date().getTime()
+                    }
+                };
+
+                storage.put(key, stored);
+            } else {
+                // DCHASMAN TODO Just update the last accessed timestamp for the item
+                //storage.log("Updating last accessed timestamp for action in " + storageName + " storage adapter", key);
+
+                // Initiate auto refresh if configured to do so
+                this.refresh();
+            }
+        }
+    } finally {
+        context.setCurrentAction(previous);
+    }
 };
 
 /**
@@ -283,12 +287,13 @@ Action.prototype.isExclusive = function() {
 /**
  * Marks the Action as storeable.
  * For server-side Actions only.
+ * @param {Object} config Checks that the Action is server-side and mark it as storeable and abortable.
  */
 Action.prototype.setStoreable = function(config) {
-	$A.assert(this.def.isServerAction(), "setStoreable() cannot be called on a client action.");
+    $A.assert(this.def.isServerAction(), "setStoreable() cannot be called on a client action.");
     this.storeable = true;
     this.storeableConfig = config;
-    
+
     // Storeable actions must also be abortable (idempotent, replayable and non-mutating)
     this.setAbortable();
 };
@@ -299,7 +304,7 @@ Action.prototype.setStoreable = function(config) {
  * @returns {Boolean} The function is storeable (true), or false otherwise.
  */
 Action.prototype.isStoreable = function() {
-	var ignoreExisting = this.storeableConfig && this.storeableConfig["ignoreExisting"];  
+    var ignoreExisting = this.storeableConfig && this.storeableConfig["ignoreExisting"];
     return this._isStoreable() && !ignoreExisting;
 };
 
@@ -307,12 +312,19 @@ Action.prototype._isStoreable = function() {
     return this.storeable || false;
 };
 
+/**
+ * Gets the storage key in name-value pairs.
+ * @private
+ */
 Action.prototype.getStorageKey = function() {
-	return this.getDef().getDescriptor().toString() + ":" + $A.util["json"].encode(this.getParams());
+    return this.getDef().getDescriptor().toString() + ":" + $A.util["json"].encode(this.getParams());
 };
 
+/**
+ * Checks if the object is from the current storage.
+ */
 Action.prototype.isFromStorage = function() {
-	return !$A.util.isUndefinedOrNull(this.storage);
+    return !$A.util.isUndefinedOrNull(this.storage);
 };
 
 /**
@@ -345,55 +357,59 @@ Action.prototype.toJSON = function() {
     };
 };
 
+/**
+ * Refreshes the Action. Used with storage.
+ * @private
+ */
 Action.prototype.refresh = function() {
     // If this action was served from storage let's automatically try to get the latest from the server too
     var storage = this.getStorage();
     if (storage) {
-		var storageService = $A.storageService.getStorage();
-    	var autoRefreshInterval = this.storeableConfig ? this.storeableConfig["refresh"] * 1000 : storageService.getDefaultAutoRefreshInterval();
+        var storageService = $A.storageService.getStorage();
+        var autoRefreshInterval = this.storeableConfig ? this.storeableConfig["refresh"] * 1000 : storageService.getDefaultAutoRefreshInterval();
 
-    	// Only auto refresh if the data we have is more than v.autoRefreshInterval seconds old
-    	var now = new Date().getTime();
-    	var action = this;
-    	if ((now - storage["created"]) > autoRefreshInterval) {
-        	storageService.log("Action.refresh(): auto refresh begin", action);
-        	
-        	var cmp = action.getComponent();
-        	var isRefreshObserver = cmp.isInstanceOf("auraStorage:refreshObserver");
-        	if (isRefreshObserver) {
-            	// If our component implements auraStorage:refreshObserver then let it know that refreshing has started
-        		cmp.getEvent("refreshBegin").setParams({
+        // Only auto refresh if the data we have is more than v.autoRefreshInterval seconds old
+        var now = new Date().getTime();
+        var action = this;
+        if ((now - storage["created"]) > autoRefreshInterval) {
+            storageService.log("Action.refresh(): auto refresh begin", action);
+
+            var cmp = action.getComponent();
+            var isRefreshObserver = cmp.isInstanceOf("auraStorage:refreshObserver");
+            if (isRefreshObserver) {
+                // If our component implements auraStorage:refreshObserver then let it know that refreshing has started
+                cmp.getEvent("refreshBegin").setParams({
                     "action": action
-                }).fire();        		
-        	}
+                }).fire();
+            }
 
-        	var refreshAction = action.getDef().newInstance(cmp);
-        	refreshAction.setCallback(action.callbackScope, action.callback);
-        	refreshAction.setParams(action.params);
-        	refreshAction.setStoreable({ 
-        		"ignoreExisting": true
-    		});
-        	
-        	var originalCallbackScope = action.callbackScope;
-        	var originalCallback = action.callback;
-        	refreshAction.setCallback(originalCallbackScope, function(a) {
-        		if (originalCallback) {
-            		// Chain to the original callback to let it do its thing
-        			originalCallback.call(originalCallbackScope, a);
-        		}
+            var refreshAction = action.getDef().newInstance(cmp);
+            refreshAction.setCallback(action.callbackScope, action.callback);
+            refreshAction.setParams(action.params);
+            refreshAction.setStoreable({
+                "ignoreExisting": true
+            });
 
-		    	if (isRefreshObserver) {
-		        	// If our component implements auraStorage:refreshObserver then let it know that refreshing has finished
-	        		a.getComponent().getEvent("refreshEnd").setParams({
-	                    "action": a
-	                }).fire();        		
-		    	}
-		    	
-		    	storageService.log("Action.refresh(): auto refresh end", a); 
-		    });
-  
-        	action.runAfter(refreshAction);
-    	}
+            var originalCallbackScope = action.callbackScope;
+            var originalCallback = action.callback;
+            refreshAction.setCallback(originalCallbackScope, function(a) {
+                if (originalCallback) {
+                    // Chain to the original callback to let it do its thing
+                    originalCallback.call(originalCallbackScope, a);
+                }
+
+                if (isRefreshObserver) {
+                    // If our component implements auraStorage:refreshObserver then let it know that refreshing has finished
+                    a.getComponent().getEvent("refreshEnd").setParams({
+                        "action": a
+                    }).fire();
+                }
+
+                storageService.log("Action.refresh(): auto refresh end", a);
+            });
+
+            action.runAfter(refreshAction);
+        }
     }
 };
 

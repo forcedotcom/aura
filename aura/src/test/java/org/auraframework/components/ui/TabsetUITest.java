@@ -54,7 +54,7 @@ public class TabsetUITest extends WebDriverTestCase {
         String tabBodyActual = tab.getText();
 
         if (isActive) {
-            AuraUITestingUtil.assertClassNameContains(tab, "active");
+            auraUITestingUtil.assertClassNameContains(tab, "active");
             assertTrue("Since tab is active should be able to read tab body: " + tabBody, tabBodyActual.contains(tabBody));
 
             // accessibility check
@@ -62,7 +62,7 @@ public class TabsetUITest extends WebDriverTestCase {
                     "active uiTab dynamicallyAddedFromVBox uiVbox bContainer bVerticalContainer", tabClassName);
             assertEquals("Since tab is active link should have aria set (for accessability)", "true", tabLinkAria);
         } else {
-            AuraUITestingUtil.assertClassNameDoesNotContain(tab, "active");
+        	auraUITestingUtil.assertClassNameDoesNotContain(tab, "active");
             assertFalse("Since tab is inactive should not be able to read tab body: " + tabBody, tabBodyActual.contains(tabBody));
             assertNull("Since tab is inactive link should not have aria set (for accessability)", tabLinkAria);
         }

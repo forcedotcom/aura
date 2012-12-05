@@ -40,7 +40,7 @@ public class ComponentQueryLanguageUITest extends WebDriverTestCase {
     public void testQueryLanguageNotAvailableInprodMode() throws Exception{
         ServletConfigController.setProductionConfig(true);
         open("/test/laxSecurity.app", Mode.PROD);
-        Object query = getEval("return window.$A.getQueryStatement");
+        Object query = auraUITestingUtil.getEval("return window.$A.getQueryStatement");
         assertNull("Query language should not be available in PROD mode.", query);
     }
 
@@ -52,9 +52,9 @@ public class ComponentQueryLanguageUITest extends WebDriverTestCase {
      */
     public void testQueryLanguageAvailableInNonprodMode() throws Exception{
         open("/test/laxSecurity.app");
-        Object query = getEval("return window.$A.getQueryStatement");
+        Object query = auraUITestingUtil.getEval("return window.$A.getQueryStatement");
         assertNotNull("Query language should be available in non PROD mode.", query);
-        query = getEval("return window.$A.getQueryStatement()");
+        query = auraUITestingUtil.getEval("return window.$A.getQueryStatement()");
         assertNotNull("$A.q() failed to return query", query);
     }
 }

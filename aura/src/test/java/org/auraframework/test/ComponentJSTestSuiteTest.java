@@ -226,7 +226,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
 
         public void testRun() throws Throwable {
             open(getUrl(), Mode.AUTOJSTEST);
-            String ret = (String)getEval(String.format("return window.aura.test.run('%s', '%s')",
+            String ret = (String)auraUITestingUtil.getEval(String.format("return window.aura.test.run('%s', '%s')",
                     AuraTextUtil.escapeForJavascriptString(caseDef.getName()),
                     AuraTextUtil.escapeForJavascriptString(suite.getCode())));
             if (ret != null && !"null".equals(ret)) {

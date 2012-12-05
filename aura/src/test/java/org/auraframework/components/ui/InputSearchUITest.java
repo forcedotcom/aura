@@ -17,7 +17,6 @@ package org.auraframework.components.ui;
 
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -32,20 +31,12 @@ public class InputSearchUITest extends WebDriverTestCase {
 
     @ExcludeBrowsers({BrowserType.ANDROID_PHONE,BrowserType.ANDROID_TABLET,BrowserType.IPAD,BrowserType.IPHONE})
     public void testSearch() throws Exception{
-        final String valueExpression ="return window.$A.get('root.v.searched')";
-        WebDriver d = getDriver();
+        final String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.searched");
         open("/uitest/inputSearchHandlingSearchEvent.cmp");
 
-        WebElement input = AuraUITestingUtil.findElementAndTypeEventNameInIt(d, "search");
-        assertBooleanExpression("Search event should not have been triggered yet", false, valueExpression);
-        AuraUITestingUtil.pressEnter(input);
-        assertBooleanExpression("Search event should have been triggered", true, valueExpression);
+        WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt("search");
+        assertFalse("Search event should not have been triggered yet", auraUITestingUtil.getBooleanEval(valueExpression));
+        auraUITestingUtil.pressEnter(input);
+        assertTrue("Search event should have been triggered", auraUITestingUtil.getBooleanEval(valueExpression));
     }
-
-    private void assertBooleanExpression(String message, Object expected, final String valueExpression) {
-        assertEquals(message, ""+expected, ""+getEval(valueExpression));
-    }
-
-
-
 }

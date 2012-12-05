@@ -44,12 +44,12 @@ public class IterationUITest extends WebDriverTestCase {
         assertEquals("action run by button9", e.getText());
         
         WebElement root = findDomElement(By.cssSelector(".testRoot"));
-        String clientHtml = (String) getEval("return arguments[0].innerHTML;", root);
+        String clientHtml = (String) auraUITestingUtil.getEval("return arguments[0].innerHTML;", root);
 
         openNoAura("/iterationTest/simpleIterationServer.cmp");
 
         root = findDomElement(By.cssSelector(".testRoot"));
-        String serverHtml = (String) getEval("return arguments[0].innerHTML;", root);
+        String serverHtml = (String) auraUITestingUtil.getEval("return arguments[0].innerHTML;", root);
 
         clientHtml = clientHtml.replaceAll("<!---->", ""); // remove comments
         clientHtml = clientHtml.replaceAll("</br>", ""); // remove expanded br
@@ -71,11 +71,11 @@ public class IterationUITest extends WebDriverTestCase {
     public void testNestedIteration() throws Exception {
         open("/iterationTest/nestedIteration.cmp");
         WebElement root = findDomElement(By.cssSelector(".testRoot"));
-        String clientHtml = (String) getEval("return arguments[0].innerHTML;", root);
+        String clientHtml = (String) auraUITestingUtil.getEval("return arguments[0].innerHTML;", root);
 
         openNoAura("/iterationTest/nestedIterationServer.cmp");
         root = findDomElement(By.cssSelector(".testRoot"));
-        String serverHtml = (String) getEval("return arguments[0].innerHTML;", root);
+        String serverHtml = (String) auraUITestingUtil.getEval("return arguments[0].innerHTML;", root);
 
         clientHtml = clientHtml.replaceAll("<!---->", ""); // remove comments
         clientHtml = clientHtml.replaceAll("\\s+", " "); // replace whitespace with a single space

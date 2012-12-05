@@ -231,7 +231,7 @@ ArrayValue.prototype.remove = function(index) {
                 removed.destroyHandlers(globalId);
             }
         }
-        
+
         this.fire("change");
         return removed;
     }
@@ -324,7 +324,7 @@ ArrayValue.prototype.destroy = function(async) {
 //#end
     function destroy(a, async) {
         var array = a.dirty ? a.newArray : a.array;
-    	for (var i = 0; i < array.length; i++) {
+        for (var i = 0; i < array.length; i++) {
             var v = array[i];
             if (v !== undefined) {
                 v.destroy(async);
@@ -361,6 +361,9 @@ ArrayValue.prototype.destroy = function(async) {
     delete this.handlers;
 };
 
+/**
+ * Returns this type as a String.
+ */
 ArrayValue.prototype.toString = function(){
     return "ArrayValue";
 };
@@ -387,6 +390,7 @@ ArrayValue.prototype.unwrap = function(){
 
 /**
  * Compare to an ArrayValue or Array.
+ * @param {Object} arr The object that is compared. If the object is neither an ArrayValue nor an Array, return false.
  * @returns {Boolean} if they are identical return true, otherwise return false.
  */
 ArrayValue.prototype.compare = function(arr) {
@@ -432,6 +436,10 @@ ArrayValue.prototype.getEventDispatcher = function() {
     return ret;
 };
 
+/**
+ * Adds handlers that will be called by the value when a related event is triggered.
+ * @param {Object} config The handlers to be added to the queue
+ */
 ArrayValue.prototype.addHandler = function(config){
     BaseValue.addHandler(config, this.getEventDispatcher());
 
@@ -513,7 +521,7 @@ ArrayValue.prototype.render = function(parent, insertElements){
         referenceNode = this.createLocator(" array locator " + this.owner);
         ret.unshift(referenceNode);
     }
-    
+
     this.setReferenceNode(referenceNode);
 
     insertElements(ret, parent);
@@ -527,8 +535,8 @@ ArrayValue.prototype.render = function(parent, insertElements){
  * @private
  */
 ArrayValue.prototype.unrender = function(){
-	this.setReferenceNode(null);
-	delete this.rendered;
+    this.setReferenceNode(null);
+    delete this.rendered;
 };
 
 /**
@@ -586,7 +594,7 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
             // Next iteration of the loop will use this component's ref node as its "top"
             referenceNode = itemReferenceNode;
             this.setReferenceNode(referenceNode);
-            
+
             appendChild = false;
 
             rendered[globalId] = itemReferenceNode;
@@ -611,29 +619,29 @@ ArrayValue.prototype.getReferenceNode = function() {
 };
 
 ArrayValue.prototype.createLocator = function(debugText) {
-	var label = "";
-	
-	//#if {"modes" : ["DEVELOPMENT"]}
-	label = debugText;
+    var label = "";
+
+    //#if {"modes" : ["DEVELOPMENT"]}
+    label = debugText;
     //#end
-	
-	var locator = document.createComment(label);
-	locator._arrayValueOwner = this;
-	
+
+    var locator = document.createComment(label);
+    locator._arrayValueOwner = this;
+
     return locator;
 };
 
 ArrayValue.prototype.setReferenceNode = function(ref) {
-	if (this.referenceNode && this.referenceNode._arrayValueOwner === this) {
-		this.referenceNode._arrayValueOwner = null;
-		$A.util.removeElement(this.referenceNode);
-	}
+    if (this.referenceNode && this.referenceNode._arrayValueOwner === this) {
+        this.referenceNode._arrayValueOwner = null;
+        $A.util.removeElement(this.referenceNode);
+    }
 
-	if (ref) {
-		this.referenceNode = ref;
-	} else {
-		delete this.referenceNode;
-	}
+    if (ref) {
+        this.referenceNode = ref;
+    } else {
+        delete this.referenceNode;
+    }
 };
 
 //#include aura.value.ArrayValue_export

@@ -15,11 +15,11 @@
  */
 package org.auraframework.impl.java.type;
 
-import org.auraframework.impl.util.AuraLocaleImpl;
-import org.auraframework.test.UnitTestCase;
-
 import java.math.BigDecimal;
 import java.util.Locale;
+
+import org.auraframework.impl.util.AuraLocaleImpl;
+import org.auraframework.test.UnitTestCase;
 
 /**
  * Verify implementation of JavaLocalizedTypeUtil used to convert data from a given type
@@ -50,6 +50,8 @@ public class JavaLocalizedTypeUtilTest extends UnitTestCase {
 
     /**
      * Verify conversion of Localized Strings and consistent numeric data.
+     * 
+     * Reference for how different countries handle decimals: http://en.wikipedia.org/wiki/Decimal_mark#Examples_of_use
      */
     public void testNumberConvertersWork(){
 
@@ -72,8 +74,9 @@ public class JavaLocalizedTypeUtilTest extends UnitTestCase {
         assertNotNull("German localized String to BigDecimal was null", deDecimal);
         assertEquals("German localized String to BigDecimal problem", correctDecimal, deDecimal);
 
-        // TODO: add more tests
+        // ...for fr format decimals
+        BigDecimal frDecimal = JavaLocalizedTypeUtil.convert("123456.789", BigDecimal.class, false, new AuraLocaleImpl(Locale.FRANCE));
+        assertNotNull("German localized String to BigDecimal was null", frDecimal);
+        assertEquals("German localized String to BigDecimal problem", correctDecimal, frDecimal);
     }
-
-
 }

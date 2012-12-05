@@ -15,13 +15,11 @@
  */
 package org.auraframework.components.control;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.annotation.ThreadHostileTest;
-
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 /**
  * Test components using ForEach loops. This is a web driver test case to check for foreach rendering.
@@ -105,17 +103,4 @@ public class ForEachUITest extends WebDriverTestCase {
         loadApplication("stringlist_server", appText, false);
         assertEquals("foreach content text", "onetwothree", getListContent());
     }
-
-//    /**
-//     * Verifies that a component instantiation that is missing a required attribute that occurs
-    // * inside a aura:forEach tag results in a QuickFixException.
-//     *
-//     * @priority Low
-//     * @expectedResults QuickFixException text appears.
-//     */
-//    public void _testMissingRequiredAttributeInForEach() throws Exception{
-    // openNoAura("/apexauratest/testMissingRequiredAttributeInForEach.cmp");
-    // waitForTextPresent("QuickFixExcepton error message missing",
-    // "COMPONENT markup://ui:outputDateTime is missing required attribute 'value'");
-//    }
 }

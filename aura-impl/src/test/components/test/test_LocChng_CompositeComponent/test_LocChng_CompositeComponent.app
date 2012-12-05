@@ -18,10 +18,6 @@
 <aura:application locationChangeEvent="test:test_LocChng_Event2">
     <test:test_button label="click me (Button on Composite Component)" class="CompositeComponent" press="{!c.clientAction}" aura:id="compositeButton"/>
 
-    <!--One handler for location change events fired for inner component(test:test_LocChng_SimpleComponent)-->
-    <!--aura:handler event="test:test_LocChng_Event" action="{!c.innerClicked}"/-->
-
     <!--One handler for location change events fired for inner component-->
     <aura:handler event="test:test_LocChng_Event2" action="{!c.clicked}"/>
-    <!--FIXME - apps can't be referenced like this<test:test_LocChng_SimpleComponent />-->
 </aura:application>

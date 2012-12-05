@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     clientAction: function(cmp, event){
         //Client Action associated with the button
         //Get the current token, if this is the first time the page was loaded, token will be null
@@ -47,4 +47,4 @@
             }
         }
     }
-}
+})

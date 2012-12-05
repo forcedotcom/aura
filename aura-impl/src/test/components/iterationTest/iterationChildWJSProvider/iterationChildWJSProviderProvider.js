@@ -16,9 +16,6 @@
 ({
     provide : function simpleProvider(component) {
         var attr = component.getAttributes().getValue('strAttribute').getValue();
-        //TODO: This wont get me the value of the attribute, why?
-        // var attr = component.get('v.strAttribute');
-        $A.log(component);
         return {
             attributes: {
                 "newStrAttribute": "TextAppend" + attr

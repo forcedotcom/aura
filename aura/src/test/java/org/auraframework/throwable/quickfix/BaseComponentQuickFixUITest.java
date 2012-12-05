@@ -17,9 +17,10 @@ package org.auraframework.throwable.quickfix;
 
 import java.io.File;
 
-import org.junit.Ignore;
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
@@ -53,7 +54,6 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
         quickFixUIWidget = new QuickFixUIWidget(defType, this);
     }
 
-    @Ignore
     public void testCreationQuickFix() throws Exception {
         // This test needs to be updated because of "preloads" fix
         String namespace = "auratest";
@@ -85,7 +85,4 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
             }
         }
     }
-
-    /*If there is no such namespace, we now just show a runtime error instead of the quickfix
-    }*/
 }

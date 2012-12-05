@@ -30,9 +30,7 @@
                  if(handlerDefs[i].eventDef.getDescriptor().getQualifiedName()==='markup://test:test_LocChng_Event2'){
                      aura.test.assertTrue((handlerDefs[i].action.path.join(".")==="c.clicked"),
                                             "Incorrect action registered for location change handler");
-                 }/*else if(handlerDefs[i].eventDef.getDescriptor().getQualifiedName()==='test:test_LocChng_Event'){
-                     aura.test.assertTrue(handlerDefs[i].action==="{!c.clicked}", "Incorrect action registered for location change handler");
-                 }*/else{
+                 }else{
                      aura.test.fail("Unkown action/handler registered with component");
                  }
             }

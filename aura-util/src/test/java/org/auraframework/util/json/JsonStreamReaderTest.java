@@ -15,17 +15,27 @@
  */
 package org.auraframework.util.json;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.math.BigDecimal;
-import java.util.*;
-
-import com.google.common.base.Charsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.test.UnitTestCase;
-import org.auraframework.util.IOUtil;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.IOUtil;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 import org.auraframework.util.json.JsonStreamReader.JsonStreamParseException;
+
+import com.google.common.base.Charsets;
 
 /**
  * @hierarchy Aura.Unit Tests.Json StreamReader
@@ -163,8 +173,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
             jsonStreamReader.close();
         }
         /*
-         * Positive test case 2: Passing a combination of object types TODO: Ask Dani if the array can have combinations
-         * of objects
+         * Positive test case 2: Passing a combination of object types
          */
         jsonStreamReader = config.createJsonStreamReader("[\"test1\",20]");
         try {

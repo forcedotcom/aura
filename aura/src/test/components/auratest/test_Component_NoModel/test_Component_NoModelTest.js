@@ -14,21 +14,10 @@
  * limitations under the License.
  */
 ({
-    testVerifyModelIsValueObject:{
+    testVerifyModelIsUndefined:{
         test:function(component){
             var model = component.getModel();
             aura.test.assertTrue(model === undefined, 'Model should not exist');
         }
     },
-    testVerifySettingValuesOnModel:{
-        test: function(component){
-            var model = component.getModel();
-            //The dummy model should have the same function that a true model has. See Model.js
-            //FIXME - you cannot set a value on a model that was not predefined.
-            /*model.getValue('string').setValue('DummyModel');
-            aura.test.assertTrue(model.getValue('string').auraType ==='Value', 'Model not stored as a Value object');
-            aura.test.assertEquals(model.getValue('string').getValue(),'DummyModel', 'Setting value on a model failed');*/
-        }
-    }
-}
-)
+})

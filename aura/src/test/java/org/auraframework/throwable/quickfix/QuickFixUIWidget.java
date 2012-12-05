@@ -17,10 +17,11 @@ package org.auraframework.throwable.quickfix;
 
 import junit.framework.Assert;
 
-import org.openqa.selenium.*;
-
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.test.WebDriverTestCase;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 /**
  * Widget class for QuickFix testing.
@@ -77,7 +78,7 @@ public class QuickFixUIWidget {
          * @param expectedSuccess
          */
         public String clickFix(Boolean expectedSuccess) throws Exception{
-            By fixButton = By.xpath("//label[text()='Fix!']");
+            By fixButton = By.xpath("//button");
             WebElement button = testCase.getDriver().findElement(fixButton);
             button.click();
             testCase.waitFor(3);

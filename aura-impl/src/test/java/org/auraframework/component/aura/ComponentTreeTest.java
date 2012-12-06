@@ -48,7 +48,7 @@ public class ComponentTreeTest extends WebDriverTestCase {
      * @throws Exception
      */
     public void testServerVSClientShape() throws Exception {
-        checkServerVsClient("auratest:rerender.app", ApplicationDef.class);
+        checkServerVsClient("auratest:testApplication1.app", ApplicationDef.class);
     }
 
     /**

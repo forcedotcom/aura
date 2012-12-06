@@ -95,6 +95,8 @@
             <code>http://localhost:8080/helloWorld/helloWorld.app</code><br/>
             You should see a simple greeting in your browser.</li>
         </ol>
+        
+        <p>Note that the <code>helloWorld/pom.xml</code> file has a <code>&lt;dependencies&gt;</code> section, which lists the <code>&lt;version&gt;</code> of each Aura artifact in your project. They define the version of Aura that your project is using and each artifact <code>&lt;dependency&gt;</code> should use the same version.</p>
 
         <p>You created a simple app from the command line. You are probably more used to working with an IDE. The <auradocs:topicLink topic="eclipseCreateApp">Eclipse quick start</auradocs:topicLink> shows you how to create a similar app with an IDE. It also introduces the concept of modular and reusable components, which is one of the main advantages of using Aura.</p>
 

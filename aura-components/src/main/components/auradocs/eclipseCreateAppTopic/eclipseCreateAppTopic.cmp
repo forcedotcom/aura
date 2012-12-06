@@ -32,37 +32,7 @@
 
         </ol>
 
-
-    <h2>Step 1: Modify the Maven settings.xml File</h2>
-
-    <p>
-    Navigate to your home directory and create or edit your <code>.m2/settings.xml </code> file to look like:
-    </p>
-
-<auradocs:codeblock>
-<![CDATA[<settings>
-  <profiles>
-     <profile>
-
-        <id>aura</id>
-        <activation>
-           <activeByDefault>true</activeByDefault>
-         </activation>
-
-          <repositories>
-            <repository>
-              <id>maven.auraframework.org.snapshots</id>
-              <url>http://maven.auraframework.org/repo</url>
-            </repository>
-          </repositories>
-
-    </profile>
-  </profiles>
-</settings>
-]]>
-</auradocs:codeblock>
-
-    <h2>Step 2: Specify the Remote Archetype</h2>
+    <h2>Step 1: Specify the Remote Archetype</h2>
 
         <ol>
             <li>In Eclipse, add the remote catalog.<br/>
@@ -76,14 +46,7 @@
 
         </ol>
 
-    <h2>Step 3: Verify the File Path for Maven User Settings</h2>
-
-        <ol>
-            <li>Click <b>Window</b> &gt; <b>Preferences</b> &gt; <b>Maven</b> &gt; <b>User Settings</b> &gt; <b>Update Settings</b>. </li>
-            <li>Check that the <b>User Settings</b> field is set to <code>~/.m2/settings.xml</code>. Replace <code>~</code> with the path to your home directory.</li>
-        </ol>
-
-    <h2>Step 4: Create a New Project</h2>
+    <h2>Step 2: Create a New Project</h2>
 
         <ol>
             <li>Click <b>File</b> &gt; <b>New</b> &gt; <b>Other...</b> and select <b>Maven</b> &gt; <b>Maven Project</b>.</li>
@@ -93,13 +56,13 @@
             <li>Enter <code>org.myGroup</code> for <b>Group Id</b> and <code>helloWorldEclipse</code> for <b>Artifact Id</b>.</li>
             <li>Click <b>Finish</b>.</li>
         </ol>
-        <auradocs:info>The Artifact Id is also the name of your project as it appears in the Package Explorer. It can only contain alphanumeric characters. See
+        <auradocs:info>The Artifact Id is also the name of your project as it appears in the Package Explorer. See
         <a href="http://maven.apache.org/guides/mini/guide-naming-conventions.html" target="_blank">Guide to naming conventions</a> for examples of Group Id and Artifact Id naming conventions.</auradocs:info>
 
         <p>You should now have a new project called <code>helloWorldEclipse</code> in the Package Explorer.</p>
 
 
-    <h2>Step 5: Build and Run Your Project</h2>
+    <h2>Step 3: Build and Run Your Project</h2>
 
         <ol>
             <li>Click <b>Run</b> &gt; <b>Debug Configurations...</b> and double click Maven Build.</li>
@@ -113,7 +76,7 @@
         </ol>
 
 
-    <h2>Step 6: Test Your App</h2>
+    <h2>Step 4: Test Your App</h2>
 
         <ol>
             <li>Navigate to <code>http://localhost:8080</code> to test your app.<br/>

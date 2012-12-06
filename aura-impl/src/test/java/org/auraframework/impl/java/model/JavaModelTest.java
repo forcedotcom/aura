@@ -101,7 +101,7 @@ public class JavaModelTest extends AuraImplTestCase {
     }
 
     public void testSerializeMetadata() throws Exception {
-        JavaModelDefFactory factory = new JavaModelDefFactory(null);
+        JavaModelDefFactory factory = new JavaModelDefFactory();
         ModelDef def = factory.getDef(descriptor);
         serializeAndGoldFile(def);
     }

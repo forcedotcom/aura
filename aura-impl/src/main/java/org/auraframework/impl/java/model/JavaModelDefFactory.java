@@ -30,6 +30,11 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * def factory for the java model
  */
 public class JavaModelDefFactory extends BaseJavaDefFactory<ModelDef> {
+    
+    public JavaModelDefFactory() {
+        this(null);
+    }
+
     public JavaModelDefFactory(List<SourceLoader> sourceLoaders) {
         super(sourceLoaders);
     }

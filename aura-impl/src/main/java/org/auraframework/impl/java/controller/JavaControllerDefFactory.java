@@ -42,6 +42,10 @@ import com.google.common.collect.Maps;
  */
 public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> {
 
+    public JavaControllerDefFactory() {
+        this(null);
+    }
+
     public JavaControllerDefFactory(List<SourceLoader> sourceLoaders) {
         super(sourceLoaders);
     }

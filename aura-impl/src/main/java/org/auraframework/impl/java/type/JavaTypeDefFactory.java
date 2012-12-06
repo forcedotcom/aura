@@ -30,6 +30,10 @@ import org.auraframework.util.AuraTextUtil;
  * Loads Java types for Aura components.
  */
 public class JavaTypeDefFactory extends BaseJavaDefFactory<TypeDef> {
+    public JavaTypeDefFactory() {
+        this(null);
+    }
+
     public JavaTypeDefFactory(List<SourceLoader> sourceLoaders) {
         super(sourceLoaders);
     }

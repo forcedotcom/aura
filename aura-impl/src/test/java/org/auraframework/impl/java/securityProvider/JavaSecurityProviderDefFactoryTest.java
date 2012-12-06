@@ -31,7 +31,7 @@ public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
     }
 
     private SecurityProviderDef getSecurityProviderDef(String className) throws QuickFixException {
-        return new JavaSecurityProviderDefFactory(null).getDef(Aura.getDefinitionService().getDefDescriptor(
+        return new JavaSecurityProviderDefFactory().getDef(Aura.getDefinitionService().getDefDescriptor(
                 "java://" + className, SecurityProviderDef.class));
     }
 

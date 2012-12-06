@@ -29,6 +29,11 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  */
 public class JavaProviderDefFactory extends BaseJavaDefFactory<ProviderDef>{
+    
+    public JavaProviderDefFactory() {
+        this(null);
+    }
+
     public JavaProviderDefFactory(List<SourceLoader> sourceLoaders) {
         super(sourceLoaders);
     }

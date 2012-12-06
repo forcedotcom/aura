@@ -27,6 +27,10 @@ import org.auraframework.system.SourceLoader;
  */
 public class JavaRendererDefFactory extends BaseJavaDefFactory<RendererDef> {
 
+    public JavaRendererDefFactory() {
+        this(null);
+    }
+
     public JavaRendererDefFactory(List<SourceLoader> sourceLoaders) {
         super(sourceLoaders);
     }

@@ -79,9 +79,11 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                         themeLoaders.add(new FileThemeSourceLoader(location.getComponentSourceDir()));
                         markupLoaders.add(new FileSourceLoader(location.getComponentSourceDir()));
                         File javaBase = new File(location.getComponentSourceDir().getParent(), "java");
-                        javaLoaders.add(new FileSourceLoader(javaBase));
+                        if (javaBase.exists()) {
+                            javaLoaders.add(new FileSourceLoader(javaBase));
+                        }
                         File generatedJavaBase = location.getJavaGeneratedSourceDir();
-                        if (generatedJavaBase != null) {
+                        if (generatedJavaBase != null && generatedJavaBase.exists()) {
                             FileSourceLoader fsl = new FileSourceLoader(generatedJavaBase);
                             markupLoaders.add(fsl);
                             javaLoaders.add(fsl);

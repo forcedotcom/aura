@@ -41,7 +41,7 @@ public class ErrorMessageGITUITest extends WebDriverTestCase {
 
         //Cause an error to show up on client
         String errorMsg = "Something went haywire!";
-        getEval("$A.error('"+errorMsg+"')");
+        auraUITestingUtil.getEval("$A.error('"+errorMsg+"')");
 
         waitForElement("Error mask should be visible when there is an error.", findDomElement(ERROR_MASK_LOCATOR), true);
         assertEquals("Did not find expected error in error message element.", errorMsg, getText(ERROR_MSG_LOCATOR));

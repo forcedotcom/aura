@@ -47,10 +47,10 @@ public class InputTextUITest extends WebDriverTestCase {
         open(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
 
         String value = getCurrentModelValue();
-        WebElement input = AuraUITestingUtil.findElementAndTypeEventNameInIt(getDriver(), event);
+        WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(event);
         assertModelValue(value); //value shouldn't be updated yet
         input.click();
-        AuraUITestingUtil.pressTab(input);
+        auraUITestingUtil.pressTab(input);
         value = assertModelValue(event); //value should have been updated
     }
 
@@ -64,49 +64,49 @@ public class InputTextUITest extends WebDriverTestCase {
         Actions a = new Actions(d);
 
         String eventName = "blur";
-        WebElement input = AuraUITestingUtil.findElementAndTypeEventNameInIt(d, eventName);
+        WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value); //value shouldn't be updated yet
         input.click();
-        AuraUITestingUtil.pressTab(input);
+        auraUITestingUtil.pressTab(input);
         value = assertModelValue(eventName); //value should have been updated
 
         eventName = "change";
-        input = AuraUITestingUtil.findElementAndTypeEventNameInIt(d, eventName);
+        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         //assertModelValue(value); //commented out because clear() was firing change it seems
-        AuraUITestingUtil.pressTab(input);
+        auraUITestingUtil.pressTab(input);
         value = assertModelValue(eventName);
 
         eventName = "click";
-        input = AuraUITestingUtil.findElementAndTypeEventNameInIt(d, eventName);
+        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
-        AuraUITestingUtil.pressTab(input);
+        auraUITestingUtil.pressTab(input);
         assertModelValue(value);
         input.click();
         value = assertModelValue(eventName);
 
         eventName = "dblclick";
-        input = AuraUITestingUtil.findElementAndTypeEventNameInIt(d, eventName);
+        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
         a.doubleClick(input).build().perform();
         value = assertModelValue(eventName);
 
         eventName = "focus";
-        input = AuraUITestingUtil.findElementAndTypeEventNameInIt(d, eventName);
-        AuraUITestingUtil.pressTab(input);
+        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+        auraUITestingUtil.pressTab(input);
         //assertModelValue(value);//commented out because clear() was firing change it seems
         input.click();
         value = assertModelValue(eventName);
       
         eventName = "keydown";
-        input = AuraUITestingUtil.findElementAndTypeEventNameInIt(d, eventName);
+        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         value = assertModelValue(eventName.substring(0, eventName.length()-1));
 
         eventName = "keypress";
-        input = AuraUITestingUtil.findElementAndTypeEventNameInIt(d, eventName);
+        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         value = assertModelValue(eventName.substring(0, eventName.length()-1));
 
         eventName = "keyup";
-        input = AuraUITestingUtil.findElementAndTypeEventNameInIt(d, eventName);
+        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         value = assertModelValue(eventName);
     }
 
@@ -122,37 +122,37 @@ public class InputTextUITest extends WebDriverTestCase {
         WebElement outputDiv = d.findElement(By.id("output"));
 
         String eventName = "mousedown";
-        WebElement input = AuraUITestingUtil.findElementAndTypeEventNameInIt(d, eventName);
+        WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
         input.click();
         value = assertModelValue(eventName);
 
        eventName = "mousemove";
-        input = AuraUITestingUtil.findElementAndTypeEventNameInIt(d, eventName);
+        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
         a.moveToElement(input).moveByOffset(0, 100).build().perform();
         value = assertModelValue(eventName);
 
         eventName = "mouseout";
-        input = AuraUITestingUtil.findElementAndTypeEventNameInIt(d, eventName);
+        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
         a.moveToElement(input).moveToElement(outputDiv).build().perform();
         value = assertModelValue(eventName);
 
         eventName = "mouseover";
-        input = AuraUITestingUtil.findElementAndTypeEventNameInIt(d, eventName);
+        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
         a.moveToElement(input).build().perform();
         value = assertModelValue(eventName);
 
         eventName = "mouseup";
-        input = AuraUITestingUtil.findElementAndTypeEventNameInIt(d, eventName);
+        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
         input.click();
         value = assertModelValue(eventName);
         
         eventName = "select";
-        input = AuraUITestingUtil.findElementAndTypeEventNameInIt(d, eventName);
+        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
         a.doubleClick(input).build().perform();
         value = assertModelValue(eventName);
@@ -187,7 +187,7 @@ public class InputTextUITest extends WebDriverTestCase {
 
     private String getCurrentModelValue(){
         String valueExpression ="return window.$A.get('root.m.string')";
-        String value = (String) getEval(valueExpression);
+        String value = (String) auraUITestingUtil.getEval(valueExpression);
         return value;
     }
     

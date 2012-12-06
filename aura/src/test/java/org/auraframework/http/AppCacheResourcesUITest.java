@@ -317,7 +317,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
     
     private void assertAppCacheStatus(Status status) {
-        Status actual = Status.values()[Integer.parseInt(getEval("return window.applicationCache.status;").toString())];
+        Status actual = Status.values()[Integer.parseInt(auraUITestingUtil.getEval("return window.applicationCache.status;").toString())];
         assertEquals("Unexpected status", status.name(), actual.name());
     }
 

@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -38,7 +37,6 @@ import java.util.logging.Logger;
 import junit.framework.AssertionFailedError;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
@@ -51,14 +49,12 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.FreshBrowserInstance;
 import org.auraframework.test.annotation.WebDriverTest;
+import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.AuraUtil;
-import org.auraframework.util.json.JsonReader;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.ScreenshotException;
@@ -82,7 +78,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     protected int timeoutInSecs = 30;
     private WebDriver currentDriver = null;
     BrowserType currentBrowserType = null;
-
+    protected AuraUITestingUtil auraUITestingUtil;
+    
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ ElementType.TYPE, ElementType.METHOD })
     public @interface TargetBrowsers {
@@ -122,6 +119,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     public void perBrowserSetUp(){
         // re-initialize driver pointer here because test analysis might need it after perBrowserTearDown
         currentDriver = null;
+        //W-1475510: instantiating it inorder to expose certain Util methods.
+        auraUITestingUtil = new AuraUITestingUtil(this.getDriver());
     }
 
     /**
@@ -280,7 +279,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         } else {
             description.append("\nJS state: ");
             try {
-                String dump = (String)getRawEval("return (window.$A && $A.test && $A.test.getDump())||'';");
+                String dump = (String)auraUITestingUtil.getRawEval("return (window.$A && $A.test && $A.test.getDump())||'';");
                 if (dump.isEmpty()) {
                     description.append("no errors detected");
                 } else {
@@ -315,7 +314,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             try {
                 description.append("\nApplication cache status: ");
                 description
-                        .append(getRawEval(
+                        .append(auraUITestingUtil.getRawEval(
                                 "var cache=window.applicationCache;return (cache===undefined || cache===null)?'undefined':cache.status;")
                                 .toString());
             } catch (Exception ex) {
@@ -355,7 +354,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         if (t == null) {
             if (trigger) {
                 try {
-                    getRawEval("return $A.test.dummymethod();");
+                    auraUITestingUtil.getRawEval("return $A.test.dummymethod();");
                 } catch (Throwable i) {
                     return getBase64EncodedScreenshot(i, false);
                 }
@@ -532,26 +531,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @return true if Aura framework has loaded
      */
     protected boolean isAuraFrameworkReady() {
-        return getBooleanEval("return window.$A ? window.$A.finishedInit === true : false;");
+        return auraUITestingUtil.getBooleanEval("return window.$A ? window.$A.finishedInit === true : false;");
         }
-
-    /**
-     * Process the results from $A.test.getErrors(). If there were any errors, then fail the test accordingly.
-     * 
-     * @param errors
-     *            the raw results from invoking $A.test.getErrors()
-     */
-    private void assertJsTestErrors(String errors) {
-        if (!errors.isEmpty()) {
-            @SuppressWarnings("unchecked")
-            List<Map<String, Object>> errorsList = (List<Map<String, Object>>)new JsonReader().read(errors);
-            StringBuffer errorMessage = new StringBuffer();
-            for (Map<String, Object> error : errorsList) {
-                errorMessage.append(error.get("message") + "\n");
-            }
-            fail(errorMessage.toString());
-        }
-    }
 
     private <V> Function<? super WebDriver, V> addErrorCheck(final Function<? super WebDriver, V> function) {
         return new Function<WebDriver, V>() {
@@ -559,8 +540,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             public V apply(WebDriver driver) {
                 V value = function.apply(driver);
                 if ((value == null) || (Boolean.class.equals(value.getClass()) && !Boolean.TRUE.equals(value))) {
-                    String errors = (String)getRawEval("return (window.$A && window.$A.test) ? window.$A.test.getErrors() : '';");
-                    assertJsTestErrors(errors);
+                    String errors = (String)auraUITestingUtil.getRawEval("return (window.$A && window.$A.test) ? window.$A.test.getErrors() : '';");
+                    auraUITestingUtil.assertJsTestErrors(errors);
                 }
                 return value;
             }
@@ -591,7 +572,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                return (Boolean)getRawEval("return document.readyState === 'complete'");
+                return (Boolean)auraUITestingUtil.getRawEval("return document.readyState === 'complete'");
             }
         });
     }
@@ -630,7 +611,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      */
     private void waitForAuraFrameworkReady() {
         // Umbrella check for any framework load error.
-        if (!(Boolean)getRawEval("return !!window.$A")) {
+        if (!(Boolean)auraUITestingUtil.getRawEval("return !!window.$A")) {
             fail("Initialization error: document loaded without $A. Perhaps the initial GET failed.");
         }
 
@@ -643,73 +624,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             }
         });
     }
-
-    /**
-     * Returns value of executing javascript in current window.
-     *
-     * @see org.openqa.selenium.JavscriptExecutor#executeSript(String, Object...)
-     */
-    protected Object getRawEval(String javascript, Object... args) {
-        return ((JavascriptExecutor)getDriver()).executeScript(javascript, args);
-    }
-
-    /**
-     * Evaluate the given javascript in the current window. Upon completion, if the framework has loaded and is in a
-     * test mode, then assert that there are no uncaught javascript errors.
-     * <p>
-     * As an implementation detail, we accomplish this by wrapping the given javascript so that we can perform the error
-     * check on each evaluation without doing a round-trip to the browser (which might be long in cases of remote test
-     * runs).
-     * 
-     * @return the result of calling {@link JavascriptExecutor#executeScript(String, Object...) with the given
-     *         javascript and args.
-     */
-    public Object getEval(final String javascript, Object... args) {
-        /**
-         * Wrap the given javascript to evaluate and then check for any collected errors. Then, return the result and
-         * errors back to the WebDriver. We must return as an array because
-         * {@link JavascriptExecutor#executeScript(String, Object...) cannot handle Objects as return values."
-         */
-        String escapedJavascript = StringEscapeUtils.escapeJavaScript(javascript);
-        String wrapper = "var ret;" + //
-                String.format("var func = new Function('arguments', \"%s\");\n", escapedJavascript) + //
-                "var ret = func.call(this, arguments);\n" + //
-                "var errors = (window.$A && window.$A.test) ? window.$A.test.getErrors() : '';\n" + //
-                "return [ret, errors];";
-
-        try {
-            @SuppressWarnings("unchecked")
-            List<Object> wrapResult = (List<Object>)getRawEval(wrapper, args);
-            assertEquals("Wrapped javsascript execution expects an array of exactly 2 elements", 2, wrapResult.size());
-            String errors = (String)wrapResult.get(1);
-            assertJsTestErrors(errors);
-            return wrapResult.get(0);
-        } catch (WebDriverException e) {
-            fail("Script execution failed.\n" + //
-                    "Arguments: (" + Arrays.toString(args) + ")\n" + //
-                    "Script:\n" + javascript + "\n");
-            throw e;
-        }
-    }
-
-    /**
-     * Execute the given javascript and args in the current window. Fail if the result is not a boolean. Otherwise,
-     * return the result.
-     */
-    protected boolean getBooleanEval(String javascript, Object... args) {
-        Object status;
-        status = getEval(javascript, args);
-
-        if (status == null) {
-            fail("Got a null status for " + javascript + "(" + args + ")");
-        }
-        if (!(status instanceof Boolean)) {
-            fail("Got unexpected return value: for " + javascript + "(" + args + ") :\n" + status.toString());
-        }
-
-        return ((Boolean)status).booleanValue();
-    }
-
+    
     /**
      * Wait the specified number of seconds for the provided javascript to evaluate to true.
      * 
@@ -720,7 +635,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                return getBooleanEval(javascript);
+                return auraUITestingUtil.getBooleanEval(javascript);
             }
         }, timeoutInSecs);
     }
@@ -746,7 +661,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             });
         } catch (TimeoutException expected) {
             return;
-    }
+        }
     }
 
     /**
@@ -828,7 +743,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                return getBooleanEval("return arguments[0].ownerDocument === document", element);
+                return auraUITestingUtil.getBooleanEval("return arguments[0].ownerDocument === document", element);
             }
         });
         return element;
@@ -857,7 +772,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                return getBooleanEval("var cache=window.applicationCache;"
+                return auraUITestingUtil.getBooleanEval("var cache=window.applicationCache;"
                         + "return $A.util.isUndefinedOrNull(cache) || "
                         + "(cache.status===cache.UNCACHED)||(cache.status===cache.IDLE)||(cache.status===cache.OBSOLETE);");
             }

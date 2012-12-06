@@ -16,8 +16,16 @@
 package org.auraframework.impl;
 
 import java.math.BigDecimal;
-import java.text.*;
-import java.util.*;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 
 import org.auraframework.Aura;
 import org.auraframework.service.LocalizationService;
@@ -198,7 +206,7 @@ public class LocalizationServiceImplTest extends AuraImplTestCase {
 
 
 
-    public void _testParseTimeParserExceptions() throws ParseException {
+    public void testParseTimeParserExceptions() throws ParseException {
         //Test invalid time strings
         {
             int failures = 0;

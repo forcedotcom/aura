@@ -15,12 +15,16 @@
  */
 package org.auraframework.impl.system;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.util.Date;
 import java.util.List;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
 import org.auraframework.impl.source.StringSourceLoader;
@@ -28,7 +32,6 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.ThreadHostileTest;
-import org.auraframework.test.annotation.UnAdaptableTest;
 
 import com.google.common.collect.Lists;
 
@@ -62,10 +65,8 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Automation to verify that, in test mode definitions are fetched fresh for each request. W-911565 TODO: handle
-     * source being loaded as resource, so we can't necessarily write new source files
+     * Automation to verify that, in test mode definitions are fetched fresh for each request.
      */
-    @UnAdaptableTest
     public void testDefinitionsFetchingInTestMode() throws Exception {
 
         // Obtain the definition of an application without layout and make sure the
@@ -128,10 +129,9 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify staleness check is done when CachingDefRegistry is not filled up. TODO: CachingDefRegistryImpl.isStale()
-     * is dead code.
+     * Verify staleness check is done when CachingDefRegistry is not filled up.
      */
-    public void _testForStaleCheckWhenRegistryPartiallyFull() throws Exception {
+    public void testForStaleCheckWhenRegistryPartiallyFull() throws Exception {
         String markup = "<aura:component> %s </aura:component>";
         DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(String.format(markup, ""), ComponentDef.class);
         ComponentDef initialDef = dd.getDef();
@@ -161,8 +161,6 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
     /**
      * verify staleness check is done when CachingDefRegistry is filled up.
      */
-    // Flaps in SFDC build W-1265411
-    @UnAdaptableTest
     public void testForStaleCheckWhenRegistryFull() throws Exception {
         long startTimeStamp = 1331246678985l;
         String markup = "<aura:component> %s </aura:component>";

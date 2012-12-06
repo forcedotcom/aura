@@ -71,33 +71,32 @@
             aura.test.assertEquals("checkbox", component.find("checkbox").getElement().type, "Type attribute not correctly set");
         }
     },
+
     /**
      * Verify value attribute.
      * When value attribute is set and label not set, value will be used as label.
      * Comment it out as we don't render label for now.
      */
-    /*
-    testText: {
+    // TODO: W-943203 - label not displayed
+    /*testText: {
         attributes : {text: "my value"},
         test: function(component){
             aura.test.assertEquals("my value", component.find("checkbox").getElement().value, "Text attribute not correctly set");
             this.verifyLabel(component, "my value");
         }
-    },
-    */
+    },*/
     /**
      * Verify label attribute.
      * Comment it out as we don't render label for now.
      */
-    /*
-    testLabel: {
+    // TODO: W-943203 - label not displayed
+    /*testLabel: {
         attributes : {text:"my value", label : "I want a pony"},
         test: function(component){
             aura.test.assertEquals("my value", component.find("checkbox").getElement().value, "Value attribute not correctly set");
             this.verifyLabel(component, "I want a pony");
         }
-    },
-    */
+    },*/
     /**
      * Verify updating attributes on rerender.
      */
@@ -115,7 +114,7 @@
             aura.test.assertEquals("your value", component.find("checkbox").getElement().value, "After rerender, value attribute not correctly set with new value");
             aura.test.assertTrue(component.find("checkbox").getElement().disabled, "After rerender, element not disabled");
             aura.test.assertTrue(component.find("checkbox").getElement().checked, "After rerender, element not correctly selected");
-            //TODO: W-1150831
+            //TODO: W-1150831, W-943203
             //this.verifyLabel(component, "I want a pony");
         }
     },
@@ -131,6 +130,8 @@
         }
     },
 
+    // Tests using this are currently disabled. Labels are not displayed next to checkbox.
+    // W-943203
     verifyLabel: function(component, expectedLabel){
         var elements = component.getElements();
         aura.test.assertTrue(elements[0] instanceof HTMLInputElement, "Input element not found");

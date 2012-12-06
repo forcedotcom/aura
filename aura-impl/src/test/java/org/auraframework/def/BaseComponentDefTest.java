@@ -15,14 +15,20 @@
  */
 package org.auraframework.def;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.def.BaseComponentDef.RenderType;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.root.component.LazyComponentDefRef;
 import org.auraframework.impl.source.StringSourceLoader;
-import org.auraframework.throwable.quickfix.*;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonStreamReader;
 
@@ -173,17 +179,38 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Test method for {@link ApplicationDef#getHandlerDefs()}.
+     * Test method for {@link BaseComponentDef#getHandlerDefs()}.
      */
-    public void _testGetHandlerDefs() throws Exception {
-        fail("Not yet implemented");
+    public void testGetHandlerDefs() throws Exception {
+        // Verify no handlers for empty component
+        T def = define(baseTag, "", "");
+        Collection<EventHandlerDef> handlerDefs = def.getHandlerDefs();
+        assertEquals("Should have no handlers for empty component", 0, handlerDefs.size());
+        
+        // Verify multiple handlers can be added
+        def = define(baseTag, "", "<aura:handler event=\"aura:doneWaiting\" action=\"{!c.empty}\"/>" +
+                                      "<aura:handler event=\"aura:doneRendering\" action=\"{!c.empty}\"/>");
+        handlerDefs = def.getHandlerDefs();
+        assertEquals("Wrong number of handlers", 2, handlerDefs.size());
+        for (EventHandlerDef handlerDef : handlerDefs) {
+            assertTrue("Wrong handlers added to definiton", handlerDef.toString().equals("markup://aura:doneWaiting") ||
+                            handlerDef.toString().equals("markup://aura:doneRendering"));
+        }
     }
 
     /**
-     * Test method for {@link ApplicationDef#getThemeDescriptor()}.
+     * Test method for {@link BaseComponentDef#getThemeDescriptor()}.
      */
-    public void _testGetThemeDescriptor() {
-        fail("Not yet implemented");
+    public void testGetThemeDescriptor() throws Exception {
+        T def = define(baseTag, "", "");
+        DefDescriptor<ThemeDef> themeDef = def.getThemeDescriptor();
+        assertNull("ThemeDescriptor for component without theme should be null", themeDef);
+
+        def = define(baseTag, "theme=\"templateCss://test.themeTestTemplate\"", "");
+        themeDef = def.getThemeDescriptor();
+        assertNotNull("ThemeDescriptor not found on component", themeDef);
+        assertEquals("Wrong ThemeDescriptor found on component", "templateCss://test.themeTestTemplate", 
+                        themeDef.getQualifiedName());
     }
 
     /**

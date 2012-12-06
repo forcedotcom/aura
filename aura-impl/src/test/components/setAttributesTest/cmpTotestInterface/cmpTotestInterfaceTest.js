@@ -17,6 +17,7 @@
     /**
      * Verify that attributes of parent interface can be set by implementing component.
      */
+    // TODO W-1468465 - cannot set attribute values on interface
     _testSettingAttributeValueInheritedFromInterface:{
         test:function(cmp){
             //Access the interface included as facet in the current component.

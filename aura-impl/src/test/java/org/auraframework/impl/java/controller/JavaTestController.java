@@ -15,16 +15,22 @@
  */
 package org.auraframework.impl.java.controller;
 
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.instance.Component;
+import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.*;
+import org.auraframework.system.Location;
+import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.date.DateOnly;
 
@@ -61,11 +67,43 @@ public class JavaTestController {
         return param;
     }
 
+    /**
+     * Note: these cases are pretty specific to js://test.testActionExceptions
+     * 
+     * @param exceptionType What type (class) of exception to throw
+     * @param cause Cause parameter of Exception. Either a class of type Throwable or String
+     */
     @AuraEnabled
-    public static void throwsThrowable(@Key("token") String token, @Key("input") String input) {
-        throw new RuntimeException();
+    public static void throwsThrowable(@Key("type") String exceptionType, @Key("cause") String cause) throws Throwable {
+        if (exceptionType.equals("java.lang.Throwable")) {
+            throw new Throwable(cause);
+        } else if (exceptionType.equals("java.lang.RuntimeException")) {
+            throw new RuntimeException(new IllegalAccessException());
+        } else if (exceptionType.equals("java.lang.Error")) {
+            throw new Error(new RuntimeException());
+        } else if (exceptionType.equals("java.lang.reflect.InvocationTargetException")) {
+            throw new InvocationTargetException(new IllegalArgumentException());
+        } else if (exceptionType.equals("java.lang.IllegalArgumentException")) {
+            throw new IllegalArgumentException(cause);
+        } else if (exceptionType.equals("java.lang.IllegalAccessException")) {
+            throw new IllegalAccessException(cause);
+        } else if (exceptionType.equals("java.lang.reflect.InvocationTargetException")) {
+            if (cause.equals("java.lang.IllegalArgumentException")) {
+                throw new InvocationTargetException(new IllegalArgumentException());
+            } else if (cause.equals("aura.throwable.AuraHandledException")){
+                throw new InvocationTargetException(new AuraHandledException(""));
+            }
+        } else if (exceptionType.equals("aura.throwable.AuraHandledException")) {
+            if (cause.equals("java.lang.IllegalArgumentException")) {
+                throw new AuraHandledException(new IllegalArgumentException());
+            } else {
+                throw new AuraHandledException(cause);
+            }
+        } else {
+            throw new RuntimeException();
+        }
     }
-    
+
     @AuraEnabled
 	public static void throwsException(@Key("errorMsg") String errorMsg) throws Exception {
     	throw new Exception(errorMsg);

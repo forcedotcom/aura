@@ -460,7 +460,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     /**
      * Allow POST action in PROD mode, with unsecured namespace prefix.
      */
-    public void _testPostProdActionWithUnsecuredNamespace() throws Exception {
+    public void testPostProdActionWithUnsecuredNamespace() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
                 "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysDenies'>%s</aura:application>",
                 ApplicationDef.class);

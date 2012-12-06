@@ -19,13 +19,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Map;
 
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.EventType;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.impl.source.file.FileSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.system.*;
+import org.auraframework.system.Location;
 import org.auraframework.system.Parser.Format;
+import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 
 public class XMLParserTest extends AuraImplTestCase{
@@ -54,10 +59,6 @@ public class XMLParserTest extends AuraImplTestCase{
     public void testParseDescriptor() throws Exception{
         assertEquals("Unexpected Descriptor", descriptor, def.getDescriptor());
     }
-
-  //FIXME - there are no longer children.
-    /*
-    */
 
     public void testParseInvalid() throws Exception{
         XMLParser parser = XMLParser.getInstance();

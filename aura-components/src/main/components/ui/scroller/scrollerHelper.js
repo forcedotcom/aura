@@ -25,26 +25,27 @@
 	},
 
 	refreshScroller : function(component) {
-		var width = component.get("v.width");
-		if (width) {
-			component.find("scrollContent").getElement().style.width = width;
-		}
-
-		var helper = this;
-		if (!component._refreshing) {
-			component._refreshing = true;
-
-			var scroller = component._scroller;
-			if (!$A.util.isUndefined(scroller)) {
-				scroller.refresh();
-
-				// Goose the x position to insure that onScrollEnd() fires with the correct page fully revealed
-				if (component.get("v.snap")) {
-					scroller.scrollTo(scroller.maxScrollX, 0, 0);
-				}
+		if (!component._scrolling) {
+			var width = component.get("v.width");
+			if (width) {
+				component.find("scrollContent").getElement().style.width = width;
 			}
-
-			component._refreshing = false;
+	
+			if (!component._refreshing) {
+				component._refreshing = true;
+	
+				var scroller = component._scroller;
+				if (!$A.util.isUndefined(scroller)) {
+					scroller.refresh();
+	
+					// Goose the x position to insure that onScrollEnd() fires with the correct page fully revealed
+					if (component.get("v.snap")) {
+						scroller.scrollTo(scroller.maxScrollX, 0, 0);
+					}
+				}
+	
+				component._refreshing = false;
+			}
 		}
 	},
 
@@ -77,6 +78,8 @@
 						this.initIScroll();
 					}
 
+					this.trackActiveInstance(component);
+					
 					component._scroller = new iScroll(scroller, {
 						hScroll : hScroll,
 						hScrollbar : hScroll && !snap && showScrollbars,
@@ -86,6 +89,8 @@
 						snap : snap,
 						snapThreshold : 60,
 						momentum : !snap,
+						bounce : !snap,
+						bounceLock : snap,
 
 						hideScrollbar : true,
 						fadeScrollbar : true,
@@ -98,6 +103,8 @@
 						lockDirection : true,
 
 						onBeforeScrollStart : function(e) {
+							component._scrolling = true;
+							
 							var target = e.target.nodeName.toLowerCase();
 							if ("input" != target && "textarea" != target && "select" != target) {
 								e.preventDefault();
@@ -133,6 +140,8 @@
 						},
 
 						onScrollEnd : function(e) {
+							delete component._scrolling;
+							
 							if (pullToRefreshAction) {
 								if ($A.util.hasClass(pullDownEl, 'pullFlip')) {
 									$A.util.swapClass(pullDownEl, 'pullFlip', 'pullLoading');
@@ -169,7 +178,24 @@
 			}
 		}
 	},
+	
+	trackActiveInstance: function(component) {
+		if (this._activeInstances) {
+			// Ask any existing scrollers to unbind any existing transient event handlers
+			for (var id in this._activeInstances) {
+				var c = this._activeInstances[id];
 
+				c._scroller.unbindTransientHandlers();
+				
+				delete c._scrolling;
+			}
+		} else {
+			this._activeInstances = {};
+		}
+
+		this._activeInstances[component.getGlobalId()] = component;
+	},
+	
 	initImageOnload : function(component) {
 		// Add onload listener to all <img> elements in the content to detect
 		// async size changes from images loading after
@@ -197,6 +223,7 @@
 		if (!$A.util.isUndefined(component._scroller)) {
 			component._scroller.destroy();
 			delete component._scroller;
+			delete this._activeInstances[component.getGlobalId()];
 		}
 	},
 
@@ -311,7 +338,7 @@
 				return window.cancelRequestAnimationFrame || window.webkitCancelAnimationFrame || window.webkitCancelRequestAnimationFrame
 						|| window.mozCancelRequestAnimationFrame || window.oCancelRequestAnimationFrame || window.msCancelRequestAnimationFrame || clearTimeout;
 			})(),
-
+			
 			// Helpers
 			translateZ = has3d ? ' translateZ(0)' : '',
 
@@ -412,7 +439,7 @@
 				if (that.options.useTransition)
 					that.options.fixedScrollbar = true;
 
-				that.refresh(true);
+				that.refresh();
 
 				that._bind(RESIZE_EV, window);
 				that._bind(START_EV);
@@ -422,7 +449,7 @@
 						that._bind('mousewheel');
 					}
 				}
-
+				
 				if (that.options.checkDOMChanges)
 					that.checkDOMTime = setInterval(function() {
 						that._checkDOMChanges();
@@ -445,10 +472,12 @@
 
 				handleEvent : function(e) {
 					var that = this;
+					
 					switch (e.type) {
 					case START_EV:
 						if (!hasTouch && e.button !== 0)
 							return;
+						
 						that._start(e);
 						break;
 					case MOVE_EV:
@@ -611,7 +640,7 @@
 
 				_start : function(e) {
 					var that = this, point = hasTouch ? e.touches[0] : e, matrix, x, y, c1, c2;
-
+					
 					if (!that.enabled)
 						return;
 
@@ -782,11 +811,9 @@
 						dist : 0,
 						time : 0
 					}, duration = (e.timeStamp || Date.now()) - that.startTime, newPosX = that.x, newPosY = that.y, distX, distY, newDuration, snap, scale;
-
-					that._unbind(MOVE_EV, window);
-					that._unbind(END_EV, window);
-					that._unbind(CANCEL_EV, window);
-
+					
+					that.unbindTransientHandlers();
+					
 					if (that.options.onBeforeScrollEnd)
 						that.options.onBeforeScrollEnd.call(that, e);
 
@@ -845,7 +872,7 @@
 							}
 						}
 
-						that._resetPos(400);
+						that._resetPos();
 
 						if (that.options.onTouchEnd)
 							that.options.onTouchEnd.call(that, e);
@@ -914,25 +941,20 @@
 						return;
 					}
 
-					that._resetPos(200);
+					that._resetPos();
 					if (that.options.onTouchEnd)
 						that.options.onTouchEnd.call(that, e);
 				},
 
-				_resetPos : function(time) {
+				_resetPos : function() {
 					var that = this, resetX = that.x >= 0 ? 0 : that.x < that.maxScrollX ? that.maxScrollX : that.x, resetY = that.y >= that.minScrollY
 							|| that.maxScrollY > 0 ? that.minScrollY : that.y < that.maxScrollY ? that.maxScrollY : that.y;
 
 					if (resetX == that.x && resetY == that.y) {
 						if (that.moved) {
 							that.moved = false;
-							if (that.options.onScrollEnd)
-								that.options.onScrollEnd.call(that); // Execute
-																		// custom
-																		// code
-																		// on
-																		// scroll
-																		// end
+							if (that.options.onScrollEnd) 
+								that.options.onScrollEnd.call(that); 
 						}
 
 						if (that.hScrollbar && that.options.hideScrollbar) {
@@ -949,7 +971,7 @@
 						return;
 					}
 
-					that.scrollTo(resetX, resetY, time || 0);
+					that.scrollTo(resetX, resetY, 0);
 				},
 
 				_wheel : function(e) {
@@ -1031,7 +1053,7 @@
 						return;
 
 					if (!that.steps.length) {
-						that._resetPos(400);
+						that._resetPos();
 						return;
 					}
 
@@ -1050,7 +1072,7 @@
 						if (step.time)
 							that._bind(TRNEND_EV);
 						else
-							that._resetPos(0);
+							that._resetPos();
 						return;
 					}
 
@@ -1138,7 +1160,7 @@
 				},
 
 				_snap : function(x, y) {
-					var that = this, i, l, page, time, sizeX, sizeY;
+					var that = this, i, l, page, sizeX, sizeY;
 
 					// Check page X
 					page = that.pagesX.length - 1;
@@ -1148,8 +1170,11 @@
 							break;
 						}
 					}
-					if (page == that.currPageX && page > 0 && that.dirX < 0)
+					
+					if (page == that.currPageX && page > 0 && that.dirX < 0) {
 						page--;
+					}
+					
 					x = that.pagesX[page];
 					sizeX = m.abs(x - that.pagesX[that.currPageX]);
 					sizeX = sizeX ? m.abs(that.x - x) / sizeX * 500 : 0;
@@ -1163,20 +1188,20 @@
 							break;
 						}
 					}
-					if (page == that.currPageY && page > 0 && that.dirY < 0)
+					
+					if (page == that.currPageY && page > 0 && that.dirY < 0) {
 						page--;
+					}
+					
 					y = that.pagesY[page];
 					sizeY = m.abs(y - that.pagesY[that.currPageY]);
 					sizeY = sizeY ? m.abs(that.y - y) / sizeY * 500 : 0;
 					that.currPageY = page;
 
-					// Snap with constant speed (proportional duration)
-					time = m.round(m.max(sizeX, sizeY)) || 200;
-
 					return {
 						x : x,
 						y : y,
-						time : time
+						time : 600
 					};
 				},
 
@@ -1226,7 +1251,7 @@
 						that.options.onDestroy.call(that);
 				},
 
-				refresh : function(doNotAnimate) {
+				refresh : function() {
 					var that = this, offset, i, l, els, pos = 0, page = 0;
 
 					if (that.scale < that.options.zoomMin)
@@ -1295,7 +1320,7 @@
 
 					if (!that.zoomed) {
 						that.scroller.style[transitionDuration] = '0';
-						that._resetPos(doNotAnimate ? 0 : 200);
+						that._resetPos();
 					}
 				},
 
@@ -1375,16 +1400,20 @@
 					that.scrollTo(x, y, time);
 				},
 
+				unbindTransientHandlers: function() {
+					this._unbind(MOVE_EV, window);
+					this._unbind(END_EV, window);
+					this._unbind(CANCEL_EV, window);
+				},
+				
 				disable : function() {
 					this.stop();
-					this._resetPos(0);
+					this._resetPos();
 					this.enabled = false;
 
 					// If disabled after touchstart we make sure that there are
 					// no left over events
-					this._unbind(MOVE_EV, window);
-					this._unbind(END_EV, window);
-					this._unbind(CANCEL_EV, window);
+					this.unbindTransientHandlers();
 				},
 
 				enable : function() {

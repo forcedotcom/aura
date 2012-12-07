@@ -96,7 +96,7 @@
                     if (element.auraClass) {
                         c = c + " " + element.auraClass;
                     }
-                    if (c && c !== element["className"]) {
+                    if (!$A.util.isUndefinedOrNull(c) && c !== element["className"]) {
                         element["className"] = c;
                     }
                 }

@@ -30,7 +30,7 @@
     <aura:attribute name="onScrollStart" type="Aura.Action" description="The action invoked when the user starts scrolling."/>
     <aura:attribute name="onScrollEnd" type="Aura.Action" description="The action invoked when the user stops scrolling."/>
     <aura:attribute name="onScrollMove" type="Aura.Action" description="The action invoked when the user is scrolling."/>
-    <aura:attribute name="onPullToRefresh" type="Aura.Action" description="The action invoked when the user pulls to refresh the scroller area."/>
+    <aura:attribute name="onPullToRefresh" type="Aura.Action" description="The action invoked when the user pulls to refresh the scroller area.  The spacebar or Enter key also triggers a refresh."/>
     <aura:attribute name="pullToRefreshPull" type="String" default="Pull down to refresh..." description="The text to display in the top cell before the user pulls to refresh the page. Default value is &quot;Pull down to refresh...&quot;."/>
     <aura:attribute name="pullToRefreshRelease" type="String" default="Release to refresh..." description="The text to display in the revealed area above the scroller contents when the user pulls to refresh the scroller area, but has not yet released the pull. Default value is &quot;Release to refresh...&quot;."/>
     <aura:attribute name="pullToRefreshUpdating" type="String" default="Loading..." description="The text to display while the scroller component is updating after the user pulls to refresh the scroller. Default value is &quot;Loading...&quot;."/>

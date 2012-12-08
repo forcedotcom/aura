@@ -103,5 +103,36 @@
             aura.test.assertTrue(typeof tag.PLACEHOLDER === "undefined" && tag.placeholder === "Casper", "placeholder was not cased properly");
             aura.test.assertTrue(typeof tag.ValuE === "undefined" && tag.value === "infamous ghost", "value was not cased properly");
         }
+    },
+
+    assertClassUpdate : function(component, newValue) {
+		component.getValue("v.classValue").setValue(newValue);
+		$A.rerender(component);
+		$A.test.assertEquals(newValue ? newValue : "", component.find("hasClass").getElement().className);
+    },
+    
+    /**
+     * class attribute will be rerendered when initially not set
+     */
+    testRerenderAddedClassAttribute: {
+    	test: function(component) {
+    		$A.test.assertEquals("", component.find("hasClass").getElement().className, "initial class not set");
+    		this.assertClassUpdate(component, "inner");
+    	}
+    },
+
+    /**
+     * class attribute can be removed and restored in rerender
+     */
+    testRerenderUpdatedClassAttribute: {
+    	attributes: { classValue : "upper" },
+    	test: function(component) {
+    		$A.test.assertEquals("upper", component.find("hasClass").getElement().className, "initial class not set");
+	    	this.assertClassUpdate(component, "");
+	    	this.assertClassUpdate(component, "middle");
+	    	this.assertClassUpdate(component, null);
+	    	this.assertClassUpdate(component, "lower");
+	    	this.assertClassUpdate(component);
+    	}
     }
 })

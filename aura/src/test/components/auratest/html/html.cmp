@@ -16,6 +16,7 @@
 
 -->
 <aura:component render="client">
+	<aura:attribute name="classValue" type="String"/>
     <a aura:id="nohash" href="http://www.salesforce.com/">salesforce</a>
     <a aura:id="hashString" href="#layout">layout</a>
     <a aura:id="hash" href="#">hash</a>
@@ -26,4 +27,5 @@
         <br/>
     </div>
     <textarea aura:id="case" ReadOnly="false" maxlength="11" AccessKey="x" TABINDEX="1" ColSpaN="2" rOWsPAN="2" BGColor="#FFFFFF" USEmap="true" Class="low" For="ground" PLACEHOLDER="Casper" ValuE="infamous ghost"/>
+    <div aura:id="hasClass" class="{!v.classValue ? v.classValue : ''}">has class: {!v.classValue}</div>
 </aura:component>

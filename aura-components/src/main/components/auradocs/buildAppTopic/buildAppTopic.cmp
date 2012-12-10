@@ -23,10 +23,13 @@
     <p>We built a simple app on the Aura framework to demonstrate its capabilities. Aura Note is a note-taking app showcasing the simplicity of building apps on Aura.</p>
 
     <p>
-        <a href="https://github.com/forcedotcom/aura-note" target="_blank">Get the source</a> |
+        <a href="https://github.com/forcedotcom/lumen-note" target="_blank">Get the source</a> |
         <a href="http://notes.auraframework.org/auranote/notes.app" target="_blank">Visit the demo</a>
     </p>
 
+    <!-- TODO: remove this before open source -->
+    <auradocs:info><b>Note</b>: To get the source, follow the instructions on <a href="https://sites.google.com/a/salesforce.com/user-interface/lumen/git-setup-instructions#TOC-Getting-up-and-running-the-first-time" target="_blank">this Google Sites page</a> to request access to the private repo. If you get a <code>404</code> error after you've been granted access, make sure that you're logged in to GitHub. The <code>lumen-note</code> repo will be public and renamed to <code>aura-note</code> after the framework is open sourced.</auradocs:info>
+    
     <p><ui:image src="/auraFW/resources/aura/images/auraNoteDemo.png" alt="Aura Note App" /></p>
 
 </aura:component>

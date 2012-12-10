@@ -18,22 +18,23 @@
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Component Events"/>
 
-    <p>
-    Component events have attributes to pass relevant data from the firing component to any handling components. They have these characteristics:
-    </p>
-    <p><!--temp style before ul style gets fixed-->
-    <ul style="list-style-type:square; list-style-position:inside;">
-        <li>A component event is fired from an instance of a component.</li>
-        <li>A component registers that it may fire an event by using <code>&lt;aura:registerevent&gt;</code>.</li>
-        <li>A component event can be handled by the component itself or its parent. A component that extends another component can also handle events fired by the super component.</li>
-        <li>An event handler contains the firing component and declares how the event will be handled</li>
-        <li>Component events are akin to DOM events that bubble up the DOM tree and component event handlers are akin to inline HTML JavaScript handlers, with the caveat that they only bubble up one level; only the parent node can handle the thrown event, as opposed to the multi-level event bubbling and handling model in HTML.</li>
-   </ul></p>
-   <p>The following chart summarizes how Aura processes component events, with minor differences to <auradocs:topicLink topic="eventsApp">application events</auradocs:topicLink>.</p>
+    <p>Component events have attributes to pass relevant data from the firing component to any handling components.</p>
+    
+    <p>A component event is fired from an instance of a component. A component registers that it may fire an event by using <code>&lt;aura:registerevent&gt;</code>.</p>
+
+    <h2>Handling Component Events</h2>
+    
+    <p>A component event can be handled by the component itself or by a component that instantiates the component. For example, if the <code>auradocs:eventsHandler</code> component includes <code>&lt;auradocs:eventsNotifier&gt;</code> in its markup, <code>eventsHandler</code> can handle any events thrown by <code>eventsNotifier</code>.</p>
+    
+    <p>Also, a component that extends another component can also handle events fired by the super component.</p>
+
+    <h2>Component Events Overview</h2>
+   
+    <p>This chart summarizes how Aura processes component events, with minor differences to <auradocs:topicLink topic="eventsApp">application events</auradocs:topicLink>.</p>
     <p><ui:image src="/auraFW/resources/aura/images/compEvents.jpg" alt="Component Event Overview" /></p>
 
-
     <h2>File Resources for Component Events</h2>
+    
     <p>Component events are handled by the files listed here. Note that only the controller files must follow the file name convention
     <code>&lt;notifier&gt;Controller.js</code> and <code>&lt;handler&gt;Controller.js</code>.  The controllers are auto-wired to the notifier component and handler component.
     View <auradocs:topicLink topic="eventsDemo">source files and demo</auradocs:topicLink> to see how Aura events work.</p>

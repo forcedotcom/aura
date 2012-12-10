@@ -25,27 +25,25 @@
 	},
 
 	refreshScroller : function(component) {
-		if (!component._scrolling) {
-			var width = component.get("v.width");
-			if (width) {
-				component.find("scrollContent").getElement().style.width = width;
-			}
-	
-			if (!component._refreshing) {
-				component._refreshing = true;
-	
-				var scroller = component._scroller;
-				if (!$A.util.isUndefined(scroller)) {
-					scroller.refresh();
-	
-					// Goose the x position to insure that onScrollEnd() fires with the correct page fully revealed
-					if (component.get("v.snap")) {
-						scroller.scrollTo(scroller.maxScrollX, 0, 0);
-					}
+		var width = component.get("v.width");
+		if (width) {
+			component.find("scrollContent").getElement().style.width = width;
+		}
+
+		if (!component._refreshing) {
+			component._refreshing = true;
+
+			var scroller = component._scroller;
+			if (!$A.util.isUndefined(scroller)) {
+				scroller.refresh();
+
+				// Goose the x position to insure that onScrollEnd() fires with the correct page fully revealed
+				if (component.get("v.snap")) {
+					scroller.scrollTo(scroller.maxScrollX, 0, 0);
 				}
-	
-				component._refreshing = false;
 			}
+
+			component._refreshing = false;
 		}
 	},
 
@@ -101,8 +99,6 @@
 						lockDirection : true,
 
 						onBeforeScrollStart : function(e) {
-							component._scrolling = true;
-							
 							var target = e.target.nodeName.toLowerCase();
 							if ("input" != target && "textarea" != target && "select" != target) {
 								e.preventDefault();
@@ -138,8 +134,6 @@
 						},
 
 						onScrollEnd : function(e) {
-							delete component._scrolling;
-							
 							if (pullToRefreshAction) {
 								if ($A.util.hasClass(pullDownEl, 'pullFlip')) {
 									$A.util.swapClass(pullDownEl, 'pullFlip', 'pullLoading');
@@ -184,8 +178,6 @@
 				var c = this._activeInstances[id];
 
 				c._scroller.unbindTransientHandlers();
-				
-				delete c._scrolling;
 			}
 		} else {
 			this._activeInstances = {};

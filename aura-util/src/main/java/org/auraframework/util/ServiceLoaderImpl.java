@@ -21,7 +21,6 @@ import java.lang.reflect.Modifier;
 import java.util.Set;
 
 import org.auraframework.util.ServiceLocator.ServiceLocatorException;
-
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.*;
@@ -100,13 +99,11 @@ public class ServiceLoaderImpl implements ServiceLoader {
         Set<Method> beanMethods = Sets.newHashSet();
         Predicate<Method> pred;
 
+        pred = Predicates.and(predicate,
+                ReflectionUtils.withReturnTypeAssignableTo(type));
         if(primary){
-            pred = Predicates.and(predicate,
-                                    ReflectionUtils.withReturnTypeAssignableTo(type),
+            pred = Predicates.and(pred,
                                     ReflectionUtils.withAnnotation(PrimaryImpl.class));
-        }else{
-            pred = Predicates.and(predicate,
-                    ReflectionUtils.withReturnTypeAssignableTo(type));
         }
 
         /*  This is a better way to do it, but hits a runtime dep on Guava 12, so until we upgrade to Guava 12, working around this.
@@ -127,7 +124,7 @@ public class ServiceLoaderImpl implements ServiceLoader {
                 T tmp = (T)meth.invoke(null);
                 if(tmp != null){
                     if(ret != null){
-                        throw new ServiceLocatorException("More than one implementation found.");
+                        throw new ServiceLocatorException("More than one implementation found (primary=" + primary + ").");
                     }
                     ret = tmp;
                 }

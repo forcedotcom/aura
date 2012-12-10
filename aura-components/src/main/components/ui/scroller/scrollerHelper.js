@@ -89,8 +89,6 @@
 						snap : snap,
 						snapThreshold : 60,
 						momentum : !snap,
-						bounce : !snap,
-						bounceLock : snap,
 
 						hideScrollbar : true,
 						fadeScrollbar : true,
@@ -439,7 +437,7 @@
 				if (that.options.useTransition)
 					that.options.fixedScrollbar = true;
 
-				that.refresh();
+				that.refresh(true);
 
 				that._bind(RESIZE_EV, window);
 				that._bind(START_EV);
@@ -872,7 +870,7 @@
 							}
 						}
 
-						that._resetPos();
+						that._resetPos(400);
 
 						if (that.options.onTouchEnd)
 							that.options.onTouchEnd.call(that, e);
@@ -941,12 +939,12 @@
 						return;
 					}
 
-					that._resetPos();
+					that._resetPos(200);
 					if (that.options.onTouchEnd)
 						that.options.onTouchEnd.call(that, e);
 				},
 
-				_resetPos : function() {
+				_resetPos : function(time) {
 					var that = this, resetX = that.x >= 0 ? 0 : that.x < that.maxScrollX ? that.maxScrollX : that.x, resetY = that.y >= that.minScrollY
 							|| that.maxScrollY > 0 ? that.minScrollY : that.y < that.maxScrollY ? that.maxScrollY : that.y;
 
@@ -971,7 +969,7 @@
 						return;
 					}
 
-					that.scrollTo(resetX, resetY, 0);
+					that.scrollTo(resetX, resetY, time || 0);
 				},
 
 				_wheel : function(e) {
@@ -1053,7 +1051,7 @@
 						return;
 
 					if (!that.steps.length) {
-						that._resetPos();
+						that._resetPos(400);
 						return;
 					}
 
@@ -1072,7 +1070,7 @@
 						if (step.time)
 							that._bind(TRNEND_EV);
 						else
-							that._resetPos();
+							that._resetPos(0);
 						return;
 					}
 
@@ -1251,7 +1249,7 @@
 						that.options.onDestroy.call(that);
 				},
 
-				refresh : function() {
+				refresh : function(doNotAnimate) {
 					var that = this, offset, i, l, els, pos = 0, page = 0;
 
 					if (that.scale < that.options.zoomMin)
@@ -1320,7 +1318,7 @@
 
 					if (!that.zoomed) {
 						that.scroller.style[transitionDuration] = '0';
-						that._resetPos();
+						that._resetPos(doNotAnimate ? 0 : 200);
 					}
 				},
 
@@ -1408,7 +1406,7 @@
 				
 				disable : function() {
 					this.stop();
-					this._resetPos();
+					this._resetPos(0);
 					this.enabled = false;
 
 					// If disabled after touchstart we make sure that there are

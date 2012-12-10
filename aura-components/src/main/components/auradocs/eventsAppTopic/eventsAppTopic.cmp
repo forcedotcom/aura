@@ -18,16 +18,15 @@
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Application Events"/>
 
-    <p>Application events follow a traditional publish-subscribe model and have these characteristics:</p>
-    <p><!--temp style before ul style gets fixed-->
-        <ul style="list-style-type:square; list-style-position:inside;">
-            <li>An application event is fired from an instance of a component.</li>
-            <li>Application event handlers are declared per component, in the component definition's <code>.cmp</code> file.</li>
-            <li>All components that provide a handler for the event are notified.</li>
-        </ul>
-    </p>
+    <p>Application events follow a traditional publish-subscribe model. An application event is fired from an instance of a component.</p>
+    
+    <h2>Handling Application Events</h2>
+    
+    <p>Application event handlers are declared per component, in the component definition's <code>.cmp</code> file. All components that provide a handler for the event are notified.</p>
 
-     <p>The following chart summarizes how Aura processes application events, with minor differences to <auradocs:topicLink topic="eventsComp">component events</auradocs:topicLink>.</p>
+    <h2>Application Events Overview</h2>   
+
+     <p>This chart summarizes how Aura processes application events, with minor differences to <auradocs:topicLink topic="eventsComp">component events</auradocs:topicLink>.</p>
      <p><ui:image src="/auraFW/resources/aura/images/appEvents.jpg" alt="Application Event Overview" /></p>
 
      <h2>File Resources for Application Events</h2>

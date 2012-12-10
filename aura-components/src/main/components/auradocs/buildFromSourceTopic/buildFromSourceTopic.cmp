@@ -44,6 +44,8 @@
     <h2>Step 2: Get and Build Aura Source</h2>
 
     <ol>
+        <!-- TODO: remove this before open source -->
+        <li>Follow the instructions on <a href="https://sites.google.com/a/salesforce.com/user-interface/lumen/git-setup-instructions#TOC-Getting-up-and-running-the-first-time" target="_blank">this Google Sites page</a> to request access to the private repo. If you get a <code>404</code> error after you've been granted access, make sure that you're logged in to GitHub. The <code>lumen-beta</code> repo will be public and renamed to something Aura-specific after the framework is open sourced.</li>
         <li>On the command line, navigate to the directory where you want to keep the Aura source code.</li>
         <li>Run the following commands to clone the source with <code>git</code> and build it with Maven:<br/>
         <auradocs:codeblock>

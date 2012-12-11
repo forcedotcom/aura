@@ -21,9 +21,6 @@ import java.util.Set;
 
 /**
  * A group of javascript files that can be generated into one file.
- *
- *
- *
  */
 public interface JavascriptGroup {
 

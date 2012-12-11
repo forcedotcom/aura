@@ -24,8 +24,6 @@ import org.auraframework.test.UnitTestCase;
 /**
  * Verify implementation of JavaLocalizedTypeUtil used to convert data from a given type
  * to a desired type using a Locale.
- *
- *
  */
 public class JavaLocalizedTypeUtilTest extends UnitTestCase {
 

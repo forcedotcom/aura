@@ -27,9 +27,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Abstract handler for tags that contain other tags.
- *
- *
- *
  */
 public abstract class ContainerTagHandler<T extends Definition> extends XMLHandler<T> {
     protected Location startLocation;

@@ -41,9 +41,6 @@ import com.google.common.base.Charsets;
  * dropped as neither are valid UTF-8 bytes.<br>
  * <br>
  * Codepoints that are represented in UTF-16 as surrogate pairs are supported by this reader.
- *
- *
- *
  */
 @NotThreadSafe
 public class Utf8InputStreamReader extends Reader {

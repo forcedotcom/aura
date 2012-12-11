@@ -25,9 +25,6 @@ import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 
 /**
  * config for expression module, provides an expression adapter
- *
- *
- *
  */
 @AuraConfiguration
 public class AuraImplExpressionConfig {

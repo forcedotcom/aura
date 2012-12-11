@@ -32,9 +32,6 @@ import org.auraframework.util.AuraTextUtil;
 
 /**
  * <aura:set> tags
- *
- *
- *
  */
 public class AttributeDefRefHandler<P extends RootDefinition> extends ParentedTagHandler<AttributeDefRefImpl, P>{
 

@@ -21,8 +21,6 @@ import org.auraframework.system.LoggingContext;
 
 /**
  * Aura LoggingAdapter impl.
- *
- *
  */
 public class LoggingAdapterImpl implements LoggingAdapter {
 

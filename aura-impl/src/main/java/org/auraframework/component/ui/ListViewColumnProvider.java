@@ -31,8 +31,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * Determine which type of listView column implementation to render, based on type attribute
  *
  * Currently supports 'Checkbox', 'Email', 'Header', 'Html', 'Index', 'Link', 'Text' (default), or a namespaced component, eg. ns:CustomColumn
- *
- *
  */
 @Provider
 public class ListViewColumnProvider implements ComponentDescriptorProvider {

@@ -23,8 +23,6 @@ import org.auraframework.system.Annotations.Provider;
 
 /**
  * An interface provider used for testing.
- *
- *
  */
 @Provider
 public class TestProvider implements ComponentDescriptorProvider {

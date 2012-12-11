@@ -27,7 +27,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  *
  * This is a very thin wrapper around a factory, in fact, it is a little hard to tell the difference.
  * FIXME: collapse them.
- *
  */
 public class NonCachingDefRegistryImpl<T extends Definition> extends DefRegistryImpl<T> {
     private static final long serialVersionUID = 5781588775451737960L;

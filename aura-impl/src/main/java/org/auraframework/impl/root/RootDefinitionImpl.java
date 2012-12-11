@@ -31,9 +31,6 @@ import com.google.common.collect.Lists;
 
 /**
  * Shared definition code between component and event definition.
- *
- *
- *
  */
 public abstract class RootDefinitionImpl<T extends RootDefinition> extends DefinitionImpl<T> implements RootDefinition {
 

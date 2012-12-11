@@ -24,9 +24,6 @@ import org.auraframework.throwable.quickfix.InvalidExpressionException;
 
 /**
  * value providers for $ stuff that is not component specific, there is only 1 instance
- *
- *
- *
  */
 public interface GlobalValueProvider extends ValueProvider {
 

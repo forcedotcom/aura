@@ -32,9 +32,6 @@ import org.auraframework.util.AuraLocale;
  *
  * Mirrors the service methods for testing, and each is executed with a List of Config objects specifying the Locales to test, and relies on a
  * set of constants from the Config class for other test parameters, such as sample numbers, Dates, and DateFormat styles.
- *
- *
- *
  */
 public class LocalizationServiceTest extends BaseServiceTest<LocalizationService, LocalizationServiceTest.Config> implements LocalizationService {
 

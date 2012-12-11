@@ -33,9 +33,6 @@ import com.google.common.collect.Maps;
 
 /**
  * The implementation for a definition.
- *
- *
- *
  */
 @Serialization(referenceType=ReferenceType.IDENTITY)
 public abstract class DefinitionImpl<T extends Definition> implements Definition, Serializable {

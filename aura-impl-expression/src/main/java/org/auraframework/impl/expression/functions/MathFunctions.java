@@ -19,9 +19,6 @@ import java.util.List;
 
 /**
  * functions that do mathy stuff
- *
- *
- *
  */
 public class MathFunctions {
 

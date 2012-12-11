@@ -18,9 +18,6 @@ package org.auraframework.util.json;
 
 /**
  * standard jsony stuff
- *
- *
- *
  */
 public abstract class BaseJsonSerializationContext implements JsonSerializationContext {
     private final boolean format;

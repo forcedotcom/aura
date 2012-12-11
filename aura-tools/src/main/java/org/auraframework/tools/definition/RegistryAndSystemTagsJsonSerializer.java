@@ -31,8 +31,6 @@ import org.auraframework.util.RegistryJsonSerializer;
 
 /**
  * Serialize Aura Component Registry to json for consumption by tools like eclipse plugin.
- *
- *
  */
 public class RegistryAndSystemTagsJsonSerializer {
     final static String FILE_NAME_SYSTEM_TAGS = "auraSystemTags.json";

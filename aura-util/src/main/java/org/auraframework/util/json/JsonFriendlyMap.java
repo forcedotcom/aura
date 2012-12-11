@@ -22,9 +22,6 @@ import java.util.*;
  * usefulness, in addition to the standard Map methods, also has an add method that will create a List with the given
  * key (or use one that already exists), and then add the value to that List. Any entries with null values will be
  * omitted upon json serialization.
- *
- *
- *
  */
 public class JsonFriendlyMap extends LinkedHashMap<Object, Object> {
 

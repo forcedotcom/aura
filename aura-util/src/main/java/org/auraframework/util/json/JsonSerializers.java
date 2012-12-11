@@ -31,9 +31,6 @@ import java.util.Map.Entry;
 
 /**
  * Some basic serializers
- *
- *
- *
  */
 public class JsonSerializers {
     public static final LiteralSerializer LITERAL = new LiteralSerializer();

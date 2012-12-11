@@ -26,9 +26,6 @@ import org.auraframework.util.json.Json;
 /**
  * The definition of a component. Holds all information about a given type of component. ComponentDefs are immutable
  * singletons per type of ComponentDef. Once they are created, they can only be replaced, never changed.
- *
- *
- *
  */
 public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> implements ComponentDef {
     private static final long serialVersionUID = 6449560899515044182L;

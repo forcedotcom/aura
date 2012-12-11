@@ -30,9 +30,6 @@ import org.auraframework.util.IOUtil;
 /**
  * Original: CadenceGoogleChart
  * Handles building a url request to the Google Charts API.
- *
- *
- *
  */
 public class PTestGoogleChart {
     private static final String BASE_URL = "http://chart.apis.google.com/chart";

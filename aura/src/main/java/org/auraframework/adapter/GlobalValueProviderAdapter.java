@@ -23,9 +23,6 @@ import org.auraframework.instance.ValueProviderType;
 
 /**
  * factory that creates global value providers. each module can have one.
- *
- *
- *
  */
 public interface GlobalValueProviderAdapter extends AuraAdapter {
 

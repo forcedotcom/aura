@@ -24,9 +24,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * RootDefinitions are the Definitions that can be defined at the top-level of markup.
  * This includes things like component, interface, and event.  The common trait
  * of all of these types is that they can include AttributeDefs.
- *
- *
- *
  */
 public interface RootDefinition extends Definition {
     public enum SupportLevel{

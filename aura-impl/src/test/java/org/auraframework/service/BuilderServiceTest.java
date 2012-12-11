@@ -31,8 +31,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * @hierarchy Aura.Services.BuilderService
  * @userStory a07B0000000Eb3M
- *
- *
  */
 public class BuilderServiceTest extends BaseServiceTest<BuilderService, BuilderServiceTest.Config> implements BuilderService {
 

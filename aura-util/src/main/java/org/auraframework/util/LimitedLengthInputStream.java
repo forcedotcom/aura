@@ -28,9 +28,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  * <br>
  * The main use case for this class is creating a child InputStream on a main InputStream that can then be passed to an InputStream
  * reader that fully consumes it.
- *
- *
- *
  */
 @NotThreadSafe
 public class LimitedLengthInputStream extends InputStream {

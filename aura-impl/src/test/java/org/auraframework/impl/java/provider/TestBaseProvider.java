@@ -25,8 +25,6 @@ import org.auraframework.system.Annotations.Provider;
  * This provider is part of the test to ensure that concrete components always intantiate
  * as such. It always provides 'provider:providerB' to allow us to test 'provider:providerA'
  * instantiating.
- *
- *
  */
 @Provider
 public class TestBaseProvider implements ComponentDescriptorProvider {

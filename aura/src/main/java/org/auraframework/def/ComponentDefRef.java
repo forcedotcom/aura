@@ -25,9 +25,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Interface for component definition references.
- *
- *
- *
  */
 public interface ComponentDefRef extends Definition {
     public static enum Load{

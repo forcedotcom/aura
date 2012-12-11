@@ -32,9 +32,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 /**
  * LoggingContext impl.
- *
- *
- *
  */
 
 public class LoggingContextImpl implements LoggingContext {

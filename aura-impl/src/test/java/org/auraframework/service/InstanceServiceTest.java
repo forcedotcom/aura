@@ -33,8 +33,6 @@ import com.google.common.collect.Maps;
 /**
  * @hierarchy Aura.Services.InstanceService
  * @userStory a07B0000000Eb3M
- *
- *
  */
 public class InstanceServiceTest extends BaseServiceTest<InstanceService, InstanceServiceTest.Config> implements InstanceService {
 

@@ -23,9 +23,6 @@ import org.auraframework.util.javascript.JavascriptGroup;
 /**
  * Interface that provides javascript groups. Each module that has javascript has to implement this so the generation and app
  * initialization can find the groups from other modules. It also allows modules to access each others javascript.
- *
- *
- *
  */
 public interface JavascriptGroupProvider {
 

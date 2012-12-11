@@ -30,9 +30,6 @@ import org.auraframework.util.json.*;
 
 /**
  * json serialization context for aura
- *
- *
- *
  */
 public class AuraJsonContext extends ClassMapJsonSerializationContext {
     private static final Map<String, JsonSerializer<?>> mappyFasty;

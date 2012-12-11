@@ -31,9 +31,6 @@ import com.google.common.cache.*;
 
 /**
  * base class for registries, adds some important methods that aren't exposed through the top level interface
- *
- *
- *
  */
 public class CachingDefRegistryImpl<T extends Definition> extends NonCachingDefRegistryImpl<T> {
 

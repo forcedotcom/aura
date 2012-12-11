@@ -49,8 +49,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 
 /**
  * @see QuickFixException
- *
- *
  */
 public abstract class AuraXMLQuickFix extends AuraQuickFix {
 

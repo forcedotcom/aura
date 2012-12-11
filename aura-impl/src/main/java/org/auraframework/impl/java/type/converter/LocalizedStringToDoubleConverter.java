@@ -24,9 +24,6 @@ import org.auraframework.util.type.converter.StringToDoubleConverter;
 
 /**
  * Used by aura.impl.java.type.JavaLocalizedTypeUtil;
- *
- *
- *
  */
 public class LocalizedStringToDoubleConverter
     extends StringToDoubleConverter

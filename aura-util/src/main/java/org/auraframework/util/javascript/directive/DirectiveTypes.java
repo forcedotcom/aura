@@ -21,9 +21,6 @@ import com.google.common.collect.ImmutableList;
 
 /**
  * standard types
- *
- *
- *
  */
 public class DirectiveTypes {
 

@@ -31,9 +31,6 @@ import org.auraframework.util.json.Json;
 /**
  * The definition of an interface. Holds all information about a given type of interface. InterfaceDefs are immutable
  * singletons per type. Once they are created, they can only be replaced, never changed.
- *
- *
- *
  */
 public final class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implements InterfaceDef {
 

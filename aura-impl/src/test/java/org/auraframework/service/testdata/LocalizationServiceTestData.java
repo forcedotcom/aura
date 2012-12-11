@@ -23,9 +23,6 @@ import java.util.TimeZone;
 /**
  * Unit tests for the Localization Service.
  * Test exceptions thrown when supplied miscellaneous data
- *
- *
- *
  */
 public final class LocalizationServiceTestData {
 

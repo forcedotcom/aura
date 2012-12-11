@@ -27,9 +27,6 @@ import org.auraframework.util.AuraLocale;
 
 /**
  * Encapsulates all the metadata to construct any localization related objects for a given view.
- *
- *
- *
  */
 public class AuraLocaleImpl implements AuraLocale, Serializable {
 

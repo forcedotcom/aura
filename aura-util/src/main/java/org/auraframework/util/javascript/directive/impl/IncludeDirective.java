@@ -26,9 +26,6 @@ import org.auraframework.util.javascript.directive.*;
 
 /**
  * includes another file, expecting just the filename relative to the root in java format (. instead of / as dir separator)
- *
- *
- *
  */
 public class IncludeDirective extends DirectiveImpl {
     private File include;

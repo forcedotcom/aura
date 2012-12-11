@@ -30,9 +30,6 @@ import java.text.NumberFormat;
 
 /**
  * A Aura model that backs the ui:outputPercent Aura component.
- *
- *
- *
  */
 @Model
 public class OutputPercentModel {

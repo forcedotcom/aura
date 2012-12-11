@@ -25,9 +25,6 @@ import org.auraframework.system.Source;
 
 /**
  * removes a body from an xml node
- *
- *
- *
  */
 public class RemoveBodyQuickFix extends AuraXMLQuickFix {
 

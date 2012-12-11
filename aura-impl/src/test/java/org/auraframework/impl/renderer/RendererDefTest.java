@@ -34,9 +34,6 @@ import org.auraframework.util.json.JsonReader;
  * Java Renderers: Are treated as local to app server. They do not have a definition and not written as part of the
  *   component def. Each instance of the component has a section called "rendering" which has pure HTML markup which is
  *   sent to the client as part of the component instance(ComponentImpl).
- *
- *
- *
  */
 public class RendererDefTest extends AuraImplTestCase {
     public RendererDefTest(String name){

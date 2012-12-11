@@ -35,9 +35,6 @@ import org.auraframework.util.ServiceLoaderImpl.PrimaryImpl;
 /**
  * AuraConfig This is the spring configuration for the aura module.Provide access to lower level modules (like sfdc)
  * by defining runtime implementations here. This class will be loaded by common.provider.ProviderFactory.
- *
- *
- *
  */
 @AuraConfiguration
 public class AuraImplConfig {

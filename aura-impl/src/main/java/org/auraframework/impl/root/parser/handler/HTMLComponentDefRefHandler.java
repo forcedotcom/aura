@@ -31,9 +31,6 @@ import com.google.common.collect.ImmutableSet;
 
 /**
  * Handles free HTML in component markup.
- *
- *
- *
  */
 public class HTMLComponentDefRefHandler<P extends RootDefinition> extends ComponentDefRefHandler<P> {
 

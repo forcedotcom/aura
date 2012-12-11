@@ -19,9 +19,6 @@ import java.util.List;
 
 /**
  * javascript ouchies
- *
- *
- *
  */
 public class JavascriptProcessingError {
 

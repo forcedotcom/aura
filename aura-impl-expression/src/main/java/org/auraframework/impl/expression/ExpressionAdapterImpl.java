@@ -30,9 +30,6 @@ import org.antlr.runtime.*;
 
 /**
  * adapter that calls our expression factory
- *
- *
- *
  */
 public class ExpressionAdapterImpl implements ExpressionAdapter {
 

@@ -26,9 +26,6 @@ import org.auraframework.util.IOUtil;
 
 /**
  * validates some javascript using jslint
- *
- *
- *
  */
 public class JavascriptValidator {
     public static final String JSLINT = "jslint.js";

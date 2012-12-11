@@ -30,9 +30,6 @@ import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 
 /**
  * function calling expression
- *
- *
- *
  */
 public class FunctionCallImpl implements FunctionCall {
 

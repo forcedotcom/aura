@@ -27,9 +27,6 @@ import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 
 /**
  * inserts a debugger statement, defaults to debug mode only
- *
- *
- *
  */
 public class DebuggerDirective extends DirectiveImpl {
 

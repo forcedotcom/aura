@@ -19,9 +19,6 @@ import org.auraframework.util.json.*;
 
 /**
  * handler provider for js controllers, only allows functions
- *
- *
- *
  */
 public class JavascriptControllerHandlerProvider extends JsonHandlerProviderImpl {
 

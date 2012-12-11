@@ -32,9 +32,6 @@ import org.auraframework.util.json.JsonHandlerProvider;
 
 /**
  * Javascript handler for controller defs
- *
- *
- *
  */
 public class JavascriptControllerDefHandler extends
         JavascriptHandler<DefDescriptor<ControllerDef>, JavascriptControllerDef> {

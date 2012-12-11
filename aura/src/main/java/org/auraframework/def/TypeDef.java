@@ -25,9 +25,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * A TypeDef is a wrapper around an implementation of a supported type.
  * It generally wraps and delegates to a Class definition from another language.
- *
- *
- *
  */
 public interface TypeDef extends Definition {
     @Override

@@ -25,9 +25,6 @@ import org.auraframework.util.json.Json;
 
 /**
  * Instance of an event handler attribute
- *
- *
- *
  */
 public class EventHandlerImpl implements EventHandler {
 

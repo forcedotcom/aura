@@ -30,9 +30,6 @@ import org.auraframework.util.json.JsonSerializationContext;
 
 /**
  * context adapter for aura
- *
- *
- *
  */
 
 

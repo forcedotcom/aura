@@ -20,9 +20,6 @@ import org.auraframework.util.javascript.directive.DirectiveType;
 /**
  * debugger;
  * without jslint complaining
- *
- *
- *
  */
 public class DebuggerDirectiveType implements DirectiveType<DebuggerDirective> {
 

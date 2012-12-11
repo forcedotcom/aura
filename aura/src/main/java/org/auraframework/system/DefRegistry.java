@@ -26,9 +26,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * Public interface for retrieving aura definitions to be implemented by the cache.
  * This is exposed through aura context, all loading and caching is hidden in the implmentations.
- *
- *
- *
  */
 public interface DefRegistry<T extends Definition> extends Serializable {
 

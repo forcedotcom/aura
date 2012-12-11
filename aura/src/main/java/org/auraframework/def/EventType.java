@@ -18,9 +18,6 @@ package org.auraframework.def;
 
 /**
  * All the different types of aura events
- *
- *
- *
  */
 public enum EventType {
 

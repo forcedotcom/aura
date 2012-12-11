@@ -32,9 +32,6 @@ import org.auraframework.util.adapter.SourceControlAdapter;
 
 /**
  * Entry point for accessing Aura services
- *
- *
- *
  */
 public class Aura {
     private static final Log log = LogFactory.getLog(Aura.class);

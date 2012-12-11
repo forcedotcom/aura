@@ -23,9 +23,6 @@ import org.auraframework.system.Location;
 
 /**
  * Collection of utility methods used in the Aura module.
- *
- *
- *
  */
 public class AuraUtil {
 

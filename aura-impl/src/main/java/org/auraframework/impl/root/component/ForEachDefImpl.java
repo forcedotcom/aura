@@ -34,9 +34,6 @@ import org.auraframework.util.json.Json;
  *
  * ForEachDef creates an inner component definition, subDefs on DefinitionImpl, that represents its body,
  * and then creates an instance of the body for each var in the collection.
- *
- *
- *
  */
 public class ForEachDefImpl extends ComponentDefRefImpl implements ForEachDef {
 

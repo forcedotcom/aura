@@ -23,7 +23,6 @@ import java.util.Set;
 /**
  * Verify that the conditions found in the CSS are within the set of
  * known conditionals.
- *
  */
 public class VerifyConditions extends DefaultTreeVisitor
         implements CssCompilerPass {

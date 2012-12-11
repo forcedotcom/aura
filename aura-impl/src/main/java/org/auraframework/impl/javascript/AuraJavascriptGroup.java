@@ -24,9 +24,6 @@ import org.auraframework.util.javascript.directive.*;
 
 /**
  * the aura javascript. starts at Force.js
- *
- *
- *
  */
 public class AuraJavascriptGroup extends DirectiveBasedJavascriptGroup {
 

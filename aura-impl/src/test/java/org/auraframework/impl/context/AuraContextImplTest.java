@@ -38,8 +38,6 @@ import org.auraframework.util.json.Json;
  * @hierarchy Aura.Basic
  * @priority high
  * @userStory a07B0000000DfxB
- *
- *
  */
 public class AuraContextImplTest extends AuraImplTestCase {
     public AuraContextImplTest(String name){

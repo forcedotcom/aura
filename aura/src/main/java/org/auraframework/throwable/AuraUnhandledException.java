@@ -21,9 +21,6 @@ import org.auraframework.system.Location;
  * Aura-related runtime exception that has not been handled and should gack.
  *
  * Any unhandled exception that bubbles to the top of the servlet endpoints will be wrapped in this before serialization.
- *
- *
- *
  */
 public class AuraUnhandledException extends AuraRuntimeException {
     private static final long serialVersionUID = 567465869440612069L;

@@ -23,7 +23,6 @@ import org.auraframework.test.WebDriverTestCase;
 
 /**
  * aura:interation UI tests.
- * 
  */
 public class IterationUITest extends WebDriverTestCase {
 

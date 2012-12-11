@@ -28,9 +28,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
  * @hierarchy Aura.Components.Events.Browser History Management
  * @priority high
  * @userStory a07B0000000EYU4
- *
- *
- *
  */
 public class LocationChangeEventTest extends AuraImplTestCase {
     public LocationChangeEventTest(String name){

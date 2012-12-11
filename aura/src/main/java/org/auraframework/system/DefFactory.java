@@ -25,9 +25,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * A factory that produces Definitions of a particular type. It is not safe for a DefRegistry to cache the returned
  * definitions. DefFactories that do produce Definitions that are safe to cache should instead implement
  * CacheableDefFactory.
- *
- *
- *
  */
 public interface DefFactory<D extends Definition> {
     /**

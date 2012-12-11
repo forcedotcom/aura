@@ -34,9 +34,6 @@ import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 
 /**
  * the basics
- *
- *
- *
  */
 public class JsonSerializerAdapterImpl implements JsonSerializerAdapter {
 

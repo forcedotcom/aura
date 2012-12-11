@@ -19,9 +19,6 @@ import org.auraframework.def.ComponentDef;
 
 /**
  * This is the interface of a runtime instance of a component as it is exposed to the rest of the world.
- *
- *
- *
  */
 public interface Component extends BaseComponent<ComponentDef, Component>{
 

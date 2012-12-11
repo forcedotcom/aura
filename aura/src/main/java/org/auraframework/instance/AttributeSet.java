@@ -25,9 +25,6 @@ import org.auraframework.util.json.JsonSerializable;
 
 /**
  * A set of attribute instances on a component, interface or event.
- *
- *
- *
  */
 public interface AttributeSet extends ValueProvider, JsonSerializable, Iterable<Attribute> {
 

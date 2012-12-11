@@ -40,9 +40,6 @@ import com.google.common.collect.Lists;
 
 /**
  * The definition of an event, basically just defines shape, i.e. attributes
- *
- *
- *
  */
 public final class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventDef {
     private static final long serialVersionUID = 610875326950592992L;

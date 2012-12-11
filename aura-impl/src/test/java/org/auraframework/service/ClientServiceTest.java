@@ -22,8 +22,6 @@ import com.google.common.collect.Lists;
 /**
  * @hierarchy Aura.Services.ClientService
  * @userStory a07B0000000Eb3M
- *
- *
  */
 public class ClientServiceTest extends BaseServiceTest<ClientService, ClientServiceTest.Config> implements ClientService {
 

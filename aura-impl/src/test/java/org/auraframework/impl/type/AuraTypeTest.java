@@ -26,8 +26,6 @@ import org.auraframework.instance.BaseComponent;
  * Test to check aura types
  * @hierarchy Aura.Mobile Web
  * @userStorySyncIdOrName a07B0000000EQgW
- *
- *
  */
 public class AuraTypeTest extends AuraImplTestCase{
 

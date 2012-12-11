@@ -27,9 +27,6 @@ import org.auraframework.system.Source;
 
 /**
  * removes an attribute from an xml node
- *
- *
- *
  */
 public class RemoveAttributeQuickFix extends AuraXMLQuickFix {
 

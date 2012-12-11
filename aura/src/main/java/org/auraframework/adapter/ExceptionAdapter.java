@@ -26,9 +26,6 @@ import org.auraframework.instance.Action;
  *
  * FIXME: there should be an ExceptionAdapterBaseImpl that implements standard stuff
  * and is in the aura package so that it can be overridden.
- *
- *
- *
  */
 public interface ExceptionAdapter extends AuraAdapter {
     /**

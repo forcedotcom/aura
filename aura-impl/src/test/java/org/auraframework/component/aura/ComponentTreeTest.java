@@ -32,9 +32,6 @@ import org.openqa.selenium.JavascriptExecutor;
 /**
  * This class has tests to verify the component tree constructed on the client based on information sent from
  * AuraServlet.
- *
- *
- *
  */
 public class ComponentTreeTest extends WebDriverTestCase {
 

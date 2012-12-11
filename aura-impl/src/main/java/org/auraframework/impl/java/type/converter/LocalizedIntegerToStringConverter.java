@@ -24,9 +24,6 @@ import org.auraframework.util.type.converter.IntegerToStringConverter;
 
 /**
  * Used by aura.impl.java.type.JavaLocalizedTypeUtil;
- *
- *
- *
  */
 public class LocalizedIntegerToStringConverter
     extends IntegerToStringConverter

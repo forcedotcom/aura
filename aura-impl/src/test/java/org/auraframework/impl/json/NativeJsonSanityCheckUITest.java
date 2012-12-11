@@ -28,7 +28,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
  * @userStory a07B0000000Kx2A
  *
  * @since 0.0.160
- *
  */
 public class NativeJsonSanityCheckUITest extends WebDriverTestCase {
     public NativeJsonSanityCheckUITest(String name){

@@ -20,9 +20,6 @@ import org.auraframework.throwable.AuraValidationException;
 
 /**
  * Thrown when validating a reference in a definition.
- *
- *
- *
  */
 public class InvalidReferenceException extends AuraValidationException {
     /**

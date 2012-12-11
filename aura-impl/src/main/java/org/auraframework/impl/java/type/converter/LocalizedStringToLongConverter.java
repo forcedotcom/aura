@@ -24,9 +24,6 @@ import org.auraframework.util.type.converter.StringToLongConverter;
 
 /**
  * Used by aura.impl.java.type.JavaLocalizedTypeUtil;
- *
- *
- *
  */
 public class LocalizedStringToLongConverter
     extends StringToLongConverter

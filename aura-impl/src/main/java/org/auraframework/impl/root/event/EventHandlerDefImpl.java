@@ -37,9 +37,6 @@ import org.auraframework.util.json.Json;
  * Definition of an event handler.
  *
  * FIXME: W-1328552 This should extend DefinitionImpl<EventHandlerDef> and getEventDescriptor should be an override
- *
- *
- *
  */
 public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements EventHandlerDef {
     private static final long serialVersionUID = 20559007136143177L;

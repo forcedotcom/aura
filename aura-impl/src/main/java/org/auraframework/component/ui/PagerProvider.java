@@ -31,8 +31,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * Determine which type of pager implementation to render, based on type attribute
  *
  * Currently supports 'JumpToPage', 'NextPrevious' (default), 'PageInfo', 'PageSize', or a namespaced component, eg. ns:CustomPager
- *
- *
  */
 @Provider
 public class PagerProvider implements ComponentDescriptorProvider {

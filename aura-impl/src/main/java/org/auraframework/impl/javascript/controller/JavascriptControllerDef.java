@@ -34,9 +34,6 @@ import org.auraframework.util.json.Json;
 
 /**
  * def for client controllers
- *
- *
- *
  */
 public class JavascriptControllerDef extends DefinitionImpl<ControllerDef> implements ControllerDef {
 

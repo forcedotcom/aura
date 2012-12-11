@@ -24,8 +24,6 @@ import org.auraframework.impl.expression.AuraImplExpressionTestCase;
  *
  * @hierarchy Aura.Runtime.Expression.Server.Parser
  * @userStory a07B0000000Ed9n
- *
- *
  */
 // @TestLabels(IgnoreFailureReason.IN_DEV)
 public class ExpressionParserSpecialCharactersTest extends AuraImplExpressionTestCase {

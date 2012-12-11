@@ -19,9 +19,6 @@ import org.auraframework.util.adapter.SourceControlAdapter;
 
 /**
  * Entry point for accessing Aura services
- *
- *
- *
  */
 public class AuraUtil {
     /**

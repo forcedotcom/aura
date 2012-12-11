@@ -22,9 +22,6 @@ import org.auraframework.throwable.AuraValidationException;
 
 /**
  * thrown when unable to locate a def for a descriptor
- *
- *
- *
  */
 public class DefinitionNotFoundException extends AuraValidationException {
 

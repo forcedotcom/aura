@@ -25,9 +25,6 @@ import org.auraframework.instance.Model;
 import org.auraframework.throwable.AuraRuntimeException;
 /**
  * This class has automation to verify the implementation of @Type() annotation in models.
- *
- *
- *
  */
 public class TypeAnnotationInModelTest extends AuraImplTestCase {
     public TypeAnnotationInModelTest(String name){

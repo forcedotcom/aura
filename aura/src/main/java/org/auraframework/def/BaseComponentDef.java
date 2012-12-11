@@ -21,9 +21,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Common base for ComponentDef and ApplicationDef
- *
- *
- *
  */
 public interface BaseComponentDef extends RootDefinition {
 

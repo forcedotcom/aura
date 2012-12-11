@@ -19,9 +19,6 @@ import org.auraframework.util.javascript.directive.DirectiveType;
 
 /**
  * Include another file
- *
- *
- *
  */
 public class IncludeDirectiveType implements DirectiveType<IncludeDirective> {
 

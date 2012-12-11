@@ -17,9 +17,6 @@ package org.auraframework.expression;
 
 /**
  * Every possible expression type.
- *
- *
- *
  */
 public enum ExpressionType {
     PROPERTY,

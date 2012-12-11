@@ -33,8 +33,6 @@ import com.google.common.util.concurrent.ExecutionError;
 /**
  * @hierarchy Aura.Services.SerializationService
  * @userStory a07B0000000Eb3M
- *
- *
  */
 public class SerializationServiceTest extends BaseServiceTest<SerializationService, SerializationServiceTest.Config> implements SerializationService {
 

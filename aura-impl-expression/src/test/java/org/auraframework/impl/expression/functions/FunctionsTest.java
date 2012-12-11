@@ -27,8 +27,6 @@ import org.auraframework.impl.expression.AuraImplExpressionTestCase;
  *
  * @hierarchy Aura.Runtime.Expression.Server.Functions
  * @userStory a07B0000000Ed9n
- *
- *
  */
 public class FunctionsTest extends AuraImplExpressionTestCase {
     private static final double d1 = 3146431.43266;

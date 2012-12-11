@@ -25,9 +25,6 @@ import org.auraframework.util.type.converter.StringToBigDecimalConverter;
 
 /**
  * Used by aura.impl.java.type.JavaLocalizedTypeUtil;
- *
- *
- *
  */
 public class LocalizedStringToBigDecimalConverter
     extends StringToBigDecimalConverter

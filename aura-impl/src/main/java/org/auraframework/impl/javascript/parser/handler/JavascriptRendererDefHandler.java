@@ -29,9 +29,6 @@ import org.auraframework.util.json.JsFunction;
 /**
  * happy happy render render
  * TODO: this class needs to validate stuff about the renderer
- *
- *
- *
  */
 public class JavascriptRendererDefHandler extends JavascriptHandler<DefDescriptor<RendererDef>, RendererDef> {
 

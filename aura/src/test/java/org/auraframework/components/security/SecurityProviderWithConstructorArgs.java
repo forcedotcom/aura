@@ -22,8 +22,6 @@ import org.auraframework.def.SecurityProvider;
  * A security provider with an argument to the constructor.
  *
  * This will fail due to an inability to construct the provider.
- *
- *
  */
 public class SecurityProviderWithConstructorArgs implements SecurityProvider {
     public SecurityProviderWithConstructorArgs(int unused) {

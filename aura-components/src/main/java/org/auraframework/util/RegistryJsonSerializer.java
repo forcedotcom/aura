@@ -36,8 +36,6 @@ import org.auraframework.util.json.Json;
 
 /**
  * Serialize Aura Component Registry to json for consumption by tools like eclipse plugin.
- *
- *
  */
 
 public class RegistryJsonSerializer {

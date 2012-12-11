@@ -29,9 +29,6 @@ import org.auraframework.instance.Component;
  * @hierarchy Aura.Components.Renderer
  * @priority high
  * @userStory a07B0000000Doob
- *
- *
- *
  */
 public class JavascriptRendererDefTest extends AuraImplTestCase {
     public JavascriptRendererDefTest(String name){

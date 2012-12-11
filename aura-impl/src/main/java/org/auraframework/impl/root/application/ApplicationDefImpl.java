@@ -41,9 +41,6 @@ import com.google.common.collect.Sets;
 /**
  * The definition of an Application. Holds all information about a given type of application. ApplicationDefs are immutable
  * singletons per type of Application. Once they are created, they can only be replaced, never changed.
- *
- *
- *
  */
 public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> implements ApplicationDef {
 

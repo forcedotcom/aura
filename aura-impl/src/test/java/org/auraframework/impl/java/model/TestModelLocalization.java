@@ -30,9 +30,6 @@ import org.auraframework.util.date.DateOnly;
 
 /**
  * Used by /expressionTest/expressionFunction.cmp which expects the current return values.
- *
- *
- *
  */
 @Model
 public class TestModelLocalization {

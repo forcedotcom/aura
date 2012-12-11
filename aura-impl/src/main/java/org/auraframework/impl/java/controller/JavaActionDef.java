@@ -27,9 +27,6 @@ import org.auraframework.util.json.Json;
 
 /**
  * action in java, aka static method.
- *
- *
- *
  */
 public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDef {
     private static final long serialVersionUID = -9179014361802437154L;

@@ -25,9 +25,6 @@ import org.auraframework.util.AuraLocale;
 
 /**
  * Provides access to AuraLocale instances.
- *
- *
- *
  */
 public interface LocalizationAdapter extends AuraAdapter {
 

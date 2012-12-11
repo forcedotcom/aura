@@ -25,9 +25,6 @@ import org.auraframework.util.javascript.JavascriptValidator;
  * Directive to the parser, matching lines beginning with //#. The rest of the matching line will
  * be passed for processing. Directives are removed from the file and can be replaced with anything,
  * and create more directives
- *
- *
- *
  */
 public interface Directive {
 

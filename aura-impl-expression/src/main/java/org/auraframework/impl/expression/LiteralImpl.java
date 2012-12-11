@@ -28,9 +28,6 @@ import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 
 /**
  * a literal number, string, boolean, or null
- *
- *
- *
  */
 public class LiteralImpl implements Literal {
 

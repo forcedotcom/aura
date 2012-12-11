@@ -21,9 +21,6 @@ import org.auraframework.util.json.JsonSerializer;
 
 /**
  * adapts json serializers that aura should use
- *
- *
- *
  */
 public interface JsonSerializerAdapter extends AuraAdapter {
 

@@ -23,7 +23,6 @@ import org.auraframework.impl.javascript.helper.JavascriptHelperDef;
  * @hierarchy Aura.Unit Tests.Components.HelperDef.JavascriptHelperDef
  * @priority medium
  * @userStorySyncIdOrName a07B0000000EuDd
- *
  */
 public class JavascriptHelperDefTest extends AuraImplTestCase {
     public JavascriptHelperDefTest(String name){

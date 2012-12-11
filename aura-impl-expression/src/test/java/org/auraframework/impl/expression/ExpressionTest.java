@@ -32,8 +32,6 @@ import com.google.common.collect.ImmutableList;
  *
  * @hierarchy Aura.Runtime.Expression.Server.Evaluation
  * @userStory a07B0000000EdAC
- *
- *
  */
 public class ExpressionTest extends AuraImplExpressionTestCase {
 

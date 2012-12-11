@@ -32,9 +32,6 @@ import com.google.common.collect.ImmutableSet;
 
 /**
  * handler for aura:registerEvent tag
- *
- *
- *
  */
 public class RegisterEventHandler extends XMLHandler<RegisterEventDefImpl> {
 

@@ -25,7 +25,6 @@ import org.apache.commons.codec.binary.Base64;
 
 /**
  * @since 0.0.85
- *
  */
 public class MD5InputStream extends FilterInputStream{
 

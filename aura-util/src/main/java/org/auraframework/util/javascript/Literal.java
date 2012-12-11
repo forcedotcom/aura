@@ -23,8 +23,6 @@ import org.auraframework.util.json.JsonSerializable;
 
 /**
  * Represents a js literal.
- *
- *
  */
 public class Literal implements JsonSerializable, Serializable {
     /**

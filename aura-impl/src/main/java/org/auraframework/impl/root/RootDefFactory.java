@@ -35,9 +35,6 @@ import org.auraframework.util.AuraTextUtil;
  * Should not be used directly. Used by ComponentDefRegistry population of registry.
  * This is actually incorrectly typed, as it is not meant to return a single type. We probably should allow
  * a non-typed Factory, or somehow clean this up.
- *
- *
- *
  */
 public final class RootDefFactory extends DefFactoryImpl<RootDefinition> implements CacheableDefFactory<RootDefinition> {
 

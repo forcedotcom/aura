@@ -21,9 +21,6 @@ import javax.servlet.*;
 
 /**
  * A quick and dirty way to add a cross-app-server compatible mount point for AuraDocs that will always use PROD mode.
- *
- *
- *
  */
 public class AuraDocsRewriteFilter implements Filter {
 

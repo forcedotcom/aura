@@ -26,9 +26,6 @@ import com.google.common.collect.Maps;
 
 /**
  * Immutable DefRegistry implementation, backed by a prepopulated map.
- *
- *
- *
  */
 public class StaticDefRegistryImpl<T extends Definition> extends DefRegistryImpl<T> {
 

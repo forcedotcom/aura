@@ -22,9 +22,6 @@ import com.google.common.collect.ImmutableList;
 
 /**
  * group for testyness
- *
- *
- *
  */
 public class TestGroup extends DirectiveBasedJavascriptGroup {
 

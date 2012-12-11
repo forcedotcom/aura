@@ -26,7 +26,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
  * @hierarchy Aura.Unit Tests.Components.LayoutsDef
  * @priority medium
  * @userStorySyncIdOrName a07B0000000EGkF
- *
  */
 public class LayoutsDefTest extends AuraImplTestCase{
 

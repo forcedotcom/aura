@@ -40,9 +40,6 @@ import org.auraframework.Aura;
  * be one of the Config objects returned by getConfigs() on that impl.  Every config returned by that
  * method will be used as a seperate test suite so that the same test cases can be run multiple times
  * with different config data.
- *
- *
- *
  */
 public class AuraTest extends TestCase {
 

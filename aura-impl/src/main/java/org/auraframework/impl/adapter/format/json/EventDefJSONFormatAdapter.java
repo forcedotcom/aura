@@ -28,8 +28,6 @@ import org.auraframework.util.json.Json;
 
 /**
  * Event JSON format adapter.
- *
- *
  */
 @ThreadSafe
 public class EventDefJSONFormatAdapter extends JSONFormatAdapter<EventDef>{

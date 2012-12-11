@@ -36,8 +36,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * @hierarchy Aura.Services.ServerService
  * @userStory a07B0000000Eb3M
- *
- *
  */
 public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServiceTest.Config> implements ServerService {
 

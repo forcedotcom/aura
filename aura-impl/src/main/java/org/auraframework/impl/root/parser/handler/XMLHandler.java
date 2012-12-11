@@ -34,9 +34,6 @@ import org.auraframework.util.AuraTextUtil;
 
 /**
  * Superclass for all the xml handlers.
- *
- *
- *
  */
 public abstract class XMLHandler<T extends Definition> {
 

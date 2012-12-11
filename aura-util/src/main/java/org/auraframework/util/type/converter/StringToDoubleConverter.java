@@ -19,9 +19,6 @@ import org.auraframework.util.type.Converter;
 
 /**
  * Used by aura.util.type.TypeUtil
- *
- *
- *
  */
 public class StringToDoubleConverter implements Converter<String, Double> {
     @Override

@@ -27,9 +27,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 /**
  * TODO: test extends
- *
- *
- *
  */
 public class EventDefTest extends AuraImplTestCase {
 

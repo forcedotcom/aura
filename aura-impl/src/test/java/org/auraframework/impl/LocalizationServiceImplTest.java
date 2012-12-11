@@ -34,8 +34,6 @@ import org.auraframework.util.number.AuraNumberFormat;
 
 /**
  * Tests for LocalizationServiceImpl.
- *
- *
  */
 public class LocalizationServiceImplTest extends AuraImplTestCase {
 

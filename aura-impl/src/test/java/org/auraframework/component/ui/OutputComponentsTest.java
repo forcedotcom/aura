@@ -34,9 +34,6 @@ import com.google.common.collect.*;
 
 /**
  * Common tests for ui:output components
- *
- *
- *
  */
 public class OutputComponentsTest extends AuraTestCase {
     public OutputComponentsTest(String name) {

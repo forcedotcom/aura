@@ -20,9 +20,6 @@ import java.util.List;
 
 /**
  * the thing that actually executes some function in the formula engine
- *
- *
- *
  */
 public interface Function extends Serializable{
 

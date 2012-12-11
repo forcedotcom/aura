@@ -22,9 +22,6 @@ import org.auraframework.def.TypeDef;
 
 /**
  * expression for a function call
- *
- *
- *
  */
 public interface FunctionCall extends Expression {
 

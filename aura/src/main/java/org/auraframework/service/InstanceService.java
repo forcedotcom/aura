@@ -31,9 +31,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * <p>
  * Instances of all AuraServices should be retrieved from {@link Aura}
  * </p>
- *
- *
- *
  */
 public interface InstanceService extends AuraService {
 

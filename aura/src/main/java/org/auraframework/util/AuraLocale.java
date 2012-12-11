@@ -23,9 +23,6 @@ import java.util.*;
 
 /**
  * Encapsulates all the metadata to construct any localization related objects for a given view.
- *
- *
- *
  */
 public interface AuraLocale extends Serializable {
 

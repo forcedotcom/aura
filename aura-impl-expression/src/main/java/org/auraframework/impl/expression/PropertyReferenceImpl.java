@@ -32,9 +32,6 @@ import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 
 /**
  * an expression in aura
- *
- *
- *
  */
 public class PropertyReferenceImpl implements PropertyReference {
 

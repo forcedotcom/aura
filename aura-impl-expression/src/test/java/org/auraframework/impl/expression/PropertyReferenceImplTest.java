@@ -23,9 +23,6 @@ import org.auraframework.test.UnitTestCase;
 
 /**
  * expressiony test
- *
- *
- *
  */
 public class PropertyReferenceImplTest extends UnitTestCase {
 

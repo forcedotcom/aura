@@ -22,9 +22,6 @@ import org.auraframework.test.UnitTestCase;
  * Ok, I will.
  * Then do it already.
  * I just did!
- *
- *
- *
  */
 public abstract class AuraImplExpressionTestCase extends UnitTestCase {
 

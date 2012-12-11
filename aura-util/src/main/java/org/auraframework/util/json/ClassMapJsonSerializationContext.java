@@ -23,9 +23,6 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * uses 2 maps to find serializers. first is direct class lookup (fast), second is an instanceof lookup (slow)
- *
- *
- *
  */
 public class ClassMapJsonSerializationContext extends BaseJsonSerializationContext {
 

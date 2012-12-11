@@ -23,8 +23,6 @@ import org.auraframework.test.annotation.UnAdaptableTest;
  * Tests for the expression parser
  * @hierarchy Aura.Runtime.Expression.Server.Parser
  * @userStory a07B0000000Ed9n
- *
- *
  */
 public class ExpressionParserTest extends AuraImplExpressionTestCase {
 

@@ -26,9 +26,6 @@ import com.google.javascript.jscomp.Compiler;
 
 /**
  * Util for compressing and writing javascript.
- *
- *
- *
  */
 public class JavascriptWriter {
 

@@ -19,9 +19,6 @@ import java.util.List;
 
 /**
  * functions that can have multiple different types of arguments
- *
- *
- *
  */
 public class MultiFunctions {
 

@@ -24,9 +24,6 @@ import org.auraframework.Aura;
  * <p>
  * Instances of all AuraServices should be retrieved from {@link Aura}
  * </p>
- *
- *
- *
  */
 public interface ClientService extends AuraService {
 

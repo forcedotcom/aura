@@ -29,9 +29,6 @@ import org.auraframework.impl.system.DefDescriptorImpl;
  * @hierarchy Aura.Components.Controllers
  * @priority medium
  * @userStory a0790000000DQHs
- *
- *
- *
  */
 public class JavascriptControllerDefTest extends AuraImplTestCase{
     public JavascriptControllerDefTest(String name){

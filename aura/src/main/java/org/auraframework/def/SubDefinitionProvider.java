@@ -17,9 +17,6 @@ package org.auraframework.def;
 
 /**
  * A def that has subdefs
- *
- *
- *
  */
 public interface SubDefinitionProvider<T extends Definition> {
 

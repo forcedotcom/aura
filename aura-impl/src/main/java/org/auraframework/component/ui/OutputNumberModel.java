@@ -29,9 +29,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * A Aura model that backs the ui:outputNumber Aura component.
- *
- *
- *
  */
 @Model
 public class OutputNumberModel {

@@ -35,9 +35,6 @@ import org.auraframework.util.json.Json;
  * @hierarchy Aura.Components.Renderer
  * @priority high
  * @userStory a07B0000000Doob
- *
- *
- *
  */
 public class JavaRendererDefTest extends AuraImplTestCase {
     public Component dummyCmp  = null;

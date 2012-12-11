@@ -32,9 +32,6 @@ import java.util.TimeZone;
 
 /**
  * A Aura model that backs the ui:outputDate Aura component.
- *
- *
- *
  */
 @Model
 public class OutputDateModel {

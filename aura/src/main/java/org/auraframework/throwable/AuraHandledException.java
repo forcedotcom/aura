@@ -17,9 +17,6 @@ package org.auraframework.throwable;
 
 /**
  * Aura-related runtime exception that has been handled and has a specific message that can be reported to the end user.
- *
- *
- *
  */
 public class AuraHandledException extends AuraRuntimeException {
     private static final long serialVersionUID = -8503516144374931379L;

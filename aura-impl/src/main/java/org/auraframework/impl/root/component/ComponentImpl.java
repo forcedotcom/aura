@@ -31,9 +31,6 @@ import org.auraframework.util.json.Json.Serialization.ReferenceType;
 
 /**
  * The real runtime component thing that sits in the tree. The Component interface is just what is exposed to models
- *
- *
- *
  */
 @Serialization(referenceType=ReferenceType.IDENTITY)
 public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Component> implements Component {

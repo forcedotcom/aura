@@ -26,9 +26,6 @@ import org.auraframework.util.json.JsonSerializer;
 
 /**
  * direct serializers for expression implementations
- *
- *
- *
  */
 public class ExpressionJsonSerializerAdapterImpl implements JsonSerializerAdapter {
 

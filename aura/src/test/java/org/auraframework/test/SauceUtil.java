@@ -30,8 +30,6 @@ import org.auraframework.test.WebDriverUtil.BrowserType;
 
 /**
  * SauceLabs-related utility methods
- *
- *
  */
 public final class SauceUtil {
 

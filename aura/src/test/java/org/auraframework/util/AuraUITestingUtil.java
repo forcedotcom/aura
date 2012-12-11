@@ -30,8 +30,6 @@ import junit.framework.Assert;
 
 /**
  * A place to put common UI testing specific helper methods
- *
- *
  */
 
 public class AuraUITestingUtil {

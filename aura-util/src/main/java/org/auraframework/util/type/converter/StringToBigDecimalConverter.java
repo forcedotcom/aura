@@ -21,9 +21,6 @@ import org.auraframework.util.type.Converter;
 
 /**
  * Used by aura.util.type.TypeUtil
- *
- *
- *
  */
 public class StringToBigDecimalConverter implements Converter<String, BigDecimal> {
 

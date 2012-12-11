@@ -22,9 +22,6 @@ import org.auraframework.throwable.AuraValidationException;
 /**
  * adapt a parser that takes in strings and returns {@link Expression} objects
  * default implementation is in the aura-impl-expression module
- *
- *
- *
  */
 public interface ExpressionAdapter extends AuraAdapter {
 

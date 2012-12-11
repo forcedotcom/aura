@@ -29,9 +29,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 /**
  * Locates source code and produces Source objects that can be used to read that code and associated metadata. Source
  * creation is delegated to a SourceLoader that has registered to load Source for a particular namespace.
- *
- *
- *
  */
 public final class SourceFactory {
 

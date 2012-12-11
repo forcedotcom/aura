@@ -25,9 +25,6 @@ import org.auraframework.util.json.Json;
 
 /**
  * proto-component is used by providers, when the real component isn't known yet.
- *
- *
- *
  */
 public class ProtoComponentImpl implements Component {
     private final DefDescriptor<ComponentDef> descriptor;

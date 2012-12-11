@@ -22,9 +22,6 @@ import org.auraframework.util.javascript.JavascriptWriter.CompressionLevel;
  * Modes are for generating copies of javascript files suited for specific purposes, the most basic being
  * for development and production.
  * TODO: need a way to only allow production mode in production
- *
- *
- *
  */
 public enum JavascriptGeneratorMode {
 

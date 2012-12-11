@@ -27,8 +27,6 @@ import org.auraframework.util.json.JsonSerializable;
 
 /**
  * @see QuickFixException
- *
- *
  */
 public abstract class AuraQuickFix implements JsonSerializable {
 

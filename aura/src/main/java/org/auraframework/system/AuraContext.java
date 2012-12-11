@@ -32,9 +32,6 @@ import org.auraframework.util.json.JsonSerializationContext;
 
 /**
  * AuraContext public interface
- *
- *
- *
  */
 public interface AuraContext {
 

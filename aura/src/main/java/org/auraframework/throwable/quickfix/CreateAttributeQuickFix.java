@@ -30,9 +30,6 @@ import org.auraframework.throwable.AuraError;
 
 /**
  * adds an attribute to a component or interface def
- *
- *
- *
  */
 public class CreateAttributeQuickFix extends AuraQuickFix {
     private static final Pattern CMP_TAG = Pattern.compile("<aura:component([^>]*?)>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);

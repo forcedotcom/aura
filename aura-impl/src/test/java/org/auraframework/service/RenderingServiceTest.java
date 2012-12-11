@@ -32,8 +32,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * @hierarchy Aura.Services.RenderingService
  * @userStory a07B0000000Eb3M
- *
- *
  */
 public class RenderingServiceTest extends BaseServiceTest<RenderingService, RenderingServiceTest.Config> implements RenderingService {
 

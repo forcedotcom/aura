@@ -25,9 +25,6 @@ import org.auraframework.util.javascript.JavascriptWriter.CompressionLevel;
 /**
  * Javascript group that contains directives for parsing instructions or metadata or other fun stuff. It starts from one file
  * which should include the others.
- *
- *
- *
  */
 public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
     // name for threads that compress and write the output

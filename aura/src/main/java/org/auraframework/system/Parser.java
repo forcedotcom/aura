@@ -21,9 +21,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Creates Definitions from Source of a particular format.
- *
- *
- *
  */
 public interface Parser {
 

@@ -24,8 +24,6 @@ import org.auraframework.system.Annotations.Provider;
 
 /**
  * Returns the same descriptor that called this provider to cause a cyclic dependency
- *
- *
  */
 @Provider
 public class TestProviderAbstractCyclic {

@@ -27,9 +27,6 @@ import com.google.common.collect.Maps;
 
 /**
  * This is a fake registry (both master and standard) for testing purposes only. Primarily used for testing validateReferences calls
- *
- *
- *
  */
 public class FakeRegistry implements MasterDefRegistry {
     private final Map<DefDescriptor<?>, Definition> stuff = Maps.newHashMap();

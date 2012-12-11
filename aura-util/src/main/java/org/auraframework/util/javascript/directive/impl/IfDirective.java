@@ -28,9 +28,6 @@ import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
  * //#if {"modes" : ["FUNKY"]}
  *   alert("get down");
  * //#end
- *
- *
- *
  */
 public class IfDirective extends DirectiveImpl {
 

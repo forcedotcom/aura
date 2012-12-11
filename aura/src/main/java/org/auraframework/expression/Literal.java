@@ -17,9 +17,6 @@ package org.auraframework.expression;
 
 /**
  * Expression wrapper around a literal string, boolean, or number
- *
- *
- *
  */
 public interface Literal extends Expression {
 

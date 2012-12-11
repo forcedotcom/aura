@@ -29,9 +29,6 @@ import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 
 /**
  * Automation for Aura JavascriptGroup.
- *
- *
- *
  */
 public class AuraJavascriptGroupTest extends AuraImplTestCase {
     public AuraJavascriptGroupTest(String name) {

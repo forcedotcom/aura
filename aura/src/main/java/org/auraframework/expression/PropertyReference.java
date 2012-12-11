@@ -19,9 +19,6 @@ import java.util.List;
 
 /**
  * A reference to some property, i.e. a parsed list of strings separated by dots.
- *
- *
- *
  */
 public interface PropertyReference extends Expression {
 

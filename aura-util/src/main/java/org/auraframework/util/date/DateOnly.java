@@ -19,8 +19,6 @@ import java.util.Date;
 
 /**
  * An indicator class that this is a date-only date (i.e. just YYYY-MM-DD)
- *
- *
  */
 public class DateOnly extends Date {
 

@@ -20,9 +20,6 @@ import org.auraframework.throwable.AuraValidationException;
 
 /**
  * Thrown when validating a definition.
- *
- *
- *
  */
 public class InvalidDefinitionException extends AuraValidationException {
     /**

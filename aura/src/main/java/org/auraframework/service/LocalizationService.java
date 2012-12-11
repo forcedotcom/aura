@@ -31,9 +31,6 @@ import java.util.*;
  * <p>
  * Instances of all AuraServices should be retrieved from {@link Aura}
  * </p>
- *
- *
- *
  */
 public interface LocalizationService extends AuraService {
 

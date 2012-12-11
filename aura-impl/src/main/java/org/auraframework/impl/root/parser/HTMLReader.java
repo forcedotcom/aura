@@ -23,9 +23,6 @@ import java.io.*;
  * of the stax parser will be fixed in the future, and then we can remove this.
  *
  * This includes an arbitrarily shortened list of entities from html -- the ones webdevs use often.
- *
- *
- *
  */
 public class HTMLReader extends FilterReader {
 

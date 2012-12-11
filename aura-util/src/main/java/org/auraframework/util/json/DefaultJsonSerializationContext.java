@@ -20,9 +20,6 @@ import org.auraframework.util.ServiceLocator;
 /**
  * default serialization context that expects the values know how to serialize themselves using {@link JsonSerializable}
  * this uses instanceof to determine how to serialize, there is no fast lookup cache deal.
- *
- *
- *
  */
 public class DefaultJsonSerializationContext extends BaseJsonSerializationContext {
 

@@ -20,9 +20,6 @@ import java.util.*;
 
 /**
  * Implementation of the common stuff shared between the main javascript library in sfdc and the new directive based javascript groups
- *
- *
- *
  */
 public abstract class CommonJavascriptGroupImpl implements JavascriptGroup {
 

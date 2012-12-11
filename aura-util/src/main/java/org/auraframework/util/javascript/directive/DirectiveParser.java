@@ -25,9 +25,6 @@ import org.auraframework.util.javascript.JavascriptValidator;
 
 /**
  * parses files for directives
- *
- *
- *
  */
 public class DirectiveParser {
 

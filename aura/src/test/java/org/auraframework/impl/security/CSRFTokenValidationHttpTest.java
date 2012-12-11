@@ -35,8 +35,6 @@ import org.auraframework.util.json.JsonReader;
  * @hierarchy Aura.Security
  * @priority high
  * @userStory a07B0000000DV9S
- *
- *
  */
 public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
     public CSRFTokenValidationHttpTest(String name) {

@@ -21,9 +21,6 @@ import org.auraframework.def.Definition;
 /**
  * Sub descriptors are for concrete things that are part of another definition with its own descriptor, and need to be referenced
  * by something outside of that definition.
- *
- *
- *
  */
 public interface SubDefDescriptor<T extends Definition, P extends Definition> extends DefDescriptor<T> {
 

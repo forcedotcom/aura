@@ -521,8 +521,11 @@ Aura.prototype.unwrap = function(val){
 
 
 /**
- * Checks the condition and if the condition is false, returns an error message.
- * If the condition is true, runs trace() and fires the error event.
+ * Checks the condition and if the condition is false, displays an error message.
+ *
+ * Displays an error message if condition is false, runs 'trace()' and stops JS execution. The
+ * app will cease to function until reloaded if this is called, and errors are not caught.
+ *
  * @param {Boolean} condition True prevents the error message from being displayed, or false otherwise.
  * @param {String} assertMessage A message to be displayed when condition is false.
  * @protected
@@ -531,22 +534,39 @@ Aura.prototype.unwrap = function(val){
 Aura.prototype.assert = function(condition, assertMessage) {
     //#if {"excludeModes" : ["PRODUCTION"]}
     if (!condition) {
-        assertMessage += " : "+condition;
-        var error = new Error(assertMessage);
+        var message = "Assertion Failed!: "+assertMessage+" : "+condition;
+        var error = new Error(message);
         aura.trace();
-        var event = aura.get("e.aura:systemError");
-        if (event) {
-            event.setParams({message : assertMessage, error : error});
-            event.fire();
+        //
+        // Trying to fire an event here is a very dangerous thing to do, as
+        // we have no idea of where we are, or what went wrong to cause a call
+        // to assert(). In order to avoid problems, we do the most basic thing
+        // to alert the user.
+        //
+        //var event = aura.get("e.aura:systemError");
+        //if (event) {
+        //    event.setParams({message : message, error : error});
+        //    event.fire();
+        //}
+        var elt = aura.util.getElement("auraErrorMessage");
+        if (elt) {
+            elt.innerHTML = message;
+            aura.util.removeClass(document.body, "loading");
+            aura.util.addClass(document.body, "auraError");
+        } else {
+            alert(message);
         }
-
         throw error;
     }
     //#end
 };
 
 /**
- * Checks for a specified user condition. Displays an error message if condition is false, which could happen based on bad input for instance.
+ * Checks for a specified user condition, only to be used for fatal errors!.
+ *
+ * Displays an error message if condition is false, and stops JS execution. The
+ * app will cease to function until reloaded if this is called.
+ *
  * @param {Boolean} condition The conditional expression to be evaluated.
  * @param {String} msg The message to be displayed when the condition is false.
  * @public

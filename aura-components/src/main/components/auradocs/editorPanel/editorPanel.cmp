@@ -22,7 +22,7 @@
     <aura:attribute name="region" type="String" default="center"/>
     <aura:registerevent name="open" type="auradocs:openDef"/>
 
-    <ui:tab title="{!v.title}" aura:id="panel" scroll="false">
+    <ui:tab title="{!v.title}" aura:id="panel" scroll="true">
         <div aura:id="container"/>
     </ui:tab>
 </aura:component>

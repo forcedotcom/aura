@@ -15,9 +15,9 @@
  */
 package org.auraframework.impl.javascript;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.EnumSet;
-
 
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.util.javascript.directive.*;
@@ -28,7 +28,14 @@ import org.auraframework.util.javascript.directive.*;
 public class AuraJavascriptGroup extends DirectiveBasedJavascriptGroup {
 
     public AuraJavascriptGroup() throws IOException {
-        super("aura", AuraImplFiles.AuraJavascriptSourceDirectory.asFile(), "aura/Aura.js",
+        this(AuraImplFiles.AuraJavascriptSourceDirectory.asFile());
+    }
+    
+    /**
+     * Alternate constructor for tests  which might want to control the root directory.
+     */
+    protected AuraJavascriptGroup(File rootDirectory) throws IOException {
+        super("aura", rootDirectory, "aura/Aura.js",
                 DirectiveTypes.DEFAULT_TYPES,
                 EnumSet.of(JavascriptGeneratorMode.DEVELOPMENT,
                         JavascriptGeneratorMode.STATS,

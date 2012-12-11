@@ -42,7 +42,7 @@ public class ConfigAdapterImpl implements ConfigAdapter{
     private final ResourceLoader resourceLoader;
     private final Long buildTimestamp;
     private String auraVersionString;
-    private boolean hasCompilationErrors = false;
+    private boolean lastGenerationHadCompilationErrors = false;
 
 
     public ConfigAdapterImpl(){
@@ -59,7 +59,7 @@ public class ConfigAdapterImpl implements ConfigAdapter{
         // can this initialization move to some sort of common initialization dealy?
         AuraJavascriptGroup tempGroup = null;
         try {
-            tempGroup = new AuraJavascriptGroup();
+            tempGroup = newAuraJavascriptGroup();
             try{
                 tempGroup.parse();
             } catch (IOException x) {
@@ -121,24 +121,27 @@ public class ConfigAdapterImpl implements ConfigAdapter{
 
     @Override
     public synchronized void regenerateAuraJS() {
-        if (!isProduction() && jsGroup != null && (jsGroup.isStale() || hasCompilationErrors) ) {
+        if (!isProduction() && jsGroup != null && (jsGroup.isStale() || lastGenerationHadCompilationErrors)) {
             try {
                 File dest = AuraImplFiles.AuraResourceJavascriptDirectory.asFile();
                 File resourceDest = AuraImplFiles.AuraResourceJavascriptClassDirectory.asFile();
                 jsGroup.regenerate(dest);
                 // now we have to copy the new files to the resource directory
-                for (File f : dest.listFiles(JS_ONLY)) {
-                    InputStream is = new FileInputStream(f);
-                    OutputStream os = new FileOutputStream(new File(resourceDest, f.getName()));
-                    IOUtil.copyStream(is, os);
-                    getResourceLoader().refreshCache("aura/javascript/"+f.getName());
+                File[] destFiles = dest.listFiles(JS_ONLY);
+                if (destFiles != null) {
+                    for (File f : destFiles) {
+                        InputStream is = new FileInputStream(f);
+                        OutputStream os = new FileOutputStream(new File(resourceDest, f.getName()));
+                        IOUtil.copyStream(is, os);
+                        getResourceLoader().refreshCache("aura/javascript/"+f.getName());
 
-                    is.close();
-                    os.close();
+                        is.close();
+                        os.close();
+                    }
                 }
-            	hasCompilationErrors = false;                
+            	lastGenerationHadCompilationErrors = false;                
             } catch (Exception x) {
-            	hasCompilationErrors = true; 
+            	lastGenerationHadCompilationErrors = true; 
                 throw new AuraRuntimeException("Unable to regenerate aura javascript", x);
 
             }
@@ -246,4 +249,11 @@ public class ConfigAdapterImpl implements ConfigAdapter{
         return jsGroup == null;
     }
 
+    /**
+     * Creates a new Javascript group.  This method exists to allow tests to override, so they can
+     * substitute e.g. an AuraJavascriptGroup that experiences synthetic errors.
+     */
+    protected AuraJavascriptGroup newAuraJavascriptGroup() throws IOException {
+        return new AuraJavascriptGroup();
+    }
 }

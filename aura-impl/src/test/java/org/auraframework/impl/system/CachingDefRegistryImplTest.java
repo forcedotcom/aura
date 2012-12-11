@@ -18,7 +18,6 @@ package org.auraframework.impl.system;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
-import java.util.Date;
 import java.util.List;
 
 import org.auraframework.Aura;
@@ -27,6 +26,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
+import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
@@ -135,7 +135,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
      */
     public void _testForStaleCheckWhenRegistryPartiallyFull() throws Exception {
         String markup = "<aura:component> %s </aura:component>";
-        DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(String.format(markup, ""), ComponentDef.class);
+        DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(ComponentDef.class, String.format(markup, ""));
         ComponentDef initialDef = dd.getDef();
         long initialTimeStamp = initialDef.getLocation().getLastModified();
 
@@ -144,8 +144,8 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.PROD, null, Format.JSON, Access.AUTHENTICATED, laxSecurityApp);
 
-        StringSourceLoader.getInstance().updateSource(dd,
-                String.format(markup, "<aura:attribute type=\"String\" name=\"attr\"/>"), new Date());
+        StringSource source = (StringSource)auraTestingUtil.getSource(dd);
+        source.addOrUpdate(String.format(markup, "<aura:attribute type=\"String\" name=\"attr\"/>"));
         // Verify that the initial def object hasn't been updated
         assertEquals(initialTimeStamp, initialDef.getLocation().getLastModified());
 
@@ -166,11 +166,10 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
     // Flaps in SFDC build W-1265411
     @UnAdaptableTest
     public void testForStaleCheckWhenRegistryFull() throws Exception {
-        long startTimeStamp = 1331246678985l;
+        long startTimeStamp = System.currentTimeMillis() - 60000;
         String markup = "<aura:component> %s </aura:component>";
-        DefDescriptor<ComponentDef> dd = StringSourceLoader.getInstance().createStringSourceDescriptor("staleCheck",
-                ComponentDef.class);
-        addSourceAutoCleanup(dd, String.format(markup, ""), new Date(startTimeStamp));
+        DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(ComponentDef.class, String.format(markup, ""));
+        ((StringSource)auraTestingUtil.getSource(dd)).setLastModified(startTimeStamp);
         ComponentDef initialDef = dd.getDef();
         long initialTimeStamp = initialDef.getLocation().getLastModified();
         assertEquals(startTimeStamp, initialTimeStamp);
@@ -180,9 +179,9 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         // request (context of the request)
         Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.PROD, null, Format.JSON, Access.AUTHENTICATED, laxSecurityApp);
-        StringSourceLoader.getInstance()
-                .updateSource(dd, String.format(markup, "<aura:attribute type=\"String\" name=\"attr\"/>"),
-                new Date(startTimeStamp + 5));
+        StringSource source = (StringSource)auraTestingUtil.getSource(dd);
+        source.addOrUpdate(String.format(markup, "<aura:attribute type=\"String\" name=\"attr\"/>"));
+        source.setLastModified(startTimeStamp + 5);
         // Verify that the initial def object hasn't been updated
         assertEquals(initialTimeStamp, initialDef.getLocation().getLastModified());
 
@@ -213,7 +212,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
 
         // Assured non-resource has no caching set:
         String markup = "<aura:component> %s </aura:component>";
-        DefDescriptor<ComponentDef> dd = auraTestingUtil.addSourceAutoCleanup(String.format(markup, ""), ComponentDef.class);
+        DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(ComponentDef.class, String.format(markup, ""));
         component = definitionService.getDefinition(dd);
         assertFalse("string source has caching, but shouldn't",
                 component.getLocation().hasCacheEntry());
@@ -230,9 +229,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         List<DefDescriptor<ComponentDef>> dummyDefs = Lists.newArrayList();
         // Fill up twice the capacity to make sure the initial set of defs are thrown out
         for (int i = 0; i < CACHE_SIZE_MAX * 2; i++) {
-            DefDescriptor<ComponentDef> dummyCmps = StringSourceLoader.getInstance().createStringSourceDescriptor(
-                    getName(), ComponentDef.class);
-            addSourceAutoCleanup(dummyCmps, String.format(markup, i));
+            DefDescriptor<ComponentDef> dummyCmps = addSourceAutoCleanup(ComponentDef.class, String.format(markup, i));
             dummyCmps.getDef();
             dummyDefs.add(dummyCmps);
         }
@@ -244,7 +241,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
      */
     public void testExists() {
         String markup = "<aura:component></aura:component>";
-        DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(markup, ComponentDef.class);
+        DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(ComponentDef.class, markup);
         assertTrue("Failed to find an existing def.", dd.exists());
 
         // The value should be cached

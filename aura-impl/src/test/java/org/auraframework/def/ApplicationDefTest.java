@@ -15,11 +15,9 @@
  */
 package org.auraframework.def;
 
-import java.util.Date;
-
 import org.auraframework.Aura;
 import org.auraframework.http.AuraServlet;
-import org.auraframework.impl.source.StringSourceLoader;
+import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.ThreadHostileTest;
@@ -37,24 +35,24 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     }
 
     public void testGetSecurityProviderDefDescriptorDefault() throws Exception {
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(String.format(baseTag, "", ""), ApplicationDef.class);
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, String.format(baseTag, "", ""));
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
         assertEquals("java://org.auraframework.components.DefaultSecurityProvider", appdef
                 .getSecurityProviderDefDescriptor().getQualifiedName());
     }
 
     public void testGetSecurityProviderDefDescriptorProvided() throws Exception {
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(String.format(baseTag,
-                "securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows'", ""),
-                ApplicationDef.class);
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseTag,
+                        "securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows'", ""));
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
         assertEquals("java://org.auraframework.components.security.SecurityProviderAlwaysAllows", appdef
                 .getSecurityProviderDefDescriptor().getQualifiedName());
     }
 
     public void testGetSecurityProviderDefDescriptorEmpty() throws Exception {
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(String.format(baseTag, "securityProvider=''", ""),
-                ApplicationDef.class);
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseTag, "securityProvider=''", ""));
         try {
             Aura.getDefinitionService().getDefinition(desc);
             fail("No AuraRuntimeException when securityProvider is empty string");
@@ -65,13 +63,13 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
 
     public void testGetSecurityProviderDefDescriptorInherited() throws Exception {
         DefDescriptor<ApplicationDef> parentDesc = addSourceAutoCleanup(
-                String.format(
-                        baseTag,
-                        "securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows' extensible='true'",
-                        ""), ApplicationDef.class);
+                ApplicationDef.class, String.format(
+                                baseTag,
+                                "securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows' extensible='true'",
+                                ""));
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(
-                String.format(baseTag, String.format("extends='%s'", parentDesc.getQualifiedName()), ""),
-                ApplicationDef.class);
+                ApplicationDef.class,
+                String.format(baseTag, String.format("extends='%s'", parentDesc.getQualifiedName()), ""));
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
         assertEquals("java://org.auraframework.components.security.SecurityProviderAlwaysAllows", appdef
                 .getSecurityProviderDefDescriptor().getQualifiedName());
@@ -79,17 +77,17 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
 
     public void testGetSecurityProviderDefDescriptorGrandInherited() throws Exception {
         DefDescriptor<ApplicationDef> grandparentDesc = addSourceAutoCleanup(
-                String.format(
-                        baseTag,
-                        "securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows' extensible='true'",
-                        ""), ApplicationDef.class);
+                ApplicationDef.class, String.format(
+                                baseTag,
+                                "securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows' extensible='true'",
+                                ""));
         DefDescriptor<ApplicationDef> parentDesc = addSourceAutoCleanup(
+                ApplicationDef.class,
                 String.format(baseTag,
-                        String.format("extends='%s' extensible='true'", grandparentDesc.getQualifiedName()), ""),
-                ApplicationDef.class);
+                        String.format("extends='%s' extensible='true'", grandparentDesc.getQualifiedName()), ""));
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(
-                String.format(baseTag, String.format("extends='%s'", parentDesc.getQualifiedName()), ""),
-                ApplicationDef.class);
+                ApplicationDef.class,
+                String.format(baseTag, String.format("extends='%s'", parentDesc.getQualifiedName()), ""));
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
         assertEquals("java://org.auraframework.components.security.SecurityProviderAlwaysAllows", appdef
                 .getSecurityProviderDefDescriptor().getQualifiedName());
@@ -97,16 +95,16 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
 
     public void testGetSecurityProviderDefDescriptorOverride() throws Exception {
         DefDescriptor<ApplicationDef> parentDesc = addSourceAutoCleanup(
-                String.format(
-                        baseTag,
-                        "securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows' extensible='true'",
-                        ""), ApplicationDef.class);
+                ApplicationDef.class, String.format(
+                                baseTag,
+                                "securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows' extensible='true'",
+                                ""));
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(
-                String.format(
-                        baseTag,
-                        String.format(
-                                "extends='%s' securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysDenies'",
-                                parentDesc.getQualifiedName()), ""), ApplicationDef.class);
+                ApplicationDef.class, String.format(
+                                        baseTag,
+                                        String.format(
+                                                "extends='%s' securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysDenies'",
+                                                parentDesc.getQualifiedName()), ""));
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
         assertEquals("java://org.auraframework.components.security.SecurityProviderAlwaysDenies", appdef
                 .getSecurityProviderDefDescriptor().getQualifiedName());
@@ -117,10 +115,10 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
      */
     public void testIsAppCacheEnabledInherited() throws Exception {
         DefDescriptor<ApplicationDef> parentDesc = addSourceAutoCleanup(
-                String.format(baseTag, "useAppcache='true' preload='aura' extensible='true'", ""), ApplicationDef.class);
+                ApplicationDef.class, String.format(baseTag, "useAppcache='true' preload='aura' extensible='true'", ""));
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(
-                String.format(baseTag, String.format("extends='%s' preload='aura'", parentDesc.getQualifiedName()), ""),
-                ApplicationDef.class);
+                ApplicationDef.class,
+                String.format(baseTag, String.format("extends='%s' preload='aura'", parentDesc.getQualifiedName()), ""));
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
         assertEquals(Boolean.TRUE, appdef.isAppcacheEnabled());
     }
@@ -130,7 +128,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
      */
     public void testIsAppCacheEnabledOverridesDefault() throws Exception {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(
-                String.format(baseTag, "useAppcache='true' preload='aura'", ""), ApplicationDef.class);
+                ApplicationDef.class, String.format(baseTag, "useAppcache='true' preload='aura'", ""));
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
         assertEquals(Boolean.TRUE, appdef.isAppcacheEnabled());
     }
@@ -140,10 +138,10 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
      */
     public void testIsAppCacheEnabledOverridesExtends() throws Exception {
         DefDescriptor<ApplicationDef> parentDesc = addSourceAutoCleanup(
-                String.format(baseTag, "useAppcache='true' preload='aura' extensible='true'", ""), ApplicationDef.class);
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(String.format(baseTag,
-                String.format("extends='%s' useAppcache='false' preload='aura'", parentDesc.getQualifiedName()), ""),
-                ApplicationDef.class);
+                ApplicationDef.class, String.format(baseTag, "useAppcache='true' preload='aura' extensible='true'", ""));
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseTag,
+                        String.format("extends='%s' useAppcache='false' preload='aura'", parentDesc.getQualifiedName()), ""));
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
         assertEquals(Boolean.FALSE, appdef.isAppcacheEnabled());
     }
@@ -152,8 +150,8 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
      * App's useAppcache attribute value is empty
      */
     public void testIsAppCacheEnabledUseAppcacheEmpty() throws Exception {
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup("<aura:application useAppCache='' preload='aura'/>",
-                ApplicationDef.class);
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                "<aura:application useAppCache='' preload='aura'/>");
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
         assertEquals(Boolean.FALSE, appdef.isAppcacheEnabled());
     }
@@ -162,8 +160,8 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
      * App's useAppcache attribute value is true, but application has no preloads
      */
     public void testIsAppCacheEnabledWithoutPreload() throws Exception {
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup("<aura:application useAppCache='true'/>",
-                ApplicationDef.class);
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                "<aura:application useAppCache='true'/>");
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
         assertEquals(Boolean.FALSE, appdef.isAppcacheEnabled());
     }
@@ -174,66 +172,63 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     public void testMultipleAppCache() throws Exception {
         String appFormat = "<aura:application securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows' useAppCache='true' preload='%s'>\n    <%s:%s />\n</aura:application>";
         String componentText = "<aura:component>the body</aura:component>";
-        StringSourceLoader loader = StringSourceLoader.getInstance();
-        DefDescriptor<ComponentDef> oldcomp = loader.createStringSourceDescriptor("oldComp", ComponentDef.class);
-        addSourceAutoCleanup(oldcomp, componentText);
-        String appText;
-        DefDescriptor<ApplicationDef> oldApp;
+        DefDescriptor<ComponentDef> oldCompDesc = addSourceAutoCleanup(ComponentDef.class, componentText, "oldComp");
+        StringSource<ComponentDef> oldComp = (StringSource<ComponentDef>)getSource(oldCompDesc);
 
-        appText = String.format(appFormat, oldcomp.getNamespace(), oldcomp.getNamespace(), oldcomp.getName());
-        oldApp = loader.createStringSourceDescriptor("old", ApplicationDef.class);
-        addSourceAutoCleanup(oldApp, appText);
-        enablePreloads(oldApp);
+        String appText = String.format(appFormat, oldCompDesc.getNamespace(), oldCompDesc.getNamespace(), oldCompDesc.getName());
+        DefDescriptor<ApplicationDef> oldAppDesc = addSourceAutoCleanup(ApplicationDef.class, appText, "old");
+        StringSource<ApplicationDef> oldApp = (StringSource<ApplicationDef>)getSource(oldAppDesc);
+        enablePreloads(oldAppDesc);
 
         // With the preloads seeded, get a lastMod for the source that we know is greater.
-        Date soon = new Date(Math.max(System.currentTimeMillis(), AuraServlet.getLastMod()) + 1);
-        loader.updateSource(oldcomp, componentText, soon);
-        loader.updateSource(oldApp, appText, soon);
+        long soon = Math.max(System.currentTimeMillis(), AuraServlet.getLastMod()) + 1;
+        oldComp.setLastModified(soon);
+        oldApp.setLastModified(soon);
 
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.PROD, null, Access.AUTHENTICATED, oldApp);
-        enablePreloads(oldApp);
+        Aura.getContextService().startContext(Mode.PROD, null, Access.AUTHENTICATED, oldAppDesc);
+        enablePreloads(oldAppDesc);
         //
         // The app should give us 'soon'
         //
-        assertEquals("Expected first app to show up as soon", soon.getTime(), AuraServlet.getLastMod());
-        Date later = new Date(Math.max(System.currentTimeMillis(), AuraServlet.getLastMod()) + 1);
+        assertEquals("Expected first app to show up as soon", soon, AuraServlet.getLastMod());
+        long later = Math.max(System.currentTimeMillis(), AuraServlet.getLastMod()) + 1;
         Aura.getContextService().endContext();
 
-        DefDescriptor<ComponentDef> newcomp = loader.createStringSourceDescriptor("new", ComponentDef.class);
-        addSourceAutoCleanup(newcomp, componentText, later);
-        appText = String.format(appFormat, newcomp.getNamespace(), newcomp.getNamespace(), newcomp.getName());
-        DefDescriptor<ApplicationDef> newerApp = loader.createStringSourceDescriptor("new", ApplicationDef.class);
-        addSourceAutoCleanup(newerApp, appText, later);
+        DefDescriptor<ComponentDef> newCompDesc = addSourceAutoCleanup(ComponentDef.class, componentText);
+        ((StringSource)auraTestingUtil.getSource(newCompDesc)).setLastModified(later);
+        appText = String.format(appFormat, newCompDesc.getNamespace(), newCompDesc.getNamespace(), newCompDesc.getName());
+        DefDescriptor<ApplicationDef> newerAppDesc = addSourceAutoCleanup(ApplicationDef.class, appText);
+        ((StringSource)auraTestingUtil.getSource(newerAppDesc)).setLastModified(later);
 
         // Start a newerApp context in DEV mode so that we can update the lastMod cache.
-        Aura.getContextService().startContext(Mode.DEV, null, Access.AUTHENTICATED, newerApp);
+        Aura.getContextService().startContext(Mode.DEV, null, Access.AUTHENTICATED, newerAppDesc);
 
         // Sanity check that we get the expected answer in DEV mode.
         // assertEquals("Sanity check DEV mode lastMod update", later.getTime(), AuraServlet.getLastMod());
 
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.PROD, null, Access.AUTHENTICATED, newerApp);
-        enablePreloads(newerApp);
+        Aura.getContextService().startContext(Mode.PROD, null, Access.AUTHENTICATED, newerAppDesc);
+        enablePreloads(newerAppDesc);
 
         //
         // The newer app should give its newer lastmod 'later'.
         //
-        assertEquals("Expected second app to show up as soon", later.getTime(), AuraServlet.getLastMod());
+        assertEquals("Expected second app to show up as soon", later, AuraServlet.getLastMod());
         Aura.getContextService().endContext();
 
         //
         // Switching back to dev mode should reset, and give us 'later' for the first app as the
         // namespace was updated by newer
         //
-        Aura.getContextService().startContext(Mode.DEV, null, Access.AUTHENTICATED, oldApp);
-        enablePreloads(newerApp);
-        assertEquals("Expected first app to show up as later second time", later.getTime(), AuraServlet.getLastMod());
+        Aura.getContextService().startContext(Mode.DEV, null, Access.AUTHENTICATED, oldAppDesc);
+        enablePreloads(newerAppDesc);
+        assertEquals("Expected first app to show up as later second time", later, AuraServlet.getLastMod());
         Aura.getContextService().endContext();
 
-        Aura.getContextService().startContext(Mode.PROD, null, Access.AUTHENTICATED, newerApp);
-        enablePreloads(newerApp);
-        assertEquals("Expected second app to show up as later second time", later.getTime(), AuraServlet.getLastMod());
+        Aura.getContextService().startContext(Mode.PROD, null, Access.AUTHENTICATED, newerAppDesc);
+        enablePreloads(newerAppDesc);
+        assertEquals("Expected second app to show up as later second time", later, AuraServlet.getLastMod());
         Aura.getContextService().endContext();
     }
 
@@ -255,7 +250,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
      */
     public void testIsAppCacheEnabledUseAppcacheInvalid() throws Exception {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(
-                "<aura:application useAppCache='yes' preload='aura'/>", ApplicationDef.class);
+                ApplicationDef.class, "<aura:application useAppCache='yes' preload='aura'/>");
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
         assertEquals(Boolean.FALSE, appdef.isAppcacheEnabled());
     }
@@ -290,18 +285,18 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
      * @throws Exception
      */
     public void testIsOnePageApp()throws Exception{
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(String.format(baseTag, "isOnePageApp='true'", "")
-                , ApplicationDef.class);
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class
+                , String.format(baseTag, "isOnePageApp='true'", ""));
         ApplicationDef onePageApp = Aura.getDefinitionService().getDefinition(desc);
         assertEquals(Boolean.TRUE, onePageApp.isOnePageApp());
         
-        desc = addSourceAutoCleanup(String.format(baseTag, "isOnePageApp='false'","")
-                , ApplicationDef.class);
+        desc = addSourceAutoCleanup(ApplicationDef.class
+                , String.format(baseTag, "isOnePageApp='false'",""));
         ApplicationDef nonOnePageApp = Aura.getDefinitionService().getDefinition(desc);
         assertEquals(Boolean.FALSE, nonOnePageApp.isOnePageApp());
         
         //By default an application is not a onePageApp
-        desc = addSourceAutoCleanup(String.format(baseTag, "", ""), ApplicationDef.class);
+        desc = addSourceAutoCleanup(ApplicationDef.class, String.format(baseTag, "", ""));
         ApplicationDef simpleApp = Aura.getDefinitionService().getDefinition(desc);
         assertEquals(Boolean.FALSE, simpleApp.isOnePageApp());
         

@@ -59,7 +59,7 @@ public class HelperDefTest extends AuraImplTestCase {
      */
     public void testExplicitHelperDirectiveSpecification() throws Exception{
         String explicitHelperMarkup = String.format(baseComponentTag, "helper='js://test.test_SimpleHelper'", "");
-        DefDescriptor<ComponentDef> cmpDescriptor = addSourceAutoCleanup(explicitHelperMarkup, ComponentDef.class);
+        DefDescriptor<ComponentDef> cmpDescriptor = addSourceAutoCleanup(ComponentDef.class, explicitHelperMarkup);
         assertNotNull(cmpDescriptor.getDef());
         HelperDef hlprDef = cmpDescriptor.getDef().getHelperDef();
         assertNotNull("Failed to extract helper def on component.",hlprDef);
@@ -81,8 +81,8 @@ public class HelperDefTest extends AuraImplTestCase {
 
         String cmpReferingToNonExistingHelperMarkup = String.format(baseComponentTag, "helper='js://test.blahBleeblue"
                 + System.currentTimeMillis() + "'", "");
-        DefDescriptor<ComponentDef> testCmp1 = addSourceAutoCleanup(cmpReferingToNonExistingHelperMarkup,
-                ComponentDef.class);
+        DefDescriptor<ComponentDef> testCmp1 = addSourceAutoCleanup(ComponentDef.class,
+                cmpReferingToNonExistingHelperMarkup);
         try{
             testCmp1.getDef();
             fail("should not be able to process component refering to non existing component folder.");
@@ -90,8 +90,8 @@ public class HelperDefTest extends AuraImplTestCase {
 
         String cmpWithBadHelperSpecificationFormatMarkup = String.format(baseComponentTag,
                 "helper='js://test:test_SimpleHelper'", "");
-        DefDescriptor<ComponentDef> testCmp2 = addSourceAutoCleanup(cmpWithBadHelperSpecificationFormatMarkup,
-                ComponentDef.class);
+        DefDescriptor<ComponentDef> testCmp2 = addSourceAutoCleanup(ComponentDef.class,
+                cmpWithBadHelperSpecificationFormatMarkup);
         try{
             testCmp2.getDef();
             fail("The helper directive used the wrong format. It is using a colon(':') as seperator. Should have failed.");
@@ -100,12 +100,12 @@ public class HelperDefTest extends AuraImplTestCase {
         }
 
         DefDescriptor<ComponentDef> cmpWithNoHelper = this.addSourceAutoCleanup(
-                String.format(baseComponentTag, "", ""), ComponentDef.class);
+                ComponentDef.class, String.format(baseComponentTag, "", ""));
         assertNull(cmpWithNoHelper.getDef().getHelperDef());
         String cmpReferingCmpWithNoHelperMarkup = String.format(baseComponentTag,
                 "helper='js://" + cmpWithNoHelper.getNamespace() + "." + cmpWithNoHelper.getName() + "'", "");
-        DefDescriptor<ComponentDef> testCmp3 = addSourceAutoCleanup(cmpReferingCmpWithNoHelperMarkup,
-                ComponentDef.class);
+        DefDescriptor<ComponentDef> testCmp3 = addSourceAutoCleanup(ComponentDef.class,
+                cmpReferingCmpWithNoHelperMarkup);
         try{
             testCmp3.getDef();
             fail("should not be able to process component refering to non existing helper");
@@ -147,7 +147,7 @@ public class HelperDefTest extends AuraImplTestCase {
     public void _testMultipleRemoteHelperShouldFail() throws Exception{
         String cmpWithMultipleHelperMarkup = String.format(baseComponentTag,
                 "helper='js://test.test_SimpleHelper, js://test.testJSHelper'", "");
-        DefDescriptor<ComponentDef> testCmp = addSourceAutoCleanup(cmpWithMultipleHelperMarkup, ComponentDef.class);
+        DefDescriptor<ComponentDef> testCmp = addSourceAutoCleanup(ComponentDef.class, cmpWithMultipleHelperMarkup);
         try{
             testCmp.getDef();
             fail("should not be able to specify multiple remote helpers.");

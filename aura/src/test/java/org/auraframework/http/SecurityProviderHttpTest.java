@@ -54,7 +54,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     private GetMethod buildGetRequest(DefType defType, String attrs, String body, String contextStr) throws Exception {
         String tag = "aura:" + defType.name().toLowerCase();
         String source = String.format("<%s %s>%s</%1$s>", tag, attrs, body);
-        DefDescriptor<?> desc = addSourceAutoCleanup(source, defType.getPrimaryInterface());
+        DefDescriptor<?> desc = addSourceAutoCleanup(defType.getPrimaryInterface(), source);
         String url = String.format("/string/%s.%s?aura.context=%s", desc.getName(),
                 DefType.APPLICATION.equals(defType) ? "app" : "cmp", AuraTextUtil.urlencode(contextStr));
         return obtainGetMethod(url);
@@ -129,8 +129,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
      */
     public void testGetDevCmpWithDenies() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
-                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysDenies'>App Denies</aura:application>",
-                ApplicationDef.class);
+                ApplicationDef.class,
+                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysDenies'>App Denies</aura:application>");
         verifyGetAccessDenied(DefType.COMPONENT, "",
                 String.format("{'mode':'DEV','app':'%s'}", appDesc.getQualifiedName()),
                 " disallowed by SecurityProviderAlwaysDenies");
@@ -150,8 +150,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
      */
     public void testGetDevCmpWithThrows() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
-                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderThrowsThrowable'>%s</aura:application>",
-                ApplicationDef.class);
+                ApplicationDef.class,
+                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderThrowsThrowable'>%s</aura:application>");
         verifyGetAccessDenied(DefType.COMPONENT, "",
                 String.format("{'mode':'DEV','app':'%s'}", appDesc.getQualifiedName()),
                 "Access Denied: cause = generated intentionally");
@@ -188,8 +188,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     public void testGetProdConfigCmpWithThrows() throws Exception {
         ServletConfigController.setProductionConfig(true);
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
-                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderThrowsThrowable'>%s</aura:application>",
-                ApplicationDef.class);
+                ApplicationDef.class,
+                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderThrowsThrowable'>%s</aura:application>");
         GetMethod get = buildGetRequest(DefType.COMPONENT, "", "",
                 String.format("{'mode':'PROD','app':'%s'}", appDesc.getQualifiedName()));
         int statusCode = getHttpClient().executeMethod(get);
@@ -242,8 +242,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     public void testGetProdConfigAppWithDeniesAndOther() throws Exception {
         ServletConfigController.setProductionConfig(true);
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
-                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysAllows'>%s</aura:application>",
-                ApplicationDef.class);
+                ApplicationDef.class,
+                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysAllows'>%s</aura:application>");
         verifyGetAccessDenied(DefType.APPLICATION,
                 "securityProvider='org.auraframework.components.security.SecurityProviderAlwaysDenies'",
                 String.format("{'app':'%s'}", appDesc.getQualifiedName()), null);
@@ -255,8 +255,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     public void testGetProdConfigAppWithAllowsAndOther() throws Exception {
         ServletConfigController.setProductionConfig(true);
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
-                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysDenies'>%s</aura:application>",
-                ApplicationDef.class);
+                ApplicationDef.class,
+                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysDenies'>%s</aura:application>");
         verifyGetAccessAllowed(DefType.APPLICATION,
                 "securityProvider='org.auraframework.components.security.SecurityProviderAlwaysAllows'",
                 String.format("{'app':'%s'}", appDesc.getQualifiedName()));
@@ -278,8 +278,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     // SFDCAuraServlet will not allow COMPONENTs at all
     public void testGetProdCmpWithAllows() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
-                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysAllows'>%s</aura:application>",
-                ApplicationDef.class);
+                ApplicationDef.class,
+                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysAllows'>%s</aura:application>");
         verifyGetAccessAllowed(DefType.COMPONENT, "",
                 String.format("{'mode':'PROD','app':'%s'}", appDesc.getQualifiedName()));
     }
@@ -290,8 +290,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     public void testGetProdConfigCmpWithDenies() throws Exception {
         ServletConfigController.setProductionConfig(true);
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
-                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysDenies'>%s</aura:application>",
-                ApplicationDef.class);
+                ApplicationDef.class,
+                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysDenies'>%s</aura:application>");
         verifyGetAccessDenied(DefType.COMPONENT, "", String.format("{'app':'%s'}", appDesc.getQualifiedName()), null);
     }
 
@@ -308,15 +308,15 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
      */
     public void testCachingAccessChecks() throws Exception {
         // setup component, component containing previous, and app containing both
-        DefDescriptor<ComponentDef> innerCmpDesc = addSourceAutoCleanup("<aura:component/>", ComponentDef.class);
+        DefDescriptor<ComponentDef> innerCmpDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
         DefDescriptor<ComponentDef> outerCmpDesc = addSourceAutoCleanup(
-                String.format("<aura:component><%1$s:%2$s/><%1$s:%2$s/>{!v.body}</aura:component>",
-                        innerCmpDesc.getNamespace(), innerCmpDesc.getName()), ComponentDef.class);
+                ComponentDef.class, String.format("<aura:component><%1$s:%2$s/><%1$s:%2$s/>{!v.body}</aura:component>",
+                                innerCmpDesc.getNamespace(), innerCmpDesc.getName()));
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
-                String.format(
-                        "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAccessLogger'><%1$s:%2$s><%3$s:%4$s/></%1$s:%2$s><%3$s:%4$s/></aura:application>",
-                        outerCmpDesc.getNamespace(), outerCmpDesc.getName(), innerCmpDesc.getNamespace(),
-                        innerCmpDesc.getName()), ApplicationDef.class);
+                ApplicationDef.class, String.format(
+                                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAccessLogger'><%1$s:%2$s><%3$s:%4$s/></%1$s:%2$s><%3$s:%4$s/></aura:application>",
+                                outerCmpDesc.getNamespace(), outerCmpDesc.getName(), innerCmpDesc.getNamespace(),
+                                innerCmpDesc.getName()));
         ImmutableSet<DefDescriptor<? extends BaseComponentDef>> expectedDescs = ImmutableSet.of(innerCmpDesc,
                 outerCmpDesc, appDesc);
 
@@ -410,8 +410,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
      */
     public void testPostDevActionWithAppDenied() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
-                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysDenies'>%s</aura:application>",
-                ApplicationDef.class);
+                ApplicationDef.class,
+                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysDenies'>%s</aura:application>");
         verifyPostAccessDenied(Mode.DEV, "java://test.controller.JavaController/ACTION$noArgs", appDesc.getNamespace()
                 + ":" + appDesc.getName());
     }
@@ -421,8 +421,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
      */
     public void testPostDevActionWithAppAllowed() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
-                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysAllows'>%s</aura:application>",
-                ApplicationDef.class);
+                ApplicationDef.class,
+                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysAllows'>%s</aura:application>");
         verifyPostAccessAllowed(Mode.DEV, "java://test.controller.JavaController/ACTION$noArgs",
                                 appDesc.getNamespace() + ":" + appDesc.getName());
     }
@@ -439,8 +439,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
      */
     public void testPostProdActionWithAppDenied() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
-                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysDenies'>%s</aura:application>",
-                ApplicationDef.class);
+                ApplicationDef.class,
+                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysDenies'>%s</aura:application>");
         verifyPostAccessDenied(Mode.PROD, "java://test.controller.JavaController/ACTION$noArgs", appDesc.getNamespace()
                 + ":" + appDesc.getName());
     }
@@ -451,8 +451,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     @TestLabels("auraSanity")
     public void testPostProdActionWithAppAllowed() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
-                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysAllows'>%s</aura:application>",
-                ApplicationDef.class);
+                ApplicationDef.class,
+                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysAllows'>%s</aura:application>");
         verifyPostAccessAllowed(Mode.PROD, "java://test.controller.JavaController/ACTION$noArgs",
                                 appDesc.getNamespace() + ":" + appDesc.getName());
     }
@@ -462,8 +462,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
      */
     public void testPostProdActionWithUnsecuredNamespace() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
-                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysDenies'>%s</aura:application>",
-                ApplicationDef.class);
+                ApplicationDef.class,
+                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAlwaysDenies'>%s</aura:application>");
         verifyPostAccessAllowed(Mode.PROD,
                 "java://org.auraframework.impl.java.controller.TestController/ACTION$doSomething",
                                 appDesc.getNamespace() + ":" + appDesc.getName());
@@ -476,8 +476,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     public void testPostProdConfigActionWithAppThrows() throws Exception {
         ServletConfigController.setProductionConfig(true);
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
-                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderThrowsThrowable'>%s</aura:application>",
-                ApplicationDef.class);
+                ApplicationDef.class,
+                "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderThrowsThrowable'>%s</aura:application>");
         PostMethod post = buildPostRequest(Mode.PROD, "java://test.controller.JavaController/ACTION$noArgs",
                 appDesc.getNamespace() + ":" + appDesc.getName());
         int statusCode = getHttpClient().executeMethod(post);

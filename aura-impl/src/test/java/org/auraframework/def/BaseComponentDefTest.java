@@ -16,7 +16,6 @@
 package org.auraframework.def;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,7 @@ import org.auraframework.def.BaseComponentDef.RenderType;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.root.component.LazyComponentDefRef;
-import org.auraframework.impl.source.StringSourceLoader;
+import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
@@ -36,8 +35,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
-/**
- */
 public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends RootDefinitionTest<T> {
 
     protected final String interfaceTag = "<aura:interface provider='%s'>%s</aura:interface>";
@@ -386,14 +383,12 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
         //6. Server dependency through component extension
         //Having a Parent who has server dependencies, should also make the child server dependent
-        StringSourceLoader loader = StringSourceLoader.getInstance();
-        DefDescriptor<T> parent = loader.createStringSourceDescriptor("parent", getDefClass());
         String parentContent = String.format(baseTag,
                 "extensible='true' model='java://org.auraframework.impl.java.model.TestJavaModel' ", "");
-        addSourceAutoCleanup(parent, parentContent);
+        DefDescriptor<T> parent = addSourceAutoCleanup(getDefClass(), parentContent);
 
-        DefDescriptor<T> child = loader.createStringSourceDescriptor("localDeps_child", getDefClass());
-        addSourceAutoCleanup(child, String.format(baseTag, "extends='" + parent.getDescriptorName() + "'", ""));
+        DefDescriptor<T> child = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "extends='" + parent.getDescriptorName() + "'", ""));
         assertTrue(
                 "When a component's parent has serverside dependency, the component should be marked as server dependent.",
                 child.getDef().hasLocalDependencies());
@@ -410,10 +405,10 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     public void testComponentCannotExtendItself(){
-        DefDescriptor<T> extendsSelf = StringSourceLoader.getInstance().createStringSourceDescriptor("cmpExtendsSelf",
-                getDefClass());
-        addSourceAutoCleanup(extendsSelf,
-                String.format(baseTag, "extensible='true' extends='" + extendsSelf.getDescriptorName() + "'", ""));
+        DefDescriptor<T> extendsSelf = addSourceAutoCleanup(getDefClass(), "");
+        Source<T> source = auraTestingUtil.getSource(extendsSelf);
+        source.addOrUpdate(String.format(baseTag,
+                "extensible='true' extends='" + extendsSelf.getDescriptorName() + "'", ""));
         DefType defType = DefType.getDefType(this.getDefClass());
         try{
             T componentDef = extendsSelf.getDef();
@@ -428,14 +423,11 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
     public void testIsInstanceOf() throws Exception{
         //Test cases for Abstract Component extensions
-        StringSourceLoader loader = StringSourceLoader.getInstance();
-        DefDescriptor<T> grandParent = loader.createStringSourceDescriptor("instanceOf_grandParent", getDefClass());
-        addSourceAutoCleanup(grandParent, String.format(baseTag, "extensible='true' abstract='true'", ""), new Date());
-        DefDescriptor<T> parent = loader.createStringSourceDescriptor("instanceOf_parent", getDefClass());
-        addSourceAutoCleanup(parent,
+        DefDescriptor<T> grandParent = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "extensible='true' abstract='true'", ""));
+        DefDescriptor<T> parent = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "extensible='true' extends='" + grandParent.getDescriptorName() + "'", ""));
-        DefDescriptor<T> child = loader.createStringSourceDescriptor("instanceOf_child", getDefClass());
-        addSourceAutoCleanup(child,
+        DefDescriptor<T> child = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "extensible='true' extends='" + parent.getDescriptorName() + "'", ""));
 
         assertTrue("Failed to assert inheritance across one level.", parent.getDef().isInstanceOf(grandParent));
@@ -444,15 +436,11 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
         //Test cases for Interface inheritance and implementations
         String interfaceTag = "<aura:interface %s> </aura:interface>";
-        DefDescriptor<InterfaceDef> grandParentInterface = loader.createStringSourceDescriptor(
-                "instanceOf_grandParentInterface", InterfaceDef.class);
-        addSourceAutoCleanup(grandParentInterface, String.format(interfaceTag, ""));
-        DefDescriptor<InterfaceDef> parentInterface = loader.createStringSourceDescriptor("instanceOf_parentInterface",
-                InterfaceDef.class);
-        addSourceAutoCleanup(parentInterface,
+        DefDescriptor<InterfaceDef> grandParentInterface = addSourceAutoCleanup(InterfaceDef.class,
+                String.format(interfaceTag, ""));
+        DefDescriptor<InterfaceDef> parentInterface = addSourceAutoCleanup(InterfaceDef.class,
                 String.format(interfaceTag, "extends='" + grandParentInterface.getDescriptorName() + "'"));
-        DefDescriptor<T> interfaceImpl = loader.createStringSourceDescriptor("instanceOf_interfaceImpl", getDefClass());
-        addSourceAutoCleanup(interfaceImpl,
+        DefDescriptor<T> interfaceImpl = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "implements='" + parentInterface.getDescriptorName() + "'", ""));
         assertTrue("Failed to assert interface implementation one level.",
                 interfaceImpl.getDef().isInstanceOf(parentInterface));
@@ -483,10 +471,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     @SuppressWarnings("unchecked")
     public void testLazyLoadingFacets() throws Exception{
         //1. When a facet is marked for Lazy/Exclusive loading, parentDef has a LazyComponentDefRef
-        DefDescriptor<T> desc = StringSourceLoader.getInstance().createStringSourceDescriptor("lazy",
-                this.getDefClass());
-        addSourceAutoCleanup(desc, String.format(baseTag, "", "<aura:text aura:load='LAZY'/>" + "<aura:label />"
-                + "<aura:text aura:load='Exclusive'/>"));
+        DefDescriptor<T> desc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "",
+                "<aura:text aura:load='LAZY'/>" + "<aura:label />" + "<aura:text aura:load='Exclusive'/>"));
 
         T def = desc.getDef();
         AttributeDefRef body = getBodyAttributeFromDef(def);
@@ -503,9 +489,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         assertTrue(bodyCmps.get(1) instanceof ComponentDefRef);
 
         //3. When a bad component is specified to be loaded Lazily
-        StringSourceLoader loader = StringSourceLoader.getInstance();
-        desc = loader.createStringSourceDescriptor("lazy_bad", getDefClass());
-        addSourceAutoCleanup(desc, String.format(baseTag, "", "<aura:fooBar999 aura:load='LAZY'/>"));
+        desc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "", "<aura:fooBar999 aura:load='LAZY'/>"));
         try{
             desc.getDef();
             fail("should not be able to use a non-existing component by marking it to be lazy loaded");
@@ -514,8 +498,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         }
 
         //4. When a component is requested with non-existing attribute
-        desc = loader.createStringSourceDescriptor("lazy_nonexistingAttribute", getDefClass());
-        addSourceAutoCleanup(desc, String.format(baseTag, "", "<aura:text aura:load='LAZY' fooBar999='hoze'/>"));
+        desc = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "", "<aura:text aura:load='LAZY' fooBar999='hoze'/>"));
         try{
             desc.getDef();
             fail("should not be able to use a non-existing attribute by marking it to be lazy loaded");
@@ -528,13 +512,10 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         }*/
 
         //6. Non basic data type for attribute specification.
-        DefDescriptor<ComponentDef> cmpAttr = loader.createStringSourceDescriptor("lazyLoadingFacets_cmpAttr",
-                ComponentDef.class);
-        addSourceAutoCleanup(cmpAttr,
+        DefDescriptor<ComponentDef> cmpAttr = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:attribute name='cmps' type='Aura.Component'/> </aura:component>");
-        desc = loader.createStringSourceDescriptor("lazyLoadingFacets_lazy", getDefClass());
-        addSourceAutoCleanup(
-                desc,
+        desc = addSourceAutoCleanup(
+                getDefClass(),
                 String.format(baseTag, "",
                         "<" + cmpAttr.getDescriptorName() + " aura:load='LAZY'>" + "<aura:set attribute='cmps'>"
                                 + "<aura:text/>" + "</aura:set>" + "</" + cmpAttr.getDescriptorName() + ">"));
@@ -553,9 +534,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      * Components outside aura namespace cannot implement aura:rootComponent. Test uses string namespace.
      */
     public void testNonAuraRootMarker() throws Exception {
-        DefDescriptor<T> d = StringSourceLoader.getInstance().createStringSourceDescriptor("nonAuraRootMarker",
-                getDefClass());
-        addSourceAutoCleanup(d, String.format(baseTag, "implements='aura:rootComponent'", ""));
+        DefDescriptor<T> d = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "implements='aura:rootComponent'", ""));
         DefType defType = DefType.getDefType(getDefClass());
         try {
             d.getDef();
@@ -572,15 +552,12 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      * Tests to verify validateReferences() on BaseComponentDefImpl.
      */
     public void testValidateReferences() throws Exception{
-        StringSourceLoader loader = StringSourceLoader.getInstance();
         //Grand parent with BETA support
-        DefDescriptor<T> grandParentDesc = loader.createStringSourceDescriptor("validateReferences_grandParent",
-                getDefClass());
-        addSourceAutoCleanup(grandParentDesc, String.format(baseTag, "extensible='true' support='BETA'", ""));
+        DefDescriptor<T> grandParentDesc = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "extensible='true' support='BETA'", ""));
         //Parent with GA support
-        DefDescriptor<T> parentDesc = loader.createStringSourceDescriptor("validateReferences_parent", getDefClass());
-        addSourceAutoCleanup(
-                parentDesc,
+        DefDescriptor<T> parentDesc = addSourceAutoCleanup(
+                getDefClass(),
                 String.format(baseTag, "extensible='true' extends='" + grandParentDesc.getDescriptorName()
                         + "' support='GA'", ""));
         try{
@@ -592,9 +569,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                             parentDesc.getQualifiedName(), grandParentDesc.getQualifiedName()), e.getMessage());
         }
         //Child with GA support
-        DefDescriptor<T> childDesc = loader.createStringSourceDescriptor("validateReferences_child", getDefClass());
-        addSourceAutoCleanup(
-                childDesc,
+        DefDescriptor<T> childDesc = addSourceAutoCleanup(
+                getDefClass(),
                 String.format(baseTag, "extensible='true' extends='" + parentDesc.getDescriptorName()
                         + "' support='GA'", ""));
         try{
@@ -606,15 +582,12 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                             + grandParentDesc.getQualifiedName() + "'s level of BETA", e.getMessage());
         }
         //Including a component, that violates support level restriction, as facet
-        DefDescriptor<ComponentDef> parentCmp = loader.createStringSourceDescriptor("validateReferences_parentCmp",
-                ComponentDef.class);
-        addSourceAutoCleanup(parentCmp, "<aura:component extensible='true' support='BETA'></aura:component>");
-        DefDescriptor<ComponentDef> childCmp = loader.createStringSourceDescriptor("validateReferences_childCmp",
-                ComponentDef.class);
-        addSourceAutoCleanup(childCmp, "<aura:component extends='" + parentCmp.getDescriptorName()
-                + "' support='GA'></aura:component>");
-        DefDescriptor<T> testDesc = loader.createStringSourceDescriptor("validateReferences_testCmp", getDefClass());
-        addSourceAutoCleanup(testDesc, String.format(baseTag, "", "<" + childCmp.getDescriptorName() + "/>"));
+        DefDescriptor<ComponentDef> parentCmp = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component extensible='true' support='BETA'></aura:component>", "validateReferences_parentCmp");
+        DefDescriptor<ComponentDef> childCmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component extends='"
+                + parentCmp.getDescriptorName() + "' support='GA'></aura:component>", "validateReferences_childCmp");
+        DefDescriptor<T> testDesc = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "", "<" + childCmp.getDescriptorName() + "/>"), "validateReferences_testCmp");
         try{
             testDesc.getDef().validateReferences();
             fail("Test component's facet has a component which tries to widen the support level of its parent.");

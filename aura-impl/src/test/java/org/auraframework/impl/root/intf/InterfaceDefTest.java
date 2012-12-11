@@ -32,7 +32,7 @@ import org.auraframework.impl.FakeRegistry;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
-import org.auraframework.impl.source.StringSourceLoader;
+import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -221,11 +221,10 @@ public class InterfaceDefTest extends AuraImplTestCase {
     }
 
     public void testInterfaceCannotExtendItself() throws Exception {
-
-        DefDescriptor<InterfaceDef> extendsSelf = StringSourceLoader.getInstance().createStringSourceDescriptor(
-                "interfaceExtendsSelf", InterfaceDef.class);
-        addSourceAutoCleanup(extendsSelf,
-                String.format("<aura:interface extends='%s'> </aura:interface>", extendsSelf.getDescriptorName()));
+        DefDescriptor<InterfaceDef> extendsSelf = addSourceAutoCleanup(InterfaceDef.class, "");
+        StringSource source = (StringSource)auraTestingUtil.getSource(extendsSelf);
+        source.addOrUpdate(String.format("<aura:interface extends='%s'> </aura:interface>",
+                extendsSelf.getDescriptorName()));
         try {
             InterfaceDef def = extendsSelf.getDef();
             def.validateReferences();
@@ -237,9 +236,8 @@ public class InterfaceDefTest extends AuraImplTestCase {
 
 
     public void testInterfaceCannotImplementAnInterface() throws Exception {
-        DefDescriptor<InterfaceDef> d = StringSourceLoader.getInstance().createStringSourceDescriptor(
-                "interfaceImplementingInterface", InterfaceDef.class);
-        addSourceAutoCleanup(d, "<aura:interface implements='test:fakeInterface'> </aura:interface>");
+        DefDescriptor<InterfaceDef> d = addSourceAutoCleanup(InterfaceDef.class,
+                "<aura:interface implements='test:fakeInterface'> </aura:interface>");
         try {
             d.getDef();
             fail("An interface cannot implement another interface, it can only extend it.");

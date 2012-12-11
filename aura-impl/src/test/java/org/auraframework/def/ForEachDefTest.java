@@ -15,11 +15,8 @@
  */
 package org.auraframework.def;
 
-import java.util.Date;
-
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.throwable.MissingRequiredAttributeException;
 
 public class ForEachDefTest extends DefinitionTest<ComponentDef> {
@@ -103,35 +100,23 @@ public class ForEachDefTest extends DefinitionTest<ComponentDef> {
     }
 
     private DefDescriptor<ComponentDef> registerComponentRequiredAttribute() {
-        DefDescriptor<ComponentDef> cmpDesc = StringSourceLoader.getInstance().createStringSourceDescriptor(
-                "HasRequiredAttribute", ComponentDef.class);
-        addSourceAutoCleanup(cmpDesc,
-                "<aura:component><aura:attribute name='req' type='String' required='true'/></aura:component>",
-                new Date());
-        return cmpDesc;
+        return addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component><aura:attribute name='req' type='String' required='true'/></aura:component>");
     }
 
     private DefDescriptor<ComponentDef> registerComponentMissingRequiredAttribute(
             DefDescriptor<ComponentDef> withRequiredAttribute) {
-        DefDescriptor<ComponentDef> cmpDesc = StringSourceLoader.getInstance().createStringSourceDescriptor(
-                "_MissingRequiredAttribute", ComponentDef.class);
-        addSourceAutoCleanup(
-                cmpDesc,
+        return addSourceAutoCleanup(
+                ComponentDef.class,
                 "<aura:component model=\"java://org.auraframework.impl.java.model.TestJavaModel\"><aura:foreach items='{!m.stringList}' var='i'><"
                         + withRequiredAttribute.getDescriptorName() + "/></aura:foreach></aura:component>");
-        return cmpDesc;
     }
 
     private DefDescriptor<ComponentDef> registerComponentInheritedRequiredAttribute() {
-        DefDescriptor<ComponentDef> parentDesc = StringSourceLoader.getInstance().createStringSourceDescriptor(
-                "_Parent_", ComponentDef.class);
-        addSourceAutoCleanup(parentDesc,
+        DefDescriptor<ComponentDef> parentDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component extensible='true'><aura:attribute name='req' type='String' required='true'/></aura:component>");
-        DefDescriptor<ComponentDef> childDesc = StringSourceLoader.getInstance().createStringSourceDescriptor(
-                "_ChildHasRequired", ComponentDef.class);
-        addSourceAutoCleanup(childDesc,
+        return addSourceAutoCleanup(ComponentDef.class,
                 String.format("<aura:component extends='%s'/>", parentDesc.getDescriptorName()));
-        return childDesc;
     }
 
     private DefDescriptor<ComponentDef> registerComponentMissingInheritedRequiredAttribute(
@@ -139,9 +124,6 @@ public class ForEachDefTest extends DefinitionTest<ComponentDef> {
         String contents = "<aura:component model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
                 + "<aura:foreach items='{!m.stringList}' var='i'><" + required.getDescriptorName()
                 + "/></aura:foreach></aura:component>";
-        DefDescriptor<ComponentDef> missingDesc = StringSourceLoader.getInstance().createStringSourceDescriptor(
-                "_ChildMissingRequired", ComponentDef.class);
-        addSourceAutoCleanup(missingDesc, contents);
-        return missingDesc;
+        return addSourceAutoCleanup(ComponentDef.class, contents);
     }
 }

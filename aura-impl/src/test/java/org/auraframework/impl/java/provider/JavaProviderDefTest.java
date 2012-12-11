@@ -169,7 +169,7 @@ public class JavaProviderDefTest extends AuraImplTestCase {
         };
         for (String testcase : runtimeTestCases) {
             markupTestCase = String.format(markupSkeleton, testcase);
-            DefDescriptor<InterfaceDef> desc = addSourceAutoCleanup(markupTestCase, InterfaceDef.class);
+            DefDescriptor<InterfaceDef> desc = addSourceAutoCleanup(InterfaceDef.class, markupTestCase);
             try {
                 Aura.getInstanceService().getInstance(desc.getQualifiedName(), ComponentDef.class);
                 fail("Invalid provider defined: Should have failed to provide a component implementing this interface.");
@@ -179,7 +179,7 @@ public class JavaProviderDefTest extends AuraImplTestCase {
         }
         for (String testcase : markupTestCases) {
             markupTestCase = String.format(markupSkeleton, testcase);
-            DefDescriptor<InterfaceDef> desc = addSourceAutoCleanup(markupTestCase, InterfaceDef.class);
+            DefDescriptor<InterfaceDef> desc = addSourceAutoCleanup(InterfaceDef.class, markupTestCase);
             try {
                 Aura.getInstanceService().getInstance(desc.getQualifiedName(), ComponentDef.class);
                 fail("Invalid provider defined: Should have failed to provide a component implementing this interface.");

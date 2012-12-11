@@ -210,7 +210,7 @@ public class AttributeDefTest extends AuraImplTestCase {
         String cmpMarkup = "<aura:component >%s</aura:component>";
         String markup = String.format(cmpMarkup,
                 "<aura:attribute type='String' name='attr' description='Describe the attribute'/>");
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(markup, ComponentDef.class);
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
         assertEquals("Description of attribute not processed", "Describe the attribute", cmpDesc.getDef()
                 .getAttributeDef("attr").getDescription());
     }

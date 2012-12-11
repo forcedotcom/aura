@@ -15,26 +15,16 @@
  */
 package org.auraframework.impl.root.component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.auraframework.Aura;
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.AttributeDefRef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefRefImpl;
-import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.throwable.MissingRequiredAttributeException;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.MissingRequiredAttributeException;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -156,8 +146,8 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
 
     public void testRequiredAttribute() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
-                "<aura:component><aura:attribute name='req' type='String' required='true'/></aura:component>",
-                ComponentDef.class);
+                ComponentDef.class,
+                "<aura:component><aura:attribute name='req' type='String' required='true'/></aura:component>");
 
         Map<String, Object> atts = ImmutableMap.of("req", (Object)"hi");
 
@@ -184,12 +174,10 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
     }
 
     public void testRequiredInheritedAttribute() throws Exception {
-        DefDescriptor<ComponentDef> parent = StringSourceLoader.getInstance().createStringSourceDescriptor("parent",
-                ComponentDef.class);
-        addSourceAutoCleanup(parent,
+        DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component extensible='true'><aura:attribute name='req' type='String' required='true'/></aura:component>");
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
-                String.format("<aura:component extends='%s'/>", parent.getDescriptorName()), ComponentDef.class);
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
+                String.format("<aura:component extends='%s'/>", parent.getDescriptorName()));
 
         Map<String, Object> atts = ImmutableMap.of("req", (Object)"hi");
 
@@ -216,13 +204,10 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
     }
 
     public void testRequiredInnerAttribute() throws Exception {
-        DefDescriptor<ComponentDef> inner = StringSourceLoader.getInstance().createStringSourceDescriptor("inner",
-                ComponentDef.class);
-        addSourceAutoCleanup(inner,
+        DefDescriptor<ComponentDef> inner = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:attribute name='req' type='String' required='true'/></aura:component>");
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
-                String.format("<aura:component><%s/></aura:component>", inner.getDescriptorName()),
-                ComponentDef.class);
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
+                String.format("<aura:component><%s/></aura:component>", inner.getDescriptorName()));
         try {
             Aura.getInstanceService().getInstance(cmpDesc.getDescriptorName(), ComponentDef.class);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());

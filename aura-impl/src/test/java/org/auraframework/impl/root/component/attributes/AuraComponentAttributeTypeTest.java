@@ -43,9 +43,9 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
      * @throws Exception
      */
     public void testUsageOfComponentDefRefArray()throws Exception{
-        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(String.format(baseComponentTag, "",
-                "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>" + "<test:text/>"
-                        + "<aura:text value='aura'/>" + "</aura:attribute>"), ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "",
+                                "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>" + "<test:text/>"
+                                        + "<aura:text value='aura'/>" + "</aura:attribute>"));
         Component cmp = (Component)Aura.getInstanceService().getInstance(desc);
         assertNotNull("Failed to create component with Aura.ComponentDefRef[] type attribute.", cmp);
         Object value = cmp.getAttributes().getValue("attr");
@@ -71,9 +71,9 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
      * @throws Exception
      */
     public void testEmptyBodyForComponentDefRefArray()throws Exception{
-        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(String.format(baseComponentTag, "",
-                "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>" + "</aura:attribute>"),
-                ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "",
+                        "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>" + "</aura:attribute>"));
         //Verify that it works fine
         Component cmp = (Component)Aura.getInstanceService().getInstance(desc);
         assertNotNull("Was not able to use an attribute of Aura.ComponentDefRef[] with an empty body.", cmp);
@@ -87,8 +87,8 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
      * @throws Exception
      */
     public void testComponentDefRefIsNotValidType()throws Exception{
-        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(String.format(baseComponentTag, "",
-                "<aura:attribute type='Aura.ComponentDefRef' name='attr' default=''/>"), ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "",
+                        "<aura:attribute type='Aura.ComponentDefRef' name='attr' default=''/>"));
         try{
             Aura.getInstanceService().getInstance(desc);
             fail("Aura.ComponentDefRef is not a valid attribute type.");
@@ -97,10 +97,10 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
 
     public void testAttributesInComponentDefRefArray() throws Exception{
         //1. Expression using outer attributes
-        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(String.format(baseComponentTag, "",
-                "<aura:attribute type='String' name='outerAttr' default='emulp'/>"
-                        + "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>"
-                        + "<aura:text value=\"{!'aura'+ v.outerAttr}\"/>" + "</aura:attribute>"), ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "",
+                                "<aura:attribute type='String' name='outerAttr' default='emulp'/>"
+                                        + "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>"
+                                        + "<aura:text value=\"{!'aura'+ v.outerAttr}\"/>" + "</aura:attribute>"));
         Component cmp = (Component)Aura.getInstanceService().getInstance(desc);
         assertNotNull(cmp);
         Object value = cmp.getAttributes().getValue("attr");
@@ -120,10 +120,10 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
      */
     public void testMarkupValidationInComponentDefRefArray() throws Exception{
         //Incomplete formula
-        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(String.format(baseComponentTag, "",
-                "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>" +
-                    //Unclosed formula field
-                        "<aura:text value='{!aura/>" + "</aura:attribute>"), ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "",
+                                "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>" +
+                                    //Unclosed formula field
+                                        "<aura:text value='{!aura/>" + "</aura:attribute>"));
         try{
             Aura.getInstanceService().getInstance(desc);
             fail("Should have failed creation because of incomplete formula.");

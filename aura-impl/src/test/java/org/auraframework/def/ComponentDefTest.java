@@ -29,7 +29,7 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
      */
     public void testIsAbstract() throws Exception {
         //This creates a StringSource to store the definition  
-        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup("", ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, "");
         ComponentDefImpl.Builder builder = new ComponentDefImpl.Builder();
         builder.setDescriptor(DefDescriptorImpl.getInstance(desc.getQualifiedName(), ComponentDef.class));
         builder.isAbstract = true;

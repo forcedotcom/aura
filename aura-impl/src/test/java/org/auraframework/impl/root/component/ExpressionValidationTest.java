@@ -39,8 +39,8 @@ public class ExpressionValidationTest extends AuraImplTestCase {
      */
     public void _testTopLevelComponentExpressionsNotAllowed() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
-                "<aura:application><aura:attribute name='strAtt' type='String'>{!who.cares}</aura:attribute></aura:application>",
-                ApplicationDef.class);
+                ApplicationDef.class,
+                "<aura:application><aura:attribute name='strAtt' type='String'>{!who.cares}</aura:attribute></aura:application>");
         try {
             Aura.getInstanceService().getInstance(appDesc);
             fail("Expressions cannot be used as attribute values in top-level components.");
@@ -227,13 +227,13 @@ public class ExpressionValidationTest extends AuraImplTestCase {
 
     private void verifyValidationException(String strExpr, String dblExpr, String expectedMessageStartsWith)
             throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(String.format("<aura:component>"
-                + "<aura:attribute name='strAtt' type='String' default=\"%s\"/>"
-                + "<aura:attribute name='dblAtt' type='Double' default=\"%s\"/>" + "</aura:component>", strExpr,
-                dblExpr), ComponentDef.class);
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, String.format("<aura:component>"
+                        + "<aura:attribute name='strAtt' type='String' default=\"%s\"/>"
+                        + "<aura:attribute name='dblAtt' type='Double' default=\"%s\"/>" + "</aura:component>", strExpr,
+                        dblExpr));
         String cmpName = cmpDesc.getNamespace() + ":" + cmpDesc.getName();
-        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(String.format("<aura:application>" + "<%s/>"
-                + "</aura:application>", cmpName), ApplicationDef.class);
+        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, String.format("<aura:application>" + "<%s/>"
+                        + "</aura:application>", cmpName));
         try {
             Aura.getInstanceService().getInstance(appDesc);
             fail("Expression validation did not result in a runtime exception for strAtt=\"" + strExpr + "\" dblAtt=\""
@@ -242,11 +242,11 @@ public class ExpressionValidationTest extends AuraImplTestCase {
             if (!e.getMessage().contains(expectedMessageStartsWith)) throw(e);
         }
 
-        cmpDesc = addSourceAutoCleanup("<aura:component>" + "<aura:attribute name='strAtt' type='String'/>"
-                + "<aura:attribute name='dblAtt' type='Double'/>" + "</aura:component>", ComponentDef.class);
+        cmpDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component>" + "<aura:attribute name='strAtt' type='String'/>"
+                        + "<aura:attribute name='dblAtt' type='Double'/>" + "</aura:component>");
         cmpName = cmpDesc.getNamespace() + ":" + cmpDesc.getName();
-        appDesc = addSourceAutoCleanup(String.format("<aura:application>" + "<%s strAtt=\"%s\" dblAtt=\"%s\"/>"
-                + "</aura:application>", cmpName, strExpr, dblExpr), ApplicationDef.class);
+        appDesc = addSourceAutoCleanup(ApplicationDef.class, String.format("<aura:application>" + "<%s strAtt=\"%s\" dblAtt=\"%s\"/>"
+                        + "</aura:application>", cmpName, strExpr, dblExpr));
         try {
             Aura.getInstanceService().getInstance(appDesc);
             fail("Expression validation did not result in a runtime exception for strAtt=\"" + strExpr + "\" dblAtt=\""

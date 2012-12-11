@@ -43,8 +43,8 @@ public class ComponentDefHTMLFormatAdapterTest extends BaseComponentDefHTMLForma
         AuraContext context = Aura.getContextService().getCurrentContext();
         context.setPreloading(true); // clears out current preloads
         context.addPreload("aura");
-        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup("<aura:component render='client'></aura:component>",
-                ComponentDef.class);
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component render='client'></aura:component>");
         String body = doWrite(desc.getDef());
         int start = body.indexOf("<html ");
         String tag = body.substring(start, body.indexOf('>', start) + 1);

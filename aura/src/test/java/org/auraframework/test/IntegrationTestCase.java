@@ -18,7 +18,10 @@ package org.auraframework.test;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -27,14 +30,15 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.auraframework.Aura;
 import org.auraframework.controller.java.ServletConfigController;
-import org.auraframework.def.*;
+import org.auraframework.def.ActionDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.http.AuraServlet;
-import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.ContextService;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -46,7 +50,9 @@ import org.auraframework.util.AuraUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Base class for all Aura integration tests.
@@ -57,9 +63,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
      * Note, any tests that write to the servletConfig are {@link ThreadHostileTest}.
      */
     protected static TestServletConfig servletConfig = AuraUtil.get(TestServletConfig.class);
-    // Do not use the testUtil to add string source in WebDriver tests.
     protected final AuraTestingUtil auraTestingUtil;
-    private Set<DefDescriptor<?>> cleanUpDds;
     private HttpClient httpClient = null;
 
     public IntegrationTestCase(String name) {
@@ -77,13 +81,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     public void tearDown() throws Exception {
         httpClient = null;
         auraTestingUtil.tearDown();
-        // Clean up any defs that were created on the test app server
-        if (cleanUpDds != null && !cleanUpDds.isEmpty()) {
-            removeSource(cleanUpDds);
-        }
-
         ServletConfigController.resetMocks();
-
         super.tearDown();
     }
 
@@ -185,30 +183,16 @@ public abstract class IntegrationTestCase extends AuraTestCase {
         return post;
     }
 
-    protected <T extends Definition> void addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents,
-            Date lastModified) {
-        auraTestingUtil.addSourceAutoCleanup(descriptor, contents, lastModified);
+    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents) {
+        return auraTestingUtil.addSourceAutoCleanup(defClass, contents);
     }
-
-    protected <T extends Definition> void addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents) {
-        addSourceAutoCleanup(descriptor, contents, new Date());
+    
+    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents, String namePrefix) {
+        return auraTestingUtil.addSourceAutoCleanup(defClass, contents, namePrefix);
     }
-
-    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(String contents, Class<T> defClass) {
-        return auraTestingUtil.addSourceAutoCleanup(contents, defClass);
-    }
-
-    /**
-     * Clean up defs created by tests.
-     *
-     * @param defs
-     */
-    protected void removeSource(Set<DefDescriptor<?>> defs) {
-        StringSourceLoader stringSourceLoader = StringSourceLoader.getInstance();
-
-        for(DefDescriptor<?> dd :defs){
-            stringSourceLoader.removeSource(dd);
-        }
+    
+    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents) {
+        return auraTestingUtil.addSourceAutoCleanup(descriptor, contents);
     }
 
     public static class ServerAction implements Action {

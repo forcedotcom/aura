@@ -40,7 +40,7 @@ public class OutputTextTest extends AuraImplTestCase {
     public void testInjectingScriptTagIntoValue() throws Exception{
         String scriptTags = "<script>alert(\'blah\')</script>";
         String cmpMarkup = String.format(baseComponentTag, "", "<ui:outputText value='"+scriptTags+"'/>");
-        DefDescriptor<ComponentDef> testCmp = addSourceAutoCleanup(cmpMarkup, ComponentDef.class);
+        DefDescriptor<ComponentDef> testCmp = addSourceAutoCleanup(ComponentDef.class, cmpMarkup);
         try{
             testCmp.getDef();
             fail("XML should not be assigned as value.");

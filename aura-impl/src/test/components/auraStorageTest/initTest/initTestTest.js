@@ -25,7 +25,7 @@
 				a.setStoreable();
 				$A.test.fail("Client actions cannot be marked for storage.");
 			}catch(e){
-				$A.test.assertTrue(e.message.indexOf("setStoreable() cannot be called on a client action.")===0);
+				$A.test.assert(e.message.indexOf("Assertion Failed!: setStoreable() cannot be called on a client action.")===0);
 			}
 			$A.test.assertFalse(a.isStoreable());
 		}

@@ -103,7 +103,7 @@
             try{
                 $A.componentService.newComponent(config, null, true, false);
             } catch (e){
-                $A.test.assertEquals("DefDescriptor config undefined : undefined", e.message);
+                $A.test.assertEquals("Assertion Failed!: DefDescriptor config undefined : undefined", e.message);
                 return;
             }
             throw new Error("Expected an error");

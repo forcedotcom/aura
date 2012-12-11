@@ -268,7 +268,7 @@
                 $A.componentService.newComponent(config);
                 $A.test.fail('Should have failed to create component without a descriptor.');
             }catch(e){
-                $A.test.assertEquals("ComponentDef Config required for registration : undefined",e.message);
+                $A.test.assertEquals("Assertion Failed!: ComponentDef Config required for registration : undefined",e.message);
             }
         },function(cmp){
             aura.test.setTestTimeout(15000);
@@ -296,7 +296,7 @@
                 $A.componentService.newComponent('');
                 $A.test.fail('Should have failed to create component without a descriptor.');
             }catch(e){
-                $A.test.assertTrue(e.message.indexOf("config is required in ComponentService.newComponent(config)")===0);
+                $A.test.assertTrue(e.message.indexOf("Assertion Failed!: config is required in ComponentService.newComponent(config)")===0);
             }
         },function(cmp){
             aura.test.setTestTimeout(15000);

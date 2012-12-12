@@ -29,7 +29,7 @@ public class InputSearchUITest extends WebDriverTestCase {
 
     }
 
-    @ExcludeBrowsers({BrowserType.ANDROID_PHONE,BrowserType.ANDROID_TABLET,BrowserType.IPAD,BrowserType.IPHONE})
+    @ExcludeBrowsers({BrowserType.ANDROID_PHONE,BrowserType.ANDROID_TABLET,BrowserType.IPAD,BrowserType.IPHONE, BrowserType.SAFARI})
     public void testSearch() throws Exception{
         final String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.searched");
         open("/uitest/inputSearchHandlingSearchEvent.cmp");

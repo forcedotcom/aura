@@ -1,0 +1,12 @@
+<aura:component extensible="true" extends="performanceTest:grandParent">
+    <aura:attribute type="String" name="division"/>
+    <aura:attribute  type="String" name="shortName"/>
+    <aura:attribute  type="Integer" name="founded"/>
+    <aura:attribute  type="String" name="mostTitles"/>
+    <div class="{!v.color}">
+        <div class="{!'division ' + v.color}" style="float:left">{!v.division} &nbsp; aka &nbsp; {!v.shortName}</div>
+        <br/><span class="{! 'founded ' + v.color }">{!v.founded}</span><br/>
+        <div class="{! 'record ' + v.color }" style="float:left">{!v.mostTitles}</div>
+    </div><br/> <br/>
+    {!v.body}
+</aura:component>

@@ -1,0 +1,9 @@
+<aura:component>
+    <aura:attribute name="color" default="white" type="String"/>
+    <div style="visibility:hidden">Inheritance</div>
+    <performanceTest:child color="{!v.color}" 
+        city="San Francisco" country="United States of America" state="California" geoLocation="37°47′N 122°25′W" nickname="The city by the bay"
+        league="National League" startYear="1883" endYear="Current" president="Bill Giles"
+        division="West" shortName="NL West" founded="1969" mostTitles="Los Angeles Dodgers"
+        teamName="San Francisco Giants" manager="Bruce Bochy" generalManager="Brian Sabean" stadium="AT&amp;T Park"/>
+</aura:component>

@@ -1,0 +1,12 @@
+<aura:component extensible="true" extends="performanceTest:greatGrandParent">
+    <aura:attribute name="league" type="String"/>
+    <aura:attribute name="startYear" type="String"/>
+    <aura:attribute name="endYear" type="String"/>
+    <aura:attribute name="president" type="String"/>
+   <div class="{!v.color}">
+        <div class="{!'league ' + v.color}" style="float:left">{!v.league} &nbsp;</div>
+        <br/><span class="{! 'year ' + v.color }">Years:&nbsp;{!v.startYear}&nbsp;to&nbsp;{!v.endYear}</span><br/>
+        <div class="{! 'president ' + v.color }" style="float:left">{!v.president}</div>
+    </div><br/> <br/>
+    {!v.body}
+</aura:component>

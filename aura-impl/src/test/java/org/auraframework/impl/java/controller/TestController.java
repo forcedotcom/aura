@@ -15,8 +15,16 @@
  */
 package org.auraframework.impl.java.controller;
 
-import org.auraframework.system.Annotations.Controller;
+import java.util.Map;
+
+import org.auraframework.Aura;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.instance.Component;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Controller;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 @Controller
 public class TestController {
@@ -32,5 +40,21 @@ public class TestController {
     @AuraEnabled
     public static String throwException() {
         throw new RuntimeException("intentionally generated");
+    }
+    
+    @AuraEnabled
+    public static Component baseBallDivisions() throws Exception{
+        String[] s = {"East","Central", "West", "East", "Central", "West"};
+        Map<String,Object> m = Maps.newHashMap();
+        m.put("items", Lists.newArrayList(s));
+        return Aura.getInstanceService().getInstance("iterationTest:basicIteration",ComponentDef.class, m);
+    }
+    
+    @AuraEnabled
+    public static Component basketBallDivisions()throws Exception{
+        String[] s = {"Atlantic", "Central", "Southeast", "Northwest", "Pacific", "Southwest"};
+        Map<String,Object> m = Maps.newHashMap();
+        m.put("string", Lists.newArrayList(s));
+        return Aura.getInstanceService().getInstance("forEachDefTest:basicDataType",ComponentDef.class, m);
     }
 }

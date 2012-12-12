@@ -1,0 +1,71 @@
+<aura:layouts catchall="default" default="default">
+    <aura:layout name="default" title="default">
+        <aura:layoutItem container="game">
+            <performanceTest:baseBall/>
+        </aura:layoutItem>
+        <aura:layoutItem container="divisions" action="{!c.baseBallDivisions}"/>
+        <aura:layoutItem container="teams">
+            <ui:outputText value="Baltimore Orioles"/><br/>
+            <ui:outputText value="Boston Red Sox "/><br/>
+            <ui:outputText value="New York Yankees"/><br/>
+            <ui:outputText value="Tampa Bay Rays"/><br/>
+            <ui:outputText value="Toronto Blue Jays"/><br/>
+            <ui:outputText value="Chicago White Sox "/><br/>
+            <ui:outputText value="Cleveland Indians"/><br/>
+            <ui:outputText value="Detroit Tigers"/><br/>
+            <ui:outputText value="Kansas City Royals"/><br/>
+            <ui:outputText value="Minnesota Twins "/><br/>
+            <ui:outputText value="Houston Astros"/><br/>
+            <ui:outputText value="Los Angeles Angels of Anaheim"/><br/>
+            <ui:outputText value="Oakland Athletics"/><br/>
+            <ui:outputText value="Seattle Mariners"/><br/>
+            <ui:outputText value="Texas Rangers"/><br/>
+        </aura:layoutItem>
+    </aura:layout>
+    <aura:layout name="baseBall" title="default">
+        <aura:layoutItem container="game">
+            <performanceTest:baseBall/>
+        </aura:layoutItem>
+        <!--aura:layoutItem container="divisions" action="{!c.baseBallDivisions}"/-->
+        <aura:layoutItem container="teams">
+            <ui:outputText value="Baltimore Orioles"/><br/>
+            <ui:outputText value="Boston Red Sox "/><br/>
+            <ui:outputText value="New York Yankees"/><br/>
+            <ui:outputText value="Tampa Bay Rays"/><br/>
+            <ui:outputText value="Toronto Blue Jays"/><br/>
+            <ui:outputText value="Chicago White Sox "/><br/>
+            <ui:outputText value="Cleveland Indians"/><br/>
+            <ui:outputText value="Detroit Tigers"/><br/>
+            <ui:outputText value="Kansas City Royals"/><br/>
+            <ui:outputText value="Minnesota Twins "/><br/>
+            <ui:outputText value="Houston Astros"/><br/>
+            <ui:outputText value="Los Angeles Angels of Anaheim"/><br/>
+            <ui:outputText value="Oakland Athletics"/><br/>
+            <ui:outputText value="Seattle Mariners"/><br/>
+            <ui:outputText value="Texas Rangers"/><br/>
+        </aura:layoutItem>
+    </aura:layout>
+    <aura:layout name="basketBall" title="Basket Ball">
+        <aura:layoutItem container="game">
+            <performanceTest:basketBall/>
+        </aura:layoutItem>
+        <!--aura:layoutItem container="divisions" action="{!c.baseketBallDivisions}"/-->
+        <aura:layoutItem container="teams">
+            <ui:outputText value="Boston Celtics"/><br/>
+            <ui:outputText value="Brooklyn Nets"/><br/>
+            <ui:outputText value="New York Knicks"/><br/>
+            <ui:outputText value="Philadelphia 76ers"/><br/>
+            <ui:outputText value="Toronto Raptors"/><br/>
+            <ui:outputText value="Chicago Bulls"/><br/>
+            <ui:outputText value="Cleveland Cavaliers"/><br/>
+            <ui:outputText value="Detroit Pistons"/><br/>
+            <ui:outputText value="Indiana Pacers"/><br/>
+            <ui:outputText value="Milwaukee Bucks"/><br/>
+            <ui:outputText value="Atlanta Hawks"/><br/>
+            <ui:outputText value="Charlotte Bobcats"/><br/>
+            <ui:outputText value="Miami Heat"/><br/>
+            <ui:outputText value="Orlando Magic"/><br/>
+            <ui:outputText value="Washington Wizards"/><br/>
+        </aura:layoutItem>
+    </aura:layout>
+</aura:layouts>

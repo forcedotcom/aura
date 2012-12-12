@@ -1,0 +1,62 @@
+.performanceTestInheritance .city{
+    background-color: orange;
+}
+.performanceTestInheritance .state{
+    background-color: white;
+}
+.performanceTestInheritance .country{
+    background-color: black;
+    color:white;
+}
+.performanceTestInheritance .league{
+    background-color: blue;
+    color:white;
+}
+.performanceTestInheritance .year{
+    background-color: blue;
+    color:white;
+}
+.performanceTestInheritance .president{
+    background-color: white;
+    color:blue;
+}
+.performanceTestInheritance .record{
+    background-color: blue;
+    color:white;
+}
+.performanceTestInheritance.team{
+    background-color: orange;
+    color:black;
+}
+.performanceTestInheritance .city.grey{
+    background-color: black;
+    color:white;
+}
+.performanceTestInheritance .state.grey{
+    background-color: orange;
+}
+.performanceTestInheritance .country.grey{
+    background-color: lightgrey;
+    color:white;
+}
+.performanceTestInheritance .league.grey{
+    background-color: lightblue;
+    color:white;
+}
+.performanceTestInheritance .year.grey{
+    background-color: lightblue;
+    color:white;
+}
+.performanceTestInheritance .president.grey{
+    background-color: lightblue;
+    color:white;
+}
+.performanceTestInheritance .record.grey{
+    background-color: lightgrey;
+    color:blue;
+}
+
+.performanceTestInheritance.team.grey{
+    background-color: lightgrey;
+    color:orange;
+}

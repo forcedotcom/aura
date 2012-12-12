@@ -1,0 +1,16 @@
+<aura:component model="java://org.auraframework.impl.java.model.TestIterationModel">
+    <aura:attribute name="color" default="white" type="String"/>
+    <aura:attribute name="rowNumber" type="List"/>
+    <aura:attribute name="start" type="Integer"/>
+    <aura:attribute name="end" type="Integer"/>
+    
+    <div>
+    <table width="100px">
+        <aura:iteration aura:id="iteration" items="{!v.rowNumber}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
+	        <tr width="100%" class="{!v.color +' ' + ((idx%2==0)?'even':'odd')}" style="text-align:center">{!var}</tr>
+	    </aura:iteration>
+	    <div style="visibility:hidden">Iteration through basic components</div>
+	</table>
+    </div>
+    
+</aura:component>

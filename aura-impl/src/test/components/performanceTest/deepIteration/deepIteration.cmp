@@ -1,0 +1,16 @@
+<aura:component>
+    <aura:attribute name="color" default="white" type="String"/>
+    <aura:attribute name="players" type="List"/>
+    <aura:attribute name="start" type="Integer"/>
+    <aura:attribute name="end" type="Integer"/>
+    
+    <div>
+    <aura:iteration items="{!v.players}" var="var" start="{!v.start}" end="{!v.end}" indexVar="idx" >
+        <tr class="{!v.color +' ' + ((idx%2==0)?'even':'odd')}">
+	        <aura:iteration items="{!var}" var="fields">
+	            <td width="200px">{!fields}</td>
+	        </aura:iteration>
+        </tr>
+    </aura:iteration>
+    </div>
+</aura:component>

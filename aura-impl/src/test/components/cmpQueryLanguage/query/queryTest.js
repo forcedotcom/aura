@@ -89,7 +89,7 @@
                 $A.getQueryStatement().from("foo").query();
                 $A.test.fail("Should not have accepted invalid view:")
             }catch(e){
-                $A.test.assertEquals("Invalid view : foo : undefined",e.message);
+                $A.test.assertEquals("Assertion Failed!: Invalid view : foo : undefined",e.message);
             }
 
             // Verify that empty, undefined and null value for from() just

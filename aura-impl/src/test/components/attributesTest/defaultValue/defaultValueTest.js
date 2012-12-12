@@ -42,38 +42,38 @@
                 $A.test.assertFalsy(cmp.getAttributes().getValue(undefined));
                 $A.test.fail("Should not be able to use undefined in getValue()");
             }catch(e){
-                $A.test.assertEquals("Key is required for getValue on MapValue : undefined", e.message)
+                $A.test.assertEquals("Assertion Failed!: Key is required for getValue on MapValue : undefined", e.message)
             }
             try{
                 $A.test.assertFalsy(cmp.getAttributes().getValue(null));
                 $A.test.fail("Should not be able to use null in getValue()");
             }catch(e){
-                $A.test.assertEquals("Key is required for getValue on MapValue : null", e.message)
+                $A.test.assertEquals("Assertion Failed!: Key is required for getValue on MapValue : null", e.message)
             }
             try{
                 $A.test.assertFalsy(cmp.getAttributes().getValue());
                 $A.test.fail("Should not be able to use null in getValue()");
             }catch(e){
-                $A.test.assertEquals("Key is required for getValue on MapValue : undefined", e.message)
+                $A.test.assertEquals("Assertion Failed!: Key is required for getValue on MapValue : undefined", e.message)
             }
             /**W-1324218
              * try{
                 $A.test.assertFalsy(cmp.getAttributes().get(null));
                 $A.test.fail("Should not be able to use null in get()");
             }catch(e){
-                $A.test.assertEquals("Key is required for get on MapValue : null", e.message)
+                $A.test.assertEquals("Assertion Failed!: Key is required for get on MapValue : null", e.message)
             }
             try{
                 $A.test.assertFalsy(cmp.getAttributes().get(undefined));
                 $A.test.fail("Should not be able to use undefined in get()");
             }catch(e){
-                $A.test.assertEquals("Key is required for get on MapValue : undefined", e.message)
+                $A.test.assertEquals("Assertion Failed!: Key is required for get on MapValue : undefined", e.message)
             }
             try{
                 $A.test.assertFalsy(cmp.getAttributes().get());
                 $A.test.fail("Should not be able to use undefined in get()");
             }catch(e){
-                $A.test.assertEquals("Key is required for get on MapValue : undefined", e.message)
+                $A.test.assertEquals("Assertion Failed!: Key is required for get on MapValue : undefined", e.message)
             }
             */
         }

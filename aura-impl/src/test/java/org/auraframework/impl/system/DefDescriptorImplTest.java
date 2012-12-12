@@ -42,6 +42,15 @@ public class DefDescriptorImplTest extends AuraImplTestCase{
         assertEquals("java://foo.Bar", descriptor.getQualifiedName());
     }
 
+    public void testBadNameChars() {
+        try {
+            DefDescriptorImpl.getInstance("markup://foo.1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ+/", ComponentDef.class);
+            fail("did not fail on invalid characters");
+        } catch (AuraRuntimeException expected) {
+            // ignore, I suppose we could check the string, but we should probably change the exception as well.
+        }
+    }
+
     public void testSerialize2() throws Exception {
         DefDescriptor<ControllerDef> descriptor = DefDescriptorImpl.getInstance("java://foo.Bar", ControllerDef.class);
         serializeAndGoldFile(descriptor);

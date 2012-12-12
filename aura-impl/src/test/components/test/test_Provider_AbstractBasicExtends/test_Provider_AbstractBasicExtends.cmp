@@ -15,5 +15,5 @@
     limitations under the License.
 
 -->
-<aura:component extends="test:test_Provider_AbstractBasic, test:test_JSProvider_AbstractBasic">
+<aura:component extends="test:test_Provider_AbstractBasic">
 </aura:component>

@@ -35,6 +35,8 @@
 
 			var scroller = component._scroller;
 			if (!$A.util.isUndefined(scroller)) {
+				scroller.unbindTransientHandlers();
+				
 				scroller.refresh();
 
 				// Goose the x position to insure that onScrollEnd() fires with the correct page fully revealed

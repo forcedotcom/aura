@@ -38,6 +38,8 @@
     <aura:attribute name="stopEventPropagation" type="Boolean" default="false" description="Disables DOM event propagation. (This probably isn't something you want to enable.)"/>
 
     <aura:registerEvent name="refreshed" type="ui:scrollerRefreshed"/>
+	<aura:handler event="aura:locationChange" action="{!c.locationChange}"/>
+    
     <ui:resizeObserver onresize="{!c.refresh}"/>
 
     <div aura:id="scrollWrapper" class="{!v.class + ' scrollWrapper'}">

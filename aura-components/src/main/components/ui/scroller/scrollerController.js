@@ -16,5 +16,12 @@
 ({
     refresh: function(component, event, helper) {
         helper.refresh(component);
+    },
+    
+    locationChange: function(component, event, helper) {
+		var scroller = component._scroller;
+		if (!$A.util.isUndefined(scroller)) {
+			scroller.unbindTransientHandlers();
+		}    	
     }
 })

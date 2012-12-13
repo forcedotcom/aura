@@ -20,27 +20,30 @@
     <aura:set attribute="title" value="Client-Side Providers"/>
 
     <p>A provider enables you to use an abstract component or an interface in markup. The framework uses the provider to determine the concrete component to use at runtime.</p>
-    
+
     <p><auradocs:topicLink topic="oodProviders">Server-side providers</auradocs:topicLink> are more common, but if you don't need to access the server when you're creating a component, you can use a client-side provider instead.</p>
 
     <auradocs:warning>The framework behavior is undefined if a component has a client-side provider and a server-side provider that return different values. It's preferable to only use a server-side or a client-side provider unless you need both.</auradocs:warning>
-            
-	<h2>Creating a Provider</h2>
-	
-	<p>A client-side provider is part of the component bundle and is auto-wired if you follow the naming convention, <code>&lt;componentName&gt;Provider.js.</code></p>
-	
-	<p>To reuse a provider from another component, you can use the <code>provider</code> system attribute in <code>aura:component</code> instead. For example, this component uses the auto-wired provider for <code>auradocs.sampleComponent</code> in <code>auradocs/sampleComponent/sampleComponentProvider.js</code>.</p> 
-	
+
+    <h2>Creating a Provider</h2>
+
+    <p>A client-side provider is part of the component bundle and is auto-wired if you follow the naming convention, <code>&lt;componentName&gt;Provider.js.</code></p>
+
+    <p>To reuse a provider from another component, you can use the <code>provider</code> system attribute in <code>aura:component</code> instead. For example, this component uses the auto-wired provider for <code>auradocs.sampleComponent</code> in <code>auradocs/sampleComponent/sampleComponentProvider.js</code>.</p>
+
 <auradocs:codeblock><![CDATA[
-<aura:component 
+<aura:component
     provider="js://auradocs.sampleComponent">
-    ...	
+    ...
 </aura:component>]]>
 </auradocs:codeblock>
 
-	<p>A client-side provider file is a simple JavaScript object that defines the <code>provide</code> function. For example, this provider returns a string that defines the topic to display.</p>
-	
-	<!-- not mentioning optional localCreation parameter until add more doc about local cmp creation -->
+    <p>To add an external provider not within your component bundle, append the provider  in a comma-separated list: <code>provider="js://auradocs.sampleComponent, js://auradocs.anotherComponent"</code>.
+      We recommend that you use a provider within the component bundle for maintainability and use an external provider only if you must.</p>
+
+    <p>A client-side provider file is a simple JavaScript object that defines the <code>provide</code> function. For example, this provider returns a string that defines the topic to display.</p>
+
+    <!-- not mentioning optional localCreation parameter until add more doc about local cmp creation -->
 <auradocs:codeblock>({
     provide : function (cmp) {
         var topic = cmp.get('v.topic');
@@ -65,7 +68,7 @@
 </auradocs:codeblock>
 
     <p>You can omit the <code>componentDef</code> entry if the component is already concrete and you only want to provide attributes.</p>
-	
+
     <p><b>See also:</b><br/>
         <auradocs:topicLink topic="oodCmpAbstract">Abstract Components</auradocs:topicLink><br/>
         <auradocs:topicLink topic="oodInterfaces">Interfaces</auradocs:topicLink><br/>

@@ -17,21 +17,27 @@
 -->
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Helpers"/>
-    
+
     <p>A helper file contains JavaScript functions that can be called from a client-side controller or renderer for a component. Put functions that you want to reuse and call from a controller and renderer in the component's helper file.</p>
 
     <h2>Creating a Helper</h2>
-    
+
     <p>A helper file is part of the component bundle and is auto-wired if you follow the naming convention, <code>&lt;componentName&gt;Helper.js</code>.</p>
 
-    <p>To reuse a helper from another component, you can use the <code>helper</code> system attribute in <code>aura:component</code> instead. For example, this component uses the auto-wired helper for <code>auradocs.sampleComponent</code> in <code>auradocs/sampleComponent/sampleComponentHelper.js</code>.</p> 
-    
+    <p>To reuse a helper from another component, you can use the <code>helper</code> system attribute in <code>aura:component</code> instead. For example, this component uses the auto-wired helper for <code>auradocs.sampleComponent</code> in <code>auradocs/sampleComponent/sampleComponentHelper.js</code>.</p>
+
 <auradocs:codeblock><![CDATA[
-<aura:component 
+<aura:component
     helper="js://auradocs.sampleComponent">
-    ... 
+    ...
 </aura:component>]]>
-</auradocs:codeblock>    
+</auradocs:codeblock>
+
+     <p>If you are reusing a helper from another component and you already have an auto-wired helper in your component bundle, the methods in your auto-wired helper will not be accessible unless you explicitly declare it. Otherwise, only helpers in bundles that the component extends will be accessible.
+     </p>
+
+    <p>To use both your auto-wired helper and an external one in a component, specify both helper files on the component: <code>  helper="js://auradocs.sampleComponent, js://auradocs.anotherComponent"</code>.
+         We recommend that you use a helper  within the component bundle for maintainability and use an external helper only if you must. </p>
 
     <h2>Using a Helper in a Renderer</h2>
 
@@ -40,22 +46,22 @@
     call <code>open</code> in the helper method.</p>
 
     <p><b>detailsRenderer.js</b></p>
-    
+
 <auradocs:codeblock>({
-	afterRender : function(component, helper){
-	    helper.open(component, null, "new");
-	}
+    afterRender : function(component, helper){
+        helper.open(component, null, "new");
+    }
 })</auradocs:codeblock>
 
     <p><b>detailsHelper.js</b></p>
-    
+
 <auradocs:codeblock>({
-	open : function(component, note, mode, sort){
-	    if(mode === "new") {
-	        //do something
-	    }
-	    // do something else, such as firing an event
-	}
+    open : function(component, note, mode, sort){
+        if(mode === "new") {
+            //do something
+        }
+        // do something else, such as firing an event
+    }
 })</auradocs:codeblock>
 
         <p>For an example on using helper methods to customize renderers, see
@@ -68,7 +74,7 @@
     The following code shows you how to reuse the <code>open</code> function in a controller.</p>
 
     <p><b>detailsController.js</b></p>
-    
+
 <auradocs:codeblock>({
     openNote: function(component, event, helper) {
         var note = event.getParam("note");

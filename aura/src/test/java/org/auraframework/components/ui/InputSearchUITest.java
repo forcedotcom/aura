@@ -28,7 +28,7 @@ public class InputSearchUITest extends WebDriverTestCase {
         super(name);
 
     }
-
+    //Excluding safari due to W-1478819
     @ExcludeBrowsers({BrowserType.ANDROID_PHONE,BrowserType.ANDROID_TABLET,BrowserType.IPAD,BrowserType.IPHONE, BrowserType.SAFARI})
     public void testSearch() throws Exception{
         final String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.searched");

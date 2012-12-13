@@ -17,7 +17,7 @@
     /**
      * Verify for a parented element that removeElement will move it to the trashcan and then delete it on the next gc cycle.
      */
-    _testRemoveParentedDiv: {
+    testRemoveParentedDiv: {
         test: function(component){
             $A.test.setTestTimeout(30000);
             var element = component.find("auraDiv").getElement();
@@ -35,7 +35,7 @@
     /**
      * Verify for a parented text node that removeElement will move it to the trashcan and then delete it on the next gc cycle.
      */
-    _testRemoveParentedText: {
+    testRemoveParentedText: {
         test: function(component){
             $A.test.setTestTimeout(30000);
             var element = component.find("auraDiv").getElement().childNodes[0];
@@ -52,28 +52,30 @@
     /**
      * Verify for an unparented element that removeElement will move it to the trashcan and then delete it on the next gc cycle.
      */
-    _testRemoveUnparentedDiv: {
+    testRemoveUnparentedDiv: {
         test: function(component){
             $A.test.setTestTimeout(30000);
             var element = component.find("auraDiv").getElement();
             element.parentNode.removeChild(element);
             $A.util.removeElement(element);
-            var trash = element.parentNode;
-            $A.test.runAfterIf(function(){return trash !== element.parentNode;}); // check that element emptied from trash
+            $A.test.assertTrue($A.util.$trash$.length > 0, "element never placed in trash");
+            $A.test.assertEquals("", component.find("container").getElement().textContent, "element not removed");
+            $A.test.runAfterIf(function(){return $A.util.$trash$.length === 0;}); // check that element emptied from trash
         }
     },
 
     /**
      * Verify for an unparented textnode that removeElement will do nothing to it.
      */
-    _testRemoveUnparentedText: {
+    testRemoveUnparentedText: {
         test: function(component){
             var element = component.find("auraDiv").getElement().childNodes[0];
             element.parentNode.removeChild(element);
             $A.util.removeElement(element);
             if(document.implementation["createHTMLDocument"]){
-                var trash = element.parentNode;
-                $A.test.runAfterIf(function(){return trash != element.parentNode;}); // check that element emptied from trash
+                $A.test.assertTrue($A.util.$trash$.length > 0, "element never placed in trash");
+            $A.test.assertEquals("", component.find("container").getElement().textContent, "element not removed");
+            $A.test.runAfterIf(function(){return $A.util.$trash$.length === 0;}); // check that element emptied from trash
             }else{
                 $A.test.assertNull(element.parentNode);
             }
@@ -84,7 +86,7 @@
     /**
      * removeElement will send the target to the trash only once.
      */
-    _testRemoveElementTrashesOnce: {
+    testRemoveElementTrashesOnce: {
         test: function(component){
             var elem = component.find("setup").getElement();
             $A.util.removeElement(elem);

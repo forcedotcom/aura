@@ -37,6 +37,7 @@ public class ExpressionValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults AuraRuntimeException when instantiating the component
      */
+    // TODO(W-1480493): Expression Validation needs work
     public void _testTopLevelComponentExpressionsNotAllowed() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
                 ApplicationDef.class,
@@ -65,6 +66,7 @@ public class ExpressionValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults AuraRuntimeException when instantiating the component
      */
+    // TODO(W-1480493): Expression Validation needs work
     public void _testUnknownValueProvider() throws Exception {
         verifyValidationException("{!x.fit}", "", "!!!No current validation on ValueProvider");
     }
@@ -74,6 +76,7 @@ public class ExpressionValidationTest extends AuraImplTestCase {
      *
      * @expectedResults InvalidExpressionException when instantiating the component
      */
+    // TODO(W-1480493): Expression Validation needs work
     public void _testUnknownLabel() throws Exception {
         verifyValidationException("{!$Label.Aura.goomba}", "",
                 "org.auraframework.throwable.InvalidExpressionException: No label found for Aura.goomba");
@@ -105,6 +108,7 @@ public class ExpressionValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults InvalidExpressionException when instantiating the component
      */
+    // TODO(W-1480493): Expression Validation needs work
     public void _testTypeChecking() throws Exception {
         verifyValidationException("{!5+1}", "", "!!!No current type validation - returns null");
         verifyValidationException("", "{!'NotANumber'}", "!!!No current type validation - returns null");
@@ -115,6 +119,7 @@ public class ExpressionValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults InvalidExpressionException when instantiating the component
      */
+    // TODO(W-1480493): Expression Validation needs work
     public void _testCyclicalReference() throws Exception {
         verifyValidationException("{!v.strAtt}again", "",
                 "!!!No current validation of recursive expressions - returns arraylist of propref and string");

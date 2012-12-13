@@ -20,8 +20,10 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.throwable.AuraRuntimeException;
 
+@ThreadHostileTest
 public class ComponentDefDescriptorTest extends AuraImplTestCase {
 
     public ComponentDefDescriptorTest(String name) {
@@ -39,12 +41,12 @@ public class ComponentDefDescriptorTest extends AuraImplTestCase {
         // getInstance should never return null
         assertNotNull(testDescriptor);
 
-        // even if the component doesn't exist
+        // even if the component doesn't exist 
         assertNotNull(DefDescriptorImpl.getInstance("fake:component", ComponentDef.class));
 
+        // this is not guaranteed to be true if other threads are running
         // subsequent calls to getInstance should return the same object
-        // TODO jtroup: but right now it doesn't.  uncomment this once caching is in place.
-        // assertSame(testDescriptor, (AuraDescriptorImpl.getInstance("aura:test")));
+        assertSame(testDescriptor, (DefDescriptorImpl.getInstance("aura:test", ComponentDef.class)));
 
         DefDescriptor<ComponentDef> testDescriptorWithLocation = DefDescriptorImpl.getInstance("aura:test", ComponentDef.class);
 
@@ -54,9 +56,9 @@ public class ComponentDefDescriptorTest extends AuraImplTestCase {
         // even if the component doesn't exist
         assertNotNull(DefDescriptorImpl.getInstance("fake:component", ComponentDef.class));
 
+        // this is not guaranteed to be true if other threads are running
         // subsequent calls to getInstance should return the same object
-        // TODO jtroup: but right now it doesn't.  uncomment this once caching is in place.
-        // assertSame(testDescriptorWithLocation, (AuraDescriptorImpl.getInstance("aura:test", fakeLocation)));
+        assertSame(testDescriptorWithLocation, (DefDescriptorImpl.getInstance("aura:test", ComponentDef.class)));
 
         DefDescriptor<ComponentDef> testDescriptorNullTag = null;
 

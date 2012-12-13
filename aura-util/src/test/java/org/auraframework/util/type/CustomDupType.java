@@ -23,13 +23,12 @@ import org.auraframework.util.json.JsonSerializable;
 public class CustomDupType implements JsonSerializable {
     private String name =null;
     @Override
-    public void serialize(Json json) throws IOException {
-        // TODO Auto-generated method stub
+    public void serialize(Json json) throws IOException {}
 
-    }
     public void setName(String name) {
         this.name = name;
     }
+
     public String getName() {
         return name;
     }

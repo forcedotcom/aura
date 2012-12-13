@@ -15,7 +15,12 @@
  */
 package org.auraframework.util.json;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -96,14 +101,10 @@ public class JsonReaderTest extends UnitTestCase {
         }
 
         @Override
-        public void close() throws IOException {
-            // TODO Auto-generated method stub
-
-        }
+        public void close() throws IOException {}
 
         @Override
         public int read(char[] cbuf, int off, int len) throws IOException {
-            // TODO Auto-generated method stub
             return 0;
         }
     }

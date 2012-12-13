@@ -16,7 +16,10 @@
 package org.auraframework.util.javascript.directive;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.javascript.JavascriptProcessingError;
@@ -34,20 +37,6 @@ public class DirectiveParserTest extends UnitTestCase {
     public DirectiveParserTest(String name) {
         super(name);
     }
-
-    /**
-     * Tests for the constructor of DirectiveParser
-     */
-    /**
-     * Try to pass a null set of directives TODO: Waiting for a fix - https://gus.soma.salesforce.com/a0790000000DOEVAA4
-     * public void testEmptyDirectiveTypes() throws Exception{ DirectiveBasedJavascriptGroup jg = new
-     * DirectiveBasedJavascriptGroup( "testDummy", new File(SettingsTestUtil.getTestdataDir()), "javascript/head.js",
-     * false, null, EnumSet.of(JavascriptGeneratorMode.DEVELOPMENT, JavascriptGeneratorMode.TESTING,
-     * JavascriptGeneratorMode.PRODUCTION)); DirectiveParser dp = new DirectiveParser (jg, jg.getStartFile()); try{
-     * dp.parseFile(); }catch( RuntimeException e){
-     * assertTrue("Directive parser must not accept null directives",e.getMessage
-     * ().equals("Directives cannot be null")); } }
-     */
 
     /**
      * Try to pass an empty set of directive. Ideally the test should return just the contents of the file after
@@ -119,7 +108,7 @@ public class DirectiveParserTest extends UnitTestCase {
     }
 
     /**
-     * TODO: https://gus.soma.salesforce.com/a0790000000DP7YAAW Negative test: Multi line directive without an END
+     * Negative test: Multi line directive without an END
      * directive
      */
     public void testMultilineWithoutEndDirective() throws Exception {
@@ -191,10 +180,6 @@ public class DirectiveParserTest extends UnitTestCase {
 
     /*
      * Tests for the generate() method in DirectiveParser
-     */
-    /**
-     * TODO: What should happen? Shouldn't it throw an exception https://gus.soma.salesforce.com/a0790000000DPbwAAG What
-     * if the generate function is called before the Javascript group is parsed.
      */
     public void testCallGenerateBeforeParse() throws Exception {
         File file = getResourceFile("/testdata/javascript/testMultilineDirective.js");

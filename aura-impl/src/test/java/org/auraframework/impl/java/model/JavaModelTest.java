@@ -91,7 +91,6 @@ public class JavaModelTest extends AuraImplTestCase {
 
         @Override
         public boolean exists() {
-            // TODO Auto-generated method stub
             return false;
         }
     };

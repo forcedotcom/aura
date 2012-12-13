@@ -19,7 +19,6 @@ import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Application;
-
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 /**
@@ -47,7 +46,6 @@ public class LocationChangeEventTest extends AuraImplTestCase {
     }
     /**
      * Negative test case: Check that events used to handle location change always extend aura:locationChange.
-     * TODO: W-776071
      */
     public void testRegisteredLocationChangeEventExtendsAuraLocationChange() throws Exception{
         try{

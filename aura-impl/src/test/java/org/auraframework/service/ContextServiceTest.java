@@ -18,15 +18,12 @@ package org.auraframework.service;
 import java.util.List;
 import java.util.Set;
 
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.impl.source.StringSourceLoader;
-import org.auraframework.system.AuraContext;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.NoContextException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -149,7 +146,7 @@ public class ContextServiceTest extends BaseServiceTest<ContextService, ContextS
             service.assertEstablished();
             fail("NoContextException should have been thrown");
         }catch(NoContextException e){
-            //good.
+            // Expected
         }
         service.startContext(config.mode, config.format, config.access);
         service.assertEstablished();
@@ -159,7 +156,7 @@ public class ContextServiceTest extends BaseServiceTest<ContextService, ContextS
             service.assertEstablished();
             fail("NoContextException should have been thrown");
         }catch(NoContextException e){
-            //good.
+            // Expected
         }
 
     }
@@ -168,15 +165,11 @@ public class ContextServiceTest extends BaseServiceTest<ContextService, ContextS
     }
 
     @Override
-    public void assertAccess(DefDescriptor<?> desc) {
-        // TODO Auto-generated method stub
-
-    }
+    public void assertAccess(DefDescriptor<?> desc) {}
 
     @Override
     public AuraContext startContext(Mode mode, Format format, Access access,
                                      DefDescriptor<? extends BaseComponentDef> appDesc) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -184,7 +177,6 @@ public class ContextServiceTest extends BaseServiceTest<ContextService, ContextS
     public AuraContext startContext(Mode mode, Set<SourceLoader> loaders,
                                      Format format, Access access,
                                      DefDescriptor<? extends BaseComponentDef> appDesc) throws QuickFixException {
-        // TODO Auto-generated method stub
         return null;
     }
 }

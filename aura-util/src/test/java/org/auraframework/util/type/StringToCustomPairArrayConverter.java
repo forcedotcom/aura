@@ -43,7 +43,6 @@ public class StringToCustomPairArrayConverter implements Converter<String, Custo
 
     @Override
     public Class<?>[] getToParameters() {
-        // TODO Auto-generated method stub
         return null;
     }
 

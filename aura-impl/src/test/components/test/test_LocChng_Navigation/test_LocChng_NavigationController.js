@@ -21,7 +21,7 @@
         var num = $A.historyService.get().num;
         //Increment the value of num
         if(num){
-            $A.historyService.set("ButtonClicked?num="+((num*1)+1));
+            $A.historyService.set("ButtonClicked?num=" + (Number(num) + 1));
         }else{
             $A.historyService.set("ButtonClicked?num=1");
         }

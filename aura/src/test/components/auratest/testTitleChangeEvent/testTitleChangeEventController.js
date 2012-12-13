@@ -16,15 +16,15 @@
 {
     layoutChanged : function(cmp, event) {
         $A.log("layoutChange: "+event.getParam("prevTitle") + " -> "+event.getParam("title"));
-        cmp.find("lastLayoutTitle").getElement().innerHTML = event.getParam("prevTitle");
-        cmp.find("currLayoutTitle").getElement().innerHTML = event.getParam("title");
+        cmp._lastLayoutTitle = event.getParam("prevTitle");
+        cmp._currLayoutTitle = event.getParam("title");
         $A.util.addClass(cmp.find("ready").getElement(),"layoutChanged");
     },
 
     titleChanged : function(cmp, event) {
         $A.log("titleChange: "+event.getParam("prevTitle") + " -> "+event.getParam("title"));
-        cmp.find("lastTitle").getElement().innerHTML = event.getParam("prevTitle");
-        cmp.find("currTitle").getElement().innerHTML = event.getParam("title");
+        cmp._lastTitle = event.getParam("prevTitle");
+        cmp._currTitle = event.getParam("title");
         $A.util.addClass(cmp.find("ready").getElement(),"titleChanged");
     }
 }

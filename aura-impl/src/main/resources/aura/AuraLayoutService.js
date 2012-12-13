@@ -86,8 +86,6 @@ var AuraLayoutService = function(){
                 }
             }
 
-            aura.util.removeClass(document.body, "auraLoading");
-
             layoutService.layout(token, event.getParams());
         },
 
@@ -97,9 +95,15 @@ var AuraLayoutService = function(){
         },
 
         back : function(){
-            priv.pop();
-            priv.pop();
-            historyService.back();
+            // Is there something in the stack to go back to?
+            if (priv.history.length > 1) {
+                this.pop();
+                this.refreshLayout();
+                // We've just handled the re-layout. Update the history but
+                // don't double-layout.
+                skipLocationChangeHandlerSemaphore++;
+                historyService.back();
+            }
         },
 
         clearHistory : function(){
@@ -251,8 +255,8 @@ var AuraLayoutService = function(){
 
         setCurrentLayoutTitle : function(title){
             var current = priv.peek();
-            if (current && current.title !== title) {
-                var oldTitle = current.title;
+            if (current && priv.getTitle(current) !== title) {
+                var oldTitle = priv.getTitle(current);
                 current.title = title;
 
                 var params = {

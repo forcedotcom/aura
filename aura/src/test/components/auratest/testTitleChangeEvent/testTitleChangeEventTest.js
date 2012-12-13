@@ -41,13 +41,13 @@
     },
 
     assertTitleEventTitles: function(component, prev, curr){
-        aura.test.assertEquals(prev, component.find("lastTitle").getElement().textContent, "titleChange prevTitle not expected");
-        aura.test.assertEquals(curr, component.find("currTitle").getElement().textContent, "titleChange title not expected");
+        aura.test.assertEquals(prev, component._lastTitle, "titleChange prevTitle not expected");
+        aura.test.assertEquals(curr, component._currTitle, "titleChange title not expected");
     },
 
     assertBothEventTitles: function(test, component, prev, curr){
-        aura.test.assertEquals(prev, component.find("lastLayoutTitle").getElement().textContent, "layoutChange prevTitle not expected");
-        aura.test.assertEquals(curr, component.find("currLayoutTitle").getElement().textContent, "layoutChange title not expected");
+        aura.test.assertEquals(prev, component._lastLayoutTitle, "layoutChange prevTitle not expected");
+        aura.test.assertEquals(curr, component._currLayoutTitle, "layoutChange title not expected");
         test.assertTitleEventTitles(component, prev, curr);
     },
 
@@ -72,7 +72,7 @@
         test: function(component){
             var t = this;
             t.waitForLayoutChange(t, component, function(){
-                t.assertBothEventTitles(t, component, 'undefined', 'this is the default');
+                t.assertBothEventTitles(t, component, undefined, 'this is the default');
             });
         }
     },
@@ -85,13 +85,13 @@
         test: function(component){
             var t = this;
             t.waitForLayoutChange(t, component, function(){
-                t.assertBothEventTitles(t, component, 'undefined', 'string title');
+                t.assertBothEventTitles(t, component, undefined, 'string title');
                 $A.historyService.set("noTitle");
                 t.waitForLayoutChange(t, component, function(){
-                    t.assertBothEventTitles(t, component, 'string title', 'undefined');
+                    t.assertBothEventTitles(t, component, 'string title', undefined);
                     $A.historyService.set("stringTitle");
                     t.waitForLayoutChange(t, component, function(){
-                        t.assertBothEventTitles(t, component, 'undefined', 'string title');
+                        t.assertBothEventTitles(t, component, undefined, 'string title');
                     });
                 });
             });
@@ -106,13 +106,13 @@
         test: function(component){
             var t = this;
             t.waitForLayoutChange(t, component, function(){
-                t.assertBothEventTitles(t, component, 'undefined', 'undefined');
+                t.assertBothEventTitles(t, component, undefined, undefined);
                 $A.historyService.set("emptyTitle");
                 t.waitForLayoutChange(t, component, function(){
-                    t.assertBothEventTitles(t, component, 'undefined', '');
+                    t.assertBothEventTitles(t, component, undefined, '');
                     $A.historyService.set("noTitle");
                     t.waitForLayoutChange(t, component, function(){
-                        t.assertBothEventTitles(t, component, '', 'undefined');
+                        t.assertBothEventTitles(t, component, '', undefined);
                     });
                 });
             });
@@ -127,7 +127,7 @@
         test: function(component){
             var t = this;
             t.waitForLayoutChange(t, component, function(){
-                t.assertBothEventTitles(t, component, 'undefined', 'from expression');
+                t.assertBothEventTitles(t, component, undefined, 'from expression');
                 $A.historyService.set("funcTitle");
                 t.waitForLayoutChange(t, component, function(){
                     t.assertBothEventTitles(t, component, 'from expression', 'from expression function');
@@ -144,12 +144,12 @@
      * Setting layout title to string fires change events with string title.
      */
     // W-1059942 https://gus.soma.salesforce.com/a07B0000000G0YwIAK
-    _testSetLayoutTitleToString: {
+    testSetLayoutTitleToString: {
         attributes : {__layout: '#stringTitle'},
         test: function(component){
             var t = this;
             t.waitForLayoutChange(t, component, function(){
-                t.assertBothEventTitles(t, component, 'undefined', 'string title');
+                t.assertBothEventTitles(t, component, undefined, 'string title');
                 $A.layoutService.setCurrentLayoutTitle('shiny new title');
                 t.waitForTitleChange(component, function(){
                     t.assertTitleEventTitles(component, 'string title', 'shiny new title');
@@ -164,15 +164,15 @@
      * Setting layout title to null fires change events with null title.
      */
     // W-1059942 https://gus.soma.salesforce.com/a07B0000000G0YwIAK
-    _testSetLayoutTitleToNull: {
+    testSetLayoutTitleToNull: {
         attributes : {__layout: '#funcTitle'},
         test: function(component){
             var t = this;
-            t.waitForLayoutChange(t, component, function(){
-                t.assertBothEventTitles(t, component, 'undefined', 'from expression function');
+            t.waitForLayoutChange(t, component, function() {
+                t.assertBothEventTitles(t, component, undefined, 'from expression function');
                 $A.layoutService.setCurrentLayoutTitle(null);
                 t.waitForTitleChange(component, function(){
-                    t.assertTitleEventTitles(component, 'from expression function', 'null');
+                    t.assertTitleEventTitles(component, 'from expression function', null);
 
                     // check no layout events fired
                     t.assertNoEventsFired(component);
@@ -182,7 +182,7 @@
     },
 
     /**
-     * Setting layout title to undefined does not fire change events.
+     * Setting layout title to undefined works as expected.
      */
     // W-1059942 https://gus.soma.salesforce.com/a07B0000000G0YwIAK
     testSetLayoutTitleToUndefined: {
@@ -191,10 +191,15 @@
             var t = this;
             var imnotdefined;
             t.waitForLayoutChange(t, component, function(){
-                t.assertBothEventTitles(t, component, 'undefined', 'string title');
+                t.assertBothEventTitles(t, component, undefined, 'string title');
                 $A.log("setCurrentLayoutTitle to undefined");
                 $A.layoutService.setCurrentLayoutTitle(imnotdefined);
-                t.assertNoEventsFired(component);
+                t.waitForTitleChange(component, function(){
+                    t.assertTitleEventTitles(component, 'string title', undefined);
+
+                    // check no layout events fired
+                    t.assertNoEventsFired(component);
+                });
             });
         }
     },
@@ -203,12 +208,12 @@
      * Setting layout title to same title does not fire change events.
      */
     // W-1059942 https://gus.soma.salesforce.com/a07B0000000G0YwIAK
-    _testSetLayoutTitleToSame: {
+    testSetLayoutTitleToSame: {
         attributes : {__layout: '#stringTitle'},
         test: function(component){
             var t = this;
             t.waitForLayoutChange(t, component, function(){
-                t.assertBothEventTitles(t, component, 'undefined', 'string title');
+                t.assertBothEventTitles(t, component, undefined, 'string title');
                 $A.log("setCurrentLayoutTitle to 'string title'");
                 $A.layoutService.setCurrentLayoutTitle('string title');
                 t.assertNoEventsFired(component);

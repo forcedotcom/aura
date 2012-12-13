@@ -19,10 +19,6 @@ var priv = {
     history : [],
 
     push : function(layout, params, title){
-        if (!aura["finishedInit"] && this.history.length > 0) {
-            this.pop();
-        }
-
         this.history.push({
             layout : layout,
             params : params,

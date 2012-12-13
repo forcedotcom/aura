@@ -39,35 +39,43 @@ public class LayoutItemsUITest extends WebDriverTestCase {
     public void testNavigationWhenLayoutHasMultipleLayoutItems() throws Exception {
         By forwardButton = By.cssSelector(".Forward_Button");
         By backButton = By.cssSelector(".Back_Button");
-        By layoutDoneLocator = By.cssSelector(".layoutDone");
+        By layoutDone = By.cssSelector(".layoutDone");
+        By removeLayoutDone = By.cssSelector(".Remove_Layout_Done");
 
         open("/layoutServiceTest/multipleLayoutItems.app");
         getDriver().manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-        findDomElement(layoutDoneLocator);
+        findDomElement(layoutDone);
         verifyExpectedResultsForInitialLayout();
 
         findDomElement(forwardButton).click();
-        findDomElement(layoutDoneLocator);
+        findDomElement(layoutDone);
         verifyExpectedResultsForLayout1();
 
         findDomElement(forwardButton).click();
-        findDomElement(layoutDoneLocator);
+        findDomElement(layoutDone);
         verifyExpectedResultForLayout2();
 
         findDomElement(backButton).click();
-        findDomElement(layoutDoneLocator);
+        findDomElement(layoutDone);
         verifyExpectedResultsForLayout1();
 
         findDomElement(backButton).click();
-        findDomElement(layoutDoneLocator);
+        findDomElement(layoutDone);
         verifyExpectedResultsForInitialLayout();
 
         findDomElement(forwardButton).click();
-        findDomElement(layoutDoneLocator);
+        findDomElement(layoutDone);
         verifyExpectedResultsForLayout1();
 
+        findDomElement(removeLayoutDone).click();
         getDriver().navigate().back();
+        findDomElement(layoutDone);
         verifyExpectedResultsForInitialLayout();
+        
+        findDomElement(removeLayoutDone).click();
+        getDriver().navigate().forward();
+        findDomElement(layoutDone);
+        verifyExpectedResultsForLayout1();
     }
 
     private void verifyExpectedResultsForInitialLayout() throws Exception {

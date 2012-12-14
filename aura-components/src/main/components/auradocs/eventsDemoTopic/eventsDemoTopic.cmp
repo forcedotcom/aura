@@ -97,7 +97,7 @@
     <h3>Handler Component</h3>
     <p><b>eventsHandler.cmp</b></p>
 
-    <p>The handler component contains the notifier component (or a <code>&lt;aura:handler&gt;</code> tag for application events), and calls the controller action that is executed after the event is fired.</p>
+    <p>The handler component contains the notifier component or a <code>&lt;aura:handler&gt;</code> tag, and calls the controller action that is executed after the event is fired.</p>
 
     <auradocs:example descriptor="auradocs:eventsHandler" />
 

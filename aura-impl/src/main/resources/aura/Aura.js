@@ -30,7 +30,7 @@ var clientService;
 
 //#include aura.util.Function
 //#include aura.util.Util
-//#include {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"], "path" : "aura.test.Test"}
+//#include {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG", "DOC"], "path" : "aura.test.Test"}
 //#include aura.system.DefDescriptor
 //#include aura.util.Json
 //#include aura.util.Transport

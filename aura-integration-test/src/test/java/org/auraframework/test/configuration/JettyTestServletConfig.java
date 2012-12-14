@@ -59,11 +59,12 @@ public class JettyTestServletConfig implements TestServletConfig {
             }
         }
         baseUrl = new URL("http", host, port, "/");
+        System.out.println(String.format("BaseUrl: %s", baseUrl));
     }
 
     @Override
     public URL getBaseUrl() {
-        return baseUrl;
+    	return baseUrl;
     }
 
     @Override

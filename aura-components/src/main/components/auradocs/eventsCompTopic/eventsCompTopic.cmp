@@ -24,9 +24,19 @@
 
     <h2>Handling Component Events</h2>
     
-    <p>A component event can be handled by the component itself or by a component that instantiates the component. For example, if the <code>auradocs:eventsHandler</code> component includes <code>&lt;auradocs:eventsNotifier&gt;</code> in its markup, <code>eventsHandler</code> can handle any events thrown by <code>eventsNotifier</code>.</p>
+    <p>A component event can be handled by the component itself or by a component that instantiates the component.</p>
     
-    <p>Also, a component that extends another component can also handle events fired by the super component.</p>
+    <p>For example, if the <code>auradocs:eventsHandler</code> component includes <code>&lt;auradocs:eventsNotifier&gt;</code> in its markup, <code>eventsHandler</code> instantiates <code>eventsNotifier</code> and can handle any events thrown by <code>eventsNotifier</code>.</p>
+    
+    <p>A component can handle its own event by using the <code>aura:handler</code> tag. </p>
+
+<auradocs:codeblock>&lt;aura:registerEvent name="actionError" type="auradocs:sampleError"/&gt;
+&lt;aura:handler name="actionError" action="<aura:text value="{!"/>c.handleError}"/&gt;
+</auradocs:codeblock>    
+
+    <p>Note that the <code>name</code> attributes of <code>aura:registerEvent</code> and <code>aura:handler</code> must match. The <code>action</code> attribute of <code>aura:handler</code> sets the controller action to handle the event.</p>    
+    
+    <p>A component that extends another component can also handle events fired by the super component.</p>
 
     <h2>Component Events Overview</h2>
    
@@ -83,7 +93,7 @@
                 <code>
     &lt;auradocs:eventsNotifier parentName="<aura:text value="{!"/>v.name}" componentEventFired="<aura:text value="{!"/>c.handleComponentEventFired}"/&gt;
                 </code>
-                Note that <code>componentEventFired</code> matches the name attribute in the <code>aura:registerevent</code> tag in the notifier component. The value of the <code>componentEventFired</code> attribute is <code><aura:text value="{!"/>c.handleComponentEventFired}"</code> so the corresponding action in the handler controller is executed.
+                Note that <code>componentEventFired</code> matches the name attribute in the <code>aura:registerevent</code> tag in the notifier component. The value of the <code>componentEventFired</code> attribute is <code><aura:text value="{!"/>c.handleComponentEventFired}</code> so the corresponding action in the handler controller is executed.
                 The <code>parentName</code> attribute is set to the name of the handler component. We saw earlier that this attribute was used to set the <code>context</code> attribute in the notifier controller.
                 </td>
             </tr>

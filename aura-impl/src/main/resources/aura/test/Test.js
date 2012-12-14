@@ -16,6 +16,7 @@
 /*jslint evil: true, sub : true*/
 /**
  * @namespace Test Framework
+ * 
  */
 var Test = function(){
     //#include aura.test.Test_private
@@ -40,7 +41,14 @@ var Test = function(){
         }
     })();
 
+    /**
+     * @constructor
+     */
     var test = {
+    	/**
+    	 * Used to keep track of errors happening in test modes.
+    	 * @private
+    	 */
         logError : function(msg, e){
             var p, err = { "message": msg + ": " + (e.message || e.toString()) };
             for (p in e){
@@ -52,6 +60,9 @@ var Test = function(){
             priv.errors.push(err);
         },
 
+        /**
+         * @private
+         */
         run : function(name, code, count){
             // check if test has already started running, since frame loads from layouts may trigger multiple runs
             if(priv.complete >= 0){
@@ -84,6 +95,10 @@ var Test = function(){
                     priv.complete = 0;
                 }
             };
+            
+            /**
+             * @private
+             */
             var continueWhenReady = function() {
                 if(priv.complete < 2){
                     return;
@@ -160,7 +175,12 @@ var Test = function(){
             setTimeout(continueWhenReady, 1);
         },
 
-        // Wait for expected === actual, or if actual is not provided, then expected === true.
+        /**
+         * Wait for expected === actual, or if actual is not provided, then expected === true before invoking callback
+         * @param {Object} expected
+         * @param {Object} actual
+         * @param {function} callback
+         */ 
         addWaitFor : function(expected, actual, callback){
             if(arguments.length === 1){
                 if(!$A.util.isFunction(expected)){
@@ -171,9 +191,15 @@ var Test = function(){
                 priv.waits.push({ expected: expected, actual: actual, callback : callback });
             }
         },
+        
         /**
          * Get an instance of a server controller by name.
          * Expects you to provide the parameters and call back function.
+         * 
+         * @param {Component} cmp
+         * @param {String} name
+         * @param {Object} params
+         * @param {function} callback
          */
         getServerControllerInstance:function(cmp,name, params, callback){
             var cntlr = cmp.get(name);
@@ -182,6 +208,9 @@ var Test = function(){
             return cntlr;
         },
 
+        /**
+         * See if there are any pending actions 
+         */
         isActionPending : function() {
             return $A.clientService["priv"].inRequest;
         },
@@ -240,6 +269,9 @@ var Test = function(){
             }
         },
 
+        /**
+         * @private
+         */
         runAfterIf : function(conditionFunction, callback, intervalInMs){
             if(priv.complete === 0){
                 return;
@@ -265,14 +297,24 @@ var Test = function(){
             }
         },
 
+        /**
+         * set test timeout in miliseconds
+         * @param {int} timeoutMsec
+         */
         setTestTimeout : function(timeoutMsec){
             priv.timeoutTime = new Date().getTime() + timeoutMsec;
         },
 
+        /**
+         * @private
+         */
         isComplete : function(){
             return priv.complete === 0;
         },
 
+        /**
+         * Get the list of errors encountered by the js test
+         */
         getErrors : function(){
             if (priv.errors.length > 0){
                 return aura.util.json.encode(priv.errors);
@@ -281,6 +323,9 @@ var Test = function(){
             }
         },
 
+        /**
+         * get the string representation of errors encountered by a js test
+         */
         getDump : function() {
             var status = "";
             if (priv.errors.length > 0) {
@@ -298,6 +343,10 @@ var Test = function(){
             return status;
         },
 
+        /**
+         * Essentially a toString method. Returns a string even for undefined/null value.
+         * @param {Object} value
+         */
         print : function(value) {
             if (value === undefined) {
                 return "undefined";
@@ -310,6 +359,14 @@ var Test = function(){
             }
         },
 
+        /**
+         * Assert that if(condition) check evaluates to true. 
+         * @param {Object} condition
+         * @param {String} assertMessage
+         * @example 
+         * Positive: assertTruthy("helloWorld") 
+         * Negative: assertTruthy(null)
+         */
         assertTruthy : function(condition, assertMessage) {
             if (!condition) {
                 if(assertMessage){
@@ -322,6 +379,14 @@ var Test = function(){
             }
         },
 
+         /**
+         * Assert that if(condition) check evaluates to false. 
+         * @param {Object} condition
+         * @param {String} assertMessage
+         * @example 
+         * Negative: assertFalsy("helloWorld") 
+         * Postive: assertFalsy(null)
+         */
         assertFalsy : function(condition, assertMessage) {
             if (condition) {
                 if(assertMessage){
@@ -334,10 +399,25 @@ var Test = function(){
             }
         },
 
+         /**
+         * Assert that if(condition) check evaluates to true. 
+         * @param {Object} condition
+         * @param {String} assertMessage
+         * @example 
+         * Positive: assert("helloWorld") 
+         * Negative: assert(null)
+         */
         assert : function(condition, assertMessage) {
             aura.test.assertTruthy(condition, assertMessage);
         },
-
+        
+        
+		/**
+		 * Assert that the two values provided are equal
+		 * @param {Object} arg1
+		 * @param {Object} arg2
+		 * @param {String} assertMessage
+		 */
         assertEquals : function(arg1, arg2, assertMessage){
             if(arg1!==arg2){
                 if(!assertMessage){
@@ -350,36 +430,71 @@ var Test = function(){
                  throw new Error(assertMessage);
             }
         },
+        
+        /**
+         * Assert that the condition === true
+         * @param {boolean} condition
+         * @param {String} assertMessage
+         */
         assertTrue : function(condition, assertMessage){
                if(!assertMessage){
                    assertMessage = "Expected: {True}, but Actual: {False} ";
                }
             aura.test.assertEquals(true,condition,assertMessage);
         },
+        
+        /**
+         * Assert that the condition === false
+         * @param {boolean} condition
+         * @param {String} assertMessage
+         */
         assertFalse :function(condition, assertMessage){
                if(!assertMessage){
                    assertMessage = "Expected: {False}, but Actual: {True} ";
                }
                aura.test.assertEquals(false,condition,assertMessage);
         },
+        
+         /**
+         * Assert that the value passed in is either undefined or null
+         * @param {Object} arg1
+         * @param {String} assertMessage
+         */
         assertUndefinedOrNull : function(arg1, assertMessage){
             if(!assertMessage){
                 assertMessage = "Assertion failure, Expected: {Undefined or Null}, but Actual: {"+arg1+"} ";
             }
                aura.test.assertTrue($A.util.isUndefinedOrNull(arg1),assertMessage);
         },
+        
+         /**
+         * Assert that value === null
+         * @param {Object} arg1
+         * @param {String} assertMessage
+         */
         assertNull : function(arg1, assertMessage){
             if(!assertMessage){
                 assertMessage = "Assertion failure, Expected: {Null}, but Actual: {"+arg1+"} ";
             }
                aura.test.assertTrue(arg1===null,assertMessage);
         },
+        
+        /**
+         * Assert that value !== null
+         * @param {Object} arg1
+         * @param {String} assertMessage
+         */
         assertNotNull : function(arg1, assertMessage){
             if(!assertMessage){
                 assertMessage = "Assertion failure, Expected: {Non Null}, but Actual:{"+arg1+"}";
             }
             aura.test.assertTrue(arg1!==null,assertMessage);
         },
+        
+        /**
+         * Throws an Error, making a js test fail with the message specifid
+         * @param {String} assertMessage
+         */
         fail : function(assertMessage){
             if(assertMessage){
                 throw new Error(assertMessage);
@@ -447,7 +562,8 @@ var Test = function(){
         },
 
         /** 
-         * In IE returns \r\n for newline
+         * Returns text content of the Dom element. Tries "innerText" followed by "textContext" to take browser differens into account.
+         * @param {DOMElement} node 
          */
         getText : function(node) {
             var t = node.innerText;
@@ -459,6 +575,7 @@ var Test = function(){
         
         /**
          * Given a component, this function return the textContent of all elements rendered by this component.
+         * @param {Component} component
          */
         getTextByComponent : function(component){
             var ret = "";
@@ -481,6 +598,12 @@ var Test = function(){
             return ret;
         },
 
+        /**
+         * Get value for the specified style for the element provided
+         * 
+         * @param {DOMElement} elem
+         * @param {String} Style 
+         */
         getStyle : function(elem, style){
             var val = "";
             if(document.defaultView && document.defaultView.getComputedStyle){
@@ -495,6 +618,10 @@ var Test = function(){
             return val;
         },
 
+        /**
+         * Filters out comment nodes from a list nodes provided
+         * @param {Array|Object} nodes
+         */
         getNonCommentNodes : function(nodes){
             var ret = [];
             if($A.util.isObject(nodes)){

@@ -38,6 +38,8 @@
 </aura:component>]]>
 </auradocs:codeblock>
 
+ <p>If you are reusing a provider  from another component and you already have an auto-wired provider in your component bundle, the methods in your auto-wired provider  will not be accessible unless you explicitly declare it. Otherwise, only providers in bundles that the component extends will be accessible.
+     </p>
     <p>To add an external provider not within your component bundle, append the provider  in a comma-separated list: <code>provider="js://auradocs.sampleComponent, js://auradocs.anotherComponent"</code>.
       We recommend that you use a provider within the component bundle for maintainability and use an external provider only if you must.</p>
 

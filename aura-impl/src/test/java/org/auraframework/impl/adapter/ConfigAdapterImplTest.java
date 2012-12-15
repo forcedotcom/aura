@@ -15,7 +15,8 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
 import java.util.TimeZone;
@@ -24,6 +25,7 @@ import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.test.UnitTestCase;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.mockito.Mockito;
 
 /**
  * Tests for ConfigAdapterImpl.
@@ -36,38 +38,8 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     // An exception thrown to test error handling.
     public static class MockException extends RuntimeException {
         public MockException(String string) {
-            // TODO Auto-generated constructor stub
         }
     };
-
-    // An AuraJavascriptGroup that fails compilation, and also that exists
-    // when we're running from jars (when the normal AuraImplFiles don't
-    // exist, so the normal group throws an IOException).
-    public static class MockAuraJavascriptGroup extends AuraJavascriptGroup {
-        private int count = 0;
-        private File tempDir;
-
-        public MockAuraJavascriptGroup(File tempDir) throws IOException {
-            super(tempDir);
-            this.tempDir = tempDir;
-            count = 0;
-        }
-        
-        @Override
-        public boolean isStale() {
-            count++;
-            return (count % 2 == 1);  // stale first and third times only
-        }
-
-        @Override
-        public void regenerate(File dir) throws IOException {
-            if (count < 3) {
-              // "compile errors" the first and second time.
-              throw new MockException("Pretend we had a compile error in regeneration");
-            }
-            super.regenerate(tempDir);
-        };
-    }
 
     /**
      * Make sure that version file is available in aura package.
@@ -111,57 +83,46 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         impl.regenerateAuraJS();
                
         // But an error case should fail, and not be swallowed.
-        final File tmpDir = File.createTempFile("ConfigAdapterImplTest", "tmp");
-        File aura = null;
-        File auraJs = null;
+        final AuraJavascriptGroup mockJsGroup = Mockito.mock(AuraJavascriptGroup.class);
+        
+        impl = new ConfigAdapterImpl() {
+            @Override
+            public AuraJavascriptGroup newAuraJavascriptGroup() throws IOException {
+                return mockJsGroup;
+            }
+            @Override
+            public boolean isProduction() {
+                return false;
+            }
+        };
         try {
-            aura = new File(tmpDir, "aura");
-            auraJs = new File(aura, "Aura.js");
-            tmpDir.delete();
-            aura.mkdirs();
-            auraJs.createNewFile();
-            
-            impl = new ConfigAdapterImpl() {
-                @Override
-                public AuraJavascriptGroup newAuraJavascriptGroup() throws IOException {
-                    return new MockAuraJavascriptGroup(tmpDir);
-                }
-                @Override
-                public boolean isProduction() {
-                    return false;
-                }
-            };
-            try {
-                impl.regenerateAuraJS();
-                fail("Compilation failure should have been caught!");
-            } catch (AuraRuntimeException e) {
-                assertTrue("expected ARTE caused by MockException, not " + e.getCause().toString(),
-                        e.getCause() instanceof MockException);
-            }
-            // Try again, without changes; it should still fail.
-            try {
-                impl.regenerateAuraJS();
-                fail("Second compilation failure should have been caught!");                
-            } catch (AuraRuntimeException e2) {
-                assertTrue("expected ARTE caused by MockException, not " + e2.getCause().toString(),
-                        e2.getCause() instanceof MockException);
-            }
-            // Third time's the charm, we stop pretending there are errors and it should work.  Unless
-            // we're in a resources-only environment, in which case the copying done after our
-            // jsGroup.regenerate() can't work, even though the mock jsGroup.regenerate() will..  
-            if (!AuraImplFiles.AuraResourceJavascriptDirectory.asFile().exists()) {
-                impl.regenerateAuraJS();
-            }
-        } finally {
-            if (auraJs.exists()) {
-                auraJs.delete();
-            }
-            if (aura.exists()) {
-                aura.delete();
-            }
-            if (tmpDir.exists()) {
-                tmpDir.delete();
-            }
+            Mockito.when(mockJsGroup.isStale()).thenReturn(true);
+            Mockito.doThrow(new MockException("Pretend we had a compile error in regeneration")).when(mockJsGroup)
+                    .regenerate(AuraImplFiles.AuraResourceJavascriptDirectory.asFile());
+            impl.regenerateAuraJS();
+            fail("Compilation failure should have been caught!");
+        } catch (AuraRuntimeException e) {
+            assertTrue("expected ARTE caused by MockException, not " + e.getCause().toString(),
+                    e.getCause() instanceof MockException);
+        }
+        
+        // Try again, without changes; it should still fail.
+        try {
+            Mockito.when(mockJsGroup.isStale()).thenReturn(false);
+            impl.regenerateAuraJS();
+            fail("Second compilation failure should have been caught!");                
+        } catch (AuraRuntimeException e2) {
+            assertTrue("expected ARTE caused by MockException, not " + e2.getCause().toString(),
+                    e2.getCause() instanceof MockException);
+        }
+        
+        // Third time's the charm, we stop pretending there are errors and it should work.  Unless
+        // we're in a resources-only environment, in which case the copying done after our
+        // jsGroup.regenerate() can't work, even though the mock jsGroup.regenerate() will..  
+        if (!AuraImplFiles.AuraResourceJavascriptDirectory.asFile().exists()) {
+            Mockito.reset(mockJsGroup);
+            Mockito.when(mockJsGroup.isStale()).thenReturn(true);
+            impl.regenerateAuraJS();
         }
     }
 }

@@ -60,7 +60,6 @@
     <p>After accessing the value object, you can append it to another component. For example, you may want retrieve the body of a component and append it to another component.
     This can be done by adding the new item to the component using <code>component.push()</code>. The following code shows how to append a component to another component's body:</p>
     <auradocs:codeblock>
-
     var body = cmp.getValue("v.body");
     body.push(cmpToAppend);
     </auradocs:codeblock>

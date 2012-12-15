@@ -33,9 +33,9 @@
     Individual test cases can share code by putting them in a shared function in the format <code>this.sharedMethod()</code>.
     The functions <code>setUp</code> and <code>tearDown</code> are optional and let you quickly set up and remove objects.
     They are called before and after a test method is run.
-    Aura's unit testing framework may be viewed <a href="https://github.com/forcedotcom/aura-beta/blob/master/aura-impl/javascript/src/aura.test/Test.js" target="_blank">here</a>.
     </p>
 
+    <auradocs:info> Aura's unit testing framework can be viewed on <a href="https://github.com/forcedotcom/lumen-beta/blob/master/aura-impl/src/main/resources/aura/test/Test.js" target="_blank">github</a>. Make sure you have access to the Aura repo.</auradocs:info>
     <p>You may want to use <auradocs:topicLink topic="testAssert">assertions</auradocs:topicLink>, <auradocs:topicLink topic="testsUser">user interactions</auradocs:topicLink>, and <auradocs:topicLink topic="testsUtility">utility functions</auradocs:topicLink> available to you for unit testing.</p>
 
 

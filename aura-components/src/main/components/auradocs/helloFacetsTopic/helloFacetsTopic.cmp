@@ -67,7 +67,13 @@
 </ui:panel>
 ]]></auradocs:codeblock>
 
-    <p>For more information on <code>&lt;aura:set&gt;</code>, see <auradocs:topicLink topic="tagAuraSet">aura:set</auradocs:topicLink>.</p>
+    <p>See <auradocs:topicLink topic="tagAuraSet">aura:set</auradocs:topicLink> for more information on  setting attributes.</p>
+
+    <h3>Accessing  the Component Body</h3>
+
+    <p>To access a component body, use <code>component.getValue("v.body")</code>, where <code>v.body</code> resolves to a value object.
+    See <auradocs:topicLink topic="valueObjects">Value Objects</auradocs:topicLink> for more information.
+    </p>
 
     <h2>Facets</h2>
 

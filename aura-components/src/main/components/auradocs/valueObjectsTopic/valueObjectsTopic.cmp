@@ -56,6 +56,16 @@
     <p>The controller retrieves the <code>errorMsg</code> attribute and sets an empty string in the component body denoted by<code><aura:text value="{!"/>v.errorMsg}</code>.
     Similarly, <code>find("status").getAttributes().setValue("value", "Cleared error")</code> finds the component with an ID of <code>status</code> and sets its value with the string <code>"Cleared error"</code>.</p>
 
+    <h3>Appending the Value Object</h3>
+    <p>After accessing the value object, you can append it to another component. For example, you may want retrieve the body of a component and append it to another component.
+    This can be done by adding the new item to the component using <code>component.push()</code>. The following code shows how to append a component to another component's body:</p>
+    <auradocs:codeblock>
+
+    var body = cmp.getValue("v.body");
+    body.push(cmpToAppend);
+    </auradocs:codeblock>
+    <p><code>cmpToAppend</code> can be a component from another body, a facet,  or created dynamically.
+    Note that you don't have to set the value after adding the item.</p>
     <h2>Introspection Methods</h2>
 
     <p>These methods give you information about the underlying data in a value object.</p>

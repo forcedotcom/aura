@@ -45,7 +45,7 @@ public class ComponentTreeTest extends WebDriverTestCase {
      * @throws Exception
      */
     public void testServerVSClientShape() throws Exception {
-        checkServerVsClient("auratest:testApplication1.app", ApplicationDef.class);
+        checkServerVsClient("auratest:testApplication1", ApplicationDef.class);
     }
 
     /**
@@ -54,7 +54,7 @@ public class ComponentTreeTest extends WebDriverTestCase {
      * @throws Exception
      */
     public void testForeachBasicTypes() throws Exception {
-        checkServerVsClient("foreachDefTest:basicDataType.cmp", ComponentDef.class);
+        checkServerVsClient("foreachDefTest:basicDataType", ComponentDef.class);
     }
 
     /**

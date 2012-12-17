@@ -57,7 +57,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     @SuppressWarnings("unchecked")
     public void testGetContextHasPreloads() throws Exception {
         String modeAndContext = "{'mode':'DEV','preloads':['preloadTest']}";
-        String url = "/aura?aura.tag=test%3Atext.cmp&aura.context=" + AuraTextUtil.urlencode(modeAndContext)
+        String url = "/aura?aura.tag=test%3Atext&aura.context=" + AuraTextUtil.urlencode(modeAndContext)
                 + "&aura.lastmod=" + getLastMod(Mode.DEV, "preloadTest");
         GetMethod get = obtainGetMethod(url);
         int statusCode = getHttpClient().executeMethod(get);

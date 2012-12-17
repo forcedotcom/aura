@@ -88,7 +88,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
      * 3 = name = bar prefix = null
      */
     private static final Pattern TAG_PATTERN = Pattern
-            .compile("\\A(?:([\\w\\*]+)://)?([\\w\\*]+)(?:\\:([\\w$\\:\\*]+))?");
+            .compile("(?:([\\w\\*]+)://)?(?:([\\w\\*]+):)?([\\w\\$\\*]+)");
 
     /**
      * Pattern for class descriptors: java://foo.bar.baz Group 0 = QName = java://foo.bar.baz Group 1 = prefix = java
@@ -190,7 +190,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
                 case DOCUMENTATION:
                 case LAYOUTS:
                     Matcher tagMatcher = TAG_PATTERN.matcher(qualifiedName);
-                    if (tagMatcher.find()) {
+                    if (tagMatcher.matches()) {
                         prefix = tagMatcher.group(1);
                         if(prefix == null){
                             prefix = MARKUP_PREFIX;

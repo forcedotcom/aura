@@ -274,7 +274,7 @@ public class FileSourceLoader extends BaseSourceLoader {
             }
             DefDescriptor<?> dd = DefDescriptorImpl.getInstance(getQName(dt, this.namespace, file.getName()),
                                                                 dt.getPrimaryInterface());
-            if (dm.matchPrefix(dd.getPrefix()) && dm.matchName(dd.getName())) {
+            if (dm.matchDescriptor(dd)) {
                 this.dset.add(dd);
             }
             // We don't need to accept this, as we've already either included or excluded the

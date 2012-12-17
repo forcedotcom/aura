@@ -217,7 +217,7 @@ public class StringSourceLoader implements SourceLoader{
      * @param source
      *            the loaded definition to remove.
      */
-    public final void removeSource(StringSource source){
+    public final void removeSource(StringSource<?> source){
         removeSource(source.getDescriptor());
     }
 
@@ -227,7 +227,7 @@ public class StringSourceLoader implements SourceLoader{
         for (String namespace : namespaces.keySet()) {
             if (matcher.matchNamespace(namespace)) {
                 for (DefDescriptor<?> desc : namespaces.get(namespace).keySet()) {
-                    if (matcher.matchName(desc.getName()) && matcher.matchPrefix(desc.getPrefix())) {
+                    if (matcher.matchDescriptorNoNS(desc)) {
                         ret.add(desc);
                     }
                 }

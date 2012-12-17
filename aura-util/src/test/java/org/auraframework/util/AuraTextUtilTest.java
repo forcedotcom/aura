@@ -289,6 +289,39 @@ public class AuraTextUtilTest extends UnitTestCase {
         }
     }
 
+    private static final SplitMatch [] splitLimitTests = new SplitMatch [] {
+        new SplitMatch("a", ",", 1, new String [] { "a" }),
+        new SplitMatch("a,b", ",", 1, new String [] { "a,b" }),
+        new SplitMatch("axxxb", "xxx", 1, new String [] { "axxxb" }),
+        new SplitMatch("axxxb", "xxx", 2, new String [] { "a", "b" }),
+        new SplitMatch("axxxbxxxc", "xxx", 2, new String [] { "a", "bxxxc" }),
+        new SplitMatch("a,b,", ",", 2, new String [] { "a", "b," }),
+        new SplitMatch("a,b,", ",", 10, new String [] { "a", "b", "" }),
+    };
+
+    public void testSplitSimpleLimit() {
+        for (SplitMatch sm : splitLimitTests) {
+            sm.checkResult(AuraTextUtil.splitSimpleLimit(sm.input, sm.delimiter, sm.expectedSize));
+        }
+    }
+
+    private static final SplitMatch [] splitLimitTrimTests = new SplitMatch [] {
+        new SplitMatch("a   ", ",", 1, new String [] { "a" }),
+        new SplitMatch("a , b", ",", 1, new String [] { "a , b" }),
+        new SplitMatch("axxx b", "xxx", 1, new String [] { "axxx b" }),
+        new SplitMatch("axxx b", "xxx", 2, new String [] { "a", "b" }),
+        new SplitMatch("axxxbxxx c", "xxx", 2, new String [] { "a", "bxxx c" }),
+        new SplitMatch("a,b,   ", ",", 2, new String [] { "a", "b," }),
+        new SplitMatch("a,b,   ", ",", 10, new String [] { "a", "b", "" }),
+    };
+
+    public void testSplitSimpleLimitTrim() {
+        for (SplitMatch sm : splitLimitTrimTests) {
+            sm.checkResult(AuraTextUtil.splitSimpleLimitAndTrim(sm.input, sm.delimiter, sm.expectedSize));
+        }
+    }
+
+
     private final static StringPair [] INIT_CAP_PAIRS = new StringPair [] {
         new StringPair(null, null),
         new StringPair("", ""),

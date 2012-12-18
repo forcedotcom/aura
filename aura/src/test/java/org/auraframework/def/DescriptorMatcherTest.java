@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.system;
+package org.auraframework.def;
 
 import java.io.IOException;
 

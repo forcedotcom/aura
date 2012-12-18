@@ -249,7 +249,7 @@ public class DefinitionServiceImpl implements DefinitionService {
     }
 
     @Override
-    public Set<DefDescriptor<?>> find(String matcher) {
+    public Set<DefDescriptor<?>> find(DescriptorMatcher matcher) {
         Aura.getContextService().assertEstablished();
 
         AuraContext context = Aura.getContextService().getCurrentContext();

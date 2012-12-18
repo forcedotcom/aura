@@ -19,9 +19,9 @@ import java.util.*;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorMatcher;
 
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.system.DescriptorMatcher;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -92,13 +92,12 @@ public final class SourceFactory {
         }
     }
 
-    public Set<DefDescriptor<?>> find(String matcher){
-        DescriptorMatcher dm = new DescriptorMatcher(matcher);
+    public Set<DefDescriptor<?>> find(DescriptorMatcher matcher){
         Set<DefDescriptor<?>> ret = new HashSet<DefDescriptor<?>>();
 
         for (Map.Entry<LoaderKey,SourceLoader> entry : this.loaders.entrySet()) {
-            if (dm.matchPrefix(entry.getKey().getPrefix()) && dm.matchNamespace(entry.getKey().getNamespace())) {
-                ret.addAll(entry.getValue().find(dm));
+            if (matcher.matchPrefix(entry.getKey().getPrefix()) && matcher.matchNamespace(entry.getKey().getNamespace())) {
+                ret.addAll(entry.getValue().find(matcher));
             }
         }
         return ret;

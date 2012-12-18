@@ -81,7 +81,7 @@ public final class RootDefFactory extends DefFactoryImpl<RootDefinition> impleme
     }
 
     @Override
-    public Set<DefDescriptor<?>> find(String matcher) {
+    public Set<DefDescriptor<?>> find(DescriptorMatcher matcher) {
         return sourceFactory.find(matcher);
     }
 

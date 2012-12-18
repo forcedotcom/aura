@@ -54,9 +54,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     @Override
-    public Set<DefDescriptor<?>> find(String matcher) {
-        DescriptorMatcher dm = new DescriptorMatcher(matcher);
-        Set<DefRegistry<?>> registries = this.delegateRegistries.getRegistries(dm);
+    public Set<DefDescriptor<?>> find(DescriptorMatcher matcher) {
+        Set<DefRegistry<?>> registries = this.delegateRegistries.getRegistries(matcher);
         Set<DefDescriptor<?>> matched = Sets.newHashSet();
 
         for (DefRegistry<?> reg : registries) {

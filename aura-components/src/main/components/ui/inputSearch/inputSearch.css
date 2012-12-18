@@ -1,0 +1,25 @@
+input.THIS {
+    padding-right: 30px;
+    line-height: normal;
+}
+
+.THIS::-webkit-search-cancel-button {
+   /* Remove default */
+    -webkit-appearance: none;
+}
+
+.THIS.clear {
+    background: transparent url(/auraFW/resources/aura/images/clear.png) no-repeat;
+    height: 15px;
+    width: 15px;
+    border: 0;
+    outline: 0;
+    position: relative;
+    top: 3px;
+    left: -27px;
+    -webkit-box-shadow: none;
+}
+
+.THIS.hide {
+    display: none;
+}

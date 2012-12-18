@@ -19,9 +19,10 @@
 <!-- attribute that indicates that search has been called atleast once. Its set via c.doSearch -->
 <aura:attribute name="searched" type="boolean" default="{!false}"/>
 <aura:attribute name="value" type="string" />
+<aura:attribute name="showClear" type="boolean" default="{!false}"/>
 
 <div id="search">
-<ui:inputSearch aura:id="searchCmp" search="{!c.doSearch}" value="{!v.value}"/>
+<ui:inputSearch aura:id="searchCmp" search="{!c.doSearch}" value="{!v.value}" showClear="{!v.showClear}"/>
 </div>
 
 </aura:component>

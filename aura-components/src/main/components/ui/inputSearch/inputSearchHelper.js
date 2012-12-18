@@ -28,8 +28,35 @@
         if (!this.isEventSupported("search") && event.type === "keyup" && event.keyCode === 13) {
             // fire Aura "search" event
             var e = component.getEvent("search");
+            e.setParams({
+                searchTerm: component.find("search").getElement().value
+            });
             e.fire();
         }
         this.handleUpdate(component, event);
+    },
+    
+    fireEvent: function(component, event) {
+        var e = component.getEvent(event.type);
+        if (event.type === "search") {
+            e.setParams({
+                searchTerm: component.find("search").getElement().value
+            });
+        }
+        e.fire();
+    },
+    
+    toggleClearButton: function(component) {
+        var clearButton = component.find("clearSearchTermButton");
+        if (clearButton) {
+            var clearButtonElem = clearButton.getElement();
+            var searchCmp = component.find("search");
+            var elem = searchCmp.getElement();
+            if ($A.util.isEmpty(elem.value)) {
+                $A.util.addClass(clearButtonElem, "hide");
+            } else {
+                $A.util.removeClass(clearButtonElem, "hide");
+            }
+        }
     }
 })

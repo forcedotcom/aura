@@ -17,17 +17,14 @@ package org.auraframework.impl;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
-import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
 import org.auraframework.service.ContextService;
@@ -87,12 +84,6 @@ public class ServerServiceImpl implements ServerService {
 
         DefDescriptor<T> defDescriptor = message.getDefDescriptor();
         T def = definitionService.getDefinition(defDescriptor);
-
-        if (defDescriptor.getDefType() == DefType.APPLICATION) {
-            ApplicationDef appDef = (ApplicationDef) def;
-            addPreloads(appDef.getPreloads(), context);
-        }
-
         return new Message<T>(null, null, def);
     }
 
@@ -121,12 +112,6 @@ public class ServerServiceImpl implements ServerService {
             }
         });
 
-    }
-
-    private static void addPreloads(Set<String> preloads, AuraContext context) {
-        for (String preload : preloads) {
-            context.addPreload(preload);
-        }
     }
 
     private static List<Action> run(List<Action> actions) {

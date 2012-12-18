@@ -208,14 +208,21 @@ public interface AuraContext {
      * @param preload
      */
     void addPreload(String preload);  
+
+    /**
+     * Clear the current set of preloads.
+     *
+     * This can be used to reset preloads in the case of error, preventing recurrance of
+     * any quick fix error.
+     */
+    void clearPreloads();
+
     /**
      * get the current set of preloads.
      *
      * By default, the aura and os namespaces are included.
      */
     Set<String> getPreloads();
-
-    Set<String> getPreviousPreloads();
 
     Format getFormat();
 

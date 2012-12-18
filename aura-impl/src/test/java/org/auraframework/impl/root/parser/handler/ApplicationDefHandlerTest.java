@@ -94,11 +94,12 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
                 Format.XML);
         try {
             ApplicationDef app = parser.parse(descriptor, source);
+            app.validateDefinition();
             app.validateReferences();
             fail("Should have thrown Exception. Wild characters cannot be specified for preload namespace");
         } catch (InvalidDefinitionException expected) {
             assertTrue("Unexpected message "+expected.getMessage(),
-                       expected.getMessage().equals("* is not a valid namespace"));
+                       expected.getMessage().equals("Illegal namespace in ?"));
         }
     }
 

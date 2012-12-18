@@ -58,7 +58,7 @@ public abstract class AuraTestCase extends UnitTestCase {
         AuraContext newContext = service.startContext(context.getMode(), context.getFormat(), context.getAccess(),
                                                        context.getApplicationDescriptor());
         newContext.setLastMod(context.getLastMod());
-        newContext.setPreloading(true);
+        newContext.clearPreloads();
         for(String preload: context.getPreloads()){
             newContext.addPreload(preload);
         }

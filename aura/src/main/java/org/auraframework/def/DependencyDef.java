@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.builder;
-
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.LayoutsDef;
+package org.auraframework.def;
 
 /**
+ * A dependency for a component/application.
  */
-public interface ApplicationDefBuilder extends BaseComponentDefBuilder<ApplicationDef>{
+public interface DependencyDef extends Definition {
+    @Override
+    DefDescriptor<DependencyDef> getDescriptor();
 
-    ApplicationDefBuilder setAccess(String access);
+    /**
+     * @return The dependency.
+     */
+    DescriptorFilter getDependency();
 
-    ApplicationDefBuilder setLayouts(LayoutsDef layouts);
-
-    ApplicationDefBuilder setSecurityProviderDescriptor(String securityProvider);
-
+    DefDescriptor<? extends RootDefinition> getParentDescriptor();
 }

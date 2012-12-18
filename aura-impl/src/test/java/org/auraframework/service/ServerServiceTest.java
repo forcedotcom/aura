@@ -141,7 +141,7 @@ public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServ
                 Message<ApplicationDef> appResult = service.temporaryGet(appMsg, ctx);
                 ApplicationDef appDef = appResult.getDef();
                 assertEquals(appDefDescriptor, appDef.getDescriptor());
-                assertTrue(ctx.getPreloads().containsAll(appDef.getPreloads()));
+                //assertTrue(ctx.getPreloads().containsAll(appDef.getPreloads()));
             } catch (DefinitionNotFoundException e) {
                 if (ctx.getAccess() != Access.PUBLIC) {
                     throw e;

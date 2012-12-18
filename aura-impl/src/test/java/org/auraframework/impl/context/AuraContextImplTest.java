@@ -67,7 +67,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      */
     public void testPreloadConfigurationMethods()throws Exception{
         AuraContext lc = Aura.getContextService().getCurrentContext();
-        lc.setPreloading(true);
+        lc.clearPreloads();
         Set<String> preloadNamespace = lc.getPreloads();
         assertTrue("Preload namespace configuration could not be reset", preloadNamespace.size()==0);
         lc.addPreload("auratest");
@@ -83,8 +83,8 @@ public class AuraContextImplTest extends AuraImplTestCase {
     public void testComponentDefSerializedFormat() throws Exception{
         ApplicationDef cDef = Aura.getDefinitionService().getDefinition("preloadTest:test_Preload_Cmp_SameNameSpace", 
                 ApplicationDef.class);
-        Set<String> preloadNamespace = cDef.getPreloads();
-        assertTrue(preloadNamespace.contains("preloadTest"));
+        //Set<String> preloadNamespace = cDef.getPreloads();
+        //assertTrue(preloadNamespace.contains("preloadTest"));
         AuraContext lc = Aura.getContextService().getCurrentContext();
         lc.addPreload("preloadTest");
         assertEquals("{\"descriptor\":\"markup://preloadTest:test_Preload_Cmp_SameNameSpace\"}",Json.serialize(cDef));
@@ -98,7 +98,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      */
     public void testClearPreloadsBySetPreloadingToTrue() throws Exception{
         AuraContext lc = Aura.getContextService().getCurrentContext();
-        lc.setPreloading(true);
+        lc.clearPreloads();
         Set<String> preloadNamespace = lc.getPreloads();
         assertEquals("Setting preloading to true should clear the context of all preload namespaces.",
                 0, preloadNamespace.size());
@@ -122,8 +122,9 @@ public class AuraContextImplTest extends AuraImplTestCase {
         assertTrue("aura namespace not specified as standard preload namespace",preloadNamespace.contains("aura"));
 
         lc.setPreloading(true);
-        assertEquals("Setting preloading to true should clear the context of all preload namespaces.",
-                0, lc.getPreloads().size());
+        assertTrue(preloadNamespace.size()>=2);
+        assertTrue("UI namespace not specified as standard preload namespace",preloadNamespace.contains("ui"));
+        assertTrue("aura namespace not specified as standard preload namespace",preloadNamespace.contains("aura"));
 
         lc.setPreloading(false);
         preloadNamespace = lc.getPreloads();

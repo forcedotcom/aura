@@ -292,7 +292,7 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
     }
 
     @Override
-    public Set<DefDescriptor<?>> find(DescriptorMatcher matcher) throws QuickFixException {
+    public Set<DefDescriptor<?>> find(DescriptorFilter matcher) throws QuickFixException {
         // TODO Auto-generated method stub
         return null;
     }

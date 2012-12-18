@@ -70,6 +70,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
     private final RenderType render;
     private final WhitespaceBehavior whitespaceBehavior; 
 
+    private final List<DependencyDef> dependencies;
+
     private final int hashCode;
 
     private transient Boolean localDeps = null;
@@ -100,6 +102,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
         this.isExtensible = builder.isExtensible;
         this.testSuiteDefDescriptor = builder.testSuiteDefDescriptor;
         this.facets = AuraUtil.immutableList(builder.facets);
+        this.dependencies = AuraUtil.immutableList(builder.dependencies);
 
         String renderName = builder.render;
         if(renderName == null){
@@ -124,6 +127,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
 
+        for (DependencyDef def : dependencies) {
+            def.validateDefinition();
+        }
         for (AttributeDef att : this.attributeDefs.values()) {
             att.validateDefinition();
             if (events.containsKey(att.getName())) {
@@ -216,6 +222,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
     @Override
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
+        for (DependencyDef def : dependencies) {
+            def.validateReferences();
+        }
         for (AttributeDef att : this.attributeDefs.values()) {
             att.validateReferences();
         }
@@ -319,6 +328,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
                 desc.getDef().retrieveLabels();
             }
         }
+    }
+
+    @Override
+    public List<DependencyDef> getDependencies() {
+        return this.dependencies;
     }
 
     /**
@@ -776,6 +790,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
         public Set<PropertyReference> expressionRefs;
         public String render;
         public WhitespaceBehavior whitespaceBehavior;
+        private List<DependencyDef> dependencies;
 
         @Override
         public Builder<T> setFacet(String key, Object value){
@@ -871,6 +886,14 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
         @Override
         public Builder<T> setTemplate(String templateName) {
             this.templateDefDescriptor = Aura.getDefinitionService().getDefDescriptor(templateName, ComponentDef.class);
+            return this;
+        }
+
+        public Builder<T> addDependency(DependencyDef dependency) {
+            if (this.dependencies == null) {
+                this.dependencies = Lists.newArrayList();
+            }
+            this.dependencies.add(dependency);
             return this;
         }
 

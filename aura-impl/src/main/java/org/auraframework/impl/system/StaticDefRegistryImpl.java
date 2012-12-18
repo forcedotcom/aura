@@ -77,7 +77,7 @@ public class StaticDefRegistryImpl<T extends Definition> extends DefRegistryImpl
     }
 
     @Override
-    public Set<DefDescriptor<?>> find(DescriptorMatcher matcher) {
+    public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         Set<DefDescriptor<?>> ret = new HashSet<DefDescriptor<?>>();
 
         for(DefDescriptor<T> key : defs.keySet()){

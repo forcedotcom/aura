@@ -33,6 +33,7 @@ import org.auraframework.Aura;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.RequestParam.StringParam;
@@ -252,19 +253,9 @@ public abstract class AuraBaseServlet extends HttpServlet {
             // that this is still a bit dangerous, as we seem to have a lot
             // of magic in the serializer.
             //
-
-            //
-            // BOGUS!!! setPreloading has some bizarre side effects, this forces the preloads
-            // to be truly empty while telling everyone that we are not preloading. I'm guessing
-            // that there should be a push/pop preloading instead of overloading set.
-            //
-            // EVEN MORE BOGUS!!! Some exceptions are rather not like others, and expect preloads
-            // This only applies to QuickFixes.
-            //
             if (!(mappedEx instanceof QuickFixException)) {
                 context.setPreloading(true);
-                context.setPreloading(true);
-                context.setPreloading(false);
+                context.clearPreloads();
                 //
                 // Don't serialize preloads.
                 //

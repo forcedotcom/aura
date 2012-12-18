@@ -19,7 +19,7 @@ import java.util.*;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorMatcher;
+import org.auraframework.def.DescriptorFilter;
 
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.Source;
@@ -92,7 +92,7 @@ public final class SourceFactory {
         }
     }
 
-    public Set<DefDescriptor<?>> find(DescriptorMatcher matcher){
+    public Set<DefDescriptor<?>> find(DescriptorFilter matcher){
         Set<DefDescriptor<?>> ret = new HashSet<DefDescriptor<?>>();
 
         for (Map.Entry<LoaderKey,SourceLoader> entry : this.loaders.entrySet()) {

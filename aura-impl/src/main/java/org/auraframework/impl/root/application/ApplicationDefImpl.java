@@ -18,7 +18,6 @@ package org.auraframework.impl.root.application;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ApplicationDefBuilder;
@@ -29,14 +28,12 @@ import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.SecurityProviderDef;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 /**
  * The definition of an Application. Holds all information about a given type of application. ApplicationDefs are immutable
@@ -47,10 +44,8 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     private static final long serialVersionUID = 9044177107921912717L;
 
     public static final DefDescriptor<ApplicationDef> PROTOTYPE_APPLICATION = DefDescriptorImpl.getInstance("markup://aura:application", ApplicationDef.class);
-    private static final Pattern namespacePattern = Pattern.compile("^\\w*$");
 
     private final DefDescriptor<EventDef> locationChangeEventDescriptor;
-    private final Set<String> preloads;
     private final DefDescriptor<LayoutsDef> layoutsDefDescriptor;
     private final Access access;
     private final DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
@@ -64,7 +59,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         this.locationChangeEventDescriptor = builder.locationChangeEventDescriptor;
 
         this.layoutsDefDescriptor = builder.layoutsDefDescriptor;
-        this.preloads = AuraUtil.immutableSet(builder.preloads);
         String accessName = builder.access;
         if(accessName == null){
             this.access = Access.AUTHENTICATED;
@@ -80,7 +74,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
         public DefDescriptor<EventDef> locationChangeEventDescriptor;
         public DefDescriptor<LayoutsDef> layoutsDefDescriptor;
-        public Set<String> preloads;
         public String access;
         public Boolean isAppcacheEnabled;
         public Boolean isOnePageApp;
@@ -94,15 +87,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         @Override
         public ApplicationDefImpl build() {
             return new ApplicationDefImpl(this);
-        }
-
-        @Override
-        public Builder addPreload(String preload) {
-            if(preloads == null){
-                preloads = Sets.newHashSet();
-            }
-            preloads.add(preload);
-            return this;
         }
 
         @Override
@@ -170,11 +154,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     }
 
     @Override
-    public Set<String> getPreloads() {
-        return preloads;
-    }
-
-    @Override
     public void retrieveLabels() throws QuickFixException {
         super.retrieveLabels();
 
@@ -202,10 +181,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
     @Override
     public Boolean isAppcacheEnabled() throws QuickFixException{
-        // Don't use appcache if preloads are not set
-        if(this.getPreloads() == null || this.getPreloads().isEmpty()){
-            return false;
-        }
         if(this.isAppcacheEnabled == null){
             return getSuperDef().isAppcacheEnabled();
         }
@@ -227,25 +202,12 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             throw new InvalidDefinitionException(String.format("%s must extend aura:locationChange", locationChangeDef.getDescriptor()), getLocation());
         }
 
-        for(String preload : getPreloads()){
-            if(!isValidNamespace(preload)){
-                throw new InvalidDefinitionException(String.format("%s is not a valid namespace", preload), getLocation());
-            }
-
-            /*if(!reg.namespaceExists(preload)){
-            }*/
-        }
-
         DefDescriptor<SecurityProviderDef> securityProviderDesc = getSecurityProviderDefDescriptor();
         if(securityProviderDesc == null){
             throw new InvalidDefinitionException(String.format("Security provider is required on application %s", getName()), getLocation());
         }
         //Will throw quickfix exception if not found.
         securityProviderDesc.getDef();
-    }
-
-    private static boolean isValidNamespace(String ns){
-        return namespacePattern.matcher(ns).find();
     }
 
     @Override

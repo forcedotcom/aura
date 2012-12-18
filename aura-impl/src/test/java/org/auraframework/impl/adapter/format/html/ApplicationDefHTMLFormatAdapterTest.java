@@ -47,7 +47,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         AuraContext context = Aura.getContextService().getCurrentContext();
         String oldConfig = System.setProperty(AuraServlet.DISABLE_APPCACHE_PROPERTY, "true");
         try {
-            context.setPreloading(true); // clears out current preloads
+            context.clearPreloads();
             context.addPreload("aura");
             DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(
                     ApplicationDef.class, "<aura:application useAppcache='true' render='client'></aura:application>");
@@ -72,7 +72,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
      */
     public void testWriteManifestWithoutPreloads() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        context.setPreloading(true); // clears out current preloads
+        context.clearPreloads();
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(
                 ApplicationDef.class, "<aura:application useAppcache='true' render='client'></aura:application>");
         context.setApplicationDescriptor(desc);
@@ -89,7 +89,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
      */
     public void testWriteManifestWithUseAppCacheFalse() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        context.setPreloading(true); // clears out current preloads
+        context.clearPreloads();
         context.addPreload("aura");
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(
                 ApplicationDef.class, "<aura:application render='client' useAppcache='false'></aura:application>");
@@ -107,7 +107,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
      */
     public void testWriteManifestWithUseAppCacheInherited() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        context.setPreloading(true); // clears out current preloads
+        context.clearPreloads();
         context.addPreload("aura");
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(
                 ApplicationDef.class, "<aura:application render='client'></aura:application>");
@@ -125,7 +125,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
      */
     public void testWriteManifestWithPreloads() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        context.setPreloading(true); // clears out current preloads
+        context.clearPreloads();
         context.addPreload("aura");
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(
                 ApplicationDef.class,

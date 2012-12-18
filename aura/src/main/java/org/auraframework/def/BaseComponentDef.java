@@ -32,6 +32,19 @@ public interface BaseComponentDef extends RootDefinition {
     boolean isAbstract();
 
     /**
+     * Get the set of dependencies declared on this component.
+     *
+     * These dependencies must be loaded for the component to be functional, either
+     * at the initial load time or before rendering. These dependencies are in the
+     * form of DescriptorFilters which can then be used to match the actual descriptors.
+     *
+     * @return the list of declared dependencies for the component.
+     */
+    List<DependencyDef> getDependencies();
+
+    /**
+     * Get the event handlers for the component.
+     *
      * @return all the handlers on this component, including those inherited
      * @throws QuickFixException
      */

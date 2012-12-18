@@ -22,5 +22,7 @@
          implements="aura:rootComponent"
          support="GA"
                 description="The root of the component hierarchy.">
+    <!-- we need to include all of the aura events, because many don't have direct references -->
+    <aura:dependency resource="aura" type="EVENT" />
     <aura:attribute name="body" type="Aura.Component[]" description="The body of the component.  In markup, this is everything in the body of the tag."/>
 </aura:component>

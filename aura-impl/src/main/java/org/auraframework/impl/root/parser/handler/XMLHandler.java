@@ -51,7 +51,8 @@ public abstract class XMLHandler<T extends Definition> {
             LayoutsDefHandler.TAG,
             LayoutItemDefHandler.TAG,
             RegisterEventHandler.TAG,
-            AttributeDefRefHandler.TAG
+            AttributeDefRefHandler.TAG,
+            DependencyDefHandler.TAG
     );
 
     protected final XMLStreamReader xmlReader;

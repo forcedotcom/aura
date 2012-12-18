@@ -292,4 +292,10 @@ public final class TestComponent implements ComponentDef{
         return false;
     }
 
+    @Override
+    public List<DependencyDef> getDependencies() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

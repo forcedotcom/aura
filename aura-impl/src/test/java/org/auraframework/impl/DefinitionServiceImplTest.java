@@ -131,7 +131,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             Aura.getDefinitionService().getNamespaceLastMod(Sets.newHashSet("foo"));
             fail("Should not be able to specify non existing namespace");
         }catch(AuraRuntimeException e){
-            assertEquals("Loader not found for markup://foo", e.getMessage());
+            assertEquals("No definitions found by *://foo:*[APPLICATION, COMPONENT]", e.getMessage());
          }
         //4. Just a wild character
 
@@ -185,34 +185,34 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
 
         // Test wildcards
         assertEquals("find() fails with wildcard as prefix", 1,
-                     definitionService.find(new DescriptorMatcher("*://" + houseboat.getDescriptorName())).size());
+                     definitionService.find(new DescriptorFilter("*://" + houseboat.getDescriptorName())).size());
         assertEquals("find() fails with wildcard as namespace", 1,
-                     definitionService.find(new DescriptorMatcher("markup://*:" + houseboat.getName())).size());
+                     definitionService.find(new DescriptorFilter("markup://*:" + houseboat.getName())).size());
         assertEquals("find() fails with wildcard as name", 1,
-                     definitionService.find(new DescriptorMatcher(houseboat.getQualifiedName())).size());
+                     definitionService.find(new DescriptorFilter(houseboat.getQualifiedName())).size());
         assertEquals("find() fails with wildcard at end of name", 2,
-                     definitionService.find(new DescriptorMatcher(String.format("markup://string:house%s*", nonce))).size());
+                     definitionService.find(new DescriptorFilter(String.format("markup://string:house%s*", nonce))).size());
         assertEquals("find() fails with wildcard at beginning of name", 2,
-                     definitionService.find(new DescriptorMatcher(String.format("markup://string:*%sparty*", nonce))).size());
+                     definitionService.find(new DescriptorFilter(String.format("markup://string:*%sparty*", nonce))).size());
         assertEquals("find() should not find nonexistent name with preceeding wildcard", 0,
-                     definitionService.find(new DescriptorMatcher("markup://string:*notherecaptain")).size());
+                     definitionService.find(new DescriptorFilter("markup://string:*notherecaptain")).size());
 
         // Look in NonCachingDefRegistry
         assertEquals("find() should find a single component", 1,
-                     definitionService.find(new DescriptorMatcher("markup://ui:outputNumber")).size());
+                     definitionService.find(new DescriptorFilter("markup://ui:outputNumber")).size());
         assertEquals("find() fails with wildcard as prefix", 3,
-                     definitionService.find(new DescriptorMatcher("*://ui:outputNumber")).size());
+                     definitionService.find(new DescriptorFilter("*://ui:outputNumber")).size());
         assertEquals("find() is finding non-existent items", 0,
-                     definitionService.find(new DescriptorMatcher("markup://ui:doesntexist")).size());
+                     definitionService.find(new DescriptorFilter("markup://ui:doesntexist")).size());
 
         // Look in AuraStaticTypeDefRegistry (StaticDefRegistry)
         assertEquals("find() fails looking in StaticDefRegistry", 1,
-                     definitionService.find(new DescriptorMatcher("aura://*:String")).size());
+                     definitionService.find(new DescriptorFilter("aura://*:String")).size());
         // Look in AuraStaticControllerDefRegistry (StaticDefRegistry)
         assertEquals("find() fails looking in StaticDefRegistry", 1,
-                     definitionService.find(new DescriptorMatcher("aura://*:ComponentController")).size());
+                     definitionService.find(new DescriptorFilter("aura://*:ComponentController")).size());
         assertEquals("find() is finding non-existent items", 0,
-                     definitionService.find(new DescriptorMatcher("aura://*:doesntexist")).size());
+                     definitionService.find(new DescriptorFilter("aura://*:doesntexist")).size());
 
         // Find css
         // This always returns 0 results - W-1426841

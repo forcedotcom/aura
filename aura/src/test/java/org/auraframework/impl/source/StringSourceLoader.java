@@ -30,7 +30,7 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorMatcher;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
@@ -222,7 +222,7 @@ public class StringSourceLoader implements SourceLoader{
     }
 
     @Override
-    public synchronized Set<DefDescriptor<?>> find(DescriptorMatcher matcher) {
+    public synchronized Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         Set<DefDescriptor<?>> ret = Sets.newHashSet();
         for (String namespace : namespaces.keySet()) {
             if (matcher.matchNamespace(namespace)) {

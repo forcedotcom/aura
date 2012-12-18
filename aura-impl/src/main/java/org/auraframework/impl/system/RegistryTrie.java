@@ -77,7 +77,7 @@ public class RegistryTrie {
      * Note that this ignores the type of the registry, and uses only the prefix and
      * namespace. 
      */
-    public Set<DefRegistry<?>> getRegistries(DescriptorMatcher matcher) {
+    public Set<DefRegistry<?>> getRegistries(DescriptorFilter matcher) {
         Set<DefRegistry<?>> matched = Sets.newHashSet();
 
         for (DefRegistry<?> reg : this.allRegistries) {

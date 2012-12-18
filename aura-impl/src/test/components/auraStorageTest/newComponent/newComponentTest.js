@@ -179,7 +179,7 @@
 			a.setParams({
 				testName: cmp._testName
 			});
-			a.setStoreable();
+			a.setStorable();
 			a.runAfter(a);
 			$A.eventService.finishFiring();
 			cmp.test = this;

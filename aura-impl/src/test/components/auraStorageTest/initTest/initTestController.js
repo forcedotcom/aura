@@ -15,7 +15,7 @@
 				testName: (!_testName?"fetchCounterValue":_testName)
 		};
 		var additionalProperties = function(a){
-			a.setStoreable();
+			a.setStorable();
 		}
 		helper.executeAction(cmp, actionName, param, additionalProperties);
 	},
@@ -26,7 +26,7 @@
 				testName: (!_testName?"fetchCounterValue":_testName)
 		};
 		var additionalProperties = function(a){
-			a.setStoreable({"ignoreExisting":false,"refresh":5});
+			a.setStorable({"ignoreExisting":false,"refresh":5});
 		}
 		helper.executeAction(cmp, actionName, param, additionalProperties);
 	},

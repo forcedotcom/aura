@@ -33,8 +33,8 @@ exp(p,
     "setExclusive", p.setExclusive,
     "isExclusive", p.isExclusive,
     "setChained", p.setChained,
-    "setStoreable", p.setStoreable,
-    "isStoreable", p.isStoreable,
+    "setStorable", p.setStorable,
+    "isStorable", p.isStorable,
     "isFromStorage", p.isFromStorage,
     "toJSON", p.toJSON
     //#if {"excludeModes" : ["PRODUCTION"]}

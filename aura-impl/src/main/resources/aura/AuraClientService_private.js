@@ -362,7 +362,7 @@ var priv = {
         
             // For cacheable actions check the storage service to see if we already have a viable cached action response we can complete immediately
     		var storage = $A.storageService.getStorage();
-            if(action.isStoreable() && storage){
+            if(action.isStorable() && storage){
             	var key = action.getStorageKey();
             	
             	storage.get(key, this.createResultCallback(action, scope, actionGroup, callback, actionsToComplete, actionsToSend, actionCollected));

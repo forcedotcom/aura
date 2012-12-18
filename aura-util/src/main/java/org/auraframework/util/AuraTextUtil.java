@@ -273,6 +273,47 @@ public class AuraTextUtil {
         return result;
     }
 
+    public static List<String> splitSimpleLimit(String str, String delimiter, int limitSize) {
+        return splitSimpleLimit(str, delimiter, limitSize, false);
+    }
+
+    public static List<String> splitSimpleLimitAndTrim(String str, String delimiter, int limitSize) {
+        return splitSimpleLimit(str, delimiter, limitSize, true);
+    }
+
+    private static List<String> splitSimpleLimit(String str, String delimiter, int limitSize, boolean shouldTrim) {
+        if (str == null) {
+            return null;
+        }
+        List<String> result = new ArrayList<String>(limitSize);
+        int count = limitSize - 1;
+        int start = 0;
+        int indexof;
+
+        while (count > 0 && (indexof = str.indexOf(delimiter, start)) != -1) {
+            String substring = str.substring(start, indexof);
+            if (shouldTrim) {
+                substring = substring.trim();
+            }
+            result.add(substring);
+            count -= 1;
+            start = indexof + delimiter.length();
+            if (start >= str.length()) {
+                break;
+            }
+        }
+        if (count == 0 || start < str.length()) {
+            String substring = str.substring(start);
+            if (shouldTrim) {
+                substring = substring.trim();
+            }
+            result.add(substring);
+        } else if (start == str.length()) {
+            result.add("");
+        }
+        return result;
+    }
+    
     /**
      * Makes the first letter of the input string upper case.
      */

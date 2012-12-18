@@ -83,7 +83,7 @@ public class StaticDefRegistryImpl<T extends Definition> extends DefRegistryImpl
         Set<DefDescriptor<?>> ret = new HashSet<DefDescriptor<?>>();
 
         for(DefDescriptor<T> key : defs.keySet()){
-            if(dm.matchPrefix(key.getPrefix()) && dm.matchNamespace(key.getNamespace()) && dm.matchName(key.getName())){
+            if(dm.matchDescriptor(key)) {
                 ret.add(key);
             }
         }

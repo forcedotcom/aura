@@ -138,7 +138,7 @@ public class ResourceSourceLoader extends BaseSourceLoader {
         for (Map.Entry<IndexKey, Set<DefDescriptor<?>>> entry : index.entrySet()) {
             if (matcher.matchNamespace(entry.getKey().namespace)) {
                 for (DefDescriptor<?> desc : entry.getValue()) {
-                    if (matcher.matchPrefix(desc.getPrefix()) && matcher.matchName(desc.getName())) {
+                    if (matcher.matchDescriptorNoNS(desc)) {
                         ret.add(desc);
                     }
                 }

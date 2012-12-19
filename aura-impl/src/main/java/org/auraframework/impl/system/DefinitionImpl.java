@@ -133,6 +133,9 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     @SuppressWarnings("unchecked")
     @Override
     public <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> sddesc) {
+        if (subDefs == null) {
+            return null;
+        }
         return (D)subDefs.get(sddesc);
     }
 

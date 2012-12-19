@@ -70,7 +70,7 @@
        *     $A.test.type(input, "[backspace][backspace][backspace][backspace][backspace][backspace][backspace][
        *     $A.test.type(input, "2011-09-10");
        *     $A.test.click(input.parentNode);
-       *     $A.test.addWaitFor(function(){return input.value == "2011-09-10"});
+       *     $A.test.addWaitFor(true, function(){return input.value == "2011-09-10"});
        * }
        *},
        */
@@ -85,7 +85,7 @@
        *     $A.test.click(input);
        *     $A.test.type(input, "01-30-1999");
        *     $A.test.click(input.parentNode);
-       *     $A.test.addWaitFor(function(){return input.value == "30-1999-01"});
+       *     $A.test.addWaitFor(true, function(){return input.value == "30-1999-01"});
        * }
        *},
        */
@@ -99,7 +99,7 @@
        *     $A.test.click(input);
        *     $A.test.type(input, "2-1-1999");
        *     $A.test.click(input.parentNode);
-       *     $A.test.addWaitFor(function(){return input.value == "1999-02-01"});
+       *     $A.test.addWaitFor(true, function(){return input.value == "1999-02-01"});
        * }
        *},
        */

@@ -15,13 +15,14 @@
  */
 package org.auraframework.docs;
 
+import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 @Model
@@ -41,7 +42,6 @@ public class ApiTopicModel {
 
     @AuraEnabled
     public Map<String, Object> getSymbol(){
-
         return symbol;
     }
 
@@ -50,5 +50,16 @@ public class ApiTopicModel {
         return title;
     }
 
-
+    @AuraEnabled
+    public String getDescription() {
+        String desc = symbol.get("classDesc").toString();
+        if (desc != null && !desc.isEmpty()) {
+            return desc;
+        }
+        try {
+            return ((Map)((List)((Map)symbol.get("comment")).get("tags")).get(0)).get("desc").toString();
+        } catch (Throwable t) {
+            return "";
+        }
+    }
 }

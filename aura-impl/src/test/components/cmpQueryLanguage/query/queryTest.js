@@ -14,6 +14,19 @@
  * limitations under the License.
  */
 ({
+    // Checks if undefined variable message is correct. Message varies across browsers.
+    checkUndefinedMsg : function(variable, msg) {
+        var chromeMsg = variable + " is not defined";
+        var ieMsg = "\'" + variable + "\' is undefined";
+        var iosMsg = "Can't find variable: " + variable;
+
+        if (msg == chromeMsg || msg == ieMsg || msg == iosMsg) {
+            return true;
+        } else {
+            return false;
+        }
+    },
+    
     /**
      * Verify that $A.getQueryStatement().query() by default queries on components and selects
      * all fields on the component object.
@@ -200,7 +213,7 @@
                 result = $A.getQueryStatement().field('getDef().getDescriptor().toString()', 'desc').query();
                 $A.test.fail('should not accept literals as derived field');
             }catch(e){
-                $A.test.assertTrue($A.test.checkUndefinedMsg('desc', e.message), "desc should not be defined");
+                $A.test.assertTrue(this.checkUndefinedMsg('desc', e.message), "desc should not be defined");
             }
 
         // 2. Specify a invalid function as derived field
@@ -208,7 +221,7 @@
                 result = $A.getQueryStatement().field('foo', 'bar()').query();
                 $A.test.fail('Should not accept arbitraty functions as derived field')
             }catch(e){
-                $A.test.assertTrue($A.test.checkUndefinedMsg('bar', e.message), "bar should not be defined");
+                $A.test.assertTrue(this.checkUndefinedMsg('bar', e.message), "bar should not be defined");
             }
 
         // 3. Specify explicit function with return value
@@ -337,7 +350,7 @@
                 result = $A.getQueryStatement().from("component").where("foo").query();
                 $A.test.fail("Should not be able to use literals in where clause");
             }catch(e){
-                $A.test.assertTrue($A.test.checkUndefinedMsg('foo', e.message), "foo should not be defined");
+                $A.test.assertTrue(this.checkUndefinedMsg('foo', e.message), "foo should not be defined");
             }
 
         // 2. Verify that null, undefined and empty values for where clause

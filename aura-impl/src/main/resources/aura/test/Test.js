@@ -13,208 +13,82 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint evil: true, sub : true*/
-/**
- * @namespace Test Framework
- * 
- */
+
+/*jslint evil:true, sub:true */
+
 var Test = function(){
     //#include aura.test.Test_private
 
-    window.onerror = (function(){
-        var origHandler = window.onerror;
-        var newHandler = function(msg, url, line){
-            var error = { message: "Uncaught js error: " + msg };
-            if(url){
-                error["url"] = url;
-            }
-            if(line){
-                error["line"] = line;
-            }
-            priv.errors.push(error);
-        };
-
-        if(origHandler) {
-            return function(){ return origHandler.apply(this, arguments) || newHandler.apply(this, arguments); };
-        } else {
-            return newHandler;
-        }
-    })();
-
     /**
-     * @constructor
+     * @constructor Test utility functions
      */
-    var test = {
-    	/**
-    	 * Used to keep track of errors happening in test modes.
-    	 * @private
-    	 */
-        logError : function(msg, e){
-            var p, err = { "message": msg + ": " + (e.message || e.toString()) };
-            for (p in e){
-                if(p=="message"){
-                    continue;
-                }
-                err[p] = "" + e[p];
+    var Test = {
+		/**
+		 * Asynchronously wait for a condition before continuing with the next
+		 * stage of the test case.  The wait condition is checked after the
+		 * current test stage is completed but before the next stage is started.
+		 * 
+		 * @example aura.test.addWaitFor("i was updated", function(){return
+		 *            element.textContent;}, function(){alert("the wait is over"});
+		 * 
+		 * @param {Object} expected
+		 *             The value to compare against. If expected is a function,
+		 *             it will evaluate it before comparison.
+		 * @param {Object} testFunction
+		 *             A function to evaluate and compare against expected.
+		 * @param {function} callback
+		 *             Invoked after the comparison evaluates to true
+		 */
+        addWaitFor : function(expected, testFunction, callback){
+            if (!$A.util.isFunction(testFunction)) {
+                throw new Error("addWaitFor expects a function to evaluate for comparison, but got: " + testFunction);
             }
-            priv.errors.push(err);
-        },
-
-        /**
-         * @private
-         */
-        run : function(name, code, count){
-            // check if test has already started running, since frame loads from layouts may trigger multiple runs
-            if(priv.complete >= 0){
-                return;
+            if (callback && !$A.util.isFunction(callback)) {
+                throw new Error("addWaitFor expects a function for callback, but got: " + callback);
             }
-            priv.complete = 2;
-            priv.timeoutTime = new Date().getTime() + 5000 * count;
-            if(!count){
-                count = 1;
-            }
-            var cmp = $A.getRoot();
-            var suite = aura.util.json.decode(code);
-            var stages = suite[name]["test"];
-            stages = $A.util.isArray(stages) ? stages : [stages];
-
-            var doTearDown = function() {
-                // check if already tearing down
-                if(priv.complete > 1){
-                    priv.complete = 1;
-                }else {
-                    return;
-                }
-                try{
-                    if(suite["tearDown"]){
-                        suite["tearDown"].call(suite, cmp);
-                    }
-                    setTimeout(function(){priv.complete--;}, 100);
-                }catch(e){
-                    $A.test.logError("Error during tearDown", e);
-                    priv.complete = 0;
-                }
-            };
-            
-            /**
-             * @private
-             */
-            var continueWhenReady = function() {
-                if(priv.complete < 2){
-                    return;
-                }
-                if(priv.errors.length > 0){
-                    doTearDown();
-                    return;
-                }
-                try{
-                    if((priv.complete > 1) && (new Date().getTime() > priv.timeoutTime)){
-                        if(priv.waits.length > 0){
-                            var texp = priv.waits[0].expected;
-                            if($A.util.isFunction(texp)){
-                                texp = texp().toString();
-                            }
-                            var tact = priv.waits[0].actual;
-                            var val = tact;
-                            if($A.util.isFunction(tact)){
-                                val = tact().toString();
-                                tact = tact.toString();
-                            }
-                            throw new Error("Test timed out waiting for: " + tact + "; Expected: " + texp + "; Actual: " + val);
-                        }else{
-                            throw new Error("Test timed out");
-                        }
-                    }
-                    if(priv.complete > 2){
-                        setTimeout(continueWhenReady, 200);
-                    }else{
-                        if(priv.waits.length > 0){
-                            var exp = priv.waits[0].expected;
-                            if($A.util.isFunction(exp)){
-                                exp = exp();
-                            }
-                            var act = priv.waits[0].actual;
-                            if($A.util.isFunction(act)){
-                                act = act();
-                            }
-                            if(exp === act){
-                                var callback = priv.waits[0].callback;
-                                if(callback){
-                                    //Set the suite as scope for callback function. Helpful to expose test suite as 'this' in callbacks for addWaitFor
-                                    callback.call(suite);
-                                }
-                                priv.waits.shift();
-                                setTimeout(continueWhenReady, 1);
-                            }else{
-                                setTimeout(continueWhenReady, 200);
-                            }
-                        }else if(stages.length === 0){
-                            doTearDown();
-                        }else{
-                            priv.lastStage = stages.shift();
-                            priv.lastStage.call(suite, cmp);
-                            setTimeout(continueWhenReady, 1);
-                        }
-                    }
-                }catch(e){
-                    if(priv.lastStage) {
-                        e["lastStage"] = priv.lastStage;
-                    }
-                    $A.test.logError("Test error", e);
-                    doTearDown();
-                }
-            };
-            try {
-                if(suite["setUp"]){
-                    suite["setUp"].call(suite, cmp);
-                }
-            }catch(e){
-                $A.test.logError("Error during setUp", e);
-                doTearDown();
-            }
-            setTimeout(continueWhenReady, 1);
-        },
-
-        /**
-         * Wait for expected === actual, or if actual is not provided, then expected === true before invoking callback
-         * @param {Object} expected
-         * @param {Object} actual
-         * @param {function} callback
-         */ 
-        addWaitFor : function(expected, actual, callback){
-            if(arguments.length === 1){
-                if(!$A.util.isFunction(expected)){
-                    throw new Error("addWaitFor expects a function to return true, or 2 things to compare for equality");
-                }
-                priv.waits.push({ expected: true, actual: expected, callback : callback });
-            } else {
-                priv.waits.push({ expected: expected, actual: actual, callback : callback });
-            }
+            priv.waits.push({ expected:expected, actual:testFunction, callback:callback });
         },
         
         /**
-         * Get an instance of a server controller by name.
+         * Get an instance of an action.
          * Expects you to provide the parameters and call back function.
          * 
-         * @param {Component} cmp
+         * @param {Component} component
          * @param {String} name
+         *             of the action from the component's perspective (e.g. "c.doSomething")
          * @param {Object} params
          * @param {function} callback
+         * @returns {Action} an instance of the action
          */
-        getServerControllerInstance:function(cmp,name, params, callback){
-            var cntlr = cmp.get(name);
-            cntlr.setParams(params);
-            cntlr.setCallback(cmp, callback);
-            return cntlr;
+        getAction:function(component, name, params, callback){
+            var action = component.get(name);
+            if (params) {
+                action.setParams(params);
+            }
+            if (callback) {
+                action.setCallback(component, callback);
+            }
+            return action;
         },
 
         /**
-         * See if there are any pending actions 
+         * Peek if there are any pending server actions.
+         * @returns {boolean}
          */
         isActionPending : function() {
             return $A.clientService["priv"].inRequest;
         },
 
+        /**
+         * Invoke a server action.  At the end of current test case stage, the
+         * test will wait for any actions to complete before continuing to the
+         * next stage of the test case.
+         * @param {Action} action
+         * @param {boolean} doImmediate
+         *             if true, the request will be sent immediately, otherwise
+         *             the action will be handled as any other Action and may
+         *             be queued behind prior requests
+         */
         callServerAction : function(action, doImmediate){
             if(priv.complete === 0){
                 return;
@@ -233,15 +107,15 @@ var Test = function(){
                         "callback" :function(response){
                             var msg = $A["clientService"]["priv"].checkAndDecodeResponse(response);
                             if ($A.util.isUndefinedOrNull(msg)) {
-                                    for ( var k = 0; k < actions.length; k++) {
-                                    $A.test.logError("Unable to execute action", actions[k]);
-                                    }
+                                for ( var k = 0; k < actions.length; k++) {
+                                    logError("Unable to execute action", actions[k]);
+                                }
                             }
                             var serverActions = msg["actions"];
                             for (var i = 0; i < serverActions.length; i++) {
-                                    for ( var j = 0; j < serverActions[i]["error"].length; j++) {
-                                    $A.test.logError("Error during action", serverActions[i]["error"][j]);
-                                    }
+                                for ( var j = 0; j < serverActions[i]["error"].length; j++) {
+                                    logError("Error during action", serverActions[i]["error"][j]);
+                                }
                             }
                             priv.complete--;
                         },
@@ -256,7 +130,7 @@ var Test = function(){
                 } else {
                     $A.clientService.runActions(actions, cmp , function(msg){
                         for(var i=0;i<msg["errors"].length;i++){
-                            $A.test.logError("Error during action", msg["errors"][i]);
+                            logError("Error during action", msg["errors"][i]);
                         }
                         priv.complete--;
                     });
@@ -270,7 +144,13 @@ var Test = function(){
         },
 
         /**
-         * @private
+         * Invoke a callback after the provided condition evaluates to truthy,
+         * checking on the condition every specified interval.
+         * @param {function} conditionFunction
+         * @param {function} callback
+         * @param {int} intervalInMs
+         *             the number of milliseconds between each evaluation of
+         *             conditionFunction 
          */
         runAfterIf : function(conditionFunction, callback, intervalInMs){
             if(priv.complete === 0){
@@ -293,59 +173,47 @@ var Test = function(){
                     return;
                 }
             }catch(e){
-                $A.test.logError("Error in runAfterIf", e);
+                logError("Error in runAfterIf", e);
             }
         },
 
         /**
-         * set test timeout in miliseconds
+         * Set test to timeout in a period of miliseconds from now.
          * @param {int} timeoutMsec
+         *             the number of milliseconds from now when the test should
+         *             timeout
          */
         setTestTimeout : function(timeoutMsec){
             priv.timeoutTime = new Date().getTime() + timeoutMsec;
         },
 
         /**
-         * @private
+         * Return whether the test is finished.
+         * @returns {boolean}
          */
         isComplete : function(){
             return priv.complete === 0;
         },
 
         /**
-         * Get the list of errors encountered by the js test
+         * Get the list of errors seen by the test, not including any errors
+         * handled explicitly by the framework.
+         * @returns {string} an empty string if no errors are seen, else a json
+         *             encoded list of errors
          */
         getErrors : function(){
             if (priv.errors.length > 0){
                 return aura.util.json.encode(priv.errors);
-            }else{
+            } else {
                 return "";
             }
         },
 
         /**
-         * get the string representation of errors encountered by a js test
-         */
-        getDump : function() {
-            var status = "";
-            if (priv.errors.length > 0) {
-                status += "errors {" + $A.test.print($A.test.getErrors()) + "} ";
-            }
-            if (priv.waits.length > 0 ) {
-                var actual;
-                try {
-                    actual = priv.waits[0].actual();
-                } catch (e) {}
-                status += "waiting for {" + $A.test.print(priv.waits[0].expected) + "} currently {" + $A.test.print(actual) + "} from {" + $A.test.print(priv.waits[0].actual) + "} after {" + $A.test.print(priv.lastStage) + "} ";
-            } else if (!$A.util.isUndefinedOrNull(priv.lastStage)) {
-                status += "executing {" + $A.test.print(priv.lastStage) + "} ";
-            }
-            return status;
-        },
-
-        /**
-         * Essentially a toString method. Returns a string even for undefined/null value.
+         * Essentially a toString method, except strings are enclosed with
+         * double quotations.  Returns a string even for undefined/null value.
          * @param {Object} value
+         * @returns {String}
          */
         print : function(value) {
             if (value === undefined) {
@@ -369,10 +237,9 @@ var Test = function(){
          */
         assertTruthy : function(condition, assertMessage) {
             if (!condition) {
-                if(assertMessage){
+                if (assertMessage) {
                     assertMessage += " : "+condition;
-                }
-                else{
+                } else {
                     assertMessage = "Assertion Failure: expected {Truthy}, but Actual : {" + condition + "}";
                 }
                 throw new Error(assertMessage);
@@ -389,10 +256,9 @@ var Test = function(){
          */
         assertFalsy : function(condition, assertMessage) {
             if (condition) {
-                if(assertMessage){
+                if (assertMessage) {
                     assertMessage += " : "+condition;
-                }
-                else{
+                } else {
                     assertMessage = "Assertion Failure: expected {Falsy}, but Actual : {" + condition + "}";
                 }
                 throw new Error(assertMessage);
@@ -437,9 +303,9 @@ var Test = function(){
          * @param {String} assertMessage
          */
         assertTrue : function(condition, assertMessage){
-               if(!assertMessage){
-                   assertMessage = "Expected: {True}, but Actual: {False} ";
-               }
+            if(!assertMessage){
+                assertMessage = "Expected: {True}, but Actual: {False} ";
+            }
             aura.test.assertEquals(true,condition,assertMessage);
         },
         
@@ -449,10 +315,10 @@ var Test = function(){
          * @param {String} assertMessage
          */
         assertFalse :function(condition, assertMessage){
-               if(!assertMessage){
-                   assertMessage = "Expected: {False}, but Actual: {True} ";
-               }
-               aura.test.assertEquals(false,condition,assertMessage);
+            if(!assertMessage){
+                assertMessage = "Expected: {False}, but Actual: {True} ";
+            }
+            aura.test.assertEquals(false,condition,assertMessage);
         },
         
          /**
@@ -464,7 +330,7 @@ var Test = function(){
             if(!assertMessage){
                 assertMessage = "Assertion failure, Expected: {Undefined or Null}, but Actual: {"+arg1+"} ";
             }
-               aura.test.assertTrue($A.util.isUndefinedOrNull(arg1),assertMessage);
+            aura.test.assertTrue($A.util.isUndefinedOrNull(arg1),assertMessage);
         },
         
          /**
@@ -476,7 +342,7 @@ var Test = function(){
             if(!assertMessage){
                 assertMessage = "Assertion failure, Expected: {Null}, but Actual: {"+arg1+"} ";
             }
-               aura.test.assertTrue(arg1===null,assertMessage);
+            aura.test.assertTrue(arg1===null,assertMessage);
         },
         
         /**
@@ -492,8 +358,10 @@ var Test = function(){
         },
         
         /**
-         * Throws an Error, making a js test fail with the message specifid
+         * Throws an Error, making a test fail with the specified message. 
          * @param {String} assertMessage
+         *             defaults to "Assertion failure", if not provided
+         * @throws {Error}
          */
         fail : function(assertMessage){
             if(assertMessage){
@@ -503,10 +371,27 @@ var Test = function(){
             }
         },
 
+        /**
+         * Get an object's prototype.
+         * @param {Object} instance
+         * @returns {Object}
+         */
         getPrototype : function(instance){
             return instance && (Object.getPrototypeOf && Object.getPrototypeOf(instance)) || instance.__proto || instance.constructor.prototype;
         },
 
+        /**
+         * Replace a function on an object with a restorable override.
+         * @param {Object} instance
+         * @param {function} originalFunction
+         * @param {function} newFunction
+         * @returns {function}
+         *             the override (newFunction) with an added "restore"
+         *             function that, when invoked, will restore originalFunction
+         *             on instance
+         * @throws {Error}
+         *             if instance does not have originalFunction as a property
+         */
         overrideFunction : function(instance, originalFunction, newFunction){
             var override = newFunction;
             override.originalInstance = instance;
@@ -530,14 +415,37 @@ var Test = function(){
                 originalFunction.originalInstance = override;
             }
 
+            var found = false;
             for(var p in instance){
                 if(instance[p] === originalFunction){
                     instance[p] = override;
+                    found = true;
                 }
+            }
+            if(!found) {
+            	throw new Error("Did not find the specified function on the given object!");
             }
             return override;
         },
 
+        /**
+         * Add a handler function to an existing object's function.
+         * The handler may be attached before or after the target function.
+         * If attached after (postProcess === true), the handler will be
+         * invoked with the original function's return value followed by
+         * the original arguments.  If attached before (postProcess !== true),
+         * the handler will be invoked with just the original arguments.
+         * @param {Object} instance
+         * @param {function} originalFunction
+         * @param {function} newFunction
+         * @param {boolean} postProcess
+         *             whether the handler will be called after or before
+         *             originalFunction is called
+         * @returns {function}
+         *             the override of originalFunction, which has a "restore"
+         *             function that, when invoked, will restore originalFunction
+         *             on instance
+         */
         addFunctionHandler : function(instance, originalFunction, newFunction, postProcess){
             var handler = newFunction;
             return $A.test.overrideFunction(instance, originalFunction, postProcess ?
@@ -551,6 +459,11 @@ var Test = function(){
             );
         },
 
+        /**
+         * Get a DOM node's outerHTML.
+         * @param {Node} node
+         * @returns {String}
+         */
         getOuterHtml : function(node) {
             return node.outerHTML || (function(n){
                 var div = document.createElement('div');
@@ -562,8 +475,10 @@ var Test = function(){
         },
 
         /** 
-         * Returns text content of the Dom element. Tries "innerText" followed by "textContext" to take browser differens into account.
-         * @param {DOMElement} node 
+         * Get the text content of a DOM node. Tries "innerText" followed by
+         * "textContext" to take browser differences into account.
+         * @param {Node} node 
+         * @returns {String}
          */
         getText : function(node) {
             var t = node.innerText;
@@ -574,8 +489,9 @@ var Test = function(){
         },
         
         /**
-         * Given a component, this function return the textContent of all elements rendered by this component.
+         * Get the textContent of all elements rendered by this component.
          * @param {Component} component
+         * @returns {String}
          */
         getTextByComponent : function(component){
             var ret = "";
@@ -599,10 +515,11 @@ var Test = function(){
         },
 
         /**
-         * Get value for the specified style for the element provided
+         * Get the current value for a style for a DOMElement.
          * 
          * @param {DOMElement} elem
          * @param {String} Style 
+         * @returns {String}
          */
         getStyle : function(elem, style){
             var val = "";
@@ -619,8 +536,9 @@ var Test = function(){
         },
 
         /**
-         * Filters out comment nodes from a list nodes provided
+         * Filter out comment nodes from a list of nodes.
          * @param {Array|Object} nodes
+         * @returns {Array}
          */
         getNonCommentNodes : function(nodes){
             var ret = [];
@@ -640,6 +558,11 @@ var Test = function(){
             return ret;
         },
 
+        /**
+         * Check if a node has been "deleted" by Aura.
+         * @param {Node} node
+         * @returns {boolean}
+         */
         isNodeDeleted : function(node){
             if (!node.parentNode){
                 return true;
@@ -654,32 +577,28 @@ var Test = function(){
             return document.querySelectorAll.apply(document, arguments);
         },
         
-        contains : function(test, target){
-        	if (!$A.util.isUndefinedOrNull(test)) {
-        		return (test.indexOf(target) != -1);
+        /**
+         * Check if a string contains another string.
+         * @param {String} testString
+         *             the string to check
+         * @param {String} targetString
+         *             the string to look for
+         * @returns {boolean}
+         */
+        contains : function(testString, targetString){
+        	if (!$A.util.isUndefinedOrNull(testString)) {
+        		return (testString.indexOf(targetString) != -1);
         	}
         	return false;
         },
 
         // Used by tests to modify framework source to trigger JS last mod update
+        /** @ignore */
         dummyFunction : function(){
             return '@@@TOKEN@@@';
-        },
-
-        // Checks if undefined variable message is correct. Message varies across browsers.
-        checkUndefinedMsg : function(variable, msg) {
-            var chromeMsg = variable + " is not defined";
-            var ieMsg = "\'" + variable + "\' is undefined";
-            var iosMsg = "Can't find variable: " + variable;
-
-            if (msg == chromeMsg || msg == ieMsg || msg == iosMsg) {
-                return true;
-            } else {
-                return false;
-            }
         }
     };
 
     //#include aura.test.Test_export
-    return test;
+    return Test;
 };

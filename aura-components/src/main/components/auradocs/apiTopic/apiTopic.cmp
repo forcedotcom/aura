@@ -18,7 +18,7 @@
 <aura:component extends="auradocs:topicPanel" model="java://org.auraframework.docs.ApiTopicModel">
     <aura:set attribute="title" value="{!m.title}"/>
     <aura:set attribute="subtitle">type</aura:set>
-    <aura:set attribute="description">{!m.symbol.classDesc}</aura:set>
+    <aura:set attribute="example">{!m.description}</aura:set>
 
     <auradocs:apiSymbols title="Methods" symbols="{!m.symbol.methods}"/>
     <auradocs:apiSymbols title="Fields" symbols="{!m.symbol.properties}"/>

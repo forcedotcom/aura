@@ -20,12 +20,12 @@
     testChainingExternalActions:{
         test:function(cmp){
             //Local action
-            var getString = $A.test.getServerControllerInstance(cmp, "c.getString",{});
+            var getString = $A.test.getAction(cmp, "c.getString",{});
             getString.setChained();
 
             //Chain local action with action of facet
             var facet = cmp.find('facet');
-            var add = $A.test.getServerControllerInstance(facet,"c.add",
+            var add = $A.test.getAction(facet,"c.add",
                                     {
                                         "a" : 1, "b" : 99,
                                         "actions": $A.util.json.encode({

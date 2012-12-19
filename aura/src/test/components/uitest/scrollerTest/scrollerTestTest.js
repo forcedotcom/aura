@@ -46,7 +46,7 @@
                 }, 1000);
             });
 
-            $A.test.addWaitFor(function(){
+            $A.test.addWaitFor(true, function(){
                 return imageLoaded;
             });
 

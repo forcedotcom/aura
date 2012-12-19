@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 /*jslint sub: true */
-var p = test;
+var p = Test;
 exp(p,
-    "run", p.run,
-    "addWaitFor", p.addWaitFor,
-    "callServerAction", p.callServerAction,
-    "isActionPending", p.isActionPending,
-    "getServerControllerInstance", p.getServerControllerInstance,
-    "runAfterIf", p.runAfterIf,
-    "setTestTimeout", p.setTestTimeout,
-    "isComplete", p.isComplete,
-    "getErrors", p.getErrors,
-    "getDump", p.getDump,
-    "init", p.init,
+	// asserts
     "assert", p.assert,
     "assertTruthy", p.assertTruthy,
     "assertFalsy", p.assertFalsy,
@@ -36,10 +26,16 @@ exp(p,
     "assertUndefinedOrNull", p.assertUndefinedOrNull,
     "assertNull", p.assertNull,
     "assertNotNull", p.assertNotNull,
+    
+    // test flow/state
     "fail", p.fail,
-    "getPrototype", p.getPrototype,
-    "overrideFunction", p.overrideFunction,
-    "addFunctionHandler", p.addFunctionHandler,
+    "isComplete", p.isComplete,
+    "addWaitFor", p.addWaitFor,
+    "runAfterIf", p.runAfterIf,
+    "setTestTimeout", p.setTestTimeout,
+    "getErrors", p.getErrors,
+    
+    // DOM
     "getOuterHtml", p.getOuterHtml,
     "getText", p.getText,
     "getTextByComponent", p.getTextByComponent,
@@ -47,6 +43,19 @@ exp(p,
     "getNonCommentNodes", p.getNonCommentNodes,
     "isNodeDeleted", p.isNodeDeleted,
     "select", p.select,
-    "dummyFunction", p.dummyFunction,
-    "checkUndefinedMsg", p.checkUndefinedMsg
+
+    // javascript
+    "getPrototype", p.getPrototype,
+    "overrideFunction", p.overrideFunction,
+    "addFunctionHandler", p.addFunctionHandler,
+    
+    // actions
+    "callServerAction", p.callServerAction,
+    "isActionPending", p.isActionPending,
+    "getAction", p.getAction,
+
+    // internal functions
+    "run", run,
+    "getDump", getDump,
+    "dummyFunction", p.dummyFunction
 );

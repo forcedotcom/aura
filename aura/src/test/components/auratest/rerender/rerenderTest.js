@@ -52,7 +52,7 @@
     testAbstractAttributeUpdated: {
         attributes : { __layout: "#def" },
         test: [function(component){
-                $A.test.addWaitFor(function(){
+                $A.test.addWaitFor(true, function(){
                     var t = $A.test.getText(component.find("layoutTarget").getElement());
                     return t && (t.indexOf("def layout item") >= 0);
                 });
@@ -73,7 +73,7 @@
     testAbstractModelUpdated: {
         attributes : { __layout: "#def" },
         test: [function(component){
-                $A.test.addWaitFor(function(){
+                $A.test.addWaitFor(true, function(){
                     var t = $A.test.getText(component.find("layoutTarget").getElement());
                     return t && (t.indexOf("def layout item") >= 0);
                 });
@@ -94,7 +94,7 @@
     testInterfaceAttributeUpdated: {
         attributes : { __layout: "#def" },
         test: [function(component){
-                $A.test.addWaitFor(function(){
+                $A.test.addWaitFor(true, function(){
                     var t = $A.test.getText(component.find("layoutTarget").getElement());
                     return t && (t.indexOf("def layout item") >= 0);
                 });
@@ -163,7 +163,7 @@
     testLayoutChange: {
         attributes : { __layout: "#def" },
         test: [function(component){
-                $A.test.addWaitFor(function(){
+                $A.test.addWaitFor(true, function(){
                     var t = $A.test.getText(component.find("layoutTarget").getElement());
                     return t && (t.indexOf("def layout item") >= 0);
                 });
@@ -177,7 +177,7 @@
             }, function(component){
                 this.assertCounters(component, "2", "2", "0", "0", "2");
                 $A.layoutService.layout("death");
-                $A.test.addWaitFor(function(){
+                $A.test.addWaitFor(true, function(){
                     var t = $A.test.getText(component.find("layoutTarget").getElement());
                     return t && (t.indexOf("death layout item") >= 0);
                 });
@@ -199,7 +199,7 @@
     testLayoutItemAttributeUpdated: {
         attributes : { __layout: "#def" },
         test: [function(component){
-                $A.test.addWaitFor(function(){
+                $A.test.addWaitFor(true, function(){
                     var t = $A.test.getText(component.find("layoutTarget").getElement());
                     return t && (t.indexOf("def layout item") >= 0);
                 });
@@ -254,7 +254,7 @@
         test: [function(component){
                 component.find("pushText").get("e.press").fire();
                 component.find("pushComponent").get("e.press").fire();
-                $A.test.addWaitFor(function(){
+                $A.test.addWaitFor(true, function(){
                     var cmps = component.find("emptyArrayContainer").get("v.body")[0].get("v.value");
                     return (cmps.length === 2) && cmps[0].isRendered() && cmps[1].isRendered();
                 });
@@ -287,7 +287,7 @@
         test: [function(component){
                 component.find("pushText").get("e.press").fire();
                 component.find("pushComponent").get("e.press").fire();
-                $A.test.addWaitFor(function(){
+                $A.test.addWaitFor(true, function(){
                     var cmps = component.find("emptyArrayContainer").get("v.body")[0].get("v.value");
                     return (cmps.length === 2) && cmps[0].isRendered() && cmps[1].isRendered();
                 });
@@ -341,7 +341,7 @@
 
                 // clear the array
                 component.find("clear").get("e.press").fire();
-                $A.test.addWaitFor(function(){
+                $A.test.addWaitFor(true, function(){
                     var elem = cmp.getElement().firstChild.firstChild;
                     return (elem.nodeType === 3) && ($A.test.getText(elem) == ""); //wait for placeholder, instead of original div that just got unrendered at this position
                 });

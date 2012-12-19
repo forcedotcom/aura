@@ -27,7 +27,6 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.annotation.TestLabels;
-import org.junit.Ignore;
 
 /**
  * @since 0.0.171
@@ -55,7 +54,6 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
         quickFixUIWidget = new QuickFixUIWidget(defType, this);
     }
 
-    @Ignore
     public void testCreationQuickFix() throws Exception {
         // This test needs to be updated because of "preloads" fix
         String namespace = "auratest";

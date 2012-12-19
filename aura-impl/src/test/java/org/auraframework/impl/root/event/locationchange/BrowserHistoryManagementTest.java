@@ -26,12 +26,7 @@ import org.openqa.selenium.WebElement;
  * Tests that Verify the mechanics of Browser History Management. Location Change event is an APPLICATION event.
  * {@link aura.def.EventType} Which means that all handler registered to handle this event are invoked. NOTE: Location
  * change event is fired as soon as the page is loaded. Implementation is in AuraHistoryService_Private.js
- * 
- * @hierarchy Aura.Components.Events.Browser History Management
- * @priority high
- * @userStory a07B0000000DX2cIAG
  */
-
 public class BrowserHistoryManagementTest extends WebDriverTestCase {
     public BrowserHistoryManagementTest(String name) {
         super(name);

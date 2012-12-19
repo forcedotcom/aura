@@ -78,7 +78,7 @@ public class QuickFixUIWidget {
          * @param expectedSuccess
          */
         public String clickFix(Boolean expectedSuccess) throws Exception{
-            By fixButton = By.xpath("//label[text()='Fix!']");
+            By fixButton = By.xpath("//img[@alt='Fix!']");
             WebElement button = testCase.getDriver().findElement(fixButton);
             button.click();
             testCase.waitFor(3);

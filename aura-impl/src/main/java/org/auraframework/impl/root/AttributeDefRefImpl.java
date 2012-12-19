@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.auraframework.def.*;
+import org.auraframework.expression.Expression;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -39,21 +40,36 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
 
     public static final String BODY_ATTRIBUTE_NAME = "body";
 
+    // the original value , which could be a string representation
     private final Object value;
+    /*
+     * if the original value was a string representation of a non-string type, then this is the value parsed from that
+     * string this is set in the parseValue method which is called during the validateReferences stage of compilation
+     */
+    private Object parsedValue;
     private final int hashCode;
 
     protected AttributeDefRefImpl(Builder builder) {
         super(builder);
         this.value = builder.value;
+        this.parsedValue = value;
         this.hashCode = AuraUtil.hashCode(descriptor, value);
     }
 
     @Override
+    public void parseValue(TypeDef typeDef) {
+        if (!(this.value instanceof Expression)) {
+            this.parsedValue = typeDef.valueOf(this.value);
+        }
+    }
+
+    @Override
     public void validateReferences() throws QuickFixException {
-        if (value instanceof Definition) {
-            ((Definition)value).validateReferences();
-        } else if (value instanceof Collection) {
-            Collection<?> col = (Collection<?>)value;
+        Object v = this.getValue();
+        if (v instanceof Definition) {
+            ((Definition)v).validateReferences();
+        } else if (v instanceof Collection) {
+            Collection<?> col = (Collection<?>)v;
             for (Object obj : col) {
                 if (obj instanceof Definition) {
                     ((Definition)obj).validateReferences();
@@ -64,11 +80,12 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
 
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
-        if(value instanceof Definition){
-            Definition def = (Definition)value;
+        Object v = this.getValue();
+        if(v instanceof Definition){
+            Definition def = (Definition)v;
             def.appendDependencies(dependencies);
-        }else if(value instanceof Collection){
-            Collection<?> col = (Collection<?>)value;
+        }else if(v instanceof Collection){
+            Collection<?> col = (Collection<?>)v;
             for(Object obj : col){
                 if(obj instanceof Definition){
                     Definition def = (Definition)obj;
@@ -82,20 +99,20 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
         json.writeMapEntry("descriptor", getDescriptor());
-        json.writeMapEntry("value", value);
+        json.writeMapEntry("value", getValue());
         json.writeMapEnd();
     }
 
     @Override
     public Object getValue() {
-        return value;
+        return parsedValue;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o instanceof AttributeDefRefImpl) {
             AttributeDefRefImpl e = (AttributeDefRefImpl)o;
-            return getName().equals(e.getName()) && value.equals(e.getValue());
+            return getName().equals(e.getName()) && getValue().equals(e.getValue());
         }
 
         return false;
@@ -103,6 +120,7 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
 
     @Override
     public String toString() {
+        // output the original value
         return value.toString();
     }
 

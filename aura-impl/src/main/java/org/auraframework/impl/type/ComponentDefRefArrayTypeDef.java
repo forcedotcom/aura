@@ -63,7 +63,7 @@ public class ComponentDefRefArrayTypeDef extends DefinitionImpl<TypeDef> impleme
 
     @Override
     public Object valueOf(Object stringRep) {
-        throw new UnsupportedOperationException();
+        return stringRep;
     }
 
     @Override

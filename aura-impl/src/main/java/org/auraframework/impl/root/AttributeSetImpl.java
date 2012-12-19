@@ -85,81 +85,80 @@ public class AttributeSetImpl implements AttributeSet {
     }
 
     private void set(Attribute attribute) {
-            if (trackDirty) {
-                attribute.markDirty();
-            }
-            attributes.put(attribute.getDescriptor(), attribute);
+        if (trackDirty) {
+            attribute.markDirty();
+        }
+        attributes.put(attribute.getDescriptor(), attribute);
     }
 
     private void set(AttributeDefRef attributeDefRef) throws QuickFixException {
-            RootDefinition def = rootDefDescriptor.getDef();
-            Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = def.getAttributeDefs();
+        RootDefinition def = rootDefDescriptor.getDef();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = def.getAttributeDefs();
 
-            AttributeDef attributeDef = attributeDefs.get(attributeDefRef.getDescriptor());
-            // setAndValidateAttribute should be merged with creating the
-            // AttributeImpl here
-            AttributeImpl attribute;
+        AttributeDef attributeDef = attributeDefs.get(attributeDefRef.getDescriptor());
+        // setAndValidateAttribute should be merged with creating the
+        // AttributeImpl here
+        AttributeImpl attribute;
 
-            if (attributeDef == null) {
-                Map<String, RegisterEventDef> events = def.getRegisterEventDefs();
-                if (events.containsKey(attributeDefRef.getDescriptor().getName())) {
-                    EventHandlerImpl eh = new EventHandlerImpl(attributeDefRef.getDescriptor().getName());
-                    Object o = attributeDefRef.getValue();
-                    if (!(o instanceof PropertyReference)) {
-                        // FIXME: where are we?
-                        throw new InvalidDefinitionException(String.format("%s no can haz %s", eh.getName(), o),
-                                                             SUPER_PASSTHROUGH);
-                    }
-                    eh.setActionExpression((PropertyReference) o);
-                    set(eh);
-                    return;
-                } else {
+        if (attributeDef == null) {
+            Map<String, RegisterEventDef> events = def.getRegisterEventDefs();
+            if (events.containsKey(attributeDefRef.getDescriptor().getName())) {
+                EventHandlerImpl eh = new EventHandlerImpl(attributeDefRef.getDescriptor().getName());
+                Object o = attributeDefRef.getValue();
+                if (!(o instanceof PropertyReference)) {
                     // FIXME: where are we?
-                    throw new AttributeNotFoundException(rootDefDescriptor, attributeDefRef.getName(), SUPER_PASSTHROUGH);
+                    throw new InvalidDefinitionException(String.format("%s no can haz %s", eh.getName(), o), SUPER_PASSTHROUGH);
                 }
+                eh.setActionExpression((PropertyReference)o);
+                set(eh);
+                return;
             } else {
-                attribute = new AttributeImpl(attributeDef.getDescriptor());
+                // FIXME: where are we?
+                throw new AttributeNotFoundException(rootDefDescriptor, attributeDefRef.getName(), SUPER_PASSTHROUGH);
             }
+        } else {
+            attribute = new AttributeImpl(attributeDef.getDescriptor());
+        }
 
-            Object value = attributeDefRef.getValue();
-            value = attributeDef.getTypeDef().initialize(value, valueProvider);
-            attribute.setValue(value);
+        Object value = attributeDefRef.getValue();
+        value = attributeDef.getTypeDef().initialize(value, valueProvider);
+        attribute.setValue(value);
 
-            set(attribute);
+        set(attribute);
     }
 
     @Override
     public void set(Collection<AttributeDefRef> attributeDefRefs) throws QuickFixException {
-            for (AttributeDefRef attributeDefRef : attributeDefRefs) {
-                set(attributeDefRef);
-            }
+        for (AttributeDefRef attributeDefRef : attributeDefRefs) {
+            set(attributeDefRef);
+        }
     }
 
     @Override
     public void set(Collection<AttributeDefRef> facetDefRefs, AttributeSet attributeSet) throws QuickFixException {
-            RootDefinition rootDef = rootDefDescriptor.getDef();
-            Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = rootDef.getAttributeDefs();
-            Map<DefDescriptor<?>, Object> lookup = Maps.newHashMap();
+        RootDefinition rootDef = rootDefDescriptor.getDef();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = rootDef.getAttributeDefs();
+        Map<DefDescriptor<?>, Object> lookup = Maps.newHashMap();
 
-            for (Attribute attribute : attributeSet) {
-                lookup.put(DefDescriptorImpl.getInstance(attribute.getName(), AttributeDef.class), attribute);
-            }
+        for (Attribute attribute : attributeSet) {
+            lookup.put(DefDescriptorImpl.getInstance(attribute.getName(), AttributeDef.class), attribute);
+        }
 
-            for (AttributeDefRef attributeDefRef : facetDefRefs) {
-                lookup.put(attributeDefRef.getDescriptor(), attributeDefRef);
-            }
+        for (AttributeDefRef attributeDefRef : facetDefRefs) {
+            lookup.put(attributeDefRef.getDescriptor(), attributeDefRef);
+        }
 
-            for (DefDescriptor<AttributeDef> desc : attrs.keySet()) {
-                Object val = lookup.get(desc);
-                if (val != null) {
-                    if (val instanceof Attribute) {
-                        Attribute attribute = (Attribute) val;
-                        setExpression(attribute.getDescriptor(), new PropertyReferenceImpl("v." + attribute.getName(), SUPER_PASSTHROUGH));
-                    } else if (val instanceof AttributeDefRef) {
-                        set((AttributeDefRef) val);
-                    }
+        for (DefDescriptor<AttributeDef> desc : attrs.keySet()) {
+            Object val = lookup.get(desc);
+            if (val != null) {
+                if (val instanceof Attribute) {
+                    Attribute attribute = (Attribute)val;
+                    setExpression(attribute.getDescriptor(), new PropertyReferenceImpl("v." + attribute.getName(), SUPER_PASSTHROUGH));
+                } else if (val instanceof AttributeDefRef) {
+                    set((AttributeDefRef)val);
                 }
             }
+        }
     }
 
     @Override
@@ -218,22 +217,16 @@ public class AttributeSetImpl implements AttributeSet {
         Object value = getExpression(expr.getRoot());
         PropertyReference stem = expr.getStem();
 
-        if (value instanceof String) {
-            // literal string from markup
+        if (value instanceof Expression) {
+            value = ((Expression) value).evaluate(valueProvider);
+        }
+        if (value instanceof ValueProvider && stem != null) {
+            value = ((ValueProvider) value).getValue(stem);
+        } else if (stem != null) {
             AttributeDef attributeDef = rootDefDescriptor.getDef().getAttributeDef(expr.getRoot());
-            value = attributeDef.getTypeDef().valueOf(value);
-        } else {
-            if (value instanceof Expression) {
-                value = ((Expression) value).evaluate(valueProvider);
-            }
-            if (value instanceof ValueProvider && stem != null) {
+            value = attributeDef.getTypeDef().wrap(value);
+            if (value instanceof ValueProvider) {
                 value = ((ValueProvider) value).getValue(stem);
-            } else if (stem != null) {
-                AttributeDef attributeDef = rootDefDescriptor.getDef().getAttributeDef(expr.getRoot());
-                value = attributeDef.getTypeDef().wrap(value);
-                if (value instanceof ValueProvider) {
-                    value = ((ValueProvider) value).getValue(stem);
-                }
             }
         }
         if (value instanceof Wrapper) {

@@ -16,6 +16,7 @@
 package org.auraframework.impl.root;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
@@ -118,16 +119,26 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     }
 
     @Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
+        defaultValue.appendDependencies(dependencies);
+    }
+
+    @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
-        if (this.serializeTo == SerializeToType.INVALID) { throw new InvalidDefinitionException(
-                "Invalid serializeTo value", getLocation()); }
+        if (this.serializeTo == SerializeToType.INVALID) {
+            throw new InvalidDefinitionException("Invalid serializeTo value", getLocation());
+        }
     }
 
     @Override
     public void validateReferences() throws QuickFixException {
         try {
-            typeDefDescriptor.getDef();
+            TypeDef typeDef = typeDefDescriptor.getDef();
+            if (defaultValue != null) {
+                defaultValue.parseValue(typeDef);
+                defaultValue.validateReferences();
+            }
         } catch (AuraRuntimeException e) {
             if (e.getCause() instanceof ClassNotFoundException) {
                 throw new DefinitionNotFoundException(typeDefDescriptor);

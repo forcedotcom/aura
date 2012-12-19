@@ -134,6 +134,8 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
                     throw new AttributeNotFoundException(rootDef.getDescriptor(),
                         attributeDefDesc.getName(), getLocation());
                 }
+            } else {
+                entry.getValue().parseValue(attributeDef.getTypeDef());
             }
             entry.getValue().validateReferences();
             // heres where some type validation would go

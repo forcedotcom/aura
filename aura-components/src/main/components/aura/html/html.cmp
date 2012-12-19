@@ -17,7 +17,7 @@
 -->
 <aura:component renderer="js://aura.html, java://org.auraframework.renderer.HtmlRenderer" template="auradev:blankTemplate" implements="aura:rootComponent"
                      support="GA" description="A meta component that represents all html elements.  Any html found in your markup causes the creation of one of these.">
-    <aura:attribute name="body" type="Aura.Component[]"/>
+    <aura:attribute name="body" type="Aura.Component[]" description="The body of the component.  In markup, this is everything in the body of the tag."/>
     <aura:attribute name="tag" type="String" description="The name of the html element that should be rendered."/>
     <aura:attribute name="HTMLAttributes" type="Map" description="A Map of attributes to set on the html element."/>
     <!--<aura:attribute name="markup" type="Object[]" description="As an alternative to the tag and HTMLAttributes attributes, this allows Strings of raw markup to be rendered."/>-->

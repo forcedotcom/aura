@@ -17,12 +17,12 @@
 -->
 <aura:component support="GA">
 	<aura:attribute name="implementation" type="String" default="memory" description="The specific type of storage to use. Valid values are: memory, websql, indexeddb, smartstore."/>
-	<aura:attribute name="clearStorageOnInit" type="Boolean" default="{!true}" description="For persistent storage delete all previous data on initialization."/>
+	<aura:attribute name="clearStorageOnInit" type="Boolean" default="true" description="For persistent storage delete all previous data on initialization."/>
 	<aura:attribute name="defaultExpiration" type="Integer" default="10" description="The default number of seconds that an object will be retained in storage if a request specific expiration has not been specified in the call to Action.setStorable()."/>
 	<aura:attribute name="defaultAutoRefreshInterval" type="Integer" default="30" description="The default number of seconds before an auto refresh request will be initiated if a request specific interval has not been specified in the call to Action.setStorable()."/>
     <aura:attribute name="maxSize" type="Integer" default="1000" description="Maximum size in kilobytes that will be used in the memory adapter's storage. Existing items will be evicted to make room for new items using LRU and expiry strategies."/>
-    <aura:attribute name="debugLoggingEnabled" type="Boolean" default="{!false}" description="Controls if additional $A.log() messages are generated."/>
-    <aura:attribute name="requireUseStorageQueryParam" type="Boolean" default="{!false}" description="Temporary control override for conditional enablement via aura.useStorage=true query param."/>
+    <aura:attribute name="debugLoggingEnabled" type="Boolean" default="false" description="Controls if additional $A.log() messages are generated."/>
+    <aura:attribute name="requireUseStorageQueryParam" type="Boolean" default="false" description="Temporary control override for conditional enablement via aura.useStorage=true query param."/>
 	
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler event="aura:noConnection" action="{!c.noConnection}"/>

@@ -21,11 +21,11 @@
 	<aura:attribute name="title" type="String" description="The label to display in the UI." />
 	<aura:attribute name="leafClass" type="String" description="A custom class to apply if the node is a leaf" />
 	<aura:attribute name="class" type="String" description="A custom class to apply to this node" />
-	<aura:attribute name="expanded" type="Boolean" default="{!false}"
+	<aura:attribute name="expanded" type="Boolean" default="false"
 	   description="The expansion state of the node. Changing this is a no-op for leaf nodes." />
     <aura:attribute name="active" type="Boolean"
        description="The active state of the node. If true, then this node's &lt;li&gt; will have the DOM attribute active='true' and the node will scroll into view if necessary. "/>
-	<aura:attribute name="hidden" type="Boolean" default="{!false}"
+	<aura:attribute name="hidden" type="Boolean" default="false"
 	   description="Controls whether this node should render into the DOM. Currently unsupported." />
 	<aura:attribute name="item" type="java://org.auraframework.components.ui.TreeNode"
 	   description="For nodes generated via a server-side model, the dictionary representing the TreeNode object." />

@@ -25,10 +25,10 @@
 		<aura:if isTrue="{! !v.thang}">
 			<span class="itIsFalse">It is not true.</span>
 		</aura:if>
-		<aura:if isTrue="{!false}">
+		<aura:if isTrue="false">
 			<span class="itIsLiterallyFalse">It is literally false.</span>
 		</aura:if>
-		<aura:if isTrue="{!true}">
+		<aura:if isTrue="true">
 			<span class="itIsLiterallyNotFalse">It is literally not false.</span>
 		</aura:if>
 	</span>

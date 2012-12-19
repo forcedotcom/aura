@@ -17,9 +17,9 @@
 -->
 <aura:component>
 <!-- attribute that indicates that event has been called atleast once. Its set via c.doSearch -->
-<aura:attribute name="copyEventFired" type="boolean" default="{!false}"/>
-<aura:attribute name="cutEventFired" type="boolean" default="{!false}"/>
-<aura:attribute name="pasteEventFired" type="boolean" default="{!false}"/>
+<aura:attribute name="copyEventFired" type="boolean" default="false"/>
+<aura:attribute name="cutEventFired" type="boolean" default="false"/>
+<aura:attribute name="pasteEventFired" type="boolean" default="false"/>
 <aura:attribute name="value" type="string" default = "testText"/>
 	Input Text: <ui:inputText aura:id="inputCmp" copy="{!c.doCopy}" paste="{!c.doPaste}" cut="{!c.doCut}" value="{!v.value}"/> <br/>
 	Event Fired: <ui:outputText aura:id="outputStatus" value=""/> <br/><br/>

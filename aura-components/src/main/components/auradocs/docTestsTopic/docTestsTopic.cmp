@@ -50,7 +50,7 @@
     <code>?aura.mode=JSTESTDEBUG</code> to your production component. Remove or comment out the <code>debugger</code> statement after you finish debugging.</p>
     <p>Another useful tool for debugging is Google Chrome's Developer Tools.
             <ul>
-                <li>To open Developer Tools on Windows and Linux, press Control - Shift - I.</li>
+                <li>To open Developer Tools on Windows and Linux, press Control - Shift - I in your Chrome browser.</li>
                 <li>To quickly find which line of code a test fails on, enable the <b>Pause on all exceptions</b> option before running the test.</li>
              </ul>
              Learn more about how to use  breakpoints at <a href="https://developers.google.com/chrome-developer-tools/docs/scripts-breakpoints" target="_blank">Chrome Developer Tools</a>.</p>

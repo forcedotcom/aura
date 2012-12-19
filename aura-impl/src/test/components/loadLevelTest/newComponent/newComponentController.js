@@ -26,20 +26,22 @@
      */
     createCmpWithSimpleAttributes : function(cmp, evt, helper){
         helper.createComponentAndPushToBody(cmp, {componentDef: "markup://aura:text",
-                                                   attributes:{values:{
-                                                                        truncate:{descriptor:'truncate', value:6},
-                                                                        value:{descriptor:'value',value:"TextComponent"}
-                                                                       }
-                                                               }
+                                                   attributes:{
+                                                	   values:{ truncate:6,
+                                                                value:"TextComponent"
+                                                       }
+                                                   }
                                                  });
     },
     createCmpWithComplexAttributes: function(cmp, evt, helper){
-        helper.createComponentAndPushToBody(cmp, {componentDef: "markup://loadLevelTest:displayStringArray",
-               attributes:{values:{
-                                    StringArray:{descriptor:'StringArray', value:['one','two']}
-                                }
-                           }
-          });
+        helper.createComponentAndPushToBody(cmp, 
+        		{componentDef: "markup://loadLevelTest:displayStringArray",
+               		attributes:{
+	            	   values:{
+	                        StringArray:['one','two']
+	            	   }
+               		}
+        		});
     },
     /**
      * Create a component whose definition is not available at the client.
@@ -47,9 +49,9 @@
      */
     createCmpByFetchingDefFromServer : function(cmp, evt,helper){
         helper.createComponentAndPushToBody(cmp, {componentDef: "markup://loadLevelTest:displayNumber",
-                                                  attributes:{values:{number:{descriptor:'number', value:99}
-                                                                     }
-                                                             }
+                                                  attributes:{
+                                                	  values:{number:99}
+                                                  }
                                                  });
     },
     /**
@@ -59,9 +61,9 @@
      */
     createCmpWithServerDependecies : function(cmp, evt,helper){
         helper.createComponentAndPushToBody(cmp, {componentDef: "markup://loadLevelTest:serverComponent",
-                                                    attributes:{values:{stringAttribute:{descriptor:'stringAttribute', value:'creatingComponentWithServerDependecies'}
-                                                                        }
-                                                                }
+                                                    attributes:{
+                                                    	values:{stringAttribute:'creatingComponentWithServerDependecies'}
+                                                    }
                                                 });
     },
     /**

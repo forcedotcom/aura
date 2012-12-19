@@ -36,8 +36,7 @@
     /**
      * Tests to verify creating a component whose definition is fetched from the server.
      */
-    //W-1278764
-    _testConfig_FetchNewDefFromServer:{
+    testConfig_FetchNewDefFromServer:{
         test:[function(cmp){
             var action = cmp.get('c.createCmpByFetchingDefFromServer');
             action.run();
@@ -51,7 +50,7 @@
                     function(){
                         var textCmp = this.extractCmpFromPlaceholder(body[0],"markup://loadLevelTest:displayNumber");
                         //Since this is created under root component and this is the first component from the server
-                        $A.test.assertEquals("1:2",textCmp.getGlobalId(), "Expected global id to be 1:2");
+                        $A.test.assertEquals("1:1.2",textCmp.getGlobalId(), "Expected global id to be 1:2");
                         $A.test.assertEquals(99,textCmp.get('v.number'), "Failed to pass attribute values to placeholder");
                         $A.test.assertEquals("99",$A.test.getTextByComponent(textCmp), "Failed to pass attribute values to placeholder");
                     });
@@ -141,8 +140,7 @@
      * Verify that attributes are passed to the server with the post action.
      * The model for
      */
-    //W-1278805
-    _testConfig_ComponentWithServerDependecies:{
+    testConfig_ComponentWithServerDependecies:{
         test:[function(cmp){
             var action = cmp.get('c.createCmpWithServerDependecies');
             action.run();
@@ -157,7 +155,7 @@
 
                         $A.test.assertEquals('creatingComponentWithServerDependecies',serverCmp.get("m.string"),
                                 "Failed to send attribute with post action, model did not get the attribute required.");
-                        $A.test.assertEquals($A.test.getTextByComponent(textCmp).indexOf('creatingComponentWithServerDependecies')!=-1,
+                        $A.test.assertTrue($A.test.getTextByComponent(serverCmp).indexOf('creatingComponentWithServerDependecies')!=-1,
                             "Failed to set model value for local component");
                     });
         }]

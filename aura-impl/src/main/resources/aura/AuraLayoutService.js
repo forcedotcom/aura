@@ -137,7 +137,7 @@ var AuraLayoutService = function(){
                         var defaultAction = function() {
                             var action = item.getAction(cmp);
                             
-                            action.setStoreable();
+                            action.setStorable();
                             
                             //Only set params for actions specified in the layouts file.  components requests will already have the params set properly.
                             if(!item.getBody() || item.getBody().length === 0){

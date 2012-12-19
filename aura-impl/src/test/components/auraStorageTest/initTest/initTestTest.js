@@ -14,35 +14,35 @@
 			//Verify API for server actions
 			var a = cmp.get("c.fetchDataRecord");
 			$A.test.assertTrue( a.getDef().isServerAction());
-			$A.test.assertFalse(a.isStoreable(), "By default action should not be marked for storage.");
+			$A.test.assertFalse(a.isStorable(), "By default action should not be marked for storage.");
 			
-			a.setStoreable();
-			$A.test.assertTrue(a.isStoreable(), "Failed to mark action for storage.");
+			a.setStorable();
+			$A.test.assertTrue(a.isStorable(), "Failed to mark action for storage.");
 		}, function(cmp){
 			//Verify API for client actions
 			var a = cmp.get("c.forceActionAtServer");
 			try{
-				a.setStoreable();
+				a.setStorable();
 				$A.test.fail("Client actions cannot be marked for storage.");
 			}catch(e){
-				$A.test.assert(e.message.indexOf("Assertion Failed!: setStoreable() cannot be called on a client action.")===0);
+				$A.test.assert(e.message.indexOf("Assertion Failed!: setStorable() cannot be called on a client action.")===0);
 			}
-			$A.test.assertFalse(a.isStoreable());
+			$A.test.assertFalse(a.isStorable());
 		}
 		]
 	},
 	/**
-	 * Verify Action.isStoreable()
+	 * Verify Action.isStorable()
 	 */
-	testIsStoreableAPI:{
+	testIsStorableAPI:{
 		test:[function(cmp){
 			var a = cmp.get("c.fetchDataRecord");
-			a.setStoreable();
-			$A.test.assertTrue(a.isStoreable(), "Failed to mark action as storable.");
-			a.setStoreable({"ignoreExisting": true});
-			$A.test.assertFalse(a.isStoreable(), "Failed to use ignoreExisting as config.");
-			a.setStoreable({"ignoreExisting": false});
-			$A.test.assertTrue(a.isStoreable(), "Action was marked to not ignore existing storage config.");
+			a.setStorable();
+			$A.test.assertTrue(a.isStorable(), "Failed to mark action as storable.");
+			a.setStorable({"ignoreExisting": true});
+			$A.test.assertFalse(a.isStorable(), "Failed to use ignoreExisting as config.");
+			a.setStorable({"ignoreExisting": false});
+			$A.test.assertTrue(a.isStorable(), "Action was marked to not ignore existing storage config.");
 		}
 		]
 	},
@@ -63,10 +63,10 @@
 			$A.test.setTestTimeout(30000);
 			this.resetCounter(cmp, "testSetStorableAPI");
 		},function(cmp){
-			//Run the action and mark it as storeable.
+			//Run the action and mark it as storable.
 			var a = cmp.get("c.fetchDataRecord");
 			a.setParams({testName : "testSetStorableAPI"});
-			a.setStoreable();
+			a.setStorable();
 			a.runAfter(a);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor(false, $A.test.isActionPending,
@@ -80,7 +80,7 @@
 			//Test case 1: No refresh Override, default is 60 seconds
 			var aSecond = cmp.get("c.fetchDataRecord");
 			aSecond.setParams({testName : "testSetStorableAPI"});
-			aSecond.setStoreable();
+			aSecond.setStorable();
 			aSecond.runAfter(aSecond);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor("SUCCESS", function(){return aSecond.getState()},
@@ -95,7 +95,7 @@
 			var aThird = cmp.get("c.fetchDataRecord");
 			aThird.setParams({testName : "testSetStorableAPI"});
 			//Keeping the auto refresh time to 0, helps testing the override
-			aThird.setStoreable({"refresh": 0});
+			aThird.setStorable({"refresh": 0});
 			aThird.runAfter(aThird);
 			var requestTime = new Date().getTime();
 			//Make sure we haven't reached the autorefresh timeout already. Default is set to 60, so 30 is quite conservative
@@ -121,7 +121,7 @@
 							function(){
 								var aFourth = cmp.get("c.fetchDataRecord");
 								aFourth.setParams({testName : "testSetStorableAPI"});
-								aFourth.setStoreable();
+								aFourth.setStorable();
 								aFourth.runAfter(aFourth);
 								$A.eventService.finishFiring();
 								$A.test.addWaitFor("SUCCESS", function(){return aFourth.getState()},
@@ -149,7 +149,7 @@
 			var a = cmp.get("c.fetchDataRecord");
 			a.setParams({testName : "testSetStorableAPI_Empty"});
 			//Empty settings
-			a.setStoreable({});
+			a.setStorable({});
 			a.runAfter(a);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor(false, $A.test.isActionPending);
@@ -157,8 +157,8 @@
 			var aSecond = cmp.get("c.fetchDataRecord");
 			aSecond.setParams({testName : "testSetStorableAPI_Empty"});
 			//Empty settings
-			aSecond.setStoreable({});
-			$A.test.assertTrue(aSecond.isStoreable());
+			aSecond.setStorable({});
+			$A.test.assertTrue(aSecond.isStorable());
 			aSecond.runAfter(aSecond);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor("SUCCESS", function(){return aSecond.getState()},
@@ -181,8 +181,8 @@
 			var aUndefined = cmp.get("c.fetchDataRecord");
 			aUndefined.setParams({testName : "testSetStorableAPI_Undefined"});
 			//Undefined
-			aUndefined.setStoreable(undefined);
-			$A.test.assertTrue(aUndefined.isStoreable());
+			aUndefined.setStorable(undefined);
+			$A.test.assertTrue(aUndefined.isStorable());
 			aUndefined.runAfter(aUndefined);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor("SUCCESS", function(){return aUndefined.getState()},
@@ -194,8 +194,8 @@
 		}, function(cmp){
 			var aUndefinedSecond = cmp.get("c.fetchDataRecord");
 			aUndefinedSecond.setParams({testName : "testSetStorableAPI_Undefined"});
-			aUndefinedSecond.setStoreable(undefined);
-			$A.test.assertTrue(aUndefinedSecond.isStoreable());
+			aUndefinedSecond.setStorable(undefined);
+			$A.test.assertTrue(aUndefinedSecond.isStorable());
 			aUndefinedSecond.runAfter(aUndefinedSecond);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor("SUCCESS", function(){return aUndefinedSecond.getState()},
@@ -210,7 +210,7 @@
 							function(){
 								var aUndefinedThird = cmp.get("c.fetchDataRecord");
 								aUndefinedThird.setParams({testName : "testSetStorableAPI_Undefined"});
-								aUndefinedThird.setStoreable(undefined);
+								aUndefinedThird.setStorable(undefined);
 								aUndefinedThird.runAfter(aUndefinedThird);
 								$A.eventService.finishFiring();
 								$A.test.addWaitFor("SUCCESS", function(){return aUndefinedThird.getState()},
@@ -238,8 +238,8 @@
 			var aUndefined = cmp.get("c.fetchDataRecord");
 			aUndefined.setParams({testName : "testSetStorableAPI_UndefinedProps"});
 			//Undefined parts
-			aUndefined.setStoreable({"IgnoreExisting": undefined, "refresh":undefined});
-			$A.test.assertTrue(aUndefined.isStoreable());
+			aUndefined.setStorable({"IgnoreExisting": undefined, "refresh":undefined});
+			$A.test.assertTrue(aUndefined.isStorable());
 			aUndefined.runAfter(aUndefined);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor("SUCCESS", function(){return aUndefined.getState()},
@@ -251,8 +251,8 @@
 		}, function(cmp){
 			var aUndefinedSecond = cmp.get("c.fetchDataRecord");
 			aUndefinedSecond.setParams({testName : "testSetStorableAPI_UndefinedProps"});
-			aUndefinedSecond.setStoreable({"IgnoreExisting": undefined, "refresh":undefined});
-			$A.test.assertTrue(aUndefinedSecond.isStoreable());
+			aUndefinedSecond.setStorable({"IgnoreExisting": undefined, "refresh":undefined});
+			$A.test.assertTrue(aUndefinedSecond.isStorable());
 			aUndefinedSecond.runAfter(aUndefinedSecond);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor("SUCCESS", function(){return aUndefinedSecond.getState()},
@@ -267,7 +267,7 @@
 							function(){
 								var aUndefinedThird = cmp.get("c.fetchDataRecord");
 								aUndefinedThird.setParams({testName : "testSetStorableAPI_UndefinedProps"});
-								aUndefinedThird.setStoreable({"IgnoreExisting": undefined, "refresh":undefined});
+								aUndefinedThird.setStorable({"IgnoreExisting": undefined, "refresh":undefined});
 								aUndefinedThird.runAfter(aUndefinedThird);
 								$A.eventService.finishFiring();
 								$A.test.addWaitFor("SUCCESS", function(){return aUndefinedThird.getState()},
@@ -285,7 +285,7 @@
 		]
 	},
 	/**
-	 * Verify that an action can bypass the storage service when its not marked a Storeable.
+	 * Verify that an action can bypass the storage service when its not marked a Storable.
 	 * Verify isFromStorage() API on Action.
 	 */
 	testForceActionAtServer:{
@@ -297,7 +297,7 @@
 			cmp._testName = "testForceActionAtServer";
 			this.resetCounter(cmp, "testForceActionAtServer");
 		},function(cmp){
-			//Run the action and mark it as storeable.
+			//Run the action and mark it as storable.
 			var btn = cmp.find("RunActionAndStore");
 			var evt = btn.get("e.press");
 			evt.fire();
@@ -311,7 +311,7 @@
 						});
 		},
 		function(cmp){
-			//Re-Run the action without marking it as storeable, this should force the action to by pass memory service.
+			//Re-Run the action without marking it as storable, this should force the action to by pass memory service.
 			var btn = cmp.find("ForceActionAtServer");
 			var evt = btn.get("e.press");
 			evt.fire();
@@ -324,7 +324,7 @@
 					});
 		},
 		function(cmp){
-			//Re-Run the action and mark it as storeable. Expect to see the cached response.
+			//Re-Run the action and mark it as storable. Expect to see the cached response.
 			var btn = cmp.find("RunActionAndStore");
 			var evt = btn.get("e.press");
 			evt.fire();
@@ -344,7 +344,7 @@
 				this.resetCounter(cmp, "testUnmarkedActionAreNotStored");
 				$A.test.assertEquals(0, $A.storageService.getStorage().getSize());
 		},function(cmp){
-			//Run the action without marking it as storeable.
+			//Run the action without marking it as storable.
 			var btn = cmp.find("ForceActionAtServer");
 			var evt = btn.get("e.press");
 			evt.fire();
@@ -377,10 +377,10 @@
 			$A.test.setTestTimeout(30000);
 			this.resetCounter(cmp, "testCacheExpiration");
 		},function(cmp){
-			//Run the action and mark it as storeable.
+			//Run the action and mark it as storable.
 			var a = cmp.get("c.fetchDataRecord");
 			a.setParams({testName : "testCacheExpiration"});
-			a.setStoreable();
+			a.setStorable();
 			a.runAfter(a);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor(false, $A.test.isActionPending,
@@ -399,7 +399,7 @@
 			//Run the action and verify that new response was fetched from server
 			var aSecond = cmp.get("c.fetchDataRecord");
 			aSecond.setParams({testName : "testCacheExpiration"});
-			aSecond.setStoreable();
+			aSecond.setStorable();
 			aSecond.runAfter(aSecond);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor("SUCCESS", function(){return aSecond.getState()},
@@ -419,7 +419,7 @@
 		function(cmp){
 			var a = cmp.get("c.substring");
 			a.setParams({testName : "testActionKeyOverloading", param1 : 999});
-			a.setStoreable();
+			a.setStorable();
 			a.runAfter(a);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor(false, $A.test.isActionPending,
@@ -432,7 +432,7 @@
 			//Controller name is a substring of previous controller
 			var a = cmp.get("c.string");
 			a.setParams({testName : "testActionKeyOverloading", param1 : 999});
-			a.setStoreable();
+			a.setStorable();
 			a.runAfter(a);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor(false, $A.test.isActionPending,
@@ -445,7 +445,7 @@
 			//Controller name is the same as previous controller but different paramenter value
 			var a = cmp.get("c.string");
 			a.setParams({testName : "testActionKeyOverloading", param1 : 9999});
-			a.setStoreable();
+			a.setStorable();
 			a.runAfter(a);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor(false, $A.test.isActionPending,
@@ -474,11 +474,11 @@
 			//2 Stored actions
 			var a1 = cmp.get("c.substring");
 			a1.setParams({testName : "testActionGrouping_A", param1 : 999});
-			a1.setStoreable();
+			a1.setStorable();
 			a1.runAfter(a1);
 			var b1 = cmp.get("c.string");
 			b1.setParams({testName : "testActionGrouping_B", param1 : 666});
-			b1.setStoreable();
+			b1.setStorable();
 			b1.runAfter(b1);
 			//1 Unstored action
 			var notStored = cmp.get("c.fetchDataRecord");
@@ -490,7 +490,7 @@
 			//Run a action whose response has been previously stored
 			var a2 = cmp.get("c.substring");
 			a2.setParams({testName : "testActionGrouping_A", param1 : 999});
-			a2.setStoreable();
+			a2.setStorable();
 			a2.runAfter(a2);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor("SUCCESS", function(){return a2.getState()},
@@ -504,7 +504,7 @@
 			//Run a action whose response has been previously stored
 			var b2 = cmp.get("c.string");
 			b2.setParams({testName : "testActionGrouping_B", param1 : 666});
-			b2.setStoreable();
+			b2.setStorable();
 			b2.runAfter(b2);
 			//Run a action which was previously not marked to be stored and group it with the one above
 			var notStoredAgain = cmp.get("c.fetchDataRecord");
@@ -543,14 +543,14 @@
 			cmp._testCounter = 2;
 			var abortable1 = cmp.get("c.substring");
 			abortable1.setParams({testName : "testAbortableAction_A", param1 : 999});
-			abortable1.setStoreable();
-			$A.test.assertTrue(abortable1.isAbortable(), "Storeable actions should be abortable by default.")
+			abortable1.setStorable();
+			$A.test.assertTrue(abortable1.isAbortable(), "Storable actions should be abortable by default.")
 			
 			var abortable2 = cmp.get("c.string");
 			abortable2.setParams({testName : "testAbortableAction_B", param1 : 666});
 			abortable2.setAbortable();
-			$A.test.assertFalse(abortable2.isStoreable(), "The converse is not true. Abortable does not mean its storeable.")
-			abortable2.setStoreable();
+			$A.test.assertFalse(abortable2.isStorable(), "The converse is not true. Abortable does not mean its storable.")
+			abortable2.setStorable();
 			
 			//Why does abortable work only in another action's callback? Gerald?
 			var a = cmp.get("c.fetchDataRecord");
@@ -571,7 +571,7 @@
 		},function(cmp){
 			var abortedAction = cmp.get("c.substring");
 			abortedAction.setParams({testName : "testAbortableAction_A", param1 : 999});
-			abortedAction.setStoreable();
+			abortedAction.setStorable();
 			abortedAction.runAfter(abortedAction);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor("SUCCESS", function(){return abortedAction.getState()},
@@ -583,7 +583,7 @@
 		},function(cmp){
 			var successfulAction = cmp.get("c.string");
 			successfulAction.setParams({testName : "testAbortableAction_B", param1 : 666});
-			successfulAction.setStoreable();
+			successfulAction.setStorable();
 			successfulAction.runAfter(successfulAction);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor("SUCCESS", function(){return successfulAction.getState()},

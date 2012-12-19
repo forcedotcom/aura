@@ -32,7 +32,7 @@
 		a.setExclusive();
 		a.runAfter(a);
 	},
-	getTeamAndPlayers:function(cmp, storeable){
+	getTeamAndPlayers:function(cmp, storable){
 		var _testName = cmp._testName;
 		//First Action
 		var aTeam = cmp.get("c.getBaseball");
@@ -48,8 +48,8 @@
 		aTeam.setParams({
 			testName: (!_testName?"baseBall":_testName)
 		});
-		if(storeable)
-			aTeam.setStoreable();
+		if(storable)
+			aTeam.setStorable();
 		aTeam.runAfter(aTeam);
 		
 		//Second Action
@@ -69,11 +69,11 @@
 		aPlayers.setParams({
 			testName: (!_testName?"baseBall":_testName)
 		});
-		if(storeable)
-			aPlayers.setStoreable();
+		if(storable)
+			aPlayers.setStorable();
 		aPlayers.runAfter(aPlayers);
 	},
-	getTeamOnly:function(cmp,storeable){
+	getTeamOnly:function(cmp,storable){
 		this.setCounter(cmp,0);
 		var _testName = cmp._testName;
 		var a = cmp.get("c.getBaseball");
@@ -89,12 +89,12 @@
 		a.setParams({
 			testName: (!_testName?"baseBall":_testName)
 		});
-		if(storeable)
-			a.setStoreable();
+		if(storable)
+			a.setStorable();
 		a.runAfter(a);
 		cmp.find("Actions").getElement().innerHTML = a.getId();
 	},
-	getPlayersOnly:function(cmp,storeable){
+	getPlayersOnly:function(cmp,storable){
 		this.setCounter(cmp,1);
 		var _testName = cmp._testName;
 		var a = cmp.get("c.getBaseball");
@@ -113,8 +113,8 @@
 		a.setParams({
 			testName: (!_testName?"baseBall":_testName)
 		});
-		if(storeable)
-			a.setStoreable();
+		if(storable)
+			a.setStorable();
 		a.runAfter(a);
 		cmp.getDef().getHelper().findAndSetText(cmp, "Actions", a.getId());
 	},

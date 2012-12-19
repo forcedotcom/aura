@@ -211,7 +211,7 @@ Action.prototype.complete = function(response) {
         }
 
         var storage = $A.storageService.getStorage();
-        if (storage && this._isStoreable() && this.getState() === "SUCCESS") {
+        if (storage && this._isStorable() && this.getState() === "SUCCESS") {
             var storageName = storage.getName();
             var key = this.getStorageKey();
             if (!this.storage) {
@@ -285,31 +285,31 @@ Action.prototype.isExclusive = function() {
 };
 
 /**
- * Marks the Action as storeable.
+ * Marks the Action as storable.
  * For server-side Actions only.
- * @param {Object} config Checks that the Action is server-side and mark it as storeable and abortable.
+ * @param {Object} config Checks that the Action is server-side and mark it as storable and abortable.
  */
-Action.prototype.setStoreable = function(config) {
-    $A.assert(this.def.isServerAction(), "setStoreable() cannot be called on a client action.");
-    this.storeable = true;
-    this.storeableConfig = config;
+Action.prototype.setStorable = function(config) {
+    $A.assert(this.def.isServerAction(), "setStorable() cannot be called on a client action.");
+    this.storable = true;
+    this.storableConfig = config;
 
-    // Storeable actions must also be abortable (idempotent, replayable and non-mutating)
+    // Storable actions must also be abortable (idempotent, replayable and non-mutating)
     this.setAbortable();
 };
 
 /**
- * Checks if the function is storeable.
+ * Checks if the function is storable.
  * For server-side Action only.
- * @returns {Boolean} The function is storeable (true), or false otherwise.
+ * @returns {Boolean} The function is storable (true), or false otherwise.
  */
-Action.prototype.isStoreable = function() {
-    var ignoreExisting = this.storeableConfig && this.storeableConfig["ignoreExisting"];
-    return this._isStoreable() && !ignoreExisting;
+Action.prototype.isStorable = function() {
+    var ignoreExisting = this.storableConfig && this.storableConfig["ignoreExisting"];
+    return this._isStorable() && !ignoreExisting;
 };
 
-Action.prototype._isStoreable = function() {
-    return this.storeable || false;
+Action.prototype._isStorable = function() {
+    return this.storable || false;
 };
 
 /**
@@ -366,7 +366,7 @@ Action.prototype.refresh = function() {
     var storage = this.getStorage();
     if (storage) {
         var storageService = $A.storageService.getStorage();
-        var autoRefreshInterval = this.storeableConfig ? this.storeableConfig["refresh"] * 1000 : storageService.getDefaultAutoRefreshInterval();
+        var autoRefreshInterval = this.storableConfig ? this.storableConfig["refresh"] * 1000 : storageService.getDefaultAutoRefreshInterval();
 
         // Only auto refresh if the data we have is more than v.autoRefreshInterval seconds old
         var now = new Date().getTime();
@@ -386,7 +386,7 @@ Action.prototype.refresh = function() {
             var refreshAction = action.getDef().newInstance(cmp);
             refreshAction.setCallback(action.callbackScope, action.callback);
             refreshAction.setParams(action.params);
-            refreshAction.setStoreable({
+            refreshAction.setStorable({
                 "ignoreExisting": true
             });
 

@@ -23,11 +23,12 @@
         path.push('stringAttribute');
         var expr = $A.expressionService.create(null, {"exprType":"PROPERTY", "path": path});
         var config = {componentDef:"markup://aura:text",
-                      attributes:{values:{
-                                    truncate:{descriptor:'truncate', value:6},
-                                    value:{descriptor:'value',value:expr}
-                                         }
-                                 },
+                      attributes:{
+                    	  values:{
+                                    truncate:6,
+                                    value:expr
+                                 }
+                          },
                       localId:"txt_Id"
                      };
         helper.createComponentAndPushToBody(cmp,config,cmp);
@@ -42,11 +43,12 @@
         path.push('nameAttribute');
         var expr = $A.expressionService.create(null, {"exprType":"PROPERTY", "path": path});
         var config = {componentDef:"markup://aura:text",
-                      attributes:{values:{
-                                    truncate:{descriptor:'truncate', value:10},
-                                    value:{descriptor:'value',value:expr}
-                                         }
-                                 },
+                      attributes:{
+                    	  values:{
+	                            truncate:10,
+	                            value:expr
+                          }
+                      },
                       localId:"txt_Id"
                      };
         var avp = $A.expressionService.createPassthroughValue({}, cmp)
@@ -65,10 +67,11 @@
 
         //Specify current component's attribute as value for new cmp's attribute
         var config = {componentDef:"markup://loadLevelTest:displayNumber",
-                      attributes:{values:{
-                                    number:{descriptor:'number',value:expr}
-                                         }
-                                 },
+                      attributes:{
+                    	  values:{
+                              number:expr
+                          }
+                      },
                       /**TODO W-1318095: Cannot specify localId for defs fetched from server
                       localId:"num_Id"*/
                      };
@@ -89,11 +92,12 @@
         path.push('stringAttribute');
         var expr = $A.expressionService.create(null, {"exprType":"PROPERTY", "path": path});
         var config = {componentDef:"markup://aura:text",
-                      attributes:{values:{
-                                    truncate:{descriptor:'truncate', value:6},
-                                    value:{descriptor:'value',value:expr}
-                                         }
-                                 }
+                      attributes:{
+                    	  values:{
+                               truncate:6,
+                               value:expr
+                          }
+                      }
                      };
         helper.createComponentAndPushToBody(cmp,config,{});
     },
@@ -107,11 +111,12 @@
         path.push('stringAttribute');
         var expr = $A.expressionService.create(null, {"exprType":"PROPERTY", "path": path});
         var config = {componentDef:"markup://aura:text",
-                      attributes:{values:{
-                                    truncate:{descriptor:'truncate', value:6},
-                                    value:{descriptor:'value',value:expr}
-                                         }
-                                 }
+                      attributes:{
+                    	  values:{
+	                           truncate:6,
+	                           value:expr
+                          }
+                      }
                      };
         helper.createComponentAndPushToBody(cmp,config,undefined);
     },
@@ -120,11 +125,12 @@
      */
     createCmpWithNoRequirementForAVP : function(cmp, evt,helper){
         var config = {componentDef:"markup://aura:text",
-                      attributes:{values:{
-                                    truncate:{descriptor:'truncate', value:14},
-                                    value:{descriptor:'value',value:'SelfSustaining'}
-                                         }
-                                 }
+                      attributes:{
+                    	  values:{
+                            truncate:14,
+                            value:'SelfSustaining'
+                          }
+                      }
                      };
         helper.createComponentAndPushToBody(cmp,config,undefined);
     },

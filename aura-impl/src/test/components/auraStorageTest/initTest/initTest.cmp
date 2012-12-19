@@ -16,7 +16,7 @@
                       
     <ui:button label="Run action at Server Always" press="{!c.forceActionAtServer}" aura:id="ForceActionAtServer"/>
     <p/>
-    <ui:button label="Run action at Server and mark as storeable" press="{!c.runActionAtServerAndStore}" aura:id="RunActionAndStore"/>
+    <ui:button label="Run action at Server and mark as storable" press="{!c.runActionAtServerAndStore}" aura:id="RunActionAndStore"/>
     <p/>
     <ui:button label="Re-run action and verify cached response" press="{!c.fetchActionFromStorage}"/>
     <p/>

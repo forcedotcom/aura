@@ -45,9 +45,19 @@
     http://&lt;your server&gt;/ui/inputAddr.cmp?aura.mode=JSTEST</code> and the test results are displayed in the same tab on the browser.</p>
 
     <h2>Debugging Components</h2>
+    <h3>Tools</h3>
     <p>Use the <code>debugger;</code> statement to debug your JavaScript test. You can view your debug output by appending
     <code>?aura.mode=JSTESTDEBUG</code> to your production component. Remove or comment out the <code>debugger</code> statement after you finish debugging.</p>
+    <p>Another useful tool for debugging is Google Chrome's Developer Tools.
+            <ul>
+                <li>To open Developer Tools on Windows and Linux, press Control - Shift - I in your Chrome browser.</li>
+                <li>To quickly find which line of code a test fails on, enable the <b>Pause on all exceptions</b> option before running the test.</li>
+             </ul>
+             Learn more about how to use  breakpoints at <a href="https://developers.google.com/chrome-developer-tools/docs/scripts-breakpoints" target="_blank">Chrome Developer Tools</a>.</p>
 
+    <h3>Writing Asserts</h3>
+    <p>Include unique and specific error messages in your assert statements. For example, use <code>assertTrue(run, "Returns true if the action has run successfully.")</code>
+    instead of a generic message. Making each assert message unique also helps in narrowing down which assert statement has failed. </p>
     <p><b>See also:</b><br/>
         <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink>
     </p>

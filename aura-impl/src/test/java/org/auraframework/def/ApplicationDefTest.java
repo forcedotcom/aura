@@ -196,10 +196,10 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         Aura.getContextService().endContext();
 
         DefDescriptor<ComponentDef> newCompDesc = addSourceAutoCleanup(ComponentDef.class, componentText);
-        ((StringSource)auraTestingUtil.getSource(newCompDesc)).setLastModified(later);
+        ((StringSource<?>)auraTestingUtil.getSource(newCompDesc)).setLastModified(later);
         appText = String.format(appFormat, newCompDesc.getNamespace(), newCompDesc.getNamespace(), newCompDesc.getName());
         DefDescriptor<ApplicationDef> newerAppDesc = addSourceAutoCleanup(ApplicationDef.class, appText);
-        ((StringSource)auraTestingUtil.getSource(newerAppDesc)).setLastModified(later);
+        ((StringSource<?>)auraTestingUtil.getSource(newerAppDesc)).setLastModified(later);
 
         // Start a newerApp context in DEV mode so that we can update the lastMod cache.
         Aura.getContextService().startContext(Mode.DEV, null, Access.AUTHENTICATED, newerAppDesc);

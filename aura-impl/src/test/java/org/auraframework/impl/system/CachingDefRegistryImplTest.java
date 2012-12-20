@@ -144,7 +144,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.PROD, null, Format.JSON, Access.AUTHENTICATED, laxSecurityApp);
 
-        StringSource source = (StringSource)auraTestingUtil.getSource(dd);
+        StringSource<?> source = (StringSource<?>)auraTestingUtil.getSource(dd);
         source.addOrUpdate(String.format(markup, "<aura:attribute type=\"String\" name=\"attr\"/>"));
         // Verify that the initial def object hasn't been updated
         assertEquals(initialTimeStamp, initialDef.getLocation().getLastModified());
@@ -169,7 +169,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         long startTimeStamp = System.currentTimeMillis() - 60000;
         String markup = "<aura:component> %s </aura:component>";
         DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(ComponentDef.class, String.format(markup, ""));
-        ((StringSource)auraTestingUtil.getSource(dd)).setLastModified(startTimeStamp);
+        ((StringSource<?>)auraTestingUtil.getSource(dd)).setLastModified(startTimeStamp);
         ComponentDef initialDef = dd.getDef();
         long initialTimeStamp = initialDef.getLocation().getLastModified();
         assertEquals(startTimeStamp, initialTimeStamp);
@@ -179,7 +179,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         // request (context of the request)
         Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.PROD, null, Format.JSON, Access.AUTHENTICATED, laxSecurityApp);
-        StringSource source = (StringSource)auraTestingUtil.getSource(dd);
+        StringSource<?> source = (StringSource<?>)auraTestingUtil.getSource(dd);
         source.addOrUpdate(String.format(markup, "<aura:attribute type=\"String\" name=\"attr\"/>"));
         source.setLastModified(startTimeStamp + 5);
         // Verify that the initial def object hasn't been updated

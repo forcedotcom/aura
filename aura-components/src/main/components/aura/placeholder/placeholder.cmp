@@ -19,7 +19,7 @@
     <aura:attribute name="body" type="Aura.Component[]">
         <div class="spin"/>
     </aura:attribute>
-    <aura:attribute name="refDescriptor" type="String"/>
+    <aura:attribute name="refDescriptor" type="java://org.auraframework.def.DefDescriptor"/>
     <aura:attribute name="attributes" type="Object"/>
     <aura:attribute name="loaded" type="Boolean" default="false"/>
     <aura:attribute name="exclusive" type="Boolean" default="false"/>

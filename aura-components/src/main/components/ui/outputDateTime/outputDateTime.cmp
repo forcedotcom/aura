@@ -16,7 +16,7 @@
 
 -->
 <aura:component extends="ui:output" implements="ui:outputDateComponent" extensible="true" model="java://org.auraframework.component.ui.OutputDateTimeModel" support="GA"
-    description="Displays a date, time, and timezone in the default or specified format.">
+    description="Displays a date, time, and timezone in the default or specified format based on the user's locale.">
     <!-- If you bind the "value" attribute to an Apex model then the Apex DateTime's timezone will be used by default.
          You can specify a literal value which must be long value representing milliseconds since Jan 1 1970. -->
     <aura:attribute name="value" type="DateTime" required="true" description="The value of the date and time to be output. A literal value (long) can be used to represent milliseconds since Jan 1, 1970."/>

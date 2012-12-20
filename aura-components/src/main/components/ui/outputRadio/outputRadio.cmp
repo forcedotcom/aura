@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:output" extensible="true" support="GA" description="Displays a radio button based on the value attribute.">
+<aura:component extends="ui:output" extensible="true" support="PROTO" description="Displays a radio button based on the value attribute.">
     <ui:underConstruction/>
 </aura:component>

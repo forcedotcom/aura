@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:output" extensible="true" model="java://org.auraframework.component.ui.OutputCurrencyModel" support="GA" description="Displays the currency in the default or specified format.">
+<aura:component extends="ui:output" extensible="true" model="java://org.auraframework.component.ui.OutputCurrencyModel" support="GA" description="Displays the currency in the default or specified format, such as with specific currency code or decimal places.">
     <aura:attribute name="value" type="Decimal" required="true" description="The output value of the currency, which is defined as type Decimal."/>
     <!-- fractionDigits is the number of digits to the right of the decimal place, the max value supported is 340-->
     <aura:attribute name="fractionDigits" type="Integer" default="2" description="The maximum number of digits to the right of the decimal place. Default value is &#8220;2&#8221;. The maximum number allowed is 340."/>

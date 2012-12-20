@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:output" extensible="true" model="java://org.auraframework.component.ui.OutputPercentModel" support="GA" description="Displays the percentage in the default or specified format.">
+<aura:component extends="ui:output" extensible="true" model="java://org.auraframework.component.ui.OutputPercentModel" support="GA" description="Displays the percentage in the default or specified format with the user's locale.">
     <aura:attribute name="value" type="Decimal" required="true" description="The percentage displayed when this component is rendered."/>
     <aura:attribute name="format" type="String" description="The format of the percent of type String."/>
     <!-- the displayed result will be value * ten raised to the power of valueScale * 100%  -->

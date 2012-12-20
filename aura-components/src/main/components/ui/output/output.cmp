@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component abstract="true" extensible="true" extends="ui:interactive" description="Displays the output as type Object." support="GA">
-    <aura:attribute name="value" type="Object" required="true" description="The text displayed when the output is rendered."/>
+<aura:component abstract="true" extensible="true" extends="ui:interactive" description="The base component of most output components." support="GA">
+    <aura:attribute name="value" type="Object" required="true" description="The value displayed when the output is rendered."/>
     {!v.body}
 </aura:component>

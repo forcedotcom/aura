@@ -28,7 +28,6 @@ import org.auraframework.impl.source.BaseSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 
-import org.auraframework.system.DescriptorMatcher;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;

@@ -219,14 +219,14 @@ public final class TestComponent implements ComponentDef{
 
     }
 
-        @Override
-        public void markValid() {
-        }
+    @Override
+    public void markValid() {
+    }
 
-        @Override
-        public boolean isValid() {
-            return true;
-        }
+    @Override
+    public boolean isValid() {
+        return true;
+    }
 
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies)

@@ -19,7 +19,6 @@ import java.util.*;
 
 import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.system.DescriptorMatcher;
 import org.auraframework.system.Source;
 
 import com.google.common.collect.Maps;
@@ -78,12 +77,11 @@ public class StaticDefRegistryImpl<T extends Definition> extends DefRegistryImpl
     }
 
     @Override
-    public Set<DefDescriptor<?>> find(String matcher) {
-        DescriptorMatcher dm = new DescriptorMatcher(matcher);
+    public Set<DefDescriptor<?>> find(DescriptorMatcher matcher) {
         Set<DefDescriptor<?>> ret = new HashSet<DefDescriptor<?>>();
 
         for(DefDescriptor<T> key : defs.keySet()){
-            if(dm.matchDescriptor(key)) {
+            if(matcher.matchDescriptor(key)) {
                 ret.add(key);
             }
         }

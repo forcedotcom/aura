@@ -184,31 +184,35 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         addSourceAutoCleanup(ApplicationDef.class, baseContents, String.format("pants%sparty", nonce));
 
         // Test wildcards
-        assertEquals("find() fails with wildcard as prefix", 1, definitionService.find("*://" + houseboat.getDescriptorName())
-                .size());
-        assertEquals("find() fails with wildcard as namespace", 1, definitionService.find("markup://*:" + houseboat.getName())
-                .size());
-        assertEquals("find() fails with wildcard as name", 1, definitionService.find(houseboat.getQualifiedName()).size());
+        assertEquals("find() fails with wildcard as prefix", 1,
+                     definitionService.find(new DescriptorMatcher("*://" + houseboat.getDescriptorName())).size());
+        assertEquals("find() fails with wildcard as namespace", 1,
+                     definitionService.find(new DescriptorMatcher("markup://*:" + houseboat.getName())).size());
+        assertEquals("find() fails with wildcard as name", 1,
+                     definitionService.find(new DescriptorMatcher(houseboat.getQualifiedName())).size());
         assertEquals("find() fails with wildcard at end of name", 2,
-                definitionService.find(String.format("markup://string:house%s*", nonce)).size());
+                     definitionService.find(new DescriptorMatcher(String.format("markup://string:house%s*", nonce))).size());
         assertEquals("find() fails with wildcard at beginning of name", 2,
-                definitionService.find(String.format("markup://string:*%sparty*", nonce)).size());
+                     definitionService.find(new DescriptorMatcher(String.format("markup://string:*%sparty*", nonce))).size());
         assertEquals("find() should not find nonexistent name with preceeding wildcard", 0,
-                definitionService.find("markup://string:*notherecaptain").size());
+                     definitionService.find(new DescriptorMatcher("markup://string:*notherecaptain")).size());
 
         // Look in NonCachingDefRegistry
-        assertEquals("find() should find a single component", 1, definitionService.find("markup://ui:outputNumber")
-                .size());
-        assertEquals("find() fails with wildcard as prefix", 3, definitionService.find("*://ui:outputNumber").size());
-        assertEquals("find() is finding non-existent items", 0, definitionService.find("markup://ui:doesntexist")
-                .size());
+        assertEquals("find() should find a single component", 1,
+                     definitionService.find(new DescriptorMatcher("markup://ui:outputNumber")).size());
+        assertEquals("find() fails with wildcard as prefix", 3,
+                     definitionService.find(new DescriptorMatcher("*://ui:outputNumber")).size());
+        assertEquals("find() is finding non-existent items", 0,
+                     definitionService.find(new DescriptorMatcher("markup://ui:doesntexist")).size());
 
         // Look in AuraStaticTypeDefRegistry (StaticDefRegistry)
-        assertEquals("find() fails looking in StaticDefRegistry", 1, definitionService.find("aura://*:String").size());
+        assertEquals("find() fails looking in StaticDefRegistry", 1,
+                     definitionService.find(new DescriptorMatcher("aura://*:String")).size());
         // Look in AuraStaticControllerDefRegistry (StaticDefRegistry)
         assertEquals("find() fails looking in StaticDefRegistry", 1,
-                definitionService.find("aura://*:ComponentController").size());
-        assertEquals("find() is finding non-existent items", 0, definitionService.find("aura://*:doesntexist").size());
+                     definitionService.find(new DescriptorMatcher("aura://*:ComponentController")).size());
+        assertEquals("find() is finding non-existent items", 0,
+                     definitionService.find(new DescriptorMatcher("aura://*:doesntexist")).size());
 
         // Find css
         // This always returns 0 results - W-1426841

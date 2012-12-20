@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DescriptorMatcher;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.RootDefFactory;
 import org.auraframework.impl.source.SourceFactory;
@@ -61,22 +62,23 @@ public class RootDefFactoryTest extends AuraImplTestCase {
 
         assertTrue("RootDefFactory should have a find() method", factory.hasFind());
         assertTrue("find() not finding all sources",
-                factory.find(String.format("markup://%s:*", namespace)).size() == 3);
-        assertEquals("find() fails with wildcard as prefix", 1, factory.find("*://" + houseboat.getDescriptorName())
-                .size());
-        assertEquals("find() fails with wildcard as namespace", 1, factory.find("markup://*:" + houseboat.getName())
-                .size());
-        assertEquals("find() fails with wildcard as name", 1, factory.find(houseboat.getQualifiedName()).size());
+                   factory.find(new DescriptorMatcher(String.format("markup://%s:*", namespace))).size() == 3);
+        assertEquals("find() fails with wildcard as prefix", 1,
+                     factory.find(new DescriptorMatcher("*://" + houseboat.getDescriptorName())).size());
+        assertEquals("find() fails with wildcard as namespace", 1,
+                     factory.find(new DescriptorMatcher("markup://*:" + houseboat.getName())).size());
+        assertEquals("find() fails with wildcard as name", 1,
+                     factory.find(new DescriptorMatcher(houseboat.getQualifiedName())).size());
         assertEquals("find() fails with wildcard at end of name", 2,
-                factory.find(String.format("markup://%s:house*", namespace)).size());
+                     factory.find(new DescriptorMatcher(String.format("markup://%s:house*", namespace))).size());
         assertEquals("find() fails with wildcard at beginning of name", 2,
-                factory.find(String.format("markup://%s:*party*", namespace)).size());
+                     factory.find(new DescriptorMatcher(String.format("markup://%s:*party*", namespace))).size());
 
         assertEquals("find() should not find nonexistent name", 0,
-                factory.find(String.format("markup://%s:househunters", namespace)).size());
+                     factory.find(new DescriptorMatcher(String.format("markup://%s:househunters", namespace))).size());
         assertEquals("find() should not find nonexistent name ending with wildcard", 0,
-                factory.find(String.format("markup://%s:househunters*", namespace)).size());
+                     factory.find(new DescriptorMatcher(String.format("markup://%s:househunters*", namespace))).size());
         assertEquals("find() should not find nonexistent name with preceeding wildcard", 0,
-                factory.find(String.format("markup://%s:*notherecaptain", namespace)).size());
+                     factory.find(new DescriptorMatcher(String.format("markup://%s:*notherecaptain", namespace))).size());
     }
 }

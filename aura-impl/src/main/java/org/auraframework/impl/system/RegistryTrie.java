@@ -20,7 +20,6 @@ import java.util.*;
 import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.DefRegistry;
-import org.auraframework.system.DescriptorMatcher;
 import org.auraframework.throwable.AuraError;
 
 import com.google.common.collect.Sets;

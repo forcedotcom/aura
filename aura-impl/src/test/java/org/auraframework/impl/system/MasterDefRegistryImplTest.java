@@ -58,6 +58,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         StringSourceLoader loader =  StringSourceLoader.getInstance();
         List<SourceLoader> loaders = Lists.newArrayList((SourceLoader)loader);
         RootDefFactory factory = new RootDefFactory(new SourceFactory(loaders));
+        @SuppressWarnings("rawtypes")
         NonCachingDefRegistryImpl nonCachDefReg = new NonCachingDefRegistryImpl(factory, defTypes, prefixes);
         MasterDefRegistryImpl masterDefReg = new MasterDefRegistryImpl(nonCachDefReg);
 

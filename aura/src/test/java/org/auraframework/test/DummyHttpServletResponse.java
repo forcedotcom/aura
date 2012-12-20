@@ -36,6 +36,8 @@ public class DummyHttpServletResponse implements HttpServletResponse {
      * this {@link RuntimeException} if those are called.
      */
     public static class NotImplementedException extends RuntimeException {
+        private static final long serialVersionUID = 4533660990974185099L;
+
         public NotImplementedException(String method) {
             super(String.format("If %s is called, it should have been overridden by a subclass",
                     method));

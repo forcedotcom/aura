@@ -37,6 +37,8 @@ public class ConfigAdapterImplTest extends UnitTestCase {
 
     // An exception thrown to test error handling.
     public static class MockException extends RuntimeException {
+        private static final long serialVersionUID = -8065118313848222864L;
+
         public MockException(String string) {
         }
     };

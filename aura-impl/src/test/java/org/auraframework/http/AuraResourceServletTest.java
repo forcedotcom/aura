@@ -33,6 +33,7 @@ import org.auraframework.test.*;
 public class AuraResourceServletTest extends AuraTestCase {
 
     public static class SimulatedErrorException extends RuntimeException {
+        private static final long serialVersionUID = 411181168049748986L;
     }
 
     public AuraResourceServletTest() {

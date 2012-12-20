@@ -37,6 +37,7 @@ public class AuraContextFilterTest extends AuraTestCase {
         Mockito.when(mock.getContextPath()).thenReturn(input);
         AuraContext context = filter.startContext(mock, null, null);
         assertEquals(expected, context.getContextPath());
+        filter.endContext();
     }
 
     public void testStartContextContextPath() throws Exception {

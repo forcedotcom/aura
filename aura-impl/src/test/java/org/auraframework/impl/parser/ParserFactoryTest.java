@@ -28,8 +28,4 @@ public class ParserFactoryTest extends AuraImplTestCase {
         assertNotNull(new ParserFactory());
         assertEquals(Parser.Format.XML, Parser.Format.valueOf("XML"));
     }
-
-    //FIXMEDLP
-    /*
-    */
 }

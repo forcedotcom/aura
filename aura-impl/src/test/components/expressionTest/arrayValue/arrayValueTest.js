@@ -535,6 +535,7 @@
             array.insert(0, "squeeze");
             this.assertChangeEvent(component);
 
+              // TODO(W-1322739): change event not firing when array item is destroyed
 //            $A.log("for destroy");
 //            val.destroy();
 //            this.assertChangeEvent(component, 1, val);

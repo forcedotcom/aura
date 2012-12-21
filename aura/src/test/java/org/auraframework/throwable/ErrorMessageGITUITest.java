@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 package org.auraframework.throwable;
-import org.openqa.selenium.By;
-
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
+import org.openqa.selenium.By;
 /**
  * Automation for error message displayed in auraErrorMask div.
  *
@@ -32,7 +31,7 @@ public class ErrorMessageGITUITest extends WebDriverTestCase {
     }
     /**
      * Verify that error message box displays in the auraErrorMask div and can be dismissed using the close button.
-     * W-1091838
+     * Automation for W-1091838.
      */
     public void testErrorMessageDisplayAndClose() throws Exception{
         open("/test/laxSecurity.app", Mode.PROD);

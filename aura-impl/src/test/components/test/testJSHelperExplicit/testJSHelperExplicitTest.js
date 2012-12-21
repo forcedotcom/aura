@@ -39,12 +39,11 @@
     /**
      * When an explicit helper method is specified, local helper file in component directory is ignored
      */
-    //TODO, this is a bug, how is it that you can see helper on parent and not yourself
     testHelperLocalToComponent:{
         test:function(component){
             var helper = component.getDef().getHelper();
             aura.test.assertNotNull(helper);
-            aura.test.assert(!helper.localMethodFortestJSHelperExplicit, "Should not be able to see local helper methods." );
+            aura.test.assert(!helper.localMethodFortestJSHelperExplicit, "Should not be able to see local helper methods when helper is explicitly defined on component." );
         }
     }
 

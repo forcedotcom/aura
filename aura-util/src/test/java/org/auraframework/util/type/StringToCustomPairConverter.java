@@ -39,7 +39,6 @@ public class StringToCustomPairConverter implements Converter<String, CustomPair
 
     @Override
     public Class<?>[] getToParameters() {
-        // TODO Auto-generated method stub
         return null;
     }
 }

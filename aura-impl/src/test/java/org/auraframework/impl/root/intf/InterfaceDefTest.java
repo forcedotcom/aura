@@ -244,4 +244,23 @@ public class InterfaceDefTest extends AuraImplTestCase {
         } catch (InvalidSystemAttributeException expected) {
         }
     }
+
+    /**
+     * Test to verify that InterfaceDef has information about server dependency.
+     * Creating instances of interface on the clientside would require server
+     * dependency information. Make sure this information is part of interface
+     * def.
+     */
+    // TODO: W-1476870
+    /*
+    * public void testHasLocalDependencies(){ assertFalse(
+    * "An interface with clientside provider does not depend on server.",
+    * definitionService.getDefinition("test:test_JSProvider_Interface",
+    * InterfaceDef.class).hasLocalDependencies());
+    * assertTrue("An interface with only serverside provider depends on server."
+    * , definitionService.getDefinition("test:test_Provider_Interface",
+    * InterfaceDef.class).hasLocalDependencies());
+    *
+    * }
+    */
 }

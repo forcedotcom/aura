@@ -45,43 +45,60 @@ public final class LocalizationServiceTestData {
      * Test data for Dates
      */
     public static final int[] DATE_FORMATS = {DateFormat.DEFAULT, DateFormat.SHORT, DateFormat.MEDIUM, DateFormat.LONG, DateFormat.FULL};
-    // TODO: Add dates around y2k, near edge of DST cut-overs, Feb 29 on leap and non-leap years, etc.
     public static final Date[] DATES = {
-        new Date(), // now
-        new Date(1000L), // early in 1970
+        new Date(),               // now
+        new Date(1000L),          // early in 1970
         new Date(1333322872649L), // April 1, 2012
-        new Date(0) // January 1, 1970 00:00:00.000 GMT
+        new Date(0),              // January 1, 1970 00:00:00.000 GMT
+        new Date(946684800000L),  // January 1, 2000 00:00:00.000 GMT (Y2K)
+        new Date(946684801000L),  // January 1, 2000 00:00:01.000 GMT
+        new Date(1330502400000L), // February 29, 2012 (Leap year)
+        new Date(1331456400000L)  // March 11, 2012 02:00:00.000 PST (Daylight savings)
     };
-    public static final String[] PASS_DATE_STRINGS = {
-        "February 40, 2012" //non-existant
+
+    /**
+     * Test data for Date
+     */
+    public static final String[] PASS_DATE_STRINGS= {
+        "February 29, 2008",   // leap year
+        "January 1, 2000",     // Y2K
+        "December 31, 1999"    // Day before Y2K
     };
-    public static final String[] FAIL_DATE_STRINGS = {
+    public static final String[] FAIL_DATE_STRINGS_MEDIUM_FORMAT = {
         new String(""),
         "null",
-        "Wedne, December 31, 1970",
         "",
         "''",
-        "Jonuary 4, 2012",  //bad spelling for month
-        "2012/01/40",
-        "2012/01/1x",       //bad format yyyy/mm/dd
-        "0000-00-00"
+        "Jonuary 4, 2012",     // bad spelling for month
+        "Janua 4, 2012",       // incomplete spelling of month
+        "January 32, 2012",    // days cannot exceed max for that month
+        "February 30, 2012",   // leap year but day still exceeds max
+        "February 29, 2013",   // non leap year
+        "Wednesday, January 4, 2012" // DateFormat.LONG instead of MEDIUM
     };
-
-
+    public static final String[] FAIL_DATE_STRINGS_SHORT_FORMAT = {
+        new String(""),
+        "null",
+        "",
+        "''",
+        "January 4, 2012", // DateFormat.MEDIUM instead of DateFormat.SHORT
+        "2012/01/40",
+        "2012/01/1x",      // bad format yyyy/mm/dd
+        "0000-00-00",
+    };
 
     /**
      * Test data for Date-Time
      */
     public static final Date[] DATE_TIMES = {
-        new Date(), // now
-        new Date(1000L), // 12:00:01 AM GMT early in 1970
+        new Date(),              // now
+        new Date(1000L),         // 12:00:01 AM GMT early in 1970
         new Date(1333322872649L) // April 1, 2012  4:27:52.649 PM PDT (GMT-7)
     };
     public static final String[] PASS_DATE_TIME_STRINGS = {
         "May 1, 2012 90:00:00 PM",
         "APRIL 001, 1970 01:01:20 PM",  //Upper case month
         "Feb 29, 2012 00:00:00 AM",
-        "OCT 40, 1920 23:00:00 PM",     //Non-existant date
     };
     public static final String[] FAIL_DATE_TIME_STRINGS = {
         "JANU 01, 2012 12:12:12 PM",
@@ -89,15 +106,14 @@ public final class LocalizationServiceTestData {
         "fEB 29, 2011 00-00-00 AM"
     };
 
-
     /**
      * Test data for Time
      */
     public static final Date[] TIMES = {
-        new Date(), // now
-        new Date(1000L), // 12:00:01 AM GMT
+        new Date(),               // now
+        new Date(1000L),          // 12:00:01 AM GMT
         new Date(1333322872649L), // 4:27:52.649 PM PDT (GMT-7)
-        new Date(0) // 00:00:00.000 GMT
+        new Date(0)               // 00:00:00.000 GMT
     };
     public static final String[] PASS_TIME_STRINGS = {
         "10:27:52 PM GMT",
@@ -114,7 +130,6 @@ public final class LocalizationServiceTestData {
         "雨が降りそう"
     };
 
-
     /**
      * Test data for Int
      */
@@ -129,7 +144,6 @@ public final class LocalizationServiceTestData {
         "\0"
     };
 
-
     /**
      * Test data for Long
      */
@@ -143,7 +157,6 @@ public final class LocalizationServiceTestData {
         "L"         //alphabet
     };
 
-
     /**
      * Test data for Float
      */
@@ -156,7 +169,6 @@ public final class LocalizationServiceTestData {
     public static final String[] FAIL_FLOAT_STRINGS = {
         "F"         //alphabet
     };
-
 
     /**
      * Test data for Double
@@ -173,7 +185,6 @@ public final class LocalizationServiceTestData {
         "-d"        //alphabet
     };
 
-
     /**
      * Test data for Percent
      */
@@ -188,7 +199,6 @@ public final class LocalizationServiceTestData {
         "%f",
         "%d"
     };
-
 
     /**
      * Test data for currency
@@ -213,4 +223,11 @@ public final class LocalizationServiceTestData {
         "￥9,990.00"
     };
 
+    // List of currency codes: http://en.wikipedia.org/wiki/ISO_4217
+    public static final String[] CURRENCY_TYPES = {
+        "USD",
+        "GBP",
+        "EUR",
+        "JPY"
+    };
 }

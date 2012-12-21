@@ -15,7 +15,11 @@
  */
 package org.auraframework.util.javascript;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 
 import org.auraframework.test.UnitTestCase;
 
@@ -121,33 +125,20 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
         }
 
         @Override
-        public void generate(File destRoot, boolean doValidation) throws IOException {
-            // TODO Auto-generated method stub
-
-        }
+        public void generate(File destRoot, boolean doValidation) throws IOException {}
 
         @Override
         public boolean isStale() {
-            // TODO Auto-generated method stub
             return false;
         }
 
         @Override
-        public void parse() throws IOException {
-            // TODO Auto-generated method stub
-
-        }
+        public void parse() throws IOException {}
 
         @Override
-        public void postProcess() {
-            // TODO Auto-generated method stub
-
-        }
+        public void postProcess() {}
 
         @Override
-        public void regenerate(File destRoot) throws IOException {
-            // TODO Auto-generated method stub
-
-        }
+        public void regenerate(File destRoot) throws IOException {}
     }
 }

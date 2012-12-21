@@ -22,10 +22,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
-import org.auraframework.def.ModelDef;
+import org.auraframework.def.*;
 import org.auraframework.impl.java.model.JavaModelDef;
 import org.auraframework.impl.test.util.AuraImplUnitTestingUtil;
 import org.auraframework.instance.BaseComponent;
@@ -106,14 +103,14 @@ public abstract class AuraImplTestCase extends AuraTestCase {
     }
 
     /**
-     * Convenience method to create an instance of a JavaModel given the qualified name. TODO: Must consolidate such
-     * methods in a util.
+     * Convenience method to create an instance of a JavaModel given the qualified name.
      *
      * @param qualifiedName
      *            For example: java://org.auraframework.impl.java.model.TestModel
      * @return
      * @throws Exception
      */
+    // TODO: W-1478576 Must consolidate such methods in a util.
     protected Model getJavaModelByQualifiedName(String qualifiedName) throws Exception {
         ModelDef javaModelDef = definitionService.getDefinition(qualifiedName, ModelDef.class);
         assertTrue(javaModelDef instanceof JavaModelDef);

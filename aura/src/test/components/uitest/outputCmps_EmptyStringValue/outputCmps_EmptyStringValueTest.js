@@ -17,7 +17,7 @@
     /*
      * These tests moved here due to bug W-1465202 - value attribute as empty string must be set in markup.
      * 
-     * TODO: Once bug is fixed, remove these tests and re-enable tests on components themselves.
+     * TODO(W-1465202): Once bug is fixed, remove these tests and re-enable tests on components themselves.
      */
     testOutputDateEmptyStringValue: {
         test: function(component){

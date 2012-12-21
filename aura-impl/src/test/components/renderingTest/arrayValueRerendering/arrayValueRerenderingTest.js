@@ -68,19 +68,29 @@
                 body.push(c);
             });
 
-            // DCHASMAN TODO Still some kinks in the insert() story - next round of ArrayValue mods will address that
-            /*// Now lets do some splicing
-            addComponent("Value inserted at index 0", function(body, c) {
+            // Now lets do some splicing. Insert Value to index first, middle, and last index
+            // TODO(W-1479653): inserting to index 0 actually adds to end of array
+            /*addComponent("Value inserted at index 0", function(body, c) {
                 body.insert(0, c);
             });
-            $A.rerender(component);*/
+            $A.rerender(component);
+            $A.test.assertEquals("Value inserted at index 0", values[0].textContent);
+            $A.test.assertEquals(13, values.length);*/
 
             addComponent("Value inserted at index 1", function(body, c) {
                 body.insert(1, c);
             });
             $A.rerender(component);
+            $A.test.assertEquals("Value inserted at index 1", values[1].textContent, "Value not inserted at proper index");
+            $A.test.assertEquals(13, values.length);
 
-            $A.test.assertEquals("Value inserted at index 1", values[1].textContent);
+            // TODO(W-1479653): after test is changed to insert at index 0, modify this block of code to insert at last index again
+            addComponent("Value inserted at last index", function(body, c) {
+                body.insert(13, c);
+            });
+            $A.rerender(component);
+            $A.test.assertEquals("Value inserted at last index", values[13].textContent, "Value not inserted at end of array");
+            $A.test.assertEquals(14, values.length);
         }
     }
 })

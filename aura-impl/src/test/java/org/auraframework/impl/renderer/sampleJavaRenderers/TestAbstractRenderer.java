@@ -29,9 +29,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 public abstract class TestAbstractRenderer implements Renderer {
 
     @Override
-    public void render(BaseComponent<?, ?> component, Appendable appendable) throws IOException, QuickFixException {
-        // TODO Auto-generated method stub
-
-    }
+    public void render(BaseComponent<?, ?> component, Appendable appendable) throws IOException, QuickFixException {}
 
 }

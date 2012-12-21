@@ -29,19 +29,11 @@ import org.auraframework.system.SourceLoader;
 import com.google.common.collect.Lists;
 
 public class RootDefFactoryTest extends AuraImplTestCase {
-    // TODO FIXME This class needs to test RootDefFactory none of these objects should be instantiated outside of a test
-    // context
 
     private String baseContents = "<aura:application></aura:application>";
 
     public RootDefFactoryTest(String name) {
         super(name);
-    }
-
-    public void testGetComponentDef() throws Exception {
-        /*
-         * FIXMEDLP
-         */
     }
 
     /**

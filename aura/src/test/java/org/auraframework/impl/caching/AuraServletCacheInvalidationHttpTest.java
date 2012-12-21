@@ -15,9 +15,14 @@
  */
     package org.auraframework.impl.caching;
 
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.http.AuraBaseServlet;
@@ -33,14 +38,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 
-import org.apache.commons.httpclient.HttpStatus;
-
-import java.io.IOException;
-import java.net.URLEncoder;
-
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-
 /**
  * Test class to verify that clientside cache is invalidated by Aura Servlet. ThreadHostile due to reliance on
  * getLastMod.
@@ -51,7 +48,6 @@ import org.apache.commons.httpclient.methods.PostMethod;
  */
 @ThreadHostileTest
 public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
-    private static final String CACHE_INVALIDATION_TOKEN = "OUTDATED";
 
     public AuraServletCacheInvalidationHttpTest(String name){
         super(name);
@@ -95,21 +91,6 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Verify that AuraServlet returns an error code in the response body when a lastmod timestamp is not used in a GET
-     * request.
-     */
-    @TestLabels("auraSanity")
-    public void _testGetRequestWithNoTimeStamp() throws Exception{
-        //When last mod time stamp is older than a year.
-        GetMethod get = obtainGetMethod("/aura?aura.tag=auratest:test_TokenValidation&aura.mode=FTEST&aura.format=JSON&");
-        int statusCode = getHttpClient().executeMethod(get);
-        assertTrue("Failed to reach aura servlet.",statusCode == HttpStatus.SC_OK);
-        String response = get.getResponseBodyAsString();
-        assertEquals("AuraServlet failed to notify the client about invalid cache.", CACHE_INVALIDATION_TOKEN,
-                response);
-    }
-
-    /**
      * Verify that AuraServlet returns usable content in the response body when valid lastmod timestamp is used in a
      * GET request.
      * 
@@ -143,20 +124,6 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
         assertTrue("Aura servlet should return 200.",statusCode == HttpStatus.SC_OK);
         String response = post.getResponseBodyAsString();
         assertOutdated(response);
-    }
-
-    /**
-     * Verify that AuraServlet returns an error code in the response body when a lastmod timestamp is not used in a
-     * POST request.
-     */
-    public void _testPostRequestWithNoTimeStamp() throws Exception{
-        AuraContext ctx = startContext("auratest:test_TokenValidation");
-        PostMethod post = getPostObject(ctx, null);
-        int statusCode = this.getHttpClient().executeMethod(post);
-        assertTrue("Failed to post to aura servlet",statusCode == HttpStatus.SC_OK);
-        String response = post.getResponseBodyAsString();
-        assertEquals("AuraServlet failed to notify the client about invalid cache.", CACHE_INVALIDATION_TOKEN,
-                response);
     }
 
     /**

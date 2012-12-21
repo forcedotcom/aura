@@ -16,5 +16,5 @@
 
 -->
 <aura:component support="GA" description="Represents a label">
-    <aura:attribute name="value" type="String" description="The text to display on the label. Placeholders such as {0} or {1} can be used, corresponding to items in this component's body. An item can be a component or an expression like {$Label.Object.title}." />
+    <aura:attribute name="value" type="String" description="The text to display on the label. Placeholders such as {0} or {1} can be used, corresponding to items in this component's body. An item can be a component or an expression like {!$Label.Object.title}." />
 </aura:component>

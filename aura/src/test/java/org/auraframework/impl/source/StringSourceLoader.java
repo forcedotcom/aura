@@ -36,6 +36,7 @@ import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.RendererDef;
+import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
@@ -57,7 +58,7 @@ public class StringSourceLoader implements SourceLoader{
     private static final Set<String> PREFIXES = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX,
             DefDescriptor.JAVASCRIPT_PREFIX, DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX);
     private static final Set<DefType> DEFTYPES = ImmutableSet.of(DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT,
-            DefType.INTERFACE, DefType.LAYOUTS, DefType.CONTROLLER, DefType.HELPER, DefType.RENDERER, DefType.STYLE);
+            DefType.INTERFACE, DefType.LAYOUTS, DefType.CONTROLLER, DefType.HELPER, DefType.RENDERER, DefType.STYLE, DefType.TESTSUITE);
     
     /**
      * A counter that we can use to guarantee unique names across multiple calls to add a source.
@@ -287,7 +288,8 @@ public class StringSourceLoader implements SourceLoader{
         CONTROLLER(ControllerDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         HELPER(HelperDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         RENDERER(RendererDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
-        STYLE(ThemeDef.class, Format.CSS, DefDescriptor.CSS_PREFIX, ".");
+        STYLE(ThemeDef.class, Format.CSS, DefDescriptor.CSS_PREFIX, "."),
+        TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, ".");
         
         private static Map<Class<? extends Definition>, DescriptorInfo> infoMap;
 

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.test.UnitTestCase;
+import org.mockito.Mockito;
 
 /**
  */
@@ -72,7 +73,8 @@ public class JsonReaderTest extends UnitTestCase {
         } finally {
             writer.close();
         }
-        Reader newFile = new FakeFileReader(new File(newFileobj.getParentFile(), newFileobj.getName()));
+        Reader newFile = Mockito.mock(FileReader.class);
+        Mockito.when(newFile.read()).thenThrow(new IOException());
         try {
             new JsonReader().read(newFile);
             fail("When the reader fumbles, the JsonReader should have signaled that");
@@ -81,31 +83,6 @@ public class JsonReaderTest extends UnitTestCase {
         } finally {
             newFile.close();
             newFileobj.delete();
-        }
-    }
-
-    /**
-     * This inner class is purely to simulate an error condition to be user in the testIOException method
-     *
-     *
-     *
-     */
-    private class FakeFileReader extends FileReader {
-        public FakeFileReader(File f) throws Exception {
-            super(f);
-        }
-
-        @Override
-        public int read() throws IOException {
-            throw new IOException();
-        }
-
-        @Override
-        public void close() throws IOException {}
-
-        @Override
-        public int read(char[] cbuf, int off, int len) throws IOException {
-            return 0;
         }
     }
 }

@@ -15,15 +15,21 @@
  */
 package org.auraframework.impl.source.file;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.EventDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraImplFiles;
-import org.auraframework.system.*;
 import org.auraframework.system.Parser.Format;
+import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 
 public class FileSourceLoaderTest extends AuraImplTestCase {
@@ -44,14 +50,18 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
             super.runTest();
     }
 
-    public void testFileSourceLoader() {
+    public void testFileSourceLoaderSanity() {
         assertNotNull(new FileSourceLoader(AuraImplFiles.TestComponents.asFile()));
+    }
 
+    public void testFileSourceLoaderWithNonExistentFile() {
         try {
             new FileSourceLoader(new File("this_probably_doesnt_exist"));
             fail("Should have thrown AuraException(Base directory does not exist)");
         } catch (AuraRuntimeException e) {}
+    }
 
+    public void testFileSourceLoaderWithNullFile() {
         try {
             new FileSourceLoader(null);
             fail("Should have thrown AuraException(Base directory does not exist)");

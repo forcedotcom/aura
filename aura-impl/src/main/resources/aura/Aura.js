@@ -116,13 +116,13 @@ function Aura(){
     //#end
     var aura = this;
 
+    /** @field */
     this.services = {
         /**
          * Rendering Service
          * @public
          * @type AuraRenderingService
          * @memberOf Aura.prototype
-         * @borrows AuraRenderingService
          **/
         rendering : aura.renderingService,
         /**
@@ -130,7 +130,6 @@ function Aura(){
          * @public
          * @type AuraEventService
          * @memberOf Aura.prototype
-         * @borrows AuraEventService
          **/
         event : aura.eventService,
         /**
@@ -138,7 +137,6 @@ function Aura(){
          * @public
          * @type AuraComponentService
          * @memberOf Aura.prototype
-         * @borrows AuraComponentService
          **/
         component : aura.componentService,
         /**
@@ -146,13 +144,14 @@ function Aura(){
          * @public
          * @type AuraClientService
          * @memberOf Aura.prototype
-         * @borrows AuraClientService
          **/
         client : aura.clientService,
 
         /**
          * History Service
          * @public
+         * @type AuraHistoryService
+         * @memberOf Aura.prototype
          */
         history : aura.historyService,
 
@@ -161,7 +160,6 @@ function Aura(){
          * @public
          * @type AuraLocalizationService
          * @memberOf Aura.prototype
-         * @borrows AuraLocalizationService
          */
         localization : aura.localizationService,
 
@@ -170,7 +168,6 @@ function Aura(){
          * @public
          * @type AuraStorageService
          * @memberOf Aura.prototype
-         * @borrows AuraStorageService
          */
         storage : aura.storageService,
 
@@ -180,7 +177,6 @@ function Aura(){
          * @type AuraComponentService
          * @memberOf Aura.prototype
          * @see Aura#services.component
-         * @borrows AuraComponentService
          **/
         cmp : aura.componentService,
         /**
@@ -189,7 +185,6 @@ function Aura(){
          * @type AuraEventService
          * @memberOf Aura.prototype
          * @see Aura#services.event
-         * @borrows AuraEventService
          **/
         e : aura.eventService,
 
@@ -199,7 +194,6 @@ function Aura(){
          * @type AuraLocalizationService
          * @memberOf Aura.prototype
          * @see Aura#service.localization
-         * @borrows AuraLocalizationService
          */
         l10n : aura.localizationService,
 
@@ -672,7 +666,6 @@ Aura.prototype.getStackTrace = function(e) {
 
 /**
  * Logs a stack trace. Trace calls using console.trace() if defined on the console implementation.
- *
  * @public
  */
 Aura.prototype.trace = function(){
@@ -684,6 +677,7 @@ Aura.prototype.trace = function(){
 /**
  * Map through to Jiffy.mark if Jiffy is loaded, otherwise a no-op.
  * @public
+ * @function
  */
 Aura.prototype.mark = (function() {
     if (w["Jiffy"]) {
@@ -696,6 +690,7 @@ Aura.prototype.mark = (function() {
 /**
  * Map through to Jiffy.measure if Jiffy is loaded, otherwise a no-op.
  * @public
+ * @function
  */
 Aura.prototype.measure = (function() {
     if (w["Jiffy"]) {

@@ -18,7 +18,7 @@
         test : [function(cmp) {
             // try to create a new component needing server trip
             cmp.find("newComponent").get("e.press").fire();
-            $A.test.addWaitFor(function(){
+            $A.test.addWaitFor(true, function(){
                 var target = cmp.find("target").get("v.body");
                 if (target.length > 0){
                     var placeholder = target[0].get("v.body");

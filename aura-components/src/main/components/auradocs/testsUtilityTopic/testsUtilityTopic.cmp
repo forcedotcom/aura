@@ -32,8 +32,8 @@
                 <td>Adds a new function handler and overrides the original function.</td>
             </tr>
             <tr>
-                <td><code>aura.test.addWaitFor(expected, actual, callback)</code></td>
-                <td>Waits for expected === actual. If <code>actual</code> is not provided, expected === true.</td>
+                <td><code>aura.test.addWaitFor(expected, testFunction, callback)</code></td>
+                <td>Waits for expected === testFunction().</td>
             </tr>
             <tr>
                 <td><code>aura.test.callServerAction(action)</code></td>
@@ -56,8 +56,8 @@
                 <td>Returns <code>instance</code> and the prototype of the instance or object.</td>
             </tr>
             <tr>
-                <td><code>aura.test.getServerControllerInstance(cmp, name, params, callback)</code></td>
-                <td>Returns an instance of a server controller by name, given the parameters and call back function.</td>
+                <td><code>aura.test.getAction(component, name, params, callback)</code></td>
+                <td>Returns an instance of an action.</td>
             </tr>
             <tr>
                 <td><code>aura.test.getText(node)</code></td>

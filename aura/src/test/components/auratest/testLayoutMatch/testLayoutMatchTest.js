@@ -15,7 +15,7 @@
  */
 ({
     waitForLayoutChange : function(component){
-        $A.test.addWaitFor(function(){
+        $A.test.addWaitFor(true, function(){
             var elem = component.find("layoutTitle").getElement();
             var done = $A.util.hasClass(elem,"layoutChanged");
             if(done){

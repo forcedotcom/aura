@@ -20,7 +20,7 @@
      */
     testChainingLocalActions:{
         test:function(cmp){
-            var multiply = $A.test.getServerControllerInstance(cmp,"c.multiply", {"a" : 2},
+            var multiply = $A.test.getAction(cmp,"c.multiply", {"a" : 2},
                                                         function(action){
                                                             //If the call backs are in order, then this attribute will have the value set by c.add's call back
                                                             $A.test.assertEquals("1", cmp.getAttributes().getValue('responseOrder').getValue(), "Action chaining did not preserve order at client.");
@@ -28,7 +28,7 @@
                                                         });
             multiply.setChained();
 
-            var subtract = $A.test.getServerControllerInstance(cmp,"c.subtract",{"a" : 99},
+            var subtract = $A.test.getAction(cmp,"c.subtract",{"a" : 99},
                                                         function(action){
                                                             //If the call backs are in order, then this attribute will have the value set by c.multiply's call back
                                                             $A.test.assertEquals("2", cmp.getAttributes().getValue('responseOrder').getValue(), "Action chaining did not preserve order at client.");
@@ -36,7 +36,7 @@
                                                     });
             subtract.setChained();
 
-            var add = $A.test.getServerControllerInstance(cmp,"c.add",{
+            var add = $A.test.getAction(cmp,"c.add",{
                                         "a" : 1, "b" : 99,
                                         "actions": $A.util.json.encode({
                                             actions: [multiply, subtract]

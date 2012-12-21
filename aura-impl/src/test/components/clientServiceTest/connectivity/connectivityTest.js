@@ -21,10 +21,10 @@
     testConnection : {
         attributes : { __layout : "#" },
         test : [function(component) {
-                $A.test.addWaitFor(function() { return component.get("v.eventsFired").trim() == "layoutChange"; });
+                $A.test.addWaitFor(true, function() { return component.get("v.eventsFired").trim() == "layoutChange"; });
             }, function(component) {
                 component.find("button").get("e.press").fire();
-                $A.test.addWaitFor(function() { return component.get("v.actionStatus") != ""; });
+                $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") != ""; });
             }, function(component) {
                 $A.test.assertEquals("SUCCESS", component.get("v.actionStatus"));
                 $A.test.assertEquals("layoutChange", component.get("v.eventsFired"));
@@ -38,12 +38,12 @@
         testLabels : ["UnAdaptableTest"],
         attributes : { __layout : "#" },
         test : [function(component) {
-                $A.test.addWaitFor(function() { return component.get("v.eventsFired").trim() == "layoutChange"; });
+                $A.test.addWaitFor(true, function() { return component.get("v.eventsFired").trim() == "layoutChange"; });
             }, function(component) {
                 $A.test.setTestTimeout(30000);
                 component.getValue("v.host").setValue("http://invalid.salesforce.com");
                 component.find("button").get("e.press").fire();
-                $A.test.addWaitFor(function() { return component.get("v.actionStatus") != ""; });
+                $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") != ""; });
             }, function(component) {
                 $A.test.assertEquals("INCOMPLETE", component.get("v.actionStatus"));
                 $A.test.assertEquals("layoutChange noConnection", component.get("v.eventsFired").trim());
@@ -57,18 +57,18 @@
         testLabels : ["UnAdaptableTest"],
         attributes : { __layout : "#" },
         test : [function(component) {
-                $A.test.addWaitFor(function() { return component.get("v.eventsFired").trim() == "layoutChange"; });
+                $A.test.addWaitFor(true, function() { return component.get("v.eventsFired").trim() == "layoutChange"; });
             }, function(component) {
                 $A.test.setTestTimeout(30000);
                 component.getValue("v.host").setValue("http://invalid.salesforce.com");
                 component.find("button").get("e.press").fire();
-                $A.test.addWaitFor(function() { return component.get("v.actionStatus") != ""; });
+                $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") != ""; });
             }, function(component) {
                 $A.test.assertEquals("INCOMPLETE", component.get("v.actionStatus"));
                 $A.test.assertEquals("layoutChange noConnection", component.get("v.eventsFired").trim());
                 component.getValue("v.host").setValue(undefined); // restore to default
                 component.find("button").get("e.press").fire();
-                $A.test.addWaitFor(function() { return component.get("v.actionStatus") == "SUCCESS"; });
+                $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") == "SUCCESS"; });
             }, function(component) {
                 $A.test.assertEquals("layoutChange noConnection", component.get("v.eventsFired").trim()); // no additional events
             }]
@@ -81,7 +81,7 @@
         testLabels : ["UnAdaptableTest"],
         attributes : { host : "http://invalid.salesforce.com", __layout : "#" },
         test : [function(component) {
-                $A.test.addWaitFor(function() { return component.get("v.eventsFired").trim() == "noConnection layoutFailed layoutChange"; });
+                $A.test.addWaitFor(true, function() { return component.get("v.eventsFired").trim() == "noConnection layoutFailed layoutChange"; });
             }]
     },
 
@@ -92,11 +92,11 @@
         testLabels : ["UnAdaptableTest"],
         attributes : { host : "http://invalid.salesforce.com", __layout : "#" },
         test : [function(component) {
-                $A.test.addWaitFor(function() { return component.get("v.eventsFired").trim() == "noConnection layoutFailed layoutChange"; });
+                $A.test.addWaitFor(true, function() { return component.get("v.eventsFired").trim() == "noConnection layoutFailed layoutChange"; });
             }, function(component) {
                 component.getValue("v.host").setValue(undefined); // restore to default
                 $A.historyService.set("action");
-                $A.test.addWaitFor(function() { return component.get("v.eventsFired").trim() == "noConnection layoutFailed layoutChange layoutChange"; });
+                $A.test.addWaitFor(true, function() { return component.get("v.eventsFired").trim() == "noConnection layoutFailed layoutChange layoutChange"; });
             }]
     }
 })

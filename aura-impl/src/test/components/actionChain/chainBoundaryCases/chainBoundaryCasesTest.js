@@ -24,7 +24,7 @@
      */
     testNullSpecifiedForChaining:{
         test:function(cmp){
-            var a = $A.test.getServerControllerInstance(cmp,"c.add", { "a" : 1, "b" : 99,actions : null});
+            var a = $A.test.getAction(cmp,"c.add", { "a" : 1, "b" : 99,actions : null});
             this.enqueueServerActionAndFireEvent(cmp, a);
             //"Expected the server to flag an error."
             $A.test.addWaitFor("ERROR",
@@ -41,13 +41,13 @@
      */
     testSurfaceExceptionsWhileChaining:{
         test:function(cmp){
-            var multiply = $A.test.getServerControllerInstance(cmp,"c.multiply", {"a" : 2});
+            var multiply = $A.test.getAction(cmp,"c.multiply", {"a" : 2});
             multiply.setChained();
             //Divide by 0 error
-            var divide = $A.test.getServerControllerInstance(cmp,"c.divide",{"a" : 0});
+            var divide = $A.test.getAction(cmp,"c.divide",{"a" : 0});
             divide.setChained();
 
-            var add = $A.test.getServerControllerInstance(cmp,"c.add",{
+            var add = $A.test.getAction(cmp,"c.add",{
                                         "a" : 1, "b" : 99,
                                         "actions": $A.util.json.encode({
                                             actions: [divide, multiply]
@@ -75,9 +75,9 @@
     //TODO W-1252082
     _testInfiniteChainingAtClient:{
         test:function(cmp){
-            var doNothing = $A.test.getServerControllerInstance(cmp,"c.doNothing",{ });
+            var doNothing = $A.test.getAction(cmp,"c.doNothing",{ });
             doNothing.setChained();
-            var add = $A.test.getServerControllerInstance(cmp,"c.add",{ });
+            var add = $A.test.getAction(cmp,"c.add",{ });
 
             for(var i=0;i<10;i++){
                 add.setParams({"a" : 1, "b" : 99,
@@ -100,7 +100,7 @@
     //W-1251785: Unable to detect server side infinite action.
     _testInfiniteChainingAtServer:{
         test:function(cmp){
-            var infiniteChain = $A.test.getServerControllerInstance(cmp,"c.infiniteChain",{});
+            var infiniteChain = $A.test.getAction(cmp,"c.infiniteChain",{});
             this.enqueueServerActionAndFireEvent(cmp, infiniteChain);
             //"Server failed to detect an infinite chain."
             $A.test.addWaitFor("ERROR", function(){return infiniteChain.getState()},
@@ -117,7 +117,7 @@
     // TODO: W-1347322
     _testSettingChainedActionToBeExclusive:{
         test:function(cmp){
-            var multiply = $A.test.getServerControllerInstance(cmp,"c.multiply", {"a" : 2},
+            var multiply = $A.test.getAction(cmp,"c.multiply", {"a" : 2},
                 function(action){
                     $A.test.assertEquals(200, action.getReturnValue(), "Exclusive action should not be executed before parent action.");
                     //If the call backs are in order, then this attribute will have value set by c.add's call back
@@ -127,7 +127,7 @@
             multiply.setChained();
             multiply.setExclusive(true);
 
-            var add = $A.test.getServerControllerInstance(cmp,"c.add",
+            var add = $A.test.getAction(cmp,"c.add",
                 {"a" : 1, "b" : 99, "actions": $A.util.json.encode({ actions: [multiply] })},
                 function(action){
                         $A.test.assertEquals(100, action.getReturnValue(), "Chained action was executed before parent action.");
@@ -154,7 +154,7 @@
     testChainSameActionTwice:{
         test:[function(cmp){
 
-                var multiply = $A.test.getServerControllerInstance(cmp,"c.multiply", {"a" : 2},
+                var multiply = $A.test.getAction(cmp,"c.multiply", {"a" : 2},
                                                             //Server call back function will be called back twice
                                                             function(action){
                                                                 $A.test.assertEquals("SUCCESS",action.getState());
@@ -162,7 +162,7 @@
                                                                 cmp.getAttributes().setValue('callbackCount', cmp.getAttributes().getValue('callbackCount').getValue()+1);
                                                             });
                 multiply.setChained();
-                var add = $A.test.getServerControllerInstance(cmp,"c.add",{
+                var add = $A.test.getAction(cmp,"c.add",{
                                             "a" : 1, "b" : 99,
                                             "actions": $A.util.json.encode({
                                                 actions: [multiply, multiply]

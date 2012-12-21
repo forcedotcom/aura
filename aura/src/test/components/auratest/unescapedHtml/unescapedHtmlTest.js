@@ -24,7 +24,7 @@
                 var cmp = component.find("value");
                 $A.test.assertTrue($A.util.isUndefined(cmp.getElements()), "no elements should have been rendered");
 //                component.find("toggle").get("e.press").fire();
-//                $A.test.addWaitFor(function(){
+//                $A.test.addWaitFor(true, function(){
 //                    return !component.getValue("v.value").isDirty();
 //                });
 //            }, function(component){
@@ -33,7 +33,7 @@
 //                $A.test.assertEquals("B", e.tagName.toUpperCase());
 //                $A.test.assertEquals("some value", e.textContent || e.innerText, "new value not rendered");
 //                component.find("toggle").get("e.press").fire();
-//                $A.test.addWaitFor(function(){
+//                $A.test.addWaitFor(true, function(){
 //                    return !component.getValue("v.value").isDirty();
 //                });
 //            }, function(component){
@@ -51,7 +51,7 @@
                 var cmp = component.find("value");
                 $A.test.assertTrue($A.util.isUndefined(cmp.getElements()), "no elements should have been rendered");
 //                component.find("toggle").get("e.press").fire();
-//                $A.test.addWaitFor(function(){
+//                $A.test.addWaitFor(true, function(){
 //                    return !component.getValue("v.value").isDirty();
 //                });
 //            }, function(component){
@@ -60,7 +60,7 @@
 //                $A.test.assertEquals("B", e.tagName.toUpperCase());
 //                $A.test.assertEquals("some value", e.textContent || e.innerText, "new value not rendered");
 //                component.find("toggle").get("e.press").fire();
-//                $A.test.addWaitFor(function(){
+//                $A.test.addWaitFor(true, function(){
 //                    return !component.getValue("v.value").isDirty();
 //                });
 //            }, function(component){
@@ -78,7 +78,7 @@
                 var cmp = component.find("null");
                 $A.test.assertTrue($A.util.isUndefined(cmp.getElements()), "no elements should have been rendered");
 //                component.find("toggle").get("e.press").fire();
-//                $A.test.addWaitFor(function(){
+//                $A.test.addWaitFor(true, function(){
 //                    return !component.getValue("v.value").isDirty();
 //                });
 //            }, function(component){

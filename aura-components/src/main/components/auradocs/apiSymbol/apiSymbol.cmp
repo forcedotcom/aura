@@ -30,11 +30,34 @@
                         {!param.name}
                     </span>
                 </aura:forEach>)
+		        <aura:if isTrue="{!v.symbol.returns &amp;&amp; v.symbol.returns.length>0}">
+		            <span class="paramType">{!':&nbsp;' + v.symbol.returns[0].type}</span>
+		        </aura:if>
             </small>
         </h4>
         <p><aura:unescapedHtml value="{!v.symbol.classDesc + v.symbol.desc}"/></p>
         <aura:if isTrue="{!v.symbol._params.length > 0}">
             <p><auradocs:apiParams params="{!v.symbol._params}"/></p>
+        </aura:if>
+        <aura:if isTrue="{!v.symbol.returns &amp;&amp; v.symbol.returns.length>0}">
+	        <h6 class="nav-header">Returns</h6>
+		    <ul class="nav nav-list">
+		        <li>
+		            <b>{!v.symbol.returns[0].type}</b>
+		            <p><aura:unescapedHtml value="{!v.symbol.returns[0].desc}"/></p>
+		        </li>
+		    </ul>
+        </aura:if>
+        <aura:if isTrue="{!v.symbol.exceptions &amp;&amp; v.symbol.exceptions.length>0}">
+	        <h6 class="nav-header">Throws</h6>
+		    <ul class="nav nav-list">
+                <aura:forEach items="{!v.symbol.exceptions}" var="ex">
+			        <li>
+			            <b>{!ex.type}</b>
+			            <p><aura:unescapedHtml value="{!ex.desc}"/></p>
+			        </li>
+                </aura:forEach>
+		    </ul>
         </aura:if>
     </td>
 </aura:component>

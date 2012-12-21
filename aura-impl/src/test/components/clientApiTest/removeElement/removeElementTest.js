@@ -52,7 +52,8 @@
     /**
      * Verify for an unparented element that removeElement will move it to the trashcan and then delete it on the next gc cycle.
      */
-    testRemoveUnparentedDiv: {
+    // TODO(tbliss): these fail in prod mode since can't access util.$trash$. Figure out way to check that trash is empty
+    _testRemoveUnparentedDiv: {
         test: function(component){
             $A.test.setTestTimeout(30000);
             var element = component.find("auraDiv").getElement();
@@ -67,7 +68,7 @@
     /**
      * Verify for an unparented textnode that removeElement will do nothing to it.
      */
-    testRemoveUnparentedText: {
+    _testRemoveUnparentedText: {
         test: function(component){
             var element = component.find("auraDiv").getElement().childNodes[0];
             element.parentNode.removeChild(element);

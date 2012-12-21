@@ -37,12 +37,12 @@
         <ol>
             <li>In Eclipse, add the remote catalog.<br/>
             On Linux or Windows: Click <b>Window</b> &gt; <b>Preferences</b> &gt; <b>Maven</b> &gt; <b>Archetypes</b> &gt; <b>Add Remote Catalog...</b><br/>
-            On Mac: Click <b>Eclipse</b> &gt; <b>Preferences</b></li>
+            On Mac: Click <b>Eclipse</b> &gt; <b>Preferences</b> ...</li>
             <li>In the Remote Archetype Catalog window, enter these values:<br/>
             <b>Catalog File</b>: <code>http://maven.auraframework.org/libs-release-local/archetype-catalog.xml</code><br/>
             <b>Description</b>: Aura Archetype
             </li>
-            <li>Click <b>OK</b> and <b>Apply</b>.</li>
+            <li>Click <b>OK</b>.</li>
 
         </ol>
 
@@ -52,7 +52,7 @@
             <li>Click <b>File</b> &gt; <b>New</b> &gt; <b>Other...</b> and select <b>Maven</b> &gt; <b>Maven Project</b>.</li>
             <li>Click <b>Next</b> twice.</li>
             <li>In the <b>Catalog</b> drop-down menu, select Aura Archetype.</li>
-            <li>Select the archetype with Artifact Id of <code>aura-archetype-simple</code>, and click <b>Next</b>.</li>
+            <li>Select the archetype with Artifact Id of <code>simple-aura-archetype</code>, and click <b>Next</b>.</li>
             <li>Enter <code>org.myGroup</code> for <b>Group Id</b> and <code>helloWorldEclipse</code> for <b>Artifact Id</b>.</li>
             <li>Click <b>Finish</b>.</li>
         </ol>
@@ -74,7 +74,8 @@
             <auradocs:info>To use another port, such as port 8080, append <code>-Djetty.port=8080</code> to <code>jetty:run</code>.</auradocs:info>
             <li>Click <b>Debug</b>.</li>
         </ol>
-
+        
+        <p>You should see a message in the Eclipse Console window indicating that the Jetty server has started.</p>
 
     <h2>Step 4: Test Your App</h2>
 

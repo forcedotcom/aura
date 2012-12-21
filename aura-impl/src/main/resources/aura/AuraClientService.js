@@ -166,6 +166,33 @@ var AuraClientService = function(){
 
         runActions : function(actions, scope, callback){
             priv.request(actions, scope, callback);
+        },
+
+        injectComponent: function(parent, rawConfig, placeholderId, localId) {
+    		var config = $A.util.json.resolveRefs(rawConfig);
+    		
+    		// Save off any context global stuff like new labels
+    		$A.getContext().join(config["context"]);
+    		
+    		var actionResult = config["actions"][0];
+            var action = $A.get("c.aura://ComponentController.getComponent");
+            
+            action.setCallback(action, function(a) {
+            	var componentConfig = a.getReturnValue();
+            	
+            	componentConfig["localId"] = localId;
+            	
+                var c = $A.componentService.newComponent(componentConfig, parent);
+                
+                parent.getValue("v.body").push(c);
+                
+                var element = $A.util.getElement(placeholderId);
+                $A.render(c, element);
+
+                $A.afterRender(c);
+            });
+            
+    		action.complete(actionResult);        	
         }
 
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

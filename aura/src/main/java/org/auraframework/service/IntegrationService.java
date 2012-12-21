@@ -13,17 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-exp(clientService,
-    "initHost", clientService.initHost,
-    "init", clientService.init,
-    "initDefs", clientService.initDefs,
-    "loadApplication", clientService.loadApplication,
-    "loadComponent", clientService.loadComponent,
-    "runActions", clientService.runActions,
-    "throwExceptionEvent", clientService.throwExceptionEvent,
-    "resetToken", clientService.resetToken,
-    "hardRefresh", clientService.hardRefresh,
-    "setOutdated", clientService.setOutdated,
-    "injectComponent", clientService.injectComponent
-);
+package org.auraframework.service;
+
+import org.auraframework.Aura;
+import org.auraframework.def.Definition;
+import org.auraframework.instance.Instance;
+import org.auraframework.integration.Integration;
+import org.auraframework.system.AuraContext.Mode;
+
+/**
+ * <p>
+ * Service for constructing an {@link Instance} of a {@link Definition}
+ * </p>
+ * <p>
+ * Instances of all AuraServices should be retrieved from {@link Aura}
+ * </p>
+ */
+public interface IntegrationService extends AuraService {
+	Integration createIntegration(String securityProviderDescr, String contextPath, Mode mode);
+}

@@ -339,8 +339,6 @@ var priv = {
 	        		setTimeout(function() {
 	        			for(var n = 0; n < actionsToComplete.length; n++) {
 	        				var info = actionsToComplete[n];
-	        				
-	        				clientService.sanitizeStoredResponse(info.action, info.response);		        				
 	        				info.action.complete(info.response);
 	        			}
 	        			
@@ -403,34 +401,6 @@ var priv = {
         actionCollectedCallback();
     },
     
-    sanitizeStoredResponse: function(action, response) {
-		// Sanitize generation number references
-		var santizedComponents = {};
-		
-        var suffix = action.getId();
-		var globalId;
-		var components = response["components"];
-		for(globalId in components) {
-			var newGlobalId = globalId.substr(0, globalId.indexOf(":") + 1) + suffix;
-			
-			// Rewrite the globalId
-			var c = components[globalId]; 
-			c["globalId"] = newGlobalId;
-			
-			santizedComponents[newGlobalId] = c; 
-		}
-		
-		response["components"] = santizedComponents;
-		
-		var returnValue = response["returnValue"];
-		if(returnValue) {
-    		globalId = returnValue["globalId"];
-    		if(globalId) {
-    			returnValue["globalId"] = globalId.substr(0, globalId.indexOf(":") + 1) + suffix;
-    		}
-		}
-    },
-
     doRequest : function(){
         var queue = this.requestQueue;
         if(!this.inRequest && queue.length > 0){

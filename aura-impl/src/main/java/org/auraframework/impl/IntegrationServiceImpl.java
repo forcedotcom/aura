@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-exp(clientService,
-    "initHost", clientService.initHost,
-    "init", clientService.init,
-    "initDefs", clientService.initDefs,
-    "loadApplication", clientService.loadApplication,
-    "loadComponent", clientService.loadComponent,
-    "runActions", clientService.runActions,
-    "throwExceptionEvent", clientService.throwExceptionEvent,
-    "resetToken", clientService.resetToken,
-    "hardRefresh", clientService.hardRefresh,
-    "setOutdated", clientService.setOutdated,
-    "injectComponent", clientService.injectComponent
-);
+package org.auraframework.impl;
+
+import org.auraframework.impl.integration.IntegrationImpl;
+import org.auraframework.integration.Integration;
+import org.auraframework.service.IntegrationService;
+import org.auraframework.system.AuraContext.Mode;
+
+public class IntegrationServiceImpl implements IntegrationService {
+
+	@Override
+	public Integration createIntegration(String securityProviderDescr, String contextPath, Mode mode) {
+		return new IntegrationImpl(securityProviderDescr, contextPath, mode);
+	}
+
+    private static final long serialVersionUID = -2650728458106333787L;
+}

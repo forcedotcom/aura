@@ -192,6 +192,8 @@ Action.prototype.runAfter = function(action) {
  * @param {Object} response
  */
 Action.prototype.complete = function(response) {
+	this.sanitizeStoredResponse(response);		        				
+	
     this.state = response["state"];
     this.returnValue = response.returnValue;
     this.error = response.error;
@@ -412,5 +414,37 @@ Action.prototype.refresh = function() {
         }
     }
 };
+
+/**
+ * Sanitize generation number references to allow actions to be replayed w/out globalId conflicts.
+ * @private
+ */
+Action.prototype.sanitizeStoredResponse = function(response) {
+	var santizedComponents = {};
+	
+	var globalId;
+	var suffix = this.getId();
+	var components = response["components"];
+	for(globalId in components) {
+		var newGlobalId = globalId.substr(0, globalId.indexOf(":") + 1) + suffix;
+		
+		// Rewrite the globalId
+		var c = components[globalId]; 
+		c["globalId"] = newGlobalId;
+		
+		santizedComponents[newGlobalId] = c; 
+	}
+	
+	response["components"] = santizedComponents;
+	
+	var returnValue = response["returnValue"];
+	if(returnValue) {
+		globalId = returnValue["globalId"];
+		if(globalId) {
+			returnValue["globalId"] = globalId.substr(0, globalId.indexOf(":") + 1) + suffix;
+		}
+	}
+};
+
 
 //#include aura.controller.Action_export

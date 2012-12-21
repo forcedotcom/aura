@@ -134,6 +134,13 @@ public class Aura {
         return Aura.get(SourceControlAdapter.class);
     }
 
+    /**
+     * Gets the Integration Service: Service that makes integrating into other containers easy.
+     */
+    public static IntegrationService getIntegrationService() {
+        return Aura.get(IntegrationService.class);
+    }
+    
     public static <T> T get(Class<T> type) {
         return ServiceLocator.get().get(type);
     }

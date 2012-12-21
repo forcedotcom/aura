@@ -312,5 +312,9 @@ public class AuraImplConfig {
         return new LocalizedStringToLongConverter();
     }
 
-
+    @Impl
+    @PrimaryImpl
+    public static IntegrationService integrationService() {
+        return new IntegrationServiceImpl();
+    }
 }

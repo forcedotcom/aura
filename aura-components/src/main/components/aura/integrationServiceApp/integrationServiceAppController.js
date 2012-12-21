@@ -13,17 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-exp(clientService,
-    "initHost", clientService.initHost,
-    "init", clientService.init,
-    "initDefs", clientService.initDefs,
-    "loadApplication", clientService.loadApplication,
-    "loadComponent", clientService.loadComponent,
-    "runActions", clientService.runActions,
-    "throwExceptionEvent", clientService.throwExceptionEvent,
-    "resetToken", clientService.resetToken,
-    "hardRefresh", clientService.hardRefresh,
-    "setOutdated", clientService.setOutdated,
-    "injectComponent", clientService.injectComponent
-);
+({
+	addComponent: function(component, event, helper) {
+		$A.clientService.injectComponent(component, event.getParam("config"), event.getParam("placeholderId"), event.getParam("localId"));
+	}
+})

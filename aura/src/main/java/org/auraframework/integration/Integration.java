@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-exp(clientService,
-    "initHost", clientService.initHost,
-    "init", clientService.init,
-    "initDefs", clientService.initDefs,
-    "loadApplication", clientService.loadApplication,
-    "loadComponent", clientService.loadComponent,
-    "runActions", clientService.runActions,
-    "throwExceptionEvent", clientService.throwExceptionEvent,
-    "resetToken", clientService.resetToken,
-    "hardRefresh", clientService.hardRefresh,
-    "setOutdated", clientService.setOutdated,
-    "injectComponent", clientService.injectComponent
-);
+package org.auraframework.integration;
+
+import java.io.IOException;
+import java.util.Map;
+
+import org.auraframework.throwable.quickfix.QuickFixException;
+
+public interface Integration {
+	void addPreload(String namespace);
+	void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId, Appendable out) throws QuickFixException, IOException;
+}

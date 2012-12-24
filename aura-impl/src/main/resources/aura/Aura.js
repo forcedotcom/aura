@@ -340,12 +340,18 @@ Aura.prototype.initAsync = function(config){
  * Used for synchronous initialization.
  * @param {Object} config
  */
-Aura.prototype.initConfig = function AuraInitConfig(config){
-    clientService.initHost(config["host"]);
+Aura.prototype.initConfig = function AuraInitConfig(config, useExisting){
     config = $A.util.json.resolveRefs(config);
-
-    aura.context = new AuraContext(config["context"]);
-    this.init(config["instance"], config["token"], config["context"]);
+    
+	if (!useExisting || $A.util.isUndefined($A.getContext())) {
+	    clientService.initHost(config["host"]);
+	
+	    aura.context = new AuraContext(config["context"]);
+	    this.init(config["instance"], config["token"], config["context"]);
+	} else {
+		// Use the existing context and just join the new context into it
+		$A.getContext().join(config["context"]);
+	}
 };
 
 /**

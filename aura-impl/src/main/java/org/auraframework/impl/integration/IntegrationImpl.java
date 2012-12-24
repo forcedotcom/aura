@@ -21,9 +21,11 @@ import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.RegisterEventDef;
 import org.auraframework.instance.Action;
 import org.auraframework.integration.Integration;
 import org.auraframework.service.ContextService;
@@ -35,6 +37,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -74,11 +77,26 @@ public class IntegrationImpl implements Integration {
             paramValues.put("name", descriptor.getQualifiedName());
             
             Map<String, Object> actionAttributes = Maps.newHashMap();
+            Map<String, String> actionEventHandlers = Maps.newHashMap();
             
             ComponentDef componentDef = descriptor.getDef();
             for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-            	String name = componentDef.getAttributeDef(entry.getKey()).getName();
-                actionAttributes.put(name, entry.getValue());
+            	String key = entry.getKey();
+
+            	AttributeDef attributeDef = componentDef.getAttributeDef(key);
+            	if (attributeDef != null) {
+            		String name = attributeDef.getName();
+                    actionAttributes.put(name, entry.getValue());
+            	} else {
+            		RegisterEventDef eventDef = componentDef.getRegisterEventDefs().get(key);
+            		if (eventDef != null) {
+            			// Emit component.addHandler() wired to special global scope value provider
+            			String name = eventDef.getAttributeName();
+            			actionEventHandlers.put(name, (String)entry.getValue());
+            		} else {
+            			throw new AuraRuntimeException(String.format("Unknown attribute or event %s:%s", tag, key));
+            		}
+            	}
             }
             
             paramValues.put("attributes", actionAttributes);
@@ -100,6 +118,12 @@ public class IntegrationImpl implements Integration {
             init.append("var config = ");
             Aura.getSerializationService().write(message, null, Message.class, init);
             init.append(";\n");
+
+            if (!actionEventHandlers.isEmpty()) {
+	            init.append("config.actionEventHandlers = ");
+	            Json.serialize(actionEventHandlers, init);
+	            init.append(";\n");
+            }
             
             init.append(String.format("$A.getRoot().get(\"e.addComponent\").setParams({ config: config, placeholderId: \"%s\", localId: \"%s\" }).fire();\n", locatorDomId, localId));
             

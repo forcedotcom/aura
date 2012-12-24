@@ -18,50 +18,33 @@
 <aura:component extensible="true" support="BETA" 
                  description="A server-rendered template used to bootstrap the loading of the Aura framework and an application or component embedded in other containers, such as Visualforce, Siteforce, and legacy Salesforce UI.">
 
-    <aura:attribute name="title" type="String" default="Salesforce.com" 
-                     description="The title of the page created by this template. Not used in this embedded implementation, as Aura does not typically own the page in a container scenario."/>
     <aura:attribute name="auraStyleTags" type="String" 
                      description="A list of external style tags necessary for the Aura framework."/>
     <aura:attribute name="auraScriptTags" type="String" 
                      description="A list of external script tags necessary for the Aura framework."/>
-    <aura:attribute name="auraInlineStyle" type="String" 
-                     description="A string of inline style code to use in this template."/>
     <aura:attribute name="auraInit" type="String" 
                      description="A config object used to retrieve and initialize components for this application."/>
     <aura:attribute name="auraInitBlock" type="String"
                      description="A string of inline script code to use in this template."/>
-    <aura:attribute name="autoInitialize" type="Boolean" default="true"
-                     description="Whether to init aura config using auraInit"/>
     <aura:attribute name="extraStyleTags" type="String"
                      description="A list of style tags necessary for this template"/>
     <aura:attribute name="extraScriptTags" type="String"
                      description="A list of script tags necessary for this template"/>
     <aura:attribute name="extraMetaTags" type="String"
                      description="A list of meta tags necessary for this template"/>
-    <aura:attribute name="bodyClass" type="String" default="auraLoading"
-                     description="A CSS class name for the body of this template"/>
-    <aura:attribute name="inlineStyle" type="Aura.Component[]"
-                     description="A list of CSS style components for this template"/>
 
     {!v.extraMetaTags}
-    <style>
-        {!v.inlineStyle}
-    </style>
     {!v.auraStyleTags}
     {!v.extraStyleTags}
     <style>
         {!v.auraInlineStyle}
     </style>
 
-    {!v.body}
-
     {!v.extraScriptTags}
     {!v.auraScriptTags}
 
     <script>
-        if ({!v.autoInitialize}) {
-            aura.initConfig({!v.auraInit});
-        }
+    $A.initConfig({!v.auraInit}, true);
     </script>
           
     {!v.auraInitBlock}

@@ -184,6 +184,22 @@ var AuraClientService = function(){
             	
                 var c = $A.componentService.newComponent(componentConfig, parent);
                 
+                // Wire up event handlers
+                var actionEventHandlers = config["actionEventHandlers"];
+                if (actionEventHandlers) {
+	                var containerValueProvider = { 
+	            		getValue: function(functionName) { 
+	            			return { 
+	            				run: function(event) { window[functionName](event); } 
+	            			};
+	        			}
+	                };
+	                
+	                for (var event in actionEventHandlers) {
+	                	c.addHandler(event, containerValueProvider, actionEventHandlers[event]);
+	                }
+                }
+                
                 parent.getValue("v.body").push(c);
                 
                 var element = $A.util.getElement(placeholderId);

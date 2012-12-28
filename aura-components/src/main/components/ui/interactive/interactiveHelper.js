@@ -50,9 +50,17 @@
         helper.preEventFiring(component, event);
 
         // fire the equivalent Aura event
+        helper.fireEvent(component, event);
+    },
+    
+    /**
+     * Fire the equivalent Aura event for DOM one.
+     * This can be overridden by extended component
+     */
+     fireEvent : function (component, event) {
         var e = component.getEvent(event.type);
         e.fire();
-    },
+     },
 
     /**
      * Returns the list of valid DOM events this component may handle

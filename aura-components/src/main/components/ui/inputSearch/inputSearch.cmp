@@ -17,9 +17,30 @@
 -->
 <aura:component extends="ui:inputText" extensible="true" support="GA"
     description="This component displays an input field suitable for entering a search string.">
-
-    <aura:set attribute="type" value="search"/>
+    <aura:attribute name="type" type="String" default="search" description="The input type of the string. Default value is &quot;search&quot;."/>
     <aura:attribute name="placeholder" type="String" default="Search" description="Text that is displayed when the field is empty, to prompt the user for a valid search string. Default value is &quot;Search&quot;."/>
-    <aura:set attribute="placeholder" value="{!v.placeholder}" />
+    <aura:attribute name="showClear" type="Boolean" default="false" description="Boolean value indicate if we should show the search clear button. Default value is &quot;false&quot;."/>
     <aura:registerevent name="search" type="ui:searchEvent" description="The event fired when the user runs a search."/>
+    <aura:renderif isTrue="{!v.body.length == 0}">
+       <input aura:id="search" 
+              class="{!v.class}" 
+              type="{!v.type}" 
+              value="{!v.value}" 
+              placeholder="{!v.placeholder}" 
+              required="{!v.required}" 
+              disabled="{!v.disabled}" 
+              maxlength="{!v.maxlength}" 
+              size="{!v.size}"
+              oninput="{!c.input}"/>
+       <aura:if isTrue="{!v.showClear}">
+           <ui:button aura:id="clearSearchTermButton"
+                      class="{!v.value ? 'clear' : 'hide clear'}"                      
+                      label="clear"
+                      labelDisplay="false"
+                      press="{!c.clearSearchTerm}"/>
+       </aura:if>
+       <aura:set attribute="else">
+           {!v.body}
+       </aura:set>
+    </aura:renderif>
 </aura:component>

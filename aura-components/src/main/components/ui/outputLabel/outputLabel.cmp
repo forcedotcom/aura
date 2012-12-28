@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:output" extensible="true" support="BETA" description="Displays a label as specified by the value attribute.">
+<aura:component extends="ui:output" extensible="true" support="BETA" description="Displays an element label as specified by the value attribute.">
     <span class="{!v.class}">{!v.value}</span>&#160;:
 </aura:component>

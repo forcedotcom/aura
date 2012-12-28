@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:output" extensible="true" support="GA" description="Displays an email address in an HTML a element.">
+<aura:component extends="ui:output" extensible="true" support="GA" description="Displays an email address in an HTML anchor (&lt;a?&gt;) element. The leading and trailing space are trimmed.">
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
     <aura:if isTrue="{!v.value != null &amp;&amp; v.value != ''}">

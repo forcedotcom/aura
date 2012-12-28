@@ -1,0 +1,49 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Setting Attributes on a Component Reference"/>
+
+    <p>When you include another component, such as <code>&lt;ui:button&gt;</code>, in a component, we call that a component reference to <code>&lt;ui:button&gt;</code>. You can use <code>&lt;aura:set&gt;</code> to set an attribute on the component reference. For example, if your component includes a reference to <code>&lt;ui:button&gt;</code>:</p>
+
+<auradocs:codeblock><![CDATA[<ui:button label="">
+    <aura:set attribute="label" value="hello"/>
+</ui:button>
+]]></auradocs:codeblock>
+
+    <p>This is equivalent to:</p>
+
+<auradocs:codeblock><![CDATA[<ui:button label="hello"/>
+]]></auradocs:codeblock>
+
+    <p>The latter syntax without <code>aura:set</code> makes more sense in this simple example. You can also use this simpler syntax in component references to set values for attributes that are inherited from parent components.</p>
+
+    <p><code>aura:set</code> is more useful when you want to set markup as the attribute value. In the <a href="https://github.com/forcedotcom/aura-note/blob/master/src/main/webapp/WEB-INF/components/auranote/notes/notes.app" target="_new">Aura Note sample app</a>, the <code>&lt;aura:set&gt;</code> tag specifies the markup for the <code>left</code> attribute of the <code>ui:block</code> element.</p>
+
+<auradocs:codeblock><![CDATA[<ui:block class="wrapper" aura:id="block">
+    <aura:set attribute="left">
+        <auranote:sidebar aura:id="sidebar" />
+    </aura:set>
+    <auranote:details aura:id="details" />
+</ui:block>
+]]></auradocs:codeblock>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="tagAuraSetSuper">Setting Attributes on a Super Component</auradocs:topicLink>
+    </p>
+</aura:component>

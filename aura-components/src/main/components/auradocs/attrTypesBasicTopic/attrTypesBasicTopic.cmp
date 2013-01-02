@@ -39,7 +39,7 @@
             <tr>
                 <td><code>Date</code></td>
                 <td><code>&lt;aura:attribute name="startDate" type="Date" /&gt;</code></td>
-                <td>A date corresponding to a calendar day. The hh:mm:ss portion of the date is not stored. To include time fields, use <code>DateTime</code> instead.</td>
+                <td>A date corresponding to a calendar day in the format yyyy-mm-dd. The hh:mm:ss portion of the date is not stored. To include time fields, use <code>DateTime</code> instead.</td>
             </tr>
 
             <tr>

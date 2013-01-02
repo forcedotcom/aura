@@ -117,7 +117,10 @@ public class AuraResourceServlet extends AuraBaseServlet {
         List<DescriptorFilter> filters = Lists.newArrayList();
         BaseComponentDef comp = null;
         try {
-            comp = context.getApplicationDescriptor().getDef();
+            DefDescriptor<? extends BaseComponentDef> appDesc = context.getApplicationDescriptor();
+            if (appDesc != null) {
+                comp = appDesc.getDef();
+            }
         } catch (QuickFixException qfe) {
             comp = Aura.getDefinitionService().getDefinition("auradev:quickFixException", ComponentDef.class);
         }

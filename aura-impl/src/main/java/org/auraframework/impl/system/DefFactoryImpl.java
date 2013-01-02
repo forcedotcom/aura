@@ -19,7 +19,7 @@ import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorMatcher;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.system.DefFactory;
 import org.auraframework.system.Source;
 
@@ -47,7 +47,7 @@ public abstract class DefFactoryImpl<D extends Definition>  implements DefFactor
     }
 
     @Override
-    public Set<DefDescriptor<?>> find(DescriptorMatcher matcher) {
+    public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         throw new UnsupportedOperationException();
     }
 

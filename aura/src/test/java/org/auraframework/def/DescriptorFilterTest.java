@@ -25,12 +25,12 @@ import org.auraframework.test.UnitTestCase;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-public class DescriptorMatcherTest extends UnitTestCase {
-    public DescriptorMatcherTest(String name) {
+public class DescriptorFilterTest extends UnitTestCase {
+    public DescriptorFilterTest(String name) {
         super(name);
     }
 
-    private String getLabel(DescriptorMatcher dm, boolean expected, String what, String value) {
+    private String getLabel(DescriptorFilter dm, boolean expected, String what, String value) {
         String match;
 
         if (expected) {
@@ -41,52 +41,52 @@ public class DescriptorMatcherTest extends UnitTestCase {
         return dm.toString()+": "+match+" "+what+": "+value;
     }
 
-    private void checkPrefix(DescriptorMatcher dm, String prefix, boolean value) {
+    private void checkPrefix(DescriptorFilter dm, String prefix, boolean value) {
         assertEquals(getLabel(dm, value, "prefix", prefix), value, dm.matchPrefix(prefix));
     }
 
-    private void checkNamespace(DescriptorMatcher dm, String namespace, boolean value) {
+    private void checkNamespace(DescriptorFilter dm, String namespace, boolean value) {
         assertEquals(getLabel(dm, value, "namespace", namespace), value, dm.matchNamespace(namespace));
     }
 
-    private void checkName(DescriptorMatcher dm, String name, boolean value) {
+    private void checkName(DescriptorFilter dm, String name, boolean value) {
         assertEquals(getLabel(dm, value, "name", name), value, dm.matchName(name));
     }
 
-    private void checkType(DescriptorMatcher dm, DefType type, boolean value) {
+    private void checkType(DescriptorFilter dm, DefType type, boolean value) {
         assertEquals(getLabel(dm, value, "type", type.toString()), value, dm.matchType(type));
     }
 
     public void testInvalid() throws Exception {
         try {
-            new DescriptorMatcher("bah.humbug://a:b");
+            new DescriptorFilter("bah.humbug://a:b");
             fail("should have gotten an exception");
         } catch (IllegalArgumentException expected) {
             assertTrue("exception should name prefix", expected.getMessage().contains("prefix"));
         }
         try {
-            new DescriptorMatcher("a://bah.humbug:b");
+            new DescriptorFilter("a://bah.humbug:b");
             fail("should have gotten an exception");
         } catch (IllegalArgumentException expected) {
             assertTrue("exception should name namespace", expected.getMessage().contains("namespace"));
         }
         try {
-            new DescriptorMatcher("a://b:bah.humbug");
+            new DescriptorFilter("a://b:bah.humbug");
             fail("should have gotten an exception");
         } catch (IllegalArgumentException expected) {
             assertTrue("exception should name name", expected.getMessage().contains(" name "));
         }
         try {
-            new DescriptorMatcher("a://b:c", "bah.humbug");
+            new DescriptorFilter("a://b:c", "bah.humbug");
             fail("should have gotten an exception");
         } catch (IllegalArgumentException expected) {
         }
     }
 
     public void testPrefixOnly() throws Exception {
-        DescriptorMatcher dm;
+        DescriptorFilter dm;
        
-        dm = new DescriptorMatcher("notfound://");
+        dm = new DescriptorFilter("notfound://");
         checkPrefix(dm, "hi", false);
         checkPrefix(dm, "css", false);
         checkNamespace(dm, "hi", true);
@@ -99,9 +99,9 @@ public class DescriptorMatcherTest extends UnitTestCase {
     }
 
     public void testPrefixPlusNamespace() throws Exception {
-        DescriptorMatcher dm;
+        DescriptorFilter dm;
        
-        dm = new DescriptorMatcher("notfound://hi");
+        dm = new DescriptorFilter("notfound://hi");
         checkPrefix(dm, "hi", false);
         checkPrefix(dm, "css", false);
         checkNamespace(dm, "hi", true);
@@ -114,9 +114,9 @@ public class DescriptorMatcherTest extends UnitTestCase {
     }
 
     public void testNamespaceOnly() throws Exception {
-        DescriptorMatcher dm;
+        DescriptorFilter dm;
        
-        dm = new DescriptorMatcher("hi");
+        dm = new DescriptorFilter("hi");
         checkPrefix(dm, "hi", true);
         checkPrefix(dm, "css", true);
         checkNamespace(dm, "hi", true);
@@ -129,9 +129,9 @@ public class DescriptorMatcherTest extends UnitTestCase {
     }
 
     public void testNamespaceAndName() throws Exception {
-        DescriptorMatcher dm;
+        DescriptorFilter dm;
        
-        dm = new DescriptorMatcher("hi:ho");
+        dm = new DescriptorFilter("hi:ho");
         checkPrefix(dm, "hi", true);
         checkPrefix(dm, "css", true);
         checkNamespace(dm, "hi", true);
@@ -145,9 +145,9 @@ public class DescriptorMatcherTest extends UnitTestCase {
     }
 
     public void testFullWildcardMatcher() throws Exception {
-        DescriptorMatcher dm;
+        DescriptorFilter dm;
        
-        dm = new DescriptorMatcher("*://*:*");
+        dm = new DescriptorFilter("*://*:*");
         checkPrefix(dm, "hi", true);
         checkPrefix(dm, "css", true);
         checkNamespace(dm, "hi", true);
@@ -160,9 +160,9 @@ public class DescriptorMatcherTest extends UnitTestCase {
     }
 
     public void testNoprefixWildcardMatcher() throws Exception {
-        DescriptorMatcher dm;
+        DescriptorFilter dm;
        
-        dm = new DescriptorMatcher("notfound://*:*");
+        dm = new DescriptorFilter("notfound://*:*");
         checkPrefix(dm, "hi", false);
         checkPrefix(dm, "css", false);
         checkNamespace(dm, "hi", true);
@@ -175,9 +175,9 @@ public class DescriptorMatcherTest extends UnitTestCase {
     }
 
     public void testNonamespaceWildcardMatcher() throws Exception {
-        DescriptorMatcher dm;
+        DescriptorFilter dm;
        
-        dm = new DescriptorMatcher("*://notfound:*");
+        dm = new DescriptorFilter("*://notfound:*");
         checkPrefix(dm, "hi", true);
         checkPrefix(dm, "css", true);
         checkNamespace(dm, "hi", false);
@@ -190,9 +190,9 @@ public class DescriptorMatcherTest extends UnitTestCase {
     }
 
     public void testNonameWildcardMatcher() throws Exception {
-        DescriptorMatcher dm;
+        DescriptorFilter dm;
        
-        dm = new DescriptorMatcher("*://*:notfound");
+        dm = new DescriptorFilter("*://*:notfound");
         checkPrefix(dm, "hi", true);
         checkPrefix(dm, "css", true);
         checkNamespace(dm, "hi", true);
@@ -205,9 +205,9 @@ public class DescriptorMatcherTest extends UnitTestCase {
     }
 
     public void testExactMatcher() throws Exception {
-        DescriptorMatcher dm;
+        DescriptorFilter dm;
        
-        dm = new DescriptorMatcher("exactprefix://exactnamespace:exactname");
+        dm = new DescriptorFilter("exactprefix://exactnamespace:exactname");
 
         checkPrefix(dm, "exactprefix1", false);
         checkPrefix(dm, "1exactprefix", false);
@@ -232,9 +232,9 @@ public class DescriptorMatcherTest extends UnitTestCase {
     }
 
     public void testAlmostMatcher() throws Exception {
-        DescriptorMatcher dm;
+        DescriptorFilter dm;
        
-        dm = new DescriptorMatcher("almostprefix*://almostnamespace*:almostname*");
+        dm = new DescriptorFilter("almostprefix*://almostnamespace*:almostname*");
 
         checkPrefix(dm, "almostprefix1", true);
         checkPrefix(dm, "1almostprefix", false);
@@ -260,7 +260,7 @@ public class DescriptorMatcherTest extends UnitTestCase {
 
     public void testTypeMatcher() throws Exception {
         for (DefType type : DefType.values()) {
-            DescriptorMatcher dm = new DescriptorMatcher("exactprefix://exactnamespace:exactname", type.toString());
+            DescriptorFilter dm = new DescriptorFilter("exactprefix://exactnamespace:exactname", type.toString());
 
             checkType(dm, type, true);
             for (DefType otype : DefType.values()) {
@@ -347,16 +347,16 @@ public class DescriptorMatcherTest extends UnitTestCase {
     }
 
     public void testDescriptor() {
-        DescriptorMatcher dm;
+        DescriptorFilter dm;
         FakeDefDescriptor dd;
 
-        dm = new DescriptorMatcher("exactprefix://exactnamespace:exactname", "APPLICATION");
+        dm = new DescriptorFilter("exactprefix://exactnamespace:exactname", "APPLICATION");
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.APPLICATION);
         assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.COMPONENT);
         assertEquals(getLabel(dm, false, "dd", dd.toString()), false, dm.matchDescriptor(dd));
 
-        dm = new DescriptorMatcher("exactprefix://exactnamespace:exactname", "APPLICATION,COMPONENT");
+        dm = new DescriptorFilter("exactprefix://exactnamespace:exactname", "APPLICATION,COMPONENT");
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.APPLICATION);
         assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.COMPONENT);
@@ -364,7 +364,7 @@ public class DescriptorMatcherTest extends UnitTestCase {
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.STYLE);
         assertEquals(getLabel(dm, false, "dd", dd.toString()), false, dm.matchDescriptor(dd));
 
-        dm = new DescriptorMatcher("exactprefix://exactnamespace:exactname", "*");
+        dm = new DescriptorFilter("exactprefix://exactnamespace:exactname", "*");
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.APPLICATION);
         assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.COMPONENT);
@@ -372,7 +372,7 @@ public class DescriptorMatcherTest extends UnitTestCase {
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.STYLE);
         assertEquals(getLabel(dm, true, "dd", dd.toString()), true, dm.matchDescriptor(dd));
 
-        dm = new DescriptorMatcher("exactprefix://exactnamespace:exactname", null);
+        dm = new DescriptorFilter("exactprefix://exactnamespace:exactname", null);
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.APPLICATION);
         assertEquals(getLabel(dm, false, "dd", dd.toString()), false, dm.matchDescriptor(dd));
         dd = new FakeDefDescriptor("exactprefix", "exactnamespace", "exactname", DefType.COMPONENT);

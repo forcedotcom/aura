@@ -120,7 +120,7 @@ public class FileSourceLoader extends BaseSourceLoader {
     }
 
     @Override
-    public Set<DefDescriptor<?>> find(DescriptorMatcher matcher) {
+    public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         Set<DefDescriptor<?>> ret = new HashSet<DefDescriptor<?>>();
         AnyTypeFilter af = new AnyTypeFilter(ret, matcher);
 
@@ -220,7 +220,7 @@ public class FileSourceLoader extends BaseSourceLoader {
      * all of that work, we can simply do what we need to here.
      */
     private static class AnyTypeFilter implements FileFilter {
-        private DescriptorMatcher dm;
+        private DescriptorFilter dm;
         private Set<DefDescriptor<?>> dset;
         private String namespace;
 
@@ -230,7 +230,7 @@ public class FileSourceLoader extends BaseSourceLoader {
          * @param dset the set of descriptors to be filled.
          * @param dm the matcher to check the descriptors.
          */
-        public AnyTypeFilter(Set<DefDescriptor<?>> dset, DescriptorMatcher dm) {
+        public AnyTypeFilter(Set<DefDescriptor<?>> dset, DescriptorFilter dm) {
             this.dm = dm;
             this.dset = dset;
             this.namespace = null;

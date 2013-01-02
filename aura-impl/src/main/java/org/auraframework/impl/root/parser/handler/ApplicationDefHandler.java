@@ -28,6 +28,8 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.LayoutsDef;
+
+import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Component;
@@ -40,7 +42,6 @@ import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  */
@@ -127,10 +128,13 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
         String preloadNames = getAttributeValue(ATTRIBUTE_PRELOAD);
         if(!AuraTextUtil.isNullEmptyOrWhitespace(preloadNames)){
-            appBuilder.preloads = Sets.newHashSet();
             List<String> preloads = AuraTextUtil.splitSimple(",", preloadNames);
             for(String preload : preloads){
-                appBuilder.preloads.add(preload.trim());
+                DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
+                ddb.setLocation(getLocation());
+                ddb.setResource(preload);
+                ddb.setType("*");
+                appBuilder.addDependency(ddb.build());
             }
         }
         String isAppcacheEnabled = getAttributeValue(ATTRIBUTE_APPCACHE_ENABLED);

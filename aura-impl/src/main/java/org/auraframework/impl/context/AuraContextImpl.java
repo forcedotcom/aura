@@ -30,6 +30,7 @@ import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DependencyDef;
 import org.auraframework.def.EventType;
 import org.auraframework.http.AuraServlet;
 import org.auraframework.instance.Action;
@@ -51,7 +52,6 @@ import org.auraframework.util.json.JsonSerializer;
 import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 import org.auraframework.util.json.JsonSerializers;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -189,8 +189,6 @@ public class AuraContextImpl implements AuraContext {
 
     private final LinkedHashSet<String> preloadedNamespaces = Sets.newLinkedHashSet();
 
-    private LinkedHashSet<String> previousPreloadedNamespaces;
-
     private final Format format;
 
     private final Map<ValueProviderType, GlobalValueProvider> globalProviders;
@@ -208,6 +206,8 @@ public class AuraContextImpl implements AuraContext {
     private boolean preloading = false;
 
     private DefDescriptor<? extends BaseComponentDef> appDesc;
+    private BaseComponentDef app;
+    private boolean appLoaded = false;
     private List<Locale> requestedLocales;
     private Client client = Client.OTHER;
 
@@ -226,7 +226,6 @@ public class AuraContextImpl implements AuraContext {
                 preloadedNamespaces.add("auradev");
             }
         }
-
         this.mode = mode;
         this.masterRegistry = masterRegistry;
         this.defaultPrefixes = defaultPrefixes;
@@ -242,22 +241,30 @@ public class AuraContextImpl implements AuraContext {
         preloadedNamespaces.add(preload);
     }
 
-    /**
-     * Remove all preloads, but add them to previousPreloads.
-     */
-    protected void clearPreloads() {
-        previousPreloadedNamespaces = new LinkedHashSet<String>();
-        previousPreloadedNamespaces.addAll(preloadedNamespaces);
+    @Override
+    public void clearPreloads() {
         preloadedNamespaces.clear();
     }
 
     @Override
     public boolean isPreloaded(DefDescriptor<?> descriptor) {
-        if (descriptor.getDefType() == DefType.STYLE) {
-            //
-            // Oh. My. God. what is this for...
-            //
-            return this.previousPreloadedNamespaces != null && this.previousPreloadedNamespaces.contains(descriptor.getNamespace());
+        if (this.preloading) {
+            return false;
+        }
+        if (this.appDesc != null && !this.appLoaded) {
+            this.appLoaded = true;
+            try {
+                this.app = this.appDesc.getDef();
+            } catch (QuickFixException qfe) {
+                // we just don't have an app, ignore this.
+            }
+        }
+        if (this.app != null) {
+            for (DependencyDef dd : this.app.getDependencies()) {
+                if (dd.getDependency().matchDescriptor(descriptor)) {
+                    return true;
+                }
+            }
         }
         return this.preloadedNamespaces.contains(descriptor.getNamespace());
     }
@@ -358,12 +365,6 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public Set<String> getPreviousPreloads() {
-        if (previousPreloadedNamespaces != null) { return Collections.unmodifiableSet(previousPreloadedNamespaces); }
-        return ImmutableSet.of();
-    }
-
-    @Override
     public List<Locale> getRequestedLocales() {
         return this.requestedLocales;
     }
@@ -459,11 +460,6 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public void setPreloading(boolean preloading) {
         this.preloading = preloading;
-        if (this.preloading) {
-            clearPreloads();
-        } else {
-            unclearPreloads();
-        }
     }
 
     @Override
@@ -490,10 +486,10 @@ public class AuraContextImpl implements AuraContext {
     public void addClientApplicationEvent(Event event) throws Exception{
         if(event!=null){
            if(event.getDescriptor().getDef().getEventType()!=EventType.APPLICATION){
-                   throw new InvalidEventTypeException(
-                           String.format("%s is not an Application event. " +
-                           		"Only Application events are allowed to be fired from server.",
-                           		    event.getDescriptor()), null);
+               throw new InvalidEventTypeException(
+                       String.format("%s is not an Application event. " +
+                                    "Only Application events are allowed to be fired from server.",
+                                        event.getDescriptor()), null);
            }
            clientEvents.add(event);
         }
@@ -502,16 +498,5 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public List<Event> getClientEvents(){
     	return clientEvents;
-    }
-    
-    /**
-     * Add preloads back and remove them from previousPreloads.
-     */
-    protected void unclearPreloads() {
-        if (previousPreloadedNamespaces != null) {
-            preloadedNamespaces.clear();
-            preloadedNamespaces.addAll(previousPreloadedNamespaces);
-            previousPreloadedNamespaces.clear();
-        }
     }
 }

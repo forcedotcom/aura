@@ -163,7 +163,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application useAppCache='true'/>");
         ApplicationDef appdef = Aura.getDefinitionService().getDefinition(desc);
-        assertEquals(Boolean.FALSE, appdef.isAppcacheEnabled());
+        assertEquals(Boolean.TRUE, appdef.isAppcacheEnabled());
     }
 
     /**
@@ -240,9 +240,6 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
      */
     private void enablePreloads(DefDescriptor<ApplicationDef> applicationDef) throws QuickFixException {
         Aura.getContextService().getCurrentContext().setPreloading(true);
-        for (String preload : applicationDef.getDef().getPreloads()) {
-            Aura.getContextService().getCurrentContext().addPreload(preload);
-        }
     }
 
     /**

@@ -56,7 +56,7 @@ public interface SourceLoader {
     /**
      * Match descriptors against a matcher.
      */
-    Set<DefDescriptor<?>> find(DescriptorMatcher dm);
+    Set<DefDescriptor<?>> find(DescriptorFilter dm);
 
     <T extends Definition> Set<DefDescriptor<T>> find(Class<T> primaryInterface, String prefix, String namespace);
 }

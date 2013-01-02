@@ -19,7 +19,7 @@ import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorMatcher;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -60,7 +60,7 @@ public interface MasterDefRegistry {
      * Does not compile the definitions if they were not already compiled, and does
      * not guarantee that they can compile.
      */
-    Set<DefDescriptor<?>> find(DescriptorMatcher matcher);
+    Set<DefDescriptor<?>> find(DescriptorFilter matcher);
 
     /**
      * Returns true if the source related to the descriptor exists.  Does not

@@ -41,7 +41,6 @@ public class ComponentDefHTMLFormatAdapterTest extends BaseComponentDefHTMLForma
      */
     public void testWriteManifestWithPreloads() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        context.setPreloading(true); // clears out current preloads
         context.addPreload("aura");
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component render='client'></aura:component>");

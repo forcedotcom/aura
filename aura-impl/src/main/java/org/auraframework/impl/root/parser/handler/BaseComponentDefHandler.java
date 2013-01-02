@@ -120,6 +120,8 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
             builder.eventHandlers.add(new EventHandlerDefHandler(this, xmlReader, source).getElement());
         }else if (AttributeDefRefHandler.TAG.equalsIgnoreCase(tag)) {
             builder.facets.add(new AttributeDefRefHandler<T>(this, xmlReader, source).getElement());
+        }else if (DependencyDefHandler.TAG.equalsIgnoreCase(tag)) {
+            builder.addDependency(new DependencyDefHandler<T>(this, xmlReader, source).getElement());
         } else {
             body.add(getDefRefHandler(this).getElement());
             // if it wasn't one of the above, it must be a defref, or an error

@@ -20,7 +20,7 @@ import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorMatcher;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
 
@@ -46,7 +46,7 @@ public class FakeRegistry implements MasterDefRegistry {
     }
 
     @Override
-    public Set<DefDescriptor<?>> find(DescriptorMatcher matcher) {
+    public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         return null;
     }
 

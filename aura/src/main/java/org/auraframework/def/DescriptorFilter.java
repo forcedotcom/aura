@@ -29,7 +29,7 @@ import org.auraframework.util.text.GlobMatcher;
 
 import com.google.common.collect.Lists;
 
-public class DescriptorMatcher {
+public class DescriptorFilter {
     private static final List<DefType> componentType = Collections.unmodifiableList(Arrays.asList(new DefType [] {
                                                                                                       DefType.COMPONENT
                                                                                                   }));
@@ -38,11 +38,11 @@ public class DescriptorMatcher {
     private final GlobMatcher namespaceMatch;
     private final GlobMatcher nameMatch;
 
-    public DescriptorMatcher(String matcher) {
+    public DescriptorFilter(String matcher) {
         this(matcher, "*");
     }
 
-    public DescriptorMatcher(String matcher, String typeStr) {
+    public DescriptorFilter(String matcher, String typeStr) {
         String prefix = "*", namespace = "*", name = "*";
         String remainder = matcher;
 

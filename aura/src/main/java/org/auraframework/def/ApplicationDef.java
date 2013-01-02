@@ -15,11 +15,8 @@
  */
 package org.auraframework.def;
 
-import java.util.Set;
-
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
 
 /**
  */
@@ -28,8 +25,6 @@ public interface ApplicationDef extends BaseComponentDef {
     DefDescriptor<ApplicationDef> getDescriptor();
     @Override
     DefDescriptor<ApplicationDef> getExtendsDescriptor();
-
-    Set<String> getPreloads();
 
     DefDescriptor<LayoutsDef> getLayoutsDefDescriptor();
 

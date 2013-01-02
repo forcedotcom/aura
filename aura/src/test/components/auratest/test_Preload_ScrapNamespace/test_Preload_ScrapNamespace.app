@@ -15,7 +15,8 @@
     limitations under the License.
 
 -->
-<aura:application preload="somecrap">
+<aura:application>
+    <aura:dependency resource="somecrap" />
     <auratest:test_button class="displayText" label="Sitting pretty tight"/>
 </aura:application>
 <!-- This component is used in ApplicationDefTest.testNonExistantNameSpace() -->

@@ -19,6 +19,7 @@ import java.util.*;
 
 import org.auraframework.Aura;
 import org.auraframework.def.*;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.*;
@@ -54,7 +55,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     @Override
-    public Set<DefDescriptor<?>> find(DescriptorMatcher matcher) {
+    public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         Set<DefRegistry<?>> registries = this.delegateRegistries.getRegistries(matcher);
         Set<DefDescriptor<?>> matched = Sets.newHashSet();
 
@@ -214,6 +215,17 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     def.appendDependencies(deps);
                     this.defs.put(def.getDescriptor(), def);
                     //cc.dependencies.put(canonical, def);
+                    //
+                    // Add all of the filters on here. Note that we might want to track
+                    // the filters separately so that we can do tighter dependency matching later.
+                    //
+                    if (def instanceof BaseComponentDef) {
+                        BaseComponentDef bcd = (BaseComponentDef)def;
+
+                        for (DependencyDef dep : bcd.getDependencies()) {
+                            deps.addAll(find(dep.getDependency()));
+                        }
+                    }
                 }
                 return def;
             }

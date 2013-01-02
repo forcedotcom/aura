@@ -16,11 +16,14 @@
 package org.auraframework.impl;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
+
+import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.service.ContextService;
@@ -30,6 +33,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 /**
@@ -173,28 +177,27 @@ public class DefinitionServiceImpl implements DefinitionService {
      *
      * This calculates the last mod time for a set of preloads.
      *
-     * @param preloads the preloads to process.
+     * @param dependencies the preloads to process.
      * @param contextService a handy pointer.
      * @param processed The set of already processed descriptors.
      * @param lastMod the input last mod time
      * @return a new last mod time.
      */
-    private long preloadsHelper(Collection<String> preloads,
+    private long preloadsHelper(Collection<DependencyDef> dependencySet,
                                 ContextService contextService,
                                 Set<DefDescriptor<?>> processed, long lastMod) throws QuickFixException {
-        Set<DefDescriptor<? extends Definition>> matchers = Sets.newHashSet();
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
         long ret = lastMod;
 
-        for (String preload : preloads) {
-            if(!preload.contains("_")){
-                matchers.add(getDefDescriptor(String.format("markup://%s:*", preload), ApplicationDef.class));
-                matchers.add(getDefDescriptor(String.format("markup://%s:*", preload), ComponentDef.class));
-            }
-        }
-        for (DefDescriptor<? extends Definition> matcher : matchers) {
-            for (DefDescriptor<? extends Definition> desc : find(matcher)) {
+        for (DependencyDef dependency : dependencySet) {
+            int count = 0;
+
+            for (DefDescriptor<? extends Definition> desc : find(dependency.getDependency())) {
                 ret = checkOneDef(desc, contextService, dependencies, processed, ret);
+                count += 1;
+            }
+            if (count == 0) {
+                throw new AuraRuntimeException("No definitions found by "+dependency.getDependency().toString());
             }
         }
         return dependenciesHelper(dependencies, contextService, processed, ret);
@@ -211,9 +214,18 @@ public class DefinitionServiceImpl implements DefinitionService {
     public long getNamespaceLastMod(Collection<String> preloads) throws QuickFixException {
         ContextService contextService = Aura.getContextService();
         Set<DefDescriptor<?>> processed = Sets.newHashSet();
+        List<DependencyDef> dependencySet = Lists.newArrayList();
 
         contextService.assertEstablished();
-        return preloadsHelper(preloads, contextService, processed, 0L);
+        for (String preload : preloads) {
+            if(!preload.contains("_")){
+                DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
+                ddb.setResource(preload);
+                ddb.setType("APPLICATION,COMPONENT");
+                dependencySet.add(ddb.build());
+            }
+        }
+        return preloadsHelper(dependencySet, contextService, processed, 0L);
     }
 
     /**
@@ -233,8 +245,8 @@ public class DefinitionServiceImpl implements DefinitionService {
         lastMod = dependenciesHelper(dependencies, contextService, processed, lastMod);
         T def = contextService.getCurrentContext().getDefRegistry().getDef(desc);
         if (def != null) {
-            if (def instanceof ApplicationDef) {
-                return preloadsHelper(((ApplicationDef)def).getPreloads(), contextService, processed, lastMod);
+            if (def instanceof BaseComponentDef) {
+                return preloadsHelper(((BaseComponentDef)def).getDependencies(), contextService, processed, lastMod);
             }
         }
         return lastMod;
@@ -249,7 +261,7 @@ public class DefinitionServiceImpl implements DefinitionService {
     }
 
     @Override
-    public Set<DefDescriptor<?>> find(DescriptorMatcher matcher) {
+    public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         Aura.getContextService().assertEstablished();
 
         AuraContext context = Aura.getContextService().getCurrentContext();

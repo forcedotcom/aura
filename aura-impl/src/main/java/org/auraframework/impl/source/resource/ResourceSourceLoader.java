@@ -131,7 +131,7 @@ public class ResourceSourceLoader extends BaseSourceLoader {
     }
 
     @Override
-    public Set<DefDescriptor<?>> find(DescriptorMatcher matcher) {
+    public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         Set<DefDescriptor<?>> ret = Sets.newHashSet();
 
         for (Map.Entry<IndexKey, Set<DefDescriptor<?>>> entry : index.entrySet()) {

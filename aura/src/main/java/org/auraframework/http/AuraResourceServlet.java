@@ -19,9 +19,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,12 +35,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
 import org.auraframework.def.*;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
-import org.auraframework.service.SerializationService;
 import org.auraframework.system.Client;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
@@ -64,60 +60,76 @@ public class AuraResourceServlet extends AuraBaseServlet {
 
     private final static StringParam errorParam = new StringParam(AURA_PREFIX + "error", 128, false);
 
+
+    /**
+     * A very hackish internal filter.
+     *
+     * This is used to apply the theme definition filter for 'templates', which appears to be quite
+     * bogus, but is getting rather further embedded in code.
+     *
+     * TODO: W-1486762
+     */
+    private static interface TempFilter {
+        public boolean apply(DefDescriptor<?> descriptor);
+    }
+
     /**
      * An internal routine to populate a set from a set of namespaces.
      *
      * This will go away when W-1166679 is fixed.
      */
-    private <P extends Definition, D extends P> void addDefinitions(String prefix, Class<D> preloadType,
-                                                                    List<String> namespaces, String separator,
+    private <P extends Definition, D extends P> void addDefinitions(Class<D> preloadType,
+                                                                    List<DescriptorFilter> filters,
+                                                                    TempFilter extraFilter,
                                                                     Set<P> defs) throws QuickFixException {
         DefinitionService definitionService = Aura.getDefinitionService();
 
-        for (String ns : namespaces) {
-            DefDescriptor<D> matcher = definitionService.getDefDescriptor(String.format("%s://%s%s*", prefix, ns,
-                                                                                        separator), preloadType);
-            Set<DefDescriptor<D>> descriptors = definitionService.find(matcher);
+        for (DescriptorFilter filter : filters) {
+            Set<DefDescriptor<?>> descriptors = definitionService.find(filter);
 
-            for(DefDescriptor<D> descriptor : descriptors){
-                P def = descriptor.getDef();
-                if(def != null){
-                    defs.add(def);
+            for(DefDescriptor<?> descriptor : descriptors){
+                if (preloadType.isAssignableFrom(descriptor.getDefType().getPrimaryInterface())
+                        && (extraFilter == null || extraFilter.apply(descriptor))) {
+                    @SuppressWarnings("unchecked")
+                    DefDescriptor<? extends D> dd = (DefDescriptor<? extends D>)descriptor;
+                    P def = dd.getDef();
+                    if(def != null){
+                        defs.add(def);
+                    }
                 }
             }
         }
     }
 
     /**
-     * This will go away when the parent bug W-1166679 is fixed.
+     * Get the set of filters for the current context using a different base component.
+     *
+     * Note the special handling here for quick fixes, as we need to be able to get all
+     * of the appropriate definitions even when the app fails to compile. In that case
+     * we reset everything and get the auradev:quickFixException.
+     *
+     * TODO: Note that this means the quickfix handling is hard wired, but I'm not sure that
+     * this is an issue. We should maybe make it more obvious by moving things around
+     * and using static strings..
      */
-    private <T extends Definition> void preloadSerialize(Collection<T> defs, Class<T> type,
-                                                         Appendable out) throws IOException, QuickFixException {
+    private List<DescriptorFilter> getFilters() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        SerializationService serializationService = Aura.getSerializationService();
-
-        context.setPreloading(true);
-        try{
-            serializationService.writeCollection(defs, type, out);
-        } finally {
-            context.setPreloading(false);
+        List<DescriptorFilter> filters = Lists.newArrayList();
+        BaseComponentDef comp = null;
+        try {
+            comp = context.getApplicationDescriptor().getDef();
+        } catch (QuickFixException qfe) {
+            comp = Aura.getDefinitionService().getDefinition("auradev:quickFixException", ComponentDef.class);
         }
-    }
-
-    /**
-     * This will go away when the parent bug W-1166679 is fixed.
-     */
-    private <T extends Definition> void preloadSerialize(Collection<T> defs, Class<T> type, Appendable out,
-                                                         String format) throws IOException, QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        SerializationService serializationService = Aura.getSerializationService();
-
-        context.setPreloading(true);
-        try{
-            serializationService.writeCollection(defs, type, out, format);
-        } finally {
-            context.setPreloading(false);
+        for (String ns : context.getPreloads()) {
+            filters.add(new DescriptorFilter(ns, "*"));
         }
+        if (comp != null && comp.getDependencies() != null) {
+            for (DependencyDef dd : comp.getDependencies()) {
+                filters.add(dd.getDependency());
+            }
+        }
+        return filters;
     }
 
     /**
@@ -125,7 +137,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
      *
      * This writes out the full manifest for an application so that we can use the AppCache.
      *
-     * FIXME: we should document what goes in the manifest and why.
+     * TODO: W-1486764 we should document what goes in the manifest and why.
      *
      * @param request the request
      * @param response the response
@@ -148,8 +160,6 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 return;
             }
         	
-        	setPreloads();
-
             String originalPath = (String)request.getAttribute(AuraResourceServlet.ORIG_REQUEST_URI);
             if(originalPath != null){
                 String currentManifestUrl = AuraServlet.getManifest();
@@ -201,6 +211,15 @@ public class AuraResourceServlet extends AuraBaseServlet {
      */
     private static final Map<String,String> cssCache = new ConcurrentHashMap<String,String>();
 
+    private static class NonTemplateFilter implements TempFilter {
+        @Override
+        public boolean apply(DefDescriptor<?> descriptor) {
+            return !descriptor.getName().toLowerCase().endsWith("template");
+        }
+    }
+
+    private static final NonTemplateFilter NTF = new NonTemplateFilter();
+
     /**
      * write out CSS.
      *
@@ -216,39 +235,25 @@ public class AuraResourceServlet extends AuraBaseServlet {
                           HttpServletResponse response) throws IOException, QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
-        List<String> namespaces = Lists.newArrayList(context.getPreloads());
-        DefinitionService definitionService = Aura.getDefinitionService();
+        List<DescriptorFilter> filters = getFilters();
         Client.Type type = Aura.getContextService().getCurrentContext().getClient().getType();
         Mode mode = context.getMode();
         StringBuffer sb = new StringBuffer();
         
-        for (String ns : namespaces) {
-            String key = type.name() + "$" + ns;
+        context.setPreloading(true);
+        for (DescriptorFilter filter : filters) {
+            String key = type.name() + "$" + filter;
             
             String nsCss = !mode.isTestMode() ? cssCache.get(key) : null;
             if (nsCss == null) {
-                DefDescriptor<ThemeDef> matcher = definitionService.getDefDescriptor(String.format("css://%s.*", ns),
-                                                                                     ThemeDef.class);
-                Set<DefDescriptor<ThemeDef>> descriptors = definitionService.find(matcher);
-                List<ThemeDef> nddefs = new ArrayList<ThemeDef>();
+                Set<ThemeDef> nddefs = Sets.newHashSet();
+                List<DescriptorFilter> shortlist = Lists.newArrayList();
 
+                shortlist.add(filter);
+                addDefinitions(ThemeDef.class, shortlist, NTF, nddefs);
                 sb.setLength(0);
-                for(DefDescriptor<ThemeDef> descriptor : descriptors){
-                    //
-                    // This could use the generic routine above except for this brain dead little
-                    // gem.
-                    //
-                    if(!descriptor.getName().toLowerCase().endsWith("template")){
-                        ThemeDef def = descriptor.getDef();
-                        if(def != null){
-                            nddefs.add(def);
-                        }
-                    }
-                }
-                
-                context.setPreloading(true);
                 Appendable tmp = mode.isTestMode() ? response.getWriter() : sb;
-                preloadSerialize(nddefs, ThemeDef.class, tmp);
+                Aura.getSerializationService().writeCollection(nddefs, ThemeDef.class, tmp);
                 if (!mode.isTestMode()) {
                     nsCss = sb.toString();
                     cssCache.put(key, nsCss);
@@ -261,9 +266,6 @@ public class AuraResourceServlet extends AuraBaseServlet {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static final Class<? extends BaseComponentDef>[] preloadTypes = new Class[]{ApplicationDef.class, ComponentDef.class};
-
     /**
      * Write out a set of components in JSON.
      *
@@ -274,19 +276,17 @@ public class AuraResourceServlet extends AuraBaseServlet {
     private void writeComponents(HttpServletRequest request,
                                  HttpServletResponse response) throws ServletException, IOException, QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        List<String> namespaces = Lists.newArrayList(context.getPreloads());
+        List<DescriptorFilter> filters = getFilters();
         Set<BaseComponentDef> defs = Sets.newLinkedHashSet();
 
-        for(Class<? extends BaseComponentDef> preloadType : preloadTypes) {
-            addDefinitions("markup", preloadType, namespaces, ":", defs);
-        }
-
+        addDefinitions(BaseComponentDef.class, filters, null, defs);
         context.setPreloading(true);
-        preloadSerialize(defs, BaseComponentDef.class, response.getWriter());
+        Aura.getSerializationService().writeCollection(defs, BaseComponentDef.class, response.getWriter());
     }
 
 
     private static final Map<String,String> definitionCache = new ConcurrentHashMap<String,String>();
+    private static final List<DescriptorFilter> aurafilter = Arrays.asList(new DescriptorFilter [] {new DescriptorFilter("aura://*:*","CONTROLLER")});
 
     /**
      * write out the complete set of definitions in JS.
@@ -297,7 +297,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
     private String writeDefinitions(HttpServletRequest request,
                                     HttpServletResponse response) throws ServletException, IOException, QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        List<String> namespaces = Lists.newArrayList(context.getPreloads());
+        List<DescriptorFilter> filters = getFilters();
         Mode mode = context.getMode();
         //
         // create a temp buffer in case anything bad happens while we're processing this.
@@ -309,11 +309,12 @@ public class AuraResourceServlet extends AuraBaseServlet {
         String ret = null;
         String key = null;
 
+        context.setPreloading(true);
         if(!mode.isTestMode()){
             StringBuilder keyBuilder = new StringBuilder();
 
-            for(String ns : namespaces){
-                keyBuilder.append(ns);
+            for(DescriptorFilter dm : filters){
+                keyBuilder.append(dm);
                 keyBuilder.append(",");
             }
             key = keyBuilder.toString();
@@ -329,19 +330,17 @@ public class AuraResourceServlet extends AuraBaseServlet {
 
         // append component definitions
         Set<BaseComponentDef> defs = Sets.newLinkedHashSet();
-        addDefinitions("markup", ComponentDef.class, namespaces, ":", defs);
-        addDefinitions("markup", ApplicationDef.class, namespaces, ":", defs);
+
+        addDefinitions(BaseComponentDef.class, filters, null, defs);
         sb.append("componentDefs:");
-        context.setPreloading(true);
-        preloadSerialize(defs, BaseComponentDef.class, sb, "JSON");
+        Aura.getSerializationService().writeCollection(defs, BaseComponentDef.class, sb, "JSON");
         sb.append(",");
 
         // append event definitions
         sb.append("eventDefs:");
         Set<EventDef> events = Sets.newLinkedHashSet();
-        addDefinitions("markup", EventDef.class, namespaces, ":", events);
-        context.setPreloading(true);
-        preloadSerialize(events, EventDef.class, sb, "JSON");
+        addDefinitions(EventDef.class, filters, null, events);
+        Aura.getSerializationService().writeCollection(events, EventDef.class, sb, "JSON");
 
         sb.append(",");
 
@@ -352,10 +351,9 @@ public class AuraResourceServlet extends AuraBaseServlet {
         // the namespace but did not use it. This ends up just getting a single controller.
         //
         Set<ControllerDef> controllers = Sets.newLinkedHashSet();
-        List<String> fakenamespaces = Arrays.asList(new String [] {"*"});
-        addDefinitions("aura", ControllerDef.class, fakenamespaces, ".", controllers);
+        addDefinitions(ControllerDef.class, aurafilter, null, controllers);
         sb.append("controllerDefs:");
-        preloadSerialize(controllers, ControllerDef.class, sb, "JSON");
+        Aura.getSerializationService().writeCollection(controllers, ControllerDef.class, sb, "JSON");
 
         sb.append("});");
 
@@ -445,22 +443,6 @@ public class AuraResourceServlet extends AuraBaseServlet {
 
     protected boolean checkAccess(DefDescriptor<?> desc){
         return true;
-    }
-
-    private void setPreloads() throws QuickFixException{
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        Set<String> preloads = context.getPreloads();
-        DefDescriptor<? extends BaseComponentDef> cmpDefDesc = context.getApplicationDescriptor();
-        if(cmpDefDesc != null && cmpDefDesc.getDefType().equals(DefType.APPLICATION)){
-            @SuppressWarnings("unchecked")
-            DefDescriptor<ApplicationDef> appDefDesc = (DefDescriptor<ApplicationDef>)cmpDefDesc;
-            ApplicationDef appDef = appDefDesc.getDef();
-            for(String preload : appDef.getPreloads()){
-                if(!preloads.contains(preload)){
-                    context.addPreload(preload);
-                }
-            }
-        }
     }
 
     public static boolean isResourceLocallyAvailable(String resourceURI){

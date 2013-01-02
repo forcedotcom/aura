@@ -180,13 +180,13 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * No manifest url is given when app has no explicit preloads.
+     * Manifest url is given even when app has no explicit preloads.
      */
     public void testGetManifestForAppWithoutPreloads() throws Exception {
         System.setProperty(HttpMethodParams.USER_AGENT, APPCACHE_SUPPORTED_USERAGENT);
         ManifestInfo manifest = getManifestInfo("/appCache/nopreload.app");
-        if(manifest.url != null){
-            fail("no manifest url should be present, but got: " + manifest.url);
+        if(manifest.url == null){
+            fail("manifest url should be present, but got: " + manifest.url);
         }
     }
 

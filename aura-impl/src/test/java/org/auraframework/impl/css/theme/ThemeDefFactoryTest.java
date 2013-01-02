@@ -17,7 +17,7 @@ package org.auraframework.impl.css.theme;
 
 import java.util.List;
 
-import org.auraframework.def.DescriptorMatcher;
+import org.auraframework.def.DescriptorFilter;
 
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.source.SourceFactory;
@@ -42,7 +42,7 @@ public class ThemeDefFactoryTest extends AuraImplTestCase {
         
         assertFalse("ThemeDefFactory should not have find() method", factory.hasFind());
         try {
-            factory.find(new DescriptorMatcher("*://*:*"));
+            factory.find(new DescriptorFilter("*://*:*"));
             fail("Calling find() on Factory that does not implement method should throw exception");
         } catch (UnsupportedOperationException e) {}
     }

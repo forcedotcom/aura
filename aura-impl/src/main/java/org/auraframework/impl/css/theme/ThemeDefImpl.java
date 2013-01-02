@@ -136,7 +136,7 @@ public class ThemeDefImpl extends DefinitionImpl<ThemeDef> implements ThemeDef {
 
     @Override
     public String getCode(Client.Type type) {
-        if (browserCode.containsKey(type)) {
+        if (browserCode != null && browserCode.containsKey(type)) {
             return browserCode.get(type);
         } else {
             return code;

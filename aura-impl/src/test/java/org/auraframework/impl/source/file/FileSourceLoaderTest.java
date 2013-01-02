@@ -129,18 +129,18 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
         FileSourceLoader loader = new FileSourceLoader(AuraImplFiles.TestComponents.asFile());
         Set<DefDescriptor<?>> found;
 
-        found = loader.find(new DescriptorMatcher("markup://test:extendsParent"));
+        found = loader.find(new DescriptorFilter("markup://test:extendsParent"));
         assertEquals("Should have found a single component", 1, found.size());
         assertTrue(found.contains(DefDescriptorImpl.getInstance("markup://test:extendsParent", ComponentDef.class)));
         
         // Number of results can change if files modified so just check at least 2 results from wildcard search since 
         // components are more likely to be added than deleted.
-        found = loader.find(new DescriptorMatcher("markup://test:theme*"));
+        found = loader.find(new DescriptorFilter("markup://test:theme*"));
         assertTrue("Should have found multiple components", found.size() > 1);
         assertTrue(found.contains(DefDescriptorImpl.getInstance("markup://test:themeTestTemplate", ComponentDef.class)));
         assertTrue(found.contains(DefDescriptorImpl.getInstance("markup://test:themeTest", ApplicationDef.class)));
         
-        found = loader.find(new DescriptorMatcher("markup://test:doesntexist"));
+        found = loader.find(new DescriptorFilter("markup://test:doesntexist"));
         assertEquals("Should not have found any components", 0, found.size());
     }
 }

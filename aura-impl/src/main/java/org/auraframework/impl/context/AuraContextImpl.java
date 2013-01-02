@@ -26,6 +26,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.stream.XMLStreamException;
+
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -42,6 +44,7 @@ import org.auraframework.system.Client;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidEventTypeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.ServiceLocator;
@@ -257,6 +260,12 @@ public class AuraContextImpl implements AuraContext {
                 this.app = this.appDesc.getDef();
             } catch (QuickFixException qfe) {
                 // we just don't have an app, ignore this.
+            } catch (AuraUnhandledException ahe) {
+                // Ugh! our file has been created, but not written?
+                // TODO: W-1486796
+                if (!(ahe.getCause() instanceof XMLStreamException)) {
+                    throw ahe;
+                }
             }
         }
         if (this.app != null) {

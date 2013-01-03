@@ -15,18 +15,13 @@
  */
 package org.auraframework.util;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import junit.framework.Assert;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.auraframework.util.json.JsonReader;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
-import junit.framework.Assert;
+import org.openqa.selenium.*;
 
 /**
  * A place to put common UI testing specific helper methods
@@ -71,10 +66,15 @@ public class AuraUITestingUtil {
     }
     
     public String getValueFromRootExpr(String val){
-        String exp = "return window.$A.getRoot().get('"+val+"')";
+        String exp = "window.$A.getRoot().get('"+val+"')";
         return exp;
     }
-
+    
+    public String getFindAtRootExpr(String cmp){
+        String exp = "window.$A.getRoot().find('"+cmp+"')";
+        return exp;
+    }
+    
     public void pressEnter(WebElement e){
         e.sendKeys("\n");
     }
@@ -165,5 +165,9 @@ public class AuraUITestingUtil {
             }
             Assert.fail(errorMessage.toString());
         }
+    }
+    
+    public String prepareReturnStatement(String returnStatement){
+        return "return "+returnStatement;
     }
 }

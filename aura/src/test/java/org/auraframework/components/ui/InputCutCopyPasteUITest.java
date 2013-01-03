@@ -17,10 +17,7 @@ package org.auraframework.components.ui;
 
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 /**
 * UI Tests for inputSearch Component
@@ -42,14 +39,16 @@ public class InputCutCopyPasteUITest extends WebDriverTestCase {
         input.sendKeys(Keys.CONTROL,"a");
         
         //Fire Copy Event
-        final String copyValueExpression = auraUITestingUtil.getValueFromRootExpr("v.copyEventFired");
+        String copyValueExpression = auraUITestingUtil.getValueFromRootExpr("v.copyEventFired");
+        copyValueExpression = auraUITestingUtil.prepareReturnStatement(copyValueExpression);
         assertFalse("Copy event should not have been triggered yet", auraUITestingUtil.getBooleanEval(copyValueExpression));
         input.sendKeys(Keys.CONTROL,"c");
         assertTrue("Copy event should have been triggered", auraUITestingUtil.getBooleanEval(copyValueExpression));
         waitForElementTextPresent(output, "Copy Event Fired");
         
         //Fire Cut Event
-        final String cutValueExpression = auraUITestingUtil.getValueFromRootExpr("v.cutEventFired");
+        String cutValueExpression = auraUITestingUtil.getValueFromRootExpr("v.cutEventFired");
+        cutValueExpression = auraUITestingUtil.prepareReturnStatement(cutValueExpression);
         assertFalse("Cut event should not have been triggered yet", auraUITestingUtil.getBooleanEval(cutValueExpression));
         input.sendKeys(Keys.CONTROL,"a");
         input.sendKeys(Keys.CONTROL,"x");
@@ -57,7 +56,8 @@ public class InputCutCopyPasteUITest extends WebDriverTestCase {
         waitForElementTextPresent(output, "Cut Event Fired");
         
         //Fire Paste Event
-        final String pasteValueExpression = auraUITestingUtil.getValueFromRootExpr("v.pasteEventFired");
+        String pasteValueExpression = auraUITestingUtil.getValueFromRootExpr("v.pasteEventFired");
+        pasteValueExpression = auraUITestingUtil.prepareReturnStatement(pasteValueExpression);
         assertFalse("Paste event should not have been triggered yet", auraUITestingUtil.getBooleanEval(pasteValueExpression));
         input.click();
         input.sendKeys(Keys.CONTROL,"v");

@@ -241,6 +241,7 @@ ArrayValue.prototype.remove = function(index) {
         this.fire("change");
         return removed;
     }
+    return null;
 };
 
 

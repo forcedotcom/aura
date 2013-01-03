@@ -53,9 +53,11 @@ RendererDef.prototype.render = function RendererDef$Render(component) {
     if (this.renderMethod) {
         var helper = component.getDef().getHelper();
         return this.renderMethod.call(renderer, component, helper);
-    } else if (renderer["superRender"]) {
+    }
+    if (renderer["superRender"]) {
         return renderer["superRender"]();
     }
+    return null;
 };
 
 /**

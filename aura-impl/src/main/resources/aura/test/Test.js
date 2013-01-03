@@ -150,6 +150,7 @@ var Test = function(){
         /**
          * Invoke a callback after the provided condition evaluates to truthy,
          * checking on the condition every specified interval.
+         * Truthy values can refer to a non-empty String, a non-zero number, a non-empty array, an object, or an expression evaluating to true.
          * @param {function} conditionFunction
          *             The function to evaluate
          * @param {function} callback
@@ -478,7 +479,7 @@ var Test = function(){
          * @param {function} newFunction
          * 				The target function to attach the handler to
          * @param {boolean} postProcess
-         *             True if the handler will be called after the target function
+         *             Set to true if the handler will be called after the target function
          *             or false if the handler will be called before originalFunction
          * @returns {function}
          *             The override of originalFunction, which has a "restore"
@@ -613,7 +614,7 @@ var Test = function(){
          * @param {Node} node
          * 				The node to check
          * @returns {boolean}
-         * 				Retruns true if the specified node has been deleted, or false otherwise
+         * 				Returns true if the specified node has been deleted, or false otherwise
          */
         isNodeDeleted : function(node){
             if (!node.parentNode){

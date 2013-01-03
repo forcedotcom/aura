@@ -17,33 +17,23 @@ package org.auraframework.http;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.ExceptionAdapter;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.AuraContext;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.AuraUnhandledException;
-import org.auraframework.throwable.NoAccessException;
+import org.auraframework.throwable.*;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 

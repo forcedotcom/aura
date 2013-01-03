@@ -32,7 +32,8 @@ public class InputSearchUITest extends WebDriverTestCase {
     //Excluding safari due to W-1478819
     @ExcludeBrowsers({BrowserType.ANDROID_PHONE,BrowserType.ANDROID_TABLET,BrowserType.IPAD,BrowserType.IPHONE, BrowserType.SAFARI})
     public void testSearch() throws Exception{
-        final String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.searched");
+        String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.searched");
+        valueExpression = auraUITestingUtil.prepareReturnStatement(valueExpression);
         open("/uitest/inputSearchHandlingSearchEvent.cmp");
 
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt("search");
@@ -44,7 +45,8 @@ public class InputSearchUITest extends WebDriverTestCase {
     //Excluding safari due to W-1478819
     @ExcludeBrowsers({BrowserType.ANDROID_PHONE,BrowserType.ANDROID_TABLET,BrowserType.IPAD,BrowserType.IPHONE, BrowserType.SAFARI})
     public void testClearSelection() throws Exception{
-        final String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.searched");
+        String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.searched");
+        valueExpression = auraUITestingUtil.prepareReturnStatement(valueExpression);
         open("/uitest/inputSearchHandlingSearchEvent.cmp?showClear=true");
         
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt("search");

@@ -19,11 +19,13 @@
 
     <aura:set attribute="title" value="Inherited Component Attributes"/>
 
-    <p>Inherited attributes behave differently in Aura than, for example, inherited class fields in Java. Aura uses a decorator pattern for component extension so an attribute that is inherited from a base component can have different values in the sub-component and the base component. This will be clearer when we walk through an example.</p>
+    <p>Inherited attributes behave differently in Aura than, for example, inherited class fields in Java. In Aura, an attribute that is inherited from a base component can have different values in the sub-component and the base component. This will be clearer when we walk through an example.</p>
 
-    <p>Use <code>&lt;aura:set&gt;</code> in a sub-component to set the value of any attribute that is inherited from the parent component or to set an attribute on a component reference. For more information, see <auradocs:topicLink topic="tagAuraSet">aura:set</auradocs:topicLink>.</p>
+    <p>Use <code>&lt;aura:set&gt;</code> in a sub-component to set the value of any attribute on the super component or to set an attribute on a component reference. For more information, see <auradocs:topicLink topic="tagAuraSet">aura:set</auradocs:topicLink>.</p>
 
     <p>We will be looking at the <code>body</code> attribute for each of our sample components so now is a good time for a quick refresher. <code>&lt;aura:component&gt;</code> has a <code>body</code> attribute that is inherited by all components. Any free markup that is not enclosed in another tag is assumed to be part of the <code>body</code>. It's equivalent to wrapping that free markup inside <code>&lt;aura:set attribute="body"&gt;</code>. <code><aura:text value="{!"/>v.body}</code> outputs the body of the component. For more information, see <auradocs:topicLink topic="helloFacets">Component Body and Facets</auradocs:topicLink>.</p>
+    
+    <p>The default renderer for a component iterates through its <code>body</code> attribute, renders everything, and passes the rendered data to its super component. If there is no super component, you've hit the root component and the data is inserted into <code>document.body</code>.</p>
 
     <h2>Sample Component Extension</h2>
 

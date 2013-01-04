@@ -172,7 +172,11 @@
             <auradocs:contentsNode text="aura:iteration" id="tagIteration" />
             <auradocs:contentsNode text="System Tags">
                 <auradocs:contentsNode text="aura:application" id="appOverview"/>
-                <auradocs:contentsNode text="aura:set" id="tagAuraSet"/>
+                <auradocs:contentsNode text="aura:set">
+                    <auradocs:contentsNode text="Introduction" id="tagAuraSet" />
+                    <auradocs:contentsNode text="Setting Attributes on a Super Component" id="tagAuraSetSuper" />
+                    <auradocs:contentsNode text="Setting Attributes on a Component Reference" id="tagAuraSetReference" />
+                </auradocs:contentsNode>
             </auradocs:contentsNode>
             <auradocs:contentsNode text="Supported HTML Tags" id="htmlTags"/>
             <auradocs:contentsNode text="Supported aura:attribute Types" >

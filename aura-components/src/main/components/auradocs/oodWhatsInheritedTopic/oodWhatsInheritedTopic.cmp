@@ -35,7 +35,7 @@
 
     <h2>Helpers</h2>
 
-    <p>A sub-component can call a function from a helper file in a super component.</p>
+    <p>A child component's helper inherits the methods from the helper of its super component. A child component can override a super component's helper method by defining a method with the same name as an inherited method.</p>
 
     <h2>What Isn't Inherited?</h2>
 

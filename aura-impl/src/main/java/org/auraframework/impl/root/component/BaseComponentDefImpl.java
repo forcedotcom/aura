@@ -396,7 +396,13 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
         }
         MasterDefRegistry mdf = Aura.getContextService().getCurrentContext().getDefRegistry();
         for (DependencyDef dep : this.dependencies) {
-            dependencies.addAll(mdf.find(dep.getDependency()));
+            Set<DefDescriptor<?>> found = mdf.find(dep.getDependency());
+
+            dependencies.addAll(found);
+            if (found.size() == 0) {
+                // TODO: QuickFix for broken dependency.
+                throw new InvalidDefinitionException("Invalid dependency "+dep.getDependency(), dep.getLocation());
+            }
         }
     }
 

@@ -22,6 +22,7 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -267,12 +268,12 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
      * 
      * @throws Exception
      */
-    public void _testNonExistantNameSpace() throws Exception {
+    public void testNonExistantNameSpace() throws Exception {
         try {
             Aura.getDefinitionService().getDefinition("auratest:test_Preload_ScrapNamespace", ApplicationDef.class);
             fail("Expected Exception");
-        } catch (AuraRuntimeException e) {
-            assertEquals("Namespace somecrap does not exist", e.getMessage());
+        } catch (InvalidDefinitionException e) {
+            assertEquals("Invalid dependency *://somecrap:*[COMPONENT]", e.getMessage());
         }
 
     }

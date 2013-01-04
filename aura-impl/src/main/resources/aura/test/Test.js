@@ -288,7 +288,7 @@ var Test = function(){
          * @param {String} assertMessage
          * 				The message that is returned if the condition is not true
          * @description
-         * Positive: assert("helloWorld")
+         * Positive: assert("helloWorld"),
          * Negative: assert(null)
          */
         assert : function(condition, assertMessage) {

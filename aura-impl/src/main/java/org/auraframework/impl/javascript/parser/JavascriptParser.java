@@ -15,22 +15,10 @@
  */
 package org.auraframework.impl.javascript.parser;
 
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
-import org.auraframework.def.HelperDef;
-import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RendererDef;
-import org.auraframework.def.TestSuiteDef;
-import org.auraframework.impl.javascript.parser.handler.JavascriptControllerDefHandler;
-import org.auraframework.impl.javascript.parser.handler.JavascriptHandler;
-import org.auraframework.impl.javascript.parser.handler.JavascriptHelperDefHandler;
-import org.auraframework.impl.javascript.parser.handler.JavascriptRendererDefHandler;
-import org.auraframework.impl.javascript.parser.handler.JavascriptTestSuiteDefHandler;
+import org.auraframework.def.*;
+import org.auraframework.impl.javascript.parser.handler.*;
 import org.auraframework.impl.javascript.provider.JavascriptProviderDef;
-import org.auraframework.system.Location;
-import org.auraframework.system.Parser;
-import org.auraframework.system.Source;
+import org.auraframework.system.*;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class JavascriptParser implements Parser {
@@ -60,6 +48,9 @@ public class JavascriptParser implements Parser {
                 builder.setLocation(location);
                 builder.code = JavascriptHandler.getCompressedSource(source);
                 return (D)builder.build();
+            case MODEL:{
+                return (D)new JavascriptModelDefHandler((DefDescriptor<ModelDef>)descriptor, source).getDefinition();
+            }
             default:
                 return null;
         }

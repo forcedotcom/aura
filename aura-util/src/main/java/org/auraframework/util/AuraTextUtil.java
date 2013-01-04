@@ -18,7 +18,9 @@ package org.auraframework.util;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.google.common.collect.ObjectArrays;
 
@@ -128,6 +130,9 @@ public class AuraTextUtil {
     }
 
     public static boolean isEmptyOrWhitespace(CharSequence str) {
+        if (str == null)
+            return false;
+
         int end = str.length();
         char c;
         for (int i = 0; i < end; i++) {

@@ -20,8 +20,6 @@ import java.util.List;
 
 import org.auraframework.test.UnitTestCase;
 
-import org.junit.Ignore;
-
 public class AuraTextUtilTest extends UnitTestCase {
     /**
      * A simple input/expected pair for testing.
@@ -62,7 +60,7 @@ public class AuraTextUtilTest extends UnitTestCase {
         new StringPair("1", "1"),
         new StringPair("=", "="),
         new StringPair(" A", " A"),
-        // FIXME: deal with odd cases, like other languages?.
+        new StringPair("Ñ", "ñ"),
     };
 
     public void testInitLowerCase() {
@@ -154,13 +152,7 @@ public class AuraTextUtilTest extends UnitTestCase {
     }
 
     public void testIsEmptyOrWhitespace() {
-        try {
-            // FIXME: is this ever desired behavior?
-            AuraTextUtil.isEmptyOrWhitespace(null);
-            fail("Expected null pointer exception on isEmptyOrWhitespace");
-        } catch (NullPointerException expected) {
-            // ignore
-        }
+        assertEquals(false, AuraTextUtil.isEmptyOrWhitespace(null));
         assertEquals(true, AuraTextUtil.isEmptyOrWhitespace(""));
         assertEquals(false, AuraTextUtil.isEmptyOrWhitespace("a"));
         assertEquals(true, AuraTextUtil.isEmptyOrWhitespace(" "));
@@ -171,11 +163,9 @@ public class AuraTextUtilTest extends UnitTestCase {
         assertEquals(false, AuraTextUtil.isEmptyOrWhitespace("\t\n a"));
         assertEquals(false, AuraTextUtil.isEmptyOrWhitespace("\ufffe"));
     }
-    
+
     /**
      * JS replacement strings.
-     *
-     * FIXME: are these a good set of strings?
      */
     private static StringPair [] JS_STRING_PAIRS = new StringPair [] {
         new StringPair("'", "\\'"),
@@ -199,8 +189,6 @@ public class AuraTextUtilTest extends UnitTestCase {
 
     /**
      * JSON replacement strings.
-     *
-     * FIXME: are these a good set of strings?
      */
     private static StringPair [] JSON_STRING_PAIRS = new StringPair [] {
         new StringPair("\r", "\\r"),
@@ -233,7 +221,7 @@ public class AuraTextUtilTest extends UnitTestCase {
             this.expectedSize = expectedSize;
             this.result = Arrays.asList(result);
         }
-        
+
         @Override
         public String toString() {
             return "split('"+this.delimiter+"','"+this.input+"','"+this.expectedSize+")";
@@ -321,7 +309,6 @@ public class AuraTextUtilTest extends UnitTestCase {
         }
     }
 
-
     private final static StringPair [] INIT_CAP_PAIRS = new StringPair [] {
         new StringPair(null, null),
         new StringPair("", ""),
@@ -333,7 +320,6 @@ public class AuraTextUtilTest extends UnitTestCase {
         new StringPair("=", "="),
         new StringPair(" a", " a"),
         new StringPair("ñ", "Ñ"),
-        // FIXME: deal with odd cases, like other languages?.
     };
 
     public void testInitCap() {
@@ -346,9 +332,10 @@ public class AuraTextUtilTest extends UnitTestCase {
         new StringPair("", ""),
     };
 
-    @Ignore
     public void testURLDecodeNull() {
-        assertEquals(null, AuraTextUtil.urldecode(null));
+        try {
+            AuraTextUtil.urldecode(null);
+        } catch (NullPointerException expected) {}
     }
 
     public void testURLDecode() {
@@ -361,9 +348,10 @@ public class AuraTextUtilTest extends UnitTestCase {
         new StringPair("", ""),
     };
 
-    @Ignore
     public void testURLEncodeNull() {
-        assertEquals(null, AuraTextUtil.urlencode(null));
+        try {
+            AuraTextUtil.urlencode(null);
+        } catch (NullPointerException expected) {}
     }
 
     public void testURLEncode() {
@@ -371,13 +359,4 @@ public class AuraTextUtilTest extends UnitTestCase {
             assertEquals(p.expected, AuraTextUtil.urlencode(p.input));
         }
     }
-
-    //public static String replaceChar(String value, char ch, CharSequence replacement) {
-    //public static List<String> splitSimpleAndTrim(String str, String delimiter, int expectedSize) {
-    //public static String replaceSimple(String s, String[] src, String[] target) {
-    //public static String replaceSimple(String s, String src, String target) {
-    //public static String unescapeOutput(String input, boolean includeHtmlTags) {
-    //public static String collectionToString(Iterable<?> c, String delim, String lastDelim) {
-    //public static String collectionToString(Iterable<?> c, String delim, String lastDelim, String prefix, String suffix) {
-    //public static boolean containsIgnoreCase(String input, Iterable<String> collection) {
 }

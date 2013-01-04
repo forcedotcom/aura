@@ -132,9 +132,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public DefDescriptor<T> descriptor;
         public T def;
         public DefRegistry<T> registry;
+        public Set<Definition> parents = Sets.newHashSet();
 
         public void markValid() {
-            this.registry.markValid(this.descriptor, this.def);
+            if (this.def != null) {
+                this.registry.markValid(this.descriptor, this.def);
+            }
         }
     }
 
@@ -150,6 +153,17 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public final LoggingService loggingService = Aura.getLoggingService();
         public final Map<DefDescriptor<? extends Definition>,CompilingDef<?>> compiled = Maps.newHashMap();
         //public final Map<DefDescriptor<? extends Definition>, Definition> dependencies = Maps.newHashMap();
+
+        public <D extends Definition> CompilingDef<D> getCompiling(DefDescriptor<D> descriptor) {
+            @SuppressWarnings("unchecked")
+            CompilingDef<D> cd = (CompilingDef<D>)this.compiled.get(descriptor);
+            if (cd == null) {
+                cd = new CompilingDef<D>();
+                this.compiled.put(descriptor, cd);
+            }
+            cd.descriptor = descriptor;
+            return cd;
+        }
     }
 
     /**
@@ -191,15 +205,19 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             return def;
         }
         DefRegistry<D> registry = getRegistryFor(descriptor);
+        CompilingDef<D> cd = cc.getCompiling(descriptor);
+
         if(registry != null){
             def = registry.getDef(descriptor);
             if (def != null) {
                 @SuppressWarnings("unchecked")
                 DefDescriptor<D> canonical = (DefDescriptor<D>)def.getDescriptor();
 
+                cd.descriptor = canonical;
+                cd.def = def;
+                cd.registry = registry;
+                //cc.dependencies.put(canonical, def);
                 if (!def.isValid()) {
-                    CompilingDef<D> cd = new CompilingDef<D>();
-
                     cc.loggingService.incrementNum(LoggingService.DEF_COUNT);
 
                     // FIXME: setting the current namespace on the context seems extremely hackish
@@ -212,23 +230,42 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     cc.compiled.put(canonical, cd);
                 }
                 if (!this.defs.containsKey(def.getDescriptor())) {
-                    def.appendDependencies(deps);
+                    Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
+
                     this.defs.put(def.getDescriptor(), def);
-                    //cc.dependencies.put(canonical, def);
+                    def.appendDependencies(newDeps);
+                    deps.addAll(newDeps);
                     //
                     // Add all of the filters on here. Note that we might want to track
                     // the filters separately so that we can do tighter dependency matching later.
                     //
-                    if (def instanceof BaseComponentDef) {
-                        BaseComponentDef bcd = (BaseComponentDef)def;
+                    for (DefDescriptor<?> dep : newDeps) {
+                        if (!this.defs.containsKey(dep)) {
+                            CompilingDef<?> depcd = cc.getCompiling(dep);
 
-                        for (DependencyDef dep : bcd.getDependencies()) {
-                            deps.addAll(find(dep.getDependency()));
+                            depcd.parents.add(def);
                         }
                     }
                 }
                 return def;
             }
+        }
+        //
+        // At this point, we have failed to get the def, so we should throw an
+        // error. The first stanza is to provide a more useful error description
+        // including the set of components using the missing component.
+        //
+        if (!cd.parents.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            Location handy = null;
+            for (Definition parent : cd.parents) {
+                handy = parent.getLocation();
+                if (sb.length() != 0) {
+                    sb.append(", ");
+                }
+                sb.append(parent.getDescriptor().toString());
+            }
+            throw new DefinitionNotFoundException(descriptor, handy, sb.toString());
         }
         throw new DefinitionNotFoundException(descriptor);
     }
@@ -289,7 +326,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 Set<DefDescriptor<?>> current = next;
                 next = Sets.newHashSet();
                 for (DefDescriptor<?> cdesc : current) {
-                    if (!cc.compiled.containsKey(cdesc)) {
+                    if (!cc.compiled.containsKey(cdesc) || cc.compiled.get(cdesc).def == null) {
                         getHelper(cdesc, cc, next);
                     }
                 }
@@ -302,16 +339,20 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             // a better way of doing this, but, well, this is all we have for now.
             //
             for (CompilingDef<?> cd : cc.compiled.values()) {
-                defs.put(cd.descriptor, cd.def);
+                if (cd.def != null) {
+                    defs.put(cd.descriptor, cd.def);
+                }
             }
 
             //
             // Now validate our references.
             //
             for (CompilingDef<?> cd : cc.compiled.values()) {
-                // FIXME: setting the current namespace on the context seems extremely hackish
-                cc.context.setCurrentNamespace(cd.descriptor.getNamespace());
-                cd.def.validateReferences();
+                if (cd.def != null) {
+                    // FIXME: setting the current namespace on the context seems extremely hackish
+                    cc.context.setCurrentNamespace(cd.descriptor.getNamespace());
+                    cd.def.validateReferences();
+                }
             }
 
             //

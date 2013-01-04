@@ -142,18 +142,19 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         // Create a descriptor but don't add it.
         DefDescriptor<EventDef> nonExistingRef = StringSourceLoader.getInstance().createStringSourceDescriptor("barr",
                 EventDef.class);
-        addSourceAutoCleanup(
-                ComponentDef.class, String.format(
-                                        baseComponentTag,
-                                        String.format("controller='js://%s.%s'", nonExistingRef.getNamespace(),
-                                                nonExistingRef.getName()), ""));
+        DefDescriptor<?> desc = addSourceAutoCleanup(ComponentDef.class,
+                                                     String.format(baseComponentTag,
+                                                                   String.format("controller='js://%s.%s'",
+                                                                                 nonExistingRef.getNamespace(),
+                                                                                 nonExistingRef.getName()), ""));
         try{
             Aura.getDefinitionService().getNamespaceLastMod(Sets.newHashSet("string"));
             fail("Cannot find last mod when definitions are uncompilable.");
         }catch (DefinitionNotFoundException e){
-            assertEquals(
-                    String.format("No CONTROLLER named js://%s.%s found", nonExistingRef.getNamespace(),
-                            nonExistingRef.getName()), e.getMessage());
+            assertEquals(String.format("No CONTROLLER named js://%s.%s found : %s",
+                                       nonExistingRef.getNamespace(), nonExistingRef.getName(),
+                                       desc.getQualifiedName()),
+                         e.getMessage());
         }
 
         /**

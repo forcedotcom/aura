@@ -107,7 +107,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
             fail("Expected InvalidReferenceException");
         } catch (InvalidReferenceException e) {
             assertEquals("Incorrect exception message",
-                    "aura:handler has invalid name attribute value: ThisIsNotARegisteredEventName", e.getMessage());
+                         "aura:handler has invalid name attribute value: ThisIsNotARegisteredEventName", e.getMessage());
         }
     }
 
@@ -118,8 +118,10 @@ public class EventHandlerDefTest extends AuraImplTestCase {
             componentDefDescriptor.getDef();
             fail("Expected DefinitionNotFoundException");
         } catch (DefinitionNotFoundException e) {
-            assertEquals("Incorrect exception message", "No EVENT named markup://ThisIsNotAValidEventName found",
-                    e.getMessage());
+            assertEquals("Incorrect exception message",
+                         String.format("No EVENT named markup://ThisIsNotAValidEventName found : %s",
+                                       componentDefDescriptor.getQualifiedName()), 
+                         e.getMessage());
         }
     }
 

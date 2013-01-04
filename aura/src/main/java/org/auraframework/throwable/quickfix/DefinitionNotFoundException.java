@@ -35,6 +35,11 @@ public class DefinitionNotFoundException extends AuraValidationException {
         super(getMessage(descriptor.getDefType(), descriptor.getQualifiedName()), l, getFixes(descriptor));
         this.descriptor = descriptor;
     }
+    
+    public DefinitionNotFoundException(DefDescriptor<?> descriptor, Location l, String usedAt) {
+        super(getMessage(descriptor.getDefType(), descriptor.getQualifiedName())+" : "+usedAt, l, getFixes(descriptor));
+        this.descriptor = descriptor;
+    }
 
     private static AuraQuickFix[] getFixes(DefDescriptor<?> descriptor){
         switch(descriptor.getDefType()){

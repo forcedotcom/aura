@@ -15,10 +15,22 @@
  */
 package org.auraframework.impl.javascript.parser;
 
-import org.auraframework.def.*;
-import org.auraframework.impl.javascript.parser.handler.*;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.TestSuiteDef;
+import org.auraframework.impl.javascript.parser.handler.JavascriptControllerDefHandler;
+import org.auraframework.impl.javascript.parser.handler.JavascriptHandler;
+import org.auraframework.impl.javascript.parser.handler.JavascriptHelperDefHandler;
+import org.auraframework.impl.javascript.parser.handler.JavascriptRendererDefHandler;
+import org.auraframework.impl.javascript.parser.handler.JavascriptTestSuiteDefHandler;
 import org.auraframework.impl.javascript.provider.JavascriptProviderDef;
-import org.auraframework.system.*;
+import org.auraframework.system.Location;
+import org.auraframework.system.Parser;
+import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class JavascriptParser implements Parser {
@@ -32,26 +44,22 @@ public class JavascriptParser implements Parser {
     @SuppressWarnings("unchecked")
     @Override
     public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws QuickFixException {
-        Location location = new Location(source.getSystemId(), source.getLastModified());
-
         switch (descriptor.getDefType()) {
             case CONTROLLER:
                 return (D)new JavascriptControllerDefHandler((DefDescriptor<ControllerDef>)descriptor, source).getDefinition();
-            case RENDERER:{
+            case RENDERER:
                 return (D)new JavascriptRendererDefHandler((DefDescriptor<RendererDef>)descriptor, source).getDefinition();
-            }
-            case HELPER:{
+            case HELPER:
                 return (D)new JavascriptHelperDefHandler((DefDescriptor<HelperDef>)descriptor, source).getDefinition();
-            }
             case TESTSUITE:
                 return (D)new JavascriptTestSuiteDefHandler((DefDescriptor<TestSuiteDef>)descriptor, source).getDefinition();
-            case PROVIDER:{
+            case PROVIDER:
+                Location location = new Location(source.getSystemId(), source.getLastModified());
                 JavascriptProviderDef.Builder builder = new JavascriptProviderDef.Builder();
                 builder.setDescriptor((DefDescriptor<ProviderDef>)descriptor);
                 builder.setLocation(location);
                 builder.code = JavascriptHandler.getCompressedSource(source);
                 return (D)builder.build();
-            }
             default:
                 return null;
         }

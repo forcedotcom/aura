@@ -18,13 +18,19 @@
  */
 package org.auraframework.impl.javascript.parser;
 
-import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.def.ActionDef.ActionType;
-import org.auraframework.def.*;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.TestCaseDef;
+import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.javascript.controller.JavascriptActionDef;
 import org.auraframework.impl.javascript.controller.JavascriptControllerDef;
@@ -32,7 +38,7 @@ import org.auraframework.impl.javascript.renderer.JavascriptRendererDef;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestCaseDef;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestSuiteDef;
 import org.auraframework.impl.source.BaseSourceLoader;
-import org.auraframework.impl.source.file.FileJavascriptSource;
+import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.impl.source.file.FileJavascriptSourceLoader;
 import org.auraframework.impl.source.resource.ResourceJavascriptSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -47,19 +53,10 @@ import org.auraframework.util.ServiceLocator;
  * Javascript files are parsed using the {@link JavascriptParser} and the corresponding defs are created.
  */
 public class JavascriptParserTest extends AuraImplTestCase {
-    JavascriptParser parser;
+    JavascriptParser parser = JavascriptParser.getInstance();
 
-    /**
-     * @param name
-     */
     public JavascriptParserTest(String name) {
         super(name);
-    }
-
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        parser = JavascriptParser.getInstance();
     }
 
     /**
@@ -455,73 +452,22 @@ public class JavascriptParserTest extends AuraImplTestCase {
      * referring to a simple Component with a Javascript test suite {@link DefType#TESTSUITE}. One of the test cases has
      * no function assigned to them, this should cause an Exception
      */
-    // TODO: update test to account for resource loading vs. filesystem loading
-    public void _testJSTestSuiteWithoutTestFunc() throws Exception {
-
-        DefDescriptor<TestSuiteDef> descriptor = DefDescriptorImpl.getInstance(
-                "js://test.testJSTestSuiteWithoutTestFunc", TestSuiteDef.class);
-        /**
-         * TODO: A makeshift way of creating a source, should replace it with the String Source when its available for
-         * Javascript
-         **/
-        String jsFilename = String.format("%s/%s/%s%s", descriptor.getNamespace(), descriptor.getName(),
-                descriptor.getName(), "_TestSuite.js");
-        File jsFile = new File(AuraImplFiles.TestComponents.asFile(), jsFilename);
-        String jsControllerName = String.format("js://%s.%s", descriptor.getNamespace(), descriptor.getName());
-        String pathOrId = jsFile.exists() ? jsFile.getCanonicalPath() : jsControllerName;
-
-        Source<?> source = new FileJavascriptSource<TestSuiteDef>(descriptor, pathOrId, jsFile);
-        try {
-            parser.parse(descriptor, source);
-            fail("Invalid testsuite: Every test case should have a function assigned to it");
-        } catch (AuraRuntimeException expected) {
-            assertTrue(expected.getMessage().startsWith("test function required"));
-        }
+    public void testJSTestSuiteWithoutTestFunc() throws Exception {
+        assertInvalidTestCase("{testWithString:{test:'empty'}}", "testWithString 'test' must be a function or an array of functions");
+        assertInvalidTestCase("{testWithObject:{test:{}}}", "testWithObject 'test' must be a function or an array of functions");
+        assertInvalidTestCase("{testWithMixedArray:{test:[function(){},'oops']}}", "testWithMixedArray 'test' must be a function or an array of functions");
+        assertInvalidTestCase("{testWithObjectFunction:{test:{inner:function(){}}}}", "testWithObjectFunction 'test' must be a function or an array of functions");
     }
 
-    /**
-     * Test method for {@link JavascriptParser#parse(DefDescriptor, Source)}. The DefDescriptor in this case is
-     * referring to a simple Component with a Javascript test suite {@link DefType#TESTSUITE}. One of the test cases has
-     * no function assigned to them, this should cause an Exception
-     */
-    // TODO: update test to account for resource loading vs. filesystem loading
-    public void _testJSTestSuiteNegativeCases() throws Exception {
-        // Test Case 1: There is a test case like entry in the Javascript file. The assignment to the test case is a MAP
-        DefDescriptor<TestSuiteDef> descriptor = DefDescriptorImpl.getInstance("js://test.testJSTestSuiteNegative1",
-                TestSuiteDef.class);
-        /**
-         * TODO: A makeshift way of creating a source, should replace it with the String Source when its available for
-         * Javascript
-         **/
-        String jsFilename = String.format("%s/%s/%s%s", descriptor.getNamespace(), descriptor.getName(),
-                descriptor.getName(), "_TestSuite.js");
-        File jsFile = new File(AuraImplFiles.TestComponents.asFile(), jsFilename);
-        String jsControllerName = String.format("js://%s.%s", descriptor.getNamespace(), descriptor.getName());
-
-        String pathOrId = jsFile.exists() ? jsFile.getCanonicalPath() : jsControllerName;
-        Source<?> source = new FileJavascriptSource<TestSuiteDef>(descriptor, pathOrId, jsFile);
-
+    private void assertInvalidTestCase(String suiteContent, String expectedMessageStartsWith) throws Exception {
+        DefDescriptor<TestSuiteDef> desc = addSourceAutoCleanup(TestSuiteDef.class, suiteContent);
+        Source<TestSuiteDef> source = StringSourceLoader.getInstance().getSource(desc);
         try {
-            parser.parse(descriptor, source);
-            fail("Not a well defined test case, so should have failed");
+            parser.parse(desc, source);
+            fail("Invalid testsuite: Every test case should have a function assigned to it");
         } catch (AuraRuntimeException expected) {
-            assertTrue(expected.getMessage().startsWith("test function required"));
+            assertTrue(expected.getMessage().startsWith(expectedMessageStartsWith));
         }
-        // Test Case 2: There is a test case like entry in the Javascript file. The assignment to the test case is a
-        // String
-        descriptor = DefDescriptorImpl.getInstance("js://test.testJSTestSuiteNegative2", TestSuiteDef.class);
-        jsFilename = String.format("%s/%s/%s%s", descriptor.getNamespace(), descriptor.getName(), descriptor.getName(),
-                "_TestSuite.js");
-        jsFile = new File(AuraImplFiles.TestComponents.asFile(), jsFilename);
-        jsControllerName = String.format("js://%s.%s", descriptor.getNamespace(), descriptor.getName());
-        source = getJavascriptSourceLoader().getSource(descriptor);
-        try {
-            parser.parse(descriptor, source);
-            fail("Not a well defined test case, so should have failed");
-        } catch (AuraRuntimeException expected) {
-            // Expected
-        }
-
     }
 
     /**

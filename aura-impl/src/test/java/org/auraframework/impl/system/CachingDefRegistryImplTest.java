@@ -15,15 +15,13 @@
  */
 package org.auraframework.impl.system;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
 import java.util.List;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.LayoutsDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
 import org.auraframework.impl.source.StringSource;
@@ -68,46 +66,42 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
     /**
      * Automation to verify that, in test mode definitions are fetched fresh for each request.
      */
-    @UnAdaptableTest
     public void testDefinitionsFetchingInTestMode() throws Exception {
-
         // Obtain the definition of an application without layout and make sure the
         // layoutsDefDescriptor is null
-        ApplicationDef appWithNoLayout = definitionService.getDefinition("test:layoutNoLayout", ApplicationDef.class);
+        ApplicationDef appWithNoLayout = auraTestingUtil
+                .addSourceAutoCleanup(ApplicationDef.class,
+                        "<aura:application></aura:application>")
+                .getDef();
+        DefDescriptor<ApplicationDef> appDesc = appWithNoLayout.getDescriptor();
         assertNotNull("Test failed to retrieve definition of an application.", appWithNoLayout);
         assertNull("Application should not have had any layouts associted with it.",
                 appWithNoLayout.getLayoutsDefDescriptor());
 
         // Add a new layouts file to the application.
-        String newFileName = "layoutNoLayoutLayouts" + ".xml";
-        String layoutData = "<aura:layouts catchall='home' default='home'>"
-                + "<aura:layout name='home' title='Home'>" + "<aura:layoutItem container='content'>" + "Home"
-                + "</aura:layoutItem>" + "</aura:layout>" + "</aura:layouts>";
-        File newFile = new File((new File(appWithNoLayout.getLocation().getFileName())).getParent(), newFileName);
-        Writer writer = new FileWriter(newFile);
-        writer.write(layoutData);
-        writer.close();
-        try {
-            // We are still fetching definition in PROD mode, so it should fetch the definition from
-            // cache. So no layout def yet.
-            appWithNoLayout = definitionService.getDefinition("test:layoutNoLayout", ApplicationDef.class);
-            assertNotNull("Test failed to retrieve definition of an application.", appWithNoLayout);
-            assertNull("In PROD mode, new layout file should not have been fetched.",
-                    appWithNoLayout.getLayoutsDefDescriptor());
+        DefDescriptor<LayoutsDef> layoutDesc = DefDescriptorImpl.getInstance(appDesc.getDescriptorName(),
+                LayoutsDef.class);
+        String layoutData = "<aura:layouts catchall='home' default='home'>" + "<aura:layout name='home' title='Home'>"
+                + "<aura:layoutItem container='content'>" + "Home" + "</aura:layoutItem>" + "</aura:layout>"
+                + "</aura:layouts>";
+        auraTestingUtil.addSourceAutoCleanup(layoutDesc, layoutData);
 
-            Aura.getContextService().endContext();
-            // Fetch definition in TEST mode
-            Aura.getContextService().startContext(Mode.UTEST, null, Format.JSON, Access.AUTHENTICATED);
-            appWithNoLayout = definitionService.getDefinition("test:layoutNoLayout", ApplicationDef.class);
-            assertNotNull("Test failed to retrieve definition of an application.", appWithNoLayout);
-            assertNotNull("Fetching definition is TESt mode should have noticed the new layout file.",
-                    appWithNoLayout.getLayoutsDefDescriptor());
-            assertNotNull("Failed to read definition from new layout file.", appWithNoLayout.getLayoutsDefDescriptor()
-                    .getDef());
-        } finally {
-            // Delete the temporary layout file.
-            newFile.delete();
-        }
+        // We are still fetching definition in PROD mode, so it should fetch the definition from
+        // cache. So no layout def yet.
+        appWithNoLayout = definitionService.getDefinition(appDesc);
+        assertNotNull("Test failed to retrieve definition of an application.", appWithNoLayout);
+        assertNull("In PROD mode, new layout file should not have been fetched.",
+                appWithNoLayout.getLayoutsDefDescriptor());
+
+        Aura.getContextService().endContext();
+        // Fetch definition in TEST mode
+        Aura.getContextService().startContext(Mode.UTEST, null, Format.JSON, Access.AUTHENTICATED);
+        appWithNoLayout = definitionService.getDefinition(appDesc);
+        assertNotNull("Test failed to retrieve definition of an application.", appWithNoLayout);
+        assertNotNull("Fetching definition is TESt mode should have noticed the new layout file.",
+                appWithNoLayout.getLayoutsDefDescriptor());
+        assertNotNull("Failed to read definition from new layout file.", appWithNoLayout.getLayoutsDefDescriptor()
+                .getDef());
     }
 
     /**

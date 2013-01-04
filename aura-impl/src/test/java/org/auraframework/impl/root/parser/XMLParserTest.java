@@ -32,6 +32,7 @@ import org.auraframework.system.Location;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.mockito.Mockito;
 
 public class XMLParserTest extends AuraImplTestCase{
 
@@ -92,19 +93,14 @@ public class XMLParserTest extends AuraImplTestCase{
 
     public void testParseNonexistent() throws Exception{
         XMLParser parser = XMLParser.getInstance();
-        descriptor = DefDescriptorImpl.getInstance("test:parserNonexistent", ComponentDef.class);
-        File tmpFile = null;
+        File tmpFile = Mockito.mock(File.class);
+        Mockito.when(tmpFile.exists()).thenReturn(true);
+        Mockito.when(tmpFile.lastModified()).thenReturn(0L);
+        Mockito.when(tmpFile.getCanonicalPath()).thenReturn("");
+        Mockito.when(tmpFile.getPath()).thenReturn("");
         try{
-            tmpFile = File.createTempFile("auraTest", ".cmp");
-            Source<?> source;
-            try{
-                source = new FileSource<ComponentDef>(descriptor, tmpFile, Format.XML);
-            }finally{
-                if(!tmpFile.delete()){
-                    throw new AuraRuntimeException(String.format("Could not delete tmp file %s", tmpFile.getAbsolutePath()));
-                }
-            }
-            parser.parse(descriptor, source);
+            Source<?> source = new FileSource<ComponentDef>(descriptor, tmpFile, Format.XML);
+            parser.parse(null, source);
             fail("Parsing nonexistent source should throw exception");
         }catch(AuraRuntimeException e){
             assertTrue(e.getCause() instanceof FileNotFoundException);

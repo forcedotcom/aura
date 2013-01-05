@@ -21,7 +21,7 @@
 
   <p>You can use client-side and server-side controllers in Aura. An event is always wired to a client-side controller action, which can in turn call a server-side controller action. For example, a client-side controller might handle an event and call a server-side controller action to persist data to a database.</p>
 
-  <p>You can create a server-side controller in Java. Aura requires that all methods on server-side controllers are static. This restriction is in place to remind you that Aura doesn’t create a controller instance per component instance. Instead, all instances of a given component share one static controller. This means that any state stored on the controller is shared across all instances of a component definition. This is unlikely to be what you want.</p>
+  <p>You can create a server-side controller in Java. All methods on server-side controllers must be static since Aura doesn’t create a controller instance per component instance. Instead, all instances of a given component share one static controller. This means that any state stored on the controller is shared across all instances of a component definition. This is unlikely to be what you want.</p>
 
   <p>In contrast, one model instance is created for each component instance. This means that models are the appropriate place to store state that is specific to one instance of a component.</p>
 

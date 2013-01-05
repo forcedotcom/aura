@@ -147,7 +147,7 @@
         // Boundary cases for individual fields
         function(cmp){
         // 1. Verify specifying a non existing field
-            // TODO: Is this fine, we accept non existing fields in select query
+            // TODO(W-1488665): Is this fine, we accept non existing fields in select query
             // and return a column with undefined as value
             var result = $A.getQueryStatement().field('foo').query();
             this.verifyQueryResultCount(result, 2);
@@ -225,7 +225,7 @@
             }
 
         // 3. Specify explicit function with return value
-            // TODO: This works fine but ('foo','desc') is not valid
+            // TODO(W-1488665): This works fine but ('foo','desc') is not valid. '123' should probably fail too
             result = $A.getQueryStatement().field('foo', '123').query();
             $A.log(result);
 
@@ -287,8 +287,7 @@
             $A.test.assertEquals(cmp.isConcrete(), row.concrete);
             $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
             $A.test.assertTrue(row["getDef().getDescriptor().toString()"] == undefined);
-        }
-        ]
+        }]
     },
     /**
      * Verify specifying where clause. query() accepts a function to perform
@@ -300,12 +299,12 @@
     testWhere:{
         test:[function(cmp){
             aura.test.setTestTimeout(15000);
-        // 1. Use a getXXX function as where condition
+        // 1. Use a getZZZ function as where condition
             var result = $A.getQueryStatement().from("component").where("getDef().getDescriptor().toString()==='markup://cmpQueryLanguage:query'").query();
             this.verifyQueryResultCount(result, 1);
             $A.test.assertEquals(cmp,result.rows[0], "Using where clause returned the wrong result set.");
 
-        // 2. Use a isXXX function as where condition
+        // 2. Use a isZZZ function as where condition
             result = $A.getQueryStatement().from("component").where("isRendered() === false").query();
             this.verifyQueryResultCount(result, 1);
             $A.test.assertEquals(cmp.getSuper(),result.rows[0], "Using where clause returned the wrong result set.");
@@ -388,8 +387,7 @@
             this.verifyQueryResultCount(result, 2);
             $A.test.assertEquals(2, result.groupCount);
         //3. Specifying unknown attribute if groupBy() clause is the same as case 2, where we use an unselected field in where clause.
-        }
-        ]
+        }]
     },
     verifyQueryResultCount:function(result, expectedSize){
         $A.test.assertTruthy(result);

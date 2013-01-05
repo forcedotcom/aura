@@ -20,14 +20,14 @@ var Test = function(){
     //#include aura.test.Test_private
 
     /**
-     * @constructor Test utility functions
+     * Test utility functions
+     * @namespace
      */
     var Test = {
 		/**
 		 * Asynchronously wait for a condition before continuing with the next
 		 * stage of the test case.  The wait condition is checked after the
 		 * current test stage is completed but before the next stage is started.
-		 * 
 		 * @example aura.test.addWaitFor("i was updated", function(){return
 		 *            element.textContent;}, function(){alert("the wait is over"});
 		 * 

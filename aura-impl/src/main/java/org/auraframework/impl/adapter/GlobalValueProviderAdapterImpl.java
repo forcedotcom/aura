@@ -35,11 +35,14 @@ public class GlobalValueProviderAdapterImpl implements GlobalValueProviderAdapte
         // $Locale
         l.add(new LocaleValueProvider());
 
+        // $Browser
+        l.add(new BrowserValueProvider());
+
         return l;
     }
 
     @Override
     public Set<ValueProviderType> getKeys() {
-        return EnumSet.of(ValueProviderType.LABEL, ValueProviderType.LOCALE);
+        return EnumSet.of(ValueProviderType.LABEL, ValueProviderType.LOCALE, ValueProviderType.BROWSER);
     }
 }

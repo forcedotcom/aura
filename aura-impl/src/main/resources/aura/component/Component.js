@@ -66,6 +66,7 @@ Component.prototype.index = function(localId, globalId){
     }else{
         index[localId] = globalId;
     }
+    return null;
 };
 
 /**
@@ -105,6 +106,7 @@ Component.prototype.deIndex = function(localId, globalId){
             delete priv.index[localId];
         }
     }
+    return null;
 };
 
 /**
@@ -119,13 +121,10 @@ Component.prototype.find = function(name){
         var instances = [];
         this.findInstancesOf(type, instances, this);
         return instances;
-    }else{
-        var index = this.priv.index;
-        var globalId;
-        if(index){
-            globalId = index[name];
-        }
-
+    }
+    var index = this.priv.index;
+    if(index){
+        var globalId = index[name];
         if(globalId){
             if($A.util.isArray(globalId)){
                 var ret = [];
@@ -133,13 +132,18 @@ Component.prototype.find = function(name){
                     ret.push(componentService.get(globalId[i]));
                 }
                 return ret;
-            }else{
-                return componentService.get(globalId);
             }
-        }else if(this.priv.delegateValueProvider){
-            return this.priv.delegateValueProvider.find(name);
+            return componentService.get(globalId);
         }
     }
+    if (this.priv.delegateValueProvider){
+        return this.priv.delegateValueProvider.find(name);
+    }
+    //
+    // For non-existent objects, we return undefined so that
+    // we can distinguish between not existing and null.
+    //
+    return undefined;
 };
 
 /**
@@ -156,13 +160,13 @@ Component.prototype.findValue = function(name){
                 if(value.isDefined()){
                     return value;
                 }
-            }
-            else {
+            } else {
                 return value;
             }
         }
         zuper = zuper.getSuper();
     }
+    return null;
 };
 
 /**

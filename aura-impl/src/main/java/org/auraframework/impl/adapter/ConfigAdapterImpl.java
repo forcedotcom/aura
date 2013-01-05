@@ -28,6 +28,7 @@ import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.resource.ResourceLoader;
 
@@ -36,6 +37,7 @@ public class ConfigAdapterImpl implements ConfigAdapter{
     private static final String TIMESTAMP_FORMAT_PROPERTY = "aura.build.timestamp.format";
     private static final String TIMESTAMP_PROPERTY = "aura.build.timestamp";
     private static final String VERSION_PROPERTY = "aura.build.version";
+    private static final String VALIDATE_CSS_CONFIG = "aura.css.validate";
 
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
     private final AuraJavascriptGroup jsGroup;
@@ -43,6 +45,7 @@ public class ConfigAdapterImpl implements ConfigAdapter{
     private final Long buildTimestamp;
     private String auraVersionString;
     private boolean lastGenerationHadCompilationErrors = false;
+    private final boolean validateCss;
 
 
     public ConfigAdapterImpl(){
@@ -89,8 +92,13 @@ public class ConfigAdapterImpl implements ConfigAdapter{
             if (auraVersionString == null || auraVersionString.isEmpty()) {
                 throw new AuraError("Unable to read build version from version.prop file");
             }
+            
             buildTimestamp = readBuildTimestamp(props);
         }
+        
+        Properties config = loadConfig();
+        String validateCssString = config.getProperty(VALIDATE_CSS_CONFIG);
+        validateCss = AuraTextUtil.isNullEmptyOrWhitespace(validateCssString) || Boolean.parseBoolean(validateCssString.trim());
 
     }
 
@@ -196,21 +204,37 @@ public class ConfigAdapterImpl implements ConfigAdapter{
     public Mode getDefaultMode() {
         return Aura.getConfigAdapter().isProduction() ? Mode.PROD : Mode.DEV;
     }
-
+    
     private Properties loadProperties() {
-        String path = "/version.prop";
+        
+        Properties props = new Properties();
+        try{
+            loadProperties("/version.prop", props);
+
+        } catch (IOException e) {
+            throw new AuraError("Could not read version.prop information");
+        }
+        return props;
+    }
+    
+    private Properties loadConfig(){
+        Properties props = new Properties();
+        try{
+            loadProperties("/aura.conf", props);
+        } catch (IOException e) {
+            //ignore
+        }
+        return props;
+    }
+
+    private Properties loadProperties(String path, Properties props) throws IOException {
         InputStream stream = this.resourceLoader.getResourceAsStream(path);
         if (stream == null) {
             return null;
         }
-        try {
-            Properties props = new Properties();
-            props.load(stream);
-            stream.close();
-            return props;
-        } catch (IOException e) {
-            throw new AuraError("Could not read version.prop information");
-        }
+        props.load(stream);
+        stream.close();
+        return props;
     }
 
     private Long readBuildTimestamp(Properties props) {
@@ -255,5 +279,10 @@ public class ConfigAdapterImpl implements ConfigAdapter{
      */
     protected AuraJavascriptGroup newAuraJavascriptGroup() throws IOException {
         return new AuraJavascriptGroup();
+    }
+
+    @Override
+    public boolean validateCss() {
+        return validateCss;
     }
 }

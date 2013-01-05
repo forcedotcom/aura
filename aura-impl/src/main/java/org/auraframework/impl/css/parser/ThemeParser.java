@@ -17,6 +17,7 @@ package org.auraframework.impl.css.parser;
 
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.css.theme.ThemeDefImpl;
@@ -47,7 +48,7 @@ public class ThemeParser implements Parser {
 
 
     public static ThemeParser getInstance() {
-        return instance;
+        return Aura.getConfigAdapter().validateCss()?instance:nonValidatingInstance;
     }
 
     public static ThemeParser getNonValidatingInstance() {

@@ -16,12 +16,8 @@
 package org.auraframework.impl.util;
 
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-// import constants
-import static org.auraframework.impl.util.UserAgent.*;
 import static org.auraframework.impl.util.BrowserConsts.*;
+import static org.auraframework.impl.util.UserAgent.*;
 
 
 // user-agent parser to provide browser information 

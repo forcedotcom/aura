@@ -163,6 +163,7 @@
                 <auradocs:contentsNode text="Client-Side Process" id="clientInit" />
                 <auradocs:contentsNode text="Component Request Glossary" id="cycleRefs" />
             </auradocs:contentsNode>
+            <auradocs:contentsNode text="Querying State and Statistics" id="queryLang"/>
         </auradocs:contentsNode>
 
         <auradocs:contentsNode text="Reference" >

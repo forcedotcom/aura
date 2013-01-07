@@ -36,7 +36,6 @@ import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.*;
 import org.auraframework.util.json.Json;
@@ -394,15 +393,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
         if(templateDefDescriptor != null){
             dependencies.add(templateDefDescriptor);
         }
-        MasterDefRegistry mdf = Aura.getContextService().getCurrentContext().getDefRegistry();
         for (DependencyDef dep : this.dependencies) {
-            Set<DefDescriptor<?>> found = mdf.find(dep.getDependency());
-
-            dependencies.addAll(found);
-            if (found.size() == 0) {
-                // TODO: QuickFix for broken dependency.
-                throw new InvalidDefinitionException("Invalid dependency "+dep.getDependency(), dep.getLocation());
-            }
+            dep.appendDependencies(dependencies);
         }
     }
 

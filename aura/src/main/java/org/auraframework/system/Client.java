@@ -19,6 +19,8 @@ public class Client {
 
     public static final Client OTHER = new Client();
 
+    private final String userAgent;
+    
     public enum Type {
         WEBKIT,
         FIREFOX,
@@ -33,10 +35,12 @@ public class Client {
     private final Type type;
 
     public Client() {
+        userAgent = null;
         type = Type.OTHER;
     }
 
     public Client(String ua) {
+        userAgent = ua;
         if (ua == null) {
             type = Type.OTHER;
             return;
@@ -65,5 +69,9 @@ public class Client {
         return type;
     }
 
+    public String getUserAgent() {
+        return userAgent;
+    }
 
+    
 }

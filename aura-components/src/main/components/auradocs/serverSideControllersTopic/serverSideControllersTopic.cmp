@@ -19,15 +19,9 @@
 
   <aura:set attribute="title" value="Server-Side Controllers"/>
 
-
-
   <p>You can use client-side and server-side controllers in Aura. An event is always wired to a client-side controller action, which can in turn call a server-side controller action. For example, a client-side controller might handle an event and call a server-side controller action to persist data to a database.</p>
 
-  <p>You can create a server-side controller in Java.</p>
-
-  <auradocs:info>To implement the controller in another programming language, write an adapter that enables Aura to communicate with the target language through Java. This will be documented in more detail at a later time.</auradocs:info>
-
-  <p>Aura requires that all methods on server-side controllers are static. This restriction is in place to remind you that Aura doesn’t create a controller instance per component instance. Instead, all instances of a given component share one static controller. This means that any state stored on the controller is shared across all instances of a component definition. This is unlikely to be what you want.</p>
+  <p>You can create a server-side controller in Java. All methods on server-side controllers must be static since Aura doesn’t create a controller instance per component instance. Instead, all instances of a given component share one static controller. This means that any state stored on the controller is shared across all instances of a component definition. This is unlikely to be what you want.</p>
 
   <p>In contrast, one model instance is created for each component instance. This means that models are the appropriate place to store state that is specific to one instance of a component.</p>
 
@@ -80,7 +74,25 @@
 }
 </auradocs:codeblock>
 
-  <p>The component must include a controller attribute that wires it to the server-side Java controller. For example:</p>
+    <h3>Abortable Actions</h3>
+    
+    <p>If a user clicks the same button multiple times or clicks multiple buttons in quick succession, it can cause strange display effects as the multiple responses return from the server. You can avoid this by marking a server-side action as abortable by using the <code>setAbortable()</code> method on the <code>Action</code> object in JavaScript. For example:</p>
+
+<auradocs:codeblock>
+    var a = component.get("c.serverEcho");
+    a.setAbortable();
+    a.setParams({ firstName : component.get("v.firstName") });
+</auradocs:codeblock>
+
+    <p>Let's dig into action processing to understand more. We also refer to server-side action calls as action instances. The framework batches actions into a message before sending it to the server. A message is essentially a wrapper around a list of action instances.</p>
+
+    <p>Event processing can generate a tree of events if an event handler fires more events. The framework processes the event tree and every action that needs to be executed on the server is added to a queue. When the tree of events and all the handlers (client-side actions) are processed, the queue is flushed. If there are multiple abortable actions in the queue, only the last abortable action is added to the request message to the server. The earlier abortable action instances are discarded. The only callback executed when the server returns a response is the callback for the last abortable action. If none of the actions are abortable, all callbacks will be executed.</p>
+
+    <p>Let's look at an example. If event processing adds three abortable action instances to the client queue: <code>["c.doSomething", "c.doSomethingElse", "c.doSomething"]</code>, only the last <code>c.doSomething</code> action call is executed and the other two action calls are aborted. It doesn't matter if action instances have different action names or parameters; only the last abortable action is called.</p>    
+    
+    <h2>Wiring Up a Server-Side Controller</h2>
+    
+    <p>The component must include a controller attribute that wires it to the server-side Java controller. For example:</p>
 
 <auradocs:codeblock>
   <![CDATA[<aura:component controller="java://org.auraframework.demo.controllers.TrivialServerSideController">]]>
@@ -136,7 +148,7 @@
     </tbody>
   </table>
 
-  <h3>Learn More</h3>
+  <h2>Learn More</h2>
 
   <p>For a more in-depth example of a server-side controller that interacts with a database, see the <a href="https://github.com/forcedotcom/aura-note/blob/master/src/main/java/org/auraframework/demo/notes/controllers/NoteViewController.java" target="_new">NoteViewController class</a> in the Aura Note sample app. (Log in to GitHub if you get a 404 error.)</p>
 

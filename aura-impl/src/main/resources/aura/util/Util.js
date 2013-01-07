@@ -554,7 +554,8 @@ Util.prototype.on = (function() {
                 element["addEventListener"](eventName, handler, useCapture);
             }
         };
-    } else if(window["attachEvent"]) {
+    }
+    if(window["attachEvent"]) {
         var preventDefault=function(){
             this.returnValue=false;
         };
@@ -583,6 +584,7 @@ Util.prototype.on = (function() {
             }
         };
     }
+    return null;
 })();
 
 /**
@@ -826,7 +828,7 @@ Util.prototype.acceptsData = function(element) {
  */
 Util.prototype.getDataAttribute = function(element, key) {
     if (!this.acceptsData(element) || this.isUndefined(key)) {
-        return;
+        return null;
     }
 
     key = "data-" + this.camelCaseToHyphens(key);
@@ -844,7 +846,7 @@ Util.prototype.getDataAttribute = function(element, key) {
  */
 Util.prototype.setDataAttribute = function(element, key, value) {
     if (!this.acceptsData(element) || this.isUndefined(key)) {
-        return;
+        return null;
     }
 
     key = "data-" + this.camelCaseToHyphens(key);

@@ -17,11 +17,19 @@ package org.auraframework.impl.root;
 
 import java.io.IOException;
 
+import java.util.Set;
+
+import org.auraframework.Aura;
+
+import org.auraframework.builder.DependencyDefBuilder;
+
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.system.DefinitionImpl;
+
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.json.Json;
@@ -42,10 +50,14 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
         QuickFixException caught = null;
 
         this.parentDescriptor = builder.parentDescriptor;
-        try {
-            tmp = new DescriptorFilter(builder.resource, builder.type);
-        } catch (IllegalArgumentException iae) {
-            caught = new InvalidDefinitionException(iae.getMessage(), getLocation());
+        if (builder.resource != null) {
+            try {
+                tmp = new DescriptorFilter(builder.resource, builder.type);
+            } catch (IllegalArgumentException iae) {
+                caught = new InvalidDefinitionException(iae.getMessage(), getLocation());
+            }
+        } else {
+            caught = new InvalidDefinitionException("Missing required resource", getLocation());
         }
         this.dependency = tmp;
         this.error = caught;
@@ -57,12 +69,26 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
         if (this.error != null) {
             throw this.error;
         }
+        if (this.parentDescriptor == null) {
+            throw new InvalidDefinitionException("No parent in DependencyDef", getLocation());
+        }
     }
 
     @Override
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
-        // FIXME: need a matcher that matches something.
+    }
+
+    @Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
+        MasterDefRegistry mdf = Aura.getContextService().getCurrentContext().getDefRegistry();
+        Set<DefDescriptor<?>> found = mdf.find(this.dependency);
+
+        dependencies.addAll(found);
+        if (found.size() == 0) {
+            // TODO: QuickFix for broken dependency.
+            throw new InvalidDefinitionException("Invalid dependency "+this.dependency, getLocation());
+        }
     }
 
     /**
@@ -88,7 +114,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
         // We do not serialize.
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<DependencyDef>{
+    public static class Builder extends DefinitionImpl.BuilderImpl<DependencyDef> implements DependencyDefBuilder {
 
         public Builder(){
             super(DependencyDef.class);
@@ -111,8 +137,10 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
          *
          * @param parentDescriptor The parentDescriptor.
          */
-        public void setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor) {
+        @Override
+        public Builder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor) {
             this.parentDescriptor = parentDescriptor;
+            return this;
         }
 
         /**
@@ -120,16 +148,20 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
          *
          * @param resource The resource.
          */
-        public void setResource(String resource) {
+        @Override
+        public Builder setResource(String resource) {
             this.resource = resource;
+            return this;
         }
         /**
          * Sets the type for this instance.
          *
          * @param type The type.
          */
-        public void setType(String type) {
+        @Override
+        public Builder setType(String type) {
             this.type = type;
+            return this;
         }
     }
 }

@@ -20,6 +20,8 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.AuraContext;
 
+import org.auraframework.test.annotation.UnAdaptableTest;
+
 /**
 * Tests for BaseComponentDefHTMLFormatAdapter, as it relates to ComponentDef
 *
@@ -38,7 +40,10 @@ public class ComponentDefHTMLFormatAdapterTest extends BaseComponentDefHTMLForma
 
     /**
      * Don't append the manifest attribute to <html> when accessing components directly.
+     *
+     * TODO: re-enable after W-1166679
      */
+    @UnAdaptableTest
     public void testWriteManifestWithPreloads() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
         context.addPreload("aura");

@@ -1,0 +1,118 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Querying State and Statistics"/>
+
+    <p>To aid debugging and testing, you can use Aura's query language to see the current state of certain objects in a running app. The query language is available in your browser's console for all modes, except for <code>PROD</code> mode.</p>
+    
+    <p>You can get extra statistics about the app by running queries in <code>STATS</code> mode. This can help with performance tuning.</p>
+
+    <h2>Viewing Help for Command-Line Options</h2>
+    
+    <p>To get usage instructions for the query language, run this command in your browser's console:</p>
+
+<auradocs:codeblock>$A.qhelp()
+</auradocs:codeblock>
+
+    <h2>Querying All Components</h2>
+
+    <p>To query all components on a page, run:</p>  
+    
+<auradocs:codeblock>$A.getQueryStatement().query()
+</auradocs:codeblock>
+
+    <p>Expand the <code>ResultSet</code> to drill into the components and their details. This query can return many components. To find the type of one of the components returned in the <code>rows</code> array, call <code>toString()</code>. For example, to get the type of the first returned component, run:</p>
+   
+<auradocs:codeblock>$A.getQueryStatement().query().rows[0].toString()
+</auradocs:codeblock>    
+
+    <h2>Selecting Fields</h2>
+
+    <p>The default is to return all fields, but you can be more selective by using <code>field()</code>. For example, to return a few fields, run:</p>  
+
+<auradocs:codeblock>$A.getQueryStatement().field("toString, globalId").query()
+</auradocs:codeblock>    
+
+    <p>Use a comma-separated list of fields or chain calls to <code>field()</code>. For example, this query mixes both types of <code>field()</code> syntax.</p> 
+    
+<auradocs:codeblock>$A.getQueryStatement().field("toString, globalId").field("super").field("def").query()
+</auradocs:codeblock>
+
+    <p>You can use an expression as a field too. For example, to get the value of an attribute called <code>description</code>, run:</p>
+    
+<auradocs:codeblock>$A.getQueryStatement().field("toString, v.description").query()
+</auradocs:codeblock>
+
+    <p>If a field name doesn't match, the query engine also uses <code>get</code> and <code>is</code> prefixes to resolve function names. So, you can use the same syntax as your markup to access a field in your model, such as <code>m.firstName</code> to match the <code>getFirstName</code> method in the model's class.</p>
+
+    <h3>Defining Derived Fields and Filtering</h3>
+    
+    <p>You can create a derived field by adding your own logic to process the fields available in the view that you're querying. Derive your own fields by using <code>field("derivedFieldName", "derivedFieldMethodChain")</code>. For example:</p>
+
+<auradocs:codeblock>$A.getQueryStatement().field("descriptor", "getDef().getDescriptor().toString()").query()
+</auradocs:codeblock>
+
+    <p>Derived fields are particularly useful when you want to filter the query results using <code>where()</code>. For example:</p>
+    
+<auradocs:codeblock>$A.getQueryStatement().field("descriptor", "getDef().getDescriptor().toString()").where("descriptor == 'markup://aura:application'").query()
+</auradocs:codeblock>    
+    
+    <h2>Choosing a View</h2>
+
+    <p>All the queries so far have looked at components, but you can use <code>from()</code> to explore other views, such as <code>componentDef</code>. For example:</p> 
+    
+<auradocs:codeblock>$A.getQueryStatement().from("componentDef").query()
+</auradocs:codeblock>
+
+    <p>If the query doesn't include <code>from()</code>, the default is the <code>component</code> view.</p> 
+    
+    <p>To get a list of available views, run:</p>     
+
+<auradocs:codeblock>$A.devToolService.views
+</auradocs:codeblock>
+
+    <p>Use the <code>STATS</code> mode to see extra views for value objects. To set <code>STATS</code> mode for a request, see <auradocs:topicLink topic="modesSetRequest">Setting the Mode for a Request</auradocs:topicLink>.</p>
+
+    <h2>Querying Value Objects</h2>
+
+    <p>You can query <auradocs:topicLink topic="valueObjects">value objects</auradocs:topicLink> in <code>STATS</code> mode. For example:</p> 
+    
+<auradocs:codeblock>$A.getQueryStatement().from("value").field("toString").query()
+</auradocs:codeblock>
+
+    <h2>Grouping by Fields</h2>
+
+    <p>Use <code>groupBy</code> to group your results by a field. For example, to group by the different types of value objects, run:</p> 
+
+<auradocs:codeblock>$A.getQueryStatement().from("value").field("toString").groupBy("toString").query()
+</auradocs:codeblock>
+
+    <h2>Diffing Query Result Sets</h2>
+
+    <p>To get a diff between two result sets, use <code>diff()</code>. For example:</p>
+
+<auradocs:codeblock>var before = $A.getQueryStatement().query(); var after = $A.getQueryStatement().query(); after.diff(before);
+</auradocs:codeblock>
+    
+    <p>This is useful if you want to perform operations between running the <code>before</code> and <code>after</code> queries and analyze the diff between the two result sets.</p>
+    
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="docTests">Testing Components</auradocs:topicLink>
+    </p>    
+       
+</aura:component>

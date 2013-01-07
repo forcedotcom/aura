@@ -35,9 +35,9 @@
     They are called before and after a test method is run.
     </p>
 
-    <auradocs:info> Aura's unit testing framework can be viewed on <a href="https://github.com/forcedotcom/lumen-beta/blob/master/aura-impl/src/main/resources/aura/test/Test.js" target="_blank">github</a>. Make sure you have access to the Aura repo.</auradocs:info>
-    <p>You may want to use <auradocs:topicLink topic="testAssert">assertions</auradocs:topicLink>, <auradocs:topicLink topic="testsUser">user interactions</auradocs:topicLink>, and <auradocs:topicLink topic="testsUtility">utility functions</auradocs:topicLink> available to you for unit testing.</p>
-
+    <auradocs:info>You can view Aura's test methods in the <a href="#reference?topic=api:Test">JavaScript API reference</a>.
+    <p>You may also want to use <auradocs:topicLink topic="testAssert">assertions</auradocs:topicLink>, <auradocs:topicLink topic="testsUser">user interactions</auradocs:topicLink>, and <auradocs:topicLink topic="testsUtility">utility functions</auradocs:topicLink> available to you for unit testing.</p>
+   </auradocs:info>
 
     <h2>The Test Environment</h2>
     <p>You can run JavaScript tests in a Web browser by appending <code>?aura.mode=JSTEST</code> to your production component.

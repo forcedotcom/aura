@@ -55,4 +55,6 @@ public interface ConfigAdapter extends AuraAdapter {
     String getAuraVersion();
 
     boolean isAuraJSStatic();
+
+    boolean validateCss();
 }

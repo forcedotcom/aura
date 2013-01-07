@@ -21,6 +21,7 @@ import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.ThreadHostileTest;
+import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -169,7 +170,12 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
 
     /**
      * Test app cache with more than one app.
+     *
+     * This test is marked unadaptable because it can load things outside the
+     * context of Aura (should be fixed by preloads, and re-enabled).
+     * TODO: re-enable after W-1166679
      */
+    @UnAdaptableTest
     public void testMultipleAppCache() throws Exception {
         String appFormat = "<aura:application securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows' useAppCache='true' preload='%s'>\n    <%s:%s />\n</aura:application>";
         String componentText = "<aura:component>the body</aura:component>";

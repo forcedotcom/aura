@@ -382,17 +382,17 @@ var AuraDevToolService = function() {
         {
             title : 'Choose fields to query',
             code : '$A.getQueryStatement().from("component").field("toString").field("globalId").fields("def, super").query()',
-            description : 'Any property or method on the view, any expression that can be resolved against the view may be specified. "get" and "is" are also tried as prefixes for resolving function names.  Multiple fields can be comma seperated or multiple calls to field() can be used.'
+            description : 'Any property or method on the view, any expression that can be resolved against the view may be specified. "get" and "is" are also tried as prefixes for resolving function names.  Multiple fields can be comma separated or multiple calls to field() can be used.'
         },
         {
             title : 'Group results',
-            code : '$A.getQueryStatement().from("value").field("toString").groupBy("toString).query()',
-            description : 'The value of groupBy must be a selected field.'
+            code : '$A.getQueryStatement().from("value").field("toString").groupBy("toString").query()',
+            description : 'The value of groupBy must be a selected field.  Note : The "value" view is only visible in stats mode.'
         },
         {
             title : 'Define derived fields',
             code : '$A.getQueryStatement().from("component").field("descriptor", "getDef().getDescriptor().toString()").query()',
-            description : 'The value of groupBy must be a selected field.'
+            description : 'You can create a derived field, such as getDef().getDescriptor().toString(), and refer to it as a real field called "descriptor" .'
         },
         {
             title : 'Diff the results of running a query twice',

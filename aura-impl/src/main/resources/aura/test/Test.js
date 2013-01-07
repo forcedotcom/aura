@@ -20,25 +20,27 @@ var Test = function(){
     //#include aura.test.Test_private
 
     /**
-     * @constructor Test utility functions
+     * Utility functions for component testing
+     * @namespace
      */
     var Test = {
-		/**
-		 * Asynchronously wait for a condition before continuing with the next
-		 * stage of the test case.  The wait condition is checked after the
-		 * current test stage is completed but before the next stage is started.
-		 * 
-		 * @example aura.test.addWaitFor("i was updated", function(){return
-		 *            element.textContent;}, function(){alert("the wait is over"});
-		 * 
-		 * @param {Object} expected
-		 *             The value to compare against. If expected is a function,
-		 *             it will evaluate it before comparison.
-		 * @param {Object} testFunction
-		 *             A function to evaluate and compare against expected.
-		 * @param {function} callback
-		 *             Invoked after the comparison evaluates to true
-		 */
+        /**
+         * Asynchronously wait for a condition before continuing with the next
+         * stage of the test case.  The wait condition is checked after the
+         * current test stage is completed but before the next stage is started.
+         *
+         * @description <p>Example:</p>
+         * aura.test.addWaitFor("i was updated", function(){
+         *   return element.textContent;}, function(){alert("the wait is over"});
+         *
+         * @param {Object} expected
+         *             The value to compare against. If expected is a function,
+         *             it will evaluate it before comparison.
+         * @param {Object} testFunction
+         *             A function to evaluate and compare against expected.
+         * @param {function} callback
+         *             Invoked after the comparison evaluates to true
+         */
         addWaitFor : function(expected, testFunction, callback){
             if (!$A.util.isFunction(testFunction)) {
                 throw new Error("addWaitFor expects a function to evaluate for comparison, but got: " + testFunction);
@@ -48,16 +50,17 @@ var Test = function(){
             }
             priv.waits.push({ expected:expected, actual:testFunction, callback:callback });
         },
-        
+
         /**
-         * Get an instance of an action.
-         * Expects you to provide the parameters and call back function.
-         * 
+         * Get an instance of an action based on the specified parameters and callback function.
+         *
          * @param {Component} component
          * @param {String} name
-         *             of the action from the component's perspective (e.g. "c.doSomething")
+         *           The name of the action from the component's perspective (e.g. "c.doSomething")
          * @param {Object} params
+         *            The parameters to pass to the action
          * @param {function} callback
+         *            The callback function to execute for the action
          * @returns {Action} an instance of the action
          */
         getAction:function(component, name, params, callback){
@@ -73,7 +76,7 @@ var Test = function(){
 
         /**
          * Peek if there are any pending server actions.
-         * @returns {boolean}
+         * @returns {boolean} Returns true if there are pending server actions, or false otherwise.
          */
         isActionPending : function() {
             return $A.clientService["priv"].inRequest;
@@ -84,10 +87,11 @@ var Test = function(){
          * test will wait for any actions to complete before continuing to the
          * next stage of the test case.
          * @param {Action} action
+         *            The action to invoke
          * @param {boolean} doImmediate
-         *             if true, the request will be sent immediately, otherwise
+         *             If set to true, the request will be sent immediately, otherwise
          *             the action will be handled as any other Action and may
-         *             be queued behind prior requests
+         *             be queued behind prior requests.
          */
         callServerAction : function(action, doImmediate){
             if(priv.complete === 0){
@@ -146,11 +150,14 @@ var Test = function(){
         /**
          * Invoke a callback after the provided condition evaluates to truthy,
          * checking on the condition every specified interval.
+         * Truthy values can refer to a non-empty String, a non-zero number, a non-empty array, an object, or an expression evaluating to true.
          * @param {function} conditionFunction
+         *             The function to evaluate
          * @param {function} callback
+         *             The callback function to run if conditionFunction evaluates to truthy
          * @param {int} intervalInMs
-         *             the number of milliseconds between each evaluation of
-         *             conditionFunction 
+         *             The number of milliseconds between each evaluation of
+         *             conditionFunction
          */
         runAfterIf : function(conditionFunction, callback, intervalInMs){
             if(priv.complete === 0){
@@ -180,7 +187,7 @@ var Test = function(){
         /**
          * Set test to timeout in a period of miliseconds from now.
          * @param {int} timeoutMsec
-         *             the number of milliseconds from now when the test should
+         *             The number of milliseconds from the current time when the test should
          *             timeout
          */
         setTestTimeout : function(timeoutMsec){
@@ -190,6 +197,7 @@ var Test = function(){
         /**
          * Return whether the test is finished.
          * @returns {boolean}
+         *             Returns true if the test has completed, or false otherwise.
          */
         isComplete : function(){
             return priv.complete === 0;
@@ -198,7 +206,7 @@ var Test = function(){
         /**
          * Get the list of errors seen by the test, not including any errors
          * handled explicitly by the framework.
-         * @returns {string} an empty string if no errors are seen, else a json
+         * @returns {string} Returns an empty string if no errors are seen, else a json
          *             encoded list of errors
          */
         getErrors : function(){
@@ -213,7 +221,9 @@ var Test = function(){
          * Essentially a toString method, except strings are enclosed with
          * double quotations.  Returns a string even for undefined/null value.
          * @param {Object} value
+         *             The value that will be converted to a String
          * @returns {String}
+         *              The value that is returned as a String type
          */
         print : function(value) {
             if (value === undefined) {
@@ -228,11 +238,14 @@ var Test = function(){
         },
 
         /**
-         * Assert that if(condition) check evaluates to true. 
+         * Assert that if(condition) check evaluates to true.
          * @param {Object} condition
+         * 				The condition to evaluate
          * @param {String} assertMessage
-         * @example 
-         * Positive: assertTruthy("helloWorld") 
+         * 				The message that is returned if the condition is not true
+         * @description A truthy value refers to an Object, a string, a non-zero number, a non-empty array, or true.
+         * <p>Example:</p>
+         * Positive: assertTruthy("helloWorld"),
          * Negative: assertTruthy(null)
          */
         assertTruthy : function(condition, assertMessage) {
@@ -247,11 +260,14 @@ var Test = function(){
         },
 
          /**
-         * Assert that if(condition) check evaluates to false. 
+         * Assert that the if(condition) check evaluates to false.
          * @param {Object} condition
+         * 				The condition to evaluate
          * @param {String} assertMessage
-         * @example 
-         * Negative: assertFalsy("helloWorld") 
+         * 				The message that is returned if the condition is not false
+         * @description A falsey value refers to zero, an empty string, null, undefined, or false.
+         * <p>Example:</p>
+         * Negative: assertFalsy("helloWorld"),
          * Postive: assertFalsy(null)
          */
         assertFalsy : function(condition, assertMessage) {
@@ -266,24 +282,29 @@ var Test = function(){
         },
 
          /**
-         * Assert that if(condition) check evaluates to true. 
+         * Assert that if(condition) check evaluates to true.
          * @param {Object} condition
+         * 				The condition to evaluate
          * @param {String} assertMessage
-         * @example 
-         * Positive: assert("helloWorld") 
+         * 				The message that is returned if the condition is not true
+         * @description
+         * Positive: assert("helloWorld"),
          * Negative: assert(null)
          */
         assert : function(condition, assertMessage) {
             aura.test.assertTruthy(condition, assertMessage);
         },
-        
-        
-		/**
-		 * Assert that the two values provided are equal
-		 * @param {Object} arg1
-		 * @param {Object} arg2
-		 * @param {String} assertMessage
-		 */
+
+
+        /**
+         * Assert that the two values provided are equal.
+         * @param {Object} arg1
+         * 				The argument to evaluate against arg2
+         * @param {Object} arg2
+         * 				The argument to evaluate against arg1
+         * @param {String} assertMessage
+         * 				The message that is returned if the two values are not equal
+         */
         assertEquals : function(arg1, arg2, assertMessage){
             if(arg1!==arg2){
                 if(!assertMessage){
@@ -296,11 +317,13 @@ var Test = function(){
                  throw new Error(assertMessage);
             }
         },
-        
+
         /**
-         * Assert that the condition === true
+         * Assert that the condition === true.
          * @param {boolean} condition
+         * 				The condition to evaluate
          * @param {String} assertMessage
+         * 				The message that is returned if the condition !==true
          */
         assertTrue : function(condition, assertMessage){
             if(!assertMessage){
@@ -308,11 +331,13 @@ var Test = function(){
             }
             aura.test.assertEquals(true,condition,assertMessage);
         },
-        
+
         /**
-         * Assert that the condition === false
+         * Assert that the condition === false.
          * @param {boolean} condition
+         * 				The condition to evaluate
          * @param {String} assertMessage
+         * 				The message that is returned if the condition !==false
          */
         assertFalse :function(condition, assertMessage){
             if(!assertMessage){
@@ -320,11 +345,13 @@ var Test = function(){
             }
             aura.test.assertEquals(false,condition,assertMessage);
         },
-        
+
          /**
-         * Assert that the value passed in is either undefined or null
+         * Assert that the value passed in is either undefined or null.
          * @param {Object} arg1
+         * 				The argument to evaluate
          * @param {String} assertMessage
+         * 				The message that is returned if the argument is not undefined or null
          */
         assertUndefinedOrNull : function(arg1, assertMessage){
             if(!assertMessage){
@@ -332,11 +359,13 @@ var Test = function(){
             }
             aura.test.assertTrue($A.util.isUndefinedOrNull(arg1),assertMessage);
         },
-        
+
          /**
-         * Assert that value === null
+         * Assert that value === null.
          * @param {Object} arg1
+         * 				The argument to evaluate
          * @param {String} assertMessage
+         * 				The message that is returned if the value !==null
          */
         assertNull : function(arg1, assertMessage){
             if(!assertMessage){
@@ -344,11 +373,13 @@ var Test = function(){
             }
             aura.test.assertTrue(arg1===null,assertMessage);
         },
-        
+
         /**
-         * Assert that value !== null
+         * Assert that value !== null.
          * @param {Object} arg1
+         * 				The argument to evaluate
          * @param {String} assertMessage
+         * 				The message that is returned if the value is null
          */
         assertNotNull : function(arg1, assertMessage){
             if(!assertMessage){
@@ -356,12 +387,13 @@ var Test = function(){
             }
             aura.test.assertTrue(arg1!==null,assertMessage);
         },
-        
+
         /**
-         * Throws an Error, making a test fail with the specified message. 
+         * Throw an Error, making a test fail with the specified message.
          * @param {String} assertMessage
-         *             defaults to "Assertion failure", if not provided
+         *             Defaults to "Assertion failure", if assertMessage is not provided
          * @throws {Error}
+         * 				Throws error with a message
          */
         fail : function(assertMessage){
             if(assertMessage){
@@ -374,7 +406,9 @@ var Test = function(){
         /**
          * Get an object's prototype.
          * @param {Object} instance
+         * 				The instance of the object
          * @returns {Object}
+         * 				The prototype of the specified object
          */
         getPrototype : function(instance){
             return instance && (Object.getPrototypeOf && Object.getPrototypeOf(instance)) || instance.__proto || instance.constructor.prototype;
@@ -383,14 +417,17 @@ var Test = function(){
         /**
          * Replace a function on an object with a restorable override.
          * @param {Object} instance
+         * 				The instance of the object
          * @param {function} originalFunction
+         * 				The function to be replaced
          * @param {function} newFunction
+         * 				The new function that replaces originalFunction
          * @returns {function}
-         *             the override (newFunction) with an added "restore"
+         *             The override (newFunction) with an added "restore"
          *             function that, when invoked, will restore originalFunction
          *             on instance
          * @throws {Error}
-         *             if instance does not have originalFunction as a property
+         *             Throws an error if instance does not have originalFunction as a property
          */
         overrideFunction : function(instance, originalFunction, newFunction){
             var override = newFunction;
@@ -423,7 +460,7 @@ var Test = function(){
                 }
             }
             if(!found) {
-            	throw new Error("Did not find the specified function on the given object!");
+                throw new Error("Did not find the specified function on the given object!");
             }
             return override;
         },
@@ -436,13 +473,16 @@ var Test = function(){
          * the original arguments.  If attached before (postProcess !== true),
          * the handler will be invoked with just the original arguments.
          * @param {Object} instance
+         * 				The instance of the object
          * @param {function} originalFunction
+         * 				The original function whose arguments are applied to the handler
          * @param {function} newFunction
+         * 				The target function to attach the handler to
          * @param {boolean} postProcess
-         *             whether the handler will be called after or before
-         *             originalFunction is called
+         *             Set to true if the handler will be called after the target function
+         *             or false if the handler will be called before originalFunction
          * @returns {function}
-         *             the override of originalFunction, which has a "restore"
+         *             The override of originalFunction, which has a "restore"
          *             function that, when invoked, will restore originalFunction
          *             on instance
          */
@@ -462,7 +502,9 @@ var Test = function(){
         /**
          * Get a DOM node's outerHTML.
          * @param {Node} node
+         * 				The node to get outer HTML from
          * @returns {String}
+         * 				The outer HTML
          */
         getOuterHtml : function(node) {
             return node.outerHTML || (function(n){
@@ -474,11 +516,13 @@ var Test = function(){
             })(node);
         },
 
-        /** 
+        /**
          * Get the text content of a DOM node. Tries "innerText" followed by
          * "textContext" to take browser differences into account.
-         * @param {Node} node 
+         * @param {Node} node
+         * 				The node to get the text content from
          * @returns {String}
+         * 				The text content of the specified DOM node
          */
         getText : function(node) {
             var t = node.innerText;
@@ -487,11 +531,13 @@ var Test = function(){
             }
             return (typeof t == "string") ? t : node.innerText;
         },
-        
+
         /**
          * Get the textContent of all elements rendered by this component.
          * @param {Component} component
+         * 				The component to get the text content from
          * @returns {String}
+         * 				The text content of the specified component
          */
         getTextByComponent : function(component){
             var ret = "";
@@ -516,10 +562,13 @@ var Test = function(){
 
         /**
          * Get the current value for a style for a DOMElement.
-         * 
+         *
          * @param {DOMElement} elem
-         * @param {String} Style 
+         * 				The element to get the CSS property value from
+         * @param {String} Style
+         * 				The property name to retrieve
          * @returns {String}
+         * 				The CSS property value of the specified DOMElement
          */
         getStyle : function(elem, style){
             var val = "";
@@ -538,7 +587,9 @@ var Test = function(){
         /**
          * Filter out comment nodes from a list of nodes.
          * @param {Array|Object} nodes
+         * 				The list of nodes to filter
          * @returns {Array}
+         * 				The list of nodes without comment nodes
          */
         getNonCommentNodes : function(nodes){
             var ret = [];
@@ -561,7 +612,9 @@ var Test = function(){
         /**
          * Check if a node has been "deleted" by Aura.
          * @param {Node} node
+         * 				The node to check
          * @returns {boolean}
+         * 				Returns true if the specified node has been deleted, or false otherwise
          */
         isNodeDeleted : function(node){
             if (!node.parentNode){
@@ -573,23 +626,29 @@ var Test = function(){
             return node.parentNode === div.parentNode;
         },
 
+        /**
+         * Return a node list and pass each argument as a separate parameter.
+         * @returns {Array}
+         * 				The list of nodes contained in the document node
+         */
         select : function() {
             return document.querySelectorAll.apply(document, arguments);
         },
-        
+
         /**
          * Check if a string contains another string.
          * @param {String} testString
-         *             the string to check
+         *             The string to check
          * @param {String} targetString
-         *             the string to look for
+         *             The string to look for within testString
          * @returns {boolean}
+         * 				Return true if testString contains targetString, or false otherwise
          */
         contains : function(testString, targetString){
-        	if (!$A.util.isUndefinedOrNull(testString)) {
-        		return (testString.indexOf(targetString) != -1);
-        	}
-        	return false;
+            if (!$A.util.isUndefinedOrNull(testString)) {
+                return (testString.indexOf(targetString) != -1);
+            }
+            return false;
         },
 
         // Used by tests to modify framework source to trigger JS last mod update

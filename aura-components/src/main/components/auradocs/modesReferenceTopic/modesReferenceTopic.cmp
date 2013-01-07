@@ -156,6 +156,11 @@
                 <td><code>FTEST</code></td>
                 <td>Similar to <code>UTEST</code> mode, but used for functional tests instead of unit tests. This mode may expose different debug code than <code>UTEST</code> mode.</td>
             </tr>
+
+            <tr>
+                <td><code>STATS</code></td>
+                <td>Used for compiling statistics for value objects for use with the <auradocs:topicLink topic="queryLang">query language</auradocs:topicLink>.</td>
+            </tr>
         </tbody>
     </table>
 

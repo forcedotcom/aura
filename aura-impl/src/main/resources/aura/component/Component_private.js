@@ -678,6 +678,7 @@ var ComponentPriv = (function(){ // Scoping priv
 
           return ret;
         }
+        return null;
       };
 
     return ComponentPriv;

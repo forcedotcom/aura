@@ -121,7 +121,8 @@ public class AuraContextServiceImpl implements ContextService {
         Map<ValueProviderType, GlobalValueProvider> instances = new EnumMap<ValueProviderType, GlobalValueProvider>(ValueProviderType.class);
         for (GlobalValueProviderAdapter factory : factories) {
             for (GlobalValueProvider g : factory.createValueProviders()) {
-                instances.put(g.getValueProviderKey(), g);
+                if (!instances.containsKey(g.getValueProviderKey())) 
+                      instances.put(g.getValueProviderKey(), g);
             }
         }
         return instances;

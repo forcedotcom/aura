@@ -629,16 +629,14 @@ Aura.prototype.logf = function(){
 Aura.prototype.fitTo = function(value, size) {
     if (typeof (value) != "string") {
         if ($A.util.isUndefinedOrNull(value)) {
-            return;
-        } else {
-            value = value.toString();
+            return null;
         }
+        value = value.toString();
     }
     if (value.length > size) {
         return value.slice(0, size);
-    } else {
-        return this.rpad(value, " ", size);
     }
+    return this.rpad(value, " ", size);
 };
 
 /**
@@ -668,6 +666,7 @@ Aura.prototype.getStackTrace = function(e) {
 
         return ret;
     }
+    return null;
 };
 
 /**

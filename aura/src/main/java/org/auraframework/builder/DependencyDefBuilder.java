@@ -13,11 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-exp(expressionService,
-    "setValue", expressionService.setValue,
-    "getValue", expressionService.getValue,
-    "get", expressionService.get,
-    "create", expressionService.create,
-    "createPassthroughValue", expressionService.createPassthroughValue
-);
+package org.auraframework.builder;
+
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DependencyDef;
+import org.auraframework.def.RootDefinition;
+
+/**
+ * @since 0.0.196
+ */
+public interface DependencyDefBuilder extends DefBuilder<DependencyDef, DependencyDef> {
+    DependencyDefBuilder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor);
+    DependencyDefBuilder setResource(String resource);
+    DependencyDefBuilder setType(String type);
+}

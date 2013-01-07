@@ -15,7 +15,6 @@
  */
 package org.auraframework.docs;
 
-import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
@@ -50,16 +49,4 @@ public class ApiTopicModel {
         return title;
     }
 
-    @AuraEnabled
-    public String getDescription() {
-        String desc = symbol.get("classDesc").toString();
-        if (desc != null && !desc.isEmpty()) {
-            return desc;
-        }
-        try {
-            return ((Map)((List)((Map)symbol.get("comment")).get("tags")).get(0)).get("desc").toString();
-        } catch (Throwable t) {
-            return "";
-        }
-    }
 }

@@ -29,6 +29,7 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.AttributeImpl;
+import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
@@ -267,6 +268,18 @@ public class AuraImplUnitTestingUtil {
             AttributeDefRefImpl defaultValue, boolean required, SerializeToType serializeTo, Location location) {
         return new AttributeDefImpl(DefDescriptorImpl.getInstance(name, AttributeDef.class), parentDescriptor,
                 typeDefDescriptor, defaultValue, required, serializeTo, location);
+    }
+
+    public DependencyDef makeDependencyDef(DefDescriptor<? extends RootDefinition> parentDescriptor, String resource,
+                                           String type, Location location) {
+        DependencyDefImpl.Builder builder;
+
+        builder = new DependencyDefImpl.Builder();
+        builder.setParentDescriptor(parentDescriptor);
+        builder.setResource(resource);
+        builder.setType(type);
+        builder.setLocation(location);
+        return builder.build();
     }
 
     public AttributeDefRefImpl makeAttributeDefRef() {

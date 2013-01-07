@@ -16,9 +16,11 @@
 
 -->
 <aura:component extends="auradocs:topicPanel">
-    <aura:set attribute="title" value="Querying Components and Definitions"/>
+    <aura:set attribute="title" value="Querying State and Statistics"/>
 
-    <p>You can see what components and definitions are on a page using Aura's query language in your browser's console. This is useful for quickly examining components or comparing (diffing) component status between operations.</p>
+    <p>To aid debugging and testing, you can use Aura's query language to see the current state of certain objects in a running app. The query language is available in your browser's console for all modes, except for <code>PROD</code> mode.</p>
+    
+    <p>You can get extra statistics about the app by running queries in <code>STATS</code> mode. This can help with performance tuning.</p>
 
     <h2>Viewing Help for Command-Line Options</h2>
     
@@ -58,12 +60,17 @@
 
     <p>If a field name doesn't match, the query engine also uses <code>get</code> and <code>is</code> prefixes to resolve function names. So, you can use the same syntax as your markup to access a field in your model, such as <code>m.firstName</code> to match the <code>getFirstName</code> method in the model's class.</p>
 
-    <h3>Defining Derived Fields</h3>
+    <h3>Defining Derived Fields and Filtering</h3>
     
-    <p>Derive your own fields by using <code>field("derivedFieldName", "derivedFieldMethodChain")</code>. For example:</p>
+    <p>You can create a derived field by adding your own logic to process the fields available in the view that you're querying. Derive your own fields by using <code>field("derivedFieldName", "derivedFieldMethodChain")</code>. For example:</p>
 
 <auradocs:codeblock>$A.getQueryStatement().field("descriptor", "getDef().getDescriptor().toString()").query()
 </auradocs:codeblock>
+
+    <p>Derived fields are particularly useful when you want to filter the query results using <code>where()</code>. For example:</p>
+    
+<auradocs:codeblock>$A.getQueryStatement().field("descriptor", "getDef().getDescriptor().toString()").where("descriptor == 'markup://aura:application'").query()
+</auradocs:codeblock>    
     
     <h2>Choosing a View</h2>
 
@@ -95,7 +102,7 @@
 <auradocs:codeblock>$A.getQueryStatement().from("value").field("toString").groupBy("toString").query()
 </auradocs:codeblock>
 
-    <h2>Diffing the Results of Running a Query Twice</h2>
+    <h2>Diffing Query Result Sets</h2>
 
     <p>To get a diff between two result sets, use <code>diff()</code>. For example:</p>
 
@@ -103,5 +110,9 @@
 </auradocs:codeblock>
     
     <p>This is useful if you want to perform operations between running the <code>before</code> and <code>after</code> queries and analyze the diff between the two result sets.</p>
+    
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="docTests">Testing Components</auradocs:topicLink>
+    </p>    
        
 </aura:component>

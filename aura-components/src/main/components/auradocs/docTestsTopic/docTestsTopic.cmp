@@ -59,7 +59,8 @@
     <p>Include unique and specific error messages in your assert statements. For example, use <code>assertTrue(run, "Returns true if the action has run successfully.")</code>
     instead of a generic message. Making each assert message unique also helps in narrowing down which assert statement has failed. </p>
     <p><b>See also:</b><br/>
-        <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink>
+        <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="queryLang">Querying State and Statistics</auradocs:topicLink>
     </p>
 
 </aura:component>

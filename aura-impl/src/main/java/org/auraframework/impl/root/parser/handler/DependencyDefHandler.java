@@ -54,6 +54,7 @@ public class DependencyDefHandler<P extends RootDefinition> extends ParentedTagH
         super(parentHandler, xmlReader, source);
         this.builder = new DependencyDefImpl.Builder();
         this.builder.setLocation(getLocation());
+        this.builder.setParentDescriptor(parentHandler.getDefDescriptor());
     }
 
     @Override

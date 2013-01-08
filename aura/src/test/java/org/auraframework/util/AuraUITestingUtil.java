@@ -119,22 +119,32 @@ public class AuraUITestingUtil {
          * {@link JavascriptExecutor#executeScript(String, Object...) cannot handle Objects as return values."
          */
         String escapedJavascript = StringEscapeUtils.escapeJavaScript(javascript);
-        String wrapper = "var ret;" + //
-                String.format("var func = new Function('arguments', \"%s\");\n", escapedJavascript) + //
-                "var ret = func.call(this, arguments);\n" + //
-                "var errors = (window.$A && window.$A.test) ? window.$A.test.getErrors() : '';\n" + //
-                "return [ret, errors];";
+        String wrapper = "var ret,scriptExecException;" + 
+                String.format("var func = new Function('arguments', \"%s\");\n", escapedJavascript) + 
+                "try\n{" +
+                " ret = func.call(this, arguments);\n" +
+                "}\n" +
+                "catch(e){\n" +
+                " scriptExecException = e.message || e.toString();\n" +
+                "}\n" + //
+                "var jstesterrors = (window.$A && window.$A.test) ? window.$A.test.getErrors() : '';\n" + 
+                "return [ret, jstesterrors, scriptExecException];";
 
         try {
             @SuppressWarnings("unchecked")
             List<Object> wrapResult = (List<Object>)getRawEval(wrapper, args);
-            Assert.assertEquals("Wrapped javsascript execution expects an array of exactly 2 elements", 2, wrapResult.size());
+            Assert.assertEquals("Wrapped javsascript execution expects an array of exactly 3 elements", 3, wrapResult.size());
+            Object exception = wrapResult.get(2);
+            Assert.assertNull("Following JS Exception occured while evaluating provided script:\n"+exception+"\n"+
+            		"Arguments: (" + Arrays.toString(args) + ")\n" + "Script:\n" + javascript + "\n", exception);
             String errors = (String)wrapResult.get(1);
             assertJsTestErrors(errors);
             return wrapResult.get(0);
         } catch (WebDriverException e) {
-            Assert.fail("Script execution failed.\n" + //
-                    "Arguments: (" + Arrays.toString(args) + ")\n" + //
+        	//shouldn't come here that often as we are also wrapping the js script being passed to us in try/catch above
+            Assert.fail("Script execution failed.\n" +
+            		"Failure Message: "+e.getMessage() +"\n" + 
+                    "Arguments: (" + Arrays.toString(args) + ")\n" + 
                     "Script:\n" + javascript + "\n");
             throw e;
         }
@@ -170,4 +180,15 @@ public class AuraUITestingUtil {
     public String prepareReturnStatement(String returnStatement){
         return "return "+returnStatement;
     }
+    
+    public String findGlobalIdForComponentWithGivenProperties(String fromClause, String whereClause){
+    	StringBuilder sb = new StringBuilder();    	
+    	sb.append("var cmp = $A.getQueryStatement().from('component').field('globalId').");
+    	sb.append(fromClause+".where(\""+whereClause+"\")"+".query();\n");
+    	sb.append("$A.test.assertEquals(1, cmp.rowCount,'Expected to find only one component with given properties.');\n");
+    	sb.append("return cmp.rows[0].globalId;");
+    	Object returnVal = getEval(sb.toString());    	
+    	return returnVal == null ? null: returnVal.toString();
+    }
+    
 }

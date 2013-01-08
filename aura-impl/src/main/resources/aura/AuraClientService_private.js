@@ -515,9 +515,7 @@ var priv = {
 
     getManifestURL: function(){
         var htmlNode = document.body.parentNode;
-        if(htmlNode){
-            return htmlNode.getAttribute('manifest');
-        }
+        return htmlNode ? htmlNode.getAttribute('manifest') : null;
     },
 
     isManifestPresent: function(){

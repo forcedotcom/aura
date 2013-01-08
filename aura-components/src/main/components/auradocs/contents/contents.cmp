@@ -163,6 +163,7 @@
                 <auradocs:contentsNode text="Client-Side Process" id="clientInit" />
                 <auradocs:contentsNode text="Component Request Glossary" id="cycleRefs" />
             </auradocs:contentsNode>
+            <auradocs:contentsNode text="Querying State and Statistics" id="queryLang"/>
         </auradocs:contentsNode>
 
         <auradocs:contentsNode text="Reference" >
@@ -172,7 +173,11 @@
             <auradocs:contentsNode text="aura:iteration" id="tagIteration" />
             <auradocs:contentsNode text="System Tags">
                 <auradocs:contentsNode text="aura:application" id="appOverview"/>
-                <auradocs:contentsNode text="aura:set" id="tagAuraSet"/>
+                <auradocs:contentsNode text="aura:set">
+                    <auradocs:contentsNode text="Introduction" id="tagAuraSet" />
+                    <auradocs:contentsNode text="Setting Attributes on a Super Component" id="tagAuraSetSuper" />
+                    <auradocs:contentsNode text="Setting Attributes on a Component Reference" id="tagAuraSetReference" />
+                </auradocs:contentsNode>
             </auradocs:contentsNode>
             <auradocs:contentsNode text="Supported HTML Tags" id="htmlTags"/>
             <auradocs:contentsNode text="Supported aura:attribute Types" >

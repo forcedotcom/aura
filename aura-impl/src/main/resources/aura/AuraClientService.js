@@ -23,6 +23,7 @@ var AuraClientService = function(){
 
     var clientService = {
 
+    	/** @private */
         initHost : function(host){
             priv.host = host || "";
             //#if {"modes" : ["PRODUCTION"]}
@@ -30,6 +31,7 @@ var AuraClientService = function(){
             //#end
         },
 
+    	/** @private */
         init: function(config, token, callback, container){
             $A.mark("ClientService.init");
             var body = document.body;
@@ -59,6 +61,7 @@ var AuraClientService = function(){
             delete this.init;
         },
 
+    	/** @private */
         initDefs: function(config){
              $A.mark("ClientService.initDefs");
              var evtConfigs = aura.util.json.resolveRefs(config["eventDefs"]);

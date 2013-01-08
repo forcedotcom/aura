@@ -18,7 +18,7 @@
 <aura:component render="server" model="java://org.auraframework.impl.java.model.TestIterationModel">
 
 <table class="testRoot">
-<aura:iteration items="{!m.data}" var="outer" indexVar="index" start="{!13}" end="{!19}">
+<aura:iteration items="{!m.data}" var="outer" indexVar="index" start="13" end="19">
     <tr>
     <th scope="row">indexVar is <span style="color: firebrick">{!index}</span> out here.</th>
     <aura:iteration items="{!m.innerData}" var="inner" indexVar="index">

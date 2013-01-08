@@ -16,7 +16,7 @@
 
 -->
 <aura:component>
-    <aura:attribute name="visible" type="Boolean" default="{!false}" />
+    <aura:attribute name="visible" type="Boolean" default="false" />
     
     <br/>
     

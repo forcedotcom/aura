@@ -111,6 +111,7 @@ AttributeDefSet.prototype.getDef = function(name){
     if (values) {
         return values[name.toLowerCase()];
     }
+    return null;
 };
 
 /**

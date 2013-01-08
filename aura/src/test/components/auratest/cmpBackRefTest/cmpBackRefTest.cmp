@@ -17,13 +17,13 @@
 -->
 <aura:component>
 
-<aura:renderIf isTrue="{!true}">
+<aura:renderIf isTrue="true">
     <div id="ifDiv">
         div inside renderIf
     </div>
 </aura:renderIf>
 
-<aura:renderIf isTrue="{!false}">
+<aura:renderIf isTrue="false">
 <aura:set attribute="else">
     <div id="elseDiv">
         div inside else

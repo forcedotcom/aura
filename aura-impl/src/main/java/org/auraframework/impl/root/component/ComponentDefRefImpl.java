@@ -129,11 +129,15 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
             DefDescriptor<AttributeDef> attributeDefDesc = entry.getKey();
             AttributeDef attributeDef = atts.get(attributeDefDesc);
             if (attributeDef == null) {
+                // didn't find an attribute by that name, check if there's an event
                 RegisterEventDef registeredEvent = registeredEvents.get(attributeDefDesc.getName());
                 if (registeredEvent == null) {
                     throw new AttributeNotFoundException(rootDef.getDescriptor(),
                         attributeDefDesc.getName(), getLocation());
                 }
+            } else {
+                // so it was an attribute, make sure to parse it
+                entry.getValue().parseValue(attributeDef.getTypeDef());
             }
             entry.getValue().validateReferences();
             // heres where some type validation would go

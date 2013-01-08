@@ -23,11 +23,11 @@
 <div aura:id="simple">{!itsavar.stringy}</div>
 </aura:iteration>
 
-<aura:iteration items="{!m.data}" var="stuff" indexVar="index" start="{!6}" end="{!10}">
+<aura:iteration items="{!m.data}" var="stuff" indexVar="index" start="6" end="10">
 <div aura:id="complex">{!index == 7 ? 'lucky #7' : ''} <button class="{!'button' + index}" onclick="{!c.theaction}">{!stuff.stringy}</button></div>
 </aura:iteration>
 
-<aura:iteration items="{!m.data}" var="stuff" start="{!9}" end="{!10}">
+<aura:iteration items="{!m.data}" var="stuff" start="9" end="10">
 <iterationTest:iterationChildWithModel aura:id="childwithmodel" fromiteration="{!stuff.whatever}" fromparent="{!m.derp}"/>
 </aura:iteration>
 

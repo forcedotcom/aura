@@ -180,7 +180,7 @@ public class JavaControllerTest extends AuraImplTestCase {
             Aura.getInstanceService().getInstance(dd);
             fail("Expected DefinitionNotFoundException");
         } catch (DefinitionNotFoundException e) {
-            assertEquals("No CONTROLLER named java://goats found", e.getMessage());
+            assertEquals(String.format("No CONTROLLER named java://goats found : %s", dd.getQualifiedName()), e.getMessage());
         }
     }
 

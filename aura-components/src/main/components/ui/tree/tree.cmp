@@ -27,7 +27,7 @@
         
     <ol class="{!v.class}">
         <aura:iteration items="{!v.nodes}" var="node">
-            <ui:treeNode item="{!node}" aura:id="modelNode" hidden="{!false}" />
+            <ui:treeNode item="{!node}" aura:id="modelNode" hidden="false" />
         </aura:iteration>
         {!v.body}
     </ol>

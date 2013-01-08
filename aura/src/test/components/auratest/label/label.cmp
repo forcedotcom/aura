@@ -18,8 +18,8 @@
 <aura:component>
     <aura:attribute name="value" type="String"/>
     <aura:attribute name="string" type="String" default="test"/>
-    <aura:attribute name="boolean" type="boolean" default="{!false}"/>
-    <aura:attribute name="double" type="double" default="{!20}"/>
+    <aura:attribute name="boolean" type="boolean" default="false"/>
+    <aura:attribute name="double" type="double" default="20"/>
     <aura:attribute name="undef" type="Object"/>
     <aura:attribute name="noll" type="Object"/>
 

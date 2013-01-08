@@ -369,6 +369,7 @@ ComponentDef.prototype.initSuperDef = function(config){
     if (config) {
         return $A.componentService.getDef(config);
     }
+    return null;
 };
 
 /**

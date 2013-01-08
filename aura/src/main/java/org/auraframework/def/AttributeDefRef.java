@@ -34,4 +34,15 @@ public interface AttributeDefRef extends Definition {
      * @return Returns the value.
      */
     Object getValue();
+
+    /**
+     * Parses the value stored in this defref using the passed in type definition.
+     * This MUST be called during the validateReferences compilation phase or this defref may
+     * represent a literal value that is not of the expected type (i.e. string instead of number)
+     * 
+     * TODO: when getDescriptor().getDef().getTypeDef() is fixed, this won't be needed anymore
+     * 
+     * @param typeDef type of the attribute to try to parse to
+     */
+    void parseValue(TypeDef typeDef);
 }

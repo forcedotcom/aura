@@ -26,7 +26,7 @@
     <aura:attribute name="class" type="String" default="" description="A CSS style to be attached to the button. This style is added in addition to base styles output by the component."/>
     <aura:attribute name="label" type="String" required="true" description="The text displayed on the button. Corresponds to the value attribute of the rendered HTML input element."/>
     <aura:attribute name="labelClass" type="String" default="" description="A CSS style to be attached to the label. This style is added in addition to base styles output by the component."/>
-    <aura:attribute name="labelDisplay" type="Boolean" default="{!true}" description="Specifies whether the label is displayed. If not, we add a hidden text for accessibility purpose."/>
+    <aura:attribute name="labelDisplay" type="Boolean" default="true" description="Specifies whether the label is displayed. If not, we add a hidden text for accessibility purpose."/>
     <aura:attribute name="iconImgSrc" type="String" default="/auraFW/resources/aura/s.gif" description="The absolute or relative URL of the icon to display on the button. The image's alt attribute is set to the value of the button’s label attribute."/>
     <aura:attribute name="iconClass" type="String" default="" description="A CSS style to be attached to the button's icon. This style is added in addition to base styles output by the component."/>
     <aura:attribute name="disabled" type="Boolean" default="false" description="Specifies whether this button should be displayed in a disabled state. Disabled buttons can't be clicked. Default value is &quot;false&quot;."/>

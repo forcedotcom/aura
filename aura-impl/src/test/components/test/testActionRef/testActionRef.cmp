@@ -16,7 +16,7 @@
 
 -->
 <aura:component>
-    <aura:attribute name="pants" type="integer" default="{!0}"/>
+    <aura:attribute name="pants" type="integer" default="0"/>
     sand called {!v.pants} times
     <test:testActionRefChild aura:id="sandputter" put="{!c.sand}"/>
 </aura:component>

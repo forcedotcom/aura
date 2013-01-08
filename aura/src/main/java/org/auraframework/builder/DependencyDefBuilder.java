@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    testHelloWorld: {
+package org.auraframework.builder;
 
-        attributes : {num : '2'},
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DependencyDef;
+import org.auraframework.def.RootDefinition;
 
-        test: function(component){
-            aura.assert(component.getAttributes().getValue('num') == 2, "very bad things.");
-        }
-    },
-
-    testHelloWorld2: {
-    },
-})
+/**
+ * @since 0.0.196
+ */
+public interface DependencyDefBuilder extends DefBuilder<DependencyDef, DependencyDef> {
+    DependencyDefBuilder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor);
+    DependencyDefBuilder setResource(String resource);
+    DependencyDefBuilder setType(String type);
+}

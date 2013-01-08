@@ -15,6 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component>
-
+<aura:component extends="auradocs:sampleSetTagBase">
+    <aura:set attribute="address1" value="808 State St" />
+    
+    sampleSetTagEx address1: {!v.address1}
 </aura:component>

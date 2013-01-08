@@ -35,6 +35,7 @@ import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
+
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.*;
 import org.auraframework.util.json.Json;
@@ -391,6 +392,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
 
         if(templateDefDescriptor != null){
             dependencies.add(templateDefDescriptor);
+        }
+        for (DependencyDef dep : this.dependencies) {
+            dep.appendDependencies(dependencies);
         }
     }
 

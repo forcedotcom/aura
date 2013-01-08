@@ -131,6 +131,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             List<String> preloads = AuraTextUtil.splitSimple(",", preloadNames);
             for(String preload : preloads){
                 DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
+                ddb.setParentDescriptor(this.defDescriptor);
                 ddb.setLocation(getLocation());
                 ddb.setResource(preload);
                 ddb.setType("*");

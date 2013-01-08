@@ -15,7 +15,6 @@
  */
 /*jslint sub: true */
 exp(expressionService,
-    "isLiteral", expressionService.isLiteral,
     "setValue", expressionService.setValue,
     "getValue", expressionService.getValue,
     "get", expressionService.get,

@@ -17,7 +17,7 @@
 -->
 <aura:component>
 <!-- attribute that indicates that search has been called atleast once. Its set via c.doSearch -->
-<aura:attribute name="searched" type="boolean" default="{!false}"/>
+<aura:attribute name="searched" type="boolean" default="false"/>
 <aura:attribute name="value" type="string" />
 <aura:attribute name="showClear" type="boolean" default="{!false}"/>
 

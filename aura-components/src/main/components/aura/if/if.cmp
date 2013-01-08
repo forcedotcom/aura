@@ -19,7 +19,7 @@
     provider="java://org.auraframework.components.aura.IfProvider, js://aura.if"
     renderer="java://org.auraframework.components.aura.ProvidedBodyRenderer, js://aura.providedBody"
     description="Conditionally instantiates and renders either the body or the components in the else attribute.">
-<aura:attribute name="isTrue" type="String" required="true" description="An expression that must be fulfilled in order to display the body."/>
+<aura:attribute name="isTrue" type="Boolean" required="true" description="An expression that must be fulfilled in order to display the body."/>
 <aura:attribute name="body" type="Aura.ComponentDefRef[]" required="true" description="The components to render when isTrue evaluates to true."/>
 <aura:attribute name="else" type="Aura.ComponentDefRef[]" description="The alternative to render when isTrue evaluates to false, and the body is not rendered.  Should always be set using the aura:set tag."/>
 <aura:attribute name="realbody" type="Aura.Component[]" description="Internal use only. Any value set will be ignored."/>

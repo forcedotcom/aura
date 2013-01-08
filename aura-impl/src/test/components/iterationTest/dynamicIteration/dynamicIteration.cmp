@@ -17,8 +17,8 @@
 -->
 <aura:component render="client" model="java://org.auraframework.impl.java.model.TestIterationModel">
 <aura:attribute name="list" type="List"/>
-<aura:attribute name="start" type="integer" default="{!4}"/>
-<aura:attribute name="end" type="integer" default="{!14}"/>
+<aura:attribute name="start" type="integer" default="4"/>
+<aura:attribute name="end" type="integer" default="14"/>
 <aura:attribute name="tochange" type="integer"/>
 <aura:attribute name="newvalue" type="string"/>
 

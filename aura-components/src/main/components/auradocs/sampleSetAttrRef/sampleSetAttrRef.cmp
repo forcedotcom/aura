@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component>
-
+<aura:component>    
+    <auradocs:sampleSetTagEx address1="1 Sesame St" />
 </aura:component>

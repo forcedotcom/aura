@@ -117,12 +117,20 @@ public class AuraContextServiceImpl implements ContextService {
     }
 
     private Map<ValueProviderType, GlobalValueProvider> getGlobalProviders() {
-        Collection<GlobalValueProviderAdapter> factories = ServiceLocator.get().getAll(GlobalValueProviderAdapter.class);
+        // load any @Primary GlobalValueProviderAdatper first, to give it's implementations percedence 
+        GlobalValueProviderAdapter primaryFactory = ServiceLocator.get().get(GlobalValueProviderAdapter.class);
         Map<ValueProviderType, GlobalValueProvider> instances = new EnumMap<ValueProviderType, GlobalValueProvider>(ValueProviderType.class);
+        for (GlobalValueProvider g : primaryFactory.createValueProviders()) {
+            instances.put(g.getValueProviderKey(), g);
+        }
+        Collection<GlobalValueProviderAdapter> factories = ServiceLocator.get().getAll(GlobalValueProviderAdapter.class);
         for (GlobalValueProviderAdapter factory : factories) {
-            for (GlobalValueProvider g : factory.createValueProviders()) {
-                if (!instances.containsKey(g.getValueProviderKey())) 
-                      instances.put(g.getValueProviderKey(), g);
+            if (!factory.equals(primaryFactory))
+            {
+                for (GlobalValueProvider g : factory.createValueProviders()) {
+                    if (!instances.containsKey(g.getValueProviderKey())) 
+                          instances.put(g.getValueProviderKey(), g);
+                }
             }
         }
         return instances;

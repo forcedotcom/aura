@@ -36,6 +36,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.HelperDef;
@@ -315,9 +316,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
             def.validateReferences();
         }
 
-        // have to do all sorts of craaaazy checks here for dupes and matches
-        // and bah
-
+        // have to do all sorts of craaaazy checks here for dupes and matches and bah
         validateExpressionRefs();
     }
 

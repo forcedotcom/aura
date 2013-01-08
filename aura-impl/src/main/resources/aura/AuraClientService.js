@@ -168,7 +168,7 @@ var AuraClientService = function(){
             priv.request(actions, scope, callback);
         },
 
-        injectComponent: function(parent, rawConfig, placeholderId, localId) {
+        injectComponent: function(rawConfig, placeholderId, localId) {
     		var config = $A.util.json.resolveRefs(rawConfig);
     		
     		// Save off any context global stuff like new labels
@@ -182,7 +182,8 @@ var AuraClientService = function(){
             	
             	componentConfig["localId"] = localId;
             	
-                var c = $A.componentService.newComponent(componentConfig, parent);
+            	var root = $A.getRoot();
+                var c = $A.componentService.newComponent(componentConfig, root);
                 
                 // Wire up event handlers
                 var actionEventHandlers = config["actionEventHandlers"];
@@ -200,7 +201,7 @@ var AuraClientService = function(){
 	                }
                 }
                 
-                parent.getValue("v.body").push(c);
+                root.getValue("v.body").push(c);
                 
                 var element = $A.util.getElement(placeholderId);
                 $A.render(c, element);

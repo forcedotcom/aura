@@ -18,14 +18,11 @@ package org.auraframework.impl.parser;
 import java.util.EnumMap;
 
 import org.auraframework.impl.css.parser.ThemeParser;
-import org.auraframework.impl.java.writer.JavaScriptWriter;
-import org.auraframework.impl.java.writer.JavaWriter;
-import org.auraframework.impl.java.writer.ThemeWriter;
+import org.auraframework.impl.java.writer.*;
 import org.auraframework.impl.javascript.parser.JavascriptParser;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.XMLWriter;
-import org.auraframework.system.Parser;
-import org.auraframework.system.SourceWriter;
+import org.auraframework.system.*;
 import org.auraframework.system.Parser.Format;
 
 /**

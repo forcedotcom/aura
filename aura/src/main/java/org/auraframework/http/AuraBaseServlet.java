@@ -370,13 +370,18 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     public String getContentType( AuraContext.Format format )
     {
-        switch (format)
-        {
-        case MANIFEST: return (AuraBaseServlet.MANIFEST_CONTENT_TYPE);
-        case CSS:      return (AuraBaseServlet.CSS_CONTENT_TYPE);
-        case JS:       return (AuraBaseServlet.JAVASCRIPT_CONTENT_TYPE);
-        case JSON:     return (Json.MIME_TYPE);
-        case HTML:     return (AuraBaseServlet.HTML_CONTENT_TYPE);
+        switch (format) {
+            case MANIFEST: 
+                return (AuraBaseServlet.MANIFEST_CONTENT_TYPE);
+            case CSS:      
+                return (AuraBaseServlet.CSS_CONTENT_TYPE);
+            case JS:       
+                return (AuraBaseServlet.JAVASCRIPT_CONTENT_TYPE);
+            case JSON:     
+                return (Json.MIME_TYPE);
+            case HTML:
+                return (AuraBaseServlet.HTML_CONTENT_TYPE);
+        
         }
         return ("text/plain");
     }

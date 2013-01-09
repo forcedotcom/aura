@@ -619,7 +619,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * finished loading at this point: callers should have previously called
      * {@link #waitForDocumentReady()}.
      */
-    private void waitForAuraFrameworkReady() {
+    protected void waitForAuraFrameworkReady() {
         // Umbrella check for any framework load error.
         if (!(Boolean) auraUITestingUtil.getRawEval("return !!window.$A")) {
             fail("Initialization error: document loaded without $A. Perhaps the initial GET failed.");

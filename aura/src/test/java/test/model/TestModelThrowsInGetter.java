@@ -15,8 +15,8 @@
  */
 package test.model;
 
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Model;
 
 @Model
 public class TestModelThrowsInGetter {

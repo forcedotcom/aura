@@ -15,9 +15,6 @@
  */
 package org.auraframework.service;
 
-import org.auraframework.Aura;
-import org.auraframework.system.LoggingContext;
-
 /**
  * <p>
  * Service for interacting with a {@link LoggingContext}
@@ -58,18 +55,21 @@ public interface LoggingService extends AuraService {
 
     /**
      * Start a timer.
+     * 
      * @param name timer's name
      */
     void startTimer(String name);
 
     /**
      * Stop a timer.
+     * 
      * @param name timer's name
      */
     void stopTimer(String name);
 
     /**
      * Get the time for a specific timer.
+     * 
      * @param name timer's name
      * @return the time value
      */
@@ -77,24 +77,28 @@ public interface LoggingService extends AuraService {
 
     /**
      * Reset a timer.
+     * 
      * @param name timer's name
      */
     void resetTimer(String name);
 
     /**
      * Get the number value.
+     * 
      * @param key the value's name
      */
     long getNum(String key);
 
     /**
      * Increase the value by one.
+     * 
      * @param key the value's name
      */
     void incrementNum(String key);
 
     /**
      * Increase the value.
+     * 
      * @param key the value's name
      * @param num the number it gets increased
      */
@@ -102,6 +106,7 @@ public interface LoggingService extends AuraService {
 
     /**
      * Set the value (long).
+     * 
      * @param key the value's name
      * @param num the value to be set
      */
@@ -109,6 +114,7 @@ public interface LoggingService extends AuraService {
 
     /**
      * Get the value.
+     * 
      * @param key the value's name
      * @return the value
      */
@@ -116,6 +122,7 @@ public interface LoggingService extends AuraService {
 
     /**
      * Set the value (Object)
+     * 
      * @param key the value's name
      * @param value
      */

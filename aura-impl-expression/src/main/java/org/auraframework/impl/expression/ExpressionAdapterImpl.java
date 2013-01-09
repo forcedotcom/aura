@@ -15,8 +15,19 @@
  */
 package org.auraframework.impl.expression;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 
+import org.antlr.runtime.ANTLRReaderStream;
+import org.antlr.runtime.BaseRecognizer;
+import org.antlr.runtime.CharStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.Lexer;
+import org.antlr.runtime.MismatchedTokenException;
+import org.antlr.runtime.NoViableAltException;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
 import org.auraframework.adapter.ExpressionAdapter;
 import org.auraframework.expression.Expression;
 import org.auraframework.impl.expression.parser.ExpressionLexer;
@@ -25,8 +36,6 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraValidationException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
-
-import org.antlr.runtime.*;
 
 /**
  * adapter that calls our expression factory
@@ -37,7 +46,7 @@ public class ExpressionAdapterImpl implements ExpressionAdapter {
     public Expression buildExpression(String s, Location l) throws AuraValidationException {
         ExpressionLexer lexer;
         try {
-            lexer  = new ExpressionLexer(new CaseInsensitiveReaderStream(new StringReader(s)));
+            lexer = new ExpressionLexer(new CaseInsensitiveReaderStream(new StringReader(s)));
         } catch (IOException x) {
             throw new AuraRuntimeException(x);
         }
@@ -54,18 +63,20 @@ public class ExpressionAdapterImpl implements ExpressionAdapter {
         }
     }
 
-    private static InvalidExpressionException generateException(String exp, BaseRecognizer antlr, RecognitionException re, Location l) {
+    private static InvalidExpressionException generateException(String exp, BaseRecognizer antlr,
+            RecognitionException re, Location l) {
         StringBuilder errorMsg = new StringBuilder();
         String[] names = antlr.getTokenNames();
         if (re.token != null && re.token.getType() == ExpressionParser.EOF) {
             errorMsg.append("unexpected end of expression");
         } else if (re instanceof MismatchedTokenException) {
-            MismatchedTokenException mte = (MismatchedTokenException)re;
+            MismatchedTokenException mte = (MismatchedTokenException) re;
             String txt;
             String expecting;
-            // bleh same exception class has different fields set depending on where it occurred
+            // bleh same exception class has different fields set depending on
+            // where it occurred
             if (antlr instanceof Lexer) {
-                Lexer lexer = (Lexer)antlr;
+                Lexer lexer = (Lexer) antlr;
                 txt = lexer.getCharErrorDisplay(re.c);
                 expecting = lexer.getCharErrorDisplay(mte.expecting);
             } else {
@@ -109,9 +120,10 @@ public class ExpressionAdapterImpl implements ExpressionAdapter {
         errorMsg.append(exp);
         return new InvalidExpressionException(errorMsg.toString(), l);
     }
+
     /**
-     * stream that allows case insensitive tokenization
-     * code copied directly from antlr wiki
+     * stream that allows case insensitive tokenization code copied directly
+     * from antlr wiki
      */
     private static class CaseInsensitiveReaderStream extends ANTLRReaderStream {
         private CaseInsensitiveReaderStream(Reader script) throws IOException {
@@ -120,17 +132,17 @@ public class ExpressionAdapterImpl implements ExpressionAdapter {
 
         @Override
         public int LA(int i) {
-            if ( i==0 ) {
+            if (i == 0) {
                 return 0; // undefined
             }
-            if ( i<0 ) {
+            if (i < 0) {
                 i++; // e.g., translate LA(-1) to use offset 0
             }
 
-            if ( (p+i-1) >= n ) {
+            if ((p + i - 1) >= n) {
                 return CharStream.EOF;
             }
-            return Character.toLowerCase(data[p+i-1]);
+            return Character.toLowerCase(data[p + i - 1]);
         }
     }
 }

@@ -15,24 +15,53 @@
  */
 package org.auraframework.util.json;
 
-import static org.auraframework.util.json.JsonConstant.*;
+import static org.auraframework.util.json.JsonConstant.ARRAY;
+import static org.auraframework.util.json.JsonConstant.ARRAY_END;
+import static org.auraframework.util.json.JsonConstant.ARRAY_START;
+import static org.auraframework.util.json.JsonConstant.BINARY_STREAM;
+import static org.auraframework.util.json.JsonConstant.BOOLEAN;
+import static org.auraframework.util.json.JsonConstant.COMMENT_DELIM;
+import static org.auraframework.util.json.JsonConstant.ENTRY_SEPARATOR;
+import static org.auraframework.util.json.JsonConstant.FUNCTION;
+import static org.auraframework.util.json.JsonConstant.FUNCTION_ARGS_END;
+import static org.auraframework.util.json.JsonConstant.FUNCTION_ARGS_START;
+import static org.auraframework.util.json.JsonConstant.FUNCTION_BODY;
+import static org.auraframework.util.json.JsonConstant.LITERAL_START;
+import static org.auraframework.util.json.JsonConstant.MULTICOMMENT_DELIM;
+import static org.auraframework.util.json.JsonConstant.NULL;
+import static org.auraframework.util.json.JsonConstant.NUMBER;
+import static org.auraframework.util.json.JsonConstant.OBJECT;
+import static org.auraframework.util.json.JsonConstant.OBJECT_END;
+import static org.auraframework.util.json.JsonConstant.OBJECT_SEPARATOR;
+import static org.auraframework.util.json.JsonConstant.OBJECT_START;
+import static org.auraframework.util.json.JsonConstant.STRING;
+import static org.auraframework.util.json.JsonConstant.WHITESPACE;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PushbackReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.List;
+import java.util.Map;
 
-import org.auraframework.util.*;
+import org.auraframework.util.LimitedLengthInputStream;
 import org.auraframework.util.LimitedLengthInputStream.StreamFinishedListener;
+import org.auraframework.util.Utf8InputStreamReader;
 import org.auraframework.util.json.JsonHandler.JsonValidationException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
- * Reads a stream of json-formatted objects. Call next() to parse the next thing in the stream, Then call getValue() to
- * get it.<br>
+ * Reads a stream of json-formatted objects. Call next() to parse the next thing
+ * in the stream, Then call getValue() to get it.<br>
  * <br>
- * This parser handles everything that is specified in the json spec on http://www.json.org/ <br>
+ * This parser handles everything that is specified in the json spec on
+ * http://www.json.org/ <br>
  * AND<br>
  * <br>
  * It handles a few extra things that are not supported in the spec. These are:<br>
@@ -44,14 +73,17 @@ import com.google.common.collect.Maps;
  * <br>
  * -Supports a few escape sequences that the spec doesn't mention : \', \0, \v<br>
  * <br>
- * -Javascript functions can be values in maps or arrays. These are only supported when they are in the format of
- * function(arg1,arg2){}. Named functions are not supported, as in json the names are supplied as the key in a map
- * instead. functions will be returned as lib.json.JsonFunction objects.<br>
+ * -Javascript functions can be values in maps or arrays. These are only
+ * supported when they are in the format of function(arg1,arg2){}. Named
+ * functions are not supported, as in json the names are supplied as the key in
+ * a map instead. functions will be returned as lib.json.JsonFunction objects.<br>
  * <br>
- * -Binary streams in Salesforce.com's JSON+binary format are supported, which uses the backtick character as a
- * delimiter and the format:<br>
- * `[length of data in bytes as a 64-bit big-endian binary number][raw binary data]`<br>
- * This is enabled only when a JsonStreamReader is constructed using an InputStream.<br>
+ * -Binary streams in Salesforce.com's JSON+binary format are supported, which
+ * uses the backtick character as a delimiter and the format:<br>
+ * `[length of data in bytes as a 64-bit big-endian binary number][raw binary
+ * data]`<br>
+ * This is enabled only when a JsonStreamReader is constructed using an
+ * InputStream.<br>
  * <br>
  * ===============<br>
  * <br>
@@ -65,9 +97,11 @@ import com.google.common.collect.Maps;
  * js function ==> lib.json.JsFunction<br>
  * json binary ==> java.io.InputStream<br>
  * <br>
- * If you want to provide your own mappings (rather than those above), you can pass in your own implementation of
- * JsonHandlerProvider, and then your JsonHandlers will be used. This allows you to skip the intermediate step of
- * parsing into Maps and Lists, and lets you put the primitives directly into your objects as they are parsed.
+ * If you want to provide your own mappings (rather than those above), you can
+ * pass in your own implementation of JsonHandlerProvider, and then your
+ * JsonHandlers will be used. This allows you to skip the intermediate step of
+ * parsing into Maps and Lists, and lets you put the primitives directly into
+ * your objects as they are parsed.
  */
 public class JsonStreamReader {
 
@@ -106,10 +140,12 @@ public class JsonStreamReader {
     }
 
     private JsonStreamReader(Reader reader, InputStream binaryInput, JsonHandlerProvider provider) {
-        if (reader == null) { throw new JsonParseException("Reader cannot be null"); }
+        if (reader == null) {
+            throw new JsonParseException("Reader cannot be null");
+        }
         this.reader = new PushbackReader(reader, 2);
         this.binaryInput = binaryInput == null ? null
-                : (binaryInput instanceof DataInputStream ? (DataInputStream)binaryInput : new DataInputStream(
+                : (binaryInput instanceof DataInputStream ? (DataInputStream) binaryInput : new DataInputStream(
                         binaryInput));
         this.provider = provider;
     }
@@ -119,34 +155,41 @@ public class JsonStreamReader {
     }
 
     /**
-     * Creates a JSON stream reader that also understands our proprietary JSON binary stream format, which is `[length
-     * of data in bytes as a 64-bit big-endian binary number][raw binary data]`<br>
+     * Creates a JSON stream reader that also understands our proprietary JSON
+     * binary stream format, which is `[length of data in bytes as a 64-bit
+     * big-endian binary number][raw binary data]`<br>
      * <br>
-     * <b>REALLY BIG WARNING:</b> This class <b>DOES NOT</b> enforce an overall limit on the incoming stream when this
-     * constructor is used and
-     * {@link #disableLengthLimitsBecauseIAmStreamingAndMyMemoryUseIsNotProportionalToTheStreamLength()} is also called.
-     * <b>DO NOT</b> hold onto all the objects that you collect from this class if you call that method, or else <b>YOU
-     * COULD BRING DOWN AN APP SERVER OR, POSSIBLY, A POD, AND IT WILL BE YOUR FAULT!</b> The combination of this
-     * constructor and that method is meant <b>ONLY</b> for streaming use cases where you don't hold onto objects
-     * returned from this class for long at all, and the amount of memory that you use <b>IS NOT</b> proportional to the
-     * length of the stream. That is, <b>YOUR IMPLEMENTATION MUST HAVE A MEMORY PROFILE OF O(1)</b> with respect to the
+     * <b>REALLY BIG WARNING:</b> This class <b>DOES NOT</b> enforce an overall
+     * limit on the incoming stream when this constructor is used and
+     * {@link #disableLengthLimitsBecauseIAmStreamingAndMyMemoryUseIsNotProportionalToTheStreamLength()}
+     * is also called. <b>DO NOT</b> hold onto all the objects that you collect
+     * from this class if you call that method, or else <b>YOU COULD BRING DOWN
+     * AN APP SERVER OR, POSSIBLY, A POD, AND IT WILL BE YOUR FAULT!</b> The
+     * combination of this constructor and that method is meant <b>ONLY</b> for
+     * streaming use cases where you don't hold onto objects returned from this
+     * class for long at all, and the amount of memory that you use <b>IS
+     * NOT</b> proportional to the length of the stream. That is, <b>YOUR
+     * IMPLEMENTATION MUST HAVE A MEMORY PROFILE OF O(1)</b> with respect to the
      * incoming stream size.<br>
      * <br>
-     * Note that JSON+binary is not supported if the Reader or String based constructors are used to construct this
-     * class.<br>
+     * Note that JSON+binary is not supported if the Reader or String based
+     * constructors are used to construct this class.<br>
      * <br>
-     * When JsonStreamReader is constructed with an InputStream, arrays and objects are not read in for you by default.
-     * Instead, it is up to the calling code to loop through the array and object start/separator/end tokens via next().
-     * But if you want to change that, you can call {@link #setRecursiveReadEnabled(boolean)} to enable recursive reads,
-     * though binary stream data does not get saved. Note that if you call {@link #getObject()} or {@link #getList()},
-     * you will get the Map or List back regardless of the recursiveRead property. When recursiveRead is false, calls to
-     * {@link #getObject()} or {@link #getList()} cause that object or array to get fully consumed to satisfy the
-     * request.<br>
+     * When JsonStreamReader is constructed with an InputStream, arrays and
+     * objects are not read in for you by default. Instead, it is up to the
+     * calling code to loop through the array and object start/separator/end
+     * tokens via next(). But if you want to change that, you can call
+     * {@link #setRecursiveReadEnabled(boolean)} to enable recursive reads,
+     * though binary stream data does not get saved. Note that if you call
+     * {@link #getObject()} or {@link #getList()}, you will get the Map or List
+     * back regardless of the recursiveRead property. When recursiveRead is
+     * false, calls to {@link #getObject()} or {@link #getList()} cause that
+     * object or array to get fully consumed to satisfy the request.<br>
      * <br>
-     * Note that the JSON string is assumed to be UTF-8 when JsonStreamReader is constructed with an InputStream.
-     *
-     * @param binaryInput
-     *            The raw InputStream to read from
+     * Note that the JSON string is assumed to be UTF-8 when JsonStreamReader is
+     * constructed with an InputStream.
+     * 
+     * @param binaryInput The raw InputStream to read from
      */
     public JsonStreamReader(InputStream binaryInput) {
         this(new Utf8InputStreamReader(binaryInput), binaryInput, null);
@@ -154,9 +197,11 @@ public class JsonStreamReader {
     }
 
     /**
-     * See the warning in {@link #JsonStreamReader(InputStream)}. <b>NEVER</b>, under <b>ANY CIRCUMSTANCE</b>, are you
-     * to call this <i>unless</i> if the way that you are using this class causes only O(1) memory to be used with
-     * respect to the input stream length. Otherwise, <b>DO NOT CALL THIS METHOD</b>.<br>
+     * See the warning in {@link #JsonStreamReader(InputStream)}. <b>NEVER</b>,
+     * under <b>ANY CIRCUMSTANCE</b>, are you to call this <i>unless</i> if the
+     * way that you are using this class causes only O(1) memory to be used with
+     * respect to the input stream length. Otherwise, <b>DO NOT CALL THIS
+     * METHOD</b>.<br>
      * <br>
      */
     public void disableLengthLimitsBecauseIAmStreamingAndMyMemoryUseIsNotProportionalToTheStreamLength() {
@@ -164,7 +209,9 @@ public class JsonStreamReader {
     }
 
     private static StringReader createStringReader(String string) {
-        if (string == null) { throw new JsonParseException("String cannot be null"); }
+        if (string == null) {
+            throw new JsonParseException("String cannot be null");
+        }
         return new StringReader(string);
     }
 
@@ -183,19 +230,22 @@ public class JsonStreamReader {
     /**
      * Returns the current JSON object as a Map&lt;String,Object&gt;<br>
      * <br>
-     * Note that if you have recursive reading disabled (see {@link #isRecursiveReadEnabled()}), then calling this
-     * method will cause a recursive read to occur on the current object if the current position is at the beginning of
-     * an object.
-     *
-     * @throws JsonStreamParseException
-     *             Thrown if the current JSON token is not OBJECT or, for when recursive reading is disabled,
-     *             OBJECT_START. When recursive reading is disabled, this exception can also get thrown if a problem
-     *             arises while consuming the object within the input stream
+     * Note that if you have recursive reading disabled (see
+     * {@link #isRecursiveReadEnabled()}), then calling this method will cause a
+     * recursive read to occur on the current object if the current position is
+     * at the beginning of an object.
+     * 
+     * @throws JsonStreamParseException Thrown if the current JSON token is not
+     *             OBJECT or, for when recursive reading is disabled,
+     *             OBJECT_START. When recursive reading is disabled, this
+     *             exception can also get thrown if a problem arises while
+     *             consuming the object within the input stream
      */
     @SuppressWarnings("unchecked")
     public Map<String, Object> getObject() {
 
-        // If recursive reading is off and we are at an object start, then go ahead and read in the object recursively
+        // If recursive reading is off and we are at an object start, then go
+        // ahead and read in the object recursively
         if (!recursiveRead && currentToken == OBJECT_START) {
             recursiveRead = true;
             try {
@@ -211,25 +261,28 @@ public class JsonStreamReader {
         }
 
         assertCurrentToken(OBJECT);
-        return (Map<String, Object>)current;
+        return (Map<String, Object>) current;
     }
 
     /**
      * Returns the current JSON array as a List&lt;Object&gt;<br>
      * <br>
-     * Note that if you have recursive reading disabled (see {@link #isRecursiveReadEnabled()}), then calling this
-     * method will cause a recursive read to occur on the current array if the current position is at the beginning of
-     * an array.
-     *
-     * @throws JsonStreamParseException
-     *             Thrown if the current JSON token is not ARRAY or, for when recursive reading is disabled,
-     *             ARRAY_START. When recursive reading is disabled, this exception can also get thrown if a problem
-     *             arises while consuming the array within the input stream
+     * Note that if you have recursive reading disabled (see
+     * {@link #isRecursiveReadEnabled()}), then calling this method will cause a
+     * recursive read to occur on the current array if the current position is
+     * at the beginning of an array.
+     * 
+     * @throws JsonStreamParseException Thrown if the current JSON token is not
+     *             ARRAY or, for when recursive reading is disabled,
+     *             ARRAY_START. When recursive reading is disabled, this
+     *             exception can also get thrown if a problem arises while
+     *             consuming the array within the input stream
      */
     @SuppressWarnings("unchecked")
     public List<Object> getList() {
 
-        // If recursive reading is off and we are at an array start, then go ahead and read in the object recursively
+        // If recursive reading is off and we are at an array start, then go
+        // ahead and read in the object recursively
         if (!recursiveRead && currentToken == ARRAY_START) {
             recursiveRead = true;
             try {
@@ -243,42 +296,44 @@ public class JsonStreamReader {
         }
 
         assertCurrentToken(ARRAY);
-        return (List<Object>)current;
+        return (List<Object>) current;
     }
 
     public BigDecimal getNumber() {
         assertCurrentToken(NUMBER);
-        return (BigDecimal)current;
+        return (BigDecimal) current;
     }
 
     public String getString() {
         assertCurrentToken(STRING);
-        return (String)current;
+        return (String) current;
     }
 
     public boolean getBoolean() {
         assertCurrentToken(BOOLEAN);
-        return (Boolean)current;
+        return (Boolean) current;
     }
 
     /**
-     * Returns the current binary input stream as an InputStream. Note that this should be called only by code that has
-     * constructed this JsonStreamReader using {@link #JsonStreamReader(InputStream)}. It will always throw a
-     * JsonStreamParseException if this JsonStreamReader was constructed any other way.
+     * Returns the current binary input stream as an InputStream. Note that this
+     * should be called only by code that has constructed this JsonStreamReader
+     * using {@link #JsonStreamReader(InputStream)}. It will always throw a
+     * JsonStreamParseException if this JsonStreamReader was constructed any
+     * other way.
      */
     public InputStream getBinaryStream() {
         assertCurrentToken(BINARY_STREAM);
-        return (InputStream)current;
+        return (InputStream) current;
     }
 
     /**
-     * Returns the number of bytes in the binary stream value. Note that this will always throw a
-     * JsonStreamParseException if this JsonStreamReader was not constructed using
-     * {@link #JsonStreamReader(InputStream)}.
+     * Returns the number of bytes in the binary stream value. Note that this
+     * will always throw a JsonStreamParseException if this JsonStreamReader was
+     * not constructed using {@link #JsonStreamReader(InputStream)}.
      */
     public long getBinaryStreamLength() {
         assertCurrentToken(BINARY_STREAM);
-        return ((LimitedLengthInputStream)current).getLength();
+        return ((LimitedLengthInputStream) current).getLength();
     }
 
     public boolean hasNext() throws IOException {
@@ -288,7 +343,8 @@ public class JsonStreamReader {
             c = readChar();
             unreadChar(c);
         } catch (Exception e) {
-            // We may have hit the end of the stream, which in most cases is a bad thing -- except this case.
+            // We may have hit the end of the stream, which in most cases is a
+            // bad thing -- except this case.
         }
         return c != null;
     }
@@ -302,10 +358,11 @@ public class JsonStreamReader {
     }
 
     private JsonConstant next(JsonConstant hint) throws IOException, JsonEndOfStreamException {
-        // If we have a binary stream, then ensure that it is closed first. Closing it consumes it if it hasn't been
+        // If we have a binary stream, then ensure that it is closed first.
+        // Closing it consumes it if it hasn't been
         // fully consumed yet
         if (currentToken == BINARY_STREAM && current instanceof InputStream) {
-            ((InputStream)current).close();
+            ((InputStream) current).close();
         }
 
         // Skip through all whitespace and comments
@@ -410,8 +467,8 @@ public class JsonStreamReader {
     private static final BinaryStreamFinishedListener BINARY_STREAM_FINISHED_LISTENER = new BinaryStreamFinishedListener();
 
     /**
-     * Stream-finished listener that consumes the backtick character that is supposed to appear immediately after the
-     * end of the JSON binary stream
+     * Stream-finished listener that consumes the backtick character that is
+     * supposed to appear immediately after the end of the JSON binary stream
      */
     private static class BinaryStreamFinishedListener implements StreamFinishedListener {
 
@@ -420,36 +477,45 @@ public class JsonStreamReader {
 
             // Read the next byte. It must be a ` char
             int nextByte = wrappedStream.read();
-            if (nextByte != -1 && nextByte != '`') { throw new IllegalStateException(
-                    "backtick character not encountered at the end of the JSON binary stream"); }
+            if (nextByte != -1 && nextByte != '`') {
+                throw new IllegalStateException(
+                        "backtick character not encountered at the end of the JSON binary stream");
+            }
         }
     }
 
     /**
      * Returns whether or not recursive reads of objects and arrays are enabled.<br>
      * <br>
-     * Note that when this is false, which is the default only when this JsonStreamReader is created with
-     * {@link #JsonStreamReader(InputStream)}, then reading an object will set the state to OBJECT_START and an array to
-     * ARRAY_START instead of OBJECT and ARRAY, respectively. It is then the responsibility of the caller to iterate
-     * through the JSON tokens within that object or array with {@link #next()}.<br>
+     * Note that when this is false, which is the default only when this
+     * JsonStreamReader is created with {@link #JsonStreamReader(InputStream)},
+     * then reading an object will set the state to OBJECT_START and an array to
+     * ARRAY_START instead of OBJECT and ARRAY, respectively. It is then the
+     * responsibility of the caller to iterate through the JSON tokens within
+     * that object or array with {@link #next()}.<br>
      * <br>
-     * When this is true, reading an array or an object will consume that entire array or object and return the current
-     * token as ARRAY or OBJECT, respectively.
+     * When this is true, reading an array or an object will consume that entire
+     * array or object and return the current token as ARRAY or OBJECT,
+     * respectively.
      */
     public boolean isRecursiveReadEnabled() {
         return this.recursiveRead;
     }
 
     /**
-     * Enables or disables recursive reads of objects and arrays when true or disables that when false.<br>
+     * Enables or disables recursive reads of objects and arrays when true or
+     * disables that when false.<br>
      * <br>
-     * Note that when this is false, which is the default only when this JsonStreamReader is created with
-     * {@link #JsonStreamReader(InputStream)}, then reading an object will set the state to OBJECT_START and an array to
-     * ARRAY_START instead of OBJECT and ARRAY, respectively. It is then the responsibility of the caller to iterate
-     * through the JSON tokens within that object or array with {@link #next()}.<br>
+     * Note that when this is false, which is the default only when this
+     * JsonStreamReader is created with {@link #JsonStreamReader(InputStream)},
+     * then reading an object will set the state to OBJECT_START and an array to
+     * ARRAY_START instead of OBJECT and ARRAY, respectively. It is then the
+     * responsibility of the caller to iterate through the JSON tokens within
+     * that object or array with {@link #next()}.<br>
      * <br>
-     * When this is true, reading an array or an object will consume that entire array or object and return the current
-     * token as ARRAY or OBJECT, respectively.
+     * When this is true, reading an array or an object will consume that entire
+     * array or object and return the current token as ARRAY or OBJECT,
+     * respectively.
      */
     public void setRecursiveReadEnabled(boolean recursiveRead) {
         this.recursiveRead = recursiveRead;
@@ -494,7 +560,7 @@ public class JsonStreamReader {
         while ((token = next(STRING)) == STRING) {
 
             // key
-            String key = (String)current;
+            String key = (String) current;
 
             // colon
             token = next();
@@ -527,7 +593,9 @@ public class JsonStreamReader {
     }
 
     private JsonHandlerProvider getHandlerProvider() {
-        if (provider == null) { return defaultProvider; }
+        if (provider == null) {
+            return defaultProvider;
+        }
         return provider;
     }
 
@@ -603,16 +671,16 @@ public class JsonStreamReader {
     }
 
     /**
-     * This method consumes what we expect to be a comment. It should be called after consuming the '/' character, but
-     * before either the second '/' or the '*'. If the next character read is <i>not</i> one of those two (i.e. this is
-     * not a comment), it will throw a {@link JsonStreamParseException}.
-     *
+     * This method consumes what we expect to be a comment. It should be called
+     * after consuming the '/' character, but before either the second '/' or
+     * the '*'. If the next character read is <i>not</i> one of those two (i.e.
+     * this is not a comment), it will throw a {@link JsonStreamParseException}.
+     * 
      * @return a {@link JsComment} with the comment text and location
      * @throws IOException
-     * @throws JsonEndOfStreamException
-     *             if there is no next character
-     * @throws JsonStreamParseException
-     *             if the input does not begin with a valid comment, or if a multi-line comment is not closed.
+     * @throws JsonEndOfStreamException if there is no next character
+     * @throws JsonStreamParseException if the input does not begin with a valid
+     *             comment, or if a multi-line comment is not closed.
      */
     private JsComment readComment() throws IOException, JsonEndOfStreamException {
         int line = getLineNum();
@@ -662,7 +730,7 @@ public class JsonStreamReader {
         JsonConstant next = next(STRING);
         String functionName = null;
         if (next == STRING) {
-            functionName = (String)current;
+            functionName = (String) current;
             next = next();
         }
         assertTokenType(FUNCTION_ARGS_START, next);
@@ -678,7 +746,7 @@ public class JsonStreamReader {
 
             // Literal Strings only
             assertTokenType(STRING, token);
-            args.add((String)current);
+            args.add((String) current);
 
             // comma
             token = next();
@@ -691,11 +759,12 @@ public class JsonStreamReader {
 
         assertTokenType(JsonConstant.FUNCTION_BODY, next(FUNCTION_BODY));
 
-        return new JsFunction(functionName, args, (String)current, line, col);
+        return new JsFunction(functionName, args, (String) current, line, col);
     }
 
     private String readFunctionBody() throws IOException, JsonEndOfStreamException {
-        // We have to have a bit of a stack in order to find the end of function body properly.
+        // We have to have a bit of a stack in order to find the end of function
+        // body properly.
         ArrayDeque<JsonConstant> stack = new ArrayDeque<JsonConstant>();
         StringBuilder sb = new StringBuilder();
         char c;
@@ -763,21 +832,23 @@ public class JsonStreamReader {
                 return Double.NaN;
             } else {
                 boolean negative = s.charAt(0) == '-';
-                if ("Infinity".equals(negative ? s.substring(1) : s)) { return negative ? Double.NEGATIVE_INFINITY
-                        : Double.POSITIVE_INFINITY; }
+                if ("Infinity".equals(negative ? s.substring(1) : s)) {
+                    return negative ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
+                }
             }
             ret = new BigDecimal(sb.toString());
 
         } catch (NumberFormatException e) {
-            throw new JsonStreamParseException("Attempted to convert \"" + sb.toString() + "\" to BigDecimal\r\n" + e.toString());
+            throw new JsonStreamParseException("Attempted to convert \"" + sb.toString() + "\" to BigDecimal\r\n"
+                    + e.toString());
         }
         return ret;
     }
 
     /**
-     * Literal Strings can only be used as keys in maps, so the entry separator and whitespace chars are treated as the
-     * delimiters.
-     *
+     * Literal Strings can only be used as keys in maps, so the entry separator
+     * and whitespace chars are treated as the delimiters.
+     * 
      * @return
      * @throws IOException
      */
@@ -800,16 +871,22 @@ public class JsonStreamReader {
     private char readChar() throws IOException, JsonEndOfStreamException {
         int i = reader.read();
 
-        if (i == -1) { throw new JsonEndOfStreamException("End of stream unexpectedly reached."); }
+        if (i == -1) {
+            throw new JsonEndOfStreamException("End of stream unexpectedly reached.");
+        }
 
         charNum++;
 
-        // If we have a binary input stream and if length limits were disabled, then don't validate the length because
-        // we are streaming in, and memory use is supposed to be O(1) with respect to the stream length by callers
+        // If we have a binary input stream and if length limits were disabled,
+        // then don't validate the length because
+        // we are streaming in, and memory use is supposed to be O(1) with
+        // respect to the stream length by callers
         // that are using streaming
-        if (charNum > MAX_LENGTH && lengthLimitsEnabled) { throw new JsonStreamParseException("Input too long."); }
+        if (charNum > MAX_LENGTH && lengthLimitsEnabled) {
+            throw new JsonStreamParseException("Input too long.");
+        }
 
-        char c = (char)i;
+        char c = (char) i;
 
         if (c == '\n') {
             prevColNum = colNum;
@@ -858,7 +935,7 @@ public class JsonStreamReader {
         }
         char c;
         try {
-            c = (char)Integer.parseInt(sb.toString(), 16);
+            c = (char) Integer.parseInt(sb.toString(), 16);
         } catch (NumberFormatException e) {
             throw new JsonStreamParseException(e);
         }
@@ -875,8 +952,9 @@ public class JsonStreamReader {
         }
         try {
             char c = readChar();
-            if (Character.isLetterOrDigit(c)) { throw new JsonStreamParseException(String.format(
-                    "Unexpected char %s found", c)); }
+            if (Character.isLetterOrDigit(c)) {
+                throw new JsonStreamParseException(String.format("Unexpected char %s found", c));
+            }
             unreadChar(c);
         } catch (JsonEndOfStreamException e) {
             // ignore
@@ -884,18 +962,21 @@ public class JsonStreamReader {
     }
 
     private void assertChar(char expected, char actual) {
-        if (expected != actual) { throw new JsonStreamParseException(String.format("Expected %s, found %s", expected,
-                actual)); }
+        if (expected != actual) {
+            throw new JsonStreamParseException(String.format("Expected %s, found %s", expected, actual));
+        }
     }
 
     private void assertTokenType(JsonConstant expected, JsonConstant actual) {
-        if (expected != actual) { throw new JsonStreamParseException(String.format("Expected %s, found %s", expected,
-                actual)); }
+        if (expected != actual) {
+            throw new JsonStreamParseException(String.format("Expected %s, found %s", expected, actual));
+        }
     }
 
     private void assertCurrentToken(JsonConstant expected) {
-        if (currentToken != expected) { throw new JsonStreamParseException(String.format("Current Token is %s, not %s",
-                currentToken, expected)); }
+        if (currentToken != expected) {
+            throw new JsonStreamParseException(String.format("Current Token is %s, not %s", currentToken, expected));
+        }
     }
 
     private int getLineNum() {
@@ -907,8 +988,9 @@ public class JsonStreamReader {
     }
 
     /**
-     * Runtime exception used to indicate improperly formatted json input. All messages will be decorated with the line
-     * and column numbers of the current position in the reader.
+     * Runtime exception used to indicate improperly formatted json input. All
+     * messages will be decorated with the line and column numbers of the
+     * current position in the reader.
      */
     public class JsonStreamParseException extends JsonParseException {
 
@@ -933,8 +1015,9 @@ public class JsonStreamReader {
     }
 
     /**
-     * Runtime exception used to indicate improperly formatted json input. All messages will be decorated with the line
-     * and column numbers of the current position in the reader.
+     * Runtime exception used to indicate improperly formatted json input. All
+     * messages will be decorated with the line and column numbers of the
+     * current position in the reader.
      */
     public static class JsonParseException extends RuntimeException {
 

@@ -25,7 +25,7 @@ import org.auraframework.impl.adapter.format.BaseFormatAdapter;
 /**
  */
 @ThreadSafe
-public abstract class HTMLFormatAdapter<T> extends BaseFormatAdapter<T>{
+public abstract class HTMLFormatAdapter<T> extends BaseFormatAdapter<T> {
 
     protected static final String name = "HTML";
 
@@ -39,7 +39,7 @@ public abstract class HTMLFormatAdapter<T> extends BaseFormatAdapter<T>{
     }
 
     protected void writeHtmlStyles(List<String> styles, Appendable out) throws IOException {
-        if(styles != null){
+        if (styles != null) {
             for (String style : styles) {
                 out.append(String.format(HTML_STYLE, style));
             }
@@ -47,7 +47,7 @@ public abstract class HTMLFormatAdapter<T> extends BaseFormatAdapter<T>{
     }
 
     protected void writeHtmlScripts(List<String> scripts, Appendable out) throws IOException {
-        if(scripts != null){
+        if (scripts != null) {
             for (String script : scripts) {
                 out.append(String.format(HTML_SCRIPT, script));
             }
@@ -55,7 +55,7 @@ public abstract class HTMLFormatAdapter<T> extends BaseFormatAdapter<T>{
     }
 
     protected void writeLazyHtmlScripts(List<String> scripts, Appendable out) throws IOException {
-        if(scripts != null){
+        if (scripts != null) {
             for (String script : scripts) {
                 out.append(String.format(HTML_LAZY_SCRIPT, script));
             }

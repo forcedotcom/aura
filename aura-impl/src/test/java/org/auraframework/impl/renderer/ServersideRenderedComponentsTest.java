@@ -19,23 +19,26 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.BaseComponent;
+import org.junit.Ignore;
 
 /**
- * This class has unit tests to verify rendering of components server side. Components/applications can be renderer
- * server side or client side. A detection logic checks if a component can be rendered serverside. This detection logic
- * can be forces by including a "render = 'server'" attribute on the top level component tag. By default the detection
- * logic is auto on.
+ * This class has unit tests to verify rendering of components server side.
+ * Components/applications can be renderer server side or client side. A
+ * detection logic checks if a component can be rendered serverside. This
+ * detection logic can be forces by including a "render = 'server'" attribute on
+ * the top level component tag. By default the detection logic is auto on.
  * <ul>
  * <li>This 'render' specification overrides the detection logic.
- * <li>If render = 'server', the aura servlet assumes the component can be rendered serverside and tries to render it.</li>
- * <li>If render = 'client', the aura servlet assumes the component should be rendered clientside.</li>
+ * <li>If render = 'server', the aura servlet assumes the component can be
+ * rendered serverside and tries to render it.</li>
+ * <li>If render = 'client', the aura servlet assumes the component should be
+ * rendered clientside.</li>
  * </ul>
  */
 public class ServersideRenderedComponentsTest extends AuraImplTestCase {
@@ -43,15 +46,15 @@ public class ServersideRenderedComponentsTest extends AuraImplTestCase {
         super(name);
     }
 
-    private String ATTR_COMPONENT_ARRAY = "<aura:attribute name='componentArray' type='Aura.Component[]'><div>am a div</div>just text<span>am a span</span></aura:attribute>";
-    private String ATTR_STRING_ARRAY = "<aura:attribute name='stringArray' type='String[]' default='first,second,third'/>";
-    private String ATTR_STRING_ARRAY_WITHOUTDEFAULT = "<aura:attribute name='isNotSet' type='String[]'/>";
+    private final String ATTR_COMPONENT_ARRAY = "<aura:attribute name='componentArray' type='Aura.Component[]'><div>am a div</div>just text<span>am a span</span></aura:attribute>";
+    private final String ATTR_STRING_ARRAY = "<aura:attribute name='stringArray' type='String[]' default='first,second,third'/>";
+    private final String ATTR_STRING_ARRAY_WITHOUTDEFAULT = "<aura:attribute name='isNotSet' type='String[]'/>";
 
     private String getRenderedHTML(String markup, Class<? extends BaseComponentDef> defType,
             Map<String, Object> attributes) throws Exception {
         DefDescriptor<? extends BaseComponentDef> testCmpDef = addSourceAutoCleanup(defType, markup);
         assertTrue(testCmpDef.getDef().isLocallyRenderable());
-        BaseComponent<?, ?> instance = (BaseComponent<?, ?>)Aura.getInstanceService().getInstance(testCmpDef,
+        BaseComponent<?, ?> instance = (BaseComponent<?, ?>) Aura.getInstanceService().getInstance(testCmpDef,
                 attributes);
         StringWriter sw = new StringWriter();
         Aura.getRenderingService().render(instance, sw);

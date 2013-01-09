@@ -27,7 +27,7 @@ import com.google.common.collect.Sets;
 
 /**
  */
-public abstract class DefFactoryImpl<D extends Definition>  implements DefFactory<D>{
+public abstract class DefFactoryImpl<D extends Definition> implements DefFactory<D> {
 
     private static final Set<String> defaultNamespaces = Sets.newHashSet("*");
 

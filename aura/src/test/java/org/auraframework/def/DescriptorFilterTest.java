@@ -17,10 +17,7 @@ package org.auraframework.def;
 
 import java.io.IOException;
 
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-
 import org.auraframework.test.UnitTestCase;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -38,7 +35,7 @@ public class DescriptorFilterTest extends UnitTestCase {
         } else {
             match = "Matched ";
         }
-        return dm.toString()+": "+match+" "+what+": "+value;
+        return dm.toString() + ": " + match + " " + what + ": " + value;
     }
 
     private void checkPrefix(DescriptorFilter dm, String prefix, boolean value) {
@@ -85,7 +82,7 @@ public class DescriptorFilterTest extends UnitTestCase {
 
     public void testPrefixOnly() throws Exception {
         DescriptorFilter dm;
-       
+
         dm = new DescriptorFilter("notfound://");
         checkPrefix(dm, "hi", false);
         checkPrefix(dm, "css", false);
@@ -100,7 +97,7 @@ public class DescriptorFilterTest extends UnitTestCase {
 
     public void testPrefixPlusNamespace() throws Exception {
         DescriptorFilter dm;
-       
+
         dm = new DescriptorFilter("notfound://hi");
         checkPrefix(dm, "hi", false);
         checkPrefix(dm, "css", false);
@@ -115,7 +112,7 @@ public class DescriptorFilterTest extends UnitTestCase {
 
     public void testNamespaceOnly() throws Exception {
         DescriptorFilter dm;
-       
+
         dm = new DescriptorFilter("hi");
         checkPrefix(dm, "hi", true);
         checkPrefix(dm, "css", true);
@@ -130,7 +127,7 @@ public class DescriptorFilterTest extends UnitTestCase {
 
     public void testNamespaceAndName() throws Exception {
         DescriptorFilter dm;
-       
+
         dm = new DescriptorFilter("hi:ho");
         checkPrefix(dm, "hi", true);
         checkPrefix(dm, "css", true);
@@ -146,7 +143,7 @@ public class DescriptorFilterTest extends UnitTestCase {
 
     public void testFullWildcardMatcher() throws Exception {
         DescriptorFilter dm;
-       
+
         dm = new DescriptorFilter("*://*:*");
         checkPrefix(dm, "hi", true);
         checkPrefix(dm, "css", true);
@@ -161,7 +158,7 @@ public class DescriptorFilterTest extends UnitTestCase {
 
     public void testNoprefixWildcardMatcher() throws Exception {
         DescriptorFilter dm;
-       
+
         dm = new DescriptorFilter("notfound://*:*");
         checkPrefix(dm, "hi", false);
         checkPrefix(dm, "css", false);
@@ -176,7 +173,7 @@ public class DescriptorFilterTest extends UnitTestCase {
 
     public void testNonamespaceWildcardMatcher() throws Exception {
         DescriptorFilter dm;
-       
+
         dm = new DescriptorFilter("*://notfound:*");
         checkPrefix(dm, "hi", true);
         checkPrefix(dm, "css", true);
@@ -191,7 +188,7 @@ public class DescriptorFilterTest extends UnitTestCase {
 
     public void testNonameWildcardMatcher() throws Exception {
         DescriptorFilter dm;
-       
+
         dm = new DescriptorFilter("*://*:notfound");
         checkPrefix(dm, "hi", true);
         checkPrefix(dm, "css", true);
@@ -206,7 +203,7 @@ public class DescriptorFilterTest extends UnitTestCase {
 
     public void testExactMatcher() throws Exception {
         DescriptorFilter dm;
-       
+
         dm = new DescriptorFilter("exactprefix://exactnamespace:exactname");
 
         checkPrefix(dm, "exactprefix1", false);
@@ -233,7 +230,7 @@ public class DescriptorFilterTest extends UnitTestCase {
 
     public void testAlmostMatcher() throws Exception {
         DescriptorFilter dm;
-       
+
         dm = new DescriptorFilter("almostprefix*://almostnamespace*:almostname*");
 
         checkPrefix(dm, "almostprefix1", true);
@@ -251,7 +248,7 @@ public class DescriptorFilterTest extends UnitTestCase {
         checkName(dm, "almostname1", true);
         checkName(dm, "1almostname", false);
         checkName(dm, "almostprefix", false);
-        checkName(dm, "almostnamespace", true);          // note that this is true....
+        checkName(dm, "almostnamespace", true); // note that this is true....
         checkName(dm, "almostname", true);
         for (DefType type : DefType.values()) {
             checkType(dm, type, true);
@@ -342,7 +339,7 @@ public class DescriptorFilterTest extends UnitTestCase {
 
         @Override
         public String toString() {
-            return this.prefix+"://"+this.namespace+":"+this.name+"("+this.defType.toString()+")";
+            return this.prefix + "://" + this.namespace + ":" + this.name + "(" + this.defType.toString() + ")";
         }
     }
 

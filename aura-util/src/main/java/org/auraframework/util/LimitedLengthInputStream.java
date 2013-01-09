@@ -23,11 +23,13 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * InputStream that limits the length of the stream to a construction-specified value. Note that calls to close() on this InputStream
- * do not close the wrapped InputStream.<br>
+ * InputStream that limits the length of the stream to a construction-specified
+ * value. Note that calls to close() on this InputStream do not close the
+ * wrapped InputStream.<br>
  * <br>
- * The main use case for this class is creating a child InputStream on a main InputStream that can then be passed to an InputStream
- * reader that fully consumes it.
+ * The main use case for this class is creating a child InputStream on a main
+ * InputStream that can then be passed to an InputStream reader that fully
+ * consumes it.
  */
 @NotThreadSafe
 public class LimitedLengthInputStream extends InputStream {
@@ -39,25 +41,29 @@ public class LimitedLengthInputStream extends InputStream {
     private StreamFinishedListener listener;
 
     /**
-     * Listener that gets called once the stream has been consumed. This gets called only once
+     * Listener that gets called once the stream has been consumed. This gets
+     * called only once
      */
     public static interface StreamFinishedListener {
 
         /**
-         * Notifies listeners that the LimitedLengthInputStream has been fully consumed
-         *
-         * @param wrappedStream
-         *            The underlying stream that the LimitedLengthInputStream was constructed with
+         * Notifies listeners that the LimitedLengthInputStream has been fully
+         * consumed
+         * 
+         * @param wrappedStream The underlying stream that the
+         *            LimitedLengthInputStream was constructed with
          */
         public void streamFinished(InputStream wrappedStream) throws IOException;
     }
 
     /**
-     * Wraps the given InputStream with a LimitedLengthInputStream instance that restricts the number of read bytes to
-     * the given length. An optional StreamFinishedListener can be passed in to get notified when the stream has been
-     * consumed
+     * Wraps the given InputStream with a LimitedLengthInputStream instance that
+     * restricts the number of read bytes to the given length. An optional
+     * StreamFinishedListener can be passed in to get notified when the stream
+     * has been consumed
      */
-    public LimitedLengthInputStream(@Nonnull InputStream in, long length, @Nullable StreamFinishedListener listener) throws IOException {
+    public LimitedLengthInputStream(@Nonnull InputStream in, long length, @Nullable StreamFinishedListener listener)
+            throws IOException {
         if (in == null || length < 0) {
             throw new IllegalArgumentException("in must not be null, and length must be >= 0");
         }
@@ -166,10 +172,13 @@ public class LimitedLengthInputStream extends InputStream {
     @Override
     public void close() throws IOException {
 
-        // Don't close the underlying stream, but we'll instead skip ahead to the end
+        // Don't close the underlying stream, but we'll instead skip ahead to
+        // the end
         if (pos < length) {
             final long remaining = length - pos;
-            in.skip(remaining);  // if we reach EOF before getting to remaining, then that's okay, since we're still at the end
+            in.skip(remaining); // if we reach EOF before getting to remaining,
+                                // then that's okay, since we're still at the
+                                // end
             pos += remaining;
             endOfStreamReached();
         }
@@ -191,7 +200,8 @@ public class LimitedLengthInputStream extends InputStream {
     }
 
     /**
-     * Returns the total number of bytes that this LimitedLengthInputStream is limited to
+     * Returns the total number of bytes that this LimitedLengthInputStream is
+     * limited to
      */
     public long getLength() {
         return length;

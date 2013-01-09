@@ -19,14 +19,26 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import org.auraframework.adapter.*;
+import org.auraframework.adapter.AuraAdapter;
+import org.auraframework.adapter.ComponentLocationAdapter;
+import org.auraframework.adapter.ContextAdapter;
+import org.auraframework.adapter.ExpressionAdapter;
+import org.auraframework.adapter.FormatAdapter;
+import org.auraframework.adapter.GlobalValueProviderAdapter;
+import org.auraframework.adapter.JsonSerializerAdapter;
+import org.auraframework.adapter.LocalizationAdapter;
+import org.auraframework.adapter.LoggingAdapter;
+import org.auraframework.adapter.PrefixDefaultsAdapter;
+import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.ServiceLocator;
 
-import com.google.common.cache.*;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 
 /**
@@ -35,11 +47,12 @@ public class AuraImpl {
 
     private static final Map<IndexKey, FormatAdapter<?>> formatAdapters;
 
-    private static final LoadingCache<IndexKey, FormatAdapter<?>> formatAdapterCache = CacheBuilder.newBuilder().build(new Loader());
+    private static final LoadingCache<IndexKey, FormatAdapter<?>> formatAdapterCache = CacheBuilder.newBuilder().build(
+            new Loader());
 
-    static{
+    static {
         formatAdapters = Maps.newHashMap();
-        for(FormatAdapter<?> adapter : getFormatAdapters()){
+        for (FormatAdapter<?> adapter : getFormatAdapters()) {
             formatAdapters.put(new IndexKey(adapter.getFormatName(), adapter.getType()), adapter);
         }
     }
@@ -62,9 +75,9 @@ public class AuraImpl {
         FormatAdapter<T> ret = null;
 
         try {
-            ret = (FormatAdapter<T>)formatAdapterCache.get(new IndexKey(format, type));
+            ret = (FormatAdapter<T>) formatAdapterCache.get(new IndexKey(format, type));
         } catch (ExecutionException ee) {
-            //FIXME: EXCEPTIONINFO
+            // FIXME: EXCEPTIONINFO
             throw new AuraRuntimeException(ee);
         }
 
@@ -126,7 +139,7 @@ public class AuraImpl {
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof IndexKey) {
-                IndexKey k = (IndexKey)obj;
+                IndexKey k = (IndexKey) obj;
                 return k.format.equals(format) && k.type == this.type;
             }
             return false;
@@ -147,7 +160,8 @@ public class AuraImpl {
             Class<?> cur = key.type;
 
             while (ret == null && cur != null && cur != Object.class) {
-                // walk up the class hierarchy until you find an appropriate adapter or you run out of superclasses
+                // walk up the class hierarchy until you find an appropriate
+                // adapter or you run out of superclasses
                 cur = cur.getSuperclass();
                 ret = formatAdapters.get(new IndexKey(key.format, cur));
             }

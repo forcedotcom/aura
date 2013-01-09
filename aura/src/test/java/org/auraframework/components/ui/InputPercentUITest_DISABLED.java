@@ -24,22 +24,24 @@ public class InputPercentUITest_DISABLED extends WebDriverTestCase {
     }
 
     // This tests behaviour exhibited by HTML5 input type="number".
-    // We are currently rendering ui:inputPercent using type="text" to get around
-    // browser implementation bugs.  If these bugs are resolved, we should
+    // We are currently rendering ui:inputPercent using type="text" to get
+    // around
+    // browser implementation bugs. If these bugs are resolved, we should
     // switch back to using type="number" and re-enable this test.
 
-//  public void testPercentSymbol() throws Exception{
-//      String source = "<aura:component>" +
-//              "<ui:inputPercent/>" +
-//              "</aura:component>";
-//      addSource("inputtextuipercentsymboltest", source, ComponentDef.class);
-//      open("/string/inputtextuipercentsymboltest.cmp");
-//
-//      WebDriver d = getDriver();
-//        WebElement input = d.findElement(By.tagName("input"));
-//        input.sendKeys("12.3%");
-//        AuraUITestingUtil.pressTab(input);
-//        input = d.findElement(By.tagName("input"));
-//        assertEquals("Percent symbol was not trimed", "12.3", input.getAttribute("value"));
-//    }
+    // public void testPercentSymbol() throws Exception{
+    // String source = "<aura:component>" +
+    // "<ui:inputPercent/>" +
+    // "</aura:component>";
+    // addSource("inputtextuipercentsymboltest", source, ComponentDef.class);
+    // open("/string/inputtextuipercentsymboltest.cmp");
+    //
+    // WebDriver d = getDriver();
+    // WebElement input = d.findElement(By.tagName("input"));
+    // input.sendKeys("12.3%");
+    // AuraUITestingUtil.pressTab(input);
+    // input = d.findElement(By.tagName("input"));
+    // assertEquals("Percent symbol was not trimed", "12.3",
+    // input.getAttribute("value"));
+    // }
 }

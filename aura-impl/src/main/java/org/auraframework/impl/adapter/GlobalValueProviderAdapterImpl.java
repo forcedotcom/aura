@@ -15,7 +15,10 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import org.auraframework.adapter.GlobalValueProviderAdapter;
 import org.auraframework.instance.GlobalValueProvider;

@@ -29,27 +29,29 @@ import org.auraframework.util.AuraTextUtil;
 
 /**
  * Automation to verify the functioning of AuraResourceServlet.
- * AuraResourceServlet is used to preload definitions of components in a given namespace.
- * It is also used to load CSS
- *
- *
- *
+ * AuraResourceServlet is used to preload definitions of components in a given
+ * namespace. It is also used to load CSS
+ * 
+ * 
+ * 
  * @since 0.0.128
  */
 public class AuraResourceServletHttpTest extends AuraHttpTestCase {
-    public AuraResourceServletHttpTest(String name){
+    public AuraResourceServletHttpTest(String name) {
         super(name);
     }
+
     /**
-     * Verify that special characters in CSS file are serialized down to the client.
-     * To make sure they are not replaced with a '?'
-     * Automation for W-1071128
+     * Verify that special characters in CSS file are serialized down to the
+     * client. To make sure they are not replaced with a '?' Automation for
+     * W-1071128
+     * 
      * @throws Exception
      */
     @UnAdaptableTest
-    public void testSpecialCharactersInCSSAreSerialized()throws Exception{
+    public void testSpecialCharactersInCSSAreSerialized() throws Exception {
         String modeAndContext = "{'mode':'DEV','preloads':['preloadTest']}";
-        String url = "/l/"+AuraTextUtil.urlencode(modeAndContext) +"/app.css";
+        String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.css";
         GetMethod get = obtainGetMethod(url);
         int statusCode = getHttpClient().executeMethod(get);
         assertEquals(HttpStatus.SC_OK, statusCode);
@@ -57,21 +59,25 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         char expected = '•';
         String token = "content: '";
         int start = response.indexOf(token) + token.length();
-        
-        // Google closure-stylesheets now encodes unicode characters with the CSS unicode syntax '\FFFFFF'
-        // as a result, this character is now converted to '\2022' so to verify it's present, convert it to a char and compare
-        char actual = (char)Integer.parseInt(response.substring(start + 1, response.indexOf('\'', start)), 16);
+
+        // Google closure-stylesheets now encodes unicode characters with the
+        // CSS unicode syntax '\FFFFFF'
+        // as a result, this character is now converted to '\2022' so to verify
+        // it's present, convert it to a char and compare
+        char actual = (char) Integer.parseInt(response.substring(start + 1, response.indexOf('\'', start)), 16);
         assertEquals(String.format("Failed to see the special character in the CSS file (%s)", url), expected, actual);
     }
+
     /**
-     * Verify that special characters in component mark up are serialized as part of component definition.
-     * Automation for W-1071128
+     * Verify that special characters in component mark up are serialized as
+     * part of component definition. Automation for W-1071128
+     * 
      * @throws Exception
      */
     @UnAdaptableTest
-    public void testSpecialCharactersInMarkupAreSerialized() throws Exception{
+    public void testSpecialCharactersInMarkupAreSerialized() throws Exception {
         String modeAndContext = "{'mode':'DEV','preloads':['preloadTest']}";
-        String url = "/l/"+AuraTextUtil.urlencode(modeAndContext) +"/app.js";
+        String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.js";
         GetMethod get = obtainGetMethod(url);
         int statusCode = getHttpClient().executeMethod(get);
         assertEquals(HttpStatus.SC_OK, statusCode);
@@ -79,49 +85,55 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         String expected = Arrays.toString("공유".getBytes());
         String token = "Test whether the special character shows up: ";
         int start = response.indexOf(token) + token.length();
-        String actual = Arrays.toString(response.substring(start, response.indexOf(" ",start)).getBytes());
-        assertEquals(String.format("Failed to see the special character in the Component definition (%s)", url), expected, actual);
+        String actual = Arrays.toString(response.substring(start, response.indexOf(" ", start)).getBytes());
+        assertEquals(String.format("Failed to see the special character in the Component definition (%s)", url),
+                expected, actual);
     }
 
     /**
-     * GET with If-Modified-Since header from an hour ago, will return the expected resource.
+     * GET with If-Modified-Since header from an hour ago, will return the
+     * expected resource.
      */
     @TestLabels("auraSanity")
     public void testGetWithIfModifiedSinceOld() throws Exception {
         String requestContext = "{'mode':'DEV'}";
-        String url = "/l/"+AuraTextUtil.urlencode(requestContext) +"/app.js";
+        String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/app.js";
         GetMethod get = obtainGetMethod(url);
         Calendar stamp = Calendar.getInstance();
         stamp.add(Calendar.HOUR, -1);
-        get.setRequestHeader(HttpHeaders.IF_MODIFIED_SINCE, new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime()));
+        get.setRequestHeader(HttpHeaders.IF_MODIFIED_SINCE,
+                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime()));
         int statusCode = getHttpClient().executeMethod(get);
         assertEquals(HttpStatus.SC_OK, statusCode);
         assertNotNull(get.getResponseBodyAsString());
     }
 
     /**
-     * GET with If-Modified-Since header 45 days from now, will return 304 with empty body.
+     * GET with If-Modified-Since header 45 days from now, will return 304 with
+     * empty body.
      */
     @TestLabels("auraSanity")
     public void testGetWithIfModifiedSinceNew() throws Exception {
         String requestContext = "{'mode':'DEV'}";
-        String url = "/l/"+AuraTextUtil.urlencode(requestContext) +"/app.js";
+        String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/app.js";
         GetMethod get = obtainGetMethod(url);
         Calendar stamp = Calendar.getInstance();
         stamp.add(Calendar.DAY_OF_YEAR, 45);
-        get.setRequestHeader(HttpHeaders.IF_MODIFIED_SINCE, new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime()));
+        get.setRequestHeader(HttpHeaders.IF_MODIFIED_SINCE,
+                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime()));
         int statusCode = getHttpClient().executeMethod(get);
         assertEquals(HttpStatus.SC_NOT_MODIFIED, statusCode);
         assertNull(get.getResponseBodyAsString());
     }
 
     /**
-     * GET without If-Modified-Since header from an hour ago, will return the expected resource.
+     * GET without If-Modified-Since header from an hour ago, will return the
+     * expected resource.
      */
     @TestLabels("auraSanity")
     public void testGetWithoutIfModifiedSince() throws Exception {
         String requestContext = "{'mode':'DEV'}";
-        String url = "/l/"+AuraTextUtil.urlencode(requestContext) +"/app.js";
+        String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/app.js";
         GetMethod get = obtainGetMethod(url);
         get.removeRequestHeader(HttpHeaders.IF_MODIFIED_SINCE);
         int statusCode = getHttpClient().executeMethod(get);

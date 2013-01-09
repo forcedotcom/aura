@@ -17,9 +17,10 @@ package org.auraframework.impl.adapter.format.json;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.*;
-
-import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
@@ -29,9 +30,11 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 
+import com.google.common.collect.Lists;
+
 /**
  */
-public class ActionJSONFormatAdapter extends JSONFormatAdapter<Action>{
+public class ActionJSONFormatAdapter extends JSONFormatAdapter<Action> {
 
     @Override
     public Class<Action> getType() {
@@ -40,17 +43,19 @@ public class ActionJSONFormatAdapter extends JSONFormatAdapter<Action>{
 
     @Override
     public Collection<Action> readCollection(Reader in) throws IOException, QuickFixException {
-        Map<?, ?> message = (Map<?, ?>)new JsonReader().read(in);
-        List<?> actions = (List<?>)message.get("actions");
+        Map<?, ?> message = (Map<?, ?>) new JsonReader().read(in);
+        List<?> actions = (List<?>) message.get("actions");
         List<Action> ret = Lists.newArrayList();
-        for(Object action : actions){
-            Map<?, ?> map = (Map<?, ?>)action;
+        for (Object action : actions) {
+            Map<?, ?> map = (Map<?, ?>) action;
 
             // FIXME: ints are getting translated into BigDecimals here.
-            @SuppressWarnings("unchecked") Map<String, Object> params = (Map<String, Object>) map.get("params");
+            @SuppressWarnings("unchecked")
+            Map<String, Object> params = (Map<String, Object>) map.get("params");
 
-            Action instance = (Action)Aura.getInstanceService().getInstance((String)map.get("descriptor"), ActionDef.class, params);
-            instance.setId((String)map.get("id"));
+            Action instance = (Action) Aura.getInstanceService().getInstance((String) map.get("descriptor"),
+                    ActionDef.class, params);
+            instance.setId((String) map.get("id"));
 
             ret.add(instance);
         }
@@ -59,9 +64,10 @@ public class ActionJSONFormatAdapter extends JSONFormatAdapter<Action>{
 
     @Override
     public Action read(Reader in) throws IOException, QuickFixException {
-        Map<?, ?> map = (Map<?, ?>)new JsonReader().read(in);
-        @SuppressWarnings("unchecked") Map<String, Object> params = (Map<String, Object>) map.get("params");
-        return (Action)Aura.getInstanceService().getInstance((String)map.get("descriptor"), ActionDef.class, params);
+        Map<?, ?> map = (Map<?, ?>) new JsonReader().read(in);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> params = (Map<String, Object>) map.get("params");
+        return (Action) Aura.getInstanceService().getInstance((String) map.get("descriptor"), ActionDef.class, params);
     }
 
     @Override

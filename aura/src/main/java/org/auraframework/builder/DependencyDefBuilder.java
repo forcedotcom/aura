@@ -24,6 +24,8 @@ import org.auraframework.def.RootDefinition;
  */
 public interface DependencyDefBuilder extends DefBuilder<DependencyDef, DependencyDef> {
     DependencyDefBuilder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor);
+
     DependencyDefBuilder setResource(String resource);
+
     DependencyDefBuilder setType(String type);
 }

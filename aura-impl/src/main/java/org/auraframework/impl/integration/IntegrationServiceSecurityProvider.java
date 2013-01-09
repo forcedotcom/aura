@@ -25,4 +25,3 @@ public class IntegrationServiceSecurityProvider implements SecurityProvider {
         return true;
     }
 }
-

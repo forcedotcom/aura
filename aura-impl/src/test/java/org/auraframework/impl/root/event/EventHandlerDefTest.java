@@ -32,7 +32,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         super(name);
     }
 
-    public void testSerialize() throws Exception{
+    public void testSerialize() throws Exception {
         EventHandlerDefImpl eventHandlerDef2 = vendor.makeEventHandlerDefWithNulls(
                 vendor.makeEventDefDescriptor("auratest:testevent"), new PropertyReferenceImpl("c.foo", null),
                 vendor.makeLocation("filename", 5, 5, 0));
@@ -64,8 +64,8 @@ public class EventHandlerDefTest extends AuraImplTestCase {
     }
 
     /**
-     * A aura:handler for a component event with event attribute specified is invalid. Should be name attribute that is
-     * specified.
+     * A aura:handler for a component event with event attribute specified is
+     * invalid. Should be name attribute that is specified.
      */
     public void testHandlerWithEventAttributeForComponentEvent() throws Exception {
         DefDescriptor<ComponentDef> componentDefDescriptor = DefDescriptorImpl.getInstance(
@@ -82,8 +82,8 @@ public class EventHandlerDefTest extends AuraImplTestCase {
     }
 
     /**
-     * A aura:handler for an application event with name attribute specified is invalid. Should be event attribute that
-     * is specified.
+     * A aura:handler for an application event with name attribute specified is
+     * invalid. Should be event attribute that is specified.
      */
     public void testHandlerWithNameAttributeForApplicationEvent() throws Exception {
         DefDescriptor<ComponentDef> componentDefDescriptor = DefDescriptorImpl.getInstance(
@@ -107,7 +107,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
             fail("Expected InvalidReferenceException");
         } catch (InvalidReferenceException e) {
             assertEquals("Incorrect exception message",
-                         "aura:handler has invalid name attribute value: ThisIsNotARegisteredEventName", e.getMessage());
+                    "aura:handler has invalid name attribute value: ThisIsNotARegisteredEventName", e.getMessage());
         }
     }
 
@@ -118,16 +118,15 @@ public class EventHandlerDefTest extends AuraImplTestCase {
             componentDefDescriptor.getDef();
             fail("Expected DefinitionNotFoundException");
         } catch (DefinitionNotFoundException e) {
-            assertEquals("Incorrect exception message",
-                         String.format("No EVENT named markup://ThisIsNotAValidEventName found : %s",
-                                       componentDefDescriptor.getQualifiedName()), 
-                         e.getMessage());
+            assertEquals(
+                    "Incorrect exception message",
+                    String.format("No EVENT named markup://ThisIsNotAValidEventName found : %s",
+                            componentDefDescriptor.getQualifiedName()), e.getMessage());
         }
     }
 
     public void testHandlerWithEmptyNameAttributeForComponentEvent() throws Exception {
-        DefDescriptor<ComponentDef> componentDefDescriptor = addSourceAutoCleanup(
-                ComponentDef.class,
+        DefDescriptor<ComponentDef> componentDefDescriptor = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:handler name='' action='{!c.handleIt}'/></aura:component>");
         try {
             componentDefDescriptor.getDef();
@@ -139,8 +138,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
     }
 
     public void testHandlerWithEmptyEventAttributeForApplicationEvent() throws Exception {
-        DefDescriptor<ComponentDef> componentDefDescriptor = addSourceAutoCleanup(
-                ComponentDef.class,
+        DefDescriptor<ComponentDef> componentDefDescriptor = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:handler event='' action='{!c.handleIt}'/></aura:component>");
         try {
             componentDefDescriptor.getDef();
@@ -151,7 +149,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         }
     }
 
-    public void testGetDescription()throws Exception{
+    public void testGetDescription() throws Exception {
         String cmpMarkup = "<aura:component >%s</aura:component>";
         String markup = String
                 .format(cmpMarkup,

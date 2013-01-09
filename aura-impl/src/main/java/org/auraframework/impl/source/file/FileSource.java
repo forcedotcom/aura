@@ -15,7 +15,14 @@
  */
 package org.auraframework.impl.source.file;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
@@ -35,11 +42,12 @@ public class FileSource<D extends Definition> extends Source<D> {
         this(descriptor, getFilePath(file), file, format);
     }
 
-    protected FileSource(DefDescriptor<D> descriptor, String systemId, File file, Format format){
+    protected FileSource(DefDescriptor<D> descriptor, String systemId, File file, Format format) {
         super(descriptor, systemId, format);
         this.file = file;
 
-        // Ensure that lastModified doesn't change after construction of this Source.
+        // Ensure that lastModified doesn't change after construction of this
+        // Source.
         this.lastModified = file.lastModified();
     }
 
@@ -60,7 +68,7 @@ public class FileSource<D extends Definition> extends Source<D> {
     @Override
     public Writer getWriter() {
         try {
-            if(!file.exists()){
+            if (!file.exists()) {
                 file.getParentFile().mkdirs();
                 file.createNewFile();
             } else if (!file.canWrite()) {
@@ -71,7 +79,7 @@ public class FileSource<D extends Definition> extends Source<D> {
             throw new AuraRuntimeException(e);
         }
     }
-    
+
     /**
      * Provides an absolute {@code file://} URL for this source.
      */
@@ -96,11 +104,11 @@ public class FileSource<D extends Definition> extends Source<D> {
      */
     @Override
     public String getContents() {
-        try{
+        try {
             StringWriter sw = new StringWriter();
             IOUtil.copyStream(getReader(), sw);
             return sw.toString();
-        }catch(IOException e){
+        } catch (IOException e) {
             throw new AuraRuntimeException(e);
         }
     }
@@ -115,9 +123,9 @@ public class FileSource<D extends Definition> extends Source<D> {
 
     @Override
     public boolean addOrUpdate(CharSequence newContents) {
-        try{
+        try {
             return Aura.getSourceControlAdapter().writeIfDifferent(new StringBuilder(newContents), file);
-        }catch(IOException e){
+        } catch (IOException e) {
             throw new AuraRuntimeException(e);
         }
     }

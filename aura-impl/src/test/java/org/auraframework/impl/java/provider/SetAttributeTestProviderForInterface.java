@@ -19,9 +19,10 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Annotations.Provider;
+
 @Provider
 public class SetAttributeTestProviderForInterface {
-    public static DefDescriptor<ComponentDef> provide(){
+    public static DefDescriptor<ComponentDef> provide() {
         return DefDescriptorImpl.getInstance("setAttributesTest:implementation", ComponentDef.class);
     }
 }

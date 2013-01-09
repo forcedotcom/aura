@@ -61,13 +61,14 @@ public class IncludeDirectiveTest extends UnitTestCase {
         try {
             File file = getResourceFile("/testdata/javascript/head.js");
             DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("testDummy", file.getParentFile(),
-                    file.getName(), ImmutableList.<DirectiveType<?>>of(DirectiveTypes.includeType),
+                    file.getName(), ImmutableList.<DirectiveType<?>> of(DirectiveTypes.includeType),
                     EnumSet.of(JavascriptGeneratorMode.TESTING));
             id = new IncludeDirective(4, config[1]);
             id.processDirective(jg);
             fail("should have failed because 'reallyconkyinclude' is an invalid javascript file to include");
         } catch (IOException e) {
-            // Expected the Javascript group to throw an error while adding an invalid file
+            // Expected the Javascript group to throw an error while adding an
+            // invalid file
         }
     }
 
@@ -75,19 +76,25 @@ public class IncludeDirectiveTest extends UnitTestCase {
      * Test cyclic include directives
      */
     /*
-     * Cannot have this test in autobuild. If it fails it will hose the whole autobuild. But a bug has been filed for
-     * this. https://gus.soma.salesforce.com/a0790000000DQ06AAG public void testCyclicInclude() throws Exception{
-     * DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup( "testDummy", new
-     * File(SettingsTestUtil.getTestdataDir()), "javascript/includeDirective/cyclicInclude1.js", false,
-     * ImmutableList.of(DirectiveTypes.includeType), EnumSet.of(JavascriptGeneratorMode.TESTING)); DirectiveParser dp =
-     * new DirectiveParser (jg, jg.getStartFile()); try{ dp.parseFile();
-     * fail("Should not have processed a cyclic INCLUDE directive"); }catch( RuntimeException e){
+     * Cannot have this test in autobuild. If it fails it will hose the whole
+     * autobuild. But a bug has been filed for this.
+     * https://gus.soma.salesforce.com/a0790000000DQ06AAG public void
+     * testCyclicInclude() throws Exception{ DirectiveBasedJavascriptGroup jg =
+     * new DirectiveBasedJavascriptGroup( "testDummy", new
+     * File(SettingsTestUtil.getTestdataDir()),
+     * "javascript/includeDirective/cyclicInclude1.js", false,
+     * ImmutableList.of(DirectiveTypes.includeType),
+     * EnumSet.of(JavascriptGeneratorMode.TESTING)); DirectiveParser dp = new
+     * DirectiveParser (jg, jg.getStartFile()); try{ dp.parseFile();
+     * fail("Should not have processed a cyclic INCLUDE directive"); }catch(
+     * RuntimeException e){
      * assertTrue("The Javascript Processor failed for some unkown reason"
      * ,e.getMessage().startsWith("Cyclic Include directives found")); } }
      */
     /**
-     * https://gus.soma.salesforce.com/a0790000000DQ3AAAW Test common inclusion. What if the same javascript file is
-     * included twice. Ideally each included javascript should be parsed and processed only once.
+     * https://gus.soma.salesforce.com/a0790000000DQ3AAAW Test common inclusion.
+     * What if the same javascript file is included twice. Ideally each included
+     * javascript should be parsed and processed only once.
      */
     public void testCommonInclude() throws Exception {
         getResourceFile("/testdata/javascript/includeDirective/testCommonInclude.js");
@@ -96,7 +103,8 @@ public class IncludeDirectiveTest extends UnitTestCase {
         getResourceFile("/testdata/javascript/includeDirective/testCommonInclude_commonstuff.js");
         DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("testDummy",
                 getResourceFile("/testdata/"), "javascript/includeDirective/testCommonInclude.js",
-                ImmutableList.<DirectiveType<?>>of(DirectiveTypes.includeType), EnumSet.of(JavascriptGeneratorMode.TESTING));
+                ImmutableList.<DirectiveType<?>> of(DirectiveTypes.includeType),
+                EnumSet.of(JavascriptGeneratorMode.TESTING));
         DirectiveParser dp = new DirectiveParser(jg, jg.getStartFile());
         dp.parseFile();
         goldFileText(dp.generate(JavascriptGeneratorMode.TESTING), ".js");
@@ -104,13 +112,14 @@ public class IncludeDirectiveTest extends UnitTestCase {
     }
 
     /**
-     * Include some non-existing file. Really this is handled by DirectivebasedJavascriptGroup. But having this test
-     * here only doubles the number of checks.
+     * Include some non-existing file. Really this is handled by
+     * DirectivebasedJavascriptGroup. But having this test here only doubles the
+     * number of checks.
      */
     public void testIncludeNonExistingFile() throws Exception {
         File file = getResourceFile("/testdata/javascript/includeDirective/testIncludeNonExistingFile.js");
         DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("testDummy", file.getParentFile(),
-                file.getName(), ImmutableList.<DirectiveType<?>>of(DirectiveTypes.includeType),
+                file.getName(), ImmutableList.<DirectiveType<?>> of(DirectiveTypes.includeType),
                 EnumSet.of(JavascriptGeneratorMode.TESTING));
         DirectiveParser dp = new DirectiveParser(jg, jg.getStartFile());
         try {
@@ -131,8 +140,9 @@ public class IncludeDirectiveTest extends UnitTestCase {
         getResourceFile("/testdata/javascript/includeDirective/testIncludeDirective2.js");
         getResourceFile("/testdata/javascript/includeDirective/nestedInclude/testIncludeDirective3.js");
         DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("testDummy",
-                getResourceFile("/testdata/"), "javascript/includeDirective/testIncludeDirective.js", ImmutableList.<DirectiveType<?>>of(
-                        DirectiveTypes.includeType, DirectiveTypes.ifType), EnumSet.of(JavascriptGeneratorMode.TESTING));
+                getResourceFile("/testdata/"), "javascript/includeDirective/testIncludeDirective.js",
+                ImmutableList.<DirectiveType<?>> of(DirectiveTypes.includeType, DirectiveTypes.ifType),
+                EnumSet.of(JavascriptGeneratorMode.TESTING));
         DirectiveParser dp = new DirectiveParser(jg, jg.getStartFile());
         dp.parseFile();
         goldFileText(dp.generate(JavascriptGeneratorMode.TESTING), "_test.js");

@@ -16,12 +16,22 @@
 package org.auraframework.impl.root.component;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.auraframework.builder.ComponentDefRefBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDef.SerializeToType;
+import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -29,18 +39,24 @@ import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.quickfix.*;
+import org.auraframework.throwable.quickfix.AttributeNotFoundException;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.json.*;
+import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Json.Serialization;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
- * An immutable reference to a ComponentDef, containing only instance-specific properties, like the Attributes and body.
- * All other definition-level information about the ComponentDefRef can be found in the corresponding ComponentDef
- * FIXME: W-1328556 This should extend DefinitionImpl<ComponentDefRef> and getComponentDescriptor should be an override
+ * An immutable reference to a ComponentDef, containing only instance-specific
+ * properties, like the Attributes and body. All other definition-level
+ * information about the ComponentDefRef can be found in the corresponding
+ * ComponentDef FIXME: W-1328556 This should extend
+ * DefinitionImpl<ComponentDefRef> and getComponentDescriptor should be an
+ * override
  */
 @Serialization(referenceType = ReferenceType.NONE)
 public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements ComponentDefRef {
@@ -79,13 +95,13 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     }
 
     /**
-     * Recursively adds the ComponentDescriptors of all components in this ComponentDef's children to the provided set.
-     * The set may then be used to analyze freshness of all of those types to see if any of them should be recompiled
-     * from source.
+     * Recursively adds the ComponentDescriptors of all components in this
+     * ComponentDef's children to the provided set. The set may then be used to
+     * analyze freshness of all of those types to see if any of them should be
+     * recompiled from source.
      * 
-     * @param dependencies
-     *            A Set that this method will append RootDescriptors to for every RootDef that this ComponentDefDef
-     *            requires
+     * @param dependencies A Set that this method will append RootDescriptors to
+     *            for every RootDef that this ComponentDefDef requires
      * @throws QuickFixException
      */
     @Override
@@ -103,7 +119,9 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     @Override
     public void validateReferences() throws QuickFixException {
         RootDefinition rootDef = getComponentDef();
-        if (rootDef == null) { throw new DefinitionNotFoundException(getDescriptor()); }
+        if (rootDef == null) {
+            throw new DefinitionNotFoundException(getDescriptor());
+        }
 
         validateAttributesValues();
         // validateMissingAttributes();
@@ -112,14 +130,13 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     }
 
     /**
-     * Validate attributes that were specified in the component instantiation. Does not validate missing attributes.
-     * Example: in the component instantiation of myMS:widget validates the specified attributes foo and bar
-     * <myNS:uberWidget foo="123" bar="blah"/>
+     * Validate attributes that were specified in the component instantiation.
+     * Does not validate missing attributes. Example: in the component
+     * instantiation of myMS:widget validates the specified attributes foo and
+     * bar <myNS:uberWidget foo="123" bar="blah"/>
      * 
-     * @param rootDef
-     *            the element being instantiated
-     * @param specifiedAttributes
-     *            the attributes specified in the comp
+     * @param rootDef the element being instantiated
+     * @param specifiedAttributes the attributes specified in the comp
      */
     private void validateAttributesValues() throws QuickFixException, AttributeNotFoundException {
         RootDefinition rootDef = getComponentDef();
@@ -129,11 +146,12 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
             DefDescriptor<AttributeDef> attributeDefDesc = entry.getKey();
             AttributeDef attributeDef = atts.get(attributeDefDesc);
             if (attributeDef == null) {
-                // didn't find an attribute by that name, check if there's an event
+                // didn't find an attribute by that name, check if there's an
+                // event
                 RegisterEventDef registeredEvent = registeredEvents.get(attributeDefDesc.getName());
                 if (registeredEvent == null) {
-                    throw new AttributeNotFoundException(rootDef.getDescriptor(),
-                        attributeDefDesc.getName(), getLocation());
+                    throw new AttributeNotFoundException(rootDef.getDescriptor(), attributeDefDesc.getName(),
+                            getLocation());
                 }
             } else {
                 // so it was an attribute, make sure to parse it
@@ -147,7 +165,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof ComponentDefRefImpl) {
-            ComponentDefRefImpl other = (ComponentDefRefImpl)obj;
+            ComponentDefRefImpl other = (ComponentDefRefImpl) obj;
 
             // TODO: factor attributeDefs into this? #W-689622
             return descriptor.equals(other.getDescriptor()) && location.equals(other.getLocation());
@@ -303,8 +321,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
         /**
          * Sets the intfDescriptor for this instance.
          * 
-         * @param intfDescriptor
-         *            The intfDescriptor.
+         * @param intfDescriptor The intfDescriptor.
          */
         public ComponentDefRefBuilder setIntfDescriptor(DefDescriptor<InterfaceDef> intfDescriptor) {
             this.intfDescriptor = intfDescriptor;

@@ -19,18 +19,20 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.system.CacheableDefFactory;
+import org.auraframework.def.Definition;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.CacheableDefFactory;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.base.Optional;
-
-import com.google.common.cache.*;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 /**
- * base class for registries, adds some important methods that aren't exposed through the top level interface
+ * base class for registries, adds some important methods that aren't exposed
+ * through the top level interface
  */
 public class CachingDefRegistryImpl<T extends Definition> extends NonCachingDefRegistryImpl<T> {
 
@@ -39,14 +41,11 @@ public class CachingDefRegistryImpl<T extends Definition> extends NonCachingDefR
     protected static final int CACHE_SIZE_MAX = 1024;
 
     protected final Cache<DefDescriptor<T>, Optional<T>> defs = CacheBuilder.newBuilder()
-                                                                            .initialCapacity(CACHE_SIZE_MIN)
-                                                                            .maximumSize(CACHE_SIZE_MAX)
-                                                                            .build();
+            .initialCapacity(CACHE_SIZE_MIN).maximumSize(CACHE_SIZE_MAX).build();
 
     private final CacheableDefFactory<T> cacheableFactory;
-    private final Cache<DefDescriptor<T>, Boolean> existsCache = CacheBuilder.newBuilder()
-                                                                             .maximumSize(CACHE_SIZE_MAX)
-                                                                             .build();
+    private final Cache<DefDescriptor<T>, Boolean> existsCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE_MAX)
+            .build();
 
     public CachingDefRegistryImpl(CacheableDefFactory<T> factory, Set<DefType> defTypes, Set<String> prefixes) {
         super(factory, defTypes, prefixes);
@@ -62,7 +61,7 @@ public class CachingDefRegistryImpl<T extends Definition> extends NonCachingDefR
 
     /**
      * Try to get a definition from the cache, or reload if necessary.
-     *
+     * 
      * @throws QuickFixException if the fetch throws one.
      */
     @Override
@@ -98,19 +97,20 @@ public class CachingDefRegistryImpl<T extends Definition> extends NonCachingDefR
     }
 
     /**
-     * Check if the giving def is stale. Some registries don't support stale checks.
-     * Will only check a def once per request
-     *
-     * TODO: this has to take things that depend on this def into account #W-689590
-     *
+     * Check if the giving def is stale. Some registries don't support stale
+     * checks. Will only check a def once per request
+     * 
+     * TODO: this has to take things that depend on this def into account
+     * #W-689590
+     * 
      * This should really be done elsewhere, and will be soon enough....
-     *
+     * 
      * @return true if this def is stale
      */
     private boolean isStale(T def) {
         AuraContext context = Aura.getContextService().getCurrentContext();
         @SuppressWarnings("unchecked")
-        DefDescriptor<T> descriptor = (DefDescriptor<T>)def.getDescriptor();
+        DefDescriptor<T> descriptor = (DefDescriptor<T>) def.getDescriptor();
         if (!context.hasChecked(descriptor)) {
             boolean stale = getLastMod(descriptor) > def.getLocation().getLastModified();
             context.setStaleCheck(descriptor);

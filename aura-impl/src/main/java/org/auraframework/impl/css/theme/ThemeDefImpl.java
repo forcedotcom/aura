@@ -67,10 +67,12 @@ public class ThemeDefImpl extends DefinitionImpl<ThemeDef> implements ThemeDef {
         boolean preloaded = context.isPreloaded(getDescriptor());
         json.writeMapBegin();
         json.writeMapEntry("descriptor", descriptor);
-        if(!preloaded){
+        if (!preloaded) {
             Client.Type type = context.getClient().getType();
-            //Note that if this starts to depend on anything beside the name of the type,
-            //ThemeDefCSSFormatAdapter needs to know to restructure its cache keys
+            // Note that if this starts to depend on anything beside the name of
+            // the type,
+            // ThemeDefCSSFormatAdapter needs to know to restructure its cache
+            // keys
             String out = getCode(type);
             json.writeMapEntry("code", out);
         }
@@ -78,9 +80,9 @@ public class ThemeDefImpl extends DefinitionImpl<ThemeDef> implements ThemeDef {
         json.writeMapEnd();
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<ThemeDef> implements ThemeDefBuilder{
+    public static class Builder extends DefinitionImpl.BuilderImpl<ThemeDef> implements ThemeDefBuilder {
 
-        public Builder(){
+        public Builder() {
             super(ThemeDef.class);
         }
 
@@ -143,11 +145,11 @@ public class ThemeDefImpl extends DefinitionImpl<ThemeDef> implements ThemeDef {
         }
     }
 
-    private Set<String> validateImageURLs(Set<String> imageURLs){
-        if(imageURLs != null){
+    private Set<String> validateImageURLs(Set<String> imageURLs) {
+        if (imageURLs != null) {
             Set<String> validImageURLs = new HashSet<String>(imageURLs.size());
-            for(String imgURL : imageURLs){
-                if(AuraResourceServlet.isResourceLocallyAvailable(imgURL)){
+            for (String imgURL : imageURLs) {
+                if (AuraResourceServlet.isResourceLocallyAvailable(imgURL)) {
                     validImageURLs.add(imgURL);
                 }
             }

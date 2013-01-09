@@ -18,7 +18,6 @@ package org.auraframework.impl.java.provider;
 import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
-
 import org.auraframework.instance.ComponentConfig;
 import org.auraframework.system.Annotations.Provider;
 
@@ -28,7 +27,7 @@ import org.auraframework.system.Annotations.Provider;
 @Provider
 public class TestComponentConfigProvider implements ComponentConfigProvider {
     @Override
-    public ComponentConfig provide(){
+    public ComponentConfig provide() {
         ComponentConfig config = new ComponentConfig();
 
         config.setDescriptor(DefDescriptorImpl.getInstance("test:test_Preload_Interface_Impl", ComponentDef.class));

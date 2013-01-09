@@ -18,10 +18,11 @@ package org.auraframework.throwable;
 import org.auraframework.system.Location;
 
 /**
- * Aura-related runtime exception from which client code could not be expected to recover. These usually indicate
- * programming bugs, such as logic errors or improper use of an API. One example might be a Aura developer error that
+ * Aura-related runtime exception from which client code could not be expected
+ * to recover. These usually indicate programming bugs, such as logic errors or
+ * improper use of an API. One example might be a Aura developer error that
  * causes a NullPointerException.
- *
+ * 
  * @see AuraException
  * @see AuraError
  */
@@ -57,7 +58,7 @@ public class AuraRuntimeException extends RuntimeException implements AuraExcept
     public AuraRuntimeException(String message, Location location, Throwable cause, String extraMessage) {
         super(message, cause);
         if (cause != null && cause instanceof AuraExceptionInfo) {
-            AuraExceptionInfo info = (AuraExceptionInfo)cause;
+            AuraExceptionInfo info = (AuraExceptionInfo) cause;
 
             if (location == null) {
                 location = info.getLocation();
@@ -92,7 +93,9 @@ public class AuraRuntimeException extends RuntimeException implements AuraExcept
      */
     @Override
     public String getMessage() {
-        if (this.location != null) { return this.location + ": " + super.getMessage(); }
+        if (this.location != null) {
+            return this.location + ": " + super.getMessage();
+        }
         return super.getMessage();
     }
 }

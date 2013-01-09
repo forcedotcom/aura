@@ -19,34 +19,36 @@ import java.io.File;
 import java.util.List;
 
 import junit.framework.Test;
+
 import org.auraframework.util.perfomance.PTestGoogleChart.ChartPoint;
 
 /**
  * This test util is based on JTroup's AbstractCadenceTest framework.
- *
- *
+ * 
+ * 
  * @since 0.0.178
  */
 public class PerformanceTestUtil {
-    Test test ;
+    Test test;
     PTestResultsHandler resultsHandler;
-    public PerformanceTestUtil(Test test, File resultsDir){
+
+    public PerformanceTestUtil(Test test, File resultsDir) {
         this.test = test;
         this.resultsHandler = getResultsHandler(resultsDir);
     }
 
     /**
-     * Get the handler which decides what to do with the test results.
-     * Currently we save the results to a local file.
+     * Get the handler which decides what to do with the test results. Currently
+     * we save the results to a local file.
      */
-    protected PTestResultsHandler getResultsHandler(File resultsDir){
+    protected PTestResultsHandler getResultsHandler(File resultsDir) {
         return new LocalFilePTestResultsHandler(this.test, resultsDir);
     }
 
     /**
      * Write the results to a file.
      */
-    public void handleResults(String testName, List<ChartPoint> dataPoints)throws Exception{
+    public void handleResults(String testName, List<ChartPoint> dataPoints) throws Exception {
         resultsHandler.handleResults(testName, dataPoints);
     }
 }

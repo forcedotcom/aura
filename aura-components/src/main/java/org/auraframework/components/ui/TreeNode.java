@@ -92,7 +92,9 @@ public class TreeNode implements JsonSerializable, Comparable<TreeNode> {
 
     @Override
     public int compareTo(TreeNode o) {
-        if (this.equals(o)) { return 0; }
+        if (this.equals(o)) {
+            return 0;
+        }
         return title.compareTo(o.title);
     }
 

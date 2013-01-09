@@ -15,10 +15,15 @@
  */
 package org.auraframework.impl.system;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.system.Source;
 
 import com.google.common.collect.Maps;
@@ -33,16 +38,17 @@ public class StaticDefRegistryImpl<T extends Definition> extends DefRegistryImpl
     private static final String WILD = "*";
     protected final Map<DefDescriptor<T>, Source<T>> sources;
 
-    public StaticDefRegistryImpl(Set<DefType> defTypes, Set<String> prefixes, Set<String> namespaces, Collection<T> defs){
-        this(defTypes, prefixes, namespaces, Maps.<DefDescriptor<T>, T>newHashMapWithExpectedSize(defs.size()), null);
-        for(T def : defs){
+    public StaticDefRegistryImpl(Set<DefType> defTypes, Set<String> prefixes, Set<String> namespaces, Collection<T> defs) {
+        this(defTypes, prefixes, namespaces, Maps.<DefDescriptor<T>, T> newHashMapWithExpectedSize(defs.size()), null);
+        for (T def : defs) {
             @SuppressWarnings("unchecked")
-            DefDescriptor<T> desc = (DefDescriptor<T>)def.getDescriptor();
+            DefDescriptor<T> desc = (DefDescriptor<T>) def.getDescriptor();
             this.defs.put(desc, def);
         }
     }
 
-    public StaticDefRegistryImpl(Set<DefType> defTypes, Set<String> prefixes, Set<String> namespaces, Map<DefDescriptor<T>, T> defs, Map<DefDescriptor<T>, Source<T>> sources){
+    public StaticDefRegistryImpl(Set<DefType> defTypes, Set<String> prefixes, Set<String> namespaces,
+            Map<DefDescriptor<T>, T> defs, Map<DefDescriptor<T>, Source<T>> sources) {
         super(defTypes, prefixes, namespaces);
         this.defs = defs;
         this.sources = sources;
@@ -64,11 +70,10 @@ public class StaticDefRegistryImpl<T extends Definition> extends DefRegistryImpl
         String prefix = matcher.getPrefix();
         DefType defType = matcher.getDefType();
         Set<DefDescriptor<T>> ret = new HashSet<DefDescriptor<T>>();
-        for(DefDescriptor<T> key : defs.keySet()){
+        for (DefDescriptor<T> key : defs.keySet()) {
 
-            if(defType == key.getDefType()
-                    && key.getPrefix().equalsIgnoreCase(prefix)
-                    && (namespace.equalsIgnoreCase(WILD) || namespace.equalsIgnoreCase(key.getNamespace()))){
+            if (defType == key.getDefType() && key.getPrefix().equalsIgnoreCase(prefix)
+                    && (namespace.equalsIgnoreCase(WILD) || namespace.equalsIgnoreCase(key.getNamespace()))) {
 
                 ret.add(key);
             }
@@ -80,8 +85,8 @@ public class StaticDefRegistryImpl<T extends Definition> extends DefRegistryImpl
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         Set<DefDescriptor<?>> ret = new HashSet<DefDescriptor<?>>();
 
-        for(DefDescriptor<T> key : defs.keySet()){
-            if(matcher.matchDescriptor(key)) {
+        for (DefDescriptor<T> key : defs.keySet()) {
+            if (matcher.matchDescriptor(key)) {
                 ret.add(key);
             }
         }
@@ -100,7 +105,7 @@ public class StaticDefRegistryImpl<T extends Definition> extends DefRegistryImpl
 
     @Override
     public Source<T> getSource(DefDescriptor<T> descriptor) {
-        if(sources != null){
+        if (sources != null) {
             return sources.get(descriptor);
         }
         return null;

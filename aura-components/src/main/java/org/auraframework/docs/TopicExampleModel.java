@@ -18,12 +18,14 @@ package org.auraframework.docs;
 import java.util.List;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -39,11 +41,11 @@ public class TopicExampleModel {
     public TopicExampleModel() throws QuickFixException {
 
         AuraContext context = Aura.getContextService().getCurrentContext();
-        BaseComponent<?,?> component = context.getCurrentComponent();
+        BaseComponent<?, ?> component = context.getCurrentComponent();
 
-        String desc = (String)component.getAttributes().getValue("descriptor");
+        String desc = (String) component.getAttributes().getValue("descriptor");
 
-        DefType defType = DefType.valueOf(((String)component.getAttributes().getValue("defType")).toUpperCase());
+        DefType defType = DefType.valueOf(((String) component.getAttributes().getValue("defType")).toUpperCase());
         DefDescriptor<? extends RootDefinition> descriptor = (DefDescriptor<? extends RootDefinition>) Aura
                 .getDefinitionService().getDefDescriptor(desc, defType.getPrimaryInterface());
 
@@ -52,7 +54,7 @@ public class TopicExampleModel {
         defs.add(new DefModel(descriptor));
 
         if (def instanceof RootDefinition) {
-            List<DefDescriptor<?>> deps = ((RootDefinition)def).getBundle();
+            List<DefDescriptor<?>> deps = ((RootDefinition) def).getBundle();
 
             for (DefDescriptor<?> dep : deps) {
                 defs.add(new DefModel(dep));

@@ -21,8 +21,8 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.def.HtmlTag;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.component.HTMLDefRef;
 import org.auraframework.system.Source;
@@ -36,7 +36,8 @@ public class HTMLComponentDefRefHandler<P extends RootDefinition> extends Compon
 
     protected HTMLDefRef.Builder htmlBuilder = new HTMLDefRef.Builder();
 
-    protected HTMLComponentDefRefHandler(RootTagHandler<P> parentHandler, String tag, XMLStreamReader xmlReader, Source<?> source) {
+    protected HTMLComponentDefRefHandler(RootTagHandler<P> parentHandler, String tag, XMLStreamReader xmlReader,
+            Source<?> source) {
         super(parentHandler, xmlReader, source);
         builder = htmlBuilder;
         builder.setLocation(getLocation());
@@ -54,25 +55,11 @@ public class HTMLComponentDefRefHandler<P extends RootDefinition> extends Compon
     }
 
     @Override
-    protected void setBody(List<ComponentDefRef> body){
+    protected void setBody(List<ComponentDefRef> body) {
         htmlBuilder.setComponentAttribute(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME, body);
     }
 
-
-    public static final Set<String> SPECIAL_BOOLEANS = ImmutableSet.of(
-        "checked",
-        "selected",
-        "disabled",
-        "readonly",
-        "multiple",
-        "ismap",
-        "defer",
-        "declare",
-        "noresize",
-        "nowrap",
-        "noshade",
-        "compact",
-        "autocomplete",
-        "required"
-    );
+    public static final Set<String> SPECIAL_BOOLEANS = ImmutableSet.of("checked", "selected", "disabled", "readonly",
+            "multiple", "ismap", "defer", "declare", "noresize", "nowrap", "noshade", "compact", "autocomplete",
+            "required");
 }

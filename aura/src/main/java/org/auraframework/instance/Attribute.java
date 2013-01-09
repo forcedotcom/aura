@@ -17,7 +17,6 @@ package org.auraframework.instance;
 
 import org.auraframework.def.AttributeDef;
 
-
 /**
  */
 public interface Attribute extends Instance<AttributeDef> {

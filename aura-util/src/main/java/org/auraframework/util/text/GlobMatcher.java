@@ -20,10 +20,10 @@ import java.util.regex.Pattern;
 
 /**
  * A very simple pattern matcher based on shell globbing.
- *
- * This matcher actually only matches the simplified patterns with '*' meaning any string.
- * All other globbing characters are illegal.
- *
+ * 
+ * This matcher actually only matches the simplified patterns with '*' meaning
+ * any string. All other globbing characters are illegal.
+ * 
  * Note that for the moment, this is case insensitive...
  */
 public class GlobMatcher {
@@ -38,7 +38,7 @@ public class GlobMatcher {
 
     public GlobMatcher(String glob) {
         if (!stringPattern.matcher(glob).matches()) {
-            throw new IllegalArgumentException("Illegal glob pattern: "+glob);
+            throw new IllegalArgumentException("Illegal glob pattern: " + glob);
         }
         this.original = glob;
         if (glob.equals(ALL_STRING)) {

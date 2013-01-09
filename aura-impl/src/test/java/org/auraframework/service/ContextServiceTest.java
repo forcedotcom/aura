@@ -18,12 +18,15 @@ package org.auraframework.service;
 import java.util.List;
 import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.source.StringSourceLoader;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.NoContextException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -33,7 +36,8 @@ import com.google.common.collect.Lists;
  * @hierarchy Aura.Services.ContextService
  * @userStory a07B0000000Eb3M
  */
-public class ContextServiceTest extends BaseServiceTest<ContextService, ContextServiceTest.Config> implements ContextService {
+public class ContextServiceTest extends BaseServiceTest<ContextService, ContextServiceTest.Config> implements
+        ContextService {
     private static final long serialVersionUID = 6488992999239427778L;
 
     public ContextServiceTest(String name) {
@@ -41,19 +45,19 @@ public class ContextServiceTest extends BaseServiceTest<ContextService, ContextS
     }
 
     @Override
-    public List<Config> getConfigs(){
+    public List<Config> getConfigs() {
         List<Config> ret = Lists.newArrayList(new Config());
         return permuteConfigs(ret);
     }
 
     @Override
     public void endContext() {
-        try{
+        try {
             assertNull(service.getCurrentContext());
             service.startContext(config.mode, config.format, config.access);
             AuraContext context = service.getCurrentContext();
             assertNotNull(context);
-        }finally{
+        } finally {
             service.endContext();
             assertNull(service.getCurrentContext());
             service.endContext();
@@ -63,7 +67,7 @@ public class ContextServiceTest extends BaseServiceTest<ContextService, ContextS
 
     @Override
     public AuraContext getCurrentContext() {
-        try{
+        try {
             assertNull(service.getCurrentContext());
             service.startContext(config.mode, config.format, config.access);
             AuraContext context = service.getCurrentContext();
@@ -75,7 +79,7 @@ public class ContextServiceTest extends BaseServiceTest<ContextService, ContextS
             AuraContext context2 = service.getCurrentContext();
             assertNotSame(context, context2);
             assertNull(context2.getAccess());
-        }finally{
+        } finally {
             service.endContext();
         }
         assertNull(service.getCurrentContext());
@@ -86,10 +90,10 @@ public class ContextServiceTest extends BaseServiceTest<ContextService, ContextS
     @Override
     public boolean isEstablished() {
         assertFalse(getService().isEstablished());
-        try{
+        try {
             service.startContext(config.mode, config.format, config.access);
             assertTrue(service.isEstablished());
-        }finally{
+        } finally {
             service.endContext();
         }
         assertFalse(getService().isEstablished());
@@ -99,7 +103,7 @@ public class ContextServiceTest extends BaseServiceTest<ContextService, ContextS
 
     @Override
     public AuraContext startContext(Mode mode, Format format, Access access) {
-        try{
+        try {
             assertNull(service.getCurrentContext());
             service.startContext(config.mode, config.format, config.access);
             AuraContext context = service.getCurrentContext();
@@ -107,7 +111,7 @@ public class ContextServiceTest extends BaseServiceTest<ContextService, ContextS
             assertEquals(context.getMode(), config.mode);
             assertEquals(context.getFormat(), config.format);
             assertEquals(context.getAccess(), config.access);
-        }finally{
+        } finally {
             service.endContext();
         }
 
@@ -119,7 +123,7 @@ public class ContextServiceTest extends BaseServiceTest<ContextService, ContextS
             throws QuickFixException {
         StringSourceLoader loader = StringSourceLoader.getInstance();
         DefDescriptor<ComponentDef> desc = null;
-        try{
+        try {
             desc = loader.addSource(ComponentDef.class, "<aura:component/>", null).getDescriptor();
 
             assertNull(service.getCurrentContext());
@@ -132,7 +136,7 @@ public class ContextServiceTest extends BaseServiceTest<ContextService, ContextS
             ComponentDef def = context.getDefRegistry().getDef(desc);
             assertNotNull(def);
             assertEquals(desc, def.getDescriptor());
-        }finally{
+        } finally {
             service.endContext();
             loader.removeSource(desc);
         }
@@ -142,41 +146,41 @@ public class ContextServiceTest extends BaseServiceTest<ContextService, ContextS
 
     @Override
     public void assertEstablished() {
-        try{
+        try {
             service.assertEstablished();
             fail("NoContextException should have been thrown");
-        }catch(NoContextException e){
+        } catch (NoContextException e) {
             // Expected
         }
         service.startContext(config.mode, config.format, config.access);
         service.assertEstablished();
         service.endContext();
 
-        try{
+        try {
             service.assertEstablished();
             fail("NoContextException should have been thrown");
-        }catch(NoContextException e){
+        } catch (NoContextException e) {
             // Expected
         }
 
     }
 
-    public static class Config extends BaseServiceTest.Config{
+    public static class Config extends BaseServiceTest.Config {
     }
 
     @Override
-    public void assertAccess(DefDescriptor<?> desc) {}
+    public void assertAccess(DefDescriptor<?> desc) {
+    }
 
     @Override
     public AuraContext startContext(Mode mode, Format format, Access access,
-                                     DefDescriptor<? extends BaseComponentDef> appDesc) {
+            DefDescriptor<? extends BaseComponentDef> appDesc) {
         return null;
     }
 
     @Override
-    public AuraContext startContext(Mode mode, Set<SourceLoader> loaders,
-                                     Format format, Access access,
-                                     DefDescriptor<? extends BaseComponentDef> appDesc) throws QuickFixException {
+    public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Access access,
+            DefDescriptor<? extends BaseComponentDef> appDesc) throws QuickFixException {
         return null;
     }
 }

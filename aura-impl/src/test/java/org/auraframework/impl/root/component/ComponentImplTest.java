@@ -19,7 +19,7 @@ import java.util.Collections;
 
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.instance.*;
+import org.auraframework.instance.Component;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 
@@ -42,7 +42,8 @@ public class ComponentImplTest extends AuraImplTestCase {
             AttributeDefRef adr2 = vendor.makeAttributeDefRef("badAttr", "blubber", new Location("meh", 0));
             cmp.getAttributes().set(Collections.singleton(adr2));
             fail("Should have thrown AuraException(Attribute not Defined)");
-        } catch (AttributeNotFoundException expected) {}
+        } catch (AttributeNotFoundException expected) {
+        }
     }
 
     public void testSerialize() throws Exception {

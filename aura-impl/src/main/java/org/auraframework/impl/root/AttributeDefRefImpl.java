@@ -19,21 +19,26 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.TypeDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.*;
+import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Json.Serialization;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
 
 /**
  * A reference to an attribute.
- *
- * FIXME: W-1328558 This should extend DefinitionImpl<AttributeDefRef> and getAttributeDescriptor should be an override
+ * 
+ * FIXME: W-1328558 This should extend DefinitionImpl<AttributeDefRef> and
+ * getAttributeDescriptor should be an override
  */
-@Serialization(referenceType=ReferenceType.NONE)
+@Serialization(referenceType = ReferenceType.NONE)
 public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements AttributeDefRef {
 
     private static final long serialVersionUID = -7125435060409783114L;
@@ -43,8 +48,10 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
     // the original value , which could be a string representation
     private final Object value;
     /*
-     * if the original value was a string representation of a non-string type, then this is the value parsed from that
-     * string this is set in the parseValue method which is called during the validateReferences stage of compilation
+     * if the original value was a string representation of a non-string type,
+     * then this is the value parsed from that string this is set in the
+     * parseValue method which is called during the validateReferences stage of
+     * compilation
      */
     private Object parsedValue;
     private final int hashCode;
@@ -67,12 +74,12 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
     public void validateReferences() throws QuickFixException {
         Object v = this.getValue();
         if (v instanceof Definition) {
-            ((Definition)v).validateReferences();
+            ((Definition) v).validateReferences();
         } else if (v instanceof Collection) {
-            Collection<?> col = (Collection<?>)v;
+            Collection<?> col = (Collection<?>) v;
             for (Object obj : col) {
                 if (obj instanceof Definition) {
-                    ((Definition)obj).validateReferences();
+                    ((Definition) obj).validateReferences();
                 }
             }
         }
@@ -81,14 +88,14 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
         Object v = this.getValue();
-        if(v instanceof Definition){
-            Definition def = (Definition)v;
+        if (v instanceof Definition) {
+            Definition def = (Definition) v;
             def.appendDependencies(dependencies);
-        }else if(v instanceof Collection){
-            Collection<?> col = (Collection<?>)v;
-            for(Object obj : col){
-                if(obj instanceof Definition){
-                    Definition def = (Definition)obj;
+        } else if (v instanceof Collection) {
+            Collection<?> col = (Collection<?>) v;
+            for (Object obj : col) {
+                if (obj instanceof Definition) {
+                    Definition def = (Definition) obj;
                     def.appendDependencies(dependencies);
                 }
             }
@@ -111,7 +118,7 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
     @Override
     public boolean equals(Object o) {
         if (o instanceof AttributeDefRefImpl) {
-            AttributeDefRefImpl e = (AttributeDefRefImpl)o;
+            AttributeDefRefImpl e = (AttributeDefRefImpl) o;
             return getName().equals(e.getName()) && getValue().equals(e.getValue());
         }
 
@@ -129,9 +136,9 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
         return hashCode;
     }
 
-    public static class Builder extends DefinitionImpl.RefBuilderImpl<AttributeDef, AttributeDefRef>{
+    public static class Builder extends DefinitionImpl.RefBuilderImpl<AttributeDef, AttributeDefRef> {
 
-        public Builder(){
+        public Builder() {
             super(AttributeDef.class);
         }
 

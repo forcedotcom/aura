@@ -15,8 +15,6 @@
  */
 package org.auraframework.service;
 
-import org.auraframework.Aura;
-
 /**
  * <p>
  * Service for contacting other Aura servers

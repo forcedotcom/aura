@@ -16,34 +16,39 @@
 package org.auraframework.def;
 
 import org.auraframework.impl.AuraImplTestCase;
+
 /**
- * Unit test to verify the functioning of HtmlTag class.
- * HtmlTag is an Enum of all allowed HTML tags in aura component markup.
- *
- *
- *
+ * Unit test to verify the functioning of HtmlTag class. HtmlTag is an Enum of
+ * all allowed HTML tags in aura component markup.
+ * 
+ * 
+ * 
  * @since 0.0.156
  */
 public class HtmlTagTest extends AuraImplTestCase {
-    public HtmlTagTest(String name){
+    public HtmlTagTest(String name) {
         super(name);
     }
+
     /**
-     * Test to verify the static method to check if a certain HTML tag is allowed in aura.
+     * Test to verify the static method to check if a certain HTML tag is
+     * allowed in aura.
      */
-    public void testAllowedMethod(){
+    public void testAllowedMethod() {
         assertFalse("Expected HtmlTag to disallow null tags.", HtmlTag.allowed(null));
         assertFalse("Enum does not handle non existing tags.", HtmlTag.allowed("Non existing Tag"));
     }
+
     /**
-     * Gold file all allowed and disallowed HTML tags.
-     * This test will make sure we know that somebody did not enable a HTML tag by mistake.
+     * Gold file all allowed and disallowed HTML tags. This test will make sure
+     * we know that somebody did not enable a HTML tag by mistake.
+     * 
      * @throws Exception
      */
-    public void testGoldFileAcceptanceOfHTMLTags()throws Exception{
+    public void testGoldFileAcceptanceOfHTMLTags() throws Exception {
         StringBuffer tags = new StringBuffer();
-        for(HtmlTag tag : HtmlTag.values()){
-            tags.append("<"+tag.name()+"> : "+ (tag.isAllowed()?"allowed":"disallowed")+"\n");
+        for (HtmlTag tag : HtmlTag.values()) {
+            tags.append("<" + tag.name() + "> : " + (tag.isAllowed() ? "allowed" : "disallowed") + "\n");
         }
         this.goldFileText(tags.toString());
     }

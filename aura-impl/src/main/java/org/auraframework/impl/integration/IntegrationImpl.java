@@ -44,89 +44,95 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class IntegrationImpl implements Integration {
-	public IntegrationImpl(String securityProviderDescr, String contextPath, Mode mode) {
-		this.securityProviderDescr = securityProviderDescr;
-		this.contextPath = contextPath;
-		this.mode = mode;
-	}
+    public IntegrationImpl(String securityProviderDescr, String contextPath, Mode mode) {
+        this.securityProviderDescr = securityProviderDescr;
+        this.contextPath = contextPath;
+        this.mode = mode;
+    }
 
-	@Override
-	public void addPreload(String namespace) {
-		
-		// DCHASMAN TODO Figure out how to collect up all of the preloads and handle them as a set
-		
-		preloads.add(namespace);
-	}
+    @Override
+    public void addPreload(String namespace) {
 
-	@Override
-	public 	void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId, Appendable out) throws QuickFixException, IOException {
+        // DCHASMAN TODO Figure out how to collect up all of the preloads and
+        // handle them as a set
+
+        preloads.add(namespace);
+    }
+
+    @Override
+    public void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
+            Appendable out) throws QuickFixException, IOException {
         DefDescriptor<ComponentDef> descriptor = Aura.getDefinitionService().getDefDescriptor(tag, ComponentDef.class);
-        
+
         if (!hasApplicationBeenWritten) {
             hasApplicationBeenWritten = true;
-            
+
             writeApplication(out);
         }
-        
+
         AuraContext context = startContext("is");
         try {
             DefinitionService definitionService = Aura.getDefinitionService();
-            ControllerDef componentControllerDef = definitionService.getDefDescriptor("aura://ComponentController", ControllerDef.class).getDef();
-            
+            ControllerDef componentControllerDef = definitionService.getDefDescriptor("aura://ComponentController",
+                    ControllerDef.class).getDef();
+
             Map<String, Object> paramValues = Maps.newHashMap();
             paramValues.put("name", descriptor.getQualifiedName());
-            
+
             Map<String, Object> actionAttributes = Maps.newHashMap();
             Map<String, String> actionEventHandlers = Maps.newHashMap();
-            
+
             ComponentDef componentDef = descriptor.getDef();
             for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-            	String key = entry.getKey();
+                String key = entry.getKey();
 
-            	AttributeDef attributeDef = componentDef.getAttributeDef(key);
-            	if (attributeDef != null) {
-            		String name = attributeDef.getName();
+                AttributeDef attributeDef = componentDef.getAttributeDef(key);
+                if (attributeDef != null) {
+                    String name = attributeDef.getName();
                     actionAttributes.put(name, entry.getValue());
-            	} else {
-            		RegisterEventDef eventDef = componentDef.getRegisterEventDefs().get(key);
-            		if (eventDef != null) {
-            			// Emit component.addHandler() wired to special global scope value provider
-            			String name = eventDef.getAttributeName();
-            			actionEventHandlers.put(name, (String)entry.getValue());
-            		} else {
-            			throw new AuraRuntimeException(String.format("Unknown attribute or event %s:%s", tag, key));
-            		}
-            	}
+                } else {
+                    RegisterEventDef eventDef = componentDef.getRegisterEventDefs().get(key);
+                    if (eventDef != null) {
+                        // Emit component.addHandler() wired to special global
+                        // scope value provider
+                        String name = eventDef.getAttributeName();
+                        actionEventHandlers.put(name, (String) entry.getValue());
+                    } else {
+                        throw new AuraRuntimeException(String.format("Unknown attribute or event %s:%s", tag, key));
+                    }
+                }
             }
-            
+
             paramValues.put("attributes", actionAttributes);
-            
+
             Action action = componentControllerDef.createAction("getComponent", paramValues);
             action.setId("ais");
-            
+
             Action previous = context.setCurrentAction(action);
             try {
                 action.run();
             } finally {
                 context.setCurrentAction(previous);
             }
-            
+
             Message<?> message = new Message<ComponentDef>(Lists.newArrayList(action), null, null);
-            
+
             StringBuilder init = new StringBuilder();
-            
+
             init.append("var config = ");
             Aura.getSerializationService().write(message, null, Message.class, init);
             init.append(";\n");
 
             if (!actionEventHandlers.isEmpty()) {
-	            init.append("config.actionEventHandlers = ");
-	            Json.serialize(actionEventHandlers, init);
-	            init.append(";\n");
+                init.append("config.actionEventHandlers = ");
+                Json.serialize(actionEventHandlers, init);
+                init.append(";\n");
             }
-            
-            init.append(String.format("$A.getRoot().get(\"e.addComponent\").setParams({ config: config, placeholderId: \"%s\", localId: \"%s\" }).fire();\n", locatorDomId, localId));
-            
+
+            init.append(String
+                    .format("$A.getRoot().get(\"e.addComponent\").setParams({ config: config, placeholderId: \"%s\", localId: \"%s\" }).fire();\n",
+                            locatorDomId, localId));
+
             out.append("<script>").append(init).append("</script>");
 
         } catch (QuickFixException x) {
@@ -134,11 +140,11 @@ public class IntegrationImpl implements Integration {
         } finally {
             Aura.getContextService().endContext();
         }
-	}
-	
-	private AuraContext startContext(String num) {
+    }
+
+    private AuraContext startContext(String num) {
         ContextService contextService = Aura.getContextService();
-        
+
         AuraContext context = contextService.startContext(mode, Format.JSON, Access.AUTHENTICATED);
         context.setApplicationDescriptor(getApplicationDescriptor(securityProviderDescr));
 
@@ -148,35 +154,36 @@ public class IntegrationImpl implements Integration {
 
         for (String preload : preloads) {
             context.addPreload(preload);
-        }                    
-        
+        }
+
         return context;
     }
-	
+
     private void writeApplication(Appendable out) throws IOException {
         AuraContext context = startContext(null);
         try {
             context.setContextPath(contextPath);
-            
+
             ApplicationDef appDef = getApplicationDescriptor(securityProviderDescr).getDef();
-            Aura.getSerializationService().write(appDef, null, appDef.getDescriptor().getDefType().getPrimaryInterface(), out, "EMBEDDED_HTML");
+            Aura.getSerializationService().write(appDef, null,
+                    appDef.getDescriptor().getDefType().getPrimaryInterface(), out, "EMBEDDED_HTML");
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
         } finally {
             Aura.getContextService().endContext();
         }
     }
-    
+
     private static DefDescriptor<ApplicationDef> getApplicationDescriptor(String securityProviderDescr) {
-    	// DCHASMAN TODO W-1495914 Dynamically construct an extension of aura:integrationServiceApp that uses securityProviderDescr
+        // DCHASMAN TODO W-1495914 Dynamically construct an extension of
+        // aura:integrationServiceApp that uses securityProviderDescr
         DefinitionService definitionService = Aura.getDefinitionService();
         return definitionService.getDefDescriptor("aura:integrationServiceApp", ApplicationDef.class);
     }
 
-
-	private final String contextPath;
-	private final Mode mode;
-	private final String securityProviderDescr;
+    private final String contextPath;
+    private final Mode mode;
+    private final String securityProviderDescr;
     private final Set<String> preloads = Sets.newHashSet();
     private boolean hasApplicationBeenWritten;
 }

@@ -24,7 +24,7 @@ public class ParserFactoryTest extends AuraImplTestCase {
         super(name);
     }
 
-    public void testParserFactory(){
+    public void testParserFactory() {
         assertNotNull(new ParserFactory());
         assertEquals(Parser.Format.XML, Parser.Format.valueOf("XML"));
     }

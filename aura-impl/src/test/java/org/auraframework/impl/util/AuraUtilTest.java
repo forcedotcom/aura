@@ -15,7 +15,10 @@
  */
 package org.auraframework.impl.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.auraframework.impl.AuraImplTestCase;
 
@@ -28,7 +31,7 @@ public class AuraUtilTest extends AuraImplTestCase {
         super(name);
     }
 
-    public void testAuraUtil(){
+    public void testAuraUtil() {
         new AuraUtil();
     }
 
@@ -42,7 +45,8 @@ public class AuraUtilTest extends AuraImplTestCase {
         try {
             immutableSet.add("fo");
             fail("Should have thrown UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {}
+        } catch (UnsupportedOperationException e) {
+        }
 
         assertNotNull(AuraUtil.immutableSet(null));
     }
@@ -57,7 +61,8 @@ public class AuraUtilTest extends AuraImplTestCase {
         try {
             immutableList.add("fo");
             fail("Should have thrown UnsupportedOperationException");
-        } catch (UnsupportedOperationException e) {}
+        } catch (UnsupportedOperationException e) {
+        }
 
         assertNotNull(AuraUtil.immutableList(null));
     }

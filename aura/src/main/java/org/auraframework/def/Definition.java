@@ -29,23 +29,26 @@ import org.auraframework.util.json.JsonSerializable;
 public interface Definition extends JsonSerializable, Serializable {
 
     /**
-     * First pass validation, validates this definition locally, without validating any of its references to other
-     * definitions.
+     * First pass validation, validates this definition locally, without
+     * validating any of its references to other definitions.
      */
     void validateDefinition() throws QuickFixException;
 
     /**
-     * Second pass validation, which validates any references to other definitions which might not be in the cache yet.
-     * This method can never call to the AuraContext, it should get any defs it needs to validate itself from the
-     * passed in registry, which contains both compiling defs and the cached defs
+     * Second pass validation, which validates any references to other
+     * definitions which might not be in the cache yet. This method can never
+     * call to the AuraContext, it should get any defs it needs to validate
+     * itself from the passed in registry, which contains both compiling defs
+     * and the cached defs
      */
     void validateReferences() throws QuickFixException;
 
     /**
      * Final validation marker.
-     *
-     * When this is called, all definitions in the manifest of definitions have been validated. At this point the definition
-     * is about to be put in cache if it can be cached.
+     * 
+     * When this is called, all definitions in the manifest of definitions have
+     * been validated. At this point the definition is about to be put in cache
+     * if it can be cached.
      */
     void markValid();
 
@@ -70,30 +73,34 @@ public interface Definition extends JsonSerializable, Serializable {
     Location getLocation();
 
     /**
-     * Get the descriptor. Note that this _should_ be non-null, but it is not, because there are definitions that cannot
-     * be described (references and event handlers are example cases). This could be handled by having yet another
-     * layer, and defining an interface for a localized definition that has no descriptor (a superclass of this),
-     * defining all other functions. The descriptor here, if non-null should be equal to the descriptor used to retrieve
-     * this definition and getDef() should return either the same definition or a newer version of it. Within a request,
-     * desc.getDef() == desc.getDef.().getDescriptor().getDef().
-     *
+     * Get the descriptor. Note that this _should_ be non-null, but it is not,
+     * because there are definitions that cannot be described (references and
+     * event handlers are example cases). This could be handled by having yet
+     * another layer, and defining an interface for a localized definition that
+     * has no descriptor (a superclass of this), defining all other functions.
+     * The descriptor here, if non-null should be equal to the descriptor used
+     * to retrieve this definition and getDef() should return either the same
+     * definition or a newer version of it. Within a request, desc.getDef() ==
+     * desc.getDef.().getDescriptor().getDef().
+     * 
      * @return the descriptor for this definition
      */
     DefDescriptor<? extends Definition> getDescriptor();
 
     /**
-     * Get a sub definition for this definition. Typing here is a little off, the second type parameter should be the
-     * actual type of this definition, but to avoid circular definitions we drop that here.
-     *
-     * @param descriptor
-     *            the descriptor for the sub-definition.
+     * Get a sub definition for this definition. Typing here is a little off,
+     * the second type parameter should be the actual type of this definition,
+     * but to avoid circular definitions we drop that here.
+     * 
+     * @param descriptor the descriptor for the sub-definition.
      * @return the definition that matches the descriptor.
      */
     <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> descriptor);
 
     /**
-     * retrieve all labels needed by this definition. FIXME: this should be more like append dependencies so that we can
-     * build a set before retrieving any. that way we'd be much more efficient.
+     * retrieve all labels needed by this definition. FIXME: this should be more
+     * like append dependencies so that we can build a set before retrieving
+     * any. that way we'd be much more efficient.
      */
     void retrieveLabels() throws QuickFixException;
 

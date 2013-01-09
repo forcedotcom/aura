@@ -22,10 +22,13 @@ import java.util.Map;
 
 import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptValidator;
-import org.auraframework.util.javascript.directive.*;
+import org.auraframework.util.javascript.directive.DirectiveBasedJavascriptGroup;
+import org.auraframework.util.javascript.directive.DirectiveParser;
+import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 
 /**
- * includes another file, expecting just the filename relative to the root in java format (. instead of / as dir separator)
+ * includes another file, expecting just the filename relative to the root in
+ * java format (. instead of / as dir separator)
  */
 public class IncludeDirective extends DirectiveImpl {
     private File include;
@@ -35,10 +38,10 @@ public class IncludeDirective extends DirectiveImpl {
     public IncludeDirective(int offset, String line) {
         super(offset, line);
         Map<String, Object> config = getConfig();
-        if(config != null){
-            path = (String)config.get("path");
+        if (config != null) {
+            path = (String) config.get("path");
             assert path != null : "Path is required in include directive config";
-        }else{
+        } else {
             path = getLine();
         }
     }

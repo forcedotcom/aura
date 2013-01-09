@@ -24,8 +24,9 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.util.json.Json;
 
 /**
- * The definition of a component. Holds all information about a given type of component. ComponentDefs are immutable
- * singletons per type of ComponentDef. Once they are created, they can only be replaced, never changed.
+ * The definition of a component. Holds all information about a given type of
+ * component. ComponentDefs are immutable singletons per type of ComponentDef.
+ * Once they are created, they can only be replaced, never changed.
  */
 public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> implements ComponentDef {
     private static final long serialVersionUID = 6449560899515044182L;
@@ -35,16 +36,17 @@ public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> impleme
     }
 
     /**
-     * The Descriptor for the component that all non-root components eventually must extend.  Similar to java.lang.Object in java.
+     * The Descriptor for the component that all non-root components eventually
+     * must extend. Similar to java.lang.Object in java.
      */
-    public static final DefDescriptor<ComponentDef> PROTOTYPE_COMPONENT = DefDescriptorImpl.getInstance("markup://aura:component", ComponentDef.class);
+    public static final DefDescriptor<ComponentDef> PROTOTYPE_COMPONENT = DefDescriptorImpl.getInstance(
+            "markup://aura:component", ComponentDef.class);
 
-    public static class Builder extends BaseComponentDefImpl.Builder<ComponentDef> implements ComponentDefBuilder{
+    public static class Builder extends BaseComponentDefImpl.Builder<ComponentDef> implements ComponentDefBuilder {
 
-        public Builder(){
+        public Builder() {
             super(ComponentDef.class);
         }
-
 
         @Override
         public ComponentDef build() {
@@ -58,5 +60,6 @@ public class ComponentDefImpl extends BaseComponentDefImpl<ComponentDef> impleme
     }
 
     @Override
-    protected void serializeFields(Json json) throws IOException {}
+    protected void serializeFields(Json json) throws IOException {
+    }
 }

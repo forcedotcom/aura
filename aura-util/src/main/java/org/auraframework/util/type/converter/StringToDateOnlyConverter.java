@@ -15,14 +15,14 @@
  */
 package org.auraframework.util.type.converter;
 
+import java.util.Date;
+
 import org.auraframework.util.date.DateOnly;
 import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.type.Converter;
 
-import java.util.Date;
-
-public class StringToDateOnlyConverter implements Converter<String, DateOnly>{
+public class StringToDateOnlyConverter implements Converter<String, DateOnly> {
     @Override
     public DateOnly convert(String value) {
         if (value == null || value.isEmpty()) {
@@ -30,7 +30,7 @@ public class StringToDateOnlyConverter implements Converter<String, DateOnly>{
         }
         DateService dateService = DateServiceImpl.get();
         Date d = dateService.getGenericISO8601Converter().parse(value);
-        return d==null ? null : new DateOnly(d.getTime());
+        return d == null ? null : new DateOnly(d.getTime());
     }
 
     @Override

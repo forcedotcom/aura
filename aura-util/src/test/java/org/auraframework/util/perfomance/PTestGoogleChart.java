@@ -15,38 +15,48 @@
  */
 package org.auraframework.util.perfomance;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.lang.StringUtils;
-
 import org.auraframework.util.IOUtil;
 
-
 /**
- * Original: CadenceGoogleChart
- * Handles building a url request to the Google Charts API.
+ * Original: CadenceGoogleChart Handles building a url request to the Google
+ * Charts API.
  */
 public class PTestGoogleChart {
     private static final String BASE_URL = "http://chart.apis.google.com/chart";
-    private static final String[] SERIES_COLORS = { "3072F3","FF9900","555555","49188F","80C65A","224499","990066","76A4FB","008000","A4653A" };
+    private static final String[] SERIES_COLORS = { "3072F3", "FF9900", "555555", "49188F", "80C65A", "224499",
+            "990066", "76A4FB", "008000", "A4653A" };
 
-    private String title;
-    private List<ChartAxisPoints> axisPoints;
+    private final String title;
+    private final List<ChartAxisPoints> axisPoints;
     private long maxYDataPointForChart;
     private long maxXDataPointForChart;
+
     /**
-     * Data structure for a point on the x-axis of the line graph. It stores the x-axis label,
-     * and the data point values for each series at that axis point. Conceptually, this correlates
-     * with one line from the test results file, or a single test run.
+     * Data structure for a point on the x-axis of the line graph. It stores the
+     * x-axis label, and the data point values for each series at that axis
+     * point. Conceptually, this correlates with one line from the test results
+     * file, or a single test run.
      */
     public static final class ChartAxisPoints {
-        private String axisPointLabel;
-        private List<ChartPoint> seriesDataPoints;
+        private final String axisPointLabel;
+        private final List<ChartPoint> seriesDataPoints;
 
         public ChartAxisPoints(String axisPointLabel, List<ChartPoint> seriesDataPoints) {
             super();
@@ -62,14 +72,17 @@ public class PTestGoogleChart {
             return this.seriesDataPoints;
         }
     }
-    public static class ChartPoint{
+
+    public static class ChartPoint {
         public String xValue;
         public long yValue;
-        public ChartPoint(String x, long y){
+
+        public ChartPoint(String x, long y) {
             xValue = x;
             yValue = y;
         }
     }
+
     public PTestGoogleChart(String title, List<ChartAxisPoints> axisPoints) {
         this.title = title;
         this.axisPoints = axisPoints;
@@ -83,7 +96,7 @@ public class PTestGoogleChart {
         if (maxYDataPointForChart == 0) {
             List<Long> dataPoints = new ArrayList<Long>();
             for (ChartAxisPoints dataPoint : axisPoints) {
-                for(ChartPoint point: dataPoint.seriesDataPoints){
+                for (ChartPoint point : dataPoint.seriesDataPoints) {
                     dataPoints.add(point.yValue);
                 }
             }
@@ -91,6 +104,7 @@ public class PTestGoogleChart {
         }
         return maxYDataPointForChart;
     }
+
     /**
      * Get the maximum X data point to show in the chart.
      */
@@ -99,7 +113,7 @@ public class PTestGoogleChart {
         if (maxXDataPointForChart == 0) {
             List<Long> dataPoints = new ArrayList<Long>();
             for (ChartAxisPoints dataPoint : axisPoints) {
-                for(ChartPoint point: dataPoint.seriesDataPoints){
+                for (ChartPoint point : dataPoint.seriesDataPoints) {
                     dataPoints.add(Long.valueOf(point.xValue));
                 }
             }
@@ -107,10 +121,12 @@ public class PTestGoogleChart {
         }
         return maxXDataPointForChart;
     }
+
     /**
-     * Creates a Map of the params necessary to make a request to the Google Charts API.
-     * See http://code.google.com/apis/chart/docs/making_charts.html to try and make sense of the param names.
-     *
+     * Creates a Map of the params necessary to make a request to the Google
+     * Charts API. See http://code.google.com/apis/chart/docs/making_charts.html
+     * to try and make sense of the param names.
+     * 
      * @returns A Map of request parameters and their values.
      */
     public Map<String, String> buildRequestParams() {
@@ -121,21 +137,25 @@ public class PTestGoogleChart {
         data.put("chs", "1000x300"); // chart size
         data.put("chma", "0,5,50,0"); // chart margins
 
-        data.put("chdlp", "t");  // chart legend position
+        data.put("chdlp", "t"); // chart legend position
         data.put("chdl", buildSeriesLegend()); // set the chart legend items
 
-        data.put("chxt", "x,y,x,y"); // set the visible axes. (one extra axis defined to provide the "ms" label)
+        data.put("chxt", "x,y,x,y"); // set the visible axes. (one extra axis
+                                     // defined to provide the "ms" label)
 
         // set the y-axis range
-        data.put("chxr", String.format("0,1,%s|1,0,%s",getMaxXDataPointForChart(), getMaxYDataPointForChart()));
-        data.put("chg", "10,10,1,5"); //Grid lines
-        data.put("chxl", buildAxisLabels()); // add labels for the data points on the x-axis
+        data.put("chxr", String.format("0,1,%s|1,0,%s", getMaxXDataPointForChart(), getMaxYDataPointForChart()));
+        data.put("chg", "10,10,1,5"); // Grid lines
+        data.put("chxl", buildAxisLabels()); // add labels for the data points
+                                             // on the x-axis
 
-        // specify colors for our data series. If there are more series than colors provided, Google Charts will cycle
-        // through the provided colors again as necessary. Not ideal, but with that many metrics the graph would be
+        // specify colors for our data series. If there are more series than
+        // colors provided, Google Charts will cycle
+        // through the provided colors again as necessary. Not ideal, but with
+        // that many metrics the graph would be
         // hard to read either way.
         data.put("chco", StringUtils.join(SERIES_COLORS, ","));
-        data.put("chd", buildDataPoints()); //set datapoint values
+        data.put("chd", buildDataPoints()); // set datapoint values
         return data;
     }
 
@@ -161,41 +181,51 @@ public class PTestGoogleChart {
     }
 
     /**
-     * Encodes a list of values into the Google Charts API "extended encoding", scaling to the supplied max value.
+     * Encodes a list of values into the Google Charts API "extended encoding",
+     * scaling to the supplied max value.
      * http://code.google.com/apis/chart/docs/data_formats.html#extended
-     *
-     * Try and dig into their data formats sometime.  They're pretty annoying.
+     * 
+     * Try and dig into their data formats sometime. They're pretty annoying.
      */
     public String buildDataPoints() {
 
         StringBuilder data = new StringBuilder();
         data.append("t:");
-        int i =0 ;
+        int i = 0;
         for (ChartAxisPoints axisPoint : axisPoints) {
-             List<String> xValues = new ArrayList<String>();
-             List<String> yValues = new ArrayList<String>();
-             for(ChartPoint point : axisPoint.seriesDataPoints){
-                 xValues.add(""+scaleXValue(Long.valueOf(point.xValue)));
-                 yValues.add(""+scaleYValue(point.yValue));
-             }
-             if(i!=0){data.append("|");}i++;
-             data.append(StringUtils.join(xValues.iterator(), ",") +"|" + StringUtils.join(yValues.iterator(), ","));
+            List<String> xValues = new ArrayList<String>();
+            List<String> yValues = new ArrayList<String>();
+            for (ChartPoint point : axisPoint.seriesDataPoints) {
+                xValues.add("" + scaleXValue(Long.valueOf(point.xValue)));
+                yValues.add("" + scaleYValue(point.yValue));
+            }
+            if (i != 0) {
+                data.append("|");
+            }
+            i++;
+            data.append(StringUtils.join(xValues.iterator(), ",") + "|" + StringUtils.join(yValues.iterator(), ","));
         }
         return data.toString();
     }
 
-    public long scaleYValue(long y){
-        if(getMaxYDataPointForChart()!=0)
-            return (100*y)/getMaxYDataPointForChart();
+    public long scaleYValue(long y) {
+        if (getMaxYDataPointForChart() != 0) {
+            return (100 * y) / getMaxYDataPointForChart();
+        }
         return 0;
     }
-    public long scaleXValue(long x){
-        if(getMaxXDataPointForChart()!=0)
-            return (100*x)/getMaxXDataPointForChart();
+
+    public long scaleXValue(long x) {
+        if (getMaxXDataPointForChart() != 0) {
+            return (100 * x) / getMaxXDataPointForChart();
+        }
         return 0;
     }
+
     /**
-     * Write the chart to the specified file. If the file already exists, it will be replaced.
+     * Write the chart to the specified file. If the file already exists, it
+     * will be replaced.
+     * 
      * @param file Write to this file.
      * @return Whether the file was successfully created.
      */
@@ -236,12 +266,17 @@ public class PTestGoogleChart {
                 System.out.println(method.getResponseBodyAsString());
                 throw new RuntimeException("Callout to Google Charts API failed.");
             }
-        }
-        finally {
+        } finally {
             method.releaseConnection();
-            if(in!=null) in.close();
-            if(fw!=null) fw.close();
-            if(baos!=null) baos.close();
+            if (in != null) {
+                in.close();
+            }
+            if (fw != null) {
+                fw.close();
+            }
+            if (baos != null) {
+                baos.close();
+            }
         }
 
         return successful;

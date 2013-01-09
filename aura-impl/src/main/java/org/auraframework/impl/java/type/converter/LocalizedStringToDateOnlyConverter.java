@@ -15,14 +15,14 @@
  */
 package org.auraframework.impl.java.type.converter;
 
+import java.util.Date;
+
 import org.auraframework.impl.java.type.LocalizedConverter;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.date.DateOnly;
 import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.type.converter.StringToDateOnlyConverter;
-
-import java.util.Date;
 
 public class LocalizedStringToDateOnlyConverter extends StringToDateOnlyConverter implements
         LocalizedConverter<String, DateOnly> {

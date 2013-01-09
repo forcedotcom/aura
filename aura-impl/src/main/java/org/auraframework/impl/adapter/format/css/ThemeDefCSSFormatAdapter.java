@@ -24,15 +24,15 @@ import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ThemeDef;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.Client;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  */
 @ThreadSafe
 public class ThemeDefCSSFormatAdapter extends CSSFormatAdapter<ThemeDef> {
-
 
     private static final Pattern pattern1 = Pattern.compile("\\s*([{};,:])\\s*");
     private static final Pattern pattern2 = Pattern.compile("\\s+");
@@ -43,8 +43,8 @@ public class ThemeDefCSSFormatAdapter extends CSSFormatAdapter<ThemeDef> {
     }
 
     @Override
-    public void writeCollection(Collection<? extends ThemeDef> values,
-                                Appendable out) throws IOException, QuickFixException {
+    public void writeCollection(Collection<? extends ThemeDef> values, Appendable out) throws IOException,
+            QuickFixException {
         Mode mode = Aura.getContextService().getCurrentContext().getMode();
         boolean compress = !mode.isTestMode();
         AuraContext context = Aura.getContextService().getCurrentContext();
@@ -59,7 +59,7 @@ public class ThemeDefCSSFormatAdapter extends CSSFormatAdapter<ThemeDef> {
             accum = out;
         }
         for (ThemeDef def : values) {
-            if(def != null){
+            if (def != null) {
                 accum.append(def.getCode(type));
             }
         }

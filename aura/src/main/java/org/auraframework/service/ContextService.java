@@ -17,19 +17,19 @@ package org.auraframework.service;
 
 import java.util.Set;
 
-import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * <p>
- * Service for creating or interacting with a {@link AuraContext}
- * A AuraContext must be started before working using any other service.
+ * Service for creating or interacting with a {@link AuraContext} A AuraContext
+ * must be started before working using any other service.
  * </p>
  * <p>
  * Instances of all AuraServices should be retrieved from {@link Aura}
@@ -44,9 +44,11 @@ public interface ContextService extends AuraService {
 
     /**
      * Start a AuraContext and include these extra source loaders
+     * 
      * @throws QuickFixException
      */
-    AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Access access, DefDescriptor<? extends BaseComponentDef> appDesc) throws QuickFixException;
+    AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Access access,
+            DefDescriptor<? extends BaseComponentDef> appDesc) throws QuickFixException;
 
     /**
      * Start a AuraContext with the given Mode, Format, and Access
@@ -55,9 +57,11 @@ public interface ContextService extends AuraService {
 
     /**
      * Start a AuraContext and include these extra source loaders
+     * 
      * @throws QuickFixException
      */
-    AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Access access) throws QuickFixException;
+    AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Access access)
+            throws QuickFixException;
 
     /**
      * Close the current AuraContext, no matter which type it is.
@@ -65,7 +69,8 @@ public interface ContextService extends AuraService {
     void endContext();
 
     /**
-     * Get the current context if there is one.  Throws a runtime exception if one is not established.
+     * Get the current context if there is one. Throws a runtime exception if
+     * one is not established.
      */
     AuraContext getCurrentContext();
 
@@ -80,7 +85,8 @@ public interface ContextService extends AuraService {
     void assertEstablished();
 
     /**
-     * Throws a NoAccessException if the current root application's security provider denies access to the def described by the given descriptor.
+     * Throws a NoAccessException if the current root application's security
+     * provider denies access to the def described by the given descriptor.
      */
     void assertAccess(DefDescriptor<?> desc) throws QuickFixException;
 }

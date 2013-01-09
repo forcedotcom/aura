@@ -44,7 +44,7 @@ public class AuraJavascriptGroupTest extends AuraImplTestCase {
 
     /**
      * Verify that AuraJavascriptGroup does not fail JSLint validation.
-     *
+     * 
      * @priority high
      * @hierarchy Aura.Unit Tests.Javascript Library
      * @userStory a07B0000000FDWP
@@ -52,7 +52,8 @@ public class AuraJavascriptGroupTest extends AuraImplTestCase {
     public void testJSLintValidationForAuraJavascriptGroup() throws Exception {
         AuraJavascriptGroup js = new AuraJavascriptGroup();
         try {
-            // Should be ideally in setup, but this step might have some errors, so won't assume its reliable
+            // Should be ideally in setup, but this step might have some errors,
+            // so won't assume its reliable
             js.parse();
             js.validate();
         } catch (RuntimeException e) {
@@ -62,7 +63,7 @@ public class AuraJavascriptGroupTest extends AuraImplTestCase {
 
     /**
      * Verify that AuraJavascriptGroup can be compressed with all modes.
-     *
+     * 
      * @priority high
      * @hierarchy Aura.Unit Tests.Javascript Library
      * @userStory a07B0000000FDWP
@@ -74,16 +75,20 @@ public class AuraJavascriptGroupTest extends AuraImplTestCase {
         parser.parseFile();
 
         StringBuffer errorTxt = new StringBuffer();
-        // Have to do it for All modes because each mode has specific settings for comments and such
+        // Have to do it for All modes because each mode has specific settings
+        // for comments and such
         for (JavascriptGeneratorMode mode : jsModes) {
             if (mode.getCompressionLevel() != null) {
                 String jsContents = parser.generate(mode);
                 List<JavascriptProcessingError> errors = mode.getCompressionLevel().compress(
                         new StringReader(jsContents), new StringWriter(), js.getStartFile().getName());
-                for (JavascriptProcessingError e : errors)
+                for (JavascriptProcessingError e : errors) {
                     errorTxt.append(e.toString());
+                }
             }
         }
-        if (errorTxt.length() != 0) fail("There were some errors while compressing:" + errorTxt);
+        if (errorTxt.length() != 0) {
+            fail("There were some errors while compressing:" + errorTxt);
+        }
     }
 }

@@ -31,20 +31,20 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 @Provider
 public class TestJavaProviderSettingAttributeValues {
-    public static DefDescriptor<ComponentDef> provide(){
+    public static DefDescriptor<ComponentDef> provide() {
         return DefDescriptorImpl.getInstance("test:testJavaProviderSettingAttributeValuesHelper", ComponentDef.class);
     }
 
-    public static Map<String, Object> provideAttributes() throws QuickFixException{
+    public static Map<String, Object> provideAttributes() throws QuickFixException {
         Map<String, Object> attributes = new HashMap<String, Object>();
         attributes.put("a1", "a1Provider");
         attributes.put("a2", null);
         attributes.put("b1", "b1Provider");
-        attributes.put("ar1", new String[]{"ar1Provider0", "ar1Provider1"});
+        attributes.put("ar1", new String[] { "ar1Provider0", "ar1Provider1" });
 
-        BaseComponent<?,?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
 
-        if(component.getAttributes().getValue("a3") != null){
+        if (component.getAttributes().getValue("a3") != null) {
             attributes.put("b2", "b2Provider");
         }
 

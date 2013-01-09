@@ -15,8 +15,19 @@
  */
 package org.auraframework.util.resource;
 
-import java.io.*;
-import java.net.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Writer;
+import java.net.JarURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLStreamHandler;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import java.util.jar.JarFile;
@@ -28,26 +39,29 @@ import org.auraframework.util.MD5InputStream;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.cache.*;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 public class ResourceLoader extends ClassLoader {
-    
+
     /**
-     * We cache both the resource://... URL and the original using this glorified ImmutablePair.
+     * We cache both the resource://... URL and the original using this
+     * glorified ImmutablePair.
      */
     private static class CacheEntry {
         private final URL originalUrl;
         private final URL resourceUrl;
-        
+
         public CacheEntry(URL original, URL resource) {
             originalUrl = original;
             resourceUrl = resource;
         }
-        
+
         public URL getOriginalUrl() {
             return originalUrl;
         }
-        
+
         public URL getResourceUrl() {
             return resourceUrl;
         }
@@ -64,10 +78,10 @@ public class ResourceLoader extends ClassLoader {
     private final ClassLoader parent;
     private final File cache;
 
-    private LoadingCache<String, Optional<CacheEntry>> urlCache = CacheBuilder.newBuilder().initialCapacity(CACHE_SIZE_MIN)
-            .maximumSize(CACHE_SIZE_MAX).build(new Computer());
+    private final LoadingCache<String, Optional<CacheEntry>> urlCache = CacheBuilder.newBuilder()
+            .initialCapacity(CACHE_SIZE_MIN).maximumSize(CACHE_SIZE_MAX).build(new Computer());
 
-    private ResourceURLStreamHandler handler = new ResourceURLStreamHandler();
+    private final ResourceURLStreamHandler handler = new ResourceURLStreamHandler();
 
     public ResourceLoader(String tmpDir, boolean deleteCacheOnStart) throws MalformedURLException {
         this(tmpDir, ResourceLoader.class.getClassLoader(), deleteCacheOnStart);
@@ -79,16 +93,19 @@ public class ResourceLoader extends ClassLoader {
         this.cache = new File(tmpDir, RESOURCE_CACHE_NAME);
         Preconditions.checkNotNull(parent, "ClassLoader must be specified");
         this.parent = parent;
-        
+
         if (deleteCacheOnStart) {
             try {
                 IOUtil.delete(this.cache);
             } catch (IOUtil.DeleteFailedException dfe) {
                 //
                 // We failed, this is a fatal error?
-                // This used to either blindly continue or throw a null pointer exception.
-                // Now at least it will give you a clue as to what failed. Note that it will
-                // only fail here if the file exists and cannot be deleted, which is probably
+                // This used to either blindly continue or throw a null pointer
+                // exception.
+                // Now at least it will give you a clue as to what failed. Note
+                // that it will
+                // only fail here if the file exists and cannot be deleted,
+                // which is probably
                 // a pretty bad problem.
                 //
                 throw new RuntimeException(dfe);
@@ -119,35 +136,38 @@ public class ResourceLoader extends ClassLoader {
     }
 
     /**
-     * Gets the "original" URL for a resource.  {@link #getResource(String)} is
-     * overridden to return a string like "{@code resource:foo/bar}", but
-     * this allows access to the actual underlying resource URL, typically for
+     * Gets the "original" URL for a resource. {@link #getResource(String)} is
+     * overridden to return a string like "{@code resource:foo/bar}", but this
+     * allows access to the actual underlying resource URL, typically for
      * accessing location information.
-     *
+     * 
      * @param name the relative name of the resource, e.g. "foo/bar"
-     * @return the URL used to load the resource, today either a file or
-     *     jar protocol URL.
+     * @return the URL used to load the resource, today either a file or jar
+     *         protocol URL.
      */
     public URL getRawResourceUrl(String name) {
         try {
             CacheEntry entry = urlCache.get(name).orNull();
             if (entry == null) {
-                return null;  // it couldn't be found at all.
+                return null; // it couldn't be found at all.
             }
             return entry.getOriginalUrl();
         } catch (ExecutionException e) {
-            // If this happens, we're in a bad space... but aura-util can't see aura's
-            // AuraRuntimeException, so we fall back on the generic RuntimeException.
+            // If this happens, we're in a bad space... but aura-util can't see
+            // aura's
+            // AuraRuntimeException, so we fall back on the generic
+            // RuntimeException.
             throw new RuntimeException("Could not load urlCache for " + name, e);
         }
     }
 
     /**
-     * Gets a "cached" URL for a resource.  Like {@link #getRawResourceUrl(String)},
-     * this is a real URL to a file or jar, rather than a {@code resource:...} URL
-     * from {@link #getResource(String)}.  Unlike that, however, this returns a
-     * URL for the cached copy, not the the original source.
-     *
+     * Gets a "cached" URL for a resource. Like
+     * {@link #getRawResourceUrl(String)}, this is a real URL to a file or jar,
+     * rather than a {@code resource:...} URL from {@link #getResource(String)}.
+     * Unlike that, however, this returns a URL for the cached copy, not the the
+     * original source.
+     * 
      * @param name
      * @return {@null}, or a file URL to the cache of the given name.
      * @throws ExecutionException
@@ -170,31 +190,39 @@ public class ResourceLoader extends ClassLoader {
         @Override
         public Optional<CacheEntry> load(String resourcePath) throws Exception {
             URL originalUrl = parent.getResource(resourcePath);
-            if (originalUrl == null || !isFile(originalUrl)) { return Optional.absent(); }
+            if (originalUrl == null || !isFile(originalUrl)) {
+                return Optional.absent();
+            }
             refreshCache(resourcePath, originalUrl);
-            return Optional.of(new CacheEntry(originalUrl,
-                    new URL(null, String.format(urlPattern, resourcePath), handler)));
+            return Optional.of(new CacheEntry(originalUrl, new URL(null, String.format(urlPattern, resourcePath),
+                    handler)));
         }
     }
 
     /**
-     * For the given URL from the classpath, try to determine if the resource is a file. Each protocol may handle files
-     * and directories differently. If the nature of the resource cannot be determined, this method conservatively
-     * returns false. Currently, we only process jar: and file: URLs.
+     * For the given URL from the classpath, try to determine if the resource is
+     * a file. Each protocol may handle files and directories differently. If
+     * the nature of the resource cannot be determined, this method
+     * conservatively returns false. Currently, we only process jar: and file:
+     * URLs.
      */
     private boolean isFile(URL url) throws IOException {
         if (url.getProtocol().equalsIgnoreCase(JAR_PROTOCOL)) {
             if (!url.getPath().endsWith("/")) {
                 URL tryDir = parent.getResource(url.getPath() + "/");
-                if (tryDir != null) { return false; }
+                if (tryDir != null) {
+                    return false;
+                }
             }
-            JarURLConnection jarConnection = (JarURLConnection)url.openConnection();
+            JarURLConnection jarConnection = (JarURLConnection) url.openConnection();
             JarFile jar = jarConnection.getJarFile();
             /**
-             * ZipEntry.isDirectory() is unreliable: the specification is simply that a name ending in a '/' is a
-             * directory. Therefore, we cannot use it to reliably test if a resource is a directory or a file. If there
-             * is a resource at this location ending in a '/', then it must be a directory. Conversely, if there is no
-             * resource at this location ending in a '/', then it must be a file.
+             * ZipEntry.isDirectory() is unreliable: the specification is simply
+             * that a name ending in a '/' is a directory. Therefore, we cannot
+             * use it to reliably test if a resource is a directory or a file.
+             * If there is a resource at this location ending in a '/', then it
+             * must be a directory. Conversely, if there is no resource at this
+             * location ending in a '/', then it must be a file.
              */
             ZipEntry ze = jarConnection.getJarEntry();
             if (!ze.getName().endsWith("/")) {
@@ -202,7 +230,8 @@ public class ResourceLoader extends ClassLoader {
                 // The given URL must point to a directory since URL/ exists.
                 return tryDir == null;
             } else {
-                // We already have a successful connection to a dir because the name ends with a '/'
+                // We already have a successful connection to a dir because the
+                // name ends with a '/'
                 return false;
             }
         } else if (url.getProtocol().equalsIgnoreCase(FILE_PROTOCOL)) {
@@ -251,7 +280,9 @@ public class ResourceLoader extends ClassLoader {
 
     public synchronized void refreshCache(String resourcePath) throws IOException {
         URL url = parent.getResource(resourcePath);
-        if (url == null || !isFile(url)) { throw new FileNotFoundException("Could not find resource " + resourcePath); }
+        if (url == null || !isFile(url)) {
+            throw new FileNotFoundException("Could not find resource " + resourcePath);
+        }
         refreshCache(resourcePath, url);
     }
 
@@ -306,7 +337,8 @@ public class ResourceLoader extends ClassLoader {
         }
 
         @Override
-        public void connect() throws IOException {}
+        public void connect() throws IOException {
+        }
 
         @Override
         public InputStream getInputStream() throws IOException {

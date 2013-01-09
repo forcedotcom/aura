@@ -18,7 +18,9 @@ package org.auraframework.impl.type;
 import java.io.IOException;
 import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
@@ -60,7 +62,7 @@ public class ComponentTypeDef extends DefinitionImpl<TypeDef> implements TypeDef
         json.writeString(getName());
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<TypeDef>{
+    public static class Builder extends DefinitionImpl.BuilderImpl<TypeDef> {
 
         public Builder() {
             super(TypeDef.class);
@@ -75,22 +77,23 @@ public class ComponentTypeDef extends DefinitionImpl<TypeDef> implements TypeDef
     }
 
     @Override
-    public Object initialize(Object config, BaseComponent<?,?> valueProvider) throws QuickFixException {
-        ComponentDefRef defRef = (ComponentDefRef)config;
-        try{
-        return defRef.newInstance(valueProvider);
-        }catch(DefinitionNotFoundException e){
+    public Object initialize(Object config, BaseComponent<?, ?> valueProvider) throws QuickFixException {
+        ComponentDefRef defRef = (ComponentDefRef) config;
+        try {
+            return defRef.newInstance(valueProvider);
+        } catch (DefinitionNotFoundException e) {
             throw new AuraRuntimeException(e);
         }
     }
 
     /**
      * Expects instance to be a ComponentDefRef
+     * 
      * @throws QuickFixException
      */
     @Override
     public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) throws QuickFixException {
-        ((ComponentDefRef)instance).appendDependencies(deps);
+        ((ComponentDefRef) instance).appendDependencies(deps);
     }
 
 }

@@ -20,7 +20,9 @@ import java.io.IOException;
 import java.util.EnumSet;
 
 import org.auraframework.impl.util.AuraImplFiles;
-import org.auraframework.util.javascript.directive.*;
+import org.auraframework.util.javascript.directive.DirectiveBasedJavascriptGroup;
+import org.auraframework.util.javascript.directive.DirectiveTypes;
+import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 
 /**
  * the aura javascript. starts at Force.js
@@ -30,22 +32,17 @@ public class AuraJavascriptGroup extends DirectiveBasedJavascriptGroup {
     public AuraJavascriptGroup() throws IOException {
         this(AuraImplFiles.AuraJavascriptSourceDirectory.asFile());
     }
-    
+
     /**
-     * Alternate constructor for tests  which might want to control the root directory.
+     * Alternate constructor for tests which might want to control the root
+     * directory.
      */
     protected AuraJavascriptGroup(File rootDirectory) throws IOException {
-        super("aura", rootDirectory, "aura/Aura.js",
-                DirectiveTypes.DEFAULT_TYPES,
-                EnumSet.of(JavascriptGeneratorMode.DEVELOPMENT,
-                        JavascriptGeneratorMode.STATS,
-                        JavascriptGeneratorMode.TESTING,
-                        JavascriptGeneratorMode.AUTOTESTING,
-                        JavascriptGeneratorMode.TESTINGDEBUG,
-                        JavascriptGeneratorMode.AUTOTESTINGDEBUG,
-                        JavascriptGeneratorMode.PRODUCTION,
-                        JavascriptGeneratorMode.PRODUCTIONDEBUG,
-                        JavascriptGeneratorMode.DOC));
+        super("aura", rootDirectory, "aura/Aura.js", DirectiveTypes.DEFAULT_TYPES, EnumSet.of(
+                JavascriptGeneratorMode.DEVELOPMENT, JavascriptGeneratorMode.STATS, JavascriptGeneratorMode.TESTING,
+                JavascriptGeneratorMode.AUTOTESTING, JavascriptGeneratorMode.TESTINGDEBUG,
+                JavascriptGeneratorMode.AUTOTESTINGDEBUG, JavascriptGeneratorMode.PRODUCTION,
+                JavascriptGeneratorMode.PRODUCTIONDEBUG, JavascriptGeneratorMode.DOC));
     }
 
 }

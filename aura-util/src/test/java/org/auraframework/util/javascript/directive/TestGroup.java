@@ -27,7 +27,7 @@ public class TestGroup extends DirectiveBasedJavascriptGroup {
 
     public TestGroup(File start) throws Exception {
         super("testerify", start.getParentFile(), start.getName(), ImmutableList.<DirectiveType<?>> of(
-                DirectiveFactory.getMockDirective(), DirectiveFactory.getMultiLineMockDirectiveType()),
-                EnumSet.of(JavascriptGeneratorMode.MOCK1, JavascriptGeneratorMode.MOCK2));
+                DirectiveFactory.getMockDirective(), DirectiveFactory.getMultiLineMockDirectiveType()), EnumSet.of(
+                JavascriptGeneratorMode.MOCK1, JavascriptGeneratorMode.MOCK2));
     }
 }

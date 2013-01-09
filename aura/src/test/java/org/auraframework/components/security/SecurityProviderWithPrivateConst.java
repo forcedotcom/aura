@@ -20,7 +20,7 @@ import org.auraframework.def.SecurityProvider;
 
 /**
  * A security provider with a private constructor.
- *
+ * 
  * This will fail due to an inability to construct the provider.
  */
 public class SecurityProviderWithPrivateConst implements SecurityProvider {

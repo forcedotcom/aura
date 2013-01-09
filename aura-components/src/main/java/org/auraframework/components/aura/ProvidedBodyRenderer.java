@@ -24,7 +24,8 @@ import org.auraframework.instance.BaseComponent;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
- * server side renderer for components that have a templated body and provide their own dynamic body, e.g. iteration.cmp or if.cmp
+ * server side renderer for components that have a templated body and provide
+ * their own dynamic body, e.g. iteration.cmp or if.cmp
  * 
  * @since 0.0.234
  */
@@ -32,7 +33,7 @@ public class ProvidedBodyRenderer implements Renderer {
     @SuppressWarnings("unchecked")
     @Override
     public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
-        List<BaseComponent<?, ?>> realbody = (List<BaseComponent<?, ?>>)component.getAttributes().getValue("realbody");
+        List<BaseComponent<?, ?>> realbody = (List<BaseComponent<?, ?>>) component.getAttributes().getValue("realbody");
         if (realbody != null) {
             for (BaseComponent<?, ?> c : realbody) {
                 Aura.getRenderingService().render(c, out);

@@ -18,12 +18,14 @@ package org.auraframework.expression;
 import java.util.List;
 
 /**
- * A reference to some property, i.e. a parsed list of strings separated by dots.
+ * A reference to some property, i.e. a parsed list of strings separated by
+ * dots.
  */
 public interface PropertyReference extends Expression {
 
     /**
-     * @return a new PropertyReference representing the everything after the root
+     * @return a new PropertyReference representing the everything after the
+     *         root
      */
     PropertyReference getStem();
 

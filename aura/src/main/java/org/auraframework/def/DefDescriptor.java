@@ -103,7 +103,8 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable, S
     String getQualifiedName();
 
     /**
-     * @return the namespace and name portion of this descriptor for cases where the prefix/protocol is already known.
+     * @return the namespace and name portion of this descriptor for cases where
+     *         the prefix/protocol is already known.
      */
     String getDescriptorName();
 
@@ -118,30 +119,32 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable, S
     String getNamespace();
 
     /**
-     * @return The portion of a name occurring within any generic delimiters, such as < >, including said delimiters
+     * @return The portion of a name occurring within any generic delimiters,
+     *         such as < >, including said delimiters
      */
     String getNameParameters();
 
     /**
-     * @return isParameterized - identifies if additional processing is warranted to consider generic collections should
-     *         be considered
+     * @return isParameterized - identifies if additional processing is
+     *         warranted to consider generic collections should be considered
      */
     boolean isParameterized();
 
     /**
-     * @return The type of this definition, which can be used to branch and parse serialized representations
+     * @return The type of this definition, which can be used to branch and
+     *         parse serialized representations
      */
     DefType getDefType();
 
     /**
      * @return the definition (compiles it if necessary)
-     * @throws QuickFixException
-     *             if the definition is not found
+     * @throws QuickFixException if the definition is not found
      */
     T getDef() throws QuickFixException;
 
     /**
-     * @return true if the definition represented by this descriptor exists at all. does not compile the definition
+     * @return true if the definition represented by this descriptor exists at
+     *         all. does not compile the definition
      */
     boolean exists();
 }

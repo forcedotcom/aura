@@ -26,8 +26,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 public class TextRenderer implements Renderer {
 
     @Override
-    public void render(BaseComponent<?,?> component, Appendable out) throws IOException, QuickFixException {
+    public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
 
-        out.append((String)component.getAttributes().getValue("value"));
+        out.append((String) component.getAttributes().getValue("value"));
     }
 }

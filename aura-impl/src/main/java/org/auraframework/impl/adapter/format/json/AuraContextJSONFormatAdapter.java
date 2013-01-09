@@ -24,7 +24,7 @@ import org.auraframework.util.json.JsonSerializationContext;
 
 /**
  */
-public class AuraContextJSONFormatAdapter extends JSONFormatAdapter<AuraContext>{
+public class AuraContextJSONFormatAdapter extends JSONFormatAdapter<AuraContext> {
 
     @Override
     public Class<AuraContext> getType() {
@@ -33,7 +33,7 @@ public class AuraContextJSONFormatAdapter extends JSONFormatAdapter<AuraContext>
 
     @Override
     public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException {
-        AuraContext ctx = (AuraContext)value;
+        AuraContext ctx = (AuraContext) value;
         JsonSerializationContext s = ctx.getJsonSerializationContext();
         Json.serialize(ctx, out, s);
     }

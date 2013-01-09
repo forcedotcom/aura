@@ -15,16 +15,25 @@
  */
 package org.auraframework.util.javascript.directive;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.Writer;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
-import org.auraframework.util.javascript.*;
+import org.auraframework.util.javascript.CommonJavascriptGroupImpl;
+import org.auraframework.util.javascript.JavascriptProcessingError;
+import org.auraframework.util.javascript.JavascriptValidator;
 import org.auraframework.util.javascript.JavascriptWriter.CompressionLevel;
 
 /**
- * Javascript group that contains directives for parsing instructions or metadata or other fun stuff. It starts from one file
- * which should include the others.
+ * Javascript group that contains directives for parsing instructions or
+ * metadata or other fun stuff. It starts from one file which should include the
+ * others.
  */
 public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
     // name for threads that compress and write the output
@@ -59,9 +68,10 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         return startFile;
     }
 
-    public Set<JavascriptGeneratorMode> getJavascriptGeneratorModes(){
+    public Set<JavascriptGeneratorMode> getJavascriptGeneratorModes() {
         return modes;
     }
+
     @Override
     public void parse() throws IOException {
         parser = new DirectiveParser(this, getStartFile());
@@ -93,7 +103,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         List<JavascriptProcessingError> errors = parser.validate(jsv);
         if (!errors.isEmpty()) {
             StringBuilder errorSb = new StringBuilder();
-            for(JavascriptProcessingError error : errors){
+            for (JavascriptProcessingError error : errors) {
                 errorSb.append(error.toString());
                 errorSb.append('\n');
             }
@@ -117,7 +127,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                try{
+                try {
                     Writer writer = null;
                     try {
                         writer = new FileWriter(dest);
@@ -134,9 +144,9 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                         }
                         dest.setReadOnly();
                     }
-                }catch(IOException e){
+                } catch (IOException e) {
                     throw new RuntimeException(e);
-                }finally{
+                } finally {
                     counter.countDown();
                 }
             }

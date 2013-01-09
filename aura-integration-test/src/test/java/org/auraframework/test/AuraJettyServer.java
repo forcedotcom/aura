@@ -18,7 +18,6 @@ package org.auraframework.test;
 import java.io.File;
 
 import org.auraframework.Aura;
-
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
@@ -27,8 +26,8 @@ import org.openqa.selenium.net.PortProber;
 
 /**
  * A Jetty server configured with default Aura descriptor and resources.
- *
- *
+ * 
+ * 
  * @since 0.0.302
  */
 public class AuraJettyServer extends Server {
@@ -71,8 +70,8 @@ public class AuraJettyServer extends Server {
         context.setParentLoaderPriority(true);
         context.setTempDirectory(tmpDir);
 
-        String resources = System.getProperty("jetty.resources", AuraJettyServer.class.getResource("/org/auraframework/test")
-                .toString());
+        String resources = System.getProperty("jetty.resources",
+                AuraJettyServer.class.getResource("/org/auraframework/test").toString());
         context.setResourceBase(resources);
 
         setHandler(context);

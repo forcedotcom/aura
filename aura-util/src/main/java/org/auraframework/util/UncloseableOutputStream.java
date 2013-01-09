@@ -17,7 +17,9 @@
  */
 package org.auraframework.util;
 
-import java.io.*;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  */

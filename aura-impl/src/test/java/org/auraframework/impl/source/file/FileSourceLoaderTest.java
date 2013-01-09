@@ -46,8 +46,9 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
     @Override
     public void runTest() throws Throwable {
         // filesystem tests are only good if loading from filesystem
-        if (AuraImplFiles.TestComponents.asFile().exists())
+        if (AuraImplFiles.TestComponents.asFile().exists()) {
             super.runTest();
+        }
     }
 
     public void testFileSourceLoaderSanity() {
@@ -58,14 +59,16 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
         try {
             new FileSourceLoader(new File("this_probably_doesnt_exist"));
             fail("Should have thrown AuraException(Base directory does not exist)");
-        } catch (AuraRuntimeException e) {}
+        } catch (AuraRuntimeException e) {
+        }
     }
 
     public void testFileSourceLoaderWithNullFile() {
         try {
             new FileSourceLoader(null);
             fail("Should have thrown AuraException(Base directory does not exist)");
-        } catch (AuraRuntimeException e) {}
+        } catch (AuraRuntimeException e) {
+        }
 
     }
 
@@ -142,14 +145,15 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
         found = loader.find(new DescriptorFilter("markup://test:extendsParent"));
         assertEquals("Should have found a single component", 1, found.size());
         assertTrue(found.contains(DefDescriptorImpl.getInstance("markup://test:extendsParent", ComponentDef.class)));
-        
-        // Number of results can change if files modified so just check at least 2 results from wildcard search since 
+
+        // Number of results can change if files modified so just check at least
+        // 2 results from wildcard search since
         // components are more likely to be added than deleted.
         found = loader.find(new DescriptorFilter("markup://test:theme*"));
         assertTrue("Should have found multiple components", found.size() > 1);
         assertTrue(found.contains(DefDescriptorImpl.getInstance("markup://test:themeTestTemplate", ComponentDef.class)));
         assertTrue(found.contains(DefDescriptorImpl.getInstance("markup://test:themeTest", ApplicationDef.class)));
-        
+
         found = loader.find(new DescriptorFilter("markup://test:doesntexist"));
         assertEquals("Should not have found any components", 0, found.size());
     }

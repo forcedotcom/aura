@@ -28,11 +28,11 @@ import org.auraframework.util.json.Json;
 
 /**
  * Controller JSON format adapter.
- *
+ * 
  * @since 0.0.116
  */
 @ThreadSafe
-public class ControllerDefJSONFormatAdapter extends JSONFormatAdapter<ControllerDef>{
+public class ControllerDefJSONFormatAdapter extends JSONFormatAdapter<ControllerDef> {
 
     @Override
     public Class<ControllerDef> getType() {
@@ -40,7 +40,8 @@ public class ControllerDefJSONFormatAdapter extends JSONFormatAdapter<Controller
     }
 
     @Override
-    public void writeCollection(Collection<? extends ControllerDef> values, Appendable out) throws IOException, QuickFixException {
+    public void writeCollection(Collection<? extends ControllerDef> values, Appendable out) throws IOException,
+            QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         Json.serialize(values, out, context.getJsonSerializationContext());
     }

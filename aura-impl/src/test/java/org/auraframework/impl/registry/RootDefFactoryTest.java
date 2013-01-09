@@ -30,7 +30,7 @@ import com.google.common.collect.Lists;
 
 public class RootDefFactoryTest extends AuraImplTestCase {
 
-    private String baseContents = "<aura:application></aura:application>";
+    private final String baseContents = "<aura:application></aura:application>";
 
     public RootDefFactoryTest(String name) {
         super(name);
@@ -43,34 +43,32 @@ public class RootDefFactoryTest extends AuraImplTestCase {
         String namespace = "testFindRegex" + auraTestingUtil.getNonce();
         DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class, baseContents,
                 String.format("%s:houseboat", namespace));
-        addSourceAutoCleanup(ApplicationDef.class, baseContents,
-                String.format("%s:houseparty", namespace));
-        addSourceAutoCleanup(ApplicationDef.class, baseContents,
-                String.format("%s:pantsparty", namespace));
+        addSourceAutoCleanup(ApplicationDef.class, baseContents, String.format("%s:houseparty", namespace));
+        addSourceAutoCleanup(ApplicationDef.class, baseContents, String.format("%s:pantsparty", namespace));
 
-        StringSourceLoader loader =  StringSourceLoader.getInstance();
-        List<SourceLoader> loaders = Lists.newArrayList((SourceLoader)loader);
+        StringSourceLoader loader = StringSourceLoader.getInstance();
+        List<SourceLoader> loaders = Lists.newArrayList((SourceLoader) loader);
         RootDefFactory factory = new RootDefFactory(new SourceFactory(loaders));
 
         assertTrue("RootDefFactory should have a find() method", factory.hasFind());
         assertTrue("find() not finding all sources",
-                   factory.find(new DescriptorFilter(String.format("markup://%s:*", namespace))).size() == 3);
+                factory.find(new DescriptorFilter(String.format("markup://%s:*", namespace))).size() == 3);
         assertEquals("find() fails with wildcard as prefix", 1,
-                     factory.find(new DescriptorFilter("*://" + houseboat.getDescriptorName())).size());
+                factory.find(new DescriptorFilter("*://" + houseboat.getDescriptorName())).size());
         assertEquals("find() fails with wildcard as namespace", 1,
-                     factory.find(new DescriptorFilter("markup://*:" + houseboat.getName())).size());
+                factory.find(new DescriptorFilter("markup://*:" + houseboat.getName())).size());
         assertEquals("find() fails with wildcard as name", 1,
-                     factory.find(new DescriptorFilter(houseboat.getQualifiedName())).size());
+                factory.find(new DescriptorFilter(houseboat.getQualifiedName())).size());
         assertEquals("find() fails with wildcard at end of name", 2,
-                     factory.find(new DescriptorFilter(String.format("markup://%s:house*", namespace))).size());
+                factory.find(new DescriptorFilter(String.format("markup://%s:house*", namespace))).size());
         assertEquals("find() fails with wildcard at beginning of name", 2,
-                     factory.find(new DescriptorFilter(String.format("markup://%s:*party*", namespace))).size());
+                factory.find(new DescriptorFilter(String.format("markup://%s:*party*", namespace))).size());
 
         assertEquals("find() should not find nonexistent name", 0,
-                     factory.find(new DescriptorFilter(String.format("markup://%s:househunters", namespace))).size());
+                factory.find(new DescriptorFilter(String.format("markup://%s:househunters", namespace))).size());
         assertEquals("find() should not find nonexistent name ending with wildcard", 0,
-                     factory.find(new DescriptorFilter(String.format("markup://%s:househunters*", namespace))).size());
+                factory.find(new DescriptorFilter(String.format("markup://%s:househunters*", namespace))).size());
         assertEquals("find() should not find nonexistent name with preceeding wildcard", 0,
-                     factory.find(new DescriptorFilter(String.format("markup://%s:*notherecaptain", namespace))).size());
+                factory.find(new DescriptorFilter(String.format("markup://%s:*notherecaptain", namespace))).size());
     }
 }

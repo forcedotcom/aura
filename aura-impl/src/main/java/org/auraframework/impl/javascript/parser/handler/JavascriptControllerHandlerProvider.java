@@ -15,7 +15,9 @@
  */
 package org.auraframework.impl.javascript.parser.handler;
 
-import org.auraframework.util.json.*;
+import org.auraframework.util.json.JsFunction;
+import org.auraframework.util.json.JsonHandlerProviderImpl;
+import org.auraframework.util.json.JsonObjectHandler;
 
 /**
  * handler provider for js controllers, only allows functions

@@ -15,7 +15,6 @@
  */
 package org.auraframework.system;
 
-
 /**
  * LoggingContext public interface
  */

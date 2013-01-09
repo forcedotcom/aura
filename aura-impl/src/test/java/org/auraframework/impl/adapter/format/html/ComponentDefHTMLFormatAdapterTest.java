@@ -19,14 +19,13 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.AuraContext;
-
 import org.auraframework.test.annotation.UnAdaptableTest;
 
 /**
-* Tests for BaseComponentDefHTMLFormatAdapter, as it relates to ComponentDef
-*
-* @since 0.0.224
-*/
+ * Tests for BaseComponentDefHTMLFormatAdapter, as it relates to ComponentDef
+ * 
+ * @since 0.0.224
+ */
 public class ComponentDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFormatAdapterTest<ComponentDef> {
 
     public ComponentDefHTMLFormatAdapterTest(String name) {
@@ -39,8 +38,9 @@ public class ComponentDefHTMLFormatAdapterTest extends BaseComponentDefHTMLForma
     }
 
     /**
-     * Don't append the manifest attribute to <html> when accessing components directly.
-     *
+     * Don't append the manifest attribute to <html> when accessing components
+     * directly.
+     * 
      * TODO: re-enable after W-1166679
      */
     @UnAdaptableTest

@@ -22,7 +22,6 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.java.model.JavaModel;
 import org.auraframework.instance.ValueProvider;
 import org.auraframework.instance.Wrapper;
-
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
@@ -55,7 +54,7 @@ public class JavaValueProvider implements ValueProvider, Wrapper, JsonSerializab
     @Override
     public Iterator<Object> iterator() {
         if (obj instanceof Iterable) {
-            final Iterator<?> it = ((Iterable<?>)obj).iterator();
+            final Iterator<?> it = ((Iterable<?>) obj).iterator();
             return new Iterator<Object>() {
 
                 @Override

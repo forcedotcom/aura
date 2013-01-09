@@ -23,6 +23,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 public interface ApplicationDef extends BaseComponentDef {
     @Override
     DefDescriptor<ApplicationDef> getDescriptor();
+
     @Override
     DefDescriptor<ApplicationDef> getExtendsDescriptor();
 
@@ -37,5 +38,5 @@ public interface ApplicationDef extends BaseComponentDef {
     Boolean isAppcacheEnabled() throws QuickFixException;
 
     Boolean isOnePageApp() throws QuickFixException;
-    
+
 }

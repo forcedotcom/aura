@@ -19,12 +19,20 @@ import java.io.IOException;
 import java.util.List;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.EventHandlerDef;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
@@ -49,62 +57,62 @@ public class DefOverviewModel {
     private final boolean isAbstract;
     private final List<String> interfaces = Lists.newArrayList();
 
-    public DefOverviewModel() throws QuickFixException{
+    public DefOverviewModel() throws QuickFixException {
 
         AuraContext context = Aura.getContextService().getCurrentContext();
-        BaseComponent<?,?> component = context.getCurrentComponent();
+        BaseComponent<?, ?> component = context.getCurrentComponent();
 
-        String desc = (String)component.getAttributes().getValue("descriptor");
+        String desc = (String) component.getAttributes().getValue("descriptor");
 
-        DefType defType = DefType.valueOf(((String)component.getAttributes().getValue("defType")).toUpperCase());
+        DefType defType = DefType.valueOf(((String) component.getAttributes().getValue("defType")).toUpperCase());
         descriptor = Aura.getDefinitionService().getDefDescriptor(desc, defType.getPrimaryInterface());
         definition = descriptor.getDef();
         String type = null;
 
-        if(definition instanceof RootDefinition){
-            RootDefinition rootDef = (RootDefinition)definition;
-            for(AttributeDef attribute : rootDef.getAttributeDefs().values()){
+        if (definition instanceof RootDefinition) {
+            RootDefinition rootDef = (RootDefinition) definition;
+            for (AttributeDef attribute : rootDef.getAttributeDefs().values()) {
                 attributes.add(new AttributeModel(attribute));
             }
-            if(definition instanceof BaseComponentDef){
-                BaseComponentDef cmpDef = (BaseComponentDef)definition;
-                for(RegisterEventDef reg : cmpDef.getRegisterEventDefs().values()){
+            if (definition instanceof BaseComponentDef) {
+                BaseComponentDef cmpDef = (BaseComponentDef) definition;
+                for (RegisterEventDef reg : cmpDef.getRegisterEventDefs().values()) {
                     events.add(new AttributeModel(reg));
                 }
-                for(EventHandlerDef handler : cmpDef.getHandlerDefs()){
+                for (EventHandlerDef handler : cmpDef.getHandlerDefs()) {
                     handledEvents.add(new AttributeModel(handler));
                 }
-                for(DefDescriptor<InterfaceDef> intf : cmpDef.getInterfaces()){
+                for (DefDescriptor<InterfaceDef> intf : cmpDef.getInterfaces()) {
                     interfaces.add(intf.getNamespace() + ":" + intf.getName());
                 }
                 DefDescriptor<?> superDesc = cmpDef.getExtendsDescriptor();
-                if(superDesc != null){
+                if (superDesc != null) {
                     theSuper = superDesc.getNamespace() + ":" + superDesc.getName();
-                }else{
+                } else {
                     theSuper = null;
                 }
                 isAbstract = cmpDef.isAbstract();
                 isExtensible = cmpDef.isExtensible();
 
-            }else if(definition instanceof EventDef){
-                EventDef eventDef = (EventDef)definition;
+            } else if (definition instanceof EventDef) {
+                EventDef eventDef = (EventDef) definition;
                 DefDescriptor<?> superDesc = eventDef.getExtendsDescriptor();
-                if(superDesc != null){
+                if (superDesc != null) {
                     theSuper = superDesc.getNamespace() + ":" + superDesc.getName();
-                }else{
+                } else {
                     theSuper = null;
                 }
 
                 type = eventDef.getEventType().name();
                 isExtensible = true;
                 isAbstract = false;
-            }else{
+            } else {
                 theSuper = null;
                 isExtensible = true;
                 isAbstract = false;
             }
             support = rootDef.getSupport().name();
-        }else{
+        } else {
             support = null;
             theSuper = null;
             isExtensible = false;
@@ -119,12 +127,12 @@ public class DefOverviewModel {
     }
 
     @AuraEnabled
-    public String getNamespace(){
+    public String getNamespace() {
         return descriptor.getNamespace();
     }
 
     @AuraEnabled
-    public String getName(){
+    public String getName() {
         return descriptor.getName();
     }
 
@@ -139,17 +147,17 @@ public class DefOverviewModel {
     }
 
     @AuraEnabled
-    public String getDefType(){
+    public String getDefType() {
         return descriptor.getDefType().name().toLowerCase();
     }
 
     @AuraEnabled
-    public String getDescription(){
+    public String getDescription() {
         return definition.getDescription();
     }
 
     @AuraEnabled
-    public List<AttributeModel> getAttributes(){
+    public List<AttributeModel> getAttributes() {
         return attributes;
     }
 
@@ -159,17 +167,17 @@ public class DefOverviewModel {
     }
 
     @AuraEnabled
-    public List<AttributeModel> getHandledEvents(){
+    public List<AttributeModel> getHandledEvents() {
         return handledEvents;
     }
 
     @AuraEnabled
-    public List<AttributeModel> getEvents(){
+    public List<AttributeModel> getEvents() {
         return events;
     }
 
     @AuraEnabled
-    public String getSupport(){
+    public String getSupport() {
         return support;
     }
 
@@ -183,7 +191,7 @@ public class DefOverviewModel {
         return isAbstract;
     }
 
-    public class AttributeModel implements JsonSerializable{
+    public class AttributeModel implements JsonSerializable {
 
         private final String name;
         private final String description;
@@ -193,27 +201,27 @@ public class DefOverviewModel {
         private final String parentName;
         private final String parentDefType;
 
-        private AttributeModel(AttributeDef def) throws QuickFixException{
+        private AttributeModel(AttributeDef def) throws QuickFixException {
             this.name = def.getName();
             this.description = def.getDescription();
             this.type = def.getTypeDef().getName();
             this.required = def.isRequired();
-            if(def.getDefaultValue() != null){
+            if (def.getDefaultValue() != null) {
                 this.defaultValue = def.getDefaultValue().getValue().toString();
-            }else{
+            } else {
                 this.defaultValue = null;
             }
             DefDescriptor<?> parentDesc = def.getParentDescriptor();
-            if(parentDesc == null || parentDesc.equals(DefOverviewModel.this.descriptor)){
+            if (parentDesc == null || parentDesc.equals(DefOverviewModel.this.descriptor)) {
                 this.parentName = null;
                 this.parentDefType = null;
-            }else{
+            } else {
                 this.parentName = parentDesc.getNamespace() + ":" + parentDesc.getName();
                 this.parentDefType = parentDesc.getDefType().name();
             }
         }
 
-        private AttributeModel(RegisterEventDef def) throws QuickFixException{
+        private AttributeModel(RegisterEventDef def) throws QuickFixException {
             this.name = def.getAttributeName();
             this.description = def.getDescription();
             this.type = def.getDescriptor().getNamespace() + ":" + def.getDescriptor().getName();
@@ -223,11 +231,11 @@ public class DefOverviewModel {
             this.parentDefType = null;
         }
 
-        private AttributeModel(EventHandlerDef def) throws QuickFixException{
+        private AttributeModel(EventHandlerDef def) throws QuickFixException {
             this.description = def.getDescription();
-            if(def.getDescriptor() != null){
+            if (def.getDescriptor() != null) {
                 this.type = def.getDescriptor().getNamespace() + ":" + def.getDescriptor().getName();
-            }else{
+            } else {
                 this.type = null;
             }
             this.required = false;
@@ -240,13 +248,13 @@ public class DefOverviewModel {
         @Override
         public void serialize(Json json) throws IOException {
             json.writeMapBegin();
-            json.writeMapEntry("name",name);
-            json.writeMapEntry("description",description);
-            json.writeMapEntry("type",type);
-            json.writeMapEntry("required",required);
-            json.writeMapEntry("defaultValue",defaultValue);
-            json.writeMapEntry("parentName",parentName);
-            json.writeMapEntry("parentDefType",parentDefType);
+            json.writeMapEntry("name", name);
+            json.writeMapEntry("description", description);
+            json.writeMapEntry("type", type);
+            json.writeMapEntry("required", required);
+            json.writeMapEntry("defaultValue", defaultValue);
+            json.writeMapEntry("parentName", parentName);
+            json.writeMapEntry("parentDefType", parentDefType);
             json.writeMapEnd();
         }
 
@@ -286,4 +294,3 @@ public class DefOverviewModel {
         }
     }
 }
-

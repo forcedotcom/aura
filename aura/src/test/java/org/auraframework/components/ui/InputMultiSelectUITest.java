@@ -54,7 +54,7 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
     }
 
     private void selectDeselectOption(String optionLabel, boolean isSelect) {
-    	if (isSelect) {
+        if (isSelect) {
             inputSelect.selectByVisibleText(optionLabel);
             verifyOptionSelected(optionLabel);
         } else {
@@ -90,15 +90,14 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
     }
 
     /**
-     * Select one. Choose one option.
-     * Deselect one. Deselect one option.
+     * Select one. Choose one option. Deselect one. Deselect one option.
      */
     public void testInputSelectSingle() throws Exception {
         openTestPage();
 
         // select
         focusSelectElement();
-        selectOption("Option1"); 
+        selectOption("Option1");
         verifyOptionDeselected("Option2");
         verifyOptionDeselected("Option3");
 
@@ -122,8 +121,8 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
     }
 
     /**
-     * Select multiple. Choose multiple options.
-     * Deselect multiple. Deselect multiple options.
+     * Select multiple. Choose multiple options. Deselect multiple. Deselect
+     * multiple options.
      */
     public void testInputSelectDeselectMultiple() throws Exception {
         openTestPage();
@@ -152,8 +151,7 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
     }
 
     /**
-     * Select all. Select all options.
-     * Deselect all. Deselect all options.
+     * Select all. Select all options. Deselect all. Deselect all options.
      */
     public void testInputSelectDeselectAll() throws Exception {
         openTestPage();
@@ -185,17 +183,17 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
 
     private void focusSelectElement() {
         // Only for IE10 we need to explicitly bring focus on to select input
-    	// selectBy() does not do it. But clicking on select element corrupts
-    	// selected/unselected options so we need to preserve the state
-    	List<WebElement> selectedOptions = inputSelect.getAllSelectedOptions();
-    	selectElement.click();
-    	int checkNum = inputSelect.getAllSelectedOptions().size();
-    	
-    	if (checkNum != selectedOptions.size()) {
-	    	inputSelect.deselectAll();
-	    	for (int i=0; i<selectedOptions.size(); i++) {
-	    		inputSelect.selectByVisibleText(selectedOptions.get(i).getText());
-	    	}
-    	}
+        // selectBy() does not do it. But clicking on select element corrupts
+        // selected/unselected options so we need to preserve the state
+        List<WebElement> selectedOptions = inputSelect.getAllSelectedOptions();
+        selectElement.click();
+        int checkNum = inputSelect.getAllSelectedOptions().size();
+
+        if (checkNum != selectedOptions.size()) {
+            inputSelect.deselectAll();
+            for (int i = 0; i < selectedOptions.size(); i++) {
+                inputSelect.selectByVisibleText(selectedOptions.get(i).getText());
+            }
+        }
     }
 }

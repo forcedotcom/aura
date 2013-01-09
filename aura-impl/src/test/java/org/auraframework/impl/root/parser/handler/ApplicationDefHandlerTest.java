@@ -27,7 +27,6 @@ import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.AuraRuntimeException;
-
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 public class ApplicationDefHandlerTest extends AuraImplTestCase {
@@ -42,10 +41,11 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        StringSource<ApplicationDef> source = new StringSource<ApplicationDef>(vendor.getApplicationDefDescriptor(), "<aura:application controller='"
-                + vendor.getControllerDescriptor().getQualifiedName() + "' extends='"
-                + vendor.getParentComponentDefDescriptor() + "' implements='" + vendor.getInterfaceDefDescriptor()
-                + "' abstract='true'>Child Text<aura:foo/></aura:application>", "myID", Format.XML);
+        StringSource<ApplicationDef> source = new StringSource<ApplicationDef>(vendor.getApplicationDefDescriptor(),
+                "<aura:application controller='" + vendor.getControllerDescriptor().getQualifiedName() + "' extends='"
+                        + vendor.getParentComponentDefDescriptor() + "' implements='"
+                        + vendor.getInterfaceDefDescriptor()
+                        + "' abstract='true'>Child Text<aura:foo/></aura:application>", "myID", Format.XML);
         xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
         xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());
@@ -55,7 +55,7 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
 
     public void testReadAttributes() throws Exception {
         cdHandler.readAttributes();
-        ApplicationDefImpl cd = (ApplicationDefImpl)cdHandler.createDefinition();
+        ApplicationDefImpl cd = (ApplicationDefImpl) cdHandler.createDefinition();
         assertEquals(vendor.getParentComponentDefDescriptor().getQualifiedName(), cd.getExtendsDescriptor()
                 .getQualifiedName());
         assertEquals(vendor.getInterfaceDefDescriptor(), cd.getInterfaces().iterator().next());
@@ -78,28 +78,29 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
         try {
             parser.parse(descriptor, source);
             fail("Should have thrown Exception. Two attributes with the same name cannot exist");
-        } catch (AuraRuntimeException expected) {}
+        } catch (AuraRuntimeException expected) {
+        }
     }
 
     /**
      * Verify that wild characters are not accepted for preload specifier
-     *
+     * 
      * @throws Exception
      */
     public void testWildCharactersForPreLoad() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ApplicationDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser",
                 ApplicationDef.class);
-        StringSource<ApplicationDef> source = new StringSource<ApplicationDef>(descriptor, "<aura:application preload=\"*,?,/\"></aura:application>", "myID",
-                Format.XML);
+        StringSource<ApplicationDef> source = new StringSource<ApplicationDef>(descriptor,
+                "<aura:application preload=\"*,?,/\"></aura:application>", "myID", Format.XML);
         try {
             ApplicationDef app = parser.parse(descriptor, source);
             app.validateDefinition();
             app.validateReferences();
             fail("Should have thrown Exception. Wild characters cannot be specified for preload namespace");
         } catch (InvalidDefinitionException expected) {
-            assertTrue("Unexpected message "+expected.getMessage(),
-                       expected.getMessage().equals("Illegal namespace in ?"));
+            assertTrue("Unexpected message " + expected.getMessage(),
+                    expected.getMessage().equals("Illegal namespace in ?"));
         }
     }
 

@@ -20,9 +20,6 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
-
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LayoutsDef;
@@ -30,6 +27,9 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.layouts.LayoutsDefImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 /**
  */
@@ -40,15 +40,12 @@ public class LayoutsDefHandler extends RootTagHandler<LayoutsDef> {
     private static final String ATTRIBUTE_DEFAULT = "default";
     private static final String ATTRIBUTE_CATCHALL = "catchall";
 
-    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-        ATTRIBUTE_DEFAULT,
-        ATTRIBUTE_CATCHALL,
-        RootTagHandler.ATTRIBUTE_DESCRIPTION
-    );
+    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_DEFAULT, ATTRIBUTE_CATCHALL,
+            RootTagHandler.ATTRIBUTE_DESCRIPTION);
 
-    private LayoutsDefImpl.Builder builder = new LayoutsDefImpl.Builder();
+    private final LayoutsDefImpl.Builder builder = new LayoutsDefImpl.Builder();
 
-    public LayoutsDefHandler(DefDescriptor<LayoutsDef> defDescriptor, Source<?> source, XMLStreamReader xmlReader){
+    public LayoutsDefHandler(DefDescriptor<LayoutsDef> defDescriptor, Source<?> source, XMLStreamReader xmlReader) {
         super(defDescriptor, source, xmlReader);
         builder.setDescriptor(defDescriptor);
         builder.setLocation(getLocation());
@@ -98,7 +95,7 @@ public class LayoutsDefHandler extends RootTagHandler<LayoutsDef> {
 
     @Override
     public void addExpressionReferences(Set<PropertyReference> propRefs) {
-        if(builder.expressionRefs == null){
+        if (builder.expressionRefs == null) {
             builder.expressionRefs = Sets.newHashSet();
         }
         builder.expressionRefs.addAll(propRefs);

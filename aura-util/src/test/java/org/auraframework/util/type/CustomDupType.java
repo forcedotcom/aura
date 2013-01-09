@@ -21,9 +21,11 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
 public class CustomDupType implements JsonSerializable {
-    private String name =null;
+    private String name = null;
+
     @Override
-    public void serialize(Json json) throws IOException {}
+    public void serialize(Json json) throws IOException {
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -33,7 +35,7 @@ public class CustomDupType implements JsonSerializable {
         return name;
     }
 
-    public CustomDupType(String s){
-        name= s;
+    public CustomDupType(String s) {
+        name = s;
     }
 }

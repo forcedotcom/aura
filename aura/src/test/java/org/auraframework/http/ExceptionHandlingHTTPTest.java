@@ -27,9 +27,11 @@ public class ExceptionHandlingHTTPTest extends AuraHttpTestCase {
 
     @SuppressWarnings("unchecked")
     public void testExceptionLineColNums() throws Exception {
-        ServerAction a = ServerAction.run("java://org.auraframework.impl.java.controller.JavaTestController/ACTION$throwExceptionNoLineNums", null);
-        Map<String, Object> error = (Map<String, Object>)a.getErrors().get(0);
-        String message = (String)error.get("message");
+        ServerAction a = ServerAction.run(
+                "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$throwExceptionNoLineNums",
+                null);
+        Map<String, Object> error = (Map<String, Object>) a.getErrors().get(0);
+        String message = (String) error.get("message");
 
         assertFalse("Location should not put out -1,-1 as the line/column", message.contains("-1,-1"));
     }

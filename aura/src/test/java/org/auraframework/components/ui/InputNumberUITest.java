@@ -15,9 +15,10 @@
  */
 package org.auraframework.components.ui;
 
-import org.openqa.selenium.*;
-
 import org.auraframework.test.WebDriverTestCase;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 public class InputNumberUITest extends WebDriverTestCase {
 
@@ -45,7 +46,7 @@ public class InputNumberUITest extends WebDriverTestCase {
         submit.click();
         waitForElementTextPresent(output, "-123");
     }
-    
+
     // FIXME: bug W-1296985
     public void _testInputNumberDefaultValue() throws Exception {
         WebDriver d = getDriver();
@@ -55,8 +56,8 @@ public class InputNumberUITest extends WebDriverTestCase {
         assertEquals("Default number from model is incorrect", "123456789123456789", input.getAttribute("value"));
     }
 
-
-    // TODO: WebDriver doesn't support setting http headers for language. Need to use proxy or preconfigured browser to spoof Locales other than US.
+    // TODO: WebDriver doesn't support setting http headers for language. Need
+    // to use proxy or preconfigured browser to spoof Locales other than US.
     public void testLocalizedInputNumber() throws Exception {
         WebDriver d = getDriver();
         open("/uitest/inputLocalizedNumber_Test.cmp");
@@ -91,7 +92,7 @@ public class InputNumberUITest extends WebDriverTestCase {
     }
 
     public void testInputNumberWithError() throws Exception {
-    	WebDriver d = getDriver();
+        WebDriver d = getDriver();
         open("/uitest/inputNumber_Test.cmp");
 
         WebElement input = d.findElement(By.xpath("//input"));
@@ -103,10 +104,10 @@ public class InputNumberUITest extends WebDriverTestCase {
         input.sendKeys("abcdef");
         submit.click();
         waitForElementTextPresent(output, "Got Error!");
-        
+
         WebElement error = d.findElement(By.className("uiInputDefaultError"));
-        assertEquals("Incorrect error message", "Invalid value for inVar: java://long",error.getText());
-        
+        assertEquals("Incorrect error message", "Invalid value for inVar: java://long", error.getText());
+
         // clear error
         input.clear();
         input.sendKeys("1234");

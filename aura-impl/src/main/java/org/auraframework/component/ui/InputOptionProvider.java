@@ -22,25 +22,29 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.instance.*;
+import org.auraframework.instance.AttributeSet;
+import org.auraframework.instance.BaseComponent;
+import org.auraframework.instance.ComponentConfig;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
- * Render inputCheckbox, inputRadio and inputSelectOption based on "type" attribute.
- *
- *
+ * Render inputCheckbox, inputRadio and inputSelectOption based on "type"
+ * attribute.
+ * 
+ * 
  * @since Touch.174.3
  */
 @Provider
 public class InputOptionProvider {
     public static ComponentConfig provide() throws QuickFixException {
-        BaseComponent<?,?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
         AttributeSet attributes = component.getAttributes();
         ComponentConfig componentConfig = new ComponentConfig();
-        DefDescriptor<ComponentDef> defDescriptor = DefDescriptorImpl.getInstance(COMPONENT_UI_OUTPUTTEXT, ComponentDef.class);
+        DefDescriptor<ComponentDef> defDescriptor = DefDescriptorImpl.getInstance(COMPONENT_UI_OUTPUTTEXT,
+                ComponentDef.class);
 
-        String type = (String)attributes.getValue("type");
+        String type = (String) attributes.getValue("type");
         if (TYPE_UI_INPUTCHECKBOX.equalsIgnoreCase(type)) {
             defDescriptor = DefDescriptorImpl.getInstance(COMPONENT_UI_INPUTCHECKBOX, ComponentDef.class);
         } else if (TYPE_UI_INPUTRADI.equalsIgnoreCase(type)) {
@@ -49,21 +53,21 @@ public class InputOptionProvider {
             defDescriptor = DefDescriptorImpl.getInstance(COMPONENT_UI_INPUTSELECTOPTION, ComponentDef.class);
         } else {
             Map<String, Object> passingAttrs = new HashMap<String, Object>();
-            passingAttrs.put(VALUE_ATTRIBUTE_NAME,
-                    "Error in " + component.getDescriptor().getQualifiedName() + ": invalid type " + type);
+            passingAttrs.put(VALUE_ATTRIBUTE_NAME, "Error in " + component.getDescriptor().getQualifiedName()
+                    + ": invalid type " + type);
             componentConfig.setAttributes(passingAttrs);
         }
         componentConfig.setDescriptor(defDescriptor);
         return componentConfig;
     }
 
-    //component name
+    // component name
     private static final String COMPONENT_UI_INPUTCHECKBOX = "ui:inputCheckbox";
     private static final String COMPONENT_UI_INPUTRADIO = "ui:inputRadio";
     private static final String COMPONENT_UI_INPUTSELECTOPTION = "ui:inputSelectOption";
     private static final String COMPONENT_UI_OUTPUTTEXT = "ui:outputText";
 
-    //type names
+    // type names
     private static final String TYPE_UI_INPUTCHECKBOX = "checkbox";
     private static final String TYPE_UI_INPUTRADI = "radio";
     private static final String TYPE_UI_INPUTSELECTOPTION = "selectOption";

@@ -18,11 +18,10 @@ package org.auraframework.builder;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 
-public interface LazyComponentDefRefBuilder extends ComponentDefRefBuilder{
+public interface LazyComponentDefRefBuilder extends ComponentDefRefBuilder {
 
     LazyComponentDefRefBuilder setRefDescriptor(DefDescriptor<ComponentDef> refDescriptor);
 
     LazyComponentDefRefBuilder setComponentAttribute(String key, Object value);
 
 }
-

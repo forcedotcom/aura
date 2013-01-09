@@ -25,9 +25,8 @@ import org.auraframework.util.type.converter.StringToDoubleConverter;
 /**
  * Used by aura.impl.java.type.JavaLocalizedTypeUtil;
  */
-public class LocalizedStringToDoubleConverter
-    extends StringToDoubleConverter
-    implements LocalizedConverter<String, Double> {
+public class LocalizedStringToDoubleConverter extends StringToDoubleConverter implements
+        LocalizedConverter<String, Double> {
 
     @Override
     public Double convert(String value, AuraLocale locale) {
@@ -47,6 +46,5 @@ public class LocalizedStringToDoubleConverter
             return super.convert(value);
         }
     }
-
 
 }

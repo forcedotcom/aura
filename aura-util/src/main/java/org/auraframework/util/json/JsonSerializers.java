@@ -15,7 +15,23 @@
  */
 package org.auraframework.util.json;
 
-import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeSet;
+
 import org.auraframework.util.date.DateOnly;
 import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
@@ -24,10 +40,7 @@ import org.auraframework.util.json.Json.Serialization;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
 import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.Map.Entry;
+import com.google.common.collect.Maps;
 
 /**
  * Some basic serializers
@@ -71,7 +84,7 @@ public class JsonSerializers {
         m.put(GregorianCalendar.class, CALENDAR);
 
         Map<String, JsonSerializer<?>> mFast = Maps.newLinkedHashMap();
-        for(Entry<Class<?>, JsonSerializer<?>> e : m.entrySet()){
+        for (Entry<Class<?>, JsonSerializer<?>> e : m.entrySet()) {
             mFast.put(e.getKey().getName(), e.getValue());
         }
         MAPPY_FASTY = Collections.unmodifiableMap(mFast);
@@ -196,8 +209,10 @@ public class JsonSerializers {
         public void serialize(Json json, Object value) throws IOException {
             if (json.getSerializationContext().getVariableDataSizeLimit() > -1
                     && ((String) value).length() > json.getSerializationContext().getVariableDataSizeLimit()) {
-                value = ((String) value).substring(0, json.getSerializationContext().getVariableDataSizeLimit()) +
-                 " (" + Integer.toString(((String) value).length() - json.getSerializationContext().getVariableDataSizeLimit()) + " more) ...";
+                value = ((String) value).substring(0, json.getSerializationContext().getVariableDataSizeLimit())
+                        + " ("
+                        + Integer.toString(((String) value).length()
+                                - json.getSerializationContext().getVariableDataSizeLimit()) + " more) ...";
             }
             json.writeString(value);
         }

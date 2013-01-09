@@ -30,8 +30,8 @@ import org.auraframework.test.WebDriverTestCase;
 import org.openqa.selenium.JavascriptExecutor;
 
 /**
- * This class has tests to verify the component tree constructed on the client based on information sent from
- * AuraServlet.
+ * This class has tests to verify the component tree constructed on the client
+ * based on information sent from AuraServlet.
  */
 public class ComponentTreeTest extends WebDriverTestCase {
 
@@ -41,7 +41,7 @@ public class ComponentTreeTest extends WebDriverTestCase {
 
     /**
      * Verify client shape for application.
-     *
+     * 
      * @throws Exception
      */
     public void testServerVSClientShape() throws Exception {
@@ -50,7 +50,7 @@ public class ComponentTreeTest extends WebDriverTestCase {
 
     /**
      * Verify client shape for a foreach loop.
-     *
+     * 
      * @throws Exception
      */
     public void testForeachBasicTypes() throws Exception {
@@ -58,9 +58,9 @@ public class ComponentTreeTest extends WebDriverTestCase {
     }
 
     /**
-     * Convenience method to compare globalIds of component instance in the client with component instance in the
-     * server.
-     *
+     * Convenience method to compare globalIds of component instance in the
+     * client with component instance in the server.
+     * 
      * @param name the name of the component/app to check
      * @param type the type (app/component)
      * @throws Exception
@@ -71,13 +71,12 @@ public class ComponentTreeTest extends WebDriverTestCase {
         if (contextService.isEstablished()) {
             contextService.endContext();
         }
-        contextService.startContext(AuraContext.Mode.DEV, AuraContext.Format.HTML,
-                                               AuraContext.Access.AUTHENTICATED);
+        contextService.startContext(AuraContext.Mode.DEV, AuraContext.Format.HTML, AuraContext.Access.AUTHENTICATED);
         open(String.format("/%s/%s.%s", dd.getNamespace(), dd.getName(),
-                           DefDescriptor.DefType.APPLICATION.equals(dd.getDefType()) ? "app" : "cmp"),Mode.SELENIUM);
-        //open(dd);
+                DefDescriptor.DefType.APPLICATION.equals(dd.getDefType()) ? "app" : "cmp"), Mode.SELENIUM);
+        // open(dd);
         String clientIndex = getEval("return window.aura.componentService.getIndex();");
-        String [] clientlines = clientIndex.split("\n");
+        String[] clientlines = clientIndex.split("\n");
 
         AuraContext context = contextService.getCurrentContext();
         context.setNum("1");
@@ -101,8 +100,9 @@ public class ComponentTreeTest extends WebDriverTestCase {
             }
 
             serverIndexSB.append(" ] ");
-            //System.out.println(serverIndexSB.toString().toLowerCase() +" @@@@ "+ clientlines[i-1].toLowerCase());
-            assertEquals(serverIndexSB.toString().toLowerCase(), clientlines[i-1].toLowerCase());
+            // System.out.println(serverIndexSB.toString().toLowerCase()
+            // +" @@@@ "+ clientlines[i-1].toLowerCase());
+            assertEquals(serverIndexSB.toString().toLowerCase(), clientlines[i - 1].toLowerCase());
         }
         assertEquals("Number of components does not match", serverIndex.size(), clientlines.length);
     }

@@ -16,19 +16,16 @@
 package org.auraframework.impl.java.controller;
 
 import java.io.IOException;
-
 import java.util.Map;
 
-import org.auraframework.def.*;
+import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor.DefType;
-
+import org.auraframework.def.Definition;
 import org.auraframework.expression.PropertyReference;
-
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Action;
 import org.auraframework.system.SubDefDescriptor;
-
 import org.auraframework.util.json.Json;
 
 /**
@@ -55,8 +52,8 @@ public class JavaControllerDef extends DefinitionImpl<ControllerDef> implements 
     @SuppressWarnings("unchecked")
     @Override
     public <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> sddesc) {
-        if(sddesc.getDefType() == DefType.ACTION){
-            return (D)getSubDefinition(sddesc.getName());
+        if (sddesc.getDefType() == DefType.ACTION) {
+            return (D) getSubDefinition(sddesc.getName());
         }
         return super.getSubDefinition(sddesc);
     }
@@ -89,9 +86,9 @@ public class JavaControllerDef extends DefinitionImpl<ControllerDef> implements 
         return getSubDefinition(key.toString());
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<ControllerDef>{
+    public static class Builder extends DefinitionImpl.BuilderImpl<ControllerDef> {
 
-        public Builder(){
+        public Builder() {
             super(ControllerDef.class);
         }
 
@@ -113,7 +110,7 @@ public class JavaControllerDef extends DefinitionImpl<ControllerDef> implements 
         /**
          * Sets the actionMap for this instance.
          */
-        public void setActionMap(Map<String,JavaActionDef> actionMap) {
+        public void setActionMap(Map<String, JavaActionDef> actionMap) {
             this.actionMap = actionMap;
         }
     }

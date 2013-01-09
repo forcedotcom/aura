@@ -17,22 +17,30 @@ package org.auraframework.service;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import org.auraframework.Aura;
-import org.auraframework.builder.*;
-import org.auraframework.def.*;
+import org.auraframework.builder.ApplicationDefBuilder;
+import org.auraframework.builder.ComponentDefBuilder;
+import org.auraframework.builder.ComponentDefRefBuilder;
+import org.auraframework.builder.ThemeDefBuilder;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef.RenderType;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
-import org.auraframework.system.Location;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.collect.Lists;
 
 /**
  * @hierarchy Aura.Services.BuilderService
  * @userStory a07B0000000Eb3M
  */
-public class BuilderServiceTest extends BaseServiceTest<BuilderService, BuilderServiceTest.Config> implements BuilderService {
+public class BuilderServiceTest extends BaseServiceTest<BuilderService, BuilderServiceTest.Config> implements
+        BuilderService {
 
     /**
      */
@@ -102,11 +110,10 @@ public class BuilderServiceTest extends BaseServiceTest<BuilderService, BuilderS
 
         verifyLocation(defRef.getLocation());
 
-
         return null;
     }
 
-    private void verifyLocation(Location location){
+    private void verifyLocation(Location location) {
         assertNotNull(location);
         assertEquals(location.getColumn(), config.col);
         assertEquals(location.getLine(), config.line);
@@ -124,7 +131,6 @@ public class BuilderServiceTest extends BaseServiceTest<BuilderService, BuilderS
         assertNotNull(def);
         verifyLocation(def.getLocation());
 
-
         return null;
     }
 
@@ -135,13 +141,13 @@ public class BuilderServiceTest extends BaseServiceTest<BuilderService, BuilderS
 
         List<Config> ret = Lists.newArrayList();
 
-        for(String desc : descs){
-            for(Boolean isAbstract : booleans){
-                for(Access access : Access.values()){
-                    for(Boolean extensible : booleans){
-                        for(RenderType renderType : RenderType.values()){
-                            for(WhitespaceBehavior whitespaceBehavior : WhitespaceBehavior.values()){
-                                String name = "config"+ret.size();
+        for (String desc : descs) {
+            for (Boolean isAbstract : booleans) {
+                for (Access access : Access.values()) {
+                    for (Boolean extensible : booleans) {
+                        for (RenderType renderType : RenderType.values()) {
+                            for (WhitespaceBehavior whitespaceBehavior : WhitespaceBehavior.values()) {
+                                String name = "config" + ret.size();
                                 Config config = new Config(name, desc);
                                 config.isAbstract = isAbstract;
                                 config.access = access.name();
@@ -159,7 +165,7 @@ public class BuilderServiceTest extends BaseServiceTest<BuilderService, BuilderS
         return ret;
     }
 
-    public static class Config extends BaseServiceTest.Config{
+    public static class Config extends BaseServiceTest.Config {
 
         public final DefDescriptor<ApplicationDef> appDescriptor;
         public final DefDescriptor<ComponentDef> cmpDescriptor;

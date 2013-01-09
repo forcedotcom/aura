@@ -15,19 +15,15 @@
  */
 package org.auraframework;
 
-import java.util.ServiceLoader;
-
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.adapter.MockConfigAdapterImpl;
 import org.auraframework.test.annotation.UnAdaptableTest;
-import org.auraframework.util.ServiceLoaderImpl;
-import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.sampleServices.UnimplementedService;
 
 /**
  * Unit tests for various service and adapter registration.
- *
+ * 
  * @see ServiceLocator
  * @see ServiceLoaderImpl
  * @see ServiceLoader

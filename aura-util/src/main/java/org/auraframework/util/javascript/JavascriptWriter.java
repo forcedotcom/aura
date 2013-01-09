@@ -15,14 +15,24 @@
  */
 package org.auraframework.util.javascript;
 
-import java.io.*;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
 import com.google.common.collect.Lists;
-import com.google.javascript.jscomp.*;
+import com.google.javascript.jscomp.CommandLineRunner;
+import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.Compiler;
+import com.google.javascript.jscomp.CompilerOptions;
+import com.google.javascript.jscomp.JSError;
+import com.google.javascript.jscomp.PropertyRenamingPolicy;
+import com.google.javascript.jscomp.SourceFile;
+import com.google.javascript.jscomp.VariableRenamingPolicy;
 
 /**
  * Util for compressing and writing javascript.
@@ -31,7 +41,7 @@ public class JavascriptWriter {
 
     private static final List<SourceFile> externs;
 
-    static{
+    static {
         try {
             externs = CommandLineRunner.getDefaultExterns();
         } catch (IOException e) {
@@ -62,23 +72,26 @@ public class JavascriptWriter {
         },
 
         /**
-         * Closure Compiler using advanced optimizations, but avoids some compiler-created
-         * global variables.
-         *
+         * Closure Compiler using advanced optimizations, but avoids some
+         * compiler-created global variables.
+         * 
          * Closure does some optimizations that use global variables like so:
-         *     var b=false,f;
-         * Then it will use "b" in place of the "false" value. It could also set "f"
-         * to the prototype of some object.
-         * It does all of this to reduce the number of chars in the file. Unless accounted for,
-         * this will cause issues since files are run through the compiler individually. So it's
-         * possible that the global variable "b" is later set to "true" as part of another file's compilation,
-         * which will change the behavior of the previous files's compiled code.
-         *
-         * Note: This doesn't prevent global functions from being renamed, i.e., it will still rename
-         * "function MyObject(){...}" to "function b(){...}", leaving the "b" function in the global
-         * namespace. This is true even if "b" is exported in the standard way (window["MyObject"] = MyObject).
-         *
-         * TODO the keyword renaming can cause issues, but would the prototype renaming cause any code conflicts?
+         * var b=false,f; Then it will use "b" in place of the "false" value. It
+         * could also set "f" to the prototype of some object. It does all of
+         * this to reduce the number of chars in the file. Unless accounted for,
+         * this will cause issues since files are run through the compiler
+         * individually. So it's possible that the global variable "b" is later
+         * set to "true" as part of another file's compilation, which will
+         * change the behavior of the previous files's compiled code.
+         * 
+         * Note: This doesn't prevent global functions from being renamed, i.e.,
+         * it will still rename "function MyObject(){...}" to
+         * "function b(){...}", leaving the "b" function in the global
+         * namespace. This is true even if "b" is exported in the standard way
+         * (window["MyObject"] = MyObject).
+         * 
+         * TODO the keyword renaming can cause issues, but would the prototype
+         * renaming cause any code conflicts?
          */
         CLOSURE_ADVANCED_SAFER {
             @Override
@@ -95,8 +108,9 @@ public class JavascriptWriter {
         CLOSURE_AURA_DEBUG {
             @Override
             public List<JavascriptProcessingError> compress(Reader in, Writer out, String filename) throws IOException {
-                //Encase the compressed output in a self-executing function to scope everything.
-                //Global APIs are exported explicitly in the code.
+                // Encase the compressed output in a self-executing function to
+                // scope everything.
+                // Global APIs are exported explicitly in the code.
                 out.append("(function(){");
                 CompilerOptions options = new CompilerOptions();
 
@@ -115,8 +129,9 @@ public class JavascriptWriter {
         CLOSURE_AURA_PROD {
             @Override
             public List<JavascriptProcessingError> compress(Reader in, Writer out, String filename) throws IOException {
-                //Encase the compressed output in a self-executing function to scope the generated vars.
-                //Global APIs are exported explicitly in the code.
+                // Encase the compressed output in a self-executing function to
+                // scope the generated vars.
+                // Global APIs are exported explicitly in the code.
                 out.append("(function(){");
                 CompilerOptions options = new CompilerOptions();
                 CompilationLevel.ADVANCED_OPTIMIZATIONS.setOptionsForCompilationLevel(options);
@@ -131,11 +146,14 @@ public class JavascriptWriter {
 
         public static final CompressionLevel DEFAULT = CLOSURE_SIMPLE;
 
-        public abstract List<JavascriptProcessingError> compress(Reader in, Writer out, String filename) throws IOException;
+        public abstract List<JavascriptProcessingError> compress(Reader in, Writer out, String filename)
+                throws IOException;
     }
 
     /**
-     * Compresses and writes javascript. Uses the default Javascript compression method.
+     * Compresses and writes javascript. Uses the default Javascript compression
+     * method.
+     * 
      * @param in Javascript source.
      * @param out Write the compressed source to this Writer.
      * @param filename Name used for error reporting, etc...
@@ -146,8 +164,10 @@ public class JavascriptWriter {
     }
 
     /**
-     * Compresses a JavaScript file and returns the result of the compression as a String.
-     * Does NOT save the results of the compression to the file system.
+     * Compresses a JavaScript file and returns the result of the compression as
+     * a String. Does NOT save the results of the compression to the file
+     * system.
+     * 
      * @param filepath Get the compressed version of this file.
      * @return The compressed/minified source for the given file.
      * @throws IOException
@@ -158,8 +178,8 @@ public class JavascriptWriter {
         try {
             in = new FileReader(filepath);
             writeCompressed(in, out, filepath);
-        } finally{
-            if(in != null) {
+        } finally {
+            if (in != null) {
                 in.close();
             }
         }
@@ -168,13 +188,15 @@ public class JavascriptWriter {
 
     /**
      * Compress using Closure Compiler using the given CompilationLevel.
+     * 
      * @param in Javascript source.
      * @param out Write the compressed source to this Writer.
      * @param filename Name uised for error reporting, etc...
      * @param level Closure compiler compilation level to use.
      * @throws IOException
      */
-    private static List<JavascriptProcessingError> compressWithClosure(Reader in, Writer out, String filename, CompilationLevel level) throws IOException {
+    private static List<JavascriptProcessingError> compressWithClosure(Reader in, Writer out, String filename,
+            CompilationLevel level) throws IOException {
         CompilerOptions options = new CompilerOptions();
         level.setOptionsForCompilationLevel(options);
         return compressWithClosure(in, out, filename, options, true);
@@ -182,24 +204,26 @@ public class JavascriptWriter {
 
     /**
      * Compress using Closure Compiler using the given options.
+     * 
      * @param in Javascript source.
      * @param out Write the compressed source to this Writer.
      * @param filename Name used for error reporting, etc...
      * @param options Options to use for compression.
      * @throws IOException
-     *
+     * 
      * @TODO nmcwilliams: set externs file properly.
      */
-    private static List<JavascriptProcessingError> compressWithClosure(Reader in, Writer out, String filename, CompilerOptions options, boolean useSeparateThread) throws IOException {
+    private static List<JavascriptProcessingError> compressWithClosure(Reader in, Writer out, String filename,
+            CompilerOptions options, boolean useSeparateThread) throws IOException {
         Compiler c = new Compiler();
         if (!useSeparateThread) {
             c.disableThreads();
         }
 
         Compiler.setLoggingLevel(Level.WARNING);
-        SourceFile input = JSSourceFile.fromReader(filename, in);
+        SourceFile input = SourceFile.fromReader(filename, in);
 
-        c.compile(externs, Lists.<SourceFile>newArrayList(input), options);
+        c.compile(externs, Lists.<SourceFile> newArrayList(input), options);
         out.write(c.toSource());
 
         // errors and warnings

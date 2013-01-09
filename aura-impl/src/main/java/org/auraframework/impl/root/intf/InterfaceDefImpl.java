@@ -16,11 +16,17 @@
 package org.auraframework.impl.root.intf;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import com.google.common.collect.Lists;
-
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -28,9 +34,12 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
+import com.google.common.collect.Lists;
+
 /**
- * The definition of an interface. Holds all information about a given type of interface. InterfaceDefs are immutable
- * singletons per type. Once they are created, they can only be replaced, never changed.
+ * The definition of an interface. Holds all information about a given type of
+ * interface. InterfaceDefs are immutable singletons per type. Once they are
+ * created, they can only be replaced, never changed.
  */
 public final class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implements InterfaceDef {
 
@@ -59,7 +68,9 @@ public final class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> imp
         for (AttributeDef att : this.attributeDefs.values()) {
             att.validateDefinition();
             if (events.containsKey(att.getName())) {
-                throw new InvalidDefinitionException(String.format("Cannot define an attribute and register an event with the same name: %s", att.getName()), getLocation());
+                throw new InvalidDefinitionException(String.format(
+                        "Cannot define an attribute and register an event with the same name: %s", att.getName()),
+                        getLocation());
             }
         }
 
@@ -70,8 +81,10 @@ public final class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> imp
     }
 
     /**
-     * quick pass to ensure everything this extends and registers exists
-     * TODO: lots of logic around making sure this doesn't clash with what it extends #W-689596
+     * quick pass to ensure everything this extends and registers exists TODO:
+     * lots of logic around making sure this doesn't clash with what it extends
+     * #W-689596
+     * 
      * @throws QuickFixException
      */
     @Override
@@ -83,7 +96,8 @@ public final class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> imp
                 throw new DefinitionNotFoundException(extended, getLocation());
             }
             if (extended.equals(descriptor)) {
-                throw new InvalidDefinitionException(String.format("%s cannot extend itself", getDescriptor()), getLocation());
+                throw new InvalidDefinitionException(String.format("%s cannot extend itself", getDescriptor()),
+                        getLocation());
             }
         }
 
@@ -98,11 +112,13 @@ public final class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> imp
     }
 
     /**
-     * Recursively adds the Descriptors of all RootDefs in this InterfaceDef's children to the provided set.
-     * The set may then be used to analyze freshness of all of those types to see if any of them should be recompiled
-     * from source.
-     *
-     * @param dependencies A Set that this method will append RootDescriptors to for every RootDef that this InterfaceDef requires
+     * Recursively adds the Descriptors of all RootDefs in this InterfaceDef's
+     * children to the provided set. The set may then be used to analyze
+     * freshness of all of those types to see if any of them should be
+     * recompiled from source.
+     * 
+     * @param dependencies A Set that this method will append RootDescriptors to
+     *            for every RootDef that this InterfaceDef requires
      * @throws QuickFixException
      */
     @Override
@@ -112,15 +128,16 @@ public final class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> imp
             register.appendDependencies(dependencies);
         }
 
-        if (providerDescriptors != null){
+        if (providerDescriptors != null) {
             dependencies.addAll(providerDescriptors);
         }
     }
 
     @Override
-    public Map<String, RegisterEventDef> getRegisterEventDefs() throws org.auraframework.throwable.quickfix.QuickFixException {
+    public Map<String, RegisterEventDef> getRegisterEventDefs()
+            throws org.auraframework.throwable.quickfix.QuickFixException {
         Map<String, RegisterEventDef> ret = new LinkedHashMap<String, RegisterEventDef>();
-        for(DefDescriptor<InterfaceDef> extendsDescriptor : extendsDescriptors){
+        for (DefDescriptor<InterfaceDef> extendsDescriptor : extendsDescriptors) {
             InterfaceDef extendsDef = extendsDescriptor.getDef();
             ret.putAll(extendsDef.getRegisterEventDefs());
             ret.putAll(events);
@@ -134,22 +151,23 @@ public final class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> imp
     }
 
     /**
-     * @return all the attributes for this interface, including those inherited from a super interface
+     * @return all the attributes for this interface, including those inherited
+     *         from a super interface
      * @throws QuickFixException
      */
     @Override
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
 
         Map<DefDescriptor<AttributeDef>, AttributeDef> ret = new LinkedHashMap<DefDescriptor<AttributeDef>, AttributeDef>();
-        for(DefDescriptor<InterfaceDef> extendsDescriptor : extendsDescriptors){
+        for (DefDescriptor<InterfaceDef> extendsDescriptor : extendsDescriptors) {
             InterfaceDef extendsDef = extendsDescriptor.getDef();
             ret.putAll(extendsDef.getAttributeDefs());
             ret.putAll(attributeDefs);
         }
 
-        if(ret.isEmpty()){
+        if (ret.isEmpty()) {
             return attributeDefs;
-        }else{
+        } else {
             return Collections.unmodifiableMap(ret);
         }
     }
@@ -162,13 +180,11 @@ public final class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> imp
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof InterfaceDefImpl) {
-            InterfaceDefImpl other = (InterfaceDefImpl)obj;
+            InterfaceDefImpl other = (InterfaceDefImpl) obj;
 
             // TODO: factor attributeDefs into this? #W-689622
-            return getDescriptor().equals(other.getDescriptor())
-                    && extendsDescriptors.equals(other.extendsDescriptors)
-                    && events.equals(other.events)
-                    && getLocation().equals(other.getLocation());
+            return getDescriptor().equals(other.getDescriptor()) && extendsDescriptors.equals(other.extendsDescriptors)
+                    && events.equals(other.events) && getLocation().equals(other.getLocation());
         }
 
         return false;
@@ -193,7 +209,7 @@ public final class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> imp
 
     public static class Builder extends RootDefinitionImpl.Builder<InterfaceDef> {
 
-        public Builder(){
+        public Builder() {
             super(InterfaceDef.class);
         }
 
@@ -208,20 +224,20 @@ public final class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> imp
 
     @Override
     public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException {
-        switch(other.getDefType()){
-            case INTERFACE:
-                if(descriptor.equals(other)){
+        switch (other.getDefType()) {
+        case INTERFACE:
+            if (descriptor.equals(other)) {
+                return true;
+            }
+
+            for (DefDescriptor<InterfaceDef> intf : extendsDescriptors) {
+                if (intf.equals(other) || intf.getDef().isInstanceOf(other)) {
                     return true;
                 }
-
-                for(DefDescriptor<InterfaceDef> intf : extendsDescriptors){
-                    if(intf.equals(other) || intf.getDef().isInstanceOf(other)){
-                      return true;
-                    }
-                }
-                return false;
-            default:
-                return false;
+            }
+            return false;
+        default:
+            return false;
         }
     }
 

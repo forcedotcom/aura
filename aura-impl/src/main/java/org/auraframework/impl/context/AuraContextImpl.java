@@ -34,15 +34,15 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.EventType;
-import org.auraframework.http.AuraServlet;
+import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidEventTypeException;
@@ -73,7 +73,9 @@ public class AuraContextImpl implements AuraContext {
                 return URL_SERIALIZER;
             } else if (c == ArrayList.class || o instanceof Collection) {
                 return JsonSerializers.COLLECTION;
-            } else if (c == Mode.class || c == String.class) { return JsonSerializers.STRING; }
+            } else if (c == Mode.class || c == String.class) {
+                return JsonSerializers.STRING;
+            }
             return null;
         }
     }
@@ -113,12 +115,12 @@ public class AuraContextImpl implements AuraContext {
             }
             if (ctx.getSerializeLastMod()) {
                 try {
-                    json.writeMapEntry("lastmod", Long.toString(AuraServlet.getLastMod()));
+                    json.writeMapEntry("lastmod", Long.toString(AuraBaseServlet.getLastMod()));
                 } catch (QuickFixException e) {
                     throw new AuraRuntimeException(e);
                 }
             }
-            
+
             if (forClient) {
                 // client needs value providers, urls don't
                 boolean started = false;
@@ -138,11 +140,11 @@ public class AuraContextImpl implements AuraContext {
                         json.writeMapEnd();
                     }
                 }
-                
+
                 if (started) {
                     json.writeArrayEnd();
                 }
-                
+
                 Map<String, BaseComponent<?, ?>> components = ctx.getComponents();
                 if (!components.isEmpty()) {
                     json.writeMapKey("components");
@@ -216,12 +218,12 @@ public class AuraContextImpl implements AuraContext {
 
     private String lastMod = "";
 
-    private List<Event> clientEvents = Lists.newArrayList();
-    
+    private final List<Event> clientEvents = Lists.newArrayList();
+
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
-                            Format format, Access access, JsonSerializationContext jsonContext,
-                            Map<ValueProviderType, GlobalValueProvider> globalProviders,
-                            DefDescriptor<? extends BaseComponentDef> appDesc) {
+            Format format, Access access, JsonSerializationContext jsonContext,
+            Map<ValueProviderType, GlobalValueProvider> globalProviders,
+            DefDescriptor<? extends BaseComponentDef> appDesc) {
         if (access == Access.AUTHENTICATED) {
             preloadedNamespaces.add("aura");
             preloadedNamespaces.add("ui");
@@ -405,24 +407,27 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public void registerComponent(BaseComponent<?, ?> component) {
-    	Action action = getCurrentAction();
-    	if (action != null) {
+        Action action = getCurrentAction();
+        if (action != null) {
             action.registerComponent(component);
-    	} else {
+        } else {
             componentRegistry.put(component.getGlobalId(), component);
-    	}
+        }
     }
 
     @Override
     public void setApplicationDescriptor(DefDescriptor<? extends BaseComponentDef> appDesc) {
         //
-        // This logic is twisted, but not unreasonable. If someone is setting an application,
-        // we use it, otherwise, if it is a Component, we only override components, leaving
-        // applications intact. Since components are only legal for dev mode, this shouldn't
+        // This logic is twisted, but not unreasonable. If someone is setting an
+        // application,
+        // we use it, otherwise, if it is a Component, we only override
+        // components, leaving
+        // applications intact. Since components are only legal for dev mode,
+        // this shouldn't
         // affect much. In fact, most use cases, this.appDesc will be null.
         //
-        if ((appDesc != null && appDesc.getDefType().equals(DefType.APPLICATION))
-            || this.appDesc == null || !this.appDesc.getDefType().equals(DefType.APPLICATION)) {
+        if ((appDesc != null && appDesc.getDefType().equals(DefType.APPLICATION)) || this.appDesc == null
+                || !this.appDesc.getDefType().equals(DefType.APPLICATION)) {
             this.appDesc = appDesc;
         }
     }
@@ -490,22 +495,20 @@ public class AuraContextImpl implements AuraContext {
     public void setStaleCheck(DefDescriptor<?> d) {
         staleChecks.add(d);
     }
-    
+
     @Override
-    public void addClientApplicationEvent(Event event) throws Exception{
-        if(event!=null){
-           if(event.getDescriptor().getDef().getEventType()!=EventType.APPLICATION){
-               throw new InvalidEventTypeException(
-                       String.format("%s is not an Application event. " +
-                                    "Only Application events are allowed to be fired from server.",
-                                        event.getDescriptor()), null);
-           }
-           clientEvents.add(event);
+    public void addClientApplicationEvent(Event event) throws Exception {
+        if (event != null) {
+            if (event.getDescriptor().getDef().getEventType() != EventType.APPLICATION) {
+                throw new InvalidEventTypeException(String.format("%s is not an Application event. "
+                        + "Only Application events are allowed to be fired from server.", event.getDescriptor()), null);
+            }
+            clientEvents.add(event);
         }
     }
 
     @Override
-    public List<Event> getClientEvents(){
-    	return clientEvents;
+    public List<Event> getClientEvents() {
+        return clientEvents;
     }
 }

@@ -19,9 +19,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.auraframework.Aura;
-
 import org.auraframework.system.AuraContext.Mode;
-
 import org.auraframework.throwable.AuraExceptionUtil;
 
 public class ThrowableCSSFormatAdapter extends CSSFormatAdapter<Throwable> {
@@ -33,7 +31,7 @@ public class ThrowableCSSFormatAdapter extends CSSFormatAdapter<Throwable> {
 
     @Override
     public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException {
-        Throwable t = (Throwable)value;
+        Throwable t = (Throwable) value;
 
         out.append("/** \nAN EXCEPTION OCCURRED WHILE PROCESSING CSS\n");
         // FIXME: this is pretty ugly.

@@ -27,15 +27,15 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 /**
  * Utility methods related to WebDriver
- *
- * Test cases can be annotated with @TargetBrowsers and @ExcludeBrowsers.
- * These annotations are applicable for Methods(TestCase) and Classes.
+ * 
+ * Test cases can be annotated with @TargetBrowsers and @ExcludeBrowsers. These
+ * annotations are applicable for Methods(TestCase) and Classes.
  */
 public final class WebDriverUtil {
-	private static final String SELENIUM_VERSION = new BuildInfo().getReleaseLabel();
+    private static final String SELENIUM_VERSION = new BuildInfo().getReleaseLabel();
     private static Set<BrowserType> defaultBrowsers = EnumSet.of(BrowserType.GOOGLECHROME);
     private static Set<BrowserType> availableBrowsers = null;
-    
+
     private enum ExtraCapability {
         PHONE("deviceType", "phone"),
         TABLET("deviceType", "tablet"),
@@ -43,8 +43,8 @@ public final class WebDriverUtil {
         PORTRAIT("deviceOrientation", "portrait"),
         DISABLE_NATIVE_EVENTS("webdriverEnableNativeEvents", "false");
 
-        private String value;
-        private String name;
+        private final String value;
+        private final String name;
 
         private ExtraCapability(String name, String value) {
             this.name = name;
@@ -59,84 +59,90 @@ public final class WebDriverUtil {
             return this.value;
         }
     }
-    
+
     public enum BrowserType {
         FIREFOX(DesiredCapabilities.firefox(), null, Platform.ANY, ExtraCapability.DISABLE_NATIVE_EVENTS),
         IE10(DesiredCapabilities.internetExplorer(), "10", "Windows 2012"),
         IE9(DesiredCapabilities.internetExplorer(), "9", Platform.VISTA),
         IE8(DesiredCapabilities.internetExplorer(), "8", Platform.WINDOWS),
         IE7(DesiredCapabilities.internetExplorer(), "7", Platform.WINDOWS),
-        GOOGLECHROME(DesiredCapabilities.chrome(), null, Platform.ANY ),
-        SAFARI(DesiredCapabilities.safari(), "5" , "Mac 10.6"),
+        GOOGLECHROME(DesiredCapabilities.chrome(), null, Platform.ANY),
+        SAFARI(DesiredCapabilities.safari(), "5", "Mac 10.6"),
         ANDROID_PHONE(DesiredCapabilities.android(), "4", "Linux", ExtraCapability.PHONE, ExtraCapability.PORTRAIT),
         ANDROID_TABLET(DesiredCapabilities.android(), "4", "Linux", ExtraCapability.TABLET, ExtraCapability.LANDSCAPE),
         IPHONE(DesiredCapabilities.iphone(), "5", Platform.MAC),
-        IPAD(DesiredCapabilities.ipad(), "5", "Mac 10.6" );
+        IPAD(DesiredCapabilities.ipad(), "5", "Mac 10.6");
 
         private final DesiredCapabilities capability;
-        private String version;
+        private final String version;
 
-        private BrowserType(DesiredCapabilities capabilities, String version, String platform, ExtraCapability... extraCapabilities) {
-        	this.capability = capabilities;
+        private BrowserType(DesiredCapabilities capabilities, String version, String platform,
+                ExtraCapability... extraCapabilities) {
+            this.capability = capabilities;
             this.version = version;
-        	if (capabilities != null) {
+            if (capabilities != null) {
                 this.capability.setCapability("platform", platform);
             }
             initExtraCapabilities(extraCapabilities);
         }
 
-        private BrowserType(DesiredCapabilities capabilities, String version, Platform platform, ExtraCapability... extraCapabilities) {
-        	this.capability = capabilities;
+        private BrowserType(DesiredCapabilities capabilities, String version, Platform platform,
+                ExtraCapability... extraCapabilities) {
+            this.capability = capabilities;
             this.version = version;
-        	if (capabilities != null) {
+            if (capabilities != null) {
                 this.capability.setPlatform(platform);
             }
-        	initExtraCapabilities(extraCapabilities);
+            initExtraCapabilities(extraCapabilities);
         }
 
-        private void initExtraCapabilities(ExtraCapability... extraCapabilities) {            
+        private void initExtraCapabilities(ExtraCapability... extraCapabilities) {
             for (ExtraCapability extra : extraCapabilities) {
-            	// newer versions of firefox no longer support native events
-                if (extra.getCapabilityName().equals(ExtraCapability.DISABLE_NATIVE_EVENTS.getCapabilityName()) 
-                		&& this.capability.getBrowserName().equals("firefox")) {
-                	FirefoxProfile firefoxProfile = new FirefoxProfile();
-                	firefoxProfile.setEnableNativeEvents(Boolean.parseBoolean(extra.getValue()));
-                	this.capability.setCapability("firefox_profile", firefoxProfile);
+                // newer versions of firefox no longer support native events
+                if (extra.getCapabilityName().equals(ExtraCapability.DISABLE_NATIVE_EVENTS.getCapabilityName())
+                        && this.capability.getBrowserName().equals("firefox")) {
+                    FirefoxProfile firefoxProfile = new FirefoxProfile();
+                    firefoxProfile.setEnableNativeEvents(Boolean.parseBoolean(extra.getValue()));
+                    this.capability.setCapability("firefox_profile", firefoxProfile);
                 } else {
-                	this.capability.setCapability(extra.getCapabilityName(), extra.getValue());
+                    this.capability.setCapability(extra.getCapabilityName(), extra.getValue());
                 }
             }
         }
-        
-        public DesiredCapabilities getCapability() {            
+
+        public DesiredCapabilities getCapability() {
             return new DesiredCapabilities(this.capability);
         }
 
         /**
          * Set the version only when requesting capabilities from SauceLab.
+         * 
          * @return
          */
-        public String getVersion(){
+        public String getVersion() {
             return this.version;
         }
     }
-    
-    public static Set<BrowserType> getBrowserListForTestRun(Set<BrowserType> targetBrowsers, Set<BrowserType> excludeBrowsers) {
-        if (targetBrowsers == null || targetBrowsers.isEmpty()){
+
+    public static Set<BrowserType> getBrowserListForTestRun(Set<BrowserType> targetBrowsers,
+            Set<BrowserType> excludeBrowsers) {
+        if (targetBrowsers == null || targetBrowsers.isEmpty()) {
             targetBrowsers = EnumSet.allOf(BrowserType.class);
         }
         targetBrowsers.retainAll(getSupportedBrowserTypes());
-        if (excludeBrowsers != null){
+        if (excludeBrowsers != null) {
             targetBrowsers.removeAll(excludeBrowsers);
         }
         return targetBrowsers;
     }
-    
+
     /**
-     * Allow override of browser from command line using -Dwebdriver.browser.type=""
+     * Allow override of browser from command line using
+     * -Dwebdriver.browser.type=""
+     * 
      * @return
      */
-    public static Set<BrowserType> getSupportedBrowserTypes(){
+    public static Set<BrowserType> getSupportedBrowserTypes() {
         if (availableBrowsers == null) {
             String browserTypeSysVar = System.getProperty(WebDriverProvider.BROWSER_TYPE_PROPERTY);
             if (browserTypeSysVar == null) {
@@ -157,7 +163,7 @@ public final class WebDriverUtil {
         return EnumSet.copyOf(availableBrowsers);
     }
 
-	public static String getSeleniumClientVersion() {
-		return SELENIUM_VERSION;
-	}
+    public static String getSeleniumClientVersion() {
+        return SELENIUM_VERSION;
+    }
 }

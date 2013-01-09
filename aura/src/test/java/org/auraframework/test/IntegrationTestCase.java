@@ -34,7 +34,6 @@ import org.auraframework.def.ActionDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.http.AuraBaseServlet;
-import org.auraframework.http.AuraServlet;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.ContextService;
@@ -43,7 +42,6 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.IntegrationTest;
-import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.configuration.TestServletConfig;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.util.AuraUtil;
@@ -60,7 +58,8 @@ import com.google.common.collect.Maps;
 @IntegrationTest
 public abstract class IntegrationTestCase extends AuraTestCase {
     /**
-     * Note, any tests that write to the servletConfig are {@link ThreadHostileTest}.
+     * Note, any tests that write to the servletConfig are
+     * {@link ThreadHostileTest}.
      */
     protected static TestServletConfig servletConfig = AuraUtil.get(TestServletConfig.class);
     protected final AuraTestingUtil auraTestingUtil;
@@ -97,8 +96,8 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     }
 
     /**
-     * Note: Any tests utilizing getLastMod are suspects for {@link ThreadHostileTest} since the last mod is shared
-     * global state.
+     * Note: Any tests utilizing getLastMod are suspects for
+     * {@link ThreadHostileTest} since the last mod is shared global state.
      */
     protected static long getLastMod(Mode mode, String... preloads) throws Exception {
         // AuraContextImpl adds aura & ui namespaces as default
@@ -124,7 +123,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
             context.addPreload(preload);
         }
 
-        long lastMod = AuraServlet.getLastMod();
+        long lastMod = AuraBaseServlet.getLastMod();
 
         setContext(originalContext);
 
@@ -132,14 +131,15 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     }
 
     /**
-     * Given a path on the api server, return a {@link GetMethod} that has the appropriate headers and server name.
-     *
-     * @param path
-     *            the relative path to the server, such as <tt>/services/Soap</tt> or
-     *            <tt>/servlet/servlet.SForceMailMerge</tt> Follows redirects by default.
+     * Given a path on the api server, return a {@link GetMethod} that has the
+     * appropriate headers and server name.
+     * 
+     * @param path the relative path to the server, such as
+     *            <tt>/services/Soap</tt> or
+     *            <tt>/servlet/servlet.SForceMailMerge</tt> Follows redirects by
+     *            default.
      * @return a {@link GetMethod}
-     * @throws MalformedURLException
-     *             if the path is invalid.
+     * @throws MalformedURLException if the path is invalid.
      * @throws URISyntaxException
      */
     protected static GetMethod obtainGetMethod(String path) throws MalformedURLException, URISyntaxException {
@@ -150,30 +150,32 @@ public abstract class IntegrationTestCase extends AuraTestCase {
             URISyntaxException {
         String url = servletConfig.getBaseUrl().toURI().resolve(path).toString();
         GetMethod get = new GetMethod(url);
-        if (System.getProperty(HttpMethodParams.USER_AGENT) != null)
+        if (System.getProperty(HttpMethodParams.USER_AGENT) != null) {
             get.getParams().setParameter(HttpMethodParams.USER_AGENT, System.getProperty(HttpMethodParams.USER_AGENT));
+        }
         get.setFollowRedirects(followRedirects);
         return get;
     }
 
     /**
-     * Given the a path on the api server, return a {@link PostMethod} that has the appropriate headers and server name.
-     *
-     * @param path
-     *            the relative path to the server, such as <tt>/services/Soap</tt> or
+     * Given the a path on the api server, return a {@link PostMethod} that has
+     * the appropriate headers and server name.
+     * 
+     * @param path the relative path to the server, such as
+     *            <tt>/services/Soap</tt> or
      *            <tt>/servlet/servlet.SForceMailMerge</tt>.
-     * @param params
-     *            a set of name value string pairs to use as parameters to the post call.
+     * @param params a set of name value string pairs to use as parameters to
+     *            the post call.
      * @return a {@link PostMethod}
-     * @throws MalformedURLException
-     *             if the path is invalid.
+     * @throws MalformedURLException if the path is invalid.
      * @throws URISyntaxException
      */
     protected static PostMethod obtainPostMethod(String path, Map<String, String> params) throws MalformedURLException,
             URISyntaxException {
         PostMethod post = new PostMethod(servletConfig.getBaseUrl().toURI().resolve(path).toString());
-        if (System.getProperty(HttpMethodParams.USER_AGENT) != null)
+        if (System.getProperty(HttpMethodParams.USER_AGENT) != null) {
             post.getParams().setParameter(HttpMethodParams.USER_AGENT, System.getProperty(HttpMethodParams.USER_AGENT));
+        }
 
         if (params != null) {
             for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -186,11 +188,12 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents) {
         return auraTestingUtil.addSourceAutoCleanup(defClass, contents);
     }
-    
-    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents, String namePrefix) {
+
+    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents,
+            String namePrefix) {
         return auraTestingUtil.addSourceAutoCleanup(defClass, contents, namePrefix);
     }
-    
+
     protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents) {
         return auraTestingUtil.addSourceAutoCleanup(descriptor, contents);
     }
@@ -257,7 +260,8 @@ public abstract class IntegrationTestCase extends AuraTestCase {
         }
 
         @Override
-        public void setId(String id) {}
+        public void setId(String id) {
+        }
 
         @SuppressWarnings("unchecked")
         @Override
@@ -267,13 +271,14 @@ public abstract class IntegrationTestCase extends AuraTestCase {
                 servletConfig.getHttpClient().executeMethod(post);
                 assertEquals(HttpStatus.SC_OK, post.getStatusCode());
                 rawResponse = post.getResponseBodyAsString();
-                assertEquals(AuraBaseServlet.CSRF_PROTECT, rawResponse.substring(0, AuraBaseServlet.CSRF_PROTECT.length()));
-                Map<String, Object> json = (Map<String, Object>)new JsonReader().read(post.getResponseBodyAsString()
+                assertEquals(AuraBaseServlet.CSRF_PROTECT,
+                        rawResponse.substring(0, AuraBaseServlet.CSRF_PROTECT.length()));
+                Map<String, Object> json = (Map<String, Object>) new JsonReader().read(post.getResponseBodyAsString()
                         .substring(AuraBaseServlet.CSRF_PROTECT.length()));
-                Map<String, Object> action = (Map<String, Object>)((List<Object>)json.get("actions")).get(0);
+                Map<String, Object> action = (Map<String, Object>) ((List<Object>) json.get("actions")).get(0);
                 this.state = State.valueOf(action.get("state").toString());
                 this.returnValue = action.get("returnValue");
-                this.errors = (List<Object>)action.get("error");
+                this.errors = (List<Object>) action.get("error");
             } catch (Exception e) {
                 throw new AuraExecutionException(e, null);
             }
@@ -286,7 +291,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 
         @Override
         public List<Action> getActions() {
-            return ImmutableList.of((Action)this);
+            return ImmutableList.of((Action) this);
         }
 
         @Override
@@ -304,23 +309,22 @@ public abstract class IntegrationTestCase extends AuraTestCase {
             return errors;
         }
 
-		@Override
-		public void registerComponent(BaseComponent<?, ?> component) {
-			componentRegistry.put(component.getGlobalId(), component);
-		}
-        
-	    @Override
-	    public Map<String, BaseComponent<?, ?>> getComponents() {
-	        return componentRegistry;
-	    }
-		
-		@Override
-		public int getNextId() {
-			return nextId++;
-		}
-		
-		
-        private String qualifiedName;
+        @Override
+        public void registerComponent(BaseComponent<?, ?> component) {
+            componentRegistry.put(component.getGlobalId(), component);
+        }
+
+        @Override
+        public Map<String, BaseComponent<?, ?>> getComponents() {
+            return componentRegistry;
+        }
+
+        @Override
+        public int getNextId() {
+            return nextId++;
+        }
+
+        private final String qualifiedName;
         private Map<String, Object> actionParams;
         private State state = State.NEW;
         private Object returnValue;

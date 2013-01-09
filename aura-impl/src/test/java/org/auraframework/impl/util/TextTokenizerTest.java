@@ -77,7 +77,9 @@ public class TextTokenizerTest extends AuraImplTestCase {
             tokenizer.asValue(cdh);
             fail("should have failed because of mixed expression and text");
         } catch (InvalidExpressionException e) {
-            if (!e.getMessage().startsWith("Cannot mix expression and literal string in attribute value")) { throw (e); }
+            if (!e.getMessage().startsWith("Cannot mix expression and literal string in attribute value")) {
+                throw (e);
+            }
         }
     }
 
@@ -91,7 +93,7 @@ public class TextTokenizerTest extends AuraImplTestCase {
         tokenizer = TextTokenizer.tokenize(testText[1], null);
         o = tokenizer.asValue(cdh);
         assertTrue(o instanceof PropertyReferenceImpl);
-        PropertyReferenceImpl e = (PropertyReferenceImpl)o;
+        PropertyReferenceImpl e = (PropertyReferenceImpl) o;
         assertEquals(testText[1], e.toString(true));
     }
 
@@ -108,7 +110,7 @@ public class TextTokenizerTest extends AuraImplTestCase {
         assertEquals("expression", c.getDescriptor().getName());
         Object o = c.getAttributeDefRef("value").getValue();
         assertTrue(o instanceof PropertyReferenceImpl);
-        assertEquals(testText[1], ((PropertyReferenceImpl)o).toString(true));
+        assertEquals(testText[1], ((PropertyReferenceImpl) o).toString(true));
 
         c = l.get(2);
         assertEquals("text", c.getDescriptor().getName());
@@ -117,13 +119,13 @@ public class TextTokenizerTest extends AuraImplTestCase {
 
     public void testWhitespacePreserve() throws Exception {
         String[] descNames = new String[] { //
-                "text", //
+        "text", //
                 "expression", //
                 "text", //
                 "expression", //
                 "text" };
         String[] testResults = new String[] { //
-                "[value=     ]", //
+        "[value=     ]", //
                 "[value=org.auraframework.impl.expression.LiteralImpl", //
                 "[value=     ]", //
                 "[value=org.auraframework.impl.expression.LiteralImpl", //
@@ -137,7 +139,10 @@ public class TextTokenizerTest extends AuraImplTestCase {
         for (ComponentDefRef cdf : compList) {
             assertEquals("Wrong Token Type", descNames[i], cdf.getName());
             Set<Entry<DefDescriptor<AttributeDef>, AttributeDefRef>> attributes = cdf.getAttributeValues().entrySet();
-            String test = attributes.toString().substring(0, testResults[i].length()); // truncate at expected result
+            String test = attributes.toString().substring(0, testResults[i].length()); // truncate
+                                                                                       // at
+                                                                                       // expected
+                                                                                       // result
                                                                                        // size
             assertEquals("Did not preserve whitespace", testResults[i], test);
             i++;
@@ -157,7 +162,10 @@ public class TextTokenizerTest extends AuraImplTestCase {
         for (ComponentDefRef cdf : compList) {
             assertEquals("Wrong Token Type", descNames[i], cdf.getName());
             Set<Entry<DefDescriptor<AttributeDef>, AttributeDefRef>> attributes = cdf.getAttributeValues().entrySet();
-            String test = attributes.toString().substring(0, testResults[i].length()); // truncate at expected result
+            String test = attributes.toString().substring(0, testResults[i].length()); // truncate
+                                                                                       // at
+                                                                                       // expected
+                                                                                       // result
                                                                                        // size
             assertEquals("Did not optimize whitespace", testResults[i], test);
             i++;

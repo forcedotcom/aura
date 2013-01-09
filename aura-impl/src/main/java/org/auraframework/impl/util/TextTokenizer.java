@@ -43,8 +43,8 @@ import org.auraframework.util.AuraTextUtil;
 import com.google.common.collect.Sets;
 
 /**
- * Parses expressions and literal text. Those tokens can then be converted into the appropriate types of
- * ComponentDefRefs or Strings
+ * Parses expressions and literal text. Those tokens can then be converted into
+ * the appropriate types of ComponentDefRefs or Strings
  */
 public class TextTokenizer implements Iterable<TextTokenizer.Token> {
     public static final String BEGIN = "{!";
@@ -103,8 +103,9 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
     }
 
     /**
-     * Parse the input text and represent it locally as a list of tokens. If a {@link TokenType#PLAINTEXT} token looks
-     * like a malformed expression, then throw a {@link org.auraframework.throwable.quickfix.QuickFixException}
+     * Parse the input text and represent it locally as a list of tokens. If a
+     * {@link TokenType#PLAINTEXT} token looks like a malformed expression, then
+     * throw a {@link org.auraframework.throwable.quickfix.QuickFixException}
      * 
      * @throws AuraValidationException
      */
@@ -133,27 +134,32 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
             }
         } else if (text != null) {
             // Allow creation of whitespace or empty text components.
-            // If the caller doesn't want this behavior, it should make that decision externally before calling parse
+            // If the caller doesn't want this behavior, it should make that
+            // decision externally before calling parse
             maybeAddPlainText(0, text.length());
         }
     }
 
     /**
-     * This token is not a valid expression. If it looks like it wanted to be an expression rather than real plain-text,
-     * then throw a validation error.
+     * This token is not a valid expression. If it looks like it wanted to be an
+     * expression rather than real plain-text, then throw a validation error.
      * 
-     * @throws AuraValidationException
-     *             if the plain text token looks like a malformed expression.
+     * @throws AuraValidationException if the plain text token looks like a
+     *             malformed expression.
      */
     private void maybeAddPlainText(int begin, int end) throws AuraValidationException {
         String substring = text.substring(begin, end);
 
         Matcher unterminated = UNTERMINATED_EXPRESSION_PATTERN.matcher(substring);
-        if (unterminated.matches()) { throw new InvalidExpressionException("Unterminated expression", location); }
+        if (unterminated.matches()) {
+            throw new InvalidExpressionException("Unterminated expression", location);
+        }
 
         Matcher curlyBangInversion = CURLY_BANG_INVERSION_PATTERN.matcher(substring);
-        if (curlyBangInversion.matches()) { throw new InvalidExpressionException(
-                "Found an expression starting with '!{' but it should be '{!'", location); }
+        if (curlyBangInversion.matches()) {
+            throw new InvalidExpressionException("Found an expression starting with '!{' but it should be '{!'",
+                    location);
+        }
 
         tokens.add(new Token(TokenType.PLAINTEXT, begin, end));
     }
@@ -179,15 +185,18 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
     }
 
     /**
-     * turns the tokens into raw strings or expressions, not componentdefrefs. if there is only one, it returns that
-     * literal instead of a list. this is used by various system tags
+     * turns the tokens into raw strings or expressions, not componentdefrefs.
+     * if there is only one, it returns that literal instead of a list. this is
+     * used by various system tags
      */
     public Object asValue(ExpressionContainerHandler cmpHandler) throws AuraValidationException {
         if (tokens.isEmpty()) {
             return null;
-        } else if (size() > 1) { throw new InvalidExpressionException(
-                "Cannot mix expression and literal string in attribute value, try rewriting like {!'foo' + v.bar}",
-                location); }
+        } else if (size() > 1) {
+            throw new InvalidExpressionException(
+                    "Cannot mix expression and literal string in attribute value, try rewriting like {!'foo' + v.bar}",
+                    location);
+        }
         return tokens.get(0).createValue(cmpHandler);
     }
 
@@ -231,8 +240,8 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
         }
 
         /**
-         * creates either a string or expression object out of this token, notifying the parent componentdef whenever an
-         * expression is found
+         * creates either a string or expression object out of this token,
+         * notifying the parent componentdef whenever an expression is found
          */
         private Object createValue(ExpressionContainerHandler cmpHandler) throws AuraValidationException {
             String raw = getRawValue();
@@ -248,18 +257,22 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
         }
 
         /**
-         * creates a component def ref for this token, either a text or expression component
+         * creates a component def ref for this token, either a text or
+         * expression component
          * 
-         * @return - null if undesirable whitespace, else a ComponentDefRef for the given token
+         * @return - null if undesirable whitespace, else a ComponentDefRef for
+         *         the given token
          */
         private ComponentDefRef createComponentDefRef(ExpressionContainerHandler cmpHandler)
                 throws AuraValidationException {
             Object value = createValue(cmpHandler);
 
             boolean IsUndesiredWhitespace = (whitespaceBehavior == WhitespaceBehavior.OPTIMIZE)
-                    && (value instanceof String && ((String)value).trim().length() == 0);
+                    && (value instanceof String && ((String) value).trim().length() == 0);
 
-            if (value == null || IsUndesiredWhitespace) { return null; }
+            if (value == null || IsUndesiredWhitespace) {
+                return null;
+            }
 
             AttributeDefRefImpl.Builder atBuilder = new AttributeDefRefImpl.Builder();
             DefDescriptor<AttributeDef> attdesc = DefDescriptorImpl.getInstance("value", AttributeDef.class);

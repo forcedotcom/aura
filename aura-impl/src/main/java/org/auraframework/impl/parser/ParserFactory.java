@@ -18,12 +18,15 @@ package org.auraframework.impl.parser;
 import java.util.EnumMap;
 
 import org.auraframework.impl.css.parser.ThemeParser;
-import org.auraframework.impl.java.writer.*;
+import org.auraframework.impl.java.writer.JavaScriptWriter;
+import org.auraframework.impl.java.writer.JavaWriter;
+import org.auraframework.impl.java.writer.ThemeWriter;
 import org.auraframework.impl.javascript.parser.JavascriptParser;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.XMLWriter;
-import org.auraframework.system.*;
+import org.auraframework.system.Parser;
 import org.auraframework.system.Parser.Format;
+import org.auraframework.system.SourceWriter;
 
 /**
  * Factory for returning the appropriate Parser for the given Format.
@@ -33,7 +36,7 @@ public class ParserFactory {
     private static EnumMap<Format, Parser> parsers = new EnumMap<Format, Parser>(Format.class);
     private static EnumMap<Format, SourceWriter> writers = new EnumMap<Format, SourceWriter>(Format.class);
 
-    static{
+    static {
         parsers.put(Format.XML, XMLParser.getInstance());
         parsers.put(Format.CSS, ThemeParser.getInstance());
         parsers.put(Format.TEMPLATE_CSS, ThemeParser.getNonValidatingInstance());
@@ -50,7 +53,7 @@ public class ParserFactory {
         return parsers.get(format);
     }
 
-    public static SourceWriter getWriter(Format format){
+    public static SourceWriter getWriter(Format format) {
         return writers.get(format);
     }
 }

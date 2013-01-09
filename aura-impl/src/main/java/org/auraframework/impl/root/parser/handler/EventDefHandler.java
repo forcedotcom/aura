@@ -20,16 +20,19 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import com.google.common.collect.ImmutableSet;
-
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.EventType;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
+
+import com.google.common.collect.ImmutableSet;
 
 public class EventDefHandler extends RootTagHandler<EventDef> {
 
@@ -38,16 +41,12 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
     private static final String ATTRIBUTE_TYPE = "type";
     private static final String ATTRIBUTE_EXTENDS = "extends";
 
-    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-        ATTRIBUTE_TYPE,
-        ATTRIBUTE_EXTENDS,
-        RootTagHandler.ATTRIBUTE_DESCRIPTION,
-        RootTagHandler.ATTRIBUTE_SUPPORT
-    );
+    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_TYPE, ATTRIBUTE_EXTENDS,
+            RootTagHandler.ATTRIBUTE_DESCRIPTION, RootTagHandler.ATTRIBUTE_SUPPORT);
 
-    private EventDefImpl.Builder builder = new EventDefImpl.Builder();
+    private final EventDefImpl.Builder builder = new EventDefImpl.Builder();
 
-    public EventDefHandler(){
+    public EventDefHandler() {
         super();
     }
 
@@ -72,7 +71,8 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
         String tag = getTagName();
         if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
             AttributeDefImpl attributeDef = new AttributeDefHandler<EventDef>(this, xmlReader, source).getElement();
-            builder.getAttributeDefs().put(DefDescriptorImpl.getInstance(attributeDef.getName(), AttributeDef.class), attributeDef);
+            builder.getAttributeDefs().put(DefDescriptorImpl.getInstance(attributeDef.getName(), AttributeDef.class),
+                    attributeDef);
         } else {
             error("Found unexpected tag %s", tag);
         }
@@ -84,7 +84,7 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
     }
 
     @Override
-    protected void readAttributes() throws QuickFixException{
+    protected void readAttributes() throws QuickFixException {
 
         super.readAttributes();
         String extendsName = getAttributeValue(ATTRIBUTE_EXTENDS);

@@ -22,8 +22,11 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ComponentDefRef.Load;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.source.StringSource;
@@ -43,8 +46,12 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(desc, "<fake:component attr='attr value'>Child Text<aura:foo/><aura:set attribute='header'>Header Value</aura:set></fake:component>", "myID",Format.XML);
+        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component",
+                ComponentDef.class);
+        StringSource<ComponentDef> source = new StringSource<ComponentDef>(
+                desc,
+                "<fake:component attr='attr value'>Child Text<aura:foo/><aura:set attribute='header'>Header Value</aura:set></fake:component>",
+                "myID", Format.XML);
         xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
         xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());
@@ -56,7 +63,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
 
     public void testCreateDefinition() {
         ComponentDefRef cdr = cdrHandler.createDefinition();
-        assertEquals("attr value",cdr.getAttributeDefRef("attr").getValue());
+        assertEquals("attr value", cdr.getAttributeDefRef("attr").getValue());
     }
 
     @SuppressWarnings("unchecked")
@@ -64,9 +71,10 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         xmlReader.next();
         cdrHandler.handleChildText();
         ComponentDefRef cdr = cdrHandler.createDefinition();
-        ArrayList<ComponentDefRef> compDefs = (ArrayList<ComponentDefRef>)cdr.getAttributeDefRef(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME).getValue();
+        ArrayList<ComponentDefRef> compDefs = (ArrayList<ComponentDefRef>) cdr.getAttributeDefRef(
+                AttributeDefRefImpl.BODY_ATTRIBUTE_NAME).getValue();
         AttributeDefRef attDef = compDefs.get(0).getAttributeDefRef("value");
-        assertEquals("Child Text",attDef.getValue());
+        assertEquals("Child Text", attDef.getValue());
     }
 
     @SuppressWarnings("unchecked")
@@ -75,8 +83,9 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         xmlReader.next();
         cdrHandler.handleChildTag();
         ComponentDefRef cdr = cdrHandler.createDefinition();
-        ArrayList<ComponentDefRef> compDefs = (ArrayList<ComponentDefRef>)cdr.getAttributeDefRef(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME).getValue();
-        assertEquals("foo",compDefs.get(0).getDescriptor().getName());
+        ArrayList<ComponentDefRef> compDefs = (ArrayList<ComponentDefRef>) cdr.getAttributeDefRef(
+                AttributeDefRefImpl.BODY_ATTRIBUTE_NAME).getValue();
+        assertEquals("foo", compDefs.get(0).getDescriptor().getName());
     }
 
     public void testHandleChildSetTag() throws Exception {
@@ -86,52 +95,54 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         xmlReader.next();
         cdrHandler.handleChildTag();
         ComponentDefRef cdr = cdrHandler.createDefinition();
-        ComponentDefRef value = (ComponentDefRef)((List<?>)cdr.getAttributeDefRef("header").getValue()).get(0);
-        assertEquals("Header Value",value.getAttributeDefRef("value").getValue());
+        ComponentDefRef value = (ComponentDefRef) ((List<?>) cdr.getAttributeDefRef("header").getValue()).get(0);
+        assertEquals("Header Value", value.getAttributeDefRef("value").getValue());
     }
 
     public void testGetHandledTag() {
-        assertEquals("Component Reference",cdrHandler.getHandledTag());
+        assertEquals("Component Reference", cdrHandler.getHandledTag());
     }
 
     /**
      * Verify aura:load specification for componentdef refs.
+     * 
      * @throws Exception
      */
-    public void testReadSystemAttributes() throws Exception{
-        //1. Verify specifying a invalid load specification
+    public void testReadSystemAttributes() throws Exception {
+        // 1. Verify specifying a invalid load specification
         cdrHandler = createComponentDefHandler("<fake:component aura:load='foo'/>");
-        try{
+        try {
             cdrHandler.readSystemAttributes();
             fail("Should not be able to specify an invalid load value.");
-        }catch (AuraRuntimeException expected){
-            assertTrue("unexpected message: "+expected.getMessage(),
-                       expected.getMessage().contains("Invalid value 'foo' specified for 'aura:load' attribute"));
+        } catch (AuraRuntimeException expected) {
+            assertTrue("unexpected message: " + expected.getMessage(),
+                    expected.getMessage().contains("Invalid value 'foo' specified for 'aura:load' attribute"));
         }
-        //2. Verify specifying blank string as load specification
+        // 2. Verify specifying blank string as load specification
         cdrHandler = createComponentDefHandler("<fake:component aura:load=' '/>");
         cdrHandler.readSystemAttributes();
-        assertEquals("Failed to read specified load level.", Load.DEFAULT,cdrHandler.createDefinition().getLoad());
+        assertEquals("Failed to read specified load level.", Load.DEFAULT, cdrHandler.createDefinition().getLoad());
 
-        //3. Verify default load specification
+        // 3. Verify default load specification
         cdrHandler = createComponentDefHandler("<fake:component/>");
         cdrHandler.readSystemAttributes();
-        assertEquals("Failed to use DEFAULT load level", Load.DEFAULT,cdrHandler.createDefinition().getLoad());
+        assertEquals("Failed to use DEFAULT load level", Load.DEFAULT, cdrHandler.createDefinition().getLoad());
 
-        //4. Verify LAZY load specification
+        // 4. Verify LAZY load specification
         cdrHandler = createComponentDefHandler("<fake:component aura:load='LAZY'/>");
         cdrHandler.readSystemAttributes();
-        assertEquals("Failed to read LAZY load level.", Load.LAZY,cdrHandler.createDefinition().getLoad());
+        assertEquals("Failed to read LAZY load level.", Load.LAZY, cdrHandler.createDefinition().getLoad());
 
-        //5. Verify load specification is not case sensitive
+        // 5. Verify load specification is not case sensitive
         cdrHandler = createComponentDefHandler("<fake:component aura:lOAd='ExcluSiVe'/>");
         cdrHandler.readSystemAttributes();
-        assertEquals(Load.EXCLUSIVE,cdrHandler.createDefinition().getLoad());
+        assertEquals(Load.EXCLUSIVE, cdrHandler.createDefinition().getLoad());
     }
 
-    private ComponentDefRefHandler<?> createComponentDefHandler(String markup)throws Exception{
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(desc, markup , "myID",Format.XML);
+    private ComponentDefRefHandler<?> createComponentDefHandler(String markup) throws Exception {
+        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component",
+                ComponentDef.class);
+        StringSource<ComponentDef> source = new StringSource<ComponentDef>(desc, markup, "myID", Format.XML);
         xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
         xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());

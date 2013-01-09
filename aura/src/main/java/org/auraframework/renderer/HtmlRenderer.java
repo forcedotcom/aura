@@ -16,7 +16,6 @@
 package org.auraframework.renderer;
 
 import java.io.IOException;
-
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +27,6 @@ import org.auraframework.def.Renderer;
 import org.auraframework.expression.Expression;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
-
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -38,30 +36,30 @@ public class HtmlRenderer implements Renderer {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void render(BaseComponent<?,?> component, Appendable out) throws IOException, QuickFixException {
-        List<Object> markup = (List<Object>)component.getAttributes().getValue("markup");
-        if(markup != null){
-            for(int i=0;i<markup.size();i++){
+    public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
+        List<Object> markup = (List<Object>) component.getAttributes().getValue("markup");
+        if (markup != null) {
+            for (int i = 0; i < markup.size(); i++) {
                 Object section = markup.get(i);
-                if(section instanceof String){
-                    out.append((String)section);
-                }else if(section != null && section instanceof Expression){
-                    section = ((Expression)section).evaluate(component.getAttributes().getValueProvider());
+                if (section instanceof String) {
+                    out.append((String) section);
+                } else if (section != null && section instanceof Expression) {
+                    section = ((Expression) section).evaluate(component.getAttributes().getValueProvider());
 
-                    if(section != null){
+                    if (section != null) {
 
-                        if(section instanceof List){
-                            for(Object obj : (List<?>)section){
-                                if(obj instanceof ComponentDefRef){
-                                    ComponentDefRef cdr = (ComponentDefRef)obj;
-                                    for(Component cmp : cdr.newInstance(component.getAttributes().getValueProvider())){
-                                            Aura.getRenderingService().render(cmp, out);
+                        if (section instanceof List) {
+                            for (Object obj : (List<?>) section) {
+                                if (obj instanceof ComponentDefRef) {
+                                    ComponentDefRef cdr = (ComponentDefRef) obj;
+                                    for (Component cmp : cdr.newInstance(component.getAttributes().getValueProvider())) {
+                                        Aura.getRenderingService().render(cmp, out);
                                     }
-                                }else if(obj instanceof Component){
-                                    Aura.getRenderingService().render((Component)obj, out);
+                                } else if (obj instanceof Component) {
+                                    Aura.getRenderingService().render((Component) obj, out);
                                 }
                             }
-                        }else{
+                        } else {
                             out.append(section.toString());
                         }
                     }
@@ -69,27 +67,29 @@ public class HtmlRenderer implements Renderer {
             }
             return;
         }
-        String tag = (String)component.getAttributes().getValue("tag");
+        String tag = (String) component.getAttributes().getValue("tag");
         String id = component.getLocalId();
         out.append('<');
         out.append(tag);
 
-        Map<DefDescriptor<AttributeDef>, Object> htmlAttributes = (Map<DefDescriptor<AttributeDef>, Object>)component.getAttributes().getValue("HTMLAttributes");
-        if(htmlAttributes != null){
-            for(Map.Entry<DefDescriptor<AttributeDef>, Object> entry : htmlAttributes.entrySet()){
+        Map<DefDescriptor<AttributeDef>, Object> htmlAttributes = (Map<DefDescriptor<AttributeDef>, Object>) component
+                .getAttributes().getValue("HTMLAttributes");
+        if (htmlAttributes != null) {
+            for (Map.Entry<DefDescriptor<AttributeDef>, Object> entry : htmlAttributes.entrySet()) {
                 Object value = entry.getValue();
                 DefDescriptor<AttributeDef> attDef = entry.getKey();
                 if (id != null && "id".equals(attDef.getName())) {
                     //
                     // FIXME: This is an error!
-                    // Actually, having an id attribute is very dangerous, and probably should be disallowed.
+                    // Actually, having an id attribute is very dangerous, and
+                    // probably should be disallowed.
                     //
                     continue;
                 }
-                if(value != null && value instanceof Expression){
-                    value = ((Expression)value).evaluate(component.getAttributes().getValueProvider());
+                if (value != null && value instanceof Expression) {
+                    value = ((Expression) value).evaluate(component.getAttributes().getValueProvider());
                 }
-                if(value != null){
+                if (value != null) {
                     out.append(' ');
                     out.append(entry.getKey().getName());
                     out.append('=');
@@ -100,24 +100,24 @@ public class HtmlRenderer implements Renderer {
             }
         }
 
-        if(id != null){
+        if (id != null) {
             out.append(" id=\"");
             out.append(component.getLocalId());
             out.append('"');
         }
 
-        List<Component> body = (List<Component>)component.getAttributes().getValue("body");
-        if(body != null && body.size() > 0){
+        List<Component> body = (List<Component>) component.getAttributes().getValue("body");
+        if (body != null && body.size() > 0) {
             out.append('>');
             componentRenderer.render(component, out);
             out.append("</");
             out.append(tag);
             out.append('>');
-        }else if(tag.equalsIgnoreCase("script") || tag.equalsIgnoreCase("div")){
+        } else if (tag.equalsIgnoreCase("script") || tag.equalsIgnoreCase("div")) {
             out.append("></");
             out.append(tag);
             out.append('>');
-        }else{
+        } else {
             out.append("/>\n");
         }
     }

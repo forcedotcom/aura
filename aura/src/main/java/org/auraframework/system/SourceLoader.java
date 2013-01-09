@@ -17,8 +17,10 @@ package org.auraframework.system;
 
 import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
 
 /**
  */
@@ -26,28 +28,29 @@ public interface SourceLoader {
 
     /**
      * Returns a list of namespaces for which this loader is authoritative.
-     *
+     * 
      * @return List of names of namespaces that this SourceLoader handles.
      */
     Set<String> getNamespaces();
 
     /**
-     * Returns a list of prefixes (java/js/apex) for which this loader is authoritative within the
-     * namespaces returned by getNamespaces.
-     *
+     * Returns a list of prefixes (java/js/apex) for which this loader is
+     * authoritative within the namespaces returned by getNamespaces.
+     * 
      * @return List of prefixes that this SourceLoader handles.
      */
     Set<String> getPrefixes();
 
     /**
-     * Returns a list of DefTypes for which this loader is authoritative within the
-     * namespaces returned by getNamespaces and the prefixes returned by getPrefixes.
+     * Returns a list of DefTypes for which this loader is authoritative within
+     * the namespaces returned by getNamespaces and the prefixes returned by
+     * getPrefixes.
      */
     Set<DefType> getDefTypes();
 
     /**
      * Return the Source for the given descriptor.
-     *
+     * 
      * @param descriptor
      * @return Source referenced by descriptor
      */

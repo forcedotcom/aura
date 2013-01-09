@@ -22,8 +22,8 @@ import org.openqa.grid.selenium.GridLauncher;
 
 /**
  * Get WebDriver instances for Aura tests.
- *
- *
+ * 
+ * 
  * @since 0.0.94
  */
 public class SeleniumServerLauncher {
@@ -46,13 +46,16 @@ public class SeleniumServerLauncher {
         // Don't need to startup a grid as of now
         //
         // logger.info("Launching Selenium grid hub on port " + serverPort);
-        // GridLauncher.main(String.format("-port %s -role hub", serverPort).split(" "));
+        // GridLauncher.main(String.format("-port %s -role hub",
+        // serverPort).split(" "));
         // logger.info("Waiting for hub to open port");
         // waitForPortOpen(host, serverPort);
         //
         // logger.info("Launching Selenium grid node on port " + nodePort);
-        // logger.info("chrome driver location: " + System.getProperty("webdriver.chrome.driver"));
-        // GridLauncher.main(String.format("-port %s -role webdriver -hub http://%s:%s/grid/register %s", nodePort,
+        // logger.info("chrome driver location: " +
+        // System.getProperty("webdriver.chrome.driver"));
+        // GridLauncher.main(String.format("-port %s -role webdriver -hub http://%s:%s/grid/register %s",
+        // nodePort,
         // host, serverPort, browsers).split(" "));
         // logger.info("Waiting for node to open port");
         // waitForPortOpen(host, nodePort);
@@ -66,9 +69,12 @@ public class SeleniumServerLauncher {
             try {
                 new Socket(host, port);
                 isUp = true;
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
             ;
         }
-        if (!isUp) { throw new Error(String.format("Failed to open socket to port %d", port)); }
+        if (!isUp) {
+            throw new Error(String.format("Failed to open socket to port %d", port));
+        }
     }
 }

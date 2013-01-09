@@ -21,21 +21,23 @@ import java.util.List;
 import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptValidator;
 import org.auraframework.util.javascript.directive.impl.DirectiveImpl;
+
 /**
- * This class acts as a repository of Directives used for testing the Directive based javascript group processing.
- *
- *
+ * This class acts as a repository of Directives used for testing the Directive
+ * based javascript group processing.
+ * 
+ * 
  * @since 138
  */
 public class DirectiveFactory {
-    private static class EndDirective extends DirectiveImpl{
+    private static class EndDirective extends DirectiveImpl {
         public EndDirective(int offset, String line) {
             super(offset, line);
         }
 
         @Override
         public String generateOutput(JavascriptGeneratorMode mode) {
-            return JavascriptGeneratorMode.TESTING.toString()+"\n";
+            return JavascriptGeneratorMode.TESTING.toString() + "\n";
         }
 
         @Override
@@ -48,6 +50,7 @@ public class DirectiveFactory {
             return null;
         }
     }
+
     private static class EndDirectiveType implements DirectiveType<EndDirective> {
 
         @Override
@@ -60,8 +63,11 @@ public class DirectiveFactory {
             return "end";
         }
     }
-    /*A mock directive which just replaces the word "blah" with its key. The
-     * (key, value) pair is provided as part of the directive configuration in the source javascript file.
+
+    /*
+     * A mock directive which just replaces the word "blah" with its key. The
+     * (key, value) pair is provided as part of the directive configuration in
+     * the source javascript file.
      */
     private static class MockDirective extends DirectiveImpl {
 
@@ -86,6 +92,7 @@ public class DirectiveFactory {
         }
 
     }
+
     private static class MockDirectiveType implements DirectiveType<MockDirective> {
 
         @Override
@@ -98,8 +105,10 @@ public class DirectiveFactory {
             return "mock";
         }
     }
+
     /*
-     * A dummy directive which just generates the word "TESTINGdummy" in all modes
+     * A dummy directive which just generates the word "TESTINGdummy" in all
+     * modes
      */
     private static class DummyDirective extends DirectiveImpl {
 
@@ -109,7 +118,7 @@ public class DirectiveFactory {
 
         @Override
         public String generateOutput(JavascriptGeneratorMode mode) {
-            return "\n"+JavascriptGeneratorMode.TESTING.toString()+ "dummy\n";
+            return "\n" + JavascriptGeneratorMode.TESTING.toString() + "dummy\n";
         }
 
         @Override
@@ -123,6 +132,7 @@ public class DirectiveFactory {
         }
 
     }
+
     private static class DummyDirectiveType implements DirectiveType<DummyDirective> {
 
         @Override
@@ -135,10 +145,11 @@ public class DirectiveFactory {
             return "dummy";
         }
     }
+
     /*
-     * A multiline mock directive.
-     * In testing mode, this just generated the contents as is from the directive specified in the source js file.
-     * In all other modes, it just specifies the mode it is processing the group in.
+     * A multiline mock directive. In testing mode, this just generated the
+     * contents as is from the directive specified in the source js file. In all
+     * other modes, it just specifies the mode it is processing the group in.
      */
 
     private static class MultiLineMockDirective extends DirectiveImpl {
@@ -147,14 +158,15 @@ public class DirectiveFactory {
             super(offset, line);
         }
 
-        //Just throws the content as is appears in the source code
-        //Just a helper
+        // Just throws the content as is appears in the source code
+        // Just a helper
         @Override
         public String generateOutput(JavascriptGeneratorMode mode) {
-            if(mode.equals(JavascriptGeneratorMode.TESTING))
+            if (mode.equals(JavascriptGeneratorMode.TESTING)) {
                 return getContent();
-            else
-                return "/* generating in: "+mode.name() + "*/\n";
+            } else {
+                return "/* generating in: " + mode.name() + "*/\n";
+            }
         }
 
         @Override
@@ -168,16 +180,18 @@ public class DirectiveFactory {
         }
 
         @Override
-        public boolean isMultiline(){
+        public boolean isMultiline() {
             return true;
         }
-        //Helper method to test setContent
+
+        // Helper method to test setContent
         @Override
-        public String getContent(){
+        public String getContent() {
             return super.getContent();
         }
 
     }
+
     private static class MultiLineMockDirectiveType implements DirectiveType<MultiLineMockDirective> {
 
         @Override
@@ -191,16 +205,19 @@ public class DirectiveFactory {
         }
     }
 
-    public static DirectiveType<?> getEndDirective(){
+    public static DirectiveType<?> getEndDirective() {
         return new EndDirectiveType();
     }
-    public static DirectiveType<?> getMockDirective(){
+
+    public static DirectiveType<?> getMockDirective() {
         return new MockDirectiveType();
     }
-    public static DirectiveType<?> getDummyDirectiveType(){
+
+    public static DirectiveType<?> getDummyDirectiveType() {
         return new DummyDirectiveType();
     }
-    public static DirectiveType<?> getMultiLineMockDirectiveType(){
+
+    public static DirectiveType<?> getMultiLineMockDirectiveType() {
         return new MultiLineMockDirectiveType();
     }
 }

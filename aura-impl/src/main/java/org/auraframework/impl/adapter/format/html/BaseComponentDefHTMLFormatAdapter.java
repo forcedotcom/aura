@@ -21,15 +21,21 @@ import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.ThemeDef;
+import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.http.AuraServlet;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.Client;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.Literal;
@@ -49,7 +55,7 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
 
             InstanceService instanceService = Aura.getInstanceService();
             RenderingService renderingService = Aura.getRenderingService();
-            BaseComponentDef def = (BaseComponentDef)value;
+            BaseComponentDef def = (BaseComponentDef) value;
 
             ComponentDef templateDef = def.getTemplateDef();
             Map<String, Object> attributes = Maps.newHashMap();
@@ -62,7 +68,7 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
             String manifest = AuraServlet.getManifest();
             AuraContext context = Aura.getContextService().getCurrentContext();
 
-            attributes.put("lastMod", Long.toString(AuraServlet.getLastMod()));
+            attributes.put("lastMod", Long.toString(AuraBaseServlet.getLastMod()));
 
             DefDescriptor<ThemeDef> themeDefDesc = templateDef.getThemeDescriptor();
             if (themeDefDesc != null) {
@@ -76,15 +82,15 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
             if (mode.allowLocalRendering() && def.isLocallyRenderable()) {
 
                 DefType defType = def.getDescriptor().getDefType();
-                BaseComponent<?,?> cmp = null;
+                BaseComponent<?, ?> cmp = null;
 
-                if(defType == DefType.APPLICATION){
-                    cmp = (BaseComponent<?,?>)instanceService.getInstance((ApplicationDef)def, componentAttributes);
-                }else{
-                    cmp = (BaseComponent<?,?>)instanceService.getInstance((ComponentDef)def, componentAttributes);
+                if (defType == DefType.APPLICATION) {
+                    cmp = (BaseComponent<?, ?>) instanceService.getInstance((ApplicationDef) def, componentAttributes);
+                } else {
+                    cmp = (BaseComponent<?, ?>) instanceService.getInstance((ComponentDef) def, componentAttributes);
                 }
 
-                attributes.put("body", Lists.<BaseComponent<?,?>> newArrayList(cmp));
+                attributes.put("body", Lists.<BaseComponent<?, ?>> newArrayList(cmp));
                 attributes.put("bodyClass", "");
                 attributes.put("defaultBodyClass", "");
                 attributes.put("autoInitialize", "false");
@@ -96,8 +102,9 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
 
                 DefType defType = def.getDescriptor().getDefType();
 
-                if(Aura.getConfigAdapter().isClientAppcacheEnabled() && defType == DefType.APPLICATION && manifest != null && !manifest.isEmpty()){
-                    if(((ApplicationDef)def).isAppcacheEnabled()){
+                if (Aura.getConfigAdapter().isClientAppcacheEnabled() && defType == DefType.APPLICATION
+                        && manifest != null && !manifest.isEmpty()) {
+                    if (((ApplicationDef) def).isAppcacheEnabled()) {
                         attributes.put("manifest", manifest);
                     }
                 }

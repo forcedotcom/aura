@@ -15,6 +15,6 @@
  */
 package org.auraframework.util.sampleServices;
 
-public class MultipleWith2PrimaryServiceImpl1 implements MultipleWith2PrimaryService{
+public class MultipleWith2PrimaryServiceImpl1 implements MultipleWith2PrimaryService {
 
 }

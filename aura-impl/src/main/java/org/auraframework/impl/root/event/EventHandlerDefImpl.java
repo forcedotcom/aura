@@ -35,8 +35,9 @@ import org.auraframework.util.json.Json;
 
 /**
  * Definition of an event handler.
- *
- * FIXME: W-1328552 This should extend DefinitionImpl<EventHandlerDef> and getEventDescriptor should be an override
+ * 
+ * FIXME: W-1328552 This should extend DefinitionImpl<EventHandlerDef> and
+ * getEventDescriptor should be an override
  */
 public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements EventHandlerDef {
     private static final long serialVersionUID = 20559007136143177L;
@@ -54,8 +55,8 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies){
-        if(descriptor != null){
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        if (descriptor != null) {
             dependencies.add(descriptor);
         }
     }
@@ -64,7 +65,8 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
     public void validateDefinition() throws QuickFixException {
 
         if (descriptor == null && name == null || descriptor != null && name != null) {
-            throw new InvalidDefinitionException("aura:handler must specify one and only one of name=\"…\" or event=\"…\"", getLocation());
+            throw new InvalidDefinitionException(
+                    "aura:handler must specify one and only one of name=\"…\" or event=\"…\"", getLocation());
         }
 
         if (action == null) {
@@ -77,21 +79,27 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
         if (name == null && descriptor != null) {
             EventDef event = descriptor.getDef();
             if (event == null) {
-                throw new InvalidReferenceException(String.format("aura:handler has invalid event attribute value: %s", descriptor), getLocation());
+                throw new InvalidReferenceException(String.format("aura:handler has invalid event attribute value: %s",
+                        descriptor), getLocation());
             }
             if (!event.getEventType().equals(EventType.APPLICATION)) {
-                throw new InvalidReferenceException("A aura:handler that specifies an event=\"\" attribute must handle an application event. Either change the aura:event to have type=\"APPLICATION\" or alternately change the aura:handler to specify a name=\"\" attribute.", getLocation());
+                throw new InvalidReferenceException(
+                        "A aura:handler that specifies an event=\"\" attribute must handle an application event. Either change the aura:event to have type=\"APPLICATION\" or alternately change the aura:handler to specify a name=\"\" attribute.",
+                        getLocation());
             }
         } else if (name != null && descriptor == null && value == null) {
             RootDefinition parentDef = parentDescriptor.getDef();
             Map<String, RegisterEventDef> events = parentDef.getRegisterEventDefs();
             RegisterEventDef event = events.get(name);
             if (event == null) {
-                throw new InvalidReferenceException(String.format("aura:handler has invalid name attribute value: %s", name), getLocation());
+                throw new InvalidReferenceException(String.format("aura:handler has invalid name attribute value: %s",
+                        name), getLocation());
             }
             event.getDescriptor().getDef().getEventType();
             if (!event.getDescriptor().getDef().getEventType().equals(EventType.COMPONENT)) {
-                throw new InvalidReferenceException("A aura:handler that specifies a name=\"\" attribute must handle a component event. Either change the aura:event to have type=\"COMPONENT\" or alternately change the aura:handler to specify an event=\"\" attribute.", getLocation());
+                throw new InvalidReferenceException(
+                        "A aura:handler that specifies a name=\"\" attribute must handle a component event. Either change the aura:event to have type=\"COMPONENT\" or alternately change the aura:handler to specify an event=\"\" attribute.",
+                        getLocation());
             }
         }
         // TODO: validate action attribute
@@ -101,7 +109,7 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
     public void serialize(Json json) throws IOException {
         try {
             json.writeMapBegin();
-            if(descriptor != null){
+            if (descriptor != null) {
                 json.writeMapEntry("eventDef", descriptor.getDef());
             }
             json.writeMapEntry("action", action);
@@ -113,9 +121,9 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
         }
     }
 
-    public static class Builder extends DefinitionImpl.RefBuilderImpl<EventDef, EventHandlerDef>{
+    public static class Builder extends DefinitionImpl.RefBuilderImpl<EventDef, EventHandlerDef> {
 
-        public Builder(){
+        public Builder() {
             super(EventDef.class);
         }
 
@@ -129,22 +137,22 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
             return new EventHandlerDefImpl(this);
         }
 
-        public Builder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor){
+        public Builder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor) {
             this.parentDescriptor = parentDescriptor;
             return this;
         }
 
-        public Builder setAction(PropertyReference action){
+        public Builder setAction(PropertyReference action) {
             this.action = action;
             return this;
         }
 
-        public Builder setValue(PropertyReference value){
+        public Builder setValue(PropertyReference value) {
             this.value = value;
             return this;
         }
 
-        public Builder setName(String name){
+        public Builder setName(String name) {
             this.name = name;
             return this;
         }

@@ -16,12 +16,14 @@
 package org.auraframework.docs;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -35,16 +37,17 @@ public class EditorPanelModel {
     public EditorPanelModel() throws QuickFixException {
 
         AuraContext context = Aura.getContextService().getCurrentContext();
-        BaseComponent<?,?> component = context.getCurrentComponent();
+        BaseComponent<?, ?> component = context.getCurrentComponent();
 
-        String desc = (String)component.getAttributes().getValue("descriptor");
-        DefType defType = DefType.valueOf(((String)component.getAttributes().getValue("defType")).toUpperCase());
-        DefDescriptor<? extends Definition> descriptor = Aura.getDefinitionService().getDefDescriptor(desc, defType.getPrimaryInterface());
+        String desc = (String) component.getAttributes().getValue("descriptor");
+        DefType defType = DefType.valueOf(((String) component.getAttributes().getValue("defType")).toUpperCase());
+        DefDescriptor<? extends Definition> descriptor = Aura.getDefinitionService().getDefDescriptor(desc,
+                defType.getPrimaryInterface());
         Source<?> source = context.getDefRegistry().getSource(descriptor);
-        if(source != null && source.exists()){
+        if (source != null && source.exists()) {
             code = source.getContents();
             format = source.getFormat().toString();
-        }else{
+        } else {
             code = null;
             format = null;
         }

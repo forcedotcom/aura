@@ -28,10 +28,12 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 
 /**
- * This test verifies that the aura servlet checks for CSRF token before servicing any requests. All requests to aura
- * are posted to /aura and handled by the AuraServlet. A CSRF token is generated with the very first request and sent
- * back to the Client. Every subsequent request from the client has the CSRF token embedded as a request parameter.
- *
+ * This test verifies that the aura servlet checks for CSRF token before
+ * servicing any requests. All requests to aura are posted to /aura and handled
+ * by the AuraServlet. A CSRF token is generated with the very first request and
+ * sent back to the Client. Every subsequent request from the client has the
+ * CSRF token embedded as a request parameter.
+ * 
  * @hierarchy Aura.Security
  * @priority high
  * @userStory a07B0000000DV9S
@@ -44,11 +46,12 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
     private Map<String, String> makeBasePostParams() {
         Map<String, Object> message = new HashMap<String, Object>();
         Map<String, Object> actionInstance = new HashMap<String, Object>();
-        actionInstance.put("descriptor", "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString");
+        actionInstance.put("descriptor",
+                "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString");
         Map<String, Object> actionParams = new HashMap<String, Object>();
         actionParams.put("param", "some string");
         actionInstance.put("params", actionParams);
-        Map<?,?>[] actions = { actionInstance };
+        Map<?, ?>[] actions = { actionInstance };
         message.put("actions", actions);
         String jsonMessage = Json.serialize(message);
         Map<String, String> params = new HashMap<String, String>();
@@ -57,8 +60,10 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Test to post a request to aura servlet without a CSRF token. This test tries to request a action defined on a
-     * controller. But the request does not have a valid CSRF token, hence the request should fail to fetch the def.
+     * Test to post a request to aura servlet without a CSRF token. This test
+     * tries to request a action defined on a controller. But the request does
+     * not have a valid CSRF token, hence the request should fail to fetch the
+     * def.
      */
     @SuppressWarnings("unchecked")
     @TestLabels("auraSanity")
@@ -71,28 +76,26 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
         if (statusCode != HttpStatus.SC_OK || !response.endsWith("/*ERROR*/")) {
             fail("Should not be able to post to aura servlet without a valid CSRF token");
         }
-        if(response.startsWith(AuraBaseServlet.CSRF_PROTECT)){
-            response = "/*"+response;
+        if (response.startsWith(AuraBaseServlet.CSRF_PROTECT)) {
+            response = "/*" + response;
         }
-        Map<String, Object> json = (Map<String, Object>)new JsonReader().read(response);
-        assertEquals(true,json.get("exceptionEvent"));
-        Map<String, Object> event = (Map<String, Object>)json.get("event");
+        Map<String, Object> json = (Map<String, Object>) new JsonReader().read(response);
+        assertEquals(true, json.get("exceptionEvent"));
+        Map<String, Object> event = (Map<String, Object>) json.get("event");
         assertEquals("Expected to see a aura:systemError event", "markup://aura:systemError", event.get("descriptor"));
-        assertEquals("Missing parameter value for aura.token", ((Map<String, Object>)
-                                                                   ((Map<String, Object>)
-                                                                     ((Map<String, Object>)(event.get("attributes"))
-                                                                    ).get("value")
-                                                                  ).get("values")
-                                                                 ).get("message"));
+        assertEquals("Missing parameter value for aura.token",
+                ((Map<String, Object>) ((Map<String, Object>) ((Map<String, Object>) (event.get("attributes")))
+                        .get("value")).get("values")).get("message"));
         Object f = json.get("defaultHandler");
         assertEquals(JsFunction.class, f.getClass());
-        assertEquals("$A.error('unknown error');", ((JsFunction)f).getBody());
+        assertEquals("$A.error('unknown error');", ((JsFunction) f).getBody());
     }
 
     /**
-     * Test to post a request to aura servlet with an invalid CSRF token. This test tries to request a action defined
-     * on a controller. But the request does not have a valid CSRF token, hence the request should fail to fetch the
-     * def.
+     * Test to post a request to aura servlet with an invalid CSRF token. This
+     * test tries to request a action defined on a controller. But the request
+     * does not have a valid CSRF token, hence the request should fail to fetch
+     * the def.
      */
     // W-1064983 - NO CSRF validation currently
     public void _testVerifyPostWithInvalidToken() throws Exception {
@@ -108,8 +111,8 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Test to post a request to aura servlet with a valid CSRF token. This test tries to request an action defined on
-     * a controller.
+     * Test to post a request to aura servlet with a valid CSRF token. This test
+     * tries to request an action defined on a controller.
      */
     @TestLabels("auraSanity")
     public void testVerifyPostWithValidToken() throws Exception {

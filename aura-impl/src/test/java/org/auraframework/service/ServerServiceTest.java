@@ -21,23 +21,29 @@ import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ActionDef;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.Action;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.Message;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * @hierarchy Aura.Services.ServerService
  * @userStory a07B0000000Eb3M
  */
-public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServiceTest.Config> implements ServerService {
+public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServiceTest.Config> implements
+        ServerService {
 
     private static final long serialVersionUID = -5810328283514294579L;
 
@@ -72,16 +78,17 @@ public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServ
         Map<String, Object> params;
         List<Action> actions;
         Action action;
-        try{
+        try {
             AuraContext ctx = contextService.startContext(config.mode, config.format, config.access);
 
             // test single action request
-            DefDescriptor<ActionDef> actionDescriptor = Aura.getDefinitionService().getDefDescriptor(action1, ActionDef.class);
+            DefDescriptor<ActionDef> actionDescriptor = Aura.getDefinitionService().getDefDescriptor(action1,
+                    ActionDef.class);
             actionList = Lists.newArrayList();
             params = Maps.newHashMap();
 
             params.put("param", param1);
-            actionList.add((Action)Aura.getInstanceService().getInstance(actionDescriptor, params));
+            actionList.add((Action) Aura.getInstanceService().getInstance(actionDescriptor, params));
 
             msg = new Message<BaseComponentDef>(actionList, null, null);
             result = service.run(msg, ctx);
@@ -97,7 +104,8 @@ public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServ
             params = Maps.newHashMap();
 
             params.put("param", param2);
-            actionList.add((Action)Aura.getInstanceService().getInstance(Aura.getDefinitionService().getDefDescriptor(action2, ActionDef.class), params));
+            actionList.add((Action) Aura.getInstanceService().getInstance(
+                    Aura.getDefinitionService().getDefDescriptor(action2, ActionDef.class), params));
 
             msg = new Message<BaseComponentDef>(actionList, null, null);
             result = service.run(msg, ctx);
@@ -115,7 +123,7 @@ public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServ
             assertEquals(Action.State.SUCCESS, action.getState());
             assertEquals(param2, action.getReturnValue());
 
-        }finally{
+        } finally {
             contextService.endContext();
         }
         return null;
@@ -130,18 +138,19 @@ public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServ
         String cmpName = "auratest:testComponent1";
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(appName, ApplicationDef.class);
 
-        try{
+        try {
             AuraContext ctx = contextService.startContext(config.mode, config.format, config.access, appDesc);
 
             // test get application
-            DefDescriptor<ApplicationDef> appDefDescriptor = definitionService.getDefDescriptor(appName, ApplicationDef.class);
+            DefDescriptor<ApplicationDef> appDefDescriptor = definitionService.getDefDescriptor(appName,
+                    ApplicationDef.class);
             Message<ApplicationDef> appMsg = new Message<ApplicationDef>(null, appDefDescriptor, null);
 
             try {
                 Message<ApplicationDef> appResult = service.temporaryGet(appMsg, ctx);
                 ApplicationDef appDef = appResult.getDef();
                 assertEquals(appDefDescriptor, appDef.getDescriptor());
-                //assertTrue(ctx.getPreloads().containsAll(appDef.getPreloads()));
+                // assertTrue(ctx.getPreloads().containsAll(appDef.getPreloads()));
             } catch (DefinitionNotFoundException e) {
                 if (ctx.getAccess() != Access.PUBLIC) {
                     throw e;
@@ -149,7 +158,8 @@ public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServ
             }
 
             // test get component
-            DefDescriptor<ComponentDef> cmpDefDescriptor = definitionService.getDefDescriptor(cmpName, ComponentDef.class);
+            DefDescriptor<ComponentDef> cmpDefDescriptor = definitionService.getDefDescriptor(cmpName,
+                    ComponentDef.class);
             Message<ComponentDef> defMsg = new Message<ComponentDef>(null, cmpDefDescriptor, null);
             Message<ComponentDef> defResult = service.temporaryGet(defMsg, ctx);
 
@@ -164,7 +174,7 @@ public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServ
 
     @Override
     public Future<?> runAsync(Message<?> message, Appendable callback, AuraContext context) {
-        int timeout = 5; //seconds
+        int timeout = 5; // seconds
         ContextService contextService = Aura.getContextService();
         Message<?> msg;
         Message<?> expectedResult = null;
@@ -174,17 +184,18 @@ public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServ
         Appendable expectedCallback;
         Future<?> result;
 
-        try{
+        try {
             AuraContext ctx = contextService.startContext(config.mode, config.format, config.access);
 
             // test single action
-            DefDescriptor<ActionDef> actionDescriptor = Aura.getDefinitionService().getDefDescriptor(action1, ActionDef.class);
+            DefDescriptor<ActionDef> actionDescriptor = Aura.getDefinitionService().getDefDescriptor(action1,
+                    ActionDef.class);
             actionList = Lists.newArrayList();
             params = Maps.newHashMap();
             params.put("param", param1);
 
             try {
-                actionList.add((Action)Aura.getInstanceService().getInstance(actionDescriptor, params));
+                actionList.add((Action) Aura.getInstanceService().getInstance(actionDescriptor, params));
             } catch (Exception x) {
                 x.printStackTrace();
                 fail();
@@ -197,7 +208,8 @@ public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServ
             Format format = Aura.getContextService().getCurrentContext().getFormat();
             try {
                 expectedResult = service.run(msg, ctx);
-                Aura.getSerializationService().writeCollection(expectedResult.getActions(), Action.class, expectedCallback);
+                Aura.getSerializationService().writeCollection(expectedResult.getActions(), Action.class,
+                        expectedCallback);
             } catch (Exception x) {
                 if (format == Format.JSON) {
                     x.printStackTrace();
@@ -221,7 +233,8 @@ public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServ
 
             params.put("param", param2);
             try {
-                actionList.add((Action)Aura.getInstanceService().getInstance(Aura.getDefinitionService().getDefDescriptor(action2, ActionDef.class), params));
+                actionList.add((Action) Aura.getInstanceService().getInstance(
+                        Aura.getDefinitionService().getDefDescriptor(action2, ActionDef.class), params));
             } catch (Exception x) {
                 x.printStackTrace();
                 fail();
@@ -233,7 +246,8 @@ public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServ
 
             try {
                 expectedResult = service.run(msg, ctx);
-                Aura.getSerializationService().writeCollection(expectedResult.getActions(), Action.class, expectedCallback);
+                Aura.getSerializationService().writeCollection(expectedResult.getActions(), Action.class,
+                        expectedCallback);
             } catch (Exception x) {
                 if (format == Format.JSON) {
                     x.printStackTrace();

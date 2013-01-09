@@ -19,11 +19,12 @@ import org.auraframework.test.MockBean;
 
 /**
  * Provide a configurable ConfigAdapter for tests.
- *
- *
+ * 
+ * 
  * @since 0.0.178
  */
 public interface MockConfigAdapter extends ConfigAdapter, MockBean {
     void setIsProduction(boolean isProduction);
+
     void setIsAuraJSStatic(boolean isAuraJSStatic);
 }

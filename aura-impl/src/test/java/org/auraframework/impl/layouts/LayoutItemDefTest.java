@@ -39,8 +39,10 @@ public class LayoutItemDefTest extends AuraImplTestCase {
     @Override
     public void setUp() throws QuickFixException {
         util = new AuraTestingUtilImpl();
-        /**Aura.getContextService().startContext(AuraContext.Mode.UTEST, util.getAdditionalLoaders(),
-          */
+        /**
+         * Aura.getContextService().startContext(AuraContext.Mode.UTEST,
+         * util.getAdditionalLoaders(),
+         */
         Aura.getContextService().startContext(AuraContext.Mode.UTEST, AuraContext.Format.HTML,
                 AuraContext.Access.AUTHENTICATED);
     }
@@ -53,9 +55,9 @@ public class LayoutItemDefTest extends AuraImplTestCase {
 
     public void testLayoutItemWithActionAndMarkup() throws Exception {
         DefDescriptor<LayoutsDef> dd = util.addSourceAutoCleanup(LayoutsDef.class, "<aura:layouts default='def'>"
-                        + "<aura:layout name='def'>"
-                        + "<aura:layoutItem container='target' action='{!c.act}'>text</aura:layoutItem>" + "</aura:layout>"
-                        + "</aura:layouts>");
+                + "<aura:layout name='def'>"
+                + "<aura:layoutItem container='target' action='{!c.act}'>text</aura:layoutItem>" + "</aura:layout>"
+                + "</aura:layouts>");
         try {
             Aura.getDefinitionService().getDefinition(dd);
             fail("Expected QuickFixException");
@@ -66,8 +68,8 @@ public class LayoutItemDefTest extends AuraImplTestCase {
 
     public void testLayoutItemWithoutActionOrMarkup() throws Exception {
         DefDescriptor<LayoutsDef> dd = util.addSourceAutoCleanup(LayoutsDef.class, "<aura:layouts default='def'>"
-                        + "<aura:layout name='def'>" + "<aura:layoutItem container='target'/>" + "</aura:layout>"
-                        + "</aura:layouts>");
+                + "<aura:layout name='def'>" + "<aura:layoutItem container='target'/>" + "</aura:layout>"
+                + "</aura:layouts>");
         try {
             Aura.getDefinitionService().getDefinition(dd);
             fail("Expected QuickFixException");

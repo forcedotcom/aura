@@ -41,51 +41,53 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(vendor.getComponentDefDescriptor(), "<aura:component controller='"+vendor.getControllerDescriptor().getQualifiedName()+
-                                               "' extends='"+vendor.getParentComponentDefDescriptor()+
-                                               "' implements='"+vendor.getInterfaceDefDescriptor()+
-                                               "' abstract='true'>Child Text<aura:foo/></aura:component>", "myID",Format.XML);
+        StringSource<ComponentDef> source = new StringSource<ComponentDef>(vendor.getComponentDefDescriptor(),
+                "<aura:component controller='" + vendor.getControllerDescriptor().getQualifiedName() + "' extends='"
+                        + vendor.getParentComponentDefDescriptor() + "' implements='"
+                        + vendor.getInterfaceDefDescriptor()
+                        + "' abstract='true'>Child Text<aura:foo/></aura:component>", "myID", Format.XML);
         xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
         xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());
         xmlReader.next();
-        cdHandler = new ComponentDefHandler(vendor.getComponentDefDescriptor(),source,xmlReader);
+        cdHandler = new ComponentDefHandler(vendor.getComponentDefDescriptor(), source, xmlReader);
     }
-
 
     public void testReadAttributes() throws Exception {
         cdHandler.readAttributes();
-        ComponentDefImpl cd = (ComponentDefImpl)cdHandler.createDefinition();
-        assertEquals(vendor.getParentComponentDefDescriptor(),cd.getExtendsDescriptor());
-        assertEquals(vendor.getInterfaceDefDescriptor(),cd.getInterfaces().iterator().next());
+        ComponentDefImpl cd = (ComponentDefImpl) cdHandler.createDefinition();
+        assertEquals(vendor.getParentComponentDefDescriptor(), cd.getExtendsDescriptor());
+        assertEquals(vendor.getInterfaceDefDescriptor(), cd.getInterfaces().iterator().next());
         assertTrue(cd.isAbstract());
         assertTrue(cd.isExtensible());
     }
 
-
     public void testGetHandledTag() {
-        assertEquals("aura:component",cdHandler.getHandledTag());
+        assertEquals("aura:component", cdHandler.getHandledTag());
     }
 
-    public void testDuplicateAttributeNames()throws Exception{
+    public void testDuplicateAttributeNames() throws Exception {
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor, "<aura:component><aura:attribute name=\"implNumber\" type=\"String\"/>" +
-                                                "<aura:attribute name=\"implNumber\" type=\"String\"/></aura:component>",
-                                                "myID",Format.XML);
+        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+                "<aura:component><aura:attribute name=\"implNumber\" type=\"String\"/>"
+                        + "<aura:attribute name=\"implNumber\" type=\"String\"/></aura:component>", "myID", Format.XML);
         try {
             parser.parse(descriptor, source);
             fail("Should have thrown Exception. Two attributes with the same name cannot exist");
         } catch (AuraRuntimeException expected) {
         }
     }
+
     /**
      * An attribute cannot be assigned multiple times on a System tag.
+     * 
      * @throws Exception
      */
-    public void testDuplicateAttributeOnSystemTag() throws Exception{
+    public void testDuplicateAttributeOnSystemTag() throws Exception {
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor, "<aura:component extends='test:fakeAbstract' extends='test:fakeAbstractParent'></aura:component>",
-                                                "myID",Format.XML);
+        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+                "<aura:component extends='test:fakeAbstract' extends='test:fakeAbstractParent'></aura:component>",
+                "myID", Format.XML);
         try {
             parser.parse(descriptor, source);
             fail("Should have thrown Exception. Same attribute specified twice on aura:component tag.");
@@ -96,10 +98,10 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
     /**
      * Verify that an attribute cannot be assigned a blank value.
      */
-    public void testBlankValueForSystemTag() throws Exception{
+    public void testBlankValueForSystemTag() throws Exception {
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor, "<aura:component extends=''></aura:component>",
-                                                "myID",Format.XML);
+        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+                "<aura:component extends=''></aura:component>", "myID", Format.XML);
         try {
             parser.parse(descriptor, source);
             fail("Should have thrown Exception. Attribute value cannot be blank.");

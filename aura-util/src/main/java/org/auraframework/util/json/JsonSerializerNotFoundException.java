@@ -17,11 +17,13 @@ package org.auraframework.util.json;
 
 /**
  * Throw when no serializer is found for value.
- *
- *
- *
- *
- * <p>Copyright (c) 2010 salesforce.com. All rights reserved.</p>
+ * 
+ * 
+ * 
+ * 
+ * <p>
+ * Copyright (c) 2010 salesforce.com. All rights reserved.
+ * </p>
  */
 public class JsonSerializerNotFoundException extends JsonSerializationException {
 

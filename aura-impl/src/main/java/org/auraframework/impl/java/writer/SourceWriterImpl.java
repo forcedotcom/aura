@@ -17,15 +17,14 @@ package org.auraframework.impl.java.writer;
 
 import java.io.IOException;
 import java.io.Writer;
-
 import java.util.Calendar;
 
 import org.auraframework.system.SourceWriter;
 
 /**
  * Basic helper functions for SourceWriter.
- *
- *
+ * 
+ * 
  * @since 0.0.210
  */
 public abstract class SourceWriterImpl implements SourceWriter {
@@ -34,7 +33,7 @@ public abstract class SourceWriterImpl implements SourceWriter {
 
     /**
      * Write out a simple copyright.
-     *
+     * 
      * @param writer a writer for output
      * @throws IOException if the writer throws IOException
      */
@@ -44,26 +43,26 @@ public abstract class SourceWriterImpl implements SourceWriter {
 
     /**
      * Write out a specific number of line breaks.
-     *
+     * 
      * @param writer the output writer.
      * @param count how many line breaks to write.
      * @throws IOException if the writer throws IOException
      */
-    protected void writeLineBreaks(Writer writer, int count) throws IOException{
-        for(int i=0;i<count;i++){
+    protected void writeLineBreaks(Writer writer, int count) throws IOException {
+        for (int i = 0; i < count; i++) {
             writer.write(NL);
         }
     }
 
     /**
      * Format a template and write it out.
-     *
+     * 
      * @param writer the output writer.
      * @param template the string format to fill
      * @param values the values for filling the template
      * @throws IOException if the writer throws IOException
      */
-    protected void write(Writer writer, String template, Object... values) throws IOException{
+    protected void write(Writer writer, String template, Object... values) throws IOException {
         writer.write(String.format(template, values));
     }
 

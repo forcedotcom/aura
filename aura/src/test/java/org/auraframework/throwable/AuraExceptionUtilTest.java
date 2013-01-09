@@ -23,8 +23,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Tests for AuraExceptionUtil.
- *
- *
+ * 
+ * 
  * @since 0.0.210
  */
 public class AuraExceptionUtilTest extends UnitTestCase {
@@ -33,14 +33,15 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      */
     private static class TestQuickFixException extends QuickFixException {
         private static final long serialVersionUID = 7887234381181710432L;
+
         public TestQuickFixException(String name) {
             super(name, null);
         }
     }
 
     /**
-     * New StackTraceElement with filename and line number is inserted at top of stack if location contains both
-     * properties.
+     * New StackTraceElement with filename and line number is inserted at top of
+     * stack if location contains both properties.
      */
     public void testAddLocationWithFileAndLine() throws Exception {
         Throwable t = new Throwable();
@@ -50,7 +51,8 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     }
 
     /**
-     * New StackTraceElement with filename only is inserted at top of stack if location has negative line number set.
+     * New StackTraceElement with filename only is inserted at top of stack if
+     * location has negative line number set.
      */
     public void testAddLocationWithoutLine() throws Exception {
         Throwable t = new Throwable();
@@ -60,7 +62,8 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     }
 
     /**
-     * New StackTraceElement with null filename is inserted at top of stack if location contains null filename.
+     * New StackTraceElement with null filename is inserted at top of stack if
+     * location contains null filename.
      */
     public void testAddLocationWithoutFile() throws Exception {
         Throwable t = new Throwable();
@@ -84,7 +87,8 @@ public class AuraExceptionUtilTest extends UnitTestCase {
      */
     public void testWrapExecutionExceptionInstanceOfQuickFixException() throws Exception {
         Exception t = new TestQuickFixException(getName());
-        assertEquals("Did not get the original QuickFixException", t, AuraExceptionUtil.wrapExecutionException(t, new Location("here", 0)));
+        assertEquals("Did not get the original QuickFixException", t,
+                AuraExceptionUtil.wrapExecutionException(t, new Location("here", 0)));
     }
 
     /**
@@ -163,7 +167,8 @@ public class AuraExceptionUtilTest extends UnitTestCase {
         Throwable t2 = new RuntimeException("intermediate2", t3);
         Throwable t1 = new AuraUnhandledException("intermediate1", t2);
         Exception t = new RuntimeException("top", t1);
-        assertEquals("Did not get the original nested QuickFixException", t4, AuraExceptionUtil.wrapExecutionException(t, new Location("here", 0)));
+        assertEquals("Did not get the original nested QuickFixException", t4,
+                AuraExceptionUtil.wrapExecutionException(t, new Location("here", 0)));
     }
 
     /**
@@ -201,7 +206,8 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     }
 
     /**
-     * QuickFixException nested 5 or more levels deep is not extracted. New AuraRuntimeException is thrown.
+     * QuickFixException nested 5 or more levels deep is not extracted. New
+     * AuraRuntimeException is thrown.
      */
     public void testWrapExecutionExceptionNestedTooDeep() throws Exception {
         Throwable t4 = new TestQuickFixException(getName());
@@ -314,7 +320,8 @@ public class AuraExceptionUtilTest extends UnitTestCase {
     }
 
     /**
-     * QuickFixException nested 5 or more levels deep is not extracted. New AuraRuntimeException is thrown.
+     * QuickFixException nested 5 or more levels deep is not extracted. New
+     * AuraRuntimeException is thrown.
      */
     public void testPassQuickFixNestedTooDeep() throws Exception {
         Throwable t4 = new TestQuickFixException(getName());

@@ -29,10 +29,11 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.util.json.JsonReader;
 
 /**
- * Tests to verify AttributeSetImpl class. Component/Application instances are assigned an AttributeSet. A
- * component/application instances relies on its AttributeSet to decide the value of its attributes.
- *
- *
+ * Tests to verify AttributeSetImpl class. Component/Application instances are
+ * assigned an AttributeSet. A component/application instances relies on its
+ * AttributeSet to decide the value of its attributes.
+ * 
+ * 
  * @since 138
  */
 public class AttributeSetImplTest extends AuraImplTestCase {
@@ -41,12 +42,12 @@ public class AttributeSetImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify that attribute names used in expressions are not case sensitive. Attributes are used as {!v.<attrName>}
+     * Verify that attribute names used in expressions are not case sensitive.
+     * Attributes are used as {!v.<attrName>}
      */
     public void testCaseSensitivityOfAttributesInExpressions() throws Exception {
         // 1. Local attributes in a component
-        DefDescriptor<ComponentDef> parentDesc = addSourceAutoCleanup(
-                ComponentDef.class,
+        DefDescriptor<ComponentDef> parentDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "extensible='true'",
                         "<aura:attribute name='parentAttr1' type='String' default='mother'/>"
                                 + "<aura:attribute name='parentAttr2' type='String' default='father'/>"
@@ -58,10 +59,9 @@ public class AttributeSetImplTest extends AuraImplTestCase {
                 .getExternalLocation("direct attributeset access"))));
 
         // 2. Attributes inherited through parent
-        DefDescriptor<ComponentDef> childDesc = addSourceAutoCleanup(
-                ComponentDef.class,
-                String.format(baseComponentTag, String.format("extends='%s'", parentDesc.getDescriptorName()),
-                        "<aura:set attribute='parentAttr2' value='godFather'/>"));
+        DefDescriptor<ComponentDef> childDesc = addSourceAutoCleanup(ComponentDef.class, String.format(
+                baseComponentTag, String.format("extends='%s'", parentDesc.getDescriptorName()),
+                "<aura:set attribute='parentAttr2' value='godFather'/>"));
         Component childCmp = Aura.getInstanceService().getInstance(childDesc);
         assertEquals("mother", childCmp.getValue(new PropertyReferenceImpl("v.parentAttr1", AuraUtil
                 .getExternalLocation("direct attributeset access"))));
@@ -75,7 +75,8 @@ public class AttributeSetImplTest extends AuraImplTestCase {
         // Override default value will not change the value on the child
         assertEquals("father", childCmp.getValue(new PropertyReferenceImpl("v.PARENTAttr2", AuraUtil
                 .getExternalLocation("direct attributeset access"))));
-        // Override default value will not change the value on the parent, <aura:set> sets the
+        // Override default value will not change the value on the parent,
+        // <aura:set> sets the
         // value of the parent
         assertEquals(
                 "godFather",
@@ -85,10 +86,11 @@ public class AttributeSetImplTest extends AuraImplTestCase {
     }
 
     public void testCaseSensitivityOfAttributesInMarkup() throws Exception {
-        DefDescriptor<ComponentDef> parentDesc = addSourceAutoCleanup(ComponentDef.class, String
-                .format(baseComponentTag, "extensible='true'",
-                        "<aura:attribute name='parentAttr' type='String' default='mother'/>"));
-        // 1. Attribute reference in markup of extending component, note how the name of the
+        DefDescriptor<ComponentDef> parentDesc = addSourceAutoCleanup(ComponentDef.class, String.format(
+                baseComponentTag, "extensible='true'",
+                "<aura:attribute name='parentAttr' type='String' default='mother'/>"));
+        // 1. Attribute reference in markup of extending component, note how the
+        // name of the
         // attribute is in caps
         DefDescriptor<ComponentDef> childDesc = addSourceAutoCleanup(ComponentDef.class, String.format(
                 baseComponentTag, String.format("extends='%s'", parentDesc.getDescriptorName()),
@@ -113,9 +115,9 @@ public class AttributeSetImplTest extends AuraImplTestCase {
         assertEquals("godfather", innerCmp.getValue(new PropertyReferenceImpl("v.parentAttr", AuraUtil
                 .getExternalLocation("direct attributeset access"))));
 
-        //3. Attribute reference of facets using aura:set
-        DefDescriptor<ComponentDef> outerCmpUsingSetAttributeDesc = addSourceAutoCleanup(
-                ComponentDef.class, String.format(baseComponentTag, "", String.format(
+        // 3. Attribute reference of facets using aura:set
+        DefDescriptor<ComponentDef> outerCmpUsingSetAttributeDesc = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "", String.format(
                         "<%1$s> <aura:set attribute='PARENTATTR' value='evilfather'/> </%1$s>",
                         parentDesc.getDescriptorName())));
         outerCmp = Aura.getInstanceService().getInstance(outerCmpUsingSetAttributeDesc);
@@ -125,40 +127,42 @@ public class AttributeSetImplTest extends AuraImplTestCase {
                 .getExternalLocation("direct attributeset access"))));
 
     }
+
     @SuppressWarnings("unchecked")
-    private ArrayList<Component> extractFacetsFromComponent(Component c)throws Exception{
-        Object body = c.getValue(new PropertyReferenceImpl("v.body", AuraUtil.getExternalLocation("direct attributeset access")));
-        if(body==null){
-            body = c.getSuper().getValue(new PropertyReferenceImpl("v.body", AuraUtil.getExternalLocation("direct attributeset access")));
+    private ArrayList<Component> extractFacetsFromComponent(Component c) throws Exception {
+        Object body = c.getValue(new PropertyReferenceImpl("v.body", AuraUtil
+                .getExternalLocation("direct attributeset access")));
+        if (body == null) {
+            body = c.getSuper().getValue(
+                    new PropertyReferenceImpl("v.body", AuraUtil.getExternalLocation("direct attributeset access")));
         }
-        if(body==null){
+        if (body == null) {
             return null;
         }
         assertTrue(body instanceof ArrayList);
-        return ((ArrayList<Component>)body);
+        return ((ArrayList<Component>) body);
     }
-
 
     /**
      * Verify invalid attribute types throw error
      */
-    public void testUnknownAttributeType() throws Exception{
-        //With a default value.
+    public void testUnknownAttributeType() throws Exception {
+        // With a default value.
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<aura:attribute name='badType' type='foobar' default='blah'/>"));
-        try{
+        try {
             Aura.getInstanceService().getInstance(desc);
             fail("foobar is not a valid attribute type.");
-        } catch (DefinitionNotFoundException e){
+        } catch (DefinitionNotFoundException e) {
             assertEquals("No TYPE named java://foobar found", e.getMessage());
         }
-        //Without a default value
+        // Without a default value
         desc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<aura:attribute name='badType' type='foobar'/>"));
-        try{
+        try {
             Aura.getInstanceService().getInstance(desc);
             fail("foobar is not a valid attribute type.");
-        } catch (DefinitionNotFoundException e){
+        } catch (DefinitionNotFoundException e) {
             assertEquals("No TYPE named java://foobar found", e.getMessage());
         }
     }
@@ -166,7 +170,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
     /**
      * Only serialize attributes with serializeTo == BOTH.
      */
-    public void testSerializeTo() throws Exception{
+    public void testSerializeTo() throws Exception {
         // set has some attributes with serializeTo == BOTH
         DefDescriptor<ComponentDef> desc = auraTestingUtil
                 .addSourceAutoCleanup(
@@ -176,8 +180,8 @@ public class AttributeSetImplTest extends AuraImplTestCase {
                                 "",
                                 "<aura:attribute name='default' type='String' default='innie'/><aura:attribute name='both' type='String' default='outie' serializeTo='BOTH'/><aura:attribute name='server' type='String' default='lint' serializeTo='SERVER'/><aura:attribute name='none' type='String' default='holy' serializeTo='NONE'/>"));
         Component cmp = Aura.getInstanceService().getInstance(desc);
-        Map<?,?> attSet = (Map<?,?>)new JsonReader().read(toJson(cmp.getAttributes()));
-        Map<?,?> attSetValues = (Map<?,?>)((Map<?,?>)attSet.get("value")).get("values");
+        Map<?, ?> attSet = (Map<?, ?>) new JsonReader().read(toJson(cmp.getAttributes()));
+        Map<?, ?> attSetValues = (Map<?, ?>) ((Map<?, ?>) attSet.get("value")).get("values");
         assertEquals(2, attSetValues.size());
         assertEquals("innie", attSetValues.get("default"));
         assertEquals("outie", attSetValues.get("both"));
@@ -191,8 +195,8 @@ public class AttributeSetImplTest extends AuraImplTestCase {
                                 "",
                                 "<aura:attribute name='server' type='String' default='lint' serializeTo='SERVER'/><aura:attribute name='none' type='String' default='holy' serializeTo='NONE'/>"));
         cmp = Aura.getInstanceService().getInstance(desc);
-        attSet = (Map<?,?>)new JsonReader().read(toJson(cmp.getAttributes()));
-        attSetValues = (Map<?,?>)((Map<?,?>)attSet.get("value")).get("values");
+        attSet = (Map<?, ?>) new JsonReader().read(toJson(cmp.getAttributes()));
+        attSetValues = (Map<?, ?>) ((Map<?, ?>) attSet.get("value")).get("values");
         assertEquals(0, attSetValues.size());
     }
 }

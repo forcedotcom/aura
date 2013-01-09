@@ -65,7 +65,8 @@ public interface AttributeValueProvider {
 
         @Override
         public Object getValue(String key) throws QuickFixException {
-            DefDescriptor<AttributeDef> attribute = Aura.getDefinitionService().getDefDescriptor(key, AttributeDef.class);
+            DefDescriptor<AttributeDef> attribute = Aura.getDefinitionService().getDefDescriptor(key,
+                    AttributeDef.class);
             AttributeDefRef value = ref.getAttributeValue(attribute);
             return value != null ? value.getValue() : null;
         }
@@ -84,7 +85,6 @@ public interface AttributeValueProvider {
         public BaseComponent<?, ?> getValueProvider() {
             return Aura.getContextService().getCurrentContext().getCurrentComponent();
         }
-
 
         private final ComponentDefRefBuilder ref;
     }

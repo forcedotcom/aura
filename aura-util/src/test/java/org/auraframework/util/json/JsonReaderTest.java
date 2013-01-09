@@ -33,7 +33,7 @@ import org.mockito.Mockito;
 public class JsonReaderTest extends UnitTestCase {
     /**
      * This class just uses JsonReader class to parse a JsonString.
-     *
+     * 
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
@@ -41,25 +41,25 @@ public class JsonReaderTest extends UnitTestCase {
         String json = "{\"key1\":[[\"string1\",\"string2\"],true,10,[false,1.5,{\"key2\":[\"string1\",\"string2\"]}]]}";
         Object o = new JsonReader().read(json);
         assertTrue(o instanceof Map);
-        Map<String, Object> outerMap = (Map<String, Object>)o;
-        List<Object> outerList = (List<Object>)outerMap.get("key1");
-        List<Object> item0 = (List<Object>)outerList.get(0);
+        Map<String, Object> outerMap = (Map<String, Object>) o;
+        List<Object> outerList = (List<Object>) outerMap.get("key1");
+        List<Object> item0 = (List<Object>) outerList.get(0);
         assertEquals("string1", item0.get(0));
         assertEquals("string2", item0.get(1));
         assertEquals(true, outerList.get(1));
         assertEquals(new BigDecimal(10), outerList.get(2));
-        List<Object> item3 = (List<Object>)outerList.get(3);
+        List<Object> item3 = (List<Object>) outerList.get(3);
         assertEquals(false, item3.get(0));
         assertEquals(new BigDecimal(1.5), item3.get(1));
-        Map<String, Object> innerMap = (Map<String, Object>)item3.get(2);
-        List<Object> innerList = (List<Object>)innerMap.get("key2");
+        Map<String, Object> innerMap = (Map<String, Object>) item3.get(2);
+        List<Object> innerList = (List<Object>) innerMap.get("key2");
         assertEquals("string1", innerList.get(0));
         assertEquals("string2", innerList.get(1));
     }
 
     /**
      * Test case to verify the handling of IOExceptions
-     *
+     * 
      * @throws Exception
      */
     public void testIOException() throws Exception {

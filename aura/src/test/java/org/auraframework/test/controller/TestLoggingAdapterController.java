@@ -20,8 +20,8 @@ import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.LoggingAdapter;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Controller;
 import org.auraframework.test.adapter.TestLoggingAdapter;
 
 @Controller
@@ -30,20 +30,20 @@ public class TestLoggingAdapterController {
     @AuraEnabled
     public static void beginCapture() {
         LoggingAdapter adapter = Aura.get(LoggingAdapter.class);
-        if(!(adapter instanceof TestLoggingAdapter)){
+        if (!(adapter instanceof TestLoggingAdapter)) {
             throw new Error("TestLoggingAdapter not configured!");
         }
-        ((TestLoggingAdapter)adapter).clear();
-        ((TestLoggingAdapter)adapter).beginCapture();
+        ((TestLoggingAdapter) adapter).clear();
+        ((TestLoggingAdapter) adapter).beginCapture();
     }
 
     @AuraEnabled
     public static List<Map<String, Object>> endCapture() {
         LoggingAdapter adapter = Aura.get(LoggingAdapter.class);
-        if(!(adapter instanceof TestLoggingAdapter)){
+        if (!(adapter instanceof TestLoggingAdapter)) {
             throw new Error("TestLoggingAdapter not configured!");
         }
-        ((TestLoggingAdapter)adapter).endCapture();
-        return ((TestLoggingAdapter)adapter).getLogs();
+        ((TestLoggingAdapter) adapter).endCapture();
+        return ((TestLoggingAdapter) adapter).getLogs();
     }
 }

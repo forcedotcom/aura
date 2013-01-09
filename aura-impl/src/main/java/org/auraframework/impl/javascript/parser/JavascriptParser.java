@@ -45,23 +45,26 @@ public class JavascriptParser implements Parser {
     @Override
     public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws QuickFixException {
         switch (descriptor.getDefType()) {
-            case CONTROLLER:
-                return (D)new JavascriptControllerDefHandler((DefDescriptor<ControllerDef>)descriptor, source).getDefinition();
-            case RENDERER:
-                return (D)new JavascriptRendererDefHandler((DefDescriptor<RendererDef>)descriptor, source).getDefinition();
-            case HELPER:
-                return (D)new JavascriptHelperDefHandler((DefDescriptor<HelperDef>)descriptor, source).getDefinition();
-            case TESTSUITE:
-                return (D)new JavascriptTestSuiteDefHandler((DefDescriptor<TestSuiteDef>)descriptor, source).getDefinition();
-            case PROVIDER:
-                Location location = new Location(source.getSystemId(), source.getLastModified());
-                JavascriptProviderDef.Builder builder = new JavascriptProviderDef.Builder();
-                builder.setDescriptor((DefDescriptor<ProviderDef>)descriptor);
-                builder.setLocation(location);
-                builder.code = JavascriptHandler.getCompressedSource(source);
-                return (D)builder.build();
-            default:
-                return null;
+        case CONTROLLER:
+            return (D) new JavascriptControllerDefHandler((DefDescriptor<ControllerDef>) descriptor, source)
+                    .getDefinition();
+        case RENDERER:
+            return (D) new JavascriptRendererDefHandler((DefDescriptor<RendererDef>) descriptor, source)
+                    .getDefinition();
+        case HELPER:
+            return (D) new JavascriptHelperDefHandler((DefDescriptor<HelperDef>) descriptor, source).getDefinition();
+        case TESTSUITE:
+            return (D) new JavascriptTestSuiteDefHandler((DefDescriptor<TestSuiteDef>) descriptor, source)
+                    .getDefinition();
+        case PROVIDER:
+            Location location = new Location(source.getSystemId(), source.getLastModified());
+            JavascriptProviderDef.Builder builder = new JavascriptProviderDef.Builder();
+            builder.setDescriptor((DefDescriptor<ProviderDef>) descriptor);
+            builder.setLocation(location);
+            builder.code = JavascriptHandler.getCompressedSource(source);
+            return (D) builder.build();
+        default:
+            return null;
         }
     }
 }

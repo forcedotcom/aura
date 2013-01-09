@@ -29,9 +29,11 @@ import org.auraframework.util.javascript.directive.impl.IncludeDirectiveType;
 import com.google.common.collect.ImmutableList;
 
 /**
- * This class is to test the DirectiveParser class {@link DirectiveParser}. DirectiveParser class parses specified files
- * for directives. Directives are specified with //# as prefix. The list of directives, root node of the file system and
- * javascript generation modes are specified in an DirectiveBasedJavascriptGroup object.
+ * This class is to test the DirectiveParser class {@link DirectiveParser}.
+ * DirectiveParser class parses specified files for directives. Directives are
+ * specified with //# as prefix. The list of directives, root node of the file
+ * system and javascript generation modes are specified in an
+ * DirectiveBasedJavascriptGroup object.
  */
 public class DirectiveParserTest extends UnitTestCase {
     public DirectiveParserTest(String name) {
@@ -39,8 +41,9 @@ public class DirectiveParserTest extends UnitTestCase {
     }
 
     /**
-     * Try to pass an empty set of directive. Ideally the test should return just the contents of the file after
-     * stripping of all the lines with directives (lines starting with //#)
+     * Try to pass an empty set of directive. Ideally the test should return
+     * just the contents of the file after stripping of all the lines with
+     * directives (lines starting with //#)
      */
     public void testZeroDirectiveTypes() throws Exception {
         File file = getResourceFile("/testdata/javascript/head.js");
@@ -52,7 +55,8 @@ public class DirectiveParserTest extends UnitTestCase {
     }
 
     /**
-     * "end" is a reserved DirectiveType label. This must not be used by other directives.
+     * "end" is a reserved DirectiveType label. This must not be used by other
+     * directives.
      */
     public void testEndDirectiveTypes() throws Exception {
         File file = getResourceFile("/testdata/javascript/head.js");
@@ -93,8 +97,9 @@ public class DirectiveParserTest extends UnitTestCase {
      * Tests for the parse() method in DirectiveParser
      */
     /**
-     * What if the javascript that is being processed has a standard DirectiveType but the Javascript Group does not
-     * have a reference to that type.
+     * What if the javascript that is being processed has a standard
+     * DirectiveType but the Javascript Group does not have a reference to that
+     * type.
      */
     public void testMissingDirectiveSpecification() throws Exception {
         File file = getResourceFile("/testdata/javascript/testMissingDirectiveSpecification.js");
@@ -108,8 +113,7 @@ public class DirectiveParserTest extends UnitTestCase {
     }
 
     /**
-     * Negative test: Multi line directive without an END
-     * directive
+     * Negative test: Multi line directive without an END directive
      */
     public void testMultilineWithoutEndDirective() throws Exception {
         File file = getResourceFile("/testdata/javascript/testMultilineWithoutEndDirective.js");
@@ -143,8 +147,8 @@ public class DirectiveParserTest extends UnitTestCase {
     }
 
     /**
-     * Negative test: A nested directive is not supported yet. So an error should be flagged when such directives are
-     * encountered.
+     * Negative test: A nested directive is not supported yet. So an error
+     * should be flagged when such directives are encountered.
      */
     public void testNestedDirective() throws Exception {
         File file = getResourceFile("/testdata/javascript/testNestedDirective.js");
@@ -161,7 +165,8 @@ public class DirectiveParserTest extends UnitTestCase {
     }
 
     /**
-     * Positive test: Test a multiline directive by gold filing the contents passed to the directive object
+     * Positive test: Test a multiline directive by gold filing the contents
+     * passed to the directive object
      */
     public void testMultilineDirective() throws Exception {
         File file = getResourceFile("/testdata/javascript/testMultilineDirective.js");
@@ -174,7 +179,8 @@ public class DirectiveParserTest extends UnitTestCase {
         Directive multiLine = directives.getFirst();
         assertTrue("Should have created a MultiLineMockDirective after parsing the file", multiLine.getClass()
                 .getName().contains("MultiLineMockDirective"));
-        // This dummy MultiLineMockDirective is written to throw content when asked to generateOutput
+        // This dummy MultiLineMockDirective is written to throw content when
+        // asked to generateOutput
         goldFileText(multiLine.generateOutput(JavascriptGeneratorMode.TESTING), ".js");
     }
 
@@ -207,7 +213,8 @@ public class DirectiveParserTest extends UnitTestCase {
         dp.parseFile();
         goldFileText(dp.generate(JavascriptGeneratorMode.TESTING), "_test.js");
         goldFileText(dp.generate(JavascriptGeneratorMode.AUTOTESTING), "_auto.js");
-        // The content generated in PRODUCTION mode still has comments because the DirectiveParser doesn't really
+        // The content generated in PRODUCTION mode still has comments because
+        // the DirectiveParser doesn't really
         // compress the JS files.
         // Compression is handled in DirectivebasedJavascriptGroup
         goldFileText(dp.generate(JavascriptGeneratorMode.PRODUCTION), "_prod.js");

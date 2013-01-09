@@ -17,9 +17,7 @@ package org.auraframework.throwable.quickfix;
 
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.annotation.UnAdaptableTest;
-
 import org.openqa.selenium.By;
-import org.openqa.selenium.By.ByXPath;
 
 /**
  * This class has tests to verify QuickFix exception handling.
@@ -48,8 +46,9 @@ public class AuraQuickFixUITest extends WebDriverTestCase {
     public void testQuickFixSeleniumMode() throws Exception {
         openNoAura("/foo/bar.cmp?aura.mode=SELENIUM");
         assertFalse(isElementPresent(CREATE_COMPONENT_BUTTON));
-        assertTrue(getText(By.id("auraErrorMessage")).contains(
-                "org.auraframework.throwable.quickfix.DefinitionNotFoundException: No COMPONENT named markup://foo:bar found"));
+        assertTrue(getText(By.id("auraErrorMessage"))
+                .contains(
+                        "org.auraframework.throwable.quickfix.DefinitionNotFoundException: No COMPONENT named markup://foo:bar found"));
     }
 
     /**
@@ -59,7 +58,6 @@ public class AuraQuickFixUITest extends WebDriverTestCase {
     public void testQuickFixProdMode() throws Exception {
         openNoAura("/aura/SomeNonExistingJunk.app?aura.mode=PROD");
         assertFalse(isElementPresent(CREATE_COMPONENT_BUTTON));
-        assertTrue(getText(ByXPath.tagName("body")).contains(
-                "404 Not Found"));
+        assertTrue(getText(By.tagName("body")).contains("404 Not Found"));
     }
 }

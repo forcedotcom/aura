@@ -32,18 +32,14 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
 
     private static final long serialVersionUID = 6034969764380397480L;
     private static final long lastModified = System.currentTimeMillis();
-    private static final ResourceLoader resourceLoader = Aura
-            .getConfigAdapter().getResourceLoader();
+    private static final ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
 
     // RESOURCES_PATTERN format:
     // /required_root/optional_nonce/required_rest_of_path
-    private static final Pattern RESOURCES_PATTERN = Pattern
-            .compile("^/([^/]+)(/[0-9]+)?(/.*)$");
-
+    private static final Pattern RESOURCES_PATTERN = Pattern.compile("^/([^/]+)(/[0-9]+)?(/.*)$");
 
     @Override
-    protected void doGet(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // defend against directory traversal attack
         // getPathInfo() has already resolved all ".." * "%2E%2E" relative
         // references in the path
@@ -59,7 +55,8 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
         try {
             Aura.getConfigAdapter().regenerateAuraJS();
 
-            // process path (not in a function because can't use non-synced member vars in servlet)
+            // process path (not in a function because can't use non-synced
+            // member vars in servlet)
             boolean hasNonce = false;
             String resStr = null;
 
@@ -77,9 +74,9 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                     resStr = String.format("/aura/javascript%s", matcher.group(3));
                 }
             }
-            
+
             in = (resStr == null) ? null : resourceLoader.getResourceAsStream(resStr);
-            
+
             // Check if it exists
             if (in == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -88,7 +85,8 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             // end processing path
 
             // Check the cache headers
-            // FIXME if(Aura.getContextService().getCurrentContext().getMode().isTestMode()){
+            // FIXME
+            // if(Aura.getContextService().getCurrentContext().getMode().isTestMode()){
             long ifModifiedSince = request.getDateHeader("If-Modified-Since");
             if (ifModifiedSince != -1 && ifModifiedSince + 1000 > lastModified) {
                 response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
@@ -117,11 +115,9 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             response.setBufferSize(10240);// 10kb
 
             if (hasNonce) {
-                response.setDateHeader("Expires", System.currentTimeMillis()
-                        + AuraBaseServlet.LONG_EXPIRE);
+                response.setDateHeader("Expires", System.currentTimeMillis() + AuraBaseServlet.LONG_EXPIRE);
             } else {
-                response.setDateHeader("Expires", System.currentTimeMillis()
-                        + AuraBaseServlet.SHORT_EXPIRE);
+                response.setDateHeader("Expires", System.currentTimeMillis() + AuraBaseServlet.SHORT_EXPIRE);
             }
 
             IOUtil.copyStream(in, response.getOutputStream());

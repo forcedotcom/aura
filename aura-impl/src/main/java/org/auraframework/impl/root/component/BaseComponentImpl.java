@@ -17,18 +17,32 @@ package org.auraframework.impl.root.component;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.*;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.ModelDef;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.java.model.JavaModel;
 import org.auraframework.impl.root.AttributeSetImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.instance.*;
+import org.auraframework.instance.Action;
+import org.auraframework.instance.AttributeSet;
+import org.auraframework.instance.BaseComponent;
+import org.auraframework.instance.Component;
+import org.auraframework.instance.Model;
+import org.auraframework.instance.ValueProvider;
+import org.auraframework.instance.ValueProviderType;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -38,18 +52,21 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends BaseComponent<D, I>> implements
         BaseComponent<D, I> {
     /**
-     * Top level component instance with attributes passed in. Builds out the tree recursively, but only after the
-     * attribute values are all set.
-     *
+     * Top level component instance with attributes passed in. Builds out the
+     * tree recursively, but only after the attribute values are all set.
+     * 
      * @param descriptor
      * @param attributes
      * @throws QuickFixException
      */
     public BaseComponentImpl(DefDescriptor<D> descriptor, Map<String, Object> attributes) throws QuickFixException {
-        this(descriptor, null, (Map<String, Object>)null, null, null);
+        this(descriptor, null, (Map<String, Object>) null, null, null);
         LoggingService loggingService = Aura.getLoggingService();
         loggingService.startTimer(LoggingService.TIMER_COMPONENT_CREATION);
         try {
@@ -62,7 +79,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
 
     @SuppressWarnings("unchecked")
     public <T extends D> BaseComponentImpl(T def, Map<String, Object> attributes) throws QuickFixException {
-        this((DefDescriptor<D>)def.getDescriptor(), null, (Map<String, Object>)null, null, def);
+        this((DefDescriptor<D>) def.getDescriptor(), null, (Map<String, Object>) null, null, def);
         LoggingService loggingService = Aura.getLoggingService();
         loggingService.startTimer(LoggingService.TIMER_COMPONENT_CREATION);
         try {
@@ -74,9 +91,11 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     }
 
     /**
-     * Constructor used to create instances for all ComponentDefRefs, which come from both the children and the facets
-     * (attributes). Builds out the tree recursively, but only after all the attribute values, including facets are set.
-     *
+     * Constructor used to create instances for all ComponentDefRefs, which come
+     * from both the children and the facets (attributes). Builds out the tree
+     * recursively, but only after all the attribute values, including facets
+     * are set.
+     * 
      * @throws QuickFixException
      */
     public BaseComponentImpl(DefDescriptor<D> descriptor, Collection<AttributeDefRef> attributeDefRefs,
@@ -105,7 +124,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
 
     /**
      * For creating supers
-     *
+     * 
      * @throws QuickFixException
      */
     protected BaseComponentImpl(DefDescriptor<D> descriptor, I extender, BaseComponent<?, ?> attributeValueProvider,
@@ -123,13 +142,12 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     }
 
     /**
-     * The base constructor that the other 2 use to initialize the object, but not he attributes. Sets all defaults for
-     * attributes. Does not build out the tree recursively.
-     *
-     * @param descriptor
-     *            The descriptor for this component's definition
-     * @param def
-     *            TODO
+     * The base constructor that the other 2 use to initialize the object, but
+     * not he attributes. Sets all defaults for attributes. Does not build out
+     * the tree recursively.
+     * 
+     * @param descriptor The descriptor for this component's definition
+     * @param def TODO
      * @throws QuickFixException
      */
     private BaseComponentImpl(DefDescriptor<D> descriptor, BaseComponent<?, ?> attributeValueProvider,
@@ -146,7 +164,9 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                 }
                 desc = descriptor;
             } catch (DefinitionNotFoundException e) {
-                if (!e.getDescriptor().equals(descriptor)) { throw e; }
+                if (!e.getDescriptor().equals(descriptor)) {
+                    throw e;
+                }
                 DefDescriptor<InterfaceDef> intfDescriptor = DefDescriptorImpl.getInstance(
                         descriptor.getQualifiedName(), InterfaceDef.class);
                 InterfaceDef intfDef = intfDescriptor.getDef();
@@ -189,8 +209,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         AuraContext context = Aura.getContextService().getCurrentContext();
 
         DefDescriptor<RendererDef> rendererDesc = getComponentDef().getRendererDescriptor();
-        if ((rendererDesc != null && rendererDesc.getDef().isLocal())
-            || !context.isPreloaded(getDescriptor())) {
+        if ((rendererDesc != null && rendererDesc.getDef().isLocal()) || !context.isPreloaded(getDescriptor())) {
             hasLocalDependencies = true;
         }
 
@@ -201,7 +220,9 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         BaseComponent<?, ?> zuper = this.getSuper();
         while (zuper != null) {
             Object val = zuper.getAttributes().getValue(name);
-            if (val != null) { return val; }
+            if (val != null) {
+                return val;
+            }
             zuper = zuper.getSuper();
         }
         return null;
@@ -254,7 +275,8 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     }
 
     /**
-     * this is only to serialize the general shape and ids, to ensure that we generate the same stuff in the client
+     * this is only to serialize the general shape and ids, to ensure that we
+     * generate the same stuff in the client
      */
     @Override
     public void serialize(Json json) throws IOException {
@@ -274,8 +296,10 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                 if (rendererDef.isLocal()) {
                     StringWriter sw = new StringWriter();
                     rendererDef.render(this, sw);
-                    // Not writing directly to json.appendable because then it wouldn't get escaped.
-                    // ideally Json would have a FilterWriter that escapes that we could use here.
+                    // Not writing directly to json.appendable because then it
+                    // wouldn't get escaped.
+                    // ideally Json would have a FilterWriter that escapes that
+                    // we could use here.
                     json.writeMapEntry("rendering", sw.toString());
                 }
             }
@@ -302,7 +326,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
 
     /**
      * instantiates the model
-     *
+     * 
      * @throws QuickFixException
      */
     private void createModel() throws QuickFixException {
@@ -324,7 +348,8 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     }
 
     /**
-     * @return the next id to use, the ordering must match exactly what is generated client side
+     * @return the next id to use, the ordering must match exactly what is
+     *         generated client side
      */
     private static String getNextGlobalId() {
         AuraContext context = Aura.getContextService().getCurrentContext();
@@ -333,19 +358,19 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         int id;
         String suffix;
         if (action != null) {
-        	id = action.getNextId();
-        	suffix = action.getId();
+            id = action.getNextId();
+            suffix = action.getId();
         } else {
-        	id = context.getNextId();
-        	suffix = num;
+            id = context.getNextId();
+            suffix = num;
         }
-        
+
         String globalId = String.valueOf(id);
         if (suffix != null) {
-        	globalId = String.format("%s:%s", globalId, suffix);
+            globalId = String.format("%s:%s", globalId, suffix);
         }
-        
-        return globalId;    
+
+        return globalId;
     }
 
     @Override
@@ -371,20 +396,24 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
             if (root != null) {
                 if (stem != null) {
                     if (root instanceof ValueProvider) {
-                        return ((ValueProvider)root).getValue(stem);
+                        return ((ValueProvider) root).getValue(stem);
                     } else {
                         return JavaModel.getValue(root, stem, null);
-                        // no throw error at runtime even though expression reference nothing
+                        // no throw error at runtime even though expression
+                        // reference nothing
                         // return null;
                     }
                 } else {
                     // they asked for just the root.
-                    // TODO: this should only work for foreach, shouldn't be able to {!m}
+                    // TODO: this should only work for foreach, shouldn't be
+                    // able to {!m}
                     return root;
                 }
             }
             // try the delegate
-            if (delegateValueProvider != null) { return delegateValueProvider.getValue(expr); }
+            if (delegateValueProvider != null) {
+                return delegateValueProvider.getValue(expr);
+            }
             return null;
         } finally {
             context.setCurrentComponent(oldComponent);
@@ -425,10 +454,21 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     protected I concreteComponent;
     protected boolean remoteProvider = false;
     private final Map<String, List<String>> index = Maps.newLinkedHashMap();
-    private final Map<String, Object> valueProviders = new LinkedHashMap<String, Object>(); // FIXME - the keys should
-                                                                                            // be ValueProviders, but
-                                                                                            // first we need to wrap
-                                                                                            // non-m/v/c providers.
+    private final Map<String, Object> valueProviders = new LinkedHashMap<String, Object>(); // FIXME
+                                                                                            // -
+                                                                                            // the
+                                                                                            // keys
+                                                                                            // should
+                                                                                            // be
+                                                                                            // ValueProviders,
+                                                                                            // but
+                                                                                            // first
+                                                                                            // we
+                                                                                            // need
+                                                                                            // to
+                                                                                            // wrap
+                                                                                            // non-m/v/c
+                                                                                            // providers.
     protected boolean hasLocalDependencies = false;
     protected boolean hasProvidedAttributes;
 }

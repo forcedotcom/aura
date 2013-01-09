@@ -15,37 +15,39 @@
  */
 package org.auraframework.components.ui.listView;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import org.auraframework.system.Annotations.*;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Model;
 
 @Model
 public class ListViewTestModel {
 
     @AuraEnabled
-    public List<Object> getEmptyList(){
+    public List<Object> getEmptyList() {
         return new ArrayList<Object>();
     }
 
     @AuraEnabled
-    public List<Map<String, String>> getGeneratedListData(){
+    public List<Map<String, String>> getGeneratedListData() {
         return ListViewTestData.GENERATED_LIST_DATA;
     }
 
     @AuraEnabled
-    public List<Map<String, String>> getSpecifiedListData(){
+    public List<Map<String, String>> getSpecifiedListData() {
         return ListViewTestData.SPECIFIED_LIST_DATA;
     }
 
     @AuraEnabled
-    public List<Map<String, String>> getNestedColumnsListData(){
+    public List<Map<String, String>> getNestedColumnsListData() {
         return ListViewTestData.NESTED_COLUMNS_LIST_DATA;
     }
 
     @AuraEnabled
-    public List<Map<String, String>> getNestedColumnsFieldsMapsFromNonLeafNodeColumnsListData(){
+    public List<Map<String, String>> getNestedColumnsFieldsMapsFromNonLeafNodeColumnsListData() {
         return ListViewTestData.NESTED_COLUMNS_BAD_LIST_DATA;
     }
 
 }
-

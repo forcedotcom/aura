@@ -15,11 +15,11 @@
  */
 package org.auraframework.util.type.converter;
 
+import java.util.Date;
+
 import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.type.Converter;
-
-import java.util.Date;
 
 public class StringToDateConverter implements Converter<String, Date> {
 

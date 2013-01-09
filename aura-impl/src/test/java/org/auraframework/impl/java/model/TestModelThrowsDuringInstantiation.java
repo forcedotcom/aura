@@ -25,7 +25,7 @@ public class TestModelThrowsDuringInstantiation {
     }
 
     @AuraEnabled
-    public String getThis(){
+    public String getThis() {
         return "surprise ruined";
     }
 }

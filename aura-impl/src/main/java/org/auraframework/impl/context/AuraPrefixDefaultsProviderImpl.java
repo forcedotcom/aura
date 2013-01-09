@@ -27,7 +27,7 @@ public class AuraPrefixDefaultsProviderImpl implements PrefixDefaultsAdapter {
 
     protected static final Map<DefType, String> defaults = new EnumMap<DefType, String>(DefType.class);
 
-    static{
+    static {
         defaults.put(DefType.ACTION, DefDescriptor.JAVA_PREFIX);
         defaults.put(DefType.COMPONENT, DefDescriptor.MARKUP_PREFIX);
         defaults.put(DefType.CONTROLLER, DefDescriptor.JAVA_PREFIX);

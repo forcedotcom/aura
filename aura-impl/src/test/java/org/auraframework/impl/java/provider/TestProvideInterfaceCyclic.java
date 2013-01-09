@@ -24,10 +24,10 @@ import org.auraframework.system.Annotations.Provider;
 
 @Provider
 public class TestProvideInterfaceCyclic {
-    public static DefDescriptor<ComponentDef> provide(){
-        BaseComponent<?,?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
-        String cycle = (String)component.getAttributes().getExpression("cycle");
+    public static DefDescriptor<ComponentDef> provide() {
+        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        String cycle = (String) component.getAttributes().getExpression("cycle");
 
-        return DefDescriptorImpl.getInstance("test:test_Provider_InterfaceCyclicComponent"+cycle, ComponentDef.class);
+        return DefDescriptorImpl.getInstance("test:test_Provider_InterfaceCyclicComponent" + cycle, ComponentDef.class);
     }
 }

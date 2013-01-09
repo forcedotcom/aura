@@ -17,30 +17,32 @@ package org.auraframework.throwable.quickfix;
 
 import java.util.Map;
 
-import org.auraframework.builder.ThemeDefBuilder;
-
-import com.google.common.collect.Maps;
-
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.builder.ThemeDefBuilder;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.service.BuilderService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.util.AuraTextUtil;
 
+import com.google.common.collect.Maps;
+
 /**
  */
 public class CreateThemeDefQuickFix extends AuraQuickFix {
 
-    public CreateThemeDefQuickFix(Map<String, Object> attributes){
-        super("Create Theme Definition", attributes, Aura.getDefinitionService().getDefDescriptor("auradev:createThemeDefQuickFix", ComponentDef.class));
+    public CreateThemeDefQuickFix(Map<String, Object> attributes) {
+        super("Create Theme Definition", attributes, Aura.getDefinitionService().getDefDescriptor(
+                "auradev:createThemeDefQuickFix", ComponentDef.class));
     }
 
-    public CreateThemeDefQuickFix(DefDescriptor<?> descriptor){
+    public CreateThemeDefQuickFix(DefDescriptor<?> descriptor) {
         this(createMap(descriptor));
     }
 
-    private static Map<String, Object> createMap(DefDescriptor<?> descriptor){
+    private static Map<String, Object> createMap(DefDescriptor<?> descriptor) {
         Map<String, Object> ret = Maps.newHashMap();
         ret.put("descriptor", descriptor);
         return ret;
@@ -52,7 +54,7 @@ public class CreateThemeDefQuickFix extends AuraQuickFix {
         BuilderService builderService = Aura.getBuilderService();
         DefinitionService definitionService = Aura.getDefinitionService();
 
-        DefDescriptor<ThemeDef> themeDescriptor = (DefDescriptor<ThemeDef>)getAttributes().get("descriptor");
+        DefDescriptor<ThemeDef> themeDescriptor = (DefDescriptor<ThemeDef>) getAttributes().get("descriptor");
         ThemeDefBuilder builder = builderService.getThemeDefBuilder();
 
         builder.setDescriptor(themeDescriptor);
@@ -61,7 +63,7 @@ public class CreateThemeDefQuickFix extends AuraQuickFix {
         definitionService.save(themeDef);
     }
 
-    public static final void doFix(@Key("attributes")Map<String, Object> attributes) throws QuickFixException{
+    public static final void doFix(@Key("attributes") Map<String, Object> attributes) throws QuickFixException {
         new CreateComponentDefQuickFix(attributes).fix();
     }
 }

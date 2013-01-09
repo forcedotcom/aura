@@ -31,16 +31,17 @@ public class InstanceServiceImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify that calling InstanceService with an undefined attributes throws an exception.
+     * Verify that calling InstanceService with an undefined attributes throws
+     * an exception.
      */
     @Ignore("W-1483429")
-    public void testInstanceCreationWithNonExistingArrtibutes()throws Exception{
+    public void testInstanceCreationWithNonExistingArrtibutes() throws Exception {
         Map<String, Object> attrMap = Maps.newHashMap();
         attrMap.put("iDontExist", "bar");
-        try{
+        try {
             Aura.getInstanceService().getInstance("ui:inputText", ComponentDef.class, attrMap);
             fail("Instantiating a component with undefined attributes should have thrown an exception");
-        }catch(AttributeNotFoundException e){
+        } catch (AttributeNotFoundException e) {
             // Expected
         }
     }

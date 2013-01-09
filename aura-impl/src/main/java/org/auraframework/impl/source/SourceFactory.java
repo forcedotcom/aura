@@ -15,25 +15,30 @@
  */
 package org.auraframework.impl.source;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
-
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 
 /**
- * Locates source code and produces Source objects that can be used to read that code and associated metadata. Source
- * creation is delegated to a SourceLoader that has registered to load Source for a particular namespace.
+ * Locates source code and produces Source objects that can be used to read that
+ * code and associated metadata. Source creation is delegated to a SourceLoader
+ * that has registered to load Source for a particular namespace.
  */
 public final class SourceFactory {
 
     /**
-     * Immutable map of namespaces to loaders for this factory to use to load Source.
+     * Immutable map of namespaces to loaders for this factory to use to load
+     * Source.
      */
     private final Map<LoaderKey, SourceLoader> loaders;
     private static final String WILD = "*";
@@ -47,11 +52,12 @@ public final class SourceFactory {
         for (SourceLoader loader : loaders) {
             for (String namespace : loader.getNamespaces()) {
                 mutableNamespaces.add(namespace);
-                for(String prefix : loader.getPrefixes()){
+                for (String prefix : loader.getPrefixes()) {
                     LoaderKey key = new LoaderKey(namespace, prefix);
                     if (mutableLoaderMap.containsKey(key)) {
-                        throw new AuraRuntimeException(String.format("Namespace/Prefix combination %s claimed by 2 SourceLoaders : %s and %s",
-                                key.toString(), mutableLoaderMap.get(key).getClass().getName(), loader.getClass()
+                        throw new AuraRuntimeException(String.format(
+                                "Namespace/Prefix combination %s claimed by 2 SourceLoaders : %s and %s", key
+                                        .toString(), mutableLoaderMap.get(key).getClass().getName(), loader.getClass()
                                         .getName()));
                     }
 
@@ -63,7 +69,7 @@ public final class SourceFactory {
         this.loaders = AuraUtil.immutableMap(mutableLoaderMap);
     }
 
-    public Set<String> getNamespaces(){
+    public Set<String> getNamespaces() {
         return namespaces;
     }
 
@@ -77,33 +83,34 @@ public final class SourceFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Definition> Set<DefDescriptor<T>> find(DefDescriptor<T> matcher){
+    public <T extends Definition> Set<DefDescriptor<T>> find(DefDescriptor<T> matcher) {
 
         String namespace = matcher.getNamespace();
-        Class<T> primaryInterface = (Class<T>)matcher.getDefType().getPrimaryInterface();
-        if(WILD.equals(namespace)){
+        Class<T> primaryInterface = (Class<T>) matcher.getDefType().getPrimaryInterface();
+        if (WILD.equals(namespace)) {
             Set<DefDescriptor<T>> ret = new HashSet<DefDescriptor<T>>();
-            for(String ns : namespaces){
+            for (String ns : namespaces) {
                 ret.addAll(find(primaryInterface, matcher.getPrefix(), ns));
             }
             return ret;
-        }else{
+        } else {
             return find(primaryInterface, matcher.getPrefix(), namespace);
         }
     }
 
-    public Set<DefDescriptor<?>> find(DescriptorFilter matcher){
+    public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         Set<DefDescriptor<?>> ret = new HashSet<DefDescriptor<?>>();
 
-        for (Map.Entry<LoaderKey,SourceLoader> entry : this.loaders.entrySet()) {
-            if (matcher.matchPrefix(entry.getKey().getPrefix()) && matcher.matchNamespace(entry.getKey().getNamespace())) {
+        for (Map.Entry<LoaderKey, SourceLoader> entry : this.loaders.entrySet()) {
+            if (matcher.matchPrefix(entry.getKey().getPrefix())
+                    && matcher.matchNamespace(entry.getKey().getNamespace())) {
                 ret.addAll(entry.getValue().find(matcher));
             }
         }
         return ret;
     }
 
-    private <T extends Definition> Set<DefDescriptor<T>> find(Class<T> primaryInterface, String prefix, String namespace){
+    private <T extends Definition> Set<DefDescriptor<T>> find(Class<T> primaryInterface, String prefix, String namespace) {
         LoaderKey key = new LoaderKey(namespace, prefix);
         SourceLoader loader = loaders.get(key);
         if (loader == null) {
@@ -120,7 +127,7 @@ public final class SourceFactory {
         private LoaderKey(String namespace, String prefix) {
             this.namespace = namespace;
             this.prefix = prefix;
-            this.hashCode = AuraUtil.hashCode(namespace != null?namespace.toLowerCase():null, prefix.toLowerCase());
+            this.hashCode = AuraUtil.hashCode(namespace != null ? namespace.toLowerCase() : null, prefix.toLowerCase());
         }
 
         /**
@@ -137,8 +144,8 @@ public final class SourceFactory {
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof LoaderKey) {
-                LoaderKey l = (LoaderKey)obj;
-                if(prefix.equalsIgnoreCase(l.prefix) && l.namespace != null){
+                LoaderKey l = (LoaderKey) obj;
+                if (prefix.equalsIgnoreCase(l.prefix) && l.namespace != null) {
                     return l.namespace.equalsIgnoreCase(namespace);
                 }
 
@@ -156,7 +163,7 @@ public final class SourceFactory {
 
         /**
          * Gets the namespace for this instance.
-         *
+         * 
          * @return The namespace.
          */
         public String getNamespace() {
@@ -165,7 +172,7 @@ public final class SourceFactory {
 
         /**
          * Gets the prefix for this instance.
-         *
+         * 
          * @return The prefix.
          */
         public String getPrefix() {

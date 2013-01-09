@@ -27,8 +27,6 @@ import javax.annotation.concurrent.ThreadSafe;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.auraframework.system.Annotations.Model;
-import org.auraframework.system.AuraContext;
 import org.auraframework.test.ComponentJSTestSuiteTest.ComponentTestCase;
 import org.auraframework.test.TestInventory;
 import org.auraframework.test.TestInventory.Type;
@@ -37,23 +35,26 @@ import org.auraframework.util.ServiceLocator;
 import com.google.common.collect.Maps;
 
 /**
- * An encapsulation of all of the state held by the {@link TestSetRunnerModel}. This state is not kept
- * in the model itself because it is currently impossible to create lazy singleton objects that
- * adhere to the contract of {@link Model}.
- *
- * FIXME: This setup is not scoped to a user or page state. Two users can stomp on each other's test
- * results.
- *
- * FIXME: There is no stickiness to ensure that client side polls are reaching the server that is
- * running tests on its behalf if the deploy has multiple appServers.
- *
- * FIXME: Individual tests are tracked with just a bag of properties rather than as a strongly typed
- * client-visible model.
+ * An encapsulation of all of the state held by the {@link TestSetRunnerModel}.
+ * This state is not kept in the model itself because it is currently impossible
+ * to create lazy singleton objects that adhere to the contract of {@link Model}
+ * .
+ * 
+ * FIXME: This setup is not scoped to a user or page state. Two users can stomp
+ * on each other's test results.
+ * 
+ * FIXME: There is no stickiness to ensure that client side polls are reaching
+ * the server that is running tests on its behalf if the deploy has multiple
+ * appServers.
+ * 
+ * FIXME: Individual tests are tracked with just a bag of properties rather than
+ * as a strongly typed client-visible model.
  */
 @ThreadSafe
 public class TestSetRunnerState {
     /**
-     * A helper to allow for lazy initialization of the the {@link TestSetRunnerState}.
+     * A helper to allow for lazy initialization of the the
+     * {@link TestSetRunnerState}.
      */
     private static class SingletonHolder {
         private static TestSetRunnerState INSTANCE = new TestSetRunnerState();
@@ -66,8 +67,8 @@ public class TestSetRunnerState {
     private static Map<String, Test> inventory = Maps.newHashMap();
 
     /**
-     * Parallel to the inventory, this map is used as a data bag to store various properties about
-     * tests (e.g. status, exceptions, etc...)
+     * Parallel to the inventory, this map is used as a data bag to store
+     * various properties about tests (e.g. status, exceptions, etc...)
      */
     @GuardedBy("this")
     private static SortedMap<String, Map<String, Object>> testsWithPropsMap = Maps.newTreeMap();
@@ -98,7 +99,8 @@ public class TestSetRunnerState {
     }
 
     /**
-     * Populates the model by querying for all implementations of {@link TestInventory}.
+     * Populates the model by querying for all implementations of
+     * {@link TestInventory}.
      */
     private synchronized void populateInventory() {
         // Load the inventory in a separate thread.
@@ -114,20 +116,21 @@ public class TestSetRunnerState {
     }
 
     /**
-     * We load the test inventory in a separate thread because some test constructors start/stop the
-     * {@link AuraContext}. If we load them in the requesting thread, they end up corrupting the
-     * context for the {@link TestSetRunnerController}.
+     * We load the test inventory in a separate thread because some test
+     * constructors start/stop the {@link AuraContext}. If we load them in the
+     * requesting thread, they end up corrupting the context for the
+     * {@link TestSetRunnerController}.
      */
     private class InventoryPopulator implements Runnable {
         @Override
         public void run() {
-            Collection<TestInventory> inventories = ServiceLocator.get()
-                    .getAll(TestInventory.class);
+            Collection<TestInventory> inventories = ServiceLocator.get().getAll(TestInventory.class);
             for (TestInventory i : inventories) {
                 for (Type type : TestInventory.Type.values()) {
                     TestSuite suite = i.getTestSuite(type);
-                    if (suite.testCount() > 0)
+                    if (suite.testCount() > 0) {
                         addSuite(suite);
+                    }
                 }
             }
 
@@ -149,8 +152,7 @@ public class TestSetRunnerState {
         }
 
         /**
-         * @param suite
-         *        the suite to add to the model.
+         * @param suite the suite to add to the model.
          */
         private void addSuite(TestSuite suite) {
             for (Enumeration<Test> e = suite.tests(); e.hasMoreElements();) {
@@ -166,13 +168,10 @@ public class TestSetRunnerState {
 
     /**
      * Modify a property of a test
-     *
-     * @param test
-     *        identifies the test
-     * @param key
-     *        the key of the property
-     * @param value
-     *        the new value
+     * 
+     * @param test identifies the test
+     * @param key the key of the property
+     * @param value the new value
      */
     public synchronized void setTestProp(String test, String key, Object value) {
         Map<String, Object> testProps = testsWithPropsMap.get(test);

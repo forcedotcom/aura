@@ -117,8 +117,8 @@ public class JavascriptProcessingError {
     @Override
     public String toString() {
         if (evidence == null || evidence.length() == 0) {
-            return String.format("JS Processing %s: %s (line %s, char %s) : %s\n", level, filename, line,
-                    character, message);
+            return String.format("JS Processing %s: %s (line %s, char %s) : %s\n", level, filename, line, character,
+                    message);
         } else {
             return String.format("JS Processing %s: %s (line %s, char %s) : %s \n %s\n", level, filename, line,
                     character, message, evidence);

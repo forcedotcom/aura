@@ -16,7 +16,12 @@
 package org.auraframework.impl.java.type;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
@@ -55,7 +60,8 @@ public class JavaTypeDefFactory extends BaseJavaDefFactory<TypeDef> {
 
     /**
      * Return base of class name, truncating Generic qualifier, if included.
-     *   Can't instantiate a class with parameters using Class.forName().
+     * Can't instantiate a class with parameters using Class.forName().
+     * 
      * @param className - the class name, with or without a < > clause
      * @return - the base class name minus generic parameters
      */

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /*
-  * Copyright, 1999-2009, salesforce.com All Rights Reserved Company Confidential
+ * Copyright, 1999-2009, salesforce.com All Rights Reserved Company Confidential
  */
 package org.auraframework.impl.renderer;
 
@@ -27,7 +27,7 @@ import org.auraframework.system.Annotations.Provider;
 @Provider
 public class TestProvider implements ComponentDescriptorProvider {
     @Override
-    public DefDescriptor<ComponentDef> provide(){
+    public DefDescriptor<ComponentDef> provide() {
         return DefDescriptorImpl.getInstance("test:test_JavaRndr_Impl", ComponentDef.class);
     }
 }

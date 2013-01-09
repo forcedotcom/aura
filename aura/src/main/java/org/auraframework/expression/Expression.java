@@ -27,10 +27,11 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * An expression that can be evaluated on the server or the client.
  */
-public interface Expression extends Serializable{
+public interface Expression extends Serializable {
 
     /**
-     * Evaluate this expression and return the result, resolving references against the passed in value provider.
+     * Evaluate this expression and return the result, resolving references
+     * against the passed in value provider.
      */
     Object evaluate(ValueProvider vp) throws QuickFixException;
 
@@ -40,11 +41,12 @@ public interface Expression extends Serializable{
     ExpressionType getExpressionType();
 
     /**
-     * @return descriptor for the type that this expression will return (for validation)
+     * @return descriptor for the type that this expression will return (for
+     *         validation)
      */
     DefDescriptor<TypeDef> getReturnTypeDef();
 
-    //void validate(ValueProvider vp) throws Something;
+    // void validate(ValueProvider vp) throws Something;
 
     /**
      * @return location where it was defined
@@ -53,6 +55,7 @@ public interface Expression extends Serializable{
 
     /**
      * Gathers up all the property references in this expression
+     * 
      * @param propRefs set to add them to
      */
     void gatherPropertyReferences(Set<PropertyReference> propRefs);

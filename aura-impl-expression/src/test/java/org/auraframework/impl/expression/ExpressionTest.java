@@ -15,13 +15,17 @@
  */
 package org.auraframework.impl.expression;
 
-import static org.auraframework.impl.expression.functions.BooleanFunctions.*;
+import static org.auraframework.impl.expression.functions.BooleanFunctions.AND;
+import static org.auraframework.impl.expression.functions.BooleanFunctions.NOT;
+import static org.auraframework.impl.expression.functions.BooleanFunctions.OR;
 import static org.auraframework.impl.expression.functions.MathFunctions.SUBTRACT;
 import static org.auraframework.impl.expression.functions.MultiFunctions.ADD;
 
 import java.math.BigDecimal;
 
-import org.auraframework.expression.*;
+import org.auraframework.expression.Expression;
+import org.auraframework.expression.ExpressionType;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.instance.ValueProvider;
 import org.auraframework.system.Location;
 
@@ -29,7 +33,7 @@ import com.google.common.collect.ImmutableList;
 
 /**
  * Tests of expression evaluation
- *
+ * 
  * @hierarchy Aura.Runtime.Expression.Server.Evaluation
  * @userStory a07B0000000EdAC
  */
@@ -44,7 +48,9 @@ public class ExpressionTest extends AuraImplExpressionTestCase {
         public Object getValue(PropertyReference key) {
             if (key == blah) {
                 return 314;
-            } else if (key == meh) { return 235325; }
+            } else if (key == meh) {
+                return 235325;
+            }
             return null;
         }
 
@@ -55,7 +61,9 @@ public class ExpressionTest extends AuraImplExpressionTestCase {
         public Object getValue(PropertyReference key) {
             if (key == blah) {
                 return true;
-            } else if (key == meh) { return false; }
+            } else if (key == meh) {
+                return false;
+            }
             return null;
         }
 
@@ -139,16 +147,16 @@ public class ExpressionTest extends AuraImplExpressionTestCase {
     }
 
     // currently throws NullPointerException
-//    @TestLabels(IgnoreFailureReason.IN_DEV)
-//    public void testPropertyWithNoValueProvider() throws Exception {
-//        verifyEvaluateException("undefined", "??????????");
-//    }
+    // @TestLabels(IgnoreFailureReason.IN_DEV)
+    // public void testPropertyWithNoValueProvider() throws Exception {
+    // verifyEvaluateException("undefined", "??????????");
+    // }
 
     // currently throws IndexOutOfBoundsException, catch during parse?
-//    @TestLabels(IgnoreFailureReason.IN_DEV)
-//    public void testFunctionMissingOperands() throws Exception {
-//        verifyEvaluateException("add()", "??????????");
-//    }
+    // @TestLabels(IgnoreFailureReason.IN_DEV)
+    // public void testFunctionMissingOperands() throws Exception {
+    // verifyEvaluateException("add()", "??????????");
+    // }
 
     public void testFunctionMismatchedOperands() throws Exception {
         verifyEvaluateResult("3 + ' little piggies'", ExpressionType.FUNCTION, null, null);
@@ -176,14 +184,18 @@ public class ExpressionTest extends AuraImplExpressionTestCase {
         assertEquals("Unexpected evaluation of <" + expression + ">", result, e.evaluate(vp));
     }
 
-//    private void verifyEvaluateException(String expression, String messageStartsWith) throws Exception {
-//        Expression e = buildExpression(expression);
-//        try {
-//            Object result = e.evaluate(null);
-//            fail("No Exception thrown for <" + expression + ">. Instead, got: " + result);
-//        } catch (Exception ex) {
-//            if (ex.getMessage() != null && ex.getMessage().startsWith(messageStartsWith)) return;
-//            failNotEquals("Unexpected exception for <" + expression + "> ", messageStartsWith, ex);
-//        }
-//    }
+    // private void verifyEvaluateException(String expression, String
+    // messageStartsWith) throws Exception {
+    // Expression e = buildExpression(expression);
+    // try {
+    // Object result = e.evaluate(null);
+    // fail("No Exception thrown for <" + expression + ">. Instead, got: " +
+    // result);
+    // } catch (Exception ex) {
+    // if (ex.getMessage() != null &&
+    // ex.getMessage().startsWith(messageStartsWith)) return;
+    // failNotEquals("Unexpected exception for <" + expression + "> ",
+    // messageStartsWith, ex);
+    // }
+    // }
 }

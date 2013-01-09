@@ -23,7 +23,8 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 
 /**
- * value providers for $ stuff that is not component specific, there is only 1 instance
+ * value providers for $ stuff that is not component specific, there is only 1
+ * instance
  */
 public interface GlobalValueProvider extends ValueProvider {
 
@@ -39,7 +40,7 @@ public interface GlobalValueProvider extends ValueProvider {
 
     /**
      * TODO: this should be in valueprovider
-     *
+     * 
      * @param expr the property reference to validate
      * @throws InvalidExpressionException if validation fails
      */

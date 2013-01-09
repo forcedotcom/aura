@@ -15,21 +15,23 @@
  */
 package org.auraframework.impl.java.provider;
 
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDescriptorProvider;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Annotations.Provider;
 
 /**
  * A simple provider to ensure concrete instantiation.
- *
- * This provider is part of the test to ensure that concrete components always intantiate
- * as such. It always provides 'provider:providerB' to allow us to test 'provider:providerA'
- * instantiating.
+ * 
+ * This provider is part of the test to ensure that concrete components always
+ * intantiate as such. It always provides 'provider:providerB' to allow us to
+ * test 'provider:providerA' instantiating.
  */
 @Provider
 public class TestBaseProvider implements ComponentDescriptorProvider {
     @Override
-    public DefDescriptor<ComponentDef> provide(){
+    public DefDescriptor<ComponentDef> provide() {
         return DefDescriptorImpl.getInstance("provider:providerB", ComponentDef.class);
     }
 }

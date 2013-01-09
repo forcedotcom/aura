@@ -20,16 +20,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import javax.management.*;
+import javax.management.MBeanServer;
+import javax.management.MXBean;
+import javax.management.ObjectName;
 
+import org.apache.log4j.Logger;
 import org.auraframework.system.LoggingContext;
 import org.auraframework.throwable.AuraRuntimeException;
 
-import org.apache.log4j.Logger;
-
-import com.google.common.cache.*;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 /**
  * LoggingContext impl.
  */
@@ -37,7 +41,8 @@ import com.google.common.collect.Sets;
 public class LoggingContextImpl implements LoggingContext {
 
     private static final Logger logger = Logger.getLogger("LoggingContextImpl");
-    private static final LoadingCache<String, Counter> counters = CacheBuilder.newBuilder().build(new CounterComputer());
+    private static final LoadingCache<String, Counter> counters = CacheBuilder.newBuilder()
+            .build(new CounterComputer());
     private static final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 
     private final Map<String, Object> loggingValues = Maps.newHashMap();
@@ -127,9 +132,10 @@ public class LoggingContextImpl implements LoggingContext {
 
         Set<String> names = Sets.newHashSet();
 
-        for(Map.Entry<String, Timer> entry : timers.entrySet()){
+        for (Map.Entry<String, Timer> entry : timers.entrySet()) {
             String key = entry.getKey();
-            // As counters cannot handle ":", we have to replace it with something else .
+            // As counters cannot handle ":", we have to replace it with
+            // something else .
             String counterKey = replaceSpecialChars(key);
             try {
                 counters.get(counterKey).setValue(entry.getValue().getTime());
@@ -140,9 +146,10 @@ public class LoggingContextImpl implements LoggingContext {
             loggingValues.put(key + "Time", entry.getValue().getTime());
         }
 
-        for(Map.Entry<String, Long> entry : nums.entrySet()){
+        for (Map.Entry<String, Long> entry : nums.entrySet()) {
             String key = entry.getKey();
-            // As counters cannot handle ":", we have to replace it with something else .
+            // As counters cannot handle ":", we have to replace it with
+            // something else .
             String counterKey = replaceSpecialChars(key);
             try {
                 counters.get(counterKey).setValue(entry.getValue());
@@ -153,12 +160,12 @@ public class LoggingContextImpl implements LoggingContext {
             loggingValues.put(key, entry.getValue());
         }
 
-        for(Map.Entry<String, Object> entry : values.entrySet()){
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
             loggingValues.put(entry.getKey(), entry.getValue());
         }
 
-        for(Map.Entry<String, Counter> entry: counters.asMap().entrySet()){
-            if(!names.contains(entry.getKey())){
+        for (Map.Entry<String, Counter> entry : counters.asMap().entrySet()) {
+            if (!names.contains(entry.getKey())) {
                 entry.getValue().setValue(0);
             }
         }
@@ -173,18 +180,19 @@ public class LoggingContextImpl implements LoggingContext {
         StringBuilder buffer = new StringBuilder();
 
         for (Map.Entry<String, Object> entry : valueMap.entrySet()) {
-            //System.out.print(entry.getKey() + ": " + entry.getValue().toString() + ";");
-            if(entry.getValue()!=null){
+            // System.out.print(entry.getKey() + ": " +
+            // entry.getValue().toString() + ";");
+            if (entry.getValue() != null) {
                 buffer.append(entry.getKey() + ": " + entry.getValue().toString() + ";");
             }
         }
         logger.info(buffer);
-            // System.out.println();
+        // System.out.println();
     }
 
     /**
      * Replace special characters of JMX.
-     *
+     * 
      */
     private String replaceSpecialChars(String str) {
         String regex = "[\\*\\?\\,\\:\n]";
@@ -209,7 +217,7 @@ public class LoggingContextImpl implements LoggingContext {
         public void reset();
     }
 
-    public static class Counter implements CounterMXBean{
+    public static class Counter implements CounterMXBean {
 
         private long mostRecentValue = 0;
         private long totalValue = 0;
@@ -256,13 +264,13 @@ public class LoggingContextImpl implements LoggingContext {
             return totalValue;
         }
 
-        public void setValue(long value){
+        public void setValue(long value) {
             mostRecentValue = value;
             totalValue += value;
-            if(count == 0 || value < minValue){
+            if (count == 0 || value < minValue) {
                 minValue = value;
             }
-            if(count == 0 || value > maxValue){
+            if (count == 0 || value > maxValue) {
                 maxValue = value;
             }
             count++;
@@ -273,7 +281,7 @@ public class LoggingContextImpl implements LoggingContext {
     public static class Timer {
         private long startTime = -1;
         private long totalTime = 0;
-        private String name;
+        private final String name;
 
         public Timer(String name) {
             this.name = name;
@@ -284,13 +292,15 @@ public class LoggingContextImpl implements LoggingContext {
         }
 
         public void start() {
-            if (startTime < 0) {  //if invoke two starts without stop, the second has no effect
+            if (startTime < 0) { // if invoke two starts without stop, the
+                                 // second has no effect
                 startTime = System.currentTimeMillis();
             }
         }
 
         public void stop() {
-            if (startTime >= 0) { //if invoke two stops without start, the second stop has no effect
+            if (startTime >= 0) { // if invoke two stops without start, the
+                                  // second stop has no effect
                 long curr = System.currentTimeMillis();
                 totalTime += curr - startTime;
                 startTime = -1;
@@ -307,21 +317,21 @@ public class LoggingContextImpl implements LoggingContext {
         }
     }
 
-    private static final class CounterComputer extends CacheLoader<String, Counter>{
+    private static final class CounterComputer extends CacheLoader<String, Counter> {
 
         @Override
         public Counter load(String name) {
 
-                Counter counter = new Counter();
+            Counter counter = new Counter();
 
-                ObjectName objectName;
-                try {
-                    objectName = new ObjectName("aura", "name", name);
-                    server.registerMBean(counter, objectName);
-                } catch (Exception e) {
-                    throw new AuraRuntimeException(e);
-                }
-                return counter;
+            ObjectName objectName;
+            try {
+                objectName = new ObjectName("aura", "name", name);
+                server.registerMBean(counter, objectName);
+            } catch (Exception e) {
+                throw new AuraRuntimeException(e);
+            }
+            return counter;
         }
 
     }

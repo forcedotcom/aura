@@ -16,24 +16,26 @@
 package org.auraframework.service;
 
 import java.io.IOException;
-
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoContextException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.collect.Lists;
+
 /**
  * @hierarchy Aura.Services.RenderingService
  * @userStory a07B0000000Eb3M
  */
-public class RenderingServiceTest extends BaseServiceTest<RenderingService, RenderingServiceTest.Config> implements RenderingService {
+public class RenderingServiceTest extends BaseServiceTest<RenderingService, RenderingServiceTest.Config> implements
+        RenderingService {
 
     private static final long serialVersionUID = 2202770784015045204L;
 
@@ -42,39 +44,40 @@ public class RenderingServiceTest extends BaseServiceTest<RenderingService, Rend
     }
 
     @Override
-    public void render(BaseComponent<?,?> component, Appendable out) throws QuickFixException, IOException {
+    public void render(BaseComponent<?, ?> component, Appendable out) throws QuickFixException, IOException {
 
-        try{
+        try {
             service.render(component, out);
             fail("Expected NoContextException");
-        }catch(NoContextException e){
-            //good
+        } catch (NoContextException e) {
+            // good
         }
 
         ContextService contextService = Aura.getContextService();
-        try{
-            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService().getDefDescriptor("test:laxSecurity", ApplicationDef.class));
+        try {
+            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
+                    .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
 
-            DefDescriptor<ComponentDef> cmpDesc = Aura.getDefinitionService().getDefDescriptor("test:text", ComponentDef.class);
+            DefDescriptor<ComponentDef> cmpDesc = Aura.getDefinitionService().getDefDescriptor("test:text",
+                    ComponentDef.class);
             Component instance = Aura.getInstanceService().getInstance(cmpDesc);
             StringBuilder sb = new StringBuilder();
             service.render(instance, sb);
             goldFileText(sb.toString());
 
-
             cmpDesc = Aura.getDefinitionService().getDefDescriptor("test:testJSRenderer", ComponentDef.class);
             instance = Aura.getInstanceService().getInstance(cmpDesc);
             sb = new StringBuilder();
-            try{
+            try {
                 service.render(instance, sb);
                 fail("Expected an error");
-            }catch(AuraRuntimeException e){
-                //good
+            } catch (AuraRuntimeException e) {
+                // good
             }
 
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
-        }finally{
+        } finally {
             contextService.endContext();
         }
     }
@@ -88,7 +91,7 @@ public class RenderingServiceTest extends BaseServiceTest<RenderingService, Rend
         return permuteConfigs(ret);
     }
 
-    public static class Config extends BaseServiceTest.Config{
+    public static class Config extends BaseServiceTest.Config {
     }
 
 }

@@ -17,12 +17,13 @@ package org.auraframework.test.client;
 
 /**
  * Collect some useful user agent strings here.
- *
- *
+ * 
+ * 
  * @since 0.0.224
  */
 public enum UserAgent {
-    GOOGLE_CHROME("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.162 Safari/535.19"),
+    GOOGLE_CHROME(
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.162 Safari/535.19"),
     EMPTY("");
 
     private String userAgentString;

@@ -31,7 +31,8 @@ public enum JsonConstant {
     COMMENT_DELIM('/'),
     MULTICOMMENT_DELIM('*'),
 
-    // Proprietary JSON+binary, which has the following format: `[length of data in bytes as a 64-bit big-endian binary number][raw binary data]`
+    // Proprietary JSON+binary, which has the following format: `[length of data
+    // in bytes as a 64-bit big-endian binary number][raw binary data]`
     BINARY_STREAM('`'),
 
     LITERAL_START,
@@ -50,38 +51,37 @@ public enum JsonConstant {
 
     private static final int MaxTokenValue = 255; // largest allowable token
 
-    // tokens represents all possible token characters.  It is
+    // tokens represents all possible token characters. It is
     // OK to have characters beyond MaxTokenValue (for Unicode), but
     // those extended characters can only be literals or whitespace.
-    private static final JsonConstant[] tokens = new JsonConstant[MaxTokenValue+1];
+    private static final JsonConstant[] tokens = new JsonConstant[MaxTokenValue + 1];
     private final Character token;
 
-    static{
+    static {
         // sparsely add the defined tokens to this fixed-size array
-        for(JsonConstant j : JsonConstant.values()){
-            if(j.token != null){
+        for (JsonConstant j : JsonConstant.values()) {
+            if (j.token != null) {
                 tokens[j.token] = j;
             }
         }
 
-        // now populate the non-occupied spaces with the result of the isWhitespace method
-        // allowing all extended ASCII characters convert to a token is a single de-reference
-        for (char c=0; c <= MaxTokenValue; c++) {
+        // now populate the non-occupied spaces with the result of the
+        // isWhitespace method
+        // allowing all extended ASCII characters convert to a token is a single
+        // de-reference
+        for (char c = 0; c <= MaxTokenValue; c++) {
             if (tokens[c] == null) {
-               if (Character.isWhitespace(c)) {
-                   tokens[c] = WHITESPACE;
-               }
-               else {
-                   tokens[c] = LITERAL_START;
-               }
+                if (Character.isWhitespace(c)) {
+                    tokens[c] = WHITESPACE;
+                } else {
+                    tokens[c] = LITERAL_START;
+                }
             }
         }
 
-
-
     }
 
-    private JsonConstant(){
+    private JsonConstant() {
         this(null);
     }
 
@@ -96,7 +96,7 @@ public enum JsonConstant {
         return token;
     }
 
-    public static JsonConstant valueOf(Character c){
+    public static JsonConstant valueOf(Character c) {
 
         JsonConstant ret = null;
         int charVal = c;
@@ -112,7 +112,7 @@ public enum JsonConstant {
 
         // this section should only be entered for c >= MaxTokenValue (rare)
 
-        if(Character.isWhitespace(c)){
+        if (Character.isWhitespace(c)) {
             return WHITESPACE;
         }
 

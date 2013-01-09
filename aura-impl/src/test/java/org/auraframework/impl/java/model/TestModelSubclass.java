@@ -21,7 +21,7 @@ import org.auraframework.system.Annotations.Model;
 @Model
 public class TestModelSubclass extends TestModel {
     @AuraEnabled
-    public String getNextThing(){
+    public String getNextThing() {
         return "nextThing";
     }
 }

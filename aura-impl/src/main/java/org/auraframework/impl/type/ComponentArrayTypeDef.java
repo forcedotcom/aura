@@ -16,9 +16,13 @@
 package org.auraframework.impl.type;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.java.type.JavaValueProvider;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -46,7 +50,7 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
         json.writeString(getName());
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<TypeDef>{
+    public static class Builder extends DefinitionImpl.BuilderImpl<TypeDef> {
 
         public Builder() {
             super(TypeDef.class);
@@ -76,19 +80,20 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
     }
 
     @Override
-    public Object initialize(Object config, BaseComponent<?,?> valueProvider) throws QuickFixException{
+    public Object initialize(Object config, BaseComponent<?, ?> valueProvider) throws QuickFixException {
 
-        List<BaseComponent<?,?>> components = new ArrayList<BaseComponent<?,?>>();
-        List<?> list = (List<?>)config;
+        List<BaseComponent<?, ?>> components = new ArrayList<BaseComponent<?, ?>>();
+        List<?> list = (List<?>) config;
 
         if (list != null) {
             for (Object defRef : list) {
-                if(defRef instanceof BaseComponent){
-                    components.add((BaseComponent<?, ?>)defRef);
-                }else if(defRef instanceof ComponentDefRef){
-                    components.addAll(((ComponentDefRef)defRef).newInstance(valueProvider));
-                }else{
-                    throw new InvalidDefinitionException(String.format("Expected Component, recieved %s", defRef.getClass().getName()), getLocation());
+                if (defRef instanceof BaseComponent) {
+                    components.add((BaseComponent<?, ?>) defRef);
+                } else if (defRef instanceof ComponentDefRef) {
+                    components.addAll(((ComponentDefRef) defRef).newInstance(valueProvider));
+                } else {
+                    throw new InvalidDefinitionException(String.format("Expected Component, recieved %s", defRef
+                            .getClass().getName()), getLocation());
                 }
             }
         }
@@ -97,13 +102,14 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
 
     /**
      * Expects instance to be a List<ComponentDefRef>
+     * 
      * @throws QuickFixException
      */
     @SuppressWarnings("unchecked")
     @Override
     public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) throws QuickFixException {
 
-        List<ComponentDefRef> value = (List<ComponentDefRef>)instance;
+        List<ComponentDefRef> value = (List<ComponentDefRef>) instance;
 
         for (ComponentDefRef componentDefRef : value) {
             componentDefRef.appendDependencies(deps);

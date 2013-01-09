@@ -17,7 +17,7 @@ package org.auraframework.impl.java.model;
 
 import org.auraframework.system.Annotations.AuraEnabled;
 
-public class TestModelWithoutAnnotation{
+public class TestModelWithoutAnnotation {
 
     @AuraEnabled
     public String getReadOnlyThing() {

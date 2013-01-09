@@ -32,21 +32,23 @@ import junit.framework.Test;
 import junit.framework.TestFailure;
 import junit.framework.TestResult;
 
+import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.test.WebDriverProvider;
-import org.auraframework.util.AuraUtil;
 import org.auraframework.test.annotation.ThreadHostileTest;
+import org.auraframework.util.AuraUtil;
 
 /**
- * This controller handles the execution and result collection of test cases on behalf of client-initiated requests.
+ * This controller handles the execution and result collection of test cases on
+ * behalf of client-initiated requests.
  */
 @Controller
 public class TestSetRunnerController {
     /**
-     * A small helper to encapsulate the creation of a {@link ThreadPoolExecutor} for test execution. TODO: add the
-     * ability to abort the pending tasks.
+     * A small helper to encapsulate the creation of a
+     * {@link ThreadPoolExecutor} for test execution. TODO: add the ability to
+     * abort the pending tasks.
      */
     private static class ExecutorQueue {
         private final LinkedBlockingQueue<Runnable> queue;
@@ -67,7 +69,8 @@ public class TestSetRunnerController {
          * Enqueue a runnable task on the executor.
          */
         public synchronized void submit(final Runnable r) {
-            // After running the given task, check to see if the executor is empty.
+            // After running the given task, check to see if the executor is
+            // empty.
             Runnable wrappedRunnable = new Runnable() {
                 @Override
                 public void run() {
@@ -88,8 +91,9 @@ public class TestSetRunnerController {
         }
 
         /**
-         * Called when the executor transitions from the active into the empty state. Synchronized on this so that no
-         * new tasks may submit while we are running cleanup code.
+         * Called when the executor transitions from the active into the empty
+         * state. Synchronized on this so that no new tasks may submit while we
+         * are running cleanup code.
          */
         private synchronized void onExecutorEmpty() {
             WebDriverProvider provider = AuraUtil.get(WebDriverProvider.class);
@@ -107,10 +111,12 @@ public class TestSetRunnerController {
     }
 
     /**
-     * A helper to enable lazy static initialization of the {@link ExecutorQueue}.
+     * A helper to enable lazy static initialization of the
+     * {@link ExecutorQueue}.
      */
     private static class ExecutorQueueHolder {
-        // TODO: Enable parallel execution by default (and/or make configurable) once the known
+        // TODO: Enable parallel execution by default (and/or make configurable)
+        // once the known
         // parallel test flappers are addressed.
         private static ExecutorQueue INSTANCE = new ExecutorQueue(1, 1);
     }
@@ -125,8 +131,7 @@ public class TestSetRunnerController {
     /**
      * Enqueue multiple tests for execution.
      * 
-     * @param tests
-     *            the tests to execute
+     * @param tests the tests to execute
      * @throws Exception
      */
     @AuraEnabled
@@ -139,12 +144,11 @@ public class TestSetRunnerController {
     }
 
     /**
-     * Bulk update the status of the given tests and clear any exceptions they might have.
+     * Bulk update the status of the given tests and clear any exceptions they
+     * might have.
      * 
-     * @param tests
-     *            the tests to update
-     * @param status
-     *            the new status to give to the tests
+     * @param tests the tests to update
+     * @param status the new status to give to the tests
      */
     private static void changeStatus(List<String> tests, String status) throws Exception {
         for (String t : tests) {
@@ -167,13 +171,15 @@ public class TestSetRunnerController {
     }
 
     /**
-     * A {@link Runnable} adapter to schedule a test for execution and collect its results.
+     * A {@link Runnable} adapter to schedule a test for execution and collect
+     * its results.
      */
     private static class TestRunner implements Runnable {
         private final String testName;
         /**
-         * This lock ensures that a {@link ThreadHostileTest} is not run concurrently with any other tests because it
-         * must obtain the write lock.
+         * This lock ensures that a {@link ThreadHostileTest} is not run
+         * concurrently with any other tests because it must obtain the write
+         * lock.
          */
         private static final ReadWriteLock globalStateLock = new ReentrantReadWriteLock();
 
@@ -192,7 +198,8 @@ public class TestSetRunnerController {
             Lock lock;
             Class<? extends Test> clazz = test.getClass();
             if (clazz.getAnnotation(ThreadHostileTest.class) != null) {
-                // Thread hostile tests need to run alone and therefore require the write lock.
+                // Thread hostile tests need to run alone and therefore require
+                // the write lock.
                 lock = globalStateLock.writeLock();
             } else {
                 // Regular tests can run concurrently

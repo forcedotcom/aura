@@ -15,7 +15,10 @@
  */
 package org.auraframework.components.ui.listView;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ListViewTestData {
 
@@ -28,9 +31,8 @@ public class ListViewTestData {
     public final static int NUM_COLS_GENERATED_DATA = 3;
     public final static int NUM_ROWS_SPECIFIED_DATA = 4;
 
-    public final static String[] SPECIFIED_COLUMN_TITLES =
-        { "Type:Empty String", "Type:Undefined", "Type:Text", "Type:Email", "Type:Checkbox", "Type:Link",
-        "Type:Index", "Type:Html" };
+    public final static String[] SPECIFIED_COLUMN_TITLES = { "Type:Empty String", "Type:Undefined", "Type:Text",
+            "Type:Email", "Type:Checkbox", "Type:Link", "Type:Index", "Type:Html" };
 
     public final static int NUM_COLS_SPECIFIED_DATA = SPECIFIED_COLUMN_TITLES.length;
 
@@ -39,7 +41,7 @@ public class ListViewTestData {
         for (int i = 0; i < NUM_ROWS_GENERATED_DATA; ++i) {
             Map<String, String> map = new HashMap<String, String>();
             for (int j = 0; j < NUM_COLS_GENERATED_DATA; ++j) {
-                map.put("Column " + j, "value at ("+ i + ", " + j + ")");
+                map.put("Column " + j, "value at (" + i + ", " + j + ")");
             }
             GENERATED_LIST_DATA.add(map);
         }
@@ -61,14 +63,16 @@ public class ListViewTestData {
         for (int i = 0; i < NUM_ROWS_SPECIFIED_DATA; ++i) {
             Map<String, String> row = new HashMap<String, String>();
 
-            // Keys in this map correspond to hard-wired fieldName attributes of columns in a list in
-            // listViewTest.app. That list has nested columns, and only those columns that are leaf-node
+            // Keys in this map correspond to hard-wired fieldName attributes of
+            // columns in a list in
+            // listViewTest.app. That list has nested columns, and only those
+            // columns that are leaf-node
             // level columns are keyed from here.
-            row.put("third row 0, leaf 0", "row " + i +", value 0");
-            row.put("third row 1, leaf 1", "row " + i +", value 1");
-            row.put("third row 2, leaf 2", "row " + i +", value 2");
-            row.put("second row 2, leaf 3", "row " + i +", value 3");
-            row.put("first row 1, leaf 4", "row " + i +", value 4");
+            row.put("third row 0, leaf 0", "row " + i + ", value 0");
+            row.put("third row 1, leaf 1", "row " + i + ", value 1");
+            row.put("third row 2, leaf 2", "row " + i + ", value 2");
+            row.put("second row 2, leaf 3", "row " + i + ", value 3");
+            row.put("first row 1, leaf 4", "row " + i + ", value 4");
 
             NESTED_COLUMNS_LIST_DATA.add(row);
         }
@@ -76,9 +80,12 @@ public class ListViewTestData {
         NESTED_COLUMNS_BAD_LIST_DATA = new ArrayList<Map<String, String>>();
         for (int i = 0; i < NUM_ROWS_SPECIFIED_DATA; ++i) {
             Map<String, String> row = new HashMap<String, String>();
-            // Keys in this map correspond to hard-wired fieldName attributes of columns in a list in
-            // listViewTest.app. That list has nested columns, and only those columns that are non-leaf-node
-            // level columns are keyed from here. Non-leaf-node columns shouldn't be map-able to fields in the
+            // Keys in this map correspond to hard-wired fieldName attributes of
+            // columns in a list in
+            // listViewTest.app. That list has nested columns, and only those
+            // columns that are non-leaf-node
+            // level columns are keyed from here. Non-leaf-node columns
+            // shouldn't be map-able to fields in the
             // list. So none of these fields would actually appear in the list.
             row.put("first row 0", "This should not appear in list");
             row.put("second row 0", "This should not appear in list");

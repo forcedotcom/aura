@@ -28,12 +28,12 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
      * Test method for {@link ComponentDef#isAbstract()}.
      */
     public void testIsAbstract() throws Exception {
-        //This creates a StringSource to store the definition  
+        // This creates a StringSource to store the definition
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, "");
         ComponentDefImpl.Builder builder = new ComponentDefImpl.Builder();
         builder.setDescriptor(DefDescriptorImpl.getInstance(desc.getQualifiedName(), ComponentDef.class));
         builder.isAbstract = true;
-        //And then you can save the definition
+        // And then you can save the definition
         definitionService.save(builder.build());
         ComponentDef def = definitionService.getDefinition(desc.getDescriptorName(), ComponentDef.class);
 

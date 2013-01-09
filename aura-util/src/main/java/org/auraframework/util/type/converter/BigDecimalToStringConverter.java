@@ -21,15 +21,15 @@ import org.auraframework.util.type.Converter;
 
 /**
  * Used by aura.util.type.TypeUtil
- *
- *
+ * 
+ * 
  * @since 0.0.142
  */
 public class BigDecimalToStringConverter implements Converter<BigDecimal, String> {
 
     @Override
     public String convert(BigDecimal value) {
-        if(value == null){
+        if (value == null) {
             return null;
         }
         return value.toPlainString();

@@ -17,17 +17,19 @@ package org.auraframework.def;
 
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-
 /**
  */
 public interface AttributeDef extends Definition {
     @Override
     DefDescriptor<AttributeDef> getDescriptor();
 
-    public static enum SerializeToType { SERVER, BOTH, NONE, INVALID };
+    public static enum SerializeToType {
+        SERVER, BOTH, NONE, INVALID
+    };
 
     /**
-     * @return The default value to be used for instances of this AttributeDef that do not have a Value explicitly set
+     * @return The default value to be used for instances of this AttributeDef
+     *         that do not have a Value explicitly set
      */
     AttributeDefRef getDefaultValue();
 

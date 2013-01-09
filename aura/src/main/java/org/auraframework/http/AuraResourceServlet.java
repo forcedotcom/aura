@@ -15,23 +15,13 @@
  */
 package org.auraframework.http;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.*;
+import javax.servlet.http.*;
 
 import org.auraframework.Aura;
 import org.auraframework.def.*;
@@ -39,17 +29,13 @@ import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
-import org.auraframework.system.Client;
-import org.auraframework.system.AuraContext;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
 import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptWriter;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 
 public class AuraResourceServlet extends AuraBaseServlet {
 
@@ -78,7 +64,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
      *
      * This will go away when W-1166679 is fixed.
      */
-    private <P extends Definition, D extends P> void addDefinitions(Class<D> preloadType,
+    private static <P extends Definition, D extends P> void addDefinitions(Class<D> preloadType,
                                                                     List<DescriptorFilter> filters,
                                                                     TempFilter extraFilter,
                                                                     Set<P> defs) throws QuickFixException {
@@ -112,7 +98,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
      * this is an issue. We should maybe make it more obvious by moving things around
      * and using static strings..
      */
-    private List<DescriptorFilter> getFilters() throws QuickFixException {
+    private static List<DescriptorFilter> getFilters() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         List<DescriptorFilter> filters = Lists.newArrayList();
         BaseComponentDef comp = null;
@@ -234,10 +220,9 @@ public class AuraResourceServlet extends AuraBaseServlet {
      * @throws IOException if unable to write to the response
      * @throws QuickFixWxception if the definitions could not be compiled.
      */
-    private void writeCss(HttpServletRequest request,
-                          HttpServletResponse response) throws IOException, QuickFixException {
+    public static void writeCss(Appendable out) throws IOException, QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
+        
         List<DescriptorFilter> filters = getFilters();
         Client.Type type = Aura.getContextService().getCurrentContext().getClient().getType();
         Mode mode = context.getMode();
@@ -255,8 +240,8 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 shortlist.add(filter);
                 addDefinitions(ThemeDef.class, shortlist, NTF, nddefs);
                 sb.setLength(0);
-                Appendable tmp = mode.isTestMode() ? response.getWriter() : sb;
-                Aura.getSerializationService().writeCollection(nddefs, ThemeDef.class, tmp);
+                Appendable tmp = mode.isTestMode() ? out : sb;
+                Aura.getSerializationService().writeCollection(nddefs, ThemeDef.class, tmp, "CSS");
                 if (!mode.isTestMode()) {
                     nsCss = sb.toString();
                     cssCache.put(key, nsCss);
@@ -264,7 +249,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
             }
             
             if (nsCss != null) {
-            	response.getWriter().append(nsCss);
+            	out.append(nsCss);
             }
         }
     }
@@ -276,15 +261,14 @@ public class AuraResourceServlet extends AuraBaseServlet {
      *
      * This writes out the entire set of components from the namespaces in JSON.
      */
-    private void writeComponents(HttpServletRequest request,
-                                 HttpServletResponse response) throws ServletException, IOException, QuickFixException {
+    private void writeComponents(Appendable out) throws ServletException, IOException, QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         List<DescriptorFilter> filters = getFilters();
         Set<BaseComponentDef> defs = Sets.newLinkedHashSet();
 
         addDefinitions(BaseComponentDef.class, filters, null, defs);
         context.setPreloading(true);
-        Aura.getSerializationService().writeCollection(defs, BaseComponentDef.class, response.getWriter());
+        Aura.getSerializationService().writeCollection(defs, BaseComponentDef.class, out);
     }
 
 
@@ -297,8 +281,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
      * This generates a complete set of definitions for an app in JS+JSON.
      *
      */
-    private String writeDefinitions(HttpServletRequest request,
-                                    HttpServletResponse response) throws ServletException, IOException, QuickFixException {
+    public static void writeDefinitions(Appendable out) throws IOException, QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         List<DescriptorFilter> filters = getFilters();
         Mode mode = context.getMode();
@@ -324,7 +307,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
 
             ret = definitionCache.get(key);
             if (ret != null) {
-                return ret;
+                out.append(ret);
             }
         }
         StringBuilder sb = new StringBuilder();
@@ -375,7 +358,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
             // when there is a race. Just that one of them gets in.
             definitionCache.put(key, ret);
         }
-        return ret;
+        out.append(ret);
     }
 
     /**
@@ -401,7 +384,6 @@ public class AuraResourceServlet extends AuraBaseServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
-        String ret = null;
         long now = System.currentTimeMillis();
         long ifModifiedSince = request.getDateHeader("If-Modified-Since");
         if(ifModifiedSince != -1 && ifModifiedSince + 1000 > now) {
@@ -418,23 +400,22 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 break;
             case CSS:
                 try {
-                    writeCss(request, response);
+                    writeCss(response.getWriter());
                 } catch (Throwable t) {
                     handleServletException(t, true, context, request, response, true);
                 }
                 break;
             case JS:
                 try {
-                    ret = writeDefinitions(request, response);
-                    response.getWriter().println(ret);
+                    writeDefinitions(response.getWriter());
                 } catch (Throwable t) {
-                    handleServletException(t, true, context, request, response, ret != null);
+                    handleServletException(t, true, context, request, response, true);
                 }
                 break;
             case JSON:
                 try {
                     Aura.getConfigAdapter().validateCSRFToken(csrfToken.get(request));
-                    writeComponents(request, response);
+                    writeComponents(response.getWriter());
                 } catch (Throwable t) {
                     handleServletException(t, true, context, request, response, true);
                 }

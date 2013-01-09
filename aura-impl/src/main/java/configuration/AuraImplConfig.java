@@ -22,14 +22,16 @@ import org.auraframework.impl.adapter.format.css.ThemeDefCSSFormatAdapter;
 import org.auraframework.impl.adapter.format.css.ThrowableCSSFormatAdapter;
 import org.auraframework.impl.adapter.format.html.*;
 import org.auraframework.impl.adapter.format.html.embedded.ApplicationDefEmbeddedHTMLFormatAdapter;
-import org.auraframework.impl.adapter.format.js.*;
+import org.auraframework.impl.adapter.format.html.offline.ApplicationDefOfflineHTMLFormatAdapter;
+import org.auraframework.impl.adapter.format.js.ComponentDefJSFormatAdapter;
+import org.auraframework.impl.adapter.format.js.ThrowableJSFormatAdapter;
 import org.auraframework.impl.adapter.format.json.*;
 import org.auraframework.impl.context.*;
 import org.auraframework.impl.java.type.LocalizedConverter;
 import org.auraframework.impl.java.type.converter.*;
 import org.auraframework.service.*;
-import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
+import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.ServiceLoaderImpl.PrimaryImpl;
 
 /**
@@ -48,6 +50,12 @@ public class AuraImplConfig {
     public static FormatAdapter<?> applicationDefEmbeddedHTMLFormatAdapter(){
         return new ApplicationDefEmbeddedHTMLFormatAdapter();
     }
+
+    @Impl
+    public static FormatAdapter<?> applicationDefOfflineHTMLFormatAdapter(){
+        return new ApplicationDefOfflineHTMLFormatAdapter();
+    }
+
 
     @Impl
     public static FormatAdapter<?> applicationDefHTMLFormatAdapter(){

@@ -13,9 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var p = Json.prototype;
-exp(p,
-    "encode", p.encode,
-    "resolveRefs", p.resolveRefs
-);
+package org.auraframework.impl.adapter.format.html.offline;
+
+import org.auraframework.impl.adapter.format.html.HTMLFormatAdapter;
+
+/**
+ */
+public abstract class OfflineHTMLFormatAdapter<T> extends HTMLFormatAdapter<T>{
+
+    private static final String name = "OFFLINE_HTML";
+
+    @Override
+    public String getFormatName() {
+        return name;
+    }
+}

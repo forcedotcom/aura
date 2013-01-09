@@ -168,7 +168,7 @@ public class IntegrationImpl implements Integration {
     }
     
     private static DefDescriptor<ApplicationDef> getApplicationDescriptor(String securityProviderDescr) {
-    	// DCHASMAN Dynamically construct an extension of aura:integrationServiceApp that uses securityProviderDescr
+    	// DCHASMAN TODO W-1495914 Dynamically construct an extension of aura:integrationServiceApp that uses securityProviderDescr
         DefinitionService definitionService = Aura.getDefinitionService();
         return definitionService.getDefDescriptor("aura:integrationServiceApp", ApplicationDef.class);
     }

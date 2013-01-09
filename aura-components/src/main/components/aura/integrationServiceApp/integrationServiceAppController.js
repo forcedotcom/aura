@@ -15,6 +15,6 @@
  */
 ({
 	addComponent: function(component, event, helper) {
-		$A.clientService.injectComponent(component, event.getParam("config"), event.getParam("placeholderId"), event.getParam("localId"));
+		$A.clientService.injectComponent(event.getParam("config"), event.getParam("placeholderId"), event.getParam("localId"));
 	}
 })

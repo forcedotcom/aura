@@ -16,11 +16,7 @@
 
 -->
 <aura:component extends="auradocs:topicPanel">
-<aura:set attribute="title" value="Accessing Data using Expressions"/>
-
-<p>Most expressions work with values related to the state of your application or the data within it. Aura provides components with easy ways to access data, related code, and other useful things.</p>
-
-<h2>Value Providers</h2>
+<aura:set attribute="title" value="Accessing Data Using Value Providers"/>
 
 <p><em>Value providers</em> are one way to access data. Value providers encapsulate related values together, similarly to how an object encapsulates properties and methods. A number of value providers were introduced in <auradocs:topicLink topic="expressionsExamples">Example Expressions</auradocs:topicLink>, for example, <code>m</code>, <code>v</code>, and <code>c</code>.</p>
 
@@ -50,41 +46,5 @@
 &lt;/aura:component&gt;</auradocs:codeblock>
 
 <p>For deeply nested objects and attributes, continue adding dots to traverse the structure and access the nested values.</p>
-
-<h2>Globals</h2>
-
-<p>In addition to the value providers related to a component, there are global values and methods that a component can use in expressions.</p>
-
-<h3><code>$Label</code></h3>
-
-<p>Label files make it easier to translate and localize your applications by separating messages from source code. <code>$Label</code> makes it easy for you to use label files in your Aura application. Labels are hierarchical, and you access them using dot notation, <code>$Label.&lt;section&gt;.&lt;message_name&gt;</code>. For example, see the Like Button code sample previously shown, where messages are retrieved from labels:</p>
-
-<code><aura:text value="{!"/>$Label.SocialApp.YouAndOthersLike}</code>
-
-<!-- Commenting out because we don't document adapters yet. 
-<p>If your platform already provides an analogous service, you can write an adapter to use <code>$Label</code> with it. See Localizing Your Application with Labels for more details.</p>
--->
-
-<!-- <p>You can dynamically populate values in a label by using placeholders, such as {0} or {1}. For example, the following label uses a placeholder represented by {0}.</p> -->
-<!-- <code><param name="NMembers">{0} Members</param></code> --> 
-<!-- <p>This Aura label component provides the value for this label. The value can be a literal value or an expression. In this example, the Aura component provides the literal value of 5 and the value attribute of the label component specifies the label name.</p> -->  
-<!-- <code><aura:label value="$Label.MobileWebChatter.NMembers">5</aura:label></code> -->
-<!-- <p>The output is: 5 Members</p> -->
-<!-- <p>Multiple placeholders can be specified and are ordered by their index, starting from 0. This is an example with two placeholders.</p> -->
-<!-- <code><param name="NMembers">{0} Members and {1} Guests</param></code> --> 
-<!-- <p>In this second example, the first placeholder is replaced by the literal value of 5 and the second placeholder is replaced by the value of an expression.</p> -->  
-<!-- <code><aura:label value="$Label.MobileWebChatter.NMembers">5 {!m.guests}</aura:label></code> -->
-<!-- <p>The output can look like: 5 Members and 2 Guests</p> -->
-<!-- <p>The Aura label component can include multiple parameters. You can use multiple parameters using the following syntax.</p> -->
-<!-- <code><aura:label value="{!$Label.section.param}">{!param0}{!param1}...</aura:label></code> -->
-<!-- <p>Aura parses and replaces each expression in the body.</p> -->
-
-<h3><code>globalID</code></h3>
-
-<p>A globally unique identifier you can use to find and access a component. See <auradocs:topicLink topic="findById">Finding Components by ID</auradocs:topicLink> for more details. </p>
-
-<h3><code>$Browser</code></h3>
-
-<p>This is a reserved global variable, which in the future will provide various details regarding the capabilities of the user agent accessing the application.</p>
 
 </aura:component>

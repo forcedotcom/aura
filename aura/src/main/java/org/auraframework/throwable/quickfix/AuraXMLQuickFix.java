@@ -89,7 +89,7 @@ public abstract class AuraXMLQuickFix extends AuraQuickFix {
         XMLInputFactory xmlInF = XMLInputFactory.newInstance();
         xmlInF.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
         XMLOutputFactory xmlOutF = XMLOutputFactory.newInstance();
-        XMLEventReader reader = xmlInF.createXMLEventReader(source.getReader());
+        XMLEventReader reader = xmlInF.createXMLEventReader(source.getHashingReader());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         XMLEventWriter writer = xmlOutF.createXMLEventWriter(baos);
         XMLEventFactory eventFactory = XMLEventFactory.newInstance();

@@ -15,10 +15,16 @@
  */
 package org.auraframework.system;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -37,11 +43,81 @@ public abstract class Source<D extends Definition> implements Serializable {
     private final String systemId;
     private final Format format;
     private final DefDescriptor<D> descriptor;
+    private final Hash hash;
+
+    /**
+     * A {@link Reader} that, on completion will update the containing
+     * {@link Sou\ rce} with {@link ChangeInfo}. This provides a read-once
+     * method to both parse and hash the contents.
+     */
+    public class HashingReader extends Reader {
+
+        private final Reader reader;
+        private MessageDigest digest;
+        private final Charset utf8;
+        private boolean hadError;
+
+        public HashingReader(Reader reader) {
+            this.reader = reader;
+            try {
+                digest = MessageDigest.getInstance("MD5");
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException("MD5 is a required MessageDigest algorithm, but is not registered here.");
+            }
+            utf8 = Charset.forName("UTF-8");
+        }
+
+        @Override
+        public void close() throws IOException {
+            if (digest != null) {
+                setChangeInfo();
+            }
+            reader.close();
+        }
+
+        @Override
+        public int read(char[] cbuf, int off, int len) throws IOException {
+            try {
+                int result = reader.read(cbuf, off, len);
+                if (result > 0) {
+                    ByteBuffer bytes = utf8.encode(CharBuffer.wrap(cbuf, off, len));
+                    digest.update(bytes);
+                } else if (result < 0) {
+                    setChangeInfo();
+                }
+                return result;
+            } catch (IOException e) {
+                // Ensure we don't make a (probably wrong) hash from bad
+                // content.
+                // We'll probably be running away anyway, but it's easy to be
+                // sure.
+                hadError = true;
+                throw e;
+            }
+        }
+
+        private void setChangeInfo() {
+            if (!hadError) {
+                synchronized (hash) {
+                    // Multi-threading guard: if we have multiple readers for a
+                    // single Source, only one needs to set the hash. Note that
+                    // the parallel reads is probably a bad idea anyway, but it
+                    // shouldn't be a fatal one!
+                    if (!hash.isSet()) {
+                        hash.setHash(digest.digest());
+                    }
+                }
+                digest = null; // We're done; ensure we can't try to set it
+                               // again.
+            }
+        }
+    }
 
     protected Source(DefDescriptor<D> descriptor, String systemId, Format format) {
         this.systemId = systemId;
         this.format = format;
         this.descriptor = descriptor;
+        this.hash = new Hash();
     }
 
     /**
@@ -63,9 +139,32 @@ public abstract class Source<D extends Definition> implements Serializable {
         return format;
     }
 
+    /**
+     * Gets a {@link Reader} for this source, typically as the underlying reader
+     * to {@link #getHashingReader()}. Most callers want that method instead,
+     * which ensures that characters are used to construct a fingerprint as they
+     * are read; this should someday become protected.
+     * 
+     * @return
+     */
+    // FIXME(fabbott): make moving this to protected not break SFDC, then move
+    // it to protected.
     public abstract Reader getReader();
 
     public abstract Writer getWriter();
+
+    public Hash getHash() {
+        return hash;
+    }
+
+    public final Reader getHashingReader() {
+        if (hash.isSet()) {
+            // We don't need to re-hash after we've set our source. Actually,
+            // we should never need to re-read, but today we do.
+            return getReader();
+        }
+        return new HashingReader(getReader());
+    }
 
     /**
      * Gets an absolute URL to the given source, typically with one of

@@ -18,6 +18,7 @@ package org.auraframework.def;
 import java.io.Serializable;
 import java.util.Set;
 
+import org.auraframework.system.Hash;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -108,4 +109,12 @@ public interface Definition extends JsonSerializable, Serializable {
      * Get a readable description of this definition.
      */
     String getDescription();
+
+    /**
+     * Fetches a non-recursive hash for this definition's contents. This does
+     * not incorporate hash of dependent definitions, which are generally
+     * contxt-dependent (in that providers may give different users different
+     * dependencies for the same parent definition).
+     */
+    Hash getOwnHash();
 }

@@ -22,6 +22,7 @@ import java.util.Set;
 import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.system.Hash;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -80,6 +81,11 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     @Override
     public String getName() {
         return descriptor == null ? getClass().getName() : descriptor.getName();
+    }
+
+    @Override
+    public Hash getOwnHash() {
+        return location.getHash();
     }
 
     /**

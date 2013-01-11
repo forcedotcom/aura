@@ -97,6 +97,11 @@ public class JavaModelTest extends AuraImplTestCase {
         public boolean exists() {
             return false;
         }
+
+        @Override
+        public int compareTo(DefDescriptor other) {
+            return DefDescriptorImpl.compare(this, other);
+        }
     };
 
     public JavaModelTest(String name) {

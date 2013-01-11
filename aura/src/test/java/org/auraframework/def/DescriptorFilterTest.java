@@ -341,6 +341,13 @@ public class DescriptorFilterTest extends UnitTestCase {
         public String toString() {
             return this.prefix + "://" + this.namespace + ":" + this.name + "(" + this.defType.toString() + ")";
         }
+
+        @Override
+        public int compareTo(DefDescriptor other) {
+            // Can't use the helper on DefDescriptorImpl in this non-impl test
+            // package...
+            return getQualifiedName().compareToIgnoreCase(other.getQualifiedName());
+        }
     }
 
     public void testDescriptor() {

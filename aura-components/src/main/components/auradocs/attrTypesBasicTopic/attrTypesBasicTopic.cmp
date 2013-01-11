@@ -33,7 +33,7 @@
             <tr>
                 <td><code>Boolean</code></td>
                 <td><code>&lt;aura:attribute name="showDetail" type="Boolean" /&gt;</code></td>
-                <td>Valid values are <code>true</code> or <code>false</code>. To set a default value of <code>true</code>, add <code>default="<aura:text value="{!"/>true}"</code>. Note that <code><aura:text value="{!"/>true}</code> evaluates as an expression and should not be confused with the <code>!</code> (NOT) logical operator.</td>
+                <td>Valid values are <code>true</code> or <code>false</code>. To set a default value of <code>true</code>, add <code>default="true"</code>.</td>
             </tr>
 
             <tr>

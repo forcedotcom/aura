@@ -29,10 +29,6 @@ import org.auraframework.util.json.JsonSerializable;
  * dependencies, descriptors are comparable by their qualified name
  * (case-insensitively).
  * 
- * The actually definition itself can be retrieved (and compiled if necessary)
- * by this descriptor from the definition registry in the current Aura context:
- * {@code Aura.getContextService().currentContext().getDefRegistry().getDef(dd)}
- * 
  * @param <T> the more specific subtype of definition being described, e.g.
  *            {@link ComponentDef}, {@link EventDef}, etc.
  */
@@ -150,6 +146,9 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable, S
     DefType getDefType();
 
     /**
+     * Gets the actual definition described by this descriptor, compiling it if
+     * necessary, from Aura's definition service.
+     * 
      * @return the definition (compiles it if necessary)
      * @throws QuickFixException if the definition is not found
      */

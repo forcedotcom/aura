@@ -172,4 +172,14 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
     public boolean exists() {
         throw new AuraError("cannot check existence of a subdef as it requires compiling the parent def");
     }
+
+    /**
+     * Compares one {@link DefDescriptor} to another. Sorting uses (only) the
+     * qualified name, case insensitively. Per {@link Comparable}'s spec, throws
+     * {@link ClassCastException} if {@code arg} is not a {@code DefDescriptor}.
+     */
+    @Override
+    public int compareTo(DefDescriptor other) {
+        return DefDescriptorImpl.compare(this, other);
+    }
 }

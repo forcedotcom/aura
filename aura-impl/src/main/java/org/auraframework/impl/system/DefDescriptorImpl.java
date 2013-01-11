@@ -392,7 +392,16 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
      */
     @Override
     public int compareTo(DefDescriptor other) {
-        return (getQualifiedName().compareToIgnoreCase(other.getQualifiedName()));
+        return compare(this, other);
     }
 
+    /**
+     * Helper method for various {@link DefDescriptor} subclasses to implement
+     * {@link #compareTo(DefDescriptor)}, since interfaces aren't allowed to
+     * have static methods, and since {@code DefDescriptor} is an interface
+     * rather than an abstract class.
+     */
+    public static int compare(DefDescriptor dd1, DefDescriptor dd2) {
+        return dd1.getQualifiedName().compareToIgnoreCase(dd2.getQualifiedName());
+    }
 }

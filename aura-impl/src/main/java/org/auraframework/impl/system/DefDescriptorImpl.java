@@ -16,7 +16,6 @@
 package org.auraframework.impl.system;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,7 +36,7 @@ import com.google.common.cache.CacheBuilder;
 
 /**
  */
-public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>, Serializable {
+public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T> {
     private static final long serialVersionUID = 3030118554156737974L;
     protected final String namespace;
     protected final String name;
@@ -384,6 +383,16 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     @Override
     public boolean exists() {
         return Aura.getContextService().getCurrentContext().getDefRegistry().exists(this);
+    }
+
+    /**
+     * Compares one {@link DefDescriptor} to another. Sorting uses (only) the
+     * qualified name, case insensitively. Per {@link Comparable}'s spec, throws
+     * {@link ClassCastException} if {@code arg} is not a {@code DefDescriptor}.
+     */
+    @Override
+    public int compareTo(DefDescriptor other) {
+        return (getQualifiedName().compareToIgnoreCase(other.getQualifiedName()));
     }
 
 }

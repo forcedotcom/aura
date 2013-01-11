@@ -22,7 +22,7 @@ import java.io.Serializable;
  * column number. The "filename" will in most useful cases be an actual
  * filename, but may also be a jar URL (formatted as "jar://<em>filename</em>!
  * <em>interiorFile</em>" or a synthetic URL for string sources (formatted as,
- * for example, "markup://string:<em>name</em>").
+ * for example, "markup://string: <em>name</em>").
  */
 public class Location implements Serializable {
 
@@ -31,30 +31,49 @@ public class Location implements Serializable {
     private final int line;
     private final String fileName;
     private final long lastModified;
+    private final Hash hash;
 
     /**
      * Set {@code null} if not a cached resource, or to a cache file.
      */
     private final String cacheFile;
 
-    public Location(String fileName, int line, int column, long lastModified, String cacheFile) {
+    public Location(Source source) {
+        this(source, -1, -1, null);
+    }
+
+    public Location(Source source, int line, int column, String cacheFile) {
+        this.fileName = source.getSystemId();
+        this.lastModified = source.getLastModified();
+        this.hash = source.getHash();
+        this.line = line;
+        this.column = column;
+        this.cacheFile = cacheFile;
+    }
+
+    public Location(String fileName, int line, int column, long lastModified, String cacheFile, Hash hash) {
         this.fileName = fileName;
         this.line = line;
         this.column = column;
         this.lastModified = lastModified;
         this.cacheFile = cacheFile;
+        this.hash = hash;
     }
 
     public Location(String fileName, int line, int column, long lastModified) {
-        this(fileName, line, column, lastModified, null);
+        this(fileName, line, column, lastModified, null, null);
     }
 
     public Location(String fileName, long lastModified) {
-        this(fileName, -1, -1, lastModified, null);
+        this(fileName, -1, -1, lastModified, null, null);
     }
 
     public String getFileName() {
         return fileName;
+    }
+
+    public Hash getHash() {
+        return hash;
     }
 
     public int getLine() {

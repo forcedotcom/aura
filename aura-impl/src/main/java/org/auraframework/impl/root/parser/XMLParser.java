@@ -68,7 +68,7 @@ public class XMLParser implements Parser {
 
         D ret = null;
         try {
-            reader = new HTMLReader(source.getReader());
+            reader = new HTMLReader(source.getHashingReader());
 
             xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), reader);
             // need to skip junk above the start that is ok
@@ -176,7 +176,7 @@ public class XMLParser implements Parser {
             }
             URL cacheUrl = source.getCacheUrl();
             return new Location(location, xmlLocation.getLineNumber() - 1, xmlLocation.getColumnNumber(),
-                    source.getLastModified(), cacheUrl == null ? null : cacheUrl.toString());
+                    source.getLastModified(), cacheUrl == null ? null : cacheUrl.toString(), source.getHash());
         } else if (source != null) {
             return new Location(source.getSystemId(), source.getLastModified());
         }

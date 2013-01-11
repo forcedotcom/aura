@@ -63,7 +63,6 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
     @Override
     public EventHandlerDefImpl getElement() throws XMLStreamException, QuickFixException {
         builder.setParentDescriptor(parentHandler.getDefDescriptor());
-
         builder.setLocation(getLocation());
 
         String event = getAttributeValue(ATTRIBUTE_EVENT);

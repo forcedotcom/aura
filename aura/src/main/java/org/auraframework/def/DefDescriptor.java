@@ -23,7 +23,16 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
 
-public interface DefDescriptor<T extends Definition> extends JsonSerializable, Serializable {
+/**
+ * A descriptor "handle" for a definition. For applications which care about
+ * sorting, such as generating a unique hash from an application and all its
+ * dependencies, descriptors are comparable by their qualified name
+ * (case-insensitively).
+ * 
+ * @param <T> the more specific subtype of definition being described, e.g.
+ *            {@link ComponentDef}, {@link EventDef}, etc.
+ */
+public interface DefDescriptor<T extends Definition> extends JsonSerializable, Serializable, Comparable<DefDescriptor> {
 
     public static final String MARKUP_PREFIX = "markup";
     public static final String CSS_PREFIX = "css";
@@ -137,6 +146,9 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable, S
     DefType getDefType();
 
     /**
+     * Gets the actual definition described by this descriptor, compiling it if
+     * necessary, from Aura's definition service.
+     * 
      * @return the definition (compiles it if necessary)
      * @throws QuickFixException if the definition is not found
      */

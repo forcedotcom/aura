@@ -40,12 +40,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
 
-/**
- */
 public class ServerServiceImpl implements ServerService {
 
-    /**
-     */
     private static final long serialVersionUID = -2779745160285710414L;
     private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(30);
 

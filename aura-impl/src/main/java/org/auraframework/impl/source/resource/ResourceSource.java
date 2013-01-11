@@ -101,7 +101,7 @@ public class ResourceSource<D extends Definition> extends Source<D> {
     public String getContents() {
         try {
             StringWriter sw = new StringWriter();
-            IOUtil.copyStream(getReader(), sw);
+            IOUtil.copyStream(getHashingReader(), sw);
             return sw.toString();
         } catch (IOException e) {
             throw new AuraRuntimeException(e);

@@ -60,7 +60,7 @@ public class ContainerTagHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<ComponentDef>(desc, markup, "myID", Format.XML);
         xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());
+        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
         xmlReader.next();
         // Assume we found the markup in a component, create a
         // ComponentDefHandler to represent that

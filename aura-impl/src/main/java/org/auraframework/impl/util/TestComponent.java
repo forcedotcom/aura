@@ -37,6 +37,7 @@ import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.system.Hash;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -303,4 +304,8 @@ public final class TestComponent implements ComponentDef {
         return null;
     }
 
+    @Override
+    public Hash getOwnHash() {
+        return null;
+    }
 }

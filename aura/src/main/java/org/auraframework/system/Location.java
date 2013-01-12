@@ -17,6 +17,8 @@ package org.auraframework.system;
 
 import java.io.Serializable;
 
+import org.auraframework.util.text.Hash;
+
 /**
  * Information about a location in source code, including filename, line, and
  * column number. The "filename" will in most useful cases be an actual

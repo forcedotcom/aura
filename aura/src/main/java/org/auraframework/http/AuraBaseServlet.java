@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -49,8 +50,20 @@ import org.auraframework.util.json.Json;
 public abstract class AuraBaseServlet extends HttpServlet {
     public static final String AURA_PREFIX = "aura.";
     public static final String CSRF_PROTECT = "while(1);\n";
+
+    /**
+     * "Short" pages (such as manifest cookies and AuraFrameworkServlet pages)
+     * expire in 1 day.
+     */
     public static final long SHORT_EXPIRE_SECONDS = 24L * 60 * 60;
     public static final long SHORT_EXPIRE = SHORT_EXPIRE_SECONDS * 1000;
+
+    /**
+     * "Long" pages (such as resources and cached HTML templates) expire in 45
+     * days. We also use this to "pre-expire" no-cache pages, setting their
+     * expiration a month and a half into the past for user agents that don't
+     * understand Cache-Control: no-cache.
+     */
     public static final long LONG_EXPIRE = 45 * SHORT_EXPIRE;
     public static final String UTF_ENCODING = "UTF-8";
     public static final String HTML_CONTENT_TYPE = "text/html";
@@ -420,7 +433,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 lastModMap.put(app.getQualifiedName(), Long.valueOf(appLastMod));
             }
         }
-
+        // fka3: this stuff goes away
         preloads = new ArrayList<String>(context.getPreloads());
 
         if (preloads.size() > 0) {
@@ -437,6 +450,9 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 lastModMap.put(preloadsName, Long.valueOf(preloadsLastMod));
             }
         }
+        // fka3: this stuff needs to be hashed also, either as an app dependency
+        // or by adding it to the app hash here, probably as a separate item so
+        // we still get the "clean" app hash to lookup in Gordon's MDR table.
         long lastMod = Aura.getConfigAdapter().getAuraJSLastMod();
         if (appLastMod > lastMod) {
             lastMod = appLastMod;

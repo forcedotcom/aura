@@ -18,11 +18,11 @@ package org.auraframework.def;
 import java.io.Serializable;
 import java.util.Set;
 
-import org.auraframework.system.Hash;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
+import org.auraframework.util.text.Hash;
 
 /**
  * Define something.

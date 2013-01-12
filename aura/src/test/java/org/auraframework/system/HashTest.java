@@ -18,6 +18,7 @@ package org.auraframework.system;
 import java.io.StringReader;
 
 import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.text.Hash;
 
 public class HashTest extends UnitTestCase {
 
@@ -36,7 +37,7 @@ public class HashTest extends UnitTestCase {
         assertTrue(hash.isSet());
         assertEquals(new Hash(bytes), hash);
     }
-    
+
     public void testFromBytes() {
         byte[] bytes1 = { 12, 34, 56, 78, 90 };
         byte[] bytes2 = { 12, 43, 56, 78, 90 };
@@ -47,8 +48,8 @@ public class HashTest extends UnitTestCase {
         assertFalse(hash1.equals(hash2));
         assertFalse(hash2.equals(hash1));
     }
-    
-    public void testFromBytecode() {
+
+    public void testFromBytecode() throws Exception {
         Hash hash = new Hash(HashTest.class.getName());
         assertTrue(hash.isSet());
     }
@@ -88,7 +89,7 @@ public class HashTest extends UnitTestCase {
         Hash hash1 = new Hash(bytes1);
         Hash hash2 = new Hash(bytes2);
         Hash hash3 = new Hash(bytes1);
-        
+
         assertEquals(hash1, hash3);
         assertEquals(hash1.hashCode(), hash3.hashCode());
         assertFalse(hash1.equals(hash2));

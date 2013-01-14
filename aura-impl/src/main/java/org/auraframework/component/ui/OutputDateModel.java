@@ -15,6 +15,10 @@
  */
 package org.auraframework.component.ui;
 
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import org.auraframework.Aura;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.LocalizationService;
@@ -26,10 +30,6 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
 
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
-
 /**
  * A Aura model that backs the ui:outputDate Aura component.
  */
@@ -39,7 +39,7 @@ public class OutputDateModel {
     @AuraEnabled
     public String getText() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        BaseComponent<?,?> component = context.getCurrentComponent();
+        BaseComponent<?, ?> component = context.getCurrentComponent();
 
         Date date;
         try {
@@ -47,27 +47,28 @@ public class OutputDateModel {
             if (valueObj == null) {
                 return "";
             }
-            date = (Date)valueObj;
+            date = (Date) valueObj;
         } catch (NumberFormatException e) {
-            // Handles the case where converting a literal "value" attribute long (milliseconds) value fails
+            // Handles the case where converting a literal "value" attribute
+            // long (milliseconds) value fails
             return "Value must be a value in milliseconds or bound to a java.util.Date model value";
         } catch (ClassCastException e) {
             return "Value must be bound to a model value that resolves to a java.util.Date";
         }
 
         TimeZone tz = null;
-        String timezoneAttr = (String)component.getAttributes().getValue("timezone");
+        String timezoneAttr = (String) component.getAttributes().getValue("timezone");
         if (timezoneAttr != null) {
             tz = TimeZone.getTimeZone(timezoneAttr);
         }
         // should this be made accessible in the component?
         Locale loc = null;
 
-        String format = (String)component.getAttributes().getValue("format");
+        String format = (String) component.getAttributes().getValue("format");
         LocalizationService lclService = Aura.getLocalizationService();
 
-        if (format==null) {
-            String dateStyle = (String)component.getAttributes().getValue("dateStyle");
+        if (format == null) {
+            String dateStyle = (String) component.getAttributes().getValue("dateStyle");
             DateService dateService = DateServiceImpl.get();
             int intDateStyle = dateService.getStyle(dateStyle);
             return lclService.formatDate(date, loc, tz, intDateStyle);

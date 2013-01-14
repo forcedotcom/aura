@@ -24,13 +24,13 @@ import org.auraframework.system.Annotations.Provider;
 
 /**
  * Returns component that extends test_Provider_AbstractBasic component
- *
- *
+ * 
+ * 
  * @since 138
  */
 @Provider
 public class TestProviderAbstractBasic {
-    public static DefDescriptor<ComponentDef> provide(){
+    public static DefDescriptor<ComponentDef> provide() {
         return DefDescriptorImpl.getInstance("test:test_Provider_AbstractBasicExtends", ComponentDef.class);
     }
 }

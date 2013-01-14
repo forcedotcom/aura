@@ -26,24 +26,25 @@ import org.auraframework.util.type.CustomPairType;
 
 /**
  * Unit test for using custom java data types for attribute values.
- *
- * A new data type can be introduced by creating a java class to represent the data.
- * Attributes of this type can be declared like to
- * <aura:attribute name="xyz" type="java://org.auraframework.util.type.CustomPairType" default="abc"/>
- *
+ * 
+ * A new data type can be introduced by creating a java class to represent the
+ * data. Attributes of this type can be declared like to <aura:attribute
+ * name="xyz" type="java://org.auraframework.util.type.CustomPairType"
+ * default="abc"/>
+ * 
  * @since 0.0.248
  */
 public class CustomDataTypeTest extends AuraImplTestCase {
-    public CustomDataTypeTest(String name){
+    public CustomDataTypeTest(String name) {
         super(name);
     }
 
-    public void testCustomDataTypeConversion() throws Exception{
+    public void testCustomDataTypeConversion() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
-                ComponentDef.class, 
+                ComponentDef.class,
                 String.format(baseComponentTag, "",
-                "<aura:attribute name='pairAttr' type='java://org.auraframework.util.type.CustomPairType' default='HouseNo$300'/>"));
-            Component cmp = Aura.getInstanceService().getInstance(cmpDesc);
+                        "<aura:attribute name='pairAttr' type='java://org.auraframework.util.type.CustomPairType' default='HouseNo$300'/>"));
+        Component cmp = Aura.getInstanceService().getInstance(cmpDesc);
         assertEquals("Failed to convert attribute default value to custom data type object.", new CustomPairType(
                 "HouseNo", 300), cmp.getValue(new PropertyReferenceImpl("v.pairAttr", AuraUtil
                 .getExternalLocation("direct attributeset access"))));

@@ -23,8 +23,8 @@ import org.auraframework.system.AuraContext.Format;
 
 /**
  * Shared stuff for the child tests.
- *
- *
+ * 
+ * 
  * @since 0.0.224
  */
 public abstract class BaseComponentDefHTMLFormatAdapterTest<T extends Definition> extends AuraImplTestCase {

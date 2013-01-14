@@ -24,23 +24,26 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.context.AuraContextImpl;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.util.json.JsonSerializationContext;
 
 /**
  */
-public class ContextAdapterImpl implements ContextAdapter{
+public class ContextAdapterImpl implements ContextAdapter {
 
     private static ThreadLocal<AuraContext> currentContext = new ThreadLocal<AuraContext>();
 
     @Override
     public AuraContext establish(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Access access, JsonSerializationContext jsonContext,
-            Map<ValueProviderType, GlobalValueProvider> globalProviders, DefDescriptor<? extends BaseComponentDef> appDesc) {
-        AuraContext context = new AuraContextImpl(mode, masterRegistry, defaultPrefixes, format, access, jsonContext, globalProviders, appDesc);
+            Map<ValueProviderType, GlobalValueProvider> globalProviders,
+            DefDescriptor<? extends BaseComponentDef> appDesc) {
+        AuraContext context = new AuraContextImpl(mode, masterRegistry, defaultPrefixes, format, access, jsonContext,
+                globalProviders, appDesc);
         currentContext.set(context);
         return context;
     }

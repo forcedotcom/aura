@@ -20,14 +20,15 @@ import java.util.Map;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.instance.Component;
+import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.Annotations.AuraEnabled;
 
 @Controller
 public class TestController {
     @AuraEnabled
-    public static Component getNamedComponent(@Key("componentName") String componentName, @Key("attributes") Map<String,Object> attributes) throws Exception {
+    public static Component getNamedComponent(@Key("componentName") String componentName,
+            @Key("attributes") Map<String, Object> attributes) throws Exception {
         return Aura.getInstanceService().getInstance(componentName, ComponentDef.class, attributes);
     }
 }

@@ -19,10 +19,10 @@ package org.auraframework.impl.admin;
 
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.system.MasterDefRegistryImpl;
-import org.auraframework.system.DefRegistry;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Controller;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.DefRegistry;
 
 /**
  * @since 0.0.177

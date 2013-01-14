@@ -17,7 +17,14 @@ package org.auraframework.impl.java.securityProvider;
 
 import org.auraframework.Aura;
 import org.auraframework.components.DefaultSecurityProvider;
-import org.auraframework.components.security.*;
+import org.auraframework.components.security.SecurityProviderCompatibility;
+import org.auraframework.components.security.SecurityProviderThrowsThrowable;
+import org.auraframework.components.security.SecurityProviderWithConstructorArgs;
+import org.auraframework.components.security.SecurityProviderWithPrivateConst;
+import org.auraframework.components.security.SecurityProviderWithoutAnnotation;
+import org.auraframework.components.security.SecurityProviderWithoutIfc;
+import org.auraframework.components.security.SecurityProviderWithoutMethodName;
+import org.auraframework.components.security.SecurityProviderWithoutStaticMethod;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.SecurityProviderDef;
 import org.auraframework.test.AuraTestCase;
@@ -69,8 +76,8 @@ public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
      */
     public void testGetSecurityProviderDefWithoutAnnotation() throws Exception {
         assertException(SecurityProviderWithoutAnnotation.class.getName(),
-                        "SecurityProviders must implement the SecurityProvider interface",
-                        SecurityProviderWithoutAnnotation.class.getName());
+                "SecurityProviders must implement the SecurityProvider interface",
+                SecurityProviderWithoutAnnotation.class.getName());
     }
 
     /**
@@ -80,10 +87,9 @@ public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
         SecurityProviderDef compat = getSecurityProviderDef(SecurityProviderCompatibility.class.getName());
 
         assertFalse(compat.isAllowed(null));
-        assertTrue(compat.isAllowed(Aura.getDefinitionService().getDefDescriptor("auratest:html",
-                                                                                  ComponentDef.class)));
+        assertTrue(compat.isAllowed(Aura.getDefinitionService().getDefDescriptor("auratest:html", ComponentDef.class)));
         assertFalse(compat.isAllowed(Aura.getDefinitionService().getDefDescriptor("uitest:butttonteest",
-                                                                                   ComponentDef.class)));
+                ComponentDef.class)));
     }
 
     /**
@@ -91,8 +97,8 @@ public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
      */
     public void testGetSecurityProviderDefWithoutStaticMethod() throws Exception {
         assertException(SecurityProviderWithoutStaticMethod.class.getName(),
-                        "SecurityProviders must implement the SecurityProvider interface",
-                        SecurityProviderWithoutStaticMethod.class.getName());
+                "SecurityProviders must implement the SecurityProvider interface",
+                SecurityProviderWithoutStaticMethod.class.getName());
     }
 
     /**
@@ -100,8 +106,8 @@ public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
      */
     public void testGetSecurityProviderDefWithoutMethodName() {
         assertException(SecurityProviderWithoutMethodName.class.getName(),
-                        "SecurityProviders must implement the SecurityProvider interface",
-                        SecurityProviderWithoutMethodName.class.getName());
+                "SecurityProviders must implement the SecurityProvider interface",
+                SecurityProviderWithoutMethodName.class.getName());
     }
 
     /**
@@ -109,26 +115,25 @@ public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
      */
     public void testGetSecurityProviderDefWithoutIfc() {
         assertException(SecurityProviderWithoutIfc.class.getName(),
-                        "SecurityProviders must implement the SecurityProvider interface",
-                        SecurityProviderWithoutIfc.class.getName());
+                "SecurityProviders must implement the SecurityProvider interface",
+                SecurityProviderWithoutIfc.class.getName());
     }
 
     /**
      * getDef with descriptor for a class with private constructor.
      */
     public void testGetSecurityProviderDefWithPrivateConst() {
-        assertException(SecurityProviderWithPrivateConst.class.getName(),
-                        "Constructor is inaccessible for "+SecurityProviderWithPrivateConst.class.getName(),
-                        SecurityProviderWithPrivateConst.class.getName());
+        assertException(SecurityProviderWithPrivateConst.class.getName(), "Constructor is inaccessible for "
+                + SecurityProviderWithPrivateConst.class.getName(), SecurityProviderWithPrivateConst.class.getName());
     }
 
     /**
      * getDef with descriptor for a class with arguments to constructor.
      */
     public void testGetSecurityProviderDefWithConstructorArgs() {
-        assertException(SecurityProviderWithConstructorArgs.class.getName(),
-                        "Cannot instantiate "+SecurityProviderWithConstructorArgs.class.getName(),
-                        SecurityProviderWithConstructorArgs.class.getName());
+        assertException(SecurityProviderWithConstructorArgs.class.getName(), "Cannot instantiate "
+                + SecurityProviderWithConstructorArgs.class.getName(),
+                SecurityProviderWithConstructorArgs.class.getName());
     }
 
     public void testSecurityProviderThrowsThrowable() throws Exception {

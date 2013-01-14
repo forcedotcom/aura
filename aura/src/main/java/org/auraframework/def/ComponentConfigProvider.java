@@ -16,19 +16,18 @@
 package org.auraframework.def;
 
 import org.auraframework.instance.ComponentConfig;
-
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * An interface for a component config provider.
- *
- * This provider provides a component config, which means that it can set
- * both the descriptor and attributes.
- *
- * Note that this interface is instantiated as a singleton, no state should
- * be held on the class. It also needs to have a no-arg constructor.
- *
- *
+ * 
+ * This provider provides a component config, which means that it can set both
+ * the descriptor and attributes.
+ * 
+ * Note that this interface is instantiated as a singleton, no state should be
+ * held on the class. It also needs to have a no-arg constructor.
+ * 
+ * 
  * @since 0.0.184
  */
 public interface ComponentConfigProvider extends Provider {

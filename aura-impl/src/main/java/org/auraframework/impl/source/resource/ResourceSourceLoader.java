@@ -15,24 +15,29 @@
  */
 package org.auraframework.impl.source.resource;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.source.BaseSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
-
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.util.IOUtil;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.IOUtil;
 import org.auraframework.util.resource.ResourceLoader;
 
 import com.google.common.collect.Maps;
@@ -76,19 +81,18 @@ public class ResourceSourceLoader extends BaseSourceLoader {
                         String name = matcher.group(1);
 
                         DefType defType = byExtension.get(matcher.group(2));
-                        if(defType == null){
+                        if (defType == null) {
                             Matcher testSuiteMatcher = testSuitePattern.matcher(matcher.group(0));
-                            if(testSuiteMatcher.find()){
+                            if (testSuiteMatcher.find()) {
                                 defType = byExtension.get(testSuiteMatcher.group(2));
                                 name = testSuiteMatcher.group(1);
                             }
                         }
                         if (defType == DefType.STYLE) {
                             name = "css://" + AuraTextUtil.replaceChar(name, ':', ".");
-                        }else if(defType == DefType.TESTSUITE){
+                        } else if (defType == DefType.TESTSUITE) {
                             name = "js://" + AuraTextUtil.replaceChar(name, ':', ".");
-                        }
-                        else {
+                        } else {
                             name = "markup://" + name;
                         }
 
@@ -116,15 +120,14 @@ public class ResourceSourceLoader extends BaseSourceLoader {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Definition> Set<DefDescriptor<T>> find(Class<T> primaryInterface, String prefix,
-            String namespace) {
+    public <T extends Definition> Set<DefDescriptor<T>> find(Class<T> primaryInterface, String prefix, String namespace) {
 
         IndexKey key = new IndexKey(DefType.getDefType(primaryInterface), namespace);
         Set<DefDescriptor<T>> ret = Sets.newHashSet();
         Set<DefDescriptor<?>> values = index.get(key);
         if (values != null) {
             for (DefDescriptor<?> desc : values) {
-                ret.add((DefDescriptor<T>)desc);
+                ret.add((DefDescriptor<T>) desc);
             }
         }
         return ret;
@@ -156,7 +159,7 @@ public class ResourceSourceLoader extends BaseSourceLoader {
         Source<D> ret = new ResourceSource<D>(descriptor, resourcePrefix + "/" + getPath(descriptor), Format.XML);
         if (!ret.exists()) {
             @SuppressWarnings("unchecked")
-            Set<DefDescriptor<D>> all = find((Class<D>)descriptor.getDefType().getPrimaryInterface(),
+            Set<DefDescriptor<D>> all = find((Class<D>) descriptor.getDefType().getPrimaryInterface(),
                     descriptor.getPrefix(), descriptor.getNamespace());
             for (DefDescriptor<D> candidate : all) {
                 if (candidate.equals(descriptor)) {
@@ -186,7 +189,7 @@ public class ResourceSourceLoader extends BaseSourceLoader {
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof IndexKey) {
-                IndexKey k = (IndexKey)obj;
+                IndexKey k = (IndexKey) obj;
                 return k.defType.equals(defType) && namespace.equalsIgnoreCase(k.namespace);
             }
             return false;

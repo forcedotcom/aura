@@ -23,16 +23,19 @@ import org.auraframework.system.AuraContext.Mode;
  * Service for constructing an instance of a {@link Integration}
  * </p>
  * <p>
- * An Integration defines the scope of creating a set of component injection scripts
+ * An Integration defines the scope of creating a set of component injection
+ * scripts
  * </p>
  */
 public interface IntegrationService extends AuraService {
-	/**
-	 * Create an Integration object that represents a set of components that will be injected into a non-Aura container
-	 * @param securityProviderDescr
-	 * @param contextPath
-	 * @param mode
-	 * @return
-	 */
-	Integration createIntegration(String securityProviderDescr, String contextPath, Mode mode);
+    /**
+     * Create an Integration object that represents a set of components that
+     * will be injected into a non-Aura container
+     * 
+     * @param securityProviderDescr
+     * @param contextPath
+     * @param mode
+     * @return
+     */
+    Integration createIntegration(String securityProviderDescr, String contextPath, Mode mode);
 }

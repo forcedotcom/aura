@@ -23,14 +23,14 @@ import java.util.Map;
 
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-
-
 /**
- * Note: Aura reuses a single instance of FormatAdapter implementations. It is necessary to make sure all
- *       implementations of FormatAdapter are thread safe. All implementations should be annotated as
- *       {@link javax.annotation.concurrent.ThreadSafe ThreadSafe} to make sure future modifications are aware of this requirement.
+ * Note: Aura reuses a single instance of FormatAdapter implementations. It is
+ * necessary to make sure all implementations of FormatAdapter are thread safe.
+ * All implementations should be annotated as
+ * {@link javax.annotation.concurrent.ThreadSafe ThreadSafe} to make sure future
+ * modifications are aware of this requirement.
  */
-public interface FormatAdapter<T> extends AuraAdapter{
+public interface FormatAdapter<T> extends AuraAdapter {
     String getFormatName();
 
     Class<?> getType();
@@ -41,7 +41,8 @@ public interface FormatAdapter<T> extends AuraAdapter{
 
     void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException, QuickFixException;
 
-    void writeBinary(Object value, Map<String, Object> attributes, OutputStream out) throws IOException, QuickFixException;
+    void writeBinary(Object value, Map<String, Object> attributes, OutputStream out) throws IOException,
+            QuickFixException;
 
     void writeCollection(Collection<? extends T> values, Appendable out) throws IOException, QuickFixException;
 }

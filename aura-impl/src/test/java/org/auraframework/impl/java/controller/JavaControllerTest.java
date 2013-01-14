@@ -38,7 +38,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
  * @priority high
  */
 public class JavaControllerTest extends AuraImplTestCase {
-    public JavaControllerTest(String name){
+    public JavaControllerTest(String name) {
         super(name);
     }
 
@@ -52,7 +52,7 @@ public class JavaControllerTest extends AuraImplTestCase {
 
         try {
             javaCntrlrDefDesc.getDef();
-            fail("Expected "+clazz.getName());
+            fail("Expected " + clazz.getName());
         } catch (Exception e) {
             this.checkExceptionStart(e, clazz, start, loc);
         }
@@ -62,19 +62,19 @@ public class JavaControllerTest extends AuraImplTestCase {
             Object returnValue) {
         Action action = controller.createAction(name, args);
         action.run();
-        assertEquals(name+" State", expState, action.getState());
-        assertEquals(name+" expected no errors", 0, action.getErrors().size());
-        assertEquals(name+" return", returnValue, action.getReturnValue());
+        assertEquals(name + " State", expState, action.getState());
+        assertEquals(name + " expected no errors", 0, action.getErrors().size());
+        assertEquals(name + " return", returnValue, action.getReturnValue());
     }
 
-    private void checkFailAction(ControllerDef controller, String name, Map<String,Object> args, State expState,
-                                 Class<? extends Exception> error, String errorMessage) {
+    private void checkFailAction(ControllerDef controller, String name, Map<String, Object> args, State expState,
+            Class<? extends Exception> error, String errorMessage) {
         Action action = controller.createAction(name, args);
         action.run();
-        assertEquals(name+" State", expState, action.getState());
-        assertEquals(name+" expected an error", 1, action.getErrors().size());
-        checkExceptionStart((Exception)action.getErrors().get(0), error, errorMessage, null);
-        assertEquals(name+" return", null, action.getReturnValue());
+        assertEquals(name + " State", expState, action.getState());
+        assertEquals(name + " expected an error", 1, action.getErrors().size());
+        checkExceptionStart((Exception) action.getErrors().get(0), error, errorMessage, null);
+        assertEquals(name + " return", null, action.getReturnValue());
     }
 
     /**
@@ -82,7 +82,7 @@ public class JavaControllerTest extends AuraImplTestCase {
      * 
      * @userStory a07B0000000FAmj
      */
-    public void testClassLevelAnnotationForJavaController()throws Exception{
+    public void testClassLevelAnnotationForJavaController() throws Exception {
         assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerWithoutAnnotation",
                 InvalidDefinitionException.class, "@Controller annotation is required on all Controllers.",
                 "org.auraframework.impl.java.controller.TestControllerWithoutAnnotation");
@@ -98,9 +98,10 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     /**
-     * Ensure that an action must be public. Currently, we do not actualy process non-public members. This is due to a
-     * limitation in the way java returns methods. If we do want to do this, we'd have to process all methods in a
-     * rather complex way (walking up the class hierarchy).
+     * Ensure that an action must be public. Currently, we do not actualy
+     * process non-public members. This is due to a limitation in the way java
+     * returns methods. If we do want to do this, we'd have to process all
+     * methods in a rather complex way (walking up the class hierarchy).
      */
     public void testProtectedAction() throws Exception {
         ControllerDef cont = getJavaController("java://org.auraframework.impl.java.controller.TestControllerWithProtectedAction");
@@ -123,8 +124,8 @@ public class JavaControllerTest extends AuraImplTestCase {
 
     public void testActionNoParameters() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestController");
-        Map<String,Object> empty = new HashMap<String, Object>();
-        Map<String,Object> hasOne = new HashMap<String, Object>();
+        Map<String, Object> empty = new HashMap<String, Object>();
+        Map<String, Object> hasOne = new HashMap<String, Object>();
         hasOne.put("a", "don't care");
         assertNotNull("unable to load test controller", controller);
 
@@ -142,7 +143,7 @@ public class JavaControllerTest extends AuraImplTestCase {
      */
     public void testActionWithParameters() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestControllerWithParameters");
-        Map<String,Object> args = new HashMap<String, Object>();
+        Map<String, Object> args = new HashMap<String, Object>();
 
         args.put("a", "x");
         args.put("b", "y");
@@ -163,7 +164,7 @@ public class JavaControllerTest extends AuraImplTestCase {
         args.put("a", "x");
         args.put("b", "y");
         checkFailAction(controller, "sumValues", args, State.ERROR, AuraUnhandledException.class,
-                        "Invalid value for a: java://java.lang.Integer");
+                "Invalid value for a: java://java.lang.Integer");
 
         args.put("a", "1");
         args.put("b", "2");
@@ -180,7 +181,8 @@ public class JavaControllerTest extends AuraImplTestCase {
             Aura.getInstanceService().getInstance(dd);
             fail("Expected DefinitionNotFoundException");
         } catch (DefinitionNotFoundException e) {
-            assertEquals(String.format("No CONTROLLER named java://goats found : %s", dd.getQualifiedName()), e.getMessage());
+            assertEquals(String.format("No CONTROLLER named java://goats found : %s", dd.getQualifiedName()),
+                    e.getMessage());
         }
     }
 

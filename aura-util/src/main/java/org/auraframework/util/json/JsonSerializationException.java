@@ -17,11 +17,13 @@ package org.auraframework.util.json;
 
 /**
  * JsonSerializationException
- *
- *
- *
- *
- * <p>Copyright (c) 2010 salesforce.com. All rights reserved.</p>
+ * 
+ * 
+ * 
+ * 
+ * <p>
+ * Copyright (c) 2010 salesforce.com. All rights reserved.
+ * </p>
  */
 public class JsonSerializationException extends RuntimeException {
 

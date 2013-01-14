@@ -38,15 +38,15 @@ import org.auraframework.util.json.Json;
  * @userStory a07B0000000Dtmj
  */
 public class AuraFormatsHttpTest extends AuraHttpTestCase {
-    private String componentTag = "&aura.tag=auratest:test_TokenValidation";
-    private String quickFixComponentTag = "&aura.tag=foo:bar";
+    private final String componentTag = "&aura.tag=auratest:test_TokenValidation";
+    private final String quickFixComponentTag = "&aura.tag=foo:bar";
     private static Map<Format, String> FORMAT_CONTENTTYPE = new HashMap<Format, String>();
     static {
         FORMAT_CONTENTTYPE.put(Format.JSON, Json.MIME_TYPE + ";charset=" + AuraBaseServlet.UTF_ENCODING);
         FORMAT_CONTENTTYPE.put(Format.JS, "text/javascript;charset=" + AuraBaseServlet.UTF_ENCODING);
         FORMAT_CONTENTTYPE.put(Format.HTML, "text/html;charset=" + AuraBaseServlet.UTF_ENCODING);
-        FORMAT_CONTENTTYPE.put(Format.CSS, "text/css;charset="+AuraBaseServlet.UTF_ENCODING);
-        FORMAT_CONTENTTYPE.put(Format.MANIFEST, "text/cache-manifest;charset="+AuraBaseServlet.UTF_ENCODING);
+        FORMAT_CONTENTTYPE.put(Format.CSS, "text/css;charset=" + AuraBaseServlet.UTF_ENCODING);
+        FORMAT_CONTENTTYPE.put(Format.MANIFEST, "text/cache-manifest;charset=" + AuraBaseServlet.UTF_ENCODING);
     }
 
     public AuraFormatsHttpTest(String name) {
@@ -60,10 +60,9 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
                 .substring("Content-Type: ".length()).trim() : "";
         // Eliminate the spaces separating the content Type specification
         contentType = AuraTextUtil.arrayToString(contentType.split(";\\s+"), ";", -1, false);
-        assertEquals(
-                String.format("Received wrong Content-Type header%nURL(or Action): %s%nContent:%s%nRequest type:%s", url,
-                        method.getResponseBodyAsString(), method.getName()), 
-                FORMAT_CONTENTTYPE.get(format), contentType);
+        assertEquals(String.format(
+                "Received wrong Content-Type header%nURL(or Action): %s%nContent:%s%nRequest type:%s", url,
+                method.getResponseBodyAsString(), method.getName()), FORMAT_CONTENTTYPE.get(format), contentType);
     }
 
     private void getOnAuraServlet(Format f, String tag) throws Exception {
@@ -72,50 +71,55 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
         requestAndAssertContentType(get, url, f);
     }
 
-    private void postOnAuraServlet(Format f, Boolean causeException)throws Exception{
+    private void postOnAuraServlet(Format f, Boolean causeException) throws Exception {
         Map<String, Object> message = new HashMap<String, Object>();
         Map<String, Object> actionInstance = new HashMap<String, Object>();
-        actionInstance.put("descriptor", "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString");
-        Map<?,?>[] actions = { actionInstance };
+        actionInstance.put("descriptor",
+                "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString");
+        Map<?, ?>[] actions = { actionInstance };
         message.put("actions", actions);
         String jsonMessage = Json.serialize(message);
         Map<String, String> params = new HashMap<String, String>();
         params.put("message", jsonMessage);
-        if(!causeException){
+        if (!causeException) {
             params.put("aura.token", getCsrfToken());
         }
         params.put("aura.context", "{\"mode\":\"FTEST\"}");
         params.put("aura.format", "JSON");
         PostMethod post = obtainPostMethod("/aura", params);
-        requestAndAssertContentType(post, "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString", f);
+        requestAndAssertContentType(post,
+                "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString", f);
     }
-    
+
     /**
-     * Basic sanity testing for all Valid Formats that can be specified for AuraServlet.
+     * Basic sanity testing for all Valid Formats that can be specified for
+     * AuraServlet.
+     * 
      * @throws Exception
      */
     public void testResponseHeadersFromAuraServlet() throws Exception {
         for (Format format : Format.values()) {
             switch (format) {
             case JSON:
-                //Valid component get request
+                // Valid component get request
                 getOnAuraServlet(format, this.componentTag);
-                //Quick fix exception
+                // Quick fix exception
                 getOnAuraServlet(format, this.quickFixComponentTag);
-                //Non Quick fix exception, Not specifying component tag will cause RequestParam.MissingParamException
+                // Non Quick fix exception, Not specifying component tag will
+                // cause RequestParam.MissingParamException
                 getOnAuraServlet(format, "");
 
-                //Valid component post request
+                // Valid component post request
                 postOnAuraServlet(format, false);
-                //Exception
+                // Exception
                 postOnAuraServlet(format, true);
                 break;
             case HTML:
-                //Valid component get request
+                // Valid component get request
                 getOnAuraServlet(format, this.componentTag);
-                //Quick fix exception
+                // Quick fix exception
                 getOnAuraServlet(format, this.quickFixComponentTag);
-                //Non Quick fix exception
+                // Non Quick fix exception
                 getOnAuraServlet(format, "");
                 break;
             case JS:// No implementation for this format
@@ -128,69 +132,75 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
             }
         }
     }
-    
-    private void getOnAuraResourceServlet(Format f, String url) throws Exception{
+
+    private void getOnAuraResourceServlet(Format f, String url) throws Exception {
         GetMethod get = obtainGetMethod(url);
         requestAndAssertContentType(get, url, f);
     }
+
     /**
-     * Sanity testing for all valid formats that can be specified for AuraResourceServlet.
+     * Sanity testing for all valid formats that can be specified for
+     * AuraResourceServlet.
      */
-    public void testResponseHeadersFromAuraResourceServlet()  throws Exception{
+    public void testResponseHeadersFromAuraResourceServlet() throws Exception {
         String url;
         String modeAndPreload;
         for (Format format : Format.values()) {
             switch (format) {
             case JSON:
-                //Valid preload namespace
+                // Valid preload namespace
                 modeAndPreload = "{'mode':'DEV','preloads':['preloadTest']}";
-                url = "/l/"+AuraTextUtil.urlencode(modeAndPreload) +"/app.json?aura.token=+"+servletConfig.getCsrfToken();
-                getOnAuraResourceServlet(format,url);
-                
-                //Cause exception by not specifying CSRF token
-                //      The response looks much like a JSON string as much as it looks like a piece of JS
+                url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.json?aura.token=+"
+                        + servletConfig.getCsrfToken();
+                getOnAuraResourceServlet(format, url);
+
+                // Cause exception by not specifying CSRF token
+                // The response looks much like a JSON string as much as it
+                // looks like a piece of JS
                 modeAndPreload = "{'mode':'DEV','preloads':['preloadTest']}";
-                url = "/l/"+AuraTextUtil.urlencode(modeAndPreload) +"/app.json";
-                getOnAuraResourceServlet(format,url);
-                
+                url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.json";
+                getOnAuraResourceServlet(format, url);
+
                 break;
-            case HTML://No implementation for this format
+            case HTML:// No implementation for this format
                 break;
             case JS:
-                //Valid preload namespace
+                // Valid preload namespace
                 modeAndPreload = "{'mode':'DEV','preloads':['preloadTest']}";
-                url = "/l/"+AuraTextUtil.urlencode(modeAndPreload) +"/app.js";
-                getOnAuraResourceServlet(format,url);
-                
-                //Bad preload namespace, should cause an exception in AuraResourceServlet. 
-                //But the response should still be in JavaScript mime type
+                url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.js";
+                getOnAuraResourceServlet(format, url);
+
+                // Bad preload namespace, should cause an exception in
+                // AuraResourceServlet.
+                // But the response should still be in JavaScript mime type
                 modeAndPreload = "{'mode':'DEV','preloads':['test']}";
-                url = "/l/"+AuraTextUtil.urlencode(modeAndPreload) +"/app.js";
-                getOnAuraResourceServlet(format,url);
+                url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.js";
+                getOnAuraResourceServlet(format, url);
                 break;
             case CSS:
-                //Valid preload namespace
+                // Valid preload namespace
                 modeAndPreload = "{'mode':'DEV','preloads':['preloadTest']}";
-                url = "/l/"+AuraTextUtil.urlencode(modeAndPreload) +"/app.css";
-                getOnAuraResourceServlet(format,url);
-                
-                //Bad preload namespace, should cause an exception in AuraResourceServlet. 
-                //But the response should still be in CSS mime type
+                url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.css";
+                getOnAuraResourceServlet(format, url);
+
+                // Bad preload namespace, should cause an exception in
+                // AuraResourceServlet.
+                // But the response should still be in CSS mime type
                 modeAndPreload = "{'mode':'DEV','preloads':['test']}";
-                url = "/l/"+AuraTextUtil.urlencode(modeAndPreload) +"/app.css";
-                getOnAuraResourceServlet(format,url);
+                url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.css";
+                getOnAuraResourceServlet(format, url);
                 break;
             case MANIFEST:
                 String appManifestUrl = "{'mode':'DEV','app':'appCache:testApp'}";
-                url = "/l/"+AuraTextUtil.urlencode(appManifestUrl) +"/app.manifest";
+                url = "/l/" + AuraTextUtil.urlencode(appManifestUrl) + "/app.manifest";
                 System.setProperty(HttpMethodParams.USER_AGENT, UserAgent.GOOGLE_CHROME.getUserAgentString());
-                getOnAuraResourceServlet(format,url);
+                getOnAuraResourceServlet(format, url);
                 break;
             default:
                 fail(String.format("A new format value (%s) was added, update this test", format));
                 break;
             }
-            url=null;
+            url = null;
             modeAndPreload = null;
         }
     }

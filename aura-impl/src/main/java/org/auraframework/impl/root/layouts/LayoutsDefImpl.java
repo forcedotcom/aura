@@ -18,13 +18,18 @@ package org.auraframework.impl.root.layouts;
 import static org.auraframework.instance.ValueProviderType.LABEL;
 
 import java.io.IOException;
-import java.util.*;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.LayoutDef;
+import org.auraframework.def.LayoutsDef;
+import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -34,9 +39,12 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 /**
  */
-public class LayoutsDefImpl extends RootDefinitionImpl<LayoutsDef> implements LayoutsDef{
+public class LayoutsDefImpl extends RootDefinitionImpl<LayoutsDef> implements LayoutsDef {
 
     private static final long serialVersionUID = 309255009681421736L;
     private final List<LayoutDef> layoutDefs;
@@ -53,7 +61,7 @@ public class LayoutsDefImpl extends RootDefinitionImpl<LayoutsDef> implements La
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
 
         Map<String, LayoutDef> byName = Maps.newHashMap();
-        for(LayoutDef layout : layoutDefs){
+        for (LayoutDef layout : layoutDefs) {
             byName.put(layout.getName(), layout);
         }
         layoutDefsByName = AuraUtil.immutableMap(byName);
@@ -61,7 +69,7 @@ public class LayoutsDefImpl extends RootDefinitionImpl<LayoutsDef> implements La
 
     public static class Builder extends RootDefinitionImpl.Builder<LayoutsDef> {
 
-        public Builder(){
+        public Builder() {
             super(LayoutsDef.class);
         }
 
@@ -75,8 +83,8 @@ public class LayoutsDefImpl extends RootDefinitionImpl<LayoutsDef> implements La
             return new LayoutsDefImpl(this);
         }
 
-        public void addLayoutDef(LayoutDef layoutDef){
-            if(this.layoutDefs == null){
+        public void addLayoutDef(LayoutDef layoutDef) {
+            if (this.layoutDefs == null) {
                 this.layoutDefs = Lists.newArrayList();
             }
             this.layoutDefs.add(layoutDef);
@@ -115,8 +123,8 @@ public class LayoutsDefImpl extends RootDefinitionImpl<LayoutsDef> implements La
     @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
-        json.writeMapEntry("layoutDefs",layoutDefs);
-        json.writeMapEntry("defaultLayout",defaultLayout);
+        json.writeMapEntry("layoutDefs", layoutDefs);
+        json.writeMapEntry("defaultLayout", defaultLayout);
         json.writeMapEntry("catchall", catchall);
         json.writeMapEnd();
     }
@@ -128,7 +136,8 @@ public class LayoutsDefImpl extends RootDefinitionImpl<LayoutsDef> implements La
 
     @Override
     public void retrieveLabels() throws QuickFixException {
-        GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders().get(LABEL);
+        GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders()
+                .get(LABEL);
         for (PropertyReference e : expressionRefs) {
             if (e.getRoot().equals(LABEL.getPrefix())) {
                 labelProvider.getValue(e.getStem());
@@ -139,17 +148,22 @@ public class LayoutsDefImpl extends RootDefinitionImpl<LayoutsDef> implements La
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
-        if (AuraTextUtil.isNullEmptyOrWhitespace(defaultLayout)) { // default is required attribute
+        if (AuraTextUtil.isNullEmptyOrWhitespace(defaultLayout)) { // default is
+                                                                   // required
+                                                                   // attribute
             throw new InvalidDefinitionException("The \"default\" attribute is required for layouts", getLocation());
         }
-        if (getLayoutDef(defaultLayout) == null) { // the default layout must exist
-            throw new InvalidDefinitionException(String.format("The default layout \"%s\" doesn't exist", defaultLayout), getLocation());
+        if (getLayoutDef(defaultLayout) == null) { // the default layout must
+                                                   // exist
+            throw new InvalidDefinitionException(
+                    String.format("The default layout \"%s\" doesn't exist", defaultLayout), getLocation());
         }
         // if catchall is specified, it must exist
         if (catchall != null && (AuraTextUtil.isEmptyOrWhitespace(catchall) || getLayoutDef(catchall) == null)) {
-                throw new InvalidDefinitionException(String.format("The catchall layout \"%s\" doesn't exist", catchall), getLocation());
+            throw new InvalidDefinitionException(String.format("The catchall layout \"%s\" doesn't exist", catchall),
+                    getLocation());
         }
-        for(LayoutDef layout : getLayoutDefs()){
+        for (LayoutDef layout : getLayoutDefs()) {
             layout.validateDefinition();
         }
     }

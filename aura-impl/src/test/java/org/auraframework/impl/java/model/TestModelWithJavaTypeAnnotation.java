@@ -15,11 +15,19 @@
  */
 package org.auraframework.impl.java.model;
 
-
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
-import org.auraframework.system.Annotations.*;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Model;
+import org.auraframework.system.Annotations.Type;
+
 @Model
 public class TestModelWithJavaTypeAnnotation {
     /**
@@ -27,80 +35,86 @@ public class TestModelWithJavaTypeAnnotation {
      */
     @AuraEnabled
     @Type("java://java.lang.String")
-    public String getJavaString(){
+    public String getJavaString() {
         return "Java";
     }
 
     @AuraEnabled
     @Type("String")
-    public String getString(){
+    public String getString() {
         return "Model";
     }
 
     @AuraEnabled
     @Type("Integer")
-    public Integer getInteger(){
+    public Integer getInteger() {
         return 123;
     }
+
     @AuraEnabled
     @Type("Long")
-    public Long getLong(){
+    public Long getLong() {
         return 123l;
     }
+
     @AuraEnabled
     @Type("Double")
-    public Double getDouble(){
+    public Double getDouble() {
         return 1.23;
     }
+
     @AuraEnabled
     @Type("Decimal")
-    public BigDecimal getDecimal(){
+    public BigDecimal getDecimal() {
         return new BigDecimal(3.1415);
     }
+
     @AuraEnabled
     @Type("Boolean")
-    public Boolean getBoolean(){
+    public Boolean getBoolean() {
         return true;
     }
+
     @AuraEnabled
     @Type("Date")
-    public Date getDate(){
-        return new Date(1095957000000l); //"09/23/2004"
+    public Date getDate() {
+        return new Date(1095957000000l); // "09/23/2004"
     }
 
     @AuraEnabled
     @Type("Object")
-    public Object getObject(){
+    public Object getObject() {
         return "Aura";
     }
 
     @AuraEnabled
     @Type("Map<String, String>")
-    public Map<String,String> getStringMap(){
-        return new HashMap<String,String>();
+    public Map<String, String> getStringMap() {
+        return new HashMap<String, String>();
     }
 
-    //List of basic data type
+    // List of basic data type
     @AuraEnabled
     @Type("List<String>")
-    public List<String> getStringList(){
+    public List<String> getStringList() {
         return new ArrayList<String>();
     }
 
-    //Set of basic data type
+    // Set of basic data type
     @AuraEnabled
     @Type("Set<String>")
-    public Set<String> getStringSet(){
+    public Set<String> getStringSet() {
         return new TreeSet<String>();
     }
 
-    //Array of basic data type
+    // Array of basic data type
     @AuraEnabled
     @Type("String[]")
-    public String[] getStringArray(){
-        return new String[]{"one", "two"};
+    public String[] getStringArray() {
+        return new String[] { "one", "two" };
     }
 
-   /** @AuraEnabled
-    }*/
+    /**
+     * @AuraEnabled
+     */
 }

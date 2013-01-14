@@ -32,7 +32,7 @@ public class TestModel2 {
     }
 
     @AuraEnabled
-    public String getReadOnlyThing(){
+    public String getReadOnlyThing() {
         return "readonlyFromTestController2";
     }
 }

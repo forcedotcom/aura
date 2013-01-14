@@ -36,22 +36,23 @@ public class ApplicationSerializer {
         DefinitionService definitionService = Aura.getDefinitionService();
         DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor("aura:test", ApplicationDef.class);
         contextService.startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, appDesc);
-        
+
         SerializationService serializationService = Aura.getSerializationService();
         try {
             Map<String, Object> atts = Maps.newHashMap();
-            File outputDir = new File("/home/dpletter/dev/lumen-beta/aura-integration-test/src/test/resources/htdocs/app");
-            if(outputDir.exists()){
+            File outputDir = new File(
+                    "/home/dpletter/dev/lumen-beta/aura-integration-test/src/test/resources/htdocs/app");
+            if (outputDir.exists()) {
                 IOUtil.delete(outputDir);
             }
-            atts.put("outputPath",outputDir.getAbsolutePath());
-            
+            atts.put("outputPath", outputDir.getAbsolutePath());
+
             serializationService.write(appDesc.getDef(), atts, ApplicationDef.class, System.out, "OFFLINE_HTML");
         } catch (Throwable e) {
             e.printStackTrace();
             System.exit(1);
         }
-        
+
         contextService.endContext();
     }
 }

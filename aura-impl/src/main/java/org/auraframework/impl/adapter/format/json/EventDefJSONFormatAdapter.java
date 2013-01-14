@@ -30,7 +30,7 @@ import org.auraframework.util.json.Json;
  * Event JSON format adapter.
  */
 @ThreadSafe
-public class EventDefJSONFormatAdapter extends JSONFormatAdapter<EventDef>{
+public class EventDefJSONFormatAdapter extends JSONFormatAdapter<EventDef> {
 
     @Override
     public Class<EventDef> getType() {
@@ -38,8 +38,8 @@ public class EventDefJSONFormatAdapter extends JSONFormatAdapter<EventDef>{
     }
 
     @Override
-    public void writeCollection(Collection<? extends EventDef> values,
-                                Appendable out) throws IOException, QuickFixException {
+    public void writeCollection(Collection<? extends EventDef> values, Appendable out) throws IOException,
+            QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         Json.serialize(values, out, context.getJsonSerializationContext());
     }

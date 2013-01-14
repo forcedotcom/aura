@@ -23,33 +23,37 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.javascript.controller.JavascriptActionDef;
 import org.auraframework.impl.javascript.controller.JavascriptControllerDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
+
 /**
  * Test class to verify implementation of Javascript Controllers for component.
- *
+ * 
  * @hierarchy Aura.Components.Controllers
  * @priority medium
  * @userStory a0790000000DQHs
  */
-public class JavascriptControllerDefTest extends AuraImplTestCase{
-    public JavascriptControllerDefTest(String name){
+public class JavascriptControllerDefTest extends AuraImplTestCase {
+    public JavascriptControllerDefTest(String name) {
         super(name);
     }
+
     /**
      * Verify that Javascript Controller with comments is acceptable.
+     * 
      * @hierarchy Aura.Unit Tests.Json StreamReader
      * @userStorySyncIdOrName a07B0000000DUGnIAO
      * @priority medium
      * @throws Exception
      */
-    public void testControllerWithComments() throws Exception{
-        DefDescriptor<ControllerDef> descriptor = DefDescriptorImpl.getInstance("js://test.test_JSController_WithComments",ControllerDef.class);
+    public void testControllerWithComments() throws Exception {
+        DefDescriptor<ControllerDef> descriptor = DefDescriptorImpl.getInstance(
+                "js://test.test_JSController_WithComments", ControllerDef.class);
         ControllerDef def = descriptor.getDef();
         assertNotNull("Failed to fetch the definition of the Javascript Controller.", def);
         assertTrue(def instanceof JavascriptControllerDef);
-        Map<String, JavascriptActionDef> actions = ((JavascriptControllerDef)def).getActionDefs();
-        assertTrue("Expected there be only two action in the javascript controller.",actions.size()==2);
-        assertNotNull("Expected action not present.",actions.get("functionName1"));
-        assertNotNull("Expected action not present.",actions.get("functionName2"));
+        Map<String, JavascriptActionDef> actions = ((JavascriptControllerDef) def).getActionDefs();
+        assertTrue("Expected there be only two action in the javascript controller.", actions.size() == 2);
+        assertNotNull("Expected action not present.", actions.get("functionName1"));
+        assertNotNull("Expected action not present.", actions.get("functionName2"));
     }
 
 }

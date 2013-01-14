@@ -23,8 +23,8 @@ import javax.annotation.concurrent.ThreadSafe;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.instance.Component;
-import org.auraframework.throwable.ClientSideEventException;
 import org.auraframework.throwable.AuraError;
+import org.auraframework.throwable.ClientSideEventException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Maps;
@@ -40,7 +40,8 @@ public class ClientSideEventExceptionHTMLFormatAdapter extends HTMLFormatAdapter
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException, QuickFixException {
+    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException,
+            QuickFixException {
 
         Map<String, Object> attribs = Maps.newHashMap();
 

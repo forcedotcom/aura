@@ -15,13 +15,16 @@
  */
 package org.auraframework.impl.css.parser;
 
-import java.util.*;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.system.Client;
 
 public class ThemeParserResultHolder {
     private String defaultCss;
-    private Map<Client.Type, String> browserCssMap = new EnumMap<Client.Type, String>(Client.Type.class);
+    private final Map<Client.Type, String> browserCssMap = new EnumMap<Client.Type, String>(Client.Type.class);
     private Set<String> imageURLs;
     private Set<String> foundConditions;
 
@@ -40,7 +43,7 @@ public class ThemeParserResultHolder {
     public void putBrowserCss(String condition, String css) {
         this.browserCssMap.put(Client.Type.valueOf(condition), css);
     }
-    
+
     public Set<String> getFoundConditions() {
         return foundConditions;
     }

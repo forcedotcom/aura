@@ -23,12 +23,13 @@ import org.auraframework.test.IntegrationTestCase;
 
 public class ApiContentsModelTest extends IntegrationTestCase {
 
-    public ApiContentsModelTest(String name){
+    public ApiContentsModelTest(String name) {
         super(name);
     }
 
     /**
-     * Verifies generated jsdoc JSON file is loaded and contains list of jsdoc items.
+     * Verifies generated jsdoc JSON file is loaded and contains list of jsdoc
+     * items.
      */
     public void testLoadJavaScriptApi() {
         List<TreeNode> jsDocTreeNodes = new ApiContentsModel().getNodes();

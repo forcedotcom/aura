@@ -41,82 +41,104 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
     }
 
     /**
-     * Testing the getComponent method. Get a component and call each getting for the component.
+     * Testing the getComponent method. Get a component and call each getting
+     * for the component.
+     * 
      * @throws Exception
      * @hierarchy Aura.Runtime.Service
      * @userStory AuraServlet: POST
      */
-    public void testGetComponent() throws Exception{
-        Component component = Aura.getInstanceService().getInstance("auratest:testComponent1", ComponentDef.class, null);
-        assertEquals("Default String",component.getAttributes().getExpression("myString")); //from the component
-        assertEquals(true,component.getAttributes().getExpression("myBoolean")); //from the parent component
-        assertEquals("Interface String",component.getAttributes().getExpression("interfaceString")); //from the interface
-        assertEquals("1",component.getGlobalId());
+    public void testGetComponent() throws Exception {
+        Component component = Aura.getInstanceService()
+                .getInstance("auratest:testComponent1", ComponentDef.class, null);
+        assertEquals("Default String", component.getAttributes().getExpression("myString")); // from
+                                                                                             // the
+                                                                                             // component
+        assertEquals(true, component.getAttributes().getExpression("myBoolean")); // from
+                                                                                  // the
+                                                                                  // parent
+                                                                                  // component
+        assertEquals("Interface String", component.getAttributes().getExpression("interfaceString")); // from
+                                                                                                      // the
+                                                                                                      // interface
+        assertEquals("1", component.getGlobalId());
     }
 
     /**
-     * Testing the getComponentDef method. Get a componentDef and call each getting for the componentDef.
+     * Testing the getComponentDef method. Get a componentDef and call each
+     * getting for the componentDef.
+     * 
      * @hierarchy Aura.Runtime.Service
      * @userStory AuraServlet: POST
      */
     public void testGetComponentDef() throws Exception {
-        ComponentDef component = Aura.getDefinitionService().getDefinition("auratest:testComponent1", ComponentDef.class);
+        ComponentDef component = Aura.getDefinitionService().getDefinition("auratest:testComponent1",
+                ComponentDef.class);
 
-        Map< String,RegisterEventDef> red = component.getRegisterEventDefs();
+        Map<String, RegisterEventDef> red = component.getRegisterEventDefs();
         assertEquals(1, red.size());
         assertNotNull(red.get("testEvent"));
 
         Collection<EventHandlerDef> ehd = component.getHandlerDefs();
-        assertEquals(0,ehd.size());
-        //assertEquals("testEvent",ehd.iterator().next().getName());
+        assertEquals(0, ehd.size());
+        // assertEquals("testEvent",ehd.iterator().next().getName());
 
         List<DefDescriptor<ModelDef>> mdd = component.getModelDefDescriptors();
-        assertEquals(1,mdd.size());
-        assertEquals("TestJavaModel",mdd.get(0).getName());
+        assertEquals(1, mdd.size());
+        assertEquals("TestJavaModel", mdd.get(0).getName());
 
         List<DefDescriptor<ControllerDef>> cds = component.getControllerDefDescriptors();
         assertEquals(1, cds.size());
-        assertEquals("JavaTestController",cds.get(0).getName());
+        assertEquals("JavaTestController", cds.get(0).getName());
 
         DefDescriptor<ModelDef> lmdd = component.getLocalModelDefDescriptor();
-        assertEquals("TestJavaModel",lmdd.getName());
+        assertEquals("TestJavaModel", lmdd.getName());
 
         ModelDef model = component.getModelDef();
-        assertEquals("TestJavaModel",model.getName());
+        assertEquals("TestJavaModel", model.getName());
 
         ControllerDef controller = component.getControllerDef();
-        assertEquals("testComponent1",controller.getName());
+        assertEquals("testComponent1", controller.getName());
 
         DefDescriptor<RendererDef> rd = component.getRendererDescriptor();
-        assertEquals("testComponent1",rd.getName());
+        assertEquals("testComponent1", rd.getName());
 
         DefDescriptor<ThemeDef> td = component.getThemeDescriptor();
-        assertEquals("testComponent1",td.getName());
+        assertEquals("testComponent1", td.getName());
     }
 
     /**
      * Get an application and call each getting for the component.
+     * 
      * @throws QuickFixException
-     *
+     * 
      * @hierarchy Aura.Runtime.Service
      * @userStory a07B0000000EYU4
      */
     public void testGetApplication() throws QuickFixException {
-        Application application = Aura.getInstanceService().getInstance("auratest:testApplication1", ApplicationDef.class, null);
-        assertEquals("Default String", application.getAttributes().getExpression("myString")); // from the component
-        assertEquals(true   , application.getAttributes().getExpression("myBoolean")); // from the parent component
-        assertEquals("Interface String", application.getAttributes().getExpression("interfaceString")); // from the
+        Application application = Aura.getInstanceService().getInstance("auratest:testApplication1",
+                ApplicationDef.class, null);
+        assertEquals("Default String", application.getAttributes().getExpression("myString")); // from
+                                                                                               // the
+                                                                                               // component
+        assertEquals(true, application.getAttributes().getExpression("myBoolean")); // from
+                                                                                    // the
+                                                                                    // parent
+                                                                                    // component
+        assertEquals("Interface String", application.getAttributes().getExpression("interfaceString")); // from
+                                                                                                        // the
         assertEquals("1", application.getGlobalId());
     }
 
     /**
      * Get an applicationDef and call each getting for the componentDef.
-     *
+     * 
      * @hierarchy Aura.Runtime.Service
      * @userStory a07B0000000EYU4
      */
     public void testGetApplicationDef() throws Exception {
-        ApplicationDef application = Aura.getDefinitionService().getDefinition("auratest:testApplication1", ApplicationDef.class);
+        ApplicationDef application = Aura.getDefinitionService().getDefinition("auratest:testApplication1",
+                ApplicationDef.class);
 
         Map<String, RegisterEventDef> red = application.getRegisterEventDefs();
         assertEquals(1, red.size());

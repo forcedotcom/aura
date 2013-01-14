@@ -21,8 +21,8 @@ import org.auraframework.util.type.Converter;
 
 /**
  * Used by aura.util.type.TypeUtil
- *
- *
+ * 
+ * 
  * @since 0.0.56
  */
 public class BigDecimalToIntegerConverter implements Converter<BigDecimal, Integer> {

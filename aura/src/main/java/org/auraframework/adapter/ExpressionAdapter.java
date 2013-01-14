@@ -27,6 +27,7 @@ public interface ExpressionAdapter extends AuraAdapter {
 
     /**
      * parses the given string from the given location into Expressions
+     * 
      * @throws AuraValidationException when the expression is not valid
      */
     Expression buildExpression(String s, Location start) throws AuraValidationException;

@@ -19,12 +19,12 @@ import java.io.File;
 import java.util.EnumSet;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableSet;
-
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.system.Parser.Format;
+
+import com.google.common.collect.ImmutableSet;
 
 public class FileThemeSourceLoader extends FileSourceLoader {
 

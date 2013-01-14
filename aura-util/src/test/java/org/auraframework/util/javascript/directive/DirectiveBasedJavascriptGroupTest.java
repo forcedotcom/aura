@@ -29,9 +29,10 @@ import org.auraframework.test.annotation.ThreadHostileTest;
 import com.google.common.collect.ImmutableList;
 
 /**
- * Automation for verifying the implementation in DirectiveBasedJavascriptGroupTest
- * {@link DirectiveBasedJavascriptGroup}. Javascript files can be grouped in modules.
- * This helps in keeping the javascript modularized.
+ * Automation for verifying the implementation in
+ * DirectiveBasedJavascriptGroupTest {@link DirectiveBasedJavascriptGroup}.
+ * Javascript files can be grouped in modules. This helps in keeping the
+ * javascript modularized.
  */
 @ThreadHostileTest
 public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
@@ -40,12 +41,13 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
     }
 
     /**
-     * Should not be able to specify a Directory as start file for a Javascript group
+     * Should not be able to specify a Directory as start file for a Javascript
+     * group
      */
     public void testPassingDirForStartFile() throws Exception {
         try {
             DirectiveBasedJavascriptGroup test = new DirectiveBasedJavascriptGroup("test",
-                    getResourceFile("/testdata/"), "javascript", ImmutableList.<DirectiveType<?>>of(DirectiveFactory
+                    getResourceFile("/testdata/"), "javascript", ImmutableList.<DirectiveType<?>> of(DirectiveFactory
                             .getDummyDirectiveType()), EnumSet.of(JavascriptGeneratorMode.TESTING));
             fail("Creating a Directive Based javascript Group by specifying a directory as start file should have failed."
                     + test.getName());
@@ -55,10 +57,11 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
     }
 
     /**
-     * Check the workings of isStale(). isStale() only checks the last modified time stamp of EXISTING files in the
-     * group. If new files are added, then isStale() will not reflect the real state of the group. However, if you were
-     * to INCLUDE a new js file using a include directive in on of the files in the group , then isStale() would still
-     * work.
+     * Check the workings of isStale(). isStale() only checks the last modified
+     * time stamp of EXISTING files in the group. If new files are added, then
+     * isStale() will not reflect the real state of the group. However, if you
+     * were to INCLUDE a new js file using a include directive in on of the
+     * files in the group , then isStale() would still work.
      */
     public void testisStale() throws Exception {
         File newFile = getResourceFile("/testdata/javascript/testisStale.js");
@@ -73,11 +76,13 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
 
         try {
             DirectiveBasedJavascriptGroup test = new DirectiveBasedJavascriptGroup("test", newFile.getParentFile(),
-                    newFile.getName(), ImmutableList.<DirectiveType<?>>of(DirectiveFactory.getDummyDirectiveType()),
+                    newFile.getName(), ImmutableList.<DirectiveType<?>> of(DirectiveFactory.getDummyDirectiveType()),
                     EnumSet.of(JavascriptGeneratorMode.TESTING));
-            // Immediately after the javascript group is instantiated, the group is not stale yet
+            // Immediately after the javascript group is instantiated, the group
+            // is not stale yet
             assertFalse(test.isStale());
-            // Need this sleep so the last modified time changes, otherwise the test runs too fast and the test fails
+            // Need this sleep so the last modified time changes, otherwise the
+            // test runs too fast and the test fails
             // because the last modified time was not updated by the OS
             Thread.sleep(2000);
             // Update a js file which is part of the group
@@ -92,13 +97,15 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
     }
 
     /**
-     * Use the javascript processor to generate javascript files in 5 modes. Gold file the five modes and also verify
-     * that the file was not created in the 6th mode. TODO: investigate why this test is {@link ThreadHostileTest}.
+     * Use the javascript processor to generate javascript files in 5 modes.
+     * Gold file the five modes and also verify that the file was not created in
+     * the 6th mode. TODO: investigate why this test is
+     * {@link ThreadHostileTest}.
      */
     public void testJavascriptGeneration() throws Exception {
         File file = getResourceFile("/testdata/javascript/testAllKindsOfDirectiveGenerate.js");
         DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("testDummy", file.getParentFile(),
-                file.getName(), ImmutableList.<DirectiveType<?>>of(DirectiveFactory.getMultiLineMockDirectiveType(),
+                file.getName(), ImmutableList.<DirectiveType<?>> of(DirectiveFactory.getMultiLineMockDirectiveType(),
                         DirectiveFactory.getMockDirective(), DirectiveFactory.getDummyDirectiveType()), EnumSet.of(
                         JavascriptGeneratorMode.DEVELOPMENT, JavascriptGeneratorMode.AUTOTESTING,
                         JavascriptGeneratorMode.PRODUCTION, JavascriptGeneratorMode.MOCK1,
@@ -130,10 +137,13 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
                 }
             }
         } finally {
-            // Regardless of the javascript processor generating the files, clean up the expected files
+            // Regardless of the javascript processor generating the files,
+            // clean up the expected files
             for (String genFileName : expectedGenFiles) {
                 File genFile = new File(dir, genFileName + ".js");
-                if (genFile.exists()) genFile.delete();
+                if (genFile.exists()) {
+                    genFile.delete();
+                }
             }
         }
         File unExpectedGenFile = new File(dir, "testDummy_test.js");
@@ -143,12 +153,13 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
     }
 
     /**
-     * Make sure the processor regeneration stops when there are errors in the source file
+     * Make sure the processor regeneration stops when there are errors in the
+     * source file
      */
     public void testJavascriptReGenerationFails() throws Exception {
         File file = getResourceFile("/testdata/javascript/testJavascriptReGenerationFails.js");
         DirectiveBasedJavascriptGroup jg = new DirectiveBasedJavascriptGroup("regenerationFail", file.getParentFile(),
-                file.getName(), ImmutableList.<DirectiveType<?>>of(DirectiveFactory.getMockDirective()),
+                file.getName(), ImmutableList.<DirectiveType<?>> of(DirectiveFactory.getMockDirective()),
                 EnumSet.of(JavascriptGeneratorMode.TESTING));
         try {
             jg.regenerate(getResourceFile("/testdata/javascript/generated/"));

@@ -21,16 +21,17 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
-
 import org.auraframework.Aura;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.instance.*;
+import org.auraframework.instance.Action;
+import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import com.google.common.collect.Sets;
 
 /**
  * def for client controllers
@@ -79,7 +80,8 @@ public class JavascriptControllerDef extends DefinitionImpl<ControllerDef> imple
 
     @Override
     public void retrieveLabels() throws QuickFixException {
-        GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders().get(LABEL);
+        GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders()
+                .get(LABEL);
         for (PropertyReference e : expressionRefs) {
             if (e.getRoot().equals(LABEL.getPrefix())) {
                 labelProvider.getValue(e.getStem());
@@ -87,14 +89,14 @@ public class JavascriptControllerDef extends DefinitionImpl<ControllerDef> imple
         }
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<ControllerDef>{
+    public static class Builder extends DefinitionImpl.BuilderImpl<ControllerDef> {
 
-        public Builder(){
+        public Builder() {
             super(ControllerDef.class);
         }
 
         public Map<String, JavascriptActionDef> actionDefs;
-        public Set<PropertyReference> expressionRefs  =  Sets.newHashSet();
+        public Set<PropertyReference> expressionRefs = Sets.newHashSet();
 
         @Override
         public JavascriptControllerDef build() {

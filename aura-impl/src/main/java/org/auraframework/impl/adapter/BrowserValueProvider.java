@@ -33,25 +33,24 @@ import com.google.common.collect.Maps;
 
 /**
  * $Browser global value provider, backed by data from BrowserInfo
- *
+ * 
  * @author eanderson
  */
 public class BrowserValueProvider implements GlobalValueProvider {
-    public static final String IS_TABLET  = "isTablet";
-    public static final String IS_PHONE  = "isPhone";
+    public static final String IS_TABLET = "isTablet";
+    public static final String IS_PHONE = "isPhone";
     public static final String IS_ANDROID = "isAndroid";
     public static final String FORM_FACTOR = "formFactor";
     public static final String IS_IPHONE = "isIPhone";
     public static final String IS_IPAD = "isIPad";
     public static final String IS_IOS = "isIOS";
 
-    
     private Map<String, Object> browserDetails;
 
     private void parse() {
         AuraContext context = Aura.getContextService().getCurrentContext();
         Map<String, Object> m = Maps.newHashMapWithExpectedSize(32);
-        if (context == null) { 
+        if (context == null) {
             this.browserDetails = AuraUtil.immutableMap(m);
             return;
         }
@@ -59,7 +58,7 @@ public class BrowserValueProvider implements GlobalValueProvider {
         m.put(IS_TABLET, b.isTablet());
         m.put(IS_PHONE, b.isPhone());
         m.put(IS_ANDROID, b.isAndroid());
-        m.put(FORM_FACTOR, b.getFormFactor() );
+        m.put(FORM_FACTOR, b.getFormFactor());
         m.put(IS_IPHONE, b.isIPhone());
         m.put(IS_IPAD, b.isIPad());
         m.put(IS_IOS, b.isIOS());
@@ -68,7 +67,7 @@ public class BrowserValueProvider implements GlobalValueProvider {
     }
 
     public BrowserValueProvider() {
-        browserDetails=null;
+        browserDetails = null;
     }
 
     @Override
@@ -89,8 +88,9 @@ public class BrowserValueProvider implements GlobalValueProvider {
     @Override
     public void validate(PropertyReference expr) throws InvalidExpressionException {
         if (expr.size() != 1 || !getData().containsKey(expr.getRoot())) {
-            if (expr.getRoot().toString().equals("isContainer")) // TODO - remove InputDate and InputDateTime dependency on isContainer, which is SFDC specific
+            if (expr.getRoot().toString().equals("isContainer")) {
                 return;
+            }
             throw new InvalidExpressionException("No property on $Browser for key: " + expr, expr.getLocation());
         }
     }
@@ -105,7 +105,7 @@ public class BrowserValueProvider implements GlobalValueProvider {
         if (browserDetails == null) {
             parse();
         }
-        
+
         return browserDetails;
     }
 

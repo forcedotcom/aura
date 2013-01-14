@@ -23,14 +23,14 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 /**
  * Basic provider of RemoteWebDrivers.
- *
- *
+ * 
+ * 
  * @since 0.0.178
  */
 public class RemoteWebDriverFactory implements WebDriverProvider {
     protected final URL serverUrl;
 
-    public RemoteWebDriverFactory(URL serverUrl){
+    public RemoteWebDriverFactory(URL serverUrl) {
         this.serverUrl = serverUrl;
     }
 

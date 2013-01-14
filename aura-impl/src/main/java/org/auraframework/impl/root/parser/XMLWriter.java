@@ -18,18 +18,32 @@ package org.auraframework.impl.root.parser;
 import java.io.Writer;
 import java.util.Map;
 
-import com.google.common.collect.Maps;
-
 import org.auraframework.def.Definition;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
-import org.auraframework.impl.root.component.*;
-import org.auraframework.impl.root.event.*;
+import org.auraframework.impl.root.component.ComponentDefImpl;
+import org.auraframework.impl.root.component.ComponentDefRefImpl;
+import org.auraframework.impl.root.component.ForEachDefImpl;
+import org.auraframework.impl.root.event.EventDefImpl;
+import org.auraframework.impl.root.event.EventHandlerDefImpl;
+import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.root.intf.InterfaceDefImpl;
-import org.auraframework.impl.root.parser.handler.*;
+import org.auraframework.impl.root.parser.handler.ApplicationDefHandler;
+import org.auraframework.impl.root.parser.handler.AttributeDefHandler;
+import org.auraframework.impl.root.parser.handler.AttributeDefRefHandler;
+import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
+import org.auraframework.impl.root.parser.handler.ComponentDefRefHandler;
+import org.auraframework.impl.root.parser.handler.EventDefHandler;
+import org.auraframework.impl.root.parser.handler.EventHandlerDefHandler;
+import org.auraframework.impl.root.parser.handler.ForEachDefHandler;
+import org.auraframework.impl.root.parser.handler.InterfaceDefHandler;
+import org.auraframework.impl.root.parser.handler.RegisterEventHandler;
+import org.auraframework.impl.root.parser.handler.XMLHandler;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
+
+import com.google.common.collect.Maps;
 
 /**
  */
@@ -37,7 +51,7 @@ public class XMLWriter implements org.auraframework.system.SourceWriter {
 
     private static final XMLWriter instance = new XMLWriter();
 
-    private Map<Class<? extends Definition>, XMLHandler<?>> handlers = Maps.newHashMap();
+    private final Map<Class<? extends Definition>, XMLHandler<?>> handlers = Maps.newHashMap();
 
     @SuppressWarnings("rawtypes")
     public XMLWriter() {
@@ -64,23 +78,23 @@ public class XMLWriter implements org.auraframework.system.SourceWriter {
     @Override
     public <D extends Definition> void write(D def, Source<?> source) {
         Writer sourceWriter = source.getWriter();
-        try{
+        try {
             Class<?> clz = def.getClass();
-            XMLHandler<D> handler = (XMLHandler<D>)handlers.get(clz);
+            XMLHandler<D> handler = (XMLHandler<D>) handlers.get(clz);
             handler.writeElement(def, sourceWriter);
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new AuraRuntimeException(e);
-        }finally{
-            try{
+        } finally {
+            try {
                 sourceWriter.flush();
                 sourceWriter.close();
-            }catch(Exception e){
+            } catch (Exception e) {
                 throw new AuraRuntimeException(e);
             }
         }
     }
 
-    public Map<Class<? extends Definition>, XMLHandler<?>> getHandlers(){
+    public Map<Class<? extends Definition>, XMLHandler<?>> getHandlers() {
         return handlers;
     }
 }

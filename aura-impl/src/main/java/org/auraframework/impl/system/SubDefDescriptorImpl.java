@@ -31,7 +31,8 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 /**
- * subdef impl, passes most stuff except for name through to the parent descriptor
+ * subdef impl, passes most stuff except for name through to the parent
+ * descriptor
  */
 public class SubDefDescriptorImpl<T extends Definition, P extends Definition> implements SubDefDescriptor<T, P> {
     private static final long serialVersionUID = -4922652464026095847L;
@@ -43,8 +44,9 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
     private final int hashCode;
 
     /**
-     * Pattern for subDefDescriptors: java://foo.bar.baz/ACTION$getUser Group 1 = parent name = java://foo.bar.baz Group
-     * 2 = defType = ACTION Group 3 = name = getUser
+     * Pattern for subDefDescriptors: java://foo.bar.baz/ACTION$getUser Group 1
+     * = parent name = java://foo.bar.baz Group 2 = defType = ACTION Group 3 =
+     * name = getUser
      */
     public static final Pattern SUBDEF_PATTERN = Pattern.compile("\\A((?:[\\w\\\\*]+://)?.*)/(\\w+)\\$(\\w+)\\z");
 
@@ -106,7 +108,7 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
     public String getNameParameters() {
         return null;
     }
-    
+
     @Override
     public String getQualifiedName() {
         return qualifiedName;
@@ -130,7 +132,7 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
     @Override
     public boolean equals(Object o) {
         if (o instanceof SubDefDescriptorImpl) {
-            SubDefDescriptorImpl<?,?> e = (SubDefDescriptorImpl<?,?>)o;
+            SubDefDescriptorImpl<?, ?> e = (SubDefDescriptorImpl<?, ?>) o;
             return defType == e.defType && name.equals(e.name) && parentDescriptor.equals(e.parentDescriptor);
         }
         return false;
@@ -142,21 +144,21 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
     }
 
     public static <Sub extends Definition, Par extends Definition> SubDefDescriptor<Sub, Par> getInstance(String name,
-                                                                    DefDescriptor<Par> pDesc, Class<Sub> defClass) {
+            DefDescriptor<Par> pDesc, Class<Sub> defClass) {
         return new SubDefDescriptorImpl<Sub, Par>(pDesc, name, defClass);
     }
 
     public static <Sub extends Definition, Par extends Definition> SubDefDescriptor<Sub, Par> getInstance(
             String qualifiedName, Class<Sub> defClass, Class<Par> parClass) {
-        
+
         Matcher matcher = SUBDEF_PATTERN.matcher(qualifiedName);
         if (matcher.matches()) {
             String parentName = matcher.group(1);
-            String  name = matcher.group(3);
+            String name = matcher.group(3);
             DefDescriptor<Par> parentDescriptor = DefDescriptorImpl.getInstance(parentName, parClass);
             return getInstance(name, parentDescriptor, defClass);
-            
-        }else{
+
+        } else {
             throw new AuraRuntimeException(String.format("Invalid Descriptor Format: %s", qualifiedName));
         }
     }
@@ -169,5 +171,15 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
     @Override
     public boolean exists() {
         throw new AuraError("cannot check existence of a subdef as it requires compiling the parent def");
+    }
+
+    /**
+     * Compares one {@link DefDescriptor} to another. Sorting uses (only) the
+     * qualified name, case insensitively. Per {@link Comparable}'s spec, throws
+     * {@link ClassCastException} if {@code arg} is not a {@code DefDescriptor}.
+     */
+    @Override
+    public int compareTo(DefDescriptor other) {
+        return DefDescriptorImpl.compare(this, other);
     }
 }

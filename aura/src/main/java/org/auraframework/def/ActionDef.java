@@ -17,7 +17,6 @@ package org.auraframework.def;
 
 import java.util.List;
 
-
 /**
  * Interface for actions, with params, types, and return type
  */
@@ -27,12 +26,12 @@ public interface ActionDef extends Definition {
     DefDescriptor<ActionDef> getDescriptor();
 
     /**
-     * Actions can be server side or client side. If they are client side the server just sends the code down
-     * and remains oblivious as to how they are run
+     * Actions can be server side or client side. If they are client side the
+     * server just sends the code down and remains oblivious as to how they are
+     * run
      */
     public enum ActionType {
-        CLIENT,
-        SERVER;
+        CLIENT, SERVER;
     }
 
     /**
@@ -41,8 +40,9 @@ public interface ActionDef extends Definition {
     ActionType getActionType();
 
     /**
-     * The name of this action is the unique identifier the component can use to call this action
-     *
+     * The name of this action is the unique identifier the component can use to
+     * call this action
+     * 
      * @return the name of this action
      */
     @Override
@@ -50,15 +50,16 @@ public interface ActionDef extends Definition {
 
     /**
      * Basic type system stuff
-     *
+     * 
      * @return the type this action returns
      */
     DefDescriptor<TypeDef> getReturnType();
 
     /**
-     * Get all the parameters for this action. They are returned in the order they are defined but
-     * because the names are provided some contexts can provide args in any order and match up the params
-     *
+     * Get all the parameters for this action. They are returned in the order
+     * they are defined but because the names are provided some contexts can
+     * provide args in any order and match up the params
+     * 
      * @return ordered list of parameters
      */
     List<ValueDef> getParameters();

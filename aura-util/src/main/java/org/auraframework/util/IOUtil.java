@@ -67,7 +67,7 @@ public class IOUtil {
     }
 
     public static long copyStream(InputStream in, OutputStream out, byte[] buf, boolean closeStream, Logger logger,
-                                 Level level, final long numBytesToCopy) throws IOException {
+            Level level, final long numBytesToCopy) throws IOException {
         if (buf == null) {
             buf = new byte[8192];
         }
@@ -75,21 +75,24 @@ public class IOUtil {
             int len;
             long copied = 0;
             while (numBytesToCopy > copied
-                    && (len = in.read(buf, 0, (int)Math.min(buf.length, (numBytesToCopy - copied)))) != -1) {
+                    && (len = in.read(buf, 0, (int) Math.min(buf.length, (numBytesToCopy - copied)))) != -1) {
                 out.write(buf, 0, len);
                 if (logger != null && logger.isLoggable(level)) {
                     logger.log(level, new String(buf, 0, len));
                 }
                 copied += len;
             }
-            if (numBytesToCopy != Long.MAX_VALUE && numBytesToCopy != copied) { throw new IOException(
-                    "expected to copy " + numBytesToCopy + ", actually copied " + copied); }
+            if (numBytesToCopy != Long.MAX_VALUE && numBytesToCopy != copied) {
+                throw new IOException("expected to copy " + numBytesToCopy + ", actually copied " + copied);
+            }
             return copied;
         } finally {
             try {
                 out.flush();
             } finally {
-                if (closeStream) in.close();
+                if (closeStream) {
+                    in.close();
+                }
             }
         }
     }
@@ -129,7 +132,9 @@ public class IOUtil {
      * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4742723
      */
     public static void mkdirs(File f) {
-        if (f.mkdir() || f.exists()) { return; }
+        if (f.mkdir() || f.exists()) {
+            return;
+        }
         File canonFile;
         try {
             canonFile = f.getCanonicalFile();
@@ -138,7 +143,8 @@ public class IOUtil {
         }
         File parent = canonFile.getParentFile();
         if (parent != null) {
-            mkdirs(parent); // ignore the return as it may have been created already
+            mkdirs(parent); // ignore the return as it may have been created
+                            // already
         }
         // lastly, let's make this directory
         canonFile.mkdir();
@@ -146,12 +152,11 @@ public class IOUtil {
 
     /**
      * List all files inside the given directory
-     *
+     * 
      * @param rootDir
-     * @param excludeDirs
-     *          true if only files need to be listed and not directories. false if both.
-     * @param recursive
-     *          true to list files from sub folders recursively
+     * @param excludeDirs true if only files need to be listed and not
+     *            directories. false if both.
+     * @param recursive true to list files from sub folders recursively
      */
     public static File[] listFiles(File rootDir, boolean excludeDirs, boolean recursive) {
         List<File> files = new ArrayList<File>();
@@ -160,7 +165,9 @@ public class IOUtil {
         if (excludeDirs) {
             List<File> rf = new ArrayList<File>(files.size());
             for (File f : files) {
-                if (!f.isDirectory()) { rf.add(f); }
+                if (!f.isDirectory()) {
+                    rf.add(f);
+                }
             }
             files = rf;
         }
@@ -168,8 +175,9 @@ public class IOUtil {
     }
 
     /**
-     * A method used by listfiles to list the files recursively in the subfolders
-     *
+     * A method used by listfiles to list the files recursively in the
+     * subfolders
+     * 
      * @param at
      * @param files
      * @param depth
@@ -182,18 +190,19 @@ public class IOUtil {
                     files.add(f);
                     if (depth > 0) {
                         listFiles(f, files, depth - 1);
+                    }
                 }
             }
         }
     }
-    }
 
     /**
-     * This exception is thrown by {@link #delete(File)} if some level of delete failed.
+     * This exception is thrown by {@link #delete(File)} if some level of delete
+     * failed.
      */
     @SuppressWarnings("serial")
     public static class DeleteFailedException extends Exception {
-        private File file;
+        private final File file;
 
         public DeleteFailedException(String message, File file) {
             super(message);
@@ -206,7 +215,8 @@ public class IOUtil {
     }
 
     /**
-     * This exception is thrown by {@link #delete(File)} if one of the directories is not readable.
+     * This exception is thrown by {@link #delete(File)} if one of the
+     * directories is not readable.
      */
     @SuppressWarnings("serial")
     public static class DirectoryNotReadableException extends DeleteFailedException {
@@ -217,44 +227,48 @@ public class IOUtil {
 
     /**
      * Recursively delete.
-     *
-     * This makes a best attempt to delete the file/directory in question. It will recurse down any
-     * directory structure and delete all subdirectories/files. If for some reason a directory is not
-     * readable, we throw {@link DirectoryNotReadableException}, with the name of the directory.
-     * If a delete fails, we throw {@link DeleteFailedException} with the file we could not delete.
-     *
+     * 
+     * This makes a best attempt to delete the file/directory in question. It
+     * will recurse down any directory structure and delete all
+     * subdirectories/files. If for some reason a directory is not readable, we
+     * throw {@link DirectoryNotReadableException}, with the name of the
+     * directory. If a delete fails, we throw {@link DeleteFailedException} with
+     * the file we could not delete.
+     * 
      * @param file The file to recursively delete.
      * @throws DeleteFailedException if the delete fails for any reason.
      */
     public static void delete(File file) throws DeleteFailedException {
-        if (file == null || !file.exists()) { return; }
+        if (file == null || !file.exists()) {
+            return;
+        }
 
         if (file.isDirectory()) {
             File[] files = file.listFiles();
 
             if (files == null) {
-                throw new DirectoryNotReadableException("Please fix permissions for "+file.getAbsolutePath(), file);
+                throw new DirectoryNotReadableException("Please fix permissions for " + file.getAbsolutePath(), file);
             }
             for (File f : files) {
                 IOUtil.delete(f);
             }
         }
         if (!file.delete()) {
-            throw new DeleteFailedException("Failed to delete "+file.getAbsolutePath(), file);
+            throw new DeleteFailedException("Failed to delete " + file.getAbsolutePath(), file);
         }
     }
 
     /**
      * Create a JAR file containing the directory structure given by the folder.
-     *
-     * @param folder
-     *            the folder to recursively scan to fill the jar
-     * @param jarFile
-     *            the file that should contain the newly created jar.
+     * 
+     * @param folder the folder to recursively scan to fill the jar
+     * @param jarFile the file that should contain the newly created jar.
      */
     public static void createJarFromFolder(File folder, File jarFile) throws IOException, URISyntaxException {
         Preconditions.checkArgument(folder.isDirectory() && folder.exists());
-        if (!jarFile.createNewFile()) { throw new IOException("Unable to create jarfile at " + jarFile.getPath()); }
+        if (!jarFile.createNewFile()) {
+            throw new IOException("Unable to create jarfile at " + jarFile.getPath());
+        }
         JarOutputStream out = new JarOutputStream(new FileOutputStream(jarFile));
         File[] files = IOUtil.listFiles(folder, false, true);
         URI folderURI = new URI(folder.getPath());

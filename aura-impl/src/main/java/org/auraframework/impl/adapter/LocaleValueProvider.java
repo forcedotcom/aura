@@ -27,7 +27,8 @@ import org.auraframework.throwable.quickfix.InvalidExpressionException;
 
 public class LocaleValueProvider implements GlobalValueProvider {
 
-    public LocaleValueProvider() {}
+    public LocaleValueProvider() {
+    }
 
     @Override
     public Object getValue(PropertyReference expr) {
@@ -38,7 +39,8 @@ public class LocaleValueProvider implements GlobalValueProvider {
         // List<String> parts = expr.getList();
 
         // Generalize the retrieval of date formats.
-        // return Aura.getLocalizationAdapter().getFormat(parts.get(0), parts.get(1));
+        // return Aura.getLocalizationAdapter().getFormat(parts.get(0),
+        // parts.get(1));
     }
 
     @Override
@@ -74,6 +76,6 @@ public class LocaleValueProvider implements GlobalValueProvider {
         return null;
         // Get a serializable object that contains all the information
         // for the client to access the format strings.
-        //return Aura.getLocalizationAdapter().getLocale();
+        // return Aura.getLocalizationAdapter().getLocale();
     }
 }

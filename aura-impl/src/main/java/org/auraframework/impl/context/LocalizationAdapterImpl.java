@@ -15,7 +15,9 @@
  */
 package org.auraframework.impl.context;
 
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.LocalizationAdapter;
@@ -41,13 +43,15 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
     }
 
     /**
-     * Creates a AuraLocale using the first Locale specified in the Http Request based on the Accept-Language
-     * header values when available, otherwise the default is used.
+     * Creates a AuraLocale using the first Locale specified in the Http Request
+     * based on the Accept-Language header values when available, otherwise the
+     * default is used.
      */
     @Override
     public AuraLocale getAuraLocale() {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        // check for nulls - this happens when AuraContextFilter has not been run
+        // check for nulls - this happens when AuraContextFilter has not been
+        // run
         if (context != null) {
             List<Locale> locales = context.getRequestedLocales();
             if (locales != null && locales.size() > 0) {
@@ -68,11 +72,10 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
     }
 
     @Override
-    public AuraLocale getAuraLocale(Locale defaultLocale, Locale currencyLocale, Locale dateLocale, Locale languageLocale,
-            Locale numberLocale, Locale systemLocale, TimeZone timeZone) {
-        return new AuraLocaleImpl(defaultLocale, currencyLocale, dateLocale, languageLocale, numberLocale, systemLocale, timeZone);
+    public AuraLocale getAuraLocale(Locale defaultLocale, Locale currencyLocale, Locale dateLocale,
+            Locale languageLocale, Locale numberLocale, Locale systemLocale, TimeZone timeZone) {
+        return new AuraLocaleImpl(defaultLocale, currencyLocale, dateLocale, languageLocale, numberLocale,
+                systemLocale, timeZone);
     }
-
-
 
 }

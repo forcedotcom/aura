@@ -15,11 +15,16 @@
  */
 package org.auraframework.impl.source.file;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.impl.system.DefDescriptorImpl;
 
 import com.google.common.collect.ImmutableSet;
@@ -61,7 +66,8 @@ public class FileJavascriptSourceLoader extends FileSourceLoader {
         String pathOrId = jsControllerName;
         try {
             pathOrId = jsFile.exists() ? jsFile.getCanonicalPath() : jsControllerName;
-        } catch (IOException ex) {}
+        } catch (IOException ex) {
+        }
 
         return new FileJavascriptSource<D>(descriptor, pathOrId, jsFile);
     }

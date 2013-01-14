@@ -18,7 +18,9 @@ package org.auraframework.impl.javascript.provider;
 import java.io.IOException;
 
 import org.auraframework.builder.ComponentDefRefBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.ComponentConfig;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -30,7 +32,7 @@ public class JavascriptProviderDef extends DefinitionImpl<ProviderDef> implement
     /**
      */
     private static final long serialVersionUID = -3839367107553671775L;
-    private String code;
+    private final String code;
 
     protected JavascriptProviderDef(Builder builder) {
         super(builder);
@@ -44,12 +46,11 @@ public class JavascriptProviderDef extends DefinitionImpl<ProviderDef> implement
         json.writeMapEnd();
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<ProviderDef>{
+    public static class Builder extends DefinitionImpl.BuilderImpl<ProviderDef> {
 
-        public Builder(){
+        public Builder() {
             super(ProviderDef.class);
         }
-
 
         public String code;
 

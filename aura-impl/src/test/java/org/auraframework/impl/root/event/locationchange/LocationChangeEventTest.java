@@ -23,35 +23,42 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 /**
  * Unit test to verify the implementation of LocationChange event.
- *
+ * 
  * @hierarchy Aura.Components.Events.Browser History Management
  * @priority high
  * @userStory a07B0000000EYU4
  */
 public class LocationChangeEventTest extends AuraImplTestCase {
-    public LocationChangeEventTest(String name){
+    public LocationChangeEventTest(String name) {
         super(name);
     }
+
     /**
-     * A basic test to demonstrate how every application is registered to fire the LocationChange event.
-     * The definition(tree) of the application has a section called "locationChangeEventDef".
+     * A basic test to demonstrate how every application is registered to fire
+     * the LocationChange event. The definition(tree) of the application has a
+     * section called "locationChangeEventDef".
+     * 
      * @throws Exception
      */
-    public void testApplicationDefWithLocationChange() throws Exception{
-        Application cmp = Aura.getInstanceService().getInstance("test:test_LocChng_SimpleComponent", ApplicationDef.class);
-        this.serializeAndGoldFile(cmp,"simpleComponent");
-        //References to LocationChangeEvent in children refer back to the first definition of LocationChangeEvent using serRefId
+    public void testApplicationDefWithLocationChange() throws Exception {
+        Application cmp = Aura.getInstanceService().getInstance("test:test_LocChng_SimpleComponent",
+                ApplicationDef.class);
+        this.serializeAndGoldFile(cmp, "simpleComponent");
+        // References to LocationChangeEvent in children refer back to the first
+        // definition of LocationChangeEvent using serRefId
         cmp = Aura.getInstanceService().getInstance("test:test_LocChng_CompositeComponent", ApplicationDef.class);
-        this.serializeAndGoldFile(cmp,"compositeComponent");
+        this.serializeAndGoldFile(cmp, "compositeComponent");
     }
+
     /**
-     * Negative test case: Check that events used to handle location change always extend aura:locationChange.
+     * Negative test case: Check that events used to handle location change
+     * always extend aura:locationChange.
      */
-    public void testRegisteredLocationChangeEventExtendsAuraLocationChange() throws Exception{
-        try{
+    public void testRegisteredLocationChangeEventExtendsAuraLocationChange() throws Exception {
+        try {
             Aura.getInstanceService().getInstance("test:test_LocChng_NoExtends", ApplicationDef.class);
             fail("Should have not fetched this component because the location change event does not extend aura:locationChange");
-        } catch(InvalidDefinitionException e) {
+        } catch (InvalidDefinitionException e) {
         }
     }
 }

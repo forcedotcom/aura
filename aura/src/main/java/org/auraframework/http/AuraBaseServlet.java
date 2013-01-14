@@ -17,23 +17,31 @@ package org.auraframework.http;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletException;
-import javax.servlet.http.*;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
-import org.auraframework.adapter.ExceptionAdapter;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.throwable.*;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.AuraUnhandledException;
+import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -57,8 +65,9 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     static {
         mimeTypesMap = new MimetypesFileTypeMap();
-        // the default MIME map is apparently circa 1992, so add some types we might need
-        mimeTypesMap.addMimeTypes(AuraServlet.JAVASCRIPT_CONTENT_TYPE + " js");
+        // the default MIME map is apparently circa 1992, so add some types we
+        // might need
+        mimeTypesMap.addMimeTypes(AuraBaseServlet.JAVASCRIPT_CONTENT_TYPE + " js");
         mimeTypesMap.addMimeTypes("text/css css");
         mimeTypesMap.addMimeTypes("audio/mpeg mp3 mpeg3");
         mimeTypesMap.addMimeTypes("image/png png");
@@ -66,10 +75,10 @@ public abstract class AuraBaseServlet extends HttpServlet {
     }
 
     protected static void addCookie(HttpServletResponse response, String name, String value, long expiry) {
-        if(name != null){
+        if (name != null) {
             Cookie cookie = new Cookie(name, value);
             cookie.setPath("/");
-            cookie.setMaxAge((int)expiry);
+            cookie.setMaxAge((int) expiry);
             response.addCookie(cookie);
         }
     }
@@ -109,17 +118,18 @@ public abstract class AuraBaseServlet extends HttpServlet {
             uri = uri.substring(0, hashLoc);
         }
         StringBuilder sb = new StringBuilder(uri);
-        sb.append((uri.contains("?"))?"&":"?");
+        sb.append((uri.contains("?")) ? "&" : "?");
         sb.append("aura.cb=");
         sb.append(Aura.getConfigAdapter().getBuildTimestamp());
-        return sb.toString()+hash;
+        return sb.toString() + hash;
     }
 
     public AuraBaseServlet() {
         super();
     }
 
-    protected void send404(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void send404(HttpServletRequest request, HttpServletResponse response) throws ServletException,
+            IOException {
         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         response.getWriter().println("404 Not Found");
         Aura.getContextService().endContext();
@@ -134,12 +144,12 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     /**
      * Handle an exception in the servlet.
-     *
-     * This routine shold be called whenever an exception has surfaced to the top level of
-     * the servlet. It should not be overridden unless Aura is entirely subsumed. Most
-     * special cases can be handled by the Aura user by implementing
-     * {@link ExceptionAdapter ExceptionAdapter}.
-     *
+     * 
+     * This routine shold be called whenever an exception has surfaced to the
+     * top level of the servlet. It should not be overridden unless Aura is
+     * entirely subsumed. Most special cases can be handled by the Aura user by
+     * implementing {@link ExceptionAdapter ExceptionAdapter}.
+     * 
      * @param t the throwable to write out.
      * @param quickfix is this exception a valid quick-fix
      * @param context the aura context.
@@ -150,19 +160,20 @@ public abstract class AuraBaseServlet extends HttpServlet {
      * @throws ServletException if send404 does (should not generally happen).
      */
     protected void handleServletException(Throwable t, boolean quickfix, AuraContext context,
-                                          HttpServletRequest request, HttpServletResponse response,
-                                          boolean written) throws IOException, ServletException {
+            HttpServletRequest request, HttpServletResponse response, boolean written) throws IOException,
+            ServletException {
         Throwable mappedEx = t;
         boolean map = !quickfix;
         Format format = context.getFormat();
 
         //
-        //This seems to fail, though the documentation implies that you can do it.
+        // This seems to fail, though the documentation implies that you can do
+        // it.
         //
-        //if (written && !response.isCommitted()) {
-        //    response.resetBuffer();
-        //    written = false;
-        //}
+        // if (written && !response.isCommitted()) {
+        // response.resetBuffer();
+        // written = false;
+        // }
         if (!written) {
             // Should we only delete for JSON?
             deleteManifestCookie(response);
@@ -172,7 +183,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
             //
             // Just re-throw IOExceptions.
             //
-            throw (IOException)mappedEx;
+            throw (IOException) mappedEx;
         } else if (mappedEx instanceof NoAccessException) {
             Throwable cause = mappedEx.getCause();
             String denyMessage = mappedEx.getMessage();
@@ -183,7 +194,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 // Note that the exception handler can remap the cause here.
                 //
                 cause = Aura.getExceptionAdapter().handleException(cause);
-                denyMessage += ": cause = "+cause.getMessage();
+                denyMessage += ": cause = " + cause.getMessage();
             }
             //
             // Is this correct?!?!?!
@@ -222,13 +233,17 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 out.write(CSRF_PROTECT);
             }
             //
-            // If an exception happened while we were emitting JSON, we want the client to ignore the
-            // now-corrupt data structure. 404s and 500s cause the client to prepend /*, so we can effectively
-            // erase the bad data by appending a */ here and then serializing the exception info.
+            // If an exception happened while we were emitting JSON, we want the
+            // client to ignore the
+            // now-corrupt data structure. 404s and 500s cause the client to
+            // prepend /*, so we can effectively
+            // erase the bad data by appending a */ here and then serializing
+            // the exception info.
             //
             out.write("*/");
             //
-            // Unfortunately we can't do the following now. It might be possible in some cases, but we don't
+            // Unfortunately we can't do the following now. It might be possible
+            // in some cases, but we don't
             // want to go there unless we have to.
             //
             // response.setHeader("ser", "1");
@@ -265,35 +280,35 @@ public abstract class AuraBaseServlet extends HttpServlet {
         }
     }
 
-    public static boolean shouldCacheHTMLTemplate(HttpServletRequest request){
+    public static boolean shouldCacheHTMLTemplate(HttpServletRequest request) {
         AuraContext context = Aura.getContextService().getCurrentContext();
         try {
             DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getApplicationDescriptor();
-            if(appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)){
-                Boolean isOnePageApp = ((ApplicationDef)appDefDesc.getDef()).isOnePageApp();
-                if(isOnePageApp != null){
-                	return isOnePageApp.booleanValue();
+            if (appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)) {
+                Boolean isOnePageApp = ((ApplicationDef) appDefDesc.getDef()).isOnePageApp();
+                if (isOnePageApp != null) {
+                    return isOnePageApp.booleanValue();
                 }
             }
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
         }
         return !isManifestEnabled(request);
-    }    
-    
-    public static boolean isManifestEnabled(HttpServletRequest request){
-        if(!Aura.getConfigAdapter().isClientAppcacheEnabled()){
+    }
+
+    public static boolean isManifestEnabled(HttpServletRequest request) {
+        if (!Aura.getConfigAdapter().isClientAppcacheEnabled()) {
             return false;
         }
-        if(!request.getHeader("user-agent").contains("AppleWebKit")){
+        if (!request.getHeader("user-agent").contains("AppleWebKit")) {
             return false;
         }
         AuraContext context = Aura.getContextService().getCurrentContext();
         try {
             DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getApplicationDescriptor();
-            if(appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)){
-                Boolean useAppcache = ((ApplicationDef)appDefDesc.getDef()).isAppcacheEnabled();
-                if(useAppcache != null){
+            if (appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)) {
+                Boolean useAppcache = ((ApplicationDef) appDefDesc.getDef()).isAppcacheEnabled();
+                if (useAppcache != null) {
                     return useAppcache.booleanValue();
                 }
                 return false;
@@ -305,11 +320,11 @@ public abstract class AuraBaseServlet extends HttpServlet {
         return false;
     }
 
-    private static String getManifestCookieName(){
+    private static String getManifestCookieName() {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        if(context.getApplicationDescriptor()!=null){
+        if (context.getApplicationDescriptor() != null) {
             StringBuilder sb = new StringBuilder();
-            if(context.getMode() != Mode.PROD){
+            if (context.getMode() != Mode.PROD) {
                 sb.append(context.getMode());
                 sb.append("_");
             }
@@ -324,7 +339,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     public static void addManifestCookie(HttpServletResponse response, String value, long expiry) {
         String cookieName = getManifestCookieName();
-        if(cookieName != null){
+        if (cookieName != null) {
             addCookie(response, cookieName, value, expiry);
         }
     }
@@ -350,43 +365,40 @@ public abstract class AuraBaseServlet extends HttpServlet {
     }
 
     public static Cookie getManifestCookie(HttpServletRequest request) {
-         Cookie[] cookies = request.getCookies();
-         if(cookies != null){
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
             String cookieName = getManifestCookieName();
-            if(cookieName != null){
-                for(int i=0; i<cookies.length; i++){
+            if (cookieName != null) {
+                for (int i = 0; i < cookies.length; i++) {
                     Cookie cookie = cookies[i];
-                    if(cookieName.equals(cookie.getName())){
-                         return cookie;
-                     }
+                    if (cookieName.equals(cookie.getName())) {
+                        return cookie;
+                    }
                 }
             }
-         }
-         return null;
+        }
+        return null;
     }
 
-    private final static ConcurrentHashMap<String, Long> lastModMap =
-            new ConcurrentHashMap<String, Long>();
+    private final static ConcurrentHashMap<String, Long> lastModMap = new ConcurrentHashMap<String, Long>();
 
-    public String getContentType( AuraContext.Format format )
-    {
+    public String getContentType(AuraContext.Format format) {
         switch (format) {
-            case MANIFEST: 
-                return (AuraBaseServlet.MANIFEST_CONTENT_TYPE);
-            case CSS:      
-                return (AuraBaseServlet.CSS_CONTENT_TYPE);
-            case JS:       
-                return (AuraBaseServlet.JAVASCRIPT_CONTENT_TYPE);
-            case JSON:     
-                return (Json.MIME_TYPE);
-            case HTML:
-                return (AuraBaseServlet.HTML_CONTENT_TYPE);
-        
+        case MANIFEST:
+            return (AuraBaseServlet.MANIFEST_CONTENT_TYPE);
+        case CSS:
+            return (AuraBaseServlet.CSS_CONTENT_TYPE);
+        case JS:
+            return (AuraBaseServlet.JAVASCRIPT_CONTENT_TYPE);
+        case JSON:
+            return (Json.MIME_TYPE);
+        case HTML:
+            return (AuraBaseServlet.HTML_CONTENT_TYPE);
         }
         return ("text/plain");
     }
 
-    public static long getLastMod() throws QuickFixException{
+    public static long getLastMod() throws QuickFixException {
         DefinitionService definitionService = Aura.getDefinitionService();
         AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();
@@ -435,13 +447,13 @@ public abstract class AuraBaseServlet extends HttpServlet {
         return lastMod;
     }
 
-    public static long getManifestLastMod() throws QuickFixException{
+    public static long getManifestLastMod() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         Mode mode = context.getMode();
-        if(!(mode == Mode.PROD || mode == Mode.PTEST || mode == Mode.CADENCE)){
+        if (!(mode == Mode.PROD || mode == Mode.PTEST || mode == Mode.CADENCE)) {
             long auraJSLastMod = Aura.getConfigAdapter().getAuraJSLastMod();
             long lastMod = getLastMod();
-            return (auraJSLastMod > lastMod)?auraJSLastMod:lastMod;
+            return (auraJSLastMod > lastMod) ? auraJSLastMod : lastMod;
         }
         return getLastMod();
     }

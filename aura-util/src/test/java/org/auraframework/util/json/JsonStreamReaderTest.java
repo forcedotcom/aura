@@ -72,12 +72,15 @@ public class JsonStreamReaderTest extends UnitTestCase {
         try {
             new JsonStreamReader(nullReader, new JsonHandlerProviderImpl());
             fail("Should not have accepted a null reader");
-        } catch (JsonParseException expected) {}
+        } catch (JsonParseException expected) {
+        }
         try {
             new JsonStreamReader(nullString, nullProvider);
             fail("Should not have accepted a null string");
-        } catch (JsonParseException expected) {}
-        // When a null provider is passed, it's expected to use a default provider
+        } catch (JsonParseException expected) {
+        }
+        // When a null provider is passed, it's expected to use a default
+        // provider
         JsonStreamReader obj = new JsonStreamReader("[{key:\"value\"},30]", nullProvider);
         obj.next();
         assertTrue(obj.getValue() instanceof List);
@@ -104,8 +107,8 @@ public class JsonStreamReaderTest extends UnitTestCase {
     }
 
     /**
-     * Positive and negative tests for {@link JsonStreamReader#getList()} for when recursive reading is
-     * disabled
+     * Positive and negative tests for {@link JsonStreamReader#getList()} for
+     * when recursive reading is disabled
      */
     public void testGetListWithRecursiveReadDisabled() throws Exception {
         runGetListTest(new JsonStreamGetObjectOrArrayTestConfig() {
@@ -154,7 +157,8 @@ public class JsonStreamReaderTest extends UnitTestCase {
             jsonStreamReader.getList();
             fail("Trying to get a list by passing a string should have failed.");
         } catch (JsonStreamParseException expected) {
-            // Make sure the exception was because of mis-match between expected token and actual token
+            // Make sure the exception was because of mis-match between expected
+            // token and actual token
             assertTrue(expected.getMessage().startsWith("Current Token is STRING, not ARRAY"));
         } finally {
             jsonStreamReader.close();
@@ -186,12 +190,13 @@ public class JsonStreamReaderTest extends UnitTestCase {
                     assortedList.get(0), "test1");
             assertTrue(assortedList.get(1) instanceof BigDecimal);
             assertEquals("JsonStreamReader has extracted the wrong element or disordered the elements",
-                    ((BigDecimal)assortedList.get(1)).doubleValue(), 20.0);
+                    ((BigDecimal) assortedList.get(1)).doubleValue(), 20.0);
         } finally {
             jsonStreamReader.close();
         }
         /*
-         * Positive test case 3: Pass a Json string with Arrays inside of an Array
+         * Positive test case 3: Pass a Json string with Arrays inside of an
+         * Array
          */
         jsonStreamReader = config.createJsonStreamReader("[[\"test1\",\"test2\"],[20,30],true]");
         try {
@@ -201,7 +206,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
             assertEquals("JsonStreamReader should have extracted only 3 list items from the nested list", 3,
                     nestedList.size());
 
-            List<Object> stringList = (List<Object>)nestedList.get(0);
+            List<Object> stringList = (List<Object>) nestedList.get(0);
             assertEquals("JsonStreamReader should have extracted only 2 items for the first inner list", 2,
                     stringList.size());
             assertTrue("JsonStreamReader has extracted the wrong element or disordered the elements", stringList.get(0)
@@ -209,13 +214,13 @@ public class JsonStreamReaderTest extends UnitTestCase {
             assertTrue("JsonStreamReader has extracted the wrong element or disordered the elements", stringList.get(1)
                     .equals("test2"));
 
-            List<Object> numberList = (List<Object>)nestedList.get(1);
+            List<Object> numberList = (List<Object>) nestedList.get(1);
             assertEquals("JsonStreamReader should have extracted only 2 items for the second inner list", 2,
                     numberList.size());
             assertEquals("JsonStreamReader has extracted the wrong element or disordered the elements",
-                    ((BigDecimal)numberList.get(0)).doubleValue(), 20.0);
+                    ((BigDecimal) numberList.get(0)).doubleValue(), 20.0);
             assertEquals("JsonStreamReader has extracted the wrong element or disordered the elements",
-                    ((BigDecimal)numberList.get(1)).doubleValue(), 30.0);
+                    ((BigDecimal) numberList.get(1)).doubleValue(), 30.0);
 
             Object o = nestedList.get(2);
             assertTrue("JsonStreamReader has extracted the wrong element", o.equals(Boolean.TRUE));
@@ -235,7 +240,8 @@ public class JsonStreamReaderTest extends UnitTestCase {
             jsonStreamReader.getBoolean();
             fail("Trying to get a boolean by passing a string should have failed.");
         } catch (JsonParseException expected) {
-            // Make sure the exception was because of mis-match between expected token
+            // Make sure the exception was because of mis-match between expected
+            // token
             // and actual token
             assertTrue(expected.getMessage().startsWith("Current Token is NUMBER, not BOOLEAN"));
         } finally {
@@ -247,7 +253,8 @@ public class JsonStreamReaderTest extends UnitTestCase {
             assertEquals(JsonConstant.BOOLEAN, jsonStreamReader.next());
             jsonStreamReader.getBoolean();
             fail("JsonStreamReader should have treated this input as a literal");
-        } catch (JsonParseException expected) {} finally {
+        } catch (JsonParseException expected) {
+        } finally {
             jsonStreamReader.close();
         }
 
@@ -277,7 +284,8 @@ public class JsonStreamReaderTest extends UnitTestCase {
             jsonStreamReader.getNumber();
             fail("Trying to get a number by passing a string should have failed.");
         } catch (JsonStreamParseException expected) {
-            // Make sure the exception was because of mis-match between expected token and actual token
+            // Make sure the exception was because of mis-match between expected
+            // token and actual token
             assertTrue(expected.getMessage().startsWith("Current Token is STRING, not NUMBER"));
         }
         /**
@@ -289,11 +297,13 @@ public class JsonStreamReaderTest extends UnitTestCase {
             jsonStreamReader.getNumber();
             fail("Trying to get a boolean by passing a string should have failed.");
         } catch (JsonStreamParseException expected) {
-            // Make sure the exception was because of mis-match between expected token and actual token
+            // Make sure the exception was because of mis-match between expected
+            // token and actual token
             assertTrue(expected.getMessage().startsWith("Current Token is BOOLEAN, not NUMBER"));
         }
         /*
-         * Negative test case 3: Pass an invalid number and expect a numberformat exception
+         * Negative test case 3: Pass an invalid number and expect a
+         * numberformat exception
          */
         try {
             jsonStreamReader = new JsonStreamReader("30xyz");
@@ -338,8 +348,8 @@ public class JsonStreamReaderTest extends UnitTestCase {
 
     /**
      * Positive and Negative test for {@link JsonStreamReader#getObject()} and
-     * {@link JsonStreamReader#next()} when recursive reading is disabled. Also other cases while
-     * parsing a string representing an Object
+     * {@link JsonStreamReader#next()} when recursive reading is disabled. Also
+     * other cases while parsing a string representing an Object
      */
     public void testGetObjectWithRecursiveReadDisabled() throws Exception {
         runGetObjectTest(new JsonStreamGetObjectOrArrayTestConfig() {
@@ -360,7 +370,8 @@ public class JsonStreamReaderTest extends UnitTestCase {
 
     /**
      * Positive and Negative test for {@link JsonStreamReader#getObject()} and
-     * {@link JsonStreamReader#next()}. Also other cases while parsing a string representing an Object
+     * {@link JsonStreamReader#next()}. Also other cases while parsing a string
+     * representing an Object
      */
     public void testGetObject() throws Exception {
         runGetObjectTest(new JsonStreamGetObjectOrArrayTestConfig() {
@@ -380,7 +391,8 @@ public class JsonStreamReaderTest extends UnitTestCase {
 
     /**
      * Positive and Negative test for {@link JsonStreamReader#getObject()} and
-     * {@link JsonStreamReader#next()}. Also other cases while parsing a string representing an Object
+     * {@link JsonStreamReader#next()}. Also other cases while parsing a string
+     * representing an Object
      */
     private void runGetObjectTest(JsonStreamGetObjectOrArrayTestConfig config) throws Exception {
         jsonStreamReader = config.createJsonStreamReader("[\"test1\",20]");
@@ -389,7 +401,8 @@ public class JsonStreamReaderTest extends UnitTestCase {
             jsonStreamReader.getObject();
             fail("Expeccting an object when a string representing an array is passed.");
         } catch (JsonStreamParseException expected) {
-            // Make sure the exception was because of mis-match between expected token and actual token
+            // Make sure the exception was because of mis-match between expected
+            // token and actual token
             assertTrue(expected.getMessage().startsWith(
                     "Current Token is ARRAY" + (config.isRecursiveReadEnabled() ? "" : "_START") + ", not OBJECT"));
         } finally {
@@ -404,7 +417,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
             Map<String, Object> o = jsonStreamReader.getObject();
             assertTrue(o.containsKey("objName"));
             assertTrue(o.get("objName") instanceof BigDecimal);
-            assertEquals(((BigDecimal)o.get("objName")).doubleValue(), 20.0);
+            assertEquals(((BigDecimal) o.get("objName")).doubleValue(), 20.0);
         } finally {
             jsonStreamReader.close();
         }
@@ -419,8 +432,9 @@ public class JsonStreamReaderTest extends UnitTestCase {
             jsonStreamReader.close();
         }
         /*
-         * Positive test case 3: object with comments and multi line comments and special characters Object starts with
-         * comments, consists of comments.
+         * Positive test case 3: object with comments and multi line comments
+         * and special characters Object starts with comments, consists of
+         * comments.
          */
         jsonStreamReader = config.createJsonStreamReader(" //comment line, followed by another //\n"
                 + "/*  Start object paren  */ \n" + "{" + "/*comme\n\n\nnt2*/" + "objName:" + "//comment 3\n" + "20"
@@ -431,7 +445,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
             Map<String, Object> o = jsonStreamReader.getObject();
             assertTrue(o.containsKey("objName"));
             assertTrue(o.get("objName") instanceof BigDecimal);
-            assertEquals(((BigDecimal)o.get("objName")).doubleValue(), 20.0);
+            assertEquals(((BigDecimal) o.get("objName")).doubleValue(), 20.0);
         } finally {
             jsonStreamReader.close();
         }
@@ -493,17 +507,17 @@ public class JsonStreamReaderTest extends UnitTestCase {
             assertEquals(waldo, outerMap.get("waldo"));
 
             Object thud = outerMap.get("thud");
-            Map<String, Object> wibble = (Map<String, Object>)thud;
+            Map<String, Object> wibble = (Map<String, Object>) thud;
             assertTrue(wibble.containsKey("wibble"));
             assertTrue(wibble.get("wibble").equals("wobble"));
 
             assertEquals("flob", outerMap.get("wubble"));
-            assertTrue((Boolean)outerMap.get("spam"));
-            assertFalse((Boolean)outerMap.get("ham"));
+            assertTrue((Boolean) outerMap.get("spam"));
+            assertFalse((Boolean) outerMap.get("ham"));
             assertNull(outerMap.get("eggs"));
-            assertEquals(-12345.6, ((BigDecimal)outerMap.get("num")).doubleValue());
-            assertEquals(1.23456, ((BigDecimal)outerMap.get("otherNum")).doubleValue());
-            assertEquals(12345.6, ((BigDecimal)outerMap.get("otherOtherNum")).doubleValue());
+            assertEquals(-12345.6, ((BigDecimal) outerMap.get("num")).doubleValue());
+            assertEquals(1.23456, ((BigDecimal) outerMap.get("otherNum")).doubleValue());
+            assertEquals(12345.6, ((BigDecimal) outerMap.get("otherOtherNum")).doubleValue());
             assertTrue(outerMap.get("func") instanceof JsFunction);
             assertEquals("\n" + AuraTextUtil.replaceSimple(func, "/*comment\n\n\n*/", "\n"),
                     Json.serialize(outerMap.get("func"), true, false));
@@ -542,35 +556,35 @@ public class JsonStreamReaderTest extends UnitTestCase {
         func = "{key:function () {var str = \"do Nothing\";}}";
         Object funcMapObj = this.parseAndRetrieve(func);
         assertTrue(funcMapObj instanceof Map);
-        Map<?, ?> funcObj = (Map<?, ?>)funcMapObj;
+        Map<?, ?> funcObj = (Map<?, ?>) funcMapObj;
         assertTrue(funcObj.get("key") instanceof JsFunction);
-        JsFunction jsfuncObj = (JsFunction)funcObj.get("key");
+        JsFunction jsfuncObj = (JsFunction) funcObj.get("key");
         assertTrue(jsfuncObj.getArguments().size() == 0);
         assertEquals("var str = \"do Nothing\";", jsfuncObj.getBody());
 
         Object functionAsLiteral = this.parseAndRetrieve("function () {var str = \"do Nothing\";}");
         assertTrue(functionAsLiteral instanceof JsFunction);
-        assertEquals("var str = \"do Nothing\";", ((JsFunction)functionAsLiteral).getBody());
+        assertEquals("var str = \"do Nothing\";", ((JsFunction) functionAsLiteral).getBody());
 
         Object functionAsList = this.parseAndRetrieve("[function () {var str = \"do Nothing\";} , 30]");
         assertTrue(functionAsList instanceof List);
-        assertEquals(((List<?>)functionAsList).size(), 2);
-        assertTrue(((List<?>)functionAsList).get(0) instanceof JsFunction);
-        JsFunction functionAsListObj1 = (JsFunction)((List<?>)functionAsList).get(0);
+        assertEquals(((List<?>) functionAsList).size(), 2);
+        assertTrue(((List<?>) functionAsList).get(0) instanceof JsFunction);
+        JsFunction functionAsListObj1 = (JsFunction) ((List<?>) functionAsList).get(0);
         assertTrue(functionAsListObj1.getArguments().size() == 0);
         assertEquals("var str = \"do Nothing\";", functionAsListObj1.getBody());
-        assertTrue(((List<?>)functionAsList).get(1) instanceof BigDecimal);
-        assertEquals(((BigDecimal)((List<?>)functionAsList).get(1)).doubleValue(), 30.0);
+        assertTrue(((List<?>) functionAsList).get(1) instanceof BigDecimal);
+        assertEquals(((BigDecimal) ((List<?>) functionAsList).get(1)).doubleValue(), 30.0);
 
         Object functionAsStringInList = this.parseAndRetrieve("[\"function () {var str = \\\"do Nothing\\\";}\" , 30]");
         assertTrue(functionAsStringInList instanceof List);
-        assertTrue(((List<?>)functionAsStringInList).get(0) instanceof String);
+        assertTrue(((List<?>) functionAsStringInList).get(0) instanceof String);
 
         func = "{key:function(101, 280) {var str = 'do nothing';}}";
         Object functionLiteralArgs = this.parseAndRetrieve(func);
         assertTrue(functionLiteralArgs instanceof Map);
-        assertTrue(((Map<?, ?>)functionLiteralArgs).get("key") instanceof JsFunction);
-        JsFunction functionLiteralArgs1 = (JsFunction)((Map<?, ?>)functionLiteralArgs).get("key");
+        assertTrue(((Map<?, ?>) functionLiteralArgs).get("key") instanceof JsFunction);
+        JsFunction functionLiteralArgs1 = (JsFunction) ((Map<?, ?>) functionLiteralArgs).get("key");
         assertTrue(functionLiteralArgs1.getArguments().size() == 2);
         assertEquals(functionLiteralArgs1.getArguments().get(0), "101");
         assertEquals("var str = \'do nothing\';", functionLiteralArgs1.getBody());
@@ -578,7 +592,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
         func = "function(101, 280) {var str = 'do nothing';}";
         Object functionAsLiteral1 = this.parseAndRetrieve(func);
         assertTrue(functionAsLiteral1 instanceof JsFunction);
-        JsFunction functionLiteralArgs2 = (JsFunction)(functionAsLiteral1);
+        JsFunction functionLiteralArgs2 = (JsFunction) (functionAsLiteral1);
         assertTrue(functionLiteralArgs2.getArguments().size() == 2);
         assertEquals(functionLiteralArgs2.getArguments().get(0), "101");
         assertEquals("var str = 'do nothing';", functionLiteralArgs2.getBody());
@@ -587,9 +601,9 @@ public class JsonStreamReaderTest extends UnitTestCase {
         this.parseAndRetrieve(func);
         Object namedFuncMapObj = this.parseAndRetrieve(func);
         assertTrue(namedFuncMapObj instanceof Map);
-        Map<?, ?> namedFuncObj = (Map<?, ?>)namedFuncMapObj;
+        Map<?, ?> namedFuncObj = (Map<?, ?>) namedFuncMapObj;
         assertTrue(namedFuncObj.get("key") instanceof JsFunction);
-        JsFunction namedJsfuncObj = (JsFunction)namedFuncObj.get("key");
+        JsFunction namedJsfuncObj = (JsFunction) namedFuncObj.get("key");
         assertEquals("foo", namedJsfuncObj.getName());
         assertTrue(namedJsfuncObj.getArguments().size() == 2);
         assertEquals(" var str = 'do nothing';", namedJsfuncObj.getBody());
@@ -618,10 +632,10 @@ public class JsonStreamReaderTest extends UnitTestCase {
         Object o = parseAndRetrieve(json);
         assertNotNull(o);
         assertTrue(o instanceof Map);
-        Map<String, Object> m = (Map<String, Object>)o;
+        Map<String, Object> m = (Map<String, Object>) o;
         assertEquals(value1, m.get(key1));
         assertEquals(value2, m.get(key2));
-        List<?> l = (List<?>)m.get(key3);
+        List<?> l = (List<?>) m.get(key3);
         assertEquals(value3_0, l.get(0));
         assertEquals(value3_1, l.get(1));
         assertEquals(value3_2, l.get(2));
@@ -644,7 +658,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
         String json = "[\"test1\",\"test2\"]";
         Object o = parseAndRetrieve(json);
         assertTrue(o instanceof List);
-        List<String> list = (List<String>)o;
+        List<String> list = (List<String>) o;
         assertEquals("JsonStreamReader should have extracted only 2 items", 2, list.size());
         assertEquals("JsonStreamReader has extracted the wrong string or disordered the elements", "test1", list.get(0));
         assertEquals("JsonStreamReader has extracted the wrong string or disordered the elements", "test2", list.get(1));
@@ -658,7 +672,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
 
     /**
      * Tests to verify that maps are recognized and parsed correctly.
-     *
+     * 
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
@@ -666,7 +680,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
         String json = "{\"key1\":\"val1\",\"key2\":\"val2\"}";
         Object o = parseAndRetrieve(json);
         assertTrue(o instanceof Map);
-        Map<Object, Object> map = (HashMap<Object, Object>)o;
+        Map<Object, Object> map = (HashMap<Object, Object>) o;
         assertEquals(2, map.size());
         assertEquals("val1", map.get("key1"));
         assertEquals("val2", map.get("key2"));
@@ -692,27 +706,38 @@ public class JsonStreamReaderTest extends UnitTestCase {
         String json = "1";
         Object o = parseAndRetrieve(json);
         assertTrue(o instanceof BigDecimal);
-        BigDecimal num = (BigDecimal)o;
+        BigDecimal num = (BigDecimal) o;
         assertEquals(new BigDecimal(1), num);
-        assertEquals(123.456, ((BigDecimal)parseAndRetrieve("123.456")).doubleValue());
-        assertEquals(-123.456, ((BigDecimal)parseAndRetrieve("-123.456")).doubleValue());
-        assertEquals(1.2E21, ((BigDecimal)parseAndRetrieve("1.2E21")).doubleValue());
-        assertEquals(-1.2E-20, ((BigDecimal)parseAndRetrieve("-1.2E-20")).doubleValue());
-        assertEquals(1.2, ((BigDecimal)parseAndRetrieve("+1.2")).doubleValue());
+        assertEquals(123.456, ((BigDecimal) parseAndRetrieve("123.456")).doubleValue());
+        assertEquals(-123.456, ((BigDecimal) parseAndRetrieve("-123.456")).doubleValue());
+        assertEquals(1.2E21, ((BigDecimal) parseAndRetrieve("1.2E21")).doubleValue());
+        assertEquals(-1.2E-20, ((BigDecimal) parseAndRetrieve("-1.2E-20")).doubleValue());
+        assertEquals(1.2, ((BigDecimal) parseAndRetrieve("+1.2")).doubleValue());
     }
 
     /**
-     * Tests to verify all accepted forms of string values mentioned in http://www.json.org and in
-     * {@link JsonStreamReader}
+     * Tests to verify all accepted forms of string values mentioned in
+     * http://www.json.org and in {@link JsonStreamReader}
      */
     public void testReadStrings() throws IOException {
         assertEquals(null, parseAndRetrieve(""));
 
         assertEquals(null, parseAndRetrieve("null"));
-        assertEquals(" // ", parseAndRetrieve("\" // \"")); // Single line comment characters with in quotes are not
+        assertEquals(" // ", parseAndRetrieve("\" // \"")); // Single line
+                                                            // comment
+                                                            // characters with
+                                                            // in quotes are not
                                                             // treated specially
-        assertEquals(" /*  * \n *  */ ", parseAndRetrieve("\" /*  * \n *  */ \"")); // multi line comment characters
-                                                                                    // with in quotes are not treated
+        assertEquals(" /*  * \n *  */ ", parseAndRetrieve("\" /*  * \n *  */ \"")); // multi
+                                                                                    // line
+                                                                                    // comment
+                                                                                    // characters
+                                                                                    // with
+                                                                                    // in
+                                                                                    // quotes
+                                                                                    // are
+                                                                                    // not
+                                                                                    // treated
                                                                                     // specially
         assertEquals("a", parseAndRetrieve("'a'\b")); // Single quote string
         assertEquals("a", parseAndRetrieve("\"a\""));
@@ -741,7 +766,8 @@ public class JsonStreamReaderTest extends UnitTestCase {
         try {
             parseAndRetrieve("functioneer");
             fail("Should have thrown an exception on encountering key word like words");
-        } catch (JsonStreamParseException expected) {}
+        } catch (JsonStreamParseException expected) {
+        }
         assertEquals("    ! @#$%^&*()_+-=|}{[]:;?.,`~", parseAndRetrieve("\"    ! @#$%^&*()_+-=|}{[]:;?.,`~\""));
         // Japanese, Chinese, Korean
         assertEquals("速い茶色のキツネは怠け者の犬を跳び越えました。 福克斯布朗的快速跳过懒狗。 위를 건너뛰었습니다. 게으르고 개 ",
@@ -760,18 +786,18 @@ public class JsonStreamReaderTest extends UnitTestCase {
         String json = "true";
         Object o = parseAndRetrieve(json);
         assertTrue(o instanceof Boolean);
-        Boolean bool = (Boolean)o;
+        Boolean bool = (Boolean) o;
         assertTrue(bool);
         json = "false";
         o = parseAndRetrieve(json);
         assertTrue(o instanceof Boolean);
-        bool = (Boolean)o;
+        bool = (Boolean) o;
         assertFalse(bool);
     }
 
     /**
-     * Test to cover JsonStreamReader.readObject(), JsonStreamReader.readArray(), and
-     * JsonStreamReader.getHandlerProvider()
+     * Test to cover JsonStreamReader.readObject(),
+     * JsonStreamReader.readArray(), and JsonStreamReader.getHandlerProvider()
      */
     @SuppressWarnings("unchecked")
     public void testReadComplexObject() throws IOException {
@@ -779,31 +805,34 @@ public class JsonStreamReaderTest extends UnitTestCase {
                 + "{\"key2\":[\"string1\",\"string2\"]}" + "]" + "]" + "}";
         Object o = parseAndRetrieve(json);
         assertTrue(o instanceof Map);
-        Map<String, Object> outerMap = (Map<String, Object>)o;
-        List<Object> outerList = (List<Object>)outerMap.get("key1");
+        Map<String, Object> outerMap = (Map<String, Object>) o;
+        List<Object> outerList = (List<Object>) outerMap.get("key1");
 
-        List<Object> item0 = (List<Object>)outerList.get(0);
+        List<Object> item0 = (List<Object>) outerList.get(0);
         assertEquals("string1", item0.get(0));
         assertEquals("string2", item0.get(1));
 
         assertEquals(true, outerList.get(1));
         assertEquals(new BigDecimal(10), outerList.get(2));
 
-        List<Object> item3 = (List<Object>)outerList.get(3);
+        List<Object> item3 = (List<Object>) outerList.get(3);
         assertEquals(false, item3.get(0));
         assertEquals(new BigDecimal(1.5), item3.get(1));
 
-        Map<String, Object> innerMap = (Map<String, Object>)item3.get(2);
-        List<Object> innerList = (List<Object>)innerMap.get("key2");
+        Map<String, Object> innerMap = (Map<String, Object>) item3.get(2);
+        List<Object> innerList = (List<Object>) innerMap.get("key2");
         assertEquals("string1", innerList.get(0));
         assertEquals("string2", innerList.get(1));
     }
 
     /**
-     * @newTestCase Verify that JSON with comments embedded can be handled by JsonStreamReader. The first is a special
-     *              case of JSON string, because aura javascript controllers is in this format.
-     * @newTestCase Everything after a single line comment delimiter should be ignored Starting another multiline
-     *              comment with in a multiline comment is ok.
+     * @newTestCase Verify that JSON with comments embedded can be handled by
+     *              JsonStreamReader. The first is a special case of JSON
+     *              string, because aura javascript controllers is in this
+     *              format.
+     * @newTestCase Everything after a single line comment delimiter should be
+     *              ignored Starting another multiline comment with in a
+     *              multiline comment is ok.
      * @newTestCase Incomplete multi line comment.
      * @newTestCase Invalid multi line comment
      * @hierarchy Aura.Unit Tests.Json StreamReader
@@ -821,7 +850,7 @@ public class JsonStreamReaderTest extends UnitTestCase {
                 + "//Single line comments \n" + "var str = 'Still do Nothing';" + "}," + "}";
         Object o = parseAndRetrieve(commentsAtStartOfObject);
         assertTrue(o instanceof Map);
-        Map<String, Object> functionMap = (Map<String, Object>)o;
+        Map<String, Object> functionMap = (Map<String, Object>) o;
         assertEquals(2, functionMap.size());
         Object function1 = functionMap.get("functionName1");
         assertTrue(function1 instanceof JsFunction);
@@ -829,14 +858,15 @@ public class JsonStreamReaderTest extends UnitTestCase {
         assertTrue(function2 instanceof JsFunction);
 
         /*
-         * Positive test case 2: Everything after a single line comment delimiter should be ignored, Starting another
-         * multiline comment with in a multiline comment is ok,
+         * Positive test case 2: Everything after a single line comment
+         * delimiter should be ignored, Starting another multiline comment with
+         * in a multiline comment is ok,
          */
         String fakeMultiLine = "// /*Multi line comment delimiter after a single line comment delimiter \n" + "{\n"
                 + "/* */ " + " functionName1: function(args1, args2) {" + "var str = 'do Nothing'; \n" + "}," + "}";
         o = parseAndRetrieve(fakeMultiLine);
         assertTrue(o instanceof Map);
-        functionMap = (Map<String, Object>)o;
+        functionMap = (Map<String, Object>) o;
         assertEquals(1, functionMap.size());
         Object function = functionMap.get("functionName1");
         assertTrue(function instanceof JsFunction);
@@ -862,8 +892,8 @@ public class JsonStreamReaderTest extends UnitTestCase {
     }
 
     /**
-     * Tests cases of illegal input, which historically were "successfully" parsed because of quirks in the comment
-     * parsing.
+     * Tests cases of illegal input, which historically were "successfully"
+     * parsed because of quirks in the comment parsing.
      */
     public void testBadParseSlashAndStar() throws Exception {
         String invalidSymbols = "{\n" + "  / foo: 3,\n" + "}";
@@ -926,7 +956,8 @@ public class JsonStreamReaderTest extends UnitTestCase {
                 + "  bar: 'nested \", or * would cause parse error',\n" + "}";
         parseAndRetrieve(jsonString);
 
-        // Strings in function bodies retain escapers, outside do not, so test both here & below:
+        // Strings in function bodies retain escapers, outside do not, so test
+        // both here & below:
         jsonString = "{\n" + "  foo: \"non-signifying quote \\\", or * would cause parse error\",\n"
                 + "  bar: 'non-signifying quote \\', or * would cause parse error',\n"
                 + "  baz: function() { return \"non-signifying quote \\\", or * would cause parse error\"; },\n"
@@ -943,11 +974,11 @@ public class JsonStreamReaderTest extends UnitTestCase {
     }
 
     /**
-     * A convenience method to verify the functioning of JsonStreamReader. All this method does is accepts a String,
-     * creates a stream with this and creates a JsonStreamReader object to accept this stream.
-     *
-     * @param s
-     *            Json String
+     * A convenience method to verify the functioning of JsonStreamReader. All
+     * this method does is accepts a String, creates a stream with this and
+     * creates a JsonStreamReader object to accept this stream.
+     * 
+     * @param s Json String
      * @return
      */
     private Object parseAndRetrieve(String s) throws IOException {
@@ -973,21 +1004,22 @@ public class JsonStreamReaderTest extends UnitTestCase {
         final byte[] stream1bytes = new byte[32];
         new DataOutputStream(baos).writeLong(stream1bytes.length);
         for (int i = 0; i < stream1bytes.length; i++) {
-            stream1bytes[i] = (byte)i;
+            stream1bytes[i] = (byte) i;
         }
         baos.write(stream1bytes);
         baos.write("`},`".getBytes(Charsets.UTF_8));
         final byte[] stream2bytes = new byte[7];
         new DataOutputStream(baos).writeLong(stream2bytes.length);
         for (int i = 0; i < stream2bytes.length; i++) {
-            stream2bytes[i] = (byte)(255 - i);
+            stream2bytes[i] = (byte) (255 - i);
         }
         baos.write(stream2bytes);
         baos.write("`,{'䷓hello':'world'},`".getBytes(Charsets.UTF_8));
         new DataOutputStream(baos).writeLong(0);
         baos.write("`,'meowДth']".getBytes(Charsets.UTF_8));
 
-        // Read this back using a JsonStreamReader. It's Freddy versus JSON. Or is it JSON X -- Evil gets an upgrade?
+        // Read this back using a JsonStreamReader. It's Freddy versus JSON. Or
+        // is it JSON X -- Evil gets an upgrade?
         final InputStream in = new ByteArrayInputStream(baos.toByteArray());
         final JsonStreamReader reader = new JsonStreamReader(in);
         assertEquals(JsonConstant.ARRAY_START, reader.next());

@@ -15,12 +15,13 @@
  */
 package org.auraframework.def;
 
-
 /**
  */
 public interface EventDef extends RootDefinition {
     @Override
     DefDescriptor<EventDef> getDescriptor();
+
     EventType getEventType();
+
     DefDescriptor<EventDef> getExtendsDescriptor();
 }

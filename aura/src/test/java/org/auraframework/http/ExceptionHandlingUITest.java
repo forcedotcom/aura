@@ -34,8 +34,9 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
- * What should you see when something goes wrong. {@link ThreadHostile} due to setProdConfig and friends.
- *
+ * What should you see when something goes wrong. {@link ThreadHostile} due to
+ * setProdConfig and friends.
+ * 
  * @since 0.0.262
  */
 @UnAdaptableTest
@@ -63,44 +64,47 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-    * Due to duplicate div#auraErrorMessage on exceptions from server rendering, use different CSS selector to check
-    * exception message.
-    * W-1308475 - Never'd removal/change of duplicate div#auraErrorMessage
-    */
+     * Due to duplicate div#auraErrorMessage on exceptions from server
+     * rendering, use different CSS selector to check exception message.
+     * W-1308475 - Never'd removal/change of duplicate div#auraErrorMessage
+     */
     private void assertNoStacktraceServerRendering() throws Exception {
-        WebElement elem = findDomElement(By.xpath("//div[@class='auraMsgMask auraForcedErrorBox']//div[@id='auraErrorMessage']"));
+        WebElement elem = findDomElement(By
+                .xpath("//div[@class='auraMsgMask auraForcedErrorBox']//div[@id='auraErrorMessage']"));
         if (elem == null) {
             fail("error message not found");
         }
         String actual = elem.getText().replaceAll("\\s+", " ");
         assertEquals("Unable to process your request", actual);
     }
-    
+
     private void assertNoStacktrace() throws Exception {
         String actual = getQuickFixMessage().replaceAll("\\s+", " ");
         assertEquals("Unable to process your request", actual);
     }
 
     /**
-     * Due to duplicate div#auraErrorMessage on exceptions from server rendering, use different CSS selector to check
-     * exception message.
+     * Due to duplicate div#auraErrorMessage on exceptions from server
+     * rendering, use different CSS selector to check exception message.
      * W-1308475 - Never'd removal/change of duplicate div#auraErrorMessage
      */
     private void assertStacktraceServerRendering(String messageStartsWith, String... causeStartsWith) throws Exception {
-        WebElement elem = findDomElement(By.xpath("//div[@class='auraMsgMask auraForcedErrorBox']//div[@id='auraErrorMessage']"));
+        WebElement elem = findDomElement(By
+                .xpath("//div[@class='auraMsgMask auraForcedErrorBox']//div[@id='auraErrorMessage']"));
         if (elem == null) {
             fail("error message not found");
         }
         String actual = elem.getText().replaceAll("\\s+", " ");
         assertStacktraceCommon(actual, messageStartsWith, causeStartsWith);
     }
-    
+
     private void assertStacktrace(String messageStartsWith, String... causeStartsWith) throws Exception {
         String actual = getQuickFixMessage().replaceAll("\\s+", " ");
         assertStacktraceCommon(actual, messageStartsWith, causeStartsWith);
     }
 
-    private void assertStacktraceCommon(String actual, String messageStartsWith, String... causeStartsWith) throws Exception {
+    private void assertStacktraceCommon(String actual, String messageStartsWith, String... causeStartsWith)
+            throws Exception {
         if (!actual.contains(messageStartsWith)) {
             fail("unexpected error message - expected <" + messageStartsWith + "> but got <" + actual + ">");
         }
@@ -117,9 +121,10 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
             }
         }
     }
-    
+
     /**
-     * Generic error message displayed in PRODUCTION if component provider instantiation throws.
+     * Generic error message displayed in PRODUCTION if component provider
+     * instantiation throws.
      */
     public void testProdCmpProviderThrowsDuringInstantiation() throws Exception {
         setProdConfig();
@@ -131,7 +136,8 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Stacktrace displayed in non-PRODUCTION if component provider instantiation throws.
+     * Stacktrace displayed in non-PRODUCTION if component provider
+     * instantiation throws.
      */
     public void testCmpProviderThrowsDuringInstantiation() throws Exception {
         setProdContextWithoutConfig();
@@ -145,7 +151,8 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Generic error message displayed in PRODUCTION if application provider instantiation throws.
+     * Generic error message displayed in PRODUCTION if application provider
+     * instantiation throws.
      */
     public void testProdAppProviderThrowsDuringInstantiation() throws Exception {
         setProdConfig();
@@ -155,7 +162,8 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Stacktrace displayed in non-PRODUCTION if application provider instantiation throws.
+     * Stacktrace displayed in non-PRODUCTION if application provider
+     * instantiation throws.
      */
     public void testAppProviderThrowsDuringInstantiation() throws Exception {
         setProdContextWithoutConfig();
@@ -165,7 +173,8 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Generic error message displayed in PRODUCTION if component provider instantiation throws.
+     * Generic error message displayed in PRODUCTION if component provider
+     * instantiation throws.
      */
     public void testProdCmpProviderThrowsDuringProvide() throws Exception {
         setProdConfig();
@@ -177,7 +186,8 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Stacktrace displayed in non-PRODUCTION if component provider instantiation throws.
+     * Stacktrace displayed in non-PRODUCTION if component provider
+     * instantiation throws.
      */
     public void testCmpProviderThrowsDuringProvide() throws Exception {
         setProdContextWithoutConfig();
@@ -189,24 +199,24 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Generic error message displayed in PRODUCTION if component model instantiation throws.
+     * Generic error message displayed in PRODUCTION if component model
+     * instantiation throws.
      */
     public void testProdCmpModelThrowsDuringInstantiation() throws Exception {
         setProdConfig();
-        DefDescriptor<?> cdd = addSourceAutoCleanup(
-                ComponentDef.class,
+        DefDescriptor<?> cdd = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component model='java://org.auraframework.impl.java.model.TestModelThrowsDuringInstantiation'></aura:component>");
         openNoAura(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
         assertNoStacktrace();
     }
 
     /**
-     * Stacktrace displayed in non-PRODUCTION if component model instantiation throws.
+     * Stacktrace displayed in non-PRODUCTION if component model instantiation
+     * throws.
      */
     public void testCmpModelThrowsDuringInstantiation() throws Exception {
         setProdContextWithoutConfig();
-        DefDescriptor<?> cdd = addSourceAutoCleanup(
-                ComponentDef.class,
+        DefDescriptor<?> cdd = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component model='java://org.auraframework.impl.java.model.TestModelThrowsDuringInstantiation'></aura:component>");
         openNoAura(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
         assertStacktrace(
@@ -215,7 +225,8 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Generic error message displayed in PRODUCTION if component renderer instantiation throws.
+     * Generic error message displayed in PRODUCTION if component renderer
+     * instantiation throws.
      */
     public void testProdCmpRendererThrowsDuringInstantiation() throws Exception {
         setProdConfig();
@@ -227,7 +238,8 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Stacktrace displayed in non-PRODUCTION if component renderer instantiation throws.
+     * Stacktrace displayed in non-PRODUCTION if component renderer
+     * instantiation throws.
      */
     public void testCmpRendererThrowsDuringInstantiation() throws Exception {
         setProdContextWithoutConfig();
@@ -241,7 +253,8 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Generic error message displayed in PRODUCTION if component renderer throws.
+     * Generic error message displayed in PRODUCTION if component renderer
+     * throws.
      */
     public void testProdCmpRendererThrowsDuringRender() throws Exception {
         setProdConfig();
@@ -271,23 +284,27 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Parse error stack trace for application includes filename along with row,col
+     * Parse error stack trace for application includes filename along with
+     * row,col
      */
     public void testAppThrowsWithFileName() throws Exception {
         setProdContextWithoutConfig();
-        //load the defination in the loader
+        // load the defination in the loader
         DefDescriptor<?> add = addSourceAutoCleanup(
                 ApplicationDef.class,
                 "<aura:application securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows''></aura:application>");
         openNoAura(String.format("/%s/%s.app", add.getNamespace(), add.getName()));
-        assertStacktrace("org.auraframework.throwable.AuraUnhandledException: "+ String.format("markup://%s:%s:1,111: ParseError at [row,col]:[2,111]", add.getNamespace(), add.getName()));
+        assertStacktrace("org.auraframework.throwable.AuraUnhandledException: "
+                + String.format("markup://%s:%s:1,111: ParseError at [row,col]:[2,111]", add.getNamespace(),
+                        add.getName()));
     }
 
     /**
-     * Parse error stack trace for controller includes filename along with row,col
+     * Parse error stack trace for controller includes filename along with
+     * row,col
      */
 
-    public void testCntrlThrowsWithFileName() throws Exception{
+    public void testCntrlThrowsWithFileName() throws Exception {
         String fileName = "auratest/parseError";
         openNoAura(fileName + ".cmp");
         assertStacktrace("org.auraframework.throwable.AuraRuntimeException: ");
@@ -303,13 +320,13 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         // make a client-side change to the page
         findDomElement(By.cssSelector(".update")).click();
         waitForElementText(findDomElement(By.cssSelector(".uiOutputText")), "modified", true, 3000);
-        assertTrue("Page was not changed after client action", 
-                isElementPresent(By.cssSelector(".reloadMarker")));
-        
+        assertTrue("Page was not changed after client action", isElementPresent(By.cssSelector(".reloadMarker")));
+
         // make server POST call with outdated lastmod
         findDomElement(By.cssSelector(".trigger")).click();
 
-        // Wait till prior prior client-side change is gone indicating page reload
+        // Wait till prior prior client-side change is gone indicating page
+        // reload
         WebDriverWait wait = new WebDriverWait(getDriver(), 15000);
         wait.until(new ExpectedCondition<Boolean>() {
             @Override
@@ -317,7 +334,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
                 return !isElementPresent(By.cssSelector(".reloadMarker"));
             }
         });
-        //Wait for page to reload and aura framework initialization
+        // Wait for page to reload and aura framework initialization
         waitForAuraInit();
         waitForElementText(findDomElement(By.cssSelector(".uiOutputText")), "initial", true, 3000);
     }

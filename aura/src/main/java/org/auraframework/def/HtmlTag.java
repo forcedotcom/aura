@@ -15,7 +15,6 @@
  */
 package org.auraframework.def;
 
-
 public enum HtmlTag {
     a,
     abbr,
@@ -141,24 +140,24 @@ public enum HtmlTag {
 
     private final boolean allowed;
 
-    private HtmlTag(boolean allowed){
+    private HtmlTag(boolean allowed) {
         this.allowed = allowed;
     }
 
-    private HtmlTag(){
+    private HtmlTag() {
         this(true);
     }
 
-    public static final boolean allowed(String tag){
-        try{
+    public static final boolean allowed(String tag) {
+        try {
             HtmlTag ret = valueOf(tag.toLowerCase());
             return ret.isAllowed();
-        }catch(Throwable e){
+        } catch (Throwable e) {
             return false;
         }
     }
 
-    public boolean isAllowed(){
+    public boolean isAllowed() {
         return allowed;
     }
 }

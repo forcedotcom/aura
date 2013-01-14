@@ -107,14 +107,19 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
 
             SourceFactory jsSourceFactory = new SourceFactory(jsLoaders);
 
-            ret = new DefRegistry<?>[]{
+            ret = new DefRegistry<?>[] {
                     AuraStaticTypeDefRegistry.INSTANCE,
                     AuraStaticControllerDefRegistry.INSTANCE,
                     createDefRegistry(new RootDefFactory(new SourceFactory(markupLoaders)), rootDefTypes, rootPrefixes),
-                    AuraRegistryProviderImpl.<ControllerDef>createDefRegistry(new CompoundControllerDefFactory(), DefType.CONTROLLER, DefDescriptor.COMPOUND_PREFIX),
-                    AuraRegistryProviderImpl.<ControllerDef>createDefRegistry(new JavaControllerDefFactory(javaLoaders), DefType.CONTROLLER, DefDescriptor.JAVA_PREFIX),
-                    AuraRegistryProviderImpl.<RendererDef>createDefRegistry(new JavaRendererDefFactory(javaLoaders), DefType.RENDERER, DefDescriptor.JAVA_PREFIX),
-                    AuraRegistryProviderImpl.<SecurityProviderDef>createDefRegistry(new JavaSecurityProviderDefFactory(javaLoaders), DefType.SECURITY_PROVIDER, DefDescriptor.JAVA_PREFIX),
+                    AuraRegistryProviderImpl.<ControllerDef> createDefRegistry(new CompoundControllerDefFactory(),
+                            DefType.CONTROLLER, DefDescriptor.COMPOUND_PREFIX),
+                    AuraRegistryProviderImpl.<ControllerDef> createDefRegistry(
+                            new JavaControllerDefFactory(javaLoaders), DefType.CONTROLLER, DefDescriptor.JAVA_PREFIX),
+                    AuraRegistryProviderImpl.<RendererDef> createDefRegistry(new JavaRendererDefFactory(javaLoaders),
+                            DefType.RENDERER, DefDescriptor.JAVA_PREFIX),
+                    AuraRegistryProviderImpl.<SecurityProviderDef> createDefRegistry(
+                            new JavaSecurityProviderDefFactory(javaLoaders), DefType.SECURITY_PROVIDER,
+                            DefDescriptor.JAVA_PREFIX),
 
                     AuraRegistryProviderImpl.<ControllerDef>createJavascriptRegistry(jsSourceFactory, DefType.CONTROLLER),
                     AuraRegistryProviderImpl.<TestSuiteDef>createJavascriptRegistry(jsSourceFactory, DefType.TESTSUITE),
@@ -124,11 +129,13 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                     AuraRegistryProviderImpl.<ModelDef>createJavascriptRegistry(jsSourceFactory, DefType.MODEL),
                     
 
-                    createDefRegistry(new ThemeDefFactory(new SourceFactory(themeLoaders)), Sets.newHashSet(DefType.STYLE), Sets.newHashSet(DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX)),
+                    createDefRegistry(new ThemeDefFactory(new SourceFactory(themeLoaders)),
+                            Sets.newHashSet(DefType.STYLE),
+                            Sets.newHashSet(DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX)),
                     createDefRegistry(new JavaTypeDefFactory(javaLoaders), DefType.TYPE, DefDescriptor.JAVA_PREFIX),
                     createDefRegistry(new JavaModelDefFactory(javaLoaders), DefType.MODEL, DefDescriptor.JAVA_PREFIX),
-                    createDefRegistry(new JavaProviderDefFactory(javaLoaders), DefType.PROVIDER, DefDescriptor.JAVA_PREFIX)
-                };
+                    createDefRegistry(new JavaProviderDefFactory(javaLoaders), DefType.PROVIDER,
+                            DefDescriptor.JAVA_PREFIX) };
 
             if (registries == null && !mode.isTestMode()) {
                 registries = ret;
@@ -164,7 +171,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
     protected static <T extends Definition> DefRegistry<T> createDefRegistry(DefFactory<T> factory,
             Set<DefType> defTypes, Set<String> prefixes) {
         if (factory instanceof CacheableDefFactory) {
-            return new CachingDefRegistryImpl<T>((CacheableDefFactory<T>)factory, defTypes, prefixes);
+            return new CachingDefRegistryImpl<T>((CacheableDefFactory<T>) factory, defTypes, prefixes);
         } else {
             return new NonCachingDefRegistryImpl<T>(factory, defTypes, prefixes);
         }

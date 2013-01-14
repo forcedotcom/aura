@@ -18,7 +18,10 @@ package org.auraframework;
 import java.util.Enumeration;
 import java.util.Set;
 
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestResult;
+import junit.framework.TestSuite;
 
 import org.auraframework.test.TestInventory;
 import org.auraframework.test.TestInventory.Type;
@@ -53,14 +56,16 @@ public class AuraIntegrationTests extends TestSuite {
     @Override
     public void runTest(Test test, TestResult result) {
         if (test instanceof TestSuite) {
-            for (Enumeration<Test> t = ((TestSuite)test).tests(); t.hasMoreElements();) {
+            for (Enumeration<Test> t = ((TestSuite) test).tests(); t.hasMoreElements();) {
                 runTest(t.nextElement(), result);
             }
         } else if (test instanceof TestCase) {
             if (nameFragment != null) {
                 String testName = test.getClass().getName().toLowerCase() + "."
-                        + ((TestCase)test).getName().toLowerCase();
-                if (!testName.contains(nameFragment)) { return; }
+                        + ((TestCase) test).getName().toLowerCase();
+                if (!testName.contains(nameFragment)) {
+                    return;
+                }
             }
             test.run(result);
         }

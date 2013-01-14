@@ -20,16 +20,9 @@ public class Client {
     public static final Client OTHER = new Client();
 
     private final String userAgent;
-    
+
     public enum Type {
-        WEBKIT,
-        FIREFOX,
-        IE6,
-        IE7,
-        IE8,
-        IE9,
-        IE10,
-        OTHER
+        WEBKIT, FIREFOX, IE6, IE7, IE8, IE9, IE10, OTHER
     }
 
     private final Type type;
@@ -73,5 +66,4 @@ public class Client {
         return userAgent;
     }
 
-    
 }

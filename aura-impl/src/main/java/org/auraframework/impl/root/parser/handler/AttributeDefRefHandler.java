@@ -15,14 +15,16 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import com.google.common.collect.ImmutableSet;
-
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
@@ -30,26 +32,25 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * <aura:set> tags
  */
-public class AttributeDefRefHandler<P extends RootDefinition> extends ParentedTagHandler<AttributeDefRefImpl, P>{
+public class AttributeDefRefHandler<P extends RootDefinition> extends ParentedTagHandler<AttributeDefRefImpl, P> {
 
     public static final String TAG = "aura:set";
 
     private static final String ATTRIBUTE_VALUE = "value";
     private static final String ATTRIBUTE_ATTRIBUTE = "attribute";
 
-    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-        ATTRIBUTE_VALUE,
-        ATTRIBUTE_ATTRIBUTE
-    );
+    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_VALUE, ATTRIBUTE_ATTRIBUTE);
 
-    private AttributeDefRefImpl.Builder builder = new AttributeDefRefImpl.Builder();
-    private List<ComponentDefRef> children = new ArrayList<ComponentDefRef>();
+    private final AttributeDefRefImpl.Builder builder = new AttributeDefRefImpl.Builder();
+    private final List<ComponentDefRef> children = new ArrayList<ComponentDefRef>();
     private String stringValue;
 
-    public AttributeDefRefHandler(){
+    public AttributeDefRefHandler() {
         super();
     }
 
@@ -71,9 +72,9 @@ public class AttributeDefRefHandler<P extends RootDefinition> extends ParentedTa
 
     @Override
     protected AttributeDefRefImpl createDefinition() throws QuickFixException {
-        if(AuraTextUtil.isNullEmptyOrWhitespace(stringValue)){
+        if (AuraTextUtil.isNullEmptyOrWhitespace(stringValue)) {
             builder.setValue(children);
-        }else{
+        } else {
             TextTokenizer tt = TextTokenizer.tokenize(stringValue, getLocation());
             builder.setValue(tt.asValue(getParentHandler()));
         }

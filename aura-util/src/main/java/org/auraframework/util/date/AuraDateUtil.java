@@ -25,7 +25,7 @@ public class AuraDateUtil {
     }
 
     public static Date isoToDate(String isoDateString) {
-        if (isoDateString==null || isoDateString.isEmpty()) {
+        if (isoDateString == null || isoDateString.isEmpty()) {
             return null;
         } else {
             return DateServiceImpl.get().getGenericISO8601Converter().parse(isoDateString);

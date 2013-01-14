@@ -28,7 +28,7 @@ public class JavascriptTestSuiteDef extends DefinitionImpl<TestSuiteDef> impleme
     private final String code;
     private final List<TestCaseDef> caseDefs;
 
-    protected JavascriptTestSuiteDef(Builder builder){
+    protected JavascriptTestSuiteDef(Builder builder) {
         super(builder);
         this.code = builder.code;
         this.caseDefs = builder.caseDefs;
@@ -53,9 +53,9 @@ public class JavascriptTestSuiteDef extends DefinitionImpl<TestSuiteDef> impleme
         return code;
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<TestSuiteDef>{
+    public static class Builder extends DefinitionImpl.BuilderImpl<TestSuiteDef> {
 
-        public Builder(){
+        public Builder() {
             super(TestSuiteDef.class);
         }
 

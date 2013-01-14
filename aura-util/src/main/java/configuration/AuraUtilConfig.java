@@ -15,13 +15,37 @@
  */
 package configuration;
 
-import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
+import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.adapter.SourceControlAdapter;
 import org.auraframework.util.adapter.SourceControlAdapterImpl;
 import org.auraframework.util.json.DefaultJsonSerializer;
 import org.auraframework.util.type.Converter;
-import org.auraframework.util.type.converter.*;
+import org.auraframework.util.type.converter.ArrayListToBooleanArrayConverter;
+import org.auraframework.util.type.converter.ArrayListToDateArrayConverter;
+import org.auraframework.util.type.converter.ArrayListToIntegerArrayConverter;
+import org.auraframework.util.type.converter.ArrayListToStringArrayConverter;
+import org.auraframework.util.type.converter.BigDecimalToIntegerConverter;
+import org.auraframework.util.type.converter.BigDecimalToLongConverter;
+import org.auraframework.util.type.converter.BigDecimalToStringConverter;
+import org.auraframework.util.type.converter.BooleanToStringConverter;
+import org.auraframework.util.type.converter.IntegerToStringConverter;
+import org.auraframework.util.type.converter.LongToDateConverter;
+import org.auraframework.util.type.converter.LongToIntegerConverter;
+import org.auraframework.util.type.converter.LongToStringConverter;
+import org.auraframework.util.type.converter.StringToArrayListConverter;
+import org.auraframework.util.type.converter.StringToBigDecimalConverter;
+import org.auraframework.util.type.converter.StringToBooleanConverter;
+import org.auraframework.util.type.converter.StringToCalendarConverter;
+import org.auraframework.util.type.converter.StringToDateConverter;
+import org.auraframework.util.type.converter.StringToDateOnlyConverter;
+import org.auraframework.util.type.converter.StringToDoubleConverter;
+import org.auraframework.util.type.converter.StringToHashMapConverter;
+import org.auraframework.util.type.converter.StringToHashSetConverter;
+import org.auraframework.util.type.converter.StringToIntegerConverter;
+import org.auraframework.util.type.converter.StringToListConverter;
+import org.auraframework.util.type.converter.StringToLongConverter;
+import org.auraframework.util.type.converter.StringToStringArrayConverter;
 
 /**
  */
@@ -29,137 +53,137 @@ import org.auraframework.util.type.converter.*;
 public class AuraUtilConfig {
 
     @Impl
-    public static DefaultJsonSerializer auraUtilDefaultJsonSerializer(){
+    public static DefaultJsonSerializer auraUtilDefaultJsonSerializer() {
         return new DefaultJsonSerializer();
     }
 
     @Impl
-    public static SourceControlAdapter auraUtilSourceControlAdapter(){
+    public static SourceControlAdapter auraUtilSourceControlAdapter() {
         return new SourceControlAdapterImpl();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilArrayListToBooleanArrayConverter(){
+    public static Converter<?, ?> auraUtilArrayListToBooleanArrayConverter() {
         return new ArrayListToBooleanArrayConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilArrayListToDateArrayConverter(){
+    public static Converter<?, ?> auraUtilArrayListToDateArrayConverter() {
         return new ArrayListToDateArrayConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilArrayListToIntegerArrayConverter(){
+    public static Converter<?, ?> auraUtilArrayListToIntegerArrayConverter() {
         return new ArrayListToIntegerArrayConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilArrayListToStringArrayConverter(){
+    public static Converter<?, ?> auraUtilArrayListToStringArrayConverter() {
         return new ArrayListToStringArrayConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilBigDecimalToIntegerConverter(){
+    public static Converter<?, ?> auraUtilBigDecimalToIntegerConverter() {
         return new BigDecimalToIntegerConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilBigDecimalToLongConverter(){
+    public static Converter<?, ?> auraUtilBigDecimalToLongConverter() {
         return new BigDecimalToLongConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilBigDecimalToStringConverter(){
+    public static Converter<?, ?> auraUtilBigDecimalToStringConverter() {
         return new BigDecimalToStringConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilBooleanToStringConverter(){
+    public static Converter<?, ?> auraUtilBooleanToStringConverter() {
         return new BooleanToStringConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilIntegerToStringConverter(){
+    public static Converter<?, ?> auraUtilIntegerToStringConverter() {
         return new IntegerToStringConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilLongToDateConverter(){
+    public static Converter<?, ?> auraUtilLongToDateConverter() {
         return new LongToDateConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilLongToIntegerConverter(){
+    public static Converter<?, ?> auraUtilLongToIntegerConverter() {
         return new LongToIntegerConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilLongToStringConverter(){
+    public static Converter<?, ?> auraUtilLongToStringConverter() {
         return new LongToStringConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilStringToArrayListConverter(){
+    public static Converter<?, ?> auraUtilStringToArrayListConverter() {
         return new StringToArrayListConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilStringToBigDecimalConverter(){
+    public static Converter<?, ?> auraUtilStringToBigDecimalConverter() {
         return new StringToBigDecimalConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilStringToBooleanConverter(){
+    public static Converter<?, ?> auraUtilStringToBooleanConverter() {
         return new StringToBooleanConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilStringToCalendarConverter(){
+    public static Converter<?, ?> auraUtilStringToCalendarConverter() {
         return new StringToCalendarConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilStringToDateConverter(){
+    public static Converter<?, ?> auraUtilStringToDateConverter() {
         return new StringToDateConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilStringToDateOnlyConverter(){
+    public static Converter<?, ?> auraUtilStringToDateOnlyConverter() {
         return new StringToDateOnlyConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilStringToDoubleConverter(){
+    public static Converter<?, ?> auraUtilStringToDoubleConverter() {
         return new StringToDoubleConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilStringToHashMapConverter(){
+    public static Converter<?, ?> auraUtilStringToHashMapConverter() {
         return new StringToHashMapConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilStringToHashSetConverter(){
+    public static Converter<?, ?> auraUtilStringToHashSetConverter() {
         return new StringToHashSetConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilStringToIntegerConverter(){
+    public static Converter<?, ?> auraUtilStringToIntegerConverter() {
         return new StringToIntegerConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilStringToListConverter(){
+    public static Converter<?, ?> auraUtilStringToListConverter() {
         return new StringToListConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilStringToLongConverter(){
+    public static Converter<?, ?> auraUtilStringToLongConverter() {
         return new StringToLongConverter();
     }
 
     @Impl
-    public static Converter<?, ?> auraUtilStringToStringArrayConverter(){
+    public static Converter<?, ?> auraUtilStringToStringArrayConverter() {
         return new StringToStringArrayConverter();
     }
 

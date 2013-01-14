@@ -20,9 +20,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ActionDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-
+import org.auraframework.def.Definition;
+import org.auraframework.def.DependencyDef;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
@@ -46,15 +51,15 @@ public class DefinitionServiceImpl implements DefinitionService {
     @Override
     public <T extends Definition> DefDescriptor<T> getDefDescriptor(String qualifiedName, Class<T> defClass) {
         if (defClass == ActionDef.class) {
-            return (DefDescriptor<T>) SubDefDescriptorImpl.getInstance(
-                                    qualifiedName, ActionDef.class, ControllerDef.class);
+            return (DefDescriptor<T>) SubDefDescriptorImpl.getInstance(qualifiedName, ActionDef.class,
+                    ControllerDef.class);
         }
         return DefDescriptorImpl.getInstance(qualifiedName, defClass);
     }
 
     @Override
-    public <T extends Definition> DefDescriptor<T> getDefDescriptor(
-            DefDescriptor<?> desc, String prefix, Class<T> defClass) {
+    public <T extends Definition> DefDescriptor<T> getDefDescriptor(DefDescriptor<?> desc, String prefix,
+            Class<T> defClass) {
 
         return DefDescriptorImpl.getAssociateDescriptor(desc, defClass, prefix);
     }
@@ -73,8 +78,7 @@ public class DefinitionServiceImpl implements DefinitionService {
     }
 
     @Override
-    public <T extends Definition> T getDefinition(String qualifiedName,
-            Class<T> defClass) throws QuickFixException {
+    public <T extends Definition> T getDefinition(String qualifiedName, Class<T> defClass) throws QuickFixException {
         ContextService contextService = Aura.getContextService();
         contextService.assertEstablished();
 
@@ -115,9 +119,9 @@ public class DefinitionServiceImpl implements DefinitionService {
 
     /**
      * A helper function to recurse a single definition to get the last mod.
-     *
+     * 
      * This should probably go away once we get versions in.
-     *
+     * 
      * @param desc the descriptor to handle.
      * @param contextServce a handy pointer so we don't need to refetch.
      * @param dependencies the dependencies to which we should append
@@ -125,10 +129,8 @@ public class DefinitionServiceImpl implements DefinitionService {
      * @param lastMod the current 'lastMod' date.
      * @return a modified lastMod after processing all of the dependencies.
      */
-    private long checkOneDef(DefDescriptor<? extends Definition> desc,
-                             ContextService contextService,
-                             Set<DefDescriptor<?>> dependencies,
-                             Set<DefDescriptor<?>> processed, long lastMod) throws QuickFixException {
+    private long checkOneDef(DefDescriptor<? extends Definition> desc, ContextService contextService,
+            Set<DefDescriptor<?>> dependencies, Set<DefDescriptor<?>> processed, long lastMod) throws QuickFixException {
         if (processed.contains(desc)) {
             return lastMod;
         }
@@ -149,16 +151,15 @@ public class DefinitionServiceImpl implements DefinitionService {
 
     /**
      * A helper to process a set of dependencies.
-     *
+     * 
      * @param input the input dependencies.
      * @param contextService a handy pointer
      * @param processed the set of previously processed descriptors.
      * @param lastMod the last mod time to date
      * @return a modified lastMod after processing all of the dependencies.
      */
-    private long dependenciesHelper(Set<DefDescriptor<?>> input,
-                                    ContextService contextService,
-                                    Set<DefDescriptor<?>> processed, long lastMod) throws QuickFixException {
+    private long dependenciesHelper(Set<DefDescriptor<?>> input, ContextService contextService,
+            Set<DefDescriptor<?>> processed, long lastMod) throws QuickFixException {
         Set<DefDescriptor<?>> loop;
         Set<DefDescriptor<?>> dependencies = input;
 
@@ -174,18 +175,17 @@ public class DefinitionServiceImpl implements DefinitionService {
 
     /**
      * Run a set of preloads.
-     *
+     * 
      * This calculates the last mod time for a set of preloads.
-     *
+     * 
      * @param dependencies the preloads to process.
      * @param contextService a handy pointer.
      * @param processed The set of already processed descriptors.
      * @param lastMod the input last mod time
      * @return a new last mod time.
      */
-    private long preloadsHelper(Collection<DependencyDef> dependencySet,
-                                ContextService contextService,
-                                Set<DefDescriptor<?>> processed, long lastMod) throws QuickFixException {
+    private long preloadsHelper(Collection<DependencyDef> dependencySet, ContextService contextService,
+            Set<DefDescriptor<?>> processed, long lastMod) throws QuickFixException {
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
         long ret = lastMod;
 
@@ -197,7 +197,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                 count += 1;
             }
             if (count == 0) {
-                throw new AuraRuntimeException("No definitions found by "+dependency.getDependency().toString());
+                throw new AuraRuntimeException("No definitions found by " + dependency.getDependency().toString());
             }
         }
         return dependenciesHelper(dependencies, contextService, processed, ret);
@@ -205,10 +205,10 @@ public class DefinitionServiceImpl implements DefinitionService {
 
     /**
      * Get the last modification time for a set of preloads.
-     *
+     * 
      * FIXME: this should actually delegate to the definition factories, as
-     * there will be much more efficient methods of determining the last mod time
-     * for a given set of code.
+     * there will be much more efficient methods of determining the last mod
+     * time for a given set of code.
      */
     @Override
     public long getNamespaceLastMod(Collection<String> preloads) throws QuickFixException {
@@ -218,7 +218,7 @@ public class DefinitionServiceImpl implements DefinitionService {
 
         contextService.assertEstablished();
         for (String preload : preloads) {
-            if(!preload.contains("_")){
+            if (!preload.contains("_")) {
                 DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
                 ddb.setResource(preload);
                 ddb.setType("APPLICATION,COMPONENT");
@@ -230,9 +230,9 @@ public class DefinitionServiceImpl implements DefinitionService {
 
     /**
      * Get the last mod for a def.
-     *
-     * FIXME: we ignore the 'default' preloads, though this will recurse all the way to
-     * component to get the last mod.
+     * 
+     * FIXME: we ignore the 'default' preloads, though this will recurse all the
+     * way to component to get the last mod.
      */
     @Override
     public <T extends Definition> long getLastMod(DefDescriptor<T> desc) throws QuickFixException {
@@ -246,7 +246,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         T def = contextService.getCurrentContext().getDefRegistry().getDef(desc);
         if (def != null) {
             if (def instanceof BaseComponentDef) {
-                return preloadsHelper(((BaseComponentDef)def).getDependencies(), contextService, processed, lastMod);
+                return preloadsHelper(((BaseComponentDef) def).getDependencies(), contextService, processed, lastMod);
             }
         }
         return lastMod;

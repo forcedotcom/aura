@@ -16,11 +16,19 @@
 package org.auraframework.impl.root;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-import com.google.common.collect.Maps;
-
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventHandlerDef;
+import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RootDefinition;
+import org.auraframework.def.TypeDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
@@ -29,22 +37,30 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.type.ComponentArrayTypeDef;
 import org.auraframework.impl.type.ComponentTypeDef;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.instance.*;
+import org.auraframework.instance.Attribute;
+import org.auraframework.instance.AttributeSet;
+import org.auraframework.instance.BaseComponent;
+import org.auraframework.instance.EventHandler;
+import org.auraframework.instance.ValueProvider;
+import org.auraframework.instance.Wrapper;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.MissingRequiredAttributeException;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.*;
+import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Json.Serialization;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
+
+import com.google.common.collect.Maps;
 
 /**
  */
 @Serialization(referenceType = ReferenceType.IDENTITY)
 public class AttributeSetImpl implements AttributeSet {
-    private static final Location SUPER_PASSTHROUGH = AuraUtil.getExternalLocation("super component attribute passthrough");
+    private static final Location SUPER_PASSTHROUGH = AuraUtil
+            .getExternalLocation("super component attribute passthrough");
 
     private DefDescriptor<? extends RootDefinition> rootDefDescriptor;
     private final Map<DefDescriptor<AttributeDef>, Attribute> attributes = Maps.newHashMap();
@@ -52,7 +68,8 @@ public class AttributeSetImpl implements AttributeSet {
     private final BaseComponent<?, ?> valueProvider;
     private boolean trackDirty = false;
 
-    public AttributeSetImpl(DefDescriptor<? extends RootDefinition> componentDefDescriptor, BaseComponent<?, ?> valueProvider) throws QuickFixException {
+    public AttributeSetImpl(DefDescriptor<? extends RootDefinition> componentDefDescriptor,
+            BaseComponent<?, ?> valueProvider) throws QuickFixException {
         this.rootDefDescriptor = componentDefDescriptor;
         this.valueProvider = valueProvider;
         setDefaults();
@@ -107,9 +124,10 @@ public class AttributeSetImpl implements AttributeSet {
                 Object o = attributeDefRef.getValue();
                 if (!(o instanceof PropertyReference)) {
                     // FIXME: where are we?
-                    throw new InvalidDefinitionException(String.format("%s no can haz %s", eh.getName(), o), SUPER_PASSTHROUGH);
+                    throw new InvalidDefinitionException(String.format("%s no can haz %s", eh.getName(), o),
+                            SUPER_PASSTHROUGH);
                 }
-                eh.setActionExpression((PropertyReference)o);
+                eh.setActionExpression((PropertyReference) o);
                 set(eh);
                 return;
             } else {
@@ -152,10 +170,11 @@ public class AttributeSetImpl implements AttributeSet {
             Object val = lookup.get(desc);
             if (val != null) {
                 if (val instanceof Attribute) {
-                    Attribute attribute = (Attribute)val;
-                    setExpression(attribute.getDescriptor(), new PropertyReferenceImpl("v." + attribute.getName(), SUPER_PASSTHROUGH));
+                    Attribute attribute = (Attribute) val;
+                    setExpression(attribute.getDescriptor(), new PropertyReferenceImpl("v." + attribute.getName(),
+                            SUPER_PASSTHROUGH));
                 } else if (val instanceof AttributeDefRef) {
-                    set((AttributeDefRef)val);
+                    set((AttributeDefRef) val);
                 }
             }
         }
@@ -177,7 +196,8 @@ public class AttributeSetImpl implements AttributeSet {
 
     @Override
     public Object getValue(String name) throws QuickFixException {
-        PropertyReference expr = new PropertyReferenceImpl(name, AuraUtil.getExternalLocation("direct attributeset access"));
+        PropertyReference expr = new PropertyReferenceImpl(name,
+                AuraUtil.getExternalLocation("direct attributeset access"));
         if (expr.size() != 1) {
             throw new InvalidDefinitionException("No dots allowed", expr.getLocation());
         }
@@ -200,7 +220,8 @@ public class AttributeSetImpl implements AttributeSet {
         AttributeDef ad = rd.getAttributeDefs().get(desc);
         if (ad == null) {
             // this location isn't even close to right...
-                    throw new InvalidDefinitionException(String.format("Attribute %s not defined on %s", desc.getName(), rootDefDescriptor.getName()), rd.getLocation());
+            throw new InvalidDefinitionException(String.format("Attribute %s not defined on %s", desc.getName(),
+                    rootDefDescriptor.getName()), rd.getLocation());
         }
 
         AttributeImpl att = new AttributeImpl(desc);
@@ -254,7 +275,8 @@ public class AttributeSetImpl implements AttributeSet {
 
                     if (attributeDef.getSerializeTo() == AttributeDef.SerializeToType.BOTH) {
                         TypeDef typeDef = attributeDef.getTypeDef();
-                        if ((valueProvider == null && !((typeDef instanceof ComponentArrayTypeDef) || (typeDef instanceof ComponentTypeDef))) || attribute.isDirty()) {
+                        if ((valueProvider == null && !((typeDef instanceof ComponentArrayTypeDef) || (typeDef instanceof ComponentTypeDef)))
+                                || attribute.isDirty()) {
                             json.writeMapEntry(name, attribute.getValue());
                         }
                     }
@@ -305,7 +327,8 @@ public class AttributeSetImpl implements AttributeSet {
     public void validate() throws QuickFixException {
         Set<AttributeDef> missingAttributes = this.getMissingAttributes();
         if (missingAttributes != null && !missingAttributes.isEmpty()) {
-            throw new MissingRequiredAttributeException(rootDefDescriptor, missingAttributes.iterator().next().getName());
+            throw new MissingRequiredAttributeException(rootDefDescriptor, missingAttributes.iterator().next()
+                    .getName());
         }
     }
 

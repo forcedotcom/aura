@@ -15,34 +15,40 @@
  */
 package org.auraframework.archetype;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.util.List;
 
+import org.apache.commons.httpclient.HostConfiguration;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.auraframework.test.UnitTestCase;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.IOUtil;
 
-import org.apache.commons.httpclient.*;
-import org.apache.commons.httpclient.methods.GetMethod;
-
 import com.google.common.collect.ImmutableList;
 
 /**
- * Tests for using simple archetype. Note: These won't pass in Eclipse JUnit runner due to lack of privileges when
- * starting Jetty. Also, the tests will fail the first few times running on a particular machine since mvn will have to
- * download dependencies not yet stored in the local repository, and this will differ in the process output.
- *
- *
+ * Tests for using simple archetype. Note: These won't pass in Eclipse JUnit
+ * runner due to lack of privileges when starting Jetty. Also, the tests will
+ * fail the first few times running on a particular machine since mvn will have
+ * to download dependencies not yet stored in the local repository, and this
+ * will differ in the process output.
+ * 
+ * 
  * @since 0.0.178
  */
 @UnAdaptableTest
 public class AuraArchetypeSimpleTestMANUAL extends UnitTestCase {
     private static class MavenArtifact {
-        private String artifactId;
-        private String groupId;
-        private String version;
+        private final String artifactId;
+        private final String groupId;
+        private final String version;
 
         private MavenArtifact(String groupId, String artifactId, String version) {
             this.artifactId = artifactId;
@@ -55,18 +61,19 @@ public class AuraArchetypeSimpleTestMANUAL extends UnitTestCase {
     private final static String END_BUILD = "BUILD SUCCESS";
     private final static String archRepo = "http://maven.auraframework.org/repo";
     private final static String archCatalog = "http://maven.auraframework.org/libs-release-local/archetype-catalog.xml";
-    private MavenArtifact archetype;
-    private MavenArtifact project;
-    private String projectPackage;
+    private final MavenArtifact archetype;
+    private final MavenArtifact project;
+    private final String projectPackage;
     private File workspace;
 
     public AuraArchetypeSimpleTestMANUAL(String name) {
-        this(AuraArchetypeSimpleTestMANUAL.class.getName(), name, new MavenArtifact("org.auraframework.aura-archetypes",
-                "aura-archetype-simple", ARCHETYPE_VERSION), new MavenArtifact("myGroupId", "myArtifactId", "1.0-SNAPSHOT"), ".");
+        this(AuraArchetypeSimpleTestMANUAL.class.getName(), name, new MavenArtifact(
+                "org.auraframework.aura-archetypes", "aura-archetype-simple", ARCHETYPE_VERSION), new MavenArtifact(
+                "myGroupId", "myArtifactId", "1.0-SNAPSHOT"), ".");
     }
 
-    private AuraArchetypeSimpleTestMANUAL(String name, String testMethod, MavenArtifact archetype, MavenArtifact project,
-            String projectPackage) {
+    private AuraArchetypeSimpleTestMANUAL(String name, String testMethod, MavenArtifact archetype,
+            MavenArtifact project, String projectPackage) {
         super(testMethod);
         this.archetype = archetype;
         this.project = project;
@@ -128,7 +135,8 @@ public class AuraArchetypeSimpleTestMANUAL extends UnitTestCase {
             verifyDefaultDocument(http);
             verifySampleComponents(http);
         } catch (Throwable t) {
-            // if any errors in Jetty requests, let's print out the Jetty console output for diag before killing the
+            // if any errors in Jetty requests, let's print out the Jetty
+            // console output for diag before killing the
             // test
             if (jettyProcess != null) {
                 InputStream is = jettyProcess.getInputStream();
@@ -153,7 +161,8 @@ public class AuraArchetypeSimpleTestMANUAL extends UnitTestCase {
     }
 
     private void verifyGeneratedResources(File projectDir) throws Exception {
-        // assertDirectory(new File(projectDir, "src/main/java/org/auraframework"));
+        // assertDirectory(new File(projectDir,
+        // "src/main/java/org/auraframework"));
         goldFileText(IOUtil.readText(new FileReader(new File(projectDir, "pom.xml"))), "-pom.xml");
         goldFileText(IOUtil.readText(new FileReader(new File(projectDir, String.format(
                 "src/main/webapp/WEB-INF/components/%1$s/%1$s/%1$s.app", project.artifactId)))), "-sample.app");

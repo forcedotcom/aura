@@ -17,16 +17,19 @@ package org.auraframework.impl.system;
 
 import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.system.*;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
+import org.auraframework.system.DefFactory;
+import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Doesn't do any caching at all.
- *
- * This is a very thin wrapper around a factory, in fact, it is a little hard to tell the difference.
- * FIXME: collapse them.
+ * 
+ * This is a very thin wrapper around a factory, in fact, it is a little hard to
+ * tell the difference. FIXME: collapse them.
  */
 public class NonCachingDefRegistryImpl<T extends Definition> extends DefRegistryImpl<T> {
     private static final long serialVersionUID = 5781588775451737960L;
@@ -36,7 +39,8 @@ public class NonCachingDefRegistryImpl<T extends Definition> extends DefRegistry
         this(factory, defTypes, prefixes, null);
     }
 
-    public NonCachingDefRegistryImpl(DefFactory<T> factory, Set<DefType> defTypes, Set<String> prefixes, Set<String> namespace) {
+    public NonCachingDefRegistryImpl(DefFactory<T> factory, Set<DefType> defTypes, Set<String> prefixes,
+            Set<String> namespace) {
         super(defTypes, prefixes, namespace);
         this.factory = factory;
     }

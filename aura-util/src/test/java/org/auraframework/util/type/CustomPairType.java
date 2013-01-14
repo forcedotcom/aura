@@ -20,45 +20,52 @@ import java.io.IOException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
-public class CustomPairType implements JsonSerializable{
+public class CustomPairType implements JsonSerializable {
     private String strMember = null;
     private int intMember;
 
-    public CustomPairType(String s, int i){
+    public CustomPairType(String s, int i) {
         strMember = s;
         intMember = i;
     }
+
     public void setIntMember(int intMember) {
         this.intMember = intMember;
     }
+
     public int getIntMember() {
         return intMember;
     }
+
     public void setStrMember(String strMember) {
         this.strMember = strMember;
     }
+
     public String getStrMember() {
         return strMember;
     }
 
     @Override
     public int hashCode() {
-        return this.intMember+this.strMember.hashCode();
+        return this.intMember + this.strMember.hashCode();
     }
 
     @Override
-    public boolean equals(Object other){
-        if(other instanceof CustomPairType){
-            if(((CustomPairType)other).getStrMember().equals(getStrMember()) && ((CustomPairType)other).getIntMember() ==getIntMember())
+    public boolean equals(Object other) {
+        if (other instanceof CustomPairType) {
+            if (((CustomPairType) other).getStrMember().equals(getStrMember())
+                    && ((CustomPairType) other).getIntMember() == getIntMember()) {
                 return true;
+            }
         }
         return false;
     }
+
     @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
-            json.writeMapEntry("strMember", getStrMember());
-            json.writeMapEntry("intMember", getIntMember());
+        json.writeMapEntry("strMember", getStrMember());
+        json.writeMapEntry("intMember", getIntMember());
         json.writeMapEnd();
 
     }

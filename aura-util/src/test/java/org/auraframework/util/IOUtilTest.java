@@ -23,65 +23,65 @@ import org.auraframework.util.IOUtil.DeleteFailedException;
 import com.google.common.io.Files;
 
 public class IOUtilTest extends UnitTestCase {
-    public IOUtilTest(String name){
+    public IOUtilTest(String name) {
         super(name);
     }
-    
-    public void testDelete() throws Exception{
+
+    public void testDelete() throws Exception {
         File testFolder = null;
         File testFile = null;
-        //Delete null
-        try{
+        // Delete null
+        try {
             IOUtil.delete(testFile);
-        }catch (Exception e){
+        } catch (Exception e) {
             fail("IOUtil.delete() wasn't able to handle null");
         }
-        
-        //Delete non exisitng directory
+
+        // Delete non exisitng directory
         testFile = new File("/foo/bar");
-        try{
+        try {
             IOUtil.delete(testFile);
-        }catch(Exception e){
+        } catch (Exception e) {
             fail("IOUtil.delete() wasn't able to handle non existing file");
         }
-        
-        //Delete File
-        try{
+
+        // Delete File
+        try {
             testFolder = Files.createTempDir();
             testFile = File.createTempFile("tmpFile", null, testFolder);
             assertTrue(testFile.exists());
             IOUtil.delete(testFile);
             assertFalse(testFile.exists());
-        }finally{
+        } finally {
             testFile.delete();
             assertTrue("test cleanup failed", testFolder.delete());
         }
-        
-        //Delete directory and all its children
+
+        // Delete directory and all its children
         testFolder = Files.createTempDir();
         File testFile1 = File.createTempFile("tmpFile", null, testFolder);
         File testFile2 = File.createTempFile("tmpFile", null, testFolder);
-        try{
+        try {
             assertTrue(testFolder.exists());
             IOUtil.delete(testFolder);
             assertFalse(testFile1.exists());
             assertFalse(testFile2.exists());
             assertFalse(testFolder.exists());
-        }finally{
+        } finally {
             testFile1.delete();
             testFile2.delete();
             testFolder.delete();
         }
-        //Delete Directory without write permissions
-        testFolder =  Files.createTempDir();
+        // Delete Directory without write permissions
+        testFolder = Files.createTempDir();
         testFolder.mkdir();
         testFolder.setReadable(false, false);
-        try{
+        try {
             IOUtil.delete(testFolder);
             fail("IOUtils did not flag an error when trying to delete a readonly directory.");
-        }catch(DeleteFailedException e){
-            assertEquals(String.format("Please fix permissions for %s",testFolder.getAbsolutePath()), e.getMessage());
-        }finally{
+        } catch (DeleteFailedException e) {
+            assertEquals(String.format("Please fix permissions for %s", testFolder.getAbsolutePath()), e.getMessage());
+        } finally {
             testFolder.setReadable(true);
             assertTrue("test cleanup failed", testFolder.delete());
         }

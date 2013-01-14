@@ -21,7 +21,7 @@ import org.auraframework.system.Annotations.Model;
 @Model
 public class TeamFacetModel {
     @AuraEnabled
-    public String getTeamDivision(){
+    public String getTeamDivision() {
         return "National League";
     }
 }

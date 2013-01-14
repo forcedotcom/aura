@@ -15,8 +15,9 @@
  */
 package org.auraframework.impl.root.intf;
 
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.test.UnitTestCase;
 
@@ -29,8 +30,9 @@ public class InterfaceDefDescriptorTest extends UnitTestCase {
     }
 
     public void testGetDefType() {
-        DefDescriptor<InterfaceDef> testDescriptor = DefDescriptorImpl.getInstance("aura:testinterfacechild", InterfaceDef.class);
-        assertEquals(DefType.INTERFACE,testDescriptor.getDefType());
+        DefDescriptor<InterfaceDef> testDescriptor = DefDescriptorImpl.getInstance("aura:testinterfacechild",
+                InterfaceDef.class);
+        assertEquals(DefType.INTERFACE, testDescriptor.getDefType());
     }
 
 }

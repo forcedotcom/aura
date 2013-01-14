@@ -15,13 +15,13 @@
  */
 package org.auraframework.impl.java.type.converter;
 
+import java.util.Date;
+
 import org.auraframework.impl.java.type.LocalizedConverter;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.type.converter.DateToStringConverter;
-
-import java.util.Date;
 
 public class LocalizedDateToStringConverter extends DateToStringConverter implements LocalizedConverter<Date, String> {
     @Override

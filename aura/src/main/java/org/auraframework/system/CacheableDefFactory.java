@@ -19,7 +19,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 
 /**
- * A DefFactory that produces Definitions that it is acceptable for a registry to cache.
+ * A DefFactory that produces Definitions that it is acceptable for a registry
+ * to cache.
  */
 public interface CacheableDefFactory<D extends Definition> extends DefFactory<D> {
 

@@ -26,13 +26,14 @@ import com.google.common.collect.Maps;
  */
 public abstract class CreateBaseComponentDefQuickFix extends AuraQuickFix {
 
-    public CreateBaseComponentDefQuickFix(String description, Map<String, Object> attributes, DefDescriptor<ComponentDef> ui){
+    public CreateBaseComponentDefQuickFix(String description, Map<String, Object> attributes,
+            DefDescriptor<ComponentDef> ui) {
         super(description, attributes, ui);
     }
 
-    protected static Map<String, Object> createMap(DefDescriptor<?> descriptor){
+    protected static Map<String, Object> createMap(DefDescriptor<?> descriptor) {
         Map<String, Object> ret = Maps.newLinkedHashMap();
-        ret.put("descriptor", String.format("%s:%s",descriptor.getNamespace(), descriptor.getName()));
+        ret.put("descriptor", String.format("%s:%s", descriptor.getNamespace(), descriptor.getName()));
         return ret;
     }
 }

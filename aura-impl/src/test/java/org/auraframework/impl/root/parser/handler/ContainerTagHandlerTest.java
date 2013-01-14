@@ -19,11 +19,14 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.AuraRuntimeException;
+
 /**
  * Test for {@link ContainerTagHandler}.
  */
@@ -32,34 +35,38 @@ public class ContainerTagHandlerTest extends AuraImplTestCase {
     XMLInputFactory xmlInputFactory;
     ComponentDefRefHandler<?> cdrHandler;
 
-    public ContainerTagHandlerTest(String name){
+    public ContainerTagHandlerTest(String name) {
         super(name);
     }
 
-    public void testGetDefRefHandler() throws Exception{
-        //1. Verify that specifying invalid load level in a component def ref, throws Exception.
-        try{
+    public void testGetDefRefHandler() throws Exception {
+        // 1. Verify that specifying invalid load level in a component def ref,
+        // throws Exception.
+        try {
             createDefRefHandler("<fake:component aura:load='foo'/>");
             fail("Should not be able to specify an invalid load value.");
-        }catch(AuraRuntimeException expected){
-            assertTrue("unexpected message "+expected.getMessage(),
-                       expected.getMessage().contains("Invalid value 'foo' specified for 'aura:load' attribute"));
+        } catch (AuraRuntimeException expected) {
+            assertTrue("unexpected message " + expected.getMessage(),
+                    expected.getMessage().contains("Invalid value 'foo' specified for 'aura:load' attribute"));
         }
     }
 
     /**
      * Utility method to create a DefRefHandler for a given markup.
      */
-    private ParentedTagHandler<? extends ComponentDefRef, ?> createDefRefHandler(String markup)throws Exception{
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(desc, markup , "myID",Format.XML);
+    private ParentedTagHandler<? extends ComponentDefRef, ?> createDefRefHandler(String markup) throws Exception {
+        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component",
+                ComponentDef.class);
+        StringSource<ComponentDef> source = new StringSource<ComponentDef>(desc, markup, "myID", Format.XML);
         xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());
+        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
         xmlReader.next();
-        //Assume we found the markup in a component, create a ComponentDefHandler to represent that
+        // Assume we found the markup in a component, create a
+        // ComponentDefHandler to represent that
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader);
-        //Try to create a DefRefHandler which will inturn call ContainerTagHandler.getDefRefHandler()
+        // Try to create a DefRefHandler which will inturn call
+        // ContainerTagHandler.getDefRefHandler()
         return cdh.getDefRefHandler(cdh);
     }
 }

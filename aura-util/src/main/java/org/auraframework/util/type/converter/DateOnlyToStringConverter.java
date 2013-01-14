@@ -23,7 +23,7 @@ import org.auraframework.util.type.Converter;
 public class DateOnlyToStringConverter implements Converter<DateOnly, String> {
     @Override
     public String convert(DateOnly value) {
-        if(value == null){
+        if (value == null) {
             return null;
         }
         DateService dateService = DateServiceImpl.get();

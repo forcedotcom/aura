@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 import com.google.common.collect.ImmutableSet;
 
 public class AnnotationTestFilter implements TestFilter {
-    private Set<Class<? extends Annotation>> ignorableAnnotations;
+    private final Set<Class<? extends Annotation>> ignorableAnnotations;
 
     public AnnotationTestFilter(Collection<Class<? extends Annotation>> annotations) {
         this.ignorableAnnotations = ImmutableSet.copyOf(annotations);
@@ -33,14 +33,18 @@ public class AnnotationTestFilter implements TestFilter {
 
     private boolean hasIgnorableAnnotation(Annotation... annotations) {
         for (Annotation annotation : annotations) {
-            if (ignorableAnnotations.contains(annotation.annotationType())) return true;
+            if (ignorableAnnotations.contains(annotation.annotationType())) {
+                return true;
+            }
         }
         return false;
     }
 
     @Override
     public Class<? extends Test> applyTo(Class<? extends Test> testClass) {
-        if (testClass == null || hasIgnorableAnnotation(testClass.getAnnotations())) { return null; }
+        if (testClass == null || hasIgnorableAnnotation(testClass.getAnnotations())) {
+            return null;
+        }
         return testClass;
     }
 
@@ -51,7 +55,9 @@ public class AnnotationTestFilter implements TestFilter {
         } else {
             String method = test.getName();
             try {
-                if (hasIgnorableAnnotation(test.getClass().getMethod(method).getAnnotations())) { return null; }
+                if (hasIgnorableAnnotation(test.getClass().getMethod(method).getAnnotations())) {
+                    return null;
+                }
             } catch (NoSuchMethodException e) {
                 // This may happen for dynamic tests, so ignore
             }

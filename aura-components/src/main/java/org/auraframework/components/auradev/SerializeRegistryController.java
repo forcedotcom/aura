@@ -25,12 +25,12 @@ import org.auraframework.util.RegistryJsonSerializer;
 
 @Controller
 public class SerializeRegistryController {
-	@AuraEnabled
-	public static String serializeComponentRegistryToJson() throws AuraException{
-		try {
-			return RegistryJsonSerializer.serializeToFile();
-		} catch (IOException e) {
-			throw new AuraRuntimeException(e.getMessage());
-		}
-	}
+    @AuraEnabled
+    public static String serializeComponentRegistryToJson() throws AuraException {
+        try {
+            return RegistryJsonSerializer.serializeToFile();
+        } catch (IOException e) {
+            throw new AuraRuntimeException(e.getMessage());
+        }
+    }
 }

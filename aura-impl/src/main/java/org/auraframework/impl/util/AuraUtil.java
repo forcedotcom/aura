@@ -15,11 +15,16 @@
  */
 package org.auraframework.impl.util;
 
-import java.util.*;
-
-import com.google.common.collect.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.system.Location;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 /**
  * Collection of utility methods used in the Aura module.
@@ -27,12 +32,13 @@ import org.auraframework.system.Location;
 public class AuraUtil {
 
     /**
-     * Accepts a Set, or null, and always returns an immutable Set. If set was null, return will be an empty
-     * ImmutableSet
-     *
+     * Accepts a Set, or null, and always returns an immutable Set. If set was
+     * null, return will be an empty ImmutableSet
+     * 
      * @param <T> Any Object type
      * @param set any set, or null
-     * @return An ImmutableSet that is a copy of set, or an empty ImmutableSet if set was null
+     * @return An ImmutableSet that is a copy of set, or an empty ImmutableSet
+     *         if set was null
      */
     public static <T> Set<T> immutableSet(Set<T> set) {
         if (set == null) {
@@ -42,12 +48,13 @@ public class AuraUtil {
     }
 
     /**
-     * Accepts a List, or null, and always returns an immutable List. If list was null, return will be an empty
-     * ImmutableList
-     *
+     * Accepts a List, or null, and always returns an immutable List. If list
+     * was null, return will be an empty ImmutableList
+     * 
      * @param <T> Any Object type
      * @param list any List, or null
-     * @return An ImmutableList that is a copy of list, or an empty ImmutableList if list was null
+     * @return An ImmutableList that is a copy of list, or an empty
+     *         ImmutableList if list was null
      */
     public static <T> List<T> immutableList(List<T> list) {
         if (list == null) {
@@ -57,23 +64,26 @@ public class AuraUtil {
     }
 
     /**
-     * Accepts a Map, or null, and always returns an immutable Map. If map was null, return will be an empty
-     * ImmutableMap
-     *
+     * Accepts a Map, or null, and always returns an immutable Map. If map was
+     * null, return will be an empty ImmutableMap
+     * 
      * @param <K> Any Object type
      * @param <V> Any Object type
      * @param map Any Map, or null
-     * @return An ImmutableMap that is a copy of map, or an empty ImmutableMap if map was null
+     * @return An ImmutableMap that is a copy of map, or an empty ImmutableMap
+     *         if map was null
      */
     public static <K, V> Map<K, V> immutableMap(Map<K, V> map) {
         if (map == null) {
             return ImmutableMap.of();
+        } else {
+            return ImmutableMap.copyOf(map);
         }
-        else return ImmutableMap.copyOf(map);
     }
 
     /**
      * shortcut for hashing some stuff.
+     * 
      * @param toHash objects to hash, null objects will be skipped entirely
      */
     public static int hashCode(Object... toHash) {
@@ -93,14 +103,16 @@ public class AuraUtil {
         for (int i = 0; i < toHash.length; i++) {
             Object o = toHash[i];
             if (o instanceof String) {
-                toHash[i] = ((String)o).toLowerCase();
+                toHash[i] = ((String) o).toLowerCase();
             }
         }
         return hashCode(toHash);
     }
 
     /**
-     * use this to create a fake location when entering aura from outside, it has no line number info
+     * use this to create a fake location when entering aura from outside, it
+     * has no line number info
+     * 
      * @param name a string to identify the external source
      * @return the location
      */
@@ -122,7 +134,7 @@ public class AuraUtil {
 
     /**
      * Find an interface on a class.
-     *
+     * 
      * @param clazz the class to search.
      * @param ifc the interface for which we are searching.
      * @return a subclass of ifc if there is one, or null.

@@ -15,7 +15,7 @@
  */
 package org.auraframework.impl.root;
 
-import org.auraframework.def.*;
+import org.auraframework.def.DependencyDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -31,45 +31,46 @@ public class DependencyDefTest extends AuraImplTestCase {
         // Invalid, no parent.
         //
         try {
-            testDependencyDef = vendor.makeDependencyDef(null, "aura", null,
-                                                         vendor.makeLocation("f1", 5, 5, 0));
+            testDependencyDef = vendor.makeDependencyDef(null, "aura", null, vendor.makeLocation("f1", 5, 5, 0));
             testDependencyDef.validateDefinition();
             fail("Should have thrown QuickFixException for null parent in DependencyDef's");
-        } catch (QuickFixException expected) {}
+        } catch (QuickFixException expected) {
+        }
 
         //
         // Invalid no resource.
         //
         try {
             testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"), null, null,
-                                                         vendor.makeLocation("f1", 5, 5, 0));
+                    vendor.makeLocation("f1", 5, 5, 0));
             testDependencyDef.validateDefinition();
             fail("Should have thrown QuickFixException for null resource in DependencyDef's");
-        } catch (QuickFixException expected) {}
+        } catch (QuickFixException expected) {
+        }
 
         //
         // Invalid type
         //
         try {
             testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"), null, "WhatAmI",
-                                                         vendor.makeLocation("f1", 5, 5, 0));
+                    vendor.makeLocation("f1", 5, 5, 0));
             testDependencyDef.validateDefinition();
             fail("Should have thrown QuickFixException for invalid type in DependencyDef's");
-        } catch (QuickFixException expected) {}
+        } catch (QuickFixException expected) {
+        }
 
         //
         // Valid, with a namespace.
         //
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"), "aura", null,
-                                                     vendor.makeLocation("f1", 5, 5, 0));
+                vendor.makeLocation("f1", 5, 5, 0));
         testDependencyDef.validateDefinition();
-
 
         //
         // Valid, with a namespace & type.
         //
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"), "aura", "COMPONENT",
-                                                     vendor.makeLocation("f1", 5, 5, 0));
+                vendor.makeLocation("f1", 5, 5, 0));
         testDependencyDef.validateDefinition();
     }
 }

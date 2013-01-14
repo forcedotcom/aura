@@ -67,7 +67,7 @@ public class LocationTest extends UnitTestCase {
         assertFalse("filename:5,5".equals(testLocationFileOnly.toString()));
     }
 
-    public void testEquals() throws Exception  {
+    public void testEquals() throws Exception {
         Location testLocationLocal = new Location("filename", 5, 5, 10);
         Location testLocationFileOnlyLocal = new Location("filenameonly", 10);
 
@@ -81,7 +81,7 @@ public class LocationTest extends UnitTestCase {
         assertFalse(testLocationFileOnlyLocal.equals("string"));
     }
 
-    public void testHashCode() throws Exception  {
+    public void testHashCode() throws Exception {
         Location testLocationLocal = new Location("filename", 5, 5, 10);
         Location testLocationFileOnlyLocal = new Location("filenameonly", 10);
 

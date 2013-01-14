@@ -17,13 +17,18 @@ package org.auraframework.impl.compound.controller;
 
 import java.util.Map;
 
-import com.google.common.collect.Maps;
-
-import org.auraframework.def.*;
+import org.auraframework.def.ActionDef;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.compound.controller.CompoundControllerDef.Builder;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefFactoryImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.collect.Maps;
 
 /**
  */
@@ -35,29 +40,32 @@ public class CompoundControllerDefFactory extends DefFactoryImpl<ControllerDef> 
         builder.setDescriptor(descriptor);
         builder.setLocation(descriptor.getQualifiedName(), -1);
 
-        DefDescriptor<ComponentDef> compDesc = DefDescriptorImpl.getAssociateDescriptor(descriptor, ComponentDef.class, DefDescriptor.MARKUP_PREFIX);
+        DefDescriptor<ComponentDef> compDesc = DefDescriptorImpl.getAssociateDescriptor(descriptor, ComponentDef.class,
+                DefDescriptor.MARKUP_PREFIX);
         BaseComponentDef componentDef = null;
-        if(compDesc.exists()){
+        if (compDesc.exists()) {
             componentDef = compDesc.getDef();
-        }else{
-            DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getAssociateDescriptor(descriptor, ApplicationDef.class, DefDescriptor.MARKUP_PREFIX);
+        } else {
+            DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getAssociateDescriptor(descriptor,
+                    ApplicationDef.class, DefDescriptor.MARKUP_PREFIX);
             componentDef = appDesc.getDef();
         }
 
         if (componentDef == null) {
-            DefDescriptor<ComponentDef> layoutDesc = DefDescriptorImpl.getAssociateDescriptor(descriptor, ComponentDef.class, "layout");
+            DefDescriptor<ComponentDef> layoutDesc = DefDescriptorImpl.getAssociateDescriptor(descriptor,
+                    ComponentDef.class, "layout");
             componentDef = layoutDesc.getDef();
         }
 
-
         Map<String, ActionDef> flattened = Maps.newHashMap();
 
-        for(DefDescriptor<ControllerDef> delegate : componentDef.getControllerDefDescriptors()){
+        for (DefDescriptor<ControllerDef> delegate : componentDef.getControllerDefDescriptors()) {
             ControllerDef c = delegate.getDef();
             for (Map.Entry<String, ? extends ActionDef> e : c.getActionDefs().entrySet()) {
                 ActionDef a = flattened.get(e.getKey());
                 if (a != null) {
-                    // TODO: server and client actions by same name, map needs key on action type
+                    // TODO: server and client actions by same name, map needs
+                    // key on action type
                 } else {
                     flattened.put(e.getKey(), e.getValue());
                 }

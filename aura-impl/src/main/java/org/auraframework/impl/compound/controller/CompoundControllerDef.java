@@ -26,8 +26,8 @@ import org.auraframework.instance.Action;
 import org.auraframework.util.json.Json;
 
 /**
- * Compound controllers are what components usually deal with, they handle delegating actions of multiple controllers
- * and exposing them as one flat map.
+ * Compound controllers are what components usually deal with, they handle
+ * delegating actions of multiple controllers and exposing them as one flat map.
  */
 public class CompoundControllerDef extends DefinitionImpl<ControllerDef> implements ControllerDef {
     private static final long serialVersionUID = -902182692824281624L;
@@ -74,7 +74,7 @@ public class CompoundControllerDef extends DefinitionImpl<ControllerDef> impleme
             super(ControllerDef.class);
         }
 
-        public void setActionDefs(Map<String,ActionDef> actionDefs) {
+        public void setActionDefs(Map<String, ActionDef> actionDefs) {
             this.actionDefs = actionDefs;
         }
 

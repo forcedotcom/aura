@@ -22,7 +22,7 @@ import org.auraframework.system.Annotations.Provider;
 
 @Provider
 public class TestProvideNonExistingComponent {
-    public static DefDescriptor<ComponentDef> provide(){
+    public static DefDescriptor<ComponentDef> provide() {
         return DefDescriptorImpl.getInstance("test:test_nonExisting", ComponentDef.class);
     }
 }

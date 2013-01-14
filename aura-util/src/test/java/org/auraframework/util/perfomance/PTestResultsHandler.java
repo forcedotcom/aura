@@ -20,17 +20,20 @@ import java.util.List;
 import junit.framework.Test;
 
 /**
- * This test util is based on JTroup's AbstractCadenceTest framework.
- * This class mirrors CadenceResultsHandler.
- *
- *
- *
+ * This test util is based on JTroup's AbstractCadenceTest framework. This class
+ * mirrors CadenceResultsHandler.
+ * 
+ * 
+ * 
  * @since 0.0.178
  */
 public abstract class PTestResultsHandler {
     protected Test test;
-    public PTestResultsHandler(Test test){
+
+    public PTestResultsHandler(Test test) {
         this.test = test;
     }
-    public abstract void handleResults(String testName, List<org.auraframework.util.perfomance.PTestGoogleChart.ChartPoint> dataPoints)throws Exception;
+
+    public abstract void handleResults(String testName,
+            List<org.auraframework.util.perfomance.PTestGoogleChart.ChartPoint> dataPoints) throws Exception;
 }

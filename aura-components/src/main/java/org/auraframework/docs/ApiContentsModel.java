@@ -15,15 +15,20 @@
  */
 package org.auraframework.docs;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auraframework.Aura;
 import org.auraframework.components.ui.TreeNode;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Model;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.resource.ResourceLoader;
@@ -41,7 +46,7 @@ public class ApiContentsModel {
     private static final Comparator<Map<String, Object>> SYMBOL_COMPARATOR = new Comparator<Map<String, Object>>() {
         @Override
         public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-            return ((String)o1.get("_name")).compareTo((String)o2.get("_name"));
+            return ((String) o1.get("_name")).compareTo((String) o2.get("_name"));
         }
     };
 
@@ -76,16 +81,16 @@ public class ApiContentsModel {
                 symbols = Maps.newTreeMap();
 
                 for (Object symbol : readSymbols) {
-                    Map<String, Object> map = (Map<String, Object>)symbol;
-                    List<Map<String, Object>> l = (List<Map<String, Object>>)map.get("methods");
+                    Map<String, Object> map = (Map<String, Object>) symbol;
+                    List<Map<String, Object>> l = (List<Map<String, Object>>) map.get("methods");
                     if (l != null) {
                         Collections.sort(l, SYMBOL_COMPARATOR);
                     }
-                    l = (List<Map<String, Object>>)map.get("properties");
+                    l = (List<Map<String, Object>>) map.get("properties");
                     if (l != null) {
                         Collections.sort(l, SYMBOL_COMPARATOR);
                     }
-                    String name = (String)map.get("_name");
+                    String name = (String) map.get("_name");
                     symbols.put(name, map);
                 }
             } finally {
@@ -103,9 +108,9 @@ public class ApiContentsModel {
         nodes = Lists.newArrayList();
         if (theSymbols != null) {
             for (Map<String, Object> symbol : theSymbols.values()) {
-                String type = (String)symbol.get("isa");
+                String type = (String) symbol.get("isa");
                 if ("CONSTRUCTOR".equalsIgnoreCase(type)) {
-                    nodes.add(new TreeNode("#reference?topic=api:" + (String)symbol.get("_name"), (String)symbol
+                    nodes.add(new TreeNode("#reference?topic=api:" + (String) symbol.get("_name"), (String) symbol
                             .get("_name")));
                 }
             }

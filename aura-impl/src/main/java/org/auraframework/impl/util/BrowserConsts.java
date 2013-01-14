@@ -15,8 +15,7 @@
  */
 package org.auraframework.impl.util;
 
-public interface BrowserConsts
-{
+public interface BrowserConsts {
     public static final int XBROWSER_IE = 10000000;
     public static final int XBROWSER_IEM = 10000001;
     public static final int XBROWSER_IE_3 = 10003000;

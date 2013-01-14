@@ -15,14 +15,27 @@
  */
 package org.auraframework.impl.expression;
 
-import static org.auraframework.impl.expression.functions.BooleanFunctions.*;
-import static org.auraframework.impl.expression.functions.MathFunctions.*;
-import static org.auraframework.impl.expression.functions.MultiFunctions.*;
+import static org.auraframework.impl.expression.functions.BooleanFunctions.AND;
+import static org.auraframework.impl.expression.functions.BooleanFunctions.NOT;
+import static org.auraframework.impl.expression.functions.BooleanFunctions.OR;
+import static org.auraframework.impl.expression.functions.MathFunctions.ABSOLUTE;
+import static org.auraframework.impl.expression.functions.MathFunctions.DIVIDE;
+import static org.auraframework.impl.expression.functions.MathFunctions.GREATER_THAN;
+import static org.auraframework.impl.expression.functions.MathFunctions.GREATER_THAN_OR_EQUAL;
+import static org.auraframework.impl.expression.functions.MathFunctions.LESS_THAN;
+import static org.auraframework.impl.expression.functions.MathFunctions.LESS_THAN_OR_EQUAL;
+import static org.auraframework.impl.expression.functions.MathFunctions.MODULUS;
+import static org.auraframework.impl.expression.functions.MathFunctions.MULTIPLY;
+import static org.auraframework.impl.expression.functions.MathFunctions.NEGATE;
+import static org.auraframework.impl.expression.functions.MathFunctions.SUBTRACT;
+import static org.auraframework.impl.expression.functions.MultiFunctions.ADD;
+import static org.auraframework.impl.expression.functions.MultiFunctions.EQUALS;
+import static org.auraframework.impl.expression.functions.MultiFunctions.NOTEQUALS;
+import static org.auraframework.impl.expression.functions.MultiFunctions.TERNARY;
 
-import java.util.*;
-
-import com.google.common.collect.*;
-import com.google.common.collect.ImmutableMap.Builder;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
@@ -30,6 +43,10 @@ import org.auraframework.impl.expression.functions.Function;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 
 /**
  * factory used by the parser to create the expression objects
@@ -71,6 +88,7 @@ public class ExpressionFactory {
     }
 
     private final Location l;
+
     // TODO: advance locations based on token positions
 
     public ExpressionFactory(Location l) {
@@ -96,8 +114,7 @@ public class ExpressionFactory {
     }
 
     public PropertyReference createPropertyReference(List<String> path) {
-        return new PropertyReferenceImpl(
-            path == null ? ImmutableList.<String>of() : ImmutableList.copyOf(path), l);
+        return new PropertyReferenceImpl(path == null ? ImmutableList.<String> of() : ImmutableList.copyOf(path), l);
     }
 
     /**
@@ -108,14 +125,14 @@ public class ExpressionFactory {
     }
 
     /**
-     *  for binary ops
+     * for binary ops
      */
     public Expression createFunction(Function ft, Expression e1, Expression e2) {
         return new FunctionCallImpl(ft, ImmutableList.of(e1, e2), l);
     }
 
     /**
-     *  for ternary op
+     * for ternary op
      */
     public Expression createTernaryFunction(Expression e1, Expression e2, Expression e3) {
         return new FunctionCallImpl(TERNARY, ImmutableList.of(e1, e2, e3), l);
@@ -130,7 +147,7 @@ public class ExpressionFactory {
             // TODO: typed exception
             throw new AuraRuntimeException("No function found for key: " + name, l);
         }
-        return new FunctionCallImpl(f, args == null ? ImmutableList.<Expression>of() : ImmutableList.copyOf(args), l);
+        return new FunctionCallImpl(f, args == null ? ImmutableList.<Expression> of() : ImmutableList.copyOf(args), l);
     }
 
 }

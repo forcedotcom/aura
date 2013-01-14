@@ -16,24 +16,23 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.io.IOException;
-
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
 
-import com.google.common.collect.Maps;
-
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.impl.root.component.BaseComponentDefImpl.Builder;
+import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.collect.Maps;
 
 /**
  */
@@ -67,7 +66,8 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef> {
             attributes.put("def", def);
             InstanceService instanceService = Aura.getInstanceService();
             DefinitionService definitionService = Aura.getDefinitionService();
-            DefDescriptor<ComponentDef> tmplDesc = definitionService.getDefDescriptor("auradev:saveComponent", ComponentDef.class);
+            DefDescriptor<ComponentDef> tmplDesc = definitionService.getDefDescriptor("auradev:saveComponent",
+                    ComponentDef.class);
             Component tmpl = instanceService.getInstance(tmplDesc, attributes);
             Aura.getRenderingService().render(tmpl, out);
         } catch (QuickFixException x) {

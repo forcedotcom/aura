@@ -56,7 +56,8 @@ public class DateServiceImpl implements DateService {
     }
 
     /**
-     * For parsing, tries the following patterns, in order: yyyy-MM-dd'T'HH:mm:ss.SSSZZ yyyy-MM-dd'T'HH:mmZ yyyy-MM-dd
+     * For parsing, tries the following patterns, in order:
+     * yyyy-MM-dd'T'HH:mm:ss.SSSZZ yyyy-MM-dd'T'HH:mmZ yyyy-MM-dd
      */
     @Override
     public DateConverter getGenericISO8601Converter() {
@@ -64,7 +65,8 @@ public class DateServiceImpl implements DateService {
     }
 
     /**
-     * Converts dateStyle and timeStyle to joda-equivalents, and calls getStyleConverter.
+     * Converts dateStyle and timeStyle to joda-equivalents, and calls
+     * getStyleConverter.
      */
     @Override
     public DateConverter getDateTimeStyleConverter(Locale locale, int dateStyle, int timeStyle) {
@@ -109,7 +111,9 @@ public class DateServiceImpl implements DateService {
 
     @Override
     public int getStyle(String style) {
-        if (style == null) { throw new IllegalArgumentException("Style is null"); }
+        if (style == null) {
+            throw new IllegalArgumentException("Style is null");
+        }
         style = style.trim().toLowerCase();
         StyleType st = nameToStyleTypeMap.get(style);
         if (st == null) {
@@ -121,12 +125,14 @@ public class DateServiceImpl implements DateService {
 
     /**
      * Expects a two character style string, based on joda-time's style syntax:
-     *
+     * 
      * @see <a
      *      href="http://joda-time.sourceforge.net/apidocs/org/joda/time/format/DateTimeFormat.html#patternForStyle(java.lang.String, java.util.Locale)">DateTimeFormat</a>
      *      <p>
      *      Style and results:
-     *      <p><pre>
+     *      <p>
+     * 
+     *      <pre>
      * SS   6/1/12 10:37 PM
      * SM   6/1/12 10:37:14 PM
      * SL   6/1/12 10:37:14 PM UTC
@@ -154,20 +160,18 @@ public class DateServiceImpl implements DateService {
      * </pre>
      */
     private DateConverter getStyleConverter(Locale locale, String style) {
-        if (style.length() != 2)
+        if (style.length() != 2) {
             throw new IllegalArgumentException(
                     "expecting two characters:  S, M, L, or F.  Use - to indicate that date or time should be repressed.");
+        }
         String pattern = DateTimeFormat.patternForStyle(style, locale);
         return new JodaDateConverter(DateTimeFormat.forPattern(pattern).withLocale(locale));
     }
 
     private static enum StyleType {
 
-        SHORT(DateService.SHORT, "short", "S"),
-        MEDIUM(DateService.MEDIUM, "medium", "M"),
-        LONG(DateService.LONG, "long", "L"),
-        FULL(DateService.FULL, "full", "F"),
-        NONE(DateService.NONE, "none", "-");
+        SHORT(DateService.SHORT, "short", "S"), MEDIUM(DateService.MEDIUM, "medium", "M"), LONG(DateService.LONG,
+                "long", "L"), FULL(DateService.FULL, "full", "F"), NONE(DateService.NONE, "none", "-");
 
         int dateFormat;
         String nameStyle;
@@ -226,13 +230,13 @@ public class DateServiceImpl implements DateService {
             DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
 
     /**
-     * Tries a number of ISO formats when converting a Date to a String. String to Date conversions use
-     * ISO_8601_DATETIME
+     * Tries a number of ISO formats when converting a Date to a String. String
+     * to Date conversions use ISO_8601_DATETIME
      */
     private static DateConverter ISO_8601_ANY = new DateConverter() {
 
-        private List<DateConverter> isoConversions = ImmutableList.of(ISO_8601_DATETIME, ISO_8601_DATETIME_NO_SECONDS,
-                ISO_8601_DATETIME_SECONDS, ISO_8601_DATE);
+        private final List<DateConverter> isoConversions = ImmutableList.of(ISO_8601_DATETIME,
+                ISO_8601_DATETIME_NO_SECONDS, ISO_8601_DATETIME_SECONDS, ISO_8601_DATE);
 
         /**
          * Uses ISO_8601_DATETIME.
@@ -251,8 +255,8 @@ public class DateServiceImpl implements DateService {
         }
 
         /**
-         * Tries, in order: ISO_8601_DATETIME, ISO_8601_DATETIME_NO_SECONDS, ISO_8601_DATE If none parse, null is
-         * returned.
+         * Tries, in order: ISO_8601_DATETIME, ISO_8601_DATETIME_NO_SECONDS,
+         * ISO_8601_DATE If none parse, null is returned.
          */
         @Override
         public Date parse(String date, TimeZone timeZone) {
@@ -267,8 +271,8 @@ public class DateServiceImpl implements DateService {
         }
 
         /**
-         * Tries, in order: ISO_8601_DATETIME, ISO_8601_DATETIME_NO_SECONDS, ISO_8601_DATE If none parse, null is
-         * returned.
+         * Tries, in order: ISO_8601_DATETIME, ISO_8601_DATETIME_NO_SECONDS,
+         * ISO_8601_DATE If none parse, null is returned.
          */
         @Override
         public Date parse(String date) {
@@ -285,7 +289,7 @@ public class DateServiceImpl implements DateService {
 
     private static class JodaDateConverter implements DateConverter {
 
-        private DateTimeFormatter formatter;
+        private final DateTimeFormatter formatter;
 
         protected JodaDateConverter(DateTimeFormatter formatter) {
             this.formatter = formatter;
@@ -298,8 +302,12 @@ public class DateServiceImpl implements DateService {
 
         @Override
         public String format(Date date, TimeZone timeZone) {
-            if (date == null) throw new IllegalArgumentException("Date can not be null");
-            if (timeZone == null) throw new IllegalArgumentException("TimeZone can not be null");
+            if (date == null) {
+                throw new IllegalArgumentException("Date can not be null");
+            }
+            if (timeZone == null) {
+                throw new IllegalArgumentException("TimeZone can not be null");
+            }
             DateTimeZone dtz = DateTimeZone.forTimeZone(timeZone);
             DateTime dt = new DateTime(date);
             return formatter.withZone(dtz).print(dt);
@@ -312,8 +320,12 @@ public class DateServiceImpl implements DateService {
 
         @Override
         public Date parse(String date, TimeZone timeZone) {
-            if (date == null) throw new IllegalArgumentException("Date can not be null");
-            if (timeZone == null) throw new IllegalArgumentException("TimeZone can not be null");
+            if (date == null) {
+                throw new IllegalArgumentException("Date can not be null");
+            }
+            if (timeZone == null) {
+                throw new IllegalArgumentException("TimeZone can not be null");
+            }
             DateTimeZone dtz = DateTimeZone.forTimeZone(timeZone);
             return formatter.withZone(dtz).parseDateTime(date).toDate();
         }
@@ -321,8 +333,8 @@ public class DateServiceImpl implements DateService {
     }
 
     /**
-     * Allows ISO8601 converters to default to GMT instead of the JDK's timezone. Makes things more predictable -
-     * especially for testing.
+     * Allows ISO8601 converters to default to GMT instead of the JDK's
+     * timezone. Makes things more predictable - especially for testing.
      */
     private static class ISO8601JodaDateConverter extends JodaDateConverter {
 

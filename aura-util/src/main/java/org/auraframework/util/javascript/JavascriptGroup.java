@@ -35,7 +35,8 @@ public interface JavascriptGroup {
     Set<File> getFiles();
 
     /**
-     * is this group out of date? It can only check files that were in the group when initially parsed, newly added files won't show up
+     * is this group out of date? It can only check files that were in the group
+     * when initially parsed, newly added files won't show up
      */
     boolean isStale();
 
@@ -50,13 +51,15 @@ public interface JavascriptGroup {
     void generate(File destRoot, boolean doValidation) throws IOException;
 
     /**
-     * stage 3: post processing and cleanup of intermediate junk, only needed if this object will be kept in memory
+     * stage 3: post processing and cleanup of intermediate junk, only needed if
+     * this object will be kept in memory
      */
     void postProcess();
 
     /**
-     * regenerates a group. it is up to the group how it will regenerate, library groups do not get reparsed for example.
-     * generally regenerates will do validation because they only happen in dev mode
+     * regenerates a group. it is up to the group how it will regenerate,
+     * library groups do not get reparsed for example. generally regenerates
+     * will do validation because they only happen in dev mode
      */
     void regenerate(File destRoot) throws IOException;
 }

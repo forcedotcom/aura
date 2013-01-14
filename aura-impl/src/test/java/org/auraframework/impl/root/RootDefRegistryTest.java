@@ -27,13 +27,17 @@ public class RootDefRegistryTest extends AuraImplTestCase {
     }
 
     public void testGetComponentDefWithExtends() throws Exception {
-        DefDescriptor<ComponentDef> childDescriptor = DefDescriptorImpl.getInstance("test:extendsChild", ComponentDef.class);
-        DefDescriptor<ComponentDef> parentDescriptor = DefDescriptorImpl.getInstance("test:extendsParent", ComponentDef.class);
+        DefDescriptor<ComponentDef> childDescriptor = DefDescriptorImpl.getInstance("test:extendsChild",
+                ComponentDef.class);
+        DefDescriptor<ComponentDef> parentDescriptor = DefDescriptorImpl.getInstance("test:extendsParent",
+                ComponentDef.class);
         ComponentDef def = childDescriptor.getDef();
         assertEquals(parentDescriptor, def.getExtendsDescriptor());
         assertEquals(2, def.getModelDefDescriptors().size());
-        assertEquals("java://org.auraframework.impl.java.controller.TestController", def.getControllerDefDescriptors().get(0).getQualifiedName());
-        assertEquals("java://org.auraframework.impl.java.model.TestModel", def.getModelDef().getDescriptor().getQualifiedName());
+        assertEquals("java://org.auraframework.impl.java.controller.TestController", def.getControllerDefDescriptors()
+                .get(0).getQualifiedName());
+        assertEquals("java://org.auraframework.impl.java.model.TestModel", def.getModelDef().getDescriptor()
+                .getQualifiedName());
     }
 
 }

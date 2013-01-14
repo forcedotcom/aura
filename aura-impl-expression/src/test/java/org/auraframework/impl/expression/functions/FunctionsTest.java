@@ -15,16 +15,27 @@
  */
 package org.auraframework.impl.expression.functions;
 
-import static org.auraframework.impl.expression.functions.MathFunctions.*;
-import static org.auraframework.impl.expression.functions.MultiFunctions.*;
-
-import com.google.common.collect.Lists;
+import static org.auraframework.impl.expression.functions.MathFunctions.ABSOLUTE;
+import static org.auraframework.impl.expression.functions.MathFunctions.DIVIDE;
+import static org.auraframework.impl.expression.functions.MathFunctions.GREATER_THAN;
+import static org.auraframework.impl.expression.functions.MathFunctions.GREATER_THAN_OR_EQUAL;
+import static org.auraframework.impl.expression.functions.MathFunctions.LESS_THAN;
+import static org.auraframework.impl.expression.functions.MathFunctions.LESS_THAN_OR_EQUAL;
+import static org.auraframework.impl.expression.functions.MathFunctions.MODULUS;
+import static org.auraframework.impl.expression.functions.MathFunctions.MULTIPLY;
+import static org.auraframework.impl.expression.functions.MathFunctions.NEGATE;
+import static org.auraframework.impl.expression.functions.MathFunctions.SUBTRACT;
+import static org.auraframework.impl.expression.functions.MultiFunctions.ADD;
+import static org.auraframework.impl.expression.functions.MultiFunctions.EQUALS;
+import static org.auraframework.impl.expression.functions.MultiFunctions.TERNARY;
 
 import org.auraframework.impl.expression.AuraImplExpressionTestCase;
 
+import com.google.common.collect.Lists;
+
 /**
  * basic tests of functions
- *
+ * 
  * @hierarchy Aura.Runtime.Expression.Server.Functions
  * @userStory a07B0000000Ed9n
  */
@@ -69,16 +80,16 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     }
 
     // currently throws NullPointerException
-//    @TestLabels(IgnoreFailureReason.IN_DEV)
-//    public void testEqualsNulls() throws Exception {
-//        assertEquals(Boolean.TRUE, evaluate(EQUALS, null, null));
-//    }
+    // @TestLabels(IgnoreFailureReason.IN_DEV)
+    // public void testEqualsNulls() throws Exception {
+    // assertEquals(Boolean.TRUE, evaluate(EQUALS, null, null));
+    // }
 
     // currently throws NullPointerException
-//    @TestLabels(IgnoreFailureReason.IN_DEV)
-//    public void testEqualsNull1() throws Exception {
-//        assertEquals(Boolean.FALSE, evaluate(EQUALS, null, "null"));
-//    }
+    // @TestLabels(IgnoreFailureReason.IN_DEV)
+    // public void testEqualsNull1() throws Exception {
+    // assertEquals(Boolean.FALSE, evaluate(EQUALS, null, "null"));
+    // }
 
     public void testEqualsNull2() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(EQUALS, "null", null));

@@ -16,11 +16,15 @@
 package org.auraframework.impl.root.component;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import com.google.common.collect.Lists;
-
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ForEachDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.instance.BaseComponent;
@@ -28,12 +32,15 @@ import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
+import com.google.common.collect.Lists;
+
 /**
- * aura:forEach is a system tag that is handled by ForEachHandler however a component is also created
- * for this tag which is handled by ForEachDefImpl.
- *
- * ForEachDef creates an inner component definition, subDefs on DefinitionImpl, that represents its body,
- * and then creates an instance of the body for each var in the collection.
+ * aura:forEach is a system tag that is handled by ForEachHandler however a
+ * component is also created for this tag which is handled by ForEachDefImpl.
+ * 
+ * ForEachDef creates an inner component definition, subDefs on DefinitionImpl,
+ * that represents its body, and then creates an instance of the body for each
+ * var in the collection.
  */
 public class ForEachDefImpl extends ComponentDefRefImpl implements ForEachDef {
 
@@ -53,19 +60,19 @@ public class ForEachDefImpl extends ComponentDefRefImpl implements ForEachDef {
     }
 
     @Override
-    public List<Component> newInstance(BaseComponent<?,?> valueProvider) throws QuickFixException{
-        if(load == Load.LAZY){
-                return super.newInstance(valueProvider);
+    public List<Component> newInstance(BaseComponent<?, ?> valueProvider) throws QuickFixException {
+        if (load == Load.LAZY) {
+            return super.newInstance(valueProvider);
         }
 
         Object it = valueProvider.getValue(items);
-        Iterable<?> iterable = (Iterable<?>)it;
+        Iterable<?> iterable = (Iterable<?>) it;
         List<Component> ret = Lists.newArrayList();
 
-        if(iterable != null){
-            if(reverse){
+        if (iterable != null) {
+            if (reverse) {
                 List<Object> rev = Lists.newArrayList();
-                for(Object o : iterable){
+                for (Object o : iterable) {
                     rev.add(0, o);
                 }
                 iterable = rev;
@@ -81,7 +88,8 @@ public class ForEachDefImpl extends ComponentDefRefImpl implements ForEachDef {
 
                 Map<String, Object> providers = new HashMap<String, Object>();
                 providers.put(var, o);
-                ret.add(new ComponentImpl(descriptor, Lists.newArrayList(attribute), valueProvider, providers, valueProvider));
+                ret.add(new ComponentImpl(descriptor, Lists.newArrayList(attribute), valueProvider, providers,
+                        valueProvider));
             }
         }
         return ret;
@@ -104,7 +112,7 @@ public class ForEachDefImpl extends ComponentDefRefImpl implements ForEachDef {
         json.writeMapEntry("items", items);
         json.writeMapEntry("var", var);
         json.writeMapEntry("reverse", reverse);
-        if(!attributeValues.isEmpty()){
+        if (!attributeValues.isEmpty()) {
             json.writeMapKey("attributes");
             json.writeMapBegin();
             json.writeMapEntry("values", attributeValues);
@@ -114,16 +122,17 @@ public class ForEachDefImpl extends ComponentDefRefImpl implements ForEachDef {
     }
 
     /**
-     *  ForEach is a reference to N instances of a "private/inner" component that represents the body of the forEach.
-     *  This validateReferences is making sure that the inner component has a chance to valides its references too.
-     *  Note that ForEachDef extends ComponentDefRef, which has similar behavior.
+     * ForEach is a reference to N instances of a "private/inner" component that
+     * represents the body of the forEach. This validateReferences is making
+     * sure that the inner component has a chance to valides its references too.
+     * Note that ForEachDef extends ComponentDefRef, which has similar behavior.
      */
     @Override
     public void validateReferences() throws QuickFixException {
         body.validateReferences();
     }
 
-    public static class Builder extends ComponentDefRefImpl.Builder{
+    public static class Builder extends ComponentDefRefImpl.Builder {
         public PropertyReference items;
         public String var;
         private boolean reverse;
@@ -136,7 +145,7 @@ public class ForEachDefImpl extends ComponentDefRefImpl implements ForEachDef {
 
         /**
          * Sets the items for this instance.
-         *
+         * 
          * @param items The items.
          */
         public Builder setItems(PropertyReference items) {
@@ -150,9 +159,10 @@ public class ForEachDefImpl extends ComponentDefRefImpl implements ForEachDef {
         public String getVar() {
             return this.var;
         }
+
         /**
          * Sets the var for this instance.
-         *
+         * 
          * @param var The var.
          */
         public Builder setVar(String var) {
@@ -162,7 +172,7 @@ public class ForEachDefImpl extends ComponentDefRefImpl implements ForEachDef {
 
         /**
          * Sets whether or not this instance is reverse.
-         *
+         * 
          * @param reverse The reverse.
          */
         public Builder setReverse(boolean reverse) {
@@ -179,7 +189,7 @@ public class ForEachDefImpl extends ComponentDefRefImpl implements ForEachDef {
 
         /**
          * Sets the body for this instance.
-         *
+         * 
          * @param body The body.
          */
         public Builder setBody(ComponentDef body) {

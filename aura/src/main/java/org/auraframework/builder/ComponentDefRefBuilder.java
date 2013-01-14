@@ -26,6 +26,7 @@ import org.auraframework.def.DefDescriptor;
  */
 public interface ComponentDefRefBuilder extends DefBuilder<ComponentDef, ComponentDefRef> {
     ComponentDefRefBuilder setAttribute(String key, Object value);
+
     AttributeDefRef getAttributeValue(DefDescriptor<AttributeDef> key);
 
     ComponentDefRefBuilder setLocalId(String value);

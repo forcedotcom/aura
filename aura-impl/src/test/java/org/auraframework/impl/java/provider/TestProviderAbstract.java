@@ -28,9 +28,9 @@ import org.auraframework.system.Annotations.Provider;
  */
 @Provider
 public class TestProviderAbstract {
-    public static DefDescriptor<ComponentDef> provide(){
-        BaseComponent<?,?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
-        String num = (String)component.getAttributes().getExpression("implNumber");
-        return DefDescriptorImpl.getInstance("test:test_Provider_Abstract"+num, ComponentDef.class);
+    public static DefDescriptor<ComponentDef> provide() {
+        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        String num = (String) component.getAttributes().getExpression("implNumber");
+        return DefDescriptorImpl.getInstance("test:test_Provider_Abstract" + num, ComponentDef.class);
     }
 }

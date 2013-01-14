@@ -28,7 +28,7 @@ public class ArrayListToBooleanArrayConverter implements Converter<ArrayList, Bo
     @SuppressWarnings("unchecked")
     @Override
     public Boolean[] convert(ArrayList value) {
-        return ((ArrayList<Boolean>)value).toArray(new Boolean[0]);
+        return ((ArrayList<Boolean>) value).toArray(new Boolean[0]);
     }
 
     @Override

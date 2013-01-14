@@ -21,7 +21,7 @@ import java.util.Collection;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -29,7 +29,7 @@ import org.auraframework.util.json.Json;
 /**
  */
 @ThreadSafe
-public class ComponentDefJSONFormatAdapter extends JSONFormatAdapter<BaseComponentDef>{
+public class ComponentDefJSONFormatAdapter extends JSONFormatAdapter<BaseComponentDef> {
 
     @Override
     public Class<BaseComponentDef> getType() {
@@ -37,8 +37,8 @@ public class ComponentDefJSONFormatAdapter extends JSONFormatAdapter<BaseCompone
     }
 
     @Override
-    public void writeCollection(Collection<? extends BaseComponentDef> values,
-                                Appendable out) throws IOException, QuickFixException {
+    public void writeCollection(Collection<? extends BaseComponentDef> values, Appendable out) throws IOException,
+            QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         Json.serialize(values, out, context.getJsonSerializationContext());
     }

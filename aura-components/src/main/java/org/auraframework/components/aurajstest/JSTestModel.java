@@ -20,9 +20,9 @@ import java.util.List;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
@@ -37,57 +37,57 @@ public class JSTestModel {
     private final DefDescriptor<TestSuiteDef> descriptor;
     private final TestSuiteDef def;
     private final String url;
-    private List<TestCaseDef> tcd;
+    private final List<TestCaseDef> tcd;
 
-    public JSTestModel() throws QuickFixException{
+    public JSTestModel() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        BaseComponent<?,?> component = context.getCurrentComponent();
+        BaseComponent<?, ?> component = context.getCurrentComponent();
         DefinitionService defService = Aura.getDefinitionService();
 
-        String desc = (String)component.getAttributes().getValue("descriptor");
-        DefType defType = DefType.valueOf(((String)component.getAttributes().getValue("defType")).toUpperCase());
+        String desc = (String) component.getAttributes().getValue("descriptor");
+        DefType defType = DefType.valueOf(((String) component.getAttributes().getValue("defType")).toUpperCase());
 
-        desc = "js://"+desc.replace(':', '.');
+        desc = "js://" + desc.replace(':', '.');
         descriptor = defService.getDefDescriptor(desc, TestSuiteDef.class);
         def = descriptor.getDef();
-        if(def == null){
+        if (def == null) {
             throw new DefinitionNotFoundException(descriptor);
         }
         long nonce = System.currentTimeMillis();
 
-        url = String.format("/%s/%s.%s?aura.nonce=%s&aura.mode=AUTO%s", descriptor.getNamespace(), descriptor.getName(), defType == DefType.COMPONENT?"cmp":"app", nonce, context.getMode().name());
+        url = String.format("/%s/%s.%s?aura.nonce=%s&aura.mode=AUTO%s", descriptor.getNamespace(),
+                descriptor.getName(), defType == DefType.COMPONENT ? "cmp" : "app", nonce, context.getMode().name());
 
-        String test = (String)component.getAttributes().getValue("test");
+        String test = (String) component.getAttributes().getValue("test");
         tcd = filterTestCases(test);
     }
 
     private List<TestCaseDef> filterTestCases(String test) throws QuickFixException {
-        if(test != null){
+        if (test != null) {
             List<TestCaseDef> temp = descriptor.getDef().getTestCaseDefs();
-            for (TestCaseDef t : temp){
-                if(t.getName().equals(test))
-                {
+            for (TestCaseDef t : temp) {
+                if (t.getName().equals(test)) {
                     List<TestCaseDef> testCases = new ArrayList<TestCaseDef>();
                     testCases.add(t);
                     return testCases;
                 }
             }
         }
-        return  descriptor.getDef().getTestCaseDefs();
+        return descriptor.getDef().getTestCaseDefs();
     }
 
     @AuraEnabled
-    public TestSuiteDef getTestSuite() throws QuickFixException{
+    public TestSuiteDef getTestSuite() throws QuickFixException {
         return def;
     }
 
     @AuraEnabled
-    public List<TestCaseDef> getTestCases() throws QuickFixException{
+    public List<TestCaseDef> getTestCases() throws QuickFixException {
         return tcd;
     }
 
     @AuraEnabled
-    public String getUrl(){
+    public String getUrl() {
         return url;
     }
 }

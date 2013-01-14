@@ -17,11 +17,10 @@ package org.auraframework.impl.java.controller;
 
 import org.auraframework.system.Annotations.AuraEnabled;
 
-
 public class TestControllerWithoutAnnotation {
 
     @AuraEnabled
-    public static void doSomething(){
+    public static void doSomething() {
 
     }
 

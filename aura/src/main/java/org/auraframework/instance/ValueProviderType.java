@@ -22,17 +22,15 @@ import com.google.common.collect.Maps;
 
 // TODO: case insensitivity for provider keys
 public enum ValueProviderType {
-    MODEL("m"),
-    VIEW("v"),
-    CONTROLLER("c"),
-    FOREACH(null),  // key for foreach is dynamic
+    MODEL("m"), VIEW("v"), CONTROLLER("c"), FOREACH(null), // key for foreach is
+                                                           // dynamic
     LABEL("$Label", true),
     BROWSER("$Browser", true),
     LOCALE("$Locale", true),
 
-    // DCHASMAN TODO ********* Add a way to register value provider types from an adapter to avoid this bit of pollution!!!!
-    SOBJECT_TYPE("$SObjectType", true)
-    ;
+    // DCHASMAN TODO ********* Add a way to register value provider types from
+    // an adapter to avoid this bit of pollution!!!!
+    SOBJECT_TYPE("$SObjectType", true);
 
     static {
         Map<String, ValueProviderType> m = Maps.newHashMapWithExpectedSize(values().length);
@@ -52,11 +50,11 @@ public enum ValueProviderType {
     private final String prefix;
     private final boolean global;
 
-    private ValueProviderType(String prefix){
+    private ValueProviderType(String prefix) {
         this(prefix, false);
     }
 
-    private ValueProviderType(String prefix, boolean global){
+    private ValueProviderType(String prefix, boolean global) {
         this.prefix = prefix;
         this.global = global;
     }

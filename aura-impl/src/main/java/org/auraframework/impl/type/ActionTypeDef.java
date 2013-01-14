@@ -47,7 +47,7 @@ public class ActionTypeDef extends DefinitionImpl<TypeDef> implements TypeDef {
     }
 
     @Override
-    public Object initialize(Object config, BaseComponent<?,?> valueProvider) {
+    public Object initialize(Object config, BaseComponent<?, ?> valueProvider) {
         return config;
     }
 
@@ -66,7 +66,7 @@ public class ActionTypeDef extends DefinitionImpl<TypeDef> implements TypeDef {
         json.writeString(getName());
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<TypeDef>{
+    public static class Builder extends DefinitionImpl.BuilderImpl<TypeDef> {
 
         public Builder() {
             super(TypeDef.class);
@@ -81,6 +81,7 @@ public class ActionTypeDef extends DefinitionImpl<TypeDef> implements TypeDef {
     }
 
     @Override
-    public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {}
+    public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {
+    }
 
 }

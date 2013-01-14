@@ -25,16 +25,16 @@ import org.openqa.selenium.By;
  * Automation for verifying Layouts.
  */
 public class LayoutItemsUITest extends WebDriverTestCase {
-    private By resultBtn1 = By.cssSelector(".Button1");
-    private By resultBtn2 = By.cssSelector(".Button2");
+    private final By resultBtn1 = By.cssSelector(".Button1");
+    private final By resultBtn2 = By.cssSelector(".Button2");
 
     public LayoutItemsUITest(String name) {
         super(name);
     }
 
     /**
-     * Verify that navigating forward and backward works when underlying LayoutsDef has multiple layoutitems per layout.
-     * Automation for W-954182
+     * Verify that navigating forward and backward works when underlying
+     * LayoutsDef has multiple layoutitems per layout. Automation for W-954182
      */
     public void testNavigationWhenLayoutHasMultipleLayoutItems() throws Exception {
         By forwardButton = By.cssSelector(".Forward_Button");
@@ -71,7 +71,7 @@ public class LayoutItemsUITest extends WebDriverTestCase {
         getDriver().navigate().back();
         findDomElement(layoutDone);
         verifyExpectedResultsForInitialLayout();
-        
+
         findDomElement(removeLayoutDone).click();
         getDriver().navigate().forward();
         findDomElement(layoutDone);

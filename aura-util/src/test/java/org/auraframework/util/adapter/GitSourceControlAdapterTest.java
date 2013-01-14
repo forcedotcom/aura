@@ -21,20 +21,20 @@ import java.io.IOException;
 import org.auraframework.test.UnitTestCase;
 
 public class GitSourceControlAdapterTest extends UnitTestCase {
-    public GitSourceControlAdapterTest(String name){
+    public GitSourceControlAdapterTest(String name) {
         super(name);
     }
 
     public void testCanCheckout() {
-        //FIXME: nothing to test.
+        // FIXME: nothing to test.
     }
 
     public void testCheckout() {
-        //FIXME: nothing to test.
+        // FIXME: nothing to test.
     }
 
     public void testAdd() {
-        //FIXME: nothing to test.
+        // FIXME: nothing to test.
     }
 
     public void testWriteIfDifferentInvalidFile() {

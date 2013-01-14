@@ -15,7 +15,9 @@
  */
 package org.auraframework.util;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharsetDecoder;
@@ -25,36 +27,50 @@ import javax.annotation.concurrent.NotThreadSafe;
 import com.google.common.base.Charsets;
 
 /**
- * A minimal InputStreamReader implementation that reads only what it needs from the wrapped InputStream and not a byte
- * more. Java's built-in InputStreamReader can read ahead, but that doesn't play well with use cases that mix binary and
- * text data in one stream, so this InputStreamReader variant was created.<br>
+ * A minimal InputStreamReader implementation that reads only what it needs from
+ * the wrapped InputStream and not a byte more. Java's built-in
+ * InputStreamReader can read ahead, but that doesn't play well with use cases
+ * that mix binary and text data in one stream, so this InputStreamReader
+ * variant was created.<br>
  * <br>
- * Note that its original user, JsonStreamReader, reads only one character at a time, so that is how this implementation
- * is optimized. This can be updated if other use cases come along. At the very least, this InputStreamReader does
- * intelligently handle the first byte in a UTF-8 character by bulk-reading the remaining bytes based on the character
- * length, which is encoded into the first byte in a UTF-8 character. Another optimization is having one-byte UTF-8
- * characters bypass the CharsetDecoder.<br>
+ * Note that its original user, JsonStreamReader, reads only one character at a
+ * time, so that is how this implementation is optimized. This can be updated if
+ * other use cases come along. At the very least, this InputStreamReader does
+ * intelligently handle the first byte in a UTF-8 character by bulk-reading the
+ * remaining bytes based on the character length, which is encoded into the
+ * first byte in a UTF-8 character. Another optimization is having one-byte
+ * UTF-8 characters bypass the CharsetDecoder.<br>
  * <br>
- * This Reader assumes that characters in the InputStream are all UTF-8. Byte order mark (BOM) characters encoded as
- * UTF-8 are dropped, since their presence is nonsensical in UTF-8 (and we don't want to potentially contaminate any
- * UTF-16 outputs). 5-byte and 6-byte UTF-8 byte sequences are dropped at this time. Bytes with values 0xfe or 0xff are
- * dropped as neither are valid UTF-8 bytes.<br>
+ * This Reader assumes that characters in the InputStream are all UTF-8. Byte
+ * order mark (BOM) characters encoded as UTF-8 are dropped, since their
+ * presence is nonsensical in UTF-8 (and we don't want to potentially
+ * contaminate any UTF-16 outputs). 5-byte and 6-byte UTF-8 byte sequences are
+ * dropped at this time. Bytes with values 0xfe or 0xff are dropped as neither
+ * are valid UTF-8 bytes.<br>
  * <br>
- * Codepoints that are represented in UTF-16 as surrogate pairs are supported by this reader.
+ * Codepoints that are represented in UTF-16 as surrogate pairs are supported by
+ * this reader.
  */
 @NotThreadSafe
 public class Utf8InputStreamReader extends Reader {
     private final InputStream in;
-    private final ByteBuffer bb = ByteBuffer.allocate(4 /* we don't support 5 or 6 byte UTF-8 because Java doesn't, either */);
-    private final CharBuffer cb = CharBuffer.allocate(2 /* support UTF-16 surrogate pairs */);
+    private final ByteBuffer bb = ByteBuffer.allocate(4 /*
+                                                         * we don't support 5 or
+                                                         * 6 byte UTF-8 because
+                                                         * Java doesn't, either
+                                                         */);
+    private final CharBuffer cb = CharBuffer.allocate(2 /*
+                                                         * support UTF-16
+                                                         * surrogate pairs
+                                                         */);
     private final CharsetDecoder cd;
 
     /**
-     * Creates an InputStreamReader-like class that always uses UTF-8 and will read only the number of bytes necessary
-     * to fulfill a caller's read request. No read-ahead buffering occurs in this class.
-     *
-     * @param in
-     *            The InputStream to wrap
+     * Creates an InputStreamReader-like class that always uses UTF-8 and will
+     * read only the number of bytes necessary to fulfill a caller's read
+     * request. No read-ahead buffering occurs in this class.
+     * 
+     * @param in The InputStream to wrap
      */
     public Utf8InputStreamReader(InputStream in) {
         this.in = in;
@@ -65,7 +81,8 @@ public class Utf8InputStreamReader extends Reader {
     @Override
     public int read() throws IOException {
 
-        // If our previous read gave us a surrogate pair, then return the next character now
+        // If our previous read gave us a surrogate pair, then return the next
+        // character now
         if (cb.hasRemaining()) {
             return cb.get();
         }
@@ -83,7 +100,8 @@ public class Utf8InputStreamReader extends Reader {
                 final int byteCount;
                 if ((firstByte & 0x80) == 0x00) {
 
-                    // Since the character is one byte, we can just return that now, without
+                    // Since the character is one byte, we can just return that
+                    // now, without
                     // going through the CharsetDecoder
                     cb.limit(0);
                     return (char) firstByte;
@@ -95,13 +113,15 @@ public class Utf8InputStreamReader extends Reader {
                     byteCount = 4;
                 } else if ((firstByte & 0xC0) == 0x80) {
 
-                    // We are in the middle of a UTF-8 byte sequence. We'll just continue
-                    // scanning until we get to the beginning of a UTF-8 byte sequence
+                    // We are in the middle of a UTF-8 byte sequence. We'll just
+                    // continue
+                    // scanning until we get to the beginning of a UTF-8 byte
+                    // sequence
                     continue;
                 } else {
                     if ((firstByte & 0xFC) == 0xF8) {
                         byteCount = 5;
-                    } else if ((firstByte & 0xFE) == 0xFC){
+                    } else if ((firstByte & 0xFE) == 0xFC) {
                         byteCount = 6;
                     } else {
 
@@ -109,7 +129,8 @@ public class Utf8InputStreamReader extends Reader {
                         continue;
                     }
 
-                    // Skip ahead because we have a 5-byte or 6-byte UTF-8 character. We don't support
+                    // Skip ahead because we have a 5-byte or 6-byte UTF-8
+                    // character. We don't support
                     // those at this time
                     in.skip(byteCount - 1);
                     continue;
@@ -129,15 +150,18 @@ public class Utf8InputStreamReader extends Reader {
                     bytesLeft -= bytesRead;
                 } while (bytesLeft > 0);
 
-                // Convert into a character or two. If the CharsetDecoder could not understand the current UTF-8
-                // character, then we'll just drop it and move on to the next one.
+                // Convert into a character or two. If the CharsetDecoder could
+                // not understand the current UTF-8
+                // character, then we'll just drop it and move on to the next
+                // one.
                 bb.position(0).limit(byteCount);
                 cb.position(0).limit(cb.capacity());
                 cd.decode(bb, cb, true);
                 if (cb.position() > 0) {
                     final char ch = cb.get(0);
 
-                    // If this character is a byte order marker character (BOM), then skip it
+                    // If this character is a byte order marker character (BOM),
+                    // then skip it
                     if (ch == 0xFEFF || ch == 0xFFFE) {
                         continue;
                     }
@@ -156,7 +180,8 @@ public class Utf8InputStreamReader extends Reader {
                 cbuf[i] = (char) ch;
             } else {
 
-                // End of stream prematurely. If we read nothing when we got -1, then we return -1, too
+                // End of stream prematurely. If we read nothing when we got -1,
+                // then we return -1, too
                 if (i == off) {
                     return -1;
                 } else {
@@ -172,8 +197,10 @@ public class Utf8InputStreamReader extends Reader {
     @Override
     public boolean ready() throws IOException {
 
-        // If we have at least four bytes available, then we'll consider ourselves ready,
-        // which means that we can guarantee that a read of one character will not block
+        // If we have at least four bytes available, then we'll consider
+        // ourselves ready,
+        // which means that we can guarantee that a read of one character will
+        // not block
         return in.available() >= 4;
     }
 

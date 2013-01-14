@@ -37,7 +37,9 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
                 // probably in dev so look for source rather than target
                 String devPath = url.getPath().replaceFirst("/target/test-classes/", "/src/test/");
                 File f = new File(devPath);
-                if (f.exists()) url = f.toURI().toURL();
+                if (f.exists()) {
+                    url = f.toURI().toURL();
+                }
             }
             return;
         }
@@ -61,12 +63,13 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
     }
 
     /**
-     * try to invoke "diff" to create a readable diff for the test failure results, otherwise append our crappy
-     * unreadable garbage
+     * try to invoke "diff" to create a readable diff for the test failure
+     * results, otherwise append our crappy unreadable garbage
      */
     protected void appendDiffs(String results, StringBuilder sb) {
         try {
-            // create a temp file and write the results so that we're sure to have something for diff to use
+            // create a temp file and write the results so that we're sure to
+            // have something for diff to use
             File file = File.createTempFile("sfdc-gold.", ".xml");
             try {
                 OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
@@ -85,7 +88,8 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
             } finally {
                 file.delete();
             }
-        } catch (Throwable t) {}
+        } catch (Throwable t) {
+        }
     }
 
     private boolean printToBuffer(StringBuilder sb, InputStream in) throws IOException {

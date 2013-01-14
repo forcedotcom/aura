@@ -33,7 +33,7 @@ public class GatedModel {
         Aura.getContextService().getCurrentContext().getGlobalProviders();
         String id = null;
         try {
-            id = (String)Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes()
+            id = (String) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes()
                     .getValue("waitId");
         } catch (Throwable t) {
             return;
@@ -59,7 +59,7 @@ public class GatedModel {
     @AuraEnabled
     public String getString() {
         BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
-        String str = (String)component.getAttributes().getExpression("stringAttribute");
+        String str = (String) component.getAttributes().getExpression("stringAttribute");
         return str;
     }
 }

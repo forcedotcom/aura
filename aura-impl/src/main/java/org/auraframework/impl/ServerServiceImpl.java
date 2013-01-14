@@ -40,12 +40,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
 
-/**
- */
 public class ServerServiceImpl implements ServerService {
 
-    /**
-     */
     private static final long serialVersionUID = -2779745160285710414L;
     private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(30);
 
@@ -64,22 +60,17 @@ public class ServerServiceImpl implements ServerService {
     }
 
     /*
-     * Pop quiz:
-     *
-     * This method is: a) gross, and the reason Message has a generic b)
-     * temporary c) named as such to make you want to remove it d) will help
+     * Pop quiz: This method is: a) gross, and the reason Message has a generic
+     * b) temporary c) named as such to make you want to remove it d) will help
      * make Message's signature much nicer with its removal e) all of the above.
-     *
-     * ǝ :ɹǝʍsuɐ
-     *
-     * The dream is that there will be a standard controller for getting Defs.
-     * This will be replaced with an Action that hits the controller. That way,
-     * GETs and POSTs look the same--everything is an Action, and that's all
-     * Message needs to care about.
+     * ǝ :ɹǝʍsuɐ The dream is that there will be a standard controller for
+     * getting Defs. This will be replaced with an Action that hits the
+     * controller. That way, GETs and POSTs look the same--everything is an
+     * Action, and that's all Message needs to care about.
      */
     @Override
-    public <T extends BaseComponentDef> Message<T> temporaryGet(final Message<T> message, final AuraContext context) throws DefinitionNotFoundException,
-            QuickFixException {
+    public <T extends BaseComponentDef> Message<T> temporaryGet(final Message<T> message, final AuraContext context)
+            throws DefinitionNotFoundException, QuickFixException {
         DefinitionService definitionService = Aura.getDefinitionService();
 
         DefDescriptor<T> defDescriptor = message.getDefDescriptor();
@@ -128,7 +119,9 @@ public class ServerServiceImpl implements ServerService {
                 AuraContext context = Aura.getContextService().getCurrentContext();
                 Action oldAction = context.setCurrentAction(action);
                 try {
-                    // DCHASMAN TODO Look into a common base for Action implementations that we can move the call to context.setCurrentAction() into!
+                    // DCHASMAN TODO Look into a common base for Action
+                    // implementations that we can move the call to
+                    // context.setCurrentAction() into!
                     action.run();
                 } finally {
                     context.setCurrentAction(oldAction);
@@ -136,7 +129,8 @@ public class ServerServiceImpl implements ServerService {
 
                 List<Action> additionalActions = action.getActions();
 
-                // Recursively process any additional actions created by the action
+                // Recursively process any additional actions created by the
+                // action
                 if (additionalActions != null && !additionalActions.isEmpty()) {
                     result.addAll(run(additionalActions));
                 }

@@ -41,7 +41,7 @@ import com.google.common.collect.Maps;
 /**
  */
 @ThreadSafe
-public class ApplicationDefOfflineHTMLFormatAdapter extends OfflineHTMLFormatAdapter<ApplicationDef>{
+public class ApplicationDefOfflineHTMLFormatAdapter extends OfflineHTMLFormatAdapter<ApplicationDef> {
 
     @Override
     public Class<ApplicationDef> getType() {
@@ -50,27 +50,29 @@ public class ApplicationDefOfflineHTMLFormatAdapter extends OfflineHTMLFormatAda
 
     @Override
     public void write(Object value, Map<String, Object> args, Appendable out) throws IOException {
-        
-        ApplicationDef def = (ApplicationDef)value;
-        
-        String outputPath = (String)args.get("outputPath");
-        if(outputPath == null){
-            throw new AuraRuntimeException("'outputPath' directory path is required as an attribute to use this FormatAdapter");
+
+        ApplicationDef def = (ApplicationDef) value;
+
+        String outputPath = (String) args.get("outputPath");
+        if (outputPath == null) {
+            throw new AuraRuntimeException(
+                    "'outputPath' directory path is required as an attribute to use this FormatAdapter");
         }
-        
+
         String appName = def.getDescriptor().getName();
         File outputDir = new File(outputPath, appName);
-        if(outputDir.exists()){
-            throw new AuraRuntimeException(String.format("%s exists.  Please select another location.", outputDir.getAbsolutePath()));
-        }else{
+        if (outputDir.exists()) {
+            throw new AuraRuntimeException(String.format("%s exists.  Please select another location.",
+                    outputDir.getAbsolutePath()));
+        } else {
             outputDir.mkdirs();
         }
-        
+
         File html = new File(outputDir, "index.html");
-        
+
         InstanceService instanceService = Aura.getInstanceService();
         RenderingService renderingService = Aura.getRenderingService();
-        
+
         ContextService contextService = Aura.getContextService();
         AuraContext context = contextService.getCurrentContext();
 
@@ -78,61 +80,59 @@ public class ApplicationDefOfflineHTMLFormatAdapter extends OfflineHTMLFormatAda
         try {
             ComponentDef templateDef = def.getTemplateDef();
             Map<String, Object> attributes = Maps.newHashMap();
-            
 
             StringBuilder sb = new StringBuilder();
-            //Get the preload css
+            // Get the preload css
             List<String> styles = Lists.newArrayList(String.format("%s.css", appName));
             this.writeHtmlStyles(styles, sb);
             File css = new File(outputDir, String.format("%s.css", appName));
             FileWriter cssWriter = new FileWriter(css);
-            try{
+            try {
                 AuraResourceServlet.writeCss(cssWriter);
-            }finally{
+            } finally {
                 cssWriter.close();
             }
             attributes.put("auraStyleTags", sb.toString());
-            
-            //Clear sb out
+
+            // Clear sb out
             sb.setLength(0);
-            
+
             List<String> scripts = Lists.newArrayList("aura.js", String.format("%s.js", appName));
             writeHtmlScripts(scripts, sb);
-            
-            //Get the framework js
+
+            // Get the framework js
             File auraJs = new File(outputDir, "aura.js");
             FileWriter auraJsWriter = new FileWriter(auraJs);
-            InputStream in = Aura.getConfigAdapter().getResourceLoader().getResourceAsStream("aura/javascript/aura_dev.js");
+            InputStream in = Aura.getConfigAdapter().getResourceLoader()
+                    .getResourceAsStream("aura/javascript/aura_dev.js");
             InputStreamReader reader = new InputStreamReader(in);
-            try{
+            try {
                 Aura.getConfigAdapter().regenerateAuraJS();
                 IOUtil.copyStream(reader, auraJsWriter);
-            }finally{
-                try{
+            } finally {
+                try {
                     auraJsWriter.close();
-                }finally{
+                } finally {
                     reader.close();
                 }
             }
-            
 
             Application instance = instanceService.getInstance(def, null);
-            
-            //Get the preload js
+
+            // Get the preload js
             File js = new File(outputDir, String.format("%s.js", appName));
             FileWriter jsWriter = new FileWriter(js);
-            try{
+            try {
                 AuraResourceServlet.writeDefinitions(jsWriter);
-                
-                //Write the app at the bottom of the same file
-                
+
+                // Write the app at the bottom of the same file
+
                 Map<String, Object> auraInit = Maps.newHashMap();
 
                 auraInit.put("instance", instance);
                 auraInit.put("token", AuraServlet.getToken());
                 auraInit.put("host", context.getContextPath());
 
-                
                 context.addPreload("aura");
 
                 contextService.startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, def.getDescriptor());
@@ -140,29 +140,24 @@ public class ApplicationDefOfflineHTMLFormatAdapter extends OfflineHTMLFormatAda
                 jsWriter.append("\n$A.initConfig($A.util.json.resolveRefs(");
                 Json.serialize(auraInit, jsWriter, context.getJsonSerializationContext());
                 jsWriter.append("));\n");
-            }finally{
+            } finally {
                 jsWriter.close();
             }
-            
-            
 
             attributes.put("auraScriptTags", sb.toString());
 
             DefDescriptor<ThemeDef> themeDefDesc = templateDef.getThemeDescriptor();
-            if(themeDefDesc != null){
+            if (themeDefDesc != null) {
                 Client.Type type = context.getClient().getType();
                 attributes.put("auraInlineStyle", themeDefDesc.getDef().getCode(type));
             }
-
-           
-
 
             attributes.put("autoInitialize", false);
             Component template = instanceService.getInstance(templateDef.getDescriptor(), attributes);
             renderingService.render(template, htmlWriter);
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
-        }finally{
+        } finally {
             htmlWriter.close();
         }
     }

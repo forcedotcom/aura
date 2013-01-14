@@ -19,8 +19,8 @@ import org.auraframework.adapter.MockConfigAdapter;
 
 /**
  * ConfigAdapter for Aura tests.
- *
- *
+ * 
+ * 
  * @since 0.0.178
  */
 public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConfigAdapter {
@@ -28,7 +28,8 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     private Boolean isProduction = null;
     private Boolean isAuraJSStatic = null;
 
-    public MockConfigAdapterImpl(){}
+    public MockConfigAdapterImpl() {
+    }
 
     @Override
     public void reset() {

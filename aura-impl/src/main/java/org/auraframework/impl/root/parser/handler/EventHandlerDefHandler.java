@@ -17,7 +17,9 @@ package org.auraframework.impl.root.parser.handler;
 
 import java.util.Set;
 
-import javax.xml.stream.*;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.EventDef;
 import org.auraframework.def.RootDefinition;
@@ -42,23 +44,18 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_VALUE = "value";
 
-
-    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-        ATTRIBUTE_ACTION,
-        ATTRIBUTE_EVENT,
-        ATTRIBUTE_NAME,
-        ATTRIBUTE_VALUE,
-        RootTagHandler.ATTRIBUTE_DESCRIPTION
-    );
+    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_ACTION, ATTRIBUTE_EVENT,
+            ATTRIBUTE_NAME, ATTRIBUTE_VALUE, RootTagHandler.ATTRIBUTE_DESCRIPTION);
 
     private RootTagHandler<? extends RootDefinition> parentHandler;
-    private EventHandlerDefImpl.Builder builder = new EventHandlerDefImpl.Builder();
+    private final EventHandlerDefImpl.Builder builder = new EventHandlerDefImpl.Builder();
 
-    public EventHandlerDefHandler(){
+    public EventHandlerDefHandler() {
         super();
     }
 
-    public EventHandlerDefHandler(RootTagHandler<? extends RootDefinition> parentHandler, XMLStreamReader xmlReader, Source<?> source){
+    public EventHandlerDefHandler(RootTagHandler<? extends RootDefinition> parentHandler, XMLStreamReader xmlReader,
+            Source<?> source) {
         super(xmlReader, source);
         this.parentHandler = parentHandler;
     }
@@ -66,11 +63,10 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
     @Override
     public EventHandlerDefImpl getElement() throws XMLStreamException, QuickFixException {
         builder.setParentDescriptor(parentHandler.getDefDescriptor());
-
         builder.setLocation(getLocation());
 
         String event = getAttributeValue(ATTRIBUTE_EVENT);
-        if(!AuraTextUtil.isNullEmptyOrWhitespace(event)){
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(event)) {
             builder.setDescriptor(DefDescriptorImpl.getInstance(event, EventDef.class));
         }
 
@@ -78,19 +74,21 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
 
         builder.setDescription(getAttributeValue(RootTagHandler.ATTRIBUTE_DESCRIPTION));
 
-        Expression e = AuraImpl.getExpressionAdapter().buildExpression(TextTokenizer.unwrap(getAttributeValue(ATTRIBUTE_ACTION)), getLocation());
+        Expression e = AuraImpl.getExpressionAdapter().buildExpression(
+                TextTokenizer.unwrap(getAttributeValue(ATTRIBUTE_ACTION)), getLocation());
         if (!(e instanceof PropertyReference)) {
             error("value of 'action' attribute must be a reference to an Action");
         }
-        builder.setAction((PropertyReference)e);
+        builder.setAction((PropertyReference) e);
 
         String value = getAttributeValue(ATTRIBUTE_VALUE);
-        if(value != null){
-            Expression valueExpression = AuraImpl.getExpressionAdapter().buildExpression(TextTokenizer.unwrap(value), getLocation());
+        if (value != null) {
+            Expression valueExpression = AuraImpl.getExpressionAdapter().buildExpression(TextTokenizer.unwrap(value),
+                    getLocation());
             if (!(valueExpression instanceof PropertyReference)) {
                 error("value of 'value' attribute must be a reference to a Value");
             }
-            builder.setValue((PropertyReference)valueExpression);
+            builder.setValue((PropertyReference) valueExpression);
         }
 
         int next = xmlReader.next();
@@ -103,7 +101,7 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
 
     @Override
     public void writeElement(EventHandlerDefImpl def, Appendable out) {
-        //TODO
+        // TODO
     }
 
     @Override

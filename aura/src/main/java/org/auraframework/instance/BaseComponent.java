@@ -19,7 +19,8 @@ import org.auraframework.def.BaseComponentDef;
 
 /**
  */
-public interface BaseComponent<D extends BaseComponentDef,I extends BaseComponent<?,?>> extends Instance<D>, ValueProvider{
+public interface BaseComponent<D extends BaseComponentDef, I extends BaseComponent<?, ?>> extends Instance<D>,
+        ValueProvider {
 
     /**
      * @return The generated globally unique id of this component
@@ -30,7 +31,6 @@ public interface BaseComponent<D extends BaseComponentDef,I extends BaseComponen
      * @return The user provided locally unique id of this component
      */
     String getLocalId();
-
 
     AttributeSet getAttributes();
 

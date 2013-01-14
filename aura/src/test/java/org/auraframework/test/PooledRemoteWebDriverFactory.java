@@ -36,7 +36,7 @@ import com.google.common.collect.Maps;
 
 /**
  * Get pooled WebDriver instances for Aura tests.
- *
+ * 
  * @since 0.0.178
  */
 public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
@@ -51,7 +51,7 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
          * The pool containing this web driver instance.
          */
         @GuardedBy("PooledRemoteWebDriverFactory.this")
-        private Collection<PooledRemoteWebDriver> pool;
+        private final Collection<PooledRemoteWebDriver> pool;
 
         public PooledRemoteWebDriver(Collection<PooledRemoteWebDriver> pool, URL serverUrl,
                 DesiredCapabilities capabilities) {
@@ -121,17 +121,17 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
             manage().deleteAllCookies();
 
             synchronized (PooledRemoteWebDriverFactory.this) {
-            // return to pool
-            pool.add(this);
-        }
+                // return to pool
+                pool.add(this);
+            }
         }
 
         public void reallyQuit() {
             super.quit();
             synchronized (PooledRemoteWebDriverFactory.this) {
-            pool.remove(this);
+                pool.remove(this);
+            }
         }
-    }
     }
 
     @Override
@@ -141,7 +141,8 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
         }
 
         Object reuseBrowser = capabilities.getCapability(WebDriverProvider.REUSE_BROWSER_PROPERTY);
-        // default to use a pooled instance unless the test explicitly requests a brand new instance
+        // default to use a pooled instance unless the test explicitly requests
+        // a brand new instance
         if ((reuseBrowser != null) && (reuseBrowser.equals(false))) {
             return new RemoteWebDriver(serverUrl, capabilities);
         }
@@ -162,8 +163,8 @@ public class PooledRemoteWebDriverFactory extends RemoteWebDriverFactory {
 
     @Override
     public synchronized void release() {
-        for (List<PooledRemoteWebDriver> pool:pools.values()){
-            for(PooledRemoteWebDriver driver:pool){
+        for (List<PooledRemoteWebDriver> pool : pools.values()) {
+            for (PooledRemoteWebDriver driver : pool) {
                 driver.reallyQuit();
             }
         }

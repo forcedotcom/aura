@@ -18,25 +18,24 @@ package org.auraframework.impl.controller;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.java.controller.JavaControllerDef.Builder;
 import org.auraframework.impl.java.controller.JavaControllerDefFactory;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.service.DefinitionService;
-
 import org.auraframework.throwable.AuraUnhandledException;
-
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * @since 0.0.116
  */
-public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<ControllerDef>{
+public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<ControllerDef> {
 
     /**
      */
@@ -56,12 +55,13 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
     private static Map<DefDescriptor<ControllerDef>, ControllerDef> getDefs() {
 
         DefinitionService defService = Aura.getDefinitionService();
-        DefDescriptor<ControllerDef> componentControllerDesc = defService.getDefDescriptor("aura://ComponentController", ControllerDef.class);
+        DefDescriptor<ControllerDef> componentControllerDesc = defService.getDefDescriptor(
+                "aura://ComponentController", ControllerDef.class);
 
         Builder builder = new Builder();
         try {
             builder.setActionMap(JavaControllerDefFactory.createActions(ComponentController.class,
-                                                                        componentControllerDesc));
+                    componentControllerDesc));
         } catch (QuickFixException qfe) {
             throw new AuraUnhandledException("Broken ComponentController", qfe);
         }

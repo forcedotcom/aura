@@ -20,7 +20,6 @@ import java.util.Set;
 
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-
 /**
  */
 public interface InterfaceDef extends RootDefinition {

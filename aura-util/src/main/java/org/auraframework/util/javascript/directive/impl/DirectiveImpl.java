@@ -15,7 +15,10 @@
  */
 package org.auraframework.util.javascript.directive.impl;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.util.javascript.directive.Directive;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
@@ -35,32 +38,34 @@ public abstract class DirectiveImpl implements Directive {
         this.offset = offset;
         this.line = line;
         Object parsedLine = null;
-        if(line != null){
+        if (line != null) {
             try {
                 parsedLine = new JsonReader().read(line);
             } catch (JsonParseException e) {
-                // Parsing will fail if the line is not json, which is ok if it's a simple directive.
+                // Parsing will fail if the line is not json, which is ok if
+                // it's a simple directive.
                 parsedLine = null;
             }
         }
         if (parsedLine != null && parsedLine instanceof Map) {
-            config = (Map<String, Object>)parsedLine;
+            config = (Map<String, Object>) parsedLine;
         } else {
             config = null;
         }
 
         if (config != null) {
-            List<Object> modeStrings = (List<Object>)config.get("modes");
-            List<Object> excludeModeStrings = (List<Object>)config.get("excludeModes");
+            List<Object> modeStrings = (List<Object>) config.get("modes");
+            List<Object> excludeModeStrings = (List<Object>) config.get("excludeModes");
 
             if (modeStrings != null && excludeModeStrings != null) {
-                throw new UnsupportedOperationException("mode and excludeModes cannot both be specified in a single directive");
+                throw new UnsupportedOperationException(
+                        "mode and excludeModes cannot both be specified in a single directive");
             }
 
             if (modeStrings != null) {
                 modes = EnumSet.noneOf(JavascriptGeneratorMode.class);
                 for (Object modeObj : modeStrings) {
-                    modes.add(JavascriptGeneratorMode.valueOf((String)modeObj));
+                    modes.add(JavascriptGeneratorMode.valueOf((String) modeObj));
                 }
             } else {
                 modes = getDefaultModes();
@@ -68,7 +73,7 @@ public abstract class DirectiveImpl implements Directive {
                 if (excludeModeStrings != null) {
                     // Remove any excluded modes from the default set
                     for (Object modeObj : excludeModeStrings) {
-                        modes.remove(JavascriptGeneratorMode.valueOf((String)modeObj));
+                        modes.remove(JavascriptGeneratorMode.valueOf((String) modeObj));
                     }
                 }
             }
@@ -93,7 +98,8 @@ public abstract class DirectiveImpl implements Directive {
     }
 
     /**
-     * @return If the line was a JSON formatted map, return it as a Java Map, else null.
+     * @return If the line was a JSON formatted map, return it as a Java Map,
+     *         else null.
      */
     public Map<String, Object> getConfig() {
         return config;

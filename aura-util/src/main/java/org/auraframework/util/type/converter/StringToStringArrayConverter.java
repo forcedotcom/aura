@@ -28,7 +28,7 @@ public class StringToStringArrayConverter implements Converter<String, String[]>
     @Override
     public String[] convert(String value) {
         if (value != null && value.length() == 0) {
-            return new String [] {};
+            return new String[] {};
         }
         List<String> splitList = AuraTextUtil.splitSimple(",", value);
         return splitList.toArray(new String[splitList.size()]);

@@ -17,7 +17,9 @@ package org.auraframework.impl.root.parser.handler;
 
 import java.util.Set;
 
-import javax.xml.stream.*;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
@@ -41,20 +43,16 @@ public class RegisterEventHandler extends XMLHandler<RegisterEventDefImpl> {
     private static final String ATTRIBUTE_TYPE = "type";
     private static final String ATTRIBUTE_NAME = "name";
 
-    private Builder builder = new RegisterEventDefImpl.Builder();
+    private final Builder builder = new RegisterEventDefImpl.Builder();
 
-    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-        ATTRIBUTE_ACCESS,
-        ATTRIBUTE_TYPE,
-        ATTRIBUTE_NAME,
-        RootTagHandler.ATTRIBUTE_DESCRIPTION
-    );
+    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_ACCESS, ATTRIBUTE_TYPE,
+            ATTRIBUTE_NAME, RootTagHandler.ATTRIBUTE_DESCRIPTION);
 
     // only 2 access types for now
     public static final String GLOBAL = "global";
     public static final String PUBLIC = "public";
 
-    public RegisterEventHandler(){
+    public RegisterEventHandler() {
         super();
     }
 

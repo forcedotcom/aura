@@ -29,7 +29,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class AuraStaticTypeDefRegistry extends StaticDefRegistryImpl<TypeDef>{
+public class AuraStaticTypeDefRegistry extends StaticDefRegistryImpl<TypeDef> {
 
     private static final long serialVersionUID = -969733961482080930L;
 
@@ -39,8 +39,9 @@ public class AuraStaticTypeDefRegistry extends StaticDefRegistryImpl<TypeDef>{
     private static final Set<DefType> defTypes = Sets.immutableEnumSet(DefType.TYPE);
     private static final Map<String, TypeDef> defs = Maps.newHashMap();
 
-    static{
-        String[] baseTypes = {"Integer", "Long", "Double", "Decimal", "Boolean", "String", "Date", "DateTime", "Object", "Map", "List", "Set"};
+    static {
+        String[] baseTypes = { "Integer", "Long", "Double", "Decimal", "Boolean", "String", "Date", "DateTime",
+                "Object", "Map", "List", "Set" };
 
         defs.put("Aura.Component", new ComponentTypeDef.Builder().build());
         defs.put("Aura.Component[]", new ComponentArrayTypeDef.Builder().build());
@@ -48,15 +49,19 @@ public class AuraStaticTypeDefRegistry extends StaticDefRegistryImpl<TypeDef>{
         // TODO: non array defref type
         defs.put("Aura.Action", new ActionTypeDef.Builder().build());
         JavaTypeDefFactory factory = new JavaTypeDefFactory(null);
-        for(String baseType : baseTypes){
+        for (String baseType : baseTypes) {
             try {
-                defs.put(baseType, factory.getDef(DefDescriptorImpl.getInstance(String.format("aura://%s", baseType), TypeDef.class)));
+                defs.put(baseType, factory.getDef(DefDescriptorImpl.getInstance(String.format("aura://%s", baseType),
+                        TypeDef.class)));
                 String listType = String.format("List<%s>", baseType);
-                defs.put(listType, factory.getDef(DefDescriptorImpl.getInstance(String.format("aura://%s", listType), TypeDef.class)));
+                defs.put(listType, factory.getDef(DefDescriptorImpl.getInstance(String.format("aura://%s", listType),
+                        TypeDef.class)));
                 String arrayType = String.format("%s[]", baseType);
-                defs.put(arrayType, factory.getDef(DefDescriptorImpl.getInstance(String.format("aura://%s", arrayType), TypeDef.class)));
+                defs.put(arrayType, factory.getDef(DefDescriptorImpl.getInstance(String.format("aura://%s", arrayType),
+                        TypeDef.class)));
                 String setType = String.format("Set<%s>", baseType);
-                defs.put(setType, factory.getDef(DefDescriptorImpl.getInstance(String.format("aura://%s", setType), TypeDef.class)));
+                defs.put(setType, factory.getDef(DefDescriptorImpl.getInstance(String.format("aura://%s", setType),
+                        TypeDef.class)));
             } catch (QuickFixException qfe) {
                 // This should _never_ happen
                 throw new AuraRuntimeException(qfe);
@@ -70,8 +75,8 @@ public class AuraStaticTypeDefRegistry extends StaticDefRegistryImpl<TypeDef>{
         super(defTypes, prefixes, null, defs.values());
     }
 
-    public TypeDef getDef(String name){
-        if(name.startsWith("Map<")){
+    public TypeDef getDef(String name) {
+        if (name.startsWith("Map<")) {
             name = "Map";
         }
         return defs.get(name);

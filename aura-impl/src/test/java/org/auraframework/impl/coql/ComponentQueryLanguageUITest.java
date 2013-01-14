@@ -21,14 +21,14 @@ import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.annotation.ThreadHostileTest;
 
 /**
- * Automation for COQL (Component Query Language).
- * COQL is available in all modes except PRODUCTION
- *
+ * Automation for COQL (Component Query Language). COQL is available in all
+ * modes except PRODUCTION
+ * 
  * @since 0.0.302
  */
 @ThreadHostileTest
 public class ComponentQueryLanguageUITest extends WebDriverTestCase {
-    public ComponentQueryLanguageUITest(String name){
+    public ComponentQueryLanguageUITest(String name) {
         super(name);
     }
 
@@ -37,7 +37,7 @@ public class ComponentQueryLanguageUITest extends WebDriverTestCase {
      * 
      * @throws Exception
      */
-    public void testQueryLanguageNotAvailableInprodMode() throws Exception{
+    public void testQueryLanguageNotAvailableInprodMode() throws Exception {
         ServletConfigController.setProductionConfig(true);
         open("/test/laxSecurity.app", Mode.PROD);
         Object query = auraUITestingUtil.getEval("return window.$A.getQueryStatement");
@@ -45,12 +45,12 @@ public class ComponentQueryLanguageUITest extends WebDriverTestCase {
     }
 
     /**
-     * Verify that query language is available in non prod mode. For the rest of the test cases, look at
-     * js://cmpQueryLanguage.query
+     * Verify that query language is available in non prod mode. For the rest of
+     * the test cases, look at js://cmpQueryLanguage.query
      * 
      * @throws Exception
      */
-    public void testQueryLanguageAvailableInNonprodMode() throws Exception{
+    public void testQueryLanguageAvailableInNonprodMode() throws Exception {
         open("/test/laxSecurity.app");
         Object query = auraUITestingUtil.getEval("return window.$A.getQueryStatement");
         assertNotNull("Query language should be available in non PROD mode.", query);

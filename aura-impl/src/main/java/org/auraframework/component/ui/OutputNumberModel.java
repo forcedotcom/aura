@@ -24,7 +24,7 @@ import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -35,13 +35,15 @@ public class OutputNumberModel {
 
     /**
      * Returns a formatted value showing the component's value attribute.
-     *
-     * The value is formatted using either the default NumberFormat pattern for the current Locale, or the pattern specified
-     * in the component's format attribute. If using the Locale default, the thousands separator can be shown or not depending
-     * on the component's grouping attribute value.
-     *
-     * Any specified pattern should be a {@link java.text.DecimalFormat DecimalFormat} pattern.
-     *
+     * 
+     * The value is formatted using either the default NumberFormat pattern for
+     * the current Locale, or the pattern specified in the component's format
+     * attribute. If using the Locale default, the thousands separator can be
+     * shown or not depending on the component's grouping attribute value.
+     * 
+     * Any specified pattern should be a {@link java.text.DecimalFormat
+     * DecimalFormat} pattern.
+     * 
      * @return a formatted number value
      * @throws QuickFixException
      */
@@ -58,16 +60,16 @@ public class OutputNumberModel {
             if (valueObj == null) {
                 return "";
             }
-            numberValue = (Number)valueObj;
+            numberValue = (Number) valueObj;
         } catch (ClassCastException e) {
             return "The value attribute must be assigned a numeric value";
         }
 
         // start with the default for the Locale
         Locale loc = Aura.getLocalizationAdapter().getAuraLocale().getNumberLocale();
-        DecimalFormat numberFormat = (DecimalFormat)NumberFormat.getNumberInstance(loc);
+        DecimalFormat numberFormat = (DecimalFormat) NumberFormat.getNumberInstance(loc);
 
-        String numberFormatPattern = (String)attributes.getValue("format");
+        String numberFormatPattern = (String) attributes.getValue("format");
         if (numberFormatPattern != null && !numberFormatPattern.isEmpty()) {
             // if a specific format is given, apply it
             try {
@@ -76,8 +78,9 @@ public class OutputNumberModel {
                 return "Invalid format attribute";
             }
         } else {
-            // otherwise just toggle thousands separator based on the grouping attribute
-            boolean groupThousands = ((Boolean)attributes.getValue("grouping")).booleanValue();
+            // otherwise just toggle thousands separator based on the grouping
+            // attribute
+            boolean groupThousands = ((Boolean) attributes.getValue("grouping")).booleanValue();
             numberFormat.setGroupingUsed(groupThousands);
         }
         // return the formatted number String

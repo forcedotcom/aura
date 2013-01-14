@@ -19,12 +19,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.Component;
+import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -33,36 +35,39 @@ import com.google.common.collect.Lists;
 public class ComponentController {
 
     @AuraEnabled
-    public static Component getComponent(@Key("name")String name, @Key("attributes")Map<String, Object> attributes) throws QuickFixException{
+    public static Component getComponent(@Key("name") String name, @Key("attributes") Map<String, Object> attributes)
+            throws QuickFixException {
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(name, ComponentDef.class);
         return Aura.getInstanceService().getInstance(desc, attributes);
     }
 
     @AuraEnabled
-    public static Application getApplication(@Key("name")String name,@Key("attributes") Map<String, Object> attributes) throws QuickFixException{
+    public static Application getApplication(@Key("name") String name, @Key("attributes") Map<String, Object> attributes)
+            throws QuickFixException {
         DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(name, ApplicationDef.class);
         return Aura.getInstanceService().getInstance(desc, attributes);
     }
 
     @AuraEnabled
-    public static ComponentDef getComponentDef(@Key("name")String name) throws QuickFixException{
+    public static ComponentDef getComponentDef(@Key("name") String name) throws QuickFixException {
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(name, ComponentDef.class);
         return Aura.getDefinitionService().getDefinition(desc);
     }
 
     @AuraEnabled
-    public static ApplicationDef getApplicationDef(@Key("name")String name) throws QuickFixException{
+    public static ApplicationDef getApplicationDef(@Key("name") String name) throws QuickFixException {
         DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(name, ApplicationDef.class);
         return Aura.getDefinitionService().getDefinition(desc);
     }
 
     @SuppressWarnings("unchecked")
     @AuraEnabled
-    public static List<Component> getComponents(@Key("components")List<Map<String, Object>> components) throws QuickFixException{
+    public static List<Component> getComponents(@Key("components") List<Map<String, Object>> components)
+            throws QuickFixException {
         List<Component> ret = Lists.newArrayList();
-        for(int i=0;i<components.size();i++){
+        for (int i = 0; i < components.size(); i++) {
             Map<String, Object> cmp = components.get(i);
-            ret.add(getComponent((String)cmp.get("descriptor"), (Map<String, Object>)cmp.get("attributes")));
+            ret.add(getComponent((String) cmp.get("descriptor"), (Map<String, Object>) cmp.get("attributes")));
         }
         return ret;
     }

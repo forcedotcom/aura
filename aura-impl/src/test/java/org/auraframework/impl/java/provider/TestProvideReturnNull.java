@@ -21,7 +21,7 @@ import org.auraframework.system.Annotations.Provider;
 
 @Provider
 public class TestProvideReturnNull {
-    public static DefDescriptor<ComponentDef> provide(){
+    public static DefDescriptor<ComponentDef> provide() {
         return null;
     }
 }

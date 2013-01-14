@@ -17,7 +17,14 @@ package org.auraframework.impl.java.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.TimeZone;
 
 import org.auraframework.components.ui.InputOption;
 import org.auraframework.system.Annotations.AuraEnabled;
@@ -25,7 +32,8 @@ import org.auraframework.system.Annotations.Model;
 import org.auraframework.util.date.DateOnly;
 
 /**
- * Used by /expressionTest/expressionFunction.cmp which expects the current return values.
+ * Used by /expressionTest/expressionFunction.cmp which expects the current
+ * return values.
  */
 @Model
 public class TestJavaModel {
@@ -33,7 +41,7 @@ public class TestJavaModel {
     static ArrayList<InputOption> moreInputOptions = new ArrayList<InputOption>();
     static HashMap<String, ArrayList<InputOption>> optionMap = new LinkedHashMap<String, ArrayList<InputOption>>();
 
-    static{
+    static {
         inputOptions.add(new InputOption("Option1", "Opt1", false, "option1"));
         inputOptions.add(new InputOption("Option2", "Opt2", true, "option2"));
         inputOptions.add(new InputOption("Option3", "Opt3", false, "option3"));
@@ -42,22 +50,20 @@ public class TestJavaModel {
         moreInputOptions.add(new InputOption("Option5", "Opt5", false, "val5"));
         moreInputOptions.add(new InputOption("Option6", "Opt6", false, "val6"));
 
-        for(InputOption i : inputOptions){
+        for (InputOption i : inputOptions) {
             optionMap.put(i.getValue(), getSubCategory(i.getValue()));
         }
     }
 
-    private static ArrayList<InputOption> getSubCategory(String option){
+    private static ArrayList<InputOption> getSubCategory(String option) {
         ArrayList<InputOption> categoryOption = new ArrayList<InputOption>();
-        if (option.equals("option1")){
+        if (option.equals("option1")) {
             categoryOption.add(new InputOption("", "", false, "opt1-sub1"));
             categoryOption.add(new InputOption("", "", false, "opt1-sub2"));
             categoryOption.add(new InputOption("", "", false, "opt1-sub3"));
-        }
-        else if(option.equals("option2")){
+        } else if (option.equals("option2")) {
             categoryOption.add(new InputOption("", "", false, "opt2-sub1"));
-        }
-        else if(option.equals("option3")){
+        } else if (option.equals("option3")) {
             categoryOption.add(new InputOption("", "", false, "opt3-sub1"));
             categoryOption.add(new InputOption("", "", false, "opt3-sub2"));
         }
@@ -65,24 +71,24 @@ public class TestJavaModel {
     }
 
     @AuraEnabled
-    public Calendar getCalendar(){
-        Calendar c = Calendar.getInstance() ;
+    public Calendar getCalendar() {
+        Calendar c = Calendar.getInstance();
         c.set(2004, 9, 23, 16, 30, 0);
         c.set(Calendar.MILLISECOND, 0);
         return c;
     }
 
     @AuraEnabled
-    public Calendar getCalendarLater(){
-        Calendar c = Calendar.getInstance() ;
+    public Calendar getCalendarLater() {
+        Calendar c = Calendar.getInstance();
         c.set(2005, 9, 23, 16, 30, 0);
         c.set(Calendar.MILLISECOND, 0);
         return c;
     }
 
     @AuraEnabled
-    public Calendar getCalendarWithTimeZone(){
-        Calendar c = Calendar.getInstance() ;
+    public Calendar getCalendarWithTimeZone() {
+        Calendar c = Calendar.getInstance();
         c.set(2005, 6, 4, 16, 30, 0);
         c.set(Calendar.MILLISECOND, 0);
         c.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -90,8 +96,8 @@ public class TestJavaModel {
     }
 
     @AuraEnabled
-    public Calendar getCalendarWithTimeZoneLater(){
-        Calendar c = Calendar.getInstance() ;
+    public Calendar getCalendarWithTimeZoneLater() {
+        Calendar c = Calendar.getInstance();
         c.set(2006, 6, 4, 16, 30, 0);
         c.set(Calendar.MILLISECOND, 0);
         c.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -99,40 +105,40 @@ public class TestJavaModel {
     }
 
     @AuraEnabled
-    public Date getDate(){
+    public Date getDate() {
         Date d = new Date(1095957000000L);
         return d;
     }
 
     @AuraEnabled
-    public Date getDateLater(){
+    public Date getDateLater() {
         Date d = new Date(1095957000001L);
         return d;
     }
 
     @AuraEnabled
-    public String getString(){
+    public String getString() {
         return "Model";
     }
 
     @AuraEnabled
-    public String getStringNull(){
+    public String getStringNull() {
         return null;
     }
 
     @AuraEnabled
-    public String getStringEmpty(){
+    public String getStringEmpty() {
         return "";
     }
 
     @AuraEnabled
-    //TODO W-967767 can't return array because of this bug
-    public Object getStringArray(){
-        return new String[]{"red", "green", "blue"};
+    // TODO W-967767 can't return array because of this bug
+    public Object getStringArray() {
+        return new String[] { "red", "green", "blue" };
     }
 
     @AuraEnabled
-    public List<String> getStringList(){
+    public List<String> getStringList() {
         ArrayList<String> sl = new ArrayList<String>();
         sl.add("one");
         sl.add("two");
@@ -141,12 +147,12 @@ public class TestJavaModel {
     }
 
     @AuraEnabled
-    public List<String> getStringListNull(){
+    public List<String> getStringListNull() {
         return null;
     }
 
     @AuraEnabled
-    public List<List<String>> getListOfList(){
+    public List<List<String>> getListOfList() {
         List<List<String>> listofList = new ArrayList<List<String>>();
         ArrayList<String> l1 = new ArrayList<String>();
         l1.add("one");
@@ -167,23 +173,23 @@ public class TestJavaModel {
     }
 
     @AuraEnabled
-    public Integer getInteger(){
+    public Integer getInteger() {
         return 411;
     }
 
     @AuraEnabled
-    public Integer getIntegerNull(){
+    public Integer getIntegerNull() {
         return null;
     }
 
     @AuraEnabled
-    //TODO W-967767 can't return array because of this bug
-    public Object getIntegerArray(){
-        return new Integer[]{ 123, 999, 666};
+    // TODO W-967767 can't return array because of this bug
+    public Object getIntegerArray() {
+        return new Integer[] { 123, 999, 666 };
     }
 
     @AuraEnabled
-    public Object getIntegerList(){
+    public Object getIntegerList() {
         ArrayList<Integer> il = new ArrayList<Integer>();
         il.add(123);
         il.add(999);
@@ -192,32 +198,32 @@ public class TestJavaModel {
     }
 
     @AuraEnabled
-    public List<Integer> getIntegerListNull(){
+    public List<Integer> getIntegerListNull() {
         return null;
     }
 
     @AuraEnabled
-    public String getIntegerString(){
+    public String getIntegerString() {
         return "511";
     }
 
     @AuraEnabled
-    public Object getObjectNull(){
+    public Object getObjectNull() {
         return null;
     }
 
     @AuraEnabled
-    public Boolean getBooleanFalse(){
+    public Boolean getBooleanFalse() {
         return false;
     }
 
     @AuraEnabled
-    public Boolean getBooleanTrue(){
+    public Boolean getBooleanTrue() {
         return true;
     }
 
     @AuraEnabled
-    public ArrayList<Boolean> getBooleanList(){
+    public ArrayList<Boolean> getBooleanList() {
         ArrayList<Boolean> bl = new ArrayList<Boolean>();
         bl.add(true);
         bl.add(false);
@@ -226,69 +232,69 @@ public class TestJavaModel {
     }
 
     @AuraEnabled
-    public List<Boolean> getBooleanListNull(){
+    public List<Boolean> getBooleanListNull() {
         return null;
     }
 
     @AuraEnabled
-    public String getDoubleNull(){
+    public String getDoubleNull() {
         return null;
     }
 
     @AuraEnabled
-    public Double getDouble(){
+    public Double getDouble() {
         return 4.1;
     }
 
     @AuraEnabled
-    public String getDoubleString(){
+    public String getDoubleString() {
         return "5.1";
     }
 
     @AuraEnabled
-    public List<Double> getDoubleListNull(){
+    public List<Double> getDoubleListNull() {
         return null;
     }
 
     @AuraEnabled
-    public Number getInfinity(){
+    public Number getInfinity() {
         return Double.POSITIVE_INFINITY;
     }
 
     @AuraEnabled
-    public Number getNegativeInfinity(){
+    public Number getNegativeInfinity() {
         return Double.NEGATIVE_INFINITY;
     }
 
     @AuraEnabled
-    public Number getNaN(){
+    public Number getNaN() {
         return Double.NaN;
     }
 
     @AuraEnabled
-    public Object getEmptyArray(){
+    public Object getEmptyArray() {
         return new Object[0];
     }
 
     @AuraEnabled
-    public Object getEmptyList(){
+    public Object getEmptyList() {
         return Collections.emptyList();
     }
 
     @AuraEnabled
-    public Object getStringMultiArray(){
+    public Object getStringMultiArray() {
         return new String[][][] { { { "one" }, { "two", "three" } }, {}, { { "a", "b" }, {} } };
     }
 
     @AuraEnabled
-    public DateOnly getDateOnly(){
+    public DateOnly getDateOnly() {
         // Sep 23, 2004
         DateOnly d = new DateOnly(1095957000000L);
         return d;
     }
 
     @AuraEnabled
-    public Date getDateTime(){
+    public Date getDateTime() {
         // May 10, 2012, 10:45 PM GMT
         Date d = new Date(1336689900000L);
         return d;

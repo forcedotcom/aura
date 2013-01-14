@@ -20,15 +20,17 @@ import java.io.IOException;
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
 /**
  * Verify that Abstract java renderers end up surfacing as AuraRunTimeException.
- *
- *
+ * 
+ * 
  * @since 0.0.207
  */
 public abstract class TestAbstractRenderer implements Renderer {
 
     @Override
-    public void render(BaseComponent<?, ?> component, Appendable appendable) throws IOException, QuickFixException {}
+    public void render(BaseComponent<?, ?> component, Appendable appendable) throws IOException, QuickFixException {
+    }
 
 }

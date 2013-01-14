@@ -14,143 +14,147 @@
  * limitations under the License.
  */
 ({
+	assertBrowserProperties : function(component, expectedMap) {
+		var text = $A.test.getText(component.getSuper().get("v.body")[0].getElement());
+		for (var propertyName in expectedMap){
+			var expr = '$Browser.' + propertyName;
+			var expectedValue = expectedMap[propertyName];
+			
+			// check server rendered content
+			if(text.indexOf("[" + propertyName + "=" + expectedValue + "]") < 0) {
+				$A.test.fail("Unexpected value for '" + propertyName + "'; expected '" + expectedValue + "' but got " + text);
+			}
+			
+			// check provider property 
+			$A.test.assertEquals(expectedValue,
+					$A.get("$Browser")[propertyName], propertyName + ' had unexpected on $Browser');
+			
+			// check expression evaluation from root provider
+			$A.test.assertEquals(expectedValue, $A.get(expr), propertyName + ' had unexpected value from $A.get()');
+			
+			// check expression evaluation from component provider
+			$A.test.assertEquals(expectedValue, component.get('{!' + expr + '}'),
+				propertyName + ' had unexpected value from component expression evaluation');
+		}
+	},
+	
+	testInvalidProperties : {
+        test : function(component) {
+        	$A.test.assertEquals(undefined, $A.get("$Browser.isUnknown"), "Unexpected property 'isUnknown' found on $Browser");
+        	$A.test.assertEquals(undefined, $A.get("$Browser.isAndroid.really", "Unexpected subproperty 'isAndroid.really' found on $Browser"));
+        	$A.test.assertEquals(undefined, $A.get("$Browser.0"), "Unexpected property '0' found on $Browser");
+        }
+	},
+	
     testBrowserInfoChrome : {
     	browsers:["GOOGLECHROME"],
     	testLabels : ["UnAdaptableTest"],
         test : function(component) {
-        	var formFactor = component.getValue('{!$Browser.formFactor}').getValue();
-        	$A.test.assertEquals("DESKTOP", formFactor, "formFactor had unexpected value");
-
-        	var isTablet = component.getValue('{!$Browser.isTablet}').getValue();
-        	$A.test.assertEquals(false, isTablet, "isTablet had unexpected value");
-        	
-        	var isPhone = component.getValue('{!$Browser.isPhone}').getValue();
-        	$A.test.assertEquals(false, isPhone, "isPhone had unexpected value");
-        	
-        	var isAndroid = component.getValue('{!$Browser.isAndroid}').getValue();
-        	$A.test.assertEquals(false, isAndroid, "isAndroid had unexpected value");
-        	
-        	var isIPad = component.getValue('{!$Browser.isIPad}').getValue();
-        	$A.test.assertEquals(false, isIPad, "isIPad had unexpected value");
-        	
-        	var isIPhone = component.getValue('{!$Browser.isIPhone}').getValue();
-        	$A.test.assertEquals(false, isIPhone, "isIPhone had unexpected value");
-        	
-        	var isIOS = component.getValue('{!$Browser.isIOS}').getValue();
-        	$A.test.assertEquals(false, isIOS, "isIOS had unexpected value");
-            }
+        	this.assertBrowserProperties(component, {
+    			formFactor : "DESKTOP",
+    			isTablet : false,
+    			isPhone : false,
+    			isAndroid : false,
+    			isIPad : false,
+    			isIPhone : false,
+    			isIOS : false
+    		});
+        }
     },
     
     testBrowserInfoFireFox : {
     	testLabels : ["UnAdaptableTest"],
     	browsers:["FIREFOX"],
         test : function(component) {
-        	var formFactor = component.getValue('{!$Browser.formFactor}').getValue();
-        	$A.test.assertEquals("DESKTOP", formFactor, "formFactor had unexpected value");
-
-        	var isTablet = component.getValue('{!$Browser.isTablet}').getValue();
-        	$A.test.assertEquals(false, isTablet, "isTablet had unexpected value");
-        	
-        	var isPhone = component.getValue('{!$Browser.isPhone}').getValue();
-        	$A.test.assertEquals(false, isPhone, "isPhone had unexpected value");
-        	
-        	var isAndroid = component.getValue('{!$Browser.isAndroid}').getValue();
-        	$A.test.assertEquals(false, isAndroid, "isAndroid had unexpected value");
-        	
-        	var isIPad = component.getValue('{!$Browser.isIPad}').getValue();
-        	$A.test.assertEquals(false, isIPad, "isIPad had unexpected value");
-        	
-        	var isIPhone = component.getValue('{!$Browser.isIPhone}').getValue();
-        	$A.test.assertEquals(false, isIPhone, "isIPhone had unexpected value");
-        	
-        	var isIOS = component.getValue('{!$Browser.isIOS}').getValue();
-        	$A.test.assertEquals(false, isIOS, "isIOS had unexpected value");
-            }
+        	this.assertBrowserProperties(component, {
+    			formFactor : "DESKTOP",
+    			isTablet : false,
+    			isPhone : false,
+    			isAndroid : false,
+    			isIPad : false,
+    			isIPhone : false,
+    			isIOS : false
+    		});
+        }
     },
     
     testBrowserInfoSafari : {
     	testLabels : ["UnAdaptableTest"],
     	browsers:["SAFARI"],
         test : function(component) {
-        	var formFactor = component.getValue('{!$Browser.formFactor}').getValue();
-        	$A.test.assertEquals("DESKTOP", formFactor, "formFactor had unexpected value");
-
-        	var isTablet = component.getValue('{!$Browser.isTablet}').getValue();
-        	$A.test.assertEquals(false, isTablet, "isTablet had unexpected value");
-        	
-        	var isPhone = component.getValue('{!$Browser.isPhone}').getValue();
-        	$A.test.assertEquals(false, isPhone, "isPhone had unexpected value");
-        	
-        	var isAndroid = component.getValue('{!$Browser.isAndroid}').getValue();
-        	$A.test.assertEquals(false, isAndroid, "isAndroid had unexpected value");
-        	
-        	var isIPad = component.getValue('{!$Browser.isIPad}').getValue();
-        	$A.test.assertEquals(false, isIPad, "isIPad had unexpected value");
-        	
-        	var isIPhone = component.getValue('{!$Browser.isIPhone}').getValue();
-        	$A.test.assertEquals(false, isIPhone, "isIPhone had unexpected value");
-        	
-        	var isIOS = component.getValue('{!$Browser.isIOS}').getValue();
-        	$A.test.assertEquals(false, isIOS, "isIOS had unexpected value");
-            }
+        	this.assertBrowserProperties(component, {
+    			formFactor : "DESKTOP",
+    			isTablet : false,
+    			isPhone : false,
+    			isAndroid : false,
+    			isIPad : false,
+    			isIPhone : false,
+    			isIOS : false
+    		});
+        }
     },
     
     testBrowserInfoIPad : {
     	testLabels : ["UnAdaptableTest"],
     	browsers:["IPAD"],
         test : function(component) {
-        	var formFactor = component.getValue('{!$Browser.formFactor}').getValue();
-        	$A.test.assertEquals("TABLET", formFactor, "formFactor had unexpected value");
-
-        	var isTablet = component.getValue('{!$Browser.isTablet}').getValue();
-        	$A.test.assertEquals(true, isTablet, "isTablet had unexpected value");
-        	
-        	var isPhone = component.getValue('{!$Browser.isPhone}').getValue();
-        	$A.test.assertEquals(false, isPhone, "isPhone had unexpected value");
-        	
-        	var isAndroid = component.getValue('{!$Browser.isAndroid}').getValue();
-        	$A.test.assertEquals(false, isAndroid, "isAndroid had unexpected value");
-        	
-        	var isIPad = component.getValue('{!$Browser.isIPad}').getValue();
-        	$A.test.assertEquals(true, isIPad, "isIPad had unexpected value");
-        	
-        	var isIPhone = component.getValue('{!$Browser.isIPhone}').getValue();
-        	$A.test.assertEquals(false, isIPhone, "isIPhone had unexpected value");
-        	
-        	var isIOS = component.getValue('{!$Browser.isIOS}').getValue();
-        	$A.test.assertEquals(true, isIOS, "isIOS had unexpected value");
-            }
+        	this.assertBrowserProperties(component, {
+    			formFactor : "TABLET",
+    			isTablet : true,
+    			isPhone : false,
+    			isAndroid : false,
+    			isIPad : true,
+    			isIPhone : false,
+    			isIOS : true
+    		});
+        }
     },
     
     testBrowserInfoIPhone : {
     	testLabels : ["UnAdaptableTest"],
     	browsers:["IPHONE"],
         test : function(component) {
-        	var formFactor = component.getValue('{!$Browser.formFactor}').getValue();
-        	$A.test.assertEquals("PHONE", formFactor, "formFactor had unexpected value");
-
-        	var isTablet = component.getValue('{!$Browser.isTablet}').getValue();
-        	$A.test.assertEquals(false, isTablet, "isTablet had unexpected value");
-        	
-        	var isPhone = component.getValue('{!$Browser.isPhone}').getValue();
-        	$A.test.assertEquals(true, isPhone, "isPhone had unexpected value");
-        	
-        	var isAndroid = component.getValue('{!$Browser.isAndroid}').getValue();
-        	$A.test.assertEquals(false, isAndroid, "isAndroid had unexpected value");
-        	
-        	var isIPad = component.getValue('{!$Browser.isIPad}').getValue();
-        	$A.test.assertEquals(false, isIPad, "isIPad had unexpected value");
-        	
-        	var isIPhone = component.getValue('{!$Browser.isIPhone}').getValue();
-        	$A.test.assertEquals(true, isIPhone, "isIPhone had unexpected value");
-        	
-        	var isIOS = component.getValue('{!$Browser.isIOS}').getValue();
-        	$A.test.assertEquals(true, isIOS, "isIOS had unexpected value");
-            }
+        	this.assertBrowserProperties(component, {
+    			formFactor : "PHONE",
+    			isTablet : false,
+    			isPhone : true,
+    			isAndroid : false,
+    			isIPad : false,
+    			isIPhone : true,
+    			isIOS : true
+    		});
+        }
     },
     
+    testBrowserInfoAndroidPhone : {
+    	testLabels : ["UnAdaptableTest"],
+    	browsers:["ANDROID_PHONE"],
+        test : function(component) {
+        	this.assertBrowserProperties(component, {
+    			formFactor : "PHONE",
+    			isTablet : false,
+    			isPhone : true,
+    			isAndroid : true,
+    			isIPad : false,
+    			isIPhone : false,
+    			isIOS : false
+    		});
+        }
+    },
     
-
-
-
+    testBrowserInfoAndroidTablet : {
+    	testLabels : ["UnAdaptableTest"],
+    	browsers:["ANDROID_TABLET"],
+        test : function(component) {
+        	this.assertBrowserProperties(component, {
+    			formFactor : "TABLET",
+    			isTablet : true,
+    			isPhone : false,
+    			isAndroid : true,
+    			isIPad : false,
+    			isIPhone : false,
+    			isIOS : false
+    		});
+        }
+    }
 })

@@ -86,7 +86,7 @@ public abstract class UnitTestCase extends TestCase {
         logger.info(String.format("Running: %s.%s", getClass().getName(), getName()));
         super.runBare();
     }
-    
+
     @Override
     public void runTest() throws Throwable {
         try {
@@ -98,7 +98,9 @@ public abstract class UnitTestCase extends TestCase {
     }
 
     protected void addTearDownStep(Runnable toRun) {
-        if (toRun == null) { return; }
+        if (toRun == null) {
+            return;
+        }
         if (tearDownSteps == null) {
             tearDownSteps = new Stack<Runnable>();
         }
@@ -167,8 +169,8 @@ public abstract class UnitTestCase extends TestCase {
     }
 
     /**
-     * Get a resource file for use in tests. If resource is not loaded from the filesystem, write it to a temp file and
-     * use that.
+     * Get a resource file for use in tests. If resource is not loaded from the
+     * filesystem, write it to a temp file and use that.
      * 
      * @param resourceName
      * @return File containing the resource content
@@ -177,7 +179,9 @@ public abstract class UnitTestCase extends TestCase {
     protected File getResourceFile(String resourceName) throws IOException {
         URL url = getClass().getResource(resourceName);
         // if it's local and exists, just return it
-        if (url != null && url.getProtocol().equals("file")) return new File(url.getFile());
+        if (url != null && url.getProtocol().equals("file")) {
+            return new File(url.getFile());
+        }
 
         // otherwise, we'll map it to tmp filesystem
         if (!File.separator.equals("/")) {
@@ -187,7 +191,9 @@ public abstract class UnitTestCase extends TestCase {
         File tempFile = new File(fileName);
 
         // if it didn't exist on classpath, then return ref to non-existant file
-        if (url == null) { return tempFile; }
+        if (url == null) {
+            return tempFile;
+        }
 
         // if it's a dir, just create it
         if (resourceName.endsWith(File.separator)) {
@@ -223,7 +229,8 @@ public abstract class UnitTestCase extends TestCase {
         Set<String> labels;
         // get parent labels before adding own
         Class<?> supa = c.getSuperclass();
-        // could probably stop at UnitTestCase, but don't want to mess with tests not derived from, and there's only 3
+        // could probably stop at UnitTestCase, but don't want to mess with
+        // tests not derived from, and there's only 3
         // more hops to Object (for now)
         if (supa == null) {
             labels = Sets.newHashSet();
@@ -236,9 +243,10 @@ public abstract class UnitTestCase extends TestCase {
     }
 
     /**
-     * Get a Set of Strings parsed from whitespace delimited TestLabels annotation values from the current test method
-     * and test class hierarchy. This will include only the current method's annotation and not those of any methods it
-     * happens to override.
+     * Get a Set of Strings parsed from whitespace delimited TestLabels
+     * annotation values from the current test method and test class hierarchy.
+     * This will include only the current method's annotation and not those of
+     * any methods it happens to override.
      */
     public Set<String> getTestLabels() {
         Class<?> clazz = getClass();

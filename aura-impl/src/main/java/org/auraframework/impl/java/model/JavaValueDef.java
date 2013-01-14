@@ -20,10 +20,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.TypeDef;
+import org.auraframework.def.ValueDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.service.LoggingService;
-
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -72,9 +73,9 @@ public class JavaValueDef extends DefinitionImpl<ValueDef> implements ValueDef {
     }
 
     /**
-     * Retrieves the value defined by this param from the passed in object.
-     * This method should be templated and defined in the interface, because
-     * the same thing exists in its apex counterpart.
+     * Retrieves the value defined by this param from the passed in object. This
+     * method should be templated and defined in the interface, because the same
+     * thing exists in its apex counterpart.
      */
     public Object getValueFrom(Object obj) {
         try {
@@ -105,6 +106,6 @@ public class JavaValueDef extends DefinitionImpl<ValueDef> implements ValueDef {
 
     @Override
     public String toString() {
-        return name+": "+this.typeDescriptor;
+        return name + ": " + this.typeDescriptor;
     }
 }

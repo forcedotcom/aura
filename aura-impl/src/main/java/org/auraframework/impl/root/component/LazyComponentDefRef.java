@@ -22,7 +22,12 @@ import javax.annotation.concurrent.Immutable;
 
 import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.builder.LazyComponentDefRefBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
@@ -32,13 +37,15 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 @Immutable
-public class LazyComponentDefRef extends ComponentDefRefImpl{
+public class LazyComponentDefRef extends ComponentDefRefImpl {
 
     private static final long serialVersionUID = -957235808680675063L;
 
-    public static final DefDescriptor<ComponentDef> PLACEHOLDER_DESC = DefDescriptorImpl.getInstance("aura:placeholder", ComponentDef.class);
+    public static final DefDescriptor<ComponentDef> PLACEHOLDER_DESC = DefDescriptorImpl.getInstance(
+            "aura:placeholder", ComponentDef.class);
 
-    private static final Set<String> acceptableAttributeTypes = Sets.newHashSet("Integer", "Long", "Double", "Decimal", "Boolean", "String", "Date", "DateTime");
+    private static final Set<String> acceptableAttributeTypes = Sets.newHashSet("Integer", "Long", "Double", "Decimal",
+            "Boolean", "String", "Date", "DateTime");
 
     public LazyComponentDefRef(Builder builder) {
         super(builder);
@@ -47,49 +54,54 @@ public class LazyComponentDefRef extends ComponentDefRefImpl{
     @SuppressWarnings("unchecked")
     @Override
     public void validateReferences() throws QuickFixException {
-        ComponentDef def = ((DefDescriptor<ComponentDef>)getAttributeDefRef("refDescriptor").getValue()).getDef();
+        ComponentDef def = ((DefDescriptor<ComponentDef>) getAttributeDefRef("refDescriptor").getValue()).getDef();
 
-        Map<DefDescriptor<AttributeDef>, Object> lazyAttributes = (Map<DefDescriptor<AttributeDef>, Object>)getAttributeDefRef("attributes").getValue();
+        Map<DefDescriptor<AttributeDef>, Object> lazyAttributes = (Map<DefDescriptor<AttributeDef>, Object>) getAttributeDefRef(
+                "attributes").getValue();
 
-        for(DefDescriptor<AttributeDef> at : lazyAttributes.keySet()){
+        for (DefDescriptor<AttributeDef> at : lazyAttributes.keySet()) {
             AttributeDef other = def.getAttributeDef(at.getName());
-            if(other == null){
-                throw new InvalidReferenceException(String.format("Attribute %s does not exist", at.getName()), getLocation());
+            if (other == null) {
+                throw new InvalidReferenceException(String.format("Attribute %s does not exist", at.getName()),
+                        getLocation());
             }
             DefDescriptor<TypeDef> otherType = other.getTypeDef().getDescriptor();
-            if(!(otherType.getPrefix().equals("aura") && acceptableAttributeTypes.contains(otherType.getName()))){
-                throw new InvalidReferenceException(String.format("Lazy Component References can only have attributes of simple types passed in (%s is not simple)", at.getName()), getLocation());
+            if (!(otherType.getPrefix().equals("aura") && acceptableAttributeTypes.contains(otherType.getName()))) {
+                throw new InvalidReferenceException(
+                        String.format(
+                                "Lazy Component References can only have attributes of simple types passed in (%s is not simple)",
+                                at.getName()), getLocation());
             }
         }
 
         super.validateReferences();
     }
 
-    public static class Builder extends ComponentDefRefImpl.Builder implements LazyComponentDefRefBuilder{
+    public static class Builder extends ComponentDefRefImpl.Builder implements LazyComponentDefRefBuilder {
 
-        private Map<DefDescriptor<AttributeDef>, Object> lazyAttributes = Maps.newHashMap();
+        private final Map<DefDescriptor<AttributeDef>, Object> lazyAttributes = Maps.newHashMap();
 
         public Builder() {
-                    this.lockDescriptor(PLACEHOLDER_DESC);
-                    this.setComponentAttribute("attributes", lazyAttributes);
+            this.lockDescriptor(PLACEHOLDER_DESC);
+            this.setComponentAttribute("attributes", lazyAttributes);
         }
 
         @Override
-        public Builder setRefDescriptor(DefDescriptor<ComponentDef> refDescriptor){
-                    setComponentAttribute("refDescriptor", refDescriptor);
-                    return this;
+        public Builder setRefDescriptor(DefDescriptor<ComponentDef> refDescriptor) {
+            setComponentAttribute("refDescriptor", refDescriptor);
+            return this;
         }
 
-            @Override
-            public Builder setComponentAttribute(String key, Object value){
-                AttributeDefRefImpl.Builder valueBuilder = new AttributeDefRefImpl.Builder();
-                valueBuilder.setDescriptor(DefDescriptorImpl.getInstance(key, AttributeDef.class));
-                valueBuilder.setValue(value);
+        @Override
+        public Builder setComponentAttribute(String key, Object value) {
+            AttributeDefRefImpl.Builder valueBuilder = new AttributeDefRefImpl.Builder();
+            valueBuilder.setDescriptor(DefDescriptorImpl.getInstance(key, AttributeDef.class));
+            valueBuilder.setValue(value);
 
-                AttributeDefRef adr = valueBuilder.build();
-                super.setAttribute(adr.getDescriptor(), adr);
-                return this;
-            }
+            AttributeDefRef adr = valueBuilder.build();
+            super.setAttribute(adr.getDescriptor(), adr);
+            return this;
+        }
 
         @Override
         public Builder setAttribute(DefDescriptor<AttributeDef> key, AttributeDefRef value) {
@@ -104,7 +116,7 @@ public class LazyComponentDefRef extends ComponentDefRefImpl{
 
         @Override
         public ComponentDefRefBuilder setLoad(Load load) {
-            //Do not set.
+            // Do not set.
             return this;
         }
     }

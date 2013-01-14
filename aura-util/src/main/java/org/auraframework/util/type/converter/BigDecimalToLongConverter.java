@@ -21,15 +21,15 @@ import org.auraframework.util.type.Converter;
 
 /**
  * Used by aura.util.type.TypeUtil
- *
- *
+ * 
+ * 
  * @since 0.0.142
  */
 public class BigDecimalToLongConverter implements Converter<BigDecimal, Long> {
 
     @Override
     public Long convert(BigDecimal value) {
-        if(value == null){
+        if (value == null) {
             return null;
         }
         return value.longValue();

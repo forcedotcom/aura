@@ -15,13 +15,17 @@
  */
 package org.auraframework.test.annotation;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Marks the test class or method unreliable to run in other runtime environments. Some behavior expected from the
- * test may vary due to some external adapter.
- *
- *
+ * Marks the test class or method unreliable to run in other runtime
+ * environments. Some behavior expected from the test may vary due to some
+ * external adapter.
+ * 
+ * 
  * @since 0.0.94
  */
 @Retention(RetentionPolicy.RUNTIME)

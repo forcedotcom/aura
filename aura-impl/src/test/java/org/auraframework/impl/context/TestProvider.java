@@ -27,7 +27,7 @@ import org.auraframework.system.Annotations.Provider;
 @Provider
 public class TestProvider implements ComponentDescriptorProvider {
     @Override
-    public DefDescriptor<ComponentDef> provide(){
+    public DefDescriptor<ComponentDef> provide() {
         return DefDescriptorImpl.getInstance("test:test_Preload_Interface_Impl", ComponentDef.class);
     }
 }

@@ -24,7 +24,7 @@ public class StringToCustomPairConverter implements Converter<String, CustomPair
     @Override
     public CustomPairType convert(String value) {
         List<String> splitList = AuraTextUtil.splitSimple("$", value);
-        return new CustomPairType(splitList.get(0),Integer.parseInt(splitList.get(1)));
+        return new CustomPairType(splitList.get(0), Integer.parseInt(splitList.get(1)));
     }
 
     @Override

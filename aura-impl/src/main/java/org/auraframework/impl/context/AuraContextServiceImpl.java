@@ -15,10 +15,17 @@
  */
 package org.auraframework.impl.context;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.adapter.*;
+import org.auraframework.adapter.GlobalValueProviderAdapter;
+import org.auraframework.adapter.PrefixDefaultsAdapter;
+import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImpl;
@@ -27,10 +34,13 @@ import org.auraframework.impl.util.json.AuraJsonContext;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.service.ContextService;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.DefRegistry;
+import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.NoContextException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.ServiceLocator;
@@ -63,25 +73,26 @@ public class AuraContextServiceImpl implements ContextService {
     public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Access access) {
         // initialize logging context
         Aura.getLoggingService().establish();
-        AuraContext context = AuraImpl.getContextAdapter().establish(mode, getDefRegistry(mode, access, loaders), getDefaultsProvider()
-                .getPrefixDefaults(mode), format, access, AuraJsonContext.createContext(mode, true), getGlobalProviders(), null);
+        AuraContext context = AuraImpl.getContextAdapter().establish(mode, getDefRegistry(mode, access, loaders),
+                getDefaultsProvider().getPrefixDefaults(mode), format, access,
+                AuraJsonContext.createContext(mode, true), getGlobalProviders(), null);
         return context;
     }
 
     @Override
-    public AuraContext startContext(Mode mode, Format format, Access access, DefDescriptor<? extends BaseComponentDef> appDesc) {
+    public AuraContext startContext(Mode mode, Format format, Access access,
+            DefDescriptor<? extends BaseComponentDef> appDesc) {
         return startContext(mode, null, format, access, appDesc);
     }
 
     @Override
-    public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Access access, DefDescriptor<? extends BaseComponentDef> appDesc) {
+    public AuraContext startContext(Mode mode, Set<SourceLoader> loaders, Format format, Access access,
+            DefDescriptor<? extends BaseComponentDef> appDesc) {
         // initialize logging context
         Aura.getLoggingService().establish();
         AuraContext context = AuraImpl.getContextAdapter().establish(mode, getDefRegistry(mode, access, loaders),
-                                                                       getDefaultsProvider().getPrefixDefaults(mode),
-                                                                       format, access,
-                                                                       AuraJsonContext.createContext(mode, true),
-                                                                       getGlobalProviders(), appDesc);
+                getDefaultsProvider().getPrefixDefaults(mode), format, access,
+                AuraJsonContext.createContext(mode, true), getGlobalProviders(), appDesc);
         return context;
     }
 
@@ -107,7 +118,7 @@ public class AuraContextServiceImpl implements ContextService {
         Collection<RegistryAdapter> providers = AuraImpl.getRegistryAdapters();
         for (RegistryAdapter provider : providers) {
             DefRegistry<?>[] registries = provider.getRegistries(mode, access, loaders);
-            if(registries != null){
+            if (registries != null) {
                 for (DefRegistry<?> reg : registries) {
                     ret.add(reg);
                 }
@@ -117,19 +128,22 @@ public class AuraContextServiceImpl implements ContextService {
     }
 
     private Map<ValueProviderType, GlobalValueProvider> getGlobalProviders() {
-        // load any @Primary GlobalValueProviderAdatper first, to give it's implementations percedence 
+        // load any @Primary GlobalValueProviderAdatper first, to give it's
+        // implementations percedence
         GlobalValueProviderAdapter primaryFactory = ServiceLocator.get().get(GlobalValueProviderAdapter.class);
-        Map<ValueProviderType, GlobalValueProvider> instances = new EnumMap<ValueProviderType, GlobalValueProvider>(ValueProviderType.class);
+        Map<ValueProviderType, GlobalValueProvider> instances = new EnumMap<ValueProviderType, GlobalValueProvider>(
+                ValueProviderType.class);
         for (GlobalValueProvider g : primaryFactory.createValueProviders()) {
             instances.put(g.getValueProviderKey(), g);
         }
-        Collection<GlobalValueProviderAdapter> factories = ServiceLocator.get().getAll(GlobalValueProviderAdapter.class);
+        Collection<GlobalValueProviderAdapter> factories = ServiceLocator.get()
+                .getAll(GlobalValueProviderAdapter.class);
         for (GlobalValueProviderAdapter factory : factories) {
-            if (!factory.equals(primaryFactory))
-            {
+            if (!factory.equals(primaryFactory)) {
                 for (GlobalValueProvider g : factory.createValueProviders()) {
-                    if (!instances.containsKey(g.getValueProviderKey())) 
-                          instances.put(g.getValueProviderKey(), g);
+                    if (!instances.containsKey(g.getValueProviderKey())) {
+                        instances.put(g.getValueProviderKey(), g);
+                    }
                 }
             }
         }
@@ -138,13 +152,13 @@ public class AuraContextServiceImpl implements ContextService {
 
     @Override
     public void assertEstablished() {
-        if(!isEstablished()){
+        if (!isEstablished()) {
             throw new NoContextException();
         }
     }
 
     @Override
-    public void assertAccess(DefDescriptor<?> desc) throws QuickFixException{
+    public void assertAccess(DefDescriptor<?> desc) throws QuickFixException {
         assertEstablished();
 
         getCurrentContext().getDefRegistry().assertAccess(desc);

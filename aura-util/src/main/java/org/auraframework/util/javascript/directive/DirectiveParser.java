@@ -15,8 +15,14 @@
  */
 package org.auraframework.util.javascript.directive;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,8 +43,8 @@ public class DirectiveParser {
 
     private boolean parsed = false;
     protected LinkedList<Directive> directives;
-    private StringBuilder content;
-    private List<JavascriptProcessingError> parseErrors;
+    private final StringBuilder content;
+    private final List<JavascriptProcessingError> parseErrors;
 
     public DirectiveParser(DirectiveBasedJavascriptGroup group, File startFile) {
         this.group = group;
@@ -119,8 +125,7 @@ public class DirectiveParser {
             if (multiline != null) {
                 addError(lineNum, "no end found for directive", "");
             }
-        }
-        finally {
+        } finally {
             if (reader != null) {
                 reader.close();
             }
@@ -146,7 +151,7 @@ public class DirectiveParser {
         errors.addAll(validator.validate(file.getName(), content.toString(), false, true));
         for (Directive d : directives) {
             List<JavascriptProcessingError> dErrors = d.validate(validator);
-            if(dErrors != null){
+            if (dErrors != null) {
                 errors.addAll(dErrors);
             }
         }
@@ -165,7 +170,7 @@ public class DirectiveParser {
         }
         int commentOffset = generated.length();
         generated.append(content);
-        for (Directive d: directives) {
+        for (Directive d : directives) {
             if (d.hasOutput(mode)) {
                 generated.insert(d.getOffset() + commentOffset, d.generateOutput(mode));
             }

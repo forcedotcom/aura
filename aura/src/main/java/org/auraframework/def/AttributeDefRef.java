@@ -15,15 +15,14 @@
  */
 package org.auraframework.def;
 
-
 /**
  */
 public interface AttributeDefRef extends Definition {
     /**
      * FIXME: W-1328558 this method violates the contract with DefDescriptor.
-     *
+     * 
      * These two calls should be used instead, but they cause other bugs.
-     *
+     * 
      * DefDescriptor<AttributeDefRef> getDescriptor();
      * DefDescriptor<AttributeDef> getAttributeDescriptor();
      */
@@ -36,11 +35,13 @@ public interface AttributeDefRef extends Definition {
     Object getValue();
 
     /**
-     * Parses the value stored in this defref using the passed in type definition.
-     * This MUST be called during the validateReferences compilation phase or this defref may
-     * represent a literal value that is not of the expected type (i.e. string instead of number)
+     * Parses the value stored in this defref using the passed in type
+     * definition. This MUST be called during the validateReferences compilation
+     * phase or this defref may represent a literal value that is not of the
+     * expected type (i.e. string instead of number)
      * 
-     * TODO: when getDescriptor().getDef().getTypeDef() is fixed, this won't be needed anymore
+     * TODO: when getDescriptor().getDef().getTypeDef() is fixed, this won't be
+     * needed anymore
      * 
      * @param typeDef type of the attribute to try to parse to
      */

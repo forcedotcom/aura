@@ -25,7 +25,7 @@ public class JsFunctionTest extends UnitTestCase {
 
     public void testSerialize() throws Exception {
         String contents = "var thin = \"brown fox\";\njumps('over the moon');";
-        JsFunction f = new JsFunction(ImmutableList.<String>of(), contents);
+        JsFunction f = new JsFunction(ImmutableList.<String> of(), contents);
         assertEquals("\nfunction () {" + contents + "}", Json.serialize(f, true, false));
 
         JsFunction f2 = new JsFunction(ImmutableList.of("arg1"), "nothing");

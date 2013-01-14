@@ -26,7 +26,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 public class TopicPanelProvider {
     public static DefDescriptor<ComponentDef> provide() throws QuickFixException {
         BaseComponent<?, ?> c = Aura.getContextService().getCurrentContext().getCurrentComponent();
-        String topic = (String)c.getAttributes().getValue("topic");
+        String topic = (String) c.getAttributes().getValue("topic");
         if (topic != null) {
             if (topic.startsWith("api:")) {
                 return Aura.getDefinitionService().getDefDescriptor("auradocs:apiTopic", ComponentDef.class);
@@ -36,7 +36,9 @@ public class TopicPanelProvider {
                 }
                 DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("auradocs:" + topic,
                         ComponentDef.class);
-                if (desc.exists()) { return desc; }
+                if (desc.exists()) {
+                    return desc;
+                }
             }
         }
 

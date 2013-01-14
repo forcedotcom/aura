@@ -20,11 +20,14 @@ import java.io.IOException;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.instance.*;
+import org.auraframework.instance.AttributeSet;
+import org.auraframework.instance.Component;
+import org.auraframework.instance.Model;
 import org.auraframework.util.json.Json;
 
 /**
- * proto-component is used by providers, when the real component isn't known yet.
+ * proto-component is used by providers, when the real component isn't known
+ * yet.
  */
 public class ProtoComponentImpl implements Component {
     private final DefDescriptor<ComponentDef> descriptor;
@@ -59,7 +62,8 @@ public class ProtoComponentImpl implements Component {
 
     @Override
     public Object getValue(PropertyReference key) {
-        // only the view is accessible through this component, and that is accessed directly by calling getAttributes
+        // only the view is accessible through this component, and that is
+        // accessed directly by calling getAttributes
         if (key.getRoot().equalsIgnoreCase("v")) {
             return attributes;
         }

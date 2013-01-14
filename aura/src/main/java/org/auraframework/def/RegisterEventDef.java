@@ -15,21 +15,21 @@
  */
 package org.auraframework.def;
 
-
 /**
  */
 public interface RegisterEventDef extends Definition {
     /**
      * FIXME: W-1328555 this method violates the contract with DefDescriptor.
-     *
+     * 
      * These two calls should be used instead, but they cause other bugs.
-     *
-     * DefDescriptor<RegisterEventDef> getDescriptor();
-     * DefDescriptor<EventDef> getEventDescriptor();
+     * 
+     * DefDescriptor<RegisterEventDef> getDescriptor(); DefDescriptor<EventDef>
+     * getEventDescriptor();
      */
     @Override
     DefDescriptor<EventDef> getDescriptor();
 
     boolean isGlobal();
+
     String getAttributeName();
 }

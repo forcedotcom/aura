@@ -18,8 +18,14 @@ package org.auraframework.impl;
 import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ActionDef;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.EventDef;
 import org.auraframework.impl.root.application.ApplicationImpl;
 import org.auraframework.impl.root.component.ComponentImpl;
 import org.auraframework.impl.root.event.EventImpl;
@@ -44,7 +50,7 @@ public class InstanceServiceImpl implements InstanceService {
 
         Aura.getContextService().assertEstablished();
 
-        return this.<T,D>getInstance(descriptor, null);
+        return this.<T, D> getInstance(descriptor, null);
     }
 
     @SuppressWarnings("unchecked")
@@ -56,29 +62,29 @@ public class InstanceServiceImpl implements InstanceService {
 
         DefType defType = descriptor.getDefType();
 
-        switch(defType){
-            case APPLICATION:
-                return (T)new ApplicationImpl((DefDescriptor<ApplicationDef>)descriptor, attributes);
-            case COMPONENT:
-                return (T)new ComponentImpl((DefDescriptor<ComponentDef>)descriptor, attributes);
-            case ACTION:
-                AuraContext context = Aura.getContextService().getCurrentContext();
-                context.setCurrentNamespace(descriptor.getNamespace());
-                ControllerDef controllerDef = ((SubDefDescriptor<ActionDef, ControllerDef>)descriptor).getParentDescriptor().getDef();
-                return (T)controllerDef.createAction(descriptor.getName(), attributes);
-            case EVENT:
-                return (T)new EventImpl((DefDescriptor<EventDef>)descriptor, attributes);
-            default:
-                throw new AuraRuntimeException(String.format("Instances of %s cannot be created.", defType));
+        switch (defType) {
+        case APPLICATION:
+            return (T) new ApplicationImpl((DefDescriptor<ApplicationDef>) descriptor, attributes);
+        case COMPONENT:
+            return (T) new ComponentImpl((DefDescriptor<ComponentDef>) descriptor, attributes);
+        case ACTION:
+            AuraContext context = Aura.getContextService().getCurrentContext();
+            context.setCurrentNamespace(descriptor.getNamespace());
+            ControllerDef controllerDef = ((SubDefDescriptor<ActionDef, ControllerDef>) descriptor)
+                    .getParentDescriptor().getDef();
+            return (T) controllerDef.createAction(descriptor.getName(), attributes);
+        case EVENT:
+            return (T) new EventImpl((DefDescriptor<EventDef>) descriptor, attributes);
+        default:
+            throw new AuraRuntimeException(String.format("Instances of %s cannot be created.", defType));
         }
     }
 
     @Override
-    public <T extends Instance<D>, D extends Definition> T getInstance(D definition)
-            throws QuickFixException {
+    public <T extends Instance<D>, D extends Definition> T getInstance(D definition) throws QuickFixException {
         Aura.getContextService().assertEstablished();
 
-        return this.<T,D>getInstance(definition, null);
+        return this.<T, D> getInstance(definition, null);
     }
 
     @SuppressWarnings("unchecked")
@@ -88,11 +94,11 @@ public class InstanceServiceImpl implements InstanceService {
         Aura.getContextService().assertEstablished();
 
         DefType defType = definition.getDescriptor().getDefType();
-        switch(defType){
-            case APPLICATION:
-                return (T)new ApplicationImpl((ApplicationDef)definition, attributes);
-            default:
-                return (T)getInstance(definition.getDescriptor(), attributes);
+        switch (defType) {
+        case APPLICATION:
+            return (T) new ApplicationImpl((ApplicationDef) definition, attributes);
+        default:
+            return (T) getInstance(definition.getDescriptor(), attributes);
         }
     }
 
@@ -101,7 +107,7 @@ public class InstanceServiceImpl implements InstanceService {
             throws QuickFixException {
         Aura.getContextService().assertEstablished();
 
-        return this.<T,D>getInstance(qualifiedName, defClass, null);
+        return this.<T, D> getInstance(qualifiedName, defClass, null);
     }
 
     @Override
@@ -110,7 +116,8 @@ public class InstanceServiceImpl implements InstanceService {
 
         Aura.getContextService().assertEstablished();
 
-        return this.<T,D>getInstance(Aura.getDefinitionService().getDefDescriptor(qualifiedName, defClass), attributes);
+        return this.<T, D> getInstance(Aura.getDefinitionService().getDefDescriptor(qualifiedName, defClass),
+                attributes);
     }
 
     @Override
@@ -126,7 +133,7 @@ public class InstanceServiceImpl implements InstanceService {
         Aura.getContextService().assertEstablished();
 
         Definition d = Aura.getDefinitionService().getDefinition(qualifiedName, defTypes);
-        Instance<?> i = this.<Instance<Definition>, Definition>getInstance(d, attributes);
+        Instance<?> i = this.<Instance<Definition>, Definition> getInstance(d, attributes);
         return i;
     }
 

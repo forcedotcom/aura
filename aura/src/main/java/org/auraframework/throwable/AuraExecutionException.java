@@ -18,11 +18,13 @@ package org.auraframework.throwable;
 import org.auraframework.system.Location;
 
 /**
- * An exception that occurs while running code in a plug-in language within Aura.
- *
- * Must include a Location corresponding to the plug-in language file (e.g., Controller, Provider, etc.)
- * that caused the exception. In general, this should also wrap another exception (the cause). It will
- * be surfaced as an error to the client.
+ * An exception that occurs while running code in a plug-in language within
+ * Aura.
+ * 
+ * Must include a Location corresponding to the plug-in language file (e.g.,
+ * Controller, Provider, etc.) that caused the exception. In general, this
+ * should also wrap another exception (the cause). It will be surfaced as an
+ * error to the client.
  */
 public class AuraExecutionException extends AuraRuntimeException {
     private static final long serialVersionUID = 4773646750032723421L;

@@ -18,7 +18,8 @@ package org.auraframework.util.json;
 import java.io.IOException;
 
 /**
- * Comments are not part of JSON, but it handy for us to be able to parse a json-like structure that contains comments.
+ * Comments are not part of JSON, but it handy for us to be able to parse a
+ * json-like structure that contains comments.
  */
 public class JsComment implements JsonSerializable {
     private final String body;
@@ -67,9 +68,8 @@ public class JsComment implements JsonSerializable {
             return false;
         }
         if (o instanceof JsComment) {
-            JsComment j = (JsComment)o;
-            return body.equals(j.body)
-                    && line == j.line && col == j.col;
+            JsComment j = (JsComment) o;
+            return body.equals(j.body) && line == j.line && col == j.col;
         }
         return false;
     }

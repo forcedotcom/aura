@@ -17,11 +17,11 @@ package org.auraframework.def;
 
 /**
  * An interface for a security provider.
- *
- * Note that this interface is instantiated as a singleton, no state should
- * be held on the class. It also needs to have a no-arg constructor.
- *
- *
+ * 
+ * Note that this interface is instantiated as a singleton, no state should be
+ * held on the class. It also needs to have a no-arg constructor.
+ * 
+ * 
  * @since 0.0.212
  */
 public interface SecurityProvider {

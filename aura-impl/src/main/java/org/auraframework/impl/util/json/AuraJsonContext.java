@@ -20,13 +20,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
-
 import org.auraframework.adapter.JsonSerializerAdapter;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.util.json.*;
+import org.auraframework.util.json.ClassMapJsonSerializationContext;
+import org.auraframework.util.json.JsonSerializable;
+import org.auraframework.util.json.JsonSerializer;
+import org.auraframework.util.json.JsonSerializers;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 
 /**
  * json serialization context for aura
@@ -62,7 +65,7 @@ public class AuraJsonContext extends ClassMapJsonSerializationContext {
         JsonSerializer<T> s = super.getSerializer(o);
         // try the old way until we stop using it
         if (s == null && o instanceof JsonSerializable) {
-            //System.out.println("bah old serializer: " + c.getName());
+            // System.out.println("bah old serializer: " + c.getName());
             s = (JsonSerializer<T>) JsonSerializers.OLD;
         }
         return s;

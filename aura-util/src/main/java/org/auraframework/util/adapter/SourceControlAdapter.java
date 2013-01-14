@@ -18,7 +18,7 @@ package org.auraframework.util.adapter;
 import java.io.File;
 import java.io.IOException;
 
-public interface SourceControlAdapter{
+public interface SourceControlAdapter {
 
     public boolean canCheckout();
 

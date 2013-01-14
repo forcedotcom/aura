@@ -15,25 +15,31 @@
  */
 package org.auraframework.impl.css.parser;
 
-import com.google.common.css.SourceCodeLocation;
-import com.google.common.css.compiler.ast.*;
-
 import java.util.Set;
 
+import com.google.common.css.SourceCodeLocation;
+import com.google.common.css.compiler.ast.CssBooleanExpressionNode;
+import com.google.common.css.compiler.ast.CssCompilerPass;
+import com.google.common.css.compiler.ast.CssConditionalBlockNode;
+import com.google.common.css.compiler.ast.CssConditionalRuleNode;
+import com.google.common.css.compiler.ast.DefaultTreeVisitor;
+import com.google.common.css.compiler.ast.ErrorManager;
+import com.google.common.css.compiler.ast.GssError;
+import com.google.common.css.compiler.ast.MutatingVisitController;
+
 /**
- * Verify that the conditions found in the CSS are within the set of
- * known conditionals.
+ * Verify that the conditions found in the CSS are within the set of known
+ * conditionals.
  */
-public class VerifyConditions extends DefaultTreeVisitor
-        implements CssCompilerPass {
+public class VerifyConditions extends DefaultTreeVisitor implements CssCompilerPass {
 
     private final MutatingVisitController visitController;
     private final Set<String> allowedConditions;
     private final ErrorManager errorManager;
     private final ThemeParserResultHolder resultHolder;
 
-    public VerifyConditions(MutatingVisitController visitController,
-                                     Set<String> allowedConditions, ThemeParserResultHolder resultHolder, ErrorManager errorManager) {
+    public VerifyConditions(MutatingVisitController visitController, Set<String> allowedConditions,
+            ThemeParserResultHolder resultHolder, ErrorManager errorManager) {
         this.visitController = visitController;
         this.allowedConditions = allowedConditions;
         this.resultHolder = resultHolder;
@@ -42,14 +48,15 @@ public class VerifyConditions extends DefaultTreeVisitor
 
     @Override
     public boolean enterConditionalBlock(CssConditionalBlockNode block) {
-        for(CssConditionalRuleNode r : block.getChildren()) {
+        for (CssConditionalRuleNode r : block.getChildren()) {
             CssBooleanExpressionNode b = r.getCondition();
             // if b is null, we're at an @else with no condition
-            if (b!=null) {
+            if (b != null) {
                 String conditional = b.getValue();
                 if (!allowedConditions.contains(conditional)) {
                     SourceCodeLocation scl = r.getSourceCodeLocation();
-                    GssError error = new GssError("Unknown conditional: [" + conditional + "]. The allowed conditionals are: " + allowedConditions, scl);
+                    GssError error = new GssError("Unknown conditional: [" + conditional
+                            + "]. The allowed conditionals are: " + allowedConditions, scl);
                     errorManager.report(error);
                 } else {
                     resultHolder.addFoundConditions(conditional);
@@ -59,10 +66,11 @@ public class VerifyConditions extends DefaultTreeVisitor
         return true;
     }
 
-
     @Override
     public void runPass() {
-        if (allowedConditions==null) return;
+        if (allowedConditions == null) {
+            return;
+        }
         visitController.startVisit(this);
     }
 }

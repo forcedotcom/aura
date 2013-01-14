@@ -18,12 +18,13 @@ package org.auraframework.impl.source.resource;
 import java.util.EnumMap;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableSet;
-
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  */

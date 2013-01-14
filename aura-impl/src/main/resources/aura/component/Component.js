@@ -188,11 +188,13 @@ Component.prototype.findInstancesOf = function(type, ret, cmp){
     if(body){
         for(var i=0;i<body.length;i++){
             cmp = body[i];
-            var inst = cmp.findInstanceOf(type);
-            if(inst){
-                ret.push(inst);
-            }else{
-                cmp.findInstancesOf(type, ret);
+            if (cmp.findInstanceOf) {
+                var inst = cmp.findInstanceOf(type);
+                if(inst){
+                    ret.push(inst);
+                }else{
+                    cmp.findInstancesOf(type, ret);
+                }
             }
         }
     }

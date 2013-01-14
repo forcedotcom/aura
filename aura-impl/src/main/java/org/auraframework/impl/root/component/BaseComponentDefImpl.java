@@ -1019,6 +1019,14 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
         } else if (render == RenderType.SERVER) {
             return true;
         }
+        //
+        // FIXME: OMG W-1501702 really?!?!?!
+        // We desperately need to make this go away. It is heinousness incarnate, but the entirety of
+        // server side rendering is blocking this.
+        //
+        if (this.getDescriptor().getQualifiedName().equals("markup://aura:placeholder")) {
+            return true;
+        }
 
         RendererDef rendererDef = getLocalRendererDef();
         boolean ret = false;

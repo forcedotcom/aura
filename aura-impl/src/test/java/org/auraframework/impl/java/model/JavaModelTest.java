@@ -99,7 +99,7 @@ public class JavaModelTest extends AuraImplTestCase {
         }
 
         @Override
-        public int compareTo(DefDescriptor other) {
+        public int compareTo(DefDescriptor<?> other) {
             return DefDescriptorImpl.compare(this, other);
         }
     };

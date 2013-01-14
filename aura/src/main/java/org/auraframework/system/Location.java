@@ -38,11 +38,11 @@ public class Location implements Serializable {
      */
     private final String cacheFile;
 
-    public Location(Source source) {
+    public Location(Source<?> source) {
         this(source, -1, -1, null);
     }
 
-    public Location(Source source, int line, int column, String cacheFile) {
+    public Location(Source<?> source, int line, int column, String cacheFile) {
         this.fileName = source.getSystemId();
         this.lastModified = source.getLastModified();
         this.hash = source.getHash();

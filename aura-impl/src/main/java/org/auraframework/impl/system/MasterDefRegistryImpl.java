@@ -15,9 +15,13 @@
  */
 package org.auraframework.impl.system;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
@@ -32,29 +36,61 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.system.Hash;
 import org.auraframework.system.Location;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
  * Overall Master definition registry implementation.
+ * 
+ * This 'master' definition registry is actually a single threaded, per request
+ * registry that caches certain things in what is effectively a thread local
+ * cache. This means that once something is pulled into the local thread, it
+ * will not change.
  */
 public class MasterDefRegistryImpl implements MasterDefRegistry {
-
     private static final Set<DefType> securedDefTypes = Sets.immutableEnumSet(DefType.APPLICATION, DefType.COMPONENT,
             DefType.CONTROLLER, DefType.ACTION);
     private static final Set<String> unsecuredPrefixes = ImmutableSet.of("aura");
     private static final Set<String> unsecuredNamespaces = ImmutableSet.of("aura", "ui", "os", "auradev",
             "org.auraframework");
     private static final Set<String> unsecuredNonProductionNamespaces = ImmutableSet.of("auradev");
+
+    private final static int DEPENDENCY_CACHE_SIZE = 100;
+    private final static int STRING_CACHE_SIZE = 100;
+
+    private static class DependencyEntry {
+        public final String uid;
+        public final long lastModTime;
+        public final SortedSet<DefDescriptor<?>> dependencies;
+
+        public DependencyEntry(String uid, SortedSet<DefDescriptor<?>> dependencies, long lastModTime) {
+            this.uid = uid;
+            this.dependencies = Collections.unmodifiableSortedSet(dependencies);
+            this.lastModTime = lastModTime;
+        }
+    }
+
+    private final static Cache<String, DependencyEntry> dependencies = CacheBuilder.newBuilder()
+            .initialCapacity(DEPENDENCY_CACHE_SIZE).maximumSize(DEPENDENCY_CACHE_SIZE).build();
+
+    private final static Cache<String, String> strings = CacheBuilder.newBuilder().initialCapacity(STRING_CACHE_SIZE)
+            .maximumSize(STRING_CACHE_SIZE).build();
+
+    private final Map<String, DependencyEntry> localDependencies = Maps.newHashMap();
 
     private final RegistryTrie delegateRegistries;
 
@@ -65,7 +101,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private SecurityProviderDef securityProvider;
 
     public MasterDefRegistryImpl(DefRegistry<?>... registries) {
-        delegateRegistries = new RegistryTrie(registries);
+        this.delegateRegistries = new RegistryTrie(registries);
     }
 
     @Override
@@ -167,9 +203,13 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public final AuraContext context = Aura.getContextService().getCurrentContext();
         public final LoggingService loggingService = Aura.getLoggingService();
         public final Map<DefDescriptor<? extends Definition>, CompilingDef<?>> compiled = Maps.newHashMap();
+        public final Map<DefDescriptor<? extends Definition>, Definition> dependencies;
 
         // public final Map<DefDescriptor<? extends Definition>, Definition>
         // dependencies = Maps.newHashMap();
+        public CompileContext(Map<DefDescriptor<? extends Definition>, Definition> dependencies) {
+            this.dependencies = dependencies;
+        }
 
         public <D extends Definition> CompilingDef<D> getCompiling(DefDescriptor<D> descriptor) {
             @SuppressWarnings("unchecked")
@@ -218,10 +258,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             // have to continue the tree walk because some defs might not be
             // cached (FIXME: we should cache all defs).
             //
-            if (!this.defs.containsKey(def.getDescriptor())) {
+            if (cc.dependencies != null && !cc.dependencies.containsKey(def.getDescriptor())) {
                 def.appendDependencies(deps);
-                // cc.dependencies.put(def.getDescriptor(), def);
-                this.defs.put(def.getDescriptor(), def);
+                cc.dependencies.put(def.getDescriptor(), def);
             }
             return def;
         }
@@ -240,16 +279,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 // cc.dependencies.put(canonical, def);
                 if (!def.isValid()) {
                     cc.loggingService.incrementNum(LoggingService.DEF_COUNT);
-
                     // FIXME: setting the current namespace on the context seems
                     // extremely hackish
                     cc.context.setCurrentNamespace(canonical.getNamespace());
                     def.validateDefinition();
-
-                    cd.descriptor = canonical;
-                    cd.def = def;
-                    cd.registry = registry;
-                    cc.compiled.put(canonical, cd);
                 }
                 if (!this.defs.containsKey(def.getDescriptor())) {
                     Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
@@ -257,16 +290,13 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     this.defs.put(def.getDescriptor(), def);
                     def.appendDependencies(newDeps);
                     deps.addAll(newDeps);
-                    //
-                    // Add all of the filters on here. Note that we might want
-                    // to track
-                    // the filters separately so that we can do tighter
-                    // dependency matching later.
-                    //
+                    if (cc.dependencies != null) {
+                        cc.dependencies.put(canonical, def);
+                    }
+                    def.appendDependencies(newDeps);
                     for (DefDescriptor<?> dep : newDeps) {
                         if (!this.defs.containsKey(dep)) {
                             CompilingDef<?> depcd = cc.getCompiling(dep);
-
                             depcd.parents.add(def);
                         }
                     }
@@ -324,9 +354,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * 
      * @param descriptor the descriptor that we wish to compile.
      */
-    protected <D extends Definition> D compileDef(DefDescriptor<D> descriptor) throws QuickFixException {
+    protected <D extends Definition> D compileDef(DefDescriptor<D> descriptor,
+            Map<DefDescriptor<?>, Definition> dependencies) throws QuickFixException {
         Set<DefDescriptor<?>> next = Sets.newHashSet();
-        CompileContext cc = new CompileContext();
+        CompileContext cc = new CompileContext(dependencies);
         D def;
 
         cc.loggingService.startTimer(LoggingService.TIMER_DEFINITION_CREATION);
@@ -411,13 +442,38 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             for (CompilingDef<?> cd : cc.compiled.values()) {
                 // FIXME: setting the current namespace on the context seems
                 // extremely hackish
-                cc.context.setCurrentNamespace(cd.descriptor.getNamespace());
-                cd.markValid();
+                if (cd.def != null) {
+                    cc.context.setCurrentNamespace(cd.descriptor.getNamespace());
+                    cd.markValid();
+                    if (defs != null) {
+                        defs.put(cd.descriptor, cd.def);
+                    }
+                }
             }
             return def;
         } finally {
             cc.loggingService.stopTimer(LoggingService.TIMER_DEFINITION_CREATION);
         }
+    }
+
+    @Override
+    public <T extends Definition> long getLastMod(String uid) {
+        DependencyEntry de = this.localDependencies.get(uid);
+
+        if (de != null) {
+            return de.lastModTime;
+        }
+        return 0;
+    }
+
+    @Override
+    public <T extends Definition> Set<DefDescriptor<?>> getDependencies(String uid) {
+        DependencyEntry de = this.localDependencies.get(uid);
+
+        if (de != null) {
+            return de.dependencies;
+        }
+        return null;
     }
 
     @SuppressWarnings("unchecked")
@@ -432,14 +488,19 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             //
             def = this.defs.get(descriptor);
         } else {
-            def = compileDef(descriptor);
+            def = compileDef(descriptor, null);
         }
 
+        //
         // Check authentication. All defs should really support this but right
         // now
         // it's specific to Applications, so putting this special case here
         // until
         // we have a more generic check on all defs.
+        //
+        // Not sure why this is here, as we should be doing something at a
+        // higher level.
+        //
         if (def != null && def.getDescriptor().getDefType() == DefType.APPLICATION
                 && ((ApplicationDef) def).getAccess() == Access.AUTHENTICATED) {
             AuraContext context = Aura.getContextService().getCurrentContext();
@@ -450,8 +511,13 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 def = null;
             }
         }
-
         return (D) def;
+    }
+
+    protected <D extends Definition> D getDefAndDependencies(DefDescriptor<D> descriptor,
+            Map<DefDescriptor<?>, Definition> dependencies) throws QuickFixException {
+        D def = compileDef(descriptor, dependencies);
+        return def;
     }
 
     @SuppressWarnings("unchecked")
@@ -570,5 +636,118 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      */
     public DefRegistry<?>[] getAllRegistries() {
         return delegateRegistries.getAllRegistries();
+    }
+
+    /**
+     * Filter the entire set of current definitions by a set of preloads.
+     * 
+     * This filtering is very simple, it just looks for local definitions that
+     * are not included in the preload set.
+     */
+    @Override
+    public Map<DefDescriptor<? extends Definition>, Definition> filterRegistry(Set<DefDescriptor<?>> preloads) {
+        Map<DefDescriptor<? extends Definition>, Definition> filtered;
+
+        if (preloads == null || preloads.isEmpty()) {
+            return Maps.newHashMap(this.defs);
+        }
+        filtered = Maps.newHashMapWithExpectedSize(this.defs.size());
+        for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : this.defs.entrySet()) {
+            if (!preloads.contains(entry.getKey())) {
+                filtered.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return filtered;
+    }
+
+    @Override
+    public <T extends Definition> boolean invalidate(DefDescriptor<T> descriptor) {
+        if (this.localDependencies.containsKey(descriptor)) {
+            this.localDependencies.remove(descriptor);
+        }
+        // TODO: this should be optimized.
+        dependencies.invalidateAll();
+        // TODO: need to remove from the registries.
+        return false;
+    }
+
+    private String getKey(DependencyEntry de, DefDescriptor<?> descriptor, String key) {
+        return String.format("%s@%s@%s", de.uid, descriptor.getQualifiedName().toLowerCase(), key);
+    }
+
+    @Override
+    public <T extends Definition> String getCachedString(String uid, DefDescriptor<?> descriptor, String key) {
+        DependencyEntry de = this.localDependencies.get(uid);
+
+        if (de != null) {
+            return strings.getIfPresent(getKey(de, descriptor, key));
+        }
+        return null;
+    }
+
+    @Override
+    public <T extends Definition> void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value) {
+        DependencyEntry de = this.localDependencies.get(uid);
+
+        if (de != null) {
+            strings.put(getKey(de, descriptor, key), value);
+        }
+    }
+
+    @Override
+    public <T extends Definition> String getUid(String uid, DefDescriptor<T> descriptor) throws QuickFixException,
+            ClientOutOfSyncException {
+        DependencyEntry de = null;
+        String lk = descriptor.getQualifiedName().toLowerCase();
+
+        if (uid != null) {
+            de = this.localDependencies.get(uid);
+            if (de != null) {
+                return de.uid;
+            }
+            de = dependencies.getIfPresent(uid + lk);
+            if (de != null) {
+                de = this.localDependencies.put(uid, de);
+                return de.uid;
+            }
+        }
+        Map<DefDescriptor<?>, Definition> dds = Maps.newTreeMap();
+        Definition def = getDefAndDependencies(descriptor, dds);
+        String tuid = uid;
+        long lmt = 0;
+
+        if (def == null) {
+            return null;
+        }
+        for (Definition t : dds.values()) {
+            if (t.getLocation() != null && t.getLocation().getLastModified() > lmt) {
+                lmt = t.getLocation().getLastModified();
+            }
+        }
+        StringBuilder sb = new StringBuilder(dds.size() * 20);
+
+        for (Definition t : dds.values()) {
+            Hash hash = t.getOwnHash();
+
+            // TODO: we need to ensure that null hashes are ok
+            if (hash != null) {
+                sb.append(hash.toString());
+            }
+        }
+        Hash global;
+
+        try {
+            global = new Hash(new StringReader(sb.toString()));
+        } catch (IOException ioe) {
+            throw new AuraError("StringReader IO exception", ioe);
+        }
+        tuid = global.toString();
+        if (uid != null && !uid.equals(tuid)) {
+            throw new ClientOutOfSyncException("Mismatched UIDs");
+        }
+        de = new DependencyEntry(tuid, Sets.newTreeSet(dds.keySet()), lmt);
+        dependencies.put(de.uid + lk, de);
+        this.localDependencies.put(de.uid, de);
+        return tuid;
     }
 }

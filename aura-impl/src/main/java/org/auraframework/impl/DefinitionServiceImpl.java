@@ -21,7 +21,6 @@ import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
-import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -34,6 +33,7 @@ import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -44,7 +44,6 @@ import com.google.common.collect.Sets;
 /**
  */
 public class DefinitionServiceImpl implements DefinitionService {
-
     private static final long serialVersionUID = -2488984746420077688L;
 
     @SuppressWarnings("unchecked")
@@ -206,9 +205,7 @@ public class DefinitionServiceImpl implements DefinitionService {
     /**
      * Get the last modification time for a set of preloads.
      * 
-     * FIXME: this should actually delegate to the definition factories, as
-     * there will be much more efficient methods of determining the last mod
-     * time for a given set of code.
+     * TODO: this will go away.
      */
     @Override
     public long getNamespaceLastMod(Collection<String> preloads) throws QuickFixException {
@@ -229,27 +226,22 @@ public class DefinitionServiceImpl implements DefinitionService {
     }
 
     /**
-     * Get the last mod for a def.
-     * 
-     * FIXME: we ignore the 'default' preloads, though this will recurse all the
-     * way to component to get the last mod.
+     * Get the last mod for a set of descriptorss.
      */
     @Override
-    public <T extends Definition> long getLastMod(DefDescriptor<T> desc) throws QuickFixException {
-        ContextService contextService = Aura.getContextService();
-        Set<DefDescriptor<?>> processed = Sets.newHashSet();
-        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+    public MasterDefRegistry getDefRegistry() {
+        ContextService cs = Aura.getContextService();
 
-        contextService.assertEstablished();
-        long lastMod = checkOneDef(desc, contextService, dependencies, processed, 0L);
-        lastMod = dependenciesHelper(dependencies, contextService, processed, lastMod);
-        T def = contextService.getCurrentContext().getDefRegistry().getDef(desc);
-        if (def != null) {
-            if (def instanceof BaseComponentDef) {
-                return preloadsHelper(((BaseComponentDef) def).getDependencies(), contextService, processed, lastMod);
-            }
-        }
-        return lastMod;
+        cs.assertEstablished();
+        return cs.getCurrentContext().getDefRegistry();
+    }
+
+    /**
+     * Get the last mod for a set of descriptorss.
+     */
+    @Override
+    public <T extends Definition> long getLastMod(String uid) {
+        return getDefRegistry().getLastMod(uid);
     }
 
     @Override

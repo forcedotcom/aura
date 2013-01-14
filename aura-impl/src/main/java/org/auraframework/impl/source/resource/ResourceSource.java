@@ -34,7 +34,8 @@ import org.auraframework.util.IOUtil;
 import org.auraframework.util.resource.ResourceLoader;
 
 /**
- * {@link Source} implementation for source code loaded as a resource from the Java classpath.
+ * {@link Source} implementation for source code loaded as a resource from the
+ * Java classpath.
  */
 public class ResourceSource<D extends Definition> extends Source<D> {
 
@@ -48,27 +49,28 @@ public class ResourceSource<D extends Definition> extends Source<D> {
     @Override
     public boolean addOrUpdate(CharSequence newContents) {
         Writer writer = null;
-        try{
-            try{
+        try {
+            try {
                 writer = resourceLoader.getWriter(getSystemId());
                 writer.write(newContents.toString());
-            }finally{
+            } finally {
                 writer.close();
             }
-        }catch(IOException e){
+        } catch (IOException e) {
             throw new AuraRuntimeException(e);
         }
         return true;
     }
 
     /**
-     * Provides a URL to the source object.  This will typically be either a
-     * {@code jar://} or a {@code file://} URL.  Note that this is the "real"
-     * URL (for location information), but that the {@link ResourceLoader} will
-     * have shadowed that as a {@code resource://} URL internally.
-     *
-     * @returns a URL to the source, as a String.  (Other kinds of sources may
-     *    need to return semi-valid URLs, but this one will always be valid.)
+     * Provides a URL to the source object. This will typically be either a
+     * {@code jar://} or a {@code file://} URL. Note that this is the "real" URL
+     * (for location information), but that the {@link ResourceLoader} will have
+     * shadowed that as a {@code resource://} URL internally.
+     * 
+     * @returns a URL to the source, as a String. (Other kinds of sources may
+     *          need to return semi-valid URLs, but this one will always be
+     *          valid.)
      */
     @Override
     public String getUrl() {
@@ -76,19 +78,20 @@ public class ResourceSource<D extends Definition> extends Source<D> {
     }
 
     /**
-     * Provides a location to the cache object, if any.  This may be {@code null}, or
-     * may be a filename.
-     * @throws ExecutionException 
+     * Provides a location to the cache object, if any. This may be {@code null}
+     * , or may be a filename.
+     * 
+     * @throws ExecutionException
      */
     @Override
     public URL getCacheUrl() {
         try {
-          return resourceLoader.getCachedResourceUrl(getSystemId());
+            return resourceLoader.getCachedResourceUrl(getSystemId());
         } catch (ExecutionException e) {
-            return null;  // Guess there's no (useful) cache...
+            return null; // Guess there's no (useful) cache...
         }
     }
- 
+
     @Override
     public boolean exists() {
         return resourceLoader.getRawResourceUrl(getSystemId()) != null;
@@ -98,7 +101,7 @@ public class ResourceSource<D extends Definition> extends Source<D> {
     public String getContents() {
         try {
             StringWriter sw = new StringWriter();
-            IOUtil.copyStream(getReader(), sw);
+            IOUtil.copyStream(getHashingReader(), sw);
             return sw.toString();
         } catch (IOException e) {
             throw new AuraRuntimeException(e);
@@ -113,7 +116,9 @@ public class ResourceSource<D extends Definition> extends Source<D> {
     @Override
     public Reader getReader() {
         InputStream is = resourceLoader.getResourceAsStream(getSystemId());
-        if (is == null) throw new AuraRuntimeException("Resource not found: " + getSystemId());
+        if (is == null) {
+            throw new AuraRuntimeException("Resource not found: " + getSystemId());
+        }
         return new InputStreamReader(is);
     }
 

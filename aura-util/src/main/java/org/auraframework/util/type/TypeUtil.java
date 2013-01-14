@@ -21,7 +21,6 @@ import org.auraframework.util.ServiceLocator;
 
 import com.google.common.collect.Maps;
 
-
 /**
  * Type conversion utility.
  */
@@ -33,54 +32,57 @@ public class TypeUtil {
 
     private static final TypeUtil instance = new TypeUtil();
 
-    private static final TypeUtil get(){
+    private static final TypeUtil get() {
         return instance;
     }
 
     private TypeUtil() {
-        for(Converter<?,?> converter : ServiceLocator.get().getAll(Converter.class)){
+        for (Converter<?, ?> converter : ServiceLocator.get().getAll(Converter.class)) {
             Class<?> fromClass = converter.getFrom();
             Class<?> toClass = converter.getTo();
-            if(fromClass == null || toClass == null){
-                System.err.println("Invalid converter not registered : "+converter);
-            }else{
+            if (fromClass == null || toClass == null) {
+                System.err.println("Invalid converter not registered : " + converter);
+            } else {
                 String from = fromClass.getName();
                 String to = toClass.getName();
                 Class<?>[] toParams = converter.getToParameters();
                 StringBuilder toParamNames = new StringBuilder();
-                if(toParams != null){
-                    for(Class<?> clz : toParams){
-                        if(toParamNames.length() > 0){
+                if (toParams != null) {
+                    for (Class<?> clz : toParams) {
+                        if (toParamNames.length() > 0) {
                             toParamNames.append(',');
                         }
                         toParamNames.append(clz.getSimpleName());
                     }
                 }
 
-                Map<String, Converter<?,?>> toMap = converters.get(from);
-                Map<String, Map<String, Converter<?,?>>> paramToMap = parameterizedConverters.get(from);
-                if(toMap == null){
+                Map<String, Converter<?, ?>> toMap = converters.get(from);
+                Map<String, Map<String, Converter<?, ?>>> paramToMap = parameterizedConverters.get(from);
+                if (toMap == null) {
                     toMap = Maps.newHashMap();
                     converters.put(from, toMap);
                 }
-                if(paramToMap == null){
+                if (paramToMap == null) {
                     paramToMap = Maps.newHashMap();
                     parameterizedConverters.put(from, paramToMap);
                 }
 
-                if(toParams != null){
-                    Map<String, Converter<?,?>> paramMap = paramToMap.get(to);
-                    if(paramMap == null){
+                if (toParams != null) {
+                    Map<String, Converter<?, ?>> paramMap = paramToMap.get(to);
+                    if (paramMap == null) {
                         paramMap = Maps.newHashMap();
                         paramToMap.put(to, paramMap);
                     }
-                    if(paramMap.containsKey(toParamNames.toString())){
-                        converter = new ConverterInitError<Object, Object>(String.format("More than one converter registered for %s to %s<%s>.  Using %s.", from, to, toParamNames.toString(), paramMap.get(toParamNames.toString())));
+                    if (paramMap.containsKey(toParamNames.toString())) {
+                        converter = new ConverterInitError<Object, Object>(String.format(
+                                "More than one converter registered for %s to %s<%s>.  Using %s.", from, to,
+                                toParamNames.toString(), paramMap.get(toParamNames.toString())));
                     }
                     paramMap.put(toParamNames.toString(), converter);
-                }else{
-                    if(toMap.containsKey(to)){
-                        converter = new ConverterInitError<Object, Object>(String.format("More than one converter registered for %s to %s.  Using %s.", from, to, toMap.get(to)));
+                } else {
+                    if (toMap.containsKey(to)) {
+                        converter = new ConverterInitError<Object, Object>(String.format(
+                                "More than one converter registered for %s to %s.  Using %s.", from, to, toMap.get(to)));
                     }
                     toMap.put(to, converter);
                 }
@@ -108,11 +110,12 @@ public class TypeUtil {
         return convert(value, to, of, true);
     }
 
-
     /**
-     * Attempts to convert value to the type specified by 'to'.  If 'of' is not null, it indicates that 'to' is a container of 'of' types.
-     *
-     * To add supported Conversions, drop a new implementation of Converter into the aura.util.type.converter directory.
+     * Attempts to convert value to the type specified by 'to'. If 'of' is not
+     * null, it indicates that 'to' is a container of 'of' types.
+     * 
+     * To add supported Conversions, drop a new implementation of Converter into
+     * the aura.util.type.converter directory.
      */
     @SuppressWarnings("unchecked")
     public static <F, T> T convert(F value, Class<T> to, String of, boolean trim) {
@@ -122,16 +125,16 @@ public class TypeUtil {
         }
 
         if (trim && value instanceof String) {
-            value = (F)((String)value).trim();
+            value = (F) ((String) value).trim();
         }
 
-        Class<F> from = (Class<F>)value.getClass();
+        Class<F> from = (Class<F>) value.getClass();
         if (of == null && to.isAssignableFrom(from)) {
-            return (T)value;
+            return (T) value;
         }
 
         Converter<F, T> converter = getConverter(from, to, of);
-        if(converter == null){
+        if (converter == null) {
             throw new ConversionException(String.format("No Converter found for %s to %s<%s>", from, to, of));
         }
         return converter.convert(value);
@@ -140,17 +143,17 @@ public class TypeUtil {
     @SuppressWarnings("unchecked")
     private static <F, T> Converter<F, T> getConverter(Class<F> from, Class<T> to, String of) {
         TypeUtil typeUtil = get();
-        if(of == null){
-            Map<String, Converter<?,?>> map = typeUtil.converters.get(from.getName());
-            if(map != null){
-                return (Converter<F,T>)map.get(to.getName());
+        if (of == null) {
+            Map<String, Converter<?, ?>> map = typeUtil.converters.get(from.getName());
+            if (map != null) {
+                return (Converter<F, T>) map.get(to.getName());
             }
-        }else{
+        } else {
             Map<String, Map<String, Converter<?, ?>>> converters = typeUtil.parameterizedConverters.get(from.getName());
-            if(converters != null){
-                Map<String, Converter<?,?>> paramConverters = converters.get(to.getName());
-                if(paramConverters != null){
-                    return (Converter<F,T>) paramConverters.get(of);
+            if (converters != null) {
+                Map<String, Converter<?, ?>> paramConverters = converters.get(to.getName());
+                if (paramConverters != null) {
+                    return (Converter<F, T>) paramConverters.get(of);
                 }
             }
         }
@@ -161,21 +164,21 @@ public class TypeUtil {
         return getConverter(from, to, of) != null;
     }
 
-    public static class ConversionException extends RuntimeException{
+    public static class ConversionException extends RuntimeException {
 
         private static final long serialVersionUID = 297189337708675095L;
 
-        public ConversionException(String msg){
+        public ConversionException(String msg) {
             super(msg);
         }
 
     }
 
-    private static class ConverterInitError<F,T> implements Converter<F, T>{
+    private static class ConverterInitError<F, T> implements Converter<F, T> {
 
         private final String error;
 
-        private ConverterInitError(String error){
+        private ConverterInitError(String error) {
             this.error = error;
         }
 
@@ -200,6 +203,5 @@ public class TypeUtil {
         }
 
     }
-
 
 }

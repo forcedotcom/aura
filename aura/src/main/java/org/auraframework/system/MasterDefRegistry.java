@@ -24,19 +24,20 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Master Definition Registry.
- *
- * All other (type-specific) registries are delegated to by a master def registry.
- * The master definition registry handles all of the compilation and cross registry
- * references.
+ * 
+ * All other (type-specific) registries are delegated to by a master def
+ * registry. The master definition registry handles all of the compilation and
+ * cross registry references.
  */
 public interface MasterDefRegistry {
 
     /**
      * Return the definition for this descriptor, or null if it does not exist.
-     *
-     * If the definition was not already compiled, this method will cause it
-     * to be compiled before it is returned. Any dependent definitions will be loaded.
-     *
+     * 
+     * If the definition was not already compiled, this method will cause it to
+     * be compiled before it is returned. Any dependent definitions will be
+     * loaded.
+     * 
      * @throws QuickFixException if there is a problem during compilation.
      */
     <D extends Definition> D getDef(DefDescriptor<D> descriptor) throws QuickFixException;
@@ -48,31 +49,32 @@ public interface MasterDefRegistry {
 
     /**
      * Given a descriptor that contains search patterns or wildcards, return a
-     * set of Descriptors for all existing Definitions who have source that exists.
-     * Does not compile the definitions if they were not already compiled, and does
-     * not guarantee that they can compile.
+     * set of Descriptors for all existing Definitions who have source that
+     * exists. Does not compile the definitions if they were not already
+     * compiled, and does not guarantee that they can compile.
      */
     <D extends Definition> Set<DefDescriptor<D>> find(DefDescriptor<D> matcher);
 
     /**
-     * Given a string that contains search patterns or wildcards, return a
-     * set of Descriptors for all existing Definitions who have source that exists.
-     * Does not compile the definitions if they were not already compiled, and does
-     * not guarantee that they can compile.
+     * Given a string that contains search patterns or wildcards, return a set
+     * of Descriptors for all existing Definitions who have source that exists.
+     * Does not compile the definitions if they were not already compiled, and
+     * does not guarantee that they can compile.
      */
     Set<DefDescriptor<?>> find(DescriptorFilter matcher);
 
     /**
-     * Returns true if the source related to the descriptor exists.  Does not
-     * compile the definition if it was not already compiled, and does not guarantee
-     * that it can compile.
+     * Returns true if the source related to the descriptor exists. Does not
+     * compile the definition if it was not already compiled, and does not
+     * guarantee that it can compile.
      */
     <D extends Definition> boolean exists(DefDescriptor<D> descriptor);
 
     /**
      * Add a local definition to the registry.
-     *
-     * The definition to be added must have a descriptor that matches the definition.
+     * 
+     * The definition to be added must have a descriptor that matches the
+     * definition.
      */
     <D extends Definition> void addLocalDef(D def);
 

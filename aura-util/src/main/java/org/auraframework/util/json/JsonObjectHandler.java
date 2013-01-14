@@ -20,9 +20,11 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 /**
- * Base (default) implementation of JsonObjectHandler. When an object is encountered, put will be called for each entry
- * in the map. This implementation adds each item to a Map<String, Object>. If you would like to do something else with
- * each entry, extend this class and override all of the methods.
+ * Base (default) implementation of JsonObjectHandler. When an object is
+ * encountered, put will be called for each entry in the map. This
+ * implementation adds each item to a Map<String, Object>. If you would like to
+ * do something else with each entry, extend this class and override all of the
+ * methods.
  */
 public class JsonObjectHandler implements JsonHandler {
 

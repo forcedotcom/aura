@@ -15,26 +15,32 @@
  */
 package org.auraframework.util;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.auraframework.util.json.JsonReader;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 
 /**
  * A place to put common UI testing specific helper methods
  */
 
 public class AuraUITestingUtil {
-	private WebDriver d;
-	
-	public AuraUITestingUtil(WebDriver d){
-		this.d = d;
-	}
-	
-    public WebElement findElementAndTypeEventNameInIt(String event){
+    private final WebDriver d;
+
+    public AuraUITestingUtil(WebDriver d) {
+        this.d = d;
+    }
+
+    public WebElement findElementAndTypeEventNameInIt(String event) {
         String locatorTemplate = "#%s > input.uiInputText.uiInput";
         String locator = String.format(locatorTemplate, event);
         WebElement input = d.findElement(By.cssSelector(locator));
@@ -53,7 +59,8 @@ public class AuraUITestingUtil {
 
     private void assertClassNameContains(WebElement element, String namePart, boolean doesContain) {
         String className = element.getAttribute("class").trim();
-        className = " " + className + " "; // so we wont get false positive for nonactive if looking for active
+        className = " " + className + " "; // so we wont get false positive for
+                                           // nonactive if looking for active
         namePart = " " + namePart + " ";
 
         if (doesContain) {
@@ -64,28 +71,28 @@ public class AuraUITestingUtil {
                     className.contains(namePart));
         }
     }
-    
-    public String getValueFromRootExpr(String val){
-        String exp = "window.$A.getRoot().get('"+val+"')";
+
+    public String getValueFromRootExpr(String val) {
+        String exp = "window.$A.getRoot().get('" + val + "')";
         return exp;
     }
-    
-    public String getFindAtRootExpr(String cmp){
-        String exp = "window.$A.getRoot().find('"+cmp+"')";
+
+    public String getFindAtRootExpr(String cmp) {
+        String exp = "window.$A.getRoot().find('" + cmp + "')";
         return exp;
     }
-    
-    public void pressEnter(WebElement e){
+
+    public void pressEnter(WebElement e) {
         e.sendKeys("\n");
     }
 
-    public void pressTab(WebElement e){
+    public void pressTab(WebElement e) {
         e.sendKeys("\t");
     }
-    
+
     /**
-     * Execute the given javascript and args in the current window. Fail if the result is not a boolean. Otherwise,
-     * return the result.
+     * Execute the given javascript and args in the current window. Fail if the
+     * result is not a boolean. Otherwise, return the result.
      */
     public boolean getBooleanEval(String javascript, Object... args) {
         Object status;
@@ -98,67 +105,80 @@ public class AuraUITestingUtil {
             Assert.fail("Got unexpected return value: for " + javascript + "(" + args + ") :\n" + status.toString());
         }
 
-        return ((Boolean)status).booleanValue();
+        return ((Boolean) status).booleanValue();
     }
-    
+
     /**
-     * Evaluate the given javascript in the current window. Upon completion, if the framework has loaded and is in a
-     * test mode, then assert that there are no uncaught javascript errors.
+     * Evaluate the given javascript in the current window. Upon completion, if
+     * the framework has loaded and is in a test mode, then assert that there
+     * are no uncaught javascript errors.
      * <p>
-     * As an implementation detail, we accomplish this by wrapping the given javascript so that we can perform the error
-     * check on each evaluation without doing a round-trip to the browser (which might be long in cases of remote test
-     * runs).
+     * As an implementation detail, we accomplish this by wrapping the given
+     * javascript so that we can perform the error check on each evaluation
+     * without doing a round-trip to the browser (which might be long in cases
+     * of remote test runs).
      * 
-     * @return the result of calling {@link JavascriptExecutor#executeScript(String, Object...) with the given
-     *         javascript and args.
+     * @return the result of calling
+     *         {@link JavascriptExecutor#executeScript(String, Object...) with
+     *         the given javascript and args.
      */
     public Object getEval(final String javascript, Object... args) {
         /**
-         * Wrap the given javascript to evaluate and then check for any collected errors. Then, return the result and
-         * errors back to the WebDriver. We must return as an array because
-         * {@link JavascriptExecutor#executeScript(String, Object...) cannot handle Objects as return values."
+         * Wrap the given javascript to evaluate and then check for any
+         * collected errors. Then, return the result and errors back to the
+         * WebDriver. We must return as an array because
+         * {@link JavascriptExecutor#executeScript(String, Object...) cannot
+         * handle Objects as return values."
          */
         String escapedJavascript = StringEscapeUtils.escapeJavaScript(javascript);
-        String wrapper = "var ret;" + //
-                String.format("var func = new Function('arguments', \"%s\");\n", escapedJavascript) + //
-                "var ret = func.call(this, arguments);\n" + //
-                "var errors = (window.$A && window.$A.test) ? window.$A.test.getErrors() : '';\n" + //
-                "return [ret, errors];";
+        String wrapper = "var ret,scriptExecException;"
+                + String.format("var func = new Function('arguments', \"%s\");\n", escapedJavascript) + "try\n{"
+                + " ret = func.call(this, arguments);\n" + "}\n" + "catch(e){\n"
+                + " scriptExecException = e.message || e.toString();\n" + "}\n"
+                + //
+                "var jstesterrors = (window.$A && window.$A.test) ? window.$A.test.getErrors() : '';\n"
+                + "return [ret, jstesterrors, scriptExecException];";
 
         try {
             @SuppressWarnings("unchecked")
-            List<Object> wrapResult = (List<Object>)getRawEval(wrapper, args);
-            Assert.assertEquals("Wrapped javsascript execution expects an array of exactly 2 elements", 2, wrapResult.size());
-            String errors = (String)wrapResult.get(1);
+            List<Object> wrapResult = (List<Object>) getRawEval(wrapper, args);
+            Assert.assertEquals("Wrapped javsascript execution expects an array of exactly 3 elements", 3,
+                    wrapResult.size());
+            Object exception = wrapResult.get(2);
+            Assert.assertNull("Following JS Exception occured while evaluating provided script:\n" + exception + "\n"
+                    + "Arguments: (" + Arrays.toString(args) + ")\n" + "Script:\n" + javascript + "\n", exception);
+            String errors = (String) wrapResult.get(1);
             assertJsTestErrors(errors);
             return wrapResult.get(0);
         } catch (WebDriverException e) {
-            Assert.fail("Script execution failed.\n" + //
-                    "Arguments: (" + Arrays.toString(args) + ")\n" + //
-                    "Script:\n" + javascript + "\n");
+            // shouldn't come here that often as we are also wrapping the js
+            // script being passed to us in try/catch above
+            Assert.fail("Script execution failed.\n" + "Failure Message: " + e.getMessage() + "\n" + "Arguments: ("
+                    + Arrays.toString(args) + ")\n" + "Script:\n" + javascript + "\n");
             throw e;
         }
     }
-    
+
     /**
      * Returns value of executing javascript in current window.
-     *
-     * @see org.openqa.selenium.JavscriptExecutor#executeSript(String, Object...)
+     * 
+     * @see org.openqa.selenium.JavscriptExecutor#executeSript(String,
+     *      Object...)
      */
     public Object getRawEval(String javascript, Object... args) {
-        return ((JavascriptExecutor)d).executeScript(javascript, args);
+        return ((JavascriptExecutor) d).executeScript(javascript, args);
     }
-    
+
     /**
-     * Process the results from $A.test.getErrors(). If there were any errors, then fail the test accordingly.
+     * Process the results from $A.test.getErrors(). If there were any errors,
+     * then fail the test accordingly.
      * 
-     * @param errors
-     *            the raw results from invoking $A.test.getErrors()
+     * @param errors the raw results from invoking $A.test.getErrors()
      */
     public void assertJsTestErrors(String errors) {
         if (!errors.isEmpty()) {
             @SuppressWarnings("unchecked")
-            List<Map<String, Object>> errorsList = (List<Map<String, Object>>)new JsonReader().read(errors);
+            List<Map<String, Object>> errorsList = (List<Map<String, Object>>) new JsonReader().read(errors);
             StringBuffer errorMessage = new StringBuffer();
             for (Map<String, Object> error : errorsList) {
                 errorMessage.append(error.get("message") + "\n");
@@ -166,8 +186,19 @@ public class AuraUITestingUtil {
             Assert.fail(errorMessage.toString());
         }
     }
-    
-    public String prepareReturnStatement(String returnStatement){
-        return "return "+returnStatement;
+
+    public String prepareReturnStatement(String returnStatement) {
+        return "return " + returnStatement;
     }
+
+    public String findGlobalIdForComponentWithGivenProperties(String fromClause, String whereClause) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("var cmp = $A.getQueryStatement().from('component').field('globalId').");
+        sb.append(fromClause + ".where(\"" + whereClause + "\")" + ".query();\n");
+        sb.append("$A.test.assertEquals(1, cmp.rowCount,'Expected to find only one component with given properties.');\n");
+        sb.append("return cmp.rows[0].globalId;");
+        Object returnVal = getEval(sb.toString());
+        return returnVal == null ? null : returnVal.toString();
+    }
+
 }

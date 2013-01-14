@@ -21,8 +21,9 @@ import org.auraframework.instance.Action;
 import org.auraframework.instance.ValueProvider;
 
 /**
- * Controller definitions are part of a component definition, providing metadata from a controller
- * that the component definition needs to know like what actions and types of data are exposed.
+ * Controller definitions are part of a component definition, providing metadata
+ * from a controller that the component definition needs to know like what
+ * actions and types of data are exposed.
  */
 public interface ControllerDef extends ValueProvider, Definition, SubDefinitionProvider<ActionDef> {
     @Override

@@ -15,7 +15,9 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.RegisterEventDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.source.StringSource;
@@ -32,18 +34,24 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
     public void testRegisterEventHandler() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor, "<aura:component><aura:registerevent name='click' type='aura:click' description='The Description' access='global'/></aura:component>", "myID",Format.XML);
+        StringSource<ComponentDef> source = new StringSource<ComponentDef>(
+                descriptor,
+                "<aura:component><aura:registerevent name='click' type='aura:click' description='The Description' access='global'/></aura:component>",
+                "myID", Format.XML);
         ComponentDef def2 = parser.parse(descriptor, source);
         RegisterEventDef red = def2.getRegisterEventDefs().get("click");
         assertNotNull(red);
-        assertEquals("click",red.getName());
+        assertEquals("click", red.getName());
         assertTrue(red.isGlobal());
     }
 
     public void testRegisterEventHandlerPublicAccess() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor, "<aura:component><aura:registerevent name='aura:click' description='The Description' access='fakeAccessLevel'/></aura:component>", "myID",Format.XML);
+        StringSource<ComponentDef> source = new StringSource<ComponentDef>(
+                descriptor,
+                "<aura:component><aura:registerevent name='aura:click' description='The Description' access='fakeAccessLevel'/></aura:component>",
+                "myID", Format.XML);
         try {
             parser.parse(descriptor, source);
             fail("Should have thrown AuraException because access level isn't public or global");
@@ -55,7 +63,10 @@ public class RegisterEventHandlerTest extends AuraImplTestCase {
     public void testRegisterEventHandlerWithTextBetweenTags() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor, "<aura:component><aura:registerevent name='aura:click' description='The Description' access='global'>invalidtext</aura:registerevent></aura:component>", "myID",Format.XML);
+        StringSource<ComponentDef> source = new StringSource<ComponentDef>(
+                descriptor,
+                "<aura:component><aura:registerevent name='aura:click' description='The Description' access='global'>invalidtext</aura:registerevent></aura:component>",
+                "myID", Format.XML);
         try {
             parser.parse(descriptor, source);
             fail("Should have thrown AuraException because text is between aura:registerevent tags");

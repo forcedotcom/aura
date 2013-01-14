@@ -15,7 +15,9 @@
  */
 package org.auraframework.impl.root;
 
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -43,7 +45,8 @@ public class AttributeDefTest extends AuraImplTestCase {
                     vendor.makeLocation("filename1", 5, 5, 0));
             testAttributeDef.validateDefinition();
             fail("Should have thrown AuraException for null name in AttributeDef's AttributeDefDescriptor");
-        } catch (AuraRuntimeException expected) {}
+        } catch (AuraRuntimeException expected) {
+        }
 
         testAttributeDef = vendor.makeAttributeDefWithNulls(testAttributeDescriptorName, null, vendor.getTypeDef()
                 .getDescriptor(), vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
@@ -197,16 +200,16 @@ public class AttributeDefTest extends AuraImplTestCase {
     }
 
     public void testIsRequired() {
-        assertFalse("The attribute isn't required",vendor.makeAttributeDef().isRequired());
+        assertFalse("The attribute isn't required", vendor.makeAttributeDef().isRequired());
         assertTrue("The attribute is required", vendor.makeAttributeDef(null, null, null, true, null, null)
                 .isRequired());
     }
 
     public void testGetName() {
-        assertEquals(vendor.getAttributeName(),vendor.makeAttributeDef().toString());
+        assertEquals(vendor.getAttributeName(), vendor.makeAttributeDef().toString());
     }
 
-    public void testGetDescription()throws Exception{
+    public void testGetDescription() throws Exception {
         String cmpMarkup = "<aura:component >%s</aura:component>";
         String markup = String.format(cmpMarkup,
                 "<aura:attribute type='String' name='attr' description='Describe the attribute'/>");
@@ -266,14 +269,14 @@ public class AttributeDefTest extends AuraImplTestCase {
 
     public void testValidateDefinition() throws Exception {
         Location location = vendor.makeLocation("filename1", 5, 5, 0);
-        try{
+        try {
             vendor.makeAttributeDefWithNulls(testAttributeDescriptorName, null, vendor.getTypeDefDescriptor(),
                     vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue", location), false,
                     AttributeDef.SerializeToType.INVALID, location).validateDefinition();
             fail("Did not get InvalidDefinitionException for Serialize to type INVALID");
         } catch (InvalidDefinitionException e) {
             assertEquals("Invalid serializeTo value", e.getMessage());
-            assertEquals(location,e.getLocation());
+            assertEquals(location, e.getLocation());
         }
     }
 

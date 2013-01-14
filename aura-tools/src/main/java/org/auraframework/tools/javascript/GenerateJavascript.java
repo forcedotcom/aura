@@ -31,7 +31,9 @@ public class GenerateJavascript {
         File dest = AuraImplFiles.AuraResourceJavascriptDirectory.asFile();
         if (!dest.exists()) {
             dest.mkdirs();
-        } else if (!dest.isDirectory()) { throw new IOException(dest.getPath() + " is supposed to be a directory"); }
+        } else if (!dest.isDirectory()) {
+            throw new IOException(dest.getPath() + " is supposed to be a directory");
+        }
         js.parse();
         js.generate(dest, false);
     }

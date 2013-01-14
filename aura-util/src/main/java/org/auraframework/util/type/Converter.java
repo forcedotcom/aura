@@ -15,28 +15,27 @@
  */
 package org.auraframework.util.type;
 
-
 /**
- * Used by aura.util.type.TypeUtil
- * Defines a type converter that converts an object of type F to an object of type T.
- * The implementations are located by naming convention in the aura.util.type.converter package.
- * For Array types, substitute the [] in the type signature with the word "Array".
+ * Used by aura.util.type.TypeUtil Defines a type converter that converts an
+ * object of type F to an object of type T. The implementations are located by
+ * naming convention in the aura.util.type.converter package. For Array types,
+ * substitute the [] in the type signature with the word "Array".
  * 
  * So, If you're trying to convert from a String[] to an Integer[], you would
  * create an implementation called StringArrayToIntegerArrayConverter.
  **/
 public interface Converter<F, T> {
-    
+
     /**
      * 
      * @param value
-     * @return F converted into a T 
+     * @return F converted into a T
      */
     T convert(F value);
-    
+
     Class<F> getFrom();
-    
+
     Class<T> getTo();
-    
+
     Class<?>[] getToParameters();
 }

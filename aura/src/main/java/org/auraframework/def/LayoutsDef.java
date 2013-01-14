@@ -22,6 +22,8 @@ import java.util.Collection;
 public interface LayoutsDef extends RootDefinition {
     @Override
     public DefDescriptor<LayoutsDef> getDescriptor();
+
     public Collection<LayoutDef> getLayoutDefs();
+
     public LayoutDef getLayoutDef(String name);
 }

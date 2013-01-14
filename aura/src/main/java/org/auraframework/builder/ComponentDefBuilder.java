@@ -19,5 +19,5 @@ import org.auraframework.def.ComponentDef;
 
 /**
  */
-public interface ComponentDefBuilder extends BaseComponentDefBuilder<ComponentDef>{
+public interface ComponentDefBuilder extends BaseComponentDefBuilder<ComponentDef> {
 }

@@ -21,8 +21,7 @@ import org.auraframework.system.Annotations.Model;
 @Model
 public class PlayerFacetModel {
     @AuraEnabled
-    public String getPlayerAssociation(){
+    public String getPlayerAssociation() {
         return "Major League Baseball Players Association";
     }
 }
- 

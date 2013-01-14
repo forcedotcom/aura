@@ -15,23 +15,26 @@
  */
 package org.auraframework.impl.root.component.rendering;
 
+import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.annotation.TestLabels;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.TestLabels;
 
 import com.google.common.base.Function;
 
 /**
- * This class has tests for rendering components on a page. Components/applications can be renderer server side or
- * client side. A detection logic checks if a component can be rendered serverside. This detection logic can be forces
- * by including a "render = 'server'" attribute on the top level component tag. By default the detection logic is auto
- * on. This 'render' specification overrides the detection logic. If render = 'server', the aura servlet assumes the
- * component can be rendered serverside and tries to render it. If render = 'client', the aura servlet assumes the
- * component should be rendered clientside. In context of tests, Applications and components can be used
- * interchangeably.
- *
+ * This class has tests for rendering components on a page.
+ * Components/applications can be renderer server side or client side. A
+ * detection logic checks if a component can be rendered serverside. This
+ * detection logic can be forces by including a "render = 'server'" attribute on
+ * the top level component tag. By default the detection logic is auto on. This
+ * 'render' specification overrides the detection logic. If render = 'server',
+ * the aura servlet assumes the component can be rendered serverside and tries
+ * to render it. If render = 'client', the aura servlet assumes the component
+ * should be rendered clientside. In context of tests, Applications and
+ * components can be used interchangeably.
+ * 
  * @hierarchy Aura.Components.Renderer
  * @priority high
  * @userStory a07B0000000EWWg
@@ -43,8 +46,9 @@ public class ComponentRenderingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Verify that text, expressions and HTML can be rendered serverside. Text, Expression and Html are the basic
-     * building blocks of aura. These can be rendered server side. This test verifies that.
+     * Verify that text, expressions and HTML can be rendered serverside. Text,
+     * Expression and Html are the basic building blocks of aura. These can be
+     * rendered server side. This test verifies that.
      */
     public void testServerSideRenderingOfBasicComponents() throws Exception {
         String xpath = "//div[contains(@class,'%s')]";
@@ -53,7 +57,8 @@ public class ComponentRenderingUITest extends WebDriverTestCase {
                 { "rightAngleQuotationMark", "»" }, { "apostrophe", "'" }, { "euro", "€" } };
         String[][] XMLEntities = { { "greaterThan", ">" }, { "lessThan", "<" }, { "ampersand", "&" } };
         openNoAura("/auratest/test_ServerRendering.app");
-        // The component has no 'render' specification, redering logic should be in auto detect mode.
+        // The component has no 'render' specification, redering logic should be
+        // in auto detect mode.
         assertFalse("Aura client engine should not be present on page.", isAuraClientEnginePresentOnPage());
         // Verify HTML entities are rendered
         assertTrue(isElementPresent(By.xpath("//div[contains(@class,'textComponent')]")));
@@ -78,7 +83,8 @@ public class ComponentRenderingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Verify that Components that have a server side renderer can still use the render='client' specification.
+     * Verify that Components that have a server side renderer can still use the
+     * render='client' specification.
      */
     public void testCmpWithJavaRendererButRenderEqualsClient() throws Exception {
         open("/test/test_ServerRendererOnly.cmp");
@@ -93,16 +99,19 @@ public class ComponentRenderingUITest extends WebDriverTestCase {
     /**
      * Verify that an application that was rendered totally on the server.
      * <ol>
-     * <li>Verify that Components that have a server side renderer and a render='server' specification will be renderer
-     * server side. There will be no aura client engine on the page.</li>
-     * <li>Overriding facet specification for 'render': The sample application(test_SimpleServerRenderedPage.app) has a
-     * component as facet: test:test_JavaRndr_Component test:test_JavaRndr_Component has a render='client'
-     * specification. But its body has nothing that cannot be rendered serverside. So this component's render tag is not
-     * considered at all.</li>
-     * <li>The inner facet is an interface. This has both a client renderer and server renderer. Only the server
-     * renderer is used.</li>
+     * <li>Verify that Components that have a server side renderer and a
+     * render='server' specification will be renderer server side. There will be
+     * no aura client engine on the page.</li>
+     * <li>Overriding facet specification for 'render': The sample
+     * application(test_SimpleServerRenderedPage.app) has a component as facet:
+     * test:test_JavaRndr_Component test:test_JavaRndr_Component has a
+     * render='client' specification. But its body has nothing that cannot be
+     * rendered serverside. So this component's render tag is not considered at
+     * all.</li>
+     * <li>The inner facet is an interface. This has both a client renderer and
+     * server renderer. Only the server renderer is used.</li>
      * </ol>
-     *
+     * 
      * <pre>
      *     test_SimpleServerRenderedPage.app   render = 'server'
      *     {
@@ -131,10 +140,12 @@ public class ComponentRenderingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Verify forcing interactive components to be rendered serverside does not blow up aura. Test Cases:
+     * Verify forcing interactive components to be rendered serverside does not
+     * blow up aura. Test Cases:
      * <ol>
-     * <li>Components/Application that should ideally be renderered client side can be rendered server side by using the
-     * render='server' specification. This will not blow up the page. It will just be unusable.</li>
+     * <li>Components/Application that should ideally be renderered client side
+     * can be rendered server side by using the render='server' specification.
+     * This will not blow up the page. It will just be unusable.</li>
      * <li>Specifying preload on the component has no significance.</li>
      * </ol>
      */
@@ -154,7 +165,8 @@ public class ComponentRenderingUITest extends WebDriverTestCase {
                 public Boolean apply(WebDriver input) {
                     return isAuraFrameworkReady();
                 }
-            }, 10); // give it only 10sec for these tests or they'll take too long for the neg cases
+            }, 10); // give it only 10sec for these tests or they'll take too
+                    // long for the neg cases
         } catch (TimeoutException e) {
             return false;
         }

@@ -49,7 +49,8 @@ import org.auraframework.util.json.JsonReader;
 import com.google.common.collect.Lists;
 
 /**
- * TODO(W-1386863): investigate why/fix the thread hostile nature of these tests.
+ * TODO(W-1386863): investigate why/fix the thread hostile nature of these
+ * tests.
  */
 @UnAdaptableTest
 @WebDriverTest
@@ -63,7 +64,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
     }
 
     private static class FailTestCase extends WebDriverTestCase {
-        private Throwable cause;
+        private final Throwable cause;
 
         private FailTestCase(DefDescriptor<TestSuiteDef> descriptor, Throwable cause) {
             super(descriptor.getQualifiedName());
@@ -226,27 +227,28 @@ public class ComponentJSTestSuiteTest extends TestSuite {
 
         public void testRun() throws Throwable {
             open(getUrl(), Mode.AUTOJSTEST);
-            String ret = (String)auraUITestingUtil.getEval(String.format("return window.aura.test.run('%s', '%s')",
+            String ret = (String) auraUITestingUtil.getEval(String.format("return window.aura.test.run('%s', '%s')",
                     AuraTextUtil.escapeForJavascriptString(caseDef.getName()),
                     AuraTextUtil.escapeForJavascriptString(suite.getCode())));
             if (ret != null && !"null".equals(ret)) {
                 @SuppressWarnings("unchecked")
-                Map<String, Object> e = (Map<String, Object>)new JsonReader().read(ret);
-                fail((String)e.get("message"));
+                Map<String, Object> e = (Map<String, Object>) new JsonReader().read(ret);
+                fail((String) e.get("message"));
             }
-            // Actions run on servers need special handling because their call back methods are called
+            // Actions run on servers need special handling because their call
+            // back methods are called
             // asynchronously.
             // This check is to make sure all such calls were complete
-            waitForCondition("return window.aura.test.isComplete()", 30); 
+            waitForCondition("return window.aura.test.isComplete()", 30);
         }
-        
+
         @Override
         public Set<BrowserType> getTargetBrowsers() {
             return targetBrowsers;
         }
 
         @Override
-        public Set<BrowserType> getExcludedBrowsers(){
+        public Set<BrowserType> getExcludedBrowsers() {
             return excludedBrowsers;
         }
     }

@@ -15,7 +15,9 @@
  */
 package org.auraframework.def;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -33,18 +35,19 @@ public interface BaseComponentDef extends RootDefinition {
 
     /**
      * Get the set of dependencies declared on this component.
-     *
-     * These dependencies must be loaded for the component to be functional, either
-     * at the initial load time or before rendering. These dependencies are in the
-     * form of DescriptorFilters which can then be used to match the actual descriptors.
-     *
+     * 
+     * These dependencies must be loaded for the component to be functional,
+     * either at the initial load time or before rendering. These dependencies
+     * are in the form of DescriptorFilters which can then be used to match the
+     * actual descriptors.
+     * 
      * @return the list of declared dependencies for the component.
      */
     List<DependencyDef> getDependencies();
 
     /**
      * Get the event handlers for the component.
-     *
+     * 
      * @return all the handlers on this component, including those inherited
      * @throws QuickFixException
      */
@@ -76,7 +79,9 @@ public interface BaseComponentDef extends RootDefinition {
 
     DefDescriptor<ComponentDef> getTemplateDefDescriptor();
 
-    public static enum RenderType{SERVER,CLIENT,AUTO};
+    public static enum RenderType {
+        SERVER, CLIENT, AUTO
+    };
 
     RenderType getRender();
 
@@ -86,13 +91,17 @@ public interface BaseComponentDef extends RootDefinition {
 
     boolean hasLocalDependencies() throws QuickFixException;
 
-    public static enum WhitespaceBehavior{
-        OPTIMIZE, /**< keep or eliminate insignificant whitespace as the framework determines is best */ 
-        PRESERVE  /**< treat all whitespace as significant, hence preserving it  */
-        };
-    
+    public static enum WhitespaceBehavior {
+        OPTIMIZE, /**
+         * < keep or eliminate insignificant whitespace as the
+         * framework determines is best
+         */
+        PRESERVE
+        /** < treat all whitespace as significant, hence preserving it */
+    };
+
     public static final WhitespaceBehavior DefaultWhitespaceBehavior = WhitespaceBehavior.OPTIMIZE;
-    
+
     WhitespaceBehavior getWhitespaceBehavior();
-    
+
 }

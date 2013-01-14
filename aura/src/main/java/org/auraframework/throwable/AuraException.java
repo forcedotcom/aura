@@ -18,18 +18,17 @@ package org.auraframework.throwable;
 import org.auraframework.system.Location;
 
 /**
- * Aura-related exception which should be handled by client code,
- * and from which normal execution should always be recoverable.
- *
- * AuraExceptions are the only exceptions that may occur during
- * normal and expected execution, and as such, subclasses of
- * AuraException are the only checked exceptions that should
- * appear in the Aura API.
- *
- * This is an abstract class since catching a AuraException directly
- * would not be descriptive enough for client code to understand what
- * it needs to recover from.
- *
+ * Aura-related exception which should be handled by client code, and from which
+ * normal execution should always be recoverable.
+ * 
+ * AuraExceptions are the only exceptions that may occur during normal and
+ * expected execution, and as such, subclasses of AuraException are the only
+ * checked exceptions that should appear in the Aura API.
+ * 
+ * This is an abstract class since catching a AuraException directly would not
+ * be descriptive enough for client code to understand what it needs to recover
+ * from.
+ * 
  * @see AuraError
  * @see AuraRuntimeException
  */
@@ -39,7 +38,7 @@ public abstract class AuraException extends Exception implements AuraExceptionIn
     private final String extraMessage;
 
     protected AuraException(String msg, Location l, Throwable t, String extraMessage) {
-        super(msg,t);
+        super(msg, t);
         if (l != null) {
             AuraExceptionUtil.addLocation(l, this);
         }

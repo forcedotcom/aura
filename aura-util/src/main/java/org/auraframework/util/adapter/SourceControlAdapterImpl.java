@@ -15,10 +15,11 @@
  */
 package org.auraframework.util.adapter;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
-
-public class SourceControlAdapterImpl implements SourceControlAdapter{
+public class SourceControlAdapterImpl implements SourceControlAdapter {
 
     @Override
     public boolean canCheckout() {
@@ -27,29 +28,29 @@ public class SourceControlAdapterImpl implements SourceControlAdapter{
 
     @Override
     public void checkout(File f) {
-        //TODO: add to stage?
+        // TODO: add to stage?
     }
 
     @Override
     public void add(File f) {
-        //TODO: add to stage?
+        // TODO: add to stage?
     }
 
     @Override
     public boolean writeIfDifferent(Appendable newData, File file) throws IOException {
         FileWriter writer = null;
 
-        if(file.exists()){
+        if (file.exists()) {
             file.delete();
         }
         writer = new FileWriter(file);
-        try{
+        try {
             writer.write(newData.toString());
             writer.close();
             // For the finally clause.
             writer = null;
             return true;
-        }finally{
+        } finally {
             if (writer != null) {
                 try {
                     writer.close();

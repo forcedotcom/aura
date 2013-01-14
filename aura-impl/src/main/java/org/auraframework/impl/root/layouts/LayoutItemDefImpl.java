@@ -18,8 +18,6 @@ package org.auraframework.impl.root.layouts;
 import java.io.IOException;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LayoutItemDef;
@@ -33,18 +31,21 @@ import org.auraframework.throwable.quickfix.RemoveBodyQuickFix;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
+import com.google.common.collect.Lists;
+
 /**
  */
-public class LayoutItemDefImpl extends DefinitionImpl<LayoutItemDef> implements LayoutItemDef{
+public class LayoutItemDefImpl extends DefinitionImpl<LayoutItemDef> implements LayoutItemDef {
 
     /**
          */
-        private static final long serialVersionUID = -717942308004793881L;
-        private final List<ComponentDefRef> body;
+    private static final long serialVersionUID = -717942308004793881L;
+    private final List<ComponentDefRef> body;
     private final String cache;
     private final String container;
     private final Object action;
     private final String layoutName;
+
     /**
      * @param builder
      */
@@ -57,9 +58,9 @@ public class LayoutItemDefImpl extends DefinitionImpl<LayoutItemDef> implements 
         this.layoutName = builder.layoutName;
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<LayoutItemDef>{
+    public static class Builder extends DefinitionImpl.BuilderImpl<LayoutItemDef> {
 
-        public Builder(){
+        public Builder() {
             super(LayoutItemDef.class);
         }
 
@@ -74,16 +75,16 @@ public class LayoutItemDefImpl extends DefinitionImpl<LayoutItemDef> implements 
             return new LayoutItemDefImpl(this);
         }
 
-        public Builder addComponentDefRef(ComponentDefRef ref){
-            if(body == null){
+        public Builder addComponentDefRef(ComponentDefRef ref) {
+            if (body == null) {
                 body = Lists.newArrayList();
             }
             body.add(ref);
             return this;
         }
 
-        public Builder addComponentDefRefs(List<? extends ComponentDefRef> refs){
-            if(body == null){
+        public Builder addComponentDefRefs(List<? extends ComponentDefRef> refs) {
+            if (body == null) {
                 body = Lists.newArrayList();
             }
             body.addAll(refs);
@@ -92,7 +93,7 @@ public class LayoutItemDefImpl extends DefinitionImpl<LayoutItemDef> implements 
 
         /**
          * Sets the cache for this instance.
-         *
+         * 
          * @param cache The cache.
          */
         public void setCache(String cache) {
@@ -101,7 +102,7 @@ public class LayoutItemDefImpl extends DefinitionImpl<LayoutItemDef> implements 
 
         /**
          * Sets the container for this instance.
-         *
+         * 
          * @param container The container.
          */
         public void setContainer(String container) {
@@ -110,7 +111,7 @@ public class LayoutItemDefImpl extends DefinitionImpl<LayoutItemDef> implements 
 
         /**
          * Sets the action for this instance.
-         *
+         * 
          * @param action The action.
          */
         public void setAction(Object action) {
@@ -119,7 +120,7 @@ public class LayoutItemDefImpl extends DefinitionImpl<LayoutItemDef> implements 
 
         /**
          * Sets the layoutName for this instance.
-         *
+         * 
          * @param layoutName The layoutName.
          */
         public void setLayoutName(String layoutName) {
@@ -135,10 +136,10 @@ public class LayoutItemDefImpl extends DefinitionImpl<LayoutItemDef> implements 
     @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
-        if(!AuraTextUtil.isNullEmptyOrWhitespace(cache)){
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(cache)) {
             json.writeMapEntry("cache", cache);
         }
-        json.writeMapEntry("body",getBody());
+        json.writeMapEntry("body", getBody());
         json.writeMapEntry("container", container);
         json.writeMapEntry("action", action);
         json.writeMapEnd();
@@ -157,35 +158,38 @@ public class LayoutItemDefImpl extends DefinitionImpl<LayoutItemDef> implements 
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
-        if(this.action != null && this.body != null && !this.body.isEmpty()){
-            throw new BothActionAndBodyDefinedException("layoutItem should have only either an action or markup but not both", getLocation());
-        }
-        else if(this.action == null && (this.body == null || this.body.isEmpty())){
-            throw new BothActionAndBodyDefinedException("layoutItem should have either an action or markup", getLocation());
+        if (this.action != null && this.body != null && !this.body.isEmpty()) {
+            throw new BothActionAndBodyDefinedException(
+                    "layoutItem should have only either an action or markup but not both", getLocation());
+        } else if (this.action == null && (this.body == null || this.body.isEmpty())) {
+            throw new BothActionAndBodyDefinedException("layoutItem should have either an action or markup",
+                    getLocation());
         }
     }
 
-    private DefDescriptor<?> getLayoutsDesc(){
-        return ((SubDefDescriptor<?,?>)descriptor).getParentDescriptor();
+    private DefDescriptor<?> getLayoutsDesc() {
+        return ((SubDefDescriptor<?, ?>) descriptor).getParentDescriptor();
     }
 
-    private String getLayoutName(){
+    private String getLayoutName() {
         return this.layoutName;
     }
 
-    private String getQuery() throws QuickFixException{
-        return "//layouts/layout[@name=\""+this.getLayoutName()+"\"]/layoutItem[@container=\""+this.getContainer()+"\"]";
+    private String getQuery() throws QuickFixException {
+        return "//layouts/layout[@name=\"" + this.getLayoutName() + "\"]/layoutItem[@container=\""
+                + this.getContainer() + "\"]";
     }
 
-    private LayoutItemDef getDef(){
+    private LayoutItemDef getDef() {
         return this;
     }
 
     private class BothActionAndBodyDefinedException extends QuickFixException {
-                private static final long serialVersionUID = -954704188121588134L;
+        private static final long serialVersionUID = -954704188121588134L;
 
-                BothActionAndBodyDefinedException(String message, Location location) throws QuickFixException {
-                super(message, location, new RemoveAttributeQuickFix(getLayoutsDesc(),"action", getQuery(), getDef()),new RemoveBodyQuickFix(getLayoutsDesc(), getQuery(), getDef()));
+        BothActionAndBodyDefinedException(String message, Location location) throws QuickFixException {
+            super(message, location, new RemoveAttributeQuickFix(getLayoutsDesc(), "action", getQuery(), getDef()),
+                    new RemoveBodyQuickFix(getLayoutsDesc(), getQuery(), getDef()));
         }
     }
 

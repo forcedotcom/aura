@@ -15,12 +15,16 @@
  */
 package org.auraframework.test.annotation;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Marks test class to be included in WebDriver inventory.
- *
- *
+ * 
+ * 
  * @since 0.0.104
  */
 @Retention(RetentionPolicy.RUNTIME)

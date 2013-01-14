@@ -28,7 +28,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.LayoutsDef;
-
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -58,16 +57,9 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     private static final String ATTRIBUTE_IS_ONE_PAGE_APP = "isOnePageApp";
 
     private final static Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
-    .add(ATTRIBUTE_PRELOAD,
-         ATTRIBUTE_LAYOUTS,
-         ATTRIBUTE_LOCATION_CHANGE_EVENT,
-         ATTRIBUTE_PRELOAD,
-         ATTRIBUTE_ACCESS,
-         ATTRIBUTE_SECURITY_PROVIDER,
-         ATTRIBUTE_APPCACHE_ENABLED,
-         ATTRIBUTE_IS_ONE_PAGE_APP)
-    .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES)
-    .build();
+            .add(ATTRIBUTE_PRELOAD, ATTRIBUTE_LAYOUTS, ATTRIBUTE_LOCATION_CHANGE_EVENT, ATTRIBUTE_PRELOAD,
+                    ATTRIBUTE_ACCESS, ATTRIBUTE_SECURITY_PROVIDER, ATTRIBUTE_APPCACHE_ENABLED,
+                    ATTRIBUTE_IS_ONE_PAGE_APP).addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
 
     public ApplicationDefImpl.Builder appBuilder;
 
@@ -100,23 +92,23 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     protected void readAttributes() throws QuickFixException {
         super.readAttributes();
 
-
         appBuilder.setSecurityProviderDescriptor(getAttributeValue(ATTRIBUTE_SECURITY_PROVIDER));
 
         appBuilder.access = getAttributeValue(ATTRIBUTE_ACCESS);
 
         String locationChangeEvent = getAttributeValue(ATTRIBUTE_LOCATION_CHANGE_EVENT);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(locationChangeEvent)) {
-            appBuilder.locationChangeEventDescriptor = DefDescriptorImpl.getInstance(locationChangeEvent, EventDef.class);
+            appBuilder.locationChangeEventDescriptor = DefDescriptorImpl.getInstance(locationChangeEvent,
+                    EventDef.class);
         }
-
 
         String layouts = getAttributeValue(ATTRIBUTE_LAYOUTS);
         DefDescriptor<LayoutsDef> layoutsDefDescriptor = null;
 
-        if(layouts == null){
-            layoutsDefDescriptor = DefDescriptorImpl.getAssociateDescriptor(builder.getDescriptor(), LayoutsDef.class, DefDescriptor.MARKUP_PREFIX);
-            if(!layoutsDefDescriptor.exists()){
+        if (layouts == null) {
+            layoutsDefDescriptor = DefDescriptorImpl.getAssociateDescriptor(builder.getDescriptor(), LayoutsDef.class,
+                    DefDescriptor.MARKUP_PREFIX);
+            if (!layoutsDefDescriptor.exists()) {
                 layoutsDefDescriptor = null;
             }
         } else if (!AuraTextUtil.isNullEmptyOrWhitespace(layouts)) {
@@ -124,12 +116,10 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         }
         appBuilder.layoutsDefDescriptor = layoutsDefDescriptor;
 
-
-
         String preloadNames = getAttributeValue(ATTRIBUTE_PRELOAD);
-        if(!AuraTextUtil.isNullEmptyOrWhitespace(preloadNames)){
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(preloadNames)) {
             List<String> preloads = AuraTextUtil.splitSimple(",", preloadNames);
-            for(String preload : preloads){
+            for (String preload : preloads) {
                 DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
                 ddb.setParentDescriptor(this.defDescriptor);
                 ddb.setLocation(getLocation());
@@ -139,13 +129,13 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             }
         }
         String isAppcacheEnabled = getAttributeValue(ATTRIBUTE_APPCACHE_ENABLED);
-        if(!AuraTextUtil.isNullEmptyOrWhitespace(isAppcacheEnabled)){
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(isAppcacheEnabled)) {
             appBuilder.isAppcacheEnabled = Boolean.parseBoolean(isAppcacheEnabled);
         }
         String isOnePageApp = getAttributeValue(ATTRIBUTE_IS_ONE_PAGE_APP);
-        if(!AuraTextUtil.isNullEmptyOrWhitespace(isOnePageApp)){
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(isOnePageApp)) {
             appBuilder.isOnePageApp = Boolean.parseBoolean(isOnePageApp);
-        }else{
+        } else {
             appBuilder.isOnePageApp = false;
         }
     }
@@ -157,7 +147,8 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             attributes.put("def", def);
             InstanceService instanceService = Aura.getInstanceService();
             DefinitionService definitionService = Aura.getDefinitionService();
-            DefDescriptor<ComponentDef> tmplDesc = definitionService.getDefDescriptor("auradev:saveApplication", ComponentDef.class);
+            DefDescriptor<ComponentDef> tmplDesc = definitionService.getDefDescriptor("auradev:saveApplication",
+                    ComponentDef.class);
             Component tmpl = instanceService.getInstance(tmplDesc, attributes);
             Aura.getRenderingService().render(tmpl, out);
         } catch (QuickFixException x) {

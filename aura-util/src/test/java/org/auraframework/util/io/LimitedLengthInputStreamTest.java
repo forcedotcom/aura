@@ -15,7 +15,9 @@
  */
 package org.auraframework.util.io;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.LimitedLengthInputStream;
@@ -56,7 +58,8 @@ public class LimitedLengthInputStreamTest extends UnitTestCase {
     public void testLimitOfZero() throws Exception {
 
         // We get the callback upon construction in this case
-        LimitedLengthInputStream in = new LimitedLengthInputStream(createTestStream(10), 0, new TestStreamFinishedListener());
+        LimitedLengthInputStream in = new LimitedLengthInputStream(createTestStream(10), 0,
+                new TestStreamFinishedListener());
         try {
             assertEquals(0, in.getLength());
             assertTrue(callbackCalled);
@@ -152,14 +155,16 @@ public class LimitedLengthInputStreamTest extends UnitTestCase {
     }
 
     /**
-     * Ensures that a limit that is greater than the underlying stream and also smaller than Integer.MAX_VALUE works properly
+     * Ensures that a limit that is greater than the underlying stream and also
+     * smaller than Integer.MAX_VALUE works properly
      */
     public void testLimitGreaterThanStream() throws Exception {
         testLimitGreaterThanStream(6);
     }
 
     /**
-     * Ensures that a limit that is greater than Integer.MAX_VALUE works properly
+     * Ensures that a limit that is greater than Integer.MAX_VALUE works
+     * properly
      */
     public void testVeryLargeLimit() throws Exception {
         testLimitGreaterThanStream(Long.MAX_VALUE);
@@ -216,7 +221,8 @@ public class LimitedLengthInputStreamTest extends UnitTestCase {
             in.close();
         }
 
-        // Try it with the array+pos+length read (aligned with actual underlying bytes)
+        // Try it with the array+pos+length read (aligned with actual underlying
+        // bytes)
         createTestStream(5);
         in = new LimitedLengthInputStream(wrappedStream, limit, listener);
         try {
@@ -239,7 +245,8 @@ public class LimitedLengthInputStreamTest extends UnitTestCase {
             in.close();
         }
 
-        // Try it with the array+pos+length read (not aligned with actual underlying bytes)
+        // Try it with the array+pos+length read (not aligned with actual
+        // underlying bytes)
         array = new byte[10];
         createTestStream(5);
         in = new LimitedLengthInputStream(wrappedStream, limit, listener);
@@ -273,7 +280,10 @@ public class LimitedLengthInputStreamTest extends UnitTestCase {
             assertFalse(callbackCalled);
             assertEquals(0, in.available());
             assertEquals(0, in.skip(1));
-            assertFalse(callbackCalled); // The contract of skip() doesn't let us definitively say that we're at the EOF, so the callback won't get called until we read
+            assertFalse(callbackCalled); // The contract of skip() doesn't let
+                                         // us definitively say that we're at
+                                         // the EOF, so the callback won't get
+                                         // called until we read
             assertEquals(-1, in.read());
             assertEquals(0, in.available());
             assertTrue(callbackCalled);
@@ -330,7 +340,8 @@ public class LimitedLengthInputStreamTest extends UnitTestCase {
             in.close();
         }
 
-        // Try it with the array+pos+length read (aligned with actual underlying bytes)
+        // Try it with the array+pos+length read (aligned with actual underlying
+        // bytes)
         createTestStream(5);
         in = new LimitedLengthInputStream(wrappedStream, 5, listener);
         try {
@@ -350,7 +361,8 @@ public class LimitedLengthInputStreamTest extends UnitTestCase {
             in.close();
         }
 
-        // Try it with the array+pos+length read (not aligned with actual underlying bytes)
+        // Try it with the array+pos+length read (not aligned with actual
+        // underlying bytes)
         array = new byte[10];
         createTestStream(5);
         in = new LimitedLengthInputStream(wrappedStream, 5, listener);

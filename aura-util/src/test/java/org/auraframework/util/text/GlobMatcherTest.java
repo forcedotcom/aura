@@ -28,7 +28,7 @@ public class GlobMatcherTest extends UnitTestCase {
         public final List<String> matches;
         public final List<String> fails;
 
-        public GMTSet(String pattern, boolean constant, String [] matches, String [] fails) {
+        public GMTSet(String pattern, boolean constant, String[] matches, String[] fails) {
             this.pattern = pattern;
             this.constant = constant;
             if (matches != null) {
@@ -53,68 +53,65 @@ public class GlobMatcherTest extends UnitTestCase {
         assertTrue("* matches everything", gm.match("AbCd"));
     }
 
-    private static String [] ILLEGALS = new String [] {
-        "bah@",
-        "bah.",
-    };
+    private static String[] ILLEGALS = new String[] { "bah@", "bah.", };
 
     public void testIllegals() {
         for (String x : ILLEGALS) {
             try {
                 new GlobMatcher(x);
-                fail("Expected illegal argument exception for "+x);
+                fail("Expected illegal argument exception for " + x);
             } catch (IllegalArgumentException iae) {
                 // expected, don't worry about text.
             }
         }
     }
 
-    private void matchCheck(GMTSet [] theSet) {
+    private void matchCheck(GMTSet[] theSet) {
         for (GMTSet gmt : theSet) {
             GlobMatcher gm = new GlobMatcher(gmt.pattern);
 
             assertEquals("toString should give us the original", gm.toString(), gmt.pattern);
             if (gmt.constant) {
-                assertTrue(gm.toString()+": must be constant", gm.isConstant());
+                assertTrue(gm.toString() + ": must be constant", gm.isConstant());
             } else {
-                assertFalse(gm.toString()+": must NOT be constant", gm.isConstant());
+                assertFalse(gm.toString() + ": must NOT be constant", gm.isConstant());
             }
-            assertFalse(gm.toString()+": must not be all", gm.isAll());
+            assertFalse(gm.toString() + ": must not be all", gm.isAll());
             for (String m : gmt.matches) {
-                assertTrue(gm.toString()+" should match "+m, gm.match(m));
+                assertTrue(gm.toString() + " should match " + m, gm.match(m));
             }
             for (String m : gmt.fails) {
-                assertFalse(gm.toString()+" should NOT match "+m, gm.match(m));
+                assertFalse(gm.toString() + " should NOT match " + m, gm.match(m));
             }
         }
     }
 
-    private static GMTSet [] CONSTANTS = new GMTSet [] {
-        new GMTSet("bah", true, new String [] { "bah" }, new String [] { "humbug", "bah2", "ba" }),
-        new GMTSet("3bah", true, new String [] { "3bah" }, new String [] { "humbug", "bah2", "ba" }),
-    };
+    private static GMTSet[] CONSTANTS = new GMTSet[] {
+            new GMTSet("bah", true, new String[] { "bah" }, new String[] { "humbug", "bah2", "ba" }),
+            new GMTSet("3bah", true, new String[] { "3bah" }, new String[] { "humbug", "bah2", "ba" }), };
 
     public void testConstant() {
         matchCheck(CONSTANTS);
     }
 
-    private static GMTSet [] STARS = new GMTSet [] {
-        new GMTSet("bah*", false, new String [] { "bah", "bahxyz", "bahXY", "bah*" }, new String [] { "humbug", "ba", "xyzbah" }),
-        new GMTSet("*bah", false, new String [] { "bah", "xyzbah", "XYbah", "*bah" }, new String [] { "humbug", "bah2", "ba" }),
-        new GMTSet("b*ah", false, new String [] { "bah", "bXYZah", "b@ah", "b*ah" }, new String [] { "humbug", "bah2", "ba" }),
-    };
+    private static GMTSet[] STARS = new GMTSet[] {
+            new GMTSet("bah*", false, new String[] { "bah", "bahxyz", "bahXY", "bah*" }, new String[] { "humbug", "ba",
+                    "xyzbah" }),
+            new GMTSet("*bah", false, new String[] { "bah", "xyzbah", "XYbah", "*bah" }, new String[] { "humbug",
+                    "bah2", "ba" }),
+            new GMTSet("b*ah", false, new String[] { "bah", "bXYZah", "b@ah", "b*ah" }, new String[] { "humbug",
+                    "bah2", "ba" }), };
 
     public void testStar() {
         matchCheck(STARS);
     }
 
-    private static GMTSet [] INSENSITIVE = new GMTSet [] {
-        new GMTSet("bah", true, new String [] { "Bah", "BAH", "baH" }, null),
-        new GMTSet("3bah", true, new String [] { "3Bah", "3BAH", "3baH" }, null),
-        new GMTSet("bah*", false, new String [] { "Bah", "bAhxyz", "baHXY", "BAH*" }, null),
-        new GMTSet("*bah", false, new String [] { "Bah", "xyzbAh", "XYbaH", "*BAH" }, null),
-        new GMTSet("b*ah", false, new String [] { "Bah", "bXYZAh", "b@aH", "B*AH" }, null),
-    };
+    private static GMTSet[] INSENSITIVE = new GMTSet[] {
+            new GMTSet("bah", true, new String[] { "Bah", "BAH", "baH" }, null),
+            new GMTSet("3bah", true, new String[] { "3Bah", "3BAH", "3baH" }, null),
+            new GMTSet("bah*", false, new String[] { "Bah", "bAhxyz", "baHXY", "BAH*" }, null),
+            new GMTSet("*bah", false, new String[] { "Bah", "xyzbAh", "XYbaH", "*BAH" }, null),
+            new GMTSet("b*ah", false, new String[] { "Bah", "bXYZAh", "b@aH", "B*AH" }, null), };
 
     public void testCaseInsensitive() {
         matchCheck(INSENSITIVE);

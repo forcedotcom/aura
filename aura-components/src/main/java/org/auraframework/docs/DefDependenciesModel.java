@@ -15,20 +15,26 @@
  */
 package org.auraframework.docs;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-
-import com.google.common.collect.*;
+import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  */
@@ -37,15 +43,14 @@ public class DefDependenciesModel {
 
     private final List<Map<String, Object>> dependencies = Lists.newArrayList();
 
-    public DefDependenciesModel() throws QuickFixException{
-
+    public DefDependenciesModel() throws QuickFixException {
 
         AuraContext context = Aura.getContextService().getCurrentContext();
-        BaseComponent<?,?> component = context.getCurrentComponent();
+        BaseComponent<?, ?> component = context.getCurrentComponent();
 
-        String desc = (String)component.getAttributes().getValue("descriptor");
+        String desc = (String) component.getAttributes().getValue("descriptor");
 
-        DefType defType = DefType.valueOf(((String)component.getAttributes().getValue("defType")).toUpperCase());
+        DefType defType = DefType.valueOf(((String) component.getAttributes().getValue("defType")).toUpperCase());
         DefDescriptor<?> descriptor = Aura.getDefinitionService().getDefDescriptor(desc, defType.getPrimaryInterface());
 
         Definition def = descriptor.getDef();
@@ -56,11 +61,11 @@ public class DefDependenciesModel {
 
         def.appendDependencies(deps);
 
-        for(DefDescriptor<?> dep : deps){
+        for (DefDescriptor<?> dep : deps) {
             DefType type = dep.getDefType();
 
             List<DefModel> depsList = depsMap.get(type);
-            if(depsList == null){
+            if (depsList == null) {
                 depsList = Lists.newArrayList();
                 depsMap.put(type, depsList);
             }
@@ -68,7 +73,7 @@ public class DefDependenciesModel {
 
         }
 
-        for(Entry<DefType, List<DefModel>> entry : depsMap.entrySet()){
+        for (Entry<DefType, List<DefModel>> entry : depsMap.entrySet()) {
             List<DefModel> list = entry.getValue();
             Collections.sort(list);
 

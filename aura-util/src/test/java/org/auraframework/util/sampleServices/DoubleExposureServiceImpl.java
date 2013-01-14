@@ -17,12 +17,13 @@ package org.auraframework.util.sampleServices;
 
 public class DoubleExposureServiceImpl implements DoubleExposureService {
     private static DoubleExposureServiceImpl instance = null;
-    private DoubleExposureServiceImpl(){
+
+    private DoubleExposureServiceImpl() {
 
     }
 
-    public static DoubleExposureServiceImpl getInstance(){
-        if(instance == null){
+    public static DoubleExposureServiceImpl getInstance() {
+        if (instance == null) {
             instance = new DoubleExposureServiceImpl();
         }
         return instance;

@@ -19,10 +19,10 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
-import com.google.common.collect.Maps;
-
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.source.SourceFactory;
 import org.auraframework.impl.system.CacheableDefFactoryImpl;
 import org.auraframework.instance.Component;
@@ -32,6 +32,8 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.collect.Maps;
 
 /**
  */
@@ -45,19 +47,20 @@ public class ThemeDefFactory extends CacheableDefFactoryImpl<ThemeDef> {
     public void save(ThemeDef def) {
         Source<?> source = getSource(def.getDescriptor());
         Writer out = source.getWriter();
-        try{
+        try {
             Map<String, Object> attributes = Maps.newHashMap();
             attributes.put("def", def);
             InstanceService instanceService = Aura.getInstanceService();
             DefinitionService definitionService = Aura.getDefinitionService();
-            DefDescriptor<ComponentDef> tmplDesc = definitionService.getDefDescriptor("auradev:saveTheme", ComponentDef.class);
+            DefDescriptor<ComponentDef> tmplDesc = definitionService.getDefDescriptor("auradev:saveTheme",
+                    ComponentDef.class);
             Component tmpl = instanceService.getInstance(tmplDesc, attributes);
             Aura.getRenderingService().render(tmpl, out);
         } catch (QuickFixException x) {
             throw new AuraError(x);
         } catch (IOException x) {
             throw new AuraRuntimeException(x);
-        }finally{
+        } finally {
             try {
                 out.close();
             } catch (IOException x) {

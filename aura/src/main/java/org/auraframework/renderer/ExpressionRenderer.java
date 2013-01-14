@@ -16,7 +16,6 @@
 package org.auraframework.renderer;
 
 import java.io.IOException;
-
 import java.util.List;
 
 import org.auraframework.Aura;
@@ -26,38 +25,37 @@ import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.instance.Wrapper;
 import org.auraframework.service.RenderingService;
-
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  */
 public class ExpressionRenderer implements Renderer {
     @Override
-    public void render(BaseComponent<?,?> component, Appendable out) throws IOException, QuickFixException {
+    public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
 
         RenderingService renderingService = Aura.getRenderingService();
 
         Object value = component.getAttributes().getValue("value");
 
-        if(value instanceof Wrapper){
-            value = ((Wrapper)value).unwrap();
+        if (value instanceof Wrapper) {
+            value = ((Wrapper) value).unwrap();
         }
 
-        if(value instanceof String){
-            out.append((String)value);
-        } else if(value instanceof List){
-            List<?> kids = (List<?>)value;
-            for(Object kid : kids){
-                if(kid instanceof BaseComponent){
-                    renderingService.render((BaseComponent<?, ?>)kid, out);
-                }else if(kid instanceof ComponentDefRef){
-                    List<Component> cmps = ((ComponentDefRef)kid).newInstance(component);
-                    for(Component cmp : cmps){
+        if (value instanceof String) {
+            out.append((String) value);
+        } else if (value instanceof List) {
+            List<?> kids = (List<?>) value;
+            for (Object kid : kids) {
+                if (kid instanceof BaseComponent) {
+                    renderingService.render((BaseComponent<?, ?>) kid, out);
+                } else if (kid instanceof ComponentDefRef) {
+                    List<Component> cmps = ((ComponentDefRef) kid).newInstance(component);
+                    for (Component cmp : cmps) {
                         renderingService.render(cmp, out);
                     }
                 }
             }
-        }else if(value != null){
+        } else if (value != null) {
             out.append(value.toString());
         }
     }

@@ -22,8 +22,8 @@ import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.type.converter.DateOnlyToStringConverter;
 
-public class LocalizedDateOnlyToStringConverter extends DateOnlyToStringConverter
-        implements LocalizedConverter<DateOnly, String> {
+public class LocalizedDateOnlyToStringConverter extends DateOnlyToStringConverter implements
+        LocalizedConverter<DateOnly, String> {
 
     @Override
     public String convert(DateOnly value, AuraLocale locale) {

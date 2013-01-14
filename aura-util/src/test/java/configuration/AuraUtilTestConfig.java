@@ -18,10 +18,11 @@ package configuration;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 
-import org.auraframework.test.*;
-import org.auraframework.util.ServiceLoaderImpl.Impl;
+import org.auraframework.test.AnnotationTestFilter;
+import org.auraframework.test.TestFilter;
+import org.auraframework.test.TestInventory;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
-
+import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.junit.Ignore;
 
 import com.google.common.collect.Sets;
@@ -31,7 +32,7 @@ import com.google.common.collect.Sets;
 @AuraConfiguration
 public class AuraUtilTestConfig {
 
-    @Impl(name="auraUtilTestInventory")
+    @Impl(name = "auraUtilTestInventory")
     public static TestInventory auraUtilTestInventory() throws Exception {
         return new TestInventory(AuraUtilTestConfig.class);
     }

@@ -31,7 +31,8 @@ public class ThrowableJSFormatAdapter extends JSFormatAdapter<Throwable> {
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException, QuickFixException {
+    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException,
+            QuickFixException {
         out.append("aura.error(");
         Aura.getSerializationService().write(value, attributes, getType(), out, "JSON");
         out.append(");");

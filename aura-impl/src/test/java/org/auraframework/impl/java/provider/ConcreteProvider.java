@@ -17,24 +17,22 @@ package org.auraframework.impl.java.provider;
 
 import java.util.Map;
 
-import com.google.common.collect.Maps;
-
 import org.auraframework.Aura;
-
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentConfigProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.ComponentConfig;
-
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.collect.Maps;
+
 /**
- * A class to test a variety of scenarios for the concrete component with provider.
+ * A class to test a variety of scenarios for the concrete component with
+ * provider.
  */
 @Provider
 public class ConcreteProvider implements ComponentConfigProvider {
@@ -49,21 +47,22 @@ public class ConcreteProvider implements ComponentConfigProvider {
     public ComponentConfig provide() throws QuickFixException {
         ComponentConfig config = new ComponentConfig();
 
-        BaseComponent<?,?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
-        String whatToDo = (String)component.getAttributes().getExpression("whatToDo");
+        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        String whatToDo = (String) component.getAttributes().getExpression("whatToDo");
         if (whatToDo.equalsIgnoreCase("label")) {
-            Map<String,Object> attrs = Maps.newHashMap();
+            Map<String, Object> attrs = Maps.newHashMap();
             attrs.put("name", "Null Returned");
             config.setAttributes(attrs);
         } else if (whatToDo.equalsIgnoreCase("replace")) {
             config.setDescriptor(DefDescriptorImpl.getInstance("test:test_Provider_Concrete_Sub", ComponentDef.class));
         } else if (whatToDo.equalsIgnoreCase("replaceBad")) {
             @SuppressWarnings("unchecked")
-            DefDescriptor<ComponentDef> foo = (DefDescriptor<ComponentDef>)getMagicDescriptor();
+            DefDescriptor<ComponentDef> foo = (DefDescriptor<ComponentDef>) getMagicDescriptor();
 
             config.setDescriptor(foo);
         } else if (whatToDo.equalsIgnoreCase("replaceNotFound")) {
-            config.setDescriptor(DefDescriptorImpl.getInstance("test:test_Provider_Concrete_Sub_NotHere", ComponentDef.class));
+            config.setDescriptor(DefDescriptorImpl.getInstance("test:test_Provider_Concrete_Sub_NotHere",
+                    ComponentDef.class));
         }
         return config;
     }

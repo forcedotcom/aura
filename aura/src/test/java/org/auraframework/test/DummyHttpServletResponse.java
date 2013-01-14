@@ -25,22 +25,21 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * A testing mock of {@link HttpServletResponse}.  The implementations here all
+ * A testing mock of {@link HttpServletResponse}. The implementations here all
  * do nothing (and return null, zero, etc.), so override what you need to.
  */
 public class DummyHttpServletResponse implements HttpServletResponse {
 
     /**
-     * {@link HttpServletResponse} includes a lot of utility methods; if those are
-     * used, the dummy really should implement them.  So our base class here throws
-     * this {@link RuntimeException} if those are called.
+     * {@link HttpServletResponse} includes a lot of utility methods; if those
+     * are used, the dummy really should implement them. So our base class here
+     * throws this {@link RuntimeException} if those are called.
      */
     public static class NotImplementedException extends RuntimeException {
         private static final long serialVersionUID = 4533660990974185099L;
 
         public NotImplementedException(String method) {
-            super(String.format("If %s is called, it should have been overridden by a subclass",
-                    method));
+            super(String.format("If %s is called, it should have been overridden by a subclass", method));
         }
     }
 

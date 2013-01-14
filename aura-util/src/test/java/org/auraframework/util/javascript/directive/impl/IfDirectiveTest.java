@@ -19,7 +19,12 @@ import java.io.File;
 import java.util.EnumSet;
 
 import org.auraframework.test.UnitTestCase;
-import org.auraframework.util.javascript.directive.*;
+import org.auraframework.util.javascript.directive.Directive;
+import org.auraframework.util.javascript.directive.DirectiveBasedJavascriptGroup;
+import org.auraframework.util.javascript.directive.DirectiveParser;
+import org.auraframework.util.javascript.directive.DirectiveType;
+import org.auraframework.util.javascript.directive.DirectiveTypes;
+import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 
 import com.google.common.collect.ImmutableList;
 
@@ -41,7 +46,8 @@ public class IfDirectiveTest extends UnitTestCase {
         assertTrue("If directive is a multiline directive", directiveObj.isMultiline());
         String content = "Write anything you want and this will just throw is back. But it should throw back the exact same thing";
         directiveObj.setContent(content);
-        // Regardless of the javascriptGenerator mode, an IF directive just spits out its contents. Hence using null as
+        // Regardless of the javascriptGenerator mode, an IF directive just
+        // spits out its contents. Hence using null as
         // the mode.
         assertTrue("If directive should just spit out whatever was given to it", directiveObj.generateOutput(null)
                 .equals(content));

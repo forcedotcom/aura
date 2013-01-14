@@ -17,13 +17,12 @@ package org.auraframework.throwable;
 
 import java.util.Map;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.auraframework.Aura;
 import org.auraframework.def.EventDef;
 import org.auraframework.instance.Event;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsFunction;
-
-import org.apache.commons.httpclient.HttpStatus;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
@@ -55,7 +54,8 @@ public class InvalidSessionException extends ClientSideEventException {
 
     @Override
     public JsFunction getDefaultHandler() {
-        return new JsFunction(ImmutableList.<String>of(), "try{$A.clientService.hardRefresh();}catch(e){$L.clientService.hardRefresh();}");
+        return new JsFunction(ImmutableList.<String> of(),
+                "try{$A.clientService.hardRefresh();}catch(e){$L.clientService.hardRefresh();}");
     }
 
     @Override

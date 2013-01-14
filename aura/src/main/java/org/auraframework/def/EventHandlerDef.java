@@ -15,17 +15,16 @@
  */
 package org.auraframework.def;
 
-
 /**
  */
 public interface EventHandlerDef extends Definition {
     /**
      * FIXME: W-1328552 this method violates the contract with DefDescriptor.
-     *
+     * 
      * These two calls should be used instead, but they cause other bugs.
-     *
-     * DefDescriptor<EventHandlerDef> getDescriptor();
-     * DefDescriptor<EventDef> getEventDescriptor();
+     * 
+     * DefDescriptor<EventHandlerDef> getDescriptor(); DefDescriptor<EventDef>
+     * getEventDescriptor();
      */
     @Override
     DefDescriptor<EventDef> getDescriptor();

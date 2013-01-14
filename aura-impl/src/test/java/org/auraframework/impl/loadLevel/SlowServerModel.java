@@ -26,22 +26,23 @@ import org.auraframework.system.Annotations.Model;
 @Model
 public class SlowServerModel {
 
-    public SlowServerModel() throws InterruptedException{
+    public SlowServerModel() throws InterruptedException {
         Thread.sleep(5000);
     }
 
     @AuraEnabled
-    public List<String> getStringList(){
+    public List<String> getStringList() {
         ArrayList<String> sl = new ArrayList<String>();
         sl.add("foo");
         sl.add("bar");
         sl.add("beer");
         return sl;
     }
+
     @AuraEnabled
-    public String getString(){
-        BaseComponent<?,?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
-        String str = (String)component.getAttributes().getExpression("stringAttribute");
+    public String getString() {
+        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        String str = (String) component.getAttributes().getExpression("stringAttribute");
         return str;
     }
 }

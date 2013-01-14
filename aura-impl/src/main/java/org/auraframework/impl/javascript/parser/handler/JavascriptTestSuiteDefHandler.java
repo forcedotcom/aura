@@ -42,14 +42,14 @@ import com.google.common.collect.Sets;
 
 /**
  * Javascript handler for test suite defs
- *
- *
+ * 
+ * 
  * @since 0.0.194
  */
 public class JavascriptTestSuiteDefHandler extends
         JavascriptHandler<DefDescriptor<TestSuiteDef>, JavascriptTestSuiteDef> {
 
-    private Builder builder = new Builder();
+    private final Builder builder = new Builder();
 
     public JavascriptTestSuiteDefHandler(DefDescriptor<TestSuiteDef> descriptor, Source<?> source) {
         super(descriptor, source);
@@ -63,16 +63,16 @@ public class JavascriptTestSuiteDefHandler extends
         builder.setLocation(getLocation());
         builder.caseDefs = new ArrayList<TestCaseDef>();
 
-        Map<String, Object> defaultAttributes = (Map<String, Object>)map.get("attributes");
-        List<String> browserListForTestSet = (List<String>)(List<?>)map.get("browsers");
+        Map<String, Object> defaultAttributes = (Map<String, Object>) map.get("attributes");
+        List<String> browserListForTestSet = (List<String>) (List<?>) map.get("browsers");
         for (Entry<String, Object> entry : map.entrySet()) {
             String key = entry.getKey();
             if (key.startsWith("test")) {
-                Map<String, Object> value = (Map<String, Object>)entry.getValue();
+                Map<String, Object> value = (Map<String, Object>) entry.getValue();
                 Object t = value.get("test");
                 if (!(t instanceof JsFunction)) {
                     if (t instanceof List) {
-                        List<Object> functions = (List<Object>)t;
+                        List<Object> functions = (List<Object>) t;
                         for (Object i : functions) {
                             if (!(i instanceof JsFunction)) {
                                 throw new AuraRuntimeException(key
@@ -84,16 +84,16 @@ public class JavascriptTestSuiteDefHandler extends
                     }
                 }
 
-                Map<String, Object> attributes = (Map<String, Object>)value.get("attributes");
+                Map<String, Object> attributes = (Map<String, Object>) value.get("attributes");
                 DefDescriptor<TestCaseDef> caseDescriptor = DefDescriptorImpl.getInstance(key, TestCaseDef.class);
 
-                List<String> labelsList = (List<String>)(List<?>)value.get("testLabels");
+                List<String> labelsList = (List<String>) (List<?>) value.get("testLabels");
                 Set<String> labels = labelsList == null ? Collections.EMPTY_SET : Sets.newHashSet(labelsList);
 
-                List<String> browserListForTestCase = (List<String>)(List<?>)value.get("browsers");
-                Set<String> browsers = browserListForTestCase == null? 
-                                        (browserListForTestSet == null ? Collections.EMPTY_SET : Sets.newHashSet(browserListForTestSet)) 
-                                         : Sets.newHashSet(browserListForTestCase);
+                List<String> browserListForTestCase = (List<String>) (List<?>) value.get("browsers");
+                Set<String> browsers = browserListForTestCase == null ? (browserListForTestSet == null ? Collections.EMPTY_SET
+                        : Sets.newHashSet(browserListForTestSet))
+                        : Sets.newHashSet(browserListForTestCase);
                 DefDescriptor<? extends BaseComponentDef> compDesc = DefDescriptorImpl.getAssociateDescriptor(
                         descriptor, ComponentDef.class, DefDescriptor.MARKUP_PREFIX);
                 if (compDesc == null || !compDesc.exists()) {

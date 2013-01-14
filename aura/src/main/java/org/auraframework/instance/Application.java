@@ -19,6 +19,6 @@ import org.auraframework.def.ApplicationDef;
 
 /**
  */
-public interface Application extends BaseComponent<ApplicationDef, Application>{
+public interface Application extends BaseComponent<ApplicationDef, Application> {
 
 }

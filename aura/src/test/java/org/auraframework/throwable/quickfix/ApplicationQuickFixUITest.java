@@ -21,7 +21,7 @@ import org.auraframework.def.DefDescriptor.DefType;
  * Quick fix testing for Application.
  */
 public class ApplicationQuickFixUITest extends BaseComponentQuickFixUITest {
-    public ApplicationQuickFixUITest(String name){
+    public ApplicationQuickFixUITest(String name) {
         super(name, DefType.APPLICATION, ".app");
     }
 }

@@ -44,7 +44,7 @@ import org.auraframework.util.json.Json;
 public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements ProviderDef {
 
     // FIXME: this adaptor should die W-1190554
-    private static class ConfigMethodAdaptor implements ComponentConfigProvider{
+    private static class ConfigMethodAdaptor implements ComponentConfigProvider {
         private final Method configMethod;
 
         public ConfigMethodAdaptor(Method configMethod) {
@@ -56,7 +56,7 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
             ComponentConfig config;
 
             try {
-                config = (ComponentConfig)configMethod.invoke(null);
+                config = (ComponentConfig) configMethod.invoke(null);
             } catch (Exception e) {
                 throw new AuraRuntimeException(e);
             }
@@ -65,7 +65,7 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
     }
 
     // FIXME: this adaptor should die W-1190554
-    private static class DualMethodAdaptor implements ComponentConfigProvider{
+    private static class DualMethodAdaptor implements ComponentConfigProvider {
         private final Method descriptorMethod;
         private final Method attributesMethod;
 
@@ -80,9 +80,9 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
             ComponentConfig config = new ComponentConfig();
 
             try {
-                config.setDescriptor((DefDescriptor<ComponentDef>)descriptorMethod.invoke(null));
+                config.setDescriptor((DefDescriptor<ComponentDef>) descriptorMethod.invoke(null));
                 if (attributesMethod != null) {
-                    config.setAttributes((Map<String,Object>)attributesMethod.invoke(null));
+                    config.setAttributes((Map<String, Object>) attributesMethod.invoke(null));
                 }
             } catch (Exception e) {
                 throw new AuraRuntimeException(e);
@@ -90,7 +90,6 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
             return config;
         }
     }
-
 
     private static final long serialVersionUID = -4972842636058759316L;
     private final ComponentConfigProvider configProvider;
@@ -109,20 +108,20 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
             try {
                 for (Class<? extends Provider> theIfc : interfaces) {
                     if (ComponentConfigProvider.class.isAssignableFrom(theIfc)) {
-                        configProv = (ComponentConfigProvider)builder.providerClass.newInstance();
+                        configProv = (ComponentConfigProvider) builder.providerClass.newInstance();
                     } else if (ComponentDescriptorProvider.class.isAssignableFrom(theIfc)) {
-                        descriptorProv = (ComponentDescriptorProvider)builder.providerClass.newInstance();
+                        descriptorProv = (ComponentDescriptorProvider) builder.providerClass.newInstance();
                     }
 
                     if (StaticComponentConfigProvider.class.isAssignableFrom(theIfc)) {
-                        staticConfigProv = (StaticComponentConfigProvider)builder.providerClass.newInstance();
+                        staticConfigProv = (StaticComponentConfigProvider) builder.providerClass.newInstance();
                     }
                 }
             } catch (InstantiationException ie) {
-                throw new InvalidDefinitionException("Cannot instantiate "+builder.providerClass.getName(), location);
+                throw new InvalidDefinitionException("Cannot instantiate " + builder.providerClass.getName(), location);
             } catch (IllegalAccessException iae) {
-                throw new InvalidDefinitionException("Constructor is inaccessible for " + builder.providerClass.getName(),
-                        location);
+                throw new InvalidDefinitionException("Constructor is inaccessible for "
+                        + builder.providerClass.getName(), location);
             }
         } else {
             //
@@ -144,8 +143,8 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
                     }
                 }
             } catch (NoSuchMethodException e) {
-                //That's ok.
-            }catch (Exception e){
+                // That's ok.
+            } catch (Exception e) {
                 throw new AuraRuntimeException(e);
             }
             try {
@@ -154,15 +153,14 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
                     attributeMeth = null;
                 }
             } catch (NoSuchMethodException e) {
-                //That's ok.
-            }catch (Exception e){
+                // That's ok.
+            } catch (Exception e) {
                 throw new AuraRuntimeException(e);
             }
             if (configMeth != null) {
                 configProv = new ConfigMethodAdaptor(configMeth);
             } else if (descriptorMeth != null) {
-                configProv = new DualMethodAdaptor(descriptorMeth,
-                                                   attributeMeth);
+                configProv = new DualMethodAdaptor(descriptorMeth, attributeMeth);
             }
             //
             // End of compatibility mode.
@@ -181,10 +179,10 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
 
     /**
      * Validate our definition.
-     *
-     * This validation ensures that we have a provider method to get either
-     * a descriptor (simple case) or a config (complex case). It also refuses
-     * to allow a method by the name of provideAttributes.
+     * 
+     * This validation ensures that we have a provider method to get either a
+     * descriptor (simple case) or a config (complex case). It also refuses to
+     * allow a method by the name of provideAttributes.
      */
     @Override
     public void validateDefinition() throws QuickFixException {
@@ -250,9 +248,9 @@ public class JavaProviderDef extends DefinitionImpl<ProviderDef> implements Prov
         return true;
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<ProviderDef>{
+    public static class Builder extends DefinitionImpl.BuilderImpl<ProviderDef> {
 
-        public Builder(){
+        public Builder() {
             super(ProviderDef.class);
         }
 

@@ -27,18 +27,18 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  */
-public class RenderingServiceImpl implements RenderingService{
+public class RenderingServiceImpl implements RenderingService {
 
     /**
      */
     private static final long serialVersionUID = 1663840391180454913L;
 
     @Override
-    public void render(BaseComponent<?,?> component, Appendable out) throws QuickFixException, IOException {
+    public void render(BaseComponent<?, ?> component, Appendable out) throws QuickFixException, IOException {
         Aura.getContextService().assertEstablished();
 
-        BaseComponent<?,?> renderable = null;
-        BaseComponent<?,?> tmpRenderable = component;
+        BaseComponent<?, ?> renderable = null;
+        BaseComponent<?, ?> tmpRenderable = component;
         BaseComponentDef componentDef = null;
         RendererDef rendererDef = null;
 
@@ -46,7 +46,7 @@ public class RenderingServiceImpl implements RenderingService{
             componentDef = tmpRenderable.getDescriptor().getDef();
             if (rendererDef == null) {
                 rendererDef = componentDef.getLocalRendererDef();
-                if(rendererDef == null && componentDef.getRendererDescriptor() != null){
+                if (rendererDef == null && componentDef.getRendererDescriptor() != null) {
                     break;
                 }
                 renderable = tmpRenderable;
@@ -55,10 +55,9 @@ public class RenderingServiceImpl implements RenderingService{
             tmpRenderable = tmpRenderable.getSuper();
         }
 
-        if(rendererDef == null){
+        if (rendererDef == null) {
             throw new AuraRuntimeException(String.format("No local RendererDef found for %s", component));
         }
-
 
         rendererDef.render(renderable, out);
     }

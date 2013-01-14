@@ -18,9 +18,9 @@ package org.auraframework.adapter;
 import java.io.File;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
-
 import org.auraframework.system.SourceLoader;
+
+import com.google.common.collect.Sets;
 
 /**
  */
@@ -34,39 +34,42 @@ public interface ComponentLocationAdapter extends AuraAdapter {
 
     Set<SourceLoader> getSourceLoaders();
 
-    public static class Impl implements ComponentLocationAdapter{
+    public static class Impl implements ComponentLocationAdapter {
 
         private final File componentSourceDir;
         private final File javaGeneratedSourceDir;
         private final String componentSourcePackage;
-        private final Set<SourceLoader> loaders = Sets.<SourceLoader>newHashSet();
-        public Impl(File componentSourceDir){
+        private final Set<SourceLoader> loaders = Sets.<SourceLoader> newHashSet();
+
+        public Impl(File componentSourceDir) {
             this(componentSourceDir, null);
         }
 
-        public Impl(File componentSourceDir, File javaGeneratedSourceDir){
+        public Impl(File componentSourceDir, File javaGeneratedSourceDir) {
             this(componentSourceDir, javaGeneratedSourceDir, null);
         }
 
-        public Impl(File componentSourceDir, File javaGeneratedSourceDir, String componentSourcePackage){
-            if(componentSourceDir.exists() || componentSourcePackage == null){
+        public Impl(File componentSourceDir, File javaGeneratedSourceDir, String componentSourcePackage) {
+            if (componentSourceDir.exists() || componentSourcePackage == null) {
                 this.componentSourceDir = componentSourceDir;
                 this.javaGeneratedSourceDir = javaGeneratedSourceDir;
                 this.componentSourcePackage = null;
-            }else{
+            } else {
                 this.componentSourcePackage = componentSourcePackage;
                 this.componentSourceDir = null;
                 this.javaGeneratedSourceDir = null;
             }
         }
-        public Impl(SourceLoader loader){
-            if(loader!=null){
-              loaders.add(loader);
+
+        public Impl(SourceLoader loader) {
+            if (loader != null) {
+                loaders.add(loader);
             }
-            this.componentSourceDir = null ;
+            this.componentSourceDir = null;
             this.javaGeneratedSourceDir = null;
             this.componentSourcePackage = null;
         }
+
         @Override
         public File getComponentSourceDir() {
             return this.componentSourceDir;

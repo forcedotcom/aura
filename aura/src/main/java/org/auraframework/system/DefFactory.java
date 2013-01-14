@@ -23,38 +23,40 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
- * A factory that produces Definitions of a particular type. It is not safe for a DefRegistry to cache the returned
- * definitions. DefFactories that do produce Definitions that are safe to cache should instead implement
+ * A factory that produces Definitions of a particular type. It is not safe for
+ * a DefRegistry to cache the returned definitions. DefFactories that do produce
+ * Definitions that are safe to cache should instead implement
  * CacheableDefFactory.
  */
 public interface DefFactory<D extends Definition> {
     /**
      * Return the definition for this descriptor, or null if it does not exist.
      * This method will compiled the definition and then return it.
+     * 
      * @throws QuickFixException
      */
     D getDef(DefDescriptor<D> descriptor) throws QuickFixException;
 
     /**
      * Return true if the find methods work.
-     *
+     * 
      * @return true if find will not throw 'UnsupportedOperationException'
      */
     boolean hasFind();
 
     /**
      * Given a descriptor that contains search patterns or wildcards, return a
-     * set of Descriptors for all existing Definitions who have source that exists.
-     * Does not compile the definitions if they were not already compiled, and does
-     * not guarantee that they can compile.
+     * set of Descriptors for all existing Definitions who have source that
+     * exists. Does not compile the definitions if they were not already
+     * compiled, and does not guarantee that they can compile.
      */
     Set<DefDescriptor<D>> find(DefDescriptor<D> matcher);
 
     /**
-     * Given a string that contains search patterns or wildcards, return a
-     * set of Descriptors for all existing Definitions who have source that exists.
-     * Does not compile the definitions if they were not already compiled, and does
-     * not guarantee that they can compile.
+     * Given a string that contains search patterns or wildcards, return a set
+     * of Descriptors for all existing Definitions who have source that exists.
+     * Does not compile the definitions if they were not already compiled, and
+     * does not guarantee that they can compile.
      */
     Set<DefDescriptor<?>> find(DescriptorFilter matcher);
 
@@ -64,13 +66,14 @@ public interface DefFactory<D extends Definition> {
     void save(D def);
 
     /**
-     * Returns true if the source related to the descriptor exists.  Does not
+     * Returns true if the source related to the descriptor exists. Does not
      * compile the definition, and does not guarantee that it can compile.
      */
     boolean exists(DefDescriptor<D> descriptor);
 
     /**
-     * Saves alternate representations of the Component (like generated java classes)
+     * Saves alternate representations of the Component (like generated java
+     * classes)
      */
     void synchronize(D def);
 

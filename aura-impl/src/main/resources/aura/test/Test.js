@@ -21,7 +21,7 @@ var Test = function(){
 
     /**
      * Utility functions for component testing
-     * @namespace
+     * @constructor
      */
     var Test = {
         /**

@@ -34,11 +34,12 @@ public abstract class AuraQuickFix implements JsonSerializable {
     private final Map<String, Object> attributes;
     private final DefDescriptor<ComponentDef> ui;
 
-    protected AuraQuickFix(String description, Map<String, Object> attributes, DefDescriptor<ComponentDef> ui){
+    protected AuraQuickFix(String description, Map<String, Object> attributes, DefDescriptor<ComponentDef> ui) {
         this.description = description;
         this.attributes = attributes;
         this.ui = ui;
     }
+
     /**
      * @return Returns the description.
      */
@@ -53,43 +54,43 @@ public abstract class AuraQuickFix implements JsonSerializable {
         return attributes;
     }
 
-    protected Object getAttribute(String key){
+    protected Object getAttribute(String key) {
         return getAttribute(attributes, key);
     }
 
     @SuppressWarnings("unchecked")
-    private Object getAttribute(Map<String, Object> root, String key){
-        if(root == null){
+    private Object getAttribute(Map<String, Object> root, String key) {
+        if (root == null) {
             return null;
         }
 
-        if(key.indexOf(".") > -1){
+        if (key.indexOf(".") > -1) {
             List<String> split = AuraTextUtil.splitSimple(".", key);
             Object newRoot = root.get(split.get(0));
-            if(newRoot == null){
+            if (newRoot == null) {
                 return null;
-            }else{
+            } else {
                 StringBuilder sb = new StringBuilder();
-                for(int i=1;i<split.size();i++){
+                for (int i = 1; i < split.size(); i++) {
                     sb.append(split.get(i));
-                    if(i<split.size()-1){
+                    if (i < split.size() - 1) {
                         sb.append('.');
                     }
                 }
-                return getAttribute((Map<String, Object>)newRoot, sb.toString());
+                return getAttribute((Map<String, Object>) newRoot, sb.toString());
             }
-        }else{
+        } else {
             return root.get(key);
         }
     }
 
-    protected boolean getBooleanAttribute(String key){
+    protected boolean getBooleanAttribute(String key) {
         Object obj = getAttribute(key);
-        if(obj == null){
+        if (obj == null) {
             return false;
         }
 
-        if(obj.equals("on") || obj.equals("true") || obj.equals(true)){
+        if (obj.equals("on") || obj.equals("true") || obj.equals(true)) {
             return true;
         }
 
@@ -99,16 +100,18 @@ public abstract class AuraQuickFix implements JsonSerializable {
 
     /**
      * Run the fix.
+     * 
      * @throws QuickFixException
      */
-    public void execute() throws Exception{
+    public void execute() throws Exception {
         this.fix();
     }
 
     /**
-     * This should return a descriptor for a component that implements aura:quickFix
+     * This should return a descriptor for a component that implements
+     * aura:quickFix
      */
-    public DefDescriptor<ComponentDef> getUI(){
+    public DefDescriptor<ComponentDef> getUI() {
         return ui;
     }
 
@@ -131,6 +134,5 @@ public abstract class AuraQuickFix implements JsonSerializable {
         json.writeMapEntry("ui", getUI());
         json.writeMapEnd();
     }
-
 
 }

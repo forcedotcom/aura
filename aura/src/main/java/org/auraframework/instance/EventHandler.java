@@ -19,7 +19,8 @@ import org.auraframework.def.EventHandlerDef;
 import org.auraframework.expression.PropertyReference;
 
 /**
- * An event handler instance, similar to an attribute, maps a registered event to a controller action at runtime
+ * An event handler instance, similar to an attribute, maps a registered event
+ * to a controller action at runtime
  */
 public interface EventHandler extends Instance<EventHandlerDef> {
 

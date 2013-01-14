@@ -21,7 +21,10 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.parser.XMLParser;
@@ -31,66 +34,76 @@ import org.auraframework.system.Parser.Format;
 
 public class AttributeDefRefHandlerTest extends AuraImplTestCase {
 
-    public AttributeDefRefHandlerTest(String name) throws Exception{
+    public AttributeDefRefHandlerTest(String name) throws Exception {
         super(name);
     }
 
     public void testAttributeDefRefParsing() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,"<aura:component><aura:set attribute='header' value='false'>Child Text</aura:set></aura:component>", "myID",Format.XML);
+        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+                "<aura:component><aura:set attribute='header' value='false'>Child Text</aura:set></aura:component>",
+                "myID", Format.XML);
         ComponentDef cd = parser.parse(descriptor, source);
         assertNotNull(cd);
     }
 
-    public void testAttributeDefRefParsingWithChildtag () throws Exception {
+    public void testAttributeDefRefParsingWithChildtag() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
-        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,"<aura:component><aura:set attribute='header'><aura:foo/></aura:set></aura:component>", "myID",Format.XML);
+        StringSource<ComponentDef> source = new StringSource<ComponentDef>(descriptor,
+                "<aura:component><aura:set attribute='header'><aura:foo/></aura:set></aura:component>", "myID",
+                Format.XML);
         ComponentDef cd = parser.parse(descriptor, source);
         assertNotNull(cd);
     }
 
     public void testGetElementWithValueAttribute() throws Exception {
         DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor("mystring", AttributeDef.class);
-        StringSource<AttributeDef> source = new StringSource<AttributeDef>(desc,"<aura:set attribute='mystring' value='testing'/>", "myID",Format.XML);
+        StringSource<AttributeDef> source = new StringSource<AttributeDef>(desc,
+                "<aura:set attribute='mystring' value='testing'/>", "myID", Format.XML);
         XMLStreamReader xmlReader = null;
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
         xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());
         xmlReader.next();
-        AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<ComponentDef>(null, xmlReader, source);
+        AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<ComponentDef>(null, xmlReader,
+                source);
         AttributeDefRefImpl adr = adrHandler.getElement();
-        assertEquals("mystring",adr.getName());
+        assertEquals("mystring", adr.getName());
         Object o = adr.getValue();
-        assertEquals("testing",o);
+        assertEquals("testing", o);
     }
 
     public void testGetElementWithValueAsChildTag() throws Exception {
         DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor("mystring", AttributeDef.class);
-        StringSource<AttributeDef> source = new StringSource<AttributeDef>(desc,"<aura:set attribute='mystring'><aura:foo/></aura:set>", "myID",Format.XML);
+        StringSource<AttributeDef> source = new StringSource<AttributeDef>(desc,
+                "<aura:set attribute='mystring'><aura:foo/></aura:set>", "myID", Format.XML);
         XMLStreamReader xmlReader = null;
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
         xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());
         xmlReader.next();
-        AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<ComponentDef>(null, xmlReader, source);
+        AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<ComponentDef>(null, xmlReader,
+                source);
         AttributeDefRefImpl adr = adrHandler.getElement();
-        ComponentDefRef value = (ComponentDefRef)((List<?>)adr.getValue()).get(0);
-        assertEquals("foo",value.getName());
+        ComponentDefRef value = (ComponentDefRef) ((List<?>) adr.getValue()).get(0);
+        assertEquals("foo", value.getName());
     }
 
     public void testGetElementWithTextBetweenTags() throws Exception {
         DefDescriptor<AttributeDef> desc = Aura.getDefinitionService().getDefDescriptor("mystring", AttributeDef.class);
-        StringSource<AttributeDef> source = new StringSource<AttributeDef>(desc,"<aura:set attribute='mystring'>Child Text</aura:set>", "myID",Format.XML);
+        StringSource<AttributeDef> source = new StringSource<AttributeDef>(desc,
+                "<aura:set attribute='mystring'>Child Text</aura:set>", "myID", Format.XML);
         XMLStreamReader xmlReader = null;
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
         xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());
         xmlReader.next();
-        AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<ComponentDef>(null, xmlReader, source);
+        AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<ComponentDef>(null, xmlReader,
+                source);
         AttributeDefRefImpl adr = adrHandler.getElement();
-        ComponentDefRef value = (ComponentDefRef)((List<?>)adr.getValue()).get(0);
-        assertEquals("Child Text",value.getAttributeDefRef("value").getValue());
+        ComponentDefRef value = (ComponentDefRef) ((List<?>) adr.getValue()).get(0);
+        assertEquals("Child Text", value.getAttributeDefRef("value").getValue());
     }
 }

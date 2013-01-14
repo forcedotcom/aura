@@ -19,7 +19,14 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.*;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.auraframework.util.AuraTextUtil;
@@ -40,7 +47,7 @@ public class AuraResourceRewriteFilter implements Filter {
 
     }
 
-    private static String createURI(String context, String format){
+    private static String createURI(String context, String format) {
         return String.format(uriPattern, format, AuraTextUtil.urldecode(context));
     }
 
@@ -48,15 +55,16 @@ public class AuraResourceRewriteFilter implements Filter {
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException,
             IOException {
 
-        HttpServletRequest request = (HttpServletRequest)req;
+        HttpServletRequest request = (HttpServletRequest) req;
 
         String path = request.getRequestURI().substring(request.getContextPath().length());
 
         String newUri = null;
         Matcher matcher = pattern.matcher(path);
-        if(matcher.matches()){
+        if (matcher.matches()) {
             newUri = createURI(matcher.group(1), matcher.group(2));
-            // Sometimes original request URI can be useful: Eg: manifast in AuraResourceServlet
+            // Sometimes original request URI can be useful: Eg: manifast in
+            // AuraResourceServlet
             request.setAttribute(AuraResourceServlet.ORIG_REQUEST_URI,
                     (request.getQueryString() != null) ? request.getRequestURI() + "?" + request.getQueryString()
                             : request.getRequestURI());
@@ -65,7 +73,7 @@ public class AuraResourceRewriteFilter implements Filter {
         if (newUri != null) {
             RequestDispatcher dispatcher = servletContext.getRequestDispatcher(newUri);
 
-            if(dispatcher != null){
+            if (dispatcher != null) {
                 dispatcher.forward(req, res);
                 return;
             }

@@ -15,7 +15,10 @@
  */
 package org.auraframework.util;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Set;
@@ -23,8 +26,12 @@ import java.util.Set;
 import org.auraframework.util.ServiceLocator.ServiceLocatorException;
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
-import org.reflections.scanners.*;
-import org.reflections.util.*;
+import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.scanners.TypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -37,99 +44,97 @@ public class ServiceLoaderImpl implements ServiceLoader {
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
-    public @interface AuraConfiguration{}
+    public @interface AuraConfiguration {
+    }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    public @interface Impl{
+    public @interface Impl {
         String name() default "";
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    public @interface PrimaryImpl{}
+    public @interface PrimaryImpl {
+    }
 
     private static final ServiceLoader instance = new ServiceLoaderImpl();
 
     @SuppressWarnings("unchecked")
-    private static final Predicate<? super Method> predicate = Predicates.and(ReflectionUtils.withModifier(Modifier.PUBLIC),
-                                                        ReflectionUtils.withAnnotation(Impl.class),
-                                                        ReflectionUtils.withModifier(Modifier.STATIC),
-                                                        ReflectionUtils.withParametersCount(0));
+    private static final Predicate<? super Method> predicate = Predicates.and(
+            ReflectionUtils.withModifier(Modifier.PUBLIC), ReflectionUtils.withAnnotation(Impl.class),
+            ReflectionUtils.withModifier(Modifier.STATIC), ReflectionUtils.withParametersCount(0));
 
     private final Reflections reflections;
 
     private ServiceLoaderImpl() {
         Predicate<String> filter = new FilterBuilder().include(FilterBuilder.prefix("configuration"));
 
-        reflections = new Reflections(new ConfigurationBuilder()
-                                                .filterInputsBy(filter)
-                                                .setUrls(ClasspathHelper.forPackage("configuration"))
-                                                .setScanners(new TypeAnnotationsScanner(),
-                                                            new MethodAnnotationsScanner(),
-                                                            new TypesScanner()));
+        reflections = new Reflections(new ConfigurationBuilder().filterInputsBy(filter)
+                .setUrls(ClasspathHelper.forPackage("configuration"))
+                .setScanners(new TypeAnnotationsScanner(), new MethodAnnotationsScanner(), new TypesScanner()));
 
     }
 
-    public static final ServiceLoader get(){
+    public static final ServiceLoader get() {
         return instance;
     }
 
     @Override
     public <T> T get(Class<T> type) {
-        try{
+        try {
 
             Set<Class<?>> classes = reflections.getTypesAnnotatedWith(AuraConfiguration.class);
 
-            //First try those marked with primary
+            // First try those marked with primary
             T ret = get(type, classes, true, predicate);
-            if(ret != null){
+            if (ret != null) {
                 return ret;
             }
 
             return get(type, classes, false, predicate);
 
-        }catch(Throwable t){
+        } catch (Throwable t) {
             throw new ServiceLocatorException(t);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T get(Class<T> type, Set<Class<?>> classes, boolean primary, Predicate<? super Method> predicate){
+    private <T> T get(Class<T> type, Set<Class<?>> classes, boolean primary, Predicate<? super Method> predicate) {
         Set<Method> beanMethods = Sets.newHashSet();
         Predicate<Method> pred;
 
-        pred = Predicates.and(predicate,
-                ReflectionUtils.withReturnTypeAssignableTo(type));
-        if(primary){
-            pred = Predicates.and(pred,
-                                    ReflectionUtils.withAnnotation(PrimaryImpl.class));
+        pred = Predicates.and(predicate, ReflectionUtils.withReturnTypeAssignableTo(type));
+        if (primary) {
+            pred = Predicates.and(pred, ReflectionUtils.withAnnotation(PrimaryImpl.class));
         }
 
-        /*  This is a better way to do it, but hits a runtime dep on Guava 12, so until we upgrade to Guava 12, working around this.
-        */
+        /*
+         * This is a better way to do it, but hits a runtime dep on Guava 12, so
+         * until we upgrade to Guava 12, working around this.
+         */
 
-        for(Class<?> clazz : classes){
-            for(Method meth : clazz.getDeclaredMethods()){
-                if(pred.apply(meth)){
+        for (Class<?> clazz : classes) {
+            for (Method meth : clazz.getDeclaredMethods()) {
+                if (pred.apply(meth)) {
                     beanMethods.add(meth);
                 }
             }
         }
 
-
         T ret = null;
-        try{
-            for(Method meth : beanMethods){
-                T tmp = (T)meth.invoke(null);
-                if(tmp != null){
-                    if(ret != null){
-                        throw new ServiceLocatorException("More than one implementation found (primary=" + primary + ").");
+        try {
+            for (Method meth : beanMethods) {
+                T tmp = (T) meth.invoke(null);
+                if (tmp != null) {
+                    if (ret != null) {
+                        throw new ServiceLocatorException("More than one implementation found (primary=" + primary
+                                + ").");
                     }
                     ret = tmp;
                 }
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new ServiceLocatorException(e);
         }
         return ret;
@@ -146,27 +151,27 @@ public class ServiceLoaderImpl implements ServiceLoader {
 
         Set<Class<?>> classes = reflections.getTypesAnnotatedWith(AuraConfiguration.class);
 
-        /*  This is a better way to do it, but hits a runtime dep on Guava 12, so until we upgrade to Guava 12, working around this.
-        */
+        /*
+         * This is a better way to do it, but hits a runtime dep on Guava 12, so
+         * until we upgrade to Guava 12, working around this.
+         */
 
-        for(Class<?> clazz : classes){
-            for(Method meth : clazz.getDeclaredMethods()){
-                if(pred.apply(meth)){
+        for (Class<?> clazz : classes) {
+            for (Method meth : clazz.getDeclaredMethods()) {
+                if (pred.apply(meth)) {
                     beanMethods.add(meth);
                 }
             }
         }
 
-
-
-        try{
-            for(Method meth : beanMethods){
-                T val = (T)meth.invoke(null);
-                if(val != null){
+        try {
+            for (Method meth : beanMethods) {
+                T val = (T) meth.invoke(null);
+                if (val != null) {
                     ret.add(val);
                 }
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new ServiceLocatorException(e);
         }
 
@@ -175,7 +180,7 @@ public class ServiceLoaderImpl implements ServiceLoader {
 
     @Override
     public <T> T get(Class<T> type, final String name) {
-        try{
+        try {
 
             Predicate<? super Method> predicate = Predicates.and(ServiceLoaderImpl.predicate, new Predicate<Method>() {
 
@@ -187,15 +192,15 @@ public class ServiceLoaderImpl implements ServiceLoader {
             });
             Set<Class<?>> classes = reflections.getTypesAnnotatedWith(AuraConfiguration.class);
 
-            //First try those marked with primary
+            // First try those marked with primary
             T ret = get(type, classes, true, predicate);
-            if(ret != null){
+            if (ret != null) {
                 return ret;
             }
 
             return get(type, classes, false, predicate);
 
-        }catch(Throwable t){
+        } catch (Throwable t) {
             throw new ServiceLocatorException(t);
         }
     }

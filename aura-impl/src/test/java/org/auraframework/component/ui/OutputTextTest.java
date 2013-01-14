@@ -22,13 +22,13 @@ import org.auraframework.throwable.AuraRuntimeException;
 
 /**
  * This test has automation to verify implementation of ui:ouputText component.
- *
+ * 
  * @userStory a07T0000001isvq
  * @hierarchy Aura.Components.UI.OutputText
  * @priority medium
  */
 public class OutputTextTest extends AuraImplTestCase {
-    public OutputTextTest(String name){
+    public OutputTextTest(String name) {
         super(name);
     }
 
@@ -37,11 +37,11 @@ public class OutputTextTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
-    public void testInjectingScriptTagIntoValue() throws Exception{
+    public void testInjectingScriptTagIntoValue() throws Exception {
         String scriptTags = "<script>alert(\'blah\')</script>";
-        String cmpMarkup = String.format(baseComponentTag, "", "<ui:outputText value='"+scriptTags+"'/>");
+        String cmpMarkup = String.format(baseComponentTag, "", "<ui:outputText value='" + scriptTags + "'/>");
         DefDescriptor<ComponentDef> testCmp = addSourceAutoCleanup(ComponentDef.class, cmpMarkup);
-        try{
+        try {
             testCmp.getDef();
             fail("XML should not be assigned as value.");
         } catch (AuraRuntimeException e) {

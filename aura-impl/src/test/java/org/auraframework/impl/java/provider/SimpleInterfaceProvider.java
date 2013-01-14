@@ -16,7 +16,9 @@
 package org.auraframework.impl.java.provider;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDescriptorProvider;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.Provider;
@@ -25,10 +27,10 @@ import org.auraframework.system.Annotations.Provider;
 public class SimpleInterfaceProvider implements ComponentDescriptorProvider {
 
     @Override
-    public DefDescriptor<ComponentDef> provide(){
-        BaseComponent<?,?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
-        Integer num = (Integer)component.getAttributes().getExpression("integerAttribute");
-        return DefDescriptorImpl.getInstance("loadLevelTest:simpleImplementation"+num, ComponentDef.class);
+    public DefDescriptor<ComponentDef> provide() {
+        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        Integer num = (Integer) component.getAttributes().getExpression("integerAttribute");
+        return DefDescriptorImpl.getInstance("loadLevelTest:simpleImplementation" + num, ComponentDef.class);
     }
 
 }

@@ -19,7 +19,7 @@ import org.auraframework.impl.adapter.format.html.HTMLFormatAdapter;
 
 /**
  */
-public abstract class OfflineHTMLFormatAdapter<T> extends HTMLFormatAdapter<T>{
+public abstract class OfflineHTMLFormatAdapter<T> extends HTMLFormatAdapter<T> {
 
     private static final String name = "OFFLINE_HTML";
 

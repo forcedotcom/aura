@@ -18,19 +18,19 @@ package org.auraframework.components.ui;
 import java.util.Arrays;
 import java.util.List;
 
+import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
-import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.WebDriverUtil.BrowserType;
 
 public class InputSelectUITest extends WebDriverTestCase {
     private WebDriver d;
 
-    public InputSelectUITest(String name){
+    public InputSelectUITest(String name) {
         super(name);
     }
 
@@ -42,28 +42,30 @@ public class InputSelectUITest extends WebDriverTestCase {
         WebElement inputSelectElement = d.findElement(By.cssSelector(selectLocator));
         Select inputSelect = new Select(inputSelectElement);
 
-        //Assert element visible
+        // Assert element visible
         assertTrue("InputSelect not visible", inputSelectElement.isDisplayed());
 
-        //Initial selected option
+        // Initial selected option
         assertEquals("Initial select option incorrect", "Lion", inputSelect.getFirstSelectedOption().getText());
 
-        //Option label
+        // Option label
         assertEquals("The select option's label is wrong", "Ant", inputSelect.getOptions().get(5).getText());
 
-        //Change selection
+        // Change selection
         inputSelect.selectByValue("Bear");
         assertFalse("Lion should not be selected any longer", inputSelect.getOptions().get(1).isSelected());
         assertTrue("Bear should be selected", inputSelect.getOptions().get(2).isSelected());
-        assertEquals("InputSelect Component is not returning the selected value correctly", "Bear", inputSelect.getOptions().get(2).getText());
+        assertEquals("InputSelect Component is not returning the selected value correctly", "Bear", inputSelect
+                .getOptions().get(2).getText());
 
         inputSelect.selectByValue("Dragonfly");
         assertFalse("Bear should not be selected any longer", inputSelect.getOptions().get(2).isSelected());
         assertTrue("Dragonfly should be selected", inputSelect.getOptions().get(4).isSelected());
-        assertEquals("InputSelect Component is not returning the selected value correctly", "Dragonfly", inputSelect.getOptions().get(4).getText());
+        assertEquals("InputSelect Component is not returning the selected value correctly", "Dragonfly", inputSelect
+                .getOptions().get(4).getText());
     }
 
-    @ExcludeBrowsers({BrowserType.IPAD,BrowserType.ANDROID_PHONE,BrowserType.ANDROID_TABLET,BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE })
     public void testMultipleSelect() throws Exception {
         d = getDriver();
         String selectLocator = "select[class~='multiple']";
@@ -73,31 +75,32 @@ public class InputSelectUITest extends WebDriverTestCase {
         WebElement inputSelectElement = d.findElement(By.cssSelector(selectLocator));
         Select inputSelect = new Select(inputSelectElement);
 
-        //Assert element visible
+        // Assert element visible
         assertTrue("InputSelect not visible", inputSelectElement.isDisplayed());
 
-        //Initial selected option
+        // Initial selected option
         List<WebElement> selectedOptions = inputSelect.getAllSelectedOptions();
         assertTrue(selectedOptions.size() == 2);
         assertTrue("Lion not in expected otpions", isOptionSelected("Lion", selectedOptions));
         assertTrue("Bear not in expected otpions", isOptionSelected("Bear", selectedOptions));
 
-        //Checking value via Aura framework
+        // Checking value via Aura framework
         String compValue = (String) ((JavascriptExecutor) d).executeScript(valueExpr);
         assertNotNull(compValue);
         String[] selectedValues = compValue.split(";");
         assertTrue("Lion not returned in component values", Arrays.asList(selectedValues).contains("Lion"));
         assertTrue("Bear not returned in component values", Arrays.asList(selectedValues).contains("Bear"));
 
-        //Adding Click to focus Element before tabing out so that it works on IE10.
+        // Adding Click to focus Element before tabing out so that it works on
+        // IE10.
         inputSelectElement.click();
-        //change selection
+        // change selection
         inputSelect.selectByValue("Butterfly");
         inputSelectElement.sendKeys(Keys.TAB);
         selectedOptions = inputSelect.getAllSelectedOptions();
         assertTrue("Butterfly not in expected otpions", isOptionSelected("Butterfly", selectedOptions));
 
-        //Checking value via Aura framework
+        // Checking value via Aura framework
         compValue = (String) ((JavascriptExecutor) d).executeScript(valueExpr);
         assertNotNull(compValue);
         selectedValues = compValue.split(";");
@@ -121,20 +124,21 @@ public class InputSelectUITest extends WebDriverTestCase {
         WebElement inputSelectElement = d.findElement(By.cssSelector(selectLocator));
         Select inputSelect = new Select(inputSelectElement);
 
-        //Assert element visible
+        // Assert element visible
         assertTrue("InputSelect not visible", inputSelectElement.isDisplayed());
 
-        //Initial selected option
+        // Initial selected option
         List<WebElement> selectedLabels = inputSelect.getOptions();
         assertFalse("Option1 should not be selected", selectedLabels.get(0).isSelected());
         assertTrue("Option2 should be selected", selectedLabels.get(1).isSelected());
 
-        //Change selection
+        // Change selection
         inputSelect.selectByValue("option1");
         selectedLabels = inputSelect.getOptions();
         assertTrue("Option1 should be selected", selectedLabels.get(0).isSelected());
         assertFalse("Option2 should not be selected", selectedLabels.get(1).isSelected());
-        assertEquals("InputSelect Component is not returning the selected value correctly", "option1", selectedLabels.get(0).getAttribute("value"));
+        assertEquals("InputSelect Component is not returning the selected value correctly", "option1", selectedLabels
+                .get(0).getAttribute("value"));
     }
 
 }

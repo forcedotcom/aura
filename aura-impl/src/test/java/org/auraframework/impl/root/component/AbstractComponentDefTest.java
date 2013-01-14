@@ -15,9 +15,16 @@
  */
 package org.auraframework.impl.root.component;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.RegisterEventDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -34,6 +41,7 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
 
     /**
      * Abstract component extends regular component.
+     * 
      * @throws Exception
      */
     public void testExtendsComponent() throws Exception {
@@ -44,14 +52,14 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
 
         try {
             cmp.validateDefinition();
-        }
-        catch(AuraRuntimeException e) {
+        } catch (AuraRuntimeException e) {
             fail("Should not have thrown AuraRuntimeException on abstract component extending component.");
         }
     }
 
     /**
      * Abstract component extends abstract component.
+     * 
      * @throws Exception
      */
     public void testExtendsAbstract() throws Exception {
@@ -63,14 +71,14 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
 
         try {
             cmp.validateDefinition();
-        }
-        catch(AuraRuntimeException e) {
+        } catch (AuraRuntimeException e) {
             fail("Should not have thrown AuraRuntimeException on abstract component extending abstract component.");
         }
     }
 
     /**
      * Abstract component implements interface component.
+     * 
      * @throws Exception
      */
     public void testImplementsIntf() throws Exception {
@@ -84,14 +92,14 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
 
         try {
             cmp.validateDefinition();
-        }
-        catch(AuraRuntimeException e) {
+        } catch (AuraRuntimeException e) {
             fail("Should not have thrown AuraRuntimeException on abstract component implementing interface.");
         }
     }
 
     /**
      * Abstract component contains events.
+     * 
      * @throws Exception
      */
     public void testEvents() throws Exception {
@@ -109,14 +117,14 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
 
         try {
             cmp.validateDefinition();
-        }
-        catch(AuraRuntimeException e) {
+        } catch (AuraRuntimeException e) {
             fail("Should not have thrown AuraRuntimeException on abstract component containing events.");
         }
     }
 
     /**
      * Abstract component extends text component.
+     * 
      * @throws Exception
      */
     public void testTextComponent() throws Exception {
@@ -127,17 +135,17 @@ public class AbstractComponentDefTest extends AuraImplTestCase {
 
         try {
             cmp.validateDefinition();
-        }
-        catch(AuraRuntimeException e) {
+        } catch (AuraRuntimeException e) {
             fail("Should not have thrown AuraRuntimeException on abstract component extending text component.");
         }
     }
 
     /**
      * Helper method to create abstract component builder.
+     * 
      * @return
      */
-    private ComponentDefImpl.Builder createAbstractBuilder(){
+    private ComponentDefImpl.Builder createAbstractBuilder() {
         ComponentDefImpl.Builder builder = new ComponentDefImpl.Builder();
         builder.isAbstract = true;
         builder.isExtensible = true;

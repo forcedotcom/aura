@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.auraframework.Aura;
 import org.auraframework.impl.root.parser.XMLWriter;
 import org.auraframework.impl.root.parser.handler.XMLHandler;
@@ -30,11 +31,13 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.RegistryJsonSerializer;
 
 /**
- * Serialize Aura Component Registry to json for consumption by tools like eclipse plugin.
+ * Serialize Aura Component Registry to json for consumption by tools like
+ * eclipse plugin.
  */
 public class RegistryAndSystemTagsJsonSerializer {
     final static String FILE_NAME_SYSTEM_TAGS = "auraSystemTags.json";
-    final static String DEFAULT_FILE_SYSTEM_TAGS= RegistryJsonSerializer.DEFAULT_DIR+File.separator+FILE_NAME_SYSTEM_TAGS;
+    final static String DEFAULT_FILE_SYSTEM_TAGS = RegistryJsonSerializer.DEFAULT_DIR + File.separator
+            + FILE_NAME_SYSTEM_TAGS;
 
     public static void main(String[] args) throws IOException, QuickFixException {
         serializeToFile();
@@ -42,14 +45,13 @@ public class RegistryAndSystemTagsJsonSerializer {
 
     private static void serializeToFile() throws QuickFixException, IOException {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED);
-        Map<String, Map<String, Map<String, Map<String, String>>>> components = new TreeMap<String, Map<String,Map<String,Map<String,String>>>>();
-        try{
+        Map<String, Map<String, Map<String, Map<String, String>>>> components = new TreeMap<String, Map<String, Map<String, Map<String, String>>>>();
+        try {
             loadMetadataForSystemComponents(components);
             RegistryJsonSerializer.writeMetadataToFile(components, DEFAULT_FILE_SYSTEM_TAGS);
             components.clear();
             RegistryJsonSerializer.serializeToFile();
-        }
-        finally{
+        } finally {
             Aura.getContextService().endContext();
         }
     }
@@ -60,13 +62,13 @@ public class RegistryAndSystemTagsJsonSerializer {
         Collection<XMLHandler<?>> specialComps = xmlWriter.getHandlers().values();
         Map<String, Map<String, Map<String, String>>> component;
         Map<String, Map<String, String>> componentDetails;
-        for(XMLHandler<?> specialComp : specialComps){
+        for (XMLHandler<?> specialComp : specialComps) {
             String compName = specialComp.getHandledTag();
-            //some handlers don't really have a TAG..
-            if(XMLHandler.SYSTEM_TAGS.contains(compName)){
-                component = new TreeMap<String, Map<String,Map<String,String>>>();
-                componentDetails = new TreeMap<String, Map<String,String>>();
-                for(String attribute : specialComp.getAllowedAttributes()){
+            // some handlers don't really have a TAG..
+            if (XMLHandler.SYSTEM_TAGS.contains(compName)) {
+                component = new TreeMap<String, Map<String, Map<String, String>>>();
+                componentDetails = new TreeMap<String, Map<String, String>>();
+                for (String attribute : specialComp.getAllowedAttributes()) {
                     Map<String, String> attributeProps = new TreeMap<String, String>();
                     attributeProps.put(RegistryJsonSerializer.TYPE_KEY, "Object");
                     componentDetails.put(attribute, attributeProps);

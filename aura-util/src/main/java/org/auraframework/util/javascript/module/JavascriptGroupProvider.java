@@ -21,26 +21,32 @@ import java.util.Collection;
 import org.auraframework.util.javascript.JavascriptGroup;
 
 /**
- * Interface that provides javascript groups. Each module that has javascript has to implement this so the generation and app
- * initialization can find the groups from other modules. It also allows modules to access each others javascript.
+ * Interface that provides javascript groups. Each module that has javascript
+ * has to implement this so the generation and app initialization can find the
+ * groups from other modules. It also allows modules to access each others
+ * javascript.
  */
 public interface JavascriptGroupProvider {
 
     /**
-     * The name should be the same as the module the javascript is in, its primarily used as part of the url of the generated file,
-     * which is of the form /sfdc/htdocs/javascript/module/group.js
+     * The name should be the same as the module the javascript is in, its
+     * primarily used as part of the url of the generated file, which is of the
+     * form /sfdc/htdocs/javascript/module/group.js
+     * 
      * @return the name of the module this is for
      */
     String getModuleName();
 
     /**
-     * called once during app startup to create the javascript groups, this is because some group metadata is kept in memory,
-     * specifically the lastmod date of the group used for caching.
+     * called once during app startup to create the javascript groups, this is
+     * because some group metadata is kept in memory, specifically the lastmod
+     * date of the group used for caching.
      */
     void initializeJavascriptGroups(boolean isProduction) throws IOException;
 
     /**
-     * @return all the groups for this module, should only be used by the generator
+     * @return all the groups for this module, should only be used by the
+     *         generator
      */
     Collection<? extends JavascriptGroup> getAllJavascriptGroups();
 

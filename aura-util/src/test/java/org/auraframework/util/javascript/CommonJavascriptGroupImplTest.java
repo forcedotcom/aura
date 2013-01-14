@@ -24,8 +24,9 @@ import java.io.Writer;
 import org.auraframework.test.UnitTestCase;
 
 /**
- * Tests for CommonJavascriptGroupImpl class {@link CommonJavascriptGroupImpl}. This class has implementation of some
- * common functionality required for grouping javascript files in modules. The current class has some tests for
+ * Tests for CommonJavascriptGroupImpl class {@link CommonJavascriptGroupImpl}.
+ * This class has implementation of some common functionality required for
+ * grouping javascript files in modules. The current class has some tests for
  * verifying the implementation of javascript grouping functionality.
  */
 public class CommonJavascriptGroupImplTest extends UnitTestCase {
@@ -34,8 +35,9 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
     }
 
     /**
-     * Test basic initialization and other exposed public methods of CommonJavascriptGroupImpl.java.
-     *
+     * Test basic initialization and other exposed public methods of
+     * CommonJavascriptGroupImpl.java.
+     * 
      * @throws Exception
      */
     public void testBasicInitialization() throws Exception {
@@ -96,7 +98,8 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
             assertTrue("Add File function failed because of an unexpected error",
                     e.getMessage().startsWith("File did not exist or was not a .js file: "));
         }
-        // Create a new file and add it to the Group and verify that the last mod date has been changed.
+        // Create a new file and add it to the Group and verify that the last
+        // mod date has been changed.
         localCJG.reset();
         String newFileName = new Long(System.currentTimeMillis()).toString() + ".js";
         File newFile = new File(localCJG.root, newFileName);
@@ -125,7 +128,8 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
         }
 
         @Override
-        public void generate(File destRoot, boolean doValidation) throws IOException {}
+        public void generate(File destRoot, boolean doValidation) throws IOException {
+        }
 
         @Override
         public boolean isStale() {
@@ -133,12 +137,15 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
         }
 
         @Override
-        public void parse() throws IOException {}
+        public void parse() throws IOException {
+        }
 
         @Override
-        public void postProcess() {}
+        public void postProcess() {
+        }
 
         @Override
-        public void regenerate(File destRoot) throws IOException {}
+        public void regenerate(File destRoot) throws IOException {
+        }
     }
 }

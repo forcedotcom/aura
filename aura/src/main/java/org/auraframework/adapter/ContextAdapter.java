@@ -22,22 +22,24 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.util.json.JsonSerializationContext;
 
 /**
  * context adapter for aura
  */
 
-
-public interface ContextAdapter extends AuraAdapter{
+public interface ContextAdapter extends AuraAdapter {
     void release();
 
     AuraContext establish(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
-            Format format, Access access, JsonSerializationContext jsonContext, Map<ValueProviderType, GlobalValueProvider> globalProviders, DefDescriptor<? extends BaseComponentDef> appDesc);
+            Format format, Access access, JsonSerializationContext jsonContext,
+            Map<ValueProviderType, GlobalValueProvider> globalProviders,
+            DefDescriptor<? extends BaseComponentDef> appDesc);
 
     boolean isEstablished();
 

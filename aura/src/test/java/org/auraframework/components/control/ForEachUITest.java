@@ -22,7 +22,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 /**
- * Test components using ForEach loops. This is a web driver test case to check for foreach rendering.
+ * Test components using ForEach loops. This is a web driver test case to check
+ * for foreach rendering.
  */
 @ThreadHostileTest
 public class ForEachUITest extends WebDriverTestCase {
@@ -32,19 +33,22 @@ public class ForEachUITest extends WebDriverTestCase {
     }
 
     private static String FOREACH_COMPONENT = "<aura:component model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
-            +"Result:"
-            +"<div id=\"list_content\">"
-            + "<aura:foreach items=\"{!m.%s}\" var=\"i\">{!i}</aura:foreach>" + "</div>\n" + "</aura:component>";
+            + "Result:"
+            + "<div id=\"list_content\">"
+            + "<aura:foreach items=\"{!m.%s}\" var=\"i\">{!i}</aura:foreach>"
+            + "</div>\n" + "</aura:component>";
 
     private static String FOREACH_APP = "<aura:application render=\"client\" model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
-            +"Result:"
-            +"<div id=\"list_content\">"
-            + "<aura:foreach items=\"{!m.%s}\" var=\"i\">{!i}</aura:foreach>" + "</div>" + "</aura:application>";
+            + "Result:"
+            + "<div id=\"list_content\">"
+            + "<aura:foreach items=\"{!m.%s}\" var=\"i\">{!i}</aura:foreach>"
+            + "</div>" + "</aura:application>";
 
     private static String FOREACH_APP_SERVER = "<aura:application render=\"server\" model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
-            +"Result:"
-            +"<div id=\"list_content\">"
-            + "<aura:foreach items=\"{!m.%s}\" var=\"i\">{!i}</aura:foreach>" + "</div>" + "</aura:application>";
+            + "Result:"
+            + "<div id=\"list_content\">"
+            + "<aura:foreach items=\"{!m.%s}\" var=\"i\">{!i}</aura:foreach>"
+            + "</div>" + "</aura:application>";
 
     /**
      * Get the content of the 'list_content' div.
@@ -57,7 +61,7 @@ public class ForEachUITest extends WebDriverTestCase {
 
     /**
      * Test ForEach iteration over a list of Strings.
-     *
+     * 
      * @throws Exception
      */
     public void testForEachStringList() throws Exception {
@@ -71,7 +75,7 @@ public class ForEachUITest extends WebDriverTestCase {
 
     /**
      * Test ForEach iteration over empty list.
-     *
+     * 
      * @throws Exception
      */
     public void testForEachEmpty() throws Exception {
@@ -92,13 +96,13 @@ public class ForEachUITest extends WebDriverTestCase {
         assertEquals("foreach content text didn't match (Server)", "", getListContent());
     }
 
-    public void testForEachApp() throws Exception{
+    public void testForEachApp() throws Exception {
         String appText = String.format(FOREACH_APP, "stringList");
         loadApplication("stringlist_client", appText, true);
         assertEquals("foreach content text", "onetwothree", getListContent());
     }
 
-    public void testForEachAppServer() throws Exception{
+    public void testForEachAppServer() throws Exception {
         String appText = String.format(FOREACH_APP_SERVER, "stringList");
         loadApplication("stringlist_server", appText, false);
         assertEquals("foreach content text", "onetwothree", getListContent());

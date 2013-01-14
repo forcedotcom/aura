@@ -21,7 +21,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
@@ -29,9 +31,10 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 /**
- * typedef that allows for defrefs to be passed around without being automatically instantiated
- *
- *
+ * typedef that allows for defrefs to be passed around without being
+ * automatically instantiated
+ * 
+ * 
  * @since 0.0.234
  */
 public class ComponentDefRefArrayTypeDef extends DefinitionImpl<TypeDef> implements TypeDef {
@@ -42,7 +45,7 @@ public class ComponentDefRefArrayTypeDef extends DefinitionImpl<TypeDef> impleme
         super(builder);
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<TypeDef>{
+    public static class Builder extends DefinitionImpl.BuilderImpl<TypeDef> {
 
         public Builder() {
             super(TypeDef.class);
@@ -85,7 +88,7 @@ public class ComponentDefRefArrayTypeDef extends DefinitionImpl<TypeDef> impleme
     @Override
     public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) throws QuickFixException {
         @SuppressWarnings("unchecked")
-        List<ComponentDefRef> value = (List<ComponentDefRef>)instance;
+        List<ComponentDefRef> value = (List<ComponentDefRef>) instance;
         for (ComponentDefRef componentDefRef : value) {
             componentDefRef.appendDependencies(deps);
         }

@@ -20,25 +20,30 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.collect.Maps;
-
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraError;
+
+import com.google.common.collect.Maps;
 
 /**
  * adds an attribute to a component or interface def
  */
 public class CreateAttributeQuickFix extends AuraQuickFix {
-    private static final Pattern CMP_TAG = Pattern.compile("<aura:component([^>]*?)>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-    private static final Pattern INTF_TAG = Pattern.compile("<aura:interface([^>]*?)>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+    private static final Pattern CMP_TAG = Pattern.compile("<aura:component([^>]*?)>", Pattern.CASE_INSENSITIVE
+            | Pattern.MULTILINE);
+    private static final Pattern INTF_TAG = Pattern.compile("<aura:interface([^>]*?)>", Pattern.CASE_INSENSITIVE
+            | Pattern.MULTILINE);
 
     /**
      * Create an attribute quick-fix.
-     *
-     * @param descriptor the descriptor on which we wish to create the attribute.
+     * 
+     * @param descriptor the descriptor on which we wish to create the
+     *            attribute.
      * @param attName the name of the attribute
      */
     public CreateAttributeQuickFix(DefDescriptor<?> descriptor, String attName) {
@@ -47,11 +52,13 @@ public class CreateAttributeQuickFix extends AuraQuickFix {
 
     /**
      * Create an attribute quick-fix from a map.
-     *
-     * @param attributes A map with 'descriptor', 'attName', and 'intf' set appropriately.
+     * 
+     * @param attributes A map with 'descriptor', 'attName', and 'intf' set
+     *            appropriately.
      */
     public CreateAttributeQuickFix(Map<String, Object> attributes) {
-        super("Create Attribute", attributes, Aura.getDefinitionService().getDefDescriptor("auradev:createAttributeDefQuickFix", ComponentDef.class));
+        super("Create Attribute", attributes, Aura.getDefinitionService().getDefDescriptor(
+                "auradev:createAttributeDefQuickFix", ComponentDef.class));
     }
 
     /**
@@ -67,11 +74,12 @@ public class CreateAttributeQuickFix extends AuraQuickFix {
 
     @Override
     protected void fix() throws Exception {
-        String descriptor = (String)getAttributes().get("descriptor");
-        String attName = (String)getAttributes().get("attName");
-        String type = (String)getAttributes().get("type");
-        boolean intf = Boolean.valueOf((String)getAttributes().get("intf"));
-        DefDescriptor<?> desc = Aura.getDefinitionService().getDefDescriptor(descriptor, intf ? InterfaceDef.class : ComponentDef.class);
+        String descriptor = (String) getAttributes().get("descriptor");
+        String attName = (String) getAttributes().get("attName");
+        String type = (String) getAttributes().get("type");
+        boolean intf = Boolean.valueOf((String) getAttributes().get("intf"));
+        DefDescriptor<?> desc = Aura.getDefinitionService().getDefDescriptor(descriptor,
+                intf ? InterfaceDef.class : ComponentDef.class);
         Source<?> source = Aura.getContextService().getCurrentContext().getDefRegistry().getSource(desc);
         if (!source.exists()) {
             throw new AuraError("Cannot find source for " + desc.getQualifiedName());
@@ -97,7 +105,6 @@ public class CreateAttributeQuickFix extends AuraQuickFix {
         } else {
             throw new AuraError("Could not locate opening tag for " + desc.getQualifiedName());
         }
-
 
     }
 

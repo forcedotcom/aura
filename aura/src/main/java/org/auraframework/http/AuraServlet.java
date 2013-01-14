@@ -15,25 +15,49 @@
  */
 package org.auraframework.http;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.URI;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.http.RequestParam.EnumParam;
 import org.auraframework.http.RequestParam.StringParam;
-import org.auraframework.instance.*;
-import org.auraframework.service.*;
-import org.auraframework.system.*;
+import org.auraframework.instance.Application;
+import org.auraframework.instance.BaseComponent;
+import org.auraframework.instance.Component;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.InstanceService;
+import org.auraframework.service.LoggingService;
+import org.auraframework.service.SerializationService;
+import org.auraframework.service.ServerService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.throwable.*;
+import org.auraframework.system.Message;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.ClientOutOfSyncException;
+import org.auraframework.throwable.NoAccessException;
+import org.auraframework.throwable.SystemErrorException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
@@ -42,27 +66,27 @@ import com.google.common.collect.Maps;
 
 // DCHASMAN TODO Move this into its own aura-heroku module
 /*import javax.servlet.ServletException;
-import org.eclipse.jetty.webapp.*;*/
+ import org.eclipse.jetty.webapp.*;*/
 
 /**
  * The servlet for Aura.
- *
- * Run from aura-jetty project. Pass in these vmargs:
- * <code>
+ * 
+ * Run from aura-jetty project. Pass in these vmargs: <code>
  * -Dconfig=${AURA_HOME}/config -Daura.home=${AURA_HOME} -DPORT=9090
  * </code>
- *
+ * 
  * Exception handling is dealt with in {@link #handleServletException} which
  * should almost always be called when exceptions are caught. This routine will
- * use {@link org.auraframework.adapter.ExceptionAdapter ExceptionAdapter} to log and
- * rewrite exceptions as necessary.
+ * use {@link org.auraframework.adapter.ExceptionAdapter ExceptionAdapter} to
+ * log and rewrite exceptions as necessary.
  */
 public class AuraServlet extends AuraBaseServlet {
     private static final long serialVersionUID = 2218469644108785216L;
     public static final String DISABLE_APPCACHE_PROPERTY = "aura.noappcache";
 
     protected final static StringParam tag = new StringParam(AURA_PREFIX + "tag", 128, true);
-    private static final EnumParam<DefType> defTypeParam = new EnumParam<DefType>(AURA_PREFIX + "deftype", false, DefType.class);
+    private static final EnumParam<DefType> defTypeParam = new EnumParam<DefType>(AURA_PREFIX + "deftype", false,
+            DefType.class);
     private final static StringParam messageParam = new StringParam("message", 0, false);
 
     // FIXME: is this really a good idea?
@@ -75,16 +99,16 @@ public class AuraServlet extends AuraBaseServlet {
 
     /**
      * Handle an HTTP GET operation.
-     *
-     * The HTTP GET operation is used to retrieve resources from the Aura servlet. It is only used for this
-     * purpose, where POST is used for actions.
-     *
+     * 
+     * The HTTP GET operation is used to retrieve resources from the Aura
+     * servlet. It is only used for this purpose, where POST is used for
+     * actions.
+     * 
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Message<?> message;
         Message<?> ret;
         ServerService serverService;
@@ -120,37 +144,38 @@ public class AuraServlet extends AuraBaseServlet {
 
             //
             // FIXME:!!!
-            // This is part of the appcache refresh, forcing a reload while avoiding the
+            // This is part of the appcache refresh, forcing a reload while
+            // avoiding the
             // appcache. It is here because (fill in the blank).
             //
-            // This should probably be handled a little differently, maybe even before
+            // This should probably be handled a little differently, maybe even
+            // before
             // we do any checks at all.
             //
             String nocache = nocacheParam.get(request);
             if (nocache != null && !nocache.isEmpty()) {
                 response.setContentType("text/plain");
                 response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
-                
-                String newLocation =  "/";
-                
-                try{
-                	URI uri = new URI(nocache,true);
-                	String fragment = uri.getEscapedFragment();
+
+                String newLocation = "/";
+
+                try {
+                    URI uri = new URI(nocache, true);
+                    String fragment = uri.getEscapedFragment();
                     StringBuilder sb = new StringBuilder(uri.getEscapedPathQuery());
-                    if(fragment != null && !fragment.isEmpty()){
+                    if (fragment != null && !fragment.isEmpty()) {
                         sb.append("#");
-                    	sb.append(fragment);
+                        sb.append(fragment);
                     }
                     newLocation = sb.toString();
-                }
-                catch(Exception e){
-                	// This exception should never happen.
-                	// If happened: log a gack and redirect
+                } catch (Exception e) {
+                    // This exception should never happen.
+                    // If happened: log a gack and redirect
                     Aura.getExceptionAdapter().handleException(e);
-                }                
-                
+                }
+
                 response.setHeader("Location", newLocation);
-                
+
                 setNoCache(response);
                 return;
             }
@@ -191,7 +216,8 @@ public class AuraServlet extends AuraBaseServlet {
         Message<?> message = null;
 
         if (defType == DefType.APPLICATION) {
-            DefDescriptor<ApplicationDef> defDescriptor = definitionService.getDefDescriptor(tagName, ApplicationDef.class);
+            DefDescriptor<ApplicationDef> defDescriptor = definitionService.getDefDescriptor(tagName,
+                    ApplicationDef.class);
             Aura.getContextService().getCurrentContext().setApplicationDescriptor(defDescriptor);
             message = new Message<ApplicationDef>(null, defDescriptor, null);
 
@@ -205,15 +231,14 @@ public class AuraServlet extends AuraBaseServlet {
         return message;
     }
 
-
-
     /**
      * Allow the servlet to override page access.
-     *
-     * FIXME: this is totally bogus and should be handled by the security provider - GPO.
+     * 
+     * FIXME: this is totally bogus and should be handled by the security
+     * provider - GPO.
      */
-    private boolean handle404(HttpServletRequest request, HttpServletResponse response,
-                              String tagName, DefType defType) throws ServletException, IOException {
+    private boolean handle404(HttpServletRequest request, HttpServletResponse response, String tagName, DefType defType)
+            throws ServletException, IOException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         Mode mode = context.getMode();
 
@@ -229,24 +254,26 @@ public class AuraServlet extends AuraBaseServlet {
         return (defType == DefType.APPLICATION || defType == DefType.COMPONENT);
     }
 
-    private void handleJsonFormat(HttpServletRequest request, HttpServletResponse response, String tagName, DefType defType, Map<String, Object> attributes) throws IOException, ServletException {
+    private void handleJsonFormat(HttpServletRequest request, HttpServletResponse response, String tagName,
+            DefType defType, Map<String, Object> attributes) throws IOException, ServletException {
         InstanceService instanceService = Aura.getInstanceService();
         AuraContext context = Aura.getContextService().getCurrentContext();
         LoggingService loggingService = Aura.getLoggingService();
         boolean written = false;
 
-        BaseComponent<?,?> component = null;
+        BaseComponent<?, ?> component = null;
         try {
             setNoCache(response);
 
-            if(defType == DefType.APPLICATION){
+            if (defType == DefType.APPLICATION) {
                 Application app = instanceService.getInstance(tagName, ApplicationDef.class, attributes);
                 component = app;
-            }else if(defType == DefType.COMPONENT){
-                component = (Component)instanceService.getInstance(tagName, ComponentDef.class, attributes);
+            } else if (defType == DefType.COMPONENT) {
+                component = (Component) instanceService.getInstance(tagName, ComponentDef.class, attributes);
             }
 
-            if(context.getLastMod() != null && !context.getLastMod().isEmpty() && !isUpToDate(Long.parseLong(context.getLastMod()))){
+            if (context.getLastMod() != null && !context.getLastMod().isEmpty()
+                    && !isUpToDate(Long.parseLong(context.getLastMod()))) {
                 deleteManifestCookie(response);
                 throw new ClientOutOfSyncException(OUTDATED_MESSAGE);
             }
@@ -269,15 +296,14 @@ public class AuraServlet extends AuraBaseServlet {
         }
     }
 
-    private void handleHtmlFormat(HttpServletRequest request, HttpServletResponse response,
-                                  BaseComponentDef def,
-                                  Map<String, Object> attributes) throws IOException, ServletException {
+    private void handleHtmlFormat(HttpServletRequest request, HttpServletResponse response, BaseComponentDef def,
+            Map<String, Object> attributes) throws IOException, ServletException {
         SerializationService serializationService = Aura.getSerializationService();
         LoggingService loggingService = Aura.getLoggingService();
         response.setCharacterEncoding(UTF_ENCODING);
 
         try {
-            if(shouldCacheHTMLTemplate(request)){
+            if (shouldCacheHTMLTemplate(request)) {
                 setLongCache(response);
             } else {
                 setNoCache(response);
@@ -297,7 +323,7 @@ public class AuraServlet extends AuraBaseServlet {
         }
     }
 
-    private static boolean isUpToDate(long lastMod) throws QuickFixException{
+    private static boolean isUpToDate(long lastMod) throws QuickFixException {
         return (lastMod == -1) || (lastMod == getLastMod());
     }
 
@@ -310,7 +336,7 @@ public class AuraServlet extends AuraBaseServlet {
 
         List<String> ret = new ArrayList<String>();
 
-        switch(mode){
+        switch (mode) {
         case PTEST:
             ret.add(config.getJiffyJSURL());
             ret.add(config.getJiffyUIJSURL());
@@ -336,9 +362,9 @@ public class AuraServlet extends AuraBaseServlet {
             StringBuilder defs = new StringBuilder(contextPath).append("/l/");
             StringBuilder sb = new StringBuilder();
 
-            try{
+            try {
                 Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
-            }catch(IOException e){
+            } catch (IOException e) {
                 throw new AuraRuntimeException(e);
             }
             String contextJson = AuraTextUtil.urlencode(sb.toString());
@@ -369,9 +395,9 @@ public class AuraServlet extends AuraBaseServlet {
             StringBuilder defs = new StringBuilder(contextPath).append("/l/");
             StringBuilder sb = new StringBuilder();
 
-            try{
+            try {
                 Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
-            }catch(IOException e){
+            } catch (IOException e) {
                 throw new AuraRuntimeException(e);
             }
             String contextJson = AuraTextUtil.urlencode(sb.toString());
@@ -379,11 +405,11 @@ public class AuraServlet extends AuraBaseServlet {
             defs.append("/app.css");
             ret.add(defs.toString());
         }
-        switch(mode){
-            case PTEST:
-                ret.add(config.getJiffyCSSURL());
-                break;
-            default:
+        switch (mode) {
+        case PTEST:
+            ret.add(config.getJiffyCSSURL());
+            break;
+        default:
         }
         return ret;
     }
@@ -395,16 +421,17 @@ public class AuraServlet extends AuraBaseServlet {
 
         try {
             DefinitionService definitionService = Aura.getDefinitionService();
-            for(String namespace: namespaces){
-                DefDescriptor<ThemeDef> matcher = definitionService.getDefDescriptor(String.format("css://%s.*", namespace), ThemeDef.class);
+            for (String namespace : namespaces) {
+                DefDescriptor<ThemeDef> matcher = definitionService.getDefDescriptor(
+                        String.format("css://%s.*", namespace), ThemeDef.class);
                 Set<DefDescriptor<ThemeDef>> descriptors = definitionService.find(matcher);
 
-                for(DefDescriptor<ThemeDef> descriptor : descriptors){
-                    if(!descriptor.getName().toLowerCase().endsWith("template")){
+                for (DefDescriptor<ThemeDef> descriptor : descriptors) {
+                    if (!descriptor.getName().toLowerCase().endsWith("template")) {
                         ThemeDef def = descriptor.getDef();
-                        if(def != null){
+                        if (def != null) {
                             Set<String> imgs = def.getValidImageURLs();
-                            if(imgs != null && imgs.size()>0){
+                            if (imgs != null && imgs.size() > 0) {
                                 imgURLs.addAll(imgs);
                             }
                         }
@@ -417,34 +444,34 @@ public class AuraServlet extends AuraBaseServlet {
         return imgURLs;
     }
 
-     public static String getManifest() throws QuickFixException {
-         AuraContext context = Aura.getContextService().getCurrentContext();
-         Set<String> preloads = context.getPreloads();
-         String contextPath = context.getContextPath();
+    public static String getManifest() throws QuickFixException {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        Set<String> preloads = context.getPreloads();
+        String contextPath = context.getContextPath();
 
-         String ret = new String();
+        String ret = new String();
 
-         if (preloads != null && !preloads.isEmpty()) {
-             boolean serPreloads = context.getSerializePreLoad();
-             boolean serLastMod = context.getSerializeLastMod();
-             context.setSerializePreLoad(false);
-             context.setSerializeLastMod(false);
-             StringBuilder defs = new StringBuilder(contextPath).append("/l/");
-             StringBuilder sb = new StringBuilder();
-             try{
-                 Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
-             }catch(IOException e){
-                 throw new AuraRuntimeException(e);
+        if (preloads != null && !preloads.isEmpty()) {
+            boolean serPreloads = context.getSerializePreLoad();
+            boolean serLastMod = context.getSerializeLastMod();
+            context.setSerializePreLoad(false);
+            context.setSerializeLastMod(false);
+            StringBuilder defs = new StringBuilder(contextPath).append("/l/");
+            StringBuilder sb = new StringBuilder();
+            try {
+                Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
+            } catch (IOException e) {
+                throw new AuraRuntimeException(e);
             }
-             context.setSerializePreLoad(serPreloads);
-             context.setSerializeLastMod(serLastMod);
-             String contextJson = AuraTextUtil.urlencode(sb.toString());
-             defs.append(contextJson);
-             defs.append("/app.manifest");
-             ret = defs.toString();
-         }
-         return ret;
-     }
+            context.setSerializePreLoad(serPreloads);
+            context.setSerializeLastMod(serLastMod);
+            String contextJson = AuraTextUtil.urlencode(sb.toString());
+            defs.append(contextJson);
+            defs.append("/app.manifest");
+            ret = defs.toString();
+        }
+        return ret;
+    }
 
     private Map<String, Object> getComponentAttributes(HttpServletRequest request) {
         Enumeration<String> attributeNames = request.getParameterNames();
@@ -467,7 +494,8 @@ public class AuraServlet extends AuraBaseServlet {
      *      javax.servlet.http.HttpServletResponse)
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
+            IOException {
         SerializationService serializationService = Aura.getSerializationService();
         LoggingService loggingService = Aura.getLoggingService();
         ContextService contextService = Aura.getContextService();
@@ -484,8 +512,9 @@ public class AuraServlet extends AuraBaseServlet {
             Message<?> message;
             setNoCache(response);
 
-            if(context.getLastMod() != null && !context.getLastMod().isEmpty() && !isUpToDate(Long.parseLong(context.getLastMod()))){
-                AuraServlet.deleteManifestCookie(response);
+            if (context.getLastMod() != null && !context.getLastMod().isEmpty()
+                    && !isUpToDate(Long.parseLong(context.getLastMod()))) {
+                AuraBaseServlet.deleteManifestCookie(response);
                 throw new ClientOutOfSyncException(OUTDATED_MESSAGE);
             }
 

@@ -18,7 +18,9 @@ package org.auraframework.impl.root.event;
 import java.io.IOException;
 import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.RegisterEventDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.throwable.AuraUnhandledException;
@@ -28,8 +30,9 @@ import org.auraframework.util.json.Json;
 
 /**
  * registerEvent tag definition
- *
- * FIXME: W-1328555 This should extend DefinitionImpl<RegisterEventDef> and getEventDescriptor should be an override
+ * 
+ * FIXME: W-1328555 This should extend DefinitionImpl<RegisterEventDef> and
+ * getEventDescriptor should be an override
  */
 public final class RegisterEventDefImpl extends DefinitionImpl<EventDef> implements RegisterEventDef {
     private static final long serialVersionUID = 4878881039199031730L;
@@ -44,7 +47,7 @@ public final class RegisterEventDefImpl extends DefinitionImpl<EventDef> impleme
         this.hashCode = createHashCode();
     }
 
-    private int createHashCode(){
+    private int createHashCode() {
         return AuraUtil.hashCode(descriptor, isGlobal);
     }
 
@@ -107,7 +110,7 @@ public final class RegisterEventDefImpl extends DefinitionImpl<EventDef> impleme
     @Override
     public boolean equals(Object o) {
         if (o instanceof RegisterEventDefImpl) {
-            RegisterEventDefImpl def = (RegisterEventDefImpl)o;
+            RegisterEventDefImpl def = (RegisterEventDefImpl) o;
             return descriptor.equals(def.descriptor) && isGlobal == def.isGlobal;
         }
         return false;
@@ -118,9 +121,9 @@ public final class RegisterEventDefImpl extends DefinitionImpl<EventDef> impleme
         return hashCode;
     }
 
-    public static class Builder extends DefinitionImpl.RefBuilderImpl<EventDef, RegisterEventDef>{
+    public static class Builder extends DefinitionImpl.RefBuilderImpl<EventDef, RegisterEventDef> {
 
-        public Builder(){
+        public Builder() {
             super(EventDef.class);
         }
 

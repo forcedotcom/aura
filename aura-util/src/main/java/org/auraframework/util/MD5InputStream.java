@@ -26,15 +26,15 @@ import org.apache.commons.codec.binary.Base64;
 /**
  * @since 0.0.85
  */
-public class MD5InputStream extends FilterInputStream{
+public class MD5InputStream extends FilterInputStream {
 
     private final MessageDigest md5;
 
     public MD5InputStream(InputStream in) {
         super(in);
-        try{
+        try {
             this.md5 = MessageDigest.getInstance("MD5");
-        }catch (NoSuchAlgorithmException e){
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
     }
@@ -42,7 +42,7 @@ public class MD5InputStream extends FilterInputStream{
     @Override
     public int read() throws IOException {
         int b = super.read();
-        if (b != -1){
+        if (b != -1) {
             md5.update((byte) b);
         }
         return b;
@@ -50,24 +50,25 @@ public class MD5InputStream extends FilterInputStream{
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        int ret = in.read(b,off,len);
-        if (ret != -1){
-            md5.update(b,off,len);
+        int ret = in.read(b, off, len);
+        if (ret != -1) {
+            md5.update(b, off, len);
         }
         return ret;
     }
 
-    public byte[] getHash(){
+    public byte[] getHash() {
         return md5.digest();
     }
 
-    public String getBase64Hash(){
+    public String getBase64Hash() {
         return new String(Base64.encodeBase64(getHash()));
     }
 
-    public void consumeAll() throws IOException{
+    public void consumeAll() throws IOException {
         byte[] b = new byte[1024];
-        while(read(b) != -1){}
+        while (read(b) != -1) {
+        }
     }
 
 }

@@ -15,17 +15,22 @@
  */
 package org.auraframework.util.json;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * A LinkedHashMap of String to Object, which is the variety most often useful for JSON Serialization purposes For added
- * usefulness, in addition to the standard Map methods, also has an add method that will create a List with the given
- * key (or use one that already exists), and then add the value to that List. Any entries with null values will be
- * omitted upon json serialization.
+ * A LinkedHashMap of String to Object, which is the variety most often useful
+ * for JSON Serialization purposes For added usefulness, in addition to the
+ * standard Map methods, also has an add method that will create a List with the
+ * given key (or use one that already exists), and then add the value to that
+ * List. Any entries with null values will be omitted upon json serialization.
  */
 public class JsonFriendlyMap extends LinkedHashMap<Object, Object> {
 
-    public JsonFriendlyMap() {}
+    public JsonFriendlyMap() {
+    }
 
     public JsonFriendlyMap(Map<? extends Object, ? extends Object> m) {
         super(m);
@@ -42,9 +47,9 @@ public class JsonFriendlyMap extends LinkedHashMap<Object, Object> {
             valueList = new ArrayList<T>();
         } else if (oldValue.getClass().equals(value.getClass())) {
             valueList = new ArrayList<T>();
-            valueList.add((T)oldValue);
+            valueList.add((T) oldValue);
         } else {
-            valueList = (List<T>)oldValue;
+            valueList = (List<T>) oldValue;
         }
         valueList.add(value);
 

@@ -36,22 +36,24 @@ import org.auraframework.util.json.Json;
 import com.google.common.collect.Lists;
 
 /**
- * The definition of an Application. Holds all information about a given type of application. ApplicationDefs are immutable
- * singletons per type of Application. Once they are created, they can only be replaced, never changed.
+ * The definition of an Application. Holds all information about a given type of
+ * application. ApplicationDefs are immutable singletons per type of
+ * Application. Once they are created, they can only be replaced, never changed.
  */
 public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> implements ApplicationDef {
 
     private static final long serialVersionUID = 9044177107921912717L;
 
-    public static final DefDescriptor<ApplicationDef> PROTOTYPE_APPLICATION = DefDescriptorImpl.getInstance("markup://aura:application", ApplicationDef.class);
+    public static final DefDescriptor<ApplicationDef> PROTOTYPE_APPLICATION = DefDescriptorImpl.getInstance(
+            "markup://aura:application", ApplicationDef.class);
 
     private final DefDescriptor<EventDef> locationChangeEventDescriptor;
     private final DefDescriptor<LayoutsDef> layoutsDefDescriptor;
     private final Access access;
     private final DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
 
-    private Boolean isAppcacheEnabled;
-    private Boolean isOnePageApp;
+    private final Boolean isAppcacheEnabled;
+    private final Boolean isOnePageApp;
 
     protected ApplicationDefImpl(Builder builder) {
         super(builder);
@@ -60,9 +62,9 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
         this.layoutsDefDescriptor = builder.layoutsDefDescriptor;
         String accessName = builder.access;
-        if(accessName == null){
+        if (accessName == null) {
             this.access = Access.AUTHENTICATED;
-        }else{
+        } else {
             this.access = Access.valueOf(accessName.toUpperCase());
         }
         this.securityProviderDescriptor = builder.securityProviderDescriptor;
@@ -78,7 +80,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         public Boolean isAppcacheEnabled;
         public Boolean isOnePageApp;
         public DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
-
 
         public Builder() {
             super(ApplicationDef.class);
@@ -103,9 +104,10 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
         @Override
         public ApplicationDefBuilder setSecurityProviderDescriptor(String securityProviderDescriptor) {
-            if(securityProviderDescriptor != null){
-                this.securityProviderDescriptor = Aura.getDefinitionService().getDefDescriptor(securityProviderDescriptor, SecurityProviderDef.class);
-            }else{
+            if (securityProviderDescriptor != null) {
+                this.securityProviderDescriptor = Aura.getDefinitionService().getDefDescriptor(
+                        securityProviderDescriptor, SecurityProviderDef.class);
+            } else {
                 this.securityProviderDescriptor = null;
             }
             return this;
@@ -123,14 +125,13 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
      */
     @Override
     public DefDescriptor<EventDef> getLocationChangeEventDescriptor() throws QuickFixException {
-        if(locationChangeEventDescriptor == null){
-            ApplicationDef
-            superDef = getSuperDef();
-            if(superDef != null){
+        if (locationChangeEventDescriptor == null) {
+            ApplicationDef superDef = getSuperDef();
+            if (superDef != null) {
                 return superDef.getLocationChangeEventDescriptor();
             }
             return null;
-        }else{
+        } else {
             return locationChangeEventDescriptor;
         }
     }
@@ -144,11 +145,11 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     protected void serializeFields(Json json) throws IOException, QuickFixException {
 
         DefDescriptor<EventDef> locationChangeEventDescriptor = getLocationChangeEventDescriptor();
-        if(locationChangeEventDescriptor != null){
+        if (locationChangeEventDescriptor != null) {
             json.writeMapEntry("locationChangeEventDef", locationChangeEventDescriptor.getDef());
         }
 
-        if(layoutsDefDescriptor != null){
+        if (layoutsDefDescriptor != null) {
             json.writeMapEntry("layouts", getLayoutsDefDescriptor().getDef());
         }
     }
@@ -157,8 +158,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     public void retrieveLabels() throws QuickFixException {
         super.retrieveLabels();
 
-
-        if(layoutsDefDescriptor != null){
+        if (layoutsDefDescriptor != null) {
             LayoutsDef layouts = layoutsDefDescriptor.getDef();
             layouts.retrieveLabels();
         }
@@ -168,8 +168,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
         super.appendDependencies(dependencies);
 
-
-        if(layoutsDefDescriptor != null){
+        if (layoutsDefDescriptor != null) {
             dependencies.add(layoutsDefDescriptor);
         }
     }
@@ -180,33 +179,37 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     }
 
     @Override
-    public Boolean isAppcacheEnabled() throws QuickFixException{
-        if(this.isAppcacheEnabled == null){
+    public Boolean isAppcacheEnabled() throws QuickFixException {
+        if (this.isAppcacheEnabled == null) {
             return getSuperDef().isAppcacheEnabled();
         }
         return this.isAppcacheEnabled;
     }
 
     @Override
-    public Boolean isOnePageApp() throws QuickFixException{
+    public Boolean isOnePageApp() throws QuickFixException {
         return this.isOnePageApp;
-    }    
-    
+    }
+
     @Override
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
 
-        //MasterDefRegistry reg = Aura.getContextService().getCurrentContext().getDefRegistry();
+        // MasterDefRegistry reg =
+        // Aura.getContextService().getCurrentContext().getDefRegistry();
         EventDef locationChangeDef = getLocationChangeEventDescriptor().getDef();
-        if (!locationChangeDef.isInstanceOf(Aura.getDefinitionService().getDefDescriptor("aura:locationChange", EventDef.class))) {
-            throw new InvalidDefinitionException(String.format("%s must extend aura:locationChange", locationChangeDef.getDescriptor()), getLocation());
+        if (!locationChangeDef.isInstanceOf(Aura.getDefinitionService().getDefDescriptor("aura:locationChange",
+                EventDef.class))) {
+            throw new InvalidDefinitionException(String.format("%s must extend aura:locationChange",
+                    locationChangeDef.getDescriptor()), getLocation());
         }
 
         DefDescriptor<SecurityProviderDef> securityProviderDesc = getSecurityProviderDefDescriptor();
-        if(securityProviderDesc == null){
-            throw new InvalidDefinitionException(String.format("Security provider is required on application %s", getName()), getLocation());
+        if (securityProviderDesc == null) {
+            throw new InvalidDefinitionException(String.format("Security provider is required on application %s",
+                    getName()), getLocation());
         }
-        //Will throw quickfix exception if not found.
+        // Will throw quickfix exception if not found.
         securityProviderDesc.getDef();
     }
 
@@ -214,20 +217,21 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     public List<DefDescriptor<?>> getBundle() {
         List<DefDescriptor<?>> ret = Lists.newArrayList();
         ret.addAll(super.getBundle());
-        if(layoutsDefDescriptor != null){
+        if (layoutsDefDescriptor != null) {
             ret.add(layoutsDefDescriptor);
         }
         return ret;
     }
 
     @Override
-    public DefDescriptor<SecurityProviderDef> getSecurityProviderDefDescriptor() throws QuickFixException{
-        if(securityProviderDescriptor == null && getExtendsDescriptor() != null){
-            //going to the mdr to avoid security check, since this is used during security checks and would cause spin
-            return Aura.getContextService().getCurrentContext().getDefRegistry().getDef(getExtendsDescriptor()).getSecurityProviderDefDescriptor();
+    public DefDescriptor<SecurityProviderDef> getSecurityProviderDefDescriptor() throws QuickFixException {
+        if (securityProviderDescriptor == null && getExtendsDescriptor() != null) {
+            // going to the mdr to avoid security check, since this is used
+            // during security checks and would cause spin
+            return Aura.getContextService().getCurrentContext().getDefRegistry().getDef(getExtendsDescriptor())
+                    .getSecurityProviderDefDescriptor();
         }
         return securityProviderDescriptor;
     }
-
 
 }

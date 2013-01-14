@@ -25,23 +25,24 @@ public abstract class RequestParam<T> {
     protected final String name;
     protected final boolean required;
 
-    protected RequestParam(String name, boolean required){
+    protected RequestParam(String name, boolean required) {
         this.name = name;
         this.required = required;
     }
 
-    protected String getRawValue(HttpServletRequest request){
+    protected String getRawValue(HttpServletRequest request) {
         String ret = request.getParameter(name);
-        if(required && ret == null){
+        if (required && ret == null) {
             throw new MissingParamException(name);
         }
         return ret;
     }
 
     public abstract T get(HttpServletRequest request);
+
     public abstract T get(HttpServletRequest request, T theDefault);
 
-    public static class InvalidParamException extends AuraRuntimeException{
+    public static class InvalidParamException extends AuraRuntimeException {
         /**
          */
         private static final long serialVersionUID = -4184060092142799781L;
@@ -52,7 +53,7 @@ public abstract class RequestParam<T> {
         }
     }
 
-    public static class MissingParamException extends AuraRuntimeException{
+    public static class MissingParamException extends AuraRuntimeException {
         /**
          */
         private static final long serialVersionUID = -1357285133277767121L;
@@ -63,18 +64,18 @@ public abstract class RequestParam<T> {
         }
     }
 
-    public static class StringParam extends RequestParam<String>{
+    public static class StringParam extends RequestParam<String> {
         private final int length;
 
-        public StringParam(String name, int length, boolean required){
+        public StringParam(String name, int length, boolean required) {
             super(name, required);
             this.length = length;
         }
 
         @Override
-        public String get(HttpServletRequest request){
+        public String get(HttpServletRequest request) {
             String ret = getRawValue(request);
-            if(length > 0 && ret != null && ret.length() > length){
+            if (length > 0 && ret != null && ret.length() > length) {
                 throw new InvalidParamException(name);
             }
 
@@ -82,23 +83,23 @@ public abstract class RequestParam<T> {
         }
 
         @Override
-        public String get(HttpServletRequest request, String theDefault){
+        public String get(HttpServletRequest request, String theDefault) {
             String ret = get(request);
-            return ret==null?theDefault:ret;
+            return ret == null ? theDefault : ret;
         }
     }
 
-    public static class BooleanParam extends RequestParam<Boolean>{
+    public static class BooleanParam extends RequestParam<Boolean> {
 
-        public BooleanParam(String name, boolean required){
+        public BooleanParam(String name, boolean required) {
             super(name, required);
         }
 
         @Override
-        public Boolean get(HttpServletRequest request){
+        public Boolean get(HttpServletRequest request) {
             String ret = getRawValue(request);
 
-            if(ret == null){
+            if (ret == null) {
                 return false;
             }
 
@@ -106,76 +107,76 @@ public abstract class RequestParam<T> {
         }
 
         @Override
-        public Boolean get(HttpServletRequest request, Boolean theDefault){
+        public Boolean get(HttpServletRequest request, Boolean theDefault) {
             Boolean ret = get(request);
-            return ret==null?theDefault:ret;
+            return ret == null ? theDefault : ret;
         }
     }
 
-    public static class LongParam extends RequestParam<Long>{
+    public static class LongParam extends RequestParam<Long> {
 
-        public LongParam(String name, boolean required){
+        public LongParam(String name, boolean required) {
             super(name, required);
         }
 
         @Override
-        public Long get(HttpServletRequest request){
+        public Long get(HttpServletRequest request) {
             String ret = getRawValue(request);
-            return ret == null?null:Long.valueOf(ret);
+            return ret == null ? null : Long.valueOf(ret);
         }
 
         @Override
-        public Long get(HttpServletRequest request, Long theDefault){
+        public Long get(HttpServletRequest request, Long theDefault) {
             Long ret = get(request);
-            return ret==null?theDefault:ret;
+            return ret == null ? theDefault : ret;
         }
     }
 
-    public static class IntegerParam extends RequestParam<Integer>{
+    public static class IntegerParam extends RequestParam<Integer> {
 
-        public IntegerParam(String name, boolean required){
+        public IntegerParam(String name, boolean required) {
             super(name, required);
         }
 
         @Override
-        public Integer get(HttpServletRequest request){
+        public Integer get(HttpServletRequest request) {
             String ret = getRawValue(request);
-            return ret == null?null:Integer.valueOf(ret);
+            return ret == null ? null : Integer.valueOf(ret);
         }
 
         @Override
-        public Integer get(HttpServletRequest request, Integer theDefault){
+        public Integer get(HttpServletRequest request, Integer theDefault) {
             Integer ret = get(request);
-            return ret==null?theDefault:ret;
+            return ret == null ? theDefault : ret;
         }
     }
 
-    public static class EnumParam<E extends Enum<E>> extends RequestParam<E>{
+    public static class EnumParam<E extends Enum<E>> extends RequestParam<E> {
         private final Class<E> clz;
 
-        public EnumParam(String name, boolean required, Class<E> clz){
+        public EnumParam(String name, boolean required, Class<E> clz) {
             super(name, required);
             this.clz = clz;
         }
 
         @Override
-        public E get(HttpServletRequest request){
+        public E get(HttpServletRequest request) {
             String ret = getRawValue(request);
-            if(ret == null){
+            if (ret == null) {
                 return null;
             }
             ret = ret.toUpperCase();
-            try{
+            try {
                 return Enum.valueOf(clz, ret);
-            }catch(Throwable e){
+            } catch (Throwable e) {
                 throw new InvalidParamException(name);
             }
         }
 
         @Override
-        public E get(HttpServletRequest request, E theDefault){
+        public E get(HttpServletRequest request, E theDefault) {
             E ret = get(request);
-            return ret==null?theDefault:ret;
+            return ret == null ? theDefault : ret;
         }
     }
 }

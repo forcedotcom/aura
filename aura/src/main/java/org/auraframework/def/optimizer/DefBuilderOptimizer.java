@@ -17,8 +17,7 @@ package org.auraframework.def.optimizer;
 
 import org.auraframework.builder.DefBuilder;
 
-
-public interface DefBuilderOptimizer<BuilderIntf extends DefBuilder<?,?>>{
+public interface DefBuilderOptimizer<BuilderIntf extends DefBuilder<?, ?>> {
 
     BuilderIntf optimize(BuilderIntf builder);
 }

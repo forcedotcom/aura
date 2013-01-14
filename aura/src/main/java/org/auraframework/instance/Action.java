@@ -25,25 +25,22 @@ import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 
-
 /**
  */
 public interface Action extends Instance<ActionDef> {
 
-    public enum State{
-        ABORTED,
-        ERROR,
-        NEW,
-        RUNNING,
-        SUCCESS
+    public enum State {
+        ABORTED, ERROR, NEW, RUNNING, SUCCESS
     }
 
     public String getId();
+
     public void setId(String id);
 
     public void run() throws AuraExecutionException;
 
     public void add(List<Action> actions);
+
     public List<Action> getActions();
 
     public Object getReturnValue();
@@ -58,10 +55,14 @@ public interface Action extends Instance<ActionDef> {
 
         @Override
         public void serialize(Json json, Action action) throws IOException {
-            // This is a temporary fix to allow server-side actions to return null and have the value serialized to the client.
-            // Ideally I think Serializers should have a flag that determines whether null values should be serialized.
-            // The reason I'm not adding that now is because it would add an extra call to getSerializer() in Json.java, which,
-            // because JsonSerializationContext does not have caching by type, could be slow.  To summarize, we should:
+            // This is a temporary fix to allow server-side actions to return
+            // null and have the value serialized to the client.
+            // Ideally I think Serializers should have a flag that determines
+            // whether null values should be serialized.
+            // The reason I'm not adding that now is because it would add an
+            // extra call to getSerializer() in Json.java, which,
+            // because JsonSerializationContext does not have caching by type,
+            // could be slow. To summarize, we should:
             // 1) add Serializer caching
             // 2) add shouldSerializeNulls hook
             // 3) get rid of this hacky workaround
@@ -72,12 +73,12 @@ public interface Action extends Instance<ActionDef> {
             }
 
             json.writeMapBegin();
-            
-            json.writeMapEntry("id" , action.getId());
-            json.writeMapEntry("state" , action.getState());
+
+            json.writeMapEntry("id", action.getId());
+            json.writeMapEntry("state", action.getState());
             json.writeMapEntry("returnValue", returnValue);
             json.writeMapEntry("error", action.getErrors());
-            
+
             Map<String, BaseComponent<?, ?>> components = action.getComponents();
             if (!components.isEmpty()) {
                 json.writeMapKey("components");
@@ -91,13 +92,15 @@ public interface Action extends Instance<ActionDef> {
 
                 json.writeMapEnd();
             }
-            
+
             json.writeMapEnd();
         }
 
     }
 
-	public void registerComponent(BaseComponent<?, ?> component);
-	public Map<String, BaseComponent<?, ?>> getComponents();
-	public int getNextId();
+    public void registerComponent(BaseComponent<?, ?> component);
+
+    public Map<String, BaseComponent<?, ?>> getComponents();
+
+    public int getNextId();
 }

@@ -19,14 +19,13 @@ import java.util.List;
 
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.annotation.UnAdaptableTest;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 /**
  * aura:interation UI tests.
- *
- *
+ * 
+ * 
  * @since 0.0.256
  */
 public class AuraModelExceptionUITest extends WebDriverTestCase {

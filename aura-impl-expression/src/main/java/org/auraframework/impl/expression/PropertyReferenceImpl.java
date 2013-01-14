@@ -115,12 +115,12 @@ public class PropertyReferenceImpl implements PropertyReference {
         propRefs.add(this);
     }
 
-    //equals and hashcode don't use location
+    // equals and hashcode don't use location
 
     @Override
     public boolean equals(Object o) {
         if (o instanceof PropertyReferenceImpl) {
-            return pieces.equals(((PropertyReferenceImpl)o).pieces);
+            return pieces.equals(((PropertyReferenceImpl) o).pieces);
         }
         return false;
     }
@@ -135,7 +135,7 @@ public class PropertyReferenceImpl implements PropertyReference {
     private static class Serializer extends NoneSerializer<PropertyReferenceImpl> {
         @Override
         public void serialize(Json json, PropertyReferenceImpl value) throws IOException {
-            //json.writeString(value.toString(true));
+            // json.writeString(value.toString(true));
             json.writeMapBegin();
             json.writeMapEntry("exprType", value.getExpressionType());
             json.writeMapEntry("path", value.pieces);

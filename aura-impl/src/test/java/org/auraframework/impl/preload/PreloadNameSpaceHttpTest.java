@@ -17,15 +17,14 @@ package org.auraframework.impl.preload;
 
 import java.util.Map;
 
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.TestLabels;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.util.json.JsonReader;
-
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
 
 /**
  * Basic HTTP retieve test for pre loading componentDefs from namespaces.
@@ -37,38 +36,40 @@ import org.apache.commons.httpclient.methods.GetMethod;
  */
 @ThreadHostileTest
 public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
-    public PreloadNameSpaceHttpTest(String name){
+    public PreloadNameSpaceHttpTest(String name) {
         super(name);
     }
 
     /**
-     * Verify that when a component is serialized down to the client, the component Def only has the descriptor and
-     * nothing else.
+     * Verify that when a component is serialized down to the client, the
+     * component Def only has the descriptor and nothing else.
      * <ol>
-     * <li>Obtain a valid CSRF token to be used on a get request for a component in JSON format.</li>
+     * <li>Obtain a valid CSRF token to be used on a get request for a component
+     * in JSON format.</li>
      * <li>Request a component in JSON format.</li>
      * </ol>
      */
     @SuppressWarnings("unchecked")
     @TestLabels("auraSanity")
-    public void testComponentDef() throws Exception{
-        //Obtain CSRF token
+    public void testComponentDef() throws Exception {
+        // Obtain CSRF token
         String url = String
                 .format("/aura?aura.tag=preloadTest:test_Preload_Cmp_SameNameSpace&aura.format=JSON&aura.mode=FTEST&aura.lastmod=%s&aura.deftype=APPLICATION",
-                getLastMod(Mode.FTEST, "preloadTest"));
+                        getLastMod(Mode.FTEST, "preloadTest"));
         GetMethod get = obtainGetMethod(url);
         int statusCode = this.getHttpClient().executeMethod(get);
-        assertTrue("Failed to reach aura servlet",statusCode == HttpStatus.SC_OK);
-        //Obtain a component which uses preloading namespaces
+        assertTrue("Failed to reach aura servlet", statusCode == HttpStatus.SC_OK);
+        // Obtain a component which uses preloading namespaces
         String componentInJson = get.getResponseBodyAsString().substring(AuraBaseServlet.CSRF_PROTECT.length());
         Map<String, Object> outerMap = (Map<String, Object>) new JsonReader().read(componentInJson);
-        Map<String, Object> component = (Map<String, Object>)outerMap.get("component");
-        Map<String, Object> value = (Map<String, Object>)component.get("value");
-        Map<String, Object> componentDef = (Map<String, Object>)value.get("componentDef");
-        componentDef = (Map<String, Object>)componentDef.get("value");
-        //Verify that Descriptor was the only value sent back as part of the componentDef
-        assertTrue(componentDef.size()==1);
+        Map<String, Object> component = (Map<String, Object>) outerMap.get("component");
+        Map<String, Object> value = (Map<String, Object>) component.get("value");
+        Map<String, Object> componentDef = (Map<String, Object>) value.get("componentDef");
+        componentDef = (Map<String, Object>) componentDef.get("value");
+        // Verify that Descriptor was the only value sent back as part of the
+        // componentDef
+        assertTrue(componentDef.size() == 1);
         assertTrue(componentDef.containsKey("descriptor"));
-        assertEquals(componentDef.get("descriptor"),"markup://preloadTest:test_Preload_Cmp_SameNameSpace");
+        assertEquals(componentDef.get("descriptor"), "markup://preloadTest:test_Preload_Cmp_SameNameSpace");
     }
 }

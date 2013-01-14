@@ -18,8 +18,9 @@ package org.auraframework.impl.source.resource;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 
@@ -27,7 +28,8 @@ import com.google.common.collect.ImmutableSet;
 
 public class ResourceThemeSourceLoader extends ResourceSourceLoader {
 
-    public static final Set<String> PREFIXES = ImmutableSet.of(DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX);
+    public static final Set<String> PREFIXES = ImmutableSet.of(DefDescriptor.CSS_PREFIX,
+            DefDescriptor.TEMPLATE_CSS_PREFIX);
     private static final Set<DefType> DEFTYPES = EnumSet.of(DefType.STYLE);
 
     public ResourceThemeSourceLoader(String basePackage) {
@@ -45,8 +47,8 @@ public class ResourceThemeSourceLoader extends ResourceSourceLoader {
 
     @Override
     public <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
-        return new ResourceSource<D>(descriptor, resourcePrefix + "/" + getPath(descriptor), 
-                descriptor.getPrefix().equals("templateCss")?Format.TEMPLATE_CSS:Format.CSS);
+        return new ResourceSource<D>(descriptor, resourcePrefix + "/" + getPath(descriptor), descriptor.getPrefix()
+                .equals("templateCss") ? Format.TEMPLATE_CSS : Format.CSS);
     }
 
     @Override

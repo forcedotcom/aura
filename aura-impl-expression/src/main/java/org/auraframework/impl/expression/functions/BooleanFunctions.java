@@ -30,7 +30,7 @@ public class BooleanFunctions {
             Object a1 = args.get(0);
             Object a2 = args.get(1);
             if (a1 instanceof Boolean && a2 instanceof Boolean) {
-                return evaluate((Boolean)a1, (Boolean)a2);
+                return evaluate((Boolean) a1, (Boolean) a2);
             }
             return null;
         }
@@ -49,7 +49,7 @@ public class BooleanFunctions {
 
         @Override
         public String[] getKeys() {
-            return new String[] {"and"};
+            return new String[] { "and" };
         }
     }
 
@@ -63,7 +63,7 @@ public class BooleanFunctions {
 
         @Override
         public String[] getKeys() {
-            return new String[] {"or"};
+            return new String[] { "or" };
         }
     }
 
@@ -74,14 +74,14 @@ public class BooleanFunctions {
         public Object evaluate(List<Object> args) {
             Object a1 = args.get(0);
             if (a1 instanceof Boolean) {
-                return !(Boolean)a1;
+                return !(Boolean) a1;
             }
             return null;
         }
 
         @Override
         public String[] getKeys() {
-            return new String[] {"not"};
+            return new String[] { "not" };
         }
     }
 }

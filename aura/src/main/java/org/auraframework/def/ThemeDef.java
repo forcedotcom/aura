@@ -15,10 +15,9 @@
  */
 package org.auraframework.def;
 
-import org.auraframework.system.Client;
-
 import java.util.Set;
 
+import org.auraframework.system.Client;
 
 /**
  */

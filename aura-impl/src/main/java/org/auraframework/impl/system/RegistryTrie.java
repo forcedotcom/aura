@@ -15,19 +15,25 @@
  */
 package org.auraframework.impl.system;
 
-import java.util.*;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.throwable.AuraError;
 
 import com.google.common.collect.Sets;
 
 /**
- * A specialized trie-ish structure for storing which registry gurgles which defs
- *
- *
+ * A specialized trie-ish structure for storing which registry gurgles which
+ * defs
+ * 
+ * 
  * @since 0.0.162
  */
 public class RegistryTrie {
@@ -73,9 +79,9 @@ public class RegistryTrie {
 
     /**
      * Match a set of registries to a matcher.
-     *
-     * Note that this ignores the type of the registry, and uses only the prefix and
-     * namespace. 
+     * 
+     * Note that this ignores the type of the registry, and uses only the prefix
+     * and namespace.
      */
     public Set<DefRegistry<?>> getRegistries(DescriptorFilter matcher) {
         Set<DefRegistry<?>> matched = Sets.newHashSet();
@@ -116,21 +122,20 @@ public class RegistryTrie {
      * special class for the final path, which has a default built in
      */
     private static class PrefixNode {
-        // the registry to use if there is no mapping for the specified namespace, can be null
+        // the registry to use if there is no mapping for the specified
+        // namespace, can be null
         private DefRegistry<?> catchAllRegistry;
         // registries to use for specific namespaces
-        private Map<String, DefRegistry<?>> registries = new HashMap<String, DefRegistry<?>>(8);
+        private final Map<String, DefRegistry<?>> registries = new HashMap<String, DefRegistry<?>>(8);
         // the set of namespaces in this prefix.
-        private Set<String> prefixNamespaces = Sets.newHashSet();
+        private final Set<String> prefixNamespaces = Sets.newHashSet();
 
         private void put(String namespace, DefRegistry<?> registry) {
             DefRegistry<?> r = registries.put(namespace.toLowerCase(), registry);
             if (r != null) {
-                throw new AuraError(
-                        String.format(
-                                "DefType/Prefix/Namespace combination %s claimed by 2 DefRegistries : %s and %s",
-                                namespace, r.getClass().getName(), registry
-                                        .getClass().getName()));
+                throw new AuraError(String.format(
+                        "DefType/Prefix/Namespace combination %s claimed by 2 DefRegistries : %s and %s", namespace, r
+                                .getClass().getName(), registry.getClass().getName()));
             }
             if ("*".equals(namespace)) {
                 this.catchAllRegistry = registry;

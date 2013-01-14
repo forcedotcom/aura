@@ -28,6 +28,7 @@ public class TestRendererThrowsDuringInstantiation implements Renderer {
     }
 
     @Override
-    public void render(BaseComponent<?, ?> component, Appendable appendable) throws IOException, QuickFixException {}
+    public void render(BaseComponent<?, ?> component, Appendable appendable) throws IOException, QuickFixException {
+    }
 
 }

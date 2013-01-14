@@ -46,22 +46,25 @@ public final class EventDefImpl extends RootDefinitionImpl<EventDef> implements 
     private final EventType eventType;
     private final DefDescriptor<EventDef> extendsDescriptor;
     private final int hashCode;
-    private static final DefDescriptor<EventDef> PROTO_COMPONENT_EVENT = Aura.getDefinitionService().getDefDescriptor("aura:componentEvent", EventDef.class);
-    private static final DefDescriptor<EventDef> PROTO_APPLICATION_EVENT = Aura.getDefinitionService().getDefDescriptor("aura:applicationEvent", EventDef.class);
-    private static final DefDescriptor<EventDef> PROTO_VALUE_EVENT = Aura.getDefinitionService().getDefDescriptor("aura:valueEvent", EventDef.class);
+    private static final DefDescriptor<EventDef> PROTO_COMPONENT_EVENT = Aura.getDefinitionService().getDefDescriptor(
+            "aura:componentEvent", EventDef.class);
+    private static final DefDescriptor<EventDef> PROTO_APPLICATION_EVENT = Aura.getDefinitionService()
+            .getDefDescriptor("aura:applicationEvent", EventDef.class);
+    private static final DefDescriptor<EventDef> PROTO_VALUE_EVENT = Aura.getDefinitionService().getDefDescriptor(
+            "aura:valueEvent", EventDef.class);
 
     protected EventDefImpl(Builder builder) {
         super(builder);
         this.eventType = builder.eventType;
-        if(builder.extendsDescriptor != null){
+        if (builder.extendsDescriptor != null) {
             this.extendsDescriptor = builder.extendsDescriptor;
-        }else if(this.eventType == EventType.COMPONENT && !this.descriptor.equals(PROTO_COMPONENT_EVENT)){
+        } else if (this.eventType == EventType.COMPONENT && !this.descriptor.equals(PROTO_COMPONENT_EVENT)) {
             this.extendsDescriptor = PROTO_COMPONENT_EVENT;
-        }else if(this.eventType == EventType.APPLICATION && !this.descriptor.equals(PROTO_APPLICATION_EVENT)){
+        } else if (this.eventType == EventType.APPLICATION && !this.descriptor.equals(PROTO_APPLICATION_EVENT)) {
             this.extendsDescriptor = PROTO_APPLICATION_EVENT;
-        }else if(this.eventType == EventType.VALUE && !this.descriptor.equals(PROTO_VALUE_EVENT)){
-                this.extendsDescriptor = PROTO_VALUE_EVENT;
-        }else{
+        } else if (this.eventType == EventType.VALUE && !this.descriptor.equals(PROTO_VALUE_EVENT)) {
+            this.extendsDescriptor = PROTO_VALUE_EVENT;
+        } else {
             this.extendsDescriptor = null;
         }
         this.hashCode = AuraUtil.hashCode(super.hashCode(), extendsDescriptor, eventType);
@@ -83,7 +86,7 @@ public final class EventDefImpl extends RootDefinitionImpl<EventDef> implements 
             json.writeMapBegin();
             json.writeMapEntry("descriptor", getDescriptor());
             json.writeMapEntry("type", eventType);
-            if(extendsDescriptor != null){
+            if (extendsDescriptor != null) {
                 json.writeMapEntry("superDef", extendsDescriptor.getDef());
             }
             json.writeMapEntry("attributes", getAttributeDefs());
@@ -96,7 +99,7 @@ public final class EventDefImpl extends RootDefinitionImpl<EventDef> implements 
     protected EventDef getSuperDef() throws QuickFixException {
         EventDef ret = null;
         if (getExtendsDescriptor() != null) {
-            ret =  getExtendsDescriptor().getDef();
+            ret = getExtendsDescriptor().getDef();
         }
         return ret;
     }
@@ -120,10 +123,12 @@ public final class EventDefImpl extends RootDefinitionImpl<EventDef> implements 
         if (extendsDescriptor != null) {
             EventDef extended = getExtendsDescriptor().getDef();
             if (extended == null) {
-                throw new InvalidDefinitionException(String.format("Event %s cannot extend %s", getDescriptor(), getExtendsDescriptor()), getLocation());
+                throw new InvalidDefinitionException(String.format("Event %s cannot extend %s", getDescriptor(),
+                        getExtendsDescriptor()), getLocation());
             }
             if (extended.getEventType() != getEventType()) {
-                throw new InvalidDefinitionException(String.format("Event %s cannot extend %s", getDescriptor(), getExtendsDescriptor()), getLocation());
+                throw new InvalidDefinitionException(String.format("Event %s cannot extend %s", getDescriptor(),
+                        getExtendsDescriptor()), getLocation());
             }
             // need to resolve duplicated attributes from supers
         }
@@ -157,7 +162,7 @@ public final class EventDefImpl extends RootDefinitionImpl<EventDef> implements 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof EventDefImpl) {
-            EventDefImpl other = (EventDefImpl)obj;
+            EventDefImpl other = (EventDefImpl) obj;
 
             return getDescriptor().equals(other.getDescriptor())
                     && eventType == other.eventType
@@ -181,9 +186,9 @@ public final class EventDefImpl extends RootDefinitionImpl<EventDef> implements 
         return null;
     }
 
-    public static class Builder extends RootDefinitionImpl.Builder<EventDef>{
+    public static class Builder extends RootDefinitionImpl.Builder<EventDef> {
 
-        public Builder(){
+        public Builder() {
             super(EventDef.class);
         }
 
@@ -204,13 +209,13 @@ public final class EventDefImpl extends RootDefinitionImpl<EventDef> implements 
      */
     @Override
     public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) {
-        if(other.equals(descriptor)){
+        if (other.equals(descriptor)) {
             return true;
         }
         EventDef zuper = null;
         try {
             zuper = getSuperDef();
-            if(zuper != null){
+            if (zuper != null) {
                 return zuper.isInstanceOf(other);
             }
         } catch (QuickFixException e) {

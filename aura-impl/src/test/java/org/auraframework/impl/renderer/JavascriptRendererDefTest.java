@@ -23,53 +23,62 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.javascript.renderer.JavascriptRendererDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Component;
+
 /**
  * Test class to verify implementation of Javascript renderers for component.
- *
+ * 
  * @hierarchy Aura.Components.Renderer
  * @priority high
  * @userStory a07B0000000Doob
  */
 public class JavascriptRendererDefTest extends AuraImplTestCase {
-    public JavascriptRendererDefTest(String name){
+    public JavascriptRendererDefTest(String name) {
         super(name);
     }
+
     /**
      * Verify that Javascript renderers are defined as non-local.
+     * 
      * @throws Exception
      */
-    public void testIsLocal() throws Exception{
+    public void testIsLocal() throws Exception {
         JavascriptRendererDef.Builder builder = new JavascriptRendererDef.Builder();
         JavascriptRendererDef def = builder.build();
-        assertFalse("Javascript renderers should not be defined as Local, they are run in clients",def.isLocal());
+        assertFalse("Javascript renderers should not be defined as Local, they are run in clients", def.isLocal());
     }
+
     /**
-     * Verify that rendering components locally using client side renderers is Unsupported.
+     * Verify that rendering components locally using client side renderers is
+     * Unsupported.
+     * 
      * @throws Exception
      */
-    public void testUseOfJSRendererLocally() throws Exception{
-        Component dummyCmp  = null;
+    public void testUseOfJSRendererLocally() throws Exception {
+        Component dummyCmp = null;
         StringWriter sw = new StringWriter();
-        DefDescriptor<RendererDef> descriptor = DefDescriptorImpl.getInstance("js://test.testJSRenderer",RendererDef.class);
+        DefDescriptor<RendererDef> descriptor = DefDescriptorImpl.getInstance("js://test.testJSRenderer",
+                RendererDef.class);
         RendererDef def = descriptor.getDef();
-        try{
+        try {
             def.render(dummyCmp, sw);
             fail("Should not able to use a ClientSide renderer to render a component locally.");
-        }catch (UnsupportedOperationException expected){}
+        } catch (UnsupportedOperationException expected) {
+        }
     }
 
     /**
      * Verify that Javascript renderer with comments is acceptable.
+     * 
      * @hierarchy Aura.Unit Tests.Json StreamReader
      * @userStorySyncIdOrName a07B0000000DUGnIAO
      * @priority medium
      */
-    public void testRendererWithComments() throws Exception{
-        DefDescriptor<RendererDef> descriptor = DefDescriptorImpl.getInstance("js://test.test_JSRenderer_WithComments",RendererDef.class);
+    public void testRendererWithComments() throws Exception {
+        DefDescriptor<RendererDef> descriptor = DefDescriptorImpl.getInstance("js://test.test_JSRenderer_WithComments",
+                RendererDef.class);
         RendererDef def = descriptor.getDef();
         assertNotNull("Failed to fetch the definition of the Javascript Renderer.", def);
         assertTrue(def instanceof JavascriptRendererDef);
         serializeAndGoldFile(def);
     }
 }
-

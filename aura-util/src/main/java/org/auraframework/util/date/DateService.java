@@ -37,38 +37,44 @@ public interface DateService {
     public DateConverter getDateISO8601Converter();
 
     /**
-     * An ISO8601 converter which will try multiple conversion types against passed in values until
-     * one works.
+     * An ISO8601 converter which will try multiple conversion types against
+     * passed in values until one works.
      */
     public DateConverter getGenericISO8601Converter();
 
     /**
-     * Both dateStyle and timeStyle are based on Java's DateFormat.SHORT, MEDIUM, LONG, and FULL values.  An
-     * additional value should also be supported - DateService,NONE (or -1).
+     * Both dateStyle and timeStyle are based on Java's DateFormat.SHORT,
+     * MEDIUM, LONG, and FULL values. An additional value should also be
+     * supported - DateService,NONE (or -1).
      */
     public DateConverter getDateTimeStyleConverter(Locale locale, int dateStyle, int timeStyle);
 
     /**
-     * Both dateType and timeType are based on Java's DateFormat.SHORT, MEDIUM, LONG, and FULL values.  An
-     * additional value should also be supported - DateService,NONE (or -1).
+     * Both dateType and timeType are based on Java's DateFormat.SHORT, MEDIUM,
+     * LONG, and FULL values. An additional value should also be supported -
+     * DateService,NONE (or -1).
      */
     public DateConverter getDateStyleConverter(Locale locale, int dateStyle);
 
     /**
-     * Both dateType and timeType are based on Java's DateFormat.SMALL, MEDIUM, LONG, and FULL values.  An
-     * additional value should also be supported - DateService,NONE (or -1).
+     * Both dateType and timeType are based on Java's DateFormat.SMALL, MEDIUM,
+     * LONG, and FULL values. An additional value should also be supported -
+     * DateService,NONE (or -1).
      */
     public DateConverter getTimeStyleConverter(Locale locale, int timeStyle);
 
     /**
-     * Pattern is normally based on java.date.SimpleDateFormat syntax.  Implementation may differ.
-     *
-     * @see <a href="http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">SimpleDateFormat</a>
+     * Pattern is normally based on java.date.SimpleDateFormat syntax.
+     * Implementation may differ.
+     * 
+     * @see <a
+     *      href="http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">SimpleDateFormat</a>
      */
     public DateConverter getPatternConverter(Locale locale, String pattern);
 
     /**
-     * Converts the words small, medium, large, or full to a DateFormat style integer.
+     * Converts the words small, medium, large, or full to a DateFormat style
+     * integer.
      */
     public int getStyle(String style);
 

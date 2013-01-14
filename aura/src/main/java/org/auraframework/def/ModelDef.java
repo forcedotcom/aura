@@ -26,7 +26,7 @@ public interface ModelDef extends Definition {
 
     /**
      * Get the member definition by name
-     *
+     * 
      * @param name of the member to get
      * @return definition of the param
      */
@@ -39,14 +39,14 @@ public interface ModelDef extends Definition {
 
     /**
      * Create a new instance of this model.
-     *
+     * 
      * @return an instance of this model type
      */
     Model newInstance();
 
     /**
      * Parses a formula reference and returns the type of the target
-     *
+     * 
      * @param s the formula
      * @return the type, for now using a AuraType
      * @throws QuickFixException

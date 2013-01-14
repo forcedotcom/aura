@@ -21,7 +21,10 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.RootDefinition;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -48,17 +51,11 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     private static final String ATTRIBUTE_DESCRIPTION = "description";
     private static final String ATTRIBUTE_SERIALIZE_TO = "serializeTo";
 
-    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-        ATTRIBUTE_DEFAULT,
-        ATTRIBUTE_REQUIRED,
-        ATTRIBUTE_TYPE,
-        ATTRIBUTE_NAME,
-        ATTRIBUTE_DESCRIPTION,
-        ATTRIBUTE_SERIALIZE_TO
-    );
+    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_DEFAULT, ATTRIBUTE_REQUIRED,
+            ATTRIBUTE_TYPE, ATTRIBUTE_NAME, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_SERIALIZE_TO);
 
     private final AttributeDefImpl.Builder builder = new AttributeDefImpl.Builder();
-    private List<ComponentDefRef> body = Lists.newArrayList();
+    private final List<ComponentDefRef> body = Lists.newArrayList();
     private String defaultValue = null;
 
     /**
@@ -68,7 +65,9 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     }
 
     /**
-     * @param xmlReader The XMLStreamReader that the handler should read from.  It expected to be queued up the appropriate position before getElement() is invoked.
+     * @param xmlReader The XMLStreamReader that the handler should read from.
+     *            It expected to be queued up the appropriate position before
+     *            getElement() is invoked.
      */
     public AttributeDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
@@ -105,14 +104,17 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     protected AttributeDefImpl createDefinition() throws QuickFixException {
 
         Object defaultObj = null;
-        if(defaultValue != null){ // even it is an empty string or whitespace, we should still set it in order to distinguish from the case the default value is not set at all.
+        if (defaultValue != null) { // even it is an empty string or whitespace,
+                                    // we should still set it in order to
+                                    // distinguish from the case the default
+                                    // value is not set at all.
             TextTokenizer tt = TextTokenizer.tokenize(defaultValue, getLocation());
             defaultObj = tt.asValue(getParentHandler());
-        }else if(!body.isEmpty()){
+        } else if (!body.isEmpty()) {
             defaultObj = body;
         }
 
-        if(defaultObj != null){
+        if (defaultObj != null) {
             AttributeDefRefImpl.Builder atBuilder = new AttributeDefRefImpl.Builder();
             atBuilder.setDescriptor(builder.getDescriptor());
             atBuilder.setLocation(builder.getLocation());
@@ -133,7 +135,6 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
 
         body.add(getDefRefHandler(getParentHandler()).getElement());
     }
-
 
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {

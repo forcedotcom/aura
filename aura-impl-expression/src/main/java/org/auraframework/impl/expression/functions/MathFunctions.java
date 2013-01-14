@@ -45,7 +45,7 @@ public class MathFunctions {
             Object a1 = args.get(0);
             Object a2 = args.get(1);
             if (a1 instanceof Number && a2 instanceof Number) {
-                return evaluate((Number)a1, (Number)a2);
+                return evaluate((Number) a1, (Number) a2);
             }
             return null;
         }
@@ -67,7 +67,7 @@ public class MathFunctions {
 
         @Override
         public String[] getKeys() {
-            return new String[] {"sub", "subtract"};
+            return new String[] { "sub", "subtract" };
         }
     }
 
@@ -83,7 +83,7 @@ public class MathFunctions {
 
         @Override
         public String[] getKeys() {
-            return new String[] {"mult", "multiply"};
+            return new String[] { "mult", "multiply" };
         }
     }
 
@@ -99,7 +99,7 @@ public class MathFunctions {
 
         @Override
         public String[] getKeys() {
-            return new String[] {"div", "divide"};
+            return new String[] { "div", "divide" };
         }
     }
 
@@ -115,7 +115,7 @@ public class MathFunctions {
 
         @Override
         public String[] getKeys() {
-            return new String[] {"mod", "modulus"};
+            return new String[] { "mod", "modulus" };
         }
     }
 
@@ -131,7 +131,7 @@ public class MathFunctions {
 
         @Override
         public String[] getKeys() {
-            return new String[] {"gt", "greaterthan"};
+            return new String[] { "gt", "greaterthan" };
         }
     }
 
@@ -147,10 +147,9 @@ public class MathFunctions {
 
         @Override
         public String[] getKeys() {
-            return new String[] {"ge", "greaterthanorequal"};
+            return new String[] { "ge", "greaterthanorequal" };
         }
     }
-
 
     public static class LessThan extends BinaryNumberFunction {
         /**
@@ -164,7 +163,7 @@ public class MathFunctions {
 
         @Override
         public String[] getKeys() {
-            return new String[] {"lt", "lessthan"};
+            return new String[] { "lt", "lessthan" };
         }
     }
 
@@ -180,7 +179,7 @@ public class MathFunctions {
 
         @Override
         public String[] getKeys() {
-            return new String[] {"le", "lessthanorequal"};
+            return new String[] { "le", "lessthanorequal" };
         }
     }
 
@@ -193,14 +192,14 @@ public class MathFunctions {
         public Object evaluate(List<Object> args) {
             Object a1 = args.get(0);
             if (a1 instanceof Number) {
-                return -((Number)a1).doubleValue();
+                return -((Number) a1).doubleValue();
             }
             return null;
         }
 
         @Override
         public String[] getKeys() {
-            return new String[] {"neg", "negate"};
+            return new String[] { "neg", "negate" };
         }
     }
 
@@ -213,14 +212,14 @@ public class MathFunctions {
         public Object evaluate(List<Object> args) {
             Object a1 = args.get(0);
             if (a1 instanceof Number) {
-                return Math.abs(((Number)a1).doubleValue());
+                return Math.abs(((Number) a1).doubleValue());
             }
             return null;
         }
 
         @Override
         public String[] getKeys() {
-            return new String[] {"abs"};
+            return new String[] { "abs" };
         }
     }
 }

@@ -15,14 +15,17 @@
  */
 package org.auraframework.util.json;
 
-import static org.auraframework.util.json.JsonSerializers.*;
+import static org.auraframework.util.json.JsonSerializers.ARRAY;
+import static org.auraframework.util.json.JsonSerializers.LITERAL;
+import static org.auraframework.util.json.JsonSerializers.STRING;
 
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * uses 2 maps to find serializers. first is direct class lookup (fast), second is an instanceof lookup (slow)
+ * uses 2 maps to find serializers. first is direct class lookup (fast), second
+ * is an instanceof lookup (slow)
  */
 public class ClassMapJsonSerializationContext extends BaseJsonSerializationContext {
 
@@ -30,8 +33,9 @@ public class ClassMapJsonSerializationContext extends BaseJsonSerializationConte
     private final Map<Class<?>, JsonSerializer<?>> mappySlowly;
     private final ConcurrentMap<String, JsonSerializer<?>> cache;
 
-    public ClassMapJsonSerializationContext(Map<String, JsonSerializer<?>> mappyFasty, Map<Class<?>, JsonSerializer<?>> mappySlowly,
-            ConcurrentMap<String, JsonSerializer<?>> cache, boolean format, boolean refSupport, int dataSizeLimit, int collectionSizeLimit) {
+    public ClassMapJsonSerializationContext(Map<String, JsonSerializer<?>> mappyFasty,
+            Map<Class<?>, JsonSerializer<?>> mappySlowly, ConcurrentMap<String, JsonSerializer<?>> cache,
+            boolean format, boolean refSupport, int dataSizeLimit, int collectionSizeLimit) {
         super(format, refSupport, dataSizeLimit, collectionSizeLimit, false);
         this.mappyFasty = mappyFasty;
         this.mappySlowly = mappySlowly;
@@ -52,13 +56,13 @@ public class ClassMapJsonSerializationContext extends BaseJsonSerializationConte
             return (JsonSerializer<T>) STRING;
         }
 
-        JsonSerializer<T> s = (JsonSerializer<T>)cache.get(c.getName());
+        JsonSerializer<T> s = (JsonSerializer<T>) cache.get(c.getName());
         if (s != null) {
             return s;
         }
 
         String className = c.getName();
-        s = (JsonSerializer<T>)mappyFasty.get(className);
+        s = (JsonSerializer<T>) mappyFasty.get(className);
         if (s != null) {
             cache.putIfAbsent(className, s);
             return s;
@@ -66,7 +70,7 @@ public class ClassMapJsonSerializationContext extends BaseJsonSerializationConte
 
         for (Entry<Class<?>, JsonSerializer<?>> e : mappySlowly.entrySet()) {
             if (e.getKey().isAssignableFrom(c)) {
-                s =  (JsonSerializer<T>) e.getValue();
+                s = (JsonSerializer<T>) e.getValue();
                 cache.putIfAbsent(className, s);
                 return s;
             }

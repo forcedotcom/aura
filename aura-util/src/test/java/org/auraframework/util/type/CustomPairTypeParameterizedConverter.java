@@ -24,7 +24,7 @@ public class CustomPairTypeParameterizedConverter implements Converter<String, C
     @Override
     public CustomPairType convert(String value) {
         List<String> splitList = AuraTextUtil.splitSimple("$", value);
-        return new CustomPairType(splitList.get(0),Integer.parseInt(splitList.get(1)));
+        return new CustomPairType(splitList.get(0), Integer.parseInt(splitList.get(1)));
     }
 
     @Override
@@ -39,7 +39,7 @@ public class CustomPairTypeParameterizedConverter implements Converter<String, C
 
     @Override
     public Class<?>[] getToParameters() {
-        return new Class[]{String.class,Integer.class};
+        return new Class[] { String.class, Integer.class };
     }
 
 }

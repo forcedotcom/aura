@@ -24,12 +24,14 @@ import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
 
 import junit.framework.Test;
+
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 
 /**
- * This model exposes a view on the {@link TestSetRunnerState} for {@link AuraEnabled} access. Because
- * all the model state is shared, this class itself does not hold any state.
+ * This model exposes a view on the {@link TestSetRunnerState} for
+ * {@link AuraEnabled} access. Because all the model state is shared, this class
+ * itself does not hold any state.
  */
 @Model
 @ThreadSafe

@@ -15,13 +15,15 @@
  */
 package org.auraframework.impl.java.model;
 
-import org.auraframework.system.Annotations.*;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Model;
+import org.auraframework.system.Annotations.Type;
 
 @Model
 public class TestModelWithLiteralTypeAnnotation {
     @AuraEnabled
     @Type("fooBar")
-    public String getString(){
+    public String getString() {
         return "Foobar";
     }
 }

@@ -32,7 +32,7 @@ public class ArrayListToDateArrayConverter implements Converter<ArrayList, Date[
 
         ArrayList<Date> convertedValues = new ArrayList<Date>(value.size());
 
-        for (String s : ((ArrayList<String>)value)) {
+        for (String s : ((ArrayList<String>) value)) {
             convertedValues.add(new Date(Long.valueOf(s)));
         }
         return convertedValues.toArray(new Date[value.size()]);

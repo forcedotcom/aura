@@ -23,6 +23,7 @@ import org.auraframework.system.AuraContext.Mode;
 public class DefaultSecurityProvider implements SecurityProvider {
     @Override
     public boolean isAllowed(DefDescriptor<?> descriptor) {
-        return Aura.getContextService().getCurrentContext().getMode() != Mode.PROD && !Aura.getConfigAdapter().isProduction();
+        return Aura.getContextService().getCurrentContext().getMode() != Mode.PROD
+                && !Aura.getConfigAdapter().isProduction();
     }
 }

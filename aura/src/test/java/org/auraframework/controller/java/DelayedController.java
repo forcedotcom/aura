@@ -17,14 +17,14 @@ package org.auraframework.controller.java;
 
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
-
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.instance.Component;
+import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.Annotations.AuraEnabled;
+
+import com.google.common.collect.ImmutableMap;
 
 @Controller
 public class DelayedController {
@@ -36,7 +36,8 @@ public class DelayedController {
         cmp.getAttributes().set(atts);
         try {
             Thread.sleep(2000);
-        } catch (Exception e) {}
-        return new Component[]{cmp};
+        } catch (Exception e) {
+        }
+        return new Component[] { cmp };
     }
 }

@@ -23,7 +23,8 @@ import com.google.common.collect.Lists;
  * @hierarchy Aura.Services.ClientService
  * @userStory a07B0000000Eb3M
  */
-public class ClientServiceTest extends BaseServiceTest<ClientService, ClientServiceTest.Config> implements ClientService {
+public class ClientServiceTest extends BaseServiceTest<ClientService, ClientServiceTest.Config> implements
+        ClientService {
 
     /**
      */
@@ -38,7 +39,7 @@ public class ClientServiceTest extends BaseServiceTest<ClientService, ClientServ
         return Lists.newArrayList(new Config());
     }
 
-    public static class Config extends BaseServiceTest.Config{
+    public static class Config extends BaseServiceTest.Config {
 
     }
 

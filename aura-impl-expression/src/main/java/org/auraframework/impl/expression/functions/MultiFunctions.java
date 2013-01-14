@@ -41,16 +41,16 @@ public class MultiFunctions {
             Object a1 = args.get(0);
             Object a2 = args.get(1);
             if (a1 instanceof Number && a2 instanceof Number) {
-                return ((Number)a1).doubleValue() + ((Number)a2).doubleValue();
+                return ((Number) a1).doubleValue() + ((Number) a2).doubleValue();
             } else if (a1 instanceof String && a2 instanceof String) {
-                return ((String)a1).concat((String)a2);
+                return ((String) a1).concat((String) a2);
             }
             return null;
         }
 
         @Override
         public String[] getKeys() {
-            return new String[] {"add", "concat"};
+            return new String[] { "add", "concat" };
         }
 
     }
@@ -66,14 +66,14 @@ public class MultiFunctions {
             Object a1 = args.get(0);
             Object a2 = args.get(1);
             if (a1 instanceof Number && a2 instanceof Number) {
-                return ((Number)a1).doubleValue() == ((Number)a2).doubleValue();
+                return ((Number) a1).doubleValue() == ((Number) a2).doubleValue();
             }
             return nullOrEquals(a1, a2);
         }
 
         @Override
         public String[] getKeys() {
-            return new String[] {"eq", "equals"};
+            return new String[] { "eq", "equals" };
         }
 
     }
@@ -91,7 +91,7 @@ public class MultiFunctions {
 
         @Override
         public String[] getKeys() {
-            return new String[] {"ne", "notequals"};
+            return new String[] { "ne", "notequals" };
         }
 
     }
@@ -112,7 +112,7 @@ public class MultiFunctions {
 
         @Override
         public String[] getKeys() {
-            return new String[] {"if"};
+            return new String[] { "if" };
         }
     }
 

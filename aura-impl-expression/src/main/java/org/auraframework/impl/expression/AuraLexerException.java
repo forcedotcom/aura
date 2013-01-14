@@ -20,9 +20,10 @@ package org.auraframework.impl.expression;
 import org.antlr.runtime.RecognitionException;
 
 /**
- * Workaround for antlr's lexer not allowing a checked exception to be thrown when reporting errors
- *
- *
+ * Workaround for antlr's lexer not allowing a checked exception to be thrown
+ * when reporting errors
+ * 
+ * 
  * @since 0.0.204
  */
 public class AuraLexerException extends RuntimeException {

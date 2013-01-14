@@ -17,10 +17,18 @@ package org.auraframework.http;
 
 import java.io.IOException;
 
-import javax.servlet.*;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
 /**
- * A quick and dirty way to add a cross-app-server compatible mount point for AuraDocs that will always use PROD mode.
+ * A quick and dirty way to add a cross-app-server compatible mount point for
+ * AuraDocs that will always use PROD mode.
  */
 public class AuraDocsRewriteFilter implements Filter {
 
@@ -39,7 +47,7 @@ public class AuraDocsRewriteFilter implements Filter {
 
         RequestDispatcher dispatcher = servletContext.getRequestDispatcher(uriPattern);
 
-        if(dispatcher != null){
+        if (dispatcher != null) {
             dispatcher.forward(req, res);
             return;
         }

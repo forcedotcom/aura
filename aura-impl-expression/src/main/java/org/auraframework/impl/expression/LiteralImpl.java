@@ -20,7 +20,9 @@ import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
-import org.auraframework.expression.*;
+import org.auraframework.expression.ExpressionType;
+import org.auraframework.expression.Literal;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.instance.ValueProvider;
 import org.auraframework.system.Location;
 import org.auraframework.util.json.Json;

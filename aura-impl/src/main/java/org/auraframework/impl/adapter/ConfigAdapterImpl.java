@@ -15,11 +15,20 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TimeZone;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
@@ -28,14 +37,16 @@ import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.resource.ResourceLoader;
 
-public class ConfigAdapterImpl implements ConfigAdapter{
+public class ConfigAdapterImpl implements ConfigAdapter {
 
     private static final String TIMESTAMP_FORMAT_PROPERTY = "aura.build.timestamp.format";
     private static final String TIMESTAMP_PROPERTY = "aura.build.timestamp";
     private static final String VERSION_PROPERTY = "aura.build.version";
+    private static final String VALIDATE_CSS_CONFIG = "aura.css.validate";
 
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
     private final AuraJavascriptGroup jsGroup;
@@ -43,31 +54,33 @@ public class ConfigAdapterImpl implements ConfigAdapter{
     private final Long buildTimestamp;
     private String auraVersionString;
     private boolean lastGenerationHadCompilationErrors = false;
+    private final boolean validateCss;
 
-
-    public ConfigAdapterImpl(){
+    public ConfigAdapterImpl() {
         this(getDefaultCacheDir());
     }
 
-    private static String getDefaultCacheDir(){
+    private static String getDefaultCacheDir() {
         File tmpDir = new File(System.getProperty("java.io.tmpdir"));
         return new File(tmpDir, "auraResourceCache").getAbsolutePath();
 
     }
 
     protected ConfigAdapterImpl(String resourceCacheDir) {
-        // can this initialization move to some sort of common initialization dealy?
+        // can this initialization move to some sort of common initialization
+        // dealy?
         AuraJavascriptGroup tempGroup = null;
         try {
             tempGroup = newAuraJavascriptGroup();
-            try{
+            try {
                 tempGroup.parse();
             } catch (IOException x) {
                 throw new AuraError("Unable to initialize aura client javascript", x);
             }
             tempGroup.postProcess();
         } catch (IOException x) {
-            // js source wasn't found, we must be in jar land, just let the files be accessed from there
+            // js source wasn't found, we must be in jar land, just let the
+            // files be accessed from there
         }
         jsGroup = tempGroup;
 
@@ -84,13 +97,20 @@ public class ConfigAdapterImpl implements ConfigAdapter{
             auraVersionString = "development";
             buildTimestamp = System.currentTimeMillis();
         } else {
-            // If we do get our version info from properties, then try to do that.
+            // If we do get our version info from properties, then try to do
+            // that.
             auraVersionString = props.getProperty(VERSION_PROPERTY);
             if (auraVersionString == null || auraVersionString.isEmpty()) {
                 throw new AuraError("Unable to read build version from version.prop file");
             }
+
             buildTimestamp = readBuildTimestamp(props);
         }
+
+        Properties config = loadConfig();
+        String validateCssString = config.getProperty(VALIDATE_CSS_CONFIG);
+        validateCss = AuraTextUtil.isNullEmptyOrWhitespace(validateCssString)
+                || Boolean.parseBoolean(validateCssString.trim());
 
     }
 
@@ -133,15 +153,15 @@ public class ConfigAdapterImpl implements ConfigAdapter{
                         InputStream is = new FileInputStream(f);
                         OutputStream os = new FileOutputStream(new File(resourceDest, f.getName()));
                         IOUtil.copyStream(is, os);
-                        getResourceLoader().refreshCache("aura/javascript/"+f.getName());
+                        getResourceLoader().refreshCache("aura/javascript/" + f.getName());
 
                         is.close();
                         os.close();
                     }
                 }
-            	lastGenerationHadCompilationErrors = false;                
+                lastGenerationHadCompilationErrors = false;
             } catch (Exception x) {
-            	lastGenerationHadCompilationErrors = true; 
+                lastGenerationHadCompilationErrors = true;
                 throw new AuraRuntimeException("Unable to regenerate aura javascript", x);
 
             }
@@ -161,7 +181,8 @@ public class ConfigAdapterImpl implements ConfigAdapter{
     }
 
     @Override
-    public void validateCSRFToken(String token) {}
+    public void validateCSRFToken(String token) {
+    }
 
     @Override
     public boolean isProduction() {
@@ -198,34 +219,49 @@ public class ConfigAdapterImpl implements ConfigAdapter{
     }
 
     private Properties loadProperties() {
-        String path = "/version.prop";
+
+        Properties props = new Properties();
+        try {
+            loadProperties("/version.prop", props);
+
+        } catch (IOException e) {
+            throw new AuraError("Could not read version.prop information");
+        }
+        return props;
+    }
+
+    private Properties loadConfig() {
+        Properties props = new Properties();
+        try {
+            loadProperties("/aura.conf", props);
+        } catch (IOException e) {
+            // ignore
+        }
+        return props;
+    }
+
+    private Properties loadProperties(String path, Properties props) throws IOException {
         InputStream stream = this.resourceLoader.getResourceAsStream(path);
         if (stream == null) {
             return null;
         }
-        try {
-            Properties props = new Properties();
-            props.load(stream);
-            stream.close();
-            return props;
-        } catch (IOException e) {
-            throw new AuraError("Could not read version.prop information");
-        }
+        props.load(stream);
+        stream.close();
+        return props;
     }
 
     private Long readBuildTimestamp(Properties props) {
         String timestamp = (String) props.get(TIMESTAMP_PROPERTY);
         String timestampFormat = (String) props.get(TIMESTAMP_FORMAT_PROPERTY);
-        if(timestamp == null || timestamp.isEmpty() || timestampFormat == null
-                || timestampFormat.isEmpty()) {
-            throw new AuraError(String.format("Couldn't find %s or %s",
-                    TIMESTAMP_PROPERTY, TIMESTAMP_FORMAT_PROPERTY));
+        if (timestamp == null || timestamp.isEmpty() || timestampFormat == null || timestampFormat.isEmpty()) {
+            throw new AuraError(String.format("Couldn't find %s or %s", TIMESTAMP_PROPERTY, TIMESTAMP_FORMAT_PROPERTY));
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(timestampFormat);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         try {
             if (MAVEN_TIMESTAMP_PROPERTY.equals(timestamp)) {
-                // We're in an Eclipse-only or similar environment: Maven didn't filter version.prop
+                // We're in an Eclipse-only or similar environment: Maven didn't
+                // filter version.prop
                 return System.currentTimeMillis();
             }
             return simpleDateFormat.parse(timestamp).getTime();
@@ -235,7 +271,7 @@ public class ConfigAdapterImpl implements ConfigAdapter{
     }
 
     @Override
-    public long getBuildTimestamp(){
+    public long getBuildTimestamp() {
         return buildTimestamp;
     }
 
@@ -245,15 +281,21 @@ public class ConfigAdapterImpl implements ConfigAdapter{
     }
 
     @Override
-    public boolean isAuraJSStatic(){
+    public boolean isAuraJSStatic() {
         return jsGroup == null;
     }
 
     /**
-     * Creates a new Javascript group.  This method exists to allow tests to override, so they can
-     * substitute e.g. an AuraJavascriptGroup that experiences synthetic errors.
+     * Creates a new Javascript group. This method exists to allow tests to
+     * override, so they can substitute e.g. an AuraJavascriptGroup that
+     * experiences synthetic errors.
      */
     protected AuraJavascriptGroup newAuraJavascriptGroup() throws IOException {
         return new AuraJavascriptGroup();
+    }
+
+    @Override
+    public boolean validateCss() {
+        return validateCss;
     }
 }

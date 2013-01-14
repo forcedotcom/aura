@@ -33,9 +33,9 @@ public class EventTypeTest extends UnitTestCase {
     }
 
     public void testGetEventType() {
-        assertEquals(EventType.APPLICATION,EventType.getEventType("APPLICATION"));
-        assertEquals(EventType.COMPONENT,EventType.getEventType("COMPONENT"));
-        assertNotSame(EventType.APPLICATION,EventType.getEventType("COMPONENT"));
+        assertEquals(EventType.APPLICATION, EventType.getEventType("APPLICATION"));
+        assertEquals(EventType.COMPONENT, EventType.getEventType("COMPONENT"));
+        assertNotSame(EventType.APPLICATION, EventType.getEventType("COMPONENT"));
     }
 
 }

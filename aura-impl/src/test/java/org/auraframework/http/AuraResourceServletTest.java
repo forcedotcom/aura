@@ -20,7 +20,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
 import org.auraframework.system.AuraContext;
-import org.auraframework.test.*;
+import org.auraframework.test.AuraTestCase;
+import org.auraframework.test.DummyHttpServletRequest;
+import org.auraframework.test.DummyHttpServletResponse;
 
 /**
  * Simple (non-integration) test case for {@link AuraResourceServlet}, most
@@ -39,14 +41,16 @@ public class AuraResourceServletTest extends AuraTestCase {
     public AuraResourceServletTest() {
         super(AuraResourceServletTest.class.getName());
     }
-    
+
     public void testWriteManifestNoAccessError() throws Exception {
-        // Start a context to fetch manifests; the other details don't matter much 'cause
-        // we'll error out.  Then try to fetch one, with that error:
+        // Start a context to fetch manifests; the other details don't matter
+        // much 'cause
+        // we'll error out. Then try to fetch one, with that error:
         Aura.getContextService().startContext(AuraContext.Mode.UTEST, AuraContext.Format.MANIFEST,
                 AuraContext.Access.PUBLIC);
         HttpServletRequest request = new DummyHttpServletRequest() {
-            @Override  // This is the method that's going to cause the simulated failure.
+            @Override
+            // This is the method that's going to cause the simulated failure.
             public String getHeader(String name) {
                 if ("user-agent".equals(name)) {
                     throw new SimulatedErrorException();
@@ -56,10 +60,12 @@ public class AuraResourceServletTest extends AuraTestCase {
         };
         HttpServletResponse response = new DummyHttpServletResponse() {
             int status = -1;
+
             @Override
             public void setStatus(int status) {
                 this.status = status;
             }
+
             @Override
             public int getStatus() {
                 return status;

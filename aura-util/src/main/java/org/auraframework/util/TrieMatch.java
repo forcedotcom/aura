@@ -18,8 +18,9 @@ package org.auraframework.util;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * Struct returned by {@link TrieMatcher#match(String, int)} to represent a match.
- *
+ * Struct returned by {@link TrieMatcher#match(String, int)} to represent a
+ * match.
+ * 
  * @see TrieMatcher
  */
 @Immutable
@@ -30,17 +31,24 @@ public class TrieMatch {
     private final String replacement;
 
     TrieMatch(int position, String word, String replacement) {
-        if (position < 0) throw new IllegalArgumentException(Integer.toString(position));
-        if (word == null) throw new NullPointerException();
-        if (replacement == null) throw new NullPointerException();
+        if (position < 0) {
+            throw new IllegalArgumentException(Integer.toString(position));
+        }
+        if (word == null) {
+            throw new NullPointerException();
+        }
+        if (replacement == null) {
+            throw new NullPointerException();
+        }
         this.position = position;
         this.word = word;
         this.replacement = replacement;
     }
 
     /**
-     * The position of where the match was in the source.
-     * Eg, <pre>
+     * The position of where the match was in the source. Eg,
+     * 
+     * <pre>
      *    Trie trie = new Trie(String[]{"x"}, String[]{"Y"});
      *    TrieMatch match = trie.match("abcxdef");
      *    Assert.assertEquals(3, match.getPosition());
@@ -51,8 +59,9 @@ public class TrieMatch {
     }
 
     /**
-     * The word in the trie that matched.
-     * Eg, <pre>
+     * The word in the trie that matched. Eg,
+     * 
+     * <pre>
      *    Trie trie = new Trie(String[]{"x"}, String[]{"Y"});
      *    TrieMatch match = trie.match("abcxdef");
      *    Assert.assertEquals("x", match.getWord());
@@ -63,8 +72,9 @@ public class TrieMatch {
     }
 
     /**
-     * The replacement for word in the trie that matched.
-     * Eg, <pre>
+     * The replacement for word in the trie that matched. Eg,
+     * 
+     * <pre>
      *    Trie trie = new Trie(String[]{"x"}, String[]{"Y"});
      *    TrieMatch match = trie.match("abcxdef");
      *    Assert.assertEquals("Y", match.getReplacement());

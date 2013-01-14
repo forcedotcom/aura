@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.root.intf;
 
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -222,7 +221,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
 
     public void testInterfaceCannotExtendItself() throws Exception {
         DefDescriptor<InterfaceDef> extendsSelf = addSourceAutoCleanup(InterfaceDef.class, "");
-        StringSource<?> source = (StringSource<?>)auraTestingUtil.getSource(extendsSelf);
+        StringSource<?> source = (StringSource<?>) auraTestingUtil.getSource(extendsSelf);
         source.addOrUpdate(String.format("<aura:interface extends='%s'> </aura:interface>",
                 extendsSelf.getDescriptorName()));
         try {
@@ -233,7 +232,6 @@ public class InterfaceDefTest extends AuraImplTestCase {
             assertEquals(extendsSelf.getQualifiedName() + " cannot extend itself", expected.getMessage());
         }
     }
-
 
     public void testInterfaceCannotImplementAnInterface() throws Exception {
         DefDescriptor<InterfaceDef> d = addSourceAutoCleanup(InterfaceDef.class,
@@ -253,14 +251,12 @@ public class InterfaceDefTest extends AuraImplTestCase {
      */
     // TODO: W-1476870
     /*
-    * public void testHasLocalDependencies(){ assertFalse(
-    * "An interface with clientside provider does not depend on server.",
-    * definitionService.getDefinition("test:test_JSProvider_Interface",
-    * InterfaceDef.class).hasLocalDependencies());
-    * assertTrue("An interface with only serverside provider depends on server."
-    * , definitionService.getDefinition("test:test_Provider_Interface",
-    * InterfaceDef.class).hasLocalDependencies());
-    *
-    * }
-    */
+     * public void testHasLocalDependencies(){ assertFalse(
+     * "An interface with clientside provider does not depend on server.",
+     * definitionService.getDefinition("test:test_JSProvider_Interface",
+     * InterfaceDef.class).hasLocalDependencies());
+     * assertTrue("An interface with only serverside provider depends on server."
+     * , definitionService.getDefinition("test:test_Provider_Interface",
+     * InterfaceDef.class).hasLocalDependencies()); }
+     */
 }

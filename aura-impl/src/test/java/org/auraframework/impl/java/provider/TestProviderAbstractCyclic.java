@@ -23,11 +23,12 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Annotations.Provider;
 
 /**
- * Returns the same descriptor that called this provider to cause a cyclic dependency
+ * Returns the same descriptor that called this provider to cause a cyclic
+ * dependency
  */
 @Provider
 public class TestProviderAbstractCyclic {
-    public static DefDescriptor<ComponentDef> provide(){
+    public static DefDescriptor<ComponentDef> provide() {
         return DefDescriptorImpl.getInstance("test:test_Provider_AbstractCyclic", ComponentDef.class);
     }
 }

@@ -21,10 +21,10 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
 /**
- * A input option object has all the information to create an inputOption component (inputCheckbox, inputRadio
- * and inputSelectOption.
- *
- *
+ * A input option object has all the information to create an inputOption
+ * component (inputCheckbox, inputRadio and inputSelectOption.
+ * 
+ * 
  * @since Touch.174.3
  */
 public class InputOption implements JsonSerializable {
@@ -43,6 +43,7 @@ public class InputOption implements JsonSerializable {
 
     /**
      * Get the label.
+     * 
      * @return the label of this option
      */
     public String getLabel() {
@@ -51,6 +52,7 @@ public class InputOption implements JsonSerializable {
 
     /**
      * Get the name.
+     * 
      * @return the name of this option
      */
     public String getName() {
@@ -59,6 +61,7 @@ public class InputOption implements JsonSerializable {
 
     /**
      * Is the component selected.
+     * 
      * @return the true if selected, otherwise false
      */
     public boolean isSelected() {
@@ -67,6 +70,7 @@ public class InputOption implements JsonSerializable {
 
     /**
      * Get the value.
+     * 
      * @return the value of this option
      */
     public String getValue() {
@@ -85,7 +89,8 @@ public class InputOption implements JsonSerializable {
 
     @Override
     public String toString() {
-        return String.format("InputOption(label[%s] name[%s] selected[%s] value[%s])", this.label, this.name, this.selected, this.value);
+        return String.format("InputOption(label[%s] name[%s] selected[%s] value[%s])", this.label, this.name,
+                this.selected, this.value);
     }
 
 }

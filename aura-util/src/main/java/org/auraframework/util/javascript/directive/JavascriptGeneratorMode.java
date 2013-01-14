@@ -17,16 +17,16 @@ package org.auraframework.util.javascript.directive;
 
 import org.auraframework.util.javascript.JavascriptWriter.CompressionLevel;
 
-
 /**
- * Modes are for generating copies of javascript files suited for specific purposes, the most basic being
- * for development and production.
- * TODO: need a way to only allow production mode in production
+ * Modes are for generating copies of javascript files suited for specific
+ * purposes, the most basic being for development and production. TODO: need a
+ * way to only allow production mode in production
  */
 public enum JavascriptGeneratorMode {
 
     /**
-     * the mode thats usually used in your local build. leaves comments intact so you can read your code
+     * the mode thats usually used in your local build. leaves comments intact
+     * so you can read your code
      */
     DEVELOPMENT("dev", true, CompressionLevel.CLOSURE_AURA_DEBUG),
 
@@ -36,13 +36,12 @@ public enum JavascriptGeneratorMode {
     STATS("stats", true, CompressionLevel.CLOSURE_AURA_DEBUG),
 
     /**
-     * testing mode is for running ftests so you can expose private data or methods that need to be tested but are not
-     * normally exposed by the code
+     * testing mode is for running ftests so you can expose private data or
+     * methods that need to be tested but are not normally exposed by the code
      */
     TESTING("test", true, CompressionLevel.CLOSURE_AURA_DEBUG),
 
     TESTINGDEBUG("testdebug", true, CompressionLevel.CLOSURE_AURA_DEBUG),
-
 
     AUTOTESTING("auto", false, CompressionLevel.CLOSURE_AURA_PROD),
 
@@ -63,9 +62,7 @@ public enum JavascriptGeneratorMode {
     /**
      * mock modes for testing the parser and generator itself. dunt use
      */
-    MOCK1("mock1", false, null),
-    MOCK2("mock2", false, null)
-    ;
+    MOCK1("mock1", false, null), MOCK2("mock2", false, null);
 
     private final String suffix;
     private final boolean comments;
@@ -75,7 +72,6 @@ public enum JavascriptGeneratorMode {
     private JavascriptGeneratorMode(String suffix, boolean comments, CompressionLevel compressionLevel) {
         this(suffix, comments, compressionLevel, false);
     }
-
 
     private JavascriptGeneratorMode(String suffix, boolean comments, CompressionLevel compressionLevel, boolean prod) {
         this.suffix = suffix;
@@ -106,9 +102,10 @@ public enum JavascriptGeneratorMode {
     }
 
     /**
-     * There may be more than 1 mode used in production, this value should control whether the file is even generated
-     * in production environment (but it doesn't yet)
-     *
+     * There may be more than 1 mode used in production, this value should
+     * control whether the file is even generated in production environment (but
+     * it doesn't yet)
+     * 
      * @return true if the mode is used in production
      */
     public boolean allowedInProduction() {

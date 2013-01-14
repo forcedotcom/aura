@@ -20,9 +20,9 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import junit.framework.Assert;
+
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
-
 import org.xml.sax.SAXException;
 
 public class JsonDiffUtils extends TextDiffUtils {
@@ -36,7 +36,8 @@ public class JsonDiffUtils extends TextDiffUtils {
             ParserConfigurationException {
         Object controlObj = new JsonReader().read(readGoldFile());
         Object testObj = new JsonReader().read(test);
-        // for stuff that has ref support, the serIds may be different because of ordering, so resolve them
+        // for stuff that has ref support, the serIds may be different because
+        // of ordering, so resolve them
         controlObj = Json.resolveRefs(controlObj);
         testObj = Json.resolveRefs(testObj);
         Assert.assertEquals(sb == null ? "Diff from " + getUrl() : sb.toString(), controlObj, testObj);

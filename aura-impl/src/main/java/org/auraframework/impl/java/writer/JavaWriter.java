@@ -22,7 +22,6 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -34,15 +33,15 @@ public class JavaWriter extends SourceWriterImpl {
 
     private static final JavaWriter instance = new JavaWriter();
 
-    public static JavaWriter getInstance(){
+    public static JavaWriter getInstance() {
         return instance;
     }
 
     @Override
     public <D extends Definition> void write(D def, Source<?> source) {
         Writer writer = null;
-        ComponentDef componentDef = (ComponentDef)def;
-        try{
+        ComponentDef componentDef = (ComponentDef) def;
+        try {
             writer = source.getWriter();
             writeHeader(writer);
             writePackage(writer, componentDef);
@@ -53,15 +52,15 @@ public class JavaWriter extends SourceWriterImpl {
             writeLineBreaks(writer, 2);
             writeMethods(writer, componentDef);
             writeBlockEnd(writer);
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new AuraRuntimeException(e);
-        }finally{
-            try{
-                if(writer != null){
+        } finally {
+            try {
+                if (writer != null) {
                     writer.flush();
                     writer.close();
                 }
-            }catch(Exception e){
+            } catch (Exception e) {
                 throw new AuraRuntimeException(e);
             }
         }
@@ -70,7 +69,7 @@ public class JavaWriter extends SourceWriterImpl {
     private void writeHeader(Writer writer) throws IOException {
         writer.write("/*" + NL + " * ");
         writeCopyright(writer);
-        writer.write(NL+" * All Rights Reserved" + NL);
+        writer.write(NL + " * All Rights Reserved" + NL);
         writer.write(" * Company Confidential" + NL);
         writer.write(" *" + NL);
         writer.write(" * DO NOT MODIFY. DO NOT CHECK INTO PERFORCE." + NL);
@@ -78,47 +77,45 @@ public class JavaWriter extends SourceWriterImpl {
         writer.write(" */" + NL);
     }
 
-    private void writePackage(Writer writer, ComponentDef def) throws IOException{
+    private void writePackage(Writer writer, ComponentDef def) throws IOException {
         write(writer, "package cmp.%s;", def.getDescriptor().getNamespace());
     }
 
-    private void writeImports(Writer writer) throws IOException{
+    private void writeImports(Writer writer) throws IOException {
         write(writer, "import org.auraframework.instance.Component;");
     }
 
-    private void writeClassBegin(Writer writer, ComponentDef def) throws IOException{
+    private void writeClassBegin(Writer writer, ComponentDef def) throws IOException {
         write(writer, "public class %s%s", AuraTextUtil.initCap(def.getDescriptor().getName()), "Cmp");
         DefDescriptor<ComponentDef> extendsDesc = def.getExtendsDescriptor();
-        if(extendsDesc != null){
-            write(writer, " extends cmp.%s.%s%s",
-                    extendsDesc.getNamespace(),
-                    AuraTextUtil.initCap(extendsDesc.getName()),
-                    "Cmp");
+        if (extendsDesc != null) {
+            write(writer, " extends cmp.%s.%s%s", extendsDesc.getNamespace(),
+                    AuraTextUtil.initCap(extendsDesc.getName()), "Cmp");
         }
         writer.write(" implements Component");
         writeBlockBegin(writer);
     }
 
-    private void writeBlockBegin(Writer writer) throws IOException{
+    private void writeBlockBegin(Writer writer) throws IOException {
         writer.write("{");
         writeLineBreaks(writer, 1);
     }
 
-    private void writeBlockEnd(Writer writer) throws IOException{
+    private void writeBlockEnd(Writer writer) throws IOException {
         writer.write("}");
         writeLineBreaks(writer, 1);
     }
 
-    private void writeMethods(Writer writer, ComponentDef def) throws IOException, QuickFixException{
-        for(AttributeDef attributeDef : def.getDeclaredAttributeDefs().values()){
+    private void writeMethods(Writer writer, ComponentDef def) throws IOException, QuickFixException {
+        for (AttributeDef attributeDef : def.getDeclaredAttributeDefs().values()) {
             writeGetter(writer, attributeDef);
             writeLineBreaks(writer, 2);
         }
     }
 
-    private void writeGetter(Writer writer, AttributeDef attributeDef) throws IOException, QuickFixException{
+    private void writeGetter(Writer writer, AttributeDef attributeDef) throws IOException, QuickFixException {
         String name = attributeDef.getName();
-        if(name.equals("class")){
+        if (name.equals("class")) {
             name = "Clazz";
         }
         write(writer, "\tpublic /*%s*/Object get%s()", attributeDef.getTypeDef().getName(), AuraTextUtil.initCap(name));

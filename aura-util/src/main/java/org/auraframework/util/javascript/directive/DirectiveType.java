@@ -15,7 +15,6 @@
  */
 package org.auraframework.util.javascript.directive;
 
-
 /**
  * A type of directive that a group should capture
  */

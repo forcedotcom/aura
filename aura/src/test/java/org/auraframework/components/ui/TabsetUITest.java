@@ -15,11 +15,10 @@
  */
 package org.auraframework.components.ui;
 
+import org.auraframework.test.WebDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
-import org.auraframework.test.WebDriverTestCase;
 
 public class TabsetUITest extends WebDriverTestCase {
     private final String URL = "/uitest/tabsetTest.cmp";
@@ -39,7 +38,8 @@ public class TabsetUITest extends WebDriverTestCase {
         verifyTab(tab1, "tab 1 contents", true);
         verifyTab(tab2, "tab 2 contents", false);
 
-        // switch tabs by clicking on the anchor (to make this test cross browser).
+        // switch tabs by clicking on the anchor (to make this test cross
+        // browser).
         tab2.findElement(By.tagName("a")).click();
 
         // verify switched
@@ -55,15 +55,17 @@ public class TabsetUITest extends WebDriverTestCase {
 
         if (isActive) {
             auraUITestingUtil.assertClassNameContains(tab, "active");
-            assertTrue("Since tab is active should be able to read tab body: " + tabBody, tabBodyActual.contains(tabBody));
+            assertTrue("Since tab is active should be able to read tab body: " + tabBody,
+                    tabBodyActual.contains(tabBody));
 
             // accessibility check
             assertEquals("Tab role should be presentation so screen read can read '1 of 2', '2 of 2', etc..",
                     "active uiTab dynamicallyAddedFromVBox uiVbox bContainer bVerticalContainer", tabClassName);
             assertEquals("Since tab is active link should have aria set (for accessability)", "true", tabLinkAria);
         } else {
-        	auraUITestingUtil.assertClassNameDoesNotContain(tab, "active");
-            assertFalse("Since tab is inactive should not be able to read tab body: " + tabBody, tabBodyActual.contains(tabBody));
+            auraUITestingUtil.assertClassNameDoesNotContain(tab, "active");
+            assertFalse("Since tab is inactive should not be able to read tab body: " + tabBody,
+                    tabBodyActual.contains(tabBody));
             assertNull("Since tab is inactive link should not have aria set (for accessability)", tabLinkAria);
         }
 

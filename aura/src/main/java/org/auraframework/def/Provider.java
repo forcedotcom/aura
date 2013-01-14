@@ -17,12 +17,12 @@ package org.auraframework.def;
 
 /**
  * Empty interface to tag all provider interfaces.
- *
- * This interface will be used to find the appropriate interface implemented
- * by a class annotated with @Provider. All provider interfaces should extend
- * it.
- *
- *
+ * 
+ * This interface will be used to find the appropriate interface implemented by
+ * a class annotated with @Provider. All provider interfaces should extend it.
+ * 
+ * 
  * @since 0.0.184
  */
-public interface Provider { }
+public interface Provider {
+}

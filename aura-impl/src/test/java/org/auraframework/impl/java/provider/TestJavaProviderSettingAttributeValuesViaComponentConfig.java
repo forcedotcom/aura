@@ -22,7 +22,9 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.instance.*;
+import org.auraframework.instance.BaseComponent;
+import org.auraframework.instance.Component;
+import org.auraframework.instance.ComponentConfig;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -34,7 +36,8 @@ public class TestJavaProviderSettingAttributeValuesViaComponentConfig {
     public static ComponentConfig provide() throws QuickFixException {
         ComponentConfig c = new ComponentConfig();
 
-        c.setDescriptor(DefDescriptorImpl.getInstance("test:testJavaProviderSettingAttributeValuesViaComponentConfigHelper", ComponentDef.class));
+        c.setDescriptor(DefDescriptorImpl.getInstance(
+                "test:testJavaProviderSettingAttributeValuesViaComponentConfigHelper", ComponentDef.class));
         c.setAttributes(provideAttributes());
 
         return c;
@@ -54,8 +57,13 @@ public class TestJavaProviderSettingAttributeValuesViaComponentConfig {
         }
 
         Map<String, Object> facetAttributes = Maps.newHashMap();
-        facetAttributes.put("value", "aura" /*new PropertyReferenceImpl("v.value", null)*/);
-        Component facet = (Component)Aura.getInstanceService().getInstance("ui:outputText", facetAttributes, DefType.COMPONENT);
+        facetAttributes.put("value", "aura" /*
+                                             * new
+                                             * PropertyReferenceImpl("v.value",
+                                             * null)
+                                             */);
+        Component facet = (Component) Aura.getInstanceService().getInstance("ui:outputText", facetAttributes,
+                DefType.COMPONENT);
         attributes.put("facet", Lists.newArrayList(facet));
 
         return attributes;

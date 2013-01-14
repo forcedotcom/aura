@@ -19,9 +19,7 @@ import org.auraframework.expression.Expression;
 import org.auraframework.test.UnitTestCase;
 
 /**
- * Ok, I will.
- * Then do it already.
- * I just did!
+ * Ok, I will. Then do it already. I just did!
  */
 public abstract class AuraImplExpressionTestCase extends UnitTestCase {
 

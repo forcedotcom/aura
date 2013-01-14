@@ -21,11 +21,12 @@ public class StringToCustomPairArrayConverter implements Converter<String, Custo
 
     @Override
     public CustomPairType[] convert(String value) {
-        if(!value.startsWith("[") && !value.endsWith("]"))
-            return new CustomPairType[]{};
-        value = value.substring(1, value.length()-1);
+        if (!value.startsWith("[") && !value.endsWith("]")) {
+            return new CustomPairType[] {};
+        }
+        value = value.substring(1, value.length() - 1);
         ArrayList<CustomPairType> ret = new ArrayList<CustomPairType>();
-        for(String parts : value.split(",")){
+        for (String parts : value.split(",")) {
             ret.add(TypeUtil.convert(parts, CustomPairType.class));
         }
         return ret.toArray(new CustomPairType[ret.size()]);

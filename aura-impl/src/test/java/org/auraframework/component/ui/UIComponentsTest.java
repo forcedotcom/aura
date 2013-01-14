@@ -24,16 +24,18 @@ import org.auraframework.impl.AuraImplTestCase;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
 /**
  * Unit test automation for ui namespaced components.
- *
- *
+ * 
+ * 
  * @since 138
  */
 public class UIComponentsTest extends AuraImplTestCase {
-    public UIComponentsTest(String name){
+    public UIComponentsTest(String name) {
         super(name);
     }
+
     /**
      * Verify that all ui:* components are extensible.
      */
@@ -45,12 +47,13 @@ public class UIComponentsTest extends AuraImplTestCase {
             }
         }
 
-        if (!failures.isEmpty()) fail("The following ui:* components should be extensible: " + failures);
+        if (!failures.isEmpty()) {
+            fail("The following ui:* components should be extensible: " + failures);
+        }
     }
 
     private Set<ComponentDef> getUiComponents() throws Exception {
-        DefDescriptor<ComponentDef> matcher = definitionService.getDefDescriptor("markup://ui:*",
-                ComponentDef.class);
+        DefDescriptor<ComponentDef> matcher = definitionService.getDefDescriptor("markup://ui:*", ComponentDef.class);
         Set<ComponentDef> ret = Sets.newHashSet();
         for (DefDescriptor<ComponentDef> def : definitionService.find(matcher)) {
             if (!NON_EXTENSIBLE_COMPONENTS.contains(def.getName())) {

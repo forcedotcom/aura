@@ -15,20 +15,22 @@
  */
 package org.auraframework.impl.java.controller;
 
+import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.Annotations.AuraEnabled;
 
 @Controller
 public class TestControllerWithProtectedAction {
     @AuraEnabled
     protected static String appendStrings(@Key("a") String a, @Key("b") String b) {
-        return a+b;
+        return a + b;
     }
 
     @AuraEnabled
-    static void doSomething() {}
+    static void doSomething() {
+    }
 
     @AuraEnabled
-    public static void doNothing() {}
+    public static void doNothing() {
+    }
 }

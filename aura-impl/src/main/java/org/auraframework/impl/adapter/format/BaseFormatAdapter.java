@@ -15,7 +15,9 @@
  */
 package org.auraframework.impl.adapter.format;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Reader;
 import java.util.Collection;
 import java.util.Map;
 
@@ -30,27 +32,34 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 public abstract class BaseFormatAdapter<T> implements FormatAdapter<T> {
 
     @Override
-    public T read(Reader in) throws IOException, QuickFixException{
-        throw new UnsupportedOperationException(String.format("read() not implemented for '%s' in '%s' Format", getType().getName(), getFormatName()));
+    public T read(Reader in) throws IOException, QuickFixException {
+        throw new UnsupportedOperationException(String.format("read() not implemented for '%s' in '%s' Format",
+                getType().getName(), getFormatName()));
     }
 
     @Override
-    public Collection<T> readCollection(Reader in) throws IOException, QuickFixException{
-        throw new UnsupportedOperationException(String.format("readCollection() not implemented for '%s' in '%s' Format", getType().getName(), getFormatName()));
+    public Collection<T> readCollection(Reader in) throws IOException, QuickFixException {
+        throw new UnsupportedOperationException(String.format(
+                "readCollection() not implemented for '%s' in '%s' Format", getType().getName(), getFormatName()));
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException, QuickFixException {
-        throw new UnsupportedOperationException(String.format("write() not implemented for '%s' in '%s' Format", getType().getName(), getFormatName()));
+    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException,
+            QuickFixException {
+        throw new UnsupportedOperationException(String.format("write() not implemented for '%s' in '%s' Format",
+                getType().getName(), getFormatName()));
     }
 
     @Override
-    public void writeBinary(Object value, Map<String, Object> attributes, OutputStream out) throws IOException, QuickFixException {
-        throw new UnsupportedOperationException(String.format("writeBinary() not implemented for '%s' in '%s' Format", getType().getName(), getFormatName()));
+    public void writeBinary(Object value, Map<String, Object> attributes, OutputStream out) throws IOException,
+            QuickFixException {
+        throw new UnsupportedOperationException(String.format("writeBinary() not implemented for '%s' in '%s' Format",
+                getType().getName(), getFormatName()));
     }
 
     @Override
     public void writeCollection(Collection<? extends T> values, Appendable out) throws IOException, QuickFixException {
-        throw new UnsupportedOperationException(String.format("writeCollection() not implemented for '%s' in '%s' Format", getType().getName(), getFormatName()));
+        throw new UnsupportedOperationException(String.format(
+                "writeCollection() not implemented for '%s' in '%s' Format", getType().getName(), getFormatName()));
     }
 }

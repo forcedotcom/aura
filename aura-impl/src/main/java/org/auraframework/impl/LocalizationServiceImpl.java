@@ -15,6 +15,17 @@
  */
 package org.auraframework.impl;
 
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Currency;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import org.auraframework.Aura;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.util.AuraLocale;
@@ -22,20 +33,13 @@ import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.number.AuraNumberFormat;
 
-import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.util.*;
-
 /**
  * Default implementation for the Localization Service
  */
 public class LocalizationServiceImpl implements LocalizationService {
 
     // make pluggable in the future?
-    private DateService dateService = DateServiceImpl.get();
+    private final DateService dateService = DateServiceImpl.get();
 
     /**
      * Used for Serialization to ensure class consistency.
@@ -90,10 +94,6 @@ public class LocalizationServiceImpl implements LocalizationService {
         }
         return formatDate(cal.getTime(), null, cal.getTimeZone(), dateStyle);
     }
-
-
-
-
 
     @Override
     public String formatTime(Date time) {
@@ -207,13 +207,6 @@ public class LocalizationServiceImpl implements LocalizationService {
         return formatDateTime(cal.getTime(), null, cal.getTimeZone(), dateStyle, timeStyle);
     }
 
-
-
-
-
-
-
-
     @Override
     public String formatNumber(int number) {
         return formatNumber(number, null);
@@ -248,14 +241,6 @@ public class LocalizationServiceImpl implements LocalizationService {
     public String formatNumber(Double number, int minFractionDigits, int maxFractionDigits) {
         return formatNumber(number, null, minFractionDigits, maxFractionDigits);
     }
-
-
-
-
-
-
-
-
 
     @Override
     public String formatNumber(int number, Locale locale) {
@@ -320,13 +305,7 @@ public class LocalizationServiceImpl implements LocalizationService {
         nf.setMinimumFractionDigits(minFractionDigits);
         nf.setMaximumFractionDigits(maxFractionDigits);
         return nf.format(number);
-   }
-
-
-
-
-
-
+    }
 
     @Override
     public String formatPercent(double percent) {
@@ -358,9 +337,6 @@ public class LocalizationServiceImpl implements LocalizationService {
         return nf.format(percent);
     }
 
-
-
-
     @Override
     public String formatCurrency(double currency) {
         return formatCurrency(currency, null);
@@ -376,7 +352,7 @@ public class LocalizationServiceImpl implements LocalizationService {
         if (locale == null) {
             locale = Aura.getLocalizationAdapter().getAuraLocale().getNumberLocale();
         }
-        DecimalFormat df = (DecimalFormat)DecimalFormat.getCurrencyInstance(locale);
+        DecimalFormat df = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
         return df.format(currency);
     }
 
@@ -386,20 +362,20 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
-    public String formatCurrency(double value, Locale locale, int minFractionDigits, int maxFractionDigits, Currency currency) {
+    public String formatCurrency(double value, Locale locale, int minFractionDigits, int maxFractionDigits,
+            Currency currency) {
         if (locale == null) {
             locale = Aura.getLocalizationAdapter().getAuraLocale().getCurrencyLocale();
         }
         if (currency == null) {
             currency = Currency.getInstance(locale);
         }
-        DecimalFormat df = (DecimalFormat)DecimalFormat.getCurrencyInstance(locale);
+        DecimalFormat df = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
         df.setMinimumFractionDigits(minFractionDigits);
         df.setMaximumFractionDigits(maxFractionDigits);
         df.setCurrency(currency);
         return df.format(value);
     }
-
 
     @Override
     public String formatCurrency(BigDecimal currency) {
@@ -416,7 +392,7 @@ public class LocalizationServiceImpl implements LocalizationService {
         if (locale == null) {
             locale = Aura.getLocalizationAdapter().getAuraLocale().getNumberLocale();
         }
-        DecimalFormat df = (DecimalFormat)DecimalFormat.getCurrencyInstance(locale);
+        DecimalFormat df = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
         df.setParseBigDecimal(true);
         return df.format(currency);
     }
@@ -427,21 +403,21 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
-    public String formatCurrency(BigDecimal value, Locale locale, int minFractionDigits, int maxFractionDigits, Currency currency) {
+    public String formatCurrency(BigDecimal value, Locale locale, int minFractionDigits, int maxFractionDigits,
+            Currency currency) {
         if (locale == null) {
             locale = Aura.getLocalizationAdapter().getAuraLocale().getCurrencyLocale();
         }
         if (currency == null) {
             currency = Currency.getInstance(locale);
         }
-        DecimalFormat df = (DecimalFormat)DecimalFormat.getCurrencyInstance(locale);
+        DecimalFormat df = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
         df.setParseBigDecimal(true);
         df.setMinimumFractionDigits(minFractionDigits);
         df.setMaximumFractionDigits(maxFractionDigits);
         df.setCurrency(currency);
         return df.format(value);
     }
-
 
     @Override
     public Date parseDate(String date) throws ParseException {
@@ -479,8 +455,9 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
-    public Calendar parseDateToCalendar(String date, Locale locale, TimeZone timeZone, int dateStyle) throws ParseException {
-        if (date  == null) {
+    public Calendar parseDateToCalendar(String date, Locale locale, TimeZone timeZone, int dateStyle)
+            throws ParseException {
+        if (date == null) {
             return null;
         }
         AuraLocale loc = Aura.getLocalizationAdapter().getAuraLocale();
@@ -494,10 +471,6 @@ public class LocalizationServiceImpl implements LocalizationService {
         c.setTime(parseDate(date, locale, timeZone, dateStyle));
         return c;
     }
-
-
-
-
 
     @Override
     public Date parseTime(String time) throws ParseException {
@@ -551,12 +524,6 @@ public class LocalizationServiceImpl implements LocalizationService {
         c.setTime(parseTime(time, locale, timeZone, timeStyle));
         return c;
     }
-
-
-
-
-
-
 
     @Override
     public Date parseDateTime(String dateTime) throws ParseException {
@@ -649,7 +616,7 @@ public class LocalizationServiceImpl implements LocalizationService {
 
     @Override
     public int parseInt(String number, Locale locale) throws ParseException {
-        if(number == null) {
+        if (number == null) {
             throw new ParseException("Parameter 'number' was null", 0);
         }
         if (locale == null) {
@@ -661,7 +628,7 @@ public class LocalizationServiceImpl implements LocalizationService {
 
     @Override
     public long parseLong(String number, Locale locale) throws ParseException {
-        if(number == null) {
+        if (number == null) {
             throw new ParseException("Parameter 'number' was null", 0);
         }
         if (locale == null) {
@@ -673,7 +640,7 @@ public class LocalizationServiceImpl implements LocalizationService {
 
     @Override
     public float parseFloat(String number, Locale locale) throws ParseException {
-        if(number == null) {
+        if (number == null) {
             throw new ParseException("Parameter 'number' was null", 0);
         }
         if (locale == null) {
@@ -685,7 +652,7 @@ public class LocalizationServiceImpl implements LocalizationService {
 
     @Override
     public double parseDouble(String number, Locale locale) throws ParseException {
-        if(number == null) {
+        if (number == null) {
             throw new ParseException("Parameter 'number' was null", 0);
         }
         if (locale == null) {
@@ -695,19 +662,14 @@ public class LocalizationServiceImpl implements LocalizationService {
         return AuraNumberFormat.parseStrict(number, nf).doubleValue();
     }
 
-
-
-
-
-
     @Override
     public double parsePercent(String percent) throws ParseException {
-       return parsePercent(percent, null);
+        return parsePercent(percent, null);
     }
 
     @Override
     public double parsePercent(String percent, Locale locale) throws ParseException {
-        if(percent == null) {
+        if (percent == null) {
             throw new ParseException("Parameter 'percent' was null", 0);
         }
         if (locale == null) {
@@ -717,31 +679,23 @@ public class LocalizationServiceImpl implements LocalizationService {
         return AuraNumberFormat.parseStrict(percent, nf).doubleValue();
     }
 
-
-
-
-
     @Override
     public BigDecimal parseCurrency(String currency) throws ParseException {
-       return parseCurrency(currency, null);
+        return parseCurrency(currency, null);
     }
 
     @Override
     public BigDecimal parseCurrency(String currency, Locale locale) throws ParseException {
-        if(currency == null) {
+        if (currency == null) {
             return null;
         }
         if (locale == null) {
             locale = Aura.getLocalizationAdapter().getAuraLocale().getCurrencyLocale();
         }
-        DecimalFormat df = (DecimalFormat)DecimalFormat.getCurrencyInstance(locale);
+        DecimalFormat df = (DecimalFormat) NumberFormat.getCurrencyInstance(locale);
         df.setParseBigDecimal(true);
-        return (BigDecimal)AuraNumberFormat.parseStrict(currency, df);
+        return (BigDecimal) AuraNumberFormat.parseStrict(currency, df);
     }
-
-
-
-
 
     @Override
     public String formatNumber(BigDecimal number) {
@@ -756,7 +710,7 @@ public class LocalizationServiceImpl implements LocalizationService {
     @Override
     public String formatNumber(BigDecimal number, Locale locale) {
         if (number == null) {
-            return  null;
+            return null;
         }
         if (locale == null) {
             locale = Aura.getLocalizationAdapter().getAuraLocale().getNumberLocale();
@@ -768,7 +722,7 @@ public class LocalizationServiceImpl implements LocalizationService {
     @Override
     public String formatNumber(BigDecimal number, Locale locale, int minFractionDigits, int maxFractionDigits) {
         if (number == null) {
-            return  null;
+            return null;
         }
         if (locale == null) {
             locale = Aura.getLocalizationAdapter().getAuraLocale().getNumberLocale();
@@ -787,16 +741,15 @@ public class LocalizationServiceImpl implements LocalizationService {
     @Override
     public BigDecimal parseBigDecimal(String number, Locale locale) throws ParseException {
         if (number == null) {
-            return  null;
+            return null;
         }
         if (locale == null) {
             locale = Aura.getLocalizationAdapter().getAuraLocale().getNumberLocale();
         }
-        DecimalFormat df = (DecimalFormat)DecimalFormat.getInstance(locale);
+        DecimalFormat df = (DecimalFormat) NumberFormat.getInstance(locale);
         df.setParseBigDecimal(true);
         return new BigDecimal(AuraNumberFormat.parseStrict(number, df).toString());
     }
-
 
     @Override
     public String formatNumber(Number number) {
@@ -806,7 +759,7 @@ public class LocalizationServiceImpl implements LocalizationService {
     @Override
     public String formatNumber(Number number, Locale locale) {
         if (number == null) {
-            return  null;
+            return null;
         }
         if (locale == null) {
             locale = Aura.getLocalizationAdapter().getAuraLocale().getNumberLocale();
@@ -818,7 +771,7 @@ public class LocalizationServiceImpl implements LocalizationService {
     @Override
     public String formatNumber(Number number, Locale locale, int minFractionDigits, int maxFractionDigits) {
         if (number == null) {
-            return  null;
+            return null;
         }
         if (locale == null) {
             locale = Aura.getLocalizationAdapter().getAuraLocale().getNumberLocale();
@@ -831,4 +784,3 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
 }
-

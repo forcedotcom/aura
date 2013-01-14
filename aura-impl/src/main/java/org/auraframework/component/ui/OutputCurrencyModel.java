@@ -22,9 +22,9 @@ import org.auraframework.Aura;
 import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.LocalizationService;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.*;
+import org.auraframework.system.Annotations.Model;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -34,18 +34,21 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 public class OutputCurrencyModel {
 
     /**
-     * Returns a formatted value showing the value attribute as a currency, eg "$9.98".
-     *
-     * Formatted using either the default NumberFormat pattern or the given pattern.
-     *
+     * Returns a formatted value showing the value attribute as a currency, eg
+     * "$9.98".
+     * 
+     * Formatted using either the default NumberFormat pattern or the given
+     * pattern.
+     * 
      * The pattern be a {@link java.text.DecimalFormat DecimalFormat} pattern.
+     * 
      * @return a formatted value showing the given value attribute
      * @throws QuickFixException
      */
     @AuraEnabled
     public String getText() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        BaseComponent<?,?> component = context.getCurrentComponent();
+        BaseComponent<?, ?> component = context.getCurrentComponent();
         AttributeSet attrs = component.getAttributes();
         Object valueObj;
         try {
@@ -61,15 +64,15 @@ public class OutputCurrencyModel {
         String errMsgFractionDigits = "The fractionDigits attribute must be assigned a non-negative integer value";
         try {
             Object fractionDigitsObj = attrs.getValue("fractionDigits");
-            fractionDigits = (Integer)fractionDigitsObj;
-            if (fractionDigits < 0 ) {
+            fractionDigits = (Integer) fractionDigitsObj;
+            if (fractionDigits < 0) {
                 return errMsgFractionDigits;
             }
         } catch (NumberFormatException e) {
             return errMsgFractionDigits;
         }
 
-        String currencyCode = (String)attrs.getValue("currencyCode");
+        String currencyCode = (String) attrs.getValue("currencyCode");
         Currency currency = null;
         if (currencyCode != null) {
             try {
@@ -82,9 +85,9 @@ public class OutputCurrencyModel {
         LocalizationService lclService = Aura.getLocalizationService();
         // until Number vs. BigDecimal vs. double is sorted - JamesT?
         if (valueObj instanceof BigDecimal) {
-            return lclService.formatCurrency((BigDecimal)valueObj, null, fractionDigits, fractionDigits, currency);
+            return lclService.formatCurrency((BigDecimal) valueObj, null, fractionDigits, fractionDigits, currency);
         } else if (valueObj instanceof Double) {
-            return lclService.formatCurrency((Double)valueObj, null, fractionDigits, fractionDigits, currency);
+            return lclService.formatCurrency((Double) valueObj, null, fractionDigits, fractionDigits, currency);
         } else {
             return "Expecting BigDecimal or Double for value";
         }

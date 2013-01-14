@@ -25,6 +25,8 @@ import org.apache.commons.httpclient.HttpClient;
  */
 public interface TestServletConfig {
     public URL getBaseUrl() throws MalformedURLException;
+
     public HttpClient getHttpClient() throws Exception;
+
     public String getCsrfToken() throws Exception;
 }

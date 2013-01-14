@@ -16,14 +16,13 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.io.IOException;
-
 import java.util.Collections;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.*;
-
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.auraframework.def.Definition;
 import org.auraframework.impl.root.parser.XMLParser;
@@ -32,6 +31,8 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * Superclass for all the xml handlers.
  */
@@ -39,27 +40,16 @@ public abstract class XMLHandler<T extends Definition> {
 
     private static final String SYSTEM_TAG_PREFIX = "aura";
 
-    public final static Set<String> SYSTEM_TAGS = ImmutableSet.of(
-            ForEachDefHandler.TAG,
-            ApplicationDefHandler.TAG,
-            AttributeDefHandler.TAG,
-            ComponentDefHandler.TAG,
-            EventDefHandler.TAG,
-            InterfaceDefHandler.TAG,
-            EventHandlerDefHandler.TAG,
-            LayoutDefHandler.TAG,
-            LayoutsDefHandler.TAG,
-            LayoutItemDefHandler.TAG,
-            RegisterEventHandler.TAG,
-            AttributeDefRefHandler.TAG,
-            DependencyDefHandler.TAG
-    );
+    public final static Set<String> SYSTEM_TAGS = ImmutableSet.of(ForEachDefHandler.TAG, ApplicationDefHandler.TAG,
+            AttributeDefHandler.TAG, ComponentDefHandler.TAG, EventDefHandler.TAG, InterfaceDefHandler.TAG,
+            EventHandlerDefHandler.TAG, LayoutDefHandler.TAG, LayoutsDefHandler.TAG, LayoutItemDefHandler.TAG,
+            RegisterEventHandler.TAG, AttributeDefRefHandler.TAG, DependencyDefHandler.TAG);
 
     protected final XMLStreamReader xmlReader;
     protected final XMLStreamWriter xmlWriter;
     protected final Source<?> source;
 
-    public static class InvalidSystemAttributeException extends AuraRuntimeException{
+    public static class InvalidSystemAttributeException extends AuraRuntimeException {
         /**
          */
         private static final long serialVersionUID = -7339542343645451510L;
@@ -84,9 +74,10 @@ public abstract class XMLHandler<T extends Definition> {
     }
 
     /**
-     * Handles the XML for this object and returns a new definition. Expects that the reader has
-     * already been moved to a START_ELEMENT, and when this method returns it will leave the reader
-     * at the appropriate END_ELEMENT
+     * Handles the XML for this object and returns a new definition. Expects
+     * that the reader has already been moved to a START_ELEMENT, and when this
+     * method returns it will leave the reader at the appropriate END_ELEMENT
+     * 
      * @throws XMLStreamException If the stream is not queued up properly
      * @throws QuickFixException
      */
@@ -104,7 +95,7 @@ public abstract class XMLHandler<T extends Definition> {
         return XMLParser.getLocation(xmlReader, source);
     }
 
-    protected String getAttributeValue(String name){
+    protected String getAttributeValue(String name) {
         String value = xmlReader.getAttributeValue(null, name);
         if (AuraTextUtil.isNullEmptyOrWhitespace(value)) {
             for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
@@ -117,16 +108,18 @@ public abstract class XMLHandler<T extends Definition> {
     }
 
     /**
-     * Since we do not have namespace support enabled on the xmlreader, there doesn't seem to be a good
-     * api to get namespaced attributes.  Unlike tags, the simple get does actually strip off the namespace.
-     * So, we see if the simple name matches at all, and if it does, we iterate through all attributes to
-     * do the exact match, including namespace.
+     * Since we do not have namespace support enabled on the xmlreader, there
+     * doesn't seem to be a good api to get namespaced attributes. Unlike tags,
+     * the simple get does actually strip off the namespace. So, we see if the
+     * simple name matches at all, and if it does, we iterate through all
+     * attributes to do the exact match, including namespace.
      */
-    protected String getSystemAttributeValue(String name){
+    protected String getSystemAttributeValue(String name) {
         String ret = getAttributeValue(name);
-        if(!AuraTextUtil.isNullEmptyOrWhitespace(ret)){
-            for(int i=0;i<xmlReader.getAttributeCount();i++){
-                if(xmlReader.getAttributeLocalName(i).equalsIgnoreCase(name)&& SYSTEM_TAG_PREFIX.equalsIgnoreCase(xmlReader.getAttributePrefix(i))){
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(ret)) {
+            for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
+                if (xmlReader.getAttributeLocalName(i).equalsIgnoreCase(name)
+                        && SYSTEM_TAG_PREFIX.equalsIgnoreCase(xmlReader.getAttributePrefix(i))) {
                     return xmlReader.getAttributeValue(i);
                 }
             }
@@ -134,7 +127,7 @@ public abstract class XMLHandler<T extends Definition> {
         return null;
     }
 
-    protected boolean getBooleanAttributeValue(String name){
+    protected boolean getBooleanAttributeValue(String name) {
         return Boolean.parseBoolean(xmlReader.getAttributeValue(null, name));
     }
 
@@ -177,9 +170,9 @@ public abstract class XMLHandler<T extends Definition> {
             return false;
         }
 
-        String fullName =  name.getLocalPart();
-        //namespaceURI normally seems to be empty string
-        if(!namespaceURI.equals("")){
+        String fullName = name.getLocalPart();
+        // namespaceURI normally seems to be empty string
+        if (!namespaceURI.equals("")) {
             fullName = String.format("%s:%s", namespaceURI, name.getLocalPart());
         }
         return SYSTEM_TAGS.contains(fullName.toLowerCase());

@@ -50,14 +50,15 @@ public final class AuraExceptionUtil {
 
     /**
      * Try really hard to find a QuickFixException.
-     *
+     * 
      * This routine will attempt to unwrap any Aura exception nested inside
      * other exceptions. It is intended to handle things like Memoization or
-     * Excecution exceptions, surfacing the underlying Aura exception. Note
-     * that this can hide the actual exception chain.
-     *
+     * Excecution exceptions, surfacing the underlying Aura exception. Note that
+     * this can hide the actual exception chain.
+     * 
      * @param t a Throwable to check.
-     * @return the original QuickFixException if the Throwable or a cause is a quick fix
+     * @return the original QuickFixException if the Throwable or a cause is a
+     *         quick fix
      * @throws Error original Error if the Throwable or a cause is an error.
      * @throws AuraRuntimeException for any other Throwable.
      */
@@ -68,46 +69,50 @@ public final class AuraExceptionUtil {
 
         while ((recurse != null) && (count-- > 0)) {
             if (recurse instanceof QuickFixException) {
-                return (QuickFixException)recurse;
+                return (QuickFixException) recurse;
             } else if ((unwrapped == null) && (recurse instanceof AuraRuntimeException)) {
-                unwrapped = (AuraRuntimeException)recurse;
+                unwrapped = (AuraRuntimeException) recurse;
             } else if (recurse instanceof Error) {
-                throw (Error)recurse;
+                throw (Error) recurse;
             }
             recurse = recurse.getCause();
         }
         if (unwrapped != null) {
             throw unwrapped;
         }
-        if(t instanceof AuraRuntimeException){
-            throw (AuraRuntimeException)t;
+        if (t instanceof AuraRuntimeException) {
+            throw (AuraRuntimeException) t;
         }
         throw new AuraRuntimeException(t);
     }
 
     /**
      * Wrap an exception thrown inside plug-in code.
-     *
-     * Whenever a plug-in is called in Java, the caller MUST handle all exceptions, and wrap things as follows:
+     * 
+     * Whenever a plug-in is called in Java, the caller MUST handle all
+     * exceptions, and wrap things as follows:
      * <ul>
-     *   <li>Quick-Fixes should be passed through untouched
-     *      (they will either be handled, or reported as an application error)</li>
-     *   <li>AuraHandledException should be passed through untouched.
-     *       It is an error intended for the client, and should not be wrapped.</li>
-     *   <li>Any other AuraRuntimeException should be wrapped in a AuraExecutionException
-     *       (note, if these hide a quick-fix or other exception, those exceptions should be surfaced).</li>
-     *   <li>All non-aura exceptions should also be wrapped in a AuraExecutionException</li>
-     *   <li>If there is an error somewhere in the set of causes, surface that.</li>
+     * <li>Quick-Fixes should be passed through untouched (they will either be
+     * handled, or reported as an application error)</li>
+     * <li>AuraHandledException should be passed through untouched. It is an
+     * error intended for the client, and should not be wrapped.</li>
+     * <li>Any other AuraRuntimeException should be wrapped in a
+     * AuraExecutionException (note, if these hide a quick-fix or other
+     * exception, those exceptions should be surfaced).</li>
+     * <li>All non-aura exceptions should also be wrapped in a
+     * AuraExecutionException</li>
+     * <li>If there is an error somewhere in the set of causes, surface that.</li>
      * </ul>
-     *
+     * 
      * Returning a QuickFixException allows the caller to do a:
-     * <code>throw AuraExceptionUtil.wrapExcecutionException(t,l)</code>
-     * making the calling code more obvious (we are always throwing an exception).
-     *
+     * <code>throw AuraExceptionUtil.wrapExcecutionException(t,l)</code> making
+     * the calling code more obvious (we are always throwing an exception).
+     * 
      * @param t the exception to wrap/return.
      * @param l the location of the execution.
      * @return a quick fix exception
-     * @throws AuraRuntimeException (actually a subclass of this) if there is no Quick-Fix
+     * @throws AuraRuntimeException (actually a subclass of this) if there is no
+     *             Quick-Fix
      * @throws Error if an error was thrown.
      */
     public static QuickFixException wrapExecutionException(Throwable t, Location l) {
@@ -116,13 +121,14 @@ public final class AuraExceptionUtil {
 
         while ((recurse != null) && (count-- > 0)) {
             if (recurse instanceof QuickFixException) {
-                return (QuickFixException)recurse;
+                return (QuickFixException) recurse;
             } else if (recurse instanceof AuraHandledException) {
-                // Short circuit out, assume that the thrower knew what they were doing.
-                throw (AuraHandledException)recurse;
+                // Short circuit out, assume that the thrower knew what they
+                // were doing.
+                throw (AuraHandledException) recurse;
             } else if (recurse instanceof Error) {
                 // unwrap errors, ignoring anyone else's attempt to wrap.
-                throw (Error)recurse;
+                throw (Error) recurse;
             }
             recurse = recurse.getCause();
         }
@@ -131,13 +137,14 @@ public final class AuraExceptionUtil {
 
     /**
      * Wrap an exception thrown inside plug-in code, not allowing a quick-fix.
-     *
+     * 
      * This is a very simple wrapper around {@link #wrapExecutionException}
-     *
+     * 
      * @param t the exception to wrap/return.
      * @param l the location of the execution.
      * @return a wrapped quick-fix exception
-     * @throws AuraRuntimeException (actually a subclass of this) if there is no Quick-Fix
+     * @throws AuraRuntimeException (actually a subclass of this) if there is no
+     *             Quick-Fix
      * @throws Error if an error was thrown.
      */
     public static AuraRuntimeException wrapExecutionExceptionNoQFE(Throwable t, Location l) {

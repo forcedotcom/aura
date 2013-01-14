@@ -20,18 +20,22 @@ import java.io.IOException;
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
 /**
- * A Java Renderer that extends Renderer interface and has hidden its constructor.
- *
- *
+ * A Java Renderer that extends Renderer interface and has hidden its
+ * constructor.
+ * 
+ * 
  * @since 0.0.207
  */
 public class TestPrivateConstructorInRendererExtension implements Renderer {
 
-    private TestPrivateConstructorInRendererExtension(){
+    private TestPrivateConstructorInRendererExtension() {
 
     }
+
     @Override
-    public void render(BaseComponent<?, ?> component, Appendable appendable) throws IOException, QuickFixException {}
+    public void render(BaseComponent<?, ?> component, Appendable appendable) throws IOException, QuickFixException {
+    }
 
 }

@@ -15,16 +15,19 @@
  */
 package org.auraframework.impl.context;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.auraframework.adapter.RegistryAdapter;
-import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.DefRegistry;
+import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 
 public class AuraPrecompiledRegistryAdapter implements RegistryAdapter {
@@ -34,23 +37,23 @@ public class AuraPrecompiledRegistryAdapter implements RegistryAdapter {
 
     public AuraPrecompiledRegistryAdapter(File sourceLocation, String precompiledPackagePath) {
         DefRegistry<?>[] precompiledRegistries = null;
-        if(!sourceLocation.exists()){
+        if (!sourceLocation.exists()) {
             ObjectInputStream ois = null;
             InputStream ris = AuraPrecompiledRegistryAdapter.class.getResourceAsStream(precompiledPackagePath);
-            if(ris != null){
-                try{
+            if (ris != null) {
+                try {
                     ois = new ObjectInputStream(ris);
-                    precompiledRegistries = (DefRegistry[])ois.readObject();
-                } catch (Exception e){
-                    log.error(e.getClass()  + ": " + e.getMessage(), e);
+                    precompiledRegistries = (DefRegistry[]) ois.readObject();
+                } catch (Exception e) {
+                    log.error(e.getClass() + ": " + e.getMessage(), e);
                     throw new AuraRuntimeException(e);
-                }finally{
+                } finally {
                     try {
                         ris.close();
                     } catch (IOException e) {
                         throw new AuraRuntimeException(e);
                     }
-                    if(ois != null){
+                    if (ois != null) {
                         try {
                             ois.close();
                         } catch (IOException e) {
@@ -64,8 +67,7 @@ public class AuraPrecompiledRegistryAdapter implements RegistryAdapter {
     }
 
     @Override
-    public DefRegistry<?>[] getRegistries(Mode mode, Access access,
-            Set<SourceLoader> extraLoaders) {
+    public DefRegistry<?>[] getRegistries(Mode mode, Access access, Set<SourceLoader> extraLoaders) {
         return registries;
     }
 

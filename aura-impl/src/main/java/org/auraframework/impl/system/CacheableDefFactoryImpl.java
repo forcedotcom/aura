@@ -17,10 +17,13 @@ package org.auraframework.impl.system;
 
 import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.impl.parser.ParserFactory;
 import org.auraframework.impl.source.SourceFactory;
-import org.auraframework.system.*;
+import org.auraframework.system.CacheableDefFactory;
+import org.auraframework.system.Parser;
+import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class CacheableDefFactoryImpl<D extends Definition> extends DefFactoryImpl<D> implements CacheableDefFactory<D> {
@@ -36,7 +39,7 @@ public class CacheableDefFactoryImpl<D extends Definition> extends DefFactoryImp
         if (source != null && source.exists()) {
             Parser parser = ParserFactory.getParser(source.getFormat());
             D def = parser.parse(descriptor, source);
-            //def.validateDefinition();
+            // def.validateDefinition();
             return def;
         }
 

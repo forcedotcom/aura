@@ -20,16 +20,17 @@ package org.auraframework.throwable.quickfix;
 
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraValidationException;
+
 /**
  * 
- * Exception thrown when an event of incompatible type is used.
- * Also see {@link org.auraframework.def.EventType}
+ * Exception thrown when an event of incompatible type is used. Also see
+ * {@link org.auraframework.def.EventType}
  */
 public class InvalidEventTypeException extends AuraValidationException {
-    
+
     private static final long serialVersionUID = 2571238301623320240L;
 
-    public InvalidEventTypeException(String message, Location location){
+    public InvalidEventTypeException(String message, Location location) {
         super(message, location);
     }
 }

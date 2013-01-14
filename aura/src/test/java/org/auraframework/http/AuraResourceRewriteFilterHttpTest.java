@@ -15,16 +15,16 @@
  */
 package org.auraframework.http;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.TestLabels;
 
-import org.apache.commons.httpclient.HttpStatus;
-
 /**
- * Tests for ResourceRewriteFilter handling. The tests don't validate the response content, but just whether the request
- * is forwarded to the AuraResourceServlet.
- *
- *
+ * Tests for ResourceRewriteFilter handling. The tests don't validate the
+ * response content, but just whether the request is forwarded to the
+ * AuraResourceServlet.
+ * 
+ * 
  * @since 0.0.92
  */
 public class AuraResourceRewriteFilterHttpTest extends AuraHttpTestCase {
@@ -33,8 +33,9 @@ public class AuraResourceRewriteFilterHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * URLs should be forwarded to AuraResourceServlet only if they appear to have the required format.
-     * We expect 404 for all other URLs, as they shouldn't get handled by the servlet.
+     * URLs should be forwarded to AuraResourceServlet only if they appear to
+     * have the required format. We expect 404 for all other URLs, as they
+     * shouldn't get handled by the servlet.
      */
     // TODO: W-1069590 https://gus.soma.salesforce.com/a07B0000000G71N
     @TestLabels("auraSanity")

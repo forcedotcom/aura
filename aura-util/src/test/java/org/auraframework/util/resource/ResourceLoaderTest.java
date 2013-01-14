@@ -35,13 +35,14 @@ import com.google.common.io.Files;
  */
 public class ResourceLoaderTest extends UnitTestCase {
     /**
-     * The test folder serves as the root for all temporary files that these tests create so that each test can clean up
-     * after itself.
+     * The test folder serves as the root for all temporary files that these
+     * tests create so that each test can clean up after itself.
      */
     private File testFolder;
 
     /**
-     * Tests should use this for creating any temporary files or folders for populating the cache.
+     * Tests should use this for creating any temporary files or folders for
+     * populating the cache.
      */
     private File origFolder;
 
@@ -56,7 +57,8 @@ public class ResourceLoaderTest extends UnitTestCase {
     private ResourceLoader fileLoader;
 
     /**
-     * A JAR based loader. Note that refreshing contents in a JAR is currently unsupported.
+     * A JAR based loader. Note that refreshing contents in a JAR is currently
+     * unsupported.
      */
     private ResourceLoader jarLoader;
 
@@ -73,7 +75,7 @@ public class ResourceLoaderTest extends UnitTestCase {
         /**
          * <pre>
          * The test folders are all rooted at /path/to/testRootFolder with the following defaults
-         *
+         * 
          *  / : the test root
          *  /TestName-ORIG : the original source files that will be cached and read back
          *  /TestName-TEMP: the temp dir used to create the file-based loader
@@ -138,29 +140,31 @@ public class ResourceLoaderTest extends UnitTestCase {
             assertEquals("Unexpected exception message", "Cache dir name must be specified", e.getMessage());
         }
     }
-    
+
     /**
      * Verify that null value for parent is handled.
      */
-    //Automation for "W-1405114"
-    public void testParentDirNull() throws Exception{
-        try{
+    // Automation for "W-1405114"
+    public void testParentDirNull() throws Exception {
+        try {
             ResourceLoader loader = new ResourceLoader(tempFolder.getPath(), null, false);
             loader.getResource("/foo/bar.txt");
             fail("No error for null Classloader.");
-        }catch( RuntimeException e){
+        } catch (RuntimeException e) {
             assertEquals("Unexpected exception message", "ClassLoader must be specified", e.getMessage());
         }
     }
+
     /**
      * Cache directory is created if it doesn't exist.
      */
     public void testCacheDirDoesntExist() throws Exception {
-        // We should get the same results, regardless of the value of deleteOnStart.
+        // We should get the same results, regardless of the value of
+        // deleteOnStart.
         for (int pass = 0; pass < 2; pass++) {
             IOUtil.delete(tempFolder);
             assertFalse(cacheFolder.exists());
-            new ResourceLoader(tempFolder.getPath(),pass == 0);
+            new ResourceLoader(tempFolder.getPath(), pass == 0);
             assertTrue("Cache not created", cacheFolder.exists());
             assertTrue("Cache isn't a directory", cacheFolder.isDirectory());
         }
@@ -293,8 +297,8 @@ public class ResourceLoaderTest extends UnitTestCase {
     }
 
     /**
-     * Updated cache content is served, but version is not updated. Original is re-read and version updated if
-     * refreshCached called.
+     * Updated cache content is served, but version is not updated. Original is
+     * re-read and version updated if refreshCached called.
      */
 
     public void testGetResourceCachedUpdated() throws Exception {
@@ -345,9 +349,10 @@ public class ResourceLoaderTest extends UnitTestCase {
     }
 
     /**
-     * Original is re-read if cached content is deleted, but version is not updated. Note, that this test is unable to
-     * exercise the JAR loader because refreshing JAR contents is broken, but it is loosely specified and is only
-     * required during development.
+     * Original is re-read if cached content is deleted, but version is not
+     * updated. Note, that this test is unable to exercise the JAR loader
+     * because refreshing JAR contents is broken, but it is loosely specified
+     * and is only required during development.
      */
 
     public void testGetResourceCachedMissing() throws Exception {
@@ -386,7 +391,8 @@ public class ResourceLoaderTest extends UnitTestCase {
     }
 
     /**
-     * Served resource is not affected if version is deleted. Version is recomputed on refreshCache.
+     * Served resource is not affected if version is deleted. Version is
+     * recomputed on refreshCache.
      */
 
     public void testGetResourceCachedMissingVersion() throws Exception {
@@ -427,8 +433,9 @@ public class ResourceLoaderTest extends UnitTestCase {
     }
 
     /**
-     * Verify that a request for a directory, regardless of it return code, does not cause subsequent requests for
-     * elements beneath that directory to fail.
+     * Verify that a request for a directory, regardless of it return code, does
+     * not cause subsequent requests for elements beneath that directory to
+     * fail.
      * <p>
      * Regression test for W-1387862
      */

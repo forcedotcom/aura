@@ -25,7 +25,7 @@ import org.auraframework.util.json.Json;
 
 /**
  */
-public class TestSuiteDefJSONFormatAdapter extends JSONFormatAdapter<TestSuiteDef>{
+public class TestSuiteDefJSONFormatAdapter extends JSONFormatAdapter<TestSuiteDef> {
 
     @Override
     public Class<TestSuiteDef> getType() {

@@ -30,7 +30,7 @@ import org.auraframework.util.json.JsonSerializationContext;
 /**
  */
 @ThreadSafe
-public class AuraContextHTMLFormatAdapter extends HTMLFormatAdapter<AuraContext>{
+public class AuraContextHTMLFormatAdapter extends HTMLFormatAdapter<AuraContext> {
 
     @Override
     public Class<AuraContext> getType() {
@@ -40,9 +40,9 @@ public class AuraContextHTMLFormatAdapter extends HTMLFormatAdapter<AuraContext>
     @Override
     public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException {
         JsonSerializationContext s = new SerializationContext();
-        try{
+        try {
             Json.serialize(value, out, s);
-        }catch(AuraRuntimeException e){
+        } catch (AuraRuntimeException e) {
             AuraExceptionUtil.passQuickFix(e);
         }
     }

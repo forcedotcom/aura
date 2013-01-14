@@ -15,15 +15,25 @@
  */
 package org.auraframework.service;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ActionDef;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
 import org.auraframework.system.AuraContext.Format;
-import org.auraframework.throwable.*;
+import org.auraframework.throwable.AuraError;
+import org.auraframework.throwable.AuraException;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.NoContextException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -34,7 +44,8 @@ import com.google.common.util.concurrent.ExecutionError;
  * @hierarchy Aura.Services.SerializationService
  * @userStory a07B0000000Eb3M
  */
-public class SerializationServiceTest extends BaseServiceTest<SerializationService, SerializationServiceTest.Config> implements SerializationService {
+public class SerializationServiceTest extends BaseServiceTest<SerializationService, SerializationServiceTest.Config>
+        implements SerializationService {
 
     private static final long serialVersionUID = 7136575085875114482L;
 
@@ -45,46 +56,49 @@ public class SerializationServiceTest extends BaseServiceTest<SerializationServi
     @Override
     public <T> T read(Reader in, Class<T> type) throws IOException, QuickFixException {
 
-        try{
+        try {
             service.read(in, type);
             fail("Expected NoContextException");
-        }catch(NoContextException e){
-            //good
+        } catch (NoContextException e) {
+            // good
         }
 
         ContextService contextService = Aura.getContextService();
-        try{
-            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService().getDefDescriptor("test:laxSecurity", ApplicationDef.class));
+        try {
+            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
+                    .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
 
             /*
              * Try to read something that we really don't expect to be able to
              */
-            try{
+            try {
                 service.read(in, SerializationServiceTest.class);
                 fail("Did not expect to find formatter");
-            }catch(AuraRuntimeException e){
-                //good
-            }catch(AuraError e){
-                //good, will happen if format adapter not found
-            }catch(ExecutionError e){
-                //good, will happen if format adapter not found (fail load to cache)
+            } catch (AuraRuntimeException e) {
+                // good
+            } catch (AuraError e) {
+                // good, will happen if format adapter not found
+            } catch (ExecutionError e) {
+                // good, will happen if format adapter not found (fail load to
+                // cache)
             }
 
             /*
              * Try to read something we expect to be able to
              */
-            in = new StringReader("{descriptor : 'java://org.auraframework.impl.java.controller.TestController/ACTION$doSomething', params : {}}");
-            try{
+            in = new StringReader(
+                    "{descriptor : 'java://org.auraframework.impl.java.controller.TestController/ACTION$doSomething', params : {}}");
+            try {
                 service.read(in, Action.class);
-                if(config.format != Format.JSON){
+                if (config.format != Format.JSON) {
                     fail("Not expected to succeed.");
                 }
-            }catch(AuraRuntimeException e){
-                if(config.format == Format.JSON){
+            } catch (AuraRuntimeException e) {
+                if (config.format == Format.JSON) {
                     throw e;
                 }
             }
-        }finally{
+        } finally {
             contextService.endContext();
         }
         return null;
@@ -93,44 +107,47 @@ public class SerializationServiceTest extends BaseServiceTest<SerializationServi
     @Override
     public <T> T read(Reader in, Class<T> type, String format) throws IOException, QuickFixException {
 
-        try{
-            service.read(in,type,format);
+        try {
+            service.read(in, type, format);
             fail("Expected NoContextException");
-        }catch(NoContextException e){
-            //good
+        } catch (NoContextException e) {
+            // good
         }
 
         ContextService contextService = Aura.getContextService();
-        try{
-            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService().getDefDescriptor("test:laxSecurity", ApplicationDef.class));
+        try {
+            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
+                    .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
 
             /*
              * Try to read something that we really don't expect to be able to
              */
-            try{
+            try {
                 service.read(in, SerializationServiceTest.class, "HTML");
                 fail("Did not expect to find formatter");
-            }catch(AuraRuntimeException e){
-                //good
-            }catch(AuraError e){
-                //good, will happen if format adapter not found
-            }catch(ExecutionError e){
-                //good, will happen if format adapter not found (fail load to cache)
+            } catch (AuraRuntimeException e) {
+                // good
+            } catch (AuraError e) {
+                // good, will happen if format adapter not found
+            } catch (ExecutionError e) {
+                // good, will happen if format adapter not found (fail load to
+                // cache)
             }
 
             /*
              * Try to read something we expect to be able to
              */
-            in = new StringReader("{descriptor : 'java://org.auraframework.impl.java.controller.TestController/ACTION$doSomething', params : {}}");
+            in = new StringReader(
+                    "{descriptor : 'java://org.auraframework.impl.java.controller.TestController/ACTION$doSomething', params : {}}");
             assertNotNull(service.read(in, Action.class, Format.JSON.name()));
-            try{
+            try {
                 service.read(in, Action.class, Format.HTML.name());
                 fail("Did not expect success.");
-            }catch(AuraRuntimeException e){
-                //good
+            } catch (AuraRuntimeException e) {
+                // good
             }
 
-        }finally{
+        } finally {
             contextService.endContext();
         }
         return null;
@@ -139,48 +156,51 @@ public class SerializationServiceTest extends BaseServiceTest<SerializationServi
     @Override
     public <T> Collection<T> readCollection(Reader in, Class<T> type) throws IOException, QuickFixException {
 
-        try{
-            service.readCollection(in,type);
+        try {
+            service.readCollection(in, type);
             fail("Expected NoContextException");
-        }catch(NoContextException e){
-            //good
+        } catch (NoContextException e) {
+            // good
         }
 
         ContextService contextService = Aura.getContextService();
-        try{
-            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService().getDefDescriptor("test:laxSecurity", ApplicationDef.class));
+        try {
+            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
+                    .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
 
             /*
              * Try to read something that we really don't expect to be able to
              */
-            try{
+            try {
                 service.readCollection(in, SerializationServiceTest.class);
                 fail("Did not expect to find formatter");
-            }catch(AuraRuntimeException e){
-                //good
-            }catch(AuraError e){
-                //good, will happen if format adapter not found
-            }catch(ExecutionError e){
-                //good, will happen if format adapter not found (fail load to cache)
+            } catch (AuraRuntimeException e) {
+                // good
+            } catch (AuraError e) {
+                // good, will happen if format adapter not found
+            } catch (ExecutionError e) {
+                // good, will happen if format adapter not found (fail load to
+                // cache)
             }
 
             /*
              * Try to read something we expect to be able to
              */
 
-            in = new StringReader("{actions : [{descriptor : 'java://org.auraframework.impl.java.controller.TestController/ACTION$doSomething', params : {}}]}");
-            try{
+            in = new StringReader(
+                    "{actions : [{descriptor : 'java://org.auraframework.impl.java.controller.TestController/ACTION$doSomething', params : {}}]}");
+            try {
                 service.readCollection(in, Action.class);
-                if(config.format != Format.JSON){
+                if (config.format != Format.JSON) {
                     fail("Not expected to succeed.");
                 }
-            }catch(AuraRuntimeException e){
-                if(config.format == Format.JSON){
+            } catch (AuraRuntimeException e) {
+                if (config.format == Format.JSON) {
                     throw e;
                 }
             }
 
-        }finally{
+        } finally {
             contextService.endContext();
         }
         return null;
@@ -190,100 +210,104 @@ public class SerializationServiceTest extends BaseServiceTest<SerializationServi
     public <T> Collection<T> readCollection(Reader in, Class<T> type, String format) throws IOException,
             QuickFixException {
 
-        try{
-            service.readCollection(in,type,format);
+        try {
+            service.readCollection(in, type, format);
             fail("Expected NoContextException");
-        }catch(NoContextException e){
-            //good
-        }catch(AuraError e){
-            //good, will happen if format adapter not found
-        }catch(ExecutionError e){
-            //good, will happen if format adapter not found (fail load to cache)
+        } catch (NoContextException e) {
+            // good
+        } catch (AuraError e) {
+            // good, will happen if format adapter not found
+        } catch (ExecutionError e) {
+            // good, will happen if format adapter not found (fail load to
+            // cache)
         }
 
         ContextService contextService = Aura.getContextService();
-        try{
-            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService().getDefDescriptor("test:laxSecurity", ApplicationDef.class));
-
+        try {
+            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
+                    .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
 
             /*
              * Try to read something that we really don't expect to be able to
              */
-            try{
+            try {
                 service.readCollection(in, SerializationServiceTest.class, "JSON");
                 fail("Did not expect to find formatter");
-            }catch(AuraRuntimeException e){
-                //good
+            } catch (AuraRuntimeException e) {
+                // good
             }
 
             /*
              * Try to read something we expect to be able to
              */
 
-            in = new StringReader("{actions : [{descriptor : 'java://org.auraframework.impl.java.controller.TestController/ACTION$doSomething', params : {}}]}");
+            in = new StringReader(
+                    "{actions : [{descriptor : 'java://org.auraframework.impl.java.controller.TestController/ACTION$doSomething', params : {}}]}");
             Collection<Action> actions = service.readCollection(in, Action.class, "JSON");
             assertNotNull(actions);
             assertEquals(1, actions.size());
-            for(Action action : actions){
+            for (Action action : actions) {
                 assertEquals(State.NEW, action.getState());
             }
 
-        }finally{
+        } finally {
             contextService.endContext();
         }
         return null;
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException {}
+    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException {
+    }
+
     @Override
     public <T> void write(Object value, Map<String, Object> attributes, Class<T> type, Appendable out)
             throws IOException, QuickFixException {
 
-        try{
-            service.write(value,attributes,type,out);
+        try {
+            service.write(value, attributes, type, out);
             fail("Expected NoContextException");
-        }catch(NoContextException e){
-            //good
+        } catch (NoContextException e) {
+            // good
         }
 
         ContextService contextService = Aura.getContextService();
-        try{
-            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService().getDefDescriptor("test:laxSecurity", ApplicationDef.class));
+        try {
+            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
+                    .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
             Format format = Aura.getContextService().getCurrentContext().getFormat();
-
 
             ComponentDef cmp = Aura.getDefinitionService().getDefinition("test:text", ComponentDef.class);
             out = new StringBuilder();
             attributes = Maps.newHashMap();
-            try{
+            try {
                 service.write(cmp, attributes, ComponentDef.class, out);
-                if(format != Format.HTML){
+                if (format != Format.HTML) {
                     fail("Did not expect success.");
-                }else{
+                } else {
                     assertTrue(out.toString().indexOf("$A.init") > -1);
                 }
-            }catch(UnsupportedOperationException e){
-                if(format == Format.HTML){
+            } catch (UnsupportedOperationException e) {
+                if (format == Format.HTML) {
                     throw e;
                 }
-            }catch(AuraRuntimeException e){
-                if(format == Format.HTML){
+            } catch (AuraRuntimeException e) {
+                if (format == Format.HTML) {
                     throw e;
                 }
-            }catch(AuraError e){
-                if(format == Format.HTML){
+            } catch (AuraError e) {
+                if (format == Format.HTML) {
                     throw e;
                 }
             } catch (ExecutionError e) {
-                if(format == Format.HTML){
+                if (format == Format.HTML) {
                     throw e;
                 }
             }
 
-        }catch(AuraException e){
+        } catch (AuraException e) {
             throw new AuraRuntimeException(e);
-        }finally{
+        } finally {
             contextService.endContext();
         }
     }
@@ -292,48 +316,49 @@ public class SerializationServiceTest extends BaseServiceTest<SerializationServi
     public <T> void write(Object value, Map<String, Object> attributes, Class<T> type, Appendable out, String fmt)
             throws IOException, QuickFixException {
 
-        try{
-            service.write(value,attributes,type,out,fmt);
+        try {
+            service.write(value, attributes, type, out, fmt);
             fail("Expected NoContextException");
-        }catch(NoContextException e){
-            //good
+        } catch (NoContextException e) {
+            // good
         }
 
         ContextService contextService = Aura.getContextService();
-        try{
-            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService().getDefDescriptor("test:laxSecurity", ApplicationDef.class));
+        try {
+            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
+                    .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
 
             ComponentDef cmp = Aura.getDefinitionService().getDefinition("test:text", ComponentDef.class);
             out = new StringBuilder();
             attributes = Maps.newHashMap();
             Format format = config.format;
-            try{
+            try {
                 service.write(cmp, attributes, ComponentDef.class, out, format.name());
-                if(format != Format.HTML){
+                if (format != Format.HTML) {
                     fail("Did not expect success.");
-                }else{
+                } else {
                     assertTrue(out.toString().indexOf("$A.init") > -1);
                 }
-            }catch(UnsupportedOperationException e){
-                if(format == Format.HTML){
+            } catch (UnsupportedOperationException e) {
+                if (format == Format.HTML) {
                     throw e;
                 }
-            }catch(AuraRuntimeException e){
-                if(format == Format.HTML){
+            } catch (AuraRuntimeException e) {
+                if (format == Format.HTML) {
                     throw e;
                 }
-            }catch(AuraError e){
-                if(format == Format.HTML){
+            } catch (AuraError e) {
+                if (format == Format.HTML) {
                     throw e;
                 }
             } catch (ExecutionError e) {
-                if(format == Format.HTML){
+                if (format == Format.HTML) {
                     throw e;
                 }
             }
-        }catch(AuraException e){
+        } catch (AuraException e) {
             throw new AuraRuntimeException(e);
-        }finally{
+        } finally {
             contextService.endContext();
         }
     }
@@ -342,64 +367,68 @@ public class SerializationServiceTest extends BaseServiceTest<SerializationServi
     public <T> void writeBinary(Object value, Map<String, Object> attributes, Class<T> type, OutputStream out)
             throws IOException, QuickFixException {
 
-        //There are currently no implementations of writeBinary
+        // There are currently no implementations of writeBinary
         /*
         */
     }
 
     @Override
-    public <T> void writeBinary(Object value, Map<String, Object> attributes, Class<T> type, OutputStream out, String fmt) throws IOException, QuickFixException {
-        //There are currently no implementations of writeBinary
+    public <T> void writeBinary(Object value, Map<String, Object> attributes, Class<T> type, OutputStream out,
+            String fmt) throws IOException, QuickFixException {
+        // There are currently no implementations of writeBinary
         /*
         */
     }
 
     @Override
-    public <T> void writeCollection(Collection<? extends T> values, Class<T> type, Appendable out) throws IOException, QuickFixException {
+    public <T> void writeCollection(Collection<? extends T> values, Class<T> type, Appendable out) throws IOException,
+            QuickFixException {
 
-        try{
+        try {
             service.writeCollection(values, type, out);
             fail("Expected NoContextException");
-        }catch(NoContextException e){
-            //good
+        } catch (NoContextException e) {
+            // good
         }
 
         ContextService contextService = Aura.getContextService();
-        try{
-            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService().getDefDescriptor("test:laxSecurity", ApplicationDef.class));
+        try {
+            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
+                    .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
 
             Format format = Aura.getContextService().getCurrentContext().getFormat();
 
-            Action action = Aura.getInstanceService().getInstance("java://org.auraframework.impl.java.controller.TestController/ACTION$doSomething", ActionDef.class);
+            Action action = Aura.getInstanceService().getInstance(
+                    "java://org.auraframework.impl.java.controller.TestController/ACTION$doSomething", ActionDef.class);
             out = new StringBuilder();
-            try{
+            try {
                 service.writeCollection(Lists.newArrayList(action), Action.class, out);
-                if(format != Format.JSON){
+                if (format != Format.JSON) {
                     fail("Did not expect success.");
-                }else{
+                } else {
                     assertTrue(out.toString().indexOf("returnValue") > -1);
                 }
-            }catch(UnsupportedOperationException e){
-                if(format == Format.JSON){
+            } catch (UnsupportedOperationException e) {
+                if (format == Format.JSON) {
                     throw e;
                 }
-            }catch(AuraRuntimeException e){
-                if(format == Format.JSON){
+            } catch (AuraRuntimeException e) {
+                if (format == Format.JSON) {
                     throw e;
                 }
-            }catch(AuraError e){
-                if(format == Format.HTML){
+            } catch (AuraError e) {
+                if (format == Format.HTML) {
                     throw e;
                 }
             } catch (ExecutionError e) {
-                if(format == Format.HTML){
+                if (format == Format.HTML) {
                     throw e;
                 }
             }
 
-        }catch(AuraException e){
+        } catch (AuraException e) {
             throw new AuraRuntimeException(e);
-        }finally{
+        } finally {
             contextService.endContext();
         }
     }
@@ -408,26 +437,28 @@ public class SerializationServiceTest extends BaseServiceTest<SerializationServi
     public <T> void writeCollection(Collection<? extends T> values, Class<T> type, Appendable out, String fmt)
             throws IOException, QuickFixException {
 
-        try{
-            service.writeCollection(values,type,out,fmt);
+        try {
+            service.writeCollection(values, type, out, fmt);
             fail("Expected NoContextException");
-        }catch(NoContextException e){
-            //good
+        } catch (NoContextException e) {
+            // good
         }
 
         ContextService contextService = Aura.getContextService();
-        try{
-            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService().getDefDescriptor("test:laxSecurity", ApplicationDef.class));
+        try {
+            contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
+                    .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
 
             Format format = Format.JSON;
 
-            Action action = Aura.getInstanceService().getInstance("java://org.auraframework.impl.java.controller.TestController/ACTION$doSomething", ActionDef.class);
+            Action action = Aura.getInstanceService().getInstance(
+                    "java://org.auraframework.impl.java.controller.TestController/ACTION$doSomething", ActionDef.class);
             out = new StringBuilder();
             service.writeCollection(Lists.newArrayList(action), Action.class, out, format.name());
             assertTrue(out.toString().indexOf("returnValue") > -1);
-        }catch(AuraException e){
+        } catch (AuraException e) {
             throw new AuraRuntimeException(e);
-        }finally{
+        } finally {
             contextService.endContext();
         }
     }
@@ -437,9 +468,8 @@ public class SerializationServiceTest extends BaseServiceTest<SerializationServi
         return permuteConfigs(Lists.newArrayList(new Config()));
     }
 
-    public static class Config extends BaseServiceTest.Config{
+    public static class Config extends BaseServiceTest.Config {
 
     }
-
 
 }

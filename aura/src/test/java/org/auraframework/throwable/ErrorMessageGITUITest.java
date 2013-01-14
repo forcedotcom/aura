@@ -14,33 +14,37 @@
  * limitations under the License.
  */
 package org.auraframework.throwable;
+
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
 import org.openqa.selenium.By;
+
 /**
  * Automation for error message displayed in auraErrorMask div.
- *
+ * 
  * @since 0.0.259_5
  */
 public class ErrorMessageGITUITest extends WebDriverTestCase {
     private final By ERROR_MASK_LOCATOR = By.cssSelector("div[id='auraErrorMask']");
     private final By ERROR_CLOSE_LOCATOR = By.cssSelector("a[class~='close']");
     private final By ERROR_MSG_LOCATOR = By.cssSelector("div[id='auraErrorMessage']");
-    public ErrorMessageGITUITest(String name){
+
+    public ErrorMessageGITUITest(String name) {
         super(name);
     }
-    /**
-     * Verify that error message box displays in the auraErrorMask div and can be dismissed using the close button.
-     * Automation for W-1091838.
-     */
-    public void testErrorMessageDisplayAndClose() throws Exception{
-        open("/test/laxSecurity.app", Mode.PROD);
-        waitForElement("Error mask should not be visible when there is not error.",
-                findDomElement(ERROR_MASK_LOCATOR), false);
 
-        //Cause an error to show up on client
+    /**
+     * Verify that error message box displays in the auraErrorMask div and can
+     * be dismissed using the close button. Automation for W-1091838.
+     */
+    public void testErrorMessageDisplayAndClose() throws Exception {
+        open("/test/laxSecurity.app", Mode.PROD);
+        waitForElement("Error mask should not be visible when there is not error.", findDomElement(ERROR_MASK_LOCATOR),
+                false);
+
+        // Cause an error to show up on client
         String errorMsg = "Something went haywire!";
-        auraUITestingUtil.getEval("$A.error('"+errorMsg+"')");
+        auraUITestingUtil.getEval("$A.error('" + errorMsg + "')");
 
         waitForElement("Error mask should be visible when there is an error.", findDomElement(ERROR_MASK_LOCATOR), true);
         assertEquals("Did not find expected error in error message element.", errorMsg, getText(ERROR_MSG_LOCATOR));

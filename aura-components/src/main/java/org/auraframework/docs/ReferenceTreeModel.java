@@ -30,8 +30,8 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Model;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -44,7 +44,9 @@ public class ReferenceTreeModel {
     private static QuickFixException initException = null;
 
     public ReferenceTreeModel() throws QuickFixException {
-        if (initException != null) { throw initException; }
+        if (initException != null) {
+            throw initException;
+        }
     }
 
     private static final List<TreeNode> initTree() {

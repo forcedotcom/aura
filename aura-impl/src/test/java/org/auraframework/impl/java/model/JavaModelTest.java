@@ -18,7 +18,10 @@ package org.auraframework.impl.java.model;
 import java.io.IOException;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ModelDef;
+import org.auraframework.def.ValueDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -31,6 +34,7 @@ import org.auraframework.util.json.Json;
 
 /**
  * This class provides automation for Java models.
+ * 
  * @hierarchy Aura.Unit Tests.Components.Model.Java Model
  * @priority high
  */
@@ -93,6 +97,11 @@ public class JavaModelTest extends AuraImplTestCase {
         public boolean exists() {
             return false;
         }
+
+        @Override
+        public int compareTo(DefDescriptor other) {
+            return DefDescriptorImpl.compare(this, other);
+        }
     };
 
     public JavaModelTest(String name) {
@@ -117,17 +126,17 @@ public class JavaModelTest extends AuraImplTestCase {
      * 
      * @userStory a07B0000000FAmj
      */
-    public void testClassLevelAnnotationForJavaModel()throws Exception{
+    public void testClassLevelAnnotationForJavaModel() throws Exception {
         DefDescriptor<ModelDef> javaModelDefDesc = DefDescriptorImpl.getInstance(
                 "java://org.auraframework.impl.java.model.TestModel", ModelDef.class);
         assertNotNull(javaModelDefDesc.getDef());
 
         DefDescriptor<ModelDef> javaModelWOAnnotationDefDesc = DefDescriptorImpl.getInstance(
                 "java://org.auraframework.impl.java.model.TestModelWithoutAnnotation", ModelDef.class);
-        try{
+        try {
             javaModelWOAnnotationDefDesc.getDef();
             fail("Expected InvalidDefinitionException");
-        }catch(InvalidDefinitionException e){
+        } catch (InvalidDefinitionException e) {
             assertTrue("Expected to see an error message pointing to missing annotation in model", e.getMessage()
                     .startsWith("@Model annotation is required on all Models."));
         }
@@ -162,14 +171,14 @@ public class JavaModelTest extends AuraImplTestCase {
                 "java://org.auraframework.impl.java.model.TestModelWithStatic" };
 
         for (String model : failModels) {
-            try{
+            try {
                 //
                 // We don't care about the result, just that we get an
                 // exception.
                 //
                 Aura.getDefinitionService().getDefinition(model, ModelDef.class);
                 fail("Expected InvalidDefinitionException on model " + model);
-            } catch(InvalidDefinitionException e) {
+            } catch (InvalidDefinitionException e) {
                 assertTrue("Expected to see an error message pointing to broken annotation in model", e.getMessage()
                         .startsWith("@AuraEnabled"));
             }
@@ -195,34 +204,36 @@ public class JavaModelTest extends AuraImplTestCase {
      */
     public void testModelExceptionHasLocation() throws Exception {
         String failModel = "java://org.auraframework.impl.java.model.TestModelWithVoid";
-        
+
         try {
             Aura.getDefinitionService().getDefinition(failModel, ModelDef.class);
             fail("Expected InvalidDefinitionException on model " + failModel);
-        } catch(InvalidDefinitionException e) {
+        } catch (InvalidDefinitionException e) {
             assertEquals("Expected to see location of exception", failModel, e.getLocation().toString());
         }
     }
-    
+
     /**
      * Verify that accessing a non-existing property on model throws Exception.
+     * 
      * @throws Exception
      */
-    public void testNonExistingPropertiesOnModel() throws Exception{
-        DefDescriptor<ModelDef> javaModelDefDesc= DefDescriptorImpl.getInstance("java://org.auraframework.impl.java.model.TestModel", ModelDef.class);
+    public void testNonExistingPropertiesOnModel() throws Exception {
+        DefDescriptor<ModelDef> javaModelDefDesc = DefDescriptorImpl.getInstance(
+                "java://org.auraframework.impl.java.model.TestModel", ModelDef.class);
         ModelDef mDef = javaModelDefDesc.getDef();
         assertNotNull(mDef);
         Model model = mDef.newInstance();
-        try{
+        try {
             model.getValue(new PropertyReferenceImpl("fooBar", new Location("test", 0)));
             fail("Model should not be able to getValue of a non existing property.");
-        } catch(AuraRuntimeException e){
+        } catch (AuraRuntimeException e) {
             assertEquals("TestModel: no such property: fooBar", e.getMessage());
         }
-        try{
+        try {
             model.getValue(new PropertyReferenceImpl("firstThi", new Location("test", 0)));
             fail("Model.getValue() on partial matches of property names should not be successful.");
-        } catch(AuraRuntimeException e){
+        } catch (AuraRuntimeException e) {
             assertEquals("TestModel: no such property: firstThi", e.getMessage());
         }
     }

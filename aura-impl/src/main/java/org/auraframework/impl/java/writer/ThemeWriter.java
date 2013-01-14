@@ -18,21 +18,19 @@ package org.auraframework.impl.java.writer;
 import java.io.Writer;
 
 import org.auraframework.def.Definition;
-
 import org.auraframework.system.Source;
-
 import org.auraframework.throwable.AuraRuntimeException;
 
 /**
  * CSS theme writer.
- *
- *
+ * 
+ * 
  * @since 0.0.210
  */
 public class ThemeWriter extends SourceWriterImpl {
     private static final ThemeWriter instance = new ThemeWriter();
 
-    public static ThemeWriter getInstance(){
+    public static ThemeWriter getInstance() {
         return instance;
     }
 
@@ -40,18 +38,18 @@ public class ThemeWriter extends SourceWriterImpl {
     public <D extends Definition> void write(D def, Source<?> source) {
         Writer writer = null;
 
-        try{
+        try {
             // FIXME: W-1242779 actually write something.
             writer = source.getWriter();
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new AuraRuntimeException(e);
-        }finally{
-            try{
-                if(writer != null){
+        } finally {
+            try {
+                if (writer != null) {
                     writer.flush();
                     writer.close();
                 }
-            }catch(Exception e){
+            } catch (Exception e) {
                 throw new AuraRuntimeException(e);
             }
         }

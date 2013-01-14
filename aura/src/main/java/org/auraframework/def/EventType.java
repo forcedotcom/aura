@@ -15,28 +15,28 @@
  */
 package org.auraframework.def;
 
-
 /**
  * All the different types of aura events
  */
 public enum EventType {
 
     /**
-     * Application level events can be handled anywhere in the app, they have no source
+     * Application level events can be handled anywhere in the app, they have no
+     * source
      */
     APPLICATION,
 
     /**
-     * Component level events can be handled in the scope in which the component is used, this is the main
-     * method of communication between two components. The source is part of the event and can be filtered on
+     * Component level events can be handled in the scope in which the component
+     * is used, this is the main method of communication between two components.
+     * The source is part of the event and can be filtered on
      */
     COMPONENT,
 
     /**
      * Events fired from Values
      */
-    VALUE
-    ;
+    VALUE;
 
     /**
      * only global and local events can be manually fired by the user

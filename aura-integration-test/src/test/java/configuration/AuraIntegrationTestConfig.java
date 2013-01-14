@@ -19,12 +19,16 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.openqa.selenium.net.PortProber;
-import org.auraframework.test.*;
+import org.auraframework.test.PooledRemoteWebDriverFactory;
+import org.auraframework.test.RemoteWebDriverFactory;
+import org.auraframework.test.SauceUtil;
+import org.auraframework.test.SeleniumServerLauncher;
+import org.auraframework.test.WebDriverProvider;
 import org.auraframework.test.configuration.JettyTestServletConfig;
 import org.auraframework.test.configuration.TestServletConfig;
-import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
+import org.auraframework.util.ServiceLoaderImpl.Impl;
+import org.openqa.selenium.net.PortProber;
 
 /**
  */
@@ -42,14 +46,14 @@ public class AuraIntegrationTestConfig {
         try {
             String hubUrlString = System.getProperty(WebDriverProvider.WEBDRIVER_SERVER_PROPERTY);
             if ((hubUrlString != null) && !hubUrlString.equals("")) {
-                if (runningOnSauceLabs)
+                if (runningOnSauceLabs) {
                     serverUrl = SauceUtil.getSauceServerUrl();
-                else
+                } else {
                     serverUrl = new URL(hubUrlString);
+                }
             } else {
 
                 int serverPort = PortProber.findFreePort();
-
 
                 // quiet the verbose grid logging
                 Logger selLog = Logger.getLogger("org.openqa");

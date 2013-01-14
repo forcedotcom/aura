@@ -24,7 +24,7 @@ import org.auraframework.util.AuraTextUtil;
 
 public abstract class RootDefinitionTest<T extends RootDefinition> extends DefinitionTest<T> {
 
-    private Class<T> defClass;
+    private final Class<T> defClass;
     protected final String baseTag;
 
     public RootDefinitionTest(String name, Class<T> defClass, String tag) {
@@ -73,7 +73,7 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
 
     private void assertFalse(Object def, Method method) {
         try {
-            assertFalse(String.format("%s should be false", method.getName()), (Boolean)method.invoke(def));
+            assertFalse(String.format("%s should be false", method.getName()), (Boolean) method.invoke(def));
         } catch (Exception e) {
             throw new AuraRuntimeException(e);
         }
@@ -81,7 +81,7 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
 
     private void assertTrue(Object def, Method method) {
         try {
-            assertTrue(String.format("%s should be true", method.getName()), (Boolean)method.invoke(def));
+            assertTrue(String.format("%s should be true", method.getName()), (Boolean) method.invoke(def));
         } catch (Exception e) {
             throw new AuraRuntimeException(e);
         }
@@ -113,7 +113,8 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
         T def = define(baseTag, "", att1 + att2);
         Map<DefDescriptor<AttributeDef>, AttributeDef> attMap = def.getAttributeDefs();
 
-        // should inherit aura:component body attribute as well as added attributes
+        // should inherit aura:component body attribute as well as added
+        // attributes
         assertEquals("Wrong number of AttributeDefs", 3, attMap.size());
     }
 
@@ -132,15 +133,16 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
     /**
      * Test method for {@link RootDefinition#getRegisterEventDefs()}.
      */
-    public void testGetRegisterEventDefs() throws Exception{
+    public void testGetRegisterEventDefs() throws Exception {
         String event1 = "<aura:registerEvent name=\"copy\" type=\"ui:copy\"/>";
         String event2 = "<aura:registerEvent name=\"cut\" type=\"ui:cut\"/>";
-        T def = define(baseTag, "", event1+ event2);
+        T def = define(baseTag, "", event1 + event2);
         Map<String, RegisterEventDef> events = def.getRegisterEventDefs();
 
         assertEquals("Wrong number of EventDefRefs found", 2, events.size());
         assertEquals("First event not found", "markup://ui:cut", events.get("cut").getDescriptor().getQualifiedName());
-        assertEquals("Second event not found", "markup://ui:copy", events.get("copy").getDescriptor().getQualifiedName());
+        assertEquals("Second event not found", "markup://ui:copy", events.get("copy").getDescriptor()
+                .getQualifiedName());
     }
 
     public void testGetSupport() throws Exception {
@@ -161,11 +163,11 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
         try {
             define(String.format(baseTag, "support='fooBarBlah'", ""));
             fail("Support attribute should not accept invalid values.");
-        }catch(AuraRuntimeException e){
+        } catch (AuraRuntimeException e) {
             assertTrue("Exception did not have the correct string",
                     e.getMessage().contains("Invalid support level fooBarBlah"));
-            assertTrue(e.getLocation().toString() + " should have started with markup://string:thing",
-                    e.getLocation().toString().startsWith("markup://string:thing"));
+            assertTrue(e.getLocation().toString() + " should have started with markup://string:thing", e.getLocation()
+                    .toString().startsWith("markup://string:thing"));
         }
     }
 
@@ -196,14 +198,14 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
             def = define(String.format(baseTag,
                     "description='<div>use html markup in description</div> <aura:text value='foo'/>'", ""));
             fail("Shouldnt allow markup in description. ");
-        }catch (AuraRuntimeException e){
+        } catch (AuraRuntimeException e) {
 
         }
         DefDescriptor<T> parentDesc = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "description='Parent markup' extensible='true'", ""));
         DefDescriptor<T> childDesc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "extends='"
                 + parentDesc.getQualifiedName() + "' description='Child markup'", ""));
-        
+
         assertEquals("Description of parent def is wrong.", "Parent markup", parentDesc.getDef().getDescription());
         assertEquals("Description of child def is wrong.", "Child markup", childDesc.getDef().getDescription());
 

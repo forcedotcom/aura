@@ -28,7 +28,8 @@ public interface ServiceLoader {
     <T> T get(Class<T> type);
 
     /**
-     * return an instance of the given class that has been assigned the given name
+     * return an instance of the given class that has been assigned the given
+     * name
      */
     <T> T get(Class<T> type, String name);
 

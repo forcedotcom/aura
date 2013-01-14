@@ -43,14 +43,10 @@ public class LayoutDefHandler<P extends RootDefinition> extends ParentedTagHandl
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_MATCH = "match";
 
-    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-        ATTRIBUTE_TITLE,
-        ATTRIBUTE_NAME,
-        ATTRIBUTE_MATCH,
-        RootTagHandler.ATTRIBUTE_DESCRIPTION
-    );
+    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_TITLE, ATTRIBUTE_NAME,
+            ATTRIBUTE_MATCH, RootTagHandler.ATTRIBUTE_DESCRIPTION);
 
-    private LayoutDefImpl.Builder builder = new LayoutDefImpl.Builder();
+    private final LayoutDefImpl.Builder builder = new LayoutDefImpl.Builder();
 
     public LayoutDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
@@ -65,7 +61,7 @@ public class LayoutDefHandler<P extends RootDefinition> extends ParentedTagHandl
     @Override
     protected void readAttributes() throws QuickFixException {
         String name = getAttributeValue(ATTRIBUTE_NAME);
-        DefDescriptor<LayoutsDef> parentDesc = ((LayoutsDefHandler)getParentHandler()).getDefDescriptor();
+        DefDescriptor<LayoutsDef> parentDesc = ((LayoutsDefHandler) getParentHandler()).getDefDescriptor();
         builder.setDescriptor(SubDefDescriptorImpl.getInstance(name, parentDesc, LayoutDef.class));
 
         builder.setName(name);
@@ -91,7 +87,8 @@ public class LayoutDefHandler<P extends RootDefinition> extends ParentedTagHandl
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (LayoutItemDefHandler.TAG.equalsIgnoreCase(tag)) {
-            LayoutItemDef layoutItem = new LayoutItemDefHandler<P>(getParentHandler(), builder.getName(), xmlReader, source).getElement();
+            LayoutItemDef layoutItem = new LayoutItemDefHandler<P>(getParentHandler(), builder.getName(), xmlReader,
+                    source).getElement();
             builder.addLayoutItemDef(layoutItem);
         } else {
             error("Found unexpected tag %s", tag);

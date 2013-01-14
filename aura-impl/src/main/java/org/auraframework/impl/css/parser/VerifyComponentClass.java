@@ -18,19 +18,25 @@ package org.auraframework.impl.css.parser;
 import java.util.List;
 
 import com.google.common.css.SourceCodeLocation;
-import com.google.common.css.compiler.ast.*;
+import com.google.common.css.compiler.ast.CssCompilerPass;
+import com.google.common.css.compiler.ast.CssRefinerNode;
+import com.google.common.css.compiler.ast.CssRulesetNode;
+import com.google.common.css.compiler.ast.CssSelectorNode;
+import com.google.common.css.compiler.ast.DefaultTreeVisitor;
+import com.google.common.css.compiler.ast.ErrorManager;
+import com.google.common.css.compiler.ast.GssError;
+import com.google.common.css.compiler.ast.VisitController;
 
 /**
- * Ensure that all selectors in a component's theme file begin with
- * a camel-cased concatenation of the component's componentClass and name.
- *
- * E.g., all selectors in the theme file for aura:detailPage must begin with one of the following:
- *
- * .auraDetailPage
- * &lt;element&gt;.auraDetailPage
- * #&lt;id&gt;.auraDetailPage
- *
- *
+ * Ensure that all selectors in a component's theme file begin with a
+ * camel-cased concatenation of the component's componentClass and name.
+ * 
+ * E.g., all selectors in the theme file for aura:detailPage must begin with one
+ * of the following:
+ * 
+ * .auraDetailPage &lt;element&gt;.auraDetailPage #&lt;id&gt;.auraDetailPage
+ * 
+ * 
  * @since 0.0.199
  */
 public class VerifyComponentClass extends DefaultTreeVisitor implements CssCompilerPass {
@@ -47,46 +53,50 @@ public class VerifyComponentClass extends DefaultTreeVisitor implements CssCompi
 
     @Override
     public void runPass() {
-        if (componentClass !=null) {
+        if (componentClass != null) {
             visitController.startVisit(this);
         }
     }
 
     @Override
     public boolean enterRuleset(CssRulesetNode rulesetNode) {
-        // we could use this same class to ensure all components start include CMP as their componentClass
-        // we would need to disable the GCS componentClass sub in PassRunner, and do it in AuraPassRunner instead
+        // we could use this same class to ensure all components start include
+        // CMP as their componentClass
+        // we would need to disable the GCS componentClass sub in PassRunner,
+        // and do it in AuraPassRunner instead
         // *after* this is called.
         for (CssSelectorNode selector : rulesetNode.getSelectors().getChildren()) {
             List<CssRefinerNode> refiners = selector.getRefiners().getChildren();
-            if (refiners.size()==0 || !refiners.get(0).getRefinerName().equals(componentClass)) {
+            if (refiners.size() == 0 || !refiners.get(0).getRefinerName().equals(componentClass)) {
                 SourceCodeLocation scl = selector.getSourceCodeLocation();
-                GssError error = new GssError("CSS selectors must include component class: \"" + componentClass + "\"", scl);
+                GssError error = new GssError("CSS selectors must include component class: \"" + componentClass + "\"",
+                        scl);
                 errorManager.report(error);
             }
         }
         return true;
     }
 
-// helpful for debugging...
-//    private String debugSelectorsAndRefiners(CssRulesetNode rulesetNode) {
-//        StringBuilder sb = new StringBuilder("Ruleset ");
-//        for(CssSelectorNode selector : rulesetNode.getSelectors().getChildren()) {
-//            sb.append("{" + selector.getSelectorName());
-//            for (CssRefinerNode refiner : selector.getRefiners().getChildren()) {
-//                sb.append("{" + refiner.getRefinerName() + "}");
-//            }
-//            sb.append("}");
-//        }
-//        return sb.toString();
-//    }
-//
-//    private String debugRefiners(CssSelectorNode selectorNode) {
-//        StringBuilder sb = new StringBuilder("Refiners ");
-//        for (CssRefinerNode refiner : selectorNode.getRefiners().getChildren()) {
-//            sb.append("{" + refiner.getRefinerName() + "}");
-//        }
-//        return sb.toString();
-//    }
+    // helpful for debugging...
+    // private String debugSelectorsAndRefiners(CssRulesetNode rulesetNode) {
+    // StringBuilder sb = new StringBuilder("Ruleset ");
+    // for(CssSelectorNode selector : rulesetNode.getSelectors().getChildren())
+    // {
+    // sb.append("{" + selector.getSelectorName());
+    // for (CssRefinerNode refiner : selector.getRefiners().getChildren()) {
+    // sb.append("{" + refiner.getRefinerName() + "}");
+    // }
+    // sb.append("}");
+    // }
+    // return sb.toString();
+    // }
+    //
+    // private String debugRefiners(CssSelectorNode selectorNode) {
+    // StringBuilder sb = new StringBuilder("Refiners ");
+    // for (CssRefinerNode refiner : selectorNode.getRefiners().getChildren()) {
+    // sb.append("{" + refiner.getRefinerName() + "}");
+    // }
+    // return sb.toString();
+    // }
 
 }

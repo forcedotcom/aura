@@ -17,18 +17,20 @@ package org.auraframework.impl.adapter.format.json;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.*;
-
-import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.util.json.JsonReader;
 
+import com.google.common.collect.Lists;
+
 /**
  */
-public class ComponentDefRefJSONFormatAdapter extends JSONFormatAdapter<ComponentDefRef>{
+public class ComponentDefRefJSONFormatAdapter extends JSONFormatAdapter<ComponentDefRef> {
 
     @Override
     public Class<ComponentDefRef> getType() {
@@ -38,21 +40,22 @@ public class ComponentDefRefJSONFormatAdapter extends JSONFormatAdapter<Componen
     @SuppressWarnings("unchecked")
     @Override
     public Collection<ComponentDefRef> readCollection(Reader in) throws IOException, DefinitionNotFoundException {
-        List<?> cdrs = (List<?>)new JsonReader().read(in);
+        List<?> cdrs = (List<?>) new JsonReader().read(in);
         List<ComponentDefRef> ret = Lists.newArrayList();
-        for(Object cmp : cdrs){
+        for (Object cmp : cdrs) {
             ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
-            Map<?, ?> map = (Map<?, ?>)cmp;
-            Map<?, ?> componentDef = (Map<?,?>)map.get("componentDef");
-            builder.setDescriptor((String)componentDef.get("descriptor"));
-            Map<?,?> attributes = (Map<?,?>)map.get("attributes");
-            if(attributes != null){
-                Map<String,Object> attributeValues = (Map<String,Object>)attributes.get("values");
-                if(attributeValues != null){
-                    for(Map.Entry<String, Object> entry : attributeValues.entrySet()){
+            Map<?, ?> map = (Map<?, ?>) cmp;
+            Map<?, ?> componentDef = (Map<?, ?>) map.get("componentDef");
+            builder.setDescriptor((String) componentDef.get("descriptor"));
+            Map<?, ?> attributes = (Map<?, ?>) map.get("attributes");
+            if (attributes != null) {
+                Map<String, Object> attributeValues = (Map<String, Object>) attributes.get("values");
+                if (attributeValues != null) {
+                    for (Map.Entry<String, Object> entry : attributeValues.entrySet()) {
                         Object v = entry.getValue();
-                        if (v instanceof Map<?,?> && ((Map<?,?>)v).get("descriptor") != null && ((Map<?,?>)v).get("value") != null) {
-                            builder.setAttribute(entry.getKey(), ((Map<?,?>)v).get("value"));
+                        if (v instanceof Map<?, ?> && ((Map<?, ?>) v).get("descriptor") != null
+                                && ((Map<?, ?>) v).get("value") != null) {
+                            builder.setAttribute(entry.getKey(), ((Map<?, ?>) v).get("value"));
                         } else {
                             builder.setAttribute(entry.getKey(), v);
                         }

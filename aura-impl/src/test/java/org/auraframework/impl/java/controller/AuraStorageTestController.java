@@ -35,42 +35,46 @@ import com.google.common.collect.Maps;
 @Controller
 public class AuraStorageTestController {
     public static ConcurrentHashMap<String, Integer> staticCounter = new ConcurrentHashMap<String, Integer>();
-    
+
     @AuraEnabled
-    public static Record fetchDataRecord(@Key("testName") String testName){
+    public static Record fetchDataRecord(@Key("testName") String testName) {
         staticCounter.putIfAbsent(testName, 0);
-        AuraStorageTestController.Record r = new AuraStorageTestController.Record(staticCounter.get(testName) , "StorageController");
+        AuraStorageTestController.Record r = new AuraStorageTestController.Record(staticCounter.get(testName),
+                "StorageController");
         staticCounter.put(testName, new Integer(staticCounter.get(testName).intValue() + 1));
         return r;
     }
-    
+
     @AuraEnabled
-    public static void resetCounter(@Key("testName") String testName){
-        if(testName != null){
+    public static void resetCounter(@Key("testName") String testName) {
+        if (testName != null) {
             staticCounter.remove(testName);
             return;
-        }else{
-            for(String s: staticCounter.keySet()){
+        } else {
+            for (String s : staticCounter.keySet()) {
                 staticCounter.remove(s);
             }
         }
     }
+
     @AuraEnabled
-    public static void setCounter(@Key("testName") String testName, @Key("value") Integer value){
+    public static void setCounter(@Key("testName") String testName, @Key("value") Integer value) {
         staticCounter.put(testName, value);
     }
+
     @AuraEnabled
-    public static List<Integer> string(@Key("testName") String testName, @Key("param1") Integer param1){
+    public static List<Integer> string(@Key("testName") String testName, @Key("param1") Integer param1) {
         staticCounter.putIfAbsent(testName, 0);
         List<Integer> ret = Lists.newArrayList();
         ret.add(staticCounter.get(testName));
         ret.add(param1);
         staticCounter.put(testName, new Integer(staticCounter.get(testName).intValue() + 1));
         return ret;
-        
+
     }
+
     @AuraEnabled
-    public static List<Integer> substring(@Key("testName") String testName, @Key("param1") Integer param1){
+    public static List<Integer> substring(@Key("testName") String testName, @Key("param1") Integer param1) {
         staticCounter.putIfAbsent(testName, 0);
         List<Integer> ret = Lists.newArrayList();
         ret.add(staticCounter.get(testName));
@@ -78,56 +82,63 @@ public class AuraStorageTestController {
         staticCounter.put(testName, new Integer(staticCounter.get(testName).intValue() + 1));
         return ret;
     }
+
     /**
      * Object to represent return value for controller.
      */
-    static class Record implements JsonSerializable{
+    static class Record implements JsonSerializable {
         Integer counterValue;
         Object obj;
-        Record(Integer counter, Object o){
+
+        Record(Integer counter, Object o) {
             this.counterValue = counter;
             this.obj = o;
         }
-        public Integer getCounterValue(){
+
+        public Integer getCounterValue() {
             return counterValue;
         }
-        public Object getObject(){
+
+        public Object getObject() {
             return obj;
         }
+
         @Override
-        public void serialize(Json json) throws IOException{
+        public void serialize(Json json) throws IOException {
             json.writeMapBegin();
             json.writeMapEntry("Counter", getCounterValue());
-            json.writeMapEntry("Data", getObject()==null?"":getObject());
+            json.writeMapEntry("Data", getObject() == null ? "" : getObject());
             json.writeMapEnd();
         }
     }
-    
+
     @AuraEnabled
-    public static List<Component> getBaseball(@Key("testName") String testName) throws Exception{
+    public static List<Component> getBaseball(@Key("testName") String testName) throws Exception {
         List<Component> ret = Lists.newArrayList();
         staticCounter.putIfAbsent(testName, 0);
         Integer currentCount = staticCounter.get(testName);
-        //On even count get team and on odd count get players
-        if(currentCount.intValue()%2 == 0){
-            Map<String, Object> attr= Maps.newHashMap();
+        // On even count get team and on odd count get players
+        if (currentCount.intValue() % 2 == 0) {
+            Map<String, Object> attr = Maps.newHashMap();
             attr.put("name", "Giants");
             attr.put("city", "San Francisco");
-            Component cmp = Aura.getInstanceService().getInstance("auraStorageTest:teamFacet", ComponentDef.class, attr ); 
+            Component cmp = Aura.getInstanceService()
+                    .getInstance("auraStorageTest:teamFacet", ComponentDef.class, attr);
             ret.add(cmp);
-        }else{
-            Map<String, Object> attr= Maps.newHashMap();
+        } else {
+            Map<String, Object> attr = Maps.newHashMap();
             attr.put("name", "Posey");
             attr.put("nickName", "Buster");
-            Component cmp = Aura.getInstanceService().getInstance("auraStorageTest:playerFacet", ComponentDef.class, attr );
+            Component cmp = Aura.getInstanceService().getInstance("auraStorageTest:playerFacet", ComponentDef.class,
+                    attr);
             ret.add(cmp);
             attr.put("name", "PSandavol");
             attr.put("nickName", "Panda");
-            cmp = Aura.getInstanceService().getInstance("auraStorageTest:playerFacet", ComponentDef.class, attr ); 
+            cmp = Aura.getInstanceService().getInstance("auraStorageTest:playerFacet", ComponentDef.class, attr);
             ret.add(cmp);
         }
         staticCounter.put(testName, new Integer(currentCount.intValue() + 1));
         return ret;
     }
-    
+
 }

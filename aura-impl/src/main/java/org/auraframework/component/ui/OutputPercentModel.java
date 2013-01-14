@@ -15,6 +15,10 @@
  */
 package org.auraframework.component.ui;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 import org.auraframework.Aura;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.LocalizationService;
@@ -24,10 +28,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraLocale;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-
 /**
  * A Aura model that backs the ui:outputPercent Aura component.
  */
@@ -36,52 +36,56 @@ public class OutputPercentModel {
 
     /**
      * Returns a formatted value showing the given value attribute as a percent.
-     *
-     * The value attribute is multiplied by 100 and shown as a percent, e.g. a value of 0.5 is shown as 50%.
-     * If the format attribute is given, a '%' character is appended.
-     * If the format attribute is not given, the format is set to "#%".
-     *
+     * 
+     * The value attribute is multiplied by 100 and shown as a percent, e.g. a
+     * value of 0.5 is shown as 50%. If the format attribute is given, a '%'
+     * character is appended. If the format attribute is not given, the format
+     * is set to "#%".
+     * 
      * The pattern be a {@link java.text.DecimalFormat DecimalFormat} pattern.
+     * 
      * @return a formatted value showing the given value attribute as a percent
      * @throws QuickFixException
      */
     @AuraEnabled
     public String getText() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        BaseComponent<?,?> component = context.getCurrentComponent();
+        BaseComponent<?, ?> component = context.getCurrentComponent();
         Number numberValue;
         try {
             Object valueObj = component.getAttributes().getValue("value");
             if (valueObj == null) {
                 return "";
             }
-            numberValue = (Number)valueObj;
+            numberValue = (Number) valueObj;
         } catch (NumberFormatException e) {
             return "The value attribute must be assigned a numeric value";
         }
 
-        Integer valueScale = (Integer)component.getAttributes().getValue("valueScale");
+        Integer valueScale = (Integer) component.getAttributes().getValue("valueScale");
         if (valueScale != null) {
-            //workaround to ensure we don't end up rounding BigDecimals by converting them into double
-            if(numberValue instanceof BigDecimal){
-                numberValue = ((BigDecimal)numberValue).scaleByPowerOfTen(valueScale);
-            }
-            else{
+            // workaround to ensure we don't end up rounding BigDecimals by
+            // converting them into double
+            if (numberValue instanceof BigDecimal) {
+                numberValue = ((BigDecimal) numberValue).scaleByPowerOfTen(valueScale);
+            } else {
                 numberValue = BigDecimal.valueOf(numberValue.doubleValue()).scaleByPowerOfTen(valueScale);
             }
         }
 
         AuraLocale locale = Aura.getLocalizationAdapter().getAuraLocale();
 
-        // using formatNumber instead of formatPercent to preserve behavior for legacy uses.
+        // using formatNumber instead of formatPercent to preserve behavior for
+        // legacy uses.
         // in a different world, would expect that this component would:
         // 1) accept a number like .12 and use formatPercent to turn it into 12%
         // 2) and not use valueScale
         LocalizationService lclService = Aura.getLocalizationService();
-        String numberFormatPattern = (String)component.getAttributes().getValue("format");
-        if (numberFormatPattern!=null) {
-            // using getNumberInstance as the LocalizationService doesn't expose a pattern-based formatter.
-            DecimalFormat numberFormat = (DecimalFormat)NumberFormat.getNumberInstance(locale.getNumberLocale());
+        String numberFormatPattern = (String) component.getAttributes().getValue("format");
+        if (numberFormatPattern != null) {
+            // using getNumberInstance as the LocalizationService doesn't expose
+            // a pattern-based formatter.
+            DecimalFormat numberFormat = (DecimalFormat) NumberFormat.getNumberInstance(locale.getNumberLocale());
             if (!numberFormatPattern.isEmpty() && !numberFormatPattern.endsWith("%")) {
                 numberFormatPattern += "%";
             } else {
@@ -92,11 +96,13 @@ public class OutputPercentModel {
             } catch (IllegalArgumentException e) {
                 return "Invalid format attribute";
             }
-            // this is a percent object, valueScale is implied as -2 and should not be passed in
+            // this is a percent object, valueScale is implied as -2 and should
+            // not be passed in
             return numberFormat.format(numberValue);
         } else {
             String out = lclService.formatNumber(numberValue.doubleValue());
-            // this recreates the numberFormatPattern % literal logic when a pattern is not passed in
+            // this recreates the numberFormatPattern % literal logic when a
+            // pattern is not passed in
             if (!out.contains(("%"))) {
                 out += "%";
             }

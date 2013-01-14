@@ -15,11 +15,12 @@
  */
 package test.controller;
 
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Controller;
 
 @Controller
 public class JavaController {
     @AuraEnabled
-    public static void noArgs() {}
+    public static void noArgs() {
+    }
 }

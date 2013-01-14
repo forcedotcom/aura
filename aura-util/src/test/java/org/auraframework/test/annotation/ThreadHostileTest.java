@@ -22,13 +22,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks the test class unreliable to run in a concurrent environment. (e.g. the test expectations rely on exclusive
- * access to some global state).
+ * Marks the test class unreliable to run in a concurrent environment. (e.g. the
+ * test expectations rely on exclusive access to some global state).
  * <p>
- * Such tests are discouraged, and this annotation should be considered a stop-gap measure
- * towards fixing these broken tests.
+ * Such tests are discouraged, and this annotation should be considered a
+ * stop-gap measure towards fixing these broken tests.
  * <p>
- * TODO(W-1386881): Add support in TestSetRunnerController to use this as a Method annotation as well.
+ * TODO(W-1386881): Add support in TestSetRunnerController to use this as a
+ * Method annotation as well.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })

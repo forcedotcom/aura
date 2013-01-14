@@ -21,7 +21,7 @@ import org.auraframework.def.DefDescriptor.DefType;
  * Quick fix testing for Components.
  */
 public class ComponentQuickFixUITest extends BaseComponentQuickFixUITest {
-    public ComponentQuickFixUITest(String name){
+    public ComponentQuickFixUITest(String name) {
         super(name, DefType.COMPONENT, ".cmp");
     }
 }

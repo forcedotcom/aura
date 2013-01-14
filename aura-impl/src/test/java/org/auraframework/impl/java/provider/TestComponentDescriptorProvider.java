@@ -16,23 +16,25 @@
 package org.auraframework.impl.java.provider;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDescriptorProvider;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.Provider;
 
 /**
  * An interface provider used for testing.
- *
- *
+ * 
+ * 
  * @since 0.0.196
  */
 @Provider
 public class TestComponentDescriptorProvider implements ComponentDescriptorProvider {
     @Override
     public DefDescriptor<ComponentDef> provide() {
-        BaseComponent<?,?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
-        String num = (String)component.getAttributes().getExpression("implNumber");
-        return DefDescriptorImpl.getInstance("test:test_Provider_providerImpl"+num, ComponentDef.class);
+        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        String num = (String) component.getAttributes().getExpression("implNumber");
+        return DefDescriptorImpl.getInstance("test:test_Provider_providerImpl" + num, ComponentDef.class);
     }
 }

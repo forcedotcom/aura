@@ -29,20 +29,26 @@ import org.auraframework.system.Source;
 public class RootTagHandlerFactory {
 
     @SuppressWarnings("unchecked")
-    public static <T extends RootDefinition> RootTagHandler<T> newInstance(DefDescriptor<T> defDescriptor, Source<T> source, XMLStreamReader xmlReader) {
+    public static <T extends RootDefinition> RootTagHandler<T> newInstance(DefDescriptor<T> defDescriptor,
+            Source<T> source, XMLStreamReader xmlReader) {
         switch (defDescriptor.getDefType()) {
-            case APPLICATION:
-                return (RootTagHandler<T>) new ApplicationDefHandler((DefDescriptor<ApplicationDef>)defDescriptor, (Source<ApplicationDef>)source, xmlReader);
-            case COMPONENT:
-                return (RootTagHandler<T>)new ComponentDefHandler((DefDescriptor<ComponentDef>)defDescriptor, (Source<ComponentDef>)source, xmlReader);
-            case EVENT:
-                return (RootTagHandler<T>)new EventDefHandler((DefDescriptor<EventDef>)defDescriptor, (Source<EventDef>)source, xmlReader);
-            case INTERFACE:
-                return (RootTagHandler<T>)new InterfaceDefHandler((DefDescriptor<InterfaceDef>)defDescriptor, (Source<InterfaceDef>)source, xmlReader);
-            case LAYOUTS:
-                return (RootTagHandler<T>)new LayoutsDefHandler((DefDescriptor<LayoutsDef>)defDescriptor, (Source<LayoutsDef>)source, xmlReader);
-            default:
-                throw new UnsupportedOperationException();
+        case APPLICATION:
+            return (RootTagHandler<T>) new ApplicationDefHandler((DefDescriptor<ApplicationDef>) defDescriptor,
+                    (Source<ApplicationDef>) source, xmlReader);
+        case COMPONENT:
+            return (RootTagHandler<T>) new ComponentDefHandler((DefDescriptor<ComponentDef>) defDescriptor,
+                    (Source<ComponentDef>) source, xmlReader);
+        case EVENT:
+            return (RootTagHandler<T>) new EventDefHandler((DefDescriptor<EventDef>) defDescriptor,
+                    (Source<EventDef>) source, xmlReader);
+        case INTERFACE:
+            return (RootTagHandler<T>) new InterfaceDefHandler((DefDescriptor<InterfaceDef>) defDescriptor,
+                    (Source<InterfaceDef>) source, xmlReader);
+        case LAYOUTS:
+            return (RootTagHandler<T>) new LayoutsDefHandler((DefDescriptor<LayoutsDef>) defDescriptor,
+                    (Source<LayoutsDef>) source, xmlReader);
+        default:
+            throw new UnsupportedOperationException();
         }
     }
 }

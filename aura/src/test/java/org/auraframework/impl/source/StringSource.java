@@ -60,7 +60,7 @@ public class StringSource<D extends Definition> extends Source<D> {
             touch();
         }
     };
-    
+
     private final StringBuffer sb = writer.getBuffer();
     private long lastModified;
 
@@ -80,7 +80,6 @@ public class StringSource<D extends Definition> extends Source<D> {
         return new StringReader(getContents());
     }
 
-
     @Override
     public String getContents() {
         return sb.toString();
@@ -94,7 +93,7 @@ public class StringSource<D extends Definition> extends Source<D> {
     /** StringSource returns a "URL" like "markup://string:foo". */
     @Override
     public String getUrl() {
-        return getSystemId();  // e.g. "markup://string:thing"
+        return getSystemId(); // e.g. "markup://string:thing"
     }
 
     @Override
@@ -117,7 +116,7 @@ public class StringSource<D extends Definition> extends Source<D> {
         sb.setLength(0);
         touch();
     }
-    
+
     public long setLastModified(long lastModified) {
         long previous = this.lastModified;
         this.lastModified = lastModified;

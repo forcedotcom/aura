@@ -16,22 +16,18 @@
 package org.auraframework.impl.root;
 
 import java.io.IOException;
-
 import java.util.Set;
 
 import org.auraframework.Aura;
-
 import org.auraframework.builder.DependencyDefBuilder;
-
-import org.auraframework.def.DependencyDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DependencyDef;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.system.DefinitionImpl;
-
 import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 /**
@@ -65,7 +61,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
 
     @Override
     public void validateDefinition() throws QuickFixException {
-        //super.validateDefinition();
+        // super.validateDefinition();
         if (this.error != null) {
             throw this.error;
         }
@@ -87,7 +83,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
         dependencies.addAll(found);
         if (found.size() == 0) {
             // TODO: QuickFix for broken dependency.
-            throw new InvalidDefinitionException("Invalid dependency "+this.dependency, getLocation());
+            throw new InvalidDefinitionException("Invalid dependency " + this.dependency, getLocation());
         }
     }
 
@@ -101,7 +97,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
 
     /**
      * Gets the dependency for this instance.
-     *
+     * 
      * @return The dependency.
      */
     @Override
@@ -116,7 +112,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
 
     public static class Builder extends DefinitionImpl.BuilderImpl<DependencyDef> implements DependencyDefBuilder {
 
-        public Builder(){
+        public Builder() {
             super(DependencyDef.class);
         }
 
@@ -134,7 +130,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
 
         /**
          * Sets the parentDescriptor for this instance.
-         *
+         * 
          * @param parentDescriptor The parentDescriptor.
          */
         @Override
@@ -145,7 +141,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
 
         /**
          * Sets the resource for this instance.
-         *
+         * 
          * @param resource The resource.
          */
         @Override
@@ -153,9 +149,10 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
             this.resource = resource;
             return this;
         }
+
         /**
          * Sets the type for this instance.
-         *
+         * 
          * @param type The type.
          */
         @Override

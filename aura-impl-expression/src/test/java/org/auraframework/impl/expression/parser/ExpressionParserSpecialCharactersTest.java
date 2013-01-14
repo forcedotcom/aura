@@ -16,12 +16,13 @@
 package org.auraframework.impl.expression.parser;
 
 import junit.framework.TestSuite;
+
 import org.auraframework.impl.expression.AuraImplExpressionTestCase;
 
 /**
- * Shotgun tests for special chars. Tokens shouldn't contain these chars. Remaining special chars have their own tests
- * in ExpressionParserTest.
- *
+ * Shotgun tests for special chars. Tokens shouldn't contain these chars.
+ * Remaining special chars have their own tests in ExpressionParserTest.
+ * 
  * @hierarchy Aura.Runtime.Expression.Server.Parser
  * @userStory a07B0000000Ed9n
  */
@@ -30,7 +31,7 @@ public class ExpressionParserSpecialCharactersTest extends AuraImplExpressionTes
     private static final String validChars = "oO0_";
     private static final char[] otherChars = "`=[]',~@#$^&{}|:\"天".toCharArray();
 
-    private String expression;
+    private final String expression;
 
     public ExpressionParserSpecialCharactersTest(String name) {
         super(name);
@@ -45,10 +46,13 @@ public class ExpressionParserSpecialCharactersTest extends AuraImplExpressionTes
     public static TestSuite suite() throws Exception {
         TestSuite suite = new TestSuite(ExpressionParserSpecialCharactersTest.class.getName());
         for (char c : otherChars) {
-            String hex = String.format("%#x", (int)c);
-            suite.addTest(new ExpressionParserSpecialCharactersTest("testTokenStartsWith" + hex + "ThrowsRuntimeException", c + validChars));
-            suite.addTest(new ExpressionParserSpecialCharactersTest("testTokenEndsWith" + hex + "ThrowsRuntimeException", validChars + c));
-            suite.addTest(new ExpressionParserSpecialCharactersTest("testTokenContains" + hex + "ThrowsRuntimeException", validChars + c + validChars));
+            String hex = String.format("%#x", (int) c);
+            suite.addTest(new ExpressionParserSpecialCharactersTest("testTokenStartsWith" + hex
+                    + "ThrowsRuntimeException", c + validChars));
+            suite.addTest(new ExpressionParserSpecialCharactersTest("testTokenEndsWith" + hex
+                    + "ThrowsRuntimeException", validChars + c));
+            suite.addTest(new ExpressionParserSpecialCharactersTest("testTokenContains" + hex
+                    + "ThrowsRuntimeException", validChars + c + validChars));
         }
         return suite;
     }
@@ -61,14 +65,16 @@ public class ExpressionParserSpecialCharactersTest extends AuraImplExpressionTes
     public void testDo() throws Exception {
         try {
             // Expression e = buildExpression(expression);
-            // fail("Didn't get expected error for <" + expression + ">. Instead, got " + e.getExpressionType() + " <" +
+            // fail("Didn't get expected error for <" + expression +
+            // ">. Instead, got " + e.getExpressionType() + " <" +
             // e
             // + ">");
         } catch (Exception ex) {
             String message = ex.getMessage();
             if (message != null
-                    && (message.startsWith("NoViableAltException") || message.startsWith("MismatchedTokenException")))
+                    && (message.startsWith("NoViableAltException") || message.startsWith("MismatchedTokenException"))) {
                 return;
+            }
             fail("Unexpected exception for <" + expression + ">: " + ex);
         }
     }

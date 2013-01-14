@@ -22,36 +22,45 @@ import org.auraframework.impl.util.AuraLocaleImpl;
 import org.auraframework.test.UnitTestCase;
 
 /**
- * Verify implementation of JavaLocalizedTypeUtil used to convert data from a given type
- * to a desired type using a Locale.
+ * Verify implementation of JavaLocalizedTypeUtil used to convert data from a
+ * given type to a desired type using a Locale.
  */
 public class JavaLocalizedTypeUtilTest extends UnitTestCase {
 
     /**
      * Verify initialization of converters for Localized Strings and numbers.
      */
-    public void testNumberConvertersExist(){
+    public void testNumberConvertersExist() {
 
         // verify number converters are available
-        // there should be one assertion here for every LocalizedConverter in aura.impl.java.type.converter
-        assertTrue("Missing LocalizedConverter: String to BigDecimal", JavaLocalizedTypeUtil.hasConverter(String.class, BigDecimal.class));
-        assertTrue("Missing LocalizedConverter: String to Double", JavaLocalizedTypeUtil.hasConverter(String.class, Double.class));
-        assertTrue("Missing LocalizedConverter: String to Integer", JavaLocalizedTypeUtil.hasConverter(String.class, Integer.class));
-        assertTrue("Missing LocalizedConverter: String to Long", JavaLocalizedTypeUtil.hasConverter(String.class, Long.class));
-        assertTrue("Missing LocalizedConverter: BigDecimal to String", JavaLocalizedTypeUtil.hasConverter(BigDecimal.class, String.class));
-        assertTrue("Missing LocalizedConverter: Integer to String", JavaLocalizedTypeUtil.hasConverter(Integer.class, String.class));
+        // there should be one assertion here for every LocalizedConverter in
+        // aura.impl.java.type.converter
+        assertTrue("Missing LocalizedConverter: String to BigDecimal",
+                JavaLocalizedTypeUtil.hasConverter(String.class, BigDecimal.class));
+        assertTrue("Missing LocalizedConverter: String to Double",
+                JavaLocalizedTypeUtil.hasConverter(String.class, Double.class));
+        assertTrue("Missing LocalizedConverter: String to Integer",
+                JavaLocalizedTypeUtil.hasConverter(String.class, Integer.class));
+        assertTrue("Missing LocalizedConverter: String to Long",
+                JavaLocalizedTypeUtil.hasConverter(String.class, Long.class));
+        assertTrue("Missing LocalizedConverter: BigDecimal to String",
+                JavaLocalizedTypeUtil.hasConverter(BigDecimal.class, String.class));
+        assertTrue("Missing LocalizedConverter: Integer to String",
+                JavaLocalizedTypeUtil.hasConverter(Integer.class, String.class));
 
         // but only if they are really available
-        assertFalse("Wrongly identified an available LocalizedConverter", JavaLocalizedTypeUtil.hasConverter(BigDecimal.class, java.util.Date.class));
+        assertFalse("Wrongly identified an available LocalizedConverter",
+                JavaLocalizedTypeUtil.hasConverter(BigDecimal.class, java.util.Date.class));
 
     }
 
     /**
      * Verify conversion of Localized Strings and consistent numeric data.
      * 
-     * Reference for how different countries handle decimals: http://en.wikipedia.org/wiki/Decimal_mark#Examples_of_use
+     * Reference for how different countries handle decimals:
+     * http://en.wikipedia.org/wiki/Decimal_mark#Examples_of_use
      */
-    public void testNumberConvertersWork(){
+    public void testNumberConvertersWork() {
 
         // verify the converter returns a valid value...
         BigDecimal correctDecimal = new BigDecimal("123456.789");
@@ -63,17 +72,20 @@ public class JavaLocalizedTypeUtilTest extends UnitTestCase {
         assertEquals("String to Integer with Locale was wrong", correctInteger, anInteger);
 
         // ...for US format decimals
-        BigDecimal usDecimal = JavaLocalizedTypeUtil.convert("123,456.789", BigDecimal.class, false, new AuraLocaleImpl(Locale.US));
+        BigDecimal usDecimal = JavaLocalizedTypeUtil.convert("123,456.789", BigDecimal.class, false,
+                new AuraLocaleImpl(Locale.US));
         assertNotNull("U.S. localized String to BigDecimal was null", usDecimal);
         assertEquals("U.S. localized String to BigDecimal problem", correctDecimal, usDecimal);
 
         // ...for de_DE format decimals
-        BigDecimal deDecimal = JavaLocalizedTypeUtil.convert("123.456,789", BigDecimal.class, false, new AuraLocaleImpl(Locale.GERMANY));
+        BigDecimal deDecimal = JavaLocalizedTypeUtil.convert("123.456,789", BigDecimal.class, false,
+                new AuraLocaleImpl(Locale.GERMANY));
         assertNotNull("German localized String to BigDecimal was null", deDecimal);
         assertEquals("German localized String to BigDecimal problem", correctDecimal, deDecimal);
 
         // ...for fr format decimals
-        BigDecimal frDecimal = JavaLocalizedTypeUtil.convert("123456.789", BigDecimal.class, false, new AuraLocaleImpl(Locale.FRANCE));
+        BigDecimal frDecimal = JavaLocalizedTypeUtil.convert("123456.789", BigDecimal.class, false, new AuraLocaleImpl(
+                Locale.FRANCE));
         assertNotNull("German localized String to BigDecimal was null", frDecimal);
         assertEquals("German localized String to BigDecimal problem", correctDecimal, frDecimal);
     }

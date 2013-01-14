@@ -19,7 +19,7 @@ import org.auraframework.def.ComponentDef;
 
 /**
  */
-public class ComponentDefHTMLFormatAdapter extends BaseComponentDefHTMLFormatAdapter<ComponentDef>{
+public class ComponentDefHTMLFormatAdapter extends BaseComponentDefHTMLFormatAdapter<ComponentDef> {
 
     @Override
     public Class<ComponentDef> getType() {

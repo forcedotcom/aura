@@ -22,7 +22,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ModelDef;
+import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.java.type.JavaValueProvider;
 import org.auraframework.instance.Model;
@@ -30,7 +32,6 @@ import org.auraframework.instance.ValueProvider;
 import org.auraframework.service.LoggingService;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.AuraRuntimeException;
-
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
@@ -84,16 +85,16 @@ public class JavaModel implements Model {
 
     /**
      * Get a value.
-     *
-     * This method is a rather painful departure from aura best practices, as it is not really in a definition.
-     * This should probably be fixed, and the exceptions cleaned up.
-     *
+     * 
+     * This method is a rather painful departure from aura best practices, as it
+     * is not really in a definition. This should probably be fixed, and the
+     * exceptions cleaned up.
+     * 
      * @param root The object from which we want to extract the property
      * @param key the key for the property.
      * @param def the model definition.
      */
-    public static Object getValue(Object root, PropertyReference key, ModelDef def)
-                throws QuickFixException {
+    public static Object getValue(Object root, PropertyReference key, ModelDef def) throws QuickFixException {
         LoggingService loggingService = Aura.getLoggingService();
         loggingService.stopTimer(LoggingService.TIMER_AURA);
         loggingService.startTimer("java");
@@ -101,12 +102,12 @@ public class JavaModel implements Model {
         try {
             String part = key.getRoot();
             PropertyReference stem = key.getStem();
-            if(root == null){
+            if (root == null) {
                 return null;
-            }else if (root instanceof Map) {
-                ret = ((Map<?, ?>)root).get(part);
+            } else if (root instanceof Map) {
+                ret = ((Map<?, ?>) root).get(part);
             } else if (root instanceof List) {
-                List<?> l = ((List<?>)root);
+                List<?> l = ((List<?>) root);
                 // special case for length property
                 if ("length".equals(part)) {
                     ret = l.size();
@@ -114,11 +115,12 @@ public class JavaModel implements Model {
                     int i;
 
                     try {
-                        i = Integer.parseInt(part); // NumberFormatException will be caught below
+                        i = Integer.parseInt(part); // NumberFormatException
+                                                    // will be caught below
                     } catch (NumberFormatException nfe) {
                         throw makeException(nfe.getMessage(), nfe, def);
                     }
-                    ret = ((List<?>)root).get(i);
+                    ret = ((List<?>) root).get(i);
                 }
             } else {
                 Method meth = null;
@@ -143,9 +145,9 @@ public class JavaModel implements Model {
             ValueProvider vp;
             if (def != null) {
                 TypeDef typeDef = def.getType(part);
-                vp = (ret instanceof ValueProvider) ? (ValueProvider)ret : (ValueProvider)typeDef.wrap(ret);
+                vp = (ret instanceof ValueProvider) ? (ValueProvider) ret : (ValueProvider) typeDef.wrap(ret);
             } else {
-                vp = (ret instanceof ValueProvider) ? (ValueProvider)ret : new JavaValueProvider(ret);
+                vp = (ret instanceof ValueProvider) ? (ValueProvider) ret : new JavaValueProvider(ret);
             }
             if (stem != null) {
                 ret = vp.getValue(stem);

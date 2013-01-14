@@ -21,13 +21,12 @@ import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.SecurityProviderDef;
 import org.auraframework.impl.java.BaseJavaDefFactory;
-import org.auraframework.system.DefFactory;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * A {@link DefFactory} for java security providers.
- *
+ * 
  * @since 0.0.172
  */
 public class JavaSecurityProviderDefFactory extends BaseJavaDefFactory<SecurityProviderDef> {
@@ -41,7 +40,8 @@ public class JavaSecurityProviderDefFactory extends BaseJavaDefFactory<SecurityP
     }
 
     @Override
-    protected DefBuilder<?, ? extends SecurityProviderDef> getBuilder(DefDescriptor<SecurityProviderDef> descriptor) throws QuickFixException {
+    protected DefBuilder<?, ? extends SecurityProviderDef> getBuilder(DefDescriptor<SecurityProviderDef> descriptor)
+            throws QuickFixException {
         JavaSecurityProviderDef.Builder builder = new JavaSecurityProviderDef.Builder();
         builder.setDescriptor(descriptor);
 

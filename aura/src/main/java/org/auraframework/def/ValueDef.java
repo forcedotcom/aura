@@ -17,7 +17,6 @@ package org.auraframework.def;
 
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-
 public interface ValueDef extends Definition {
 
     @Override

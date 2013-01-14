@@ -17,15 +17,23 @@ package org.auraframework.impl.java.controller;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ActionDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ValueDef;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.Location;
-import org.auraframework.throwable.*;
+import org.auraframework.throwable.AuraExecutionException;
+import org.auraframework.throwable.AuraHandledException;
+import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -36,8 +44,8 @@ import com.google.common.collect.Maps;
 /**
  */
 public class JavaAction implements Action {
-    public JavaAction(DefDescriptor<ControllerDef> controllerDescriptor,
-                      JavaActionDef actionDef, Map<String, Object> paramValues) {
+    public JavaAction(DefDescriptor<ControllerDef> controllerDescriptor, JavaActionDef actionDef,
+            Map<String, Object> paramValues) {
         this.controllerDescriptor = controllerDescriptor;
         this.actionDef = actionDef;
         this.paramValues = paramValues;
@@ -54,11 +62,11 @@ public class JavaAction implements Action {
         this.id = id;
     }
 
-    private Object [] getArgs() {
+    private Object[] getArgs() {
         Class<?>[] javaParams = actionDef.getJavaParams();
         Object[] args = new Object[javaParams.length];
         int i = 0;
-        for(ValueDef valueDef : actionDef.getParameters()){
+        for (ValueDef valueDef : actionDef.getParameters()) {
             Object param = paramValues.get(valueDef.getName());
             try {
                 param = valueDef.getType().valueOf(param);
@@ -66,16 +74,19 @@ public class JavaAction implements Action {
                 //
                 // This means that we have a broken definition.
                 //
-                addException(new AuraUnhandledException("Invalid parameter "+valueDef, qfe), State.ABORTED, true, false);
+                addException(new AuraUnhandledException("Invalid parameter " + valueDef, qfe), State.ABORTED, true,
+                        false);
                 return null;
             } catch (IllegalArgumentException iae) {
-                addException(new AuraUnhandledException("Invalid value for "+valueDef, iae), State.ERROR, false, false);
+                addException(new AuraUnhandledException("Invalid value for " + valueDef, iae), State.ERROR, false,
+                        false);
                 return null;
-            } catch (AuraHandledException lhe) { 
+            } catch (AuraHandledException lhe) {
                 addException(lhe, State.ABORTED, false, false);
                 return null;
             } catch (Exception e) {
-                addException(new AuraUnhandledException("Error on parameter "+valueDef, e), State.ABORTED, false, false);
+                addException(new AuraUnhandledException("Error on parameter " + valueDef, e), State.ABORTED, false,
+                        false);
                 return null;
             }
             args[i++] = param;
@@ -85,10 +96,11 @@ public class JavaAction implements Action {
 
     /**
      * Add an exception to our set of errors.
-     *
+     * 
      * @param t the throwable to add.
      * @param newState the 'State' to set.
-     * @param loggable should this exception be run through the 'exception adapter'.
+     * @param loggable should this exception be run through the 'exception
+     *            adapter'.
      */
     private void addException(Throwable t, State newState, boolean loggable, boolean wrap) {
         this.state = newState;
@@ -109,9 +121,9 @@ public class JavaAction implements Action {
     @Override
     public void run() {
         if (this.actionDef == null) {
-            addException(new InvalidDefinitionException("No action found",
-                                                        new Location(this.controllerDescriptor.getQualifiedName(), 0)),
-                         State.ERROR, true, false);
+            addException(
+                    new InvalidDefinitionException("No action found", new Location(
+                            this.controllerDescriptor.getQualifiedName(), 0)), State.ERROR, true, false);
             return;
         }
         this.state = State.RUNNING;
@@ -124,19 +136,20 @@ public class JavaAction implements Action {
         LoggingService loggingService = Aura.getLoggingService();
         loggingService.stopTimer(LoggingService.TIMER_AURA);
         loggingService.startTimer("java");
-        try{
+        try {
             loggingService.incrementNum("JavaCallCount");
             this.returnValue = this.actionDef.getMethod().invoke(null, args);
             this.state = State.SUCCESS;
         } catch (InvocationTargetException e) {
             // something bad happened in the body of the action itself
-            // getCause() unwraps the InvocationTargetException, gives us the real information.
+            // getCause() unwraps the InvocationTargetException, gives us the
+            // real information.
             addException(e.getCause(), State.ERROR, true, true);
         } catch (Exception e) {
             //
             // Several cases handled here, including
-            //  * IllegalArgumentError: the conversion probably didn't work.
-            //  * IllegalAccessException: should not be possible.
+            // * IllegalArgumentError: the conversion probably didn't work.
+            // * IllegalAccessException: should not be possible.
             //
             addException(e, State.ERROR, true, false);
         } finally {
@@ -184,27 +197,27 @@ public class JavaAction implements Action {
         return Collections.unmodifiableList(actions);
     }
 
-	@Override
-	public void registerComponent(BaseComponent<?, ?> component) {
-		componentRegistry.put(component.getGlobalId(), component);
-	}
-	
+    @Override
+    public void registerComponent(BaseComponent<?, ?> component) {
+        componentRegistry.put(component.getGlobalId(), component);
+    }
+
     @Override
     public Map<String, BaseComponent<?, ?>> getComponents() {
         return componentRegistry;
     }
 
-	@Override
-	public int getNextId() {
-		return nextId++;
-	}
+    @Override
+    public int getNextId() {
+        return nextId++;
+    }
 
     private final DefDescriptor<ControllerDef> controllerDescriptor;
     private final JavaActionDef actionDef;
     private final Map<String, Object> paramValues;
     private final List<Action> actions = Lists.newArrayList();
     private Object returnValue;
-    private List<Object> errors = new ArrayList<Object>();
+    private final List<Object> errors = new ArrayList<Object>();
     private State state;
     private String id;
     private final Map<String, BaseComponent<?, ?>> componentRegistry = Maps.newLinkedHashMap();

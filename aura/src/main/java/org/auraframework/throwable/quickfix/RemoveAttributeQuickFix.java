@@ -18,12 +18,15 @@ package org.auraframework.throwable.quickfix;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.w3c.dom.Node;
-import com.google.common.collect.Maps;
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.LayoutsDef;
 import org.auraframework.system.Source;
+import org.w3c.dom.Node;
 
+import com.google.common.collect.Maps;
 
 /**
  * removes an attribute from an xml node
@@ -36,7 +39,8 @@ public class RemoveAttributeQuickFix extends AuraXMLQuickFix {
     }
 
     public RemoveAttributeQuickFix(Map<String, Object> attributes) {
-       super("Remove Attribute", attributes, Aura.getDefinitionService().getDefDescriptor("auradev:removeAttributeDefQuickFix", ComponentDef.class));
+        super("Remove Attribute", attributes, Aura.getDefinitionService().getDefDescriptor(
+                "auradev:removeAttributeDefQuickFix", ComponentDef.class));
     }
 
     private static Map<String, Object> createMap(DefDescriptor<?> descriptor, String attName, String query) {
@@ -47,26 +51,27 @@ public class RemoveAttributeQuickFix extends AuraXMLQuickFix {
         return ret;
     }
 
-    protected String getFix(String tagToFix, String attrName, String attrValue){
-        return tagToFix.replaceAll("[ \t]*"+Pattern.quote(attrName)+"[ \t]*=[ \t]*[\'\"]?"+Pattern.quote(attrValue)+"[\'\"]?", "");
+    protected String getFix(String tagToFix, String attrName, String attrValue) {
+        return tagToFix.replaceAll(
+                "[ \t]*" + Pattern.quote(attrName) + "[ \t]*=[ \t]*[\'\"]?" + Pattern.quote(attrValue) + "[\'\"]?", "");
     }
 
     @Override
     protected void fix() throws Exception {
-        String descriptor = (String)getAttributes().get("descriptor");
+        String descriptor = (String) getAttributes().get("descriptor");
         DefDescriptor<LayoutsDef> desc = Aura.getDefinitionService().getDefDescriptor(descriptor, LayoutsDef.class);
-        if(desc != null){
+        if (desc != null) {
             Source<?> source = getSource(desc);
-            setQuery((String)getAttributes().get("query"));
+            setQuery((String) getAttributes().get("query"));
             Node node = findNode(source, getQuery());
-            String attrName = (String)getAttributes().get("attName");
+            String attrName = (String) getAttributes().get("attName");
             Node attrNode = node.getAttributes().getNamedItem(attrName);
-            if(attrNode!=null){
+            if (attrNode != null) {
                 String attrValue = attrNode.getNodeValue();
                 int nodeTagStart = this.getNodeStartCharecterOffset(node);
                 int nodeBodyStart = this.getNodeBodyStartCharecterOffset(node);
-                String tagToFix = source.getContents().substring(nodeTagStart-1, nodeBodyStart);
-                String fix = getFix(tagToFix,attrName,attrValue);
+                String tagToFix = source.getContents().substring(nodeTagStart - 1, nodeBodyStart);
+                String fix = getFix(tagToFix, attrName, attrValue);
                 doFix(source, fix, nodeTagStart, nodeBodyStart);
             }
         }

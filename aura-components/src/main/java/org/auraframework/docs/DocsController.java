@@ -21,9 +21,9 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.instance.Component;
+import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.base.Preconditions;
@@ -42,10 +42,11 @@ public class DocsController {
     @AuraEnabled
     public static Component getReference(@Key("topic") String topic, @Key("descriptor") String descriptor,
             @Key("defType") String defType) throws QuickFixException {
-        
+
         Map<String, Object> attributes = Maps.newHashMap();
         if (topic == null && defType == null && descriptor == null) {
-            // Show an overview topic for orientation. It's similar to topics in the Help tab and is in the auradocs
+            // Show an overview topic for orientation. It's similar to topics in
+            // the Help tab and is in the auradocs
             // namespace.
             return getTopic("referenceTabTopic");
         } else if (topic != null) {

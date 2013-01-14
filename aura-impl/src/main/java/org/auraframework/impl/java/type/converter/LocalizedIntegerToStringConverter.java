@@ -25,9 +25,8 @@ import org.auraframework.util.type.converter.IntegerToStringConverter;
 /**
  * Used by aura.impl.java.type.JavaLocalizedTypeUtil;
  */
-public class LocalizedIntegerToStringConverter
-    extends IntegerToStringConverter
-    implements LocalizedConverter<Integer, String> {
+public class LocalizedIntegerToStringConverter extends IntegerToStringConverter implements
+        LocalizedConverter<Integer, String> {
 
     @Override
     public String convert(Integer value, AuraLocale locale) {
@@ -42,11 +41,10 @@ public class LocalizedIntegerToStringConverter
 
         try {
             Locale loc = locale.getNumberLocale();
-            return Aura.getLocalizationService().formatNumber(value,loc);
+            return Aura.getLocalizationService().formatNumber(value, loc);
         } catch (Exception e) {
             return super.convert(value);
         }
     }
-
 
 }

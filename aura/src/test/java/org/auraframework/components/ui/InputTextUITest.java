@@ -20,7 +20,9 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.UnAdaptableTest;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
 /**
@@ -32,30 +34,31 @@ public class InputTextUITest extends WebDriverTestCase {
         super(name);
     }
 
-    @UnAdaptableTest // because it fails in FIREFOX in SFDC (may be dependent on FF version)
-    @ExcludeBrowsers({BrowserType.IPAD,BrowserType.ANDROID_PHONE,BrowserType.ANDROID_TABLET,BrowserType.IPHONE})
-    public void testUpdateOnAttribute_UsingStringSource() throws Exception{
+    @UnAdaptableTest
+    // because it fails in FIREFOX in SFDC (may be dependent on FF version)
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE })
+    public void testUpdateOnAttribute_UsingStringSource() throws Exception {
         String event = "blur";
         String baseTag = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> "
                 + "<div id=\"%s\">" + event + ":"
                 + "<ui:inputText aura:id=\"%s\" value=\"{!m.String}\" updateOn=\"%s\"/>" + "</div>"
                 + "<div id=\"output\">" + "output: <ui:outputText value=\"{!m.String}\"/>" + "</div>"
                 + "</aura:component>";
-        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
-                baseTag.replaceAll("%s", event));
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, baseTag.replaceAll("%s", event));
         open(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
 
         String value = getCurrentModelValue();
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(event);
-        assertModelValue(value); //value shouldn't be updated yet
+        assertModelValue(value); // value shouldn't be updated yet
         input.click();
         auraUITestingUtil.pressTab(input);
-        value = assertModelValue(event); //value should have been updated
+        value = assertModelValue(event); // value should have been updated
     }
 
-    @UnAdaptableTest // because it fails in FIREFOX
-    @ExcludeBrowsers({BrowserType.IPAD,BrowserType.ANDROID_PHONE,BrowserType.ANDROID_TABLET,BrowserType.IPHONE})
-    public void testUpdateOnAttribute() throws Exception{
+    @UnAdaptableTest
+    // because it fails in FIREFOX
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE })
+    public void testUpdateOnAttribute() throws Exception {
 
         open("/uitest/inputtextupdateontest.cmp");
         String value = getCurrentModelValue();
@@ -64,14 +67,15 @@ public class InputTextUITest extends WebDriverTestCase {
 
         String eventName = "blur";
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        assertModelValue(value); //value shouldn't be updated yet
+        assertModelValue(value); // value shouldn't be updated yet
         input.click();
         auraUITestingUtil.pressTab(input);
-        value = assertModelValue(eventName); //value should have been updated
+        value = assertModelValue(eventName); // value should have been updated
 
         eventName = "change";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        //assertModelValue(value); //commented out because clear() was firing change it seems
+        // assertModelValue(value); //commented out because clear() was firing
+        // change it seems
         auraUITestingUtil.pressTab(input);
         value = assertModelValue(eventName);
 
@@ -92,26 +96,29 @@ public class InputTextUITest extends WebDriverTestCase {
         eventName = "focus";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         auraUITestingUtil.pressTab(input);
-        //assertModelValue(value);//commented out because clear() was firing change it seems
+        // assertModelValue(value);//commented out because clear() was firing
+        // change it seems
         input.click();
         value = assertModelValue(eventName);
-      
+
         eventName = "keydown";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        value = assertModelValue(eventName.substring(0, eventName.length()-1));
+        value = assertModelValue(eventName.substring(0, eventName.length() - 1));
 
         eventName = "keypress";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        value = assertModelValue(eventName.substring(0, eventName.length()-1));
+        value = assertModelValue(eventName.substring(0, eventName.length() - 1));
 
         eventName = "keyup";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         value = assertModelValue(eventName);
     }
 
-    @UnAdaptableTest // because it fails in FIREFOX
-    @ExcludeBrowsers({BrowserType.IE9,BrowserType.IE10,BrowserType.IPAD,BrowserType.ANDROID_PHONE,BrowserType.ANDROID_TABLET,BrowserType.IPHONE, BrowserType.FIREFOX})
-    public void testUpdateOnAttributeWithCertainEvents() throws Exception{
+    @UnAdaptableTest
+    // because it fails in FIREFOX
+    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.IPAD, BrowserType.ANDROID_PHONE,
+            BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.FIREFOX })
+    public void testUpdateOnAttributeWithCertainEvents() throws Exception {
 
         open("/uitest/inputtextupdateontest.cmp");
         String value = getCurrentModelValue();
@@ -126,7 +133,7 @@ public class InputTextUITest extends WebDriverTestCase {
         input.click();
         value = assertModelValue(eventName);
 
-       eventName = "mousemove";
+        eventName = "mousemove";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
         a.moveToElement(input).moveByOffset(0, 100).build().perform();
@@ -149,26 +156,26 @@ public class InputTextUITest extends WebDriverTestCase {
         assertModelValue(value);
         input.click();
         value = assertModelValue(eventName);
-        
+
         eventName = "select";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
         a.doubleClick(input).build().perform();
         value = assertModelValue(eventName);
-}
-    @ExcludeBrowsers({BrowserType.IPAD,BrowserType.ANDROID_PHONE,BrowserType.ANDROID_TABLET,BrowserType.IPHONE, BrowserType.SAFARI})
-    //Issue with Webdriver API ignores maxlength HTML5 attribute - W-1465209
-    public void testMaxLength() throws Exception{
+    }
+
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE,
+            BrowserType.SAFARI })
+    // Issue with Webdriver API ignores maxlength HTML5 attribute - W-1465209
+    public void testMaxLength() throws Exception {
         open("/uitest/inputTextMaxLength.cmp");
         WebElement input = findDomElement(By.cssSelector("input.uiInputText.uiInput"));
         input.clear();
         input.sendKeys("1234567890");
         assertEquals("Text not truncated to 5 chars correctly", "12345", input.getAttribute("value"));
     }
-    
-    
 
-    public void testNoMaxLength() throws Exception{
+    public void testNoMaxLength() throws Exception {
         open("/uitest/inputTextNoMaxLength.cmp");
         WebElement input = findDomElement(By.cssSelector("input.uiInputText.uiInput"));
         input.clear();
@@ -177,22 +184,21 @@ public class InputTextUITest extends WebDriverTestCase {
         assertEquals("Expected untruncated text", inputText, input.getAttribute("value"));
     }
 
-    private String assertModelValue(String expectedValue){
+    private String assertModelValue(String expectedValue) {
         String value = getCurrentModelValue();
         assertEquals("Model value is not what we expected", expectedValue, value);
         return value;
     }
 
-    private String getCurrentModelValue(){
-        String valueExpression ="return window.$A.get('root.m.string')";
+    private String getCurrentModelValue() {
+        String valueExpression = "return window.$A.get('root.m.string')";
         String value = (String) auraUITestingUtil.getEval(valueExpression);
         return value;
     }
-    
-    public void testNullValue() throws Exception{
-        String cmpSource = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> " +
-                            "<ui:inputText value=\"{!m.StringNull}\"/>" +
-                         "</aura:component>";
+
+    public void testNullValue() throws Exception {
+        String cmpSource = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> "
+                + "<ui:inputText value=\"{!m.StringNull}\"/>" + "</aura:component>";
         DefDescriptor<ComponentDef> inputTextNullValue = addSourceAutoCleanup(ComponentDef.class, cmpSource);
         open(String.format("/%s/%s.cmp", inputTextNullValue.getNamespace(), inputTextNullValue.getName()));
 

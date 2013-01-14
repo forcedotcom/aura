@@ -34,9 +34,9 @@ public abstract class DefRegistryImpl<T extends Definition> implements DefRegist
     public DefRegistryImpl(Set<DefType> defTypes, Set<String> prefixes, Set<String> namespaces) {
         this.defTypes = defTypes;
         this.prefixes = prefixes;
-        if(namespaces == null){
+        if (namespaces == null) {
             this.namespaces = Sets.newHashSet("*");
-        }else{
+        } else {
             this.namespaces = namespaces;
         }
     }

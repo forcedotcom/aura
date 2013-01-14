@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
-
 import org.auraframework.Aura;
 import org.auraframework.def.HelperDef;
 import org.auraframework.expression.PropertyReference;
@@ -30,6 +28,8 @@ import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import com.google.common.collect.Sets;
 
 /**
  */
@@ -51,7 +51,8 @@ public class JavascriptHelperDef extends DefinitionImpl<HelperDef> implements He
 
     @Override
     public void retrieveLabels() throws QuickFixException {
-        GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders().get(LABEL);
+        GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders()
+                .get(LABEL);
         for (PropertyReference e : expressionRefs) {
             if (e.getRoot().equals(LABEL.getPrefix())) {
                 labelProvider.getValue(e.getStem());
@@ -67,11 +68,11 @@ public class JavascriptHelperDef extends DefinitionImpl<HelperDef> implements He
         json.writeMapEnd();
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<HelperDef>{
+    public static class Builder extends DefinitionImpl.BuilderImpl<HelperDef> {
         public Map<String, Object> functions;
         public Set<PropertyReference> expressionRefs = Sets.newHashSet();
 
-        public Builder(){
+        public Builder() {
             super(HelperDef.class);
         }
 

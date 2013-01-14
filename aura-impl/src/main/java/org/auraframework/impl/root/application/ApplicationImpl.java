@@ -28,24 +28,25 @@ import org.auraframework.util.json.Json.Serialization.ReferenceType;
 
 /**
  */
-@Serialization(referenceType=ReferenceType.IDENTITY)
+@Serialization(referenceType = ReferenceType.IDENTITY)
 public class ApplicationImpl extends BaseComponentImpl<ApplicationDef, Application> implements Application {
 
-
-    public ApplicationImpl(ApplicationDef def, Map<String, Object> attributes) throws QuickFixException{
+    public ApplicationImpl(ApplicationDef def, Map<String, Object> attributes) throws QuickFixException {
         super(def, attributes);
     }
 
-    public ApplicationImpl(DefDescriptor<ApplicationDef> descriptor, Map<String, Object> attributes) throws QuickFixException{
+    public ApplicationImpl(DefDescriptor<ApplicationDef> descriptor, Map<String, Object> attributes)
+            throws QuickFixException {
         super(descriptor, attributes);
     }
 
-    protected ApplicationImpl(DefDescriptor<ApplicationDef> descriptor, Application extender, BaseComponent<?,?> attributeValueProvider, Application concreteApplication) throws QuickFixException{
+    protected ApplicationImpl(DefDescriptor<ApplicationDef> descriptor, Application extender,
+            BaseComponent<?, ?> attributeValueProvider, Application concreteApplication) throws QuickFixException {
         super(descriptor, extender, attributeValueProvider, concreteApplication);
     }
 
     @Override
-    protected void createSuper() throws QuickFixException{
+    protected void createSuper() throws QuickFixException {
         ApplicationDef def = getComponentDef();
         if (!remoteProvider) {
             DefDescriptor<ApplicationDef> superDefDescriptor = def.getExtendsDescriptor();
@@ -57,5 +58,6 @@ public class ApplicationImpl extends BaseComponentImpl<ApplicationDef, Applicati
     }
 
     @Override
-    protected void injectComponent() {}
+    protected void injectComponent() {
+    }
 }

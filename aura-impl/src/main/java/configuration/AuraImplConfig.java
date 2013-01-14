@@ -15,50 +15,112 @@
  */
 package configuration;
 
-import org.auraframework.adapter.*;
-import org.auraframework.impl.*;
-import org.auraframework.impl.adapter.*;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ContextAdapter;
+import org.auraframework.adapter.ExceptionAdapter;
+import org.auraframework.adapter.FormatAdapter;
+import org.auraframework.adapter.GlobalValueProviderAdapter;
+import org.auraframework.adapter.JsonSerializerAdapter;
+import org.auraframework.adapter.LocalizationAdapter;
+import org.auraframework.adapter.LoggingAdapter;
+import org.auraframework.adapter.PrefixDefaultsAdapter;
+import org.auraframework.adapter.RegistryAdapter;
+import org.auraframework.impl.BuilderServiceImpl;
+import org.auraframework.impl.ClientServiceImpl;
+import org.auraframework.impl.ContextAdapterImpl;
+import org.auraframework.impl.DefinitionServiceImpl;
+import org.auraframework.impl.ExceptionAdapterImpl;
+import org.auraframework.impl.InstanceServiceImpl;
+import org.auraframework.impl.IntegrationServiceImpl;
+import org.auraframework.impl.LocalizationServiceImpl;
+import org.auraframework.impl.LoggingAdapterImpl;
+import org.auraframework.impl.LoggingServiceImpl;
+import org.auraframework.impl.RenderingServiceImpl;
+import org.auraframework.impl.SerializationServiceImpl;
+import org.auraframework.impl.ServerServiceImpl;
+import org.auraframework.impl.adapter.ConfigAdapterImpl;
+import org.auraframework.impl.adapter.GlobalValueProviderAdapterImpl;
+import org.auraframework.impl.adapter.JsonSerializerAdapterImpl;
 import org.auraframework.impl.adapter.format.css.ThemeDefCSSFormatAdapter;
 import org.auraframework.impl.adapter.format.css.ThrowableCSSFormatAdapter;
-import org.auraframework.impl.adapter.format.html.*;
+import org.auraframework.impl.adapter.format.html.ApplicationDefHTMLFormatAdapter;
+import org.auraframework.impl.adapter.format.html.ApplicationHTMLFormatAdapter;
+import org.auraframework.impl.adapter.format.html.AuraContextHTMLFormatAdapter;
+import org.auraframework.impl.adapter.format.html.AuraQuickFixExceptionHTMLFormatAdapter;
+import org.auraframework.impl.adapter.format.html.ComponentDefHTMLFormatAdapter;
+import org.auraframework.impl.adapter.format.html.ComponentHTMLFormatAdapter;
+import org.auraframework.impl.adapter.format.html.TestSuiteDefHTMLFormatAdapter;
+import org.auraframework.impl.adapter.format.html.ThrowableHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.embedded.ApplicationDefEmbeddedHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.offline.ApplicationDefOfflineHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.js.ComponentDefJSFormatAdapter;
 import org.auraframework.impl.adapter.format.js.ThrowableJSFormatAdapter;
-import org.auraframework.impl.adapter.format.json.*;
-import org.auraframework.impl.context.*;
+import org.auraframework.impl.adapter.format.json.ActionJSONFormatAdapter;
+import org.auraframework.impl.adapter.format.json.AuraContextJSONFormatAdapter;
+import org.auraframework.impl.adapter.format.json.ClientSideEventExceptionJSONFormatAdapter;
+import org.auraframework.impl.adapter.format.json.ComponentDefJSONFormatAdapter;
+import org.auraframework.impl.adapter.format.json.ComponentDefRefJSONFormatAdapter;
+import org.auraframework.impl.adapter.format.json.ComponentJSONFormatAdapter;
+import org.auraframework.impl.adapter.format.json.ControllerDefJSONFormatAdapter;
+import org.auraframework.impl.adapter.format.json.EventDefJSONFormatAdapter;
+import org.auraframework.impl.adapter.format.json.MessageJSONFormatAdapter;
+import org.auraframework.impl.adapter.format.json.TestSuiteDefJSONFormatAdapter;
+import org.auraframework.impl.adapter.format.json.ThrowableJSONFormatAdapter;
+import org.auraframework.impl.context.AuraContextServiceImpl;
+import org.auraframework.impl.context.AuraPrefixDefaultsProviderImpl;
+import org.auraframework.impl.context.AuraRegistryProviderImpl;
+import org.auraframework.impl.context.LocalizationAdapterImpl;
 import org.auraframework.impl.java.type.LocalizedConverter;
-import org.auraframework.impl.java.type.converter.*;
-import org.auraframework.service.*;
+import org.auraframework.impl.java.type.converter.LocalizedBigDecimalToStringConverter;
+import org.auraframework.impl.java.type.converter.LocalizedDateOnlyToStringConverter;
+import org.auraframework.impl.java.type.converter.LocalizedDateToStringConverter;
+import org.auraframework.impl.java.type.converter.LocalizedIntegerToStringConverter;
+import org.auraframework.impl.java.type.converter.LocalizedStringToBigDecimalConverter;
+import org.auraframework.impl.java.type.converter.LocalizedStringToDateConverter;
+import org.auraframework.impl.java.type.converter.LocalizedStringToDateOnlyConverter;
+import org.auraframework.impl.java.type.converter.LocalizedStringToDoubleConverter;
+import org.auraframework.impl.java.type.converter.LocalizedStringToIntegerConverter;
+import org.auraframework.impl.java.type.converter.LocalizedStringToLongConverter;
+import org.auraframework.service.BuilderService;
+import org.auraframework.service.ClientService;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.service.InstanceService;
+import org.auraframework.service.IntegrationService;
+import org.auraframework.service.LocalizationService;
+import org.auraframework.service.LoggingService;
+import org.auraframework.service.RenderingService;
+import org.auraframework.service.SerializationService;
+import org.auraframework.service.ServerService;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.ServiceLoaderImpl.PrimaryImpl;
 
 /**
- * AuraConfig This is the spring configuration for the aura module.Provide access to lower level modules (like sfdc)
- * by defining runtime implementations here. This class will be loaded by common.provider.ProviderFactory.
+ * AuraConfig This is the spring configuration for the aura module.Provide
+ * access to lower level modules (like sfdc) by defining runtime implementations
+ * here. This class will be loaded by common.provider.ProviderFactory.
  */
 @AuraConfiguration
 public class AuraImplConfig {
 
     @Impl
-    public static FormatAdapter<?> actionJSONFormatAdapter(){
+    public static FormatAdapter<?> actionJSONFormatAdapter() {
         return new ActionJSONFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> applicationDefEmbeddedHTMLFormatAdapter(){
+    public static FormatAdapter<?> applicationDefEmbeddedHTMLFormatAdapter() {
         return new ApplicationDefEmbeddedHTMLFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> applicationDefOfflineHTMLFormatAdapter(){
+    public static FormatAdapter<?> applicationDefOfflineHTMLFormatAdapter() {
         return new ApplicationDefOfflineHTMLFormatAdapter();
     }
 
-
     @Impl
-    public static FormatAdapter<?> applicationDefHTMLFormatAdapter(){
+    public static FormatAdapter<?> applicationDefHTMLFormatAdapter() {
         return new ApplicationDefHTMLFormatAdapter();
     }
 
@@ -79,37 +141,37 @@ public class AuraImplConfig {
     }
 
     @Impl
-    public static FormatAdapter<?> componentHTMLFormatAdapter(){
+    public static FormatAdapter<?> componentHTMLFormatAdapter() {
         return new ComponentHTMLFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> applicationHTMLFormatAdapter(){
+    public static FormatAdapter<?> applicationHTMLFormatAdapter() {
         return new ApplicationHTMLFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> componentDefHTMLFormatAdapter(){
+    public static FormatAdapter<?> componentDefHTMLFormatAdapter() {
         return new ComponentDefHTMLFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> componentDefJSFormatAdapter(){
+    public static FormatAdapter<?> componentDefJSFormatAdapter() {
         return new ComponentDefJSFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> componentDefJSONFormatAdapter(){
+    public static FormatAdapter<?> componentDefJSONFormatAdapter() {
         return new ComponentDefJSONFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> componentDefRefJSONFormatAdapter(){
+    public static FormatAdapter<?> componentDefRefJSONFormatAdapter() {
         return new ComponentDefRefJSONFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> componentJSONFormatAdapter(){
+    public static FormatAdapter<?> componentJSONFormatAdapter() {
         return new ComponentJSONFormatAdapter();
     }
 
@@ -125,17 +187,17 @@ public class AuraImplConfig {
     }
 
     @Impl
-    public static FormatAdapter<?> eventDefJSONFormatAdapter(){
+    public static FormatAdapter<?> eventDefJSONFormatAdapter() {
         return new EventDefJSONFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> controllerDefJSONFormatAdapter(){
+    public static FormatAdapter<?> controllerDefJSONFormatAdapter() {
         return new ControllerDefJSONFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> messageJSONFormatAdapter(){
+    public static FormatAdapter<?> messageJSONFormatAdapter() {
         return new MessageJSONFormatAdapter();
     }
 
@@ -146,22 +208,22 @@ public class AuraImplConfig {
     }
 
     @Impl
-    public static FormatAdapter<?> auraContextHTMLFormatAdapter(){
+    public static FormatAdapter<?> auraContextHTMLFormatAdapter() {
         return new AuraContextHTMLFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> auraContextJSONFormatAdapter(){
+    public static FormatAdapter<?> auraContextJSONFormatAdapter() {
         return new AuraContextJSONFormatAdapter();
     }
 
     @Impl
-    public static ConfigAdapter auraImplConfigAdapter(){
+    public static ConfigAdapter auraImplConfigAdapter() {
         return new ConfigAdapterImpl();
     }
 
     @Impl
-    public static ContextAdapter auraImplContextAdapter(){
+    public static ContextAdapter auraImplContextAdapter() {
         return new ContextAdapterImpl();
     }
 
@@ -196,9 +258,10 @@ public class AuraImplConfig {
     }
 
     @Impl
-    public static RegistryAdapter auraImplRegistryAdapter(){
+    public static RegistryAdapter auraImplRegistryAdapter() {
         return new AuraRegistryProviderImpl();
     }
+
     /*
     */
 
@@ -209,7 +272,7 @@ public class AuraImplConfig {
 
     @Impl
     @PrimaryImpl
-    public static RenderingService renderingService(){
+    public static RenderingService renderingService() {
         return new RenderingServiceImpl();
     }
 
@@ -220,47 +283,47 @@ public class AuraImplConfig {
     }
 
     @Impl
-    public static FormatAdapter<?> testSuiteDefHTMLFormatAdapter(){
+    public static FormatAdapter<?> testSuiteDefHTMLFormatAdapter() {
         return new TestSuiteDefHTMLFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> testSuiteDefJSONFormatAdapter(){
+    public static FormatAdapter<?> testSuiteDefJSONFormatAdapter() {
         return new TestSuiteDefJSONFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> themeDefCSSFormatAdapter(){
+    public static FormatAdapter<?> themeDefCSSFormatAdapter() {
         return new ThemeDefCSSFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> throwableHTMLFormatAdapter(){
+    public static FormatAdapter<?> throwableHTMLFormatAdapter() {
         return new ThrowableHTMLFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> auraQuickFixExceptionHTMLFormatAdapter(){
+    public static FormatAdapter<?> auraQuickFixExceptionHTMLFormatAdapter() {
         return new AuraQuickFixExceptionHTMLFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> throwableJSFormatAdapter(){
+    public static FormatAdapter<?> throwableJSFormatAdapter() {
         return new ThrowableJSFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> throwableJSONFormatAdapter(){
+    public static FormatAdapter<?> throwableJSONFormatAdapter() {
         return new ThrowableJSONFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> throwableCSSFormatAdapter(){
+    public static FormatAdapter<?> throwableCSSFormatAdapter() {
         return new ThrowableCSSFormatAdapter();
     }
 
     @Impl
-    public static FormatAdapter<?> clientSideEventExceptionJSONFormatAdapter(){
+    public static FormatAdapter<?> clientSideEventExceptionJSONFormatAdapter() {
         return new ClientSideEventExceptionJSONFormatAdapter();
     }
 
@@ -268,7 +331,6 @@ public class AuraImplConfig {
     public static JsonSerializerAdapter auraImplJsonSerializationAdapter() {
         return new JsonSerializerAdapterImpl();
     }
-
 
     @Impl
     public static LocalizedConverter<?, ?> LocalizedBigDecimalToStringConverter() {

@@ -24,7 +24,7 @@ import org.auraframework.system.Annotations.Provider;
  */
 @Provider
 public class FakeProvider {
-    public static DefDescriptor<ComponentDef> provide(){
+    public static DefDescriptor<ComponentDef> provide() {
         return DefDescriptorImpl.getInstance("test:fakeImpl", ComponentDef.class);
     }
 }

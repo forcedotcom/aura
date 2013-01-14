@@ -19,8 +19,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.auraframework.Aura;
-import org.auraframework.system.Location;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraException;
 import org.auraframework.throwable.AuraExceptionUtil;
 import org.auraframework.util.json.Json;
@@ -29,12 +29,11 @@ import org.auraframework.util.json.JsonSerializable;
 import com.google.common.collect.ImmutableList;
 
 /**
- * An exception that contains a list of potential automated fixes
- * for the problem, which the client code or user can choose from
- * and invoke before retrying the original action that threw this
- * Exception.
+ * An exception that contains a list of potential automated fixes for the
+ * problem, which the client code or user can choose from and invoke before
+ * retrying the original action that threw this Exception.
  */
-public abstract class QuickFixException extends AuraException implements JsonSerializable{
+public abstract class QuickFixException extends AuraException implements JsonSerializable {
     private static final long serialVersionUID = 2050170532486579614L;
     private final List<AuraQuickFix> quickFixes;
 
@@ -54,7 +53,8 @@ public abstract class QuickFixException extends AuraException implements JsonSer
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
         json.writeMapEntry("message", getMessage());
-        if (Aura.getContextService().isEstablished() && Aura.getContextService().getCurrentContext().getMode() != Mode.PROD) {
+        if (Aura.getContextService().isEstablished()
+                && Aura.getContextService().getCurrentContext().getMode() != Mode.PROD) {
             json.writeMapEntry("stack", AuraExceptionUtil.getStackTrace(this));
             json.writeMapEntry("location", getLocation());
         }

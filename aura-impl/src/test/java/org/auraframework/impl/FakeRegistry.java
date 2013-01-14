@@ -27,7 +27,8 @@ import org.auraframework.system.Source;
 import com.google.common.collect.Maps;
 
 /**
- * This is a fake registry (both master and standard) for testing purposes only. Primarily used for testing validateReferences calls
+ * This is a fake registry (both master and standard) for testing purposes only.
+ * Primarily used for testing validateReferences calls
  */
 public class FakeRegistry implements MasterDefRegistry {
     private final Map<DefDescriptor<?>, Definition> stuff = Maps.newHashMap();
@@ -53,7 +54,7 @@ public class FakeRegistry implements MasterDefRegistry {
     @SuppressWarnings("unchecked")
     @Override
     public <D extends Definition> D getDef(DefDescriptor<D> descriptor) {
-        return (D)stuff.get(descriptor);
+        return (D) stuff.get(descriptor);
     }
 
     @Override

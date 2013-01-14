@@ -24,12 +24,12 @@ import org.auraframework.system.Annotations.Model;
 @Model
 public class SluggishServerModel {
 
-    public SluggishServerModel() throws InterruptedException{
+    public SluggishServerModel() throws InterruptedException {
         Thread.sleep(100);
     }
 
     @AuraEnabled
-    public List<String> getStringList(){
+    public List<String> getStringList() {
         ArrayList<String> sl = new ArrayList<String>();
         sl.add("foo");
         sl.add("bar");

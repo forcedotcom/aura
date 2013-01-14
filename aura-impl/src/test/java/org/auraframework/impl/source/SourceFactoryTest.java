@@ -17,13 +17,13 @@ package org.auraframework.impl.source;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 
-public class SourceFactoryTest extends AuraImplTestCase{
+import com.google.common.collect.Lists;
+
+public class SourceFactoryTest extends AuraImplTestCase {
 
     public SourceFactoryTest(String name) {
         super(name);
@@ -31,10 +31,11 @@ public class SourceFactoryTest extends AuraImplTestCase{
 
     public void testSourceFactory() {
         SourceLoader loader = StringSourceLoader.getInstance();
-        try{
+        try {
             List<SourceLoader> loaders = Lists.newArrayList(loader, loader);
             new SourceFactory(loaders);
             fail("Should have failed with AuraException('Namespace claimed by 2 SourceLoaders')");
-        }catch(AuraRuntimeException e){}
+        } catch (AuraRuntimeException e) {
+        }
     }
 }

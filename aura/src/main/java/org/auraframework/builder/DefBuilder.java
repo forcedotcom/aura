@@ -20,19 +20,25 @@ import org.auraframework.def.Definition;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
- * @param <PrimaryIntf>
- *            The Primary Interface of a DefType, which should always line up with the DefTypes on the DefDescriptors
- *            that this builder deals with.
- * @param <DefOrRefType>
- *            Normally the same as T, but in the case of DefRefs, like ComponentDefRef, this would be the
- *            ComponentDefRef.class Even though the descriptors for ComponentDefRefs are Component.class.
+ * @param <PrimaryIntf> The Primary Interface of a DefType, which should always
+ *            line up with the DefTypes on the DefDescriptors that this builder
+ *            deals with.
+ * @param <DefOrRefType> Normally the same as T, but in the case of DefRefs,
+ *            like ComponentDefRef, this would be the ComponentDefRef.class Even
+ *            though the descriptors for ComponentDefRefs are Component.class.
  */
 public interface DefBuilder<PrimaryIntf extends Definition, DefOrRefType extends Definition> {
     DefOrRefType build() throws QuickFixException;
-    DefBuilder<PrimaryIntf,DefOrRefType> setLocation(String fileName, int line, int column, long lastModified);
-    DefBuilder<PrimaryIntf,DefOrRefType> setLocation(String fileName, long lastModified);
-    DefBuilder<PrimaryIntf,DefOrRefType> setDescriptor(String qualifiedName);
-    DefBuilder<PrimaryIntf,DefOrRefType> setDescriptor(DefDescriptor<PrimaryIntf> desc);
-    DefBuilder<PrimaryIntf,DefOrRefType> setDescription(String description);
+
+    DefBuilder<PrimaryIntf, DefOrRefType> setLocation(String fileName, int line, int column, long lastModified);
+
+    DefBuilder<PrimaryIntf, DefOrRefType> setLocation(String fileName, long lastModified);
+
+    DefBuilder<PrimaryIntf, DefOrRefType> setDescriptor(String qualifiedName);
+
+    DefBuilder<PrimaryIntf, DefOrRefType> setDescriptor(DefDescriptor<PrimaryIntf> desc);
+
+    DefBuilder<PrimaryIntf, DefOrRefType> setDescription(String description);
+
     DefDescriptor<PrimaryIntf> getDescriptor();
 }

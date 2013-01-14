@@ -18,31 +18,33 @@ package org.auraframework.impl.root.parser.handler;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef.Load;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.component.LazyComponentDefRef;
 import org.auraframework.system.Source;
 
 /**
  * Handles lazy component references
- *
- *
+ * 
+ * 
  * @since 0.0.196
  */
 public class LazyComponentDefRefHandler<P extends RootDefinition> extends ComponentDefRefHandler<P> {
 
     protected LazyComponentDefRef.Builder lazyBuilder = new LazyComponentDefRef.Builder();
 
-    protected LazyComponentDefRefHandler(RootTagHandler<P> parentHandler, String tag, XMLStreamReader xmlReader, Source<?> source) {
+    protected LazyComponentDefRefHandler(RootTagHandler<P> parentHandler, String tag, XMLStreamReader xmlReader,
+            Source<?> source) {
         super(parentHandler, xmlReader, source);
         builder = lazyBuilder;
         builder.setLocation(getLocation());
         lazyBuilder.setRefDescriptor(Aura.getDefinitionService().getDefDescriptor(tag.trim(), ComponentDef.class));
 
         String loadString = getSystemAttributeValue("load");
-        if(loadString != null){
+        if (loadString != null) {
             Load load = Load.valueOf(loadString.toUpperCase());
-            if(load == Load.EXCLUSIVE){
+            if (load == Load.EXCLUSIVE) {
                 lazyBuilder.setComponentAttribute("exclusive", true);
             }
         }

@@ -21,21 +21,22 @@ import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.system.DefFactoryImpl;
-import org.auraframework.system.*;
+import org.auraframework.system.Source;
+import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
 
 /**
- * Base class for {@link DefFactory} implementations for the java:// pseudo-protocol.
+ * Base class for {@link DefFactory} implementations for the java://
+ * pseudo-protocol.
  */
 public abstract class BaseJavaDefFactory<D extends Definition> extends DefFactoryImpl<D> {
 
     final List<SourceLoader> loaders;
 
     public BaseJavaDefFactory(List<SourceLoader> sourceLoaders) {
-        loaders = (sourceLoaders == null || sourceLoaders.isEmpty()) ? null :
-            Lists.newArrayList(sourceLoaders);
+        loaders = (sourceLoaders == null || sourceLoaders.isEmpty()) ? null : Lists.newArrayList(sourceLoaders);
     }
 
     @Override
@@ -45,19 +46,19 @@ public abstract class BaseJavaDefFactory<D extends Definition> extends DefFactor
         }
         for (SourceLoader loader : loaders) {
             Source<D> source = loader.getSource(descriptor);
-            if (source != null  && source.exists()) {
+            if (source != null && source.exists()) {
                 return source;
             }
         }
         return null;
     }
 
-    protected Class<?> getClazz(DefDescriptor<D> descriptor){
+    protected Class<?> getClazz(DefDescriptor<D> descriptor) {
         Class<?> clazz;
         try {
-            if(descriptor.getNamespace() == null){
+            if (descriptor.getNamespace() == null) {
                 clazz = Class.forName(descriptor.getName());
-            }else{
+            } else {
                 clazz = Class.forName(String.format("%s.%s", descriptor.getNamespace(), descriptor.getName()));
             }
         } catch (ClassNotFoundException e) {
@@ -68,20 +69,21 @@ public abstract class BaseJavaDefFactory<D extends Definition> extends DefFactor
 
     /**
      * Get a builder for the def.
-     *
-     * This function must be implemented by all subclasses. It should return
-     * a builder from which only the 'build()' function will be executed.
-     * It is allowed to return a null, in which case the
+     * 
+     * This function must be implemented by all subclasses. It should return a
+     * builder from which only the 'build()' function will be executed. It is
+     * allowed to return a null, in which case the
      * {@link #getDef(DefDescriptor)} function will return a null.
-     *
+     * 
      * Note that this can throw a QuickFixException as there are certain things
-     * that will cause a builder to fail early. It would be possible to force them
-     * to be lazy, but that doesn't really help anything. An example is a class
-     * that does not have the correct annotation on it.
-     *
+     * that will cause a builder to fail early. It would be possible to force
+     * them to be lazy, but that doesn't really help anything. An example is a
+     * class that does not have the correct annotation on it.
+     * 
      * @param descriptor the incoming descriptor for which we need a builder.
      * @return a builder for the Def or null if none could be found.
-     * @throws QuickFixException if the builder could not be created because of a defect.
+     * @throws QuickFixException if the builder could not be created because of
+     *             a defect.
      */
     protected abstract DefBuilder<?, ? extends D> getBuilder(DefDescriptor<D> descriptor) throws QuickFixException;
 

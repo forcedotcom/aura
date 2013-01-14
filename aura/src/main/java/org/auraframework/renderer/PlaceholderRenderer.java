@@ -16,26 +16,18 @@
 package org.auraframework.renderer;
 
 import java.io.IOException;
-import java.util.List;
 
-import org.auraframework.Aura;
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  */
-public class ComponentRenderer implements Renderer {
+public class PlaceholderRenderer implements Renderer {
 
     @Override
     public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
-
-        @SuppressWarnings("unchecked")
-        List<BaseComponent<?, ?>> body = (List<BaseComponent<?, ?>>) component.getAttributes().getValue("body");
-        if (body != null) {
-            for (BaseComponent<?, ?> c : body) {
-                Aura.getRenderingService().render(c, out);
-            }
-        }
+        throw new UnsupportedOperationException("Don't know how to build a placeholder yet");
     }
 }
+

@@ -24,10 +24,8 @@ import org.auraframework.impl.javascript.model.JavascriptModelDef.Builder;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+public class JavascriptModelDefHandler extends JavascriptHandler<DefDescriptor<ModelDef>, JavascriptModelDef> {
 
-public class JavascriptModelDefHandler extends
-                    JavascriptHandler<DefDescriptor<ModelDef>, JavascriptModelDef> {
-    
     private Builder builder = new Builder();
 
     public JavascriptModelDefHandler(DefDescriptor<ModelDef> descriptor, Source<?> source) {
@@ -38,7 +36,7 @@ public class JavascriptModelDefHandler extends
     protected JavascriptModelDef createDefinition(Map<String, Object> map) throws QuickFixException {
         builder.setDescriptor(descriptor);
         builder.setLocation(getLocation());
-        
+
         for (Map.Entry<String, Object> e : map.entrySet()) {
             builder.addProperty(e.getKey(), e.getValue(), getLocation());
         }

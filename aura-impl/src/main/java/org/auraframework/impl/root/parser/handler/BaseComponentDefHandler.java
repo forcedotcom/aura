@@ -187,8 +187,8 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef> extend
             if (jsDescriptor.exists()) {
                 builder.modelDefDescriptor = jsDescriptor;
             } else {
-                String apexModelName = String.format("apex://%s.%sModel", defDescriptor.getNamespace(), AuraTextUtil
-                        .initCap(defDescriptor.getName()));
+                String apexModelName = String.format("apex://%s.%sModel", defDescriptor.getNamespace(),
+                        AuraTextUtil.initCap(defDescriptor.getName()));
                 DefDescriptor<ModelDef> apexDescriptor = DefDescriptorImpl.getInstance(apexModelName, ModelDef.class);
                 if (apexDescriptor.exists()) {
                     builder.modelDefDescriptor = apexDescriptor;

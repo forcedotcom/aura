@@ -121,13 +121,14 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                             new JavaSecurityProviderDefFactory(javaLoaders), DefType.SECURITY_PROVIDER,
                             DefDescriptor.JAVA_PREFIX),
 
-                    AuraRegistryProviderImpl.<ControllerDef>createJavascriptRegistry(jsSourceFactory, DefType.CONTROLLER),
-                    AuraRegistryProviderImpl.<TestSuiteDef>createJavascriptRegistry(jsSourceFactory, DefType.TESTSUITE),
-                    AuraRegistryProviderImpl.<RendererDef>createJavascriptRegistry(jsSourceFactory, DefType.RENDERER),
-                    AuraRegistryProviderImpl.<HelperDef>createJavascriptRegistry(jsSourceFactory, DefType.HELPER),
-                    AuraRegistryProviderImpl.<ProviderDef>createJavascriptRegistry(jsSourceFactory, DefType.PROVIDER),
-                    AuraRegistryProviderImpl.<ModelDef>createJavascriptRegistry(jsSourceFactory, DefType.MODEL),
-                    
+                    AuraRegistryProviderImpl.<ControllerDef> createJavascriptRegistry(jsSourceFactory,
+                            DefType.CONTROLLER),
+                    AuraRegistryProviderImpl
+                            .<TestSuiteDef> createJavascriptRegistry(jsSourceFactory, DefType.TESTSUITE),
+                    AuraRegistryProviderImpl.<RendererDef> createJavascriptRegistry(jsSourceFactory, DefType.RENDERER),
+                    AuraRegistryProviderImpl.<HelperDef> createJavascriptRegistry(jsSourceFactory, DefType.HELPER),
+                    AuraRegistryProviderImpl.<ProviderDef> createJavascriptRegistry(jsSourceFactory, DefType.PROVIDER),
+                    AuraRegistryProviderImpl.<ModelDef> createJavascriptRegistry(jsSourceFactory, DefType.MODEL),
 
                     createDefRegistry(new ThemeDefFactory(new SourceFactory(themeLoaders)),
                             Sets.newHashSet(DefType.STYLE),

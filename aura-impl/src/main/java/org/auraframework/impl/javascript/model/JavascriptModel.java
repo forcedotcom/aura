@@ -35,50 +35,50 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class JavascriptModel implements Model {
-    
+
     private Map<String, Object> bean = Maps.newHashMap();
 
     private final JavascriptModelDef modelDef;
 
-    public JavascriptModel(JavascriptModelDef modelDef){
+    public JavascriptModel(JavascriptModelDef modelDef) {
         this.modelDef = modelDef;
         for (JavascriptValueDef member : this.modelDef.getAllMembers()) {
             bean.put(member.getName(), clone(member.getDefaultValue()));
         }
     }
-    
+
     @SuppressWarnings("unchecked")
-    private Object clone(Object val){
-        if(val == null || val instanceof Map){
-            return clone((Map<String, Object>)val);
-        }else if (val instanceof List){
-            //Array
-            return clone((List<Object>)val);
-        }else if (val instanceof String){
-            //String
+    private Object clone(Object val) {
+        if (val == null || val instanceof Map) {
+            return clone((Map<String, Object>) val);
+        } else if (val instanceof List) {
+            // Array
+            return clone((List<Object>) val);
+        } else if (val instanceof String) {
+            // String
             return val;
-        }else if (val instanceof Boolean){
-            //Boolean
-            return ((Boolean)val).booleanValue();
-        }else if (val instanceof Number){
-            //Number
+        } else if (val instanceof Boolean) {
+            // Boolean
+            return ((Boolean) val).booleanValue();
+        } else if (val instanceof Number) {
+            // Number
             return new BigDecimal(val.toString());
         }
         throw new AuraRuntimeException("Unexpected type.");
     }
-    
-    private Map<String, Object> clone(Map<String, Object> val){
+
+    private Map<String, Object> clone(Map<String, Object> val) {
         Map<String, Object> ret = Maps.newHashMap();
-        for(Entry<String, Object> entry : val.entrySet()){
+        for (Entry<String, Object> entry : val.entrySet()) {
             ret.put(entry.getKey(), clone(entry.getValue()));
         }
         return ret;
     }
-    
-    private List<Object> clone(List<Object> val){
+
+    private List<Object> clone(List<Object> val) {
         List<Object> ret = Lists.newArrayList();
-        
-        for(Object obj : val){
+
+        for (Object obj : val) {
             ret.add(clone(obj));
         }
         return ret;
@@ -95,7 +95,7 @@ public class JavascriptModel implements Model {
         loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION_AURA);
         loggingService.stopTimer(LoggingService.TIMER_AURA);
         loggingService.startTimer("javascript");
-        
+
         try {
             json.writeMap(bean);
         } finally {

@@ -31,8 +31,8 @@ import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Maps;
 
-public class JavascriptModelDef extends DefinitionImpl<ModelDef> implements ModelDef{
-    
+public class JavascriptModelDef extends DefinitionImpl<ModelDef> implements ModelDef {
+
     private final Map<String, JavascriptValueDef> memberMap;
 
     protected JavascriptModelDef(Builder builder) {
@@ -56,7 +56,7 @@ public class JavascriptModelDef extends DefinitionImpl<ModelDef> implements Mode
     protected Collection<JavascriptValueDef> getAllMembers() {
         return memberMap.values();
     }
-    
+
     @Override
     public boolean hasMembers() {
         return !memberMap.isEmpty();
@@ -71,44 +71,44 @@ public class JavascriptModelDef extends DefinitionImpl<ModelDef> implements Mode
     public TypeDef getType(String s) throws QuickFixException {
         return getMemberByName(s).getType();
     }
-    
-    public static class Builder extends DefinitionImpl.BuilderImpl<ModelDef>{
 
-        public Builder(){
+    public static class Builder extends DefinitionImpl.BuilderImpl<ModelDef> {
+
+        public Builder() {
             super(ModelDef.class);
         }
-        
+
         private Map<String, JavascriptValueDef> memberMap = Maps.newHashMap();
 
-        public void addProperty(String key, Object val, Location location) throws QuickFixException{
+        public void addProperty(String key, Object val, Location location) throws QuickFixException {
             DefDescriptor<TypeDef> type = null;
             DefinitionService defService = Aura.getDefinitionService();
-            if(val == null || val instanceof Map){
-                //Object
+            if (val == null || val instanceof Map) {
+                // Object
                 type = defService.getDefDescriptor("aura://Object", TypeDef.class);
-            }else if (val instanceof List){
-                //Array
+            } else if (val instanceof List) {
+                // Array
                 type = defService.getDefDescriptor("aura://List", TypeDef.class);
-            }else if (val instanceof String){
-                //String
+            } else if (val instanceof String) {
+                // String
                 type = defService.getDefDescriptor("aura://String", TypeDef.class);
-            }else if (val instanceof Boolean){
-                //Boolean
+            } else if (val instanceof Boolean) {
+                // Boolean
                 type = defService.getDefDescriptor("aura://Boolean", TypeDef.class);
-            }else if (val instanceof Number){
-                //Number
+            } else if (val instanceof Number) {
+                // Number
                 type = defService.getDefDescriptor("aura://Decimal", TypeDef.class);
-            }else{
+            } else {
                 throw new InvalidDefinitionException("Invalid value type in model definition.", getLocation());
             }
-            
+
             JavascriptValueDef value = new JavascriptValueDef(key, type, val, location);
             memberMap.put(key, value);
         }
 
         @Override
         public JavascriptModelDef build() throws QuickFixException {
-            
+
             return new JavascriptModelDef(this);
         }
     }

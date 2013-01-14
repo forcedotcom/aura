@@ -24,22 +24,23 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 public class JavascriptValueDef extends DefinitionImpl<ValueDef> implements ValueDef {
-    
+
     private final String name;
     private final DefDescriptor<TypeDef> typeDescriptor;
     private final Object defaultValue;
-    
-    protected JavascriptValueDef(String name, DefDescriptor<TypeDef> typeDescriptor, Object defaultValue, Location location) {
+
+    protected JavascriptValueDef(String name, DefDescriptor<TypeDef> typeDescriptor, Object defaultValue,
+            Location location) {
         super(null, location);
         this.name = name;
         this.typeDescriptor = typeDescriptor;
         this.defaultValue = defaultValue;
     }
-    
+
     public Object getDefaultValue() {
         return defaultValue;
     }
-    
+
     @Override
     public String getName() {
         return name;

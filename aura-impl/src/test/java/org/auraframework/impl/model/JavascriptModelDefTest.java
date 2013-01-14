@@ -30,47 +30,51 @@ import org.auraframework.instance.Model;
 import com.google.common.collect.Maps;
 
 public class JavascriptModelDefTest extends AuraImplTestCase {
-    
-    public JavascriptModelDefTest(String name){
+
+    public JavascriptModelDefTest(String name) {
         super(name);
     }
-    
+
     /**
      * Verify that javascript model defs are serializable.
+     * 
      * @throws Exception
      */
-    public void testDefaults() throws Exception{
-        //Find the model by autowiring
+    public void testDefaults() throws Exception {
+        // Find the model by autowiring
         Aura.getDefinitionService().getDefinition("test:jsModel", ComponentDef.class);
-        JavascriptModelDef modelDef = (JavascriptModelDef)Aura.getDefinitionService().getDefinition("js://test.jsModel", ModelDef.class);
-        
-        //Make sure the properties expected are found on the def
+        JavascriptModelDef modelDef = (JavascriptModelDef) Aura.getDefinitionService().getDefinition(
+                "js://test.jsModel", ModelDef.class);
+
+        // Make sure the properties expected are found on the def
         validateProperty(modelDef, "obj", Maps.newHashMap());
         validateProperty(modelDef, "bool", true);
         validateProperty(modelDef, "num", BigDecimal.valueOf(5));
         validateProperty(modelDef, "str", "yes");
         validateProperty(modelDef, "list", new ArrayList());
-        
-       
-        
+
     }
-    
-    private void validateProperty(JavascriptModelDef def, String name, Object expectedValue) throws Exception{
-        //Validate the default from the def
-        JavascriptValueDef valueDef = (JavascriptValueDef)def.getMemberByName(name);
+
+    private void validateProperty(JavascriptModelDef def, String name, Object expectedValue) throws Exception {
+        // Validate the default from the def
+        JavascriptValueDef valueDef = (JavascriptValueDef) def.getMemberByName(name);
         Object defaultValue = valueDef.getDefaultValue();
         assertEquals(expectedValue, defaultValue);
-        
-        //Also validate that the default appropriately shows up on an instance of this model.
+
+        // Also validate that the default appropriately shows up on an instance
+        // of this model.
         Model model = def.newInstance();
         Object instanceValue = model.getValue(new PropertyReferenceImpl(name, null));
         assertEquals(expectedValue, instanceValue);
-        
-        //Make sure that the instance value was cloned so that changes to the instance value don't affect other instances or the default.
-        //This check doesn't work well for booleans or Strings.
-        if(!(expectedValue instanceof Boolean) && !(expectedValue instanceof String)){
-            assertNotSame(String.format("The default value %s and instance value %s should not have the same identity.", defaultValue, instanceValue), defaultValue, instanceValue);
+
+        // Make sure that the instance value was cloned so that changes to the
+        // instance value don't affect other instances or the default.
+        // This check doesn't work well for booleans or Strings.
+        if (!(expectedValue instanceof Boolean) && !(expectedValue instanceof String)) {
+            assertNotSame(String.format(
+                    "The default value %s and instance value %s should not have the same identity.", defaultValue,
+                    instanceValue), defaultValue, instanceValue);
         }
     }
-    
+
 }

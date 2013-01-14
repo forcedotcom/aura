@@ -15,14 +15,22 @@
  */
 package org.auraframework.impl.java.model;
 
-
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.instance.Component;
-import org.auraframework.system.Annotations.*;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Model;
+import org.auraframework.system.Annotations.Type;
+
 @Model
 public class TestModelWithAuraTypeAnnotation {
 
@@ -31,90 +39,100 @@ public class TestModelWithAuraTypeAnnotation {
      */
     @AuraEnabled
     @Type("aura://String")
-    public String getString(){
+    public String getString() {
         return "Model";
     }
+
     @AuraEnabled
     @Type("AURA://INTEGER")
-    public Integer getInteger(){
+    public Integer getInteger() {
         return 123;
     }
+
     @AuraEnabled
     @Type("aura://Long")
-    public Long getLong(){
+    public Long getLong() {
         return 123l;
     }
+
     @AuraEnabled
     @Type("aura://Double")
-    public Double getDouble(){
+    public Double getDouble() {
         return 1.23;
     }
+
     @AuraEnabled
     @Type("aura://Decimal")
-    public BigDecimal getDecimal(){
+    public BigDecimal getDecimal() {
         return new BigDecimal(3.1415);
     }
+
     @AuraEnabled
     @Type("aura://Boolean")
-    public Boolean getBoolean(){
+    public Boolean getBoolean() {
         return true;
     }
+
     @AuraEnabled
     @Type("aura://Date")
-    public Date getDate(){
-        return new Date(1095957000000l); //"09/23/2004"
+    public Date getDate() {
+        return new Date(1095957000000l); // "09/23/2004"
     }
 
     @AuraEnabled
     @Type("aura://Object")
-    public Object getObject(){
+    public Object getObject() {
         return "Aura";
     }
 
     @AuraEnabled
     @Type("aura://Map")
-    public Map<String,String> getStringMap(){
-        return new HashMap<String,String>();
+    public Map<String, String> getStringMap() {
+        return new HashMap<String, String>();
     }
-    //List of basic data type
+
+    // List of basic data type
     @AuraEnabled
     @Type("aura://List<String>")
-    public List<String> getStringList(){
+    public List<String> getStringList() {
         return new ArrayList<String>();
     }
-    //Set of basic data type
+
+    // Set of basic data type
     @AuraEnabled
     @Type("aura://Set<String>")
-    public Set<String> getStringSet(){
+    public Set<String> getStringSet() {
         return new TreeSet<String>();
     }
-    //Array of basic data type
+
+    // Array of basic data type
     @AuraEnabled
     @Type("aura://String[]")
-    public String[] getStringArray(){
-        return new String[]{"one", "two"};
+    public String[] getStringArray() {
+        return new String[] { "one", "two" };
     }
 
     @AuraEnabled
     @Type("aura://List<Map>")
-    public List<Map<String,String>> getListOfMaps(){
-        Map<String, String> m = new HashMap<String,String>();
-        List<Map<String,String>> l = new ArrayList<Map<String,String>>();
+    public List<Map<String, String>> getListOfMaps() {
+        Map<String, String> m = new HashMap<String, String>();
+        List<Map<String, String>> l = new ArrayList<Map<String, String>>();
         l.add(m);
         return l;
     }
+
     @AuraEnabled
     @Type("aura://Set<Map>")
-    public Set<Map<String,String>> getSetOfMaps(){
-        Map<String, String> m = new HashMap<String,String>();
-        Set<Map<String,String>> s = new TreeSet<Map<String,String>>();
+    public Set<Map<String, String>> getSetOfMaps() {
+        Map<String, String> m = new HashMap<String, String>();
+        Set<Map<String, String>> s = new TreeSet<Map<String, String>>();
         s.add(m);
         return s;
     }
 
     @AuraEnabled
     @Type("aura://List<List>")
-    public List<List<String>> getListOfList(){
+    public List<List<String>> getListOfList() {
         List<String> l = new ArrayList<String>();
         List<List<String>> ll = new ArrayList<List<String>>();
         ll.add(l);
@@ -123,7 +141,7 @@ public class TestModelWithAuraTypeAnnotation {
 
     @AuraEnabled
     @Type("aura://Set<List>")
-    public Set<List<String>> getSetOfList(){
+    public Set<List<String>> getSetOfList() {
         List<String> l = new ArrayList<String>();
         Set<List<String>> s = new TreeSet<List<String>>();
         s.add(l);
@@ -132,7 +150,7 @@ public class TestModelWithAuraTypeAnnotation {
 
     @AuraEnabled
     @Type("aura://List<Set>")
-    public List<Set<String>> getListOfSet(){
+    public List<Set<String>> getListOfSet() {
         Set<String> s = new TreeSet<String>();
         List<Set<String>> l = new ArrayList<Set<String>>();
         l.add(s);
@@ -141,7 +159,7 @@ public class TestModelWithAuraTypeAnnotation {
 
     @AuraEnabled
     @Type("aura://Set<Set>")
-    public Set<Set<String>> getSetOfSet(){
+    public Set<Set<String>> getSetOfSet() {
         Set<String> s = new TreeSet<String>();
         Set<Set<String>> ss = new TreeSet<Set<String>>();
         ss.add(s);
@@ -150,16 +168,16 @@ public class TestModelWithAuraTypeAnnotation {
 
     @AuraEnabled
     @Type("Aura.Component")
-    public Component getAuraComponent() throws Exception{
-        return (Component)Aura.getInstanceService().getInstance("test:text", ComponentDef.class, null);
+    public Component getAuraComponent() throws Exception {
+        return (Component) Aura.getInstanceService().getInstance("test:text", ComponentDef.class, null);
     }
 
     @AuraEnabled
     @Type("Aura.Component[]")
-    public Component[] getAuraComponentArray() throws Exception{
+    public Component[] getAuraComponentArray() throws Exception {
         Component[] ret = new Component[2];
-        ret[0] = (Component)Aura.getInstanceService().getInstance("test:text", ComponentDef.class, null);
-        ret[1] = (Component)Aura.getInstanceService().getInstance("test:test_button", ComponentDef.class, null);
+        ret[0] = (Component) Aura.getInstanceService().getInstance("test:text", ComponentDef.class, null);
+        ret[1] = (Component) Aura.getInstanceService().getInstance("test:test_button", ComponentDef.class, null);
         return ret;
     }
 }

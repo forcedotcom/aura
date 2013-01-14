@@ -18,27 +18,25 @@ package org.auraframework.def;
 import java.io.IOException;
 
 import org.auraframework.instance.BaseComponent;
-
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * An interface for a component renderer.
- *
- * Note that this interface is instantiated as a singleton, no state should
- * be held on the class. It also needs to have a no-arg constructor.
- *
- *
+ * 
+ * Note that this interface is instantiated as a singleton, no state should be
+ * held on the class. It also needs to have a no-arg constructor.
+ * 
+ * 
  * @since 0.0.184
  */
 public interface Renderer {
     /**
      * Render a component.
-     *
+     * 
      * @param component The instance to render.
      * @param appendable the output buffer
      * @throws IOException if the appendable does.
      * @throws QuickFixException if there is a quick fix.
      */
-    public void render(BaseComponent<?,?> component, Appendable appendable)
-        throws IOException, QuickFixException;
+    public void render(BaseComponent<?, ?> component, Appendable appendable) throws IOException, QuickFixException;
 }

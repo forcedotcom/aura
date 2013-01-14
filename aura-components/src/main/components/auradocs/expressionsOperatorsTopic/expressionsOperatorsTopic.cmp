@@ -179,7 +179,8 @@ For comparison purposes, numbers are treated as the same type (internally, all n
 <table class="table table-bordered table-striped">
 <thead>
     <tr>
-        <th>Operator</th>
+        <th>Operator</th>  
+        <th>Alternative</th>      
         <th>Usage</th>
         <th>Description</th>
     </tr>
@@ -187,36 +188,48 @@ For comparison purposes, numbers are treated as the same type (internally, all n
 <tbody>
     <tr>
         <td>==</td>
+        <td>eq</td>
         <td>1 == 1<br/>
-            1 == 1.0</td>
+            1 == 1.0<br/>
+            1 eq 1</td>
         <td>True if the operands are equal. This comparison is valid for all data types.</td>
     </tr>
     <tr>
         <td>!=</td>
+        <td>ne</td>
         <td>1 != 2<br/>
             1 != true<br/>
             1 != '1'<br/>
-            null != false</td>
+            null != false<br/>
+            1 ne 2</td>
         <td>True if the operands are not equal. This comparison is valid for all data types.</td>
     </tr>
     <tr>
         <td>&lt;</td>
-        <td>1 &lt; 2</td>
+        <td>lt</td>
+        <td>1 &lt; 2<br/>
+            1 lt 2</td>
         <td>True if the first operand is numerically less than the second.</td>
     </tr>
     <tr>
         <td>&gt;</td>
-        <td>42 &gt; 2</td>
+        <td>gt</td>
+        <td>42 &gt; 2<br/>
+            42 gt 2</td>
         <td>True if the first operand is numerically greater than the second.</td>
     </tr>
     <tr>
         <td>&lt;=</td>
-        <td>2 &lt;= 42</td>
+        <td>le</td>
+        <td>2 &lt;= 42<br/>
+            2 lt 42</td>
         <td>True if the first operand is numerically less than or equal to the second.</td>
     </tr>
     <tr>
         <td>&gt;=</td>
-        <td>42 &gt;= 42</td>
+        <td>ge</td>
+        <td>42 &gt;= 42<br/>
+            42 ge 42</td>
         <td>True if the first operand is numerically greater than or equal to the second.</td>
     </tr>
 </tbody>
@@ -252,6 +265,7 @@ For comparison purposes, numbers are treated as the same type (internally, all n
     </tr>
 </tbody>
 </table>
+<auradocs:info>You must escape the &amp;&amp; operator to &#38;amp;&#38;amp; to use it in Aura markup. Alternatively, you can use the and() function and pass it the values to perform the operation on. For example, and(isEnabled, hasPermission). The and() function is case-sensitive and must be lowercase.</auradocs:info>
 
 <h2>Logical Literals</h2>
 

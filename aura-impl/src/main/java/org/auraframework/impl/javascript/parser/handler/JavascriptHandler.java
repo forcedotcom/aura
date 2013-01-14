@@ -28,13 +28,16 @@ import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.*;
+import org.auraframework.util.json.JsonConstant;
+import org.auraframework.util.json.JsonHandlerProvider;
+import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 
 /**
  * base class for javascripty source handling gnomes.
  */
-public abstract class JavascriptHandler<D extends DefDescriptor<? extends Definition>, T extends Definition> implements ExpressionContainerHandler {
+public abstract class JavascriptHandler<D extends DefDescriptor<? extends Definition>, T extends Definition> implements
+        ExpressionContainerHandler {
     protected final Source<?> source;
     protected final D descriptor;
 
@@ -52,7 +55,8 @@ public abstract class JavascriptHandler<D extends DefDescriptor<? extends Defini
     }
 
     /**
-     * override this method to provide your own handlers to validate the input and such
+     * override this method to provide your own handlers to validate the input
+     * and such
      */
     protected JsonHandlerProvider getHandlerProvider() {
         // null is for the default
@@ -64,7 +68,7 @@ public abstract class JavascriptHandler<D extends DefDescriptor<? extends Defini
         try {
             in = new JsonStreamReader(source.getReader(), getHandlerProvider());
             JsonConstant token = in.next();
-            if(token == JsonConstant.FUNCTION_ARGS_START){
+            if (token == JsonConstant.FUNCTION_ARGS_START) {
                 in.next();
             }
             Map<String, Object> map = in.getObject();
@@ -83,11 +87,14 @@ public abstract class JavascriptHandler<D extends DefDescriptor<? extends Defini
                 try {
                     in.close();
                 } catch (IOException e) {
-                    //We are in a very confusing state here, don't throw an exception.
-                    //Either we've already had an exception, in which case we have
-                    //more information there, or we successfully finished, in which
-                    //case it is rather unclear how this could happen.
-                    //throw new AuraRuntimeException(e);
+                    // We are in a very confusing state here, don't throw an
+                    // exception.
+                    // Either we've already had an exception, in which case we
+                    // have
+                    // more information there, or we successfully finished, in
+                    // which
+                    // case it is rather unclear how this could happen.
+                    // throw new AuraRuntimeException(e);
                 }
             }
         }
@@ -95,20 +102,22 @@ public abstract class JavascriptHandler<D extends DefDescriptor<? extends Defini
 
     /**
      * create the definition from the parsed source
-     *
+     * 
      * @param map the source that was read in
      */
     protected abstract T createDefinition(Map<String, Object> map) throws QuickFixException;
 
-    public static String getCompressedSource(Source<?> source){
-        /**FIXME
-        */
+    public static String getCompressedSource(Source<?> source) {
+        /**
+         * FIXME
+         */
         return source.getContents();
     }
 
     @Override
     public void addExpressionReferences(Set<PropertyReference> propRefs) {
         // TODO: this should be a typed exception
-        throw new AuraRuntimeException("Expressions are not allowed inside a " + descriptor.getDefType() + " definition", propRefs.iterator().next().getLocation());
+        throw new AuraRuntimeException("Expressions are not allowed inside a " + descriptor.getDefType()
+                + " definition", propRefs.iterator().next().getLocation());
     }
 }

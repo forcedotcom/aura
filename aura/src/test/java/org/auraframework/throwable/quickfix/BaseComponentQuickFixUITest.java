@@ -47,6 +47,7 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
     public void tearDown() throws Exception {
         super.tearDown();
     }
+
     public BaseComponentQuickFixUITest(String name, DefType defType, String typeSuffix) {
         super(name);
         this.typeSuffix = typeSuffix;
@@ -60,13 +61,15 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
         String cmpName = String.format("nonExistant%s%s", defType.name(), System.currentTimeMillis());
         DefDescriptor<?> defDescriptor = null;
         if (defType == DefType.APPLICATION) {
-            defDescriptor = Aura.getDefinitionService().getDefDescriptor(namespace+":"+cmpName, ApplicationDef.class);
+            defDescriptor = Aura.getDefinitionService().getDefDescriptor(namespace + ":" + cmpName,
+                    ApplicationDef.class);
         } else if (defType == DefType.COMPONENT) {
-            defDescriptor = Aura.getDefinitionService().getDefDescriptor(namespace+":"+cmpName, ComponentDef.class);
+            defDescriptor = Aura.getDefinitionService().getDefDescriptor(namespace + ":" + cmpName, ComponentDef.class);
         }
         File f = null;
-        if(defDescriptor.exists()){
-            f = new File(Aura.getContextService().getCurrentContext().getDefRegistry().getSource(defDescriptor).getSystemId());
+        if (defDescriptor.exists()) {
+            f = new File(Aura.getContextService().getCurrentContext().getDefRegistry().getSource(defDescriptor)
+                    .getSystemId());
             f.delete();
         }
         try {
@@ -75,11 +78,12 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
             quickFixUIWidget.clickCreate();
             String result = quickFixUIWidget.clickFix(true);
             assertEquals(String.format("TODO: %s:%s", namespace, cmpName), result);
-            //Serverside verification.
-            assertTrue("Failed to locate the definition.",defDescriptor.exists());
+            // Serverside verification.
+            assertTrue("Failed to locate the definition.", defDescriptor.exists());
         } finally {
-            f = new File(Aura.getContextService().getCurrentContext().getDefRegistry().getSource(defDescriptor).getSystemId());
-            if(f.exists()){
+            f = new File(Aura.getContextService().getCurrentContext().getDefRegistry().getSource(defDescriptor)
+                    .getSystemId());
+            if (f.exists()) {
                 f.delete();
                 f.getParentFile().delete();
             }

@@ -15,13 +15,22 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ComponentDefRef.Load;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -31,15 +40,17 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
- * Handles all references to other components. Note that while the reference to the other component is created here,
- * it is not validated until the {@link ComponentDefRefImpl#validateReferences()} method is called by loading registry.
+ * Handles all references to other components. Note that while the reference to
+ * the other component is created here, it is not validated until the
+ * {@link ComponentDefRefImpl#validateReferences()} method is called by loading
+ * registry.
  */
 public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTagHandler<ComponentDefRef, P> {
 
     private List<ComponentDefRef> body;
     protected ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
 
-    public ComponentDefRefHandler(){
+    public ComponentDefRefHandler() {
         super();
     }
 
@@ -51,10 +62,11 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
     }
 
     /**
-     * this one is only used by {@link HTMLComponentDefRefHandler}, which passes in the descriptor, the one above can't
-     * use it cause of java stupidness
+     * this one is only used by {@link HTMLComponentDefRefHandler}, which passes
+     * in the descriptor, the one above can't use it cause of java stupidness
      */
-    protected ComponentDefRefHandler(RootTagHandler<P> parentHandler, DefDescriptor<ComponentDef> descriptor, XMLStreamReader xmlReader, Source<?> source) {
+    protected ComponentDefRefHandler(RootTagHandler<P> parentHandler, DefDescriptor<ComponentDef> descriptor,
+            XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
         builder.setDescriptor(descriptor);
         builder.setLocation(getLocation());
@@ -63,7 +75,7 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
 
     @Override
     protected void readAttributes() throws QuickFixException {
-        for(Map.Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : getAttributes().entrySet()){
+        for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDefRef> entry : getAttributes().entrySet()) {
             builder.setAttribute(entry.getKey(), entry.getValue());
         }
     }
@@ -74,28 +86,31 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
         super.readSystemAttributes();
         builder.setLocalId(getSystemAttributeValue("id"));
         String load = getSystemAttributeValue("load");
-        if(load != null){
+        if (load != null) {
             Load loadVal = null;
-            try{
+            try {
                 loadVal = Load.valueOf(load.toUpperCase());
-            }catch(IllegalArgumentException e){
-                throw new AuraRuntimeException(String.format("Invalid value '%s' specified for 'aura:load' attribute", load), getLocation());
+            } catch (IllegalArgumentException e) {
+                throw new AuraRuntimeException(String.format("Invalid value '%s' specified for 'aura:load' attribute",
+                        load), getLocation());
             }
             builder.setLoad(loadVal);
-            if(loadVal == Load.LAZY || loadVal == Load.EXCLUSIVE){
-                ((BaseComponentDefHandler)getParentHandler()).setRender("client");
+            if (loadVal == Load.LAZY || loadVal == Load.EXCLUSIVE) {
+                ((BaseComponentDefHandler) getParentHandler()).setRender("client");
             }
         }
     }
 
     protected Map<DefDescriptor<AttributeDef>, AttributeDefRef> getAttributes() throws QuickFixException {
-        //TODOJT: add varargs "validAttributeNames" to this and validate that any attributes we find are in that list.
-        //TODOJT: possibly those arguments are like *Param objects with built-in value validation?
+        // TODOJT: add varargs "validAttributeNames" to this and validate that
+        // any attributes we find are in that list.
+        // TODOJT: possibly those arguments are like *Param objects with
+        // built-in value validation?
         Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes = new LinkedHashMap<DefDescriptor<AttributeDef>, AttributeDefRef>();
 
         for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
             String attName = xmlReader.getAttributeLocalName(i);
-            if(!"aura".equalsIgnoreCase(xmlReader.getAttributePrefix(i))){
+            if (!"aura".equalsIgnoreCase(xmlReader.getAttributePrefix(i))) {
                 DefDescriptor<AttributeDef> att = DefDescriptorImpl.getInstance(attName, AttributeDef.class);
 
                 String attValue = xmlReader.getAttributeValue(i);
@@ -123,7 +138,8 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
         }
 
         // hacky. if there is an interface, grab that descriptor too
-        DefDescriptor<InterfaceDef> id = DefDescriptorImpl.getInstance(builder.getDescriptor().getQualifiedName(), InterfaceDef.class);
+        DefDescriptor<InterfaceDef> id = DefDescriptorImpl.getInstance(builder.getDescriptor().getQualifiedName(),
+                InterfaceDef.class);
         if (id.exists()) {
             builder.setIntfDescriptor(id);
         }
@@ -131,7 +147,7 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
         return builder.build();
     }
 
-    protected void setBody(List<ComponentDefRef> body){
+    protected void setBody(List<ComponentDefRef> body) {
         builder.setAttribute(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME, body);
     }
 
@@ -143,9 +159,10 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
 
         String tag = getTagName();
         if (AttributeDefRefHandler.TAG.equalsIgnoreCase(tag)) {
-            AttributeDefRefImpl attributeDefRef = new AttributeDefRefHandler<P>(getParentHandler(), xmlReader, source).getElement();
+            AttributeDefRefImpl attributeDefRef = new AttributeDefRefHandler<P>(getParentHandler(), xmlReader, source)
+                    .getElement();
             builder.setAttribute(attributeDefRef.getDescriptor(), attributeDefRef);
-        }else{
+        } else {
             body.add(getDefRefHandler(getParentHandler()).getElement());
         }
     }
@@ -162,7 +179,8 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
 
     @Override
     protected boolean handlesTag(String tag) {
-        // FIXMEDLP - this handler handles many tags, but should blacklist the ones we know it doesn't handle. #W-690036
+        // FIXMEDLP - this handler handles many tags, but should blacklist the
+        // ones we know it doesn't handle. #W-690036
         return true;
     }
 

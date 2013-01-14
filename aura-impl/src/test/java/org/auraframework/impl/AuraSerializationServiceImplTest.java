@@ -36,7 +36,7 @@ public class AuraSerializationServiceImplTest extends AuraImplTestCase {
         assertTrue(serializationService instanceof SerializationServiceImpl);
     }
 
-    public void testWriteJson() throws Exception{
+    public void testWriteJson() throws Exception {
         InstanceService instanceService = Aura.getInstanceService();
         SerializationService serializationService = Aura.getSerializationService();
 

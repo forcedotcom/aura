@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 /*
-* Copyright, 1999-2009, salesforce.com All Rights Reserved Company Confidential
-*/
+ * Copyright, 1999-2009, salesforce.com All Rights Reserved Company Confidential
+ */
 package org.auraframework.impl.javascript.renderer;
 
 import static org.auraframework.instance.ValueProviderType.LABEL;
@@ -41,7 +41,7 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
     private final JsFunction afterRender;
     private final JsFunction rerender;
     private final JsFunction unrender;
-    //Code is only used by aura-j.  Would be nice if we could get rid of it.
+    // Code is only used by aura-j. Would be nice if we could get rid of it.
     private final String code;
     private final Set<PropertyReference> expressionRefs;
 
@@ -74,7 +74,7 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
     }
 
     @Override
-    public void render(BaseComponent<?,?> component, Appendable out) {
+    public void render(BaseComponent<?, ?> component, Appendable out) {
         throw new UnsupportedOperationException();
     }
 
@@ -90,7 +90,7 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<RendererDef> {
-        public Builder(){
+        public Builder() {
             super(RendererDef.class);
         }
 

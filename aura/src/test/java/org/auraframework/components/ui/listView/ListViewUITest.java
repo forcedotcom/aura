@@ -20,12 +20,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.test.WebDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
-import org.auraframework.test.WebDriverTestCase;
 
 public class ListViewUITest extends WebDriverTestCase {
 
@@ -52,17 +51,14 @@ public class ListViewUITest extends WebDriverTestCase {
                 getCellsInRow(tHeadElement, "th").size() == 0);
 
         // Body
-        assertTrue("Empty list tbody should contain one row",
-                tBodyElement.findElements(By.tagName("tr")).size() == 1);
+        assertTrue("Empty list tbody should contain one row", tBodyElement.findElements(By.tagName("tr")).size() == 1);
         List<WebElement> bodyCellElements = getCellsInRow(getRowAt(tableElement, "tbody", 0), "td");
-        assertTrue("Empty list tbody's single row should contain one cell",
-                bodyCellElements.size() == 1);
+        assertTrue("Empty list tbody's single row should contain one cell", bodyCellElements.size() == 1);
         assertEquals("Empty list message was not present or was not what was expected",
                 getEmptyLisViewMessage(tableElement), EMPTY_LIST_MESSAGE);
 
         // Footer
-        assertTrue("tfoot element should contain no rows",
-                tFootElement.findElements(By.tagName("tr")).size() == 0);
+        assertTrue("tfoot element should contain no rows", tFootElement.findElements(By.tagName("tr")).size() == 0);
     }
 
     public void testEmptyListSpecifiedColumns() throws Exception {
@@ -84,17 +80,14 @@ public class ListViewUITest extends WebDriverTestCase {
                 Arrays.asList(ListViewTestData.SPECIFIED_COLUMN_TITLES), getTextFromElements(headerCellElements));
 
         // Body
-        assertTrue("Empty list tbody should contain one row",
-                tBodyElement.findElements(By.tagName("tr")).size() == 1);
+        assertTrue("Empty list tbody should contain one row", tBodyElement.findElements(By.tagName("tr")).size() == 1);
         List<WebElement> bodyCellElements = getCellsInRow(getRowAt(tableElement, "tbody", 0), "td");
-        assertTrue("Empty list tbody's single row should contain one cell",
-                bodyCellElements.size() == 1);
+        assertTrue("Empty list tbody's single row should contain one cell", bodyCellElements.size() == 1);
         assertEquals("Empty list message was not present or was not what was expected",
                 getEmptyLisViewMessage(tableElement), EMPTY_LIST_MESSAGE);
 
         // Footer
-        assertTrue("tfoot element should contain no rows",
-                tFootElement.findElements(By.tagName("tr")).size() == 0);
+        assertTrue("tfoot element should contain no rows", tFootElement.findElements(By.tagName("tr")).size() == 0);
     }
 
     public void testListGeneratedColumns() throws Exception {
@@ -109,34 +102,30 @@ public class ListViewUITest extends WebDriverTestCase {
         WebElement tFootElement = tableElement.findElement(By.tagName("tfoot"));
 
         // Header
-        assertTrue("The thead should contain one row",
-                getNumRows(tHeadElement) == 1);
+        assertTrue("The thead should contain one row", getNumRows(tHeadElement) == 1);
         List<WebElement> headerCellElements = getCellsInRow(getRowAt(tableElement, "thead", 0), "th");
-        assertEquals("List should contain one header cell for each column",
-                expectedData.get(0).size(), headerCellElements.size());
+        assertEquals("List should contain one header cell for each column", expectedData.get(0).size(),
+                headerCellElements.size());
         List<String> headerCells = getTextFromElements(headerCellElements);
         for (String headerCell : headerCells) {
-            assertTrue("Actual header cell title did not match expected",
-                    expectedData.get(0).containsKey(headerCell));
+            assertTrue("Actual header cell title did not match expected", expectedData.get(0).containsKey(headerCell));
         }
 
         // Body
-        assertTrue("list tbody did not contain expected number of rows",
-                tBodyElement.findElements(By.tagName("tr")).size() == expectedData.size());
+        assertTrue("list tbody did not contain expected number of rows", tBodyElement.findElements(By.tagName("tr"))
+                .size() == expectedData.size());
         for (int i = 0; i < expectedData.size(); ++i) {
             List<WebElement> rowCellElements = getCellsInRow(getRowAt(tableElement, "tbody", i), "td");
             Map<String, String> row = expectedData.get(i);
-            assertEquals("Expected number of cells in row did not match actual",
-                    row.size(), rowCellElements.size());
+            assertEquals("Expected number of cells in row did not match actual", row.size(), rowCellElements.size());
             for (int j = 0; j < rowCellElements.size(); ++j) {
-                assertEquals("Expected cell value did not match actual",
-                        row.get(headerCells.get(j)), rowCellElements.get(j).getText());
+                assertEquals("Expected cell value did not match actual", row.get(headerCells.get(j)), rowCellElements
+                        .get(j).getText());
             }
         }
 
         // Footer
-        assertTrue("tfoot element should contain no rows",
-                tFootElement.findElements(By.tagName("tr")).size() == 0);
+        assertTrue("tfoot element should contain no rows", tFootElement.findElements(By.tagName("tr")).size() == 0);
     }
 
     public void testListSpecifiedColumns() throws Exception {
@@ -154,17 +143,17 @@ public class ListViewUITest extends WebDriverTestCase {
         assertTrue("The thead in an empty list with single-level specified columns thead should contain one row",
                 getNumRows(tHeadElement) == 1);
         List<WebElement> headerCellElements = getCellsInRow(getRowAt(tableElement, "thead", 0), "th");
-        assertEquals("List should contain one header cell for each column",
-                ListViewTestData.NUM_COLS_SPECIFIED_DATA, headerCellElements.size());
+        assertEquals("List should contain one header cell for each column", ListViewTestData.NUM_COLS_SPECIFIED_DATA,
+                headerCellElements.size());
         List<String> headerCells = getTextFromElements(headerCellElements);
-        for (int i = 0 ; i < ListViewTestData.NUM_COLS_SPECIFIED_DATA; ++i) {
+        for (int i = 0; i < ListViewTestData.NUM_COLS_SPECIFIED_DATA; ++i) {
             assertTrue("Actual header cell title did not match expected",
                     ListViewTestData.SPECIFIED_COLUMN_TITLES[i].equals(headerCells.get(i)));
         }
 
         // Body
-        assertTrue("list tbody did not contain expected number of rows",
-                tBodyElement.findElements(By.tagName("tr")).size() == expectedData.size());
+        assertTrue("list tbody did not contain expected number of rows", tBodyElement.findElements(By.tagName("tr"))
+                .size() == expectedData.size());
         for (int i = 0; i < ListViewTestData.NUM_ROWS_SPECIFIED_DATA; ++i) {
             List<WebElement> rowCellElements = getCellsInRow(getRowAt(tableElement, "tbody", i), "td");
             Map<String, String> row = expectedData.get(i);
@@ -176,25 +165,32 @@ public class ListViewUITest extends WebDriverTestCase {
                         row.get(headerCells.get(j).toLowerCase()), rowCellElements.get(j).getText());
             }
             // Fourth column will be Type:Email
-            assertTrue("Email 'mailto' link was not present or did not contain correct text",
+            assertTrue(
+                    "Email 'mailto' link was not present or did not contain correct text",
                     isElementPresentInElementWithText("a", rowCellElements.get(3),
                             "mailto:" + row.get(headerCells.get(3).toLowerCase())));
 
             // Fifth column will be Type:Checkbox
-            List<WebElement> inputFields = rowCellElements.get(4).findElements(By.cssSelector("input[type='checkbox']"));
+            List<WebElement> inputFields = rowCellElements.get(4)
+                    .findElements(By.cssSelector("input[type='checkbox']"));
             assertTrue("Cell did not contain, or contained more than one, checkbox", inputFields.size() == 1);
 
             // Sixth column will be Type:Link
-            assertTrue("Link was not present or did not contain correct text",
-                    isElementPresentInElementWithText("a", rowCellElements.get(5), row.get(headerCells.get(5).toLowerCase())));
+            assertTrue(
+                    "Link was not present or did not contain correct text",
+                    isElementPresentInElementWithText("a", rowCellElements.get(5),
+                            row.get(headerCells.get(5).toLowerCase())));
 
-            // Seventh column will be Type:Index, whose value should be equal to the row index + 1
+            // Seventh column will be Type:Index, whose value should be equal to
+            // the row index + 1
             String expectedIndexValue = new Integer(i + 1).toString();
-            assertEquals("Index cell did not contain expected value",
-                    expectedIndexValue, rowCellElements.get(6).getText());
+            assertEquals("Index cell did not contain expected value", expectedIndexValue, rowCellElements.get(6)
+                    .getText());
 
-            // Eighth column will be Type:Html, which should contain a div with some text.
-            // First, we need to get rid of the html tags that enclose the expected string.
+            // Eighth column will be Type:Html, which should contain a div with
+            // some text.
+            // First, we need to get rid of the html tags that enclose the
+            // expected string.
             String rawHtml = row.get(headerCells.get(7).toLowerCase());
             String expectedHtmlCellText = rawHtml.substring(rawHtml.indexOf('>') + 1);
             expectedHtmlCellText = expectedHtmlCellText.substring(0, expectedHtmlCellText.indexOf('<'));
@@ -203,8 +199,7 @@ public class ListViewUITest extends WebDriverTestCase {
         }
 
         // Footer
-        assertTrue("tfoot element should contain no rows",
-                tFootElement.findElements(By.tagName("tr")).size() == 0);
+        assertTrue("tfoot element should contain no rows", tFootElement.findElements(By.tagName("tr")).size() == 0);
     }
 
     public void testCellClickEvent() throws Exception {
@@ -233,16 +228,20 @@ public class ListViewUITest extends WebDriverTestCase {
 
     /**
      * Check whether a variable is defined in a currently open browser window
+     * 
      * @param variableName name of the variable we're looking for
      * @return true if the variable is present, false otherwise
      */
     private boolean isGlobalVariableDefinedInWindow(String variableName) {
         JavascriptExecutor js = (JavascriptExecutor) this.getDriver();
-        return (Boolean) js.executeScript("if(typeof " + variableName + " === 'undefined'){return false;}else{return true;}");
+        return (Boolean) js.executeScript("if(typeof " + variableName
+                + " === 'undefined'){return false;}else{return true;}");
     }
 
     /**
-     * Check whether an html element with some particular text is a child of another element
+     * Check whether an html element with some particular text is a child of
+     * another element
+     * 
      * @param tagName tag of element we are looking for
      * @param parentElement parent of the element we are looking for
      * @param text the text we'd like to check for
@@ -260,12 +259,14 @@ public class ListViewUITest extends WebDriverTestCase {
     }
 
     /**
-     * Given a list of WebElements, get a new list containing the text from each element
+     * Given a list of WebElements, get a new list containing the text from each
+     * element
+     * 
      * @param elements list of WebElements
      * @return list containing text from each element
      */
     private List<String> getTextFromElements(List<WebElement> elements) {
-        List<String> result= new ArrayList<String>();
+        List<String> result = new ArrayList<String>();
         for (WebElement element : elements) {
             result.add(element.getText());
         }
@@ -274,8 +275,10 @@ public class ListViewUITest extends WebDriverTestCase {
 
     /**
      * Get a presumably empty listview's empty message
+     * 
      * @param tableElement main element of listview
-     * @return the text that appears in the canonical empty listview message location
+     * @return the text that appears in the canonical empty listview message
+     *         location
      */
     private String getEmptyLisViewMessage(WebElement tableElement) {
         WebElement tBodyElement = tableElement.findElement(By.tagName("tbody"));
@@ -285,6 +288,7 @@ public class ListViewUITest extends WebDriverTestCase {
 
     /**
      * Get a particular row element
+     * 
      * @param tableElement main element of listview
      * @param parentContainerTagName tagname of the row's parent container
      * @param location of the row we want to retrieve
@@ -297,8 +301,9 @@ public class ListViewUITest extends WebDriverTestCase {
     }
 
     /**
-     * Given an element corresponding to a row, return a list of the header or cell elements in the order in which they
-     * appear
+     * Given an element corresponding to a row, return a list of the header or
+     * cell elements in the order in which they appear
+     * 
      * @param rowElement a thead, tbody, or tfoot row element
      * @param cellTagName tag name of the cell type ('td' or 'th')
      * @return list of cell elements contained in rowElement
@@ -310,6 +315,7 @@ public class ListViewUITest extends WebDriverTestCase {
 
     /**
      * Get the number of rows that an element contains
+     * 
      * @param parentContainerElement
      * @return the number of rows contained in parentContainerElement
      */

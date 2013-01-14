@@ -25,9 +25,7 @@ import org.auraframework.util.type.converter.StringToLongConverter;
 /**
  * Used by aura.impl.java.type.JavaLocalizedTypeUtil;
  */
-public class LocalizedStringToLongConverter
-    extends StringToLongConverter
-    implements LocalizedConverter<String, Long> {
+public class LocalizedStringToLongConverter extends StringToLongConverter implements LocalizedConverter<String, Long> {
 
     @Override
     public Long convert(String value, AuraLocale locale) {
@@ -47,6 +45,5 @@ public class LocalizedStringToLongConverter
             return super.convert(value);
         }
     }
-
 
 }

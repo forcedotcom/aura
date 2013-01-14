@@ -16,14 +16,11 @@
 package org.auraframework.renderer;
 
 import java.io.IOException;
-
 import java.util.List;
 
 import org.auraframework.Aura;
-
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
-
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -32,11 +29,11 @@ public class ComponentRenderer implements Renderer {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void render(BaseComponent<?,?> component, Appendable out) throws IOException, QuickFixException {
+    public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
 
-        List<BaseComponent<?,?>> body = (List<BaseComponent<?,?>>)component.getAttributes().getValue("body");
-        if(body != null){
-            for(BaseComponent<?,?> c : body){
+        List<BaseComponent<?, ?>> body = (List<BaseComponent<?, ?>>) component.getAttributes().getValue("body");
+        if (body != null) {
+            for (BaseComponent<?, ?> c : body) {
                 Aura.getRenderingService().render(c, out);
             }
         }

@@ -17,16 +17,12 @@ package org.auraframework.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.auraframework.Aura;
-
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.instance.Action;
-
 import org.auraframework.throwable.AuraExceptionInfo;
 import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.AuraUnhandledException;
-
 import org.auraframework.util.json.Json;
 
 /**
@@ -53,7 +49,8 @@ public class ExceptionAdapterImpl implements ExceptionAdapter {
 
         if (th instanceof AuraHandledException) {
             //
-            // If we have a aura handled exception, we really only want to gack the
+            // If we have a aura handled exception, we really only want to gack
+            // the
             // cause (if there is one).
             //
             loggable = th.getCause();
@@ -68,7 +65,8 @@ public class ExceptionAdapterImpl implements ExceptionAdapter {
         }
         if (loggable != null && logging) {
             StringBuilder extended = new StringBuilder();
-            String logString = null;;
+            String logString = null;
+            ;
 
             if (action != null) {
                 try {
@@ -81,8 +79,8 @@ public class ExceptionAdapterImpl implements ExceptionAdapter {
                 extended.append("\n");
             }
             if (th instanceof AuraExceptionInfo) {
-                AuraExceptionInfo info = (AuraExceptionInfo)th;
-                String loc = (info.getLocation() == null?null:info.getLocation().toString());
+                AuraExceptionInfo info = (AuraExceptionInfo) th;
+                String loc = (info.getLocation() == null ? null : info.getLocation().toString());
                 String addl = info.getExtraMessage();
                 if (addl != null) {
                     extended.append(addl);

@@ -18,23 +18,25 @@ package org.auraframework.java.controller;
 import java.io.StringReader;
 import java.util.Collection;
 
-import com.google.common.collect.Lists;
-
 import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
 import org.auraframework.instance.Action;
+import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.Annotations.AuraEnabled;
+
+import com.google.common.collect.Lists;
 
 @Controller
 public class ActionChainingController {
-    public static int i =0 ;
+    public static int i = 0;
 
     @AuraEnabled
-    public static int add(@Key("a") Integer a,@Key("b") Integer b , @Key("actions")String chainedActions) throws Exception {
+    public static int add(@Key("a") Integer a, @Key("b") Integer b, @Key("actions") String chainedActions)
+            throws Exception {
         Action currentAction = Aura.getContextService().getCurrentContext().getCurrentAction();
-        Collection<Action> actions= Aura.getSerializationService().readCollection(new StringReader(chainedActions), Action.class);
+        Collection<Action> actions = Aura.getSerializationService().readCollection(new StringReader(chainedActions),
+                Action.class);
         currentAction.add(Lists.newArrayList(actions));
         i = a + b;
         return i;
@@ -54,21 +56,24 @@ public class ActionChainingController {
 
     @AuraEnabled
     public static int divide(@Key("a") Integer a) throws Exception {
-        i = i/a;
+        i = i / a;
         return i;
     }
 
     @AuraEnabled
-    public static void doNothing(@Key("actions")String chainedActions) throws Exception{
+    public static void doNothing(@Key("actions") String chainedActions) throws Exception {
         Action currentAction = Aura.getContextService().getCurrentContext().getCurrentAction();
-        Collection<Action> actions= Aura.getSerializationService().readCollection(new StringReader(chainedActions), Action.class);
+        Collection<Action> actions = Aura.getSerializationService().readCollection(new StringReader(chainedActions),
+                Action.class);
         currentAction.add(Lists.newArrayList(actions));
     }
 
     @AuraEnabled
-    public static void infiniteChain() throws Exception{
+    public static void infiniteChain() throws Exception {
         Action currentAction = Aura.getContextService().getCurrentContext().getCurrentAction();
-        Action actions= Aura.getInstanceService().getInstance("java://org.auraframework.java.controller.ActionChainingController/ACTION$infiniteChain", ActionDef.class, null);
+        Action actions = Aura.getInstanceService().getInstance(
+                "java://org.auraframework.java.controller.ActionChainingController/ACTION$infiniteChain",
+                ActionDef.class, null);
         currentAction.add(Lists.newArrayList(actions));
     }
 

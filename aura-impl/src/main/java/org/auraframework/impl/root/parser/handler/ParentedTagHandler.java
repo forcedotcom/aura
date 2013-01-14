@@ -21,10 +21,10 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.Definition;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;

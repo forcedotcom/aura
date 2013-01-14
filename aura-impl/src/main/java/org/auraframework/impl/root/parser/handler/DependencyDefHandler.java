@@ -20,33 +20,29 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.auraframework.def.DependencyDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.DependencyDefImpl;
-
-import com.google.common.collect.ImmutableSet;
-
-import org.auraframework.def.*;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * <aura:set> tags
  */
-public class DependencyDefHandler<P extends RootDefinition> extends ParentedTagHandler<DependencyDef, P>{
+public class DependencyDefHandler<P extends RootDefinition> extends ParentedTagHandler<DependencyDef, P> {
 
     public static final String TAG = "aura:dependency";
 
     private static final String ATTRIBUTE_RESOURCE = "resource";
     private static final String ATTRIBUTE_TYPE = "type";
 
-
-    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-        ATTRIBUTE_RESOURCE,
-        ATTRIBUTE_TYPE
-    );
+    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_RESOURCE, ATTRIBUTE_TYPE);
 
     private DependencyDefImpl.Builder builder;
 
-    public DependencyDefHandler(){
+    public DependencyDefHandler() {
         super();
     }
 

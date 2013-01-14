@@ -16,10 +16,19 @@
 package org.auraframework.docs;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.TestSuiteDef;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
@@ -51,32 +60,31 @@ public class TopicsModel {
     }
 
     private <E extends Definition> List<Node> makeNodes(String prefix, Class<E> type) throws QuickFixException {
-//        if (!Config.isProduction()) {
-            String sep = prefix.equals("markup") ? ":" : ".";
-            DefinitionService definitionService = Aura.getDefinitionService();
+        // if (!Config.isProduction()) {
+        String sep = prefix.equals("markup") ? ":" : ".";
+        DefinitionService definitionService = Aura.getDefinitionService();
 
-            List<Node> ret = Lists.newArrayList();
+        List<Node> ret = Lists.newArrayList();
 
-            Map<String, Node> namespaceNodes = Maps.newHashMap();
-            DefDescriptor<E> matcher = definitionService.getDefDescriptor(String.format("%s://*%s*", prefix, sep),
-                    type);
-            Set<DefDescriptor<E>> descriptors = definitionService.find(matcher);
-            for (DefDescriptor<E> desc : descriptors) {
-                String namespace = desc.getNamespace();
-                Node namespaceNode = namespaceNodes.get(desc.getNamespace());
-                if (namespaceNode == null) {
-                    namespaceNode = new Node(namespace);
-                    namespaceNodes.put(namespace, namespaceNode);
-                    ret.add(namespaceNode);
-                }
-                namespaceNode.addChild(new Node(String.format("%s%s%s", prefix.equals("markup") ? namespace : prefix
-                        + "://" + namespace, sep, desc.getName())));
+        Map<String, Node> namespaceNodes = Maps.newHashMap();
+        DefDescriptor<E> matcher = definitionService.getDefDescriptor(String.format("%s://*%s*", prefix, sep), type);
+        Set<DefDescriptor<E>> descriptors = definitionService.find(matcher);
+        for (DefDescriptor<E> desc : descriptors) {
+            String namespace = desc.getNamespace();
+            Node namespaceNode = namespaceNodes.get(desc.getNamespace());
+            if (namespaceNode == null) {
+                namespaceNode = new Node(namespace);
+                namespaceNodes.put(namespace, namespaceNode);
+                ret.add(namespaceNode);
             }
-            Collections.sort(ret);
-            return ret;
-//        } else {
-//            return null;
-//        }
+            namespaceNode.addChild(new Node(String.format("%s%s%s", prefix.equals("markup") ? namespace : prefix
+                    + "://" + namespace, sep, desc.getName())));
+        }
+        Collections.sort(ret);
+        return ret;
+        // } else {
+        // return null;
+        // }
     }
 
     @AuraEnabled
@@ -141,7 +149,7 @@ public class TopicsModel {
 
         @Override
         public int compareTo(Node o) {
-            if(this.equals(o)){
+            if (this.equals(o)) {
                 return 0;
             }
             return title.compareTo(o.title);

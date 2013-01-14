@@ -23,7 +23,7 @@ public abstract class ClientSideEventException extends AuraHandledException {
 
     /**
      * Create an exception with a (visible) cause.
-     *
+     * 
      * @see AuraHandledException#AuraHandledException(Throwable)
      * @param cause the cause (usually logged).
      */
@@ -33,9 +33,9 @@ public abstract class ClientSideEventException extends AuraHandledException {
 
     /**
      * Create an exception with a message and a (hidden) cause.
-     *
+     * 
      * @see AuraHandledException#AuraHandledException(String, Throwable)
-     *
+     * 
      * @param message the message for the client side.
      * @param cause the cause (usually logged).
      */

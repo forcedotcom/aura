@@ -29,7 +29,8 @@ public class StringToCalendarConverter implements Converter<String, Calendar> {
         if (value == null || value.isEmpty()) {
             return null;
         }
-        // This converter handles Calendars that are serialized as milliseconds since Jan 1 1970
+        // This converter handles Calendars that are serialized as milliseconds
+        // since Jan 1 1970
         Long milliseconds = Long.valueOf(value);
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(milliseconds);

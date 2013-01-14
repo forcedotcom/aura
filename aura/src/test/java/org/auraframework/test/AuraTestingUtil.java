@@ -23,6 +23,7 @@ import org.auraframework.system.Source;
 
 public interface AuraTestingUtil {
     public void setUp();
+
     public void tearDown();
 
     File getAuraJavascriptSourceDirectory();
@@ -31,13 +32,14 @@ public interface AuraTestingUtil {
      * Get a unique value for use in tests
      */
     String getNonce();
-    
+
     /**
-     * Retrieves the source of a component resource. Note: Works only for markup://string:XXXXX components and not for
-     * any other namespace. By default, test util is aware of StringSourceLoader only.
+     * Retrieves the source of a component resource. Note: Works only for
+     * markup://string:XXXXX components and not for any other namespace. By
+     * default, test util is aware of StringSourceLoader only.
      * 
-     * @param descriptor
-     *            Descriptor of the resource you want to see the source of
+     * @param descriptor Descriptor of the resource you want to see the source
+     *            of
      * @return
      */
     <T extends Definition> Source<T> getSource(DefDescriptor<T> descriptor);
@@ -45,23 +47,18 @@ public interface AuraTestingUtil {
     /**
      * Convenience method to create a description and load a source in one shot.
      * 
-     * @param defClass
-     *            interface of the definition represented by this source
-     * @param contents
-     *            source contents
+     * @param defClass interface of the definition represented by this source
+     * @param contents source contents
      * @return the {@link DefDescriptor} for the created definition
      */
     <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents);
-    
+
     /**
      * Convenience method to create a description and load a source in one shot.
      * 
-     * @param defClass
-     *            interface of the definition represented by this source
-     * @param contents
-     *            source contents
-     * @param namePrefix
-     *            package name prefix
+     * @param defClass interface of the definition represented by this source
+     * @param contents source contents
+     * @param namePrefix package name prefix
      * @return the {@link DefDescriptor} for the created definition
      */
     <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents, String namePrefix);
@@ -69,10 +66,8 @@ public interface AuraTestingUtil {
     /**
      * Convenience method to create a description and load a source in one shot.
      * 
-     * @param descriptor
-     *            descriptor for the source to be created
-     * @param contents
-     *            source contents
+     * @param descriptor descriptor for the source to be created
+     * @param contents source contents
      * @return the {@link DefDescriptor} for the created definition
      */
     <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents);

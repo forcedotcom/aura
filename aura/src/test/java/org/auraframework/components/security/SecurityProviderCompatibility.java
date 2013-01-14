@@ -16,7 +16,6 @@
 package org.auraframework.components.security;
 
 import org.auraframework.def.DefDescriptor;
-
 import org.auraframework.system.Annotations;
 
 @Annotations.SecurityProvider

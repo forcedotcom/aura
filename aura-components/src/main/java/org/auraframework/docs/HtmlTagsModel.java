@@ -17,11 +17,11 @@ package org.auraframework.docs;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import org.auraframework.def.HtmlTag;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
+
+import com.google.common.collect.Lists;
 
 @Model
 public class HtmlTagsModel {
@@ -29,23 +29,23 @@ public class HtmlTagsModel {
     private final List<String> allowedTags = Lists.newArrayList();
     private final List<String> disallowedTags = Lists.newArrayList();
 
-    public HtmlTagsModel(){
-        for(HtmlTag tag: HtmlTag.values()){
-            if(tag.isAllowed()){
+    public HtmlTagsModel() {
+        for (HtmlTag tag : HtmlTag.values()) {
+            if (tag.isAllowed()) {
                 allowedTags.add(tag.name());
-            }else{
+            } else {
                 disallowedTags.add(tag.name());
             }
         }
     }
 
     @AuraEnabled
-    public List<String> getAllowedTags(){
+    public List<String> getAllowedTags() {
         return allowedTags;
     }
 
     @AuraEnabled
-    public List<String> getDisallowedTags(){
+    public List<String> getDisallowedTags() {
         return disallowedTags;
     }
 }

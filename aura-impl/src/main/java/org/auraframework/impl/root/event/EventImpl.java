@@ -22,7 +22,9 @@ import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.impl.root.AttributeSetImpl;
-import org.auraframework.instance.*;
+import org.auraframework.instance.AttributeSet;
+import org.auraframework.instance.BaseComponent;
+import org.auraframework.instance.Event;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -32,13 +34,15 @@ public class EventImpl implements Event {
     private final DefDescriptor<EventDef> eventDefDescriptor;
     private final AttributeSet attributeSet;
 
-    public EventImpl(DefDescriptor<EventDef> eventDefDescriptor, Map<String, Object> attributes, BaseComponent<?,?> valueProvider) throws QuickFixException {
+    public EventImpl(DefDescriptor<EventDef> eventDefDescriptor, Map<String, Object> attributes,
+            BaseComponent<?, ?> valueProvider) throws QuickFixException {
         this.eventDefDescriptor = eventDefDescriptor;
         this.attributeSet = new AttributeSetImpl(eventDefDescriptor, valueProvider);
         this.attributeSet.set(attributes);
     }
 
-    public EventImpl(DefDescriptor<EventDef> eventDefDescriptor, Map<String, Object> attributes) throws QuickFixException {
+    public EventImpl(DefDescriptor<EventDef> eventDefDescriptor, Map<String, Object> attributes)
+            throws QuickFixException {
         this(eventDefDescriptor, attributes, null);
     }
 

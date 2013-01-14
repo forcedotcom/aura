@@ -19,12 +19,35 @@ import static org.auraframework.instance.ValueProviderType.LABEL;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.BaseComponentDefBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DependencyDef;
+import org.auraframework.def.EventHandlerDef;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.ModelDef;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.RootDefinition;
+import org.auraframework.def.TestSuiteDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.RootDefinitionImpl;
@@ -35,17 +58,20 @@ import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
-
 import org.auraframework.throwable.AuraUnhandledException;
-import org.auraframework.throwable.quickfix.*;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
+public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends RootDefinitionImpl<T> implements
+        BaseComponentDef, Serializable {
 
-    public static final DefDescriptor<InterfaceDef> ROOT_MARKER = DefDescriptorImpl.getInstance("markup://aura:rootComponent", InterfaceDef.class);
+    public static final DefDescriptor<InterfaceDef> ROOT_MARKER = DefDescriptorImpl.getInstance(
+            "markup://aura:rootComponent", InterfaceDef.class);
 
     private static final long serialVersionUID = -2485193714215681494L;
     private final boolean isAbstract;
@@ -69,7 +95,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
     private final Set<PropertyReference> expressionRefs;
 
     private final RenderType render;
-    private final WhitespaceBehavior whitespaceBehavior; 
+    private final WhitespaceBehavior whitespaceBehavior;
 
     private final List<DependencyDef> dependencies;
 
@@ -77,7 +103,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
 
     private transient Boolean localDeps = null;
 
-    protected BaseComponentDefImpl(Builder<T> builder){
+    protected BaseComponentDefImpl(Builder<T> builder) {
         super(builder);
         this.modelDefDescriptor = builder.modelDefDescriptor;
         this.controllerDescriptors = AuraUtil.immutableList(builder.controllerDescriptors);
@@ -106,17 +132,19 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
         this.dependencies = AuraUtil.immutableList(builder.dependencies);
 
         String renderName = builder.render;
-        if(renderName == null){
+        if (renderName == null) {
             this.render = RenderType.AUTO;
-        }else{
+        } else {
             this.render = RenderType.valueOf(renderName.toUpperCase());
         }
-        
+
         this.whitespaceBehavior = builder.whitespaceBehavior;
 
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
-        this.compoundControllerDescriptor = DefDescriptorImpl.getAssociateDescriptor(getDescriptor(), ControllerDef.class, DefDescriptor.COMPOUND_PREFIX);
-        this.hashCode = AuraUtil.hashCode(super.hashCode(), attributeDefs, events, controllerDescriptors, modelDefDescriptor, extendsDescriptor);
+        this.compoundControllerDescriptor = DefDescriptorImpl.getAssociateDescriptor(getDescriptor(),
+                ControllerDef.class, DefDescriptor.COMPOUND_PREFIX);
+        this.hashCode = AuraUtil.hashCode(super.hashCode(), attributeDefs, events, controllerDescriptors,
+                modelDefDescriptor, extendsDescriptor);
 
     }
 
@@ -134,7 +162,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
         for (AttributeDef att : this.attributeDefs.values()) {
             att.validateDefinition();
             if (events.containsKey(att.getName())) {
-                throw new InvalidDefinitionException(String.format("Cannot define an attribute and register an event with the same name: %s", att.getName()), getLocation());
+                throw new InvalidDefinitionException(String.format(
+                        "Cannot define an attribute and register an event with the same name: %s", att.getName()),
+                        getLocation());
             }
         }
 
@@ -150,67 +180,74 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
 
         // an abstract component that you can't extend is pretty useless
         if (this.isAbstract() && !this.isExtensible()) {
-            throw new InvalidDefinitionException(String.format("Abstract component %s must be extensible.", getDescriptor()), getLocation());
+            throw new InvalidDefinitionException(String.format("Abstract component %s must be extensible.",
+                    getDescriptor()), getLocation());
         }
 
         if (this.interfaces.contains(ROOT_MARKER)) {
-            // only aura has root access (this could be solved with namespace only visiblity of the rootComponent interface someday)
+            // only aura has root access (this could be solved with namespace
+            // only visiblity of the rootComponent interface someday)
             if (!"aura".equals(this.descriptor.getNamespace())) {
-                throw new InvalidDefinitionException(String.format("Component %s cannot implement the rootComponent interface because it is not in the aura namespace", getDescriptor()), getLocation());
+                throw new InvalidDefinitionException(
+                        String.format(
+                                "Component %s cannot implement the rootComponent interface because it is not in the aura namespace",
+                                getDescriptor()), getLocation());
             }
             // cannot be a root and extend something
             if (this.extendsDescriptor != null) {
-                throw new InvalidDefinitionException(String.format("Component %s cannot be a rootComponent and extend %s", getDescriptor(), this.extendsDescriptor), getLocation());
+                throw new InvalidDefinitionException(
+                        String.format("Component %s cannot be a rootComponent and extend %s", getDescriptor(),
+                                this.extendsDescriptor), getLocation());
             }
         }
     }
 
     @Override
-    public boolean hasLocalDependencies() throws QuickFixException{
-        if(localDeps == null){
+    public boolean hasLocalDependencies() throws QuickFixException {
+        if (localDeps == null) {
             computeLocalDependencies();
         }
         return localDeps;
     }
 
-    private synchronized void computeLocalDependencies() throws QuickFixException{
-        if(localDeps != null){
+    private synchronized void computeLocalDependencies() throws QuickFixException {
+        if (localDeps != null) {
             return;
         }
-        if(rendererDescriptors != null && !rendererDescriptors.isEmpty()){
+        if (rendererDescriptors != null && !rendererDescriptors.isEmpty()) {
             boolean hasRemote = false;
-            for(DefDescriptor<RendererDef> rendererDescriptor : rendererDescriptors){
-                if(!rendererDescriptor.getDef().isLocal()){
+            for (DefDescriptor<RendererDef> rendererDescriptor : rendererDescriptors) {
+                if (!rendererDescriptor.getDef().isLocal()) {
                     hasRemote = true;
                     break;
                 }
             }
-            if(!hasRemote){
+            if (!hasRemote) {
                 localDeps = true;
                 return;
             }
         }
-        if(modelDefDescriptor != null){
+        if (modelDefDescriptor != null) {
             localDeps = true;
             return;
         }
 
-        if(providerDescriptors != null){
+        if (providerDescriptors != null) {
             boolean hasRemote = providerDescriptors.isEmpty();
-            for(DefDescriptor<ProviderDef> providerDescriptor : providerDescriptors){
-                if(!providerDescriptor.getDef().isLocal()){
+            for (DefDescriptor<ProviderDef> providerDescriptor : providerDescriptors) {
+                if (!providerDescriptor.getDef().isLocal()) {
                     hasRemote = true;
                     break;
                 }
             }
-            if(!hasRemote){
+            if (!hasRemote) {
                 localDeps = true;
                 return;
             }
         }
         T superDef = getSuperDef();
-        if(superDef != null){
-            if(superDef.hasLocalDependencies()){
+        if (superDef != null) {
+            if (superDef.hasLocalDependencies()) {
                 localDeps = true;
                 return;
             }
@@ -244,21 +281,25 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
             }
 
             if (parentDef.getDescriptor().equals(descriptor)) {
-                throw new InvalidDefinitionException(String.format("%s cannot extend itself", getDescriptor()), getLocation());
+                throw new InvalidDefinitionException(String.format("%s cannot extend itself", getDescriptor()),
+                        getLocation());
             }
 
             if (!parentDef.isExtensible()) {
-                throw new InvalidDefinitionException(String.format("%s cannot extend non-extensible component %s", getDescriptor(), extendsDescriptor), getLocation());
+                throw new InvalidDefinitionException(String.format("%s cannot extend non-extensible component %s",
+                        getDescriptor(), extendsDescriptor), getLocation());
             }
 
             SupportLevel support = getSupport();
             DefDescriptor<T> extDesc = extendsDescriptor;
-            while(extDesc != null){
+            while (extDesc != null) {
                 T extDef = extDesc.getDef();
-                if(support.ordinal() > extDef.getSupport().ordinal()){
-                    throw new InvalidDefinitionException(String.format("%s cannot widen the support level to %s from %s's level of %s", getDescriptor(), support, extDesc, extDef.getSupport()), getLocation());
+                if (support.ordinal() > extDef.getSupport().ordinal()) {
+                    throw new InvalidDefinitionException(String.format(
+                            "%s cannot widen the support level to %s from %s's level of %s", getDescriptor(), support,
+                            extDesc, extDef.getSupport()), getLocation());
                 }
-                extDesc = (DefDescriptor<T>)extDef.getExtendsDescriptor();
+                extDesc = (DefDescriptor<T>) extDef.getExtendsDescriptor();
             }
         }
 
@@ -275,10 +316,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
             def.validateReferences();
         }
 
-
-
         // have to do all sorts of craaaazy checks here for dupes and matches and bah
-
         validateExpressionRefs();
     }
 
@@ -298,34 +336,35 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
                     gvp.validate(e.getStem());
                 }
             } else {
-                //validate against m v or c
+                // validate against m v or c
             }
         }
     }
 
     @Override
     public void retrieveLabels() throws QuickFixException {
-        GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders().get(LABEL);
+        GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders()
+                .get(LABEL);
         for (PropertyReference e : expressionRefs) {
             if (e.getRoot().equals(LABEL.getPrefix())) {
                 labelProvider.getValue(e.getStem());
             }
         }
 
-        if(controllerDescriptors != null){
-            for(DefDescriptor<ControllerDef> desc : controllerDescriptors){
+        if (controllerDescriptors != null) {
+            for (DefDescriptor<ControllerDef> desc : controllerDescriptors) {
                 desc.getDef().retrieveLabels();
             }
         }
 
-        if(rendererDescriptors != null){
-            for(DefDescriptor<RendererDef> desc : rendererDescriptors){
+        if (rendererDescriptors != null) {
+            for (DefDescriptor<RendererDef> desc : rendererDescriptors) {
                 desc.getDef().retrieveLabels();
             }
         }
 
-        if(helperDescriptors != null){
-            for(DefDescriptor<HelperDef> desc : helperDescriptors){
+        if (helperDescriptors != null) {
+            for (DefDescriptor<HelperDef> desc : helperDescriptors) {
                 desc.getDef().retrieveLabels();
             }
         }
@@ -337,11 +376,13 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Recursively adds the ComponentDescriptors of all components in this ComponentDef's children to the provided set.
-     * The set may then be used to analyze freshness of all of those types to see if any of them should be recompiled
-     * from source.
-     *
-     * @param dependencies A Set that this method will append RootDescriptors to for every RootDef that this ComponentDef requires
+     * Recursively adds the ComponentDescriptors of all components in this
+     * ComponentDef's children to the provided set. The set may then be used to
+     * analyze freshness of all of those types to see if any of them should be
+     * recompiled from source.
+     * 
+     * @param dependencies A Set that this method will append RootDescriptors to
+     *            for every RootDef that this ComponentDef requires
      * @throws QuickFixException
      */
     @Override
@@ -366,31 +407,31 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
             handler.appendDependencies(dependencies);
         }
 
-        if (providerDescriptors != null){
+        if (providerDescriptors != null) {
             dependencies.addAll(providerDescriptors);
         }
 
-        if (controllerDescriptors != null){
+        if (controllerDescriptors != null) {
             dependencies.addAll(controllerDescriptors);
         }
 
-        if(modelDefDescriptor != null){
+        if (modelDefDescriptor != null) {
             dependencies.add(modelDefDescriptor);
         }
 
-        if(rendererDescriptors != null){
+        if (rendererDescriptors != null) {
             dependencies.addAll(rendererDescriptors);
         }
 
-        if(helperDescriptors != null){
+        if (helperDescriptors != null) {
             dependencies.addAll(helperDescriptors);
         }
 
-        if(themeDescriptor != null){
+        if (themeDescriptor != null) {
             dependencies.add(themeDescriptor);
         }
 
-        if(templateDefDescriptor != null){
+        if (templateDefDescriptor != null) {
             dependencies.add(templateDefDescriptor);
         }
         for (DependencyDef dep : this.dependencies) {
@@ -400,7 +441,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
 
     /**
      * This is used to validate by the compiler to validate EventDefRefs.
-     *
+     * 
      * @return all the events this component can fire, including those inherited
      * @throws QuickFixException
      */
@@ -411,14 +452,14 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
             ret.putAll(getSuperDef().getRegisterEventDefs());
         }
 
-        for(DefDescriptor<InterfaceDef> intf : interfaces){
+        for (DefDescriptor<InterfaceDef> intf : interfaces) {
             InterfaceDef intfDef = intf.getDef();
             ret.putAll(intfDef.getRegisterEventDefs());
         }
 
-        if (ret.isEmpty()){
+        if (ret.isEmpty()) {
             return events;
-        }else{
+        } else {
             ret.putAll(events);
             return Collections.unmodifiableMap(ret);
         }
@@ -434,7 +475,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
     }
 
     /**
-     * @return all the attributes for this component, including those inherited from a super component
+     * @return all the attributes for this component, including those inherited
+     *         from a super component
      * @throws QuickFixException
      */
     @Override
@@ -444,20 +486,20 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
             map.putAll(getSuperDef().getAttributeDefs());
         }
 
-        for(DefDescriptor<InterfaceDef> intf : interfaces){
+        for (DefDescriptor<InterfaceDef> intf : interfaces) {
             InterfaceDef intfDef = intf.getDef();
-            for(Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> entry : intfDef.getAttributeDefs().entrySet()){
+            for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> entry : intfDef.getAttributeDefs().entrySet()) {
                 DefDescriptor<AttributeDef> desc = entry.getKey();
-                if(map.containsKey(desc)){
-                    //FIXMEDLP - do some validation #W-690040
+                if (map.containsKey(desc)) {
+                    // FIXMEDLP - do some validation #W-690040
                 }
                 map.put(desc, entry.getValue());
             }
         }
 
-        if(map.isEmpty()){
+        if (map.isEmpty()) {
             return attributeDefs;
-        }else{
+        } else {
             map.putAll(attributeDefs);
             return Collections.unmodifiableMap(map);
         }
@@ -490,7 +532,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
     }
 
     public ThemeDef getThemeDef() throws QuickFixException {
-        return themeDescriptor == null?null:themeDescriptor.getDef();
+        return themeDescriptor == null ? null : themeDescriptor.getDef();
     }
 
     @Override
@@ -505,15 +547,15 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
 
     @Override
     public ComponentDef getTemplateDef() throws QuickFixException {
-        if(templateDefDescriptor == null){
+        if (templateDefDescriptor == null) {
             return getSuperDef().getTemplateDef();
-        }else{
+        } else {
             return templateDefDescriptor.getDef();
         }
     }
 
     @Override
-    public DefDescriptor<ThemeDef> getThemeDescriptor(){
+    public DefDescriptor<ThemeDef> getThemeDescriptor() {
         return themeDescriptor;
     }
 
@@ -528,21 +570,22 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
     }
 
     @Override
-    public Set<DefDescriptor<InterfaceDef>> getInterfaces(){
+    public Set<DefDescriptor<InterfaceDef>> getInterfaces() {
         return interfaces;
     }
 
-    private Set<DefDescriptor<InterfaceDef>> getAllInterfaces() throws QuickFixException{
+    private Set<DefDescriptor<InterfaceDef>> getAllInterfaces() throws QuickFixException {
         Set<DefDescriptor<InterfaceDef>> ret = Sets.newLinkedHashSet();
-        for(DefDescriptor<InterfaceDef> intf : interfaces){
+        for (DefDescriptor<InterfaceDef> intf : interfaces) {
             addAllInterfaces(intf, ret);
         }
         return ret;
     }
 
-    private void addAllInterfaces(DefDescriptor<InterfaceDef> intf, Set<DefDescriptor<InterfaceDef>> set) throws QuickFixException{
+    private void addAllInterfaces(DefDescriptor<InterfaceDef> intf, Set<DefDescriptor<InterfaceDef>> set)
+            throws QuickFixException {
         set.add(intf);
-        for(DefDescriptor<InterfaceDef> zuper : intf.getDef().getExtendsDescriptors()){
+        for (DefDescriptor<InterfaceDef> zuper : intf.getDef().getExtendsDescriptors()) {
             set.add(zuper);
             addAllInterfaces(zuper, set);
         }
@@ -562,14 +605,14 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof BaseComponentDefImpl) {
-            BaseComponentDefImpl<?> other = (BaseComponentDefImpl<?>)obj;
+            BaseComponentDefImpl<?> other = (BaseComponentDefImpl<?>) obj;
 
             return getDescriptor().equals(other.getDescriptor())
                     && controllerDescriptors.equals(other.controllerDescriptors)
-                    && (modelDefDescriptor == null ? other.modelDefDescriptor == null : modelDefDescriptor.equals(other.modelDefDescriptor))
+                    && (modelDefDescriptor == null ? other.modelDefDescriptor == null : modelDefDescriptor
+                            .equals(other.modelDefDescriptor))
                     && (extendsDescriptor == null ? other.extendsDescriptor == null : extendsDescriptor
-                            .equals(other.extendsDescriptor))
-                    && events.equals(other.events)
+                            .equals(other.extendsDescriptor)) && events.equals(other.events)
                     && getLocation().equals(other.getLocation());
         }
 
@@ -585,8 +628,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Serialize this component to json. The output will include all of the attributes, events, and
-     * handlers inherited. It doesn't yet include inherited ComponentDefRefs, but maybe it should.
+     * Serialize this component to json. The output will include all of the
+     * attributes, events, and handlers inherited. It doesn't yet include
+     * inherited ComponentDefRefs, but maybe it should.
      */
     @Override
     public void serialize(Json json) throws IOException {
@@ -597,14 +641,14 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
 
             json.writeMapBegin();
             json.writeMapEntry("descriptor", getDescriptor());
-            if(!preloaded){
+            if (!preloaded) {
                 context.setCurrentNamespace(descriptor.getNamespace());
                 RendererDef rendererDef = getRendererDef();
-                if(rendererDef != null && !rendererDef.isLocal()){
+                if (rendererDef != null && !rendererDef.isLocal()) {
                     json.writeMapEntry("rendererDef", rendererDef);
                 }
                 HelperDef helperDef = getHelperDef();
-                if(helperDef != null && !helperDef.isLocal()){
+                if (helperDef != null && !helperDef.isLocal()) {
                     json.writeMapEntry("helperDef", helperDef);
                 }
                 json.writeMapEntry("themeDef", getThemeDef());
@@ -620,34 +664,34 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
                     json.writeMapEntry("interfaces", allInterfaces);
                 }
                 Collection<RegisterEventDef> regevents = getRegisterEventDefs().values();
-                if(!regevents.isEmpty()){
+                if (!regevents.isEmpty()) {
                     json.writeMapEntry("registerEventDefs", regevents);
                 }
                 Collection<EventHandlerDef> handlers = getHandlerDefs();
-                if(!handlers.isEmpty()){
+                if (!handlers.isEmpty()) {
                     json.writeMapEntry("handlerDefs", handlers);
                 }
-                if(!facets.isEmpty()){
+                if (!facets.isEmpty()) {
                     json.writeMapEntry("facets", facets);
                 }
                 boolean local = hasLocalDependencies();
-                if(local){
+                if (local) {
                     json.writeMapEntry("hasServerDeps", true);
                 }
-                if(isAbstract){
+                if (isAbstract) {
                     json.writeMapEntry("isAbstract", isAbstract);
                 }
 
                 ProviderDef providerDef = getProviderDef();
-                if(providerDef != null && !providerDef.isLocal()){
+                if (providerDef != null && !providerDef.isLocal()) {
                     json.writeMapEntry("providerDef", providerDef);
                 }
 
-                if(subDefs != null){
+                if (subDefs != null) {
                     json.writeMapEntry("subDefs", subDefs.values());
                 }
 
-                if(mode.equals(Mode.AUTOJSTEST)){
+                if (mode.equals(Mode.AUTOJSTEST)) {
                     json.writeMapEntry("testSuiteDef", getTestSuiteDef());
                 }
                 serializeFields(json);
@@ -666,12 +710,12 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
      */
     @Override
     public DefDescriptor<RendererDef> getRendererDescriptor() throws QuickFixException {
-        if(rendererDescriptors != null && rendererDescriptors.size() == 1){
+        if (rendererDescriptors != null && rendererDescriptors.size() == 1) {
             return rendererDescriptors.get(0);
         }
 
         RendererDef rendererDef = getRendererDef();
-        if(rendererDef != null){
+        if (rendererDef != null) {
             return rendererDef.getDescriptor();
         }
         return null;
@@ -680,12 +724,12 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
     @Override
     public RendererDef getLocalRendererDef() throws QuickFixException {
         RendererDef def = null;
-        if(rendererDescriptors != null){
-            for(DefDescriptor<RendererDef> desc : rendererDescriptors){
+        if (rendererDescriptors != null) {
+            for (DefDescriptor<RendererDef> desc : rendererDescriptors) {
                 def = desc.getDef();
-                if(def.isLocal()){
+                if (def.isLocal()) {
                     break;
-                }else{
+                } else {
                     def = null;
                 }
             }
@@ -694,15 +738,16 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
     }
 
     /**
-     * @return The primary renderer def.  If multiple exist, this will be the remote one.
+     * @return The primary renderer def. If multiple exist, this will be the
+     *         remote one.
      * @throws QuickFixException
      */
     public RendererDef getRendererDef() throws QuickFixException {
         RendererDef def = null;
-        if(rendererDescriptors != null){
-            for(DefDescriptor<RendererDef> desc : rendererDescriptors){
+        if (rendererDescriptors != null) {
+            for (DefDescriptor<RendererDef> desc : rendererDescriptors) {
                 def = desc.getDef();
-                if(!def.isLocal()){
+                if (!def.isLocal()) {
                     break;
                 }
             }
@@ -711,16 +756,17 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
     }
 
     /**
-     * @return The primary helper def.  If multiple exist, this will be the remote one.
+     * @return The primary helper def. If multiple exist, this will be the
+     *         remote one.
      * @throws QuickFixException
      */
     @Override
     public HelperDef getHelperDef() throws QuickFixException {
         HelperDef def = null;
-        if(helperDescriptors != null){
-            for(DefDescriptor<HelperDef> desc : helperDescriptors){
+        if (helperDescriptors != null) {
+            for (DefDescriptor<HelperDef> desc : helperDescriptors) {
                 def = desc.getDef();
-                if(!def.isLocal()){
+                if (!def.isLocal()) {
                     break;
                 }
             }
@@ -729,7 +775,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
     }
 
     public TestSuiteDef getTestSuiteDef() throws QuickFixException {
-        return testSuiteDefDescriptor == null?null:testSuiteDefDescriptor.getDef();
+        return testSuiteDefDescriptor == null ? null : testSuiteDefDescriptor.getDef();
     }
 
     /**
@@ -747,7 +793,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
     public ModelDef getModelDef() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         context.setCurrentNamespace(descriptor.getNamespace());
-        return modelDefDescriptor == null?null:modelDefDescriptor.getDef();
+        return modelDefDescriptor == null ? null : modelDefDescriptor.getDef();
     }
 
     /**
@@ -767,13 +813,12 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
         return ret;
     }
 
-    public static abstract class Builder<T extends BaseComponentDef>
-                    extends RootDefinitionImpl.Builder<T> implements BaseComponentDefBuilder<T>{
+    public static abstract class Builder<T extends BaseComponentDef> extends RootDefinitionImpl.Builder<T> implements
+            BaseComponentDefBuilder<T> {
 
-        public Builder(Class<T> defClass){
+        public Builder(Class<T> defClass) {
             super(defClass);
         }
-
 
         public boolean isAbstract;
         public boolean isExtensible;
@@ -797,8 +842,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
         private List<DependencyDef> dependencies;
 
         @Override
-        public Builder<T> setFacet(String key, Object value){
-            if(facets == null){
+        public Builder<T> setFacet(String key, Object value) {
+            if (facets == null) {
                 facets = Lists.newArrayList();
             }
 
@@ -810,15 +855,15 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
             return this;
         }
 
-        public void addRenderer(String name){
-            if(this.rendererDescriptors == null){
+        public void addRenderer(String name) {
+            if (this.rendererDescriptors == null) {
                 this.rendererDescriptors = Lists.newArrayList();
             }
             this.rendererDescriptors.add(DefDescriptorImpl.getInstance(name, RendererDef.class));
         }
 
-        public void addHelper(String name){
-            if(this.helperDescriptors == null){
+        public void addHelper(String name) {
+            if (this.helperDescriptors == null) {
                 this.helperDescriptors = Lists.newArrayList();
             }
             this.helperDescriptors.add(DefDescriptorImpl.getInstance(name, HelperDef.class));
@@ -826,7 +871,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
 
         @Override
         public Builder<T> addControllerDef(ControllerDef controllerDef) {
-            if(controllerDescriptors == null){
+            if (controllerDescriptors == null) {
                 controllerDescriptors = Lists.newArrayList();
             }
             controllerDescriptors.add(controllerDef.getDescriptor());
@@ -835,7 +880,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
 
         @Override
         public Builder<T> addInterfaceDef(InterfaceDef interfaceDef) {
-            if(interfaces == null){
+            if (interfaces == null) {
                 interfaces = Sets.newLinkedHashSet();
             }
             interfaces.add(interfaceDef.getDescriptor());
@@ -844,7 +889,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
 
         @Override
         public Builder<T> addRendererDef(RendererDef rendererDef) {
-            if(rendererDescriptors == null){
+            if (rendererDescriptors == null) {
                 rendererDescriptors = Lists.newArrayList();
             }
             rendererDescriptors.add(rendererDef.getDescriptor());
@@ -913,19 +958,19 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
      */
     @Override
     public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException {
-        switch(other.getDefType()){
-            case INTERFACE:
-                for(DefDescriptor<InterfaceDef> intf : interfaces){
-                    if(intf.equals(other) || intf.getDef().isInstanceOf(other)){
-                      return true;
-                    }
+        switch (other.getDefType()) {
+        case INTERFACE:
+            for (DefDescriptor<InterfaceDef> intf : interfaces) {
+                if (intf.equals(other) || intf.getDef().isInstanceOf(other)) {
+                    return true;
                 }
-                return (extendsDescriptor != null && getSuperDef().isInstanceOf(other));
-            case COMPONENT:
-            case APPLICATION:
-                return descriptor.equals(other) || (extendsDescriptor != null && getSuperDef().isInstanceOf(other));
-            default:
-                return false;
+            }
+            return (extendsDescriptor != null && getSuperDef().isInstanceOf(other));
+        case COMPONENT:
+        case APPLICATION:
+            return descriptor.equals(other) || (extendsDescriptor != null && getSuperDef().isInstanceOf(other));
+        default:
+            return false;
         }
     }
 
@@ -940,24 +985,24 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
     @Override
     public List<DefDescriptor<?>> getBundle() {
         List<DefDescriptor<?>> ret = Lists.newArrayList();
-        if(controllerDescriptors != null){
+        if (controllerDescriptors != null) {
             ret.addAll(controllerDescriptors);
         }
-        if(rendererDescriptors != null){
+        if (rendererDescriptors != null) {
             ret.addAll(rendererDescriptors);
         }
-        if(modelDefDescriptor != null){
+        if (modelDefDescriptor != null) {
             ret.add(modelDefDescriptor);
         }
-        if(providerDescriptors != null){
+        if (providerDescriptors != null) {
             ret.addAll(providerDescriptors);
         }
 
-        if(themeDescriptor != null){
+        if (themeDescriptor != null) {
             ret.add(themeDescriptor);
         }
 
-        if(helperDescriptors != null){
+        if (helperDescriptors != null) {
             ret.addAll(helperDescriptors);
         }
         return ret;
@@ -965,64 +1010,65 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
 
     @Override
     public boolean isLocallyRenderable() throws QuickFixException {
-        return isLocallyRenderable(Sets.<DefDescriptor<?>>newLinkedHashSet());
+        return isLocallyRenderable(Sets.<DefDescriptor<?>> newLinkedHashSet());
     }
 
     private boolean isLocallyRenderable(Set<DefDescriptor<?>> already) throws QuickFixException {
-        if(render == RenderType.CLIENT){
+        if (render == RenderType.CLIENT) {
             return false;
-        }else if(render == RenderType.SERVER){
+        } else if (render == RenderType.SERVER) {
             return true;
         }
 
         RendererDef rendererDef = getLocalRendererDef();
         boolean ret = false;
-        //have a local renderer?
-        if(rendererDef == null){
-            //no?
+        // have a local renderer?
+        if (rendererDef == null) {
+            // no?
             rendererDef = getRendererDef();
-            //ok, is there a remote one?
+            // ok, is there a remote one?
             ret = rendererDef == null;
-        }else{
-            //cool.
+        } else {
+            // cool.
             ret = true;
         }
 
-        //If we've gotten this far, let's check for remote providers
-        if(ret){
+        // If we've gotten this far, let's check for remote providers
+        if (ret) {
             ret = ret && isInConcreteAndHasLocalProvider();
         }
 
-        //If we've gotten this far, let's check for controllers.
-        if(ret){
+        // If we've gotten this far, let's check for controllers.
+        if (ret) {
             ret = ret && getControllerDefDescriptors().isEmpty();
         }
 
-        //If we've gotten this far, let's check for Themes (server rendering doesn't work with themes) W-922563
-        if(ret){
+        // If we've gotten this far, let's check for Themes (server rendering
+        // doesn't work with themes) W-922563
+        if (ret) {
             ret = ret && getThemeDescriptor() == null;
         }
 
-        //If we've gotten this far, let's spider dependencies.
-        if(ret){
+        // If we've gotten this far, let's spider dependencies.
+        if (ret) {
             Set<DefDescriptor<?>> deps = Sets.newLinkedHashSet();
 
             appendDependencies(deps);
-            for(DefDescriptor<?> dep : deps){
-                if(!already.contains(dep)){
+            for (DefDescriptor<?> dep : deps) {
+                if (!already.contains(dep)) {
                     already.add(dep);
-                    if(dep.getDefType() == DefType.COMPONENT || dep.getDefType() == DefType.APPLICATION){
-                        BaseComponentDefImpl<?> depDef = (BaseComponentDefImpl<?>)dep.getDef();
-                        if(depDef != this){
+                    if (dep.getDefType() == DefType.COMPONENT || dep.getDefType() == DefType.APPLICATION) {
+                        BaseComponentDefImpl<?> depDef = (BaseComponentDefImpl<?>) dep.getDef();
+                        if (depDef != this) {
                             ret = ret && depDef.isLocallyRenderable(already);
-                            if(!ret){
+                            if (!ret) {
                                 return false;
                             }
                         }
-                    }else if(dep.getDefType() == DefType.INTERFACE){
-                        InterfaceDefImpl depDef = (InterfaceDefImpl)dep.getDef();
+                    } else if (dep.getDefType() == DefType.INTERFACE) {
+                        InterfaceDefImpl depDef = (InterfaceDefImpl) dep.getDef();
                         ret = ret && depDef.isInConcreteAndHasLocalProvider();
-                    }else if(dep.getDefType() == DefType.LAYOUTS){
+                    } else if (dep.getDefType() == DefType.LAYOUTS) {
                         return false;
                     }
                 }

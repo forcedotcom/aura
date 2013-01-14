@@ -15,7 +15,9 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
@@ -54,7 +56,8 @@ public class LabelValueProvider implements GlobalValueProvider {
         String ret = m.get(param);
         if (ret == null) {
             String label = Aura.getLocalizationAdapter().getLabel(section, param);
-            // people escape stuff like &copy; in the labels, aura doesn't need that.
+            // people escape stuff like &copy; in the labels, aura doesn't need
+            // that.
             ret = AuraTextUtil.unescapeOutput(label, false);
             m.put(param, ret);
         }

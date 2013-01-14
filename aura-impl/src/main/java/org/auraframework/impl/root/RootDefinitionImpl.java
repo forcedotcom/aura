@@ -15,12 +15,16 @@
  */
 package org.auraframework.impl.root;
 
-import java.util.*;
-
-import com.google.common.collect.Maps;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -28,6 +32,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Shared definition code between component and event definition.
@@ -42,16 +47,17 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
 
     protected RootDefinitionImpl(Builder<T> builder) {
         super(builder);
-        if(builder.attributeDefs.size() == 0) {
+        if (builder.attributeDefs.size() == 0) {
             this.attributeDefs = ImmutableMap.of();
-        }else{
-            this.attributeDefs = Collections.unmodifiableMap(new LinkedHashMap<DefDescriptor<AttributeDef>, AttributeDef>(builder.attributeDefs));
+        } else {
+            this.attributeDefs = Collections
+                    .unmodifiableMap(new LinkedHashMap<DefDescriptor<AttributeDef>, AttributeDef>(builder.attributeDefs));
         }
         this.providerDescriptors = AuraUtil.immutableList(builder.providerDescriptors);
 
-        if(builder.support == null){
+        if (builder.support == null) {
             support = SupportLevel.PROTO;
-        }else{
+        } else {
             support = builder.support;
         }
 
@@ -76,20 +82,20 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         return getAttributeDefs().get(DefDescriptorImpl.getInstance(name, AttributeDef.class));
     }
 
-    public abstract static class Builder<T extends RootDefinition> extends DefinitionImpl.BuilderImpl<T>
-        implements RootDefinitionBuilder<T>{
+    public abstract static class Builder<T extends RootDefinition> extends DefinitionImpl.BuilderImpl<T> implements
+            RootDefinitionBuilder<T> {
 
         public Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
         private List<DefDescriptor<ProviderDef>> providerDescriptors;
         private SupportLevel support;
 
-        public Builder(Class<T> defClass){
+        public Builder(Class<T> defClass) {
             super(defClass);
             this.attributeDefs = Maps.newHashMap();
         }
 
-        public void addProvider(String name){
-            if(this.providerDescriptors == null){
+        public void addProvider(String name) {
+            if (this.providerDescriptors == null) {
                 this.providerDescriptors = Lists.newArrayList();
             }
             this.providerDescriptors.add(DefDescriptorImpl.getInstance(name, ProviderDef.class));
@@ -97,22 +103,22 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
 
         /**
          * Gets the attributeDefs for this instance.
-         *
+         * 
          * @return The attributeDefs.
          */
-        public Map<DefDescriptor<AttributeDef>,AttributeDef> getAttributeDefs() {
+        public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() {
             return this.attributeDefs;
         }
 
         /**
          * Sets the attributeDefs for this instance.
          */
-        public void addAttributeDef(DefDescriptor<AttributeDef> attrdesc,AttributeDef attributeDef) {
+        public void addAttributeDef(DefDescriptor<AttributeDef> attrdesc, AttributeDef attributeDef) {
             this.attributeDefs.put(attrdesc, attributeDef);
         }
 
         @Override
-        public Builder<T> setSupport(SupportLevel support){
+        public Builder<T> setSupport(SupportLevel support) {
             this.support = support;
             return this;
         }
@@ -125,12 +131,12 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
 
     @Override
     public DefDescriptor<ProviderDef> getProviderDescriptor() throws QuickFixException {
-        if(providerDescriptors != null && providerDescriptors.size() == 1){
+        if (providerDescriptors != null && providerDescriptors.size() == 1) {
             return providerDescriptors.get(0);
         }
 
         ProviderDef providerDef = getProviderDef();
-        if(providerDef != null){
+        if (providerDef != null) {
             return providerDef.getDescriptor();
         }
         return null;
@@ -139,12 +145,12 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
     @Override
     public ProviderDef getLocalProviderDef() throws QuickFixException {
         ProviderDef def = null;
-        if(providerDescriptors != null){
-            for(DefDescriptor<ProviderDef> desc : providerDescriptors){
+        if (providerDescriptors != null) {
+            for (DefDescriptor<ProviderDef> desc : providerDescriptors) {
                 def = desc.getDef();
-                if(def.isLocal()){
+                if (def.isLocal()) {
                     break;
-                }else{
+                } else {
                     def = null;
                 }
             }
@@ -153,16 +159,17 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
     }
 
     /**
-     * @return The primary provider def.  If multiple exist, this will be the remote one.
+     * @return The primary provider def. If multiple exist, this will be the
+     *         remote one.
      * @throws QuickFixException
      */
     @Override
     public ProviderDef getProviderDef() throws QuickFixException {
         ProviderDef def = null;
-        if(providerDescriptors != null){
-            for(DefDescriptor<ProviderDef> desc : providerDescriptors){
+        if (providerDescriptors != null) {
+            for (DefDescriptor<ProviderDef> desc : providerDescriptors) {
                 def = desc.getDef();
-                if(!def.isLocal()){
+                if (!def.isLocal()) {
                     break;
                 }
             }
@@ -171,15 +178,16 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
     }
 
     /**
-     * Method to check if this is a Definition of an Interface/Abstract Component and if it has a local provider.
-     *
-     * @return True if there are no providers or there is a local provider
-     *         False if there is only a remtre provider and no local provider
+     * Method to check if this is a Definition of an Interface/Abstract
+     * Component and if it has a local provider.
+     * 
+     * @return True if there are no providers or there is a local provider False
+     *         if there is only a remtre provider and no local provider
      * @throws QuickFixException
      */
-    public boolean isInConcreteAndHasLocalProvider() throws QuickFixException{
+    public boolean isInConcreteAndHasLocalProvider() throws QuickFixException {
         ProviderDef providerDef = getProviderDef();
-        if(providerDef != null && !providerDef.isLocal()){
+        if (providerDef != null && !providerDef.isLocal()) {
             providerDef = getLocalProviderDef();
             return providerDef != null;
         }

@@ -16,31 +16,32 @@
 package org.auraframework.impl.appCache;
 
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.*;
+import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.FreshBrowserInstance;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
+
 /**
- * UI automation for AppCache implementation. ThreadHostile because simultaneous loads of the testApp will interfere
- * with progress bar loading.
- *
+ * UI automation for AppCache implementation. ThreadHostile because simultaneous
+ * loads of the testApp will interfere with progress bar loading.
+ * 
  * @userStory a07B0000000LyOe
  * @since 0.0.224
  */
 @ThreadHostileTest
-@TargetBrowsers({BrowserType.GOOGLECHROME, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET})
+@TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
 public class AppCacheProgressBarUITest extends WebDriverTestCase {
     private final String PROGRESSEVENTSCRIPT = "var evt = new ProgressEvent('%s', {%s});"
             + "window.applicationCache.dispatchEvent(evt);";
-    private final String APPCACHEPROGRESS = String.format(PROGRESSEVENTSCRIPT, "progress","loaded:%s, total:%s");
-    private final String APPCACHENOUPDATE = String.format(PROGRESSEVENTSCRIPT, "noupdate","");
-    private final String APPCACHECACHED = String.format(PROGRESSEVENTSCRIPT, "cached","");
+    private final String APPCACHEPROGRESS = String.format(PROGRESSEVENTSCRIPT, "progress", "loaded:%s, total:%s");
+    private final String APPCACHENOUPDATE = String.format(PROGRESSEVENTSCRIPT, "noupdate", "");
+    private final String APPCACHECACHED = String.format(PROGRESSEVENTSCRIPT, "cached", "");
 
     private final By appCacheProgressDiv = By.cssSelector("div[id='auraAppcacheProgress']");
 
-    public AppCacheProgressBarUITest(String name){
+    public AppCacheProgressBarUITest(String name) {
         super(name);
     }
 
@@ -49,12 +50,14 @@ public class AppCacheProgressBarUITest extends WebDriverTestCase {
      * 
      * @throws Exception
      * 
-     * TODO: this should pass in iBrowsers since no javascript called, but looks like the progress bar loads/disappears
-     *       too fast for test to pick it up. Passes locally if you clear cache in Safari first.
+     *             TODO: this should pass in iBrowsers since no javascript
+     *             called, but looks like the progress bar loads/disappears too
+     *             fast for test to pick it up. Passes locally if you clear
+     *             cache in Safari first.
      */
     @FreshBrowserInstance
-    @ExcludeBrowsers({BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE})
-    public void testProgressBar() throws Exception{
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    public void testProgressBar() throws Exception {
         openNoAura("/appCache/testApp.app?aura.mode=DEV");
         assertTrue("Progress bar for appCache did not show up.", findDomElement(appCacheProgressDiv).isDisplayed());
         waitForAuraInit();
@@ -63,44 +66,48 @@ public class AppCacheProgressBarUITest extends WebDriverTestCase {
     }
 
     /**
-     * Verify that progress bar shows true progress by simulating the progress event.
+     * Verify that progress bar shows true progress by simulating the progress
+     * event.
      * 
      * @throws Exception
      */
-    public void testProgressBarBySimulatingProgressEvents() throws Exception{
+    public void testProgressBarBySimulatingProgressEvents() throws Exception {
         open("/appCache/testApp.app", Mode.DEV);
         waitForElementAbsent("Progress bar for appCache is visible even after aura is ready.",
                 findDomElement(appCacheProgressDiv));
 
-        //Step 1: Fire a progress event and verify that progress bar is visible
-        auraUITestingUtil.getEval(String.format(APPCACHEPROGRESS, 1,100));
+        // Step 1: Fire a progress event and verify that progress bar is visible
+        auraUITestingUtil.getEval(String.format(APPCACHEPROGRESS, 1, 100));
         waitForElementPresent("Progress bar for appCache is not visible visible.", findDomElement(appCacheProgressDiv));
 
-        //Step 2: 50% progress
-        auraUITestingUtil.getEval(String.format(APPCACHEPROGRESS, 50,100));
+        // Step 2: 50% progress
+        auraUITestingUtil.getEval(String.format(APPCACHEPROGRESS, 50, 100));
         waitForElementPresent("Progress bar for appCache is not visible visible.", findDomElement(appCacheProgressDiv));
-        
-        assertEquals("width: 50%;", findDomElement(By.cssSelector("div[class~='progressBar']")).getAttribute("style").trim());
 
-        //Step 3: Fire a cached event and verify that progress bar has disappeared
+        assertEquals("width: 50%;", findDomElement(By.cssSelector("div[class~='progressBar']")).getAttribute("style")
+                .trim());
+
+        // Step 3: Fire a cached event and verify that progress bar has
+        // disappeared
         auraUITestingUtil.getEval(APPCACHECACHED);
         waitForElementAbsent("Progress bar for appCache is visible even after 'cached' event is fired.",
                 findDomElement(appCacheProgressDiv));
     }
 
     /**
-     * Verify that when a noupdate event is fired for appcache, the progress bar doesn't show up.
+     * Verify that when a noupdate event is fired for appcache, the progress bar
+     * doesn't show up.
      * 
      * @throws Exception
      */
-    public void testNoUpdateBySimulatingEvents() throws Exception{
+    public void testNoUpdateBySimulatingEvents() throws Exception {
         open("/appCache/testApp.app", Mode.DEV);
 
-        //Step 1: Force the progress bar to show up
-        auraUITestingUtil.getEval(String.format(APPCACHEPROGRESS, 1,100));
+        // Step 1: Force the progress bar to show up
+        auraUITestingUtil.getEval(String.format(APPCACHEPROGRESS, 1, 100));
         waitForElementPresent("Progress bar for appCache is not visible visible.", findDomElement(appCacheProgressDiv));
 
-        //Step 2: Fire noupdate event and make sure there is no progress bar
+        // Step 2: Fire noupdate event and make sure there is no progress bar
         auraUITestingUtil.getEval(APPCACHENOUPDATE);
         waitForElementAbsent("Progress bar for appCache is visible even after 'noupdate' event is fired.",
                 findDomElement(appCacheProgressDiv));
@@ -112,12 +119,13 @@ public class AppCacheProgressBarUITest extends WebDriverTestCase {
      * @throws Exception
      */
     @FreshBrowserInstance
-    public void testProgressbarNotVisibleInPRODMode()throws Exception{
+    public void testProgressbarNotVisibleInPRODMode() throws Exception {
         openNoAura("/appCache/testApp.app?aura.mode=PROD");
         assertFalse("Progress bar for appCache should not show up in PROD mode.", findDomElement(appCacheProgressDiv)
                 .isDisplayed());
-        //This time simulate the progress event and verify that the progress bar does not show up.
-        auraUITestingUtil.getEval(String.format(APPCACHEPROGRESS, 1,100));
+        // This time simulate the progress event and verify that the progress
+        // bar does not show up.
+        auraUITestingUtil.getEval(String.format(APPCACHEPROGRESS, 1, 100));
         assertFalse("Progress bar for appCache should not show up in PROD mode.", findDomElement(appCacheProgressDiv)
                 .isDisplayed());
     }

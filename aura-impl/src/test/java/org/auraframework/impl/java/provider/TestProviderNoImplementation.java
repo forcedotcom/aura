@@ -24,8 +24,9 @@ import org.auraframework.system.Annotations.Provider;
  */
 @Provider
 public class TestProviderNoImplementation {
-    public static DefDescriptor<ComponentDef> provide(){
-        //Provide a component which does not implement tes:test_Provider_InterfaceNoImplementation
+    public static DefDescriptor<ComponentDef> provide() {
+        // Provide a component which does not implement
+        // tes:test_Provider_InterfaceNoImplementation
         return DefDescriptorImpl.getInstance("test:test_Provider_NoImpl", ComponentDef.class);
     }
 }

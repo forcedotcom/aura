@@ -15,12 +15,12 @@
  */
 package org.auraframework.def;
 
-
 /**
  */
 public interface ComponentDef extends BaseComponentDef {
     @Override
     DefDescriptor<ComponentDef> getDescriptor();
+
     @Override
     DefDescriptor<ComponentDef> getExtendsDescriptor();
 }

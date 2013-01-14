@@ -17,19 +17,20 @@ package org.auraframework.util.json;
 
 public interface JsonHandlerProvider {
     /**
-     * This will be called for every entry in a map.
-     * If you want to provide a special handler for that key,
-     * return its handler.  If you return null, the default handler
-     * implementation will be used.
-     *
-     * @param key The key in the parent object for which the handler is being requested.
+     * This will be called for every entry in a map. If you want to provide a
+     * special handler for that key, return its handler. If you return null, the
+     * default handler implementation will be used.
+     * 
+     * @param key The key in the parent object for which the handler is being
+     *            requested.
      */
     JsonHandlerProvider getObjectEntryHandlerProvider(String key);
 
     /**
-     * This will be called once each time an array is read.  The returned
-     * handler provider will be used to get a handler for each object or array
-     * within the array.  If you return null, the default handler implementation will be used.
+     * This will be called once each time an array is read. The returned handler
+     * provider will be used to get a handler for each object or array within
+     * the array. If you return null, the default handler implementation will be
+     * used.
      */
     JsonHandlerProvider getArrayEntryHandlerProvider();
 

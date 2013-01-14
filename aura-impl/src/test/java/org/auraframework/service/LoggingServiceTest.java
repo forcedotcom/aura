@@ -17,18 +17,19 @@ package org.auraframework.service;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.system.LoggingContext;
+
+import com.google.common.collect.Lists;
 
 /**
  * @hierarchy Aura.Services.ContextService
  * @userStory a07B0000000FcRW
- *
+ * 
  * @since touch.174.1
  */
-public class LoggingServiceTest  extends BaseServiceTest<LoggingService, LoggingServiceTest.Config> implements LoggingService {
+public class LoggingServiceTest extends BaseServiceTest<LoggingService, LoggingServiceTest.Config> implements
+        LoggingService {
 
     /**
      */
@@ -62,16 +63,16 @@ public class LoggingServiceTest  extends BaseServiceTest<LoggingService, Logging
 
     @Override
     public void release() {
-       try {
-           LoggingContext lc = AuraImpl.getLoggingAdapter().getLoggingContext();
-           assertNull(lc);
-           service.establish();
-           lc = AuraImpl.getLoggingAdapter().getLoggingContext();
-           assertNotNull(lc);
-       } finally {
-           service.release();
-           assertNull(AuraImpl.getLoggingAdapter().getLoggingContext());
-       }
+        try {
+            LoggingContext lc = AuraImpl.getLoggingAdapter().getLoggingContext();
+            assertNull(lc);
+            service.establish();
+            lc = AuraImpl.getLoggingAdapter().getLoggingContext();
+            assertNotNull(lc);
+        } finally {
+            service.release();
+            assertNull(AuraImpl.getLoggingAdapter().getLoggingContext());
+        }
     }
 
     @Override
@@ -228,6 +229,6 @@ public class LoggingServiceTest  extends BaseServiceTest<LoggingService, Logging
 
     }
 
-    public static class Config extends BaseServiceTest.Config{
+    public static class Config extends BaseServiceTest.Config {
     }
 }

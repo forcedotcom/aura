@@ -16,13 +16,14 @@
 package org.auraframework.util.json;
 
 /**
- * don't use this, use jackson
- * Context for serializing json using {@link Json} with reference support.
+ * don't use this, use jackson Context for serializing json using {@link Json}
+ * with reference support.
  */
 public interface JsonSerializationContext {
 
     /**
-     * Truncate variable type (e.g. string, big decimal) data sizes to this length, -1 to not truncate
+     * Truncate variable type (e.g. string, big decimal) data sizes to this
+     * length, -1 to not truncate
      */
     int getVariableDataSizeLimit();
 
@@ -43,16 +44,17 @@ public interface JsonSerializationContext {
 
     /**
      * Get the serializer to use for the given object
+     * 
      * @return the serializer
      */
     <T> JsonSerializer<T> getSerializer(T o);
 
     /**
-     * Returns whether or not null values in arrays and objects get written out. By default, this is
-     * false.
-     *
-     * @return When false, array and object values that are null cause the entry to not get written out. When true,
-     *         these are written out.
+     * Returns whether or not null values in arrays and objects get written out.
+     * By default, this is false.
+     * 
+     * @return When false, array and object values that are null cause the entry
+     *         to not get written out. When true, these are written out.
      */
     public boolean isNullValueEnabled();
 }

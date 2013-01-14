@@ -28,24 +28,24 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 public class ApiTopicModel {
 
     private String title;
-    private Map<String, Object> symbol;
+    private final Map<String, Object> symbol;
 
-    public ApiTopicModel() throws QuickFixException{
+    public ApiTopicModel() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        BaseComponent<?,?> component = context.getCurrentComponent();
-        title = (String)component.getAttributes().getValue("topic");
+        BaseComponent<?, ?> component = context.getCurrentComponent();
+        title = (String) component.getAttributes().getValue("topic");
         title = title.substring(4);
 
         symbol = ApiContentsModel.getSymbol(title);
     }
 
     @AuraEnabled
-    public Map<String, Object> getSymbol(){
+    public Map<String, Object> getSymbol() {
         return symbol;
     }
 
     @AuraEnabled
-    public String getTitle(){
+    public String getTitle() {
         return title;
     }
 

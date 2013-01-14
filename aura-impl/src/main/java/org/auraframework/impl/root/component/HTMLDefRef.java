@@ -34,20 +34,21 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-public class HTMLDefRef extends ComponentDefRefImpl{
+public class HTMLDefRef extends ComponentDefRefImpl {
 
     private static final long serialVersionUID = -957235808680675063L;
-    //private static final Optimizer optimizer = new Optimizer();
+    // private static final Optimizer optimizer = new Optimizer();
 
-    public static final DefDescriptor<ComponentDef> HTML_DESC = DefDescriptorImpl.getInstance("aura:html", ComponentDef.class);
+    public static final DefDescriptor<ComponentDef> HTML_DESC = DefDescriptorImpl.getInstance("aura:html",
+            ComponentDef.class);
 
     public HTMLDefRef(Builder builder) {
         super(builder);
     }
 
-    public static class Builder extends ComponentDefRefImpl.Builder implements HtmlDefRefBuilder{
+    public static class Builder extends ComponentDefRefImpl.Builder implements HtmlDefRefBuilder {
 
-        private Map<DefDescriptor<AttributeDef>, Object> htmlAttributes = Maps.newHashMap();
+        private final Map<DefDescriptor<AttributeDef>, Object> htmlAttributes = Maps.newHashMap();
 
         public Builder() {
             this.lockDescriptor(HTML_DESC);
@@ -55,13 +56,13 @@ public class HTMLDefRef extends ComponentDefRefImpl{
         }
 
         @Override
-        public Builder setTag(String tag){
+        public Builder setTag(String tag) {
             setComponentAttribute("tag", tag);
             return this;
         }
 
         @Override
-        public Builder setComponentAttribute(String key, Object value){
+        public Builder setComponentAttribute(String key, Object value) {
             AttributeDefRefImpl.Builder valueBuilder = new AttributeDefRefImpl.Builder();
             valueBuilder.setDescriptor(DefDescriptorImpl.getInstance(key, AttributeDef.class));
             valueBuilder.setValue(value);
@@ -74,7 +75,8 @@ public class HTMLDefRef extends ComponentDefRefImpl{
         @Override
         public Builder setAttribute(DefDescriptor<AttributeDef> key, AttributeDefRef value) {
             //
-            // Automatically push system attributes up to the component attributes.
+            // Automatically push system attributes up to the component
+            // attributes.
             //
             if ("aura".equals(key.getNamespace())) {
                 super.setAttribute(key, value);
@@ -86,15 +88,15 @@ public class HTMLDefRef extends ComponentDefRefImpl{
             }
             return this;
         }
-
+ 
         @Override
         public ComponentDefRef build() {
-            //Builder optimizedBuilder = optimizer.optimize(this);
+            // Builder optimizedBuilder = optimizer.optimize(this);
             return new HTMLDefRef(this);
         }
     }
 
-    protected static class Optimizer implements DefBuilderOptimizer<Builder>{
+    protected static class Optimizer implements DefBuilderOptimizer<Builder> {
 
         @Override
         @SuppressWarnings("unchecked")
@@ -106,27 +108,29 @@ public class HTMLDefRef extends ComponentDefRefImpl{
             AttributeDefRef bodyRef = builder.getAttributeValue(bodyDesc);
             Map<DefDescriptor<AttributeDef>, Object> htmlAttributes = builder.htmlAttributes;
             boolean pureHTML = true;
-            if(bodyRef != null){
-                for(ComponentDefRef cdr : (List<ComponentDefRef>)bodyRef.getValue()){
-                    if(cdr.getClass().equals(HTMLDefRef.class)){
-                        if(cdr.getAttributeDefRef("markup") == null){
+            if (bodyRef != null) {
+                for (ComponentDefRef cdr : (List<ComponentDefRef>) bodyRef.getValue()) {
+                    if (cdr.getClass().equals(HTMLDefRef.class)) {
+                        if (cdr.getAttributeDefRef("markup") == null) {
                             pureHTML = false;
                             break;
                         }
-                    }else if((!(cdr.getDescriptor().equals(textDesc) || cdr.getDescriptor().equals(expDesc))) || cdr.getLocalId() != null){
+                    } else if ((!(cdr.getDescriptor().equals(textDesc) || cdr.getDescriptor().equals(expDesc)))
+                            || cdr.getLocalId() != null) {
                         pureHTML = false;
                         break;
                     }
                 }
             }
-            if(builder.getLocalId() != null){
+            if (builder.getLocalId() != null) {
                 pureHTML = false;
             }
-            if(pureHTML){
+            if (pureHTML) {
                 Set<String> booleanAttributes = HTMLComponentDefRefHandler.SPECIAL_BOOLEANS;
-                for(Map.Entry<DefDescriptor<AttributeDef>, Object> entry : htmlAttributes.entrySet()){
+                for (Map.Entry<DefDescriptor<AttributeDef>, Object> entry : htmlAttributes.entrySet()) {
                     String key = entry.getKey().getName();
-                    if(key.toLowerCase().startsWith("on") || key.toLowerCase().equals("href") || booleanAttributes.contains(key.toLowerCase())){
+                    if (key.toLowerCase().startsWith("on") || key.toLowerCase().equals("href")
+                            || booleanAttributes.contains(key.toLowerCase())) {
 
                         pureHTML = false;
                         break;
@@ -134,38 +138,35 @@ public class HTMLDefRef extends ComponentDefRefImpl{
                 }
             }
 
-            if(pureHTML){
+            if (pureHTML) {
                 List<Object> markup = Lists.newArrayList();
-                String tag = (String)builder.getAttributeValue(tagDesc).getValue();
+                String tag = (String) builder.getAttributeValue(tagDesc).getValue();
                 add(markup, "<").add(markup, tag);
-                if(htmlAttributes != null){
-                    for(Map.Entry<DefDescriptor<AttributeDef>, Object> entry : htmlAttributes.entrySet()){
+                if (htmlAttributes != null) {
+                    for (Map.Entry<DefDescriptor<AttributeDef>, Object> entry : htmlAttributes.entrySet()) {
                         Object value = entry.getValue();
-                        if(value != null){
-                            add(markup, " ")
-                               .add(markup, entry.getKey().getName())
-                               .add(markup, "=")
-                               .add(markup, "\"");
+                        if (value != null) {
+                            add(markup, " ").add(markup, entry.getKey().getName()).add(markup, "=").add(markup, "\"");
 
-                               if(value instanceof Expression){
-                                   add(markup, value);
-                               }else{
-                                   add(markup, value.toString());
-                               }
+                            if (value instanceof Expression) {
+                                add(markup, value);
+                            } else {
+                                add(markup, value.toString());
+                            }
 
-                               add(markup, "\"");
+                            add(markup, "\"");
                         }
                     }
                 }
 
                 add(markup, ">");
-                if(bodyRef != null){
-                    for(ComponentDefRef cdr : (List<ComponentDefRef>)bodyRef.getValue()){
-                        if(cdr.getClass().equals(HTMLDefRef.class)){
-                            for(Object childMarkup : (List<Object>)cdr.getAttributeDefRef("markup").getValue()){
+                if (bodyRef != null) {
+                    for (ComponentDefRef cdr : (List<ComponentDefRef>) bodyRef.getValue()) {
+                        if (cdr.getClass().equals(HTMLDefRef.class)) {
+                            for (Object childMarkup : (List<Object>) cdr.getAttributeDefRef("markup").getValue()) {
                                 add(markup, childMarkup);
                             }
-                        }else if(cdr.getDescriptor().equals(textDesc)){
+                        } else if (cdr.getDescriptor().equals(textDesc)) {
                             add(markup, cdr.getAttributeDefRef("value").getValue());
                         } else if (cdr.getDescriptor().equals(expDesc)) {
                             add(markup, cdr.getAttributeDefRef("value").getValue());
@@ -179,11 +180,11 @@ public class HTMLDefRef extends ComponentDefRefImpl{
             return builder;
         }
 
-        private Optimizer add(List<Object> markup, Object o){
-            if(o instanceof String && !markup.isEmpty() && markup.get(markup.size()-1) instanceof String){
-                String last = (String)markup.get(markup.size() - 1);
-                markup.set(markup.size() -1, last + (String)o);
-            }else{
+        private Optimizer add(List<Object> markup, Object o) {
+            if (o instanceof String && !markup.isEmpty() && markup.get(markup.size() - 1) instanceof String) {
+                String last = (String) markup.get(markup.size() - 1);
+                markup.set(markup.size() - 1, last + (String) o);
+            } else {
                 markup.add(o);
             }
             return this;

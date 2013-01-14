@@ -15,11 +15,17 @@
  */
 package org.auraframework.util.javascript;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
- * Implementation of the common stuff shared between the main javascript library in sfdc and the new directive based javascript groups
+ * Implementation of the common stuff shared between the main javascript library
+ * in sfdc and the new directive based javascript groups
  */
 public abstract class CommonJavascriptGroupImpl implements JavascriptGroup {
 

@@ -17,8 +17,8 @@ package configuration;
 
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.components.AuraComponentsFiles;
-import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
+import org.auraframework.util.ServiceLoaderImpl.Impl;
 
 /**
  */
@@ -26,8 +26,8 @@ import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 public class AuraComponentsConfig {
 
     @Impl
-    public static ComponentLocationAdapter auraComponentLocationAdapterImpl(){
-        return new ComponentLocationAdapter.Impl(AuraComponentsFiles.Components.asFile(),null,"components_aura_components");
+    public static ComponentLocationAdapter auraComponentLocationAdapterImpl() {
+        return new ComponentLocationAdapter.Impl(AuraComponentsFiles.Components.asFile(), null,
+                "components_aura_components");
     }
 }
-

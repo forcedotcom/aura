@@ -17,17 +17,19 @@ package org.auraframework.test;
 
 import org.auraframework.Aura;
 import org.auraframework.controller.java.ServletConfigController;
-import org.auraframework.def.*;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.service.ContextService;
-import org.auraframework.system.Location;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Base class for unit tests referencing the Aura framework.
- *
- *
+ * 
+ * 
  * @since 0.0.178
  */
 public abstract class AuraTestCase extends UnitTestCase {
@@ -46,77 +48,84 @@ public abstract class AuraTestCase extends UnitTestCase {
     }
 
     /**
-     * Useful for restoring a context in case a test needs to temporarily switch contexts.
+     * Useful for restoring a context in case a test needs to temporarily switch
+     * contexts.
      */
     protected static void setContext(AuraContext context) {
         ContextService service = Aura.getContextService();
         AuraContext current = service.getCurrentContext();
-        if (context == null || context == current) { return; }
+        if (context == null || context == current) {
+            return;
+        }
         if (current != null) {
             service.endContext();
         }
         AuraContext newContext = service.startContext(context.getMode(), context.getFormat(), context.getAccess(),
-                                                       context.getApplicationDescriptor());
+                context.getApplicationDescriptor());
         newContext.setLastMod(context.getLastMod());
         newContext.clearPreloads();
-        for(String preload: context.getPreloads()){
+        for (String preload : context.getPreloads()) {
             newContext.addPreload(preload);
         }
     }
 
     /**
-     * Check to ensure that an exception exactly matches both message and location.
-     *
+     * Check to ensure that an exception exactly matches both message and
+     * location.
+     * 
      * @param e the exception to check.
      * @param clazz a class to match if it is not null.
      * @param message The message to match (must be exact match).
-     * @param filename a 'file name' to match the location (not checked if null).
+     * @param filename a 'file name' to match the location (not checked if
+     *            null).
      */
     protected void checkExceptionFull(Throwable e, Class<?> clazz, String message, String filename) {
         assertEquals("unexpected message", message, e.getMessage());
         if (clazz != null) {
-            assertTrue("Exception must be "+clazz.getSimpleName(), clazz.equals(e.getClass()));
+            assertTrue("Exception must be " + clazz.getSimpleName(), clazz.equals(e.getClass()));
         }
         if (filename != null) {
             Location l = null;
 
             if (e instanceof QuickFixException) {
-                l = ((QuickFixException)e).getLocation();
+                l = ((QuickFixException) e).getLocation();
             } else if (e instanceof AuraRuntimeException) {
-                l = ((AuraRuntimeException)e).getLocation();
+                l = ((AuraRuntimeException) e).getLocation();
             }
-            assertNotNull("Unable to find location, expected "+filename, l);
+            assertNotNull("Unable to find location, expected " + filename, l);
             assertEquals("Unexpected location", filename, l.getFileName());
         }
     }
 
     /**
-     * Check to ensure that an exception message starts with a given message and matches a location.
-     *
+     * Check to ensure that an exception message starts with a given message and
+     * matches a location.
+     * 
      * @param e the exception to check.
      * @param clazz a class to match if it is not null.
      * @param message The message to match (must be exact match).
-     * @param filename a 'file name' to match the location (not checked if null).
+     * @param filename a 'file name' to match the location (not checked if
+     *            null).
      */
     protected void checkExceptionStart(Throwable e, Class<?> clazz, String message, String filename) {
         if (clazz != null) {
-            assertEquals("Exception must be "+clazz.getSimpleName(), clazz, e.getClass());
+            assertEquals("Exception must be " + clazz.getSimpleName(), clazz, e.getClass());
         }
-        assertTrue("unexpected message: "+e.getMessage()+"!="+message, e.getMessage().startsWith(message));
+        assertTrue("unexpected message: " + e.getMessage() + "!=" + message, e.getMessage().startsWith(message));
         if (filename != null) {
             Location l = null;
 
             if (e instanceof QuickFixException) {
-                l = ((QuickFixException)e).getLocation();
+                l = ((QuickFixException) e).getLocation();
             } else if (e instanceof AuraRuntimeException) {
-                l = ((AuraRuntimeException)e).getLocation();
+                l = ((AuraRuntimeException) e).getLocation();
             }
-            assertNotNull("Unable to find location, expected "+filename, l);
+            assertNotNull("Unable to find location, expected " + filename, l);
             assertEquals("Unexpected location", filename, l.getFileName());
         }
     }
 
-    protected DefDescriptor<ControllerDef> getClientController(BaseComponentDef def) throws Exception{
+    protected DefDescriptor<ControllerDef> getClientController(BaseComponentDef def) throws Exception {
         for (DefDescriptor<ControllerDef> cd : def.getControllerDefDescriptors()) {
             if ("js".equals(cd.getPrefix())) {
                 return cd;

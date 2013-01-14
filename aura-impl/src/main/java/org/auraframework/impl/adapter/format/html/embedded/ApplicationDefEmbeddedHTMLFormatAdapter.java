@@ -21,14 +21,18 @@ import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ThemeDef;
+import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.http.AuraServlet;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.Component;
 import org.auraframework.service.InstanceService;
 import org.auraframework.service.RenderingService;
-import org.auraframework.system.Client;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.Client;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.Literal;
@@ -39,7 +43,7 @@ import com.google.common.collect.Maps;
 /**
  */
 @ThreadSafe
-public class ApplicationDefEmbeddedHTMLFormatAdapter extends EmbeddedHTMLFormatAdapter<ApplicationDef>{
+public class ApplicationDefEmbeddedHTMLFormatAdapter extends EmbeddedHTMLFormatAdapter<ApplicationDef> {
 
     @Override
     public Class<ApplicationDef> getType() {
@@ -50,7 +54,7 @@ public class ApplicationDefEmbeddedHTMLFormatAdapter extends EmbeddedHTMLFormatA
     public void write(Object value, Map<String, Object> componentAttributes, Appendable out) throws IOException {
         InstanceService instanceService = Aura.getInstanceService();
         RenderingService renderingService = Aura.getRenderingService();
-        ApplicationDef def = (ApplicationDef)value;
+        ApplicationDef def = (ApplicationDef) value;
         AuraContext context = Aura.getContextService().getCurrentContext();
 
         try {
@@ -63,7 +67,7 @@ public class ApplicationDefEmbeddedHTMLFormatAdapter extends EmbeddedHTMLFormatA
             sb.setLength(0);
             writeHtmlScripts(AuraServlet.getScripts(), sb);
             DefDescriptor<ThemeDef> themeDefDesc = templateDef.getThemeDescriptor();
-            if(themeDefDesc != null){
+            if (themeDefDesc != null) {
                 Client.Type type = context.getClient().getType();
                 attributes.put("auraInlineStyle", themeDefDesc.getDef().getCode(type));
             }
@@ -74,7 +78,7 @@ public class ApplicationDefEmbeddedHTMLFormatAdapter extends EmbeddedHTMLFormatA
             Application instance = instanceService.getInstance(def, null);
 
             auraInit.put("instance", instance);
-            auraInit.put("token", AuraServlet.getToken());
+            auraInit.put("token", AuraBaseServlet.getToken());
             auraInit.put("host", context.getContextPath());
 
             StringBuilder contextWriter = new StringBuilder();

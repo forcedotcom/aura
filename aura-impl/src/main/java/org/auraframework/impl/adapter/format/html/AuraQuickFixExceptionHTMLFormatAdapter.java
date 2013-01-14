@@ -40,9 +40,10 @@ public class AuraQuickFixExceptionHTMLFormatAdapter extends HTMLFormatAdapter<Qu
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException, QuickFixException {
+    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException,
+            QuickFixException {
         Mode m = Aura.getContextService().getCurrentContext().getMode();
-        if(m != Mode.DEV){
+        if (m != Mode.DEV) {
             Aura.getSerializationService().write(value, attributes, Throwable.class, out, getFormatName());
             return;
         }
@@ -51,7 +52,8 @@ public class AuraQuickFixExceptionHTMLFormatAdapter extends HTMLFormatAdapter<Qu
             Map<String, Object> attribs = Maps.newHashMap();
             attribs.put("exception", value);
             Aura.getContextService().getCurrentContext().setPreloading(false);
-            Component cmp = Aura.getInstanceService().getInstance("auradev:quickFixException", ComponentDef.class, attribs);
+            Component cmp = Aura.getInstanceService().getInstance("auradev:quickFixException", ComponentDef.class,
+                    attribs);
             Aura.getSerializationService().write(cmp, attribs, Component.class, out);
         } catch (QuickFixException e) {
             throw new AuraError(e);

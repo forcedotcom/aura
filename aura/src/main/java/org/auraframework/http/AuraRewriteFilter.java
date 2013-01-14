@@ -19,7 +19,14 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.*;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.auraframework.def.DefDescriptor.DefType;
@@ -43,10 +50,10 @@ public class AuraRewriteFilter implements Filter {
 
     }
 
-    private static String createURI(String namespace, String name, String defType, String access, String qs){
+    private static String createURI(String namespace, String name, String defType, String access, String qs) {
         String ret = String.format(uriPattern, namespace, name, defType, access);
 
-        if(qs != null){
+        if (qs != null) {
             ret = String.format("%s&%s", ret, qs);
         }
 
@@ -57,16 +64,17 @@ public class AuraRewriteFilter implements Filter {
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException,
             IOException {
 
-        HttpServletRequest request = (HttpServletRequest)req;
+        HttpServletRequest request = (HttpServletRequest) req;
 
         String path = request.getRequestURI().substring(request.getContextPath().length());
         String qs = request.getQueryString();
 
         String newUri = null;
         Matcher pubMatcher = publicPattern.matcher(path);
-        if(pubMatcher.matches()){
-            newUri = createURI(pubMatcher.group(1), pubMatcher.group(2), DefType.APPLICATION.name(), Access.PUBLIC.name(), qs);
-        }else{
+        if (pubMatcher.matches()) {
+            newUri = createURI(pubMatcher.group(1), pubMatcher.group(2), DefType.APPLICATION.name(),
+                    Access.PUBLIC.name(), qs);
+        } else {
             Mode mode = AuraContextFilter.mode.get(request, Mode.PROD);
             String ns;
             String name;
@@ -74,23 +82,23 @@ public class AuraRewriteFilter implements Filter {
             Matcher matcher = null;
 
             Matcher appMatcher = appPattern.matcher(path);
-            if(appMatcher.matches()){
+            if (appMatcher.matches()) {
                 matcher = appMatcher;
                 type = DefType.APPLICATION.name();
-            }else{
+            } else {
                 Matcher cmpMatcher = cmpPattern.matcher(path);
-                if(cmpMatcher.matches()){
+                if (cmpMatcher.matches()) {
                     matcher = cmpMatcher;
                     type = DefType.COMPONENT.name();
                 }
             }
-            if(matcher != null){
-                if(mode == Mode.JSTEST || mode == Mode.JSTESTDEBUG){
+            if (matcher != null) {
+                if (mode == Mode.JSTEST || mode == Mode.JSTESTDEBUG) {
                     qs = String.format("descriptor=%s:%s&defType=%s", matcher.group(1), matcher.group(2), type);
                     ns = "aurajstest";
                     name = "jstest";
                     type = DefType.APPLICATION.name();
-                }else{
+                } else {
                     ns = matcher.group(1);
                     name = matcher.group(2);
                 }
@@ -98,10 +106,10 @@ public class AuraRewriteFilter implements Filter {
             }
 
         }
-        if(newUri!=null && !newUri.isEmpty()){
+        if (newUri != null && !newUri.isEmpty()) {
             RequestDispatcher dispatcher = servletContext.getRequestDispatcher(newUri);
 
-            if(dispatcher != null){
+            if (dispatcher != null) {
                 dispatcher.forward(req, res);
                 return;
             }

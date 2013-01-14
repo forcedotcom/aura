@@ -16,15 +16,15 @@
 package configuration;
 
 import org.auraframework.test.TestInventory;
-import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
+import org.auraframework.util.ServiceLoaderImpl.Impl;
 
 /**
  */
 @AuraConfiguration
 public class AuraImplExpressionTestConfig {
 
-    @Impl(name="auraImplExpressionTestInventory")
+    @Impl(name = "auraImplExpressionTestInventory")
     public static TestInventory auraImplExpressionTestInventory() throws Exception {
         return new TestInventory(AuraImplExpressionTestConfig.class);
     }

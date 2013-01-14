@@ -43,16 +43,17 @@ public class ThrowableHTMLFormatAdapter extends HTMLFormatAdapter<Throwable> {
     @Override
     public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException {
 
-        Throwable t = Aura.getExceptionAdapter().getRootCause((Throwable)value);
+        Throwable t = Aura.getExceptionAdapter().getRootCause((Throwable) value);
         Map<String, Object> attribs = Maps.newHashMap();
         attribs.put("autoInitialize", "false");
         attribs.put("bodyClass", "auraError");
         attribs.put("defaultBodyClass", "auraError");
         attribs.put("forceError", "true");
 
-        if (Aura.getContextService().isEstablished() && Aura.getContextService().getCurrentContext().getMode() != Mode.PROD) {
+        if (Aura.getContextService().isEstablished()
+                && Aura.getContextService().getCurrentContext().getMode() != Mode.PROD) {
             attribs.put("errorMessage", AuraExceptionUtil.getStackTrace(t));
-        }else{
+        } else {
             attribs.put("errorMessage", t.getMessage());
         }
         try {

@@ -16,10 +16,11 @@
 package org.auraframework.throwable;
 
 /**
- * Aura-related error arising from abnormal conditions which no one should reasonably try to catch. One example might
- * be if Aura was missing some key source code of the engine itself.
+ * Aura-related error arising from abnormal conditions which no one should
+ * reasonably try to catch. One example might be if Aura was missing some key
+ * source code of the engine itself.
  * "Even if you could recover, things will continue to not go your way."
- *
+ * 
  * @see AuraException
  * @see AuraRuntimeException
  */

@@ -16,11 +16,13 @@
 package org.auraframework.impl.java.controller;
 
 import java.io.IOException;
-
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.auraframework.def.*;
+import org.auraframework.def.ActionDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.TypeDef;
+import org.auraframework.def.ValueDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.util.json.Json;
@@ -59,7 +61,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
 
     /**
      * Gets the method for this instance.
-     *
+     * 
      * @return The method.
      */
     public Method getMethod() {
@@ -82,9 +84,9 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         json.writeMapEnd();
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<ActionDef>{
+    public static class Builder extends DefinitionImpl.BuilderImpl<ActionDef> {
 
-        public Builder(){
+        public Builder() {
             super(ActionDef.class);
         }
 
@@ -100,7 +102,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
 
         /**
          * Sets the returnTypeDescriptor for this instance.
-         *
+         * 
          * @param returnTypeDescriptor The returnTypeDescriptor.
          */
         public void setReturnTypeDescriptor(DefDescriptor<TypeDef> returnTypeDescriptor) {
@@ -109,7 +111,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
 
         /**
          * Sets the params for this instance.
-         *
+         * 
          * @param params The params.
          */
         public void setParams(List<ValueDef> params) {
@@ -118,7 +120,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
 
         /**
          * Sets the javaParams for this instance.
-         *
+         * 
          * @param javaParams The javaParams.
          */
         public void setJavaParams(Class<?>[] javaParams) {

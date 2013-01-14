@@ -18,8 +18,8 @@ package org.auraframework.components.auradocs;
 import java.util.List;
 
 import org.auraframework.components.ui.TreeNode;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Model;
 
 import com.google.common.collect.Lists;
 

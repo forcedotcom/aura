@@ -17,7 +17,6 @@ package org.auraframework.def;
 
 import java.util.Collection;
 
-
 /**
  */
 public interface LayoutDef extends Definition {

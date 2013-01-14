@@ -25,14 +25,15 @@ import org.auraframework.test.adapter.TestLoggingAdapter;
 import com.google.common.collect.Lists;
 
 /**
- * Hook into logger so we can do some basic request monitoring in tests, as AuraContextFilter logs all incoming.
- *
- *
+ * Hook into logger so we can do some basic request monitoring in tests, as
+ * AuraContextFilter logs all incoming.
+ * 
+ * 
  * @since 0.0.224
  */
 public class TestLoggingAdapterImpl implements TestLoggingAdapter {
     private static ThreadLocal<LoggingContext> currentContext = new ThreadLocal<LoggingContext>();
-    private List<Map<String, Object>> logs = Lists.newLinkedList();
+    private final List<Map<String, Object>> logs = Lists.newLinkedList();
     private boolean isCapturing = false;
 
     @Override

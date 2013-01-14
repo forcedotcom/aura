@@ -23,11 +23,12 @@ import org.auraframework.system.Annotations.Model;
 
 @Model
 public class SleepyServerModel {
-    public SleepyServerModel()throws InterruptedException{
+    public SleepyServerModel() throws InterruptedException {
         Thread.sleep(10000);
     }
+
     @AuraEnabled
-    public List<String> getStringList(){
+    public List<String> getStringList() {
         ArrayList<String> sl = new ArrayList<String>();
         sl.add("foo");
         sl.add("bar");

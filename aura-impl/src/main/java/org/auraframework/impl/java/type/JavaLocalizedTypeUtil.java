@@ -19,18 +19,16 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import com.google.common.collect.Maps;
-
 import org.auraframework.Aura;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.ServiceLocator;
-import org.auraframework.util.type.TypeUtil;
+
+import com.google.common.collect.Maps;
 
 /**
- * Converts java Aura values between types, using the Aura Localization layer
- * to decipher formatting and handle parsing.
- *
+ * Converts java Aura values between types, using the Aura Localization layer to
+ * decipher formatting and handle parsing.
+ * 
  * @see TypeUtil
  */
 public class JavaLocalizedTypeUtil {
@@ -45,8 +43,8 @@ public class JavaLocalizedTypeUtil {
 
     // cached converters
     private final Map<String, Map<String, LocalizedConverter<?, ?>>> converters = Maps.newHashMap();
-    private final Map<String, Map<String, Map<String, LocalizedConverter<?, ?>>>> parameterizedConverters = Maps.newHashMap();
-
+    private final Map<String, Map<String, Map<String, LocalizedConverter<?, ?>>>> parameterizedConverters = Maps
+            .newHashMap();
 
     /**
      * Private constructor that populates a converter cache.
@@ -110,21 +108,20 @@ public class JavaLocalizedTypeUtil {
 
     /**
      * Ask if a given converter is available.
-     *
+     * 
      * @param from the conversion source data type
      * @param to the conversion target data type
      * @param of if not null, 'to' is a container of this type
-     *
+     * 
      * @return true if a converter is available
      */
     public static boolean hasConverter(Class<?> from, Class<?> to, String of) {
         return getConverter(from, to, of) != null;
     }
 
-
     /**
      * Ask if a given converter is available.
-     *
+     * 
      * @param from
      * @param to
      * @return true if a converter is available
@@ -138,10 +135,10 @@ public class JavaLocalizedTypeUtil {
      * Conversions, drop a new implementation of LocalizedConverter into the
      * aura.impl.java.type.converter directory and add a reference to it in
      * configuration.AuraImplConfig.
-     *
+     * 
      * If a Locale aware <code>LocalizedConverter</code> can't be found a
      * <code>aura.util.type.Converter<code> will be used instead.
-     *
+     * 
      * @param <F>
      * @param <T>
      * @param value
@@ -149,7 +146,7 @@ public class JavaLocalizedTypeUtil {
      * @param of
      * @param trim
      * @param locale
-     *
+     * 
      * @return a converted T
      */
     @SuppressWarnings("unchecked")
@@ -177,8 +174,6 @@ public class JavaLocalizedTypeUtil {
         return getConverter(from, to, of).convert(value, locale);
     }
 
-
-
     // additional convert signatures that all just pass in the right args
     // to the long form version
 
@@ -186,8 +181,7 @@ public class JavaLocalizedTypeUtil {
         return convert(value, to, null, false, null);
     }
 
-    public static <F, T> T convertNoTrim(F value, Class<T> to,
-            AuraLocale locale) {
+    public static <F, T> T convertNoTrim(F value, Class<T> to, AuraLocale locale) {
         return convert(value, to, null, false, locale);
     }
 
@@ -203,8 +197,7 @@ public class JavaLocalizedTypeUtil {
         return convert(value, to, null, trim, null);
     }
 
-    public static <F, T> T convert(F value, Class<T> to, boolean trim,
-            AuraLocale locale) {
+    public static <F, T> T convert(F value, Class<T> to, boolean trim, AuraLocale locale) {
         return convert(value, to, null, trim, locale);
     }
 
@@ -212,8 +205,7 @@ public class JavaLocalizedTypeUtil {
         return convert(value, to, of, false, null);
     }
 
-    public static <F, T> T convertNoTrim(F value, Class<T> to, String of,
-            AuraLocale locale) {
+    public static <F, T> T convertNoTrim(F value, Class<T> to, String of, AuraLocale locale) {
         return convert(value, to, of, false, locale);
     }
 
@@ -221,8 +213,7 @@ public class JavaLocalizedTypeUtil {
         return convert(value, to, of, true, null);
     }
 
-    public static <F, T> T convert(F value, Class<T> to, String of,
-            AuraLocale locale) {
+    public static <F, T> T convert(F value, Class<T> to, String of, AuraLocale locale) {
         return convert(value, to, of, true, locale);
     }
 
@@ -238,21 +229,23 @@ public class JavaLocalizedTypeUtil {
     @SuppressWarnings("unchecked")
     private static <F, T> LocalizedConverter<F, T> getConverter(Class<F> from, Class<T> to, String of) {
         JavaLocalizedTypeUtil typeUtil = get();
-        if (of == null){
-            Map<String, LocalizedConverter<?,?>> map = typeUtil.converters.get(from.getName());
-            if(map != null){
-                return (LocalizedConverter<F,T>)map.get(to.getName());
+        if (of == null) {
+            Map<String, LocalizedConverter<?, ?>> map = typeUtil.converters.get(from.getName());
+            if (map != null) {
+                return (LocalizedConverter<F, T>) map.get(to.getName());
             }
         } else {
-            Map<String, Map<String, LocalizedConverter<?, ?>>> converters = typeUtil.parameterizedConverters.get(from.getName());
-            if(converters != null){
-                Map<String, LocalizedConverter<?,?>> paramConverters = converters.get(to.getName());
-                if(paramConverters != null){
-                    return (LocalizedConverter<F,T>) paramConverters.get(of);
+            Map<String, Map<String, LocalizedConverter<?, ?>>> converters = typeUtil.parameterizedConverters.get(from
+                    .getName());
+            if (converters != null) {
+                Map<String, LocalizedConverter<?, ?>> paramConverters = converters.get(to.getName());
+                if (paramConverters != null) {
+                    return (LocalizedConverter<F, T>) paramConverters.get(of);
                 }
             }
         }
-        // Don't panic yet - if no LocalizedConverter is found, we can still use the non-localized version.
+        // Don't panic yet - if no LocalizedConverter is found, we can still use
+        // the non-localized version.
         return null;
     }
 

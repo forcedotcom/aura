@@ -17,10 +17,9 @@ package org.auraframework.impl.adapter.format.html;
 
 import org.auraframework.instance.Application;
 
-
 /**
  */
-public class ApplicationHTMLFormatAdapter extends BaseComponentHTMLFormatAdapter<Application>{
+public class ApplicationHTMLFormatAdapter extends BaseComponentHTMLFormatAdapter<Application> {
 
     @Override
     public Class<Application> getType() {

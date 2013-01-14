@@ -15,17 +15,20 @@
  */
 package org.auraframework.impl.loadLevel;
 
+import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.Annotations.AuraEnabled;
 
 @Controller
 public class GatedModelController {
 
     @AuraEnabled
     public static void resumeById(@Key("waitId") String waitId) {
-        if (waitId == null) { return; }
-        String lock = GatedModel.pending.remove(waitId);;
+        if (waitId == null) {
+            return;
+        }
+        String lock = GatedModel.pending.remove(waitId);
+        ;
         if (lock != null) {
             synchronized (lock) {
                 lock.notifyAll();

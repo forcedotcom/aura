@@ -15,15 +15,15 @@
  */
 package org.auraframework.impl.java.model;
 
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Model;
 
 @Model
 public class TestModel {
-    private String firstThing = "firstThingDefault";
+    private final String firstThing = "firstThingDefault";
 
     @AuraEnabled
-    public String getFirstThing(){
+    public String getFirstThing() {
         return firstThing;
     }
 

@@ -41,7 +41,8 @@ import com.google.common.collect.Maps;
 public class JavaTestController {
 
     @AuraEnabled
-    public static void noArgs() {}
+    public static void noArgs() {
+    }
 
     @AuraEnabled
     public static Object getComponents(@Key("token") String token, @Key("input") String input) throws Exception {
@@ -71,7 +72,8 @@ public class JavaTestController {
      * Note: these cases are pretty specific to js://test.testActionExceptions
      * 
      * @param exceptionType What type (class) of exception to throw
-     * @param cause Cause parameter of Exception. Either a class of type Throwable or String
+     * @param cause Cause parameter of Exception. Either a class of type
+     *            Throwable or String
      */
     @AuraEnabled
     public static void throwsThrowable(@Key("type") String exceptionType, @Key("cause") String cause) throws Throwable {
@@ -90,7 +92,7 @@ public class JavaTestController {
         } else if (exceptionType.equals("java.lang.reflect.InvocationTargetException")) {
             if (cause.equals("java.lang.IllegalArgumentException")) {
                 throw new InvocationTargetException(new IllegalArgumentException());
-            } else if (cause.equals("aura.throwable.AuraHandledException")){
+            } else if (cause.equals("aura.throwable.AuraHandledException")) {
                 throw new InvocationTargetException(new AuraHandledException(""));
             }
         } else if (exceptionType.equals("aura.throwable.AuraHandledException")) {
@@ -105,9 +107,9 @@ public class JavaTestController {
     }
 
     @AuraEnabled
-	public static void throwsException(@Key("errorMsg") String errorMsg) throws Exception {
-    	throw new Exception(errorMsg);
-	}
+    public static void throwsException(@Key("errorMsg") String errorMsg) throws Exception {
+        throw new Exception(errorMsg);
+    }
 
     private static Map<String, StringBuffer> buffers = Maps.newLinkedHashMap();
 
@@ -124,8 +126,8 @@ public class JavaTestController {
     }
 
     /**
-     * Wait for delayMs milliseconds and then return a auratest:text component whose value is the current buffer
-     * contents plus the current append.
+     * Wait for delayMs milliseconds and then return a auratest:text component
+     * whose value is the current buffer contents plus the current append.
      */
     @AuraEnabled
     public static Component appendBuffer(@Key("id") String id, @Key("delayMs") BigDecimal delayMs,
@@ -133,8 +135,10 @@ public class JavaTestController {
         StringBuffer buffer = buffers.get(id);
         buffer.append(append);
         long delay = delayMs.longValue();
-        if (delay > 0) Thread.sleep(delay);
-        Map<String, Object> atts = ImmutableMap.of("value", (Object)(buffer + "."));
+        if (delay > 0) {
+            Thread.sleep(delay);
+        }
+        Map<String, Object> atts = ImmutableMap.of("value", (Object) (buffer + "."));
         return Aura.getInstanceService().getInstance("auratest:text", ComponentDef.class, atts);
     }
 

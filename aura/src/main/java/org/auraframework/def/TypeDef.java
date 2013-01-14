@@ -20,11 +20,9 @@ import java.util.Set;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-
-
 /**
- * A TypeDef is a wrapper around an implementation of a supported type.
- * It generally wraps and delegates to a Class definition from another language.
+ * A TypeDef is a wrapper around an implementation of a supported type. It
+ * generally wraps and delegates to a Class definition from another language.
  */
 public interface TypeDef extends Definition {
     @Override
@@ -32,9 +30,9 @@ public interface TypeDef extends Definition {
 
     /**
      * Attempts to parse the stringRep and return the implementation-specific
-     * value of the Type represented by this TypeDef.  If parsing fails, or
-     * if the delegate type does not support coersion from Strings, returns null.
-     *
+     * value of the Type represented by this TypeDef. If parsing fails, or if
+     * the delegate type does not support coersion from Strings, returns null.
+     * 
      * @param stringRep
      * @return The parsed value, or null if the String value cannot be parsed.
      */
@@ -46,14 +44,15 @@ public interface TypeDef extends Definition {
     Object wrap(Object o);
 
     /**
-     * @return The delegate type for the language specified by the passed in prefix.
-     * In java, for example, this would be a java.lang.Class, but for a custom java
-     * type where Apex is passed in as the prefix, Basic.ANYTYPE might be returned.
+     * @return The delegate type for the language specified by the passed in
+     *         prefix. In java, for example, this would be a java.lang.Class,
+     *         but for a custom java type where Apex is passed in as the prefix,
+     *         Basic.ANYTYPE might be returned.
      * @throws QuickFixException
      */
     Object getExternalType(String prefix) throws QuickFixException;
 
-    Object initialize(Object config, BaseComponent<?,?> valueProvider) throws QuickFixException;
+    Object initialize(Object config, BaseComponent<?, ?> valueProvider) throws QuickFixException;
 
     void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) throws QuickFixException;
 }

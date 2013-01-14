@@ -15,7 +15,10 @@
  */
 package org.auraframework.impl;
 
-import org.auraframework.builder.*;
+import org.auraframework.builder.ApplicationDefBuilder;
+import org.auraframework.builder.ComponentDefBuilder;
+import org.auraframework.builder.ComponentDefRefBuilder;
+import org.auraframework.builder.ThemeDefBuilder;
 import org.auraframework.impl.css.theme.ThemeDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.component.ComponentDefImpl;
@@ -24,18 +27,16 @@ import org.auraframework.service.BuilderService;
 
 /**
  */
-public class BuilderServiceImpl implements BuilderService{
+public class BuilderServiceImpl implements BuilderService {
 
     /**
      */
     private static final long serialVersionUID = 5092951086123399013L;
 
-
     @Override
     public ApplicationDefBuilder getApplicationDefBuilder() {
         return new ApplicationDefImpl.Builder();
     }
-
 
     @Override
     public ComponentDefBuilder getComponentDefBuilder() {
@@ -46,7 +47,6 @@ public class BuilderServiceImpl implements BuilderService{
     public ComponentDefRefBuilder getComponentDefRefBuilder() {
         return new ComponentDefRefImpl.Builder();
     }
-
 
     @Override
     public ThemeDefBuilder getThemeDefBuilder() {

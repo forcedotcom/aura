@@ -21,17 +21,16 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.auraframework.controller.java.ServletConfigController;
-import org.auraframework.test.AuraHttpTestCase;
-import org.auraframework.test.annotation.ThreadHostileTest;
-import org.auraframework.test.annotation.UnAdaptableTest;
-import org.auraframework.test.client.UserAgent;
-
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.http.HttpHeaders;
+import org.auraframework.controller.java.ServletConfigController;
+import org.auraframework.test.AuraHttpTestCase;
+import org.auraframework.test.annotation.ThreadHostileTest;
+import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.test.client.UserAgent;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.LineReader;
@@ -43,17 +42,17 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     private static final String APPCACHE_UNSUPPORTED_USERAGENT = UserAgent.EMPTY.getUserAgentString();
     private static final Pattern HTML_TAG_PATTERN = Pattern.compile("<html data-lm=\"(.*?)\" manifest=\"(.*?)\">");
 
-    private class ManifestInfo{
+    private class ManifestInfo {
         String url;
         String lastmod;
 
-        ManifestInfo(String url, String lastmod){
+        ManifestInfo(String url, String lastmod) {
             this.url = url;
             this.lastmod = lastmod;
         }
     }
 
-    public AppCacheManifestHttpTest(String name){
+    public AppCacheManifestHttpTest(String name) {
         super(name);
     }
 
@@ -63,7 +62,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         ServletConfigController.setAppCacheDisabled(false);
     }
 
-    private ManifestInfo getManifestInfo(String appPath) throws HttpException, IOException, Exception{
+    private ManifestInfo getManifestInfo(String appPath) throws HttpException, IOException, Exception {
         GetMethod get = obtainGetMethod(appPath + "?aura.mode=PROD");
         getHttpClient().executeMethod(get);
         String responseBody = get.getResponseBodyAsString();
@@ -77,7 +76,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         return new ManifestInfo(url, lastmod);
     }
 
-    private String getManifestErrorUrl(String manifestURI){
+    private String getManifestErrorUrl(String manifestURI) {
         return manifestURI + "?aura.error=true";
     }
 
@@ -86,7 +85,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
 
         LineReader reader = new LineReader(new StringReader(manifestContents));
         for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-            if(line.startsWith("/")){
+            if (line.startsWith("/")) {
                 links.add(line);
             }
         }
@@ -110,35 +109,35 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         assertLinksReachable(links);
     }
 
-    private void assertManifestFormat(String manifestContent){
-        if(!manifestContent.startsWith("CACHE MANIFEST\n")){
-            fail("Manifest should starts with: "+ "CACHE MANIFEST");
+    private void assertManifestFormat(String manifestContent) {
+        if (!manifestContent.startsWith("CACHE MANIFEST\n")) {
+            fail("Manifest should starts with: " + "CACHE MANIFEST");
         }
     }
 
     private void assertManifestLastMod(String manifestContent, String lastMod) throws Exception {
-        String lastModMarker = String.format("\n# LAST MOD: %s\n",lastMod);
-        if(!manifestContent.contains(lastModMarker)){
-            fail("Line not found: "+ lastModMarker);
+        String lastModMarker = String.format("\n# LAST MOD: %s\n", lastMod);
+        if (!manifestContent.contains(lastModMarker)) {
+            fail("Line not found: " + lastModMarker);
         }
     }
 
     private void assertRequiredLinks(List<String> required, List<String> links) throws Exception {
-        for(String requiredLink : required){
+        for (String requiredLink : required) {
             boolean foundFlag = false;
-               for(String link : links){
-                   if(link.endsWith(requiredLink)){
-                       foundFlag = true;
-                   }
-               }
-               if(!foundFlag){
-                   fail("Missing required link: *"+ requiredLink);
-               }
+            for (String link : links) {
+                if (link.endsWith(requiredLink)) {
+                    foundFlag = true;
+                }
+            }
+            if (!foundFlag) {
+                fail("Missing required link: *" + requiredLink);
+            }
         }
     }
 
     private void assertLinksReachable(List<String> links) throws Exception {
-        for(String link : links){
+        for (String link : links) {
             GetMethod get = obtainGetMethod(link);
             getHttpClient().executeMethod(get);
             assertEquals(HttpStatus.SC_OK, get.getStatusCode());
@@ -146,8 +145,9 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     }
 
     private void assertManifestHeaders(GetMethod get) throws Exception {
-        assertEquals(String.format("%s;charset=%s", AuraBaseServlet.MANIFEST_CONTENT_TYPE, AuraBaseServlet.UTF_ENCODING), get
-                .getResponseHeader(HttpHeaders.CONTENT_TYPE).getValue().replaceAll("\\s", ""));
+        assertEquals(
+                String.format("%s;charset=%s", AuraBaseServlet.MANIFEST_CONTENT_TYPE, AuraBaseServlet.UTF_ENCODING),
+                get.getResponseHeader(HttpHeaders.CONTENT_TYPE).getValue().replaceAll("\\s", ""));
         assertEquals("no-cache, no-store", get.getResponseHeader(HttpHeaders.CACHE_CONTROL).getValue());
     }
 
@@ -162,8 +162,8 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         getHttpClient().executeMethod(get);
         String response = get.getResponseBodyAsString();
 
-        if(!response.isEmpty()){
-            fail("manifest should be empty: *"+ manifest.url);
+        if (!response.isEmpty()) {
+            fail("manifest should be empty: *" + manifest.url);
         }
     }
 
@@ -174,7 +174,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         System.setProperty(HttpMethodParams.USER_AGENT, APPCACHE_SUPPORTED_USERAGENT);
         ServletConfigController.setAppCacheDisabled(true);
         ManifestInfo manifest = getManifestInfo("/appCache/withpreload.app");
-        if(manifest.url != null){
+        if (manifest.url != null) {
             fail("no manifest url should be present, but got: " + manifest.url);
         }
     }
@@ -185,14 +185,15 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     public void testGetManifestForAppWithoutPreloads() throws Exception {
         System.setProperty(HttpMethodParams.USER_AGENT, APPCACHE_SUPPORTED_USERAGENT);
         ManifestInfo manifest = getManifestInfo("/appCache/nopreload.app");
-        if(manifest.url == null){
+        if (manifest.url == null) {
             fail("manifest url should be present, but got: " + manifest.url);
         }
     }
 
     /**
-     * GET app cache manifest for app with preloads returns a full manifest containing preloading resources. * note that
-     * invalid and absolute css urls are not included
+     * GET app cache manifest for app with preloads returns a full manifest
+     * containing preloading resources. * note that invalid and absolute css
+     * urls are not included
      */
     public void testGetManifestForAppWithPreloads() throws Exception {
         System.setProperty(HttpMethodParams.USER_AGENT, APPCACHE_SUPPORTED_USERAGENT);
@@ -207,7 +208,8 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * GET app cache manifest with aura.error query param returns empty response and error-valued manifest cookie.
+     * GET app cache manifest with aura.error query param returns empty response
+     * and error-valued manifest cookie.
      */
     @UnAdaptableTest
     public void testGetManifestWithAuraErrorParam() throws Exception {
@@ -227,7 +229,8 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * GET app cache manifest with manifest cookie with error value, returns 404 and deletes the manifest cookie.
+     * GET app cache manifest with manifest cookie with error value, returns 404
+     * and deletes the manifest cookie.
      */
     public void testGetManifestWithErrorManifestCookie() throws Exception {
         System.setProperty(HttpMethodParams.USER_AGENT, APPCACHE_SUPPORTED_USERAGENT);
@@ -248,7 +251,8 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         GetMethod getClean = obtainGetMethod(manifest.url);
         getHttpClient().executeMethod(getClean);
 
-        // Now, after one failed call a new manifest call should go thru.(Error cookie cleared);
+        // Now, after one failed call a new manifest call should go thru.(Error
+        // cookie cleared);
         assertManifest(
                 getClean.getResponseBodyAsString(),
                 Lists.newArrayList(String.format("%%22lastmod%%22%%3A%%22%s%%22%%7D/app.css", manifest.lastmod),

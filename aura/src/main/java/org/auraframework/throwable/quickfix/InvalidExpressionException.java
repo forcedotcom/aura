@@ -22,8 +22,8 @@ import org.auraframework.throwable.AuraValidationException;
 
 /**
  * thrown when an invalid expression is detected
- *
- *
+ * 
+ * 
  * @since 0.0.204
  */
 public class InvalidExpressionException extends AuraValidationException {

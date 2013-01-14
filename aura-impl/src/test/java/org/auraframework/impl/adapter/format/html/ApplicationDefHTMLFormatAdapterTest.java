@@ -25,7 +25,7 @@ import org.auraframework.util.AuraTextUtil;
 
 /**
  * Tests for BaseComponentDefHTMLFormatAdapter, as it relates to ApplicationDef
- *
+ * 
  * @since 0.0.224
  */
 @ThreadHostileTest
@@ -41,7 +41,8 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
     }
 
     /**
-     * Manifest is not appended to <html> if system config is set to disable appcache (aura.noappcache = true).
+     * Manifest is not appended to <html> if system config is set to disable
+     * appcache (aura.noappcache = true).
      */
     public void testWriteManifestWithConfigDisabled() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
@@ -49,8 +50,8 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         try {
             context.clearPreloads();
             context.addPreload("aura");
-            DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(
-                    ApplicationDef.class, "<aura:application useAppcache='true' render='client'></aura:application>");
+            DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                    "<aura:application useAppcache='true' render='client'></aura:application>");
             context.setApplicationDescriptor(desc);
             String body = doWrite(desc.getDef());
             int start = body.indexOf("<html ");
@@ -73,8 +74,8 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
     public void testWriteManifestWithoutPreloads() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
         context.clearPreloads();
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(
-                ApplicationDef.class, "<aura:application useAppcache='true' render='client'></aura:application>");
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                "<aura:application useAppcache='true' render='client'></aura:application>");
         context.setApplicationDescriptor(desc);
         String body = doWrite(desc.getDef());
         int start = body.indexOf("<html ");
@@ -91,8 +92,8 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         AuraContext context = Aura.getContextService().getCurrentContext();
         context.clearPreloads();
         context.addPreload("aura");
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(
-                ApplicationDef.class, "<aura:application render='client' useAppcache='false'></aura:application>");
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                "<aura:application render='client' useAppcache='false'></aura:application>");
         context.setApplicationDescriptor(desc);
         String body = doWrite(desc.getDef());
         int start = body.indexOf("<html ");
@@ -103,14 +104,15 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
     }
 
     /**
-     * Manifest is not appended to <html> if useAppcache is missing (inherits false from aura:application).
+     * Manifest is not appended to <html> if useAppcache is missing (inherits
+     * false from aura:application).
      */
     public void testWriteManifestWithUseAppCacheInherited() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
         context.clearPreloads();
         context.addPreload("aura");
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(
-                ApplicationDef.class, "<aura:application render='client'></aura:application>");
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                "<aura:application render='client'></aura:application>");
         context.setApplicationDescriptor(desc);
         String body = doWrite(desc.getDef());
         int start = body.indexOf("<html ");
@@ -127,14 +129,14 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         AuraContext context = Aura.getContextService().getCurrentContext();
         context.clearPreloads();
         context.addPreload("aura");
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(
-                ApplicationDef.class,
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application render='client' preload='aura' useAppcache='true'></aura:application>");
         context.setApplicationDescriptor(desc);
         String body = doWrite(desc.getDef());
         int start = body.indexOf("<html ");
         String tag = body.substring(start, body.indexOf('>', start) + 1);
-        String expectedSubPath = AuraTextUtil.urlencode("{\"mode\":\"UTEST\",\"app\":\"string:"+desc.getName()+"\"}");
+        String expectedSubPath = AuraTextUtil.urlencode("{\"mode\":\"UTEST\",\"app\":\"string:" + desc.getName()
+                + "\"}");
         String expectedAttribute = " manifest=\"/l/" + expectedSubPath + "/app.manifest\"";
         if (!tag.contains(expectedAttribute)) {
             fail("Did not find expected manifest attribute <" + expectedAttribute + ">:" + body);

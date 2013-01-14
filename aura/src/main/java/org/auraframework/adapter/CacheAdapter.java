@@ -17,6 +17,6 @@ package org.auraframework.adapter;
 
 /**
  */
-public interface CacheAdapter extends AuraAdapter{
+public interface CacheAdapter extends AuraAdapter {
 
 }

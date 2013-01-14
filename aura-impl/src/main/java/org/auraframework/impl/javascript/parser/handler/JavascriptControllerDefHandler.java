@@ -15,11 +15,12 @@
  */
 package org.auraframework.impl.javascript.parser.handler;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
 
-import com.google.common.collect.Maps;
-
-import org.auraframework.def.*;
+import org.auraframework.def.ActionDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.javascript.controller.JavascriptActionDef;
 import org.auraframework.impl.javascript.controller.JavascriptControllerDef;
@@ -30,13 +31,15 @@ import org.auraframework.system.Source;
 import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.JsonHandlerProvider;
 
+import com.google.common.collect.Maps;
+
 /**
  * Javascript handler for controller defs
  */
 public class JavascriptControllerDefHandler extends
         JavascriptHandler<DefDescriptor<ControllerDef>, JavascriptControllerDef> {
 
-    private Builder builder = new Builder();
+    private final Builder builder = new Builder();
 
     public JavascriptControllerDefHandler(DefDescriptor<ControllerDef> descriptor, Source<?> source) {
         super(descriptor, source);
@@ -53,7 +56,7 @@ public class JavascriptControllerDefHandler extends
         builder.setLocation(getLocation());
         builder.actionDefs = Maps.newTreeMap();
         for (Map.Entry<String, Object> e : map.entrySet()) {
-            JsFunction f = (JsFunction)e.getValue();
+            JsFunction f = (JsFunction) e.getValue();
             String name = e.getKey();
             JavascriptActionDef action = createActionDef(name, f);
             builder.actionDefs.put(name, action);

@@ -50,15 +50,13 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     }
 
     /**
-     * Given a URL to post a GET request, this method compares the actual status code of the response with an expected
-     * status code.
-     *
-     * @param msg
-     *            Error message that should be displayed if the actual response does not match the expected response
-     * @param url
-     *            URL to be used to execute the GET request
-     * @param statusCode
-     *            expected status code of response
+     * Given a URL to post a GET request, this method compares the actual status
+     * code of the response with an expected status code.
+     * 
+     * @param msg Error message that should be displayed if the actual response
+     *            does not match the expected response
+     * @param url URL to be used to execute the GET request
+     * @param statusCode expected status code of response
      * @throws Exception
      */
     protected void assertUrlResponse(String msg, String url, int statusCode) throws Exception {

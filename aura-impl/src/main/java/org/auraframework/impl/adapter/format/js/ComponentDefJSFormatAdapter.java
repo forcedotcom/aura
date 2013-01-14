@@ -32,7 +32,8 @@ public class ComponentDefJSFormatAdapter extends JSFormatAdapter<BaseComponentDe
     }
 
     @Override
-    public void writeCollection(Collection<? extends BaseComponentDef> values, Appendable out) throws IOException, QuickFixException {
+    public void writeCollection(Collection<? extends BaseComponentDef> values, Appendable out) throws IOException,
+            QuickFixException {
         out.append("$A.clientService.initDefs(");
         Aura.getSerializationService().writeCollection(values, getType(), out, "JSON");
         out.append(");");

@@ -20,7 +20,8 @@ import java.util.TimeZone;
 
 public interface DateConverter {
     /**
-     * This will format dates based on the JDK's default timezone. For ISO8601 formatting, this is not a problem.
+     * This will format dates based on the JDK's default timezone. For ISO8601
+     * formatting, this is not a problem.
      */
     public String format(Date date);
 
@@ -30,14 +31,14 @@ public interface DateConverter {
     public String format(Date date, TimeZone timeZone);
 
     /**
-     * This will parse dates based on the JDK's default timezone. For ISO8601 parsing, this works well as the timezone
-     * is built into the format.
+     * This will parse dates based on the JDK's default timezone. For ISO8601
+     * parsing, this works well as the timezone is built into the format.
      */
     public Date parse(String date);
 
     /**
-     * This will parse dates based on the timeZone passed in. Use this, and you'll predictable dates come out the
-     * parsing.
+     * This will parse dates based on the timeZone passed in. Use this, and
+     * you'll predictable dates come out the parsing.
      */
     public Date parse(String date, TimeZone timeZone);
 }

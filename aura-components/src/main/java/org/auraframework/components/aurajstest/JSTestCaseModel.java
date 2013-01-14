@@ -15,21 +15,21 @@
  */
 package org.auraframework.components.aurajstest;
 
-import java.util.*;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
 import org.auraframework.Aura;
 import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
 
 import com.google.common.collect.Lists;
 
@@ -39,13 +39,13 @@ public class JSTestCaseModel {
     private final String url;
     private final int count;
 
-    public JSTestCaseModel() throws QuickFixException{
+    public JSTestCaseModel() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        BaseComponent<?,?> component = context.getCurrentComponent();
+        BaseComponent<?, ?> component = context.getCurrentComponent();
 
-        TestCaseDef caseDef = (TestCaseDef)component.getAttributes().getValue("case");
+        TestCaseDef caseDef = (TestCaseDef) component.getAttributes().getValue("case");
 
-        String baseUrl  = component.getAttributes().getValue("url").toString();
+        String baseUrl = component.getAttributes().getValue("url").toString();
         Set<Entry<String, Object>> attributes = caseDef.getAttributeValues().entrySet();
         if (attributes.isEmpty()) {
             url = baseUrl;
@@ -64,17 +64,17 @@ public class JSTestCaseModel {
             url = baseUrl + "&" + URLEncodedUtils.format(newParams, "UTF-8") + hash;
         }
 
-        count = ((TestSuiteDef)component.getAttributes().getValue("suite")).getTestCaseDefs().size();
+        count = ((TestSuiteDef) component.getAttributes().getValue("suite")).getTestCaseDefs().size();
 
     }
 
     @AuraEnabled
-    public String getUrl(){
+    public String getUrl() {
         return url;
     }
 
     @AuraEnabled
-    public Integer getCount(){
+    public Integer getCount() {
         return count;
     }
 }

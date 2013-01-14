@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application extensible="true" template="aura:embeddedTemplate" securityProvider="java://org.auraframework.java.securityProvider.LaxSecurityProvider" render="CLIENT">
+<aura:application extensible="true" template="aura:embeddedTemplate" securityProvider="java://org.auraframework.impl.integration.IntegrationServiceSecurityProvider" render="CLIENT">
     <aura:registerevent name="addComponent" type="aura:addIntegrationComponent"/>
     <aura:handler name="addComponent" action="{!c.addComponent}" />
 </aura:application>

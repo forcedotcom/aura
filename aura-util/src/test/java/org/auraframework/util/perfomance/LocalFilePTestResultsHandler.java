@@ -15,30 +15,39 @@
  */
 package org.auraframework.util.perfomance;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Scanner;
 
 import junit.framework.Test;
+
 import org.auraframework.util.perfomance.PTestGoogleChart.ChartAxisPoints;
 import org.auraframework.util.perfomance.PTestGoogleChart.ChartPoint;
+
 /**
- * This test util is based on JTroup's AbstractCadenceTest framework.
- * This class mirrors LocalFileResultsHandler.
- *
- *
+ * This test util is based on JTroup's AbstractCadenceTest framework. This class
+ * mirrors LocalFileResultsHandler.
+ * 
+ * 
  * @since 0.0.178
  */
 public class LocalFilePTestResultsHandler extends PTestResultsHandler {
-    private File resultsDir;
-    public LocalFilePTestResultsHandler(Test test, File resultsDir){
+    private final File resultsDir;
+
+    public LocalFilePTestResultsHandler(Test test, File resultsDir) {
         super(test);
         this.resultsDir = resultsDir;
     }
 
     @Override
-    public void handleResults(String testName, List<ChartPoint> dataPoints) throws Exception{
+    public void handleResults(String testName, List<ChartPoint> dataPoints) throws Exception {
         File refFile = new File(resultsDir, testName);
 
         if (refFile.exists()) {
@@ -48,16 +57,19 @@ public class LocalFilePTestResultsHandler extends PTestResultsHandler {
         }
         generateGraphFromReferenceFile(testName, refFile);
     }
-    public void generateGraphFromReferenceFile(String chartTitle, File refFile)throws Exception{
+
+    public void generateGraphFromReferenceFile(String chartTitle, File refFile) throws Exception {
         List<ChartAxisPoints> axisPoints = getTestRuns(refFile);
         PTestGoogleChart chart = new PTestGoogleChart(chartTitle, axisPoints);
 
         // write the chart to a file
         File chartFile = new File(refFile.getParentFile(), refFile.getName() + "_chart.png");
-        if(!chartFile.exists())
+        if (!chartFile.exists()) {
             chartFile.createNewFile();
+        }
         chart.writeToFile(chartFile);
     }
+
     /**
      * Appends this run's average load time to an existing reference file.
      */
@@ -75,6 +87,7 @@ public class LocalFilePTestResultsHandler extends PTestResultsHandler {
         refFile.createNewFile();
         appendToReferenceFile(refFile, dataPoints);
     }
+
     /**
      * Writes the results of this run to the supplied Appendable
      */
@@ -86,11 +99,13 @@ public class LocalFilePTestResultsHandler extends PTestResultsHandler {
 
         // write out the metrics and their values
         for (ChartPoint entry : dataPoints.toArray(new ChartPoint[0])) {
-            // replace colons and spaces with underscores so that we can correctly identify metric names later.
+            // replace colons and spaces with underscores so that we can
+            // correctly identify metric names later.
             String formattedMetricName = entry.xValue.replaceAll("[:\\s]", "_");
             out.append(String.format(" %s:%d", formattedMetricName, entry.yValue));
         }
     }
+
     /**
      * Get the chart data for each test run stored in the file.
      */
@@ -99,7 +114,8 @@ public class LocalFilePTestResultsHandler extends PTestResultsHandler {
 
         Scanner scanner = new Scanner(refFile);
 
-        // read each line in the file one by one, finding the timestamp and metrics
+        // read each line in the file one by one, finding the timestamp and
+        // metrics
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
 
@@ -118,11 +134,12 @@ public class LocalFilePTestResultsHandler extends PTestResultsHandler {
 
         return axisPoints;
     }
+
     /**
      * Find all the metric name/value pairs in a string.
      */
     private final List<ChartPoint> parseMetrics(String text) {
-        List<ChartPoint> metricsMap = new ArrayList<ChartPoint>() ;
+        List<ChartPoint> metricsMap = new ArrayList<ChartPoint>();
 
         String[] metrics = text.trim().split("\\s");
         for (String metric : metrics) {

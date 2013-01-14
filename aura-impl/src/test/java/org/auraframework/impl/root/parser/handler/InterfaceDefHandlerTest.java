@@ -15,7 +15,9 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.source.StringSource;
@@ -32,27 +34,32 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
     public void testInterfaceDefHandler() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<InterfaceDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", InterfaceDef.class);
-        StringSource<InterfaceDef> source = new StringSource<InterfaceDef>(descriptor, "<aura:interface><aura:attribute name='mystring' type='String'/><aura:registerevent name='click' type='aura:click' description='The Description'/></aura:interface>", "myID",Format.XML);
+        StringSource<InterfaceDef> source = new StringSource<InterfaceDef>(
+                descriptor,
+                "<aura:interface><aura:attribute name='mystring' type='String'/><aura:registerevent name='click' type='aura:click' description='The Description'/></aura:interface>",
+                "myID", Format.XML);
         InterfaceDef def = parser.parse(descriptor, source);
-        assertEquals(1,def.getAttributeDefs().size());
+        assertEquals(1, def.getAttributeDefs().size());
         assertTrue(def.getAttributeDefs().containsKey(DefDescriptorImpl.getInstance("mystring", AttributeDef.class)));
-        assertEquals(1,def.getRegisterEventDefs().size());
+        assertEquals(1, def.getRegisterEventDefs().size());
         assertNotNull(def.getRegisterEventDefs().get("click"));
     }
 
     public void testInterfaceDefHandlerWithExtension() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<InterfaceDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", InterfaceDef.class);
-        StringSource<InterfaceDef> source = new StringSource<InterfaceDef>(descriptor, "<aura:interface extends='aura:testinterfaceparent'></aura:interface>", "myID",Format.XML);
+        StringSource<InterfaceDef> source = new StringSource<InterfaceDef>(descriptor,
+                "<aura:interface extends='aura:testinterfaceparent'></aura:interface>", "myID", Format.XML);
         InterfaceDef def = parser.parse(descriptor, source);
-        assertEquals(1,def.getExtendsDescriptors().size());
-        assertEquals("testinterfaceparent",def.getExtendsDescriptors().iterator().next().getName());
+        assertEquals(1, def.getExtendsDescriptors().size());
+        assertEquals("testinterfaceparent", def.getExtendsDescriptors().iterator().next().getName());
     }
 
     public void testInterfaceDefHandlerWithInvalidChildTag() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<InterfaceDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", InterfaceDef.class);
-        StringSource<InterfaceDef> source = new StringSource<InterfaceDef>(descriptor,"<aura:interface><aura:foo/></aura:interface>", "myID",Format.XML);
+        StringSource<InterfaceDef> source = new StringSource<InterfaceDef>(descriptor,
+                "<aura:interface><aura:foo/></aura:interface>", "myID", Format.XML);
         try {
             parser.parse(descriptor, source);
             fail("Should have thrown AuraException aura:foo isn't a valid child tag for aura:interface");
@@ -64,7 +71,8 @@ public class InterfaceDefHandlerTest extends AuraImplTestCase {
     public void testInterfaceDefHandlerWithTextBetweenTag() throws Exception {
         XMLParser parser = XMLParser.getInstance();
         DefDescriptor<InterfaceDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", InterfaceDef.class);
-        StringSource<InterfaceDef> source = new StringSource<InterfaceDef>(descriptor, "<aura:interface>Invalid text</aura:interface>", "myID",Format.XML);
+        StringSource<InterfaceDef> source = new StringSource<InterfaceDef>(descriptor,
+                "<aura:interface>Invalid text</aura:interface>", "myID", Format.XML);
         try {
             parser.parse(descriptor, source);
             fail("Should have thrown AuraException because text is between aura:interface tags");

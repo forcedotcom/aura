@@ -22,22 +22,19 @@ import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-
 /**
  * Interface for component definition references.
  */
 public interface ComponentDefRef extends Definition {
-    public static enum Load{
-        DEFAULT,
-        LAZY,
-        EXCLUSIVE
+    public static enum Load {
+        DEFAULT, LAZY, EXCLUSIVE
     }
 
     /**
      * FIXME: W-1328556 this method violates the contract with DefDescriptor.
-     *
+     * 
      * These two calls should be used instead, but they cause other bugs.
-     *
+     * 
      * DefDescriptor<ComponentDefRef> getDescriptor();
      * DefDescriptor<ComponentDef> getComponentDescriptor();
      */

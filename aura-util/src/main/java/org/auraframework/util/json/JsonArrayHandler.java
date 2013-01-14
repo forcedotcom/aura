@@ -20,11 +20,13 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 /**
- * Base (default) implementation of JsonArrayHandler. When an array is encountered, add will be called for each element
- * in the array. This implementation adds each item to a List<Object>. If you would like to do something else with each
- * item, extend this class and override all of the methods.
+ * Base (default) implementation of JsonArrayHandler. When an array is
+ * encountered, add will be called for each element in the array. This
+ * implementation adds each item to a List<Object>. If you would like to do
+ * something else with each item, extend this class and override all of the
+ * methods.
  */
-public class JsonArrayHandler implements JsonHandler{
+public class JsonArrayHandler implements JsonHandler {
 
     List<Object> list = Lists.newArrayList();
 

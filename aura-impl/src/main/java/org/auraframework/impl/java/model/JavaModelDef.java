@@ -18,23 +18,29 @@ package org.auraframework.impl.java.model;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ModelDef;
+import org.auraframework.def.TypeDef;
+import org.auraframework.def.ValueDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Model;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Type;
-import org.auraframework.system.*;
+import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 /**
  * JavaModelDef describes a single java model.
- *
+ * 
  * The framework imposes a two stage construction/validation framework onto
  */
 public class JavaModelDef extends DefinitionImpl<ModelDef> implements ModelDef {
@@ -72,7 +78,7 @@ public class JavaModelDef extends DefinitionImpl<ModelDef> implements ModelDef {
 
     /**
      * Add our dependencies to the set.
-     *
+     * 
      * @throws QuickFixException
      */
     @Override
@@ -103,33 +109,29 @@ public class JavaModelDef extends DefinitionImpl<ModelDef> implements ModelDef {
     private static DefDescriptor<TypeDef> getReturnTypeDescriptor(Method method) throws QuickFixException {
         int modifiers = method.getModifiers();
 
-        if (!Modifier.isPublic(modifiers)
-            || Modifier.isStatic(modifiers)
-            || method.getParameterTypes().length > 0)
-        {
-            throw new InvalidDefinitionException(String.format("@AuraEnabled annotation found on invalid method %s", method.getName()),
-                                                 new Location("java://"+method.getDeclaringClass().getCanonicalName(), 0));
+        if (!Modifier.isPublic(modifiers) || Modifier.isStatic(modifiers) || method.getParameterTypes().length > 0) {
+            throw new InvalidDefinitionException(String.format("@AuraEnabled annotation found on invalid method %s",
+                    method.getName()), new Location("java://" + method.getDeclaringClass().getCanonicalName(), 0));
         }
         Type type = method.getAnnotation(Type.class);
-        if(type == null){
+        if (type == null) {
             //
             // FIXME: need better checks here, including doing things like
             // List<Type>, arrays also need to be handled here.
             //
             if (Void.TYPE.equals(method.getGenericReturnType())) {
-                throw new InvalidDefinitionException(String.format("@AuraEnabled annotation found on void method %s", method.getName()),
-                                                     new Location("java://"+method.getDeclaringClass().getCanonicalName(), 0));
+                throw new InvalidDefinitionException(String.format("@AuraEnabled annotation found on void method %s",
+                        method.getName()), new Location("java://" + method.getDeclaringClass().getCanonicalName(), 0));
             }
-            return DefDescriptorImpl.getInstance("java://"+method.getReturnType().getName(), TypeDef.class);
-        }else{
+            return DefDescriptorImpl.getInstance("java://" + method.getReturnType().getName(), TypeDef.class);
+        } else {
             return DefDescriptorImpl.getInstance(type.value(), TypeDef.class);
         }
     }
 
+    public static class Builder extends DefinitionImpl.BuilderImpl<ModelDef> {
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<ModelDef>{
-
-        public Builder(){
+        public Builder() {
             super(ModelDef.class);
         }
 
@@ -145,8 +147,8 @@ public class JavaModelDef extends DefinitionImpl<ModelDef> implements ModelDef {
             String name = JavaValueDef.getMemberName(method.getName());
             DefDescriptor<TypeDef> typeDescriptor = getReturnTypeDescriptor(method);
 
-            JavaValueDef member = new JavaValueDef(name, method, typeDescriptor,
-                                                   new Location(this.modelClass.getName()+"."+name,0));
+            JavaValueDef member = new JavaValueDef(name, method, typeDescriptor, new Location(this.modelClass.getName()
+                    + "." + name, 0));
             this.memberMap.put(name, member);
         }
 

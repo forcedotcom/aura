@@ -29,8 +29,8 @@ import org.mockito.Mockito;
 
 /**
  * Tests for ConfigAdapterImpl.
- *
- *
+ * 
+ * 
  * @since 0.0.245
  */
 public class ConfigAdapterImplTest extends UnitTestCase {
@@ -44,8 +44,8 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     };
 
     /**
-     * Make sure that version file is available in aura package.
-     * If this test fails, then we have a build/packaging issue.
+     * Make sure that version file is available in aura package. If this test
+     * fails, then we have a build/packaging issue.
      */
     public void testVersionPropFile() throws Exception {
         String path = "/version.prop";
@@ -53,8 +53,8 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         Properties props = new Properties();
         props.load(stream);
         stream.close();
-        String timestamp = (String)props.get("aura.build.timestamp");
-        String timestampFormat = (String)props.get("aura.build.timestamp.format");
+        String timestamp = (String) props.get("aura.build.timestamp");
+        String timestampFormat = (String) props.get("aura.build.timestamp.format");
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(timestampFormat);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         simpleDateFormat.parse(timestamp).getTime();
@@ -72,26 +72,27 @@ public class ConfigAdapterImplTest extends UnitTestCase {
         }
         assertTrue(impl.getBuildTimestamp() > 0);
     }
-    
+
     /**
-     * Test regenerateAuraJS() functionality.  Note that in a resource/jar-based
+     * Test regenerateAuraJS() functionality. Note that in a resource/jar-based
      * environment, this is essentially a no-op because we never "regenerate,"
      * but the test makes a fake jsGroup which will still act as though it saw
-     * an error (and should be handled as such). 
+     * an error (and should be handled as such).
      */
     public void testRegenerateHandlesErrors() throws Exception {
         // The real case should work, of course:
         ConfigAdapterImpl impl = new ConfigAdapterImpl();
         impl.regenerateAuraJS();
-               
+
         // But an error case should fail, and not be swallowed.
         final AuraJavascriptGroup mockJsGroup = Mockito.mock(AuraJavascriptGroup.class);
-        
+
         impl = new ConfigAdapterImpl() {
             @Override
             public AuraJavascriptGroup newAuraJavascriptGroup() throws IOException {
                 return mockJsGroup;
             }
+
             @Override
             public boolean isProduction() {
                 return false;
@@ -107,20 +108,23 @@ public class ConfigAdapterImplTest extends UnitTestCase {
             assertTrue("expected ARTE caused by MockException, not " + e.getCause().toString(),
                     e.getCause() instanceof MockException);
         }
-        
+
         // Try again, without changes; it should still fail.
         try {
             Mockito.when(mockJsGroup.isStale()).thenReturn(false);
             impl.regenerateAuraJS();
-            fail("Second compilation failure should have been caught!");                
+            fail("Second compilation failure should have been caught!");
         } catch (AuraRuntimeException e2) {
             assertTrue("expected ARTE caused by MockException, not " + e2.getCause().toString(),
                     e2.getCause() instanceof MockException);
         }
-        
-        // Third time's the charm, we stop pretending there are errors and it should work.  Unless
-        // we're in a resources-only environment, in which case the copying done after our
-        // jsGroup.regenerate() can't work, even though the mock jsGroup.regenerate() will..  
+
+        // Third time's the charm, we stop pretending there are errors and it
+        // should work. Unless
+        // we're in a resources-only environment, in which case the copying done
+        // after our
+        // jsGroup.regenerate() can't work, even though the mock
+        // jsGroup.regenerate() will..
         if (!AuraImplFiles.AuraResourceJavascriptDirectory.asFile().exists()) {
             Mockito.reset(mockJsGroup);
             Mockito.when(mockJsGroup.isStale()).thenReturn(true);

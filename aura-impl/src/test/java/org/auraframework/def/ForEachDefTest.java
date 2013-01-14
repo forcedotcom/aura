@@ -33,7 +33,8 @@ public class ForEachDefTest extends DefinitionTest<ComponentDef> {
         try {
             Aura.getInstanceService().getInstance(missing.getQualifiedName(), ComponentDef.class);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
-        } catch (MissingRequiredAttributeException expected) {}
+        } catch (MissingRequiredAttributeException expected) {
+        }
     }
 
     public void testInnerRequiredAttribute2() throws Exception {
@@ -42,7 +43,8 @@ public class ForEachDefTest extends DefinitionTest<ComponentDef> {
         try {
             Aura.getInstanceService().getInstance(missing.getQualifiedName(), DefType.COMPONENT);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
-        } catch (MissingRequiredAttributeException expected) {}
+        } catch (MissingRequiredAttributeException expected) {
+        }
     }
 
     public void testInnerRequiredAttribute3() throws Exception {
@@ -51,7 +53,8 @@ public class ForEachDefTest extends DefinitionTest<ComponentDef> {
         try {
             Aura.getInstanceService().getInstance(missing);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
-        } catch (MissingRequiredAttributeException expected) {}
+        } catch (MissingRequiredAttributeException expected) {
+        }
     }
 
     public void testInnerRequiredAttribute4() throws Exception {
@@ -60,7 +63,8 @@ public class ForEachDefTest extends DefinitionTest<ComponentDef> {
         try {
             Aura.getInstanceService().getInstance(missing.getDef());
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
-        } catch (MissingRequiredAttributeException expected) {}
+        } catch (MissingRequiredAttributeException expected) {
+        }
     }
 
     public void testInnerRequiredInheritedAttribute1() throws Exception {
@@ -69,7 +73,8 @@ public class ForEachDefTest extends DefinitionTest<ComponentDef> {
         try {
             Aura.getInstanceService().getInstance(missing.getQualifiedName(), ComponentDef.class);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
-        } catch (MissingRequiredAttributeException expected) {}
+        } catch (MissingRequiredAttributeException expected) {
+        }
     }
 
     public void testInnerRequiredInheritedAttribute2() throws Exception {
@@ -78,7 +83,8 @@ public class ForEachDefTest extends DefinitionTest<ComponentDef> {
         try {
             Aura.getInstanceService().getInstance(missing.getQualifiedName(), DefType.COMPONENT);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
-        } catch (MissingRequiredAttributeException expected) {}
+        } catch (MissingRequiredAttributeException expected) {
+        }
     }
 
     public void testInnerRequiredInheritedAttribute3() throws Exception {
@@ -87,7 +93,8 @@ public class ForEachDefTest extends DefinitionTest<ComponentDef> {
         try {
             Aura.getInstanceService().getInstance(missing);
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
-        } catch (MissingRequiredAttributeException expected) {}
+        } catch (MissingRequiredAttributeException expected) {
+        }
     }
 
     public void testInnerRequiredInheritedAttribute4() throws Exception {
@@ -96,7 +103,8 @@ public class ForEachDefTest extends DefinitionTest<ComponentDef> {
         try {
             Aura.getInstanceService().getInstance(missing.getDef());
             fail("Did not get expected exception: " + MissingRequiredAttributeException.class.getName());
-        } catch (MissingRequiredAttributeException expected) {}
+        } catch (MissingRequiredAttributeException expected) {
+        }
     }
 
     private DefDescriptor<ComponentDef> registerComponentRequiredAttribute() {

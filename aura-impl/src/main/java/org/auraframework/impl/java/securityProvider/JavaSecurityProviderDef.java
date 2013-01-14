@@ -28,7 +28,6 @@ import org.auraframework.def.SecurityProviderDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.service.LoggingService;
-
 import org.auraframework.system.Annotations;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraExecutionException;
@@ -55,7 +54,7 @@ public class JavaSecurityProviderDef extends DefinitionImpl<SecurityProviderDef>
         try {
             ret = securityProvider.isAllowed(toCheck);
             loggingService.incrementNum("JavaCallCount");
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new NoAccessException("Access Denied", e);
         } finally {
             loggingService.stopTimer("java");
@@ -81,13 +80,13 @@ public class JavaSecurityProviderDef extends DefinitionImpl<SecurityProviderDef>
         public boolean isAllowed(DefDescriptor<?> descriptor) {
             Boolean value;
             try {
-                value = (Boolean)method.invoke(null, new Object [] { descriptor });
+                value = (Boolean) method.invoke(null, new Object[] { descriptor });
             } catch (InvocationTargetException e) {
                 throw new AuraExecutionException(e.getCause(), this.location);
             } catch (Exception e) {
                 throw new AuraExecutionException(e, this.location);
             }
-            return (value==null)?false:value.booleanValue();
+            return (value == null) ? false : value.booleanValue();
         }
     }
 
@@ -104,12 +103,12 @@ public class JavaSecurityProviderDef extends DefinitionImpl<SecurityProviderDef>
             ifcs = AuraUtil.findInterfaces(clazz, SecurityProvider.class);
             if (ifcs.size() > 0) {
                 try {
-                    this.securityProvider = (SecurityProvider)clazz.newInstance();
+                    this.securityProvider = (SecurityProvider) clazz.newInstance();
                 } catch (InstantiationException ie) {
-                    throw new InvalidDefinitionException("Cannot instantiate "+clazz.getName(), getLocation());
+                    throw new InvalidDefinitionException("Cannot instantiate " + clazz.getName(), getLocation());
                 } catch (IllegalAccessException iae) {
-                    throw new InvalidDefinitionException("Constructor is inaccessible for "+clazz.getName(),
-                                                         getLocation());
+                    throw new InvalidDefinitionException("Constructor is inaccessible for " + clazz.getName(),
+                            getLocation());
                 }
             } else {
                 try {
@@ -118,18 +117,20 @@ public class JavaSecurityProviderDef extends DefinitionImpl<SecurityProviderDef>
                     if (Modifier.isStatic(isAllowed.getModifiers())) {
                         Class<?> retType = isAllowed.getReturnType();
                         if ((retType.equals(boolean.class) || retType.equals(Boolean.class))
-                            && clazz.isAnnotationPresent(Annotations.SecurityProvider.class)) {
+                                && clazz.isAnnotationPresent(Annotations.SecurityProvider.class)) {
                             this.securityProvider = new MethodSecurityProvider(isAllowed, getLocation());
                         }
                     }
                 } catch (NoSuchMethodException e) {
                 }
                 if (this.securityProvider == null) {
-                    throw new InvalidDefinitionException("SecurityProviders must implement the SecurityProvider interface", getLocation());
+                    throw new InvalidDefinitionException(
+                            "SecurityProviders must implement the SecurityProvider interface", getLocation());
                 }
             }
             return this;
         }
+
         @Override
         public JavaSecurityProviderDef build() {
             return new JavaSecurityProviderDef(this);

@@ -15,14 +15,16 @@
  */
 package org.auraframework.docs;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 
 /**
- * for aura:iteration docs
- * modified from TestIterationModel.java
+ * for aura:iteration docs modified from TestIterationModel.java
  */
 @Model
 public class SampleIterationModel {
@@ -33,7 +35,7 @@ public class SampleIterationModel {
         data = new LinkedList<Object>();
         for (int i = 0; i < 26; i++) {
             Map<String, Object> theMap = new HashMap<String, Object>();
-            char c = (char)('a' + i);
+            char c = (char) ('a' + i);
             theMap.put("letters", "" + c + c + c);
             data.add(theMap);
         }

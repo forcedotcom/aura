@@ -24,17 +24,22 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.java.model.JavaModel;
-import org.auraframework.instance.*;
+import org.auraframework.instance.AttributeSet;
+import org.auraframework.instance.BaseComponent;
+import org.auraframework.instance.Component;
+import org.auraframework.instance.Model;
+import org.auraframework.instance.ValueProvider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 /**
  * TODO: make public
- *
- *
+ * 
+ * 
  * @since 0.0.234
  */
-public class IterationValueProvider<D extends BaseComponentDef,I extends BaseComponent<D,I>> implements BaseComponent<D, I> {
+public class IterationValueProvider<D extends BaseComponentDef, I extends BaseComponent<D, I>> implements
+        BaseComponent<D, I> {
 
     private final I attributeValueProvider;
     private final Map<String, Object> additionalValueProviders;
@@ -62,7 +67,7 @@ public class IterationValueProvider<D extends BaseComponentDef,I extends BaseCom
             PropertyReference stem = key.getStem();
             if (stem != null) {
                 if (o instanceof ValueProvider) {
-                    return ((ValueProvider)o).getValue(stem);
+                    return ((ValueProvider) o).getValue(stem);
                 } else {
                     return JavaModel.getValue(o, stem, null);
                 }

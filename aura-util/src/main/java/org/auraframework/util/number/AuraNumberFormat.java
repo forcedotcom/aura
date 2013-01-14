@@ -22,8 +22,8 @@ import java.text.ParsePosition;
 public class AuraNumberFormat {
 
     /**
-     * Ensures strict parsing of a number.  Throws ParseException if the input number
-     * is not fully consumed.
+     * Ensures strict parsing of a number. Throws ParseException if the input
+     * number is not fully consumed.
      */
     public static Number parseStrict(String input, NumberFormat numberFormat) throws ParseException {
         if (input == null) {

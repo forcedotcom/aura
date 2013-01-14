@@ -15,9 +15,11 @@
  */
 package org.auraframework.impl;
 
-import org.openqa.selenium.*;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.WebDriver;
 
 public class AuraClientServiceUITest extends WebDriverTestCase {
 
@@ -33,7 +35,7 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
      * Excluded on ipad/iphone due to known WebDriver issue:
      * http://code.google.com/p/selenium/issues/detail?id=4348
      */
-    @ExcludeBrowsers({BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
     public void testRefreshDuringLocationChange() throws Exception {
         open("/clientServiceTest/refreshDuringLocationChange.app");
 

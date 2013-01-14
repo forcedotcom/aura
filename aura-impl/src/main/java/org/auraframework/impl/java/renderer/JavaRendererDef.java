@@ -35,10 +35,10 @@ public class JavaRendererDef extends DefinitionImpl<RendererDef> implements Rend
     private final Renderer renderer;
 
     /**
-     * Consumers of this class should use a builder to build the instance.
-     * If this were to be extended, the builder should also be extended, and
-     * the build() method would need to be overridden.
-     *
+     * Consumers of this class should use a builder to build the instance. If
+     * this were to be extended, the builder should also be extended, and the
+     * build() method would need to be overridden.
+     * 
      * @param builder the builder that is building this class.
      */
     protected JavaRendererDef(Builder builder) {
@@ -48,10 +48,10 @@ public class JavaRendererDef extends DefinitionImpl<RendererDef> implements Rend
 
     /**
      * Validate our definition.
-     *
-     * Most of the validation actually occurs in the builder, but we do
-     * ensure that the renderer is not null. It would be cleaner to throw all
-     * errors here, but we would need to store the error message in the constructor
+     * 
+     * Most of the validation actually occurs in the builder, but we do ensure
+     * that the renderer is not null. It would be cleaner to throw all errors
+     * here, but we would need to store the error message in the constructor
      * which is a bit funky.
      */
     @Override
@@ -68,7 +68,7 @@ public class JavaRendererDef extends DefinitionImpl<RendererDef> implements Rend
     }
 
     @Override
-    public void render(BaseComponent<?,?> component, Appendable out) throws IOException, QuickFixException {
+    public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
         LoggingService loggingService = Aura.getLoggingService();
         loggingService.stopTimer(LoggingService.TIMER_AURA);
         loggingService.startTimer("java");
@@ -89,19 +89,19 @@ public class JavaRendererDef extends DefinitionImpl<RendererDef> implements Rend
 
     /**
      * A builder for JavaRendererDef.
-     *
-     * This builder extends the basic Definition builder by adding the
-     * class of the renderer.
+     * 
+     * This builder extends the basic Definition builder by adding the class of
+     * the renderer.
      */
-    public static class Builder extends DefinitionImpl.BuilderImpl<RendererDef>{
+    public static class Builder extends DefinitionImpl.BuilderImpl<RendererDef> {
         private Class<?> rendererClass;
         private Renderer rendererInstance;
 
         /**
          * A function to actually build the renderer class.
-         *
-         * This class is currently a bit over complicated, as it handles the
-         * old static case for render methods.
+         * 
+         * This class is currently a bit over complicated, as it handles the old
+         * static case for render methods.
          */
         protected void buildRenderer() throws QuickFixException {
             if (this.rendererClass == null) {
@@ -111,18 +111,19 @@ public class JavaRendererDef extends DefinitionImpl<RendererDef> implements Rend
             List<Class<? extends Renderer>> interfaces = AuraUtil.findInterfaces(this.rendererClass, Renderer.class);
             if (!interfaces.isEmpty()) {
                 try {
-                    this.rendererInstance = (Renderer)rendererClass.newInstance();
+                    this.rendererInstance = (Renderer) rendererClass.newInstance();
                 } catch (InstantiationException ie) {
                     throw new InvalidDefinitionException("Cannot instantiate " + getLocation(), getLocation());
                 } catch (IllegalAccessException iae) {
-                    throw new InvalidDefinitionException("Constructor is inaccessible for "+getLocation(), getLocation());
+                    throw new InvalidDefinitionException("Constructor is inaccessible for " + getLocation(),
+                            getLocation());
                 }
             } else {
                 this.rendererInstance = null;
             }
         }
 
-        public Builder(){
+        public Builder() {
             super(RendererDef.class);
         }
 

@@ -15,6 +15,6 @@
  */
 package org.auraframework.util.sampleServices;
 
-public class MultipleImplNoPrimaryServiceImpl1  implements MultipleImplNoPrimaryService {
+public class MultipleImplNoPrimaryServiceImpl1 implements MultipleImplNoPrimaryService {
 
 }

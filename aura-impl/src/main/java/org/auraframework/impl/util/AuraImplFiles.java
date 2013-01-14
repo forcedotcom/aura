@@ -42,14 +42,17 @@ public enum AuraImplFiles {
      */
     AuraJavascriptSourceDirectory(AuraImplModuleDirectory.getPath(), "src/main/resources"),
     /**
-     * javascript destination directory to generate into, in the resources module
+     * javascript destination directory to generate into, in the resources
+     * module
      */
-    AuraResourceJavascriptDirectory(AuraFiles.Core.getPath(), "aura-resources", "target", "src-gen", "main", "resources", "aura", "javascript"),
+    AuraResourceJavascriptDirectory(AuraFiles.Core.getPath(), "aura-resources", "target", "src-gen", "main",
+            "resources", "aura", "javascript"),
     /**
-     * the other javascript destination directory that we have to regenerate into, also in the resources module
+     * the other javascript destination directory that we have to regenerate
+     * into, also in the resources module
      */
-    AuraResourceJavascriptClassDirectory(AuraFiles.Core.getPath(), "aura-resources", "target", "classes", "aura", "javascript"),
-    ;
+    AuraResourceJavascriptClassDirectory(AuraFiles.Core.getPath(), "aura-resources", "target", "classes", "aura",
+            "javascript"), ;
 
     private final String path;
 

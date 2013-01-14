@@ -15,16 +15,16 @@
  */
 package org.auraframework.impl.java.controller;
 
+import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.Annotations.AuraEnabled;
 
 @Controller
 public class TestControllerWithParameters {
 
     @AuraEnabled
     public static String appendStrings(@Key("a") String a, @Key("b") String b) {
-        return a+b;
+        return a + b;
     }
 
     @AuraEnabled

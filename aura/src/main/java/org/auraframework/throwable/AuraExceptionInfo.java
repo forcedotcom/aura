@@ -20,18 +20,19 @@ import org.auraframework.system.Location;
 public interface AuraExceptionInfo {
     /**
      * Get the location for this exception.
-     *
+     * 
      * @return the location associated with the exception or null.
      */
     Location getLocation();
 
     /**
      * Get any additional info associated with the exception.
-     *
-     * Note that this is used so that information about the exact parameters that cause the
-     * exception can be logged without making the exception appear to be different than others
-     * with different information, but the same stack signature. This can be used to log information
-     * such as database IDs and other highly variable information.
+     * 
+     * Note that this is used so that information about the exact parameters
+     * that cause the exception can be logged without making the exception
+     * appear to be different than others with different information, but the
+     * same stack signature. This can be used to log information such as
+     * database IDs and other highly variable information.
      */
     String getExtraMessage();
 }

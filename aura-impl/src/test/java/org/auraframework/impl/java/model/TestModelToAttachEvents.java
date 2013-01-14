@@ -21,23 +21,26 @@ import java.util.Map;
 import org.auraframework.Aura;
 import org.auraframework.def.EventDef;
 import org.auraframework.instance.Event;
-import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Model;
 
 @Model
 public class TestModelToAttachEvents {
-    public TestModelToAttachEvents() throws Exception{
-        Map<String, Object> attributes= new HashMap<String, Object>();
+    public TestModelToAttachEvents() throws Exception {
+        Map<String, Object> attributes = new HashMap<String, Object>();
         attributes.put("strParam", "Go 49ers!");
-        //Adding an event whose definition is in the client because of the handler.
-        Event evt = Aura.getInstanceService().getInstance("test:applicationEvent", EventDef.class,attributes );
+        // Adding an event whose definition is in the client because of the
+        // handler.
+        Event evt = Aura.getInstanceService().getInstance("test:applicationEvent", EventDef.class, attributes);
         Aura.getContextService().getCurrentContext().addClientApplicationEvent(evt);
-        //Adding an event that was not preloaded and without a handler. So the definition is not in the client.
-        evt = Aura.getInstanceService().getInstance("handleEventTest:unHandledEvent", EventDef.class, null );
+        // Adding an event that was not preloaded and without a handler. So the
+        // definition is not in the client.
+        evt = Aura.getInstanceService().getInstance("handleEventTest:unHandledEvent", EventDef.class, null);
         Aura.getContextService().getCurrentContext().addClientApplicationEvent(evt);
     }
+
     @AuraEnabled
-    public String getModelData(){
+    public String getModelData() {
         return "Sample Model Data";
     }
 }

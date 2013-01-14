@@ -15,17 +15,17 @@
  */
 package org.auraframework.util.type.converter;
 
+import java.util.Date;
+
 import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.type.Converter;
-
-import java.util.Date;
 
 public class DateToStringConverter implements Converter<Date, String> {
 
     @Override
     public String convert(Date value) {
-        if(value == null){
+        if (value == null) {
             return null;
         }
         DateService dateService = DateServiceImpl.get();

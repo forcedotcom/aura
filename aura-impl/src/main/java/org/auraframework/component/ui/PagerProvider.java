@@ -15,8 +15,6 @@
  */
 package org.auraframework.component.ui;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableMap;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDescriptorProvider;
@@ -27,10 +25,15 @@ import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
+
 /**
- * Determine which type of pager implementation to render, based on type attribute
- *
- * Currently supports 'JumpToPage', 'NextPrevious' (default), 'PageInfo', 'PageSize', or a namespaced component, eg. ns:CustomPager
+ * Determine which type of pager implementation to render, based on type
+ * attribute
+ * 
+ * Currently supports 'JumpToPage', 'NextPrevious' (default), 'PageInfo',
+ * 'PageSize', or a namespaced component, eg. ns:CustomPager
  */
 @Provider
 public class PagerProvider implements ComponentDescriptorProvider {
@@ -39,24 +42,24 @@ public class PagerProvider implements ComponentDescriptorProvider {
 
     // permissible types
     private static final ImmutableMap<String, String> typeMap = new ImmutableMap.Builder<String, String>()
-            .put("JumpToPage",   "ui:pagerJumpToPage")
-            .put("NextPrevious", "ui:pagerNextPrevious")
-            .put("PageInfo",     "ui:pagerPageInfo")
-            .put("PageSize",     "ui:pagerPageSize")
-            .put("",             "ui:pagerNextPrevious")
+            .put("JumpToPage", "ui:pagerJumpToPage").put("NextPrevious", "ui:pagerNextPrevious")
+            .put("PageInfo", "ui:pagerPageInfo").put("PageSize", "ui:pagerPageSize").put("", "ui:pagerNextPrevious")
             .build();
 
     @Override
     public DefDescriptor<ComponentDef> provide() throws QuickFixException {
-        BaseComponent<?,?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
+        BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
         String type = (String) component.getAttributes().getValue(TYPE_ATTRIBUTE);
-        if(type==null){
-            type="";
+        if (type == null) {
+            type = "";
         }
         String typeDescriptor = type.contains(":") ? type : typeMap.get(type);
         if (typeDescriptor != null) {
             return DefDescriptorImpl.getInstance(typeDescriptor, ComponentDef.class);
         }
-        throw new AuraRuntimeException("Unknown type attribute specified for ui:pager '" + type + "'. Remove the type attribute or use one of the following values: '"+Joiner.on("', '").join(typeMap.keySet())+"', or any namespaced component descriptor, e.g. ns:CustomPager.");
+        throw new AuraRuntimeException("Unknown type attribute specified for ui:pager '" + type
+                + "'. Remove the type attribute or use one of the following values: '"
+                + Joiner.on("', '").join(typeMap.keySet())
+                + "', or any namespaced component descriptor, e.g. ns:CustomPager.");
     }
 }

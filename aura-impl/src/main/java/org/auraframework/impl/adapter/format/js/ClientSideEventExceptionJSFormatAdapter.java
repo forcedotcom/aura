@@ -33,7 +33,8 @@ public class ClientSideEventExceptionJSFormatAdapter extends JSFormatAdapter<Cli
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException, QuickFixException {
+    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException,
+            QuickFixException {
         out.append("$A.service.client.throwExceptionEvent(");
         Aura.getSerializationService().write(value, attributes, getType(), out, "JSON");
         out.append(");");

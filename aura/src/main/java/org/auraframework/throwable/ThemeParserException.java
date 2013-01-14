@@ -30,7 +30,7 @@ public class ThemeParserException extends AuraValidationException {
     }
 
     public ThemeParserException(String message, Location l) {
-        this(message, l, (AuraQuickFix[])null);
+        this(message, l, (AuraQuickFix[]) null);
     }
 
 }

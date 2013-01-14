@@ -24,7 +24,7 @@ import org.auraframework.system.Annotations.Provider;
  */
 @Provider
 public class TestProviderSelf {
-    public static DefDescriptor<InterfaceDef> provide(){
+    public static DefDescriptor<InterfaceDef> provide() {
         return DefDescriptorImpl.getInstance("test:test_Provider_InterfaceSelf", InterfaceDef.class);
     }
 }

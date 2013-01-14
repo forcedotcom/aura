@@ -27,31 +27,31 @@ import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 /**
- * The definition of an attribute. Holds all information about a given component's AttributeDefRef, aside from the
- * actual ValueDefRef. AttrbitueInfos are immutable. Once they are created, they can only be replaced, never changed.
+ * The definition of an attribute. Holds all information about a given
+ * component's AttributeDefRef, aside from the actual ValueDefRef.
+ * AttrbitueInfos are immutable. Once they are created, they can only be
+ * replaced, never changed.
  */
 public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> implements AttributeDef {
     /**
      * Construct an AttributeDef
-     *
-     * @param descriptor
-     *            the descriptor of this attribute
-     * @param parentDescriptor
-     *            the parent descriptor of this attribute
-     * @param typeDefDescriptor
-     *            The TypeDef Descriptor for the Type of instances of this AttributeDef
-     * @param defaultValue
-     *            The ValueDef for the default value to be used if no Value is set on the Attribute instance
-     * @param required
-     *            true if is required that this attribute Value be set (not defaulted) on Attribute instances that refer
-     *            to this AttributeDef
-     * @param location
-     *            The location where this AttributeDef was defined in the markup.
+     * 
+     * @param descriptor the descriptor of this attribute
+     * @param parentDescriptor the parent descriptor of this attribute
+     * @param typeDefDescriptor The TypeDef Descriptor for the Type of instances
+     *            of this AttributeDef
+     * @param defaultValue The ValueDef for the default value to be used if no
+     *            Value is set on the Attribute instance
+     * @param required true if is required that this attribute Value be set (not
+     *            defaulted) on Attribute instances that refer to this
+     *            AttributeDef
+     * @param location The location where this AttributeDef was defined in the
+     *            markup.
      */
     public AttributeDefImpl(DefDescriptor<AttributeDef> descriptor,
             DefDescriptor<? extends RootDefinition> parentDescriptor, DefDescriptor<TypeDef> typeDefDescriptor,
@@ -74,7 +74,8 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     }
 
     /**
-     * @return The ValueDef that defines type information about Values for instances of this AttributeDef
+     * @return The ValueDef that defines type information about Values for
+     *         instances of this AttributeDef
      * @throws QuickFixException
      */
     @Override
@@ -83,7 +84,8 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     }
 
     /**
-     * @return The default value to be used for instances of this AttributeDef that do not have a Value explicitly set
+     * @return The default value to be used for instances of this AttributeDef
+     *         that do not have a Value explicitly set
      */
     @Override
     public AttributeDefRef getDefaultValue() {
@@ -99,8 +101,9 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     }
 
     /**
-     * @return SERVER if this attribute should only be serialized from client to server, BOTH if serialization should
-     *         occur in both directions (the default)
+     * @return SERVER if this attribute should only be serialized from client to
+     *         server, BOTH if serialization should occur in both directions
+     *         (the default)
      */
     @Override
     public SerializeToType getSerializeTo() {
@@ -143,7 +146,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
             if (e.getCause() instanceof ClassNotFoundException) {
                 throw new DefinitionNotFoundException(typeDefDescriptor);
             } else {
-                throw e;  // Don't try to be clever about unknown bad things!
+                throw e; // Don't try to be clever about unknown bad things!
             }
         }
     }
@@ -156,9 +159,9 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
         return parentDescriptor;
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<AttributeDef>{
+    public static class Builder extends DefinitionImpl.BuilderImpl<AttributeDef> {
 
-        public Builder(){
+        public Builder() {
             super(AttributeDef.class);
         }
 
@@ -178,9 +181,8 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
 
         /**
          * Sets the parentDescriptor for this instance.
-         *
-         * @param parentDescriptor
-         *            The parentDescriptor.
+         * 
+         * @param parentDescriptor The parentDescriptor.
          */
         public Builder setParentDescriptor(DefDescriptor<? extends RootDefinition> parentDescriptor) {
             this.parentDescriptor = parentDescriptor;
@@ -189,9 +191,8 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
 
         /**
          * Sets the typeDefDescriptor for this instance.
-         *
-         * @param typeDefDescriptor
-         *            The typeDefDescriptor.
+         * 
+         * @param typeDefDescriptor The typeDefDescriptor.
          */
         public Builder setTypeDefDescriptor(DefDescriptor<TypeDef> typeDefDescriptor) {
             this.typeDefDescriptor = typeDefDescriptor;
@@ -200,9 +201,8 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
 
         /**
          * Sets the defaultValue for this instance.
-         *
-         * @param defaultValue
-         *            The defaultValue.
+         * 
+         * @param defaultValue The defaultValue.
          */
         public Builder setDefaultValue(AttributeDefRef defaultValue) {
             this.defaultValue = defaultValue;
@@ -211,9 +211,8 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
 
         /**
          * Sets whether or not this instance is required.
-         *
-         * @param required
-         *            The required.
+         * 
+         * @param required The required.
          */
         public Builder setRequired(boolean required) {
             this.required = required;
@@ -221,7 +220,8 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
         }
 
         /**
-         * Sets how this attribute should be serialized (to client, to server, or both (default)).
+         * Sets how this attribute should be serialized (to client, to server,
+         * or both (default)).
          */
         public Builder setSerializeTo(SerializeToType serializeTo) {
             this.serializeTo = serializeTo;

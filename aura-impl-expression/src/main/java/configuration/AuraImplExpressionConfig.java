@@ -15,13 +15,12 @@
  */
 package configuration;
 
-
 import org.auraframework.adapter.ExpressionAdapter;
 import org.auraframework.adapter.JsonSerializerAdapter;
 import org.auraframework.impl.expression.ExpressionAdapterImpl;
 import org.auraframework.impl.expression.adapter.ExpressionJsonSerializerAdapterImpl;
-import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
+import org.auraframework.util.ServiceLoaderImpl.Impl;
 
 /**
  * config for expression module, provides an expression adapter

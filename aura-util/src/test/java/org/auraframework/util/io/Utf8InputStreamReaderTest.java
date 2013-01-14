@@ -15,7 +15,11 @@
  */
 package org.auraframework.util.io;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.util.Arrays;
 
 import org.auraframework.test.UnitTestCase;
@@ -56,22 +60,33 @@ public class Utf8InputStreamReaderTest extends UnitTestCase {
     }
 
     /**
-     * Tests 1-byte, 2-byte, 3-byte, and 4-byte UTF-8 characters, some which decode into UTF-16 surrogate pairs, using
-     * an InputStream that reads only one byte at a time, just to exercise the inner bulk read in read()
+     * Tests 1-byte, 2-byte, 3-byte, and 4-byte UTF-8 characters, some which
+     * decode into UTF-16 surrogate pairs, using an InputStream that reads only
+     * one byte at a time, just to exercise the inner bulk read in read()
      */
     public void testUTF8CharsUsingAnInputStreamThatReadsOneByteAtATime() throws Exception {
         testUTF8Chars(true);
     }
 
     /**
-     * Tests 1-byte, 2-byte, 3-byte, and 4-byte UTF-8 characters, some which decode into UTF-16 surrogate pairs
+     * Tests 1-byte, 2-byte, 3-byte, and 4-byte UTF-8 characters, some which
+     * decode into UTF-16 surrogate pairs
      */
     public void testUTF8Chars() throws Exception {
         testUTF8Chars(false);
     }
 
     private void testUTF8Chars(boolean oneByteAtATime) throws Exception {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream(88 /* actual is less, but this is an upper estimate */);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream(88 /*
+                                                                         * actual
+                                                                         * is
+                                                                         * less,
+                                                                         * but
+                                                                         * this
+                                                                         * is an
+                                                                         * upper
+                                                                         * estimate
+                                                                         */);
         final String testChars = "𥝱𥞩𥞴𥞴𥝱𥝱𠵅🁛🀦𐌸𐍄７辶헪ȦE§קஇ𥞴";
         baos.write(testChars.getBytes(Charsets.UTF_8));
         InputStream in = new ByteArrayInputStream(baos.toByteArray());
@@ -150,8 +165,10 @@ public class Utf8InputStreamReaderTest extends UnitTestCase {
 
     public void testInvalidUTF8() throws Exception {
 
-        // Try an invalid UTF-8 sequence. The problem here is on the third and fourth bytes.
-        // We should get back 0x04, since the first byte caused the first four to be read in
+        // Try an invalid UTF-8 sequence. The problem here is on the third and
+        // fourth bytes.
+        // We should get back 0x04, since the first byte caused the first four
+        // to be read in
         // for the first character
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(5);
         baos.write(0xF0);
@@ -169,8 +186,9 @@ public class Utf8InputStreamReaderTest extends UnitTestCase {
     }
 
     /**
-     * Ensures that reading a byte that is actually in the middle of a UTF-8 byte sequence causes the current sequence
-     * to be skipped and the next character read.
+     * Ensures that reading a byte that is actually in the middle of a UTF-8
+     * byte sequence causes the current sequence to be skipped and the next
+     * character read.
      */
     public void testMiddleOfUTF8ByteSequence() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(12);
@@ -184,7 +202,7 @@ public class Utf8InputStreamReaderTest extends UnitTestCase {
         baos.write(0xB2); // middle of a UTF-8 sequence
         baos.write(0xBF); // middle of a UTF-8 sequence
         baos.write(0xB2); // middle of a UTF-8 sequence
-        baos.write('H');  // 1-byte UTF-8
+        baos.write('H'); // 1-byte UTF-8
         final Reader reader = new Utf8InputStreamReader(new ByteArrayInputStream(baos.toByteArray()));
         try {
             assertEquals('䷾', reader.read());
@@ -208,8 +226,9 @@ public class Utf8InputStreamReaderTest extends UnitTestCase {
     }
 
     /**
-     * Ensure that byte order markers (BOMs) are ignored. BOMs are not relevant in UTF-8, but
-     * they could be given to us by a customer's crazy software anyway.
+     * Ensure that byte order markers (BOMs) are ignored. BOMs are not relevant
+     * in UTF-8, but they could be given to us by a customer's crazy software
+     * anyway.
      */
     public void testBOMs() throws Exception {
 
@@ -235,8 +254,9 @@ public class Utf8InputStreamReaderTest extends UnitTestCase {
     }
 
     /**
-     * Ensures that surrogate pair codepoints that are improperly used in UTF-8 get ignored. These codepoints are to
-     * exist only in UTF-16 bytes as per the standard. CharsetDecoder conveniently skips these for us.
+     * Ensures that surrogate pair codepoints that are improperly used in UTF-8
+     * get ignored. These codepoints are to exist only in UTF-16 bytes as per
+     * the standard. CharsetDecoder conveniently skips these for us.
      */
     public void testUTF16SurrogatePairs() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(7);
@@ -252,10 +272,12 @@ public class Utf8InputStreamReaderTest extends UnitTestCase {
         baos.write(0xED); // First high surrogate, expressed as UTF-8
         baos.write(0x9F);
         baos.write(0xC0);
-        baos.write(0xED); // Last char before the first high surrogate (okay to read)
+        baos.write(0xED); // Last char before the first high surrogate (okay to
+                          // read)
         baos.write(0x9F);
         baos.write(0xBF);
-        baos.write(0xEE); // First char after the last low surrogate (okay to read)
+        baos.write(0xEE); // First char after the last low surrogate (okay to
+                          // read)
         baos.write(0x80);
         baos.write(0x80);
         baos.write('H');

@@ -15,12 +15,16 @@
  */
 package org.auraframework.test.annotation;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Marks that this test method needs a fresh browser instance.
- *
- *
+ * 
+ * 
  * @since 0.0.224
  */
 @Retention(RetentionPolicy.RUNTIME)

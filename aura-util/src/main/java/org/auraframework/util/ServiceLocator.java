@@ -15,7 +15,9 @@
  */
 package org.auraframework.util;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -25,11 +27,11 @@ import com.google.common.collect.Sets;
 
 /**
  * Delegates and combines calls to all ServiceLoaders currently in the classpath
- *
- *
+ * 
+ * 
  * @since 0.0.233
  */
-public class ServiceLocator implements ServiceLoader{
+public class ServiceLocator implements ServiceLoader {
 
     private static ServiceLocator instance = createInstance();
 
@@ -43,26 +45,27 @@ public class ServiceLocator implements ServiceLoader{
     /**
      * Cache backing get(Class, String)
      */
-    private final ConcurrentMap<Class<?>, ConcurrentMap<String, Optional<Object>>> namedInstanceCache = new ConcurrentHashMap<Class<?>, ConcurrentMap<String,Optional<Object>>>();
+    private final ConcurrentMap<Class<?>, ConcurrentMap<String, Optional<Object>>> namedInstanceCache = new ConcurrentHashMap<Class<?>, ConcurrentMap<String, Optional<Object>>>();
 
     /**
      * Cache backing getAll(Class)
      */
     private final ConcurrentMap<Class<?>, Set<?>> setCache = new ConcurrentHashMap<Class<?>, Set<?>>();
 
-
     /**
-     * If this is not called, then ServiceLoaderImpl is used as the only ServiceLoader.
-     * If this is called, all caches will be invalidated and the current loader list will be replaced.
-     * This allows you to register your own service loaders for adapting to Spring, JNDI, or others.
-     * The loaders will be used in the order provided.  For methods that return a single object, the first one
-     * to return something non-null will win, and no others will be consulted.  So, even if a latter
-     * loader would have a bean that overrides an earlier one because it is marked with @Primary, the earlier one
-     * will be used.
-     *
+     * If this is not called, then ServiceLoaderImpl is used as the only
+     * ServiceLoader. If this is called, all caches will be invalidated and the
+     * current loader list will be replaced. This allows you to register your
+     * own service loaders for adapting to Spring, JNDI, or others. The loaders
+     * will be used in the order provided. For methods that return a single
+     * object, the first one to return something non-null will win, and no
+     * others will be consulted. So, even if a latter loader would have a bean
+     * that overrides an earlier one because it is marked with @Primary, the
+     * earlier one will be used.
+     * 
      * @param loaders
      */
-    public static void init(ServiceLoader...loaders){
+    public static void init(ServiceLoader... loaders) {
         synchronized (instance) {
             instance.loaders = Lists.newArrayList(loaders);
             instance.instanceCache.clear();
@@ -71,10 +74,10 @@ public class ServiceLocator implements ServiceLoader{
         }
     }
 
-    private static ServiceLocator createInstance(){
+    private static ServiceLocator createInstance() {
         ServiceLocator ret = new ServiceLocator();
         ServiceLocatorConfigurator config = ret.get(ServiceLocatorConfigurator.class);
-        if(config != null){
+        if (config != null) {
             ret.loaders = config.getServiceLoaders();
         }
         return ret;
@@ -83,11 +86,11 @@ public class ServiceLocator implements ServiceLoader{
     /**
      * Get the singleton
      */
-    public static final ServiceLocator get(){
+    public static final ServiceLocator get() {
         return instance;
     }
 
-    private ServiceLocator(){
+    private ServiceLocator() {
         loaders.add(ServiceLoaderImpl.get());
     }
 
@@ -100,7 +103,7 @@ public class ServiceLocator implements ServiceLoader{
                 o = loadInstance(type);
                 instanceCache.putIfAbsent(type, o);
             }
-            return (T)o.orNull();
+            return (T) o.orNull();
         } catch (Exception e) {
             throw new ServiceLocatorException(e);
         }
@@ -115,7 +118,7 @@ public class ServiceLocator implements ServiceLoader{
                 s = loadSet(type);
                 setCache.putIfAbsent(type, s);
             }
-            return (Set<T>)s;
+            return (Set<T>) s;
         } catch (Exception e) {
             throw new ServiceLocatorException(e);
         }
@@ -135,16 +138,16 @@ public class ServiceLocator implements ServiceLoader{
                 o = loadNamedInstance(type, name);
                 c.putIfAbsent(name, o);
             }
-            return (T)o.orNull();
+            return (T) o.orNull();
         } catch (Exception e) {
             throw new ServiceLocatorException(e);
         }
     }
 
     private Optional<Object> loadInstance(Class<?> key) {
-        for(ServiceLoader loader : loaders){
+        for (ServiceLoader loader : loaders) {
             Object val = loader.get(key);
-            if (val != null){
+            if (val != null) {
                 return Optional.of(val);
             }
         }
@@ -152,9 +155,9 @@ public class ServiceLocator implements ServiceLoader{
     }
 
     private Optional<Object> loadNamedInstance(Class<?> clazz, String key) {
-        for(ServiceLoader loader : loaders){
+        for (ServiceLoader loader : loaders) {
             Object val = loader.get(clazz, key);
-            if(val != null){
+            if (val != null) {
                 return Optional.of(val);
             }
         }
@@ -163,24 +166,24 @@ public class ServiceLocator implements ServiceLoader{
 
     private Set<?> loadSet(Class<?> key) {
         Set<Object> ret = Sets.newHashSet();
-        for(ServiceLoader loader : loaders){
+        for (ServiceLoader loader : loaders) {
             Collection<?> val = loader.getAll(key);
-            if(val != null){
+            if (val != null) {
                 ret.addAll(val);
             }
         }
         return ret;
     }
 
-    public static class ServiceLocatorException extends RuntimeException{
+    public static class ServiceLocatorException extends RuntimeException {
 
         private static final long serialVersionUID = 3754864787887097292L;
 
-        public ServiceLocatorException(Throwable cause){
+        public ServiceLocatorException(Throwable cause) {
             super(cause);
         }
 
-        public ServiceLocatorException(String reason){
+        public ServiceLocatorException(String reason) {
             super(reason);
         }
 

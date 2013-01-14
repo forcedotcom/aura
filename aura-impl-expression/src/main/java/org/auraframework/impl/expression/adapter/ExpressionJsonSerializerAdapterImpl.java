@@ -18,11 +18,13 @@ package org.auraframework.impl.expression.adapter;
 import java.util.Collections;
 import java.util.Map;
 
-import com.google.common.collect.Maps;
-
 import org.auraframework.adapter.JsonSerializerAdapter;
-import org.auraframework.impl.expression.*;
+import org.auraframework.impl.expression.FunctionCallImpl;
+import org.auraframework.impl.expression.LiteralImpl;
+import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.util.json.JsonSerializer;
+
+import com.google.common.collect.Maps;
 
 /**
  * direct serializers for expression implementations

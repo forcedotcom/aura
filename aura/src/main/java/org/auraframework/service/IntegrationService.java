@@ -15,20 +15,27 @@
  */
 package org.auraframework.service;
 
-import org.auraframework.Aura;
-import org.auraframework.def.Definition;
-import org.auraframework.instance.Instance;
 import org.auraframework.integration.Integration;
 import org.auraframework.system.AuraContext.Mode;
 
 /**
  * <p>
- * Service for constructing an {@link Instance} of a {@link Definition}
+ * Service for constructing an instance of a {@link Integration}
  * </p>
  * <p>
- * Instances of all AuraServices should be retrieved from {@link Aura}
+ * An Integration defines the scope of creating a set of component injection
+ * scripts
  * </p>
  */
 public interface IntegrationService extends AuraService {
-	Integration createIntegration(String securityProviderDescr, String contextPath, Mode mode);
+    /**
+     * Create an Integration object that represents a set of components that
+     * will be injected into a non-Aura container
+     * 
+     * @param securityProviderDescr
+     * @param contextPath
+     * @param mode
+     * @return
+     */
+    Integration createIntegration(String securityProviderDescr, String contextPath, Mode mode);
 }

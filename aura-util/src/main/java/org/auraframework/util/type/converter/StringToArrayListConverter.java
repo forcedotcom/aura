@@ -23,19 +23,20 @@ import org.auraframework.util.type.Converter;
 
 /**
  * Convert strings to array lists.
- *
- * The suppress warnings here is because of the broken Java handling of parameterized types. it is
- * not possible to properly type things here (syntax errors result).
+ * 
+ * The suppress warnings here is because of the broken Java handling of
+ * parameterized types. it is not possible to properly type things here (syntax
+ * errors result).
  */
 @SuppressWarnings("rawtypes")
 public class StringToArrayListConverter implements Converter<String, ArrayList> {
 
     /**
      * Convert an incoming string value to an arraylist of strings.
-     *
-     * A couple of oddities here. Inputs of null will return null, and
-     * empty strings will return an empty list.
-     *
+     * 
+     * A couple of oddities here. Inputs of null will return null, and empty
+     * strings will return an empty list.
+     * 
      * @param value the incoming value.
      */
     @Override
@@ -46,7 +47,7 @@ public class StringToArrayListConverter implements Converter<String, ArrayList> 
             return new ArrayList<String>();
         }
         List<String> splitList = AuraTextUtil.splitSimple(",", value);
-        return (ArrayList<String>)splitList;
+        return (ArrayList<String>) splitList;
     }
 
     @Override

@@ -15,19 +15,27 @@
  */
 package org.auraframework.impl.type;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.BaseComponent;
 
 /**
  * Test to check aura types
+ * 
  * @hierarchy Aura.Mobile Web
  * @userStorySyncIdOrName a07B0000000EQgW
  */
-public class AuraTypeTest extends AuraImplTestCase{
+public class AuraTypeTest extends AuraImplTestCase {
 
     public AuraTypeTest(String name) {
         super(name);
@@ -35,16 +43,18 @@ public class AuraTypeTest extends AuraImplTestCase{
 
     /**
      * Test Aura Data Types.
+     * 
      * @throws Exception
      */
-    public void testAuraConverter() throws Exception{
+    public void testAuraConverter() throws Exception {
         ArrayList<String> typeNames = new ArrayList<String>();
-        String[] types = {"Integer", "Long", "Double", "Decimal", "Boolean", "String", "Object", "Map", "List", "Set", "Aura.Component[]", "Aura.Component", "Aura.ComponentDefRef[]", "Aura.Action"};
+        String[] types = { "Integer", "Long", "Double", "Decimal", "Boolean", "String", "Object", "Map", "List", "Set",
+                "Aura.Component[]", "Aura.Component", "Aura.ComponentDefRef[]", "Aura.Action" };
 
-        for (int i=0; i<types.length; i++){
+        for (int i = 0; i < types.length; i++) {
             types[i] = "aura://" + types[i];
         }
-        List<String> baseTypes =  Arrays.asList(types);
+        List<String> baseTypes = Arrays.asList(types);
 
         BaseComponent<ComponentDef, ?> cmp = null;
         Map<String, Object> attributes = new HashMap<String, Object>();
@@ -64,18 +74,20 @@ public class AuraTypeTest extends AuraImplTestCase{
         ComponentDef def = desc.getDef();
         Map<DefDescriptor<AttributeDef>, AttributeDef> attrMap = def.getAttributeDefs();
         Set<DefDescriptor<AttributeDef>> keys = attrMap.keySet();
-        Object [] keyArray = keys.toArray();
+        Object[] keyArray = keys.toArray();
 
-        for (int j=0; j<keys.size(); j++){
+        for (int j = 0; j < keys.size(); j++) {
             DefDescriptor<?> d = attrMap.get(keyArray[j]).getTypeDef().getDescriptor();
             typeNames.add(d.getQualifiedName());
 
-            //Check that each data type is defaulted to aura data type
-            if (baseTypes.contains(d.getQualifiedName()))
+            // Check that each data type is defaulted to aura data type
+            if (baseTypes.contains(d.getQualifiedName())) {
                 assertTrue("This type is not Aura type!", d.getPrefix().equals("aura"));
+            }
         }
 
-        //Check that all types that were supposed to change to aura data type are tested
+        // Check that all types that were supposed to change to aura data type
+        // are tested
         assertTrue("Does not have all attribute data types listed in component!", typeNames.containsAll(baseTypes));
     }
 }

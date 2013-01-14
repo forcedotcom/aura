@@ -15,37 +15,47 @@
  */
 package configuration;
 
-import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
-import org.auraframework.util.type.*;
+import org.auraframework.util.ServiceLoaderImpl.Impl;
+import org.auraframework.util.type.BadConverter;
+import org.auraframework.util.type.Converter;
+import org.auraframework.util.type.CustomDupConverter1;
+import org.auraframework.util.type.CustomDupConverter2;
+import org.auraframework.util.type.CustomDupType;
+import org.auraframework.util.type.CustomPairType;
+import org.auraframework.util.type.CustomPairTypeParameterizedConverter;
+import org.auraframework.util.type.StringToCustomPairArrayConverter;
+import org.auraframework.util.type.StringToCustomPairConverter;
 
 @AuraConfiguration
 public class TestTypeConvertersConfig {
     @Impl
-    public static Converter<String, CustomPairType> testUtilStringToCustomPairType(){
+    public static Converter<String, CustomPairType> testUtilStringToCustomPairType() {
         return new StringToCustomPairConverter();
     }
 
-    @Impl public static Converter<String, CustomPairType[]> testUtilStringToCustomPairArray(){
+    @Impl
+    public static Converter<String, CustomPairType[]> testUtilStringToCustomPairArray() {
         return new StringToCustomPairArrayConverter();
     }
 
     @Impl
-    public static Converter<String,CustomDupType> testUtilStringToCustomDupType1(){
+    public static Converter<String, CustomDupType> testUtilStringToCustomDupType1() {
         return new CustomDupConverter1();
     }
+
     @Impl
-    public static Converter<String,CustomDupType> testUtilStringToCustomDupType2(){
+    public static Converter<String, CustomDupType> testUtilStringToCustomDupType2() {
         return new CustomDupConverter2();
     }
 
     @Impl
-    public static Converter<CustomPairType, String> testConverterWithNulls(){
+    public static Converter<CustomPairType, String> testConverterWithNulls() {
         return new BadConverter();
     }
 
     @Impl
-    public static Converter<String, CustomPairType> testUtilStringToCustomPairParameterized(){
+    public static Converter<String, CustomPairType> testUtilStringToCustomPairParameterized() {
         return new CustomPairTypeParameterizedConverter();
     }
 }

@@ -19,12 +19,20 @@ import java.io.IOException;
 import java.util.List;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.EventHandlerDef;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
@@ -55,20 +63,20 @@ public class ComponentDefModel {
         AuraContext context = Aura.getContextService().getCurrentContext();
         BaseComponent<?, ?> component = context.getCurrentComponent();
 
-        String desc = (String)component.getAttributes().getValue("descriptor");
+        String desc = (String) component.getAttributes().getValue("descriptor");
 
-        DefType defType = DefType.valueOf(((String)component.getAttributes().getValue("defType")).toUpperCase());
+        DefType defType = DefType.valueOf(((String) component.getAttributes().getValue("defType")).toUpperCase());
         descriptor = Aura.getDefinitionService().getDefDescriptor(desc, defType.getPrimaryInterface());
         definition = descriptor.getDef();
         String type = null;
 
         if (definition instanceof RootDefinition) {
-            RootDefinition rootDef = (RootDefinition)definition;
+            RootDefinition rootDef = (RootDefinition) definition;
             for (AttributeDef attribute : rootDef.getAttributeDefs().values()) {
                 attributes.add(new AttributeModel(attribute));
             }
             if (definition instanceof BaseComponentDef) {
-                BaseComponentDef cmpDef = (BaseComponentDef)definition;
+                BaseComponentDef cmpDef = (BaseComponentDef) definition;
                 for (RegisterEventDef reg : cmpDef.getRegisterEventDefs().values()) {
                     events.add(new AttributeModel(reg));
                 }
@@ -88,7 +96,7 @@ public class ComponentDefModel {
                 isExtensible = cmpDef.isExtensible();
 
             } else if (definition instanceof EventDef) {
-                EventDef eventDef = (EventDef)definition;
+                EventDef eventDef = (EventDef) definition;
                 DefDescriptor<?> superDesc = eventDef.getExtendsDescriptor();
                 if (superDesc != null) {
                     theSuper = superDesc.getNamespace() + ":" + superDesc.getName();
@@ -107,7 +115,7 @@ public class ComponentDefModel {
             support = rootDef.getSupport().name();
 
             if (definition instanceof RootDefinition) {
-                List<DefDescriptor<?>> deps = ((RootDefinition)definition).getBundle();
+                List<DefDescriptor<?>> deps = ((RootDefinition) definition).getBundle();
 
                 for (DefDescriptor<?> dep : deps) {
                     defs.add(new DefModel(dep));

@@ -19,9 +19,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import com.google.common.collect.Maps;
-
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.LayoutDef;
+import org.auraframework.def.LayoutItemDef;
+import org.auraframework.def.LayoutsDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -29,17 +30,17 @@ import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
+import com.google.common.collect.Maps;
+
 /**
  */
-public class LayoutDefImpl extends DefinitionImpl<LayoutDef> implements LayoutDef{
+public class LayoutDefImpl extends DefinitionImpl<LayoutDef> implements LayoutDef {
 
     /**
          */
-        private static final long serialVersionUID = 8414825652777198915L;
+    private static final long serialVersionUID = 8414825652777198915L;
 
-
-        private final Map<DefDescriptor<LayoutItemDef>, LayoutItemDef> layoutItemDefs;
-
+    private final Map<DefDescriptor<LayoutItemDef>, LayoutItemDef> layoutItemDefs;
 
     private final String name;
     private final Object title;
@@ -53,9 +54,9 @@ public class LayoutDefImpl extends DefinitionImpl<LayoutDef> implements LayoutDe
         this.match = builder.match;
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<LayoutDef>{
+    public static class Builder extends DefinitionImpl.BuilderImpl<LayoutDef> {
 
-        public Builder(){
+        public Builder() {
             super(LayoutDef.class);
         }
 
@@ -69,8 +70,8 @@ public class LayoutDefImpl extends DefinitionImpl<LayoutDef> implements LayoutDe
             return new LayoutDefImpl(this);
         }
 
-        public Builder addLayoutItemDef(LayoutItemDef layoutItemDef){
-            if(this.layoutItemDefs == null){
+        public Builder addLayoutItemDef(LayoutItemDef layoutItemDef) {
+            if (this.layoutItemDefs == null) {
                 this.layoutItemDefs = Maps.newHashMap();
             }
             this.layoutItemDefs.put(layoutItemDef.getDescriptor(), layoutItemDef);
@@ -79,7 +80,7 @@ public class LayoutDefImpl extends DefinitionImpl<LayoutDef> implements LayoutDe
 
         /**
          * Sets the name for this instance.
-         *
+         * 
          * @param name The name.
          */
         public Builder setName(String name) {
@@ -93,7 +94,7 @@ public class LayoutDefImpl extends DefinitionImpl<LayoutDef> implements LayoutDe
 
         /**
          * Sets the match for this instance.
-         *
+         * 
          * @param match The match.
          */
         public Builder setMatch(String match) {
@@ -103,7 +104,7 @@ public class LayoutDefImpl extends DefinitionImpl<LayoutDef> implements LayoutDe
 
         /**
          * Sets the title for this instance.
-         *
+         * 
          * @param title The title.
          */
         public Builder setTitle(Object title) {
@@ -121,7 +122,7 @@ public class LayoutDefImpl extends DefinitionImpl<LayoutDef> implements LayoutDe
     public void serialize(Json json) throws IOException {
 
         json.writeMapBegin();
-        json.writeMapEntry("layoutItemDefs",getLayoutItemDefs());
+        json.writeMapEntry("layoutItemDefs", getLayoutItemDefs());
         json.writeMapEntry("name", name);
         json.writeMapEntry("title", title);
         json.writeMapEntry("match", match);
@@ -131,7 +132,7 @@ public class LayoutDefImpl extends DefinitionImpl<LayoutDef> implements LayoutDe
     @Override
     public LayoutItemDef getLayoutItemDef(String containerName) {
         @SuppressWarnings("unchecked")
-                SubDefDescriptor<LayoutDef,LayoutsDef> subdefDesc = (SubDefDescriptor<LayoutDef,LayoutsDef>)getDescriptor();
+        SubDefDescriptor<LayoutDef, LayoutsDef> subdefDesc = (SubDefDescriptor<LayoutDef, LayoutsDef>) getDescriptor();
         DefDescriptor<LayoutsDef> parentDesc = subdefDesc.getParentDescriptor();
         DefDescriptor<?> desc = SubDefDescriptorImpl.getInstance(containerName, parentDesc, LayoutItemDef.class);
         return layoutItemDefs.get(desc);
@@ -141,8 +142,8 @@ public class LayoutDefImpl extends DefinitionImpl<LayoutDef> implements LayoutDe
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
         Collection<LayoutItemDef> layoutItems = getLayoutItemDefs();
-        for(LayoutItemDef layoutItem: layoutItems){
-                layoutItem.validateDefinition();
+        for (LayoutItemDef layoutItem : layoutItems) {
+            layoutItem.validateDefinition();
         }
     }
 

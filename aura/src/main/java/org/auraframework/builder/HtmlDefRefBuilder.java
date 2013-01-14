@@ -15,7 +15,7 @@
  */
 package org.auraframework.builder;
 
-public interface HtmlDefRefBuilder extends ComponentDefRefBuilder{
+public interface HtmlDefRefBuilder extends ComponentDefRefBuilder {
 
     HtmlDefRefBuilder setTag(String tag);
 

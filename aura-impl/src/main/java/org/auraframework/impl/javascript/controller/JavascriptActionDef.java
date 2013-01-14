@@ -19,7 +19,10 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import org.auraframework.def.*;
+import org.auraframework.def.ActionDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.TypeDef;
+import org.auraframework.def.ValueDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.util.json.JsFunction;
@@ -35,10 +38,9 @@ public class JavascriptActionDef extends DefinitionImpl<ActionDef> implements Ac
     protected JavascriptActionDef(Builder builder) {
         super(builder);
         this.function = builder.function;
-        SubDefDescriptor<?,?> desc = (SubDefDescriptor<?,?>)descriptor;
-        function.setName(String.format("%s$%s_%s", desc.getParentDescriptor().getNamespace(),
-                                                   desc.getParentDescriptor().getName(),
-                                                   desc.getName()));
+        SubDefDescriptor<?, ?> desc = (SubDefDescriptor<?, ?>) descriptor;
+        function.setName(String.format("%s$%s_%s", desc.getParentDescriptor().getNamespace(), desc
+                .getParentDescriptor().getName(), desc.getName()));
     }
 
     @Override
@@ -48,7 +50,8 @@ public class JavascriptActionDef extends DefinitionImpl<ActionDef> implements Ac
 
     @Override
     public List<ValueDef> getParameters() {
-        // if we do allow extra params, they must somehow be annotated as we have no way to infer the type from the code
+        // if we do allow extra params, they must somehow be annotated as we
+        // have no way to infer the type from the code
         return Collections.emptyList();
     }
 
@@ -68,9 +71,9 @@ public class JavascriptActionDef extends DefinitionImpl<ActionDef> implements Ac
         json.writeMapEnd();
     }
 
-    public static class Builder extends DefinitionImpl.BuilderImpl<ActionDef>{
+    public static class Builder extends DefinitionImpl.BuilderImpl<ActionDef> {
 
-        public Builder(){
+        public Builder() {
             super(ActionDef.class);
         }
 

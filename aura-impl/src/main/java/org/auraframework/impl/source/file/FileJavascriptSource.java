@@ -26,7 +26,7 @@ public class FileJavascriptSource<D extends Definition> extends FileSource<D> {
 
     /**
      * @param pathOrId - the canonical path of the file provided, if available.
-     *  Otherwise a useful systemID in the form namespace:item
+     *            Otherwise a useful systemID in the form namespace:item
      */
     public FileJavascriptSource(DefDescriptor<D> descriptor, String pathOrId, File file) {
         super(descriptor, pathOrId, file, Format.JS);

@@ -22,7 +22,8 @@ import org.auraframework.util.adapter.SourceControlAdapter;
  */
 public class AuraUtil {
     /**
-     * Get the Source Control Adapter : Allows interaction with the source control system.
+     * Get the Source Control Adapter : Allows interaction with the source
+     * control system.
      */
     public static SourceControlAdapter getSourceControlAdapter() {
         return AuraUtil.get(SourceControlAdapter.class);

@@ -19,20 +19,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.auraframework.def.DefDescriptor;
-
 import org.auraframework.def.DefDescriptor.DefType;
-
 import org.auraframework.util.AuraTextUtil;
-
 import org.auraframework.util.text.GlobMatcher;
 
 import com.google.common.collect.Lists;
 
 public class DescriptorFilter {
-    private static final List<DefType> componentType = Collections.unmodifiableList(Arrays.asList(new DefType [] {
-                                                                                                      DefType.COMPONENT
-                                                                                                  }));
+    private static final List<DefType> componentType = Collections.unmodifiableList(Arrays
+            .asList(new DefType[] { DefType.COMPONENT }));
     private final List<DefType> defTypes;
     private final GlobMatcher prefixMatch;
     private final GlobMatcher namespaceMatch;
@@ -61,17 +56,17 @@ public class DescriptorFilter {
         try {
             this.prefixMatch = new GlobMatcher(prefix);
         } catch (IllegalArgumentException iae) {
-            throw new IllegalArgumentException("Illegal prefix in "+matcher);
+            throw new IllegalArgumentException("Illegal prefix in " + matcher);
         }
         try {
             this.namespaceMatch = new GlobMatcher(namespace);
         } catch (IllegalArgumentException iae) {
-            throw new IllegalArgumentException("Illegal namespace in "+matcher);
+            throw new IllegalArgumentException("Illegal namespace in " + matcher);
         }
         try {
             this.nameMatch = new GlobMatcher(name);
         } catch (IllegalArgumentException iae) {
-            throw new IllegalArgumentException("Illegal name in "+matcher);
+            throw new IllegalArgumentException("Illegal name in " + matcher);
         }
         if ("*".equals(typeStr)) {
             this.defTypes = null;
@@ -106,7 +101,7 @@ public class DescriptorFilter {
 
     public boolean matchDescriptor(DefDescriptor<?> dd) {
         return matchType(dd.getDefType()) && matchName(dd.getName()) && matchPrefix(dd.getPrefix())
-               && matchNamespace(dd.getNamespace());
+                && matchNamespace(dd.getNamespace());
     }
 
     public boolean matchDescriptorNoNS(DefDescriptor<?> dd) {
@@ -115,13 +110,13 @@ public class DescriptorFilter {
 
     @Override
     public String toString() {
-        return this.prefixMatch+"://"+this.namespaceMatch+":"+this.nameMatch
-               +((this.defTypes==null)?"(any)":this.defTypes.toString());
+        return this.prefixMatch + "://" + this.namespaceMatch + ":" + this.nameMatch
+                + ((this.defTypes == null) ? "(any)" : this.defTypes.toString());
     }
 
     /**
      * Gets the prefix match for this instance.
-     *
+     * 
      * @return The prefix matcher.
      */
     public GlobMatcher getPrefixMatch() {
@@ -130,7 +125,7 @@ public class DescriptorFilter {
 
     /**
      * Gets the namespace matcher for this instance.
-     *
+     * 
      * @return The namespace matcher.
      */
     public GlobMatcher getNamespaceMatch() {
@@ -139,7 +134,7 @@ public class DescriptorFilter {
 
     /**
      * Gets the name matcher for this instance.
-     *
+     * 
      * @return The name matcher.
      */
     public GlobMatcher getNameMatch() {

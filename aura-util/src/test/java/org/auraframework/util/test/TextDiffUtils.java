@@ -15,15 +15,22 @@
  */
 package org.auraframework.util.test;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.net.URL;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import junit.framework.Assert;
+
 import org.auraframework.util.AuraUtil;
 import org.auraframework.util.adapter.SourceControlAdapter;
-
 import org.xml.sax.SAXException;
 
 public class TextDiffUtils extends BaseDiffUtils<String> {
@@ -35,7 +42,9 @@ public class TextDiffUtils extends BaseDiffUtils<String> {
     @Override
     public void assertDiff(String results, StringBuilder sb) throws SAXException, IOException,
             ParserConfigurationException {
-        if (sb == null) sb = new StringBuilder();
+        if (sb == null) {
+            sb = new StringBuilder();
+        }
         String gold = "";
         try {
             gold = readGoldFile();
@@ -69,7 +78,9 @@ public class TextDiffUtils extends BaseDiffUtils<String> {
         fw.write(results);
         fw.close();
 
-        if (!existed) sca.add(f);
+        if (!existed) {
+            sca.add(f);
+        }
     }
 
     @Override
@@ -77,7 +88,8 @@ public class TextDiffUtils extends BaseDiffUtils<String> {
         int READ_BUFFER = 4096;
 
         // TK TODO: deal with brand new files separately at the outer level.
-        // Maybe that means catching FileNotFoundException and printing a different error. Should also p4 add
+        // Maybe that means catching FileNotFoundException and printing a
+        // different error. Should also p4 add
         Reader br = new BufferedReader(new InputStreamReader(getUrl().openStream(), "UTF-8"));
         char[] buff = new char[READ_BUFFER];
         int read = -1;

@@ -22,7 +22,6 @@ import java.util.Set;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.RootDefFactory;
@@ -37,9 +36,9 @@ import com.google.common.collect.Lists;
  * @see org.auraframework.impl.registry.RootDefFactoryTest
  */
 public class MasterDefRegistryImplTest extends AuraImplTestCase {
-    private String baseContents = "<aura:application></aura:application>";
-    private Set<String> prefixes = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
-    private Set<DefType> defTypes = EnumSet.of(DefType.APPLICATION, DefType.COMPONENT);
+    private final String baseContents = "<aura:application></aura:application>";
+    private final Set<String> prefixes = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
+    private final Set<DefType> defTypes = EnumSet.of(DefType.APPLICATION, DefType.COMPONENT);
 
     public MasterDefRegistryImplTest(String name) {
         super(name);
@@ -50,36 +49,34 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         String namespace = "testFindRegex" + auraTestingUtil.getNonce();
         DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class, baseContents,
                 String.format("%s:houseboat", namespace));
-        addSourceAutoCleanup(ApplicationDef.class, baseContents,
-                String.format("%s:houseparty", namespace));
-        addSourceAutoCleanup(ApplicationDef.class, baseContents,
-                String.format("%s:pantsparty", namespace));
+        addSourceAutoCleanup(ApplicationDef.class, baseContents, String.format("%s:houseparty", namespace));
+        addSourceAutoCleanup(ApplicationDef.class, baseContents, String.format("%s:pantsparty", namespace));
 
-        StringSourceLoader loader =  StringSourceLoader.getInstance();
-        List<SourceLoader> loaders = Lists.newArrayList((SourceLoader)loader);
+        StringSourceLoader loader = StringSourceLoader.getInstance();
+        List<SourceLoader> loaders = Lists.newArrayList((SourceLoader) loader);
         RootDefFactory factory = new RootDefFactory(new SourceFactory(loaders));
         @SuppressWarnings("rawtypes")
         NonCachingDefRegistryImpl nonCachDefReg = new NonCachingDefRegistryImpl(factory, defTypes, prefixes);
         MasterDefRegistryImpl masterDefReg = new MasterDefRegistryImpl(nonCachDefReg);
 
         assertTrue("find() not finding all sources",
-                   masterDefReg.find(new DescriptorFilter(String.format("markup://%s:*", namespace))).size() == 3);
+                masterDefReg.find(new DescriptorFilter(String.format("markup://%s:*", namespace))).size() == 3);
         assertEquals("find() fails with wildcard as prefix", 1,
-                     masterDefReg.find(new DescriptorFilter("*://" + houseboat.getDescriptorName())).size());
+                masterDefReg.find(new DescriptorFilter("*://" + houseboat.getDescriptorName())).size());
         assertEquals("find() fails with wildcard as namespace", 1,
-                     masterDefReg.find(new DescriptorFilter("markup://*:" + houseboat.getName())).size());
+                masterDefReg.find(new DescriptorFilter("markup://*:" + houseboat.getName())).size());
         assertEquals("find() fails with wildcard as name", 1,
-                     masterDefReg.find(new DescriptorFilter(houseboat.getQualifiedName())).size());
+                masterDefReg.find(new DescriptorFilter(houseboat.getQualifiedName())).size());
         assertEquals("find() fails with wildcard at end of name", 2,
-                     masterDefReg.find(new DescriptorFilter(String.format("markup://%s:house*", namespace))).size());
+                masterDefReg.find(new DescriptorFilter(String.format("markup://%s:house*", namespace))).size());
         assertEquals("find() fails with wildcard at beginning of name", 2,
-                     masterDefReg.find(new DescriptorFilter(String.format("markup://%s:*party*", namespace))).size());
+                masterDefReg.find(new DescriptorFilter(String.format("markup://%s:*party*", namespace))).size());
 
         assertEquals("find() should not find nonexistent name", 0,
-                     masterDefReg.find(new DescriptorFilter(String.format("markup://%s:househunters", namespace))).size());
+                masterDefReg.find(new DescriptorFilter(String.format("markup://%s:househunters", namespace))).size());
         assertEquals("find() should not find nonexistent name ending with wildcard", 0,
-                     masterDefReg.find(new DescriptorFilter(String.format("markup://%s:househunters*", namespace))).size());
+                masterDefReg.find(new DescriptorFilter(String.format("markup://%s:househunters*", namespace))).size());
         assertEquals("find() should not find nonexistent name with preceeding wildcard", 0,
-                     masterDefReg.find(new DescriptorFilter(String.format("markup://%s:*notherecaptain", namespace))).size());
+                masterDefReg.find(new DescriptorFilter(String.format("markup://%s:*notherecaptain", namespace))).size());
     }
 }

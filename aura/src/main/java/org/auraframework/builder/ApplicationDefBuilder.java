@@ -20,7 +20,7 @@ import org.auraframework.def.LayoutsDef;
 
 /**
  */
-public interface ApplicationDefBuilder extends BaseComponentDefBuilder<ApplicationDef>{
+public interface ApplicationDefBuilder extends BaseComponentDefBuilder<ApplicationDef> {
 
     ApplicationDefBuilder setAccess(String access);
 

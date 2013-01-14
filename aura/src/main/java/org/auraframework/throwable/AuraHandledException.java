@@ -16,17 +16,18 @@
 package org.auraframework.throwable;
 
 /**
- * Aura-related runtime exception that has been handled and has a specific message that can be reported to the end user.
+ * Aura-related runtime exception that has been handled and has a specific
+ * message that can be reported to the end user.
  */
 public class AuraHandledException extends AuraRuntimeException {
     private static final long serialVersionUID = -8503516144374931379L;
 
     /**
      * Create an exception with a throwable.
-     *
-     * This will set the message to the message from the throwable,
-     * and store the throwable as the cause.
-     *
+     * 
+     * This will set the message to the message from the throwable, and store
+     * the throwable as the cause.
+     * 
      * @param e the throwable that is being handled.
      */
     public AuraHandledException(Throwable e) {
@@ -35,11 +36,11 @@ public class AuraHandledException extends AuraRuntimeException {
 
     /**
      * Create an exception with a message and (hidden) cause.
-     *
-     * This is intended to send a specific message to the client, but
-     * to also remember the cause of the exception. This is especially
-     * important when the cause should not be reported to the client.
-     *
+     * 
+     * This is intended to send a specific message to the client, but to also
+     * remember the cause of the exception. This is especially important when
+     * the cause should not be reported to the client.
+     * 
      * @param message the message to send to the client.
      * @param e the throwable that is being handled.
      */
@@ -49,11 +50,11 @@ public class AuraHandledException extends AuraRuntimeException {
 
     /**
      * Create an exception with a message.
-     *
-     * This is intended to send a specific message to the client. It should
-     * be used if the underlying exception should be suppressed or if there
-     * is none.
-     *
+     * 
+     * This is intended to send a specific message to the client. It should be
+     * used if the underlying exception should be suppressed or if there is
+     * none.
+     * 
      * @param message the message to send to the client.
      */
     public AuraHandledException(String message) {

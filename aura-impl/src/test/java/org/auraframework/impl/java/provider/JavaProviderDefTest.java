@@ -50,20 +50,23 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Positive test Case 1: Simple case of Interface implementation. This is a case with a simple interface. The
-     * interface has a provider written in JAVA. The interface is implemented by two components. When the provider
-     * creates these components, the attributes are passed on from the interface to the components.
+     * Positive test Case 1: Simple case of Interface implementation. This is a
+     * case with a simple interface. The interface has a provider written in
+     * JAVA. The interface is implemented by two components. When the provider
+     * creates these components, the attributes are passed on from the interface
+     * to the components.
      */
     public void testBasicProviderScenario() throws Exception {
         Map<String, Object> attributes = Maps.newHashMap();
 
         attributes.put("implNumber", "3");
-        Component component = Aura.getInstanceService().getInstance("test:test_Provider_Interface",
-                ComponentDef.class, attributes);
+        Component component = Aura.getInstanceService().getInstance("test:test_Provider_Interface", ComponentDef.class,
+                attributes);
         assertEquals("Java Provider: Failed to retrieve the right implementation for the interface.", component
                 .getDescriptor().getQualifiedName(), "markup://test:test_Provider_providerImpl3");
 
-        // Verify that the attributes passed off to the interface were inherited by the component provided by the
+        // Verify that the attributes passed off to the interface were inherited
+        // by the component provided by the
         // provider
         assertEquals("Failed to initialize attributes on the component",
                 component.getAttributes().getExpression("implNumber"), "3");
@@ -76,7 +79,8 @@ public class JavaProviderDefTest extends AuraImplTestCase {
                 attributes);
         assertEquals("Java Provider: Failed to retrieve the right implementation for the interface.", component
                 .getDescriptor().getQualifiedName(), "markup://test:test_Provider_providerImpl1");
-        // Verify that the attributes passed off to the interface were inherited by the component provided by the
+        // Verify that the attributes passed off to the interface were inherited
+        // by the component provided by the
         // provider
         assertEquals("Failed to initialize attributes on the component",
                 component.getAttributes().getExpression("implNumber"), "1");
@@ -85,7 +89,8 @@ public class JavaProviderDefTest extends AuraImplTestCase {
                 component.getAttributes().getExpression("ComponentSpecificAttr"), "iammine");
         this.serializeAndGoldFile(component, "_providerImpl1");
 
-        // Request a component which is using the interface test:test_Provider_Interface
+        // Request a component which is using the interface
+        // test:test_Provider_Interface
         component = Aura.getInstanceService().getInstance("test:test_Provider_Component", ComponentDef.class, null);
         assertEquals("Java Provider: Failed to retrieve the component using the test interface.", component
                 .getDescriptor().getQualifiedName(), "markup://test:test_Provider_Component");
@@ -141,14 +146,14 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Negative test Case: Request for an interface which does not have a valid provider defined.
+     * Negative test Case: Request for an interface which does not have a valid
+     * provider defined.
      */
     public void testInterfaceWithNoProvider() throws Exception {
         String markupSkeleton = "<aura:interface %s>"
                 + "<aura:attribute name=\"defaultAttr\" type=\"String\" default=\"meh\"/>" + "</aura:interface>";
         String markupTestCase;
-        String[] runtimeTestCases = {
-                "provider=\"\"", // Blank provider
+        String[] runtimeTestCases = { "provider=\"\"", // Blank provider
         };
         String[] markupTestCases = { "", // No Provider
                 // TODO W-775818 - no validation for Java providers
@@ -156,16 +161,16 @@ public class JavaProviderDefTest extends AuraImplTestCase {
                 "provider=\"java://org.auraframework.impl.java.provider.TestProviderWithNoProvideMethod\"",
                 // Non static provide method in the Java Provider
                 "provider=\"java://org.auraframework.impl.java.provider.TestProviderWithNonStaticMethod\"",
-                // Javascript provider
-                // "provider=\"js://org.auraframework.impl.java.provider.TestComponentDescriptorProvider\"",
-                // Non existing provider
-                // "provider=\"java://org.auraframework.impl.java.provider.meh\"",
-                // Bad return type, basically forcing a class cast exception
-                // "provider=\"java://org.auraframework.impl.java.provider.TestProviderWithBadReturnType\"",
-                // Provider returns null
-                // "provider=\"java://org.auraframework.impl.java.provider.TestProvideReturnNull\"",
-                //Return a component which does not exist
-                // "provider=\"java://org.auraframework.impl.java.provider.TestProvideNonExistingComponent\""
+        // Javascript provider
+        // "provider=\"js://org.auraframework.impl.java.provider.TestComponentDescriptorProvider\"",
+        // Non existing provider
+        // "provider=\"java://org.auraframework.impl.java.provider.meh\"",
+        // Bad return type, basically forcing a class cast exception
+        // "provider=\"java://org.auraframework.impl.java.provider.TestProviderWithBadReturnType\"",
+        // Provider returns null
+        // "provider=\"java://org.auraframework.impl.java.provider.TestProvideReturnNull\"",
+        // Return a component which does not exist
+        // "provider=\"java://org.auraframework.impl.java.provider.TestProvideNonExistingComponent\""
         };
         for (String testcase : runtimeTestCases) {
             markupTestCase = String.format(markupSkeleton, testcase);
@@ -190,34 +195,40 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Negative test Case: Is there a check to verify that a component provided by a provider implements the right
-     * interface. Have a interface(test:test_Provider_InterfaceNoImplementation) with one attribute. The provider
-     * (TestProviderNoImplementation.java) provides a component (test:test_Provider_NoImpl) which does not implement
-     * this interface. So the getComponent method should throw an exception because the attribute values cannot be
-     * passed along to the component.
+     * Negative test Case: Is there a check to verify that a component provided
+     * by a provider implements the right interface. Have a
+     * interface(test:test_Provider_InterfaceNoImplementation) with one
+     * attribute. The provider (TestProviderNoImplementation.java) provides a
+     * component (test:test_Provider_NoImpl) which does not implement this
+     * interface. So the getComponent method should throw an exception because
+     * the attribute values cannot be passed along to the component.
      */
     @Ignore("W-775818 - no validation for Java providers")
     public void testComponentProviderImplementsInterface() throws Exception {
         try {
             Aura.getInstanceService().getInstance("test:test_Provider_InterfaceNoImplementation", ComponentDef.class);
             fail("Should have checked that the component provided by the provider does not implement test:test_Provider_InterfaceNoImplementation");
-        } catch (AuraRuntimeException expected) {}
+        } catch (AuraRuntimeException expected) {
+        }
     }
 
     /**
-     * Positive test case: Check what happens when a provided component has an attribute value which is the same as the
-     * attribute on the interface. When a component has an attribute which is the same as the attribute of an interface
-     * that it is implementing, the attribute provided through the interface should take precedence.
+     * Positive test case: Check what happens when a provided component has an
+     * attribute value which is the same as the attribute on the interface. When
+     * a component has an attribute which is the same as the attribute of an
+     * interface that it is implementing, the attribute provided through the
+     * interface should take precedence.
      */
     public void testOverrideInterfaceAttributes() throws Exception {
         Map<String, Object> attributes = Maps.newHashMap();
 
         attributes.put("implNumber", "OverrideAttr");
-        Component component = Aura.getInstanceService().getInstance("test:test_Provider_Interface",
-                ComponentDef.class, attributes);
+        Component component = Aura.getInstanceService().getInstance("test:test_Provider_Interface", ComponentDef.class,
+                attributes);
         assertEquals("Java Provider: Failed to retrieve the right implementation for the interface.", component
                 .getDescriptor().getQualifiedName(), "markup://test:test_Provider_providerImplOverrideAttr");
-        // Verify that the attributes passed off to the interface were inherited by the component provided by the
+        // Verify that the attributes passed off to the interface were inherited
+        // by the component provided by the
         // provider
         assertEquals("Attribute values of implementing component were overriden by values defined for interface",
                 component.getAttributes().getExpression("implNumber"), "OverrideAttr");
@@ -240,18 +251,20 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Test to ensure that a concrete component properly instantiates when a provider is specified. Note the
-     * construction of this test. provider:providerC has a body with three components,
+     * Test to ensure that a concrete component properly instantiates when a
+     * provider is specified. Note the construction of this test.
+     * provider:providerC has a body with three components,
      * <ul>
-     *   <li>provider:providerA which should instantiate as is.
-     *   <li>provider:providerBase which should use the java provider class to give us providerB
-     *   <li>provider:providerB which should instantiate as is.
+     * <li>provider:providerA which should instantiate as is.
+     * <li>provider:providerBase which should use the java provider class to
+     * give us providerB
+     * <li>provider:providerB which should instantiate as is.
      * </ul>
      */
     @SuppressWarnings("unchecked")
     public void testConcreteWithProvider() throws Exception {
         Component component = Aura.getInstanceService().getInstance("provider:providerC", ComponentDef.class);
-        List<? extends Component> body = (List<? extends Component>)component.getSuper().getAttributes()
+        List<? extends Component> body = (List<? extends Component>) component.getSuper().getAttributes()
                 .getValue("body");
         assertEquals("First element must be concrete provider A", "markup://provider:providerA", body.get(0)
                 .getDescriptor().getQualifiedName());
@@ -262,10 +275,12 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     }
 
     /**
-     * An interface provider should not return an interface. Note: The testInterfaceProviderProvidesItself() test above
-     * might seem redundant with this test's existence. But we are not allowing providers to provide interface only for
-     * now. We might open up multiple levels of providing later. So its good to have both the tests.
-     *
+     * An interface provider should not return an interface. Note: The
+     * testInterfaceProviderProvidesItself() test above might seem redundant
+     * with this test's existence. But we are not allowing providers to provide
+     * interface only for now. We might open up multiple levels of providing
+     * later. So its good to have both the tests.
+     * 
      * @throws Exception
      */
     @Ignore("W-777620 - don't allow prividing abstract cmp or interface w/no provider")
@@ -279,14 +294,17 @@ public class JavaProviderDefTest extends AuraImplTestCase {
         /*
          * Eventually this test should work. Component component =
          * instanceService.getComponent("test:test_Provider_InterfaceChain");
-         * assertEquals("Java Provider: Failed to retrieve the right implementation for the interface.",
-         * component.getDescriptor().getQualifiedName(), "test:test_Provider_InterfaceChainComponent");
+         * assertEquals(
+         * "Java Provider: Failed to retrieve the right implementation for the interface."
+         * , component.getDescriptor().getQualifiedName(),
+         * "test:test_Provider_InterfaceChainComponent");
          */
     }
 
     /**
-     * A cyclic injection using Interfaces. This test would also check cyclic injection of components.
-     *
+     * A cyclic injection using Interfaces. This test would also check cyclic
+     * injection of components.
+     * 
      * @throws Exception
      */
     @Ignore("W-777675 - cyclic injection causes stack overflow")
@@ -305,8 +323,9 @@ public class JavaProviderDefTest extends AuraImplTestCase {
      * * A B S T R A C T C O M P O N E N T S * *
      */
     /**
-     * Abstract component's provider returns a component which extends the abstract class
-     *
+     * Abstract component's provider returns a component which extends the
+     * abstract class
+     * 
      * @throws Exception
      */
     public void testProviderAbstractBasic() throws Exception {
@@ -317,9 +336,9 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Call provider for interface to get abstract component. Then call provider for abstract component to supply a
-     * component.
-     *
+     * Call provider for interface to get abstract component. Then call provider
+     * for abstract component to supply a component.
+     * 
      * @TestLabels("ignore")
      * @throws Exception
      */
@@ -327,8 +346,8 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     public void testProviderForAbstractComponent() throws Exception {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("implNumber", "4");
-        Component component = Aura.getInstanceService().getInstance("test:test_Provider_Interface",
-                ComponentDef.class, attributes);
+        Component component = Aura.getInstanceService().getInstance("test:test_Provider_Interface", ComponentDef.class,
+                attributes);
         assertEquals("Java Provider: Failed to retrieve the right implementation for the interface.", component
                 .getDescriptor().getQualifiedName(), "markup://test:test_Provider_providerImpl4");
 
@@ -340,9 +359,9 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Call provider for interface to get abstract component. Then call provider for abstract component to supply a
-     * component.
-     *
+     * Call provider for interface to get abstract component. Then call provider
+     * for abstract component to supply a component.
+     * 
      * @TestLabels("ignore")
      * @throws Exception
      */
@@ -351,14 +370,16 @@ public class JavaProviderDefTest extends AuraImplTestCase {
         try {
             Aura.getInstanceService().getInstance("test:test_NoProvider_NonAbstract_Component", ComponentDef.class);
             fail("Should have thrown QuickFixException");
-        } catch (QuickFixException expected) {} catch (Throwable t) {
+        } catch (QuickFixException expected) {
+        } catch (Throwable t) {
             fail("Should have thrown QuickFixException");
         }
     }
 
     /**
-     * Call provider for of abstract component, which returns the same component.
-     *
+     * Call provider for of abstract component, which returns the same
+     * component.
+     * 
      * @TestLabels("ignore")
      * @throws Exception
      */
@@ -367,14 +388,15 @@ public class JavaProviderDefTest extends AuraImplTestCase {
         try {
             Aura.getInstanceService().getInstance("test:test_Provider_AbstractCyclic", ComponentDef.class);
             fail("Should have thrown AuraRuntimeException for infinite recursion from component referencing itself");
-        } catch (AuraRuntimeException expected) {} catch (Throwable t) {
+        } catch (AuraRuntimeException expected) {
+        } catch (Throwable t) {
             fail("Should have thrown AuraRuntimeException");
         }
     }
 
     /**
      * Provider for abstract component supplies another abstract component.
-     *
+     * 
      * @TestLabels("ignore")
      * @throws Exception
      */
@@ -382,8 +404,8 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     public void testProviderForAbstractComponentProvidesAbstractComponent() throws Exception {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("implNumber", "2");
-        Component component = Aura.getInstanceService().getInstance("test:test_Provider_Abstract1",
-                ComponentDef.class, attributes);
+        Component component = Aura.getInstanceService().getInstance("test:test_Provider_Abstract1", ComponentDef.class,
+                attributes);
         assertEquals("Java Provider: Failed to retrieve the right implementation for the abstract component.",
                 component.getDescriptor().getQualifiedName(), "markup://test:test_Provider_Abstract2");
 
@@ -396,8 +418,9 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Component provided by the provider should extend the Abstract component requested.
-     *
+     * Component provided by the provider should extend the Abstract component
+     * requested.
+     * 
      * @TestLabels("ignore")
      * @throws Exception
      */
@@ -406,12 +429,13 @@ public class JavaProviderDefTest extends AuraImplTestCase {
         try {
             Aura.getInstanceService().getInstance("test:test_Provider_AbstractNoExtends", ComponentDef.class);
             fail("Should have checked that the component provided by the provider does not extend test:test_Provider_AbstractNoExtends");
-        } catch (AuraRuntimeException e) {}
+        } catch (AuraRuntimeException e) {
+        }
     }
 
     /**
      * Test to ensure providers can use provideAttributes() to set attributes.
-     *
+     * 
      * @throws Exception
      */
     private void _testProviderSettingAttributes(String compName) throws Exception {
@@ -452,9 +476,9 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify that class level annotation is required for a java Provider that doesn't implement a Provider-derived
-     * interface.
-     *
+     * Verify that class level annotation is required for a java Provider that
+     * doesn't implement a Provider-derived interface.
+     * 
      * @userStory a07B0000000FAmj
      */
     public void testClassLevelAnnotationForJavaProvider() throws Exception {
@@ -517,19 +541,18 @@ public class JavaProviderDefTest extends AuraImplTestCase {
             javaPrvdrDefDesc.getDef();
             fail("Expected a InvalidDefinitionException");
         } catch (InvalidDefinitionException e) {
-            assertEquals(
-                    "Cannot instantiate org.auraframework.impl.java.provider.TestProviderWithoutNoArgConstructor",
+            assertEquals("Cannot instantiate org.auraframework.impl.java.provider.TestProviderWithoutNoArgConstructor",
                     e.getMessage());
         }
     }
 
     /**
-     * Exception thrown during provider instantiation should ...(be wrapped in a AuraRuntimeException?).
+     * Exception thrown during provider instantiation should ...(be wrapped in a
+     * AuraRuntimeException?).
      */
     public void testProviderThrowsDuringInstantiation() throws Exception {
-        DefDescriptor<ProviderDef> javaPrvdrDefDesc = DefDescriptorImpl
-                .getInstance("java://org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation",
-                        ProviderDef.class);
+        DefDescriptor<ProviderDef> javaPrvdrDefDesc = DefDescriptorImpl.getInstance(
+                "java://org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation", ProviderDef.class);
         try {
             javaPrvdrDefDesc.getDef();
             fail("Expected an intentional error");

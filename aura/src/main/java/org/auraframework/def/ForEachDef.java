@@ -17,7 +17,7 @@ package org.auraframework.def;
 
 /**
  */
-public interface ForEachDef extends ComponentDefRef{
+public interface ForEachDef extends ComponentDefRef {
 
     ComponentDef getComponentDef();
 }

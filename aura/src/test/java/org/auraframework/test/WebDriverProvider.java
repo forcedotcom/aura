@@ -21,11 +21,14 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 /**
  * @since 0.0.94
  */
-// If you get a "/ by zero" WebDriverException, then most likely the Grid node tried to use an unavailable port.
-// Check available ports and make sure the low value is NOT 1024, and the high value is NOT 65535.
+// If you get a "/ by zero" WebDriverException, then most likely the Grid node
+// tried to use an unavailable port.
+// Check available ports and make sure the low value is NOT 1024, and the high
+// value is NOT 65535.
 // - to view port range: sysctl net.ipv4.ip_local_port_range
 // - to set port range: sudo sysctl -w net.ipv4.ip_local_port_range="1025 32000"
-// - to save port range: edit /etc/sysctl.conf and edit/add property for net.ipv4.ip_local_port_range = 1025
+// - to save port range: edit /etc/sysctl.conf and edit/add property for
+// net.ipv4.ip_local_port_range = 1025
 // 32000
 public interface WebDriverProvider {
     String WEBDRIVER_SERVER_PROPERTY = "webdriver.remote.server";
@@ -34,7 +37,7 @@ public interface WebDriverProvider {
 
     /**
      * Get a a {@link WebDriver} instance.
-     *
+     * 
      * @param capabilities
      * @return
      */

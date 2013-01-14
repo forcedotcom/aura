@@ -35,13 +35,14 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 /**
- * Serialize Aura Component Registry to json for consumption by tools like eclipse plugin.
+ * Serialize Aura Component Registry to json for consumption by tools like
+ * eclipse plugin.
  */
 
 public class RegistryJsonSerializer {
     public static final String DEFAULT_DIR = System.getProperty("java.io.tmpdir");
     public final static String FILE_NAME = "auraRegistry.json";
-    final static String DEFAULT_FILE= System.getProperty("java.io.tmpdir")+File.separator+FILE_NAME;
+    final static String DEFAULT_FILE = System.getProperty("java.io.tmpdir") + File.separator + FILE_NAME;
     static boolean shouldPrettyPrint = false;
 
     public final static String ATTRIBUTES_KEY = "attributes";
@@ -57,19 +58,21 @@ public class RegistryJsonSerializer {
     }
 
     public static void serializeToFile(String file) throws QuickFixException, IOException {
-        Map<String, Map<String, Map<String, Map<String, String>>>> components = new TreeMap<String, Map<String,Map<String,Map<String,String>>>>();
-            loadMetadataForComponents(components);
-            writeMetadataToFile(components, file);
+        Map<String, Map<String, Map<String, Map<String, String>>>> components = new TreeMap<String, Map<String, Map<String, Map<String, String>>>>();
+        loadMetadataForComponents(components);
+        writeMetadataToFile(components, file);
     }
 
-    public static void writeMetadataToFile(Map<String, Map<String, Map<String, Map<String, String>>>> components, String file) throws IOException {
+    public static void writeMetadataToFile(Map<String, Map<String, Map<String, Map<String, String>>>> components,
+            String file) throws IOException {
         FileWriter f = new FileWriter(file, false);
         BufferedWriter bf = new BufferedWriter(f);
         Json.serialize(components, bf, shouldPrettyPrint, false);
         bf.close();
     }
 
-    public static void loadMetadataForComponents(Map<String, Map<String, Map<String, Map<String, String>>>> components) throws QuickFixException {
+    public static void loadMetadataForComponents(Map<String, Map<String, Map<String, Map<String, String>>>> components)
+            throws QuickFixException {
         DefinitionService definitionService = Aura.getDefinitionService();
 
         DefDescriptor<ComponentDef> matcher = definitionService.getDefDescriptor("markup://*:*", ComponentDef.class);
@@ -78,22 +81,22 @@ public class RegistryJsonSerializer {
         Map<String, Map<String, String>> componentDetails;
 
         for (DefDescriptor<ComponentDef> descriptor : descriptors) {
-            component = new TreeMap<String, Map<String,Map<String,String>>>();
-            try{
+            component = new TreeMap<String, Map<String, Map<String, String>>>();
+            try {
                 ComponentDef compDef = descriptor.getDef();
-                String compName = descriptor.getNamespace()+":"+compDef.getName();
-                if(components.containsKey(compName)){
+                String compName = descriptor.getNamespace() + ":" + compDef.getName();
+                if (components.containsKey(compName)) {
                     continue;
                 }
 
-                Map<DefDescriptor<AttributeDef>, AttributeDef> attDefs =  compDef.getAttributeDefs();
-                if(attDefs != null && attDefs.size() > 0){
-                    componentDetails = new TreeMap<String, Map<String,String>>();
-                    for(DefDescriptor<AttributeDef> attDef : attDefs.keySet()){
+                Map<DefDescriptor<AttributeDef>, AttributeDef> attDefs = compDef.getAttributeDefs();
+                if (attDefs != null && attDefs.size() > 0) {
+                    componentDetails = new TreeMap<String, Map<String, String>>();
+                    for (DefDescriptor<AttributeDef> attDef : attDefs.keySet()) {
                         Map<String, String> attributePros = new TreeMap<String, String>();
                         attributePros.put("type", attDefs.get(attDef).getTypeDef().getName());
                         String desc = attDefs.get(attDef).getDescription();
-                        if(desc != null){
+                        if (desc != null) {
                             attributePros.put(DESCRIPTION_KEY, desc);
                         }
                         componentDetails.put(attDef.getName(), attributePros);
@@ -102,13 +105,13 @@ public class RegistryJsonSerializer {
                 }
 
                 Map<String, RegisterEventDef> eventDefs = compDef.getRegisterEventDefs();
-                if(eventDefs != null && eventDefs.size() > 0){
-                    componentDetails = new TreeMap<String, Map<String,String>>();
-                    for(String eventDef : eventDefs.keySet()){
+                if (eventDefs != null && eventDefs.size() > 0) {
+                    componentDetails = new TreeMap<String, Map<String, String>>();
+                    for (String eventDef : eventDefs.keySet()) {
                         Map<String, String> eventPros = new TreeMap<String, String>();
                         eventPros.put(TYPE_KEY, "Action");
                         String desc = eventDefs.get(eventDef).getDescription();
-                        if(desc != null){
+                        if (desc != null) {
                             eventPros.put(DESCRIPTION_KEY, desc);
                         }
                         componentDetails.put(eventDef, eventPros);
@@ -118,12 +121,12 @@ public class RegistryJsonSerializer {
                 }
 
                 Collection<EventHandlerDef> handlerDefs = compDef.getHandlerDefs();
-                if(handlerDefs !=null && handlerDefs.size() > 0){
-                    componentDetails = new TreeMap<String, Map<String,String>>();
-                    for(EventHandlerDef handlerDef: handlerDefs){
+                if (handlerDefs != null && handlerDefs.size() > 0) {
+                    componentDetails = new TreeMap<String, Map<String, String>>();
+                    for (EventHandlerDef handlerDef : handlerDefs) {
                         Map<String, String> eventHandlerProps = new TreeMap<String, String>();
                         String desc = handlerDef.getDescription();
-                        if(desc != null){
+                        if (desc != null) {
                             eventHandlerProps.put(DESCRIPTION_KEY, desc);
                         }
                         componentDetails.put(handlerDef.getName(), eventHandlerProps);
@@ -133,23 +136,22 @@ public class RegistryJsonSerializer {
                 }
 
                 String desc = compDef.getDescription();
-                if(desc != null){
-                    componentDetails = new TreeMap<String, Map<String,String>>();
+                if (desc != null) {
+                    componentDetails = new TreeMap<String, Map<String, String>>();
                     componentDetails.put(desc, new TreeMap<String, String>());
                     component.put(DESCRIPTION_KEY, componentDetails);
                 }
 
                 String support = compDef.getSupport().toString();
-                if(support != null){
-                    componentDetails = new TreeMap<String, Map<String,String>>();
+                if (support != null) {
+                    componentDetails = new TreeMap<String, Map<String, String>>();
                     componentDetails.put(support, new TreeMap<String, String>());
                     component.put(SUPPORT_KEY, componentDetails);
                 }
                 components.put(compName, component);
 
-            }
-            catch (Throwable t){
-                //IGNORE.... basically skip components that are having problem.
+            } catch (Throwable t) {
+                // IGNORE.... basically skip components that are having problem.
             }
         }
     }

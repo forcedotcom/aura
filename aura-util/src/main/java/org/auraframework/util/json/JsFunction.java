@@ -21,13 +21,15 @@ import java.util.List;
 
 import org.auraframework.util.AuraTextUtil;
 
-
 /**
- * Ok, functions are not part of JSON, but it handy for us to be able to parse a json-like structure where some of the
- * values are javascript functions so that we can extract the signature of the function in Java. When JsonStreamReader
- * encounters a structure like: GOOD: { foo : function(arg1, arg2){} } The parsed value of foo will be one of these
- * JsFunction objects. Since this is only parsed from json-like structures, the name of the function is not part of this
- * object. This means that do not support other ways of creating functions, like: BAD: function foo(arg1, arg2){}
+ * Ok, functions are not part of JSON, but it handy for us to be able to parse a
+ * json-like structure where some of the values are javascript functions so that
+ * we can extract the signature of the function in Java. When JsonStreamReader
+ * encounters a structure like: GOOD: { foo : function(arg1, arg2){} } The
+ * parsed value of foo will be one of these JsFunction objects. Since this is
+ * only parsed from json-like structures, the name of the function is not part
+ * of this object. This means that do not support other ways of creating
+ * functions, like: BAD: function foo(arg1, arg2){}
  */
 public class JsFunction implements JsonSerializable, Serializable {
     /**
@@ -90,25 +92,26 @@ public class JsFunction implements JsonSerializable, Serializable {
      * @param name The name to set.
      */
     public void setName(String name) {
-        //Clear out the cache of the serialized form since the name is changing.
+        // Clear out the cache of the serialized form since the name is
+        // changing.
         this.name = name;
     }
 
     /**
-     * Not escaped! Executable code! Escape the output of this if you need it to use it as a String value! I don't know
-     * what we're yelling about!
+     * Not escaped! Executable code! Escape the output of this if you need it to
+     * use it as a String value! I don't know what we're yelling about!
      */
     @Override
     public void serialize(Json json) throws IOException {
         json.writeBreak();
-        //json.writeIndent();
+        // json.writeIndent();
         json.writeLiteral(toString());
     }
 
     @Override
     public String toString() {
         StringBuilder func = new StringBuilder("function ");
-        if(!AuraTextUtil.isNullEmptyOrWhitespace(name)){
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(name)) {
             func.append(name);
         }
         func.append("(");
@@ -134,18 +137,17 @@ public class JsFunction implements JsonSerializable, Serializable {
         }
 
         if (o instanceof JsFunction) {
-            JsFunction j = (JsFunction)o;
-            return (body.equals(j.body)
-                    && (arguments == null ? j.arguments == null : arguments.equals(j.arguments))
-                    && (line == j.line)
-                    && (col == j.col)
-                    && (name != null?name.equals(j.name):j.name!=null?j.name.equals(name):true));
+            JsFunction j = (JsFunction) o;
+            return (body.equals(j.body) && (arguments == null ? j.arguments == null : arguments.equals(j.arguments))
+                    && (line == j.line) && (col == j.col) && (name != null ? name.equals(j.name)
+                        : j.name != null ? j.name.equals(name) : true));
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return this.body.hashCode() * 31 + (this.name==null?0:this.name.hashCode() * 31)+ (arguments == null ? 0 : arguments.hashCode()) + col + line;
+        return this.body.hashCode() * 31 + (this.name == null ? 0 : this.name.hashCode() * 31)
+                + (arguments == null ? 0 : arguments.hashCode()) + col + line;
     }
 }

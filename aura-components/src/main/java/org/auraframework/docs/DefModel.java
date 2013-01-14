@@ -22,11 +22,11 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
-public class DefModel implements JsonSerializable, Comparable<DefModel>{
+public class DefModel implements JsonSerializable, Comparable<DefModel> {
 
     private final DefDescriptor<?> descriptor;
 
-    DefModel(DefDescriptor<?> descriptor){
+    DefModel(DefDescriptor<?> descriptor) {
         this.descriptor = descriptor;
     }
 
@@ -34,22 +34,22 @@ public class DefModel implements JsonSerializable, Comparable<DefModel>{
         return descriptor.getQualifiedName();
     }
 
-    public String getDefType(){
+    public String getDefType() {
         return descriptor.getDefType().name().toLowerCase();
     }
 
-    public String getFullName(){
-        if(descriptor.getPrefix().equals("markup")){
+    public String getFullName() {
+        if (descriptor.getPrefix().equals("markup")) {
             return String.format("%s:%s", descriptor.getNamespace(), descriptor.getName());
-        }else{
+        } else {
             return getDescriptor();
         }
     }
 
-    public String getName(){
-        if(descriptor.getPrefix().equals("markup")){
+    public String getName() {
+        if (descriptor.getPrefix().equals("markup")) {
             return AuraTextUtil.initCap(getDefType());
-        }else{
+        } else {
             return String.format("%s://%s", descriptor.getPrefix(), getDefType());
         }
     }

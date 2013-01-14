@@ -18,7 +18,7 @@ package org.auraframework.throwable;
 /**
  * Indicates that a AuraContext should have been established, but wasn't.
  */
-public class NoContextException extends AuraRuntimeException{
+public class NoContextException extends AuraRuntimeException {
     private static final long serialVersionUID = -8055941822692798951L;
 
     public NoContextException() {

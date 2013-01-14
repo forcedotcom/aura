@@ -15,8 +15,9 @@
  */
 package org.auraframework.impl.javascript.parser.handler;
 
-import java.util.*;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
@@ -29,7 +30,7 @@ import org.auraframework.util.json.JsFunction;
  */
 public class JavascriptHelperDefHandler extends JavascriptHandler<DefDescriptor<HelperDef>, HelperDef> {
 
-    private JavascriptHelperDef.Builder builder = new JavascriptHelperDef.Builder();
+    private final JavascriptHelperDef.Builder builder = new JavascriptHelperDef.Builder();
 
     public JavascriptHelperDefHandler(DefDescriptor<HelperDef> descriptor, Source<?> source) {
         super(descriptor, source);
@@ -40,10 +41,10 @@ public class JavascriptHelperDefHandler extends JavascriptHandler<DefDescriptor<
         builder.setDescriptor(descriptor);
         builder.setLocation(getLocation());
         builder.functions = map;
-        for(Entry<String, Object> entry : map.entrySet()){
+        for (Entry<String, Object> entry : map.entrySet()) {
             Object value = entry.getValue();
-            if(value != null && value instanceof JsFunction){
-                ((JsFunction)value).setName(entry.getKey());
+            if (value != null && value instanceof JsFunction) {
+                ((JsFunction) value).setName(entry.getKey());
             }
         }
         return builder.build();

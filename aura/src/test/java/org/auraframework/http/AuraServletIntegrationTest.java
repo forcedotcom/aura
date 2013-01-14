@@ -17,12 +17,16 @@ package org.auraframework.http;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventDef;
 import org.auraframework.service.ContextService;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.Source;
 import org.auraframework.test.IntegrationTestCase;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
@@ -30,7 +34,7 @@ import org.auraframework.test.util.AuraPrivateAccessor;
 
 /**
  * Tests for AuraServlet.
- *
+ * 
  * @since 0.0.2.48
  */
 @ThreadHostileTest
@@ -47,7 +51,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
         contextService.startContext(Mode.DEV, Format.HTML, Access.AUTHENTICATED);
         String buster = "" + Aura.getConfigAdapter().getBuildTimestamp();
         String expected = String.format(expectedFormat, buster);
-        String actual = AuraServlet.addCacheBuster(initialValue);
+        String actual = AuraBaseServlet.addCacheBuster(initialValue);
         assertEquals(expected, actual);
     }
 
@@ -60,7 +64,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
             contextService.endContext();
         }
         contextService.startContext(Mode.DEV, Format.HTML, Access.AUTHENTICATED);
-        assertNull(AuraServlet.addCacheBuster(null));
+        assertNull(AuraBaseServlet.addCacheBuster(null));
     }
 
     /**
@@ -92,25 +96,27 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
     }
 
     /**
-     * URL with hash with query will have buster appended as query (before the hash).
+     * URL with hash with query will have buster appended as query (before the
+     * hash).
      */
     public void testAddCacheBusterWithHashQuery() throws Exception {
         assertBustedUrl("/something?aura.cb=%s#layout?option=value", "/something#layout?option=value");
     }
 
     /**
-     * URL with query and hash will have buster appended to query (before the hash).
+     * URL with query and hash will have buster appended to query (before the
+     * hash).
      */
     public void testAddCacheBusterWithQueryAndHash() throws Exception {
         assertBustedUrl("/something?is=fishy&aura.cb=%s#inside", "/something?is=fishy#inside");
     }
 
     /**
-     * URL with query and hash with query will have buster appended to query (before the hash).
+     * URL with query and hash with query will have buster appended to query
+     * (before the hash).
      */
     public void testAddCacheBusterWithQueryAndHashQuery() throws Exception {
-        assertBustedUrl("/something?is=fishy&aura.cb=%s#inside?where=fridge",
-                "/something?is=fishy#inside?where=fridge");
+        assertBustedUrl("/something?is=fishy&aura.cb=%s#inside?where=fridge", "/something?is=fishy#inside?where=fridge");
     }
 
     private Runnable touchSource(final DefDescriptor<?> toUpdate) {
@@ -136,7 +142,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
             @Override
             public void run() {
                 try {
-                    long newStamp = AuraServlet.getLastMod() + 1;
+                    long newStamp = AuraBaseServlet.getLastMod() + 1;
                     ConfigAdapter configAdapter = Aura.getConfigAdapter();
                     AuraPrivateAccessor.set(configAdapter, "buildTimestamp", newStamp);
                     Object jsGroup = AuraPrivateAccessor.get(configAdapter, "jsGroup");
@@ -152,15 +158,16 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
 
     private void assertLastModAfterUpdate(Mode mode, DefDescriptor<ApplicationDef> appDesc, Runnable update,
             boolean shouldLastModUpdate) throws Exception {
-        long lastModBeforeUpdate = AuraServlet.getLastMod();
+        long lastModBeforeUpdate = AuraBaseServlet.getLastMod();
         assertTrue("failed to get valid lastmod: " + lastModBeforeUpdate, lastModBeforeUpdate > 0);
-        Thread.sleep(1002); // ensure lastMod changes despite system time resolution
+        Thread.sleep(1002); // ensure lastMod changes despite system time
+                            // resolution
         update.run();
 
         // restart context as prior context will have old lastMod
         Aura.getContextService().endContext();
         Aura.getContextService().startContext(mode, Format.HTML, Access.AUTHENTICATED, appDesc);
-        long lastModAfterUpdate = AuraServlet.getLastMod();
+        long lastModAfterUpdate = AuraBaseServlet.getLastMod();
         if (shouldLastModUpdate) {
             if (lastModBeforeUpdate >= lastModAfterUpdate) {
                 fail(String.format("Did not get updated lastMod - previous: <%s>, current: <%s>", lastModBeforeUpdate,
@@ -217,8 +224,8 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "updateTest:updateWithoutPreload", ApplicationDef.class);
         Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.AUTHENTICATED, appDesc);
-        ComponentDef depDef = Aura.getDefinitionService().getDefinition("updateTest:updateableAlso",
-                ComponentDef.class);
+        ComponentDef depDef = Aura.getDefinitionService()
+                .getDefinition("updateTest:updateableAlso", ComponentDef.class);
         assertLastModAfterUpdate(Mode.DEV, appDesc, touchSource(getClientController(depDef)), true);
     }
 
@@ -255,8 +262,8 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "updateTest:updateWithoutPreload", ApplicationDef.class);
         Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.AUTHENTICATED, appDesc);
-        ApplicationDef depDef = Aura.getDefinitionService().getDefinition("updateTest:updateBase",
-                ApplicationDef.class);
+        ApplicationDef depDef = Aura.getDefinitionService()
+                .getDefinition("updateTest:updateBase", ApplicationDef.class);
         assertLastModAfterUpdate(Mode.DEV, appDesc, touchSource(depDef.getDescriptor()), true);
     }
 
@@ -294,8 +301,8 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "updateTest:updateWithPreload", ApplicationDef.class);
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, appDesc);
-        ComponentDef depDef = Aura.getDefinitionService().getDefinition("updateTest:updateableAlso",
-                ComponentDef.class);
+        ComponentDef depDef = Aura.getDefinitionService()
+                .getDefinition("updateTest:updateableAlso", ComponentDef.class);
         assertLastModAfterUpdate(Mode.PROD, appDesc, touchSource(getClientController(depDef)), false);
     }
 
@@ -314,8 +321,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
     public void testGetManifestWithoutPreloads() throws Exception {
         DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(
                 "appPreloadTest:appCacheNoPreload", ApplicationDef.class);
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED,
-                desc);
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, desc);
         context.clearPreloads();
         String url = AuraServlet.getManifest();
         assertEquals("", url);
@@ -327,8 +333,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
     public void testGetManifestWithPreloads() throws Exception {
         DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(
                 "appPreloadTest:appCacheNoPreload", ApplicationDef.class);
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED,
-                desc);
+        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, desc);
         context.clearPreloads();
         context.addPreload("aura");
         context.addPreload("ui");

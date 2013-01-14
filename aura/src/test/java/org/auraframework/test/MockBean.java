@@ -15,11 +15,10 @@
  */
 package org.auraframework.test;
 
-
 /**
  * Mock beans should be reset after each test.
- *
- *
+ * 
+ * 
  * @since 0.0.178
  */
 public interface MockBean {

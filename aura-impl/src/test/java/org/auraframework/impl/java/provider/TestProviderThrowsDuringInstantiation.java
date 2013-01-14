@@ -15,13 +15,15 @@
  */
 package org.auraframework.impl.java.provider;
 
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDescriptorProvider;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.Annotations.Provider;
 
 /**
  * An interface provider used for testing.
- *
- *
+ * 
+ * 
  * @since 0.0.196
  */
 @Provider

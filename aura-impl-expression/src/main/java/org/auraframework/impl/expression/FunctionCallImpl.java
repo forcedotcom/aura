@@ -16,11 +16,16 @@
 package org.auraframework.impl.expression;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
-import org.auraframework.expression.*;
+import org.auraframework.expression.Expression;
+import org.auraframework.expression.ExpressionType;
+import org.auraframework.expression.FunctionCall;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.functions.Function;
 import org.auraframework.instance.ValueProvider;
 import org.auraframework.system.Location;

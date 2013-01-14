@@ -19,7 +19,7 @@ import org.auraframework.impl.adapter.format.BaseFormatAdapter;
 
 /**
  */
-public abstract class CSSFormatAdapter<T> extends BaseFormatAdapter<T>{
+public abstract class CSSFormatAdapter<T> extends BaseFormatAdapter<T> {
 
     protected static final String name = "CSS";
 

@@ -20,5 +20,6 @@ import junit.framework.TestCase;
 
 public interface TestFilter {
     Class<? extends Test> applyTo(Class<? extends Test> testClass);
+
     TestCase applyTo(TestCase test);
 }

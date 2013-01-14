@@ -19,7 +19,6 @@ package org.auraframework.expression;
  * Every possible expression type.
  */
 public enum ExpressionType {
-    PROPERTY,
-    FUNCTION, // operators are just functions
+    PROPERTY, FUNCTION, // operators are just functions
     LITERAL;
 }

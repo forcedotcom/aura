@@ -17,10 +17,15 @@ package org.auraframework.impl.css.parser;
 
 import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.Aura;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.css.theme.ThemeDefImpl;
-import org.auraframework.system.*;
+import org.auraframework.system.Client;
+import org.auraframework.system.Parser;
+import org.auraframework.system.Source;
 import org.auraframework.throwable.ThemeParserException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -39,15 +44,14 @@ public class ThemeParser implements Parser {
     // build list of conditional permutations and allowed conditionals
     static {
         ImmutableSet.Builder<String> acBuilder = ImmutableSet.builder();
-        for(Client.Type type : Client.Type.values()) {
+        for (Client.Type type : Client.Type.values()) {
             acBuilder.add(type.toString());
         }
         allowedConditions = acBuilder.build();
     }
 
-
     public static ThemeParser getInstance() {
-        return instance;
+        return Aura.getConfigAdapter().validateCss() ? instance : nonValidatingInstance;
     }
 
     public static ThemeParser getNonValidatingInstance() {
@@ -56,7 +60,7 @@ public class ThemeParser implements Parser {
 
     private final boolean doValidation;
 
-    protected ThemeParser(boolean doValidation){
+    protected ThemeParser(boolean doValidation) {
         this.doValidation = doValidation;
     }
 
@@ -70,7 +74,6 @@ public class ThemeParser implements Parser {
             builder.setDescriptor((DefDescriptor<ThemeDef>) descriptor);
             builder.setLocation(source.getSystemId(), source.getLastModified());
             builder.setClassName(className);
-            
 
             if (descriptor.getName().toLowerCase().endsWith("template")) {
                 builder.setCode(source.getContents());
@@ -93,7 +96,7 @@ public class ThemeParser implements Parser {
                 builder.setImageURLs(resultHolder.getImageURLs());
             }
 
-            return (D)builder.build();
+            return (D) builder.build();
         }
         return null;
     }

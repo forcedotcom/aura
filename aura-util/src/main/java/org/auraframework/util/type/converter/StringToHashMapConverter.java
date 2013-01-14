@@ -32,7 +32,7 @@ public class StringToHashMapConverter implements Converter<String, HashMap> {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return (HashMap<String, Object>)reader.getObject();
+        return (HashMap<String, Object>) reader.getObject();
     }
 
     @Override

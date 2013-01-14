@@ -19,18 +19,19 @@ import java.util.EnumMap;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 
 /**
- * Abstract superclass to {@link SourceLoader} implementations, providing common descriptor and
- * filename utilities.ß
+ * Abstract superclass to {@link SourceLoader} implementations, providing common
+ * descriptor and filename utilities.ß
  */
-public abstract class BaseSourceLoader implements SourceLoader{
+public abstract class BaseSourceLoader implements SourceLoader {
 
     protected static final EnumMap<DefType, String> extensions = new EnumMap<DefType, String>(DefType.class);
     public static final Set<String> PREFIXES = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
@@ -46,35 +47,39 @@ public abstract class BaseSourceLoader implements SourceLoader{
         extensions.put(DefType.TESTSUITE, "Test.js");
     }
 
-    protected String getPath(DefDescriptor<?> descriptor){
+    protected String getPath(DefDescriptor<?> descriptor) {
         // Get rid of the inner type qualifier.
-        String name = AuraTextUtil.splitSimple("$",descriptor.getName()).get(0);
+        String name = AuraTextUtil.splitSimple("$", descriptor.getName()).get(0);
 
         String filename = null;
         if (extensions.containsKey(descriptor.getDefType())) {
-            // Alongside knowing the extension, we also know that namespace+name is a directory,
+            // Alongside knowing the extension, we also know that namespace+name
+            // is a directory,
             // and name+ext is the file inside that directory:
             filename = String.format("%s/%s/%s%s", descriptor.getNamespace(), name, name,
                     extensions.get(descriptor.getDefType()));
         } else {
-            // Otherwise, the extension matches the expected implementation language, we need to
-            // convert the namespace from dotted-package to slash-filename, and we NOT repeat name:
-            filename = String.format("%s/%s.%s",
-                    descriptor.getNamespace().replace(".", FILE_SEPARATOR),
-                    name, descriptor.getPrefix());
+            // Otherwise, the extension matches the expected implementation
+            // language, we need to
+            // convert the namespace from dotted-package to slash-filename, and
+            // we NOT repeat name:
+            filename = String.format("%s/%s.%s", descriptor.getNamespace().replace(".", FILE_SEPARATOR), name,
+                    descriptor.getPrefix());
         }
         return filename;
     }
 
     @SuppressWarnings("unchecked")
-    protected <D extends Definition> DefDescriptor<D> updateDescriptorName(DefDescriptor<D> desc, String newNamespace, String newName){
+    protected <D extends Definition> DefDescriptor<D> updateDescriptorName(DefDescriptor<D> desc, String newNamespace,
+            String newName) {
         String ext = extensions.get(desc.getDefType());
         String name = newName;
         if (name.endsWith(ext)) {
             name = name.substring(0, name.length() - ext.length());
         }
         String format = DefDescriptor.MARKUP_PREFIX.equals(desc.getPrefix()) ? "%s://%s:%s" : "%s://%s.%s";
-        return (DefDescriptor<D>)Aura.getDefinitionService().getDefDescriptor(String.format(format, desc.getPrefix(), newNamespace, name), desc.getDefType().getPrimaryInterface());
+        return (DefDescriptor<D>) Aura.getDefinitionService().getDefDescriptor(
+                String.format(format, desc.getPrefix(), newNamespace, name), desc.getDefType().getPrimaryInterface());
     }
 
     @Override
@@ -82,17 +87,17 @@ public abstract class BaseSourceLoader implements SourceLoader{
         return PREFIXES;
     }
 
-    protected static String getQName(DefType defType, String namespace, String name){
+    protected static String getQName(DefType defType, String namespace, String name) {
         String ext = extensions.get(defType);
         if (name.endsWith(ext)) {
             name = name.substring(0, name.length() - ext.length());
         }
         String qname;
-        if(defType == DefType.STYLE){
+        if (defType == DefType.STYLE) {
             qname = String.format("css://%s.%s", namespace, name);
         } else if (defType == DefType.TESTSUITE) {
             qname = String.format("js://%s.%s", namespace, name);
-        }else{
+        } else {
             qname = String.format("markup://%s:%s", namespace, name);
         }
         return qname;
@@ -103,7 +108,7 @@ public abstract class BaseSourceLoader implements SourceLoader{
         return extensions.keySet();
     }
 
-    protected static boolean isValidNameForDefType(DefType defType, String name){
+    protected static boolean isValidNameForDefType(DefType defType, String name) {
         String ext = extensions.get(defType);
         if (ext == null) {
             return false;

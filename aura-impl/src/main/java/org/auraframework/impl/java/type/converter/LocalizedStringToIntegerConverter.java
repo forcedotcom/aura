@@ -25,9 +25,8 @@ import org.auraframework.util.type.converter.StringToIntegerConverter;
 /**
  * Used by aura.impl.java.type.JavaLocalizedTypeUtil;
  */
-public class LocalizedStringToIntegerConverter
-    extends StringToIntegerConverter
-    implements LocalizedConverter<String, Integer> {
+public class LocalizedStringToIntegerConverter extends StringToIntegerConverter implements
+        LocalizedConverter<String, Integer> {
 
     @Override
     public Integer convert(String value, AuraLocale locale) {
@@ -47,6 +46,5 @@ public class LocalizedStringToIntegerConverter
             return super.convert(value);
         }
     }
-
 
 }

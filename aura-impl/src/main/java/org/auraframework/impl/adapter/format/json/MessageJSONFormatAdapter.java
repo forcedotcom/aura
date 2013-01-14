@@ -28,8 +28,8 @@ import org.auraframework.def.ActionDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
-import org.auraframework.system.Message;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.Message;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
@@ -50,19 +50,20 @@ public class MessageJSONFormatAdapter extends JSONFormatAdapter<Message<?>> {
     @SuppressWarnings("unchecked")
     @Override
     public Message<?> read(Reader in) throws IOException, QuickFixException {
-        Map<?, ?> message = (Map<?, ?>)new JsonReader().read(in);
+        Map<?, ?> message = (Map<?, ?>) new JsonReader().read(in);
 
-        List<?> actions = (List<?>)message.get("actions");
+        List<?> actions = (List<?>) message.get("actions");
         List<Action> actionList = Lists.newArrayList();
-        if(actions != null){
-            for(Object action : actions){
-                Map<?, ?> map = (Map<?, ?>)action;
+        if (actions != null) {
+            for (Object action : actions) {
+                Map<?, ?> map = (Map<?, ?>) action;
 
                 // FIXME: ints are getting translated into BigDecimals here.
                 Map<String, Object> params = (Map<String, Object>) map.get("params");
 
-                Action instance = (Action)Aura.getInstanceService().getInstance((String)map.get("descriptor"), ActionDef.class, params);
-                instance.setId((String)map.get("id"));
+                Action instance = (Action) Aura.getInstanceService().getInstance((String) map.get("descriptor"),
+                        ActionDef.class, params);
+                instance.setId((String) map.get("id"));
 
                 actionList.add(instance);
             }
@@ -73,14 +74,14 @@ public class MessageJSONFormatAdapter extends JSONFormatAdapter<Message<?>> {
 
     @Override
     public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException {
-        Message<?> message = (Message<?>)value;
+        Message<?> message = (Message<?>) value;
         AuraContext c = Aura.getContextService().getCurrentContext();
         Map<String, Object> m = new HashMap<String, Object>();
         m.put("actions", message.getActions());
         m.put("context", c);
-        List<Event> clientEvents = message.getClientEvents(); 
-        if( clientEvents!= null && !clientEvents.isEmpty()){
-        	m.put("events", clientEvents);
+        List<Event> clientEvents = message.getClientEvents();
+        if (clientEvents != null && !clientEvents.isEmpty()) {
+            m.put("events", clientEvents);
         }
 
         Json.serialize(m, out, c.getJsonSerializationContext());

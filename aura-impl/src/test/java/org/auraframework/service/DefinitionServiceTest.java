@@ -15,19 +15,28 @@
  */
 package org.auraframework.service;
 
-import java.util.*;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ComponentDefBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.ActionDef;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoContextException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * @hierarchy Aura.Services.DefinitionService
@@ -47,15 +56,15 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
     @Override
     public <D extends Definition> Set<DefDescriptor<D>> find(DefDescriptor<D> matcher) throws QuickFixException {
 
-        try{
+        try {
             service.find(config.matcher);
             fail("Expected NoContextException");
-        }catch(NoContextException e){
-            //good
+        } catch (NoContextException e) {
+            // good
         }
 
         ContextService contextService = Aura.getContextService();
-        try{
+        try {
             contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
                     .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
 
@@ -65,13 +74,13 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
             String namespace = config.matcher.getNamespace();
             DefType defType = config.matcher.getDefType();
 
-            for(Object match : matches){
-                DefDescriptor<?> desc = (DefDescriptor<?>)match;
+            for (Object match : matches) {
+                DefDescriptor<?> desc = (DefDescriptor<?>) match;
                 assertEquals(namespace, desc.getNamespace());
                 assertEquals(defType, desc.getDefType());
                 assertTrue(desc.exists());
             }
-        }finally{
+        } finally {
             contextService.endContext();
         }
 
@@ -100,8 +109,8 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
         desc = config.desc;
         Set<String> prefixes = Sets.newHashSet("css", "markup", "java", "apex", "js");
 
-        for(String pref : prefixes){
-            for(DefType defType : DefType.values()){
+        for (String pref : prefixes) {
+            for (DefType defType : DefType.values()) {
                 DefDescriptor<?> desc2 = service.getDefDescriptor(desc, pref, defType.getPrimaryInterface());
                 assertEquals(desc.getName(), desc2.getName());
                 assertEquals(desc.getNamespace(), desc2.getNamespace());
@@ -116,31 +125,31 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
     @Override
     public <T extends Definition> T getDefinition(DefDescriptor<T> descriptor) throws QuickFixException {
 
-        try{
+        try {
             service.getDefinition(descriptor);
             fail("Expected NoContextException");
-        }catch(NoContextException e){
-            //good
+        } catch (NoContextException e) {
+            // good
         }
 
         ContextService contextService = Aura.getContextService();
-        try{
+        try {
             contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
                     .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
 
             Definition def = service.getDefinition(config.desc);
             assertNotNull(def);
 
-            try{
+            try {
                 DefDescriptor<?> desc = service.getDefDescriptor(config.desc.getQualifiedName() + "foofoo", config.desc
                         .getDefType().getPrimaryInterface());
                 service.getDefinition(desc);
                 fail("Should have thrown DefinitionNotFoundException");
-            }catch(DefinitionNotFoundException e){
-                //good
+            } catch (DefinitionNotFoundException e) {
+                // good
             }
 
-        }finally{
+        } finally {
             contextService.endContext();
         }
 
@@ -150,15 +159,15 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
     @Override
     public <T extends Definition> T getDefinition(String qualifiedName, Class<T> defType) throws QuickFixException {
 
-        try{
+        try {
             service.getDefinition(qualifiedName, defType);
             fail("Expected NoContextException");
-        }catch(NoContextException e){
-            //good
+        } catch (NoContextException e) {
+            // good
         }
 
         ContextService contextService = Aura.getContextService();
-        try{
+        try {
             contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
                     .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
 
@@ -166,14 +175,14 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
                     .getPrimaryInterface());
             assertNotNull(def);
 
-            try{
+            try {
                 service.getDefinition(config.desc.getQualifiedName() + "foofoo", config.desc.getDefType()
                         .getPrimaryInterface());
                 fail("Should have thrown DefinitionNotFoundException");
-            }catch(DefinitionNotFoundException e){
-                //good
+            } catch (DefinitionNotFoundException e) {
+                // good
             }
-        }finally{
+        } finally {
             contextService.endContext();
         }
 
@@ -183,15 +192,15 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
     @Override
     public Definition getDefinition(String qualifiedName, DefType... defTypes) throws QuickFixException {
 
-        try{
+        try {
             service.getDefinition(qualifiedName, defTypes);
             fail("Expected NoContextException");
-        }catch(NoContextException e){
-            //good
+        } catch (NoContextException e) {
+            // good
         }
 
         ContextService contextService = Aura.getContextService();
-        try{
+        try {
             contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
                     .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
 
@@ -199,22 +208,22 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
             assertNotNull(def);
             assertEquals(DefType.COMPONENT, def.getDescriptor().getDefType());
 
-            try{
+            try {
                 service.getDefinition("test:doesNotExist", DefType.COMPONENT, DefType.APPLICATION);
                 fail("Exception expected");
-            }catch(DefinitionNotFoundException e){
-                //good
+            } catch (DefinitionNotFoundException e) {
+                // good
             }
 
-            try{
+            try {
                 def = service.getDefinition("test:text");
                 fail("Exception expected");
-            }catch(AuraRuntimeException e){
-                //good
+            } catch (AuraRuntimeException e) {
+                // good
             }
 
             assertNotNull(def);
-        }finally{
+        } finally {
             contextService.endContext();
         }
 
@@ -229,25 +238,27 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
 
     @Override
     public long getNamespaceLastMod(Collection<String> preloads) throws QuickFixException {
-        /**TODO:RJ, Disabling it for now, to get jenkins back to normal. Will work on it locally
-        **/
+        /**
+         * TODO:RJ, Disabling it for now, to get jenkins back to normal. Will
+         * work on it locally
+         **/
         return 0;
     }
 
     @Override
     public void save(Definition def) throws QuickFixException {
-        try{
+        try {
             service.save(def);
             fail("Expected NoContextException");
-        }catch(NoContextException e){
-            //good
+        } catch (NoContextException e) {
+            // good
         }
 
         ContextService contextService = Aura.getContextService();
-        try{
+        try {
             contextService.startContext(config.mode, config.format, config.access, Aura.getDefinitionService()
                     .getDefDescriptor("test:laxSecurity", ApplicationDef.class));
-            //This creates the StringSource objects before they can be saved.
+            // This creates the StringSource objects before they can be saved.
             DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, "");
             ComponentDefBuilder builder = Aura.getBuilderService().getComponentDefBuilder();
             builder.setDescriptor(desc.getDescriptorName());
@@ -257,9 +268,9 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
             service.save(componentDef);
 
             assertNotNull(service.getDefinition(desc.getDescriptorName(), ComponentDef.class));
-        }catch(DefinitionNotFoundException e){
+        } catch (DefinitionNotFoundException e) {
             fail("Definition did not save.");
-        }finally{
+        } finally {
             contextService.endContext();
         }
     }
@@ -269,12 +280,12 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
         List<Config> ret = Lists.newArrayList();
         DefinitionService defService = Aura.getDefinitionService();
 
-        Set<DefDescriptor<?>> descriptors = Sets.<DefDescriptor<?>>newHashSet(
+        Set<DefDescriptor<?>> descriptors = Sets.<DefDescriptor<?>> newHashSet(
                 defService.getDefDescriptor("test:text", ComponentDef.class),
                 defService.getDefDescriptor("js://test.testJSController", ControllerDef.class),
                 defService.getDefDescriptor("css://test.testValidCSS", ThemeDef.class));
 
-        for(DefDescriptor<?> desc : descriptors){
+        for (DefDescriptor<?> desc : descriptors) {
             Config config = new Config();
             config.matcher = defService.getDefDescriptor("markup://test:*", ComponentDef.class);
             config.desc = desc;
@@ -284,7 +295,7 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
         return permuteConfigs(ret);
     }
 
-    public static class Config extends BaseServiceTest.Config{
+    public static class Config extends BaseServiceTest.Config {
 
         public DefDescriptor<?> matcher;
         public DefDescriptor<?> desc;

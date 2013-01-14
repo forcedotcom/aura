@@ -22,9 +22,9 @@ import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptValidator;
 
 /**
- * Directive to the parser, matching lines beginning with //#. The rest of the matching line will
- * be passed for processing. Directives are removed from the file and can be replaced with anything,
- * and create more directives
+ * Directive to the parser, matching lines beginning with //#. The rest of the
+ * matching line will be passed for processing. Directives are removed from the
+ * file and can be replaced with anything, and create more directives
  */
 public interface Directive {
 
@@ -39,26 +39,30 @@ public interface Directive {
     String getLine();
 
     /**
-     * called during the parsing phase, this allows the directive to pass metadata back to the group
+     * called during the parsing phase, this allows the directive to pass
+     * metadata back to the group
      */
     void processDirective(DirectiveBasedJavascriptGroup parser) throws IOException;
 
     /**
      * some directives have multiline content in between a start and end marker.
      * Note that multiline directives *cannot* be nested
-     *
+     * 
      * @return true if this directive has a matching end directive
      */
     boolean isMultiline();
 
     /**
      * sets the content of a multiline directive
-     * @param content between the directives line and the corresponding end directive
+     * 
+     * @param content between the directives line and the corresponding end
+     *            directive
      */
     void setContent(String content);
 
     /**
      * might not even have output in some contexts
+     * 
      * @return whether or not to call generate
      */
     boolean hasOutput(JavascriptGeneratorMode mode);

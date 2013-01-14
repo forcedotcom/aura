@@ -15,7 +15,6 @@
  */
 package org.auraframework.util.json;
 
-
 /**
  * standard jsony stuff
  */
@@ -26,7 +25,8 @@ public abstract class BaseJsonSerializationContext implements JsonSerializationC
     private final int collectionSizeLimit;
     private final boolean nullValues;
 
-    public BaseJsonSerializationContext(boolean format, boolean refSupport, int dataSizeLimit, int collectionSizeLimit, boolean nullValues) {
+    public BaseJsonSerializationContext(boolean format, boolean refSupport, int dataSizeLimit, int collectionSizeLimit,
+            boolean nullValues) {
         this.format = format;
         this.refSupport = refSupport;
         this.dataSizeLimit = dataSizeLimit;

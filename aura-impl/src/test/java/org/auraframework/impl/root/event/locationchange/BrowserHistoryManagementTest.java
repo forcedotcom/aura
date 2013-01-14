@@ -23,9 +23,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 /**
- * Tests that Verify the mechanics of Browser History Management. Location Change event is an APPLICATION event.
- * {@link aura.def.EventType} Which means that all handler registered to handle this event are invoked. NOTE: Location
- * change event is fired as soon as the page is loaded. Implementation is in AuraHistoryService_Private.js
+ * Tests that Verify the mechanics of Browser History Management. Location
+ * Change event is an APPLICATION event. {@link aura.def.EventType} Which means
+ * that all handler registered to handle this event are invoked. NOTE: Location
+ * change event is fired as soon as the page is loaded. Implementation is in
+ * AuraHistoryService_Private.js
  */
 public class BrowserHistoryManagementTest extends WebDriverTestCase {
     public BrowserHistoryManagementTest(String name) {
@@ -33,10 +35,11 @@ public class BrowserHistoryManagementTest extends WebDriverTestCase {
     }
 
     /**
-     * A basic component which has specified a event to be fired for location change but has no handler.
+     * A basic component which has specified a event to be fired for location
+     * change but has no handler.
      * 
-     * @exception Changes
-     *                the URL to the location specified in the client action but nothing else.
+     * @exception Changes the URL to the location specified in the client action
+     *                but nothing else.
      */
     public void testNoHandlerForLocationChange() throws MalformedURLException, URISyntaxException {
         open("/test/test_LocChng_NoHandler.app");
@@ -52,9 +55,10 @@ public class BrowserHistoryManagementTest extends WebDriverTestCase {
     }
 
     /**
-     * Verify that browser History events are fired with a simple component. Have a simple component which has
-     * registered an event for handling Location Change. Have a handler which handles this location change event. Verify
-     * that the handler was evoked when aura.historyService.set()
+     * Verify that browser History events are fired with a simple component.
+     * Have a simple component which has registered an event for handling
+     * Location Change. Have a handler which handles this location change event.
+     * Verify that the handler was evoked when aura.historyService.set()
      */
     public void testBrowserHistoryInteractionInSimpleComponent() throws MalformedURLException, URISyntaxException {
         open("/test/test_LocChng_SimpleComponent.app");
@@ -69,11 +73,14 @@ public class BrowserHistoryManagementTest extends WebDriverTestCase {
     }
 
     /**
-     * Verify that browser History events in a complex component with multiple handlers. Have a simple component which
-     * has registered an event for handling Location Change. Have a Bigger component which has registered an event for
-     * handling Location Change and also includes the simple component within it's body. Have 2 handlers which handle
-     * both location change events. Verify that the handler was evoked when aura.historyService.set() This also tests
-     * that all handlers registered for the location change event are invoked.
+     * Verify that browser History events in a complex component with multiple
+     * handlers. Have a simple component which has registered an event for
+     * handling Location Change. Have a Bigger component which has registered an
+     * event for handling Location Change and also includes the simple component
+     * within it's body. Have 2 handlers which handle both location change
+     * events. Verify that the handler was evoked when aura.historyService.set()
+     * This also tests that all handlers registered for the location change
+     * event are invoked.
      */
     public void testBrowserHistoryInteractionInComplexComponent() throws MalformedURLException, URISyntaxException {
         open("/test/test_LocChng_CompositeComponent.app");
@@ -97,9 +104,10 @@ public class BrowserHistoryManagementTest extends WebDriverTestCase {
      */
     public void _testBrowserHistoryInteractionInComplexComponent2() throws MalformedURLException, URISyntaxException {
         /*
-         * This verifies that even though the Inner component has its own location change event, in the context of
-         * another bigger component, only the root component's location change event is fired. In this case
-         * test:test_LocChng_Event2
+         * This verifies that even though the Inner component has its own
+         * location change event, in the context of another bigger component,
+         * only the root component's location change event is fired. In this
+         * case test:test_LocChng_Event2
          */
         open("/test/test_LocChng_CompositeComponent.app");
         findByXpath("//div[contains(@class,'SimpleComponent')]").click();
@@ -117,12 +125,15 @@ public class BrowserHistoryManagementTest extends WebDriverTestCase {
     }
 
     /**
-     * Verify the functionality of "aura.historyService.back()" and "aura.historyService.forward()". The component has 3
-     * buttons. One to start the navigation and the other two to go back and forth using Aura History Service. The
-     * locator string used in the aura.historyService.set() has an attribute value which is used to initialize the
-     * location change event for this component. test:test_LocChng_Event is the event and it has a 'num' attribute. The
-     * history service set() is setting the values of this attribute. The actions registered for Location Change event
-     * handlers use this num. The number is extracted from the event.
+     * Verify the functionality of "aura.historyService.back()" and
+     * "aura.historyService.forward()". The component has 3 buttons. One to
+     * start the navigation and the other two to go back and forth using Aura
+     * History Service. The locator string used in the aura.historyService.set()
+     * has an attribute value which is used to initialize the location change
+     * event for this component. test:test_LocChng_Event is the event and it has
+     * a 'num' attribute. The history service set() is setting the values of
+     * this attribute. The actions registered for Location Change event handlers
+     * use this num. The number is extracted from the event.
      */
     // TODO W-1089043
     public void testNavigation() throws Exception {
@@ -174,7 +185,8 @@ public class BrowserHistoryManagementTest extends WebDriverTestCase {
         waitForElementPresent(findByXpath(locationChangeIndicator));
         assertEquals(Integer.toString(i), findByXpath(displayLocator).getText());
 
-        // The user hasn't navigated further. So clicking next should still be at the same page
+        // The user hasn't navigated further. So clicking next should still be
+        // at the same page
         findByXpath(nextLocator).click();
         // 4
         assertEquals(Integer.toString(i), findByXpath(displayLocator).getText());
@@ -182,7 +194,8 @@ public class BrowserHistoryManagementTest extends WebDriverTestCase {
         // 4
         assertEquals(Integer.toString(i), findByXpath(displayLocator).getText());
 
-        // Let's go back 4 times and click one more back to make sure we can't go any further(backwards)
+        // Let's go back 4 times and click one more back to make sure we can't
+        // go any further(backwards)
         findByXpath(backLocator).click();
         i--;
         // 3
@@ -198,8 +211,10 @@ public class BrowserHistoryManagementTest extends WebDriverTestCase {
         // 1
         waitForElementPresent(findByXpath(locationChangeIndicator));
         assertEquals(Integer.toString(i), findByXpath(displayLocator).getText());
-        // Pressing back now only changes the URL to the starting location, when there was don't click me.
-        // It actually doesn't change the button label because the client action is not written that way. Don't worry
+        // Pressing back now only changes the URL to the starting location, when
+        // there was don't click me.
+        // It actually doesn't change the button label because the client action
+        // is not written that way. Don't worry
         // about it
         findByXpath(backLocator).click();
         // 1

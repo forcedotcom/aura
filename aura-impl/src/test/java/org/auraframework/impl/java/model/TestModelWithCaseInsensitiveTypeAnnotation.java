@@ -15,18 +15,21 @@
  */
 package org.auraframework.impl.java.model;
 
-import org.auraframework.system.Annotations.*;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Model;
+import org.auraframework.system.Annotations.Type;
+
 @Model
 public class TestModelWithCaseInsensitiveTypeAnnotation {
     @AuraEnabled
     @Type("STRING")
-    public String getString(){
+    public String getString() {
         return "Model";
     }
 
     @AuraEnabled
     @Type("AURA://DOUbLE")
-    public Double getDouble(){
+    public Double getDouble() {
         return 1.23;
     }
 }

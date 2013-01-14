@@ -23,7 +23,7 @@ import org.auraframework.util.type.Converter;
 public class StringToDoubleConverter implements Converter<String, Double> {
     @Override
     public Double convert(String value) {
-        if(value == null || value.isEmpty()){
+        if (value == null || value.isEmpty()) {
             return null;
         }
         return Double.valueOf(value);

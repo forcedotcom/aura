@@ -25,8 +25,8 @@ import org.auraframework.impl.javascript.parser.JavascriptParser;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.XMLWriter;
 import org.auraframework.system.Parser;
-import org.auraframework.system.SourceWriter;
 import org.auraframework.system.Parser.Format;
+import org.auraframework.system.SourceWriter;
 
 /**
  * Factory for returning the appropriate Parser for the given Format.
@@ -36,7 +36,7 @@ public class ParserFactory {
     private static EnumMap<Format, Parser> parsers = new EnumMap<Format, Parser>(Format.class);
     private static EnumMap<Format, SourceWriter> writers = new EnumMap<Format, SourceWriter>(Format.class);
 
-    static{
+    static {
         parsers.put(Format.XML, XMLParser.getInstance());
         parsers.put(Format.CSS, ThemeParser.getInstance());
         parsers.put(Format.TEMPLATE_CSS, ThemeParser.getNonValidatingInstance());
@@ -53,7 +53,7 @@ public class ParserFactory {
         return parsers.get(format);
     }
 
-    public static SourceWriter getWriter(Format format){
+    public static SourceWriter getWriter(Format format) {
         return writers.get(format);
     }
 }

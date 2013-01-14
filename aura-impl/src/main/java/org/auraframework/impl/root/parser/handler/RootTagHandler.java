@@ -20,7 +20,8 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.def.RootDefinition.SupportLevel;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.system.Source;
@@ -32,18 +33,16 @@ import com.google.common.collect.ImmutableSet;
 /**
  * Super class for the top level tags, handles some common setup
  */
-public abstract class RootTagHandler<T extends RootDefinition> extends ContainerTagHandler<T> implements ExpressionContainerHandler {
+public abstract class RootTagHandler<T extends RootDefinition> extends ContainerTagHandler<T> implements
+        ExpressionContainerHandler {
 
     protected final DefDescriptor<T> defDescriptor;
 
     protected static final String ATTRIBUTE_SUPPORT = "support";
     protected static final String ATTRIBUTE_DESCRIPTION = "description";
-    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-            ATTRIBUTE_SUPPORT,
-            ATTRIBUTE_DESCRIPTION
-        );
+    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_SUPPORT, ATTRIBUTE_DESCRIPTION);
 
-    protected RootTagHandler(){
+    protected RootTagHandler() {
         super();
         this.defDescriptor = null;
     }
@@ -60,7 +59,8 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
     @Override
     public void addExpressionReferences(Set<PropertyReference> propRefs) {
         // TODO: this should be a typed exception
-        throw new AuraRuntimeException("Expressions are not allowed inside a " + defDescriptor.getDefType() + " definition", propRefs.iterator().next().getLocation());
+        throw new AuraRuntimeException("Expressions are not allowed inside a " + defDescriptor.getDefType()
+                + " definition", propRefs.iterator().next().getLocation());
     }
 
     @Override
@@ -74,11 +74,12 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
     protected void readAttributes() throws QuickFixException {
         RootDefinitionBuilder<T> builder = getBuilder();
         String supportName = getAttributeValue(ATTRIBUTE_SUPPORT);
-        if(supportName != null){
-            try{
+        if (supportName != null) {
+            try {
                 builder.setSupport(SupportLevel.valueOf(supportName.toUpperCase()));
-            }catch(IllegalArgumentException e){
-                throw new AuraRuntimeException(String.format("Invalid support level %s", supportName), this.getLocation());
+            } catch (IllegalArgumentException e) {
+                throw new AuraRuntimeException(String.format("Invalid support level %s", supportName),
+                        this.getLocation());
             }
         }
 

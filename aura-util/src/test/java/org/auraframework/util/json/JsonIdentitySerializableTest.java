@@ -17,13 +17,11 @@ package org.auraframework.util.json;
 
 import java.io.IOException;
 
-import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonSerializable;
 import org.auraframework.util.json.Json.Serialization;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
 
 @Serialization(referenceType = ReferenceType.IDENTITY)
-public class JsonIdentitySerializableTest implements JsonSerializable{
+public class JsonIdentitySerializableTest implements JsonSerializable {
 
     private Integer value;
 
@@ -47,7 +45,7 @@ public class JsonIdentitySerializableTest implements JsonSerializable{
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof JsonIdentitySerializableTest) {
-            JsonIdentitySerializableTest other = (JsonIdentitySerializableTest)obj;
+            JsonIdentitySerializableTest other = (JsonIdentitySerializableTest) obj;
             return value == other.value;
         }
         return false;

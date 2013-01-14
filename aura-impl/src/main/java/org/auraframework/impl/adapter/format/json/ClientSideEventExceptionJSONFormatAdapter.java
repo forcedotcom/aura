@@ -37,7 +37,7 @@ public class ClientSideEventExceptionJSONFormatAdapter extends JSONFormatAdapter
 
     @Override
     public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException {
-        ClientSideEventException e = (ClientSideEventException)value;
+        ClientSideEventException e = (ClientSideEventException) value;
         JsonSerializationContext jsonCxt = Aura.getContextService().getCurrentContext().getJsonSerializationContext();
         Map<String, Object> serialized = Maps.newHashMap();
         serialized.put("exceptionEvent", Boolean.TRUE);

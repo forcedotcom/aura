@@ -33,7 +33,7 @@ import com.google.common.collect.Maps;
 /**
  */
 @ThreadSafe
-public class TestSuiteDefHTMLFormatAdapter extends HTMLFormatAdapter<TestSuiteDef>{
+public class TestSuiteDefHTMLFormatAdapter extends HTMLFormatAdapter<TestSuiteDef> {
 
     @Override
     public Class<TestSuiteDef> getType() {
@@ -41,7 +41,8 @@ public class TestSuiteDefHTMLFormatAdapter extends HTMLFormatAdapter<TestSuiteDe
     }
 
     @Override
-    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException, QuickFixException {
+    public void write(Object value, Map<String, Object> attributes, Appendable out) throws IOException,
+            QuickFixException {
         Map<String, Object> attribs = Maps.newHashMap();
         attribs.put("autoInitialize", "false");
         attribs.put("bodyClass", " ");
@@ -58,10 +59,10 @@ public class TestSuiteDefHTMLFormatAdapter extends HTMLFormatAdapter<TestSuiteDe
         Aura.getSerializationService().write(value, attributes, getType(), sb, "JSON");
         attribs.put("auraInitBlock", String.format("<script>aura.test.init(%s);</script>", sb.toString()));
 
-        try{
+        try {
             Component c = Aura.getInstanceService().getInstance("aura:template", ComponentDef.class, attribs);
             Aura.getRenderingService().render(c, out);
-        }catch(QuickFixException e){
+        } catch (QuickFixException e) {
             throw new AuraError(e);
         }
     }

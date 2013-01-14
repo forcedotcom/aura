@@ -15,19 +15,21 @@
  */
 package org.auraframework.test.configuration;
 
-import java.net.*;
+import java.net.InetAddress;
+import java.net.URL;
+import java.net.UnknownHostException;
 
 import org.apache.commons.httpclient.HttpClient;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Server;
 import org.auraframework.Aura;
 import org.auraframework.test.AuraJettyServer;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Server;
 
 /**
  * @since 0.0.59
  */
 public class JettyTestServletConfig implements TestServletConfig {
-    private URL baseUrl;
+    private final URL baseUrl;
 
     public JettyTestServletConfig() throws Exception {
         String host;
@@ -64,13 +66,15 @@ public class JettyTestServletConfig implements TestServletConfig {
 
     @Override
     public URL getBaseUrl() {
-    	return baseUrl;
+        return baseUrl;
     }
 
     @Override
     public HttpClient getHttpClient() {
-        // 10 minute timeout for making a connection and for waiting for data on the connection.
-        // This prevents tests from hanging in the http code, which in turn can prevent the server from exiting.
+        // 10 minute timeout for making a connection and for waiting for data on
+        // the connection.
+        // This prevents tests from hanging in the http code, which in turn can
+        // prevent the server from exiting.
         int timeout = 10 * 60 * 1000;
         HttpClient http = new HttpClient();
         http.getHttpConnectionManager().getParams().setConnectionTimeout(timeout);

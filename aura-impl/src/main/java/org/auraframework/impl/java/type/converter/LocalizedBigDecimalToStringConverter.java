@@ -26,9 +26,8 @@ import org.auraframework.util.type.converter.BigDecimalToStringConverter;
 /**
  * Used by aura.impl.java.type.JavaLocalizedTypeUtil;
  */
-public class LocalizedBigDecimalToStringConverter
-    extends BigDecimalToStringConverter
-    implements LocalizedConverter<BigDecimal, String> {
+public class LocalizedBigDecimalToStringConverter extends BigDecimalToStringConverter implements
+        LocalizedConverter<BigDecimal, String> {
 
     @Override
     public String convert(BigDecimal value, AuraLocale locale) {
@@ -48,6 +47,5 @@ public class LocalizedBigDecimalToStringConverter
             return super.convert(value);
         }
     }
-
 
 }

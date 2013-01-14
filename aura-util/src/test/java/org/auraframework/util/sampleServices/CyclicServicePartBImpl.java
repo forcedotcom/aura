@@ -18,7 +18,7 @@ package org.auraframework.util.sampleServices;
 import org.auraframework.util.ServiceLocator;
 
 public class CyclicServicePartBImpl implements CyclicServicePartB {
-    public CyclicServicePartBImpl(){
+    public CyclicServicePartBImpl() {
         ServiceLocator.get().get(CyclicServicePartA.class);
     }
 }

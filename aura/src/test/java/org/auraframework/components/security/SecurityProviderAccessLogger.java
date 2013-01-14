@@ -20,8 +20,8 @@ import java.util.List;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.SecurityProvider;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Controller;
 
 @Controller
 public class SecurityProviderAccessLogger implements SecurityProvider {

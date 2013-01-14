@@ -20,8 +20,10 @@ import java.io.IOException;
 /**
  * Interface for anything that can be serialized to json.
  * <p>
- * Please read <a href="https://sites.google.com/a/salesforce.com/user-interface/documentation/json">Json docs</a> on
- * how to use this properly!
+ * Please read <a href=
+ * "https://sites.google.com/a/salesforce.com/user-interface/documentation/json"
+ * >Json docs</a> on how to use this properly!
+ * 
  * @see Json
  */
 public interface JsonSerializable {

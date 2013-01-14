@@ -15,10 +15,16 @@
  */
 package org.auraframework.impl.layouts;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.LayoutDef;
+import org.auraframework.def.LayoutItemDef;
+import org.auraframework.def.LayoutsDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
@@ -27,43 +33,52 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
  * @priority medium
  * @userStorySyncIdOrName a07B0000000EGkF
  */
-public class LayoutsDefTest extends AuraImplTestCase{
+public class LayoutsDefTest extends AuraImplTestCase {
 
     public LayoutsDefTest(String name) {
         super(name);
     }
+
     /**
      * Test to verify layouts obtained from Definition Service.
+     * 
      * @throws Exception
      */
-    public void testLayoutsFromService() throws Exception{
+    public void testLayoutsFromService() throws Exception {
         LayoutsDef layoutsDef = Aura.getDefinitionService().getDefinition("test:layouts", LayoutsDef.class);
         validateLayouts(layoutsDef);
     }
+
     /**
-     * Test to verify layouts on Application def.
-     * Application has no explicit layouts specification, its the default layouts file in the component folder.
+     * Test to verify layouts on Application def. Application has no explicit
+     * layouts specification, its the default layouts file in the component
+     * folder.
+     * 
      * @throws Exception
      */
-    public void testLayoutsFromApplicationDefAutoWire() throws Exception{
+    public void testLayoutsFromApplicationDefAutoWire() throws Exception {
         ApplicationDef applicationDef = Aura.getDefinitionService().getDefinition("test:layouts", ApplicationDef.class);
-        validateLayouts(applicationDef.getLayoutsDefDescriptor().getDef());
-    }
-    /**
-     * Test to verify Layouts on Application def.
-     * Explicit specification of layouts file.
-     * @throws Exception
-     */
-    public void testLayoutsFromApplicationDefAttribute() throws Exception{
-        ApplicationDef applicationDef = Aura.getDefinitionService().getDefinition("test:layouts2", ApplicationDef.class);
         validateLayouts(applicationDef.getLayoutsDefDescriptor().getDef());
     }
 
     /**
-     * "default" attribute is required. If there is no such attribute defined, an exception should be thrown.
-     *
+     * Test to verify Layouts on Application def. Explicit specification of
+     * layouts file.
+     * 
+     * @throws Exception
      */
-    public void testLayoutsNoDefault() throws Exception{
+    public void testLayoutsFromApplicationDefAttribute() throws Exception {
+        ApplicationDef applicationDef = Aura.getDefinitionService()
+                .getDefinition("test:layouts2", ApplicationDef.class);
+        validateLayouts(applicationDef.getLayoutsDefDescriptor().getDef());
+    }
+
+    /**
+     * "default" attribute is required. If there is no such attribute defined,
+     * an exception should be thrown.
+     * 
+     */
+    public void testLayoutsNoDefault() throws Exception {
         InvalidDefinitionException result = null;
         try {
             Aura.getDefinitionService().getDefinition("test:layoutsNoDefault", LayoutsDef.class);
@@ -78,7 +93,7 @@ public class LayoutsDefTest extends AuraImplTestCase{
      * The "default" layout must exist. Otherwise we should throw an exception.
      * W-931102
      */
-    public void testLayoutsNonExistDefault() throws Exception{
+    public void testLayoutsNonExistDefault() throws Exception {
         InvalidDefinitionException result = null;
         try {
             Aura.getDefinitionService().getDefinition("test:layoutsNonExistDefault", LayoutsDef.class);
@@ -90,10 +105,10 @@ public class LayoutsDefTest extends AuraImplTestCase{
     }
 
     /**
-     * The "catchall" layout must exist if it gets specified. Otherwise we should throw an exception.
-     * W-931102
+     * The "catchall" layout must exist if it gets specified. Otherwise we
+     * should throw an exception. W-931102
      */
-    public void testLayoutsNonExistCatchall() throws Exception{
+    public void testLayoutsNonExistCatchall() throws Exception {
         InvalidDefinitionException result = null;
         try {
             Aura.getDefinitionService().getDefinition("test:layoutsNonExistCatchall", LayoutsDef.class);
@@ -104,17 +119,18 @@ public class LayoutsDefTest extends AuraImplTestCase{
         assertNotNull(result);
     }
 
-    public void validateLayouts(LayoutsDef layoutsDef) throws Exception{
+    public void validateLayouts(LayoutsDef layoutsDef) throws Exception {
 
         assertNotNull(layoutsDef);
         assertEquals("Failed to retrieve description of layout.", "layouts description", layoutsDef.getDescription());
         Collection<LayoutDef> layoutDefs = layoutsDef.getLayoutDefs();
         assertEquals(2, layoutDefs.size());
 
-        //Feed Layout
+        // Feed Layout
         LayoutDef feedLayout = layoutsDef.getLayoutDef("feed");
         assertNotNull(feedLayout);
-        assertEquals("Failed to retrieve description of individual layout", "layout description", feedLayout.getDescription());
+        assertEquals("Failed to retrieve description of individual layout", "layout description",
+                feedLayout.getDescription());
         assertEquals(1, feedLayout.getLayoutItemDefs().size());
 
         LayoutItemDef item = feedLayout.getLayoutItemDef("content");
@@ -126,12 +142,12 @@ public class LayoutsDefTest extends AuraImplTestCase{
         ComponentDefRef ref = body.get(0);
         assertEquals("markup://aura:html", ref.getDescriptor().getQualifiedName());
         assertEquals("inner", ref.getLocalId());
-        Collection<?> htmlAttribs = ((HashMap<?,?>)ref.getAttributeDefRef("HTMLAttributes").getValue()).values();
+        Collection<?> htmlAttribs = ((HashMap<?, ?>) ref.getAttributeDefRef("HTMLAttributes").getValue()).values();
         assertEquals(1, htmlAttribs.size());
         assertEquals("self", htmlAttribs.toArray()[0]);
         assertNull(item.getCache());
 
-        //Menu Layout
+        // Menu Layout
         LayoutDef menuLayout = layoutsDef.getLayoutDef("menu");
         assertNotNull(menuLayout);
         assertEquals("Menu layout was not specified any description.", null, menuLayout.getDescription());
@@ -149,6 +165,5 @@ public class LayoutsDefTest extends AuraImplTestCase{
         assertEquals("session", item.getCache());
 
     }
-
 
 }

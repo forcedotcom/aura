@@ -18,14 +18,14 @@
 package org.auraframework.impl.admin;
 
 import java.lang.management.ManagementFactory;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import javax.management.*;
-
-import com.google.common.base.Optional;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import javax.management.JMException;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import org.auraframework.def.Definition;
 import org.auraframework.impl.AuraImpl;
@@ -33,8 +33,13 @@ import org.auraframework.impl.system.CachingDefRegistryImpl;
 import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.DefRegistry;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * @since 0.0.177
@@ -47,8 +52,7 @@ public class AdminModel {
     private final List<Map<String, Object>> registryData;
     private final List<Map<String, Object>> cachingRegistryData;
 
-    private <T extends Definition> void addCDR(CachingDefRegistryImpl<T> cdr,
-                                               Map<String, Object> data) {
+    private <T extends Definition> void addCDR(CachingDefRegistryImpl<T> cdr, Map<String, Object> data) {
         Collection<Optional<T>> defs = cdr.getCachedDefs();
         List<Map<String, Object>> defsData = Lists.newArrayListWithCapacity(defs.size());
         int nulls = 0;
@@ -85,7 +89,7 @@ public class AdminModel {
             data.put("namespaces", dr.getNamespaces().toString());
             if (dr instanceof CachingDefRegistryImpl) {
                 // add the contents
-                CachingDefRegistryImpl<? extends Definition> cdr = (CachingDefRegistryImpl<? extends Definition>)dr;
+                CachingDefRegistryImpl<? extends Definition> cdr = (CachingDefRegistryImpl<? extends Definition>) dr;
                 addCDR(cdr, data);
                 cachingRegistryData.add(data);
             } else {

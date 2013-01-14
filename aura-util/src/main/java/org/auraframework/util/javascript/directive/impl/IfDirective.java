@@ -24,10 +24,8 @@ import org.auraframework.util.javascript.directive.DirectiveBasedJavascriptGroup
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 
 /**
- * multiline directive that writes its contents out, but only in the specified modes.
- * //#if {"modes" : ["FUNKY"]}
- *   alert("get down");
- * //#end
+ * multiline directive that writes its contents out, but only in the specified
+ * modes. //#if {"modes" : ["FUNKY"]} alert("get down"); //#end
  */
 public class IfDirective extends DirectiveImpl {
 

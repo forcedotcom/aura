@@ -18,7 +18,10 @@ package org.auraframework.throwable.quickfix;
 import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.service.BuilderService;
 import org.auraframework.service.DefinitionService;
 
@@ -27,26 +30,28 @@ import org.auraframework.service.DefinitionService;
  */
 public class CreateApplicationDefQuickFix extends CreateBaseComponentDefQuickFix {
 
-    public CreateApplicationDefQuickFix(Map<String, Object> attributes){
-        super("Create Application Definition", attributes, Aura.getDefinitionService().getDefDescriptor("auradev:createApplicationDefQuickFix", ComponentDef.class));
+    public CreateApplicationDefQuickFix(Map<String, Object> attributes) {
+        super("Create Application Definition", attributes, Aura.getDefinitionService().getDefDescriptor(
+                "auradev:createApplicationDefQuickFix", ComponentDef.class));
     }
 
-    public CreateApplicationDefQuickFix(DefDescriptor<?> descriptor){
+    public CreateApplicationDefQuickFix(DefDescriptor<?> descriptor) {
         this(createMap(descriptor));
     }
+
     @Override
     protected void fix() throws QuickFixException {
         BuilderService builderService = Aura.getBuilderService();
         DefinitionService definitionService = Aura.getDefinitionService();
-        String descriptors = (String)getAttributes().get("descriptor");
+        String descriptors = (String) getAttributes().get("descriptor");
         String[] split = CreateComponentDefQuickFix.descriptorPattern.split(descriptors);
-        for(String descriptor : split){
+        for (String descriptor : split) {
             ApplicationDef def = builderService.getApplicationDefBuilder().setDescriptor(descriptor).build();
             definitionService.save(def);
 
-
-            if(getBooleanAttribute("client.css")){
-                DefDescriptor<ThemeDef> themeDescriptor = definitionService.getDefDescriptor(def.getDescriptor(), "css", ThemeDef.class);
+            if (getBooleanAttribute("client.css")) {
+                DefDescriptor<ThemeDef> themeDescriptor = definitionService.getDefDescriptor(def.getDescriptor(),
+                        "css", ThemeDef.class);
                 new CreateThemeDefQuickFix(themeDescriptor).fix();
             }
         }

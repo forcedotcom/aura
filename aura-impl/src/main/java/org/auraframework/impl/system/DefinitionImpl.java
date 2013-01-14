@@ -34,7 +34,7 @@ import com.google.common.collect.Maps;
 /**
  * The implementation for a definition.
  */
-@Serialization(referenceType=ReferenceType.IDENTITY)
+@Serialization(referenceType = ReferenceType.IDENTITY)
 public abstract class DefinitionImpl<T extends Definition> implements Definition, Serializable {
 
     private static final long serialVersionUID = 5836732915093913670L;
@@ -44,14 +44,14 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     protected final String description;
     private boolean valid;
 
-    protected DefinitionImpl(DefDescriptor<T> descriptor, Location location){
+    protected DefinitionImpl(DefDescriptor<T> descriptor, Location location) {
         this.descriptor = descriptor;
         this.location = location;
         this.subDefs = null;
         this.description = null;
     }
 
-    protected DefinitionImpl(RefBuilderImpl<T,?> builder){
+    protected DefinitionImpl(RefBuilderImpl<T, ?> builder) {
         this.descriptor = builder.getDescriptor();
         this.location = builder.getLocation();
         this.subDefs = builder.subDefs;
@@ -79,7 +79,7 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
      */
     @Override
     public String getName() {
-        return descriptor == null?getClass().getName():descriptor.getName();
+        return descriptor == null ? getClass().getName() : descriptor.getName();
     }
 
     /**
@@ -121,12 +121,13 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
 
     @Override
     public String toString() {
-        // getDescriptor is not always non-null (though is should be). Avoid throwing a null pointer
+        // getDescriptor is not always non-null (though is should be). Avoid
+        // throwing a null pointer
         // exception when someone asks for a string representation.
         if (getDescriptor() != null) {
             return getDescriptor().toString();
         } else {
-            return "INVALID["+this.location+"]: "+this.description;
+            return "INVALID[" + this.location + "]: " + this.description;
         }
     }
 
@@ -136,40 +137,40 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         if (subDefs == null) {
             return null;
         }
-        return (D)subDefs.get(sddesc);
+        return (D) subDefs.get(sddesc);
     }
 
-    public abstract static class BuilderImpl<T extends Definition> extends RefBuilderImpl<T,T> {
-        protected BuilderImpl(Class<T> defClass){
+    public abstract static class BuilderImpl<T extends Definition> extends RefBuilderImpl<T, T> {
+        protected BuilderImpl(Class<T> defClass) {
             super(defClass);
         }
     };
 
-    public abstract static class RefBuilderImpl<T extends Definition, A extends Definition> implements DefBuilder<T, A>{
+    public abstract static class RefBuilderImpl<T extends Definition, A extends Definition> implements DefBuilder<T, A> {
         private boolean descriptorLocked;
         public DefDescriptor<T> descriptor;
         public Location location;
         public Map<SubDefDescriptor<?, T>, Definition> subDefs;
-        private Class<T> defClass;
+        private final Class<T> defClass;
         public String description;
 
-        protected RefBuilderImpl(Class<T> defClass){
+        protected RefBuilderImpl(Class<T> defClass) {
             this.defClass = defClass;
         }
 
         @Override
-        public RefBuilderImpl<T,A> setLocation(String fileName, int line, int column, long lastModified) {
+        public RefBuilderImpl<T, A> setLocation(String fileName, int line, int column, long lastModified) {
             location = new Location(fileName, line, column, lastModified);
             return this;
         }
 
         @Override
-        public RefBuilderImpl<T,A> setLocation(String fileName, long lastModified) {
+        public RefBuilderImpl<T, A> setLocation(String fileName, long lastModified) {
             location = new Location(fileName, lastModified);
             return this;
         }
 
-        public RefBuilderImpl<T,A> setLocation(Location location) {
+        public RefBuilderImpl<T, A> setLocation(Location location) {
             this.location = location;
             return this;
         }
@@ -178,7 +179,7 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
             return this.location;
         }
 
-        public RefBuilderImpl<T,A> addSubDef(SubDefDescriptor<?,T> sddesc, Definition inner) {
+        public RefBuilderImpl<T, A> addSubDef(SubDefDescriptor<?, T> sddesc, Definition inner) {
             if (this.subDefs == null) {
                 this.subDefs = Maps.newHashMap();
             }
@@ -186,19 +187,19 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
             return this;
         }
 
-        public RefBuilderImpl<T,A> lockDescriptor(DefDescriptor<T> desc) {
+        public RefBuilderImpl<T, A> lockDescriptor(DefDescriptor<T> desc) {
             this.descriptorLocked = true;
             this.descriptor = desc;
             return this;
         }
 
         @Override
-        public RefBuilderImpl<T,A> setDescriptor(String qualifiedName){
+        public RefBuilderImpl<T, A> setDescriptor(String qualifiedName) {
             return this.setDescriptor(DefDescriptorImpl.getInstance(qualifiedName, defClass));
         }
 
         @Override
-        public RefBuilderImpl<T,A> setDescriptor(DefDescriptor<T> desc) {
+        public RefBuilderImpl<T, A> setDescriptor(DefDescriptor<T> desc) {
             if (!this.descriptorLocked) {
                 this.descriptor = desc;
             }
@@ -211,7 +212,7 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         }
 
         @Override
-        public RefBuilderImpl<T,A> setDescription(String description) {
+        public RefBuilderImpl<T, A> setDescription(String description) {
             this.description = description;
             return this;
         }

@@ -20,7 +20,10 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.LayoutItemDef;
+import org.auraframework.def.LayoutsDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.layouts.LayoutItemDefImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
@@ -40,15 +43,13 @@ public class LayoutItemDefHandler<P extends RootDefinition> extends ParentedTagH
     private static final String ATTRIBUTE_ACTION = "action";
     private static final String ATTRIBUTE_CONTAINER = "container";
 
-    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-        ATTRIBUTE_CACHE,
-        ATTRIBUTE_ACTION,
-        ATTRIBUTE_CONTAINER,
-        RootTagHandler.ATTRIBUTE_DESCRIPTION
-    );
+    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_CACHE, ATTRIBUTE_ACTION,
+            ATTRIBUTE_CONTAINER, RootTagHandler.ATTRIBUTE_DESCRIPTION);
 
-    private LayoutItemDefImpl.Builder builder = new LayoutItemDefImpl.Builder();
-    public LayoutItemDefHandler(RootTagHandler<P> parentHandler, String layoutName, XMLStreamReader xmlReader, Source<?> source) {
+    private final LayoutItemDefImpl.Builder builder = new LayoutItemDefImpl.Builder();
+
+    public LayoutItemDefHandler(RootTagHandler<P> parentHandler, String layoutName, XMLStreamReader xmlReader,
+            Source<?> source) {
         super(parentHandler, xmlReader, source);
         builder.setLocation(getLocation());
         builder.setLayoutName(layoutName);
@@ -72,12 +73,12 @@ public class LayoutItemDefHandler<P extends RootDefinition> extends ParentedTagH
     @Override
     protected void readAttributes() throws QuickFixException {
         String container = getAttributeValue(ATTRIBUTE_CONTAINER);
-        DefDescriptor<LayoutsDef> parentDesc = ((LayoutsDefHandler)getParentHandler()).getDefDescriptor();
+        DefDescriptor<LayoutsDef> parentDesc = ((LayoutsDefHandler) getParentHandler()).getDefDescriptor();
         builder.setDescriptor(SubDefDescriptorImpl.getInstance(container, parentDesc, LayoutItemDef.class));
         builder.setContainer(container);
 
         String action = getAttributeValue(ATTRIBUTE_ACTION);
-        if(!AuraTextUtil.isNullEmptyOrWhitespace(action)){
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(action)) {
             TextTokenizer tt = TextTokenizer.tokenize(action, getLocation());
             builder.setAction(tt.asValue(getParentHandler()));
         }

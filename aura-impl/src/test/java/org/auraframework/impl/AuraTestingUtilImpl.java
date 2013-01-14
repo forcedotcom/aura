@@ -34,7 +34,8 @@ public class AuraTestingUtilImpl implements AuraTestingUtil {
     private final Set<DefDescriptor<?>> cleanUpDds = Sets.newHashSet();
     private static AtomicLong nonce = new AtomicLong(System.currentTimeMillis());
 
-    public AuraTestingUtilImpl() {}
+    public AuraTestingUtilImpl() {
+    }
 
     @Override
     public void setUp() {
@@ -62,7 +63,8 @@ public class AuraTestingUtilImpl implements AuraTestingUtil {
 
     @Override
     public <T extends Definition> Source<T> getSource(DefDescriptor<T> descriptor) {
-        // Look up in the registry if a context is available. Otherwise, we're probably running a context-less unit test
+        // Look up in the registry if a context is available. Otherwise, we're
+        // probably running a context-less unit test
         // and better be using StringSourceLoader
         AuraContext context = Aura.getContextService().getCurrentContext();
         if (context != null) {
@@ -85,7 +87,7 @@ public class AuraTestingUtilImpl implements AuraTestingUtil {
         cleanUpDds.add(descriptor);
         return descriptor;
     }
-    
+
     @Override
     public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents) {
         StringSourceLoader loader = StringSourceLoader.getInstance();

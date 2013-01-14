@@ -19,7 +19,10 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
 
@@ -30,16 +33,17 @@ public interface AttributeSet extends ValueProvider, JsonSerializable, Iterable<
 
     /**
      * Returns the expression or literal expression that is the current value of
-     * the named attribute.  This does not resolve expressions.  Use getValue(name)
-     * if you need to evaluate the expression.
+     * the named attribute. This does not resolve expressions. Use
+     * getValue(name) if you need to evaluate the expression.
+     * 
      * @param name
-     * @return
-     * This should only ever be used from tests
+     * @return This should only ever be used from tests
      */
     Object getExpression(String name);
 
     /**
      * gets the value of an attribute by name, no expressions allowed
+     * 
      * @throws QuickFixException
      */
     Object getValue(String s) throws QuickFixException;
@@ -54,7 +58,7 @@ public interface AttributeSet extends ValueProvider, JsonSerializable, Iterable<
 
     int size();
 
-    BaseComponent<?,?> getValueProvider();
+    BaseComponent<?, ?> getValueProvider();
 
     boolean isEmpty();
 

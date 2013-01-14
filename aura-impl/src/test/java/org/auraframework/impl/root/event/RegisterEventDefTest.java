@@ -20,8 +20,8 @@ import java.util.Set;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.impl.FakeRegistry;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.FakeRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
 
 /**
@@ -52,7 +52,7 @@ public class RegisterEventDefTest extends AuraImplTestCase {
                         vendor.makeLocation("filename1", 5, 5, 0)).getLocation());
     }
 
-    public void testSerialize() throws Exception{
+    public void testSerialize() throws Exception {
         serializeAndGoldFile(vendor.makeRegisterEventDef(vendor.makeEventDefDescriptor("auratest:testEvent"), true,
                 vendor.makeLocation("filename1", 5, 5, 0)));
     }
@@ -94,7 +94,7 @@ public class RegisterEventDefTest extends AuraImplTestCase {
                 .equals(vendor.makeEventDef()));
     }
 
-    public void testGetDescription()throws Exception{
+    public void testGetDescription() throws Exception {
         String cmpMarkup = "<aura:component >%s</aura:component>";
         String markup = String.format(cmpMarkup,
                 "<aura:registerevent name='eventName' type='aura:componentEvent' description='Describe the event'/>");

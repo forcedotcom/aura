@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -44,6 +45,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 @SuppressWarnings("serial")
@@ -411,7 +413,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
         return ("text/plain");
     }
 
-    public static long getLastMod() throws QuickFixException {
+    public static long getLastMod() {
         DefinitionService definitionService = Aura.getDefinitionService();
         AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();
@@ -429,8 +431,13 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 }
             }
             if (appLastMod == -1) {
-                appLastMod = definitionService.getLastMod(app);
-                lastModMap.put(app.getQualifiedName(), Long.valueOf(appLastMod));
+                try {
+                    String uid = definitionService.getDefRegistry().getUid(null, app);
+                    appLastMod = definitionService.getLastMod(uid);
+                    lastModMap.put(app.getQualifiedName(), Long.valueOf(appLastMod));
+                } catch (QuickFixException qfe) {
+                    // ignore.
+                }
             }
         }
         // fka3: this stuff goes away
@@ -446,8 +453,12 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 }
             }
             if (preloadsLastMod == -1) {
-                preloadsLastMod = definitionService.getNamespaceLastMod(preloads);
-                lastModMap.put(preloadsName, Long.valueOf(preloadsLastMod));
+                try {
+                    preloadsLastMod = definitionService.getNamespaceLastMod(preloads);
+                    lastModMap.put(preloadsName, Long.valueOf(preloadsLastMod));
+                } catch (QuickFixException qfe) {
+                    // ignore
+                }
             }
         }
         // fka3: this stuff needs to be hashed also, either as an app dependency
@@ -472,5 +483,33 @@ public abstract class AuraBaseServlet extends HttpServlet {
             return (auraJSLastMod > lastMod) ? auraJSLastMod : lastMod;
         }
         return getLastMod();
+    }
+
+    public static String getManifest() throws QuickFixException {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        Set<String> preloads = context.getPreloads();
+        String contextPath = context.getContextPath();
+        String ret = "";
+
+        if (preloads != null && !preloads.isEmpty()) {
+            boolean serPreloads = context.getSerializePreLoad();
+            boolean serLastMod = context.getSerializeLastMod();
+            context.setSerializePreLoad(false);
+            context.setSerializeLastMod(false);
+            StringBuilder defs = new StringBuilder(contextPath).append("/l/");
+            StringBuilder sb = new StringBuilder();
+            try {
+                Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
+            } catch (IOException e) {
+                throw new AuraRuntimeException(e);
+            }
+            context.setSerializePreLoad(serPreloads);
+            context.setSerializeLastMod(serLastMod);
+            String contextJson = AuraTextUtil.urlencode(sb.toString());
+            defs.append(contextJson);
+            defs.append("/app.manifest");
+            ret = defs.toString();
+        }
+        return ret;
     }
 }

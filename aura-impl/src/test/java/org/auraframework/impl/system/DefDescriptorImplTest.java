@@ -189,7 +189,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
 
     public void testComparison() throws Exception {
         DefDescriptor<?> fakeComponent = DefDescriptorImpl.getInstance("aura:fakeComponent", ComponentDef.class);
-        DefDescriptor fakeComponent2 = DefDescriptorImpl.getInstance("Aura:FakeComponent", ComponentDef.class);
+        DefDescriptor<?> fakeComponent2 = DefDescriptorImpl.getInstance("Aura:FakeComponent", ComponentDef.class);
         DefDescriptor<?> fooComponent = DefDescriptorImpl.getInstance("aura:foo", ComponentDef.class);
 
         assertTrue(fakeComponent.compareTo(fakeComponent2) == 0);

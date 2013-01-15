@@ -15,21 +15,20 @@
  */
 package org.auraframework.impl.system;
 
-import java.util.EnumSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.RootDefFactory;
-import org.auraframework.impl.source.SourceFactory;
-import org.auraframework.impl.source.StringSourceLoader;
-import org.auraframework.system.SourceLoader;
+import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.DefRegistry;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 /**
@@ -37,14 +36,30 @@ import com.google.common.collect.Lists;
  */
 public class MasterDefRegistryImplTest extends AuraImplTestCase {
     private final String baseContents = "<aura:application></aura:application>";
-    private final Set<String> prefixes = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
-    private final Set<DefType> defTypes = EnumSet.of(DefType.APPLICATION, DefType.COMPONENT);
 
     public MasterDefRegistryImplTest(String name) {
         super(name);
     }
 
-    @SuppressWarnings("unchecked")
+    private MasterDefRegistryImpl getDefRegistry() {
+        Collection<RegistryAdapter> providers = AuraImpl.getRegistryAdapters();
+        List<DefRegistry<?>> mdrregs = Lists.newArrayList();
+
+        for (RegistryAdapter provider : providers) {
+            DefRegistry<?>[] registries = provider.getRegistries(Mode.DEV, Access.AUTHENTICATED, null);
+            if (registries != null) {
+                for (DefRegistry<?> reg : registries) {
+                    Set<String> ns = reg.getNamespaces();
+
+                    if (ns != null && ns.contains("aura") || ns.contains("*")) {
+                        mdrregs.add(reg);
+                    }
+                }
+            }
+        }
+        return new MasterDefRegistryImpl(mdrregs.toArray(new DefRegistry<?>[mdrregs.size()]));
+    }
+
     public void testFindRegex() throws Exception {
         String namespace = "testFindRegex" + auraTestingUtil.getNonce();
         DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class, baseContents,
@@ -52,12 +67,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         addSourceAutoCleanup(ApplicationDef.class, baseContents, String.format("%s:houseparty", namespace));
         addSourceAutoCleanup(ApplicationDef.class, baseContents, String.format("%s:pantsparty", namespace));
 
-        StringSourceLoader loader = StringSourceLoader.getInstance();
-        List<SourceLoader> loaders = Lists.newArrayList((SourceLoader) loader);
-        RootDefFactory factory = new RootDefFactory(new SourceFactory(loaders));
-        @SuppressWarnings("rawtypes")
-        NonCachingDefRegistryImpl nonCachDefReg = new NonCachingDefRegistryImpl(factory, defTypes, prefixes);
-        MasterDefRegistryImpl masterDefReg = new MasterDefRegistryImpl(nonCachDefReg);
+        MasterDefRegistryImpl masterDefReg = getDefRegistry();
 
         assertTrue("find() not finding all sources",
                 masterDefReg.find(new DescriptorFilter(String.format("markup://%s:*", namespace))).size() == 3);
@@ -78,5 +88,16 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 masterDefReg.find(new DescriptorFilter(String.format("markup://%s:househunters*", namespace))).size());
         assertEquals("find() should not find nonexistent name with preceeding wildcard", 0,
                 masterDefReg.find(new DescriptorFilter(String.format("markup://%s:*notherecaptain", namespace))).size());
+    }
+
+    public void testStringCache() throws Exception {
+        String namespace = "testStringCache" + auraTestingUtil.getNonce();
+        DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class, baseContents,
+                String.format("%s:houseboat", namespace));
+        MasterDefRegistryImpl masterDefReg = getDefRegistry();
+        String uid = masterDefReg.getUid(null, houseboat);
+        assertNull("Found string in new MDR", masterDefReg.getCachedString(uid, houseboat, "test1"));
+        masterDefReg.putCachedString(uid, houseboat, "test1", "value");
+        assertEquals("value", masterDefReg.getCachedString(uid, houseboat, "test1"));
     }
 }

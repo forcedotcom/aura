@@ -85,6 +85,9 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
 
     @Override
     public Hash getOwnHash() {
+        if (this.location == null) {
+            return null;
+        }
         return location.getHash();
     }
 

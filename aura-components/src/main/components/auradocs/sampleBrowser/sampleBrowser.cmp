@@ -15,13 +15,14 @@
     limitations under the License.
 
 -->
-<aura:component renderer="java://org.auraframework.renderer.PlaceholderRenderer" >
-    <aura:attribute name="body" type="Aura.Component[]">
-        <div class="spin"/>
-    </aura:attribute>
-    <aura:attribute name="refDescriptor" type="java://org.auraframework.def.DefDescriptor"/>
-    <aura:attribute name="attributes" type="Object"/>
-    <aura:attribute name="loaded" type="Boolean" default="false"/>
-    <aura:attribute name="exclusive" type="Boolean" default="false"/>
-    {!v.body}
+<aura:component>
+<pre>
+[isTablet={!$Browser.isTablet}]
+[isPhone={!$Browser.isPhone}]
+[isAndroid={!$Browser.isAndroid}]
+[formFactor={!$Browser.formFactor}]
+[isIPad={!$Browser.isIPad}]
+[isIPhone={!$Browser.isIPhone}]
+[isIOS={!$Browser.isIOS}]
+</pre>
 </aura:component>

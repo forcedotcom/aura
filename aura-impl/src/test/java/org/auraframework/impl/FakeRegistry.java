@@ -23,6 +23,8 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.ClientOutOfSyncException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Maps;
 
@@ -85,4 +87,38 @@ public class FakeRegistry implements MasterDefRegistry {
     public void assertAccess(DefDescriptor<?> desc) {
     }
 
+    @Override
+    public Map<DefDescriptor<?>, Definition> filterRegistry(Set<DefDescriptor<?>> preloads) {
+        return null;
+    }
+
+    @Override
+    public <T extends Definition> boolean invalidate(DefDescriptor<T> descriptor) {
+        return false;
+    }
+
+    @Override
+    public <T extends Definition> String getUid(String uid, DefDescriptor<T> descriptor)
+            throws ClientOutOfSyncException, QuickFixException {
+        return null;
+    }
+
+    @Override
+    public <T extends Definition> long getLastMod(String uid) {
+        return 0;
+    }
+
+    @Override
+    public <T extends Definition> Set<DefDescriptor<?>> getDependencies(String uid) {
+        return null;
+    }
+
+    @Override
+    public <T extends Definition> String getCachedString(String uid, DefDescriptor<?> descriptor, String key) {
+        return null;
+    }
+
+    @Override
+    public <T extends Definition> void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value) {
+    }
 }

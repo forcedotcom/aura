@@ -440,7 +440,6 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 }
             }
         }
-        // fka3: this stuff goes away
         preloads = new ArrayList<String>(context.getPreloads());
 
         if (preloads.size() > 0) {
@@ -461,9 +460,6 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 }
             }
         }
-        // fka3: this stuff needs to be hashed also, either as an app dependency
-        // or by adding it to the app hash here, probably as a separate item so
-        // we still get the "clean" app hash to lookup in Gordon's MDR table.
         long lastMod = Aura.getConfigAdapter().getAuraJSLastMod();
         if (appLastMod > lastMod) {
             lastMod = appLastMod;

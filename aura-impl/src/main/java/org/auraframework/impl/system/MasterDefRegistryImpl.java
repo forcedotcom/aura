@@ -36,7 +36,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
-import org.auraframework.system.Hash;
 import org.auraframework.system.Location;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
@@ -46,6 +45,7 @@ import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.text.Hash;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

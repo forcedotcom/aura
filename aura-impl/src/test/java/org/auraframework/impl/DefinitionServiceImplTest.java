@@ -128,7 +128,6 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
      */
     public void testGetLastMod() throws Exception {
         Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.PUBLIC);
-        String uid;
 
         // 3. Handle non existing namespace
         try {

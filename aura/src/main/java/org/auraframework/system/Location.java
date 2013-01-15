@@ -17,6 +17,7 @@ package org.auraframework.system;
 
 import java.io.Serializable;
 
+import org.auraframework.def.Definition;
 import org.auraframework.util.text.Hash;
 
 /**
@@ -40,7 +41,7 @@ public class Location implements Serializable {
      */
     private final String cacheFile;
 
-    public Location(Source<?> source) {
+    public Location(Source<? extends Definition> source) {
         this(source, -1, -1, null);
     }
 

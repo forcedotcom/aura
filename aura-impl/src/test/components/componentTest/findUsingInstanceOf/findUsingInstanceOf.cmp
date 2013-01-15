@@ -1,0 +1,7 @@
+<aura:component render="client">
+	<aura:text aura:id='anyCmpAsStub'>
+	    <ui:button label="Parrot" aura:id="parrot"/>
+	    <ui:button label="Peacock" aura:id="peacock"/>
+	    <aura:text value="Parakeet" aura:id="parrot"/>
+    </aura:text>
+</aura:component>

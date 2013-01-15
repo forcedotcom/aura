@@ -280,9 +280,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
         // Look in non-default namespace
         baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*://auratest:*\" type=\"EVENT\"/>");
-        // TODO(W-1496857): toString() of DependencyDef is broken.
-        // assertTrue("Dependency not found",
-        // baseComponentDef.getDependencies().equals("*://auratest:*[EVENT]"));
+        assertEquals("Dependency not found", "[*://auratest:*[EVENT]]",
+            baseComponentDef.getDependencies().toString());
 
         // Make sure correct exception is thrown for nonexistent components
         try {

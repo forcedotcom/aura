@@ -94,7 +94,7 @@ var priv = {
         return elements || [];
     },
 
-    finishRender : function(cmp, elements, ret, parent) {
+    finishRender : function(cmp, elements, ret) {
         elements = this.evalStrings(elements);
 
         var bareElements = this.associateElements(cmp, elements);

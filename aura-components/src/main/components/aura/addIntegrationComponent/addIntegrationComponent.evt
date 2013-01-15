@@ -16,7 +16,7 @@
 
 -->
 <aura:event type="COMPONENT" description="Add a component to integration service surrogate application.">
-    <aura:attribute name="config" type="Object" required="true" description="FIXME" />
+    <aura:attribute name="config" type="Object" required="true" description="FIXME" /><!--W-1489384 for the description-->
     <aura:attribute name="placeholderId" type="String" required="true" description="FIXME" />
     <aura:attribute name="localId" type="String" required="true" description="FIXME" />
 </aura:event>

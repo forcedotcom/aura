@@ -26,7 +26,7 @@ function ModelDef(config){
     // TODO: members should be valuedefs with typedefs
     for (var i = 0; i < config["members"].length; i++) {
         var m = config["members"][i];
-        members.push(m["name"]);
+        members.push(new ValueDef(m));
     }
 }
 
@@ -51,10 +51,10 @@ ModelDef.prototype.newInstance = function(config, component){
 };
 
 /**
- * Gets member names containing ValueDef and TypeDef.
+ * Gets member value defs containing ValueDef and TypeDef.
  * @returns {Object}
  */
-ModelDef.prototype.getMemberNames = function() {
+ModelDef.prototype.getMembers = function() {
     return this.members;
 };
 //#include aura.model.ModelDef_export

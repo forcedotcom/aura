@@ -50,7 +50,7 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
         super(name);
     }
 
-    private interface BrowserProperty{
+    private interface BrowserProperty {
         final PropertyReference isTablet = new PropertyReferenceImpl(BrowserValueProvider.IS_TABLET, null);
         final PropertyReference isPhone = new PropertyReferenceImpl(BrowserValueProvider.IS_PHONE, null);
         final PropertyReference isAndroid = new PropertyReferenceImpl(BrowserValueProvider.IS_ANDROID, null);
@@ -59,7 +59,7 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
         final PropertyReference isIPhone = new PropertyReferenceImpl(BrowserValueProvider.IS_IPHONE, null);
         final PropertyReference isIOS = new PropertyReferenceImpl(BrowserValueProvider.IS_IOS, null);
     }
-    
+
     public void testValidate() throws Exception {
         BrowserValueProvider bvp = new BrowserValueProvider();
         bvp.validate(BrowserProperty.isTablet);
@@ -81,10 +81,12 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
         try {
             bvp.validate(null);
             fail("Expected NullPointerException for null PropertyReference");
-        } catch (NullPointerException expected) {}
+        } catch (NullPointerException expected) {
+        }
     }
-    
-    // semi-integration test checks that value provider is created and validated on component
+
+    // semi-integration test checks that value provider is created and validated
+    // on component
     public void testInvalidPropertyInMarkup() throws Exception {
         Aura.getContextService().startContext(Mode.UTEST, Format.HTML, Access.AUTHENTICATED);
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
@@ -96,11 +98,12 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
             assertEquals("No property on $Browser for key: badProperty", e.getMessage());
         }
     }
-    
-    private void assertBrowserProperty(BrowserValueProvider bvp, PropertyReference property, Object expected) throws Exception {
+
+    private void assertBrowserProperty(BrowserValueProvider bvp, PropertyReference property, Object expected)
+            throws Exception {
         assertEquals("Unexpected value for " + property.toString(), expected, bvp.getValue(property));
     }
-    
+
     private void assertBrowserProperties(UserAgent userAgent, boolean isTablet, boolean isPhone, boolean isAndroid,
             String formFactor, boolean isIPad, boolean isIPhone, boolean isIOS) throws Exception {
         AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.HTML, Access.AUTHENTICATED);
@@ -137,9 +140,10 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
         assertBrowserProperties(UserAgent.PLAYBOOK, false, false, false, "DESKTOP", false, false, false);
         assertBrowserProperties(UserAgent.NOKIA_N95, false, false, false, "DESKTOP", false, false, false);
     }
-    
+
     public void testGetValueUndefinedProperty() throws Exception {
         BrowserValueProvider bvp = new BrowserValueProvider();
-        assertEquals(null, bvp.getValue(new PropertyReferenceImpl("isBlackberry", null)));  // undefined property
+        assertEquals(null, bvp.getValue(new PropertyReferenceImpl("isBlackberry", null))); // undefined
+                                                                                           // property
     }
 }

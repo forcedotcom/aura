@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var p = Json.prototype;
-exp(p,
-    "encode", p.encode,
-    "resolveRefs", p.resolveRefs
-);
+({
+    /**
+     * Verify that outputDate can accept Date object from java model and display it.
+     */
+    testRendering:{
+        test:function(cmp){
+        	aura.test.assertEquals("[object Object]true5yes0", cmp.getElement().innerHTML);
+        }
+    }
+})

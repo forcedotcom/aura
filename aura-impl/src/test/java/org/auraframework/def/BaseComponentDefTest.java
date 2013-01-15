@@ -266,6 +266,46 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
+     * Verify that we are able to build a component that declares dependencies
+     * and those dependencies are found and built, or that the correct Exception
+     * is thrown.
+     */
+    // TODO(W-1166679): Dependencies not attached to ComponentDef yet, add more
+    // tests to check what dependencies are actually found after this story.
+    public void testGetDependencies() throws Exception {
+        // No dependencies by default
+        T baseComponentDef = define(baseTag, "", "");
+        assertTrue("Dependencies should not be present if not specified on component", baseComponentDef
+                .getDependencies().isEmpty());
+
+        // Look in non-default namespace
+        baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*://auratest:*\" type=\"EVENT\"/>");
+        assertEquals("Dependency not found", "[*://auratest:*[EVENT]]",
+            baseComponentDef.getDependencies().toString());
+
+        // Make sure correct exception is thrown for nonexistent components
+        try {
+            baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*://idontexist:*\"/>");
+            fail("Should not be able to load non-existant resource as dependency");
+        } catch (InvalidDefinitionException expected) {
+        }
+
+        // Invalid descriptor pattern
+        try {
+            baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*://auratest.*\"/>");
+            fail("Should not be able to load resource, bad DefDescriptor format");
+        } catch (InvalidDefinitionException expected) {
+        }
+
+        // Another Invalid descriptor pattern
+        try {
+            baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*:auratest:*\"/>");
+            fail("Should not be able to load resource, bad DefDescriptor format");
+        } catch (InvalidDefinitionException expected) {
+        }
+    }
+
+    /**
      * Test to verify the detection logic for rendering components. Test method
      * for {@link BaseComponentDef#isLocallyRenderable()}.
      * 

@@ -28,18 +28,18 @@ import java.util.Arrays;
 import org.auraframework.throwable.AuraRuntimeException;
 
 /**
- * A wrapper around an MD5 hash.  This functions as a future, being created
+ * A wrapper around an MD5 hash. This functions as a future, being created
  * before the hash value is actually computed.
  */
 public class Hash {
 
     private byte[] value;
-    
+
     /** Creates a Hash object with given contents. */
     public Hash(byte[] input) {
         setHash(input);
     }
-    
+
     /** Computes the hash of a Java file. */
     public Hash(String classname) {
         InputStream bytecode = Hash.class.getResourceAsStream("/" + classname.replace('.', '/') + ".class");
@@ -62,12 +62,13 @@ public class Hash {
             throw new AuraRuntimeException("Can't read bytes for " + classname, e);
         }
     }
-   
+
     /**
-     * Consumes a Reader to compute the hash.  This is a convenience for {@link #Hash()} and
-     * {@link #setHash(Reader)}.
-     * @throws IOException 
-     * @throws  
+     * Consumes a Reader to compute the hash. This is a convenience for
+     * {@link #Hash()} and {@link #setHash(Reader)}.
+     * 
+     * @throws IOException
+     * @throws
      */
     public Hash(Reader reader) throws IOException {
         this();
@@ -106,15 +107,16 @@ public class Hash {
     @Override
     public int hashCode() {
         if (value == null) {
-            return 3;  // arbitrary value, but I dislike 0 as a hash precisely because it's so normal
+            return 3; // arbitrary value, but I dislike 0 as a hash precisely
+                      // because it's so normal
         }
         return Arrays.hashCode(value);
     }
-    
+
     public boolean isSet() {
         return value != null;
     }
-    
+
     /**
      * Assigns the hash value.
      * 
@@ -127,7 +129,7 @@ public class Hash {
         }
         value = Arrays.copyOf(hash, hash.length);
     }
-    
+
     /** Consumes and closes a reader to generate its contents' hash. */
     public void setHash(Reader reader) throws IOException, IllegalStateException {
         try {

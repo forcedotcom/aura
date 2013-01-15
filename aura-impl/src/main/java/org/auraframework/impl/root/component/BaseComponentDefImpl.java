@@ -316,7 +316,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
             def.validateReferences();
         }
 
-        // have to do all sorts of craaaazy checks here for dupes and matches and bah
+        // have to do all sorts of craaaazy checks here for dupes and matches
+        // and bah
         validateExpressionRefs();
     }
 

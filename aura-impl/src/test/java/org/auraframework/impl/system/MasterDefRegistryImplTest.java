@@ -28,6 +28,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.throwable.ClientOutOfSyncException;
 
 import com.google.common.collect.Lists;
 
@@ -99,5 +100,25 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertNull("Found string in new MDR", masterDefReg.getCachedString(uid, houseboat, "test1"));
         masterDefReg.putCachedString(uid, houseboat, "test1", "value");
         assertEquals("value", masterDefReg.getCachedString(uid, houseboat, "test1"));
+    }
+
+    public void testUidChanges() throws Exception {
+        String namespace = "testStringCache" + auraTestingUtil.getNonce();
+        String namePrefix = String.format("%s:houseboat", namespace);
+        DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class, baseContents, namePrefix);
+        MasterDefRegistryImpl masterDefReg = getDefRegistry();
+        String uid = masterDefReg.getUid(null, houseboat);
+        assertNotNull(uid);
+        // Check unchanged app gets same UID value
+        assertEquals(uid, masterDefReg.getUid(uid, houseboat));
+
+        // Check asking with an incorrect "old UID" would throw
+        try {
+            String newUid = masterDefReg.getUid(uid + " or not", houseboat);
+            fail(String.format("Should have thrown when fetching from non-null stale UID, but returned %s (was %s)",
+                    newUid, uid));
+        } catch (ClientOutOfSyncException e) {
+            // pass.
+        }
     }
 }

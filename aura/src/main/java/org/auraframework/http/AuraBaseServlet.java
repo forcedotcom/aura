@@ -413,6 +413,28 @@ public abstract class AuraBaseServlet extends HttpServlet {
         return ("text/plain");
     }
 
+    /**
+     * Gets the UID for the application descriptor of the current context, or
+     * {@code null} if there is no application (probably because of a compile
+     * error).
+     */
+    public static String getContextAppUid() {
+        DefinitionService definitionService = Aura.getDefinitionService();
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();
+
+        if (app != null) {
+            try {
+                return definitionService.getDefRegistry().getUid(null, app);
+            } catch (QuickFixException e) {
+                // This is perfectly possible, but the error is handled in more
+                // contextually-sensible places. For here, we know there's no
+                // meaningful uid, so we fall through and return null.
+            }
+        }
+        return null;
+    }
+
     public static long getLastMod() {
         DefinitionService definitionService = Aura.getDefinitionService();
         AuraContext context = Aura.getContextService().getCurrentContext();

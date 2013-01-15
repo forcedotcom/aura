@@ -1009,11 +1009,21 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
         return ret;
     }
 
+    /**
+     * This should not be here it should be a call off of MDR.
+     */
     @Override
     public boolean isLocallyRenderable() throws QuickFixException {
         return isLocallyRenderable(Sets.<DefDescriptor<?>> newLinkedHashSet());
     }
 
+    /**
+     * Helper routine for public call.
+     *
+     * DIE! please?
+     *
+     * @param already the set of processed descriptors.
+     */
     private boolean isLocallyRenderable(Set<DefDescriptor<?>> already) throws QuickFixException {
         if (render == RenderType.CLIENT) {
             return false;

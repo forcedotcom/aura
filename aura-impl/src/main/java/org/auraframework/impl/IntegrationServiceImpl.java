@@ -22,10 +22,10 @@ import org.auraframework.system.AuraContext.Mode;
 
 public class IntegrationServiceImpl implements IntegrationService {
 
-    @Override
-    public Integration createIntegration(String securityProviderDescr, String contextPath, Mode mode) {
-        return new IntegrationImpl(securityProviderDescr, contextPath, mode);
-    }
+	@Override
+	public Integration createIntegration(String contextPath, Mode mode) {
+		return new IntegrationImpl(contextPath, mode);
+	}
 
-    private static final long serialVersionUID = -2650728458106333787L;
+	private static final long serialVersionUID = -2650728458106333787L;
 }

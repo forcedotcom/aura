@@ -1,0 +1,57 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" support="BETA" 
+                 description="A server-rendered template used to bootstrap the loading of the Aura framework and an application or component embedded in other containers, such as Visualforce, Siteforce, and legacy Salesforce UI.">
+
+    <aura:attribute name="auraStyleTags" type="String" 
+                     description="A list of external style tags necessary for the Aura framework."/>
+    <aura:attribute name="auraScriptTags" type="String" 
+                     description="A list of external script tags necessary for the Aura framework."/>
+    <aura:attribute name="auraInit" type="String" 
+                     description="A config object used to retrieve and initialize components for this application."/>
+    <aura:attribute name="auraInitBlock" type="String"
+                     description="A string of inline script code to use in this template."/>
+    <aura:attribute name="extraStyleTags" type="String"
+                     description="A list of style tags necessary for this template"/>
+    <aura:attribute name="extraScriptTags" type="String"
+                     description="A list of script tags necessary for this template"/>
+    <aura:attribute name="extraMetaTags" type="String"
+                     description="A list of meta tags necessary for this template"/>
+
+    <script>
+    if (window.$A !== undefined) {
+    	throw new Error("Aura has already been initialized!");
+    }
+    </script>
+
+    {!v.extraMetaTags}
+    {!v.auraStyleTags}
+    {!v.extraStyleTags}
+    <style>
+        {!v.auraInlineStyle}
+    </style>
+
+    {!v.extraScriptTags}
+    {!v.auraScriptTags}
+
+    <script>
+   	$A.initConfig({!v.auraInit}, true);
+    </script>
+          
+    {!v.auraInitBlock}
+</aura:component>

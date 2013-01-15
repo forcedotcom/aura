@@ -28,9 +28,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableSet;
 
-/**
- * <aura:set> tags
- */
 public class DependencyDefHandler<P extends RootDefinition> extends ParentedTagHandler<DependencyDef, P> {
 
     public static final String TAG = "aura:dependency";

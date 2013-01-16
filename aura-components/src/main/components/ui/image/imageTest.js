@@ -38,7 +38,7 @@
         test: function(cmp){
             var linkElement = cmp.find('link').getElement();
             aura.test.assertTrue(linkElement instanceof HTMLAnchorElement, "Expected to see a anchor element.")
-            aura.test.assertTrue(aura.test.contains(linkElement.href,'http://www.salesforce.com/'),linkElement.href, "Expected a link with specified address.")
+            aura.test.assertTrue(aura.test.contains(linkElement.href,'http://www.salesforce.com'), linkElement.href + " Expected a link with specified address.")
             aura.test.assertEquals('_self',linkElement.target, "Expected target to be _self by default.")
             aura.test.assertEquals(1, linkElement.childElementCount);
 
@@ -53,7 +53,7 @@
         test: function(cmp){
             var linkElement = cmp.find('link').getElement();
             aura.test.assertTrue(linkElement instanceof HTMLAnchorElement, "Expected to see a anchor element.")
-            aura.test.assertTrue(aura.test.contains(linkElement.href,'http://www.salesforce.com/'),linkElement.href, "Expected a link with specified address.")
+            aura.test.assertTrue(aura.test.contains(linkElement.href,'http://www.salesforce.com'), linkElement.href + " Expected a link with specified address.")
             aura.test.assertEquals('_top',linkElement.target, "Expected target to be _top.")
             aura.test.assertTrue(linkElement.className.indexOf('logo')!==-1, "Expected link element to have specified class selector.");
 

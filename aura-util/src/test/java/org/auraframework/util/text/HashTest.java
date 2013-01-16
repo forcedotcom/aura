@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.system;
+package org.auraframework.util.text;
 
 import java.io.StringReader;
 
 import org.auraframework.test.UnitTestCase;
-import org.auraframework.util.text.Hash;
 
 public class HashTest extends UnitTestCase {
 

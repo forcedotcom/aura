@@ -19,7 +19,20 @@
  * @constructor
  */
 var MemoryStorageAdapter = function MemoryStorageAdapter() {
-	this.clear();
+	/*
+	 * Note on sizing.  The following values are taken from the ECMAScript specification, where available.
+	 * Other values are guessed.
+	 * 
+	 * Source: http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
+	 */
+	this.CHARACTER_SIZE = 2;
+	this.NUMBER_SIZE = 8;
+	// note: this value is not defined by the spec.
+	this.BOOLEAN_SIZE = 4;
+
+	this.backingStore = {};
+	this.cachedSize = 0;
+	this.isDirtyForCachedSize = false;
 };
 
 MemoryStorageAdapter.NAME = "memory";
@@ -29,7 +42,18 @@ MemoryStorageAdapter.prototype.getName = function() {
 };
 
 MemoryStorageAdapter.prototype.getSize = function() {
-	return this.currentSize;
+	if (this.isDirtyForCachedSize === true) {
+		var newSize = 0;
+		for (var key in this.backingStore) {
+			// Consider only the size of the key and the actual value object given by the caller 
+			// to the Storage layer. Ignore all the extras added by the Storage layer.
+			newSize += this.sizeOfString(key) + this.estimateSize(this.backingStore[key]["value"]);
+		}
+		this.cachedSize = newSize;
+		this.isDirtyForCachedSize = false;
+	}
+	
+	return this.cachedSize;
 };
 
 MemoryStorageAdapter.prototype.getItem = function(key, resultCallback) {
@@ -37,22 +61,19 @@ MemoryStorageAdapter.prototype.getItem = function(key, resultCallback) {
 };
 
 MemoryStorageAdapter.prototype.setItem = function(key, item) {
-	item.size = key.length + this.calculateSize(item["value"]);
-
-	this.currentSize += item.size;
 	this.backingStore[key] = item;
+	this.isDirtyForCachedSize = true;
 };
 
 MemoryStorageAdapter.prototype.removeItem = function(key) {
-	var item = this.backingStore[key];
-	this.currentSize -= item.size;
-	
 	delete this.backingStore[key];
+	this.isDirtyForCachedSize = true;
 };
 
 MemoryStorageAdapter.prototype.clear = function(key) {
 	this.backingStore = {};
-    this.currentSize = 0;
+	this.cachedSize = 0;
+	this.isDirtyForCachedSize = false;
 };
 
 MemoryStorageAdapter.prototype.getExpired = function(resultCallback) {
@@ -71,12 +92,30 @@ MemoryStorageAdapter.prototype.getExpired = function(resultCallback) {
 
 // Internals
 
-MemoryStorageAdapter.prototype.calculateSize = function(value) {
-	// DCHASMAN TODO create an object graph traversal size algorithm
-	return value ? $A.util.json.encode(value).length : 0;
+MemoryStorageAdapter.prototype.sizeOfString = function(value) {
+	return value.length * this.CHARACTER_SIZE;
 };
 
+MemoryStorageAdapter.prototype.estimateSize = function(value) {
+	var bytes = 0;
+	var typeOfValue = typeof value;
+
+	if ('boolean' === typeOfValue) {
+		bytes = this.BOOLEAN_SIZE;
+	} else if ('string' === typeOfValue) {
+		bytes = this.sizeOfString(value);
+	} else if ('number' === typeOfValue) {
+		bytes = this.NUMBER_SIZE;
+	} else if ($A.util.isArray(value) || $A.util.isObject(value)) {
+		// recursive case
+		for (var i in value) {
+			bytes += this.sizeOfString(i);
+			bytes += 8; // an assumed existence overhead
+			bytes += this.estimateSize(value[i]);
+		}
+	}
+
+	return bytes;
+};
 
 $A.storageService.registerAdapter(MemoryStorageAdapter.NAME, MemoryStorageAdapter);
-
-

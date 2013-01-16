@@ -85,7 +85,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         assertException(integration, null, attributes, "", "", out);
         //No attributes. TODO: Should be okay?
         assertException(integration, simpleComponentTag, null, "", "", out);
-        //No PlaceholderId
+        //No locatorDomId
         assertException(integration, simpleComponentTag, attributes, "", null, out);
         //No stream to write output to
         assertException(integration, simpleComponentTag, attributes, "", "", null);

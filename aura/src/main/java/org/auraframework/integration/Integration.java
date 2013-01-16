@@ -50,12 +50,15 @@ public interface Integration {
 	 *            Specify the user provided locally unique id of this component
 	 *            that can be used with $A.getRoot().find(localId)
 	 * @param locatorDomId
+	 *            The DOM identifier for the element that will be used as the
+	 *            parent of the component's elements
 	 * @param out
 	 *            Destination for injection script content
 	 * @throws AuraRuntimeException
 	 * @throws IOException
 	 */
-	void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId, Appendable out) throws AuraRuntimeException, IOException;
+	void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId, Appendable out) throws AuraRuntimeException,
+			IOException;
 
 	@Deprecated
 	/**

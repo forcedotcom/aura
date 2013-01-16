@@ -418,6 +418,7 @@
                         <exclude>**/version.prop</exclude>
                         <exclude>aura-resources/src/main/resources/**/codemirror/**</exclude>
                         <exclude>aura-resources/src/main/resources/**/jiffy/**</exclude>
+                        <exclude>aura-resources/src/main/resources/**/smartstore/**</exclude>
                         <exclude>**/target/**</exclude>
                     </excludes>
                 </configuration>

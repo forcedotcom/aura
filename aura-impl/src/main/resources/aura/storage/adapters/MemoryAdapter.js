@@ -15,6 +15,8 @@
  */
 /*jslint sub: true */
 
+//#include aura.storage.adapters.SizeEstimator
+
 /**
  * @namespace The value Object used in the backing store of the MemoryStorageAdapter.
  * @constructor
@@ -47,18 +49,8 @@ var MemoryStorageAdapter = function MemoryStorageAdapter() {
 	this.backingStore = {};
 	this.cachedSize = 0;
 	this.isDirtyForCachedSize = false;
+	this.sizeEstimator = new SizeEstimator();
 };
-
-/*
- * Note on sizing.  The following values are taken from the ECMAScript specification, where available.
- * Other values are guessed.
- * 
- * Source: http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
- */
-MemoryStorageAdapter.prototype.CHARACTER_SIZE = 2;
-MemoryStorageAdapter.prototype.NUMBER_SIZE = 8;
-// note: this value is not defined by the spec.
-MemoryStorageAdapter.prototype.BOOLEAN_SIZE = 4;
 
 MemoryStorageAdapter.NAME = "memory";
 
@@ -76,7 +68,7 @@ MemoryStorageAdapter.prototype.getSize = function() {
 			if ($A.util.isUndefinedOrNull(itemSize)) {
 				// For the size calculation, consider only the inputs to the storage layer: key and value
 				// Ignore all the extras added by the Storage layer.
-				itemSize = this.sizeOfString(key) + this.estimateSize(backingStoreValue.getItem()["value"]);
+				itemSize = this.sizeEstimator.estimateSize(key) + this.sizeEstimator.estimateSize(backingStoreValue.getItem()["value"]);
 				backingStoreValue.setSize(itemSize);
 			}
 			newSize += itemSize;
@@ -127,31 +119,10 @@ MemoryStorageAdapter.prototype.getExpired = function(resultCallback) {
 	resultCallback(expired);
 };
 
-// Internals
-
-MemoryStorageAdapter.prototype.sizeOfString = function(value) {
-	return value.length * this.CHARACTER_SIZE;
+MemoryStorageAdapter.prototype.getSizeEstimator = function() {
+	return this.sizeEstimator;
 };
 
-MemoryStorageAdapter.prototype.estimateSize = function(value) {
-	var bytes = 0;
-
-	if ($A.util.isBoolean(value)) {
-		bytes = this.BOOLEAN_SIZE;
-	} else if ($A.util.isString(value)) {
-		bytes = this.sizeOfString(value);
-	} else if ($A.util.isNumber(value)) {
-		bytes = this.NUMBER_SIZE;
-	} else if ($A.util.isArray(value) || $A.util.isObject(value)) {
-		// recursive case
-		for (var i in value) {
-			bytes += this.sizeOfString(i);
-			bytes += 8; // an assumed existence overhead
-			bytes += this.estimateSize(value[i]);
-		}
-	}
-
-	return bytes;
-};
+//#include aura.storage.adapters.MemoryAdapter_export
 
 $A.storageService.registerAdapter(MemoryStorageAdapter.NAME, MemoryStorageAdapter);

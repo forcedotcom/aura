@@ -1,0 +1,2 @@
+<aura:component render="client" template="AuraStorageTest:smartStoreMockTemplate">
+</aura:component>

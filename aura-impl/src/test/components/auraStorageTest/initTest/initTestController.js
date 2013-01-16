@@ -12,7 +12,7 @@
 		var _testName = cmp._testName;
 		var actionName = "c.fetchDataRecord";
 		var param = {
-				testName: (!_testName?"fetchCounterValue":_testName)
+			testName: (!_testName?"fetchCounterValue":_testName)
 		};
 		var additionalProperties = function(a){
 			a.setStorable();
@@ -23,7 +23,7 @@
 		var _testName = cmp._testName;
 		var actionName = "c.fetchDataRecord";
 		var param = {
-				testName: (!_testName?"fetchCounterValue":_testName)
+			testName: (!_testName?"fetchCounterValue":_testName)
 		};
 		var additionalProperties = function(a){
 			a.setStorable({"ignoreExisting":false,"refresh":5});

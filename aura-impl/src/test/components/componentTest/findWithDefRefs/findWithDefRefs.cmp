@@ -1,0 +1,20 @@
+<aura:component render="client">
+    <aura:attribute name="singleElement" type="Aura.ComponentDefRef[]">
+        <ui:button label="Tiger" aura:id="tiger"/>
+    </aura:attribute>
+    
+    <aura:attribute name="dupElement" type="Aura.ComponentDefRef[]">
+        <ui:button label="Lion" aura:id="lion"/>
+        <ui:button label="Lioness" aura:id="lion"/>
+        <aura:text value="Cub" aura:id="lion"/>
+    </aura:attribute>
+    
+    <aura:if isTrue="{!true}" aura:id="singleElement" body="{!v.singleElement}"/>
+    
+    <aura:if isTrue="{!true}" aura:id="dupElement" body="{!v.dupElement}"/>
+    
+    
+    <ui:button label="Parrot" aura:id="parrot"/>
+    <ui:button label="Peacock" aura:id="peacock"/>
+    <aura:text value="Parakeet" aura:id="parrot"/>
+</aura:component>

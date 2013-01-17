@@ -72,7 +72,8 @@
                 </auradocs:contentsNode>
                 <auradocs:contentsNode text="Expression Results" id="expressionsResults"/>
                 <auradocs:contentsNode text="Expression Evaluation" id="expressionsEvaluation"/>
-                <auradocs:contentsNode text="Operator Reference" id="expressionsOperators"/>
+                <auradocs:contentsNode text="Expression Operators Reference" id="expressionsOperators"/>
+                <auradocs:contentsNode text="Expression Functions Reference" id="expressionsFunctions"/>
             </auradocs:contentsNode>
             <auradocs:contentsNode text="Events" >
                 <auradocs:contentsNode text="Introduction" id="helloEvents"/>

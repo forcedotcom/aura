@@ -18,7 +18,7 @@ package org.auraframework.integration;
 import java.io.IOException;
 import java.util.Map;
 
-import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.throwable.AuraRuntimeException;
 
 /**
  * An Integration defines the scope of creating a set of component injection
@@ -34,10 +34,10 @@ public interface Integration {
 	 * 
 	 * @param out
 	 *            Destination for injection script content
-	 * @throws QuickFixException
+	 * @throws AuraRuntimeException
 	 * @throws IOException
 	 */
-	void injectApplication(Appendable out) throws QuickFixException, IOException;
+	void injectApplication(Appendable out) throws AuraRuntimeException, IOException;
 
 	/**
 	 * Generate a <script> tag that will correctly embed an instance of an Aura
@@ -50,12 +50,15 @@ public interface Integration {
 	 *            Specify the user provided locally unique id of this component
 	 *            that can be used with $A.getRoot().find(localId)
 	 * @param locatorDomId
+	 *            The DOM identifier for the element that will be used as the
+	 *            parent of the component's elements
 	 * @param out
 	 *            Destination for injection script content
-	 * @throws QuickFixException
+	 * @throws AuraRuntimeException
 	 * @throws IOException
 	 */
-	void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId, Appendable out) throws QuickFixException, IOException;
+	void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId, Appendable out) throws AuraRuntimeException,
+			IOException;
 
 	@Deprecated
 	/**

@@ -16,7 +16,7 @@
 
 -->
 <aura:event type="COMPONENT" description="Add a component to integration service surrogate application.">
-    <aura:attribute name="config" type="Object" required="true" description="FIXME" />
-    <aura:attribute name="placeholderId" type="String" required="true" description="FIXME" />
-    <aura:attribute name="localId" type="String" required="true" description="FIXME" />
+    <aura:attribute name="config" type="Object" required="true" description="Component configuration object." />
+    <aura:attribute name="locatorDomId" type="String" required="true" description="The DOM identifier for the element that will be used as the parent of the component's elements." />
+    <aura:attribute name="localId" type="String" required="true" description="Specify the user provided locally unique id of this component that can be used with $A.getRoot().find(localId)." />
 </aura:event>

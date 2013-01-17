@@ -79,8 +79,7 @@ footer.THIS{
 
 /*tabset overrides */
 .THIS .uiTabset {
-/*	height: 100%; */ /* quick fix by ivan */
-  	height: 360px;  /* quick fix by ivan */
+	height: 100%;
 	width: 100%;
 }
 

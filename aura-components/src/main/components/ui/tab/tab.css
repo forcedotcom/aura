@@ -56,7 +56,7 @@
 	top:27px;
 	bottom:27px;
 	display: none;
-	overflow:hidden;
+	overflow:auto;
 }
 
 .THIS div.tabBody.scrolling {

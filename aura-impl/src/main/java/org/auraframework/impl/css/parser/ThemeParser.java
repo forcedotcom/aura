@@ -26,7 +26,7 @@ import org.auraframework.impl.css.theme.ThemeDefImpl;
 import org.auraframework.system.Client;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.ThemeParserException;
+import org.auraframework.throwable.quickfix.ThemeParserException;
 import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;

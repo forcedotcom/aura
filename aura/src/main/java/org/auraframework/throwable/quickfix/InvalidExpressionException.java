@@ -18,7 +18,6 @@
 package org.auraframework.throwable.quickfix;
 
 import org.auraframework.system.Location;
-import org.auraframework.throwable.AuraValidationException;
 
 /**
  * thrown when an invalid expression is detected

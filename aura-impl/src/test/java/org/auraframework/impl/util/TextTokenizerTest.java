@@ -28,7 +28,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
 import org.auraframework.impl.util.TextTokenizer.Token;
-import org.auraframework.throwable.AuraValidationException;
+import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 
 public class TextTokenizerTest extends AuraImplTestCase {

@@ -16,7 +16,7 @@
 /*	---- INVALID RULES BY PARSER ----
 	[1]
 	The css parser will complain saying:
-	aura.throwable.ThemeParserException: Issue(s) found by Parser:CSS selectors must include 
+	aura.throwable.quickfix.ThemeParserException: Issue(s) found by Parser:CSS selectors must include 
 	component class: "testTestThemeNamespaceTokenInvalidCSS" in testTestThemeNamespaceTokenIncalidCSS 
 	at line 46 column 1:
 	.FooClassName{ 
@@ -28,7 +28,7 @@
 	The css parser will fail to parse certain CSS it cannot interpret it correctly.
 	E.g. Invalid characters not allowed in .css files as part of valid css rules, properties.
 	The css parser will complain saying:
-	aura.throwable.ThemeParserException: Issue(s) found by Parser:Encountered " <BAD_TOKEN> "| "" 
+	aura.throwable.quickfix.ThemeParserException: Issue(s) found by Parser:Encountered " <BAD_TOKEN> "| "" 
 	at line 5, column 10.
 	Was expecting one of:
     ":" ...

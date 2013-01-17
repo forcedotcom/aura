@@ -34,7 +34,7 @@ import org.auraframework.impl.expression.parser.ExpressionLexer;
 import org.auraframework.impl.expression.parser.ExpressionParser;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.AuraValidationException;
+import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 
 /**

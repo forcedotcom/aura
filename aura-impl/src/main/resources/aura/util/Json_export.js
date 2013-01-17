@@ -16,5 +16,6 @@
 /*jslint sub: true */
 var p = Json.prototype;
 exp(p,
-    "encode", p.encode
+    "encode", p.encode,
+    "resolveRefs", p.resolveRefs
 );

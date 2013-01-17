@@ -44,37 +44,29 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class IntegrationImpl implements Integration {
-    public IntegrationImpl(String securityProviderDescr, String contextPath, Mode mode) {
-        this.securityProviderDescr = securityProviderDescr;
+    public IntegrationImpl(String contextPath, Mode mode) {
         this.contextPath = contextPath;
         this.mode = mode;
     }
 
     @Override
-    public void addPreload(String namespace) {
-
-        // DCHASMAN TODO Figure out how to collect up all of the preloads and
-        // handle them as a set
-
-        preloads.add(namespace);
-    }
-
-    @Override
-    public void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
-            Appendable out) throws QuickFixException, IOException {
-        DefDescriptor<ComponentDef> descriptor = Aura.getDefinitionService().getDefDescriptor(tag, ComponentDef.class);
-
+    public void injectApplication(Appendable out) throws AuraRuntimeException, IOException{
         if (!hasApplicationBeenWritten) {
             hasApplicationBeenWritten = true;
 
             writeApplication(out);
         }
+    }
+
+    @Override
+    public void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId, Appendable out) throws AuraRuntimeException,
+            IOException {
+        DefDescriptor<ComponentDef> descriptor = Aura.getDefinitionService().getDefDescriptor(tag, ComponentDef.class);
 
         AuraContext context = startContext("is");
         try {
             DefinitionService definitionService = Aura.getDefinitionService();
-            ControllerDef componentControllerDef = definitionService.getDefDescriptor("aura://ComponentController",
-                    ControllerDef.class).getDef();
+            ControllerDef componentControllerDef = definitionService.getDefDescriptor("aura://ComponentController", ControllerDef.class).getDef();
 
             Map<String, Object> paramValues = Maps.newHashMap();
             paramValues.put("name", descriptor.getQualifiedName());
@@ -98,7 +90,7 @@ public class IntegrationImpl implements Integration {
                         String name = eventDef.getAttributeName();
                         actionEventHandlers.put(name, (String) entry.getValue());
                     } else {
-                        throw new AuraRuntimeException(String.format("Unknown attribute or event %s:%s", tag, key));
+                        throw new AuraRuntimeException(String.format("Unknown attribute or event %s - %s", tag, key));
                     }
                 }
             }
@@ -129,9 +121,8 @@ public class IntegrationImpl implements Integration {
                 init.append(";\n");
             }
 
-            init.append(String
-                    .format("$A.getRoot().get(\"e.addComponent\").setParams({ config: config, placeholderId: \"%s\", localId: \"%s\" }).fire();\n",
-                            locatorDomId, localId));
+            init.append(String.format("$A.getRoot().get(\"e.addComponent\").setParams({ config: config, locatorDomId: \"%s\", localId: \"%s\" }).fire();\n",
+                    locatorDomId, localId));
 
             out.append("<script>").append(init).append("</script>");
 
@@ -142,11 +133,20 @@ public class IntegrationImpl implements Integration {
         }
     }
 
+    @Override
+    public void addPreload(String namespace) {
+
+        // DCHASMAN TODO Figure out how to collect up all of the preloads and
+        // handle them as a set
+
+        preloads.add(namespace);
+    }
+
     private AuraContext startContext(String num) {
         ContextService contextService = Aura.getContextService();
 
         AuraContext context = contextService.startContext(mode, Format.JSON, Access.AUTHENTICATED);
-        context.setApplicationDescriptor(getApplicationDescriptor(securityProviderDescr));
+        context.setApplicationDescriptor(getApplicationDescriptor());
 
         if (num != null) {
             context.setNum(num);
@@ -159,14 +159,13 @@ public class IntegrationImpl implements Integration {
         return context;
     }
 
-    private void writeApplication(Appendable out) throws IOException {
+    private void writeApplication(Appendable out) throws IOException, AuraRuntimeException {
         AuraContext context = startContext(null);
         try {
             context.setContextPath(contextPath);
 
-            ApplicationDef appDef = getApplicationDescriptor(securityProviderDescr).getDef();
-            Aura.getSerializationService().write(appDef, null,
-                    appDef.getDescriptor().getDefType().getPrimaryInterface(), out, "EMBEDDED_HTML");
+            ApplicationDef appDef = getApplicationDescriptor().getDef();
+            Aura.getSerializationService().write(appDef, null, appDef.getDescriptor().getDefType().getPrimaryInterface(), out, "EMBEDDED_HTML");
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
         } finally {
@@ -174,16 +173,13 @@ public class IntegrationImpl implements Integration {
         }
     }
 
-    private static DefDescriptor<ApplicationDef> getApplicationDescriptor(String securityProviderDescr) {
-        // DCHASMAN TODO W-1495914 Dynamically construct an extension of
-        // aura:integrationServiceApp that uses securityProviderDescr
+    private static DefDescriptor<ApplicationDef> getApplicationDescriptor() {
         DefinitionService definitionService = Aura.getDefinitionService();
         return definitionService.getDefDescriptor("aura:integrationServiceApp", ApplicationDef.class);
     }
 
     private final String contextPath;
     private final Mode mode;
-    private final String securityProviderDescr;
     private final Set<String> preloads = Sets.newHashSet();
     private boolean hasApplicationBeenWritten;
 }

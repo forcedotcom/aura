@@ -171,7 +171,7 @@ var AuraClientService = function(){
             priv.request(actions, scope, callback);
         },
 
-        injectComponent: function(rawConfig, placeholderId, localId) {
+        injectComponent: function(rawConfig, locatorDomId, localId) {
     		var config = $A.util.json.resolveRefs(rawConfig);
     		
     		// Save off any context global stuff like new labels
@@ -206,7 +206,7 @@ var AuraClientService = function(){
                 
                 root.getValue("v.body").push(c);
                 
-                var element = $A.util.getElement(placeholderId);
+                var element = $A.util.getElement(locatorDomId);
                 $A.render(c, element);
 
                 $A.afterRender(c);

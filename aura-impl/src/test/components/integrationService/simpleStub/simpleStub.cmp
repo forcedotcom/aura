@@ -1,0 +1,6 @@
+<aura:component render="Server" renderer="java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForTestingIntegrationService">
+    <aura:attribute name='placeholder' type='String' default='placeholder'/>
+    <aura:attribute name='localId' type='String' default='localId'/>
+    <aura:attribute name='desc' type='String' default="ui:button"/>
+    <aura:attribute name='attrMap' type='Map' default="{}"/>
+</aura:component>

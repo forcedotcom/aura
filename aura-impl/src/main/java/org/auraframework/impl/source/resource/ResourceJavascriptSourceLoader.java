@@ -39,6 +39,7 @@ public class ResourceJavascriptSourceLoader extends ResourceSourceLoader {
         extensions.put(DefType.TESTSUITE, "Test.js");
         extensions.put(DefType.PROVIDER, "Provider.js");
         extensions.put(DefType.HELPER, "Helper.js");
+        extensions.put(DefType.MODEL, "Model.js");
     }
 
     public ResourceJavascriptSourceLoader(String basePackage) {

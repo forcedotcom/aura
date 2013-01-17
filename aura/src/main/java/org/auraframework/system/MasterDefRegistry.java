@@ -122,11 +122,14 @@ public interface MasterDefRegistry {
     /**
      * Get the UID associated with a descriptor.
      * 
-     * This call must be made before any of the other UID based functions. If
+     * This call must be made before any of the other UID based functions.
+     * Failing to do so will give incorrect results (null).
      * 
      * @param uid the old uid (or null if none).
      * @param descriptor the top level descriptor for which we need the UID.
      * @return Either the uid passed in, or if that was null, the correct UID
+     * @throws ClientOutOfSyncException if the UID is not null, and was a mismatch
+     * @throws QuickFixException if the definition cannot be compiled.
      */
     <T extends Definition> String getUid(String uid, DefDescriptor<T> descriptor) throws ClientOutOfSyncException,
             QuickFixException;
@@ -134,7 +137,7 @@ public interface MasterDefRegistry {
     /**
      * Get the last mod time for set of descriptors.
      * 
-     * @param uid the UID for the definition (must have called {@link getUid}).
+     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
      * @param descriptor the descriptor.
      */
     <T extends Definition> long getLastMod(String uid);
@@ -142,7 +145,7 @@ public interface MasterDefRegistry {
     /**
      * Get the dependencies for a descriptor.
      * 
-     * @param uid the UID for the definition (must have called {@link getUid}).
+     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
      * @param descriptor the descriptor.
      */
     <T extends Definition> Set<DefDescriptor<?>> getDependencies(String uid);
@@ -150,7 +153,7 @@ public interface MasterDefRegistry {
     /**
      * Get a named string from the cache for a def.
      * 
-     * @param uid the UID for the definition (must have called {@link getUid}).
+     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
      * @param descriptor the descriptor.
      * @param key the key.
      */
@@ -159,7 +162,7 @@ public interface MasterDefRegistry {
     /**
      * Put a named string in the cache for a def.
      * 
-     * @param uid the UID for the definition (must have called {@link getUid}).
+     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
      * @param descriptor the descriptor.
      * @param key the key (must be unique).
      * @param key the value to store.

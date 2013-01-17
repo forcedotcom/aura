@@ -41,12 +41,14 @@ public class FileJavascriptSourceLoader extends FileSourceLoader {
         extensions.put(DefType.TESTSUITE, "Test.js");
         extensions.put(DefType.PROVIDER, "Provider.js");
         extensions.put(DefType.HELPER, "Helper.js");
+        extensions.put(DefType.MODEL, "Model.js");
 
         filters.put(DefType.CONTROLLER, new SourceFileFilter(DefType.CONTROLLER));
         filters.put(DefType.RENDERER, new SourceFileFilter(DefType.RENDERER));
         filters.put(DefType.TESTSUITE, new SourceFileFilter(DefType.TESTSUITE));
         filters.put(DefType.PROVIDER, new SourceFileFilter(DefType.PROVIDER));
         filters.put(DefType.HELPER, new SourceFileFilter(DefType.HELPER));
+        filters.put(DefType.MODEL, new SourceFileFilter(DefType.MODEL));
     }
 
     public FileJavascriptSourceLoader(File base) {

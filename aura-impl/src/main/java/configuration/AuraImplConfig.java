@@ -52,6 +52,7 @@ import org.auraframework.impl.adapter.format.html.ComponentHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.TestSuiteDefHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.ThrowableHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.embedded.ApplicationDefEmbeddedHTMLFormatAdapter;
+import org.auraframework.impl.adapter.format.html.offline.ApplicationDefOfflineHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.js.ComponentDefJSFormatAdapter;
 import org.auraframework.impl.adapter.format.js.ThrowableJSFormatAdapter;
 import org.auraframework.impl.adapter.format.json.ActionJSONFormatAdapter;
@@ -111,6 +112,11 @@ public class AuraImplConfig {
     @Impl
     public static FormatAdapter<?> applicationDefEmbeddedHTMLFormatAdapter() {
         return new ApplicationDefEmbeddedHTMLFormatAdapter();
+    }
+
+    @Impl
+    public static FormatAdapter<?> applicationDefOfflineHTMLFormatAdapter() {
+        return new ApplicationDefOfflineHTMLFormatAdapter();
     }
 
     @Impl

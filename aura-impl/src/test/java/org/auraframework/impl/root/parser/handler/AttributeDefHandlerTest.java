@@ -107,7 +107,8 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
         XMLStreamReader xmlReader = null;
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlReader = xmlInputFactory.createXMLStreamReader(attributeSource.getSystemId(), attributeSource.getHashingReader());
+        xmlReader = xmlInputFactory.createXMLStreamReader(attributeSource.getSystemId(),
+                attributeSource.getHashingReader());
         xmlReader.next();
         return xmlReader;
     }

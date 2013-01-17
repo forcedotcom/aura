@@ -1,0 +1,215 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+<aura:set attribute="title" value="Expression Functions Reference"/>
+
+<p>The following functions are available in the Aura expression language. The Corresponding Operator column lists equivalent operators, if any. All functions are case-sensitive.</p>
+
+<h2>Math Functions</h2>
+<p>The math functions perform math operations on numbers. They take numerical arguments.</p> 
+<table class="table table-bordered table-striped">
+<thead>
+    <tr>
+        <th>Function</th>
+        <th>Alternative</th>
+        <th>Usage</th>
+        <th>Description</th>
+        <th>Corresponding Operator</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td><code>add</code></td>
+        <td><code>concat</code></td>
+        <td><code>add(1,2)</code></td>
+        <td>Adds the first argument to the second.</td>
+        <td><code>+</code></td>
+    </tr>
+    <tr>
+        <td><code>sub</code></td>
+        <td><code>subtract</code></td>
+        <td><code>sub(10,2)</code></td>
+        <td>Subtracts the second argument from the first.</td>
+        <td><code>-</code></td>
+    </tr> 
+    <tr>
+        <td><code>mult</code></td>
+        <td><code>multiply</code></td>
+        <td><code>mult(2,10)</code></td>
+        <td>Multiplies the first argument by the second.</td>
+        <td><code>*</code></td>
+    </tr>    
+    <tr>
+        <td><code>div</code></td>
+        <td><code>divide</code></td>
+        <td><code>div(4,2)</code></td>
+        <td>Divides the first argument by the second.</td>
+        <td><code>/</code></td>
+    </tr>      
+    <tr>
+        <td><code>mod</code></td>
+        <td><code>modulus</code></td>
+        <td><code>mod(5,2)</code></td>
+        <td>Returns the integer remainder resulting from dividing the first argument by the second.</td>
+        <td><code>%</code></td>
+    </tr>   
+    <tr>
+        <td><code>abs</code></td>
+        <td></td>
+        <td><code>abs(-5)</code></td>
+        <td>Returns the absolute value of the argument: the same number if the argument is positive, and the number without its negative sign if the number is negative. For example, <code>abs(-5) is 5</code>.</td>
+        <td>None</td>
+    </tr>        
+    <tr>
+        <td><code>neg</code></td>
+        <td><code>negate</code></td>
+        <td><code>neg(100)</code></td>
+        <td>Reverses the sign of the argument. For example, <code>neg(100) is -100</code>.</td>
+        <td><code>-</code> (unary)</td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>String Functions</h2>
+<table class="table table-bordered table-striped">
+<thead>
+    <tr>
+        <th>Function</th>
+        <th>Alternative</th>
+        <th>Usage</th>
+        <th>Description</th>
+        <th>Corresponding Operator</th>
+    </tr>
+</thead>
+<tbody>
+   <tr>
+        <td><code>concat</code></td>
+        <td><code>add</code></td>        
+        <td><code>concat('Hello ', 'world')</code><br/>
+            <code>add('Walk ', 'the dog')</code></td>
+        <td>Concatenates the two arguments.</td>
+        <td><code>+</code></td>
+    </tr>
+</tbody>
+</table>
+
+<h2>Comparison Functions</h2>
+<p>Comparison functions take two number arguments and return <code>true</code> or <code>false</code> depending on the comparison result. The <code>eq</code> and <code>ne</code> functions can also take other data types for their arguments, such as strings.</p> 
+<table class="table table-bordered table-striped">
+<thead>
+    <tr>
+        <th>Function</th>       
+        <th>Usage</th>
+        <th>Description</th>
+        <th>Corresponding Operator</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>        
+        <td><code>equals</code></td>
+        <td><code>equals(1,1)</code></td>
+        <td>Returns <code>true</code> if the specified arguments are equal. The arguments can be any data type.</td>
+        <td><code>==</code> or <code>eq</code></td>
+    </tr>        
+    <tr>        
+        <td><code>notequals</code></td>
+        <td><code>notequals(1,2)</code></td>
+        <td>Returns <code>true</code> if the specified arguments are not equal. The arguments can be any data type.</td>
+        <td><code>!=</code> or <code>ne</code></td>
+    </tr>   
+    <tr>        
+        <td><code>lessthan</code></td>
+        <td><code>lessthan(1,5)</code></td>
+        <td>Returns <code>true</code> if the first argument is numerically less than the second argument.</td>
+        <td><code>&lt;</code> or <code>lt</code></td>
+    </tr>
+    <tr>        
+        <td><code>greaterthan</code></td>
+        <td><code>greaterthan(5,1)</code></td>
+        <td>Returns <code>true</code> if the first argument is numerically greater than the second argument.</td>
+        <td><code>&gt;</code> or <code>gt</code></td>
+    </tr>
+    <tr>        
+        <td><code>lessthanorequal</code></td>
+        <td><code>lessthanorequal(1,2)</code></td>
+        <td>Returns <code>true</code> if the first argument is numerically less than or equal to the second argument.</td>
+        <td><code>&lt;=</code> or <code>le</code></td>
+    </tr>
+    <tr>        
+        <td><code>greaterthanorequal</code></td>
+        <td><code>greaterthanorequal(2,1)</code></td>
+        <td>Returns <code>true</code> if the first argument is numerically greather than or equal to the second argument.</td>
+        <td><code>&gt;=</code> or <code>ge</code></td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>Boolean Functions</h2>
+<p>Boolean functions operate on Boolean arguments. They are equivalent to logical operators.</p>
+<table class="table table-bordered table-striped">
+<thead>
+    <tr>
+        <th>Function</th>
+        <th>Usage</th>
+        <th>Description</th>
+        <th>Corresponding Operator</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td><code>and</code></td>
+        <td><code>and(isEnabled, hasPermission)</code></td>
+        <td>Returns <code>true</code> if both arguments are true.</td>
+        <td><code>&amp;&amp;</code></td>
+    </tr>
+    <tr>
+        <td><code>or</code></td>
+        <td><code>or(hasPermission, hasVIPPass)</code></td>
+        <td>Returns <code>true</code> if either one of the arguments is true.</td>
+        <td><code>||</code></td>
+    </tr> 
+    <tr>
+        <td><code>not</code></td>
+        <td><code>not(isNew)</code></td>
+        <td>Returns <code>true</code> if the argument is false.</td>
+        <td><code>!</code></td>
+    </tr>       
+</tbody>
+</table>
+
+<h2>Conditional Function</h2>
+<table class="table table-bordered table-striped">
+<thead>
+    <tr>
+        <th>Function</th>
+        <th>Usage</th>
+        <th>Description</th>
+        <th>Corresponding Operator</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td><code>if</code></td>
+        <td><code>if(isEnabled, 'Enabled', 'Not enabled')</code></td>
+        <td>Evaluates the first argument as a boolean. If true, returns the second argument. Otherwise, returns the third argument.</td>
+        <td><code>?:</code> (ternary)</td>
+    </tr>      
+</tbody>
+</table>
+
+</aura:component>

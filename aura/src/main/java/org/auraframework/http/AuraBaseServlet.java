@@ -435,6 +435,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
         return null;
     }
 
+    // This routine is about to die!
     public static long getLastMod() {
         DefinitionService definitionService = Aura.getDefinitionService();
         AuraContext context = Aura.getContextService().getCurrentContext();
@@ -458,7 +459,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
                     appLastMod = definitionService.getLastMod(uid);
                     lastModMap.put(app.getQualifiedName(), Long.valueOf(appLastMod));
                 } catch (QuickFixException qfe) {
-                    // ignore.
+                    // ignore. the QFE will get thrown elsewhere.
                 }
             }
         }

@@ -28,11 +28,11 @@ function MapValue(config, def, component){
     this.owner = component;
     var k;
     // attributes can come through here but have no way of knowing the member keys
-    // models have getMemberNames
-    if (def && def.getMemberNames) {
-        var allkeys = def.getMemberNames();
-        for (var i = 0; i < allkeys.length; i++) {
-            k = allkeys[i];
+    // models have getMembers
+    if (def && def.getMembers) {
+        var allMembers = def.getMembers();
+        for (var i = 0; i < allMembers.length; i++) {
+            k = allMembers[i].getName();
             this.add(k, config);
         }
     } else {

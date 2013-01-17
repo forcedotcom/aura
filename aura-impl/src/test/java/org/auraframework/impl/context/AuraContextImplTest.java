@@ -51,7 +51,6 @@ public class AuraContextImplTest extends AuraImplTestCase {
      * to be pre-loaded. Be sure to consider what namespaces you are specifying
      * for pre-loading.
      * 
-     * @throws Exception
      * @userStory a07B0000000EYU4
      */
     public void testPreloadConfigurations() throws Exception {
@@ -98,53 +97,37 @@ public class AuraContextImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify trying to set Preloading flag in context to TRUE.
-     * AuraContext.preloading indicates whether components defs are currently
-     * being preloaded. If the flag is true, all defs must be serialized in full
-     * form. If the flag is false, all defs which are part of preload namespace
-     * are serialized partially.
+     * Verify we are able to check what DefDescriptors have been preloaded.
      */
-    public void testClearPreloadsBySetPreloadingToTrue() throws Exception {
+    public void testIsPreloaded() throws Exception {
         AuraContext lc = Aura.getContextService().getCurrentContext();
         lc.clearPreloads();
-        Set<String> preloadNamespace = lc.getPreloads();
-        assertEquals("Setting preloading to true should clear the context of all preload namespaces.", 0,
-                preloadNamespace.size());
+        lc.addPreload("auratest");
+
+        // Check in preloaded namesapce
+        DefDescriptor<ComponentDef> dd = vendor.makeComponentDefDescriptor("auratest:text");
+        assertTrue("Descriptor in preloaded namespace not found", lc.isPreloaded(dd));
+
+        // Check in namespace that is not preloaded
+        dd = vendor.makeComponentDefDescriptor("aura:text");
+        assertTrue("Descriptor in namespace *not* preloaded found", !lc.isPreloaded(dd));
+
+        // Check after preloads cleared
+        lc.clearPreloads();
+        dd = vendor.makeComponentDefDescriptor("auratest:text");
+        assertTrue("Descriptor found after preloads cleared", !lc.isPreloaded(dd));
     }
 
     /**
-     * Verify trying to set Preloading flag in context to false.
-     * 
-     * @throws Exception
+     * Verify clearing current preloads in AuraContext AuraContext.preloading
+     * indicates whether components defs are currently being preloaded.
      */
-    public void testUnclearPreloadsBySetPreloadingToFalse() throws Exception {
+    public void testClearPreloads() throws Exception {
         AuraContext lc = Aura.getContextService().getCurrentContext();
+        lc.clearPreloads();
         Set<String> preloadNamespace = lc.getPreloads();
-        // Verify that 'ui' and 'Aura' are always specified as standard preload
-        // namespaces
-        // don't verify anything else as more preloads could be injected through
-        // adapters
-        assertTrue(preloadNamespace.size() >= 2);
-
-        // At this point Context already has 2 namespaces preloaded, setting it
-        // further to true should have no effect
-        lc.setPreloading(false);
-        preloadNamespace = lc.getPreloads();
-        assertTrue(preloadNamespace.size() >= 2);
-        assertTrue("UI namespace not specified as standard preload namespace", preloadNamespace.contains("ui"));
-        assertTrue("aura namespace not specified as standard preload namespace", preloadNamespace.contains("aura"));
-
-        lc.setPreloading(true);
-        assertTrue(preloadNamespace.size() >= 2);
-        assertTrue("UI namespace not specified as standard preload namespace", preloadNamespace.contains("ui"));
-        assertTrue("aura namespace not specified as standard preload namespace", preloadNamespace.contains("aura"));
-
-        lc.setPreloading(false);
-        preloadNamespace = lc.getPreloads();
-        assertTrue("Context did not recover preload namespace information.", preloadNamespace.size() >= 2);
-        assertTrue("Context did not recover preload namespace information.", preloadNamespace.contains("ui"));
-        assertTrue("Context did not recover preload namespace information.", preloadNamespace.contains("aura"));
-
+        assertEquals("Calling clearPreloads() should clear the context of all preload namespaces.", 0,
+                preloadNamespace.size());
     }
 
     /**

@@ -139,6 +139,7 @@ public enum HtmlTag {
     wbr;
 
     private final boolean allowed;
+    public static final String HTML_TAG = "aura:html";
 
     private HtmlTag(boolean allowed) {
         this.allowed = allowed;
@@ -150,6 +151,9 @@ public enum HtmlTag {
 
     public static final boolean allowed(String tag) {
         try {
+            if (tag.equals(HTML_TAG)) {
+                return true;
+            }
             HtmlTag ret = valueOf(tag.toLowerCase());
             return ret.isAllowed();
         } catch (Throwable e) {

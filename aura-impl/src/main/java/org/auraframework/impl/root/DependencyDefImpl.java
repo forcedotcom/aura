@@ -110,6 +110,11 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
         // We do not serialize.
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(this.dependency);
+    }
+
     public static class Builder extends DefinitionImpl.BuilderImpl<DependencyDef> implements DependencyDefBuilder {
 
         public Builder() {

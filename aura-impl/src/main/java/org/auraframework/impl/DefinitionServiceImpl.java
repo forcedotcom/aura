@@ -226,7 +226,10 @@ public class DefinitionServiceImpl implements DefinitionService {
     }
 
     /**
-     * Get the last mod for a set of descriptorss.
+     * Get the def registry currently in use.
+     *
+     * @return the master def registry.
+     * @throws RuntimeException if the context has not been initialized.
      */
     @Override
     public MasterDefRegistry getDefRegistry() {

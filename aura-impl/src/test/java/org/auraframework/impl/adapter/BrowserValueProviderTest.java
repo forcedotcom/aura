@@ -50,16 +50,23 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
         super(name);
     }
 
-    private interface BrowserProperty{
-        final PropertyReference isTablet = new PropertyReferenceImpl(BrowserValueProvider.IS_TABLET, null);
-        final PropertyReference isPhone = new PropertyReferenceImpl(BrowserValueProvider.IS_PHONE, null);
-        final PropertyReference isAndroid = new PropertyReferenceImpl(BrowserValueProvider.IS_ANDROID, null);
-        final PropertyReference formFactor = new PropertyReferenceImpl(BrowserValueProvider.FORM_FACTOR, null);
-        final PropertyReference isIPad = new PropertyReferenceImpl(BrowserValueProvider.IS_IPAD, null);
-        final PropertyReference isIPhone = new PropertyReferenceImpl(BrowserValueProvider.IS_IPHONE, null);
-        final PropertyReference isIOS = new PropertyReferenceImpl(BrowserValueProvider.IS_IOS, null);
+    private interface BrowserProperty {
+        final PropertyReference isTablet = new PropertyReferenceImpl(
+                BrowserValueProvider.IS_TABLET, null);
+        final PropertyReference isPhone = new PropertyReferenceImpl(
+                BrowserValueProvider.IS_PHONE, null);
+        final PropertyReference isAndroid = new PropertyReferenceImpl(
+                BrowserValueProvider.IS_ANDROID, null);
+        final PropertyReference formFactor = new PropertyReferenceImpl(
+                BrowserValueProvider.FORM_FACTOR, null);
+        final PropertyReference isIPad = new PropertyReferenceImpl(
+                BrowserValueProvider.IS_IPAD, null);
+        final PropertyReference isIPhone = new PropertyReferenceImpl(
+                BrowserValueProvider.IS_IPHONE, null);
+        final PropertyReference isIOS = new PropertyReferenceImpl(
+                BrowserValueProvider.IS_IOS, null);
     }
-    
+
     public void testValidate() throws Exception {
         BrowserValueProvider bvp = new BrowserValueProvider();
         bvp.validate(BrowserProperty.isTablet);
@@ -75,71 +82,120 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
             bvp.validate(property);
             fail("Expected InvalidExpressionException for " + property);
         } catch (InvalidExpressionException e) {
-            assertEquals("No property on $Browser for key: " + property, e.getMessage());
+            assertEquals("No property on $Browser for key: " + property,
+                    e.getMessage());
         }
 
         try {
             bvp.validate(null);
             fail("Expected NullPointerException for null PropertyReference");
-        } catch (NullPointerException expected) {}
+        } catch (NullPointerException expected) {
+        }
     }
-    
-    // semi-integration test checks that value provider is created and validated on component
+
+    // semi-integration test checks that value provider is created and validated
+    // on component
     public void testInvalidPropertyInMarkup() throws Exception {
-        Aura.getContextService().startContext(Mode.UTEST, Format.HTML, Access.AUTHENTICATED);
-        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class,
-                "<aura:component>{!$Browser.badProperty}</aura:component>");
+        AuraContext context = Aura.getContextService().startContext(Mode.UTEST,
+                Format.HTML, Access.AUTHENTICATED);
+
+        if (context == null) {
+            fail("Unable to set context");
+        }
+
         try {
+            DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(
+                    ComponentDef.class,
+                    "<aura:component>{!$Browser.badProperty}</aura:component>");
+
             Aura.getInstanceService().getInstance(desc, null);
             fail("Expected an InvalidExpressionException");
         } catch (InvalidExpressionException e) {
-            assertEquals("No property on $Browser for key: badProperty", e.getMessage());
+            assertEquals("No property on $Browser for key: badProperty",
+                    e.getMessage());
+        } finally {
+            Aura.getContextService().endContext();
         }
     }
-    
-    private void assertBrowserProperty(BrowserValueProvider bvp, PropertyReference property, Object expected) throws Exception {
-        assertEquals("Unexpected value for " + property.toString(), expected, bvp.getValue(property));
+
+    private void assertBrowserProperty(BrowserValueProvider bvp,
+            PropertyReference property, Object expected) throws Exception {
+        assertEquals("Unexpected value for " + property.toString(), expected,
+                bvp.getValue(property));
     }
-    
-    private void assertBrowserProperties(UserAgent userAgent, boolean isTablet, boolean isPhone, boolean isAndroid,
-            String formFactor, boolean isIPad, boolean isIPhone, boolean isIOS) throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.UTEST, Format.HTML, Access.AUTHENTICATED);
-        context.setClient(new Client(userAgent == null ? null : userAgent.getUserAgentString()));
-        BrowserValueProvider bvp = new BrowserValueProvider();
-        assertBrowserProperty(bvp, BrowserProperty.isTablet, isTablet);
-        assertBrowserProperty(bvp, BrowserProperty.isPhone, isPhone);
-        assertBrowserProperty(bvp, BrowserProperty.isAndroid, isAndroid);
-        assertBrowserProperty(bvp, BrowserProperty.formFactor, formFactor);
-        assertBrowserProperty(bvp, BrowserProperty.isIPad, isIPad);
-        assertBrowserProperty(bvp, BrowserProperty.isIPhone, isIPhone);
-        assertBrowserProperty(bvp, BrowserProperty.isIOS, isIOS);
+
+    private void assertBrowserProperties(UserAgent userAgent, boolean isTablet,
+            boolean isPhone, boolean isAndroid, String formFactor,
+            boolean isIPad, boolean isIPhone, boolean isIOS) throws Exception {
+        AuraContext context = Aura.getContextService().startContext(Mode.UTEST,
+                Format.HTML, Access.AUTHENTICATED);
+
+        if (context == null) {
+            fail("Unable to set context");
+        }
+
+        try {
+            context.setClient(new Client(userAgent == null ? null : userAgent
+                    .getUserAgentString()));
+            BrowserValueProvider bvp = new BrowserValueProvider();
+            assertBrowserProperty(bvp, BrowserProperty.isTablet, isTablet);
+            assertBrowserProperty(bvp, BrowserProperty.isPhone, isPhone);
+            assertBrowserProperty(bvp, BrowserProperty.isAndroid, isAndroid);
+            assertBrowserProperty(bvp, BrowserProperty.formFactor, formFactor);
+            assertBrowserProperty(bvp, BrowserProperty.isIPad, isIPad);
+            assertBrowserProperty(bvp, BrowserProperty.isIPhone, isIPhone);
+            assertBrowserProperty(bvp, BrowserProperty.isIOS, isIOS);
+        } finally {
+            Aura.getContextService().endContext();
+        }
     }
 
     // sample some user agents
     public void testGetValue() throws Exception {
-        assertBrowserProperties(null, false, false, false, "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.EMPTY, false, false, false, "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.GOOGLE_CHROME, false, false, false, "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.IE7, false, false, false, "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.IE8, false, false, false, "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.IE9, false, false, false, "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.IE10, false, false, false, "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.FIREFOX, false, false, false, "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.SAFARI5_MAC, false, false, false, "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.OPERA12, false, false, false, "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.OPERA12_MOBILE, false, true, true, "PHONE", false, false, false);
-        assertBrowserProperties(UserAgent.IPHONE4, false, true, false, "PHONE", false, true, true);
-        assertBrowserProperties(UserAgent.IPOD, false, true, false, "PHONE", false, true, true);
-        assertBrowserProperties(UserAgent.IPAD, true, false, false, "TABLET", true, false, true);
-        assertBrowserProperties(UserAgent.ANDROID1_6, false, true, true, "PHONE", false, false, false);
-        assertBrowserProperties(UserAgent.ANDROID2_3, false, true, true, "PHONE", false, false, false);
-        assertBrowserProperties(UserAgent.KINDLE_FIRE, false, false, false, "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.PLAYBOOK, false, false, false, "DESKTOP", false, false, false);
-        assertBrowserProperties(UserAgent.NOKIA_N95, false, false, false, "DESKTOP", false, false, false);
+        assertBrowserProperties(null, false, false, false, "DESKTOP", false,
+                false, false);
+        assertBrowserProperties(UserAgent.EMPTY, false, false, false,
+                "DESKTOP", false, false, false);
+        assertBrowserProperties(UserAgent.GOOGLE_CHROME, false, false, false,
+                "DESKTOP", false, false, false);
+        assertBrowserProperties(UserAgent.IE7, false, false, false, "DESKTOP",
+                false, false, false);
+        assertBrowserProperties(UserAgent.IE8, false, false, false, "DESKTOP",
+                false, false, false);
+        assertBrowserProperties(UserAgent.IE9, false, false, false, "DESKTOP",
+                false, false, false);
+        assertBrowserProperties(UserAgent.IE10, false, false, false, "DESKTOP",
+                false, false, false);
+        assertBrowserProperties(UserAgent.FIREFOX, false, false, false,
+                "DESKTOP", false, false, false);
+        assertBrowserProperties(UserAgent.SAFARI5_MAC, false, false, false,
+                "DESKTOP", false, false, false);
+        assertBrowserProperties(UserAgent.OPERA12, false, false, false,
+                "DESKTOP", false, false, false);
+        assertBrowserProperties(UserAgent.OPERA12_MOBILE, false, true, true,
+                "PHONE", false, false, false);
+        assertBrowserProperties(UserAgent.IPHONE4, false, true, false, "PHONE",
+                false, true, true);
+        assertBrowserProperties(UserAgent.IPOD, false, true, false, "PHONE",
+                false, true, true);
+        assertBrowserProperties(UserAgent.IPAD, true, false, false, "TABLET",
+                true, false, true);
+        assertBrowserProperties(UserAgent.ANDROID1_6, false, true, true,
+                "PHONE", false, false, false);
+        assertBrowserProperties(UserAgent.ANDROID2_3, false, true, true,
+                "PHONE", false, false, false);
+        assertBrowserProperties(UserAgent.KINDLE_FIRE, false, false, false,
+                "DESKTOP", false, false, false);
+        assertBrowserProperties(UserAgent.PLAYBOOK, false, false, false,
+                "DESKTOP", false, false, false);
+        assertBrowserProperties(UserAgent.NOKIA_N95, false, false, false,
+                "DESKTOP", false, false, false);
     }
-    
+
     public void testGetValueUndefinedProperty() throws Exception {
         BrowserValueProvider bvp = new BrowserValueProvider();
-        assertEquals(null, bvp.getValue(new PropertyReferenceImpl("isBlackberry", null)));  // undefined property
+        assertEquals(null,
+                bvp.getValue(new PropertyReferenceImpl("isBlackberry", null))); // undefined
+                                                                                // property
     }
 }

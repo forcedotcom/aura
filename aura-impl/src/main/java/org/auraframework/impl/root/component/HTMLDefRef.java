@@ -25,6 +25,7 @@ import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.HtmlTag;
 import org.auraframework.def.optimizer.DefBuilderOptimizer;
 import org.auraframework.expression.Expression;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -57,7 +58,9 @@ public class HTMLDefRef extends ComponentDefRefImpl {
 
         @Override
         public Builder setTag(String tag) {
-            setComponentAttribute("tag", tag);
+            if (!tag.equalsIgnoreCase(HtmlTag.HTML_TAG)) {
+                setComponentAttribute("tag", tag);
+            }
             return this;
         }
 
@@ -78,8 +81,10 @@ public class HTMLDefRef extends ComponentDefRefImpl {
             // Automatically push system attributes up to the component
             // attributes.
             //
-            if ("aura".equals(key.getNamespace())) {
+            if ("aura".equalsIgnoreCase(key.getNamespace())) {
                 super.setAttribute(key, value);
+            } else if ("tag".equalsIgnoreCase(key.getName())) {
+                setComponentAttribute(key.getName(), value.getValue());
             } else {
                 //
                 // FIXME: we should warn about non-null namespaces.

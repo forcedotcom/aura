@@ -34,39 +34,34 @@
 </thead>
 <tbody>
     <tr>
-        <td>+</td>
-        <td>1 + 1</td>
+        <td><code>+</code></td>
+        <td><code>1 + 1</code></td>
         <td>Add two numbers.</td>
     </tr>
     <tr>
-        <td>-</td>
-        <td>2 - 1</td>
+        <td><code>-</code></td>
+        <td><code>2 - 1</code></td>
         <td>Subtract one number from the other.</td>
     </tr>
     <tr>
-        <td>*</td>
-        <td>2 * 2</td>
+        <td><code>*</code></td>
+        <td><code>2 * 2</code></td>
         <td>Multiply two numbers.</td>
     </tr>
     <tr>
-        <td>/</td>
-        <td>4 / 2</td>
+        <td><code>/</code></td>
+        <td><code>4 / 2</code></td>
         <td>Divide one number by the other.</td>
     </tr>
     <tr>
-        <td>%</td>
-        <td>5 % 2</td>
+        <td><code>%</code></td>
+        <td><code>5 % 2</code></td>
         <td>Return the integer remainder of dividing the first number by the second.</td>
-    </tr>
+    </tr>    
     <tr>
-        <td>abs()</td>
-        <td>abs(m.sales - m.expenses)</td>
-        <td>Written as a function, rather than an operator. Returns the absolute value of a number.</td>
-    </tr>
-    <tr>
-        <td>-</td>
-        <td>-m.expenses</td>
-        <td>Unary operator. Reverses the sign of the succeeding number. For example if the value of expenses is 100, then -expenses is -100.</td>
+        <td><code>-</code></td>
+        <td><code>-m.exp</code></td>
+        <td>Unary operator. Reverses the sign of the succeeding number. For example if the value of <code>expenses</code> is <code>100</code>, then <code>-expenses</code> is <code>-100</code>.</td>
     </tr>
 </tbody>
 </table>
@@ -84,18 +79,18 @@
 <tbody>
     <tr>
         <td>Integer</td>
-        <td>2</td>
+        <td><code>2</code></td>
         <td>Integers are numbers without a decimal point or exponent.</td>
     </tr>
     <tr>
         <td>Float</td>
-        <td>3.14<br/>
-            -1.1e10</td>
+        <td><code>3.14</code><br/>
+            <code>-1.1e10</code></td>
         <td>Numbers with a decimal point, or numbers with an exponent.</td>
     </tr>
     <tr>
         <td>Null</td>
-        <td>null</td>
+        <td><code>null</code></td>
         <td>A literal null number. Matches the explicit null value <em>and</em> numbers with an undefined value.</td>
     </tr>
 </tbody>
@@ -115,8 +110,8 @@
 </thead>
 <tbody>
     <tr>
-        <td>+</td>
-        <td>'Title: ' + m.note.title</td>
+        <td><code>+</code></td>
+        <td><code>'Title: ' + m.note.title</code></td>
         <td>Concatenates two strings together.</td>
     </tr>
 </tbody>
@@ -124,7 +119,7 @@
 
 <h2>String Literals</h2>
 
-<p>String literals must be enclosed in single quotation marks 'like this'.</p>
+<p>String literals must be enclosed in single quotation marks <code>'like this'</code>.</p>
 
 <table class="table table-bordered table-striped">
 <thead>
@@ -137,35 +132,35 @@
 <tbody>
     <tr>
         <td>string</td>
-        <td>'hello world'</td>
+        <td><code>'hello&nbsp;world'</code></td>
         <td>Literal strings must be enclosed in single quotation marks. Double quotation marks are reserved for enclosing Aura attributes, and must be escaped in strings.</td>
     </tr>
     <tr>
         <td>\&lt;escape&gt;</td>
-        <td>'\n'</td>
+        <td><code>'\n'</code></td>
         <td>Whitespace characters:
         <ul>
-            <li>\t (tab)</li>
-            <li>\n (newline)</li>
-            <li>\r (carriage return)</li>
+            <li><code>\t</code> (tab)</li>
+            <li><code>\n</code> (newline)</li>
+            <li><code>\r</code> (carriage return)</li>
         </ul>
 
         <p>Escaped characters:</p>
         <ul>
-            <li>\" (literal ")</li>
-            <li>\' (literal ')</li>
-            <li>\\ (literal \)</li>
+            <li><code>\"</code> (literal ")</li>
+            <li><code>\'</code> (literal ')</li>
+            <li><code>\\</code> (literal \)</li>
         </ul>
         </td>
     </tr>
     <tr>
         <td>Unicode</td>
-        <td>'\u####'</td>
+        <td><code>'\u####'</code></td>
         <td>A Unicode code point. The # symbols are hexadecimal digits. A Unicode literal requires four digits.</td>
     </tr>
     <tr>
         <td>null</td>
-        <td>null</td>
+        <td><code>null</code></td>
         <td>A literal null string. Matches the explicit null value and strings with an undefined value.</td>
     </tr>
 </tbody>
@@ -187,57 +182,59 @@ For comparison purposes, numbers are treated as the same type (internally, all n
 </thead>
 <tbody>
     <tr>
-        <td>==</td>
-        <td>eq</td>
-        <td>1 == 1<br/>
-            1 == 1.0<br/>
-            1 eq 1</td>
-        <td>True if the operands are equal. This comparison is valid for all data types.</td>
+        <td><code>==</code></td>
+        <td><code>eq</code></td>
+        <td><code>1 == 1</code><br/>
+            <code>1 == 1.0</code><br/>
+            <code>1 eq 1</code></td>
+        <td>Returns <code>true</code> if the operands are equal. This comparison is valid for all data types.</td>
     </tr>
     <tr>
-        <td>!=</td>
-        <td>ne</td>
-        <td>1 != 2<br/>
-            1 != true<br/>
-            1 != '1'<br/>
-            null != false<br/>
-            1 ne 2</td>
-        <td>True if the operands are not equal. This comparison is valid for all data types.</td>
+        <td><code>!=</code></td>
+        <td><code>ne</code></td>
+        <td><code>1 != 2</code><br/>
+            <code>1 != true</code><br/>
+            <code>1 != '1'</code><br/>
+            <code>null != false</code><br/>
+            <code>1 ne 2</code></td>
+        <td>Returns <code>true</code> if the operands are not equal. This comparison is valid for all data types.</td>
     </tr>
     <tr>
-        <td>&lt;</td>
-        <td>lt</td>
-        <td>1 &lt; 2<br/>
-            1 lt 2</td>
-        <td>True if the first operand is numerically less than the second.</td>
+        <td><code>&lt;</code></td>
+        <td><code>lt</code></td>
+        <td><code>1 &lt; 2</code><br/>
+            <code>1 lt 2</code></td>
+        <td>Returns <code>true</code> if the first operand is numerically less than the second. You must escape the <code>&lt;</code> operator to <code>&#38;lt;</code> to use it in Aura markup. 
+        Alternatively, you can use the <code>lt</code> operator.</td>
     </tr>
     <tr>
-        <td>&gt;</td>
-        <td>gt</td>
-        <td>42 &gt; 2<br/>
-            42 gt 2</td>
-        <td>True if the first operand is numerically greater than the second.</td>
+        <td><code>&gt;</code></td>
+        <td><code>gt</code></td>
+        <td><code>42 &gt; 2</code><br/>
+            <code>42 gt 2</code></td>
+        <td>Returns <code>true</code> if the first operand is numerically greater than the second.</td>
     </tr>
     <tr>
-        <td>&lt;=</td>
-        <td>le</td>
-        <td>2 &lt;= 42<br/>
-            2 lt 42</td>
-        <td>True if the first operand is numerically less than or equal to the second.</td>
+        <td><code>&lt;=</code></td>
+        <td><code>le</code></td>
+        <td><code>2 &lt;= 42</code><br/>
+            <code>2 le 42</code></td>
+        <td>Returns <code>true</code> if the first operand is numerically less than or equal to the second. You must escape the <code>&lt;=</code> operator to <code>&#38;lt;=</code> to use it in Aura markup. 
+        Alternatively, you can use the <code>le</code> operator.</td>
     </tr>
     <tr>
-        <td>&gt;=</td>
-        <td>ge</td>
-        <td>42 &gt;= 42<br/>
-            42 ge 42</td>
-        <td>True if the first operand is numerically greater than or equal to the second.</td>
+        <td><code>&gt;=</code></td>
+        <td><code>ge</code></td>
+        <td><code>42 &gt;= 42</code><br/>
+            <code>42 ge 42</code></td>
+        <td>Returns <code>true</code> if the first operand is numerically greater than or equal to the second.</td>
     </tr>
 </tbody>
 </table>
 
 <h2>Logical Operators</h2>
 
-<p>Expressions based on logical operators result in a true or false value.</p>
+<p>Expressions based on logical operators result in a <code>true</code> or <code>false</code> value.</p>
 
 <table class="table table-bordered table-striped">
 <thead>
@@ -249,27 +246,31 @@ For comparison purposes, numbers are treated as the same type (internally, all n
 </thead>
 <tbody>
     <tr>
-        <td>&amp;&amp;</td>
-        <td>isEnabled &amp;&amp; hasPermission</td>
-        <td>True if both operands are individually true.</td>
+        <td><code>&amp;&amp;</code></td>
+        <td><code>isEnabled &amp;&amp; hasPermission</code></td>
+        <td>Returns <code>true</code> if both operands are individually true. You must escape the <code>&amp;&amp;</code> operator to <code>&#38;amp;&#38;amp;</code> to use it in Aura markup. 
+        Alternatively, you can use the <code>and()</code> function and pass it two arguments. For example, <code>and(isEnabled, hasPermission)</code>. 
+        </td>
     </tr>
     <tr>
-        <td>||</td>
-        <td>hasPermission || isRequired</td>
-        <td>True if either operand is individually true.</td>
+        <td><code>||</code></td>
+        <td><code>hasPermission || isRequired</code></td>
+        <td>Returns <code>true</code> if either operand is individually true.</td>
     </tr>
     <tr>
-        <td>!</td>
-        <td>!isRequired</td>
-        <td>Unary operator. True if the operand is false.</td>
+        <td><code>!</code></td>
+        <td><code>!isRequired</code></td>
+        <td>Unary operator. Returns <code>true</code> if the operand is false. This operator should not be confused with the <code>!</code> delimiter used to start an expression in <code>{!</code>. 
+        You can combine the expression delimiter with this negation operator to return the logical negation of a value, for example, <code><aura:text value="{!"/>!true}</code> returns <code>false</code>. </td>
     </tr>
 </tbody>
 </table>
-<auradocs:info>You must escape the &amp;&amp; operator to &#38;amp;&#38;amp; to use it in Aura markup. Alternatively, you can use the and() function and pass it the values to perform the operation on. For example, and(isEnabled, hasPermission). The and() function is case-sensitive and must be lowercase.</auradocs:info>
+<auradocs:info></auradocs:info>
 
 <h2>Logical Literals</h2>
 
-<p>Logical values are never equivalent to non-logical values. That is, only true == true, and only false == false; 1 != true, and 0 != false, and null != false.</p>
+<p>Logical values are never equivalent to non-logical values. That is, only <code>true == true</code>, and only <code>false == false</code>; <code>1 != true</code>, 
+and <code>0 != false</code>, and <code>null != false</code>.</p>
 
 <table class="table table-bordered table-striped">
 <thead>
@@ -282,13 +283,13 @@ For comparison purposes, numbers are treated as the same type (internally, all n
 <tbody>
     <tr>
         <td>true</td>
-        <td>true</td>
-        <td>A boolean true value.</td>
+        <td><code>true</code></td>
+        <td>A boolean <code>true</code> value.</td>
     </tr>
     <tr>
         <td>false</td>
-        <td>false</td>
-        <td>A boolean false value.</td>
+        <td><code>false</code></td>
+        <td>A boolean <code>false</code> value.</td>
     </tr>
 </tbody>
 </table>
@@ -307,11 +308,14 @@ For comparison purposes, numbers are treated as the same type (internally, all n
 </thead>
 <tbody>
     <tr>
-        <td>? :</td>
-        <td>(1 != 2) ? "Obviously" : "Black is White"</td>
-        <td>The operand before the ? operator is evaluated as a boolean. If true, the second operand is returned. If false, the third operand is returned.</td>
+        <td><code>? :</code></td>
+        <td><code>(1 != 2) ? "Obviously" : "Black is White"</code></td>
+        <td>The operand before the <code>?</code> operator is evaluated as a boolean. If true, the second operand is returned. If false, the third operand is returned.</td>
     </tr>
 </tbody>
 </table>
 
+ <p><b>See also:</b><br/>    
+    <auradocs:topicLink topic="expressionsFunctions">Expression Functions Reference</auradocs:topicLink>    
+ </p>
 </aura:component>

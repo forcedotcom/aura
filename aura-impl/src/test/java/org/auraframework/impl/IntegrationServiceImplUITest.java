@@ -202,7 +202,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
 		openIntegrationStub(customStubCmp, cmpToInject, null, "fooBared");
 
-		assertTrue("IntegrationService failed to diplay error message when no locatorDomId was specified",
+		assertTrue("IntegrationService failed to display error message when no locatorDomId was specified",
 				isElementPresent(By.xpath("//span[contains(@title,'Invalid locatorDomId specified - no element found in the DOM with id=fooBared')]")));
 	}
 
@@ -225,14 +225,14 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 	 * Verify that exceptions that happen during component instance creation are
 	 * surfaced on the page.
 	 */
-	@Ignore("W-1498388")
 	public void testExceptionDuringComponentInitialization() throws Exception {
 		DefDescriptor<ComponentDef> cmpWithReqAttr = addSourceAutoCleanup(ComponentDef.class,
 				String.format(AuraImplTestCase.baseComponentTag, "", "<aura:attribute name='reqAttr' required='true' type='String'/>"));
 		Map<String, Object> attributes = Maps.newHashMap();
 		openIntegrationStub(cmpWithReqAttr, attributes);
-		// TODO: Update test to see that error message was displayed in error
-		// div
+		
+		assertTrue("IntegrationService failed to display error message",
+				isElementPresent(By.xpath("//span[contains(@title,\"is missing required attribute 'reqAttr'\")]")));
 	}
 
 	/**

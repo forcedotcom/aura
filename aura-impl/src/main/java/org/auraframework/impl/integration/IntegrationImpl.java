@@ -59,12 +59,11 @@ public class IntegrationImpl implements Integration {
 	}
 
 	@Override
-	public void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId, Appendable out) throws AuraRuntimeException,
-			IOException {
-		DefDescriptor<ComponentDef> descriptor = Aura.getDefinitionService().getDefDescriptor(tag, ComponentDef.class);
-
+	public void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId, Appendable out) throws IOException,
+			QuickFixException {
 		AuraContext context = startContext("is");
 		try {
+			DefDescriptor<ComponentDef> descriptor = Aura.getDefinitionService().getDefDescriptor(tag, ComponentDef.class);
 			DefinitionService definitionService = Aura.getDefinitionService();
 			ControllerDef componentControllerDef = definitionService.getDefDescriptor("aura://ComponentController", ControllerDef.class).getDef();
 
@@ -85,7 +84,8 @@ public class IntegrationImpl implements Integration {
 				} else {
 					RegisterEventDef eventDef = componentDef.getRegisterEventDefs().get(key);
 					if (eventDef != null) {
-						// Emit component.addHandler() wired to special global
+						// Emit component.addHandler() wired to special
+						// global
 						// scope value provider
 						String name = eventDef.getAttributeName();
 						actionEventHandlers.put(name, (String) entry.getValue());
@@ -109,37 +109,42 @@ public class IntegrationImpl implements Integration {
 
 			Message<?> message = new Message<ComponentDef>(Lists.newArrayList(action), null, null);
 
-			StringBuilder init = new StringBuilder();
+			try {
+				StringBuilder init = new StringBuilder();
 
-			init.append("var config = ");
-			Aura.getSerializationService().write(message, null, Message.class, init);
-			init.append(";\n");
-
-			if (!actionEventHandlers.isEmpty()) {
-				init.append("config.actionEventHandlers = ");
-				Json.serialize(actionEventHandlers, init);
+				init.append("var config = ");
+				Aura.getSerializationService().write(message, null, Message.class, init);
 				init.append(";\n");
+
+				if (!actionEventHandlers.isEmpty()) {
+					init.append("config.actionEventHandlers = ");
+					Json.serialize(actionEventHandlers, init);
+					init.append(";\n");
+				}
+
+				init.append(String.format(
+						"$A.getRoot().get(\"e.addComponent\").setParams({ config: config, locatorDomId: \"%s\", localId: \"%s\" }).fire();\n", locatorDomId,
+						localId));
+
+				out.append("<script>").append(init).append("</script>");
+			} catch (Throwable t) {
+				// DCHASMAN TODO W-1498425 Refine this approach - we currently
+				// have 2
+				// conflicting exception handling mechanisms kicking in that
+				// need to be reconciled
+				out.append("<script>").append("$A.log('failed to create component: " + t.toString() + "')").append("</script>");
 			}
-
-			init.append(String.format("$A.getRoot().get(\"e.addComponent\").setParams({ config: config, locatorDomId: \"%s\", localId: \"%s\" }).fire();\n",
-					locatorDomId, localId));
-
-			out.append("<script>").append(init).append("</script>");
-
-		} catch (QuickFixException x) {
-			throw new AuraRuntimeException(x);
 		} finally {
 			Aura.getContextService().endContext();
 		}
 	}
 
 	@Override
+	@Deprecated
 	public void addPreload(String namespace) {
-
-		// DCHASMAN TODO Figure out how to collect up all of the preloads and
-		// handle them as a set
-
-		preloads.add(namespace);
+		if (namespace != null && !namespace.isEmpty()) {
+			preloads.add(namespace);
+		}
 	}
 
 	private AuraContext startContext(String num) {
@@ -155,7 +160,7 @@ public class IntegrationImpl implements Integration {
 
 		// Always include ui: because we need ui:message etc for error handling
 		context.addPreload("ui");
-		
+
 		for (String preload : preloads) {
 			context.addPreload(preload);
 		}

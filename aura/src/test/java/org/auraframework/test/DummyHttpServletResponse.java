@@ -123,6 +123,13 @@ public class DummyHttpServletResponse implements HttpServletResponse {
         // no-op
     }
 
+    /**
+     * An addition to fetch a cookie for validation.
+     */
+    public Cookie getCookie(String name) {
+        return null;
+    }
+
     @Override
     public boolean containsHeader(String name) {
         return false;

@@ -15,11 +15,16 @@
  */
 package org.auraframework.http;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraTestCase;
 import org.auraframework.test.DummyHttpServletRequest;
 import org.auraframework.test.DummyHttpServletResponse;
@@ -44,10 +49,10 @@ public class AuraResourceServletTest extends AuraTestCase {
 
     public void testWriteManifestNoAccessError() throws Exception {
         // Start a context to fetch manifests; the other details don't matter
-        // much 'cause
-        // we'll error out. Then try to fetch one, with that error:
+        // much 'cause we'll error out. Then try to fetch one, with that error:
         Aura.getContextService().startContext(AuraContext.Mode.UTEST, AuraContext.Format.MANIFEST,
                 AuraContext.Access.PUBLIC);
+
         HttpServletRequest request = new DummyHttpServletRequest() {
             @Override
             // This is the method that's going to cause the simulated failure.
@@ -74,5 +79,41 @@ public class AuraResourceServletTest extends AuraTestCase {
         AuraResourceServlet servlet = new AuraResourceServlet();
         servlet.doGet(request, response);
         assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
+    }
+
+    public void testAddAppManifestCookie() throws Exception {
+        Aura.getContextService().startContext(AuraContext.Mode.UTEST, AuraContext.Format.MANIFEST,
+                AuraContext.Access.PUBLIC);
+
+        long now = System.currentTimeMillis();
+        DefDescriptor<ApplicationDef> nopreload = DefDescriptorImpl.getInstance("appCache:nopreload",
+                ApplicationDef.class);
+        Aura.getContextService().getCurrentContext().setApplicationDescriptor(nopreload);
+
+        DummyHttpServletResponse response = new DummyHttpServletResponse() {
+
+            Cookie cookie;
+
+            @Override
+            public void addCookie(Cookie cookie) {
+                this.cookie = cookie;
+            }
+
+            @Override
+            public Cookie getCookie(String name) {
+                return cookie != null && cookie.getName().equals(name) ? cookie : null;
+            }
+        };
+        AuraResourceServlet.addManifestCookie(response);
+        String expectedName = Mode.UTEST + "_" + nopreload.getNamespace() + "_" + nopreload.getName() + "_lm";
+        Cookie cookie = response.getCookie(expectedName);
+        assertEquals(expectedName, cookie.getName());
+        assertEquals(AuraBaseServlet.SHORT_EXPIRE_SECONDS, cookie.getMaxAge());
+        assertTrue(cookie.getValue().contains(":"));
+        String uid = cookie.getValue().substring(0, cookie.getValue().indexOf(':'));
+        assertNotNull(uid);
+        assertTrue(uid.length() > 20);
+        long time = Long.parseLong(cookie.getValue().substring(uid.length() + 1));
+        assertTrue("Lastmod is later than test start", time < now);
     }
 }

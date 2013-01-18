@@ -352,23 +352,28 @@ public abstract class AuraBaseServlet extends HttpServlet {
         return null;
     }
 
-    public static void addManifestCookie(HttpServletResponse response, String value, long expiry) {
+    /**
+     * Sets the manifest cookie on response to either to uid:time, in the common
+     * case with a valid uid, or just to time if uid is {@code null}.
+     * */
+    public static void addManifestCookie(HttpServletResponse response, String time, String uid, long expiry) {
         String cookieName = getManifestCookieName();
         if (cookieName != null) {
+            String value = (uid == null) ? time : String.format("%s:%s", uid, time);
             addCookie(response, cookieName, value, expiry);
         }
     }
 
     public static void addManifestCookie(HttpServletResponse response, long expiry) {
         try {
-            addManifestCookie(response, Long.toString(getManifestLastMod()), expiry);
+            addManifestCookie(response, Long.toString(getManifestLastMod()), getContextAppUid(), expiry);
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
         }
     }
 
     public static void addManifestErrorCookie(HttpServletResponse response) {
-        addManifestCookie(response, MANIFEST_ERROR, SHORT_EXPIRE_SECONDS);
+        addManifestCookie(response, MANIFEST_ERROR, null, SHORT_EXPIRE_SECONDS);
     }
 
     public static void addManifestCookie(HttpServletResponse response) {
@@ -376,7 +381,20 @@ public abstract class AuraBaseServlet extends HttpServlet {
     }
 
     public static void deleteManifestCookie(HttpServletResponse response) {
-        addManifestCookie(response, "", 0);
+        addManifestCookie(response, "", null, 0);
+    }
+
+    public static String getRequestUid(HttpServletRequest request) {
+        Cookie cookie = getManifestCookie(request);
+        if (cookie == null) {
+            return null;
+        }
+        String value = cookie.getValue();
+        int position = value.indexOf(':');
+        if (position < 0) {
+            return null; // Old-style format, timestamp or ERROR
+        }
+        return value.substring(0, position);
     }
 
     public static Cookie getManifestCookie(HttpServletRequest request) {

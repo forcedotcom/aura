@@ -21,8 +21,5 @@
 [isPhone={!$Browser.isPhone}]
 [isAndroid={!$Browser.isAndroid}]
 [formFactor={!$Browser.formFactor}]
-[isIPad={!$Browser.isIPad}]
-[isIPhone={!$Browser.isIPhone}]
-[isIOS={!$Browser.isIOS}]
 </pre>
 </aura:component>

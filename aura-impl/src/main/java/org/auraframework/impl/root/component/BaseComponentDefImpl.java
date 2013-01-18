@@ -381,7 +381,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
      * ComponentDef's children to the provided set. The set may then be used to
      * analyze freshness of all of those types to see if any of them should be
      * recompiled from source.
-     * 
+     *
      * @param dependencies A Set that this method will append RootDescriptors to
      *            for every RootDef that this ComponentDef requires
      * @throws QuickFixException
@@ -442,7 +442,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
 
     /**
      * This is used to validate by the compiler to validate EventDefRefs.
-     * 
+     *
      * @return all the events this component can fire, including those inherited
      * @throws QuickFixException
      */
@@ -1032,8 +1032,18 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends R
         }
         //
         // FIXME: OMG W-1501702 really?!?!?!
-        // We desperately need to make this go away. It is heinousness incarnate, but the entirety of
-        // server side rendering is blocking this.
+        //
+        // We desperately need to make this go away. It is heinousness
+        // incarnate, but the entirety of server side rendering is blocking this.
+        //
+        // Currently, the server side throws an UnsupportedOperationException,
+        // so the themes (which is one part that currently breaks) never get
+        // rendered.
+        //
+        // also see W-922563
+        //
+        // This will probably stay here til we fix server side rendering (or at
+        // least the theme part). Also, we need to allow dual renderers.
         //
         if (this.getDescriptor().getQualifiedName().equals("markup://aura:placeholder")) {
             return true;

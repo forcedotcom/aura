@@ -393,9 +393,7 @@ Aura.prototype.initPriv = function AuraInitPriv(config, token, context, containe
                 $A.initialized = true;
             }
 
-            if(!cmp["isSelfFinishing"]){
-                $A.finishInit();
-            }
+            $A.finishInit();
         }, container ? $A.util.getElement(container) : null);
     }
 };

@@ -15,13 +15,17 @@
  */
 /*jslint sub: true */
 /**
- * @class The Aura Rendering Service.  Renders components.
+ * @class The Aura Rendering Service, accessible using $A.renderingService.  Renders components. 
+ * The default behaviors can be customized in a client-side controller.
  * @constructor
  */
 var AuraRenderingService = function AuraRenderingService(){
     //#include aura.AuraRenderingService_private
 
     var renderingService = {
+    		/**
+    		 * @private
+    		 */
         rerenderDirty : function(){
             if (priv.needsCleaning) {
                 $A.mark("RenderingService.rerenderDirty");
@@ -57,7 +61,16 @@ var AuraRenderingService = function AuraRenderingService(){
             }
         },
 
-
+        /**
+         * The default renderer for components. 
+         * Call superRender() from your customized function to create the DOM nodes.
+         * @param {Component} component
+         * 				The component to be rendered
+         * @param {Component} parent
+         * 				The component's parent
+         * @memberOf AuraRenderingService
+         * @public
+         */
         render: function AuraRenderingService$Render(component, parent) {
             if (component._arrayValueRef) {
                 component = component._arrayValueRef;
@@ -92,6 +105,13 @@ var AuraRenderingService = function AuraRenderingService(){
             return ret;
         },
 
+        /**
+         * The default behavior after a component is rendered.
+         * @param {Component} component
+         * 				The component that has finished rendering
+         * @memberOf AuraRenderingService
+         * @public
+         */
         afterRender: function(component){
             var array = priv.getArray(component);
             for(var i=0;i<array.length;i++){
@@ -104,6 +124,18 @@ var AuraRenderingService = function AuraRenderingService(){
 
         },
 
+        /**
+         * The default rerenderer for components affected by an event.
+         * Call superRerender() from your customized function to chain the rerendering to the components in the body attribute.
+         * @param {Component} component
+         * 				The component to be rerendered
+         * @param {Component} referenceNode
+         * 				The reference node for the component
+         * @param {Component} appendChild
+         * 				The child component
+         * @memberOf AuraRenderingService
+         * @public
+         */
         rerender: function(component, referenceNode, appendChild) {
             if (component._arrayValueRef) {
                 component = component._arrayValueRef;
@@ -123,6 +155,14 @@ var AuraRenderingService = function AuraRenderingService(){
             }
         },
 
+        /**
+         * The default unrenderer that deletes all the DOM nodes rendered by a component's render() function.
+         * Call superUnrender() from your customized function to modify the default behavior.
+         * @param {Component} component
+         * 				The component to be unrendered
+         * @memberOf AuraRenderingService
+         * @public
+         */
         unrender: function(component){
             if (!component){
                 return;

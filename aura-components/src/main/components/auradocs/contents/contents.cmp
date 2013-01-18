@@ -101,6 +101,7 @@
 
         <auradocs:contentsNode text="Code" >
             <auradocs:contentsNode text="Overview" id="code"/>
+            <auradocs:contentsNode text="Services" id="services"/>
             <auradocs:contentsNode text="JavaScript" >
                 <auradocs:contentsNode text="Introduction" id="codeJavaScriptIntro"/>
                 <auradocs:contentsNode text="Accessing the DOM" id="domAccess"/>
@@ -112,7 +113,6 @@
                 <auradocs:contentsNode text="Component Tests" >
                     <auradocs:contentsNode text="Introduction" id="docTests" />
                     <auradocs:contentsNode text="Assertions" id="testsAssert" />
-                    <auradocs:contentsNode text="User Interactions" id="testsUser" />
                     <auradocs:contentsNode text="Utility Functions" id="testsUtility" />
                     <auradocs:contentsNode text="Sample Test Cases" id="testsCases" />
                 </auradocs:contentsNode>
@@ -123,6 +123,7 @@
                 </auradocs:contentsNode>
                 <auradocs:contentsNode text="JavaScript Cookbook" >
                     <auradocs:contentsNode text="Introduction" id="jsCookbook" />
+                    <auradocs:contentsNode text="Dynamically Creating Components" id="dynamicCmp" />
                     <auradocs:contentsNode text="Finding Components by ID" id="findById" />
                     <auradocs:contentsNode text="Dynamically Showing or Hiding Markup" id="hideMarkup" />
                 </auradocs:contentsNode>

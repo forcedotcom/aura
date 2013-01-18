@@ -20,7 +20,7 @@ var Test = function(){
     //#include aura.test.Test_private
 
     /**
-     * Utility functions for component testing
+     * Utility functions for component testing, accessible using $A.test.
      * @constructor
      */
     var Test = {

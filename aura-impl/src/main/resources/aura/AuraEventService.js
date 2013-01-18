@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Aura Event Service.  Creates and Manages Events.
+ * @namespace The Aura Event Service, accessible using $A.services.event.  Creates and Manages Events.
  * @constructor
  */
 var AuraEventService = function(){
@@ -23,6 +23,14 @@ var AuraEventService = function(){
 
     var eventService = {
 
+		/**
+	     * Create a new event. Set the event parameters using Event.setParams() and fire it using Event.fire().
+	     * @param {String} name The event object in the format namespace:component
+	     * @description Example:
+	     * $A.eventService.newEvent("app:navError")
+	     * @memberOf AuraEventService
+	     * @public
+	     */
         newEvent : function(name){
             aura.assert(name, "name");
 
@@ -41,10 +49,22 @@ var AuraEventService = function(){
 
         },
 
+        /**
+         * Return the new event.
+         * @param {String} name The event object in the format namespace:component
+         * @memberOf AuraEventService
+         * @public
+         */
         getValue : function(name){
             return $A.services.event.newEvent(name);
         },
 
+        /**
+         * Add an event handler.
+         * @param {Object} config The data for the event handler
+         * @memberOf AuraEventService
+         * @public
+         */
         addHandler : function(config){
             config["event"] = priv.qualifyEventName(config["event"]);
 
@@ -61,6 +81,12 @@ var AuraEventService = function(){
             cmpHandlers.push(config["handler"]);
         },
 
+        /**
+         * Remove an event handler.
+         * @param {Object} config The data for the event
+         * @memberOf AuraEventService
+         * @public
+         */
         removeHandler : function(config){
             config["event"] = priv.qualifyEventName(config["event"]);
 
@@ -70,14 +96,31 @@ var AuraEventService = function(){
             }
         },
 
+        /**
+         * Push an action to the action queue.
+         * @param {Action} action The action to enqueue
+         * @memberOf AuraEventService
+         * @public
+         */
         enqueueAction : function(action){
             priv.actionQueue.push(action);
         },
 
+        /**
+         * Push an event to the event stack.
+         * @param {Event} event The event to start firing
+         * @memberOf AuraEventService
+         * @public
+         */
         startFiring : function(event){
             priv.eventStack.push(event);
         },
 
+        /**
+         * Clears the action queue.
+         * @memberOf AuraEventService
+         * @public
+         */
         finishFiring : function(){
             priv.eventStack.pop();
             if (priv.eventStack.length === 0){
@@ -85,10 +128,22 @@ var AuraEventService = function(){
             }
         },
 
+        /**
+         * Return the event definition (EventDef).
+         * @param {Object} config The parameters for the event
+         * @memberOf AuraEventService
+         * @public
+         */
         getEventDef : function(config){
             return priv.registry.getEventDef(config);
         },
 
+        /**
+         * Return true if the event has handlers.
+         * @param {String} name The event name
+         * @memberOf AuraEventService
+         * @public
+         */
         hasHandlers : function(name) {
             name = priv.qualifyEventName(name);
 
@@ -98,6 +153,8 @@ var AuraEventService = function(){
         ,
         /**
          * Return the qualified name of all events known to the registry.
+         * @memberOf AuraEventService
+         * @public
          */
         getRegisteredEvents : function(){
             var ret = "";

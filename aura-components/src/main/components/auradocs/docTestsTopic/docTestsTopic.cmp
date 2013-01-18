@@ -36,7 +36,7 @@
     </p>
 
     <auradocs:info>You can view Aura's test methods in the <a href="#reference?topic=api:Test">JavaScript API reference</a>.
-    <p>You may also want to use <auradocs:topicLink topic="testAssert">assertions</auradocs:topicLink>, <auradocs:topicLink topic="testsUser">user interactions</auradocs:topicLink>, and <auradocs:topicLink topic="testsUtility">utility functions</auradocs:topicLink> available to you for unit testing.</p>
+    <p>You may also want to use <auradocs:topicLink topic="testAssert">assertions</auradocs:topicLink> and <auradocs:topicLink topic="testsUtility">utility functions</auradocs:topicLink> available to you for unit testing.</p>
    </auradocs:info>
 
     <h2>The Test Environment</h2>
@@ -58,6 +58,10 @@
     <h3>Writing Asserts</h3>
     <p>Include unique and specific error messages in your assert statements. For example, use <code>assertTrue(run, "Returns true if the action has run successfully.")</code>
     instead of a generic message. Making each assert message unique also helps in narrowing down which assert statement has failed. </p>
+    
+     <h3>Simulating User Interactions</h3>
+    <p>To simulate user interactions, fire the associated aura event. For example, use <code>buttonComponent.get("e.press").fire()</code> to simulate a button click event.</p>
+    
     <p><b>See also:</b><br/>
         <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink><br/>
         <auradocs:topicLink topic="queryLang">Querying State and Statistics</auradocs:topicLink>

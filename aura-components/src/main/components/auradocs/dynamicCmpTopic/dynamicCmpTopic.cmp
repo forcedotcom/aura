@@ -1,0 +1,73 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Dynamically Creating a Component"/>
+
+    <h2>Goal</h2>
+    <p>You want to create a component dynamically from your client-side controller or helper. </p>
+
+    <h2>Code</h2>
+    <p>This sample code adds a component to a <code>div</code> element.</p>
+    <auradocs:codeblock>
+    var a = cmp.get("c.doSomething");
+    a.setParams({
+      //Set the parameters here
+    });
+
+    //Set the action callback and create a new component as part of an action on the server.
+    a.setCallback(cmp, function(action) {
+    var child = $A.services.component.newComponent(action.getReturnValue());
+    var div = cmp.find("div");
+    var body = div.getValue("v.body");
+
+   //Replace the existing component
+    body.destroy();
+    body.setValue(child);
+    })
+    </auradocs:codeblock>
+
+    <p>The following code sets the configuration attributes for the new component.</p>
+    <auradocs:codeblock>
+   var msgConfig = {
+         componentDef: {
+               descriptor: "markup://namespace:name"
+         },
+         attributes: {
+               values: {
+                    severity: 'info',
+                    strength: 1,
+                    }
+          }
+    },
+
+    var message = $A.services.component.newComponent(msgConfig);
+    </auradocs:codeblock>
+
+    <h2>Discussion</h2>
+    <p>In the first sample, <code>action.getReturnValue()</code> returns a component with its definition and attributes. The existing component is then destroyed and replaced by the new component in the body.
+    Since body is an <code>ArrayValue</code>, you can also insert new components using <code>push()</code>. In the second sample, the configuration attributes are set on the client.</p>
+    <p>The <code>newComponent()</code> method enables you to create components on the server or on the client. Aura doesn't make a call to the server if you provide the configuration attributes.
+    If the component you are dynamically creating requires a server call such as to a model or provider, <code>newComponent()</code> returns an <code>aura:placeholder</code> component.
+    The server then returns the component to the client and replaces the placeholder.</p>
+    <auradocs:info><code>newLocalComponent()</code> is deprecated and has been replaced by <code>newComponent()</code>. See the <a href="#reference?topic=api:AuraComponentService">JavaScript API reference</a> for a full list of methods.</auradocs:info>
+
+    <p><b>See also:</b><br/>
+      <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
+      <auradocs:topicLink topic="valueObjects">Value Objects</auradocs:topicLink>
+      </p>
+    </aura:component>

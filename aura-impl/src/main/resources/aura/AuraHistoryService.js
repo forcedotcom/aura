@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Aura History Service.  Manages Browser History
+ * @namespace The Aura History Service, accessible using $A.services.history.  Manages Browser History.
  * @constructor
  */
 var AuraHistoryService = function(){
@@ -23,24 +23,58 @@ var AuraHistoryService = function(){
     //#include aura.AuraHistoryService_private
 
     var historyService = {
+		/**
+	     * Set the new location.
+	     * @param {Object} token Append the token to a hash symbol
+	     * @memberOf AuraHistoryService
+	     * @public
+	     */
         set : function(token){
             location.hash = '#' + token;
         },
+        
+        /**
+         * Parse the location.
+         * @memberOf AuraHistoryService
+         * @public
+         */
         get : function(){
             return priv.parseLocation(location.hash);
         },
+        
+        /**
+         * Loads the previous URL in the history list. Standard JavaScript history.go() method.
+         * @memberOf AuraHistoryService
+         * @public
+         */
         back : function(){
             //history -> Standard javascript object
             history.go(-1);
         },
+        
+        /**
+         * Set the title of the document.
+         * @param {String} title The new title
+         * @memberOf AuraHistoryService
+         * @public
+         */
         setTitle : function(title){
               document.title = title;
         },
+        
+        /**
+         * Loads the next URL in the history list. Standard JavaScript history.go() method.
+         * @memberOf AuraHistoryService
+         * @public
+         */
         forward : function(){
             //history -> Standard javascript object
             history.go(1);
         },
 
+        /**
+         * @private
+         */
         init : function(){
             //Checks for existence of event, and also ie8 in ie7 mode (misreports existence)
             var docMode = document["documentMode"];

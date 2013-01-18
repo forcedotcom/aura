@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @namespace The Aura Expression Service.  Processes Expressions.
+ * @namespace The Aura Expression Service, accessible using $A.expressionServices.  Processes Expressions.
  * @constructor
  */
 var AuraExpressionService = function AuraExpressionService(){
@@ -33,6 +33,13 @@ var AuraExpressionService = function AuraExpressionService(){
             parentValue.getValue(lastPart).setValue(value);
         },
 
+        /**
+         * Get the wrapped value of an expression. Use Component.getValue() if you are retrieving the value of a component.
+         * @param {Object} valueProvider The value provider
+         * @param {String} expression The expression to be evaluated
+         * @public
+         * @memberOf AuraExpressionService
+         */
         getValue: function(valueProvider, expression){
             if (aura.util.isString(expression)) {
                 expression = valueFactory.parsePropertyReference(expression);
@@ -59,14 +66,27 @@ var AuraExpressionService = function AuraExpressionService(){
             return value;
         },
 
+        /**
+         * Get the raw value referenced using property syntax. Use Component.get() if you are retrieving the value of a component.
+         * @param {Object} valueProvider The value provider
+         * @param {String} expression The expression to be evaluated
+         * @public
+         * @memberOf AuraExpressionService
+         */
         get : function(valueProvider, expression){
             return $A.unwrap(this.getValue(valueProvider, expression));
         },
 
+        /**
+         * @private
+         */
         create : function(valueProvider, config){
             return valueFactory.create(config, null, valueProvider);
         },
 
+        /**
+         * @private
+         */
         // TODO: unify with above create method
         createPassthroughValue : function(primaryProviders, cmp) {
             return new PassthroughValue(primaryProviders, cmp);

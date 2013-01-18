@@ -89,10 +89,6 @@
                 <td><code>aura.test.setTestTimeout(timeoutMsec)</code></td>
                 <td>Sets the timeout in milliseconds.</td>
             </tr>
-            <tr>
-                <td><code>aura.test.uiDriver()</code></td>
-                <td>Returns the functions associated with user interactions. See <a href="https://github.com/forcedotcom/aura-beta/blob/master/aura-impl/javascript/src/aura.test/SynDriver.js" target="_blank">SynDriver.js</a> for more details.</td>
-            </tr>
         </tbody>
     </table>
 

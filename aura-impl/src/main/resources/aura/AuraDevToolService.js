@@ -15,7 +15,7 @@
  */
 /*jslint sub: true, evil : true  */
 /**
- * @namespace The Aura Dev Tool Service.
+ * @namespace The Aura Dev Tool Service, accessible using $A.devToolServices.
  * Use mostly in non-production modes.
  * @constructor
  * @protected

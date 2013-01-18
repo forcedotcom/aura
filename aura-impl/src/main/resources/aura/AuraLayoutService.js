@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Aura Layout Service.  Manages Layouts
+ * @namespace The Aura Layout Service, accessible using $A.layoutService.  Manages Layouts.
  * @constructor
  */
 var AuraLayoutService = function(){
@@ -27,6 +27,13 @@ var AuraLayoutService = function(){
 
     var layoutService = {
         // Call this method to make use of the layoutHandler override and pass in params that override the existing URL params
+    		/**
+    		 * Change the location.
+    		 * @param {Object} newLocation The new location, which is appended to the hash symbol
+    		 * @param {Object} overrideParams The parameters that override the existing URL parameters
+    		 * @memberOf AuraLayoutService
+    		 * @public
+    		 */
         changeLocation : function(newLocation, overrideParams) {
             var newHash = '#' + newLocation;
             if (!window.location || !window.location.hash || (newHash != window.location.hash)) {
@@ -44,6 +51,9 @@ var AuraLayoutService = function(){
             }
         },
 
+        /**
+         * @private
+         */
         handleLocationChange : function(event){
             if (skipLocationChangeHandlerSemaphore > 0) {
                 skipLocationChangeHandlerSemaphore--;
@@ -88,12 +98,22 @@ var AuraLayoutService = function(){
 
             layoutService.layout(token, event.getParams());
         },
-
+        
+       /**
+        * Refresh the current layout.
+        * @memberOf AuraLayoutService
+        * @public
+        */
         refreshLayout : function(){
             var curr = priv.peek();
             layoutService.layout(curr.layout.getName(), curr.params, true);
         },
 
+        /**
+         * Load the previous layout and update the history.
+         * @memberOf AuraLayoutService
+         * @public 
+         */
         back : function(){
             // Is there something in the stack to go back to?
             if (priv.history.length > 1) {
@@ -106,14 +126,32 @@ var AuraLayoutService = function(){
             }
         },
 
+        /**
+         * Clear the history.
+         * @memberOf AuraLayoutService
+         * @public
+         */
         clearHistory : function(){
             priv.clear();
         },
 
+        /**
+         * Removes the layout from the stack.
+         * @memberOf AuraLayoutService
+         * @public
+         */
         pop : function() {
             priv.pop();
         },
 
+        /**
+         * Get the requested layout.
+         * @param {String} name The name of the layout to be retrieved
+         * @param {Object} params Set params only for actions specified in the layouts file
+         * @param {Boolean} noTrack If set to true, the service does not track the layout
+         * @memberOf AuraLayoutService
+         * @public
+         */
         layout : function(name, params, noTrack){
             var layout = priv.layouts.getLayout(name);
 
@@ -213,6 +251,9 @@ var AuraLayoutService = function(){
             }
         },
 
+        /**
+         * @private
+         */
         layoutCallback : function(components, layoutItem, layout, params, noTrack){
             if (components === null || components === undefined){
                 components = [];
@@ -253,6 +294,14 @@ var AuraLayoutService = function(){
             $A.measure("Container Layout Complete: "+ layoutItem.getContainer(), markName);
         },
 
+        /**
+         * Set the current layout title.
+         * @param {Object} title The title of the layout
+         * @description Example: 
+         * $A.layoutService.setCurrentLayoutTitle(label.getValue())
+         * @memberOf AuraLayoutService
+         * @public
+         */
         setCurrentLayoutTitle : function(title){
             var current = priv.peek();
             if (current && priv.getTitle(current) !== title) {
@@ -270,6 +319,9 @@ var AuraLayoutService = function(){
             }
         },
 
+        /**
+         * @private
+         */
         init : function(cmp){
             if (cmp) {
                 priv.layouts = cmp.getDef().getLayouts();

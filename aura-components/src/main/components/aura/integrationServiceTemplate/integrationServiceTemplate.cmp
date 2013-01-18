@@ -52,7 +52,7 @@
     {!v.auraScriptTags}
     
     <script>
-   	$A.initConfig({!v.auraInit}, true);
+   	$A.initConfig({!v.auraInit}, true, true);
     </script>
           
     {!v.auraInitBlock}

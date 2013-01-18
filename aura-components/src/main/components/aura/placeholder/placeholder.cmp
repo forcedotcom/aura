@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component renderer="java://org.auraframework.renderer.PlaceholderRenderer" >
+<aura:component >
     <aura:attribute name="body" type="Aura.Component[]">
         <div class="spin"/>
     </aura:attribute>

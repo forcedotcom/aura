@@ -64,8 +64,8 @@ public class EventHandlerDefTest extends AuraImplTestCase {
     }
 
     /**
-     * A aura:handler for a component event with event attribute specified is
-     * invalid. Should be name attribute that is specified.
+     * A aura:handler for a component event with event attribute specified is invalid. Should be name attribute that is
+     * specified.
      */
     public void testHandlerWithEventAttributeForComponentEvent() throws Exception {
         DefDescriptor<ComponentDef> componentDefDescriptor = DefDescriptorImpl.getInstance(
@@ -82,8 +82,8 @@ public class EventHandlerDefTest extends AuraImplTestCase {
     }
 
     /**
-     * A aura:handler for an application event with name attribute specified is
-     * invalid. Should be event attribute that is specified.
+     * A aura:handler for an application event with name attribute specified is invalid. Should be event attribute that
+     * is specified.
      */
     public void testHandlerWithNameAttributeForApplicationEvent() throws Exception {
         DefDescriptor<ComponentDef> componentDefDescriptor = DefDescriptorImpl.getInstance(
@@ -146,6 +146,23 @@ public class EventHandlerDefTest extends AuraImplTestCase {
         } catch (InvalidDefinitionException e) {
             assertEquals("Incorrect exception message",
                     "aura:handler must specify one and only one of name=\"…\" or event=\"…\"", e.getMessage());
+        }
+    }
+
+    /**
+     * An aura:handler for a component event with no action parameter declared.
+     */
+    // TODO(W-1508416): NPE thrown when no action param in aura:handler
+    public void _testHandlerWithNoAction() throws Exception {
+        DefDescriptor<ComponentDef> componentDefDescriptor = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component><aura:registerevent name='somename' type='handleEventTest:event'/>"
+                        + "<aura:handler name='somename' /></aura:component>");
+        try {
+            componentDefDescriptor.getDef();
+            fail("Expected InvalidDefinitionException");
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "aura:handler missing attribute: action=\"…\"",
+                    componentDefDescriptor.getQualifiedName());
         }
     }
 

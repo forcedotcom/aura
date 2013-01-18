@@ -25,11 +25,10 @@ import org.auraframework.system.Client;
 import org.auraframework.throwable.quickfix.ThemeParserException;
 
 /**
- * This class tests the CSS validation in place for Aura Components. Aura
- * components can have a .css file specified in the same directory. The first
- * part of every selector has to be the name of the component, including the
- * namespace. For example, if there is a component called aura:test, then every
- * selector in the test.css file has to being with .auraTest
+ * This class tests the CSS validation in place for Aura Components. Aura components can have a .css file specified in
+ * the same directory. The first part of every selector has to be the name of the component, including the namespace.
+ * For example, if there is a component called aura:test, then every selector in the test.css file has to being with
+ * .auraTest
  */
 public class ThemeParserTest extends AuraImplTestCase {
     public ThemeParserTest(String name) {
@@ -47,12 +46,13 @@ public class ThemeParserTest extends AuraImplTestCase {
     }
 
     /**
-     * Tests for validation of css files and creation of ThemeDefs for aura
-     * components. {@link ThemeParser} Negative Test Case 1: Have two css files
-     * for a single component. Expected result: Pick up only the theme defined
-     * in file named exactly as the component but with a .css file type.
+     * Tests for validation of css files and creation of ThemeDefs for aura components. {@link ThemeParser}
+     * 
+     * Negative Test Case 1: Have two css files for a single component.
+     * 
+     * Expected result: Pick up only the theme defined in file named exactly as the component but with a .css file type.
      */
-    public void testTwoCSSFilesForAComponent() throws Exception {
+    public void testTwoCssFilesForAComponent() throws Exception {
         DefDescriptor<ThemeDef> descriptor = DefDescriptorImpl.getInstance("test.testTwoCSSFiles", ThemeDef.class);
         ThemeDef theme = descriptor.getDef();
         assertTrue(theme.getName().equals("testTwoCSSFiles"));
@@ -60,11 +60,12 @@ public class ThemeParserTest extends AuraImplTestCase {
     }
 
     /**
-     * Tests for validation of css files and creation of ThemeDefs for aura
-     * components. {@link ThemeParser} Negative Test Case 2: Have a single css
-     * file for a component. Break the Case sensitivity rule of CSS selectors.
-     * This test is sufficient to cover the test case for missing prefix for
-     * selectors. Expected result: Runtime Exception.
+     * Tests for validation of css files and creation of ThemeDefs for aura components. {@link ThemeParser}
+     * 
+     * Negative Test Case 2: Have a single css file for a component. Break the Case sensitivity rule of CSS selectors.
+     * This test is sufficient to cover the test case for missing prefix for selectors.
+     * 
+     * Expected result: The parser should throw a ThemeParserException.
      */
     public void testCaseSensitivity() throws Exception {
         DefDescriptor<ThemeDef> descriptor = DefDescriptorImpl.getInstance("test.testThemeSelectorCaseSensitivity",
@@ -78,10 +79,11 @@ public class ThemeParserTest extends AuraImplTestCase {
     }
 
     /**
-     * Tests for validation of css files and creation of ThemeDefs for aura
-     * components. {@link ThemeParser} Positive Test Case 1: Have a single valid
-     * css file for a component. Expected result: Pick up only the theme defined
-     * in file.
+     * Tests for validation of css files and creation of ThemeDefs for aura components. {@link ThemeParser}
+     * 
+     * Positive Test Case 1: Have a single valid css file for a component.
+     * 
+     * Expected result: Pick up only the theme defined in file.
      */
     public void testValidCss() throws Exception {
         DefDescriptor<ThemeDef> descriptor = DefDescriptorImpl.getInstance("test.testValidCSS", ThemeDef.class);
@@ -91,27 +93,31 @@ public class ThemeParserTest extends AuraImplTestCase {
     }
 
     /**
-     * Tests for validation of css files and creation of ThemeDefs for aura
-     * components. {@link ThemeParser} Positive Test Case 2: Have an invalid css
-     * file for a single component. Just leave on of the selectors definitions
-     * open. Expected result: The parser should throw a AuraRuntimeException.
+     * Tests for validation of css files and creation of ThemeDefs for aura components. {@link ThemeParser}
+     * 
+     * Positive Test Case 2: Have an invalid css file for a single component. Just leave on of the selectors definitions
+     * open.
+     * 
+     * Expected result: The parser should throw a ThemeParserException.
      */
-    public void testInvalidCSS() throws Exception {
+    public void testInvalidCss() throws Exception {
         DefDescriptor<ThemeDef> descriptor = DefDescriptorImpl.getInstance("test.testInValidCSS", ThemeDef.class);
         try {
             descriptor.getDef();
             fail("Should have caught the bad css");
         } catch (ThemeParserException expected) {
-            assertTrue(expected.getMessage().contains("Parse error"));
+            assertTrue("Incorrect message in ThemeParserException",
+                    expected.getMessage().contains("Parse error in testTestInValidCSS at line 40 column 1"));
         }
     }
 
     /**
-     * Tests for validation of css files and creation of ThemeDefs for aura
-     * components. {@link ThemeParser} Positive Test Case 3: Nested Component,
-     * have valid css file for parent component and an invalid file for child
-     * component. Expected result: The parser just considers the css file for
-     * the parent for validation.
+     * Tests for validation of css files and creation of ThemeDefs for aura components. {@link ThemeParser}
+     * 
+     * Positive Test Case 3: Nested Component, have valid css file for parent component and an invalid file for child
+     * component.
+     * 
+     * Expected result: The parser just considers the css file for the parent for validation.
      */
     public void testValidNestedComponents() throws Exception {
         DefDescriptor<ThemeDef> descriptor = DefDescriptorImpl.getInstance("test.testThemeValidParent", ThemeDef.class);
@@ -121,9 +127,9 @@ public class ThemeParserTest extends AuraImplTestCase {
     }
 
     /**
-     * Tests for substitution of the THIS token with the component's namespace.
-     * {@link ThemeParser} Expected result: The parser just considers the css
-     * file for the parent for validation.
+     * Tests for substitution of the THIS token with the component's namespace. {@link ThemeParser}
+     * 
+     * Expected result: Css file is valid.
      */
     public void testThemeNamespaceToken() throws Exception {
         DefDescriptor<ThemeDef> descriptor = DefDescriptorImpl.getInstance("test.testThemeNamespaceToken",
@@ -134,11 +140,12 @@ public class ThemeParserTest extends AuraImplTestCase {
     }
 
     /**
-     * Tests for substitution of the THIS token with the component's namespace
-     * for a set of valid CSS rules. {@link ThemeParser} Expected result: The
-     * parser just considers the css file for the parent for validation.
+     * Tests for substitution of the THIS token with the component's namespace for a set of valid CSS rules.
+     * {@link ThemeParser}
+     * 
+     * Expected result: The parser just considers the css file for the parent for validation.
      */
-    public void testThemeNamespaceTokenValidCSS() throws Exception {
+    public void testThemeNamespaceTokenValidCss() throws Exception {
         DefDescriptor<ThemeDef> descriptor = DefDescriptorImpl.getInstance("test.testThemeNamespaceTokenValidCSS",
                 ThemeDef.class);
         ThemeDef theme = descriptor.getDef();
@@ -147,25 +154,26 @@ public class ThemeParserTest extends AuraImplTestCase {
     }
 
     /**
-     * Tests for substitution of the THIS token with the component's namespace
-     * for a set of invalid CSS rules. {@link ThemeParser} Expected result: The
-     * parser will throw exception based on type of error it encounters while
-     * parsing the CSS file.
+     * Tests for substitution of the THIS token with the component's namespace for a set of invalid CSS rules.
+     * {@link ThemeParser}
+     * 
+     * Expected result: The parser will throw exception based on type of error it encounters while parsing the CSS file.
      */
-    public void testThemeNamespaceTokenInvalidCSS() throws ThemeParserException {
+    public void testThemeNamespaceTokenInvalidCSS() throws Exception {
         DefDescriptor<ThemeDef> descriptor = DefDescriptorImpl.getInstance("test.testThemeNamespaceTokenInvalidCSS",
                 ThemeDef.class);
         try {
             descriptor.getDef();
             fail("Exception not thrown for some set of invalid CSS rules!");
-        } catch (Exception e) {
-            assertTrue("Incorrect exception type! Message:" + e.getMessage(), (e instanceof ThemeParserException));
+        } catch (ThemeParserException expected) {
+            assertTrue("Incorrect message in ThemeParserException", expected.getMessage().contains(
+                    "Parse error in testTestThemeNamespaceTokenInvalidCSS at line 76 column 11"));
         }
     }
 
     /**
-     * Tests for browser conditionals in the CSS file. Tests if the rules for
-     * client (browser) type "chrome" get rendered.
+     * Tests for browser conditionals in the CSS file. Tests if the rules for client (browser) type "chrome" get
+     * rendered.
      */
     public void testThemeNamespaceTrueConditions() throws Exception {
         DefDescriptor<ThemeDef> descriptor = DefDescriptorImpl.getInstance("test.testThemeNamespaceTrueConditions",
@@ -180,14 +188,15 @@ public class ThemeParserTest extends AuraImplTestCase {
     /**
      * Tests for invalid values as part of browser conditionals.
      */
-    public void testThemeNamespaceExceptions() throws ThemeParserException {
+    public void testThemeNamespaceExceptions() throws Exception {
         DefDescriptor<ThemeDef> descriptor = DefDescriptorImpl.getInstance("test.testThemeNamespaceInvalidConditions",
                 ThemeDef.class);
         try {
             descriptor.getDef();
             fail("Exception not thrown for some set of invalid CSS rules!");
-        } catch (Exception e) {
-            assertTrue("Incorrect exception type! Message:" + e.getMessage(), (e instanceof ThemeParserException));
+        } catch (ThemeParserException expected) {
+            assertTrue("Incorrect message in ThemeParserException", expected.getMessage().contains(
+                    "Parse error in testTestThemeNamespaceInvalidConditions at line 55 column 1"));
         }
     }
 
@@ -212,8 +221,8 @@ public class ThemeParserTest extends AuraImplTestCase {
         try {
             cssDesc.getDef();
             fail("Parser should have thrown ThemeParserException trying to parse invalid CSS.");
-        } catch (Exception e) {
-            assertTrue("Expecting CSS parser error for component test.testTemplateCss but got: " + e.getMessage(), e
+        } catch (ThemeParserException e) {
+            assertTrue("Incorrect message in ThemeParserException", e
                     .getMessage()
                     .toString()
                     .startsWith(

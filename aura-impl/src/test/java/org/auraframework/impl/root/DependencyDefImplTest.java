@@ -22,7 +22,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class DependencyDefImplTest extends AuraImplTestCase {
     public DependencyDefImplTest(String name) {
@@ -37,7 +36,8 @@ public class DependencyDefImplTest extends AuraImplTestCase {
             testDependencyDef = vendor.makeDependencyDef(null, "aura", null, vendor.makeLocation("f1", 5, 5, 0));
             testDependencyDef.validateDefinition();
             fail("Should have thrown QuickFixException for null parent in DependencyDef's");
-        } catch (QuickFixException expected) {
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "No parent in DependencyDef", "f1");
         }
 
         // Invalid no resource.
@@ -46,7 +46,8 @@ public class DependencyDefImplTest extends AuraImplTestCase {
                     vendor.makeLocation("f1", 5, 5, 0));
             testDependencyDef.validateDefinition();
             fail("Should have thrown QuickFixException for null resource in DependencyDef's");
-        } catch (QuickFixException expected) {
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "Missing required resource", "f1");
         }
 
         // Invalid type
@@ -55,7 +56,9 @@ public class DependencyDefImplTest extends AuraImplTestCase {
                     vendor.makeLocation("f1", 5, 5, 0));
             testDependencyDef.validateDefinition();
             fail("Should have thrown QuickFixException for invalid type in DependencyDef's");
-        } catch (QuickFixException expected) {
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class,
+                    "No enum const class org.auraframework.def.DefDescriptor$DefType.WhatAmI", "f1");
         }
 
         // Valid, with a namespace.
@@ -70,12 +73,11 @@ public class DependencyDefImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify that dependencies of different types can be found within a given
-     * namespace or that the correct Exception is thrown.
+     * Verify that dependencies of different types can be found within a given namespace or that the correct Exception
+     * is thrown.
      * 
-     * Since this test looks in a namespace that can be changed over time, the
-     * specific names of dependencies may need to be changed as the source code
-     * changes.
+     * Since this test looks in a namespace that can be changed over time, the specific names of dependencies may need
+     * to be changed as the source code changes.
      */
     public void testAppendDependencies() throws Exception {
         DependencyDef testDependencyDef;
@@ -113,7 +115,9 @@ public class DependencyDefImplTest extends AuraImplTestCase {
             deps.clear();
             testDependencyDef.appendDependencies(deps);
             fail("Exception not thrown when looking for dependency that does not exist");
-        } catch (InvalidDefinitionException expected) {
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class,
+                    "Invalid dependency markup://aura:iDontExist[APPLICATION]", "f1");
         }
 
         // Valid resource name but wrong type
@@ -123,7 +127,9 @@ public class DependencyDefImplTest extends AuraImplTestCase {
             deps.clear();
             testDependencyDef.appendDependencies(deps);
             fail("Exception not thrown when dependency resource is valid but is of wrong type");
-        } catch (InvalidDefinitionException expected) {
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class,
+                    "Invalid dependency markup://aura:application[COMPONENT]", "f1");
         }
     }
 

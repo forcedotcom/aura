@@ -39,9 +39,6 @@ public class TextTokenizerTest extends AuraImplTestCase {
 
     private static final String testWhitespace = "     {!true}     {!false}     five spaces";
 
-    /**
-     * @param name
-     */
     public TextTokenizerTest(String name) {
         super(name);
     }
@@ -75,11 +72,10 @@ public class TextTokenizerTest extends AuraImplTestCase {
         ComponentDefHandler cdh = new ComponentDefHandler(null, null, null);
         try {
             tokenizer.asValue(cdh);
-            fail("should have failed because of mixed expression and text");
-        } catch (InvalidExpressionException e) {
-            if (!e.getMessage().startsWith("Cannot mix expression and literal string in attribute value")) {
-                throw (e);
-            }
+            fail("Should have failed because of mixed expression and text");
+        } catch (Exception e) {
+            checkExceptionStart(e, InvalidExpressionException.class,
+                    "Cannot mix expression and literal string in attribute value", null);
         }
     }
 
@@ -87,14 +83,14 @@ public class TextTokenizerTest extends AuraImplTestCase {
         TextTokenizer tokenizer = TextTokenizer.tokenize(testText[0], null);
         ComponentDefHandler cdh = new ComponentDefHandler(null, null, null);
         Object o = tokenizer.asValue(cdh);
-        assertTrue(o instanceof String);
-        assertEquals(testText[0], o);
+        assertTrue("Token value is of wrong type", o instanceof String);
+        assertEquals("Incorrect value returned from asValue()", testText[0], o.toString());
 
         tokenizer = TextTokenizer.tokenize(testText[1], null);
         o = tokenizer.asValue(cdh);
-        assertTrue(o instanceof PropertyReferenceImpl);
+        assertTrue("Token value is of wrong type", o instanceof PropertyReferenceImpl);
         PropertyReferenceImpl e = (PropertyReferenceImpl) o;
-        assertEquals(testText[1], e.toString(true));
+        assertEquals("Incorrect value returned from asValue()", testText[1], e.toString(true));
     }
 
     public void testAsComponentDefRefs() throws Exception {
@@ -103,18 +99,18 @@ public class TextTokenizerTest extends AuraImplTestCase {
         List<ComponentDefRef> l = tokenizer.asComponentDefRefs(cdh);
         assertEquals("Wrong number of ComponentDefRefs returned", 3, l.size());
         ComponentDefRef c = l.get(0);
-        assertEquals("text", c.getDescriptor().getName());
-        assertEquals(testText[0], c.getAttributeDefRef("value").getValue());
+        assertEquals("Incorrect ComponentDefRef type", "text", c.getDescriptor().getName());
+        assertEquals("Incorrect ComponentDefRef value", testText[0], c.getAttributeDefRef("value").getValue());
 
         c = l.get(1);
-        assertEquals("expression", c.getDescriptor().getName());
+        assertEquals("Incorrect ComponentDefRef type", "expression", c.getDescriptor().getName());
         Object o = c.getAttributeDefRef("value").getValue();
-        assertTrue(o instanceof PropertyReferenceImpl);
-        assertEquals(testText[1], ((PropertyReferenceImpl) o).toString(true));
+        assertTrue("ComponentDefRef value is of wrong type", o instanceof PropertyReferenceImpl);
+        assertEquals("Incorrect ComponentDefRef value", testText[1], ((PropertyReferenceImpl) o).toString(true));
 
         c = l.get(2);
-        assertEquals("text", c.getDescriptor().getName());
-        assertEquals(testText[2], c.getAttributeDefRef("value").getValue());
+        assertEquals("Incorrect ComponentDefRef type", "text", c.getDescriptor().getName());
+        assertEquals("Incorrect ComponentDefRef value", testText[2], c.getAttributeDefRef("value").getValue());
     }
 
     public void testWhitespacePreserve() throws Exception {
@@ -139,11 +135,8 @@ public class TextTokenizerTest extends AuraImplTestCase {
         for (ComponentDefRef cdf : compList) {
             assertEquals("Wrong Token Type", descNames[i], cdf.getName());
             Set<Entry<DefDescriptor<AttributeDef>, AttributeDefRef>> attributes = cdf.getAttributeValues().entrySet();
-            String test = attributes.toString().substring(0, testResults[i].length()); // truncate
-                                                                                       // at
-                                                                                       // expected
-                                                                                       // result
-                                                                                       // size
+            // Truncate at expected result size
+            String test = attributes.toString().substring(0, testResults[i].length());
             assertEquals("Did not preserve whitespace", testResults[i], test);
             i++;
         }
@@ -162,31 +155,29 @@ public class TextTokenizerTest extends AuraImplTestCase {
         for (ComponentDefRef cdf : compList) {
             assertEquals("Wrong Token Type", descNames[i], cdf.getName());
             Set<Entry<DefDescriptor<AttributeDef>, AttributeDefRef>> attributes = cdf.getAttributeValues().entrySet();
-            String test = attributes.toString().substring(0, testResults[i].length()); // truncate
-                                                                                       // at
-                                                                                       // expected
-                                                                                       // result
-                                                                                       // size
+            // Truncate at expected result size
+            String test = attributes.toString().substring(0, testResults[i].length());
             assertEquals("Did not optimize whitespace", testResults[i], test);
             i++;
         }
     }
 
-    public void testIncompleteExpressionQuickFix() {
+    public void testIncompleteExpressionQuickFix() throws Exception {
         try {
             TextTokenizer.tokenize("{!incompleteExpression", null);
-            fail();
-        } catch (AuraValidationException e) {
-            assertTrue(e.getMessage().startsWith("Unterminated expression"));
+            fail("Expected InvalidExpressionException");
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidExpressionException.class, "Unterminated expression", null);
         }
     }
 
-    public void testCurlyBangInversionQuickFix() {
+    public void testCurlyBangInversionQuickFix() throws Exception {
         try {
             TextTokenizer.tokenize("!{malformed}", null);
-            fail();
-        } catch (AuraValidationException e) {
-            assertTrue(e.getMessage().startsWith("Found an expression starting with '!{' but it should be '{!'"));
+            fail("Expected InvalidExpressionException");
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidExpressionException.class,
+                    "Found an expression starting with '!{' but it should be '{!'", null);
         }
     }
 }

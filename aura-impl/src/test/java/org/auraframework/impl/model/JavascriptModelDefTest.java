@@ -26,6 +26,7 @@ import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.javascript.model.JavascriptModelDef;
 import org.auraframework.impl.javascript.model.JavascriptValueDef;
 import org.auraframework.instance.Model;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 import com.google.common.collect.Maps;
 
@@ -37,8 +38,6 @@ public class JavascriptModelDefTest extends AuraImplTestCase {
 
     /**
      * Verify that javascript model defs are serializable.
-     * 
-     * @throws Exception
      */
     public void testDefaults() throws Exception {
         // Find the model by autowiring
@@ -52,7 +51,18 @@ public class JavascriptModelDefTest extends AuraImplTestCase {
         validateProperty(modelDef, "num", BigDecimal.valueOf(5));
         validateProperty(modelDef, "str", "yes");
         validateProperty(modelDef, "list", new ArrayList<Object>());
+    }
 
+    /**
+     * Verify bad value in javascript model throws correct exception.
+     */
+    public void testBadModelValue() throws Exception {
+        try {
+            Aura.getDefinitionService().getDefinition("test:jsModelBadValueType", ComponentDef.class);
+            fail("Bad value in javascript model should throw Exception");
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "Invalid value type in model definition.", null);
+        }
     }
 
     private void validateProperty(JavascriptModelDef def, String name, Object expectedValue) throws Exception {

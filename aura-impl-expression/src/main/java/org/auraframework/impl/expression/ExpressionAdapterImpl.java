@@ -116,7 +116,7 @@ public class ExpressionAdapterImpl implements ExpressionAdapter {
         } else {
             errorMsg.append(" at column ").append(re.charPositionInLine + 1);
         }
-        errorMsg.append(" of expression:\n");
+        errorMsg.append(" of expression: ");
         errorMsg.append(exp);
         return new InvalidExpressionException(errorMsg.toString(), l);
     }

@@ -50,9 +50,8 @@ public class LayoutsDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Test to verify layouts on Application def. Application has no explicit
-     * layouts specification, its the default layouts file in the component
-     * folder.
+     * Test to verify layouts on Application def. Application has no explicit layouts specification, its the default
+     * layouts file in the component folder.
      * 
      * @throws Exception
      */
@@ -62,8 +61,7 @@ public class LayoutsDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Test to verify Layouts on Application def. Explicit specification of
-     * layouts file.
+     * Test to verify Layouts on Application def. Explicit specification of layouts file.
      * 
      * @throws Exception
      */
@@ -74,49 +72,43 @@ public class LayoutsDefTest extends AuraImplTestCase {
     }
 
     /**
-     * "default" attribute is required. If there is no such attribute defined,
-     * an exception should be thrown.
-     * 
+     * "default" attribute in Layouts.xml file is required. If there is no such attribute defined, an exception should
+     * be thrown.
      */
     public void testLayoutsNoDefault() throws Exception {
-        InvalidDefinitionException result = null;
         try {
             Aura.getDefinitionService().getDefinition("test:layoutsNoDefault", LayoutsDef.class);
             fail("Not specifying a default layout should have caused an Exception.");
-        } catch (InvalidDefinitionException e) {
-            result = e;
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class,
+                    "The \"default\" attribute is required for layouts", null);
         }
-        assertNotNull(result);
     }
 
     /**
      * The "default" layout must exist. Otherwise we should throw an exception.
-     * W-931102
      */
     public void testLayoutsNonExistDefault() throws Exception {
-        InvalidDefinitionException result = null;
         try {
             Aura.getDefinitionService().getDefinition("test:layoutsNonExistDefault", LayoutsDef.class);
             fail("Specifying a non existing default layout should have caused an Exception.");
-        } catch (InvalidDefinitionException e) {
-            result = e;
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class,
+                    "The default layout \"nonExist\" doesn't exist", null);
         }
-        assertNotNull(result);
     }
 
     /**
-     * The "catchall" layout must exist if it gets specified. Otherwise we
-     * should throw an exception. W-931102
+     * The "catchall" layout must exist if it gets specified. Otherwise we should throw an exception.
      */
     public void testLayoutsNonExistCatchall() throws Exception {
-        InvalidDefinitionException result = null;
         try {
             Aura.getDefinitionService().getDefinition("test:layoutsNonExistCatchall", LayoutsDef.class);
             fail("Specifying a non existing layout for catch all should have caused an Exception.");
-        } catch (InvalidDefinitionException e) {
-            result = e;
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class,
+                    "The catchall layout \"nonExist\" doesn't exist", null);
         }
-        assertNotNull(result);
     }
 
     public void validateLayouts(LayoutsDef layoutsDef) throws Exception {

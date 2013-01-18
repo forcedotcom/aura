@@ -18,41 +18,98 @@ package org.auraframework.impl.expression.parser;
 import junit.framework.TestSuite;
 
 import org.auraframework.impl.expression.AuraImplExpressionTestCase;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
 
 /**
- * Shotgun tests for special chars. Tokens shouldn't contain these chars.
- * Remaining special chars have their own tests in ExpressionParserTest.
+ * Shotgun tests for special chars. Tokens shouldn't contain these chars. Remaining special chars have their own tests
+ * in ExpressionParserTest.
  * 
- * @hierarchy Aura.Runtime.Expression.Server.Parser
  * @userStory a07B0000000Ed9n
  */
-// @TestLabels(IgnoreFailureReason.IN_DEV)
 public class ExpressionParserSpecialCharactersTest extends AuraImplExpressionTestCase {
     private static final String validChars = "oO0_";
-    private static final char[] otherChars = "`=[]',~@#$^&{}|:\"天".toCharArray();
+    private static final char[] otherChars = "`=[]',~@#^&{}|:\"天".toCharArray();
+    private static final String[] errorMsgStartsWith = { "unexpected token: '`'",
+            "expecting '=', found 'o'",
+            "unexpected token: a left square bracket",
+            "unexpected token: a right square bracket",
+            "expecting ''', found '<EOF>'",
+            "unexpected token: a comma",
+            "unexpected token: '~'",
+            "unexpected token: '@'",
+            "unexpected token: '#'",
+            "unexpected token: '^'",
+            "expecting '&', found 'o'",
+            "unclosed brace",
+            "unexpected token: '}'",
+            "expecting '|', found 'o'",
+            "unexpected token: a colon",
+            "unexpected token: '\"'",
+            "unexpected token: '天'",
+    };
+    private static final String[] errorMsgEndsWith = { "unexpected token: '`'",
+            "expecting '=', found '<EOF>'",
+            "unexpected end of expression",
+            "unexpected token: an identifier",
+            "expecting ''', found '<EOF>'",
+            "unexpected token: ','",
+            "unexpected token: '~'",
+            "unexpected token: '@'",
+            "unexpected token: '#'",
+            "unexpected token: '^'",
+            "expecting '&', found '<EOF>'",
+            "unexpected token: '{'",
+            "unexpected token: '}'",
+            "expecting '|', found '<EOF>'",
+            "unexpected token: ':'",
+            "unexpected token: '\"'",
+            "unexpected token: '天'",
+    };
+    private static final String[] errorMsgContains = { "unexpected token: '`'",
+            "expecting '=', found 'o'",
+            "expecting a positive integer, found 'oO0_'",
+            "unexpected token: an identifier",
+            "expecting ''', found '<EOF>'",
+            "unexpected token: ','",
+            "unexpected token: '~'",
+            "unexpected token: '@'",
+            "unexpected token: '#'",
+            "unexpected token: '^'",
+            "expecting '&', found 'o'",
+            "unexpected token: '{'",
+            "unexpected token: '}'",
+            "expecting '|', found 'o'",
+            "unexpected token: ':' ",
+            "unexpected token: '\"'",
+            "unexpected token: '天'",
+    };
 
     private final String expression;
+    private final String msgStartsWith;
 
     public ExpressionParserSpecialCharactersTest(String name) {
         super(name);
         expression = "";
+        msgStartsWith = "";
     }
 
-    public ExpressionParserSpecialCharactersTest(String name, String expression) {
+    public ExpressionParserSpecialCharactersTest(String name, String expression, String errorMsg) {
         super(name);
         this.expression = expression;
+        this.msgStartsWith = errorMsg;
     }
 
     public static TestSuite suite() throws Exception {
         TestSuite suite = new TestSuite(ExpressionParserSpecialCharactersTest.class.getName());
-        for (char c : otherChars) {
+        for (int i = 0; i < otherChars.length; i++) {
+            char c = otherChars[i];
             String hex = String.format("%#x", (int) c);
             suite.addTest(new ExpressionParserSpecialCharactersTest("testTokenStartsWith" + hex
-                    + "ThrowsRuntimeException", c + validChars));
+                    + "ThrowsQuickFixException", c + validChars, errorMsgStartsWith[i]));
             suite.addTest(new ExpressionParserSpecialCharactersTest("testTokenEndsWith" + hex
-                    + "ThrowsRuntimeException", validChars + c));
+                    + "ThrowsQuickFixException", validChars + c, errorMsgEndsWith[i]));
             suite.addTest(new ExpressionParserSpecialCharactersTest("testTokenContains" + hex
-                    + "ThrowsRuntimeException", validChars + c + validChars));
+                    + "ThrowsQuickFixException", validChars + c + validChars, errorMsgContains[i]));
         }
         return suite;
     }
@@ -64,18 +121,11 @@ public class ExpressionParserSpecialCharactersTest extends AuraImplExpressionTes
 
     public void testDo() throws Exception {
         try {
-            // Expression e = buildExpression(expression);
-            // fail("Didn't get expected error for <" + expression +
-            // ">. Instead, got " + e.getExpressionType() + " <" +
-            // e
-            // + ">");
-        } catch (Exception ex) {
-            String message = ex.getMessage();
-            if (message != null
-                    && (message.startsWith("NoViableAltException") || message.startsWith("MismatchedTokenException"))) {
-                return;
-            }
-            fail("Unexpected exception for <" + expression + ">: " + ex);
+            buildExpression(expression);
+            fail("No execption thrown for <" + expression + ">. Expected InvalidExpressionException");
+        } catch (InvalidExpressionException e) {
+            assertTrue("Unexpected error message trying to parse <" + expression + ">. Expected to start with: "
+                    + msgStartsWith + ". But got: " + e.getMessage(), e.getMessage().startsWith(msgStartsWith));
         }
     }
 }

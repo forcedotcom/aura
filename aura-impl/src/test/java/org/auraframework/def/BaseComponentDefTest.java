@@ -211,10 +211,9 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Verify the render attribute specified on a component tag. Detection logic
-     * to render a component serverside or clientside is controlled by an
-     * attribute on the top level component. By default the rendering logic is
-     * turned on. Test method for {@link BaseComponentDef#getRender()}.
+     * Verify the render attribute specified on a component tag. Detection logic to render a component serverside or
+     * clientside is controlled by an attribute on the top level component. By default the rendering logic is turned on.
+     * Test method for {@link BaseComponentDef#getRender()}.
      * 
      * @userStory a07B0000000EWWg
      */
@@ -237,11 +236,9 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Verify the whitespace attribute specified on a component tag. Detection
-     * logic to whitespace preserve or optimize is controlled by an attribute on
-     * the top level component. By default the whitespace logic is optimize,
-     * which removes all non-necessary whitespace. Test method for
-     * {@link aura.def.BaseComponentDef#getWhitespace()}.
+     * Verify the whitespace attribute specified on a component tag. Detection logic to whitespace preserve or optimize
+     * is controlled by an attribute on the top level component. By default the whitespace logic is optimize, which
+     * removes all non-necessary whitespace. Test method for {@link aura.def.BaseComponentDef#getWhitespace()}.
      * 
      * @userStory W-1348188
      */
@@ -261,14 +258,15 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         try {
             define(baseTag, " whitespace='bogus'", "");
             fail("IllegalArgumentException should have been thrown for bad whitespace value.");
-        } catch (IllegalArgumentException ex) {
+        } catch (Exception e) {
+            checkExceptionFull(e, IllegalArgumentException.class,
+                    "No enum const class org.auraframework.def.BaseComponentDef$WhitespaceBehavior.BOGUS", null);
         }
     }
 
     /**
-     * Verify that we are able to build a component that declares dependencies
-     * and those dependencies are found and built, or that the correct Exception
-     * is thrown.
+     * Verify that we are able to build a component that declares dependencies and those dependencies are found and
+     * built, or that the correct Exception is thrown.
      */
     // TODO(W-1166679): Dependencies not attached to ComponentDef yet, add more
     // tests to check what dependencies are actually found after this story.
@@ -280,34 +278,37 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
         // Look in non-default namespace
         baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*://auratest:*\" type=\"EVENT\"/>");
-        assertEquals("Dependency not found", "[*://auratest:*[EVENT]]",
-            baseComponentDef.getDependencies().toString());
+        assertEquals("Dependency not found", "[*://auratest:*[EVENT]]", baseComponentDef.getDependencies().toString());
 
         // Make sure correct exception is thrown for nonexistent components
         try {
             baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*://idontexist:*\"/>");
             fail("Should not be able to load non-existant resource as dependency");
-        } catch (InvalidDefinitionException expected) {
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "Invalid dependency *://idontexist:*[COMPONENT]",
+                    null);
         }
 
         // Invalid descriptor pattern
         try {
             baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*://auratest.*\"/>");
             fail("Should not be able to load resource, bad DefDescriptor format");
-        } catch (InvalidDefinitionException expected) {
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "Illegal namespace in *://auratest.*", null);
         }
 
         // Another Invalid descriptor pattern
         try {
             baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*:auratest:*\"/>");
             fail("Should not be able to load resource, bad DefDescriptor format");
-        } catch (InvalidDefinitionException expected) {
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "Illegal name in *:auratest:*", null);
         }
     }
 
     /**
-     * Test to verify the detection logic for rendering components. Test method
-     * for {@link BaseComponentDef#isLocallyRenderable()}.
+     * Test to verify the detection logic for rendering components. Test method for
+     * {@link BaseComponentDef#isLocallyRenderable()}.
      * 
      * @userStory a07B0000000EWWg
      */
@@ -328,8 +329,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         */
 
         /**
-         * Test Case 3: When component includes an interface as facet, the
-         * interface has a Javascript provider
+         * Test Case 3: When component includes an interface as facet, the interface has a Javascript provider
          */
         baseComponentDef = define(baseTag, "", "Body: Includes an interface which has a JS provider. "
                 + " <test:test_JSProvider_Interface/>");
@@ -364,9 +364,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 baseComponentDef.isLocallyRenderable());
 
         /**
-         * TODO : W-1228861 Test Case 7: When a facet of a component has a
-         * component marked for LAZY loading, the component should always be
-         * rendered client side.
+         * TODO : W-1228861 Test Case 7: When a facet of a component has a component marked for LAZY loading, the
+         * component should always be rendered client side.
          */
         // addSource("lazyCmp","<aura:component> <aura:text aura:load='LAZY'/></aura:component>",
         // ComponentDef.class);
@@ -382,8 +381,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         // baseComponentDef.isLocallyRenderable());
 
         /**
-         * W-1228861Test Case 7: Verify that lazy loading specification in
-         * parent is reflected in child and components which use the child.
+         * W-1228861Test Case 7: Verify that lazy loading specification in parent is reflected in child and components
+         * which use the child.
          */
         // addSource("parentLazyCmp","<aura:component extensible='true'> <aura:text aura:load='LAZY'/></aura:component>",
         // ComponentDef.class);
@@ -406,10 +405,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Test to verify that components are marked as having serverside
-     * dependencies appropriately. Components that have server side dependencies
-     * have a flag marked in its def. "hasServerDeps" is part of the component
-     * def.
+     * Test to verify that components are marked as having serverside dependencies appropriately. Components that have
+     * server side dependencies have a flag marked in its def. "hasServerDeps" is part of the component def.
      */
     public void testHasLocalDependencies() throws Exception {
         // 1. Having a model
@@ -457,8 +454,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         // be marked as having
         // server dependency?
         /**
-         * TODO: DP? baseComponentDef = define(baseTag, "",
-         * "Body: Includes an interface which has a Java provider. " +
+         * TODO: DP? baseComponentDef = define(baseTag, "", "Body: Includes an interface which has a Java provider. " +
          * "<test:test_Provider_Interface implNumber='3'/>"); assertTrue(
          * "When a component's facet has serverside dependency, should the component also be marked as server dependent?"
          * , baseComponentDef.hasLocalDependencies());
@@ -466,7 +462,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
     }
 
-    public void testComponentCannotExtendItself() {
+    public void testExtendsSelf() {
         DefDescriptor<T> extendsSelf = addSourceAutoCleanup(getDefClass(), "");
         Source<T> source = auraTestingUtil.getSource(extendsSelf);
         source.addOrUpdate(String.format(baseTag,
@@ -476,10 +472,43 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             T componentDef = extendsSelf.getDef();
             componentDef.validateReferences();
             fail(defType + " should not be able to extend itself.");
-        } catch (InvalidDefinitionException expected) {
-            assertEquals(extendsSelf.getQualifiedName() + " cannot extend itself", expected.getMessage());
         } catch (Exception e) {
-            fail("Unexpected Exception " + e);
+            checkExceptionFull(e, InvalidDefinitionException.class, extendsSelf.getQualifiedName()
+                    + " cannot extend itself", extendsSelf.getQualifiedName());
+        }
+    }
+
+    public void testExtendsNonExtensible() {
+        DefDescriptor<T> nonExtensible = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "", ""));
+        DefDescriptor<T> extendsCmp = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "extends='" + nonExtensible.getDescriptorName() + "'", ""));
+
+        DefType defType = DefType.getDefType(this.getDefClass());
+        try {
+            extendsCmp.getDef();
+            fail(defType + " should not be able to extend a non-extensible component");
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, extendsCmp.getQualifiedName()
+                    + " cannot extend non-extensible component " + nonExtensible.getQualifiedName(),
+                    extendsCmp.getQualifiedName());
+        }
+    }
+
+    /**
+     * Verify extending a non-existent component throws correct Exception
+     */
+    public void testExtendsNonExistent() {
+        DefDescriptor<T> cmp = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "extends='aura:iDontExist'", ""));
+
+        DefType defType = DefType.getDefType(this.getDefClass());
+        try {
+            cmp.getDef();
+            fail(defType + " should throw Exception when extending non-existent component");
+        } catch (Exception e) {
+            checkExceptionFull(e, DefinitionNotFoundException.class, "No " + defType
+                    + " named markup://aura:iDontExist found : " + cmp.getQualifiedName(), cmp.getQualifiedName());
         }
     }
 
@@ -514,19 +543,15 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Test to verify lazy loading of facets. facets can be lazy loaded by
-     * marking them so: <aura:component> <namespace:facetName aura:load="lazy"/>
-     * </aura:component>
+     * Test to verify lazy loading of facets. facets can be lazy loaded by marking them so: <aura:component>
+     * <namespace:facetName aura:load="lazy"/> </aura:component>
      * 
-     * There are 3 levels of load specification. DEFAULT : Does not lazy load
-     * LAZY : Loading is done on client only after parent component enclosing
-     * the marked component is rendered. Until that happens, a
-     * placeholder(aura:placeholder) is placed in the dom. In afterRender, a
-     * server action fetches the actual component and replaces the placeholder.
-     * EXCLUSIVE: Everything is the same as LAZY loading just with one
-     * difference. The server action to fetch the actual component is exclusive.
-     * Which means it is not bundled with other actions. Aura uses a queue
-     * system on the clientside to batch server actions.
+     * There are 3 levels of load specification. DEFAULT : Does not lazy load LAZY : Loading is done on client only
+     * after parent component enclosing the marked component is rendered. Until that happens, a
+     * placeholder(aura:placeholder) is placed in the dom. In afterRender, a server action fetches the actual component
+     * and replaces the placeholder. EXCLUSIVE: Everything is the same as LAZY loading just with one difference. The
+     * server action to fetch the actual component is exclusive. Which means it is not bundled with other actions. Aura
+     * uses a queue system on the clientside to batch server actions.
      * 
      * @throws Exception
      */
@@ -573,9 +598,12 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
         // 5. W-1300925- Required attribute validation
         /*
-         * This test doesn't work because the attribute validation can't be done
-         * on a def, it is done on an instance, which needs to be requested by
-         * the client }
+         * This test doesn't work because the attribute validation can't be done on a def, it is done on an instance,
+         * which needs to be requested by the client. desc = addSourceAutoCleanup(String.format(baseTag, "",
+         * "<string:reqAttrCmp lumen:load='LAZY'/>"),this.getDefClass()); try{ desc.getDef(); fail(
+         * "should not be able to bypass a required attribute by marking it to be lazy loaded" ); }catch
+         * (MissingRequiredAttributeException e){ assertTrue(e.getMessage().contains(
+         * "string:reqAttrCmp is missing required attribute 'requiredAttribute'" )); }
          */
 
         // 6. Non basic data type for attribute specification.
@@ -589,17 +617,17 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         try {
             desc.getDef();
             fail("should not be able to use a non-basic attribute type in lazy loaded component");
-        } catch (InvalidReferenceException e) {
-            assertTrue(e
-                    .getMessage()
-                    .contains(
-                            "Lazy Component References can only have attributes of simple types passed in (cmps is not simple)"));
+        } catch (Exception e) {
+            checkExceptionFull(
+                    e,
+                    InvalidReferenceException.class,
+                    "Lazy Component References can only have attributes of simple types passed in (cmps is not simple)",
+                    desc.getQualifiedName());
         }
     }
 
     /**
-     * Components outside aura namespace cannot implement aura:rootComponent.
-     * Test uses string namespace.
+     * Components outside aura namespace cannot implement aura:rootComponent. Test uses string namespace.
      */
     public void testNonAuraRootMarker() throws Exception {
         DefDescriptor<T> d = addSourceAutoCleanup(getDefClass(),
@@ -608,18 +636,20 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         try {
             d.getDef();
             fail(defType + " should not be able to extend itself.");
-        } catch (InvalidDefinitionException expected) {
-            assertEquals(
+        } catch (Exception e) {
+            checkExceptionFull(
+                    e,
+                    InvalidDefinitionException.class,
                     String.format(
                             "Component %s cannot implement the rootComponent interface because it is not in the aura namespace",
-                            d.getQualifiedName()), expected.getMessage());
+                            d.getQualifiedName()), d.getQualifiedName());
         }
     }
 
     /**
-     * Tests to verify validateReferences() on BaseComponentDefImpl.
+     * Tests to verify support level checks in validateReferences() on BaseComponentDefImpl.
      */
-    public void testValidateReferences() throws Exception {
+    public void testSupportLevel() throws Exception {
         // Grand parent with BETA support
         DefDescriptor<T> grandParentDesc = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "extensible='true' support='BETA'", ""));
@@ -631,10 +661,11 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         try {
             parentDesc.getDef().validateReferences();
             fail("A child cannot widen the support level of its parent.");
-        } catch (InvalidDefinitionException e) {
-            assertEquals(
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class,
                     String.format("%s cannot widen the support level to GA from %s's level of BETA",
-                            parentDesc.getQualifiedName(), grandParentDesc.getQualifiedName()), e.getMessage());
+                            parentDesc.getQualifiedName(), grandParentDesc.getQualifiedName()),
+                    parentDesc.getQualifiedName());
         }
         // Child with GA support
         DefDescriptor<T> childDesc = addSourceAutoCleanup(
@@ -644,10 +675,10 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         try {
             childDesc.getDef().validateReferences();
             fail("A child cannot widen the support level of its grand parent.");
-        } catch (InvalidDefinitionException e) {
-            assertEquals(
-                    childDesc.getQualifiedName() + " cannot widen the support level to GA from "
-                            + grandParentDesc.getQualifiedName() + "'s level of BETA", e.getMessage());
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, childDesc.getQualifiedName()
+                    + " cannot widen the support level to GA from " + grandParentDesc.getQualifiedName()
+                    + "'s level of BETA", childDesc.getQualifiedName());
         }
         // Including a component, that violates support level restriction, as
         // facet
@@ -660,12 +691,83 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         try {
             testDesc.getDef().validateReferences();
             fail("Test component's facet has a component which tries to widen the support level of its parent.");
-        } catch (InvalidDefinitionException e) {
-            assertEquals(
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class,
                     String.format("%s cannot widen the support level to GA from %s's level of BETA",
-                            childCmp.getQualifiedName(), parentCmp.getQualifiedName()), e.getMessage());
+                            childCmp.getQualifiedName(), parentCmp.getQualifiedName()), childCmp.getQualifiedName());
         }
+    }
 
+    /**
+     * Verify a component cannot have an attribute and event with the same name.
+     */
+    public void testAttributeEventSameName() {
+        DefDescriptor<T> dd = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "", "<aura:registerEvent name='dupeAttrEvent' type='test:parentEvent'/>"
+                        + "<aura:attribute name='dupeAttrEvent' type='String'/>"));
+
+        DefType defType = DefType.getDefType(this.getDefClass());
+        try {
+            dd.getDef();
+            fail(defType + " should not be able to have attribute and event with same name");
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class,
+                    "Cannot define an attribute and register an event with the same name: dupeAttrEvent",
+                    dd.getQualifiedName());
+        }
+    }
+
+    /**
+     * Verify an abstract component must also be extensible.
+     */
+    public void testAbstractNotExtensible() {
+        DefDescriptor<T> dd = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "abstract='true' extensible='false'", ""));
+
+        DefType defType = DefType.getDefType(this.getDefClass());
+        try {
+            dd.getDef();
+            fail(defType + " should not be abstract AND not extensible");
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class,
+                    "Abstract component " + dd.getQualifiedName() + " must be extensible.",
+                    dd.getQualifiedName());
+        }
+    }
+
+    /**
+     * Verify component cannot implement root component (aura:rootComponent).
+     */
+    public void testImplementsRootComponent() {
+        DefDescriptor<T> dd = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "implements='aura:rootComponent'", ""));
+        DefType defType = DefType.getDefType(this.getDefClass());
+        try {
+            dd.getDef();
+            fail(defType + " should not be able to implement rootComponent if not in aura namespace");
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class,
+                    "Component " + dd.getQualifiedName()
+                            + " cannot implement the rootComponent interface because it is not in the aura namespace",
+                    dd.getQualifiedName());
+        }
+    }
+
+    /**
+     * Verify component cannot implement a non-existent component
+     */
+    public void testImplementsNonExistent() {
+        DefDescriptor<T> dd = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "implements='aura:iDontExist'", ""));
+        DefType defType = DefType.getDefType(this.getDefClass());
+        try {
+            dd.getDef();
+            fail(defType + " should throw Exception when implementing non-existent interface");
+        } catch (Exception e) {
+            checkExceptionFull(e, DefinitionNotFoundException.class,
+                    "No INTERFACE named markup://aura:iDontExist found : " + dd.getQualifiedName(),
+                    dd.getQualifiedName());
+        }
     }
 
     private AttributeDefRef getBodyAttributeFromDef(T def) {

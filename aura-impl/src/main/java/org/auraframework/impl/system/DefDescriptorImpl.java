@@ -402,6 +402,12 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
      * rather than an abstract class.
      */
     public static int compare(DefDescriptor<?> dd1, DefDescriptor<?> dd2) {
-        return dd1.getQualifiedName().compareToIgnoreCase(dd2.getQualifiedName());
+        int value;
+
+        value = dd1.getQualifiedName().compareToIgnoreCase(dd2.getQualifiedName());
+        if (value != 0) {
+            return value;
+        }
+        return dd1.getDefType().compareTo(dd2.getDefType());
     }
 }

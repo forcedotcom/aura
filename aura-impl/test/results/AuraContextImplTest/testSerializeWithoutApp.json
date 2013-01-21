@@ -1,0 +1,1 @@
+{"mode":"PROD","test":"org.auraframework.impl.context.AuraContextImplTest.testSerializeWithoutApp","preloads":[],"globalValueProviders":[{"type":"$Browser","values":{"formFactor":"DESKTOP","isPhone":false,"isIPad":false,"isAndroid":false,"isTablet":false,"isIPhone":false,"isIOS":false}},{"type":"$Locale"}]}

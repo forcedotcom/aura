@@ -31,6 +31,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.service.ContextService;
@@ -225,20 +226,31 @@ public class ComponentJSTestSuiteTest extends TestSuite {
             return name;
         }
 
+        @Override
+        public String getQualifiedName() {
+            return caseDef.getDescriptor().getQualifiedName();
+        }
+        
         public void testRun() throws Throwable {
+            Set<Definition> mocks = caseDef.getLocalDefs();
+			if (mocks != null && !mocks.isEmpty()) {
+				Aura.get(TestContextAdapter.class).getTestContext()
+						.getLocalDefs().addAll(mocks);
+			}
             open(getUrl(), Mode.AUTOJSTEST);
-            String ret = (String) auraUITestingUtil.getEval(String.format("return window.aura.test.run('%s', '%s')",
-                    AuraTextUtil.escapeForJavascriptString(caseDef.getName()),
-                    AuraTextUtil.escapeForJavascriptString(suite.getCode())));
-            if (ret != null && !"null".equals(ret)) {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> e = (Map<String, Object>) new JsonReader().read(ret);
-                fail((String) e.get("message"));
-            }
-            // Actions run on servers need special handling because their call
-            // back methods are called
-            // asynchronously.
-            // This check is to make sure all such calls were complete
+			String ret = (String) auraUITestingUtil.getEval(String.format(
+					"return window.aura.test.run('%s', '%s')",
+					AuraTextUtil.escapeForJavascriptString(caseDef.getName()),
+					AuraTextUtil.escapeForJavascriptString(suite.getCode())));
+			if (ret != null && !"null".equals(ret)) {
+				@SuppressWarnings("unchecked")
+				Map<String, Object> e = (Map<String, Object>) new JsonReader()
+						.read(ret);
+				fail((String) e.get("message"));
+			}
+			// Actions run on servers need special handling because their call
+			// back methods are called asynchronously.
+			// This check is to make sure all such calls were complete
             waitForCondition("return window.aura.test.isComplete()", 30);
         }
 

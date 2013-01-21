@@ -35,6 +35,7 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.http.RequestParam.EnumParam;
 import org.auraframework.http.RequestParam.InvalidParamException;
 import org.auraframework.http.RequestParam.StringParam;
@@ -44,12 +45,16 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
+import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.test.TestContext;
+import org.auraframework.test.TestContextAdapter;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
 
 /**
  */
 public class AuraContextFilter implements Filter {
+    private static final boolean isProduction = Aura.getConfigAdapter().isProduction();
 
     public static final EnumParam<AuraContext.Mode> mode = new EnumParam<AuraContext.Mode>(AuraServlet.AURA_PREFIX
             + "mode", false, AuraContext.Mode.class);
@@ -62,6 +67,7 @@ public class AuraContextFilter implements Filter {
 
     private static final StringParam app = new StringParam(AuraServlet.AURA_PREFIX + "app", 0, false);
     private static final StringParam num = new StringParam(AuraServlet.AURA_PREFIX + "num", 0, false);
+    private static final StringParam test = new StringParam(AuraServlet.AURA_PREFIX + "test", 0, false);
     private static final StringParam contextConfig = new StringParam(AuraServlet.AURA_PREFIX + "context", 0, false);
 
     private String componentDir = null;
@@ -136,6 +142,37 @@ public class AuraContextFilter implements Filter {
                 }
             }
         }
+        
+		if (!isProduction) {
+			TestContextAdapter testContextAdapter = Aura
+					.get(TestContextAdapter.class);
+			if (testContextAdapter != null) {
+				String testName = null;
+				// config takes precedence over param because the value is not
+				// expected to change during a test and it is less likely
+				// to have been modified unintentionally when from the config
+				if (configMap != null) {
+					testName = (String) configMap.get("test");
+				}
+				if (testName == null) {
+					testName = test.get(request);
+				}
+				if (testName != null) {
+					TestContext testContext = testContextAdapter
+							.getTestContext(testName);
+					if (testContext != null) {
+						MasterDefRegistry registry = context.getDefRegistry();
+						Set<Definition> mocks = testContext.getLocalDefs();
+						if (mocks != null) {
+							for (Definition def : mocks) {
+								registry.addLocalDef(def);
+							}
+						}
+					}
+				}
+			}
+		}
+        
         return context;
     }
 

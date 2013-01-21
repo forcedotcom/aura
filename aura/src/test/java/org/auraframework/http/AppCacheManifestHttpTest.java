@@ -26,11 +26,15 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.http.HttpHeaders;
+import org.auraframework.Aura;
 import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.test.AuraHttpTestCase;
+import org.auraframework.test.TestContext;
+import org.auraframework.test.TestContextAdapter;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.client.UserAgent;
+import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.LineReader;
@@ -94,7 +98,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
 
     private List<String> getRequiredLinks() throws Exception {
         List<String> required = Lists.newArrayList();
-        required.add("/aura_prod.js");
+        required.add(".*/aura_prod\\.js");
         return required;
     }
 
@@ -132,12 +136,12 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         for (String requiredLink : required) {
             boolean foundFlag = false;
             for (String link : links) {
-                if (link.endsWith(requiredLink)) {
+                if (link.matches(requiredLink)) {
                     foundFlag = true;
                 }
             }
             if (!foundFlag) {
-                fail("Missing required link: *" + requiredLink);
+                fail("Missing required link: " + requiredLink + " but got instead: " + links);
             }
         }
     }
@@ -207,10 +211,12 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         GetMethod get = obtainGetMethod(manifest.url);
         getHttpClient().executeMethod(get);
         String response = get.getResponseBodyAsString();
-        assertManifest(
-                response,
-                Lists.newArrayList(String.format("%%22lastmod%%22%%3A%%22%s%%22%%7D/app.css", manifest.lastmod),
-                        String.format("%%22lastmod%%22%%3A%%22%s%%22%%7D/app.js", manifest.lastmod)), manifest.lastmod);
+		String serializedContextFragment = AuraTextUtil.urlencode(String
+				.format("\"lastmod\":\"%s\"", manifest.lastmod));
+		assertManifest(response, Lists.newArrayList(
+				String.format(".*%s.*/app\\.css", serializedContextFragment),
+				String.format(".*%s.*/app\\.js", serializedContextFragment)),
+				manifest.lastmod);
     }
 
     /**
@@ -259,10 +265,12 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
 
         // Now, after one failed call a new manifest call should go thru.(Error
         // cookie cleared);
-        assertManifest(
-                getClean.getResponseBodyAsString(),
-                Lists.newArrayList(String.format("%%22lastmod%%22%%3A%%22%s%%22%%7D/app.css", manifest.lastmod),
-                        String.format("%%22lastmod%%22%%3A%%22%s%%22%%7D/app.js", manifest.lastmod)), manifest.lastmod);
+		String serializedContextFragment = AuraTextUtil.urlencode(String
+				.format("\"lastmod\":\"%s\"", manifest.lastmod));
+		assertManifest(getClean.getResponseBodyAsString(), Lists.newArrayList(
+				String.format(".*%s.*/app\\.css", serializedContextFragment),
+				String.format(".*%s.*/app\\.js", serializedContextFragment)),
+				manifest.lastmod);
     }
 
     /**

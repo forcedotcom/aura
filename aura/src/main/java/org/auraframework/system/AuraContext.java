@@ -301,5 +301,4 @@ public interface AuraContext {
     void addClientApplicationEvent(Event event) throws Exception;
 
     List<Event> getClientEvents();
-
 }

@@ -463,10 +463,17 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     /**
+     * Open a URL without any additional handling.
+     */
+    protected void openRaw(String url) throws MalformedURLException, URISyntaxException {
+        openRaw(getAbsoluteURI(url));
+    }
+
+    /**
      * Open a URL without the usual waitForAuraInit().
      */
     protected void openNoAura(String url) throws MalformedURLException, URISyntaxException {
-        openRaw(getAbsoluteURI(url));
+        open(url, getAuraModeForCurrentBrowser(), false);
     }
 
     /**
@@ -478,7 +485,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @throws URISyntaxException
      */
     protected void open(String url) throws MalformedURLException, URISyntaxException {
-        open(url, getAuraModeForCurrentBrowser());
+        open(url, getAuraModeForCurrentBrowser(), true);
     }
 
     /**
@@ -506,6 +513,10 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @throws URISyntaxException
      */
     protected void open(String url, Mode mode) throws MalformedURLException, URISyntaxException {
+        open(url, mode, true);
+    }
+
+    protected void open(String url, Mode mode, boolean waitForInit) throws MalformedURLException, URISyntaxException {
         // save any fragment
         int hashLoc = url.indexOf('#');
         String hash = "";
@@ -527,10 +538,13 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
         // update query with a nonce
         newParams.add(new BasicNameValuePair("aura.mode", mode.name()));
+        newParams.add(new BasicNameValuePair("aura.test", getQualifiedName()));
         url = url + "?" + URLEncodedUtils.format(newParams, "UTF-8") + hash;
 
-        openNoAura(url);
-        waitForAuraInit();
+        openRaw(url);
+        if(waitForInit){
+            waitForAuraInit();
+        }
     }
 
     /**

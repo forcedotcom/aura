@@ -262,9 +262,6 @@ public class AuraImplConfig {
         return new AuraRegistryProviderImpl();
     }
 
-    /*
-    */
-
     @Impl
     public static PrefixDefaultsAdapter prefixDefaultsAdapter() {
         return new AuraPrefixDefaultsProviderImpl();

@@ -16,22 +16,25 @@
 
 -->
 <aura:component extends="auradocs:topicPanel">
-    <aura:set attribute="title" value="Dynamically Creating a Component"/>
+    <aura:set attribute="title" value="Dynamically Creating Components"/>
 
     <h2>Goal</h2>
     <p>You want to create a component dynamically from your client-side controller or helper. </p>
 
     <h2>Code</h2>
-    <p>This sample code adds a component to a <code>div</code> element.</p>
+    <p>This sample code adds a component to a <code>div</code> element and sets an <code>aura:id</code> to the component.</p>
     <auradocs:codeblock>
-    var a = cmp.get("c.doSomething");
-    a.setParams({
-      //Set the parameters here
+    var action = cmp.get("c.doSomething");
+    action.setParams({
+      //Set the aura:id and other parameters
+      "localId":"newId";
     });
 
-    //Set the action callback and create a new component as part of an action on the server.
-    a.setCallback(cmp, function(action) {
+    //Set the action callback and create a new child component
+    action.setCallback(cmp, function(action) {
+        
     var child = $A.services.component.newComponent(action.getReturnValue());
+        
     var div = cmp.find("div");
     var body = div.getValue("v.body");
 
@@ -41,7 +44,7 @@
     })
     </auradocs:codeblock>
 
-    <p>The following code sets the configuration attributes for the new component.</p>
+    <p>This sample code sets the configuration attributes for the new component.</p>
     <auradocs:codeblock>
    var msgConfig = {
          componentDef: {
@@ -57,6 +60,7 @@
 
     var message = $A.services.component.newComponent(msgConfig);
     </auradocs:codeblock>
+    
 
     <h2>Discussion</h2>
     <p>In the first sample, <code>action.getReturnValue()</code> returns a component with its definition and attributes. The existing component is then destroyed and replaced by the new component in the body.

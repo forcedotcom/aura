@@ -101,7 +101,6 @@
 
         <auradocs:contentsNode text="Code" >
             <auradocs:contentsNode text="Overview" id="code"/>
-            <auradocs:contentsNode text="Services" id="services"/>
             <auradocs:contentsNode text="JavaScript" >
                 <auradocs:contentsNode text="Introduction" id="codeJavaScriptIntro"/>
                 <auradocs:contentsNode text="Accessing the DOM" id="domAccess"/>
@@ -109,6 +108,7 @@
                 <auradocs:contentsNode text="Helpers" id="helper"/>
                 <auradocs:contentsNode text="Renderers" id="renderers" />
                 <auradocs:contentsNode text="Client-Side Providers" id="providersClientSide" />
+                <auradocs:contentsNode text="Services" id="services"/>
                 <auradocs:contentsNode text="Error Handling" id="error"/>
                 <auradocs:contentsNode text="Component Tests" >
                     <auradocs:contentsNode text="Introduction" id="docTests" />

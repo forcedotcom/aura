@@ -277,6 +277,10 @@ var AuraComponentService = function(){
 
         //#if {"excludeModes" : ["PRODUCTION"]}
         ,priv : priv,
+        /**
+         * @memberOf AuraComponentService
+         * @private
+         */
         getIndex: function(){
             var ret = "";
             var index = priv.indexes.globalId;

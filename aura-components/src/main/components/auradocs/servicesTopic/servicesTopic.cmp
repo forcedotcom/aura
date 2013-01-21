@@ -16,44 +16,52 @@
 
 -->
 <aura:component extends="auradocs:topicPanel">
-    <aura:set attribute="title" value="Aura Services"/>
+    <aura:set attribute="title" value="JavaScript Services"/>
 
-    <p> Aura services help you to develop apps faster. Here is a list of the services.</p>
+    <p> Aura provides a set of client-side services that helps you develop apps faster. 
+    You can call these services from your JavaScript code, using the syntax <code>$A.&lt;service&gt;.&lt;method&gt;</code>. 
+    For example, use <code>$A.services.component.newComponent()</code> to create a component dynamically. 
+    See <auradocs:topicLink topic ="dynamicCmp">Dynamically Creating a Component</auradocs:topicLink> for an example of using the component service.</p>
+    <p>Here is a list of the services.</p>
 
 
     <h3>AuraComponentService</h3>
     <h4><code>$A.services.component</code></h4>
-    <p>The Component Service enables you to create and manage components. You can use the service to create a component on the client or server and access or manipulate component data.</p>
+    <p>The component service enables you to create and manage components. You can use the service to create a component on the client or server and access or manipulate component data.</p>
     <p>See Also: <a href="#reference?topic=api:AuraComponentService">Methods</a> | <auradocs:topicLink topic ="dynamicCmp">Dynamically Creating a Component</auradocs:topicLink> | <auradocs:topicLink topic ="valueObjects">Value Objects</auradocs:topicLink></p>
 
     <h3>AuraDevToolService</h3>
     <h4><code>$A.devToolServices</code></h4>
-   <p>The Dev Tool Service enables you to switch between views when querying objects in non-production modes.</p>
+   <p>The dev tool service helps you debug and test in non-production modes by enabling you to query the current state of objects and get statistics about a running app.
+      For example, you can query all components using <code>$A.getQueryStatement().query()</code>. To see a full list of queries, type <code>$A.devToolService.$helpText$</code> in a non-production mode, such as <code>DEV</code> mode. </p>
    <p>See Also: <auradocs:topicLink topic="queryLang">Querying State and Statistics</auradocs:topicLink></p>
 
     <h3>AuraEventService</h3>
     <h4><code>$A.services.event</code></h4>
-    <p>The Event Service enables you to create and manage events.</p>
+    <p>The event service enables you to create and manage events. For example, you can create a new event using <code>$A.services.event.newEvent("namespace:component")</code> or 
+    use <code>$A.services.event.finishFiring(event)</code> to remove an event from the event stack.</p>
     <p>See Also: <a href="#reference?topic=api:AuraEventService">Methods</a></p>
 
     <h3>AuraExpressionService</h3>
     <h4><code>$A.expressionService</code></h4>
-    <p>The Expression Service enables you to process expressions using a value provider.</p>
+    <p>The expression service enables you to process expressions using a value provider. 
+       For example, you can use <code>$A.expressionService.getValue(cmp, "<aura:text value="{!" />$Label.Section.Param}").getValue()</code> to evaluate labels before passing them as attributes to locally created components. 
+       Use <code>component.getValue()</code> instead if you are resolving expressions for components.</p>
     <p>See Also: <a href="#reference?topic=api:AuraExpressionService">Methods</a></p>
 
     <h3>AuraHistoryService</h3>
     <h4><code>$A.services.history</code></h4>
-    <p>The History Service enables you to manage browser history and change the location.</p>
+    <p>The history service enables you to manage browser history and change the location.</p>
     <p>See Also: <a href="#reference?topic=api:AuraHistoryService">Methods</a></p>
 
     <h3>AuraLayoutService</h3>
     <h4><code>$A.layoutService</code></h4>
-    <p>The Layout Service enables you to manage the layout and navigation of your app. </p>
+    <p>The layout service enables you to manage the layout and navigation of your app. For example, you can use the <code>changeLocation()</code> method to pass in a new location and extra parameters for the new URL.</p>
     <p>See Also: <a href="#reference?topic=api:AuraLayoutService">Methods</a> | <auradocs:topicLink topic="layouts">Using Layouts</auradocs:topicLink></p>
 
     <h3>AuraRenderingService</h3>
     <h4><code>$A.renderingService</code></h4>
-    <p>The Rendering Service updates components in the Document Object Model, enabling you to override the default rendering behavior or set the behavior after the component is rendered or destroyed.</p>
+    <p>The rendering service updates components in the Document Object Model, enabling you to override the default rendering behavior or set the behavior after the component is rendered or destroyed.</p>
     <p>See Also: <a href="#reference?topic=api:AuraExpressionService">Methods</a> | <auradocs:topicLink topic="renderers">Using Renderers</auradocs:topicLink></p>
 
 

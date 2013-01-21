@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @namespace The Aura Expression Service, accessible using $A.expressionServices.  Processes Expressions.
+ * @namespace The Aura Expression Service, accessible using $A.expressionServices.  Process Expressions.
  * @constructor
  */
 var AuraExpressionService = function AuraExpressionService(){

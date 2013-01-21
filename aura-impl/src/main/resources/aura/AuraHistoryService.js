@@ -34,7 +34,8 @@ var AuraHistoryService = function(){
         },
         
         /**
-         * Parse the location.
+         * Parse the location. A token can be used here.
+         * @description Example: token == "newLayout"; $A.historyService.get().token;
          * @memberOf AuraHistoryService
          * @public
          */

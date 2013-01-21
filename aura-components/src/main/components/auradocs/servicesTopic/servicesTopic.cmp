@@ -50,8 +50,9 @@
     <p>See Also: <a href="#reference?topic=api:AuraExpressionService">Methods</a></p>
 
     <h3>AuraHistoryService</h3>
-    <h4><code>$A.services.history</code></h4>
-    <p>The history service enables you to manage browser history and change the location.</p>
+    <h4><code>$A.historyService</code></h4>
+    <p>The history service enables you to manage browser history and change the location. For example, use <code>$A.historyService.set(location)</code> to add the location to the history service, and use <code>$A.historyService.back()</code>
+     or <code>$A.historyService.forward()</code> to load the previous or subsequent URL or layout on the list.</p>
     <p>See Also: <a href="#reference?topic=api:AuraHistoryService">Methods</a></p>
 
     <h3>AuraLayoutService</h3>
@@ -65,6 +66,6 @@
     <p>See Also: <a href="#reference?topic=api:AuraExpressionService">Methods</a> | <auradocs:topicLink topic="renderers">Using Renderers</auradocs:topicLink></p>
 
 
-    <!--TODO: AuraStorageService-->
+    <!--TODO: W-1403508 AuraStorageService-->
 
     </aura:component>

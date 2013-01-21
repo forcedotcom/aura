@@ -19,7 +19,6 @@ import junit.framework.Assert;
 
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.test.WebDriverTestCase;
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -49,10 +48,10 @@ public class QuickFixUIWidget {
     }
 
     /**
-     * Verify the menu button on QuickFix screen
+     * Verify toolbar error message and create button.
      */
-    public void verifyQuickFixButtons() {
-        util.verifyQuickFixButtons();
+    public void verifyToolbarAndButtons(String cmpName) {
+        util.verifyToolbarAndButtons(cmpName);
     }
 
     /**
@@ -61,7 +60,6 @@ public class QuickFixUIWidget {
      */
     public void clickCreate() {
         util.clickCreateAndNavigateToCustomization();
-
     }
 
     /**
@@ -69,6 +67,20 @@ public class QuickFixUIWidget {
      */
     public String clickFix(Boolean expectedSuccess) throws Exception {
         return util.clickFix(expectedSuccess);
+    }
+
+    /**
+     * Set the css file checkbox to be selected or not.
+     */
+    public void selectCssCheckbox(Boolean select) {
+        util.selectCssCheckbox(select);
+    }
+
+    /**
+     * Set the name of the component bundle before creating it.
+     */
+    public void setDescriptorNames(String text) {
+        util.setDescriptorNames(text);
     }
 
     private abstract class BaseComponentQuickFixUtil {
@@ -82,9 +94,7 @@ public class QuickFixUIWidget {
         /**
          * Verify what happens when fix button is clicked. In case of success it
          * returns the body text else it returns the information provided by
-         * alert.
-         * 
-         * @param expectedSuccess
+         * error popup.
          */
         public String clickFix(Boolean expectedSuccess) throws Exception {
             By fixButton = By.xpath("//img[@alt='Fix!']");
@@ -94,15 +104,35 @@ public class QuickFixUIWidget {
             if (expectedSuccess) {
                 return testCase.getDriver().findElement(By.tagName("body")).getText();
             } else {
-                Alert alert = testCase.getDriver().switchTo().alert();
-                return alert.getText();
+                return testCase.getDriver().findElement(By.xpath("//div[@id='auraErrorMessage']")).getText();
             }
         }
 
         /**
-         * Verify the buttons you expect to see on the WuickFix screen.
+         * Set the css file checkbox to be selected or not.
          */
-        public void verifyQuickFixButtons() {
+        public void selectCssCheckbox(Boolean select) {
+            By css = By.xpath("//input[@name='client.css' and @type='checkbox']");
+            WebElement checkbox = testCase.getDriver().findElement(css);
+            if ((select && !checkbox.isSelected()) || (!select && checkbox.isSelected())) {
+                checkbox.click();
+            }
+        }
+
+        /**
+         * Set the name of the component bundle before creating it.
+         */
+        public void setDescriptorNames(String text) {
+            By xpath = By.xpath("//textarea[@name='descriptor']");
+            WebElement textBox = testCase.getDriver().findElement(xpath);
+            textBox.clear();
+            textBox.sendKeys(text);
+        }
+
+        /**
+         * Verify the buttons you expect to see on the QuickFix screen.
+         */
+        public void verifyToolbarAndButtons(String name) {
             Assert.assertTrue("Could not locate the create button or the label on button is invalid.",
                     testCase.isElementPresent(createButton));
         }
@@ -170,6 +200,15 @@ public class QuickFixUIWidget {
             Assert.assertTrue("Could not locate checkbox to create java provider file.",
                     testCase.isElementPresent(javaProvider));
         }
+
+        @Override
+        public void verifyToolbarAndButtons(String name) {
+            super.verifyToolbarAndButtons(name);
+            By toolbarXpath = By.xpath("//div[@class='toolbar']");
+            String toolbarText = testCase.getDriver().findElement(toolbarXpath).getText();
+            Assert.assertTrue("Incorrect message displayed on quickfix toolbar",
+                    toolbarText.contains("No COMPONENT named " + name + " found"));
+        }
     }
 
     private class ApplicationQuickFixUtil extends BaseComponentQuickFixUtil {
@@ -184,6 +223,15 @@ public class QuickFixUIWidget {
             By app = By.xpath("//input[@name='client.app' and @type='checkbox']");
             Assert.assertTrue("Could not locate checkbox to create application markup file.",
                     testCase.isElementPresent(app));
+        }
+
+        @Override
+        public void verifyToolbarAndButtons(String name) {
+            super.verifyToolbarAndButtons(name);
+            By toolbarXpath = By.xpath("//div[@class='toolbar']");
+            String toolbarText = testCase.getDriver().findElement(toolbarXpath).getText();
+            Assert.assertTrue("Incorrect message displayed on quickfix toolbar",
+                    toolbarText.contains("No APPLICATION named " + name + " found"));
         }
     }
 

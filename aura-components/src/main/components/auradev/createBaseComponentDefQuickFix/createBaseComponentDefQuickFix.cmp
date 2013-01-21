@@ -37,12 +37,12 @@
                         <tr>
                             <aura:if isTrue="{!v.defType == 'Component'}">
                                 <td>
-                                    <input name="client.cmp" type="checkbox" checked="true" />
+                                    <input name="client.cmp" type="checkbox" checked="true" disabled="true"/>
                                 </td>
                                 <td>.cmp</td>
                                 <aura:set attribute="else">
                                 <td>
-                                    <input name="client.app" type="checkbox" checked="true" />
+                                    <input name="client.app" type="checkbox" checked="true" disabled="true"/>
                                 </td>
                                 <td>.app</td>
                                 </aura:set>
@@ -50,7 +50,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <input name="client.controller" type="checkbox" disabled="true" />
+                                <input name="client.controller" type="checkbox" disabled="true"/>
                             </td>
                             <td>Controller.js</td>
                         </tr>

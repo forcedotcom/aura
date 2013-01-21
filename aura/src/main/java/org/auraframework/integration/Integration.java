@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * An Integration defines the scope of creating a set of component injection
@@ -56,9 +57,10 @@ public interface Integration {
 	 *            Destination for injection script content
 	 * @throws AuraRuntimeException
 	 * @throws IOException
+	 * @throws QuickFixException
 	 */
 	void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId, Appendable out) throws AuraRuntimeException,
-			IOException;
+			IOException, QuickFixException;
 
 	@Deprecated
 	/**

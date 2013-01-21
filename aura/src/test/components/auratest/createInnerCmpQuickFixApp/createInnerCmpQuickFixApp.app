@@ -15,11 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component>
-<pre>
-[isTablet={!$Browser.isTablet}]
-[isPhone={!$Browser.isPhone}]
-[isAndroid={!$Browser.isAndroid}]
-[formFactor={!$Browser.formFactor}]
-</pre>
-</aura:component>
+<aura:application>
+    <auratest:innerCmpThatDoesntExist />
+    <div>In component createInnerCmpQuickFixApp</div>
+</aura:application>
+<!-- This component used in BaseComponentQuickFixUITest -->

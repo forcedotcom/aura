@@ -33,6 +33,8 @@
     <aura:attribute name="extraMetaTags" type="String"
                      description="A list of meta tags necessary for this template"/>
 
+    <div id="auraErrorMessage"/>
+
     <script>
     if (window.$A !== undefined) {
     	throw new Error("Aura has already been initialized!");
@@ -48,9 +50,9 @@
 
     {!v.extraScriptTags}
     {!v.auraScriptTags}
-
+    
     <script>
-   	$A.initConfig({!v.auraInit}, true);
+   	$A.initConfig({!v.auraInit}, true, true);
     </script>
           
     {!v.auraInitBlock}

@@ -15,29 +15,29 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Aura Client Service.  Communicates with the Aura Server.
+ * @namespace The Aura Client Service. Communicates with the Aura Server.
  * @constructor
  */
 var AuraClientService = function(){
-    //#include aura.AuraClientService_private
+    // #include aura.AuraClientService_private
 
     var clientService = {
 
     	/** @private */
         initHost : function(host){
             priv.host = host || "";
-            //#if {"modes" : ["PRODUCTION"]}
+            // #if {"modes" : ["PRODUCTION"]}
             delete this.initHost;
-            //#end
+            // #end
         },
 
     	/** @private */
         init: function(config, token, callback, container){
             $A.mark("ClientService.init");
             var body = document.body;
-            //#if {"modes" : ["PRODUCTION"]}
+            // #if {"modes" : ["PRODUCTION"]}
             try {
-            //#end
+            // #end
                 priv.token = token;
 
                 // Why is this happening in the ClientService? --JT
@@ -51,13 +51,13 @@ var AuraClientService = function(){
                 $A.measure("Initial Component Rendered", "ClientService.init", $A.logLevel["DEBUG"]);
                 callback(component);
 
-            //not on in dev modes to preserve stacktrace in debug tools
-            //#if {"modes" : ["PRODUCTION"]}
+            // not on in dev modes to preserve stacktrace in debug tools
+            // #if {"modes" : ["PRODUCTION"]}
             }catch(e){
                 $A.error(e);
                 throw e;
             }
-            //#end
+            // #end
             delete this.init;
         },
 
@@ -181,32 +181,73 @@ var AuraClientService = function(){
             var action = $A.get("c.aura://ComponentController.getComponent");
             
             action.setCallback(action, function(a) {
-            	var componentConfig = a.getReturnValue();
-            	
+                var element = $A.util.getElement(locatorDomId);
+                
+	        	// Check for bogus locatorDomId
+                var errors;
+                if (!element) {
+                	// We have no other place to display this critical failure - fallback to the document.body
+                	element = document.body;
+                	errors = ["Invalid locatorDomId specified - no element found in the DOM with id=" + locatorDomId];
+                } else {
+                	errors = a.getState() === "SUCCESS" ? undefined : action.getError();
+                }
+                
+            	var componentConfig;
+		        if (!errors) {
+		        	componentConfig = a.getReturnValue();
+		        } else {
+		        	// Display the errors in a ui:message instead
+		        	componentConfig = {
+						"componentDef" : {
+							"descriptor" : "markup://ui:message"
+						},
+
+						"attributes" : {
+							"values" : {
+								"title" : "Aura Integration Service Error",
+								"severity" : "error",
+								"body" : [{
+									"componentDef" : {
+										"descriptor" : "markup://ui:outputText"
+									},
+
+									"attributes" : {
+										"values" : {
+											"value" : $A.util.json.encode(errors)
+										}
+									}
+								}]
+							}
+						}
+					};
+		        }
+		        
             	componentConfig["localId"] = localId;
             	
             	var root = $A.getRoot();
                 var c = $A.componentService.newComponent(componentConfig, root);
-                
-                // Wire up event handlers
-                var actionEventHandlers = config["actionEventHandlers"];
-                if (actionEventHandlers) {
-	                var containerValueProvider = { 
-	            		getValue: function(functionName) { 
-	            			return { 
-	            				run: function(event) { window[functionName](event); } 
-	            			};
-	        			}
-	                };
-	                
-	                for (var event in actionEventHandlers) {
-	                	c.addHandler(event, containerValueProvider, actionEventHandlers[event]);
+
+                if (!errors) {
+	                // Wire up event handlers
+	                var actionEventHandlers = config["actionEventHandlers"];
+	                if (actionEventHandlers) {
+		                var containerValueProvider = { 
+		            		getValue: function(functionName) { 
+		            			return { 
+		            				run: function(event) { window[functionName](event); } 
+		            			};
+		        			}
+		                };
+		                
+		                for (var event in actionEventHandlers) {
+		                	c.addHandler(event, containerValueProvider, actionEventHandlers[event]);
+		                }
 	                }
                 }
                 
                 root.getValue("v.body").push(c);
                 
-                var element = $A.util.getElement(locatorDomId);
                 $A.render(c, element);
 
                 $A.afterRender(c);
@@ -215,13 +256,13 @@ var AuraClientService = function(){
     		action.complete(actionResult);        	
         }
 
-        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+        // #if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         ,"priv" : priv
-        //#end
+        // #end
     };
 
 
-    //#include aura.AuraClientService_export
+    // #include aura.AuraClientService_export
 
     return clientService;
 };

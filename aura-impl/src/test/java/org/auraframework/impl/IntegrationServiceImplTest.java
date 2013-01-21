@@ -26,6 +26,7 @@ import org.auraframework.integration.Integration;
 import org.auraframework.service.IntegrationService;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.junit.Ignore;
 
 import com.google.common.collect.Lists;
@@ -259,9 +260,9 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         try{
             integration.injectComponent("foo:bared", attributes, "", "", out);
             fail("Instantiating component through integration service should have failed because of missing component def.");
-        }catch(AuraRuntimeException expected){
+        }catch(DefinitionNotFoundException expected){
             //Expected exception
-            assertTrue(expected.getMessage().contains("DefinitionNotFoundException: No COMPONENT named markup://foo:bared found"));
+            assertTrue(expected.getMessage().contains("No COMPONENT named markup://foo:bared found"));
         }
     }
     /**
@@ -275,9 +276,9 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         try{
             integration.injectComponent(validApp, attributes, "", "", out);
             fail("Injecting an application through integration service should have failed.");
-        }catch(AuraRuntimeException expected){
+        }catch(DefinitionNotFoundException expected){
             //TODO: Maybe a better error message?
-            assertTrue(expected.getMessage().contains("DefinitionNotFoundException: No COMPONENT named markup://test:laxSecurity found"));
+            assertTrue(expected.getMessage().contains("No COMPONENT named markup://test:laxSecurity found"));
         }
     }
     /**

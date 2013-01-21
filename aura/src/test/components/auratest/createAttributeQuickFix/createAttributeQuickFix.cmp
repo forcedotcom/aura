@@ -16,10 +16,7 @@
 
 -->
 <aura:component>
-<pre>
-[isTablet={!$Browser.isTablet}]
-[isPhone={!$Browser.isPhone}]
-[isAndroid={!$Browser.isAndroid}]
-[formFactor={!$Browser.formFactor}]
-</pre>
+    <auratest:createAttributeQuickFix_child foo="bar" />
+    <div>In component createAttributeQuickFix</div>
 </aura:component>
+<!-- This component used in CreateAttributeQuickFixUITest -->

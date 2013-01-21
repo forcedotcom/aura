@@ -340,14 +340,14 @@ Aura.prototype.initAsync = function(config){
  * Used for synchronous initialization.
  * @param {Object} config
  */
-Aura.prototype.initConfig = function AuraInitConfig(config, useExisting){
+Aura.prototype.initConfig = function AuraInitConfig(config, useExisting, doNotInitializeServices){
     config = $A.util.json.resolveRefs(config);
     
 	if (!useExisting || $A.util.isUndefined($A.getContext())) {
 	    clientService.initHost(config["host"]);
 	
 	    aura.context = new AuraContext(config["context"]);
-	    this.init(config["instance"], config["token"], config["context"]);
+	    this.init(config["instance"], config["token"], config["context"], null, doNotInitializeServices);
 	} else {
 		// Use the existing context and just join the new context into it
 		$A.getContext().join(config["context"]);
@@ -361,9 +361,9 @@ Aura.prototype.initConfig = function AuraInitConfig(config, useExisting){
  * @param {Object} context The mode of the application or component ("DEV", "PROD", "PTEST")
  * @param {Object} container Sets the container for the component.
  */
-Aura.prototype.init = function AuraInit(config, token, context, container){
+Aura.prototype.init = function AuraInit(config, token, context, container, doNotInitializeServices){
     var component = $A.util.json.resolveRefs(config);
-    $A.initPriv(component, token, context, container);
+    $A.initPriv(component, token, context, container, doNotInitializeServices);
 };
 
 /**
@@ -373,7 +373,7 @@ Aura.prototype.init = function AuraInit(config, token, context, container){
  * @param {Object} context The mode of the application or component ("DEV", "PROD", "PTEST"),
  * @param {Object} container Sets the container for the component.
  */
-Aura.prototype.initPriv = function AuraInitPriv(config, token, context, container){
+Aura.prototype.initPriv = function AuraInitPriv(config, token, context, container, doNotInitializeServices){
     if (!$A["hasErrors"]) {
         $A.mark("Aura.initPriv");
 
@@ -382,17 +382,18 @@ Aura.prototype.initPriv = function AuraInitPriv(config, token, context, containe
             aura.setRoot(cmp);
 
             if (!$A.initialized) {
-                $A.layoutService.init(cmp);
-                $A.measure("LayoutService.init","Aura.initPriv", $A.logLevel["DEBUG"]);
-
-                $A.historyService.init();
-                $A.measure("HistoryService.init","Aura.initPriv", $A.logLevel["DEBUG"]);
+            	if (!doNotInitializeServices) {
+	                $A.layoutService.init(cmp);
+	                $A.measure("LayoutService.init","Aura.initPriv", $A.logLevel["DEBUG"]);
+	
+	                $A.historyService.init();
+	                $A.measure("HistoryService.init","Aura.initPriv", $A.logLevel["DEBUG"]);
+            	}
+            	
                 $A.initialized = true;
             }
 
-            if(!cmp["isSelfFinishing"]){
-                $A.finishInit();
-            }
+            $A.finishInit();
         }, container ? $A.util.getElement(container) : null);
     }
 };

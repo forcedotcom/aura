@@ -16,10 +16,7 @@
 
 -->
 <aura:component>
-<pre>
-[isTablet={!$Browser.isTablet}]
-[isPhone={!$Browser.isPhone}]
-[isAndroid={!$Browser.isAndroid}]
-[formFactor={!$Browser.formFactor}]
-</pre>
+    <auratest:innerCmpThatDoesntExist />
+    <div>In component createInnerCmpQuickFixCmp</div>
 </aura:component>
+<!-- This component used in BaseComponentQuickFixUITest -->

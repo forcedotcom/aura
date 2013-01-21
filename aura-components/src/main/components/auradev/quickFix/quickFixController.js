@@ -26,7 +26,7 @@
         a.setCallback(cmp, function(action){
             var state = action.getState();
             if(state === "ERROR"){
-                alert(action.getError().message);
+                $A.error(action.getError()[0].message);
             }else{
                 location.reload();
             }

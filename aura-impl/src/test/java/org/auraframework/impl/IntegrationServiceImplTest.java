@@ -25,6 +25,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.integration.Integration;
 import org.auraframework.service.IntegrationService;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.junit.Ignore;
@@ -47,11 +48,11 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
     private IntegrationService service;
     private final String simpleComponentTag = "ui:button";
     //private final String laxSecurityProviderDesc = "java://org.auraframework.components.security.SecurityProviderAlwaysAllows";
-    
+
     @Override
     public void setUp() throws Exception{
         super.setUp();
-        service = Aura.getIntegrationService();        
+        service = Aura.getIntegrationService();
     }
     /**
      * Null check for arguments sent to Integration() constructor invoked through IntegrationService.createIntegration()
@@ -71,7 +72,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         integration = service.createIntegration("" , null);
         assertException(integration);
     }
-    
+
     /**
      * Null check for arguments sent to Integration.createIntegration()
      * @throws Exception
@@ -90,7 +91,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         assertException(integration, simpleComponentTag, attributes, "", null, out);
         //No stream to write output to
         assertException(integration, simpleComponentTag, attributes, "", "", null);
-        
+
         //No local ID should be fine
         try{
             integration.injectComponent(simpleComponentTag, attributes, "" , "", out);
@@ -100,9 +101,10 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      * Sanity check for IntegrationService.
      * @throws Exception
      */
+    @UnAdaptableTest
     public void testSanityCheck() throws Exception{
         assertNotNull("Failed to locate implementation of IntegrationService.", service);
-        
+
         Mode[] testModes = new Mode[]{Mode.UTEST,Mode.PROD};
         for(Mode m:testModes){
             Integration integration = service.createIntegration("" , m);
@@ -118,10 +120,11 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
     /**
      * Verify injecting multiple components using a single Integration Object.
      */
+    @UnAdaptableTest
     public void testInjectingMultipleComponents()throws Exception{
-        DefDescriptor<ComponentDef> cmp1 = addSourceAutoCleanup(ComponentDef.class, 
+        DefDescriptor<ComponentDef> cmp1 = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
-        DefDescriptor<ComponentDef> cmp2 = addSourceAutoCleanup(ComponentDef.class, 
+        DefDescriptor<ComponentDef> cmp2 = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
@@ -147,21 +150,21 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      */
     public void testAttributeTypes() throws Exception{
         String attributeMarkup = "<aura:attribute name='strAttr' type='String'/>" +
-        		                 "<aura:attribute name='booleanAttr' type='Boolean'/>" +
-        		                 "<aura:attribute name='strList' type='List'/>" +
-        		                 "<aura:attribute name='booleanArray' type='Boolean[]'/>"+
-                                 "<aura:attribute name='cmps' type='Aura.Component[]'/>" +
-                                 "<aura:attribute name='obj' type='Object'/>";
+        "<aura:attribute name='booleanAttr' type='Boolean'/>" +
+        "<aura:attribute name='strList' type='List'/>" +
+        "<aura:attribute name='booleanArray' type='Boolean[]'/>"+
+        "<aura:attribute name='cmps' type='Aura.Component[]'/>" +
+        "<aura:attribute name='obj' type='Object'/>";
         String attributeWithDefaultsMarkup = "<aura:attribute name='strAttrDefault' type='String' default='IS'/>" +
-            "<aura:attribute name='booleanAttrDefault' type='Boolean' default='true'/>" +
-            "<aura:attribute name='strListDefault' type='List' default='foo,bar'/>" +
-            "<aura:attribute name='booleanArrayDefault' type='Boolean[]' default='[true,false,false]'/>"+
-            "<aura:attribute name='objDefault' type='Object' default='fooBar'/>"+
-            "<aura:attribute name='cmpsDefault' type='Aura.Component[]'>"+
-            "<div/><span/>text<p/>"+
-            "</aura:attribute>";
-        
-        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, 
+        "<aura:attribute name='booleanAttrDefault' type='Boolean' default='true'/>" +
+        "<aura:attribute name='strListDefault' type='List' default='foo,bar'/>" +
+        "<aura:attribute name='booleanArrayDefault' type='Boolean[]' default='[true,false,false]'/>"+
+        "<aura:attribute name='objDefault' type='Object' default='fooBar'/>"+
+        "<aura:attribute name='cmpsDefault' type='Aura.Component[]'>"+
+        "<div/><span/>text<p/>"+
+        "</aura:attribute>";
+
+        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", attributeMarkup+attributeWithDefaultsMarkup));
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("strAttr", "" );
@@ -169,7 +172,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         attributes.put("strList", Lists.newArrayList("food","bared"));
         attributes.put("booleanArray", new Boolean[]{true,false} );
         attributes.put("obj", "Object");
-        
+
         Appendable out = new StringBuffer();
         Integration integration = service.createIntegration("" , Mode.UTEST);
         try{
@@ -182,23 +185,23 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      */
     public void testAttributesAndEvents(){
         String attributeMarkup = "<aura:attribute name='strAttr' type='String'/>" +
-                                 "<aura:attribute name='booleanAttr' type='Boolean'/>";
+        "<aura:attribute name='booleanAttr' type='Boolean'/>";
         String eventsMarkup = "<aura:registerevent name='press' type='ui:press'/>" +
-        		"<aura:registerevent name='mouseout' type='ui:mouseout'/> ";
-        
-        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, 
+        "<aura:registerevent name='mouseout' type='ui:mouseout'/> ";
+
+        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", attributeMarkup+eventsMarkup));
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("strAttr", "" );
         attributes.put("booleanAttr", false);
         attributes.put("press", "function(e){alert('press')}");
         attributes.put("mouseout", "function(e){alert('mouseout')}");
-        
+
         Appendable out = new StringBuffer();
         Integration integration = service.createIntegration("" , Mode.UTEST);
         try{
             integration.injectComponent(cmp.getDescriptorName(), attributes, "", "", out);
-        }catch(Exception unexpected){fail("Exception occured when injecting component with attribute and event handlers. Exception:" + 
+        }catch(Exception unexpected){fail("Exception occured when injecting component with attribute and event handlers. Exception:" +
                 unexpected.getMessage());}
     }
     /**
@@ -217,7 +220,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
             assertEquals("Unknown attribute or event ui:button - fooBar", expected.getMessage());
         }
     }
-    
+
     @Ignore("W-1505382")
     public void testNonStringAttributeValuesForEvents() throws Exception{
         //Non String attribute for functions
@@ -240,14 +243,14 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      */
     @Ignore("W-1495914")
     public void testExceptionsDueToSecurityProvider(){
-//        Integration integration = service.createIntegration("java://org.auraframework.components.security.SecurityProviderAlwaysDenies", "" , Mode.UTEST);
-//        try{
-//            injectSimpleComponent(integration);
-//            fail("Failed to respect security provider restrictions.");
-//        }catch(NoAccessException expected){
-//            //Assert expected error message
-//            //TODO: But NoAccessException is a clientside exception. What would happen in the case of component injection?
-//        }catch(Exception allOthers){fail("Failed to respect security provider restrictions.");}
+        //        Integration integration = service.createIntegration("java://org.auraframework.components.security.SecurityProviderAlwaysDenies", "" , Mode.UTEST);
+        //        try{
+        //            injectSimpleComponent(integration);
+        //            fail("Failed to respect security provider restrictions.");
+        //        }catch(NoAccessException expected){
+        //            //Assert expected error message
+        //            //TODO: But NoAccessException is a clientside exception. What would happen in the case of component injection?
+        //        }catch(Exception allOthers){fail("Failed to respect security provider restrictions.");}
     }
     /**
      * Verify that injecting non existing exceptions is flagged with an exception.
@@ -288,7 +291,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      * @throws Exception
      */
     public void testExceptionDuringComponentInstantiation() throws Exception{
-        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, 
+        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<aura:attribute name='reqAttr' required='true' type='String'/>"));
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
@@ -297,8 +300,8 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
             integration.injectComponent(cmp.getDescriptorName(), attributes, "", "", out);
         }catch(Exception unexpected){fail("Exceptions during component instantiation should be funneled to the client.");}
     }
-    
-    private void assertException(Integration obj, String tag, Map<String, Object> attributes, 
+
+    private void assertException(Integration obj, String tag, Map<String, Object> attributes,
             String localId, String locatorDomId, Appendable out)throws Exception{
         try{
             obj.injectComponent(tag, attributes, localId, locatorDomId, out);
@@ -318,7 +321,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         }catch(AuraRuntimeException expected){
             //Expected
         }
-    }    
+    }
     private Appendable injectSimpleComponent(Integration obj) throws Exception{
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("label", "Click Me");

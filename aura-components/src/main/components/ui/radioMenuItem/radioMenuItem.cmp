@@ -1,0 +1,28 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="ui:menuItem" extensible="true" support="GA" description="A menu item with a radio button indicate if it is mutual exclusively selected or not.">
+    <aura:handler name="click" action="{!c.handleClick}"/>
+    <aura:renderif isTrue="{!v.body.length == 0}">
+        <li aura:id="listitem" class="{!v.class}" role="presentation">
+            <a aura:id="link" role="menuitemradio" disabled="{!v.disabled}"><b></b>{!v.label}</a>
+        </li>
+        <aura:set attribute="else">
+            {!v.body}
+        </aura:set>
+    </aura:renderif>
+</aura:component>

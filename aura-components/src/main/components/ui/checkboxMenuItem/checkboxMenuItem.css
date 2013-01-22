@@ -1,0 +1,11 @@
+.THIS a b {
+    float: left;
+    display: block;
+    width: 16px;
+    height: 16px;
+    margin-right: 2px;
+}
+
+.THIS a.selected b {
+    background: url('/auraFW/resources/aura/images/menuitem-check.png') no-repeat center center;
+}

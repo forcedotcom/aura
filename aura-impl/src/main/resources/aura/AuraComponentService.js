@@ -89,7 +89,9 @@ var AuraComponentService = function(){
          * Create a new component, using the format: newComponent("ui:inputText") or
          * newComponent({componentDef: {descriptor: "markup://namespace:name"}, attributes: { values: { key: value }} })
          * @param {Object} config
-         * 				Required. Use config to pass in your component definition and attributes. Supports lazy or exclusive loading by passing in "load": "LAZY" or "load": "EXCLUSIVE"
+         * 				Use config to pass in your component definition and attributes. Supports lazy or exclusive loading by passing in "load": "LAZY" or "load": "EXCLUSIVE"
+         * @param {Object} attributeValueProvider
+         * 				The value provider for the attributes
          * @memberOf AuraComponentService
          * @public
          */

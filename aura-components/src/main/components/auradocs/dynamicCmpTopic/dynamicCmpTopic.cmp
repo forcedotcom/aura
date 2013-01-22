@@ -26,21 +26,22 @@
     <auradocs:codeblock>
     var action = cmp.get("c.doSomething");
     action.setParams({
-      //Set the aura:id and other parameters
-      "localId":"newId";
+      //Set action parameters
     });
 
-    //Set the action callback and create a new child component
     action.setCallback(cmp, function(action) {
+    
+    //Create a new child component and assign an aura:id
+      var childConfig = action.getReturnValue();
+      childConfig["localId"] = "newId";  
+      var child = $A.services.component.newComponent(childConfig);
         
-    var child = $A.services.component.newComponent(action.getReturnValue());
-        
-    var div = cmp.find("div");
-    var body = div.getValue("v.body");
+      var div = cmp.find("div");
+      var body = div.getValue("v.body");
 
-   //Replace the existing component
-    body.destroy();
-    body.setValue(child);
+    //Replace the existing component
+      body.destroy();
+      body.setValue(child);
     })
     </auradocs:codeblock>
 
@@ -63,15 +64,20 @@
     
 
     <h2>Discussion</h2>
-    <p>In the first sample, <code>action.getReturnValue()</code> returns a component with its definition and attributes. The existing component is then destroyed and replaced by the new component in the body.
-    Since body is an <code>ArrayValue</code>, you can also insert new components using <code>push()</code>. In the second sample, the configuration attributes are set on the client.</p>
-    <p>The <code>newComponent()</code> method enables you to create components on the server or on the client. Aura doesn't make a call to the server if you provide the configuration attributes.
+    <p>The <code>newComponent()</code> method enables you to create components on the server or on the client.
+    In the first sample, <code>action.getReturnValue()</code> returns a component with its definition and attributes from a server-side controller. The existing component is then destroyed and replaced by the new component in the body.
+    Since body is an <code>ArrayValue</code>, you can also insert new components using <code>push()</code>. 
+    You can set the <code>localId</code> on the component only after it’s returned from the server.
+    To add an event handler to the new component, use <code>component.addHandler()</code> in your client-side controller.</p>
+    <p>In the second sample, the configuration attributes are set on the client. Aura doesn't make a call to the server if you provide the configuration attributes.</p>
+    <p> 
     If the component you are dynamically creating requires a server call such as to a model or provider, <code>newComponent()</code> returns an <code>aura:placeholder</code> component.
     The server then returns the component to the client and replaces the placeholder.</p>
     <auradocs:info><code>newLocalComponent()</code> is deprecated and has been replaced by <code>newComponent()</code>. See the <a href="#reference?topic=api:AuraComponentService">JavaScript API reference</a> for a full list of methods.</auradocs:info>
 
     <p><b>See also:</b><br/>
       <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
+      <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink><br/>
       <auradocs:topicLink topic="valueObjects">Value Objects</auradocs:topicLink>
       </p>
     </aura:component>

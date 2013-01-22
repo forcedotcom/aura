@@ -17,7 +17,7 @@ package org.auraframework.def;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.throwable.MissingRequiredAttributeException;
+import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
 
 public class ForEachDefTest extends DefinitionTest<ComponentDef> {
     /**

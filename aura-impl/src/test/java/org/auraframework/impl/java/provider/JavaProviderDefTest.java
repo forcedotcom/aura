@@ -27,9 +27,9 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.AuraValidationException;
-import org.auraframework.throwable.MissingRequiredAttributeException;
+import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Ignore;
 

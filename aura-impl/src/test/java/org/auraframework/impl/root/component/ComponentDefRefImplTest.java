@@ -33,7 +33,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.MissingRequiredAttributeException;
+import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
 
 import com.google.common.collect.ImmutableMap;
 

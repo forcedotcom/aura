@@ -37,6 +37,55 @@ public class HashTest extends UnitTestCase {
         assertEquals(new Hash(bytes), hash);
     }
 
+    private String findNonPrint(String val) {
+        StringBuffer sb = new StringBuffer();
+        boolean error = false;
+        int i;
+
+        for (i = 0; i < val.length(); i++) {
+            char x = val.charAt(i);
+
+            if (x < 128 && x >= 32) {
+                sb.append(x);
+            } else {
+                sb.append("[[[");
+                sb.append((int)x);
+                sb.append("]]]");
+                error = true;
+            }
+        }
+        if (error) {
+            return sb.toString();
+        } else {
+            return "";
+        }
+    }
+
+    public void testToString() throws Exception {
+        byte[] bytes = { 12, 34, 56, 78, 90 };
+        Hash hash = new Hash(bytes);
+        String val = hash.toString();
+
+        assertTrue(val.length() > 1);
+        assertEquals("Bad character in string", "", findNonPrint(val));
+
+        hash = new Hash(new StringReader("a test for all eternity"));
+        val = hash.toString();
+        assertTrue(val.length() > 1);
+        assertEquals("Bad character in string", "", findNonPrint(val));
+
+        hash = new Hash(new StringReader("a different test for all eternity"));
+        val = hash.toString();
+        assertTrue(val.length() > 1);
+        assertEquals("Bad character in string", "", findNonPrint(val));
+        
+        hash = new Hash(new StringReader("why are you looking at this anyway"));
+        val = hash.toString();
+        assertTrue(val.length() > 1);
+        assertEquals("Bad character in string", "", findNonPrint(val));
+    }
+
+
     public void testFromBytes() {
         byte[] bytes1 = { 12, 34, 56, 78, 90 };
         byte[] bytes2 = { 12, 43, 56, 78, 90 };

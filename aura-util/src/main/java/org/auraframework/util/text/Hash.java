@@ -25,6 +25,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
+import org.apache.commons.codec.binary.Base64;
+
 /**
  * A wrapper around an MD5 hash. This functions as a future, being created
  * before the hash value is actually computed.
@@ -35,7 +37,6 @@ public class Hash {
      * base64 to have a shorter string, but that makes the encoding marginally
      * more complex since we have to handle byte-wrap boundaries ourselves.
      */
-    private static final int RADIX = 16;
     private byte[] value;
 
     /**
@@ -110,12 +111,7 @@ public class Hash {
         if (value == null) {
             return "no-hash-value";
         }
-        StringBuilder builder = new StringBuilder(80);
-        for (byte b : value) {
-            builder.append(Character.forDigit(b >> 4, RADIX));
-            builder.append(Character.forDigit(b & 0xf, RADIX));
-        }
-        return builder.toString();
+        return Base64.encodeBase64URLSafeString(value);
     }
 
     @Override

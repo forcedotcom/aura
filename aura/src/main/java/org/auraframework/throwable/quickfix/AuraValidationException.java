@@ -13,23 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * Exception to 
- */
 package org.auraframework.throwable.quickfix;
 
 import org.auraframework.system.Location;
 
 /**
- * 
- * Exception thrown when an event of incompatible type is used. Also see
- * {@link org.auraframework.def.EventType}
  */
-public class InvalidEventTypeException extends AuraValidationException {
+public abstract class AuraValidationException extends QuickFixException {
 
-    private static final long serialVersionUID = 2571238301623320240L;
+    /**
+     */
+    private static final long serialVersionUID = -7041778809350433164L;
 
-    public InvalidEventTypeException(String message, Location location) {
-        super(message, location);
+    public AuraValidationException(String message, Location l, AuraQuickFix... quickFixes) {
+        super(message, l, quickFixes);
     }
+
+    public AuraValidationException(String msg) {
+        this(msg, null);
+    }
+
 }

@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.throwable;
+package org.auraframework.throwable.quickfix;
 
 import org.auraframework.system.Location;
-import org.auraframework.throwable.quickfix.AuraQuickFix;
 
 /**
  * @since 0.0.199

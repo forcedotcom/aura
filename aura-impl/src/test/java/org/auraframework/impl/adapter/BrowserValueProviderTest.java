@@ -22,9 +22,6 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
-import org.auraframework.system.AuraContext.Format;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
 import org.auraframework.test.client.UserAgent;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
@@ -96,13 +93,6 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
     // semi-integration test checks that value provider is created and validated
     // on component
     public void testInvalidPropertyInMarkup() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.UTEST,
-                Format.HTML, Access.AUTHENTICATED);
-
-        if (context == null) {
-            fail("Unable to set context");
-        }
-
         try {
             DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(
                     ComponentDef.class,
@@ -113,8 +103,6 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
         } catch (InvalidExpressionException e) {
             assertEquals("No property on $Browser for key: badProperty",
                     e.getMessage());
-        } finally {
-            Aura.getContextService().endContext();
         }
     }
 
@@ -127,27 +115,17 @@ public class BrowserValueProviderTest extends AuraImplTestCase {
     private void assertBrowserProperties(UserAgent userAgent, boolean isTablet,
             boolean isPhone, boolean isAndroid, String formFactor,
             boolean isIPad, boolean isIPhone, boolean isIOS) throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.UTEST,
-                Format.HTML, Access.AUTHENTICATED);
-
-        if (context == null) {
-            fail("Unable to set context");
-        }
-
-        try {
-            context.setClient(new Client(userAgent == null ? null : userAgent
-                    .getUserAgentString()));
-            BrowserValueProvider bvp = new BrowserValueProvider();
-            assertBrowserProperty(bvp, BrowserProperty.isTablet, isTablet);
-            assertBrowserProperty(bvp, BrowserProperty.isPhone, isPhone);
-            assertBrowserProperty(bvp, BrowserProperty.isAndroid, isAndroid);
-            assertBrowserProperty(bvp, BrowserProperty.formFactor, formFactor);
-            assertBrowserProperty(bvp, BrowserProperty.isIPad, isIPad);
-            assertBrowserProperty(bvp, BrowserProperty.isIPhone, isIPhone);
-            assertBrowserProperty(bvp, BrowserProperty.isIOS, isIOS);
-        } finally {
-            Aura.getContextService().endContext();
-        }
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        context.setClient(new Client(userAgent == null ? null : userAgent
+                .getUserAgentString()));
+        BrowserValueProvider bvp = new BrowserValueProvider();
+        assertBrowserProperty(bvp, BrowserProperty.isTablet, isTablet);
+        assertBrowserProperty(bvp, BrowserProperty.isPhone, isPhone);
+        assertBrowserProperty(bvp, BrowserProperty.isAndroid, isAndroid);
+        assertBrowserProperty(bvp, BrowserProperty.formFactor, formFactor);
+        assertBrowserProperty(bvp, BrowserProperty.isIPad, isIPad);
+        assertBrowserProperty(bvp, BrowserProperty.isIPhone, isIPhone);
+        assertBrowserProperty(bvp, BrowserProperty.isIOS, isIOS);
     }
 
     // sample some user agents

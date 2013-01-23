@@ -17,7 +17,7 @@ package org.auraframework.adapter;
 
 import org.auraframework.expression.Expression;
 import org.auraframework.system.Location;
-import org.auraframework.throwable.AuraValidationException;
+import org.auraframework.throwable.quickfix.AuraValidationException;
 
 /**
  * adapt a parser that takes in strings and returns {@link Expression} objects

@@ -86,7 +86,7 @@
 	top: 14px;
 	width: 32px;
 	height: 32px;
-	background-image: url(/auraFW/resources/img/msg_icons/info32.png);
+	background-image: url(/auraFW/resources/aura/images/spinner.png);
 	display: none;
 }
 
@@ -98,7 +98,7 @@
     -moz-animation-timing-function: ease-in-out;
 	-webkit-animation-iteration-count: infinite;
 	-webkit-animation-name: spinner;
-	-webkit-animation-duration: .3s;
+	-webkit-animation-duration: 1s;
 	-webkit-animation-timing-function: ease-in-out;
 }
 

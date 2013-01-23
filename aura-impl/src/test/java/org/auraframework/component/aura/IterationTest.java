@@ -25,8 +25,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.AuraExecutionException;
-import org.auraframework.throwable.MissingRequiredAttributeException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
+import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
 import org.junit.Ignore;
 
 import com.google.common.collect.Lists;

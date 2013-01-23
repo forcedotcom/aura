@@ -43,7 +43,7 @@
     <p>Each folder within a namespace folder maps to a specific component and contains all the resources necessary for the component.  We refer to this folder as the component's "bundle".</p>
     <p>In this case, the <code>helloWorld</code> bundle only contains a <code>helloWorld.cmp</code> file, which has the markup for this component. See <auradocs:topicLink topic="compBundle">Component Bundles</auradocs:topicLink> for more information on files you can include in the bundle. </p>
 
-    <auradocs:error>Note that the file names in the bundle MUST match the name of the component.</auradocs:error>
+    <auradocs:warning>Note that the file names in the bundle MUST match the name of the component.</auradocs:warning>
 
     <h2>Viewing Components</h2>
 

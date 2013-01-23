@@ -90,7 +90,7 @@
                 },function(){
                     $A.test.assertTrue(cmp.find("lazyWReqAttr").isRendered());
                     $A.test.assertTrue(cmp.find("lazyWReqAttr").getElement().textContent.indexOf(
-                                "org.auraframework.throwable.MissingRequiredAttributeException: COMPONENT markup://loadlevelTest:serverComponentWReqAttr is missing required attribute 'stringAttribute'") != -1);
+                                "org.auraframework.throwable.quickfix.MissingRequiredAttributeException: COMPONENT markup://loadlevelTest:serverComponentWReqAttr is missing required attribute 'stringAttribute'") != -1);
                 });
         }]
     }

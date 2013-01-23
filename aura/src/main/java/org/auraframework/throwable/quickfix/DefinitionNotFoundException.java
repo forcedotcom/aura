@@ -18,7 +18,6 @@ package org.auraframework.throwable.quickfix;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.Location;
-import org.auraframework.throwable.AuraValidationException;
 
 /**
  * thrown when unable to locate a def for a descriptor

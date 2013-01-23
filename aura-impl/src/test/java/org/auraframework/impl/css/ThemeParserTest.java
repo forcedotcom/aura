@@ -19,9 +19,10 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.css.parser.CSSParser;
+import org.auraframework.impl.css.parser.ThemeParser;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Client;
-import org.auraframework.throwable.ThemeParserException;
+import org.auraframework.throwable.quickfix.ThemeParserException;
 
 /**
  * This class tests the CSS validation in place for Aura Components. Aura

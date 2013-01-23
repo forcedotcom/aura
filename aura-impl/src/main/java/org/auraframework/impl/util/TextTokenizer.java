@@ -36,7 +36,7 @@ import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.impl.root.parser.handler.ExpressionContainerHandler;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;
-import org.auraframework.throwable.AuraValidationException;
+import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.util.AuraTextUtil;
 

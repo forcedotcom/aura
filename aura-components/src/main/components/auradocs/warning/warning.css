@@ -13,26 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.throwable;
 
-import org.auraframework.system.Location;
-import org.auraframework.throwable.quickfix.AuraQuickFix;
-import org.auraframework.throwable.quickfix.QuickFixException;
-
-/**
- */
-public abstract class AuraValidationException extends QuickFixException {
-
-    /**
-     */
-    private static final long serialVersionUID = -7041778809350433164L;
-
-    public AuraValidationException(String message, Location l, AuraQuickFix... quickFixes) {
-        super(message, l, quickFixes);
-    }
-
-    public AuraValidationException(String msg) {
-        this(msg, null);
-    }
-
+.auradocsWarning.warning{
+   border-color: #f8e38e;
+   background-color: #ffffdc;
+   background: 10px no-repeat url(/auraFW/resources/img/msg_icons/warning24.png);
+   padding-left: 40px;
 }

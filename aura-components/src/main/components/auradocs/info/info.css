@@ -13,23 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * Exception to 
- */
-package org.auraframework.throwable.quickfix;
-
-import org.auraframework.system.Location;
-
-/**
- * 
- * Exception thrown when an event of incompatible type is used. Also see
- * {@link org.auraframework.def.EventType}
- */
-public class InvalidEventTypeException extends AuraValidationException {
-
-    private static final long serialVersionUID = 2571238301623320240L;
-
-    public InvalidEventTypeException(String message, Location location) {
-        super(message, location);
-    }
+ 
+.auradocsInfo.info{
+    border-color:#bee6ff;
+    background-color: #f5fcff;
+    background: 10px no-repeat url(/auraFW/resources/img/msg_icons/info24.png);
+    padding-left: 40px;
 }

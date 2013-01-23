@@ -70,7 +70,7 @@ import com.google.common.collect.Sets;
  */
 // FF pops a dialog for appCache
 // IE < 10 don't support appCache
-@ExcludeBrowsers({ BrowserType.FIREFOX, BrowserType.IE7, BrowserType.IE8, BrowserType.IE9, BrowserType.IE10 })
+@ExcludeBrowsers({ BrowserType.FIREFOX, BrowserType.IE7, BrowserType.IE8, BrowserType.IE9, BrowserType.IE10})
 @FreshBrowserInstance
 @ThreadHostileTest
 public class AppCacheResourcesUITest extends WebDriverTestCase {
@@ -105,28 +105,28 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         DefDescriptor<ComponentDef> cmpDesc = createDef(ComponentDef.class, String.format("%s:%s", namespace, cmpName),
                 "<aura:component>" + "<aura:attribute name='output' type='String'/>"
-                        + "<div class='clickableme' onclick='{!c.cssalert}'>@@@TOKEN@@@</div>"
-                        + "<div class='attroutput'>{!v.output}</div>" + "</aura:component>");
+                + "<div class='clickableme' onclick='{!c.cssalert}'>@@@TOKEN@@@</div>"
+                + "<div class='attroutput'>{!v.output}</div>" + "</aura:component>");
 
         createDef(ThemeDef.class, String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, namespace, cmpName),
-                ".THIS {background-image: url(/auraFW/resources/qa/images/s.gif?@@@TOKEN@@@);}");
+        ".THIS {background-image: url(/auraFW/resources/qa/images/s.gif?@@@TOKEN@@@);}");
 
         createDef(ControllerDef.class,
                 String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, namespace, cmpName),
                 "{ cssalert:function(c){" + "function getStyle(elem, style){" + "var val = '';"
-                        + "if(document.defaultView && document.defaultView.getComputedStyle){"
-                        + "val = document.defaultView.getComputedStyle(elem, '').getPropertyValue(style);"
-                        + "} else if(elem.currentStyle){" + "style = style.replace(/\\-(\\w)/g, function (s, ch){"
-                        + "return ch.toUpperCase();" + "});" + "val = elem.currentStyle[style];" + "}" + "return val;"
-                        + "};" + "var style = getStyle(c.getElement(),'background-image');"
-                        + "c.getValue('v.output').setValue('@@@TOKEN@@@'"
-                        + "+ style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')'))"
-                        + "+ ($A.test ? $A.test.dummyFunction() : '@@@TOKEN@@@'));" + "}}");
+                + "if(document.defaultView && document.defaultView.getComputedStyle){"
+                + "val = document.defaultView.getComputedStyle(elem, '').getPropertyValue(style);"
+                + "} else if(elem.currentStyle){" + "style = style.replace(/\\-(\\w)/g, function (s, ch){"
+                + "return ch.toUpperCase();" + "});" + "val = elem.currentStyle[style];" + "}" + "return val;"
+                + "};" + "var style = getStyle(c.getElement(),'background-image');"
+                + "c.getValue('v.output').setValue('@@@TOKEN@@@'"
+                + "+ style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')'))"
+                + "+ ($A.test ? $A.test.dummyFunction() : '@@@TOKEN@@@'));" + "}}");
 
         createDef(ApplicationDef.class, String.format("%s:%s", namespace, appName), String.format(
                 "<aura:application useAppcache='true' render='client' preload='%s'"
-                        + " securityProvider='java://org.auraframework.java.securityProvider.LaxSecurityProvider'>"
-                        + "<%s:%s/>" + "</aura:application>", namespace, namespace, cmpDesc.getName()));
+                + " securityProvider='java://org.auraframework.java.securityProvider.LaxSecurityProvider'>"
+                + "<%s:%s/>" + "</aura:application>", namespace, namespace, cmpDesc.getName()));
     }
 
     @Override
@@ -188,7 +188,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      */
     public void testCacheErrorWithEmptyCache() throws Exception {
         openNoAura("/aura/application.app"); // just need a domain page to set
-                                             // cookie from
+        // cookie from
         Date expiry = new Date(System.currentTimeMillis() + 60000);
         String cookieName = getManifestCookieName();
         getDriver().manage().addCookie(new Cookie(cookieName, "error", null, "/", expiry));
@@ -221,7 +221,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, replacement, TOKEN);
         List<Request> expected = Lists.newArrayList(new Request("/aura", namespace + ":" + appName, null, null),
                 new Request("/aura", namespace + ":" + appName, null, "HTML"), new Request("/auraResource", null, null,
-                        "css"), new Request("/auraResource", null, null, "js"), new Request("/auraResource", null,
+                "css"), new Request("/auraResource", null, null, "js"), new Request("/auraResource", null,
                         null, "manifest"));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
@@ -259,11 +259,11 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         logs = loadMonitorAndValidateApp(TOKEN, replacement, TOKEN, TOKEN);
         List<Request> expected = Lists.newArrayList(
                 new Request("/aura", namespace + ":" + appName, null, null), // initAsync
-                                                                             // (cached)
+                // (cached)
                 new Request("/aura", namespace + ":" + appName, null, "HTML"), // rest
-                                                                               // are
-                                                                               // cache
-                                                                               // updates
+                // are
+                // cache
+                // updates
                 new Request("/auraResource", null, null, "css"), new Request("/auraResource", null, null, "js"),
                 new Request("/auraResource", null, null, "manifest"));
         assertRequests(expected, logs);
@@ -295,11 +295,11 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         logs = loadMonitorAndValidateApp(replacement, TOKEN, TOKEN, TOKEN);
         List<Request> expected = Lists.newArrayList(
                 new Request("/aura", namespace + ":" + appName, null, null), // initAsync
-                                                                             // (cached)
+                // (cached)
                 new Request("/aura", namespace + ":" + appName, null, "HTML"), // rest
-                                                                               // are
-                                                                               // cache
-                                                                               // updates
+                // are
+                // cache
+                // updates
                 new Request("/auraResource", null, null, "css"), new Request("/auraResource", null, null, "js"),
                 new Request("/auraResource", null, null, "manifest"));
         assertRequests(expected, logs);
@@ -349,11 +349,11 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
             logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, replacement);
             List<Request> expected = Lists.newArrayList(
                     new Request("/aura", namespace + ":" + appName, null, null), // initAsync
-                                                                                 // (cached)
+                    // (cached)
                     new Request("/aura", namespace + ":" + appName, null, "HTML"), // rest
-                                                                                   // are
-                                                                                   // cache
-                                                                                   // updates
+                    // are
+                    // cache
+                    // updates
                     new Request("/auraResource", null, null, "css"), new Request("/auraResource", null, null, "js"),
                     new Request("/auraResource", null, null, "manifest"));
             assertRequests(expected, logs);
@@ -384,7 +384,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     private void assertAppCacheStatus(Status status) {
         Status actual = Status.values()[Integer.parseInt(auraUITestingUtil.getEval(
-                "return window.applicationCache.status;").toString())];
+        "return window.applicationCache.status;").toString())];
         assertEquals("Unexpected status", status.name(), actual.name());
     }
 
@@ -397,7 +397,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
             context = service.startContext(Mode.SELENIUM, Format.HTML, Access.AUTHENTICATED);
         }
         return Aura.getDefinitionService()
-                .getDefinition(String.format("%s:%s", namespace, cmpName), ComponentDef.class);
+        .getDefinition(String.format("%s:%s", namespace, cmpName), ComponentDef.class);
     }
 
     private void assertRequests(List<Request> expected, List<Request> actual) throws Exception {
@@ -490,7 +490,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     private List<Request> getExpectedInitialRequests() {
         return ImmutableList.of(new Request("/auraResource", null, null, "manifest"), new Request("/aura", namespace
                 + ":" + appName, null, "HTML"), new Request("/auraResource", null, null, "css"), new Request(
-                "/auraResource", null, null, "js"), new Request("/aura", namespace + ":" + appName, null, null));
+                        "/auraResource", null, null, "js"), new Request("/aura", namespace + ":" + appName, null, null));
     }
 
     // keep only the info needed for these tests, from the available log info
@@ -513,5 +513,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
             }
             return null;
         }
+    }
+    @Override
+    protected Mode getAuraModeForCurrentBrowser() {
+        return Mode.SELENIUM;
     }
 }

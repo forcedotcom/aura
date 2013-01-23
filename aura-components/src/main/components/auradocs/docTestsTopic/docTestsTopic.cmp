@@ -60,7 +60,7 @@
     instead of a generic message. Making each assert message unique also helps in narrowing down which assert statement has failed. </p>
     
      <h3>Simulating User Interactions</h3>
-    <p>To simulate user interactions, fire the associated aura event. For example, use <code>buttonComponent.get("e.press").fire()</code> to simulate a button click event.</p>
+    <p>To simulate user interactions, fire the associated Aura event. For example, use <code>buttonComponent.get("e.press").fire()</code> to simulate a button click event.</p>
     
     <p><b>See also:</b><br/>
         <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink><br/>

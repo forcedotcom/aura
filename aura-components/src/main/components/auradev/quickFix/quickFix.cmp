@@ -22,5 +22,5 @@
     {!v.body}
     </form>
 
-    <ui:button label="Fix!" press="{!c.fix}" />
+    <ui:button aura:id="fixButton" label="Fix!" press="{!c.fix}" />
 </aura:component>

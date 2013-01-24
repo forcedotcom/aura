@@ -24,7 +24,7 @@ import org.openqa.selenium.By;
  */
 @UnAdaptableTest
 public class AuraQuickFixUITest extends WebDriverTestCase {
-    public final By CREATE_COMPONENT_BUTTON = By.xpath("//button[text()='Create Component Definition']");
+    public final By CREATE_COMPONENT_BUTTON = By.xpath("//button/span[text()='Create Component Definition']");
 
     public AuraQuickFixUITest(String name) {
         super(name);
@@ -46,9 +46,8 @@ public class AuraQuickFixUITest extends WebDriverTestCase {
     public void testQuickFixSeleniumMode() throws Exception {
         openNoAura("/foo/bar.cmp?aura.mode=SELENIUM");
         assertFalse(isElementPresent(CREATE_COMPONENT_BUTTON));
-        assertTrue(getText(By.id("auraErrorMessage"))
-                .contains(
-                        "org.auraframework.throwable.quickfix.DefinitionNotFoundException: No COMPONENT named markup://foo:bar found"));
+        assertTrue(getText(By.id("auraErrorMessage")).contains("org.auraframework.throwable.quickfix."
+                + "DefinitionNotFoundException: No COMPONENT named markup://foo:bar found"));
     }
 
     /**

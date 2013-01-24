@@ -26,10 +26,9 @@
 
             <div class="optionWrapper">
                 <div class="options" aura:id="container">
-                    <aura:forEach items="{!v.exception.quickFixes}" var="quickFix">
-                        <auradev:quickFixButton quickFix="{!quickFix}"
-                            showUI="{!c.showUI}" />
-                    </aura:forEach>
+                    <aura:iteration items="{!v.exception.quickFixes}" var="quickFix">
+                        <auradev:quickFixButton quickFix="{!quickFix}" showUI="{!c.showUI}" />
+                    </aura:iteration>
                 </div>
             </div>
         </div>

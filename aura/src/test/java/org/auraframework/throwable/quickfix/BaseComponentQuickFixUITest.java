@@ -26,19 +26,17 @@ import org.auraframework.def.ThemeDef;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.Source;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.annotation.TestLabels;
 
 /**
- * Tests for creating new markup bundles when you attempt to load a component
- * that doesn't exist in the browser.
+ * Tests for creating new markup bundles when you attempt to load a component that doesn't exist in the browser.
  */
 @TestLabels("auraSanity")
 public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
     protected String typeSuffix;
     protected DefType defType;
-    QuickFixUIWidget quickFixUIWidget;
+    BaseComponentQuickFixWidget quickFixUIWidget;
 
     @Override
     public void setUp() throws Exception {
@@ -55,11 +53,11 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
         super(name);
         this.typeSuffix = typeSuffix;
         this.defType = defType;
-        quickFixUIWidget = new QuickFixUIWidget(defType, this);
+        quickFixUIWidget = new BaseComponentQuickFixWidget(defType, this);
     }
 
     /**
-     * Verify .cmp/.app and .css files are created through Quickfix screen.
+     * Verify .cmp/.app and .css files are created through QuickFix screen.
      */
     public void testCreationQuickFix() throws Exception {
         String namespace = "auratest";
@@ -69,8 +67,8 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
                 ThemeDef.class);
         try {
             open(String.format("/%s/%s%s", namespace, cmpName, typeSuffix), Mode.DEV);
-            quickFixUIWidget.verifyToolbarAndButtons(defDescriptor.getQualifiedName());
-            quickFixUIWidget.clickCreate();
+            quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptor.getQualifiedName());
+            quickFixUIWidget.verifyCustomizationMenu();
             quickFixUIWidget.selectCssCheckbox(true);
             String result = quickFixUIWidget.clickFix(true);
             assertEquals(String.format("TODO: %s:%s", namespace, cmpName), result);
@@ -78,13 +76,12 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
             assertTrue("Failed to locate the definition", defDescriptor.exists());
             assertTrue("Failed to locate the css definition", defDescriptorCss.exists());
         } finally {
-            deleteFiles(defDescriptor);
+            quickFixUIWidget.deleteFiles(defDescriptor);
         }
     }
 
     /**
-     * Verify error message that is displayed when attempting to create a cmp
-     * bundle with a non-existing namespace.
+     * Verify error message that is displayed when attempting to create a cmp bundle with a non-existing namespace.
      */
     public void testCreationQuickFixNonexistentNamespace() throws Exception {
         String namespace = String.format("nonExistentNamespace%s", System.currentTimeMillis());
@@ -92,15 +89,15 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
         DefDescriptor<?> defDescriptor = createComponentDefDescriptor(namespace, cmpName);
         try {
             open(String.format("/%s/%s%s", namespace, cmpName, typeSuffix), Mode.DEV);
-            quickFixUIWidget.verifyToolbarAndButtons(defDescriptor.getQualifiedName());
-            quickFixUIWidget.clickCreate();
+            quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptor.getQualifiedName());
+            quickFixUIWidget.verifyCustomizationMenu();
             String result = quickFixUIWidget.clickFix(false);
             assertEquals("Incorrect message in alert", "java://org.auraframework.throwable.quickfix."
                     + "AuraQuickFixController: org.auraframework.throwable.AuraRuntimeException: "
                     + "Cannot find location to save definition.", result);
             assertFalse("Should not have created component bundle", defDescriptor.exists());
         } finally {
-            deleteFiles(defDescriptor);
+            quickFixUIWidget.deleteFiles(defDescriptor);
         }
     }
 
@@ -113,8 +110,8 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
         DefDescriptor<?> defDescriptor = createComponentDefDescriptor(namespace, cmpName);
         try {
             open(String.format("/%s/%s%s", namespace, cmpName, typeSuffix), Mode.DEV);
-            quickFixUIWidget.verifyToolbarAndButtons(defDescriptor.getQualifiedName());
-            quickFixUIWidget.clickCreate();
+            quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptor.getQualifiedName());
+            quickFixUIWidget.verifyCustomizationMenu();
             quickFixUIWidget.setDescriptorNames("auratest:aaa.java");
             String result = quickFixUIWidget.clickFix(false);
             assertEquals("Incorrect message in alert", "java://org.auraframework.throwable.quickfix."
@@ -122,13 +119,12 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
                     + "Descriptor Format: auratest:aaa.java", result);
             assertFalse("Should not have created component bundle", defDescriptor.exists());
         } finally {
-            deleteFiles(defDescriptor);
+            quickFixUIWidget.deleteFiles(defDescriptor);
         }
     }
 
     /**
-     * Verify that multiple component bundles can be created by entering the
-     * DefDescriptors in, comma separated.
+     * Verify that multiple component bundles can be created by entering the DefDescriptors in, comma separated.
      */
     public void testMultipleDescriptors() throws Exception {
         String namespace = String.format("auratest", System.currentTimeMillis());
@@ -138,22 +134,21 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
         DefDescriptor<?> defDescriptor2 = createComponentDefDescriptor(namespace, cmpName2);
         try {
             open(String.format("/%s/%s%s", namespace, cmpName1, typeSuffix), Mode.DEV);
-            quickFixUIWidget.verifyToolbarAndButtons(defDescriptor1.getQualifiedName());
-            quickFixUIWidget.clickCreate();
+            quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptor1.getQualifiedName());
+            quickFixUIWidget.verifyCustomizationMenu();
             quickFixUIWidget.setDescriptorNames(namespace + ":" + cmpName1 + ", " + namespace + ":" + cmpName2);
             String result = quickFixUIWidget.clickFix(true);
             assertEquals(String.format("TODO: %s:%s", namespace, cmpName1), result);
             assertTrue("Should not have created component bundle", defDescriptor1.exists());
             assertTrue("Should not have created component bundle", defDescriptor2.exists());
         } finally {
-            deleteFiles(defDescriptor1);
-            deleteFiles(defDescriptor2);
+            quickFixUIWidget.deleteFiles(defDescriptor1);
+            quickFixUIWidget.deleteFiles(defDescriptor2);
         }
     }
 
     /**
-     * Verify Quickfix works when we load a component that exists but contains
-     * an inner component that does not.
+     * Verify QuickFix works when we load a component that exists but contains an inner component that does not.
      */
     // TODO(W-1507595): loading an .app with an inner component that doesn't
     // exist will fail to create new inner component.
@@ -166,19 +161,19 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
         } else if (defType == DefType.APPLICATION) {
             parentName = "/" + namespace + "/createInnerCmpQuickFixApp.app";
             // We're actually creating a .cmp file here so use that helper class
-            quickFixUIWidget = new QuickFixUIWidget(DefType.COMPONENT, this);
+            quickFixUIWidget = new BaseComponentQuickFixWidget(DefType.COMPONENT, this);
         }
         DefDescriptor<?> defDescriptorChild = createComponentDefDescriptor(namespace, cmpName);
         try {
             open(parentName, Mode.DEV);
-            quickFixUIWidget.verifyToolbarAndButtons(defDescriptorChild.getQualifiedName());
-            quickFixUIWidget.clickCreate();
+            quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptorChild.getQualifiedName());
+            quickFixUIWidget.verifyCustomizationMenu();
             String result = quickFixUIWidget.clickFix(true);
             assertTrue("Newly created inner component text not displayed to user", result.contains(String.format(
                     "TODO: %s:%s\nIn component createInnerCmpQuickFix", namespace, cmpName)));
             assertTrue("Failed to locate the definition", defDescriptorChild.exists());
         } finally {
-            deleteFiles(defDescriptorChild);
+            quickFixUIWidget.deleteFiles(defDescriptorChild);
         }
     }
 
@@ -193,13 +188,13 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
             parentName = "/" + namespace + "/createInnerCmpQuickFixCmp.cmp";
         } else if (defType == DefType.APPLICATION) {
             parentName = "/" + namespace + "/createInnerCmpQuickFixApp.app";
-            quickFixUIWidget = new QuickFixUIWidget(DefType.COMPONENT, this);
+            quickFixUIWidget = new BaseComponentQuickFixWidget(DefType.COMPONENT, this);
         }
         DefDescriptor<?> defDescriptorChild = createComponentDefDescriptor(namespace, cmpName);
         try {
             open(parentName, Mode.DEV);
-            quickFixUIWidget.verifyToolbarAndButtons(defDescriptorChild.getQualifiedName());
-            quickFixUIWidget.clickCreate();
+            quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptorChild.getQualifiedName());
+            quickFixUIWidget.verifyCustomizationMenu();
             quickFixUIWidget.setDescriptorNames("auratestasdf:innerCmpThatDoesntExist");
             String result = quickFixUIWidget.clickFix(false);
             assertTrue("Incorrect error message text", result.contains("org.auraframework.throwable.quickfix."
@@ -207,16 +202,15 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
                     + "found : markup://auratest:createInnerCmpQuickFix"));
             assertFalse("Failed to locate the definition", defDescriptorChild.exists());
         } finally {
-            deleteFiles(defDescriptorChild);
+            quickFixUIWidget.deleteFiles(defDescriptorChild);
         }
     }
 
     /**
-     * Create component DefDescriptor for given namespace and component name.
-     * Also check if source for that file name already exists. Delete the
-     * pre-existing files if they do exist.
+     * Create component DefDescriptor for given namespace and component name. Also check if source for that file name
+     * already exists. Delete the pre-existing files if they do exist.
      */
-    protected DefDescriptor<?> createComponentDefDescriptor(String namespace, String cmpName) {
+    private DefDescriptor<?> createComponentDefDescriptor(String namespace, String cmpName) {
         DefDescriptor<?> defDescriptor = null;
         if (defType == DefType.APPLICATION) {
             defDescriptor = Aura.getDefinitionService().getDefDescriptor(namespace + ":" + cmpName,
@@ -230,22 +224,5 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
             f.delete();
         }
         return defDescriptor;
-    }
-
-    /**
-     * Delete all files in component bundle, and then directory file itself.
-     */
-    protected void deleteFiles(DefDescriptor<?> defDescriptor) {
-        Source source = Aura.getContextService().getCurrentContext().getDefRegistry().getSource(defDescriptor);
-        if (source != null) {
-            File f = new File(source.getSystemId());
-            if (f.exists()) {
-                File dir = f.getParentFile();
-                for (File x : dir.listFiles()) {
-                    x.delete();
-                }
-                dir.delete();
-            }
-        }
     }
 }

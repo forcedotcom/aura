@@ -264,7 +264,10 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
                 request.getResponseHeader("Cache-Control").getValue());
         Date expires = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss z", Locale.ENGLISH).parse(request
                 .getResponseHeader("Expires").getValue());
-        assertTrue("Expires header in response is set to an earlier date than expected.", expires.after(expected));
+		assertTrue(
+				String.format(
+						"Expires header in response is set to an earlier date than expected. Expected !before %s, got %s.",
+						expected, expires), !expires.before(expected));
     }
 
     private void assertResponseSetToNoCache(HttpMethod request) throws Exception {
@@ -277,7 +280,10 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("no-cache", request.getResponseHeader("Pragma").getValue());
         Date expires = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss z", Locale.ENGLISH).parse(request
                 .getResponseHeader("Expires").getValue());
-        assertTrue("Expires header in response should be set to a date in the past.", expires.before(expected));
+		assertTrue(
+				String.format(
+						"Expires header in response should be set to a date in the past. Expected before %s, got %s.",
+						expected, expires), expires.before(expected));
     }
 
     /**

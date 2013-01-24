@@ -15,12 +15,12 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" description="This component creates a menu which is a container to hold menu items." support="GA">
+<aura:component extensible="true" implements="ui:visible" description="A menu component that contains menu items." support="GA">
     <aura:attribute name="parent" type="Aura.Component[]" description="The parent component of this menu."/>
-    <aura:attribute name="visible" type="Boolean" default="{!false}" description="This value controls if the menu shows up or hide."/>
+    <aura:attribute name="visible" type="Boolean" default="{!false}" description="​Controls the visibility of the menu. The default is false, which hides the menu."/>
     <aura:attribute name="focusItemIndex" type="Integer" default="0" 
                     description="The index of the item which should be on focus when the menu displays. 0 means the first item and -1 refers to the last."/>
-    <aura:attribute name="menuItems" type="List" description="A list of menu items set explicitly. They should be instances of Java class: aura.components.ui.MenuItem."/>
+    <aura:attribute name="menuItems" type="List" description="A list of menu items set explicitly using instances of the Java class: aura.​components.​ui.MenuItem."/>
     <aura:registerEvent name="menuSelect" type="ui:menuSelect" description="The event fired when the user select a menu item."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:attribute name="childMenuItems" type="Aura.Component[]" description="a read-only attribute pointing to child components."/>

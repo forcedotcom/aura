@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:menuItem" extensible="true" support="GA" description="A menu item used for triggering an action.">
+<aura:component extends="ui:menuItem" extensible="true" support="GA" description="​A menu item that triggers an action.">
     <aura:handler name="click" action="{!c.handleClick}"/>
     <li aura:id="listitem" class="{!v.class}" role="presentation">
         <a aura:id="link" role="menuitem" disabled="{!v.disabled}">{!v.label}</a>

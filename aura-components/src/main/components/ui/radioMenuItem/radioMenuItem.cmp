@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:menuItem" extensible="true" support="GA" description="A menu item with a radio button indicate if it is mutual exclusively selected or not.">
+<aura:component extends="ui:menuItem" extensible="true" support="GA" description="​A menu item with a radio button that indicates a mutually exclusive selection and can be used to invoke an action.">
     <aura:handler name="click" action="{!c.handleClick}"/>
     <aura:renderif isTrue="{!v.body.length == 0}">
         <li aura:id="listitem" class="{!v.class}" role="presentation">

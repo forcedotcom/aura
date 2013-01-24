@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" description="This component creates a dropdown menu which has a trigger to control its visibility." support="GA">
+<aura:component extensible="true" implements="ui:visible" description="A dropdown menu with a trigger that controls its visibility." support="GA">
     <aura:registerEvent name="menuExpand" type="ui:menuExpand" description="The event fired when the menu expands."/>
     <aura:registerEvent name="menuCollapse" type="ui:menuCollapse" description="The event fired when the menu collapses."/>
     <aura:registerEvent name="menuTriggerPress" type="ui:menuTriggerPress" description="The event fired when the menu trigger is pressed."/>

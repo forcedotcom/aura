@@ -43,9 +43,9 @@
 
     <h3>AuraExpressionService</h3>
     <h4><code>$A.expressionService</code></h4>
-    <p>The expression service enables you to process expressions using a value provider. 
+    <p>The expression service enables you to process expressions against a different value provider. 
        For example, you can use <code>$A.expressionService.getValue(cmp, "<aura:text value="{!" />$Label.Section.Param}").getValue()</code> to evaluate labels before passing them as attributes to locally created components. 
-       Use <code>component.getValue()</code> instead if you are resolving expressions for components.</p>
+       Use <code>component.get()</code> or <code>component.getValue()</code> instead if you are resolving expressions for components.</p>
     <p>See Also: <a href="#reference?topic=api:AuraExpressionService">Methods</a></p>
 
     <h3>AuraHistoryService</h3>

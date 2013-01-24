@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
+import java.util.Comparator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -30,6 +32,13 @@ import org.auraframework.util.text.Hash;
  * in sfdc and the new directive based javascript groups
  */
 public abstract class CommonJavascriptGroupImpl implements JavascriptGroup {
+
+    private static final Comparator<URL> compareUrls = new Comparator<URL>() {
+        @Override
+        public int compare(URL url1, URL url2) {
+            return url1.toString().compareTo(url2.toString());
+        }
+    };
 
     protected final String name;
     protected final File root;
@@ -61,7 +70,11 @@ public abstract class CommonJavascriptGroupImpl implements JavascriptGroup {
     @Override
     public Hash getGroupHash() throws IOException {
         if (groupHash == null) {
-            groupHash = new Hash(new MultiFileReader(files));
+            Set<URL> urls = new TreeSet<URL>(compareUrls);
+            for (File file : files) {
+                urls.add(file.toURI().toURL());
+            }
+            groupHash = new Hash(new MultiStreamReader(urls));
         }
         return groupHash;
     }

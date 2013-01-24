@@ -117,9 +117,11 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
     /*
      * Helper Function, add more stuff as CommonJavascriptGroup gets Fleshed out
      */
-    public void verifyCleanState(CommonJavascriptGroupImpl pCJG) {
+    public void verifyCleanState(CommonJavascriptGroupImpl pCJG) throws IOException {
         assertTrue("Last modified date not initialized to -1", pCJG.lastMod == -1);
         assertTrue("javascript Group should not be initialized with a list of files", pCJG.getFiles().size() == 0);
+        assertTrue("Hash should not be unset", pCJG.getGroupHash().isSet());
+        assertTrue("Hash should not be empty", pCJG.getGroupHash().toString().length() > 0);
     }
 
     private static class TestCommonJavascriptGroupImpl extends CommonJavascriptGroupImpl {

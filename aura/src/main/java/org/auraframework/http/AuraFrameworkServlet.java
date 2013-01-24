@@ -57,16 +57,19 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
 
             // process path (not in a function because can't use non-synced
             // member vars in servlet)
-            boolean hasNonce = false;
             String resStr = null;
 
             // match entire path once, looking for root, optional nonce, and
             // rest-of-path
             Matcher matcher = RESOURCES_PATTERN.matcher(path);
-
+            String nonce = null;
             if (matcher.matches()) {
-                hasNonce = (matcher.group(2) != null);
-
+                nonce = matcher.group(2);
+                if (nonce != null && !matcher.group(2).equals(Aura.getConfigAdapter().getAuraFrameworkNonce())) {
+                    // Can we send a more specific "you're out of sync"?
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                    return;
+                }
                 String root = matcher.group(1);
                 if (root.equals("resources")) {
                     resStr = String.format("/aura/resources%s", matcher.group(3));
@@ -101,10 +104,11 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
 
             if (mimeType.equals("application/octet-stream") || mimeType.equals(JAVASCRIPT_CONTENT_TYPE)) /* unidentified */{
                 response.setContentType(JAVASCRIPT_CONTENT_TYPE);
-                hasNonce = true; // nonce is eaten on Javascript requests, but
-                                 // all javascript requests should have one.
-            } else {
-                response.setContentType(mimeType);
+                assert nonce != null;
+                if (nonce == null) {
+                    // all javascript requests should have one.
+                    nonce = Aura.getConfigAdapter().getAuraFrameworkNonce();
+                }
             }
 
             if (response.getContentType().startsWith("text")) {
@@ -114,7 +118,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             response.setDateHeader("Last-Modified", lastModified);
             response.setBufferSize(10240);// 10kb
 
-            if (hasNonce) {
+            if (nonce != null) {
                 response.setDateHeader("Expires", System.currentTimeMillis() + AuraBaseServlet.LONG_EXPIRE);
             } else {
                 response.setDateHeader("Expires", System.currentTimeMillis() + AuraBaseServlet.SHORT_EXPIRE);

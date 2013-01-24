@@ -74,15 +74,15 @@ public class ConfigAdapterImplTest extends UnitTestCase {
     }
 
     /**
-     * Test regenerateAuraJS() functionality. Note that in a resource/jar-based
-     * environment, this is essentially a no-op because we never "regenerate,"
-     * but the test makes a fake jsGroup which will still act as though it saw
-     * an error (and should be handled as such).
+     * Test regenerateAuraJS() functionality. For failure testing, the test
+     * makes a fake jsGroup which will still act as though it saw an error (and
+     * should be handled as such).
      */
     public void testRegenerateHandlesErrors() throws Exception {
         // The real case should work, of course:
         ConfigAdapterImpl impl = new ConfigAdapterImpl();
         impl.regenerateAuraJS();
+        assertTrue("Framework nonce should not be empty", impl.getAuraFrameworkNonce().length() > 0);
 
         // But an error case should fail, and not be swallowed.
         final AuraJavascriptGroup mockJsGroup = Mockito.mock(AuraJavascriptGroup.class);

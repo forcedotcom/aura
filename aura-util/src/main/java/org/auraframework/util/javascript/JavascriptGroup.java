@@ -36,6 +36,8 @@ public interface JavascriptGroup {
      * traversed in some stable order, regardless of whether {@link #getFiles()}
      * returns them in that order.
      * 
+     * FIXME: This likely needs an SFDC patch, too.
+     * 
      * @return a hash of all the files in the group.
      * @throws IOException if a file in the group cannot be read for hashing
      */

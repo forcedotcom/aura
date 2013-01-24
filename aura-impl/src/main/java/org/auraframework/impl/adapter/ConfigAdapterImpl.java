@@ -33,12 +33,14 @@ import java.util.TimeZone;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
+import org.auraframework.impl.javascript.AuraJavascriptResourceGroup;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.IOUtil;
+import org.auraframework.util.javascript.JavascriptGroup;
 import org.auraframework.util.resource.ResourceLoader;
 
 public class ConfigAdapterImpl implements ConfigAdapter {
@@ -49,7 +51,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private static final String VALIDATE_CSS_CONFIG = "aura.css.validate";
 
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
-    private final AuraJavascriptGroup jsGroup;
+    private final JavascriptGroup jsGroup;
     private final ResourceLoader resourceLoader;
     private final Long buildTimestamp;
     private String auraVersionString;
@@ -69,7 +71,13 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     protected ConfigAdapterImpl(String resourceCacheDir) {
         // can this initialization move to some sort of common initialization
         // dealy?
-        AuraJavascriptGroup tempGroup = null;
+        try {
+            this.resourceLoader = new ResourceLoader(resourceCacheDir, true);
+        } catch (MalformedURLException e) {
+            throw new AuraRuntimeException(e);
+        }
+
+        JavascriptGroup tempGroup = null;
         try {
             tempGroup = newAuraJavascriptGroup();
             try {
@@ -80,16 +88,13 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             tempGroup.postProcess();
         } catch (IOException x) {
             // js source wasn't found, we must be in jar land, just let the
-            // files be accessed from there
+            // files be accessed from there... however, we do want a hash.
+            // Question: hypothetically, could we have a hybrid with a subset
+            // of files as files, and the rest in jars? This wouldn't be
+            // accounted for here.
+            tempGroup = new AuraJavascriptResourceGroup("aura/javascript");
         }
         jsGroup = tempGroup;
-
-        try {
-            this.resourceLoader = new ResourceLoader(resourceCacheDir, true);
-        } catch (MalformedURLException e) {
-            throw new AuraRuntimeException(e);
-        }
-
         Properties props = (jsGroup == null) ? loadProperties() : null;
         if (props == null) {
             // If we don't get the framework version from properties, the
@@ -171,7 +176,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public String getAuraJSURL() {
         String suffix = Aura.getContextService().getCurrentContext().getMode().getJavascriptMode().getSuffix();
-        return String.format("/auraFW/javascript/%d/aura_%s.js", getAuraJSLastMod(), suffix);
+        return String.format("/auraFW/javascript/%s/aura_%s.js", getAuraFrameworkNonce(), suffix);
     }
 
     @Override
@@ -223,7 +228,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         Properties props = new Properties();
         try {
             loadProperties("/version.prop", props);
-
         } catch (IOException e) {
             throw new AuraError("Could not read version.prop information");
         }
@@ -297,5 +301,15 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public boolean validateCss() {
         return validateCss;
+    }
+
+    @Override
+    public final String getAuraFrameworkNonce() {
+        regenerateAuraJS();
+        try {
+            return jsGroup.getGroupHash().toString();
+        } catch (IOException e) {
+            throw new AuraRuntimeException("Can't read framework files", e);
+        }
     }
 }

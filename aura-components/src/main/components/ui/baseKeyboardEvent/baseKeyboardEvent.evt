@@ -15,4 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" extends="ui:baseMouseEvent" support="GA" description="Indicates that the user has moved the mouse pointer over the component."></aura:event>
+<aura:event type="COMPONENT" support="GA">
+    <aura:attribute name="keyCode" type="Integer" description="A numerical code identifying the value of the pressed key."/>
+</aura:event>

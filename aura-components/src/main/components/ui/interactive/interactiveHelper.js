@@ -50,15 +50,16 @@
         helper.preEventFiring(component, event);
 
         // fire the equivalent Aura event
-        helper.fireEvent(component, event);
+        helper.fireEvent(component, event, helper);
     },
     
     /**
      * Fire the equivalent Aura event for DOM one.
      * This can be overridden by extended component
      */
-     fireEvent : function (component, event) {
+     fireEvent : function (component, event, helper) {
         var e = component.getEvent(event.type);
+        helper.setEventParams(e, event);
         e.fire();
      },
 
@@ -96,5 +97,19 @@
      * For example, input component uses this method to update its value if the event is the "updateOn" event.
      */
     preEventFiring : function(component, event){
+    },
+    
+    /**
+     * Set event's parameters with the value from DOM event.
+     * The event's parameter name should be the same as the property name in DOM event.
+     */
+    setEventParams: function(e, DOMEvent) {
+        // set parameters if there is any
+        var attributeDefs = e.getDef().getAttributeDefs();
+        var params = {};
+        for (var key in attributeDefs) {
+            params[key] = DOMEvent[key];
+        };
+        e.setParams(params);
     }
 })

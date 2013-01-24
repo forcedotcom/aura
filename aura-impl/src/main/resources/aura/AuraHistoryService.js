@@ -25,7 +25,7 @@ var AuraHistoryService = function(){
     var historyService = {
 		/**
 	     * Set the new location.
-	     * @param {Object} token Append the token to a hash symbol
+	     * @param {Object} token The provided token set to the current location hash
 	     * @memberOf AuraHistoryService
 	     * @public
 	     */

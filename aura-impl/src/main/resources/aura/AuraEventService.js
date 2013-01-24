@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Aura Event Service, accessible using $A.services.event.  Creates and Manages Events.
+ * @namespace The Aura Event Service, accessible using $A.eventService.  Creates and Manages Events.
  * @constructor
  */
 var AuraEventService = function(){
@@ -24,7 +24,7 @@ var AuraEventService = function(){
     var eventService = {
 
 		/**
-	     * Create a new event. Set the event parameters using Event.setParams() and fire it using Event.fire().
+	     * Create a new application event. Set the event parameters using Event.setParams() and fire it using Event.fire().
 	     * @param {String} name The event object in the format namespace:component
 	     * @description Example:
 	     * $A.eventService.newEvent("app:navError")
@@ -110,7 +110,7 @@ var AuraEventService = function(){
          * Push an event to the event stack.
          * @param {Event} event The event to start firing
          * @memberOf AuraEventService
-         * @public
+         * @private
          */
         startFiring : function(event){
             priv.eventStack.push(event);
@@ -119,7 +119,7 @@ var AuraEventService = function(){
         /**
          * Clears the action queue.
          * @memberOf AuraEventService
-         * @public
+         * @private
          */
         finishFiring : function(){
             priv.eventStack.pop();
@@ -153,6 +153,7 @@ var AuraEventService = function(){
         ,
         /**
          * Return the qualified name of all events known to the registry.
+         * Available in DEV mode only.
          * @memberOf AuraEventService
          * @public
          */

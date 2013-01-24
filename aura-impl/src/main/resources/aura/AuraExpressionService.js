@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @namespace The Aura Expression Service, accessible using $A.expressionServices.  Process Expressions.
+ * @namespace The Aura Expression Service, accessible using $A.expressionService.  Processes Expressions.
  * @constructor
  */
 var AuraExpressionService = function AuraExpressionService(){
@@ -35,6 +35,7 @@ var AuraExpressionService = function AuraExpressionService(){
 
         /**
          * Get the wrapped value of an expression. Use Component.getValue() if you are retrieving the value of a component.
+         * $A.expressionService.get(cmp, "v.attribute") is equivalent to cmp.getValue("v.attribute").
          * @param {Object} valueProvider The value provider
          * @param {String} expression The expression to be evaluated
          * @public

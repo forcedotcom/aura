@@ -28,8 +28,8 @@ var AuraLayoutService = function(){
     var layoutService = {
         // Call this method to make use of the layoutHandler override and pass in params that override the existing URL params
     		/**
-    		 * Change the location.
-    		 * @param {Object} newLocation The new location, which is appended to the hash symbol
+    		 * Change the location with new URL and parameters.
+    		 * @param {Object} newLocation The new location set to the hash of the URL
     		 * @param {Object} overrideParams The parameters that override the existing URL parameters
     		 * @memberOf AuraLayoutService
     		 * @public
@@ -138,7 +138,7 @@ var AuraLayoutService = function(){
         /**
          * Removes the layout from the stack.
          * @memberOf AuraLayoutService
-         * @public
+         * @private
          */
         pop : function() {
             priv.pop();
@@ -150,7 +150,7 @@ var AuraLayoutService = function(){
          * @param {Object} params Set params only for actions specified in the layouts file
          * @param {Boolean} noTrack If set to true, the service does not track the layout
          * @memberOf AuraLayoutService
-         * @public
+         * @private
          */
         layout : function(name, params, noTrack){
             var layout = priv.layouts.getLayout(name);

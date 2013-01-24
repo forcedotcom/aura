@@ -16,7 +16,7 @@
 /*jslint sub: true */
 /**
  * @class The Aura Rendering Service, accessible using $A.renderingService.  Renders components. 
- * The default behaviors can be customized in a client-side controller.
+ * The default behaviors can be customized in a client-side renderer.
  * @constructor
  */
 var AuraRenderingService = function AuraRenderingService(){
@@ -62,12 +62,11 @@ var AuraRenderingService = function AuraRenderingService(){
         },
 
         /**
-         * The default renderer for components. 
-         * Call superRender() from your customized function to create the DOM nodes.
+         * Renders a component by calling its renderer. 
          * @param {Component} component
          * 				The component to be rendered
          * @param {Component} parent
-         * 				The component's parent
+         * 				Optional. The component's parent
          * @memberOf AuraRenderingService
          * @public
          */

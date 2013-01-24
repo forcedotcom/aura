@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Aura Component Service, accessible using $A.services.component.  Creates and Manages Components.
+ * @namespace The Aura Component Service, accessible using $A.componentService.  Creates and Manages Components.
  * @constructor
  */
 var AuraComponentService = function(){

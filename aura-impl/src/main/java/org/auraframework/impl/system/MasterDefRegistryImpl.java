@@ -101,7 +101,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private SecurityProviderDef securityProvider;
 
     public MasterDefRegistryImpl(DefRegistry<?>... registries) {
-        this.delegateRegistries = new RegistryTrie(registries);
+        delegateRegistries = new RegistryTrie(registries);
     }
 
     @Override
@@ -456,6 +456,57 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         }
     }
 
+    /**
+     * Internal routine to compile and return a DependencyEntry.
+     */
+    private <T extends Definition> DependencyEntry compileDE(DefDescriptor<T> descriptor)
+            throws QuickFixException {
+        Map<DefDescriptor<?>, Definition> dds = Maps.newTreeMap();
+        String lk = descriptor.getQualifiedName().toLowerCase();
+        Definition def = compileDef(descriptor, dds);
+        DependencyEntry de;
+        String uid;
+        long lmt = 0;
+
+        if (def == null) {
+            return null;
+        }
+        for (Definition t : dds.values()) {
+            if (t.getLocation() != null && t.getLocation().getLastModified() > lmt) {
+                lmt = t.getLocation().getLastModified();
+            }
+        }
+        StringBuilder sb = new StringBuilder(dds.size() * 20);
+
+        for (Definition t : dds.values()) {
+            Hash hash = t.getOwnHash();
+
+            // TODO: we need to ensure that null hashes are ok
+            if (hash != null) {
+                sb.append(hash.toString());
+            }
+        }
+        Hash global;
+
+        try {
+            global = new Hash(new StringReader(sb.toString()));
+        } catch (IOException ioe) {
+            throw new AuraError("StringReader IO exception", ioe);
+        }
+        uid = global.toString();
+        //
+        // Now try a re-lookup. This may catch existing cached
+        // entries where uid was null.
+        //
+        de = getDE(uid, lk);
+        if (de == null) {
+            de = new DependencyEntry(uid, Sets.newTreeSet(dds.keySet()), lmt);
+            dependencies.put(de.uid + lk, de);
+            localDependencies.put(de.uid, de);
+        }
+        return de;
+    }
+
     @Override
     public <T extends Definition> long getLastMod(String uid) {
         DependencyEntry de = localDependencies.get(uid);
@@ -481,15 +532,23 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     public <D extends Definition> D getDef(DefDescriptor<D> descriptor) throws QuickFixException {
         Definition def;
 
-        if (defs.containsKey(descriptor)) {
+        if (!defs.containsKey(descriptor)) {
             //
-            // If we have stored the def in our table, use it, whether null or
-            // not.
+            // Go and build the dependency tree.
             //
-            def = defs.get(descriptor);
-        } else {
-            def = compileDef(descriptor, null);
+            if (compileDE(descriptor) == null) {
+                return null;
+            }
         }
+
+        //
+        // If we have stored the def in our table, use it, whether null or
+        // not. Note that the above call _must_ generate a def. If it fails
+        // we'll either get a null here (top level not found), or an
+        // exception. Either of which will simply be sent back to the
+        // caller.
+        //
+        def = defs.get(descriptor);
 
         //
         // Check authentication. All defs should really support this but right
@@ -512,12 +571,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             }
         }
         return (D) def;
-    }
-
-    protected <D extends Definition> D getDefAndDependencies(DefDescriptor<D> descriptor,
-            Map<DefDescriptor<?>, Definition> dependencies) throws QuickFixException {
-        D def = compileDef(descriptor, dependencies);
-        return def;
     }
 
     @SuppressWarnings("unchecked")
@@ -694,6 +747,35 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         }
     }
 
+    /**
+     * Get a dependency entry for a given uid.
+     *
+     * This is a convenience routine to check both the local and global
+     * cache for a value.
+     *
+     * @param uid the uid (must not be null).
+     * @param lk the lower case descriptor name.
+     * @return the DependencyEntry or null if none present.
+     */
+    private DependencyEntry getDE(String uid, String lk) {
+        DependencyEntry de = localDependencies.get(uid);
+        if (de != null) {
+            return de;
+        }
+        de = dependencies.getIfPresent(uid + lk);
+        if (de != null) {
+            localDependencies.put(uid, de);
+            return de;
+        }
+        return null;
+    }
+
+    /**
+     * Get the UID.
+     *
+     * @param uid the uid expected (null means unknown).
+     * @param descriptor the descriptor to fetch.
+     */
     @Override
     public <T extends Definition> String getUid(String uid, DefDescriptor<T> descriptor) throws QuickFixException,
             ClientOutOfSyncException {
@@ -701,53 +783,17 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         String lk = descriptor.getQualifiedName().toLowerCase();
 
         if (uid != null) {
-            de = localDependencies.get(uid);
-            if (de != null) {
-                return de.uid;
-            }
-            de = dependencies.getIfPresent(uid + lk);
-            if (de != null) {
-                de = localDependencies.put(uid, de);
-                return de.uid;
+            de = getDE(uid, lk);
+        }
+        if (de == null) {
+            de = compileDE(descriptor);
+            if (uid != null && !uid.equals(de.uid)) {
+                throw new ClientOutOfSyncException("Mismatched UIDs expected '"+de.uid+"' got '"+uid+"'");
             }
         }
-        Map<DefDescriptor<?>, Definition> dds = Maps.newTreeMap();
-        Definition def = getDefAndDependencies(descriptor, dds);
-        String tuid = uid;
-        long lmt = 0;
-
-        if (def == null) {
-            return null;
+        if (de != null) {
+            return de.uid;
         }
-        for (Definition t : dds.values()) {
-            if (t.getLocation() != null && t.getLocation().getLastModified() > lmt) {
-                lmt = t.getLocation().getLastModified();
-            }
-        }
-        StringBuilder sb = new StringBuilder(dds.size() * 20);
-
-        for (Definition t : dds.values()) {
-            Hash hash = t.getOwnHash();
-
-            // TODO: we need to ensure that null hashes are ok
-            if (hash != null) {
-                sb.append(hash.toString());
-            }
-        }
-        Hash global;
-
-        try {
-            global = new Hash(new StringReader(sb.toString()));
-        } catch (IOException ioe) {
-            throw new AuraError("StringReader IO exception", ioe);
-        }
-        tuid = global.toString();
-        if (uid != null && !uid.equals(tuid)) {
-            throw new ClientOutOfSyncException("Mismatched UIDs");
-        }
-        de = new DependencyEntry(tuid, Sets.newTreeSet(dds.keySet()), lmt);
-        dependencies.put(de.uid + lk, de);
-        localDependencies.put(de.uid, de);
-        return tuid;
+        return null;
     }
 }

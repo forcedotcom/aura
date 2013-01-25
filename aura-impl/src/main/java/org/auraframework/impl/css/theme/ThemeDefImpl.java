@@ -147,15 +147,14 @@ public class ThemeDefImpl extends DefinitionImpl<ThemeDef> implements ThemeDef {
 
     private Set<String> validateImageURLs(Set<String> images) {
         if (images != null) {
-            Set<String> valid = new HashSet<String>(images.size());
+            Set<String> validSet = new HashSet<String>(images.size());
             for (String imgURL : images) {
                 if (AuraResourceServlet.isResourceLocallyAvailable(imgURL)) {
-                    valid.add(imgURL);
+                    validSet.add(imgURL);
                 }
             }
-            return valid;
+            return validSet;
         }
         return Collections.emptySet();
     }
-
 }

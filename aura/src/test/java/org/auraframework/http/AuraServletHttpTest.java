@@ -280,10 +280,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("no-cache", request.getResponseHeader("Pragma").getValue());
         Date expires = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss z", Locale.ENGLISH).parse(request
                 .getResponseHeader("Expires").getValue());
-		assertTrue(
-				String.format(
-						"Expires header in response should be set to a date in the past. Expected before %s, got %s.",
-						expected, expires), expires.before(expected));
+        assertTrue(String.format("Expires header in response should be in the past. Expected before %s, got %s.",
+                                 expected, expires), expires.before(expected));
     }
 
     /**
@@ -301,13 +299,11 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         GetMethod get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
         getHttpClient().executeMethod(get);
         assertEquals(HttpStatus.SC_OK, get.getStatusCode());
-        // Fetch the latest timestamp of the JS group and construct URL for DEV
-        // mode.
-        String expectedFWUrl = String.format("/auraFW/javascript/%d/aura_dev.js", Aura.getConfigAdapter()
-                .getAuraFrameworkNonce());
-        String scriptTag = "<script src=\"%s\" ></script>";
-        assertTrue(
-                "Expected Aura FW Script tag not found. Expected to see: " + String.format(scriptTag, expectedFWUrl),
-                get.getResponseBodyAsString().contains(String.format(scriptTag, expectedFWUrl)));
+        // Fetch the latest timestamp of the JS group and construct URL for DEV mode.
+        String expectedFWUrl = String.format("/auraFW/javascript/%s/aura_dev.js",
+                                             Aura.getConfigAdapter().getAuraFrameworkNonce());
+        String scriptTag = String.format("<script src=\"%s\" ></script>", expectedFWUrl);
+        assertTrue("Expected Aura FW Script tag not found. Expected to see: "+scriptTag,
+                   get.getResponseBodyAsString().contains(scriptTag));
     }
 }

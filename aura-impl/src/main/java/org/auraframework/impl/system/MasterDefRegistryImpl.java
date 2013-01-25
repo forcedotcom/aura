@@ -106,7 +106,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @Override
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
-        Set<DefRegistry<?>> registries = this.delegateRegistries.getRegistries(matcher);
+        Set<DefRegistry<?>> registries = delegateRegistries.getRegistries(matcher);
         Set<DefDescriptor<?>> matched = Sets.newHashSet();
 
         for (DefRegistry<?> reg : registries) {
@@ -154,7 +154,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 // TODO: FIXME
                 throw new AuraRuntimeException("Find on ACTION defs not supported.");
             }
-            for (String namespace : this.delegateRegistries.getAllNamespaces()) {
+            for (String namespace : delegateRegistries.getAllNamespaces()) {
                 String qualifiedName = String.format(qualifiedNamePattern,
                         matcher.getPrefix() != null ? matcher.getPrefix() : "*", namespace,
                         matcher.getName() != null ? matcher.getName() : "*");
@@ -186,8 +186,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public Set<Definition> parents = Sets.newHashSet();
 
         public void markValid() {
-            if (this.def != null) {
-                this.registry.markValid(this.descriptor, this.def);
+            if (def != null) {
+                registry.markValid(descriptor, def);
             }
         }
     }
@@ -213,10 +213,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
         public <D extends Definition> CompilingDef<D> getCompiling(DefDescriptor<D> descriptor) {
             @SuppressWarnings("unchecked")
-            CompilingDef<D> cd = (CompilingDef<D>) this.compiled.get(descriptor);
+            CompilingDef<D> cd = (CompilingDef<D>) compiled.get(descriptor);
             if (cd == null) {
                 cd = new CompilingDef<D>();
-                this.compiled.put(descriptor, cd);
+                compiled.put(descriptor, cd);
             }
             cd.descriptor = descriptor;
             return cd;
@@ -249,7 +249,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private <D extends Definition> D getHelper(DefDescriptor<D> descriptor, CompileContext cc,
             Set<DefDescriptor<?>> deps) throws QuickFixException {
         @SuppressWarnings("unchecked")
-        D def = (D) this.defs.get(descriptor);
+        D def = (D) defs.get(descriptor);
 
         if (def != null) {
             //
@@ -284,10 +284,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     cc.context.setCurrentNamespace(canonical.getNamespace());
                     def.validateDefinition();
                 }
-                if (!this.defs.containsKey(def.getDescriptor())) {
+                if (!defs.containsKey(def.getDescriptor())) {
                     Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
 
-                    this.defs.put(def.getDescriptor(), def);
+                    defs.put(def.getDescriptor(), def);
                     def.appendDependencies(newDeps);
                     deps.addAll(newDeps);
                     if (cc.dependencies != null) {
@@ -295,7 +295,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     }
                     def.appendDependencies(newDeps);
                     for (DefDescriptor<?> dep : newDeps) {
-                        if (!this.defs.containsKey(dep)) {
+                        if (!defs.containsKey(dep)) {
                             CompilingDef<?> depcd = cc.getCompiling(dep);
                             depcd.parents.add(def);
                         }
@@ -379,7 +379,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 // This fits the description of the routine, but it seems a bit
                 // silly.
                 //
-                this.defs.put(descriptor, null);
+                defs.put(descriptor, null);
                 return null;
             }
             //
@@ -458,7 +458,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @Override
     public <T extends Definition> long getLastMod(String uid) {
-        DependencyEntry de = this.localDependencies.get(uid);
+        DependencyEntry de = localDependencies.get(uid);
 
         if (de != null) {
             return de.lastModTime;
@@ -468,7 +468,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @Override
     public <T extends Definition> Set<DefDescriptor<?>> getDependencies(String uid) {
-        DependencyEntry de = this.localDependencies.get(uid);
+        DependencyEntry de = localDependencies.get(uid);
 
         if (de != null) {
             return de.dependencies;
@@ -481,12 +481,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     public <D extends Definition> D getDef(DefDescriptor<D> descriptor) throws QuickFixException {
         Definition def;
 
-        if (this.defs.containsKey(descriptor)) {
+        if (defs.containsKey(descriptor)) {
             //
             // If we have stored the def in our table, use it, whether null or
             // not.
             //
-            def = this.defs.get(descriptor);
+            def = defs.get(descriptor);
         } else {
             def = compileDef(descriptor, null);
         }
@@ -532,7 +532,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         if (defs.containsKey(descriptor)) {
             return true;
         }
-        DefRegistry<D> reg = this.getRegistryFor(descriptor);
+        DefRegistry<D> reg = getRegistryFor(descriptor);
         return reg != null && reg.exists(descriptor);
     }
 
@@ -542,7 +542,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      */
     @SuppressWarnings("unchecked")
     private <T extends Definition> DefRegistry<T> getRegistryFor(DefDescriptor<T> descriptor) {
-        return (DefRegistry<T>) this.delegateRegistries.getRegistryFor(descriptor);
+        return (DefRegistry<T>) delegateRegistries.getRegistryFor(descriptor);
     }
 
     @Override
@@ -552,7 +552,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @Override
     public <T extends Definition> Source<T> getSource(DefDescriptor<T> descriptor) {
-        DefRegistry<T> reg = this.getRegistryFor(descriptor);
+        DefRegistry<T> reg = getRegistryFor(descriptor);
         if (reg != null) {
             return reg.getSource(descriptor);
         }
@@ -649,10 +649,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         Map<DefDescriptor<? extends Definition>, Definition> filtered;
 
         if (preloads == null || preloads.isEmpty()) {
-            return Maps.newHashMap(this.defs);
+            return Maps.newHashMap(defs);
         }
-        filtered = Maps.newHashMapWithExpectedSize(this.defs.size());
-        for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : this.defs.entrySet()) {
+        filtered = Maps.newHashMapWithExpectedSize(defs.size());
+        for (Map.Entry<DefDescriptor<? extends Definition>, Definition> entry : defs.entrySet()) {
             if (!preloads.contains(entry.getKey())) {
                 filtered.put(entry.getKey(), entry.getValue());
             }
@@ -662,8 +662,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @Override
     public <T extends Definition> boolean invalidate(DefDescriptor<T> descriptor) {
-        if (this.localDependencies.containsKey(descriptor)) {
-            this.localDependencies.remove(descriptor);
+        if (localDependencies.containsKey(descriptor)) {
+            localDependencies.remove(descriptor);
         }
         // TODO: this should be optimized.
         dependencies.invalidateAll();
@@ -677,7 +677,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @Override
     public <T extends Definition> String getCachedString(String uid, DefDescriptor<?> descriptor, String key) {
-        DependencyEntry de = this.localDependencies.get(uid);
+        DependencyEntry de = localDependencies.get(uid);
 
         if (de != null) {
             return strings.getIfPresent(getKey(de, descriptor, key));
@@ -687,7 +687,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @Override
     public <T extends Definition> void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value) {
-        DependencyEntry de = this.localDependencies.get(uid);
+        DependencyEntry de = localDependencies.get(uid);
 
         if (de != null) {
             strings.put(getKey(de, descriptor, key), value);
@@ -701,13 +701,13 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         String lk = descriptor.getQualifiedName().toLowerCase();
 
         if (uid != null) {
-            de = this.localDependencies.get(uid);
+            de = localDependencies.get(uid);
             if (de != null) {
                 return de.uid;
             }
             de = dependencies.getIfPresent(uid + lk);
             if (de != null) {
-                de = this.localDependencies.put(uid, de);
+                de = localDependencies.put(uid, de);
                 return de.uid;
             }
         }
@@ -747,7 +747,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         }
         de = new DependencyEntry(tuid, Sets.newTreeSet(dds.keySet()), lmt);
         dependencies.put(de.uid + lk, de);
-        this.localDependencies.put(de.uid, de);
+        localDependencies.put(de.uid, de);
         return tuid;
     }
 }

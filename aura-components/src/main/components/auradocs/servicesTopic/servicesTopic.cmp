@@ -31,7 +31,7 @@
     <p>See Also: <a href="#reference?topic=api:AuraComponentService">Methods</a> | <auradocs:topicLink topic ="dynamicCmp">Dynamically Creating a Component</auradocs:topicLink> | <auradocs:topicLink topic ="valueObjects">Value Objects</auradocs:topicLink></p>
 
     <h3>AuraDevToolService</h3>
-    <h4><code>$A.devToolServices</code></h4>
+    <h4><code>$A.devToolService</code></h4>
    <p>The dev tool service helps you debug and test in non-production modes by enabling you to query the current state of objects and get statistics about a running app.
       For example, you can query all components using <code>$A.getQueryStatement().query()</code>.</p>
    <p>See Also: <auradocs:topicLink topic="queryLang">Querying State and Statistics</auradocs:topicLink></p>
@@ -45,7 +45,7 @@
     <h4><code>$A.expressionService</code></h4>
     <p>The expression service enables you to process expressions against a different value provider. 
        For example, you can use <code>$A.expressionService.getValue(cmp, "<aura:text value="{!" />$Label.Section.Param}").getValue()</code> to evaluate labels before passing them as attributes to locally created components. 
-       Use <code>component.get()</code> or <code>component.getValue()</code> instead if you are resolving expressions for components.</p>
+       Use <code>component.get()</code> or <code>$A.get()</code> instead if you are resolving expressions for components and do not require manipulating the actual value object.</p>
     <p>See Also: <a href="#reference?topic=api:AuraExpressionService">Methods</a></p>
 
     <h3>AuraHistoryService</h3>
@@ -61,7 +61,7 @@
 
     <h3>AuraRenderingService</h3>
     <h4><code>$A.renderingService</code></h4>
-    <p>The rendering service render components by retrieving and calling their specific renderers. You can override the default rendering behavior in a client-side controller.</p>
+    <p>The rendering service render components by retrieving and calling their specific renderers. You can override the default rendering behavior in a client-side renderer.</p>
     <p>See Also: <a href="#reference?topic=api:AuraExpressionService">Methods</a> | <auradocs:topicLink topic="renderers">Using Renderers</auradocs:topicLink></p>
 
 

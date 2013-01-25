@@ -36,7 +36,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
 
     // RESOURCES_PATTERN format:
     // /required_root/optional_nonce/required_rest_of_path
-    private static final Pattern RESOURCES_PATTERN = Pattern.compile("^/([^/]+)(/[0-9]+)?(/.*)$");
+    private static final Pattern RESOURCES_PATTERN = Pattern.compile("^/([^/]+)(/[-_0-9a-zA-Z]+)?(/.*)$");
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -63,18 +63,20 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             // rest-of-path
             Matcher matcher = RESOURCES_PATTERN.matcher(path);
             String nonce = null;
+            String file = null;
             if (matcher.matches()) {
                 nonce = matcher.group(2);
-                if (nonce != null && !matcher.group(2).equals(Aura.getConfigAdapter().getAuraFrameworkNonce())) {
+                file = matcher.group(3);
+                if (nonce != null && !nonce.substring(1).equals(Aura.getConfigAdapter().getAuraFrameworkNonce())) {
                     // Can we send a more specific "you're out of sync"?
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
                     return;
                 }
                 String root = matcher.group(1);
                 if (root.equals("resources")) {
-                    resStr = String.format("/aura/resources%s", matcher.group(3));
+                    resStr = String.format("/aura/resources%s", file);
                 } else if (root.equals("javascript")) {
-                    resStr = String.format("/aura/javascript%s", matcher.group(3));
+                    resStr = String.format("/aura/javascript%s", file);
                 }
             }
 

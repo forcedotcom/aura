@@ -166,4 +166,32 @@ public class Hash {
             throw new RuntimeException("MD5 is a required MessageDigest algorithm, but is not registered here.");
         }
     }
+
+    public static class StringBuilder {
+        private final MessageDigest digest;
+        private final Charset utf8;
+
+        public StringBuilder() {
+            utf8 = Charset.forName("UTF-8");
+            try {
+                digest = MessageDigest.getInstance("MD5");
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException("MD5 is a required MessageDigest algorithm, but is not registered here.");
+            }
+        }
+
+        /**
+         * Add data to a hash calculation.
+         */
+        public void addString(String string) {
+            ByteBuffer bytes = utf8.encode(string);
+            digest.update(bytes);
+        }
+
+        public Hash build() {
+            Hash hash = new Hash();
+            hash.setHash(digest.digest());
+            return hash;
+        }
+    };
 }

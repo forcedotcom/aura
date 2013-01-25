@@ -15,8 +15,6 @@
  */
 package org.auraframework.impl.system;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -39,7 +37,6 @@ import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Location;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
@@ -459,8 +456,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     /**
      * Internal routine to compile and return a DependencyEntry.
      */
-    private <T extends Definition> DependencyEntry compileDE(DefDescriptor<T> descriptor)
-            throws QuickFixException {
+    private <T extends Definition> DependencyEntry compileDE(DefDescriptor<T> descriptor) throws QuickFixException {
         Map<DefDescriptor<?>, Definition> dds = Maps.newTreeMap();
         String lk = descriptor.getQualifiedName().toLowerCase();
         Definition def = compileDef(descriptor, dds);
@@ -478,22 +474,24 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         }
         StringBuilder sb = new StringBuilder(dds.size() * 20);
 
-        for (Definition t : dds.values()) {
-            Hash hash = t.getOwnHash();
-
-            // TODO: we need to ensure that null hashes are ok
+        //
+        // Calculate our hash based on the descriptors and their hashes (if any).
+        // This uses a promise, and the string builder methods of Hash.
+        //
+        Hash.StringBuilder globalBuilder = new Hash.StringBuilder();
+        for (Map.Entry<DefDescriptor<?>, Definition> entry : dds.entrySet()) {
+            sb.setLength(0);
+            sb.append(entry.getKey().getQualifiedName().toLowerCase());
+            sb.append("|");
+            Hash hash = entry.getValue().getOwnHash();
             if (hash != null) {
+                // TODO: we need to ensure that null hashes are ok
                 sb.append(hash.toString());
             }
+            sb.append(",");
+            globalBuilder.addString(sb.toString());
         }
-        Hash global;
-
-        try {
-            global = new Hash(new StringReader(sb.toString()));
-        } catch (IOException ioe) {
-            throw new AuraError("StringReader IO exception", ioe);
-        }
-        uid = global.toString();
+        uid = globalBuilder.build().toString();
         //
         // Now try a re-lookup. This may catch existing cached
         // entries where uid was null.

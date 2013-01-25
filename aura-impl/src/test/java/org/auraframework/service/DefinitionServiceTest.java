@@ -43,8 +43,8 @@ import com.google.common.collect.Sets;
  * @hierarchy Aura.Services.DefinitionService
  * @userStory a07B0000000Eb3M
  */
-public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, DefinitionServiceTest.Config> implements
-        DefinitionService {
+public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, DefinitionServiceTest.Config>
+        implements DefinitionService {
 
     private static final long serialVersionUID = 8209766512828532228L;
 
@@ -307,7 +307,6 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
 
     @Override
     public MasterDefRegistry getDefRegistry() {
-        // TODO Auto-generated method stub
         return null;
     }
 }

@@ -389,8 +389,14 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         int statusCode = getHttpClient().executeMethod(post);
         assertEquals("Unexpected http status code", HttpStatus.SC_OK, statusCode);
         String response = post.getResponseBodyAsString();
-        Map<String, Object> json = (Map<String, Object>) new JsonReader().read(response
-                .substring(AuraBaseServlet.CSRF_PROTECT.length()));
+        Map<String, Object> json = null;
+       
+        try {
+            json = (Map<String, Object>) new JsonReader().read(response.substring(AuraBaseServlet.CSRF_PROTECT.length()));
+        } catch (Exception e) {
+            fail("unable to parse "+response+" "+e.getMessage());
+        }
+
         assertEquals("Unexpected state", "SUCCESS",
                 ((Map<String, Object>) ((List<Object>) json.get("actions")).get(0)).get("state"));
         Map<String, Object> context = (Map<String, Object>) json.get("context");

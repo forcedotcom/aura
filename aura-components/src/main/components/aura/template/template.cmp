@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="GA" description="The default template used to bootstrap the loading of the aura framework and an application or component. To use another template, extend aura:template and set attributes using aura:set.">
+<aura:component isTemplate="true" extensible="true" support="GA" description="The default template used to bootstrap the loading of the aura framework and an application or component. To use another template, extend aura:template and set attributes using aura:set.">
     <aura:attribute name="title" type="String" default="Aura" description="The title of the template. Default value is &#8220;Aura&#8221;."/>
     <aura:attribute name="auraStyleTags" type="String" description="Loads Aura CSS files."/>
     <aura:attribute name="auraScriptTags" type="String" description="Loads the js framework, preloads the definitions of all preload namespaces, and any other script that is needed by the framework."/>

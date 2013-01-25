@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component extends="aura:template" theme="templateCss://test.themeTestTemplate">
+<aura:component isTemplate="true" extends="aura:template" theme="templateCss://test.themeTestTemplate">
     <ui:message> Loaded themeTestTemplate cmp. </ui:message>
 </aura:component>

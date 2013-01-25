@@ -252,9 +252,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     }
 
     private void assertResponseSetToLongCache(HttpMethod request) throws Exception {
-        final long WIGGLE_FACTOR = 60000; // it's going to expire far off, so
-                                          // factor in some wiggle due to client
-                                          // latency timing
+        final long WIGGLE_FACTOR = 300000; // it's going to expire far off, so
+                                           // factor in some wiggle due to client
+                                           // latency timing
         Date expected = new Date(System.currentTimeMillis() + AuraBaseServlet.LONG_EXPIRE - WIGGLE_FACTOR);
         getHttpClient().executeMethod(request);
         assertEquals("Failed to execute request successfully.", HttpStatus.SC_OK, request.getStatusCode());

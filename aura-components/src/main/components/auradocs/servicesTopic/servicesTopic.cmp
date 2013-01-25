@@ -1,0 +1,70 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="JavaScript Services"/>
+
+    <p> Aura provides a set of client-side services that helps you develop apps faster. 
+    You can call these services from your JavaScript code, using the syntax <code>$A.&lt;service&gt;.&lt;method&gt;</code>. 
+    For example, use <code>$A.componentService.newComponent()</code> to create a component dynamically. 
+    See <auradocs:topicLink topic ="dynamicCmp">Dynamically Creating a Component</auradocs:topicLink> for an example of using the component service.</p>
+    <p>Here is a list of the services.</p>
+
+
+    <h3>AuraComponentService</h3>
+    <h4><code>$A.componentService</code></h4>
+    <p>The component service enables you to create and manage components. You can use the service to create a component on the client or server and access or manipulate component data.</p>
+    <p>See Also: <a href="#reference?topic=api:AuraComponentService">Methods</a> | <auradocs:topicLink topic ="dynamicCmp">Dynamically Creating a Component</auradocs:topicLink> | <auradocs:topicLink topic ="valueObjects">Value Objects</auradocs:topicLink></p>
+
+    <h3>AuraDevToolService</h3>
+    <h4><code>$A.devToolService</code></h4>
+   <p>The dev tool service helps you debug and test in non-production modes by enabling you to query the current state of objects and get statistics about a running app.
+      For example, you can query all components using <code>$A.getQueryStatement().query()</code>.</p>
+   <p>See Also: <auradocs:topicLink topic="queryLang">Querying State and Statistics</auradocs:topicLink></p>
+
+    <h3>AuraEventService</h3>
+    <h4><code>$A.eventService</code></h4>
+    <p>The event service enables you to create and manage events. For example, you can create a new application event using <code>$A.eventService.newEvent("namespace:component")</code>.</p>
+    <p>See Also: <a href="#reference?topic=api:AuraEventService">Methods</a></p>
+
+    <h3>AuraExpressionService</h3>
+    <h4><code>$A.expressionService</code></h4>
+    <p>The expression service enables you to process expressions against a different value provider. 
+       For example, you can use <code>$A.expressionService.getValue(cmp, "<aura:text value="{!" />$Label.Section.Param}").getValue()</code> to evaluate labels before passing them as attributes to locally created components. 
+       Use <code>component.get()</code> or <code>$A.get()</code> instead if you are resolving expressions for components and do not require manipulating the actual value object.</p>
+    <p>See Also: <a href="#reference?topic=api:AuraExpressionService">Methods</a></p>
+
+    <h3>AuraHistoryService</h3>
+    <h4><code>$A.historyService</code></h4>
+    <p>The history service enables you to manage browser history and change the location. For example, use <code>$A.historyService.set(location)</code> to add the location to the history service, and use <code>$A.historyService.back()</code>
+     or <code>$A.historyService.forward()</code> to load the previous or subsequent URL or layout on the list.</p>
+    <p>See Also: <a href="#reference?topic=api:AuraHistoryService">Methods</a></p>
+
+    <h3>AuraLayoutService</h3>
+    <h4><code>$A.layoutService</code></h4>
+    <p>The layout service enables you to manage the layout and navigation of your app. For example, you can use the <code>changeLocation()</code> method to pass in a new location and extra parameters for the new URL.</p>
+    <p>See Also: <a href="#reference?topic=api:AuraLayoutService">Methods</a> | <auradocs:topicLink topic="layouts">Using Layouts</auradocs:topicLink></p>
+
+    <h3>AuraRenderingService</h3>
+    <h4><code>$A.renderingService</code></h4>
+    <p>The rendering service render components by retrieving and calling their specific renderers. You can override the default rendering behavior in a client-side renderer.</p>
+    <p>See Also: <a href="#reference?topic=api:AuraExpressionService">Methods</a> | <auradocs:topicLink topic="renderers">Using Renderers</auradocs:topicLink></p>
+
+
+    <!--TODO: W-1403508 AuraStorageService-->
+
+    </aura:component>

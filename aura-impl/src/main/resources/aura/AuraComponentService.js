@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Aura Component Service.  Creates and Manages Components.
+ * @namespace The Aura Component Service, accessible using $A.componentService.  Creates and Manages Components.
  * @constructor
  */
 var AuraComponentService = function(){
@@ -24,11 +24,25 @@ var AuraComponentService = function(){
     var componentService = {
         renderedBy: "auraRenderedBy",
 
+        /**
+         * Get an instance of a component.
+         * @param {String} globalId
+         * 				The generated globally unique Id of the component that changes across pageloads.
+         * @memberOf AuraComponentService
+         * @public
+         */
         get: function(globalId){
             var ret = priv.indexes.globalId[globalId];
             return ret;
         },
 
+        /**
+         * Get the rendering component for the provided element recursively.
+         * @param {Object} element
+         * 				The element that is used to find the rendering component
+         * @memberOf AuraComponentService
+         * @private
+         */
         getRenderingComponentForElement: function(element) {
             if ($A.util.isUndefinedOrNull(element)) { return null;}
 
@@ -45,10 +59,21 @@ var AuraComponentService = function(){
             return ret;
         },
 
+        /**
+         * Get the attribute provider for the provided element by calling getAttributes().getValueProvider().
+         * @param {Object} element
+         * 				The element whose attribute provider is to be returned
+         * @memberOf AuraComponentService
+         * @private
+         */
         getAttributeProviderForElement: function(element) {
             return this.getRenderingComponentForElement(element).getAttributes().getValueProvider();
         },
 
+        /**
+         * Create a new component array.
+         * @private
+         */
         newComponentArray : function(config, attributeValueProvider, localCreation, doForce){
             var ret = [];
 
@@ -60,6 +85,16 @@ var AuraComponentService = function(){
             return ret;
         },
 
+        /**
+         * Create a new component, using the format: newComponent("ui:inputText") or
+         * newComponent({componentDef: {descriptor: "markup://namespace:name"}, attributes: { values: { key: value }} })
+         * @param {Object} config
+         * 				Use config to pass in your component definition and attributes. Supports lazy or exclusive loading by passing in "load": "LAZY" or "load": "EXCLUSIVE"
+         * @param {Object} attributeValueProvider
+         * 				The value provider for the attributes
+         * @memberOf AuraComponentService
+         * @public
+         */
         newComponent: function(config, attributeValueProvider, localCreation, doForce){
             aura.assert(config, "config is required in ComponentService.newComponent(config)");
 
@@ -133,34 +168,70 @@ var AuraComponentService = function(){
             return ret;
         },
 
+        /**
+         * Index the component using its global Id, which is uniquely generated across pageloads.
+         * @private
+         */
         index: function(component){
             priv.indexes.globalId[component.getGlobalId()] = component;
         },
 
+        /**
+         * Get the component definition from the registry.
+         * @param {Object} config
+         * 	@param {Object} noInit
+         * @returns {ComponentDef}  The metadata of the component
+         * @memberOf AuraComponentService
+         * @public
+         */
         getDef: function(config, noInit){
             return priv.registry.getDef(config, noInit);
         },
 
+        /**
+         * Get the component's controller definition from the registry.
+         * @private
+         */
         getControllerDef : function(config){
             return priv.controllerDefRegistry.getDef(config);
         },
 
+        /**
+         * Get the model definition from the registry.
+         * @private
+         */       
         getModelDef : function(config){
             return priv.modelDefRegistry.getDef(config);
         },
 
+        /**
+         * Get the provider definition from the registry. A provider enables an abstract component definition to be used directly in markup.
+         * @private
+         */
         getProviderDef : function(providerDefDescriptor, config){
             return priv.providerDefRegistry.getDef(providerDefDescriptor, config);
         },
 
+        /**
+         * Get the renderer definition from the registry.
+         * @private
+         */
         getRendererDef : function(componentDefDescriptor, config){
             return priv.rendererDefRegistry.getDef(componentDefDescriptor, config);
         },
 
+        /**
+         * Get the helper definition from the registry.
+         * @private
+         */
         getHelperDef : function(componentDefDescriptor, config, componentDef){
             return priv.helperDefRegistry.getDef(componentDefDescriptor, config, componentDef);
         },
 
+        /**
+         * Destroy the components.
+         * @private
+         */
         destroy: function(components){
             if (!aura.util.isArray(components)) {
                 components = [components];
@@ -174,12 +245,18 @@ var AuraComponentService = function(){
             }
         },
 
+        /**
+         * Remove the index of the component.
+         * @private
+         */
         deIndex: function(component){
             delete priv.indexes.globalId[component.getGlobalId()];
         },
 
         /**
          * Return the descriptors of all components known to the registry.
+         * @memberOf AuraComponentService
+         * @private
          */
         getRegisteredComponentDescriptors : function(){
             var ret = [];
@@ -202,6 +279,10 @@ var AuraComponentService = function(){
 
         //#if {"excludeModes" : ["PRODUCTION"]}
         ,priv : priv,
+        /**
+         * @memberOf AuraComponentService
+         * @private
+         */
         getIndex: function(){
             var ret = "";
             var index = priv.indexes.globalId;

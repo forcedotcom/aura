@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Aura Client Service. Communicates with the Aura Server.
+ * @namespace The Aura Client Service, accessible using $A.services.client. Communicates with the Aura Server.
  * @constructor
  */
 var AuraClientService = function(){
@@ -87,14 +87,45 @@ var AuraClientService = function(){
              $A.measure("Initial Scripts Finished", "PageStart");
         },
 
+        /**
+         * Load an app by calling loadComponent.
+         * @param {DefDescriptor} descriptor
+         * 				The key for a definition with a qualified name of the format prefix://namespace:name.
+         * @param {Map} attributes
+         * 				The configuration data to use in the app
+         * @param {function} callback
+         * 				The callback function to run
+         * @memberOf AuraClientService
+         * @private
+         */
         loadApplication : function(descriptor, attributes, callback){
             this.loadComponent(descriptor, attributes, callback, "APPLICATION");
         },
 
+        /**
+         * Throw an exception.
+         * @param {Object} config
+         * 				The data for the exception event
+         * @memberOf AuraClientService
+         * @private
+         */
         throwExceptionEvent : function(config){
             priv.thowExceptionEvent(config);
         },
 
+        /**
+         * Load a component.
+         * @param {DefDescriptor} descriptor
+         * 				The key for a definition with a qualified name of the format prefix://namespace:name
+         * @param {Map} attributes
+         * 				The configuration data to use. If specified, attributes are used as a key value pair.
+         * @param {function} callback
+         * 				The callback function to run
+         * @param {String} defType
+         *				Sets the defType to "COMPONENT"
+         * @memberOf AuraClientService
+         * @private
+         */
         loadComponent : function(descriptor, attributes, callback, defType){
             var url = priv.host+"/aura";
             var desc = new DefDescriptor(descriptor);
@@ -151,26 +182,66 @@ var AuraClientService = function(){
             });
         },
 
+        /**
+         * Perform a hard refresh.
+         * @memberOf AuraClientService
+         * @private
+         */
         hardRefresh : function(){
             return priv.hardRefresh();
         },
 
+        /**
+         * Marks the application as outdated.
+         * @memberOf AuraClientService
+         * @private
+         */
         setOutdated : function(){
             return priv.setOutdated();
         },
 
+        /**
+         * For bootstrapping only
+         * @private
+         */
         fireLoadEvent : function(eventName){
             return priv.fireLoadEvent(eventName);
         },
 
+        /**
+         * Reset the token.
+         * @param {Object} newToken
+         * 				Refresh the current token with a new one.
+         * @memberOf AuraClientService
+         * @private
+         */
         resetToken : function(newToken){
             priv.token = newToken;
         },
 
+        /**
+         * Run the actions.
+         * @param {Object} actions
+         * @param {function} scope
+         * 				The scope in which the function is executed
+         * @param {function} callback
+         * 				The callback function to run
+         * @memberOf AuraClientService
+         * @private
+         */
         runActions : function(actions, scope, callback){
             priv.request(actions, scope, callback);
         },
 
+        /**
+         * Inject a component and set up its event handlers. For Integration Service.
+         * @param {Component} parent
+         * @param {Object} rawConfig
+         * @param {String} placeholderId
+         * @param {String} localId
+         * @memberOf AuraClientService
+         * @private
+         */
         injectComponent: function(rawConfig, locatorDomId, localId) {
     		var config = $A.util.json.resolveRefs(rawConfig);
     		

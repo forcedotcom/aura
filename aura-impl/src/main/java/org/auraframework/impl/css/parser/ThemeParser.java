@@ -74,31 +74,30 @@ public class ThemeParser implements Parser {
             builder.setDescriptor((DefDescriptor<ThemeDef>) descriptor);
             builder.setLocation(source.getSystemId(), source.getLastModified());
             builder.setClassName(className);
+            CSSParser parser;
 
             if (descriptor.getName().toLowerCase().endsWith("template")) {
-                builder.setCode(source.getContents());
+                parser = new CSSParser(false, className, source.getContents(), allowedConditions);
             } else {
-                CSSParser parser = new CSSParser(doValidation, className, source.getContents(), allowedConditions);
-                ThemeParserResultHolder resultHolder;
-                try {
-                    resultHolder = parser.parse();
-                } catch (GssParserException e) {
-                    throw new ThemeParserException(e.getMessage(), builder.getLocation());
-                }
-
-                // scram if we found errors
-                if (parser.hasErrors()) {
-                    throw new ThemeParserException(parser.getErrorMessage(), builder.getLocation());
-                }
-
-                builder.setCode(resultHolder.getDefaultCss());
-                builder.setCode(resultHolder.getBrowserCssMap());
-                builder.setImageURLs(resultHolder.getImageURLs());
+                parser = new CSSParser(doValidation, className, source.getContents(), allowedConditions);
+            }
+            ThemeParserResultHolder resultHolder;
+            try {
+                resultHolder = parser.parse();
+            } catch (GssParserException e) {
+                throw new ThemeParserException(e.getMessage(), builder.getLocation());
             }
 
+            // scram if we found errors
+            if (parser.hasErrors()) {
+                throw new ThemeParserException(parser.getErrorMessage(), builder.getLocation());
+            }
+
+            builder.setCode(resultHolder.getDefaultCss());
+            builder.setCode(resultHolder.getBrowserCssMap());
+            builder.setImageURLs(resultHolder.getImageURLs());
             return (D) builder.build();
         }
         return null;
     }
-
 }

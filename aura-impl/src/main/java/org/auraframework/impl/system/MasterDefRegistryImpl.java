@@ -496,12 +496,16 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         // Now try a re-lookup. This may catch existing cached
         // entries where uid was null.
         //
-        de = getDE(uid, lk);
-        if (de == null) {
-            de = new DependencyEntry(uid, Sets.newTreeSet(dds.keySet()), lmt);
-            dependencies.put(de.uid + lk, de);
-            localDependencies.put(de.uid, de);
-        }
+        // TODO : this breaks last mod time tests, as it causes the mod time
+        // to stay at the first compile time. We should phase out last mod
+        // time, and then re-instantiate this code.
+        //
+        //de = getDE(uid, lk);
+        //if (de == null) {
+        de = new DependencyEntry(uid, Sets.newTreeSet(dds.keySet()), lmt);
+        dependencies.put(de.uid + lk, de);
+        localDependencies.put(de.uid, de);
+        //}
         return de;
     }
 

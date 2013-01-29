@@ -1,0 +1,29 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" implements="ui:visible" description="A dropdown menu with a trigger that controls its visibility." support="GA">
+    <aura:registerEvent name="menuExpand" type="ui:menuExpand" description="The event fired when the menu expands."/>
+    <aura:registerEvent name="menuCollapse" type="ui:menuCollapse" description="The event fired when the menu collapses."/>
+    <aura:registerEvent name="menuTriggerPress" type="ui:menuTriggerPress" description="The event fired when the menu trigger is pressed."/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="menuTriggerPress" action="{!c.trigger}"/>
+    <aura:handler name="menuExpand" action="{!c.handleMenuExpand}"/>
+    <aura:handler name="menuCollapse" action="{!c.handleMenuCollapse}"/>
+    <span aura:id="app" role="application">
+        {!v.body}
+    </span>
+</aura:component>

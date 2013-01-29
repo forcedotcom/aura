@@ -15,4 +15,9 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" extends="ui:baseMouseEvent" support="GA" description="Indicates that the user has moved the mouse pointer over the component."></aura:event>
+<aura:component extends="ui:menuItem" extensible="true" support="GA" description="​A menu item that triggers an action.">
+    <aura:handler name="click" action="{!c.handleClick}"/>
+    <li aura:id="listitem" class="{!v.class}" role="presentation">
+        <a aura:id="link" role="menuitem" disabled="{!v.disabled}">{!v.label}</a>
+    </li>
+</aura:component>

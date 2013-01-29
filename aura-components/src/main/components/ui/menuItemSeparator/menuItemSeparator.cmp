@@ -15,4 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" extends="ui:baseMouseEvent" support="GA" description="Indicates that the user has moved the mouse pointer over the component."></aura:event>
+<aura:component extensible="true" implements="ui:visible" description="A menu separator to divide menu items." support="GA">
+    <li role="separator" class="{!v.class}"/>
+</aura:component>

@@ -15,4 +15,14 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" extends="ui:baseMouseEvent" support="GA" description="Indicates that the user has moved the mouse pointer over the component."></aura:event>
+<aura:component extends="ui:menuItem" extensible="true" support="GA" description="​A menu item with a checkbox that supports multiple selection and can be used to invoke an action.">
+    <aura:handler name="click" action="{!c.handleClick}"/>
+    <aura:if isTrue="{!v.body.length == 0}">
+        <li aura:id="listitem" class="{!v.class}" role="presentation">
+            <a aura:id="link" role="menuitemcheckbox" disabled="{!v.disabled}"><b></b>{!v.label}</a>
+        </li>
+        <aura:set attribute="else">
+            {!v.body}
+        </aura:set>
+    </aura:if>
+</aura:component>

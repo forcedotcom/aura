@@ -15,4 +15,12 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" extends="ui:baseMouseEvent" support="GA" description="Indicates that the user has moved the mouse pointer over the component."></aura:event>
+<aura:component extensible="true" extends="ui:menuTrigger" description="​A link that triggers a dropdown menu." support="GA">
+    <aura:attribute name="title" type="String" default="" description="The text to display as a tooltip when the mouse pointer hovers over this component."/>
+    <aura:if isTrue="{!v.body.length == 0}">
+        <a aura:id="link" class="{!v.class}" title="{!v.title}">{!v.label}</a>
+        <aura:set attribute="else">
+            {!v.body}
+        </aura:set>
+    </aura:if>
+</aura:component>

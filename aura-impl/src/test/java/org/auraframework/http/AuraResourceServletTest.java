@@ -63,7 +63,8 @@ public class AuraResourceServletTest extends AuraTestCase {
                 return "";
             }
         };
-        HttpServletResponse response = new DummyHttpServletResponse() {
+        // Careful. Resin apparently has no getStatus().
+        DummyHttpServletResponse response = new DummyHttpServletResponse() {
             int status = -1;
 
             @Override

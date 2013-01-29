@@ -15,4 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" extends="ui:baseMouseEvent" support="GA" description="Indicates that the user has moved the mouse pointer over the component."></aura:event>
+<aura:event type="COMPONENT" support="GA" description="Indicates that the user selects a menu item inside a menu component.">
+    <aura:attribute name="selectedItem" type="Aura.Component[]" description="The menu item which is selected."/>
+</aura:event>

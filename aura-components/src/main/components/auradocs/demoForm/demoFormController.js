@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+{
   getInput: function(cmp, event) {
-        var inputCmp = cmp.find("myinput");
-        var inputItems = inputCmp.getValue("v.childinputItems");
-        var values = [];
-      //  for (var i = 0; i < inputItems.getLength(); i++) {
-       //     var c = inputItems.getValue(i);
-       //     if (c.get("v.selected") === true) {
-       //         values.push(c.get("v.label"));
-       //     }
-        }
+        var textI = cmp.find("textI");
+        var textvalue = textI.getValue("v.value");
+        var textO = cmp.find("textO");
+      
+        console.log(textI);
+        console.log(textO);
+        textO.push(textValue);
+   }
+}

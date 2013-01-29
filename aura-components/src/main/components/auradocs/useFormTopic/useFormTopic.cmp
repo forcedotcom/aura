@@ -18,7 +18,7 @@
 
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Getting User Input" />
-    <p>Aura provides out-of-the-box input components that enables you to easily retrieve and process user input with built-in features such as value binding and event handling. 
+    <p>Aura provides out-of-the-box input components that enable you to easily retrieve and process user input with built-in features such as value binding and event handling. 
     These components provide a consistent experience across mobile and desktop devices, taking advantage of HTML5 functionalities and providing a fallback experience for older browsers.
     For an example on error handling on an input component, see <auradocs:topicLink topic="error">Error Handling</auradocs:topicLink>.
     </p>

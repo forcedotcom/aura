@@ -69,15 +69,33 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private final static int DEPENDENCY_CACHE_SIZE = 100;
     private final static int STRING_CACHE_SIZE = 100;
 
+    /**
+     * A dependency entry for a uid+descriptor.
+     *
+     * This entry is created for each descriptor that a context uses at the
+     * top level. It is cached globally and locally. The second version of
+     * the entry (with a quick fix) is only ever cached locally.
+     *
+     * all values are final, and unmodifiable.
+     */
     private static class DependencyEntry {
         public final String uid;
         public final long lastModTime;
         public final SortedSet<DefDescriptor<?>> dependencies;
+        public final QuickFixException qfe;
 
         public DependencyEntry(String uid, SortedSet<DefDescriptor<?>> dependencies, long lastModTime) {
             this.uid = uid;
             this.dependencies = Collections.unmodifiableSortedSet(dependencies);
             this.lastModTime = lastModTime;
+            this.qfe = null;
+        }
+
+        public DependencyEntry(QuickFixException qfe) {
+            this.uid = null;
+            this.dependencies = null;
+            this.lastModTime = 0;
+            this.qfe = qfe;
         }
     }
 
@@ -767,6 +785,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         de = dependencies.getIfPresent(uid + lk);
         if (de != null) {
             localDependencies.put(uid, de);
+            localDependencies.put(lk, de);
             return de;
         }
         return null;
@@ -774,6 +793,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Get the UID.
+     *
+     * This uses some trickery to try to be efficient, including using a dual
+     * keyed local cache to avoid looking up values more than once even in
+     * the absense of remembered context.
      *
      * @param uid the uid expected (null means unknown).
      * @param descriptor the descriptor to fetch.
@@ -786,14 +809,24 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
         if (uid != null) {
             de = getDE(uid, lk);
+        } else {
+            de = localDependencies.get(lk);
         }
         if (de == null) {
-            de = compileDE(descriptor);
+            try {
+                de = compileDE(descriptor);
+            } catch (QuickFixException qfe) {
+                de = new DependencyEntry(qfe);
+                localDependencies.put(lk, de);
+            }
             if (uid != null && !uid.equals(de.uid)) {
                 throw new ClientOutOfSyncException("Mismatched UIDs expected '"+de.uid+"' got '"+uid+"'");
             }
-        }
+        } 
         if (de != null) {
+            if (de.qfe != null) {
+                throw de.qfe;
+            }
             return de.uid;
         }
         return null;

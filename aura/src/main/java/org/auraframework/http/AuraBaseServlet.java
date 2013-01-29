@@ -353,35 +353,33 @@ public abstract class AuraBaseServlet extends HttpServlet {
     }
 
     /**
-     * Sets the manifest cookie on response to either to uid:time, in the common
-     * case with a valid uid, or just to time if uid is {@code null}.
-     * */
-    public static void addManifestCookie(HttpServletResponse response, String time, String uid, long expiry) {
+     * Sets the manifest cookie on response.
+     *
+     * @param response the response
+     * @param value the value to set.
+     * @param expiry the expiry time for the cookie.
+     */ 
+    private static void addManifestCookie(HttpServletResponse response, String value, long expiry) {
         String cookieName = getManifestCookieName();
         if (cookieName != null) {
-            String value = (uid == null) ? time : String.format("%s:%s", uid, time);
             addCookie(response, cookieName, value, expiry);
         }
     }
 
-    public static void addManifestCookie(HttpServletResponse response, long expiry) {
-        try {
-            addManifestCookie(response, Long.toString(getManifestLastMod()), getContextAppUid(), expiry);
-        } catch (QuickFixException e) {
-            throw new AuraRuntimeException(e);
-        }
-    }
-
     public static void addManifestErrorCookie(HttpServletResponse response) {
-        addManifestCookie(response, MANIFEST_ERROR, null, SHORT_EXPIRE_SECONDS);
+        addManifestCookie(response, MANIFEST_ERROR, SHORT_EXPIRE_SECONDS);
     }
 
     public static void addManifestCookie(HttpServletResponse response) {
-        addManifestCookie(response, SHORT_EXPIRE_SECONDS);
+        String uid = getContextAppUid();
+        String fwUid = Aura.getConfigAdapter().getAuraFrameworkNonce();
+        String value = (uid == null) ? fwUid : String.format("%s:%s", uid, fwUid);
+
+        addManifestCookie(response, value, SHORT_EXPIRE_SECONDS);
     }
 
     public static void deleteManifestCookie(HttpServletResponse response) {
-        addManifestCookie(response, "", null, 0);
+        addManifestCookie(response, "", 0);
     }
 
     public static String getRequestUid(HttpServletRequest request) {
@@ -509,17 +507,6 @@ public abstract class AuraBaseServlet extends HttpServlet {
             lastMod = preloadsLastMod;
         }
         return lastMod;
-    }
-
-    public static long getManifestLastMod() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        Mode mode = context.getMode();
-        if (!(mode == Mode.PROD || mode == Mode.PTEST || mode == Mode.CADENCE)) {
-            long auraJSLastMod = Aura.getConfigAdapter().getAuraJSLastMod();
-            long lastMod = getLastMod();
-            return (auraJSLastMod > lastMod) ? auraJSLastMod : lastMod;
-        }
-        return getLastMod();
     }
 
     public static String getManifest() throws QuickFixException {

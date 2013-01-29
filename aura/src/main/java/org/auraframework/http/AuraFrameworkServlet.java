@@ -51,6 +51,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             return;
         }
 
+        long ifModifiedSince = request.getDateHeader("If-Modified-Since");
         InputStream in = null;
         try {
             Aura.getConfigAdapter().regenerateAuraJS();
@@ -67,10 +68,35 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             if (matcher.matches()) {
                 nonce = matcher.group(2);
                 file = matcher.group(3);
-                if (nonce != null && !nonce.substring(1).equals(Aura.getConfigAdapter().getAuraFrameworkNonce())) {
-                    // Can we send a more specific "you're out of sync"?
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                    return;
+                //
+                // This is ugly. We can't really distinguish here between a nonce
+                // and a path. So rather than try to be cute, if the nonce doesn't
+                // match, we just use it as part of the path. In practice this will
+                // do exactly the same thing.
+                //
+                if (nonce != null) {
+                    if (nonce.substring(1).equals(Aura.getConfigAdapter().getAuraFrameworkNonce())) {
+                        //
+                        // If we match the nonce and we have an if-modified-since, we
+                        // can just send back a not modified. Timestamps don't matter.
+                        // Note that this fails to check existence, but browsers
+                        // shouldn't ask for things that don't exist with an
+                        // if-modified-since.
+                        //
+                        // This is the earliest that we can check for the nonce, since
+                        // we only have the nonce after calling regenerate...
+                        //
+                        // DANGER: we have to be sure that the framework nonce actually
+                        // includes all of the resources that may be requested...
+                        //
+                        if (ifModifiedSince != -1) {
+                            response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
+                            return;
+                        }
+                    } else {
+                        file = nonce+file;
+                        nonce = null;
+                    }
                 }
                 String root = matcher.group(1);
                 if (root.equals("resources")) {
@@ -82,22 +108,26 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
 
             in = (resStr == null) ? null : resourceLoader.getResourceAsStream(resStr);
 
-            // Check if it exists
+            //
+            // Check if it exists. DANGER: if there is a nonce, this is really an
+            // 'out-of-date' problem, and we may break the browser by telling it a
+            // lie here.
+            //
             if (in == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
-            // end processing path
 
-            // Check the cache headers
-            // FIXME
-            // if(Aura.getContextService().getCurrentContext().getMode().isTestMode()){
-            long ifModifiedSince = request.getDateHeader("If-Modified-Since");
-            if (ifModifiedSince != -1 && ifModifiedSince + 1000 > lastModified) {
+            //
+            // Note that if we have gotten here, we can check to see if the
+            // request has already occurred, as if there was a mismatched
+            // nonce, it would have given back a SC_NOT_FOUND. In that case
+            // we desperately need the browser to go reset itself...
+            //
+            if (ifModifiedSince != -1 && ifModifiedSince > lastModified) {
                 response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
                 return;
             }
-            // }
 
             response.reset();
 
@@ -105,22 +135,22 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             String mimeType = mimeTypesMap.getContentType(path);
 
             if (mimeType.equals("application/octet-stream") || mimeType.equals(JAVASCRIPT_CONTENT_TYPE)) /* unidentified */{
-                response.setContentType(JAVASCRIPT_CONTENT_TYPE);
-                assert nonce != null;
-                if (nonce == null) {
-                    // all javascript requests should have one.
-                    nonce = Aura.getConfigAdapter().getAuraFrameworkNonce();
-                }
+                mimeType = JAVASCRIPT_CONTENT_TYPE;
             }
-
-            if (response.getContentType().startsWith("text")) {
+            response.setContentType(mimeType);
+            if (mimeType.startsWith("text")) {
                 response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
             }
 
             response.setDateHeader("Last-Modified", lastModified);
             response.setBufferSize(10240);// 10kb
 
-            if (nonce != null) {
+            //
+            // Here we force a long expire for JS. Is
+            // this actually correect? A missing nonce
+            // will cause this to fail in an evil fashion
+            //
+            if (nonce != null || mimeType.equals(JAVASCRIPT_CONTENT_TYPE)) {
                 response.setDateHeader("Expires", System.currentTimeMillis() + AuraBaseServlet.LONG_EXPIRE);
             } else {
                 response.setDateHeader("Expires", System.currentTimeMillis() + AuraBaseServlet.SHORT_EXPIRE);
@@ -129,7 +159,11 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             IOUtil.copyStream(in, response.getOutputStream());
         } finally {
             if (in != null) {
-                in.close();
+                try {
+                    in.close();
+                } catch (Throwable t) {
+                    // totally ignore failure to close.
+                }
             }
         }
     }

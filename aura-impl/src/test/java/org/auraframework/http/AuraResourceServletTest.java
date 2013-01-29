@@ -86,9 +86,8 @@ public class AuraResourceServletTest extends AuraTestCase {
         Aura.getContextService().startContext(AuraContext.Mode.UTEST, AuraContext.Format.MANIFEST,
                 AuraContext.Access.PUBLIC);
 
-        long now = System.currentTimeMillis();
         DefDescriptor<ApplicationDef> nopreload = DefDescriptorImpl.getInstance("appCache:nopreload",
-                ApplicationDef.class);
+                                                                                ApplicationDef.class);
         Aura.getContextService().getCurrentContext().setApplicationDescriptor(nopreload);
 
         DummyHttpServletResponse response = new DummyHttpServletResponse() {
@@ -110,11 +109,12 @@ public class AuraResourceServletTest extends AuraTestCase {
         Cookie cookie = response.getCookie(expectedName);
         assertEquals(expectedName, cookie.getName());
         assertEquals(AuraBaseServlet.SHORT_EXPIRE_SECONDS, cookie.getMaxAge());
-        assertTrue(cookie.getValue().contains(":"));
+        assertTrue("Cookie should contain :", cookie.getValue().contains(":"));
         String uid = cookie.getValue().substring(0, cookie.getValue().indexOf(':'));
-        assertNotNull(uid);
-        assertTrue(uid.length() > 20);
-        long time = Long.parseLong(cookie.getValue().substring(uid.length() + 1));
-        assertTrue("Lastmod is later than test start", time < now);
+        assertNotNull("App uid should not be null", uid);
+        assertTrue("App uid should be > 20 characters long", uid.length() > 20);
+        String fwUid = cookie.getValue().substring(uid.length() + 1);
+        assertNotNull("Framework uid should not be null", fwUid);
+        assertTrue("Framework uid should be > 20 characters long", fwUid.length() > 20);
     }
 }

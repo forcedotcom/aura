@@ -196,9 +196,17 @@ public class AuraResourceServlet extends AuraBaseServlet {
                     }
                 }
             }
+            addManifestCookie(response);
 
-            String serverLastMod = Long.toString(getManifestLastMod());
-            attribs.put(LAST_MOD, serverLastMod);
+            //
+            // This writes both the app and framework signatures into
+            // the manifest, so that if either one changes, the 
+            // manifest will change. Note that in most cases, we will
+            // write these signatures in multiple places, but we just
+            // need to make sure that they are in at least one place.
+            //
+            attribs.put(LAST_MOD, String.format("app=%s, FW=%s", getContextAppUid(),
+                                                Aura.getConfigAdapter().getAuraFrameworkNonce()));
             StringWriter sw = new StringWriter();
             for (String s : AuraServlet.getStyles()) {
                 sw.write(s);

@@ -17,70 +17,77 @@ package org.auraframework.throwable.quickfix;
 
 import junit.framework.Assert;
 
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.test.WebDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 /**
- * Widget class for QuickFix testing.
- * 
- * 
- * @since 0.0.171
+ * Widget class for QuickFixes to create new component/application bundles. This class handles verificaiton of UI
+ * differences between creating a component and application bundle.
  */
-public class QuickFixUIWidget {
-    private BaseComponentQuickFixUtil util;
+public class BaseComponentQuickFixWidget {
+    private BaseComponentQuickFixUtil baseCmpUtil;
     WebDriverTestCase testCase;
+    private final QuickFixUITestUtil testUtil;
 
-    public QuickFixUIWidget(DefType type, WebDriverTestCase testCase) {
+    public BaseComponentQuickFixWidget(DefType type, WebDriverTestCase testCase) {
         switch (type) {
         case APPLICATION:
-            util = new ApplicationQuickFixUtil(testCase);
+            baseCmpUtil = new ApplicationQuickFixUtil(testCase);
             break;
         case COMPONENT:
-            util = new ComponentQuickFixUtil(testCase);
+            baseCmpUtil = new ComponentQuickFixUtil(testCase);
             break;
         default:
             throw new UnsupportedOperationException("The specified defType is not supported by the test framework:"
                     + type.name());
         }
         this.testCase = testCase;
+        testUtil = new QuickFixUITestUtil(testCase);
     }
 
     /**
-     * Verify toolbar error message and create button.
+     * Verify toolbar error message and click create button.
      */
-    public void verifyToolbarAndButtons(String cmpName) {
-        util.verifyToolbarAndButtons(cmpName);
+    public void verifyToolbarAndClickCreate(String cmpName) {
+        baseCmpUtil.verifyToolbarAndClickCreate(cmpName);
     }
 
     /**
-     * Verify that clicking create button takes you to customization screen.
-     * Also verify the customization options available
+     * Verify the customization options available, such as what files to include in the bundle.
      */
-    public void clickCreate() {
-        util.clickCreateAndNavigateToCustomization();
+    public void verifyCustomizationMenu() {
+        baseCmpUtil.verifyCustomizationMenu();
     }
 
     /**
      * Click on fix button and verify what happens.
      */
     public String clickFix(Boolean expectedSuccess) throws Exception {
-        return util.clickFix(expectedSuccess);
+        return testUtil.clickFix(expectedSuccess);
     }
 
     /**
      * Set the css file checkbox to be selected or not.
      */
     public void selectCssCheckbox(Boolean select) {
-        util.selectCssCheckbox(select);
+        baseCmpUtil.selectCssCheckbox(select);
     }
 
     /**
      * Set the name of the component bundle before creating it.
      */
     public void setDescriptorNames(String text) {
-        util.setDescriptorNames(text);
+        baseCmpUtil.setDescriptorNames(text);
+    }
+
+    /**
+     * Delete the component bundle.
+     */
+    public void deleteFiles(DefDescriptor<?> defDescriptor) {
+        testUtil.deleteFiles(defDescriptor);
     }
 
     private abstract class BaseComponentQuickFixUtil {
@@ -89,23 +96,6 @@ public class QuickFixUIWidget {
 
         BaseComponentQuickFixUtil(WebDriverTestCase testCase) {
             this.testCase = testCase;
-        }
-
-        /**
-         * Verify what happens when fix button is clicked. In case of success it
-         * returns the body text else it returns the information provided by
-         * error popup.
-         */
-        public String clickFix(Boolean expectedSuccess) throws Exception {
-            By fixButton = By.xpath("//img[@alt='Fix!']");
-            WebElement button = testCase.getDriver().findElement(fixButton);
-            button.click();
-            testCase.waitFor(3);
-            if (expectedSuccess) {
-                return testCase.getDriver().findElement(By.tagName("body")).getText();
-            } else {
-                return testCase.getDriver().findElement(By.xpath("//div[@id='auraErrorMessage']")).getText();
-            }
         }
 
         /**
@@ -132,24 +122,14 @@ public class QuickFixUIWidget {
         /**
          * Verify the buttons you expect to see on the QuickFix screen.
          */
-        public void verifyToolbarAndButtons(String name) {
+        public void verifyToolbarAndClickCreate(String name) {
             Assert.assertTrue("Could not locate the create button or the label on button is invalid.",
                     testCase.isElementPresent(createButton));
+            testUtil.clickButtonByLocalId("createButton");
         }
 
         /**
-         * Choose the option to create a component/application and verify the
-         * detail in the customization screen.
-         */
-        public void clickCreateAndNavigateToCustomization() {
-            WebElement button = testCase.getDriver().findElement(createButton);
-            button.click();
-            verifyCustomizationMenu();
-        }
-
-        /**
-         * What other parts of a Component/Application do you want to create?
-         * Verify that menu.
+         * What other parts of a Component/Application do you want to create? Verify that menu.
          */
         public void verifyCustomizationMenu() {
             // No support for controller yet
@@ -182,7 +162,7 @@ public class QuickFixUIWidget {
     private class ComponentQuickFixUtil extends BaseComponentQuickFixUtil {
         ComponentQuickFixUtil(WebDriverTestCase test) {
             super(test);
-            createButton = By.xpath("//button[text()='Create Component Definition']");
+            createButton = By.xpath("//button/span[text()='Create Component Definition']");
         }
 
         @Override
@@ -202,19 +182,16 @@ public class QuickFixUIWidget {
         }
 
         @Override
-        public void verifyToolbarAndButtons(String name) {
-            super.verifyToolbarAndButtons(name);
-            By toolbarXpath = By.xpath("//div[@class='toolbar']");
-            String toolbarText = testCase.getDriver().findElement(toolbarXpath).getText();
-            Assert.assertTrue("Incorrect message displayed on quickfix toolbar",
-                    toolbarText.contains("No COMPONENT named " + name + " found"));
+        public void verifyToolbarAndClickCreate(String name) {
+            super.verifyToolbarAndClickCreate(name);
+            testUtil.verifyToolbarText("No COMPONENT named " + name + " found");
         }
     }
 
     private class ApplicationQuickFixUtil extends BaseComponentQuickFixUtil {
         ApplicationQuickFixUtil(WebDriverTestCase test) {
             super(test);
-            createButton = By.xpath("//button[text()='Create Application Definition']");
+            createButton = By.xpath("//button/span[text()='Create Application Definition']");
         }
 
         @Override
@@ -226,12 +203,9 @@ public class QuickFixUIWidget {
         }
 
         @Override
-        public void verifyToolbarAndButtons(String name) {
-            super.verifyToolbarAndButtons(name);
-            By toolbarXpath = By.xpath("//div[@class='toolbar']");
-            String toolbarText = testCase.getDriver().findElement(toolbarXpath).getText();
-            Assert.assertTrue("Incorrect message displayed on quickfix toolbar",
-                    toolbarText.contains("No APPLICATION named " + name + " found"));
+        public void verifyToolbarAndClickCreate(String name) {
+            super.verifyToolbarAndClickCreate(name);
+            testUtil.verifyToolbarText("No APPLICATION named " + name + " found");
         }
     }
 

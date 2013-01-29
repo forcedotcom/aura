@@ -18,5 +18,5 @@
 <aura:component controller="java://org.auraframework.throwable.quickfix.AuraQuickFixController">
     <aura:attribute name="quickFix" type="java://org.auraframework.throwable.quickfix.AuraQuickFix"/>
     <aura:registerevent name="showUI" type="auradev:showQuickFixUI"/>
-    <button onclick="{!c.fix}">{!v.quickFix.description}</button>
+    <ui:button aura:id="createButton" press="{!c.fix}" label="{!v.quickFix.description}" />
 </aura:component>

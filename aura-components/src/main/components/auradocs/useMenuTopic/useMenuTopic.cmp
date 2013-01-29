@@ -32,4 +32,9 @@
     
     <p>The following demo shows how to use <code>ui:menu</code> to display menu items from a model and retrieve the selected items via the <code>menuItems</code> attribute.</p>
     <auradocs:example descriptor="auradocs:demoMenuMeta" />
+    
+      <p><b>See also:</b><br/>
+      <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
+      <auradocs:topicLink topic="models">Models</auradocs:topicLink>
+    </p>
 </aura:component>

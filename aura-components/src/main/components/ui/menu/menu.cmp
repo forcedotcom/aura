@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" description="A menu component that contains menu items." support="GA">
+<aura:component extensible="true" implements="ui:visible" description="A menu component that can contain menu items: ui:actionMenuItem, ui:checkboxMenuItem, and ui:radioMenuItem, and a separator component ui:menuItemSeparator. This component can be nested in a ui:dropdown component and can be used together with a ui:menuTriggerLink component, which triggers the menu items." support="GA">
     <aura:attribute name="parent" type="Aura.Component[]" description="The parent component of this menu."/>
     <aura:attribute name="visible" type="Boolean" default="{!false}" description="​Controls the visibility of the menu. The default is false, which hides the menu."/>
     <aura:attribute name="focusItemIndex" type="Integer" default="0" 

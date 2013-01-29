@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:menuItem" extensible="true" support="GA" description="​A menu item with a checkbox that supports multiple selection and can be used to invoke an action.">
+<aura:component extends="ui:menuItem" extensible="true" support="GA" description="​A menu item with a checkbox that supports multiple selection and can be used to invoke an action. This component is nested in a ui:menu component.">
     <aura:handler name="click" action="{!c.handleClick}"/>
     <aura:if isTrue="{!v.body.length == 0}">
         <li aura:id="listitem" class="{!v.class}" role="presentation">

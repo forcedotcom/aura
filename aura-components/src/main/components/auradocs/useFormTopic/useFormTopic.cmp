@@ -18,12 +18,14 @@
 
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Getting User Input" />
-    <p>Aura provides out-of-the-box input components that enables you to easily retrieve and process user input with features such as value binding and event handling.
+    <p>Aura provides out-of-the-box input components that enables you to easily retrieve and process user input with built-in features such as value binding and event handling. 
+    These components provide a consistent experience across mobile and desktop devices, taking advantage of HTML5 functionalities and providing a fallback experience for older browsers.
+    For an example on error handling on an input component, see <auradocs:topicLink topic="error">Error Handling</auradocs:topicLink>.
     </p>
 
     <h3><code>ui:input</code></h3>
-    <p> <code>ui:input</code> is an abstract and extensible component that gets user input for processing. This component provides the attributes and events for all other child input components like
-    <code>ui:inputText</code> and <code>ui:inputNumber</code>.</p>
+    <p> <code>ui:input</code> is an abstract and extensible component that gets user input for processing. Child components that extends <code>ui:input</code>, such as <code>ui:inputText</code> and <code>ui:inputNumber</code>, inherit its attributes and events.
+    The demo below shows these commonly used <code>ui</code> components.</p>
     <auradocs:info>See the <auradocs:defLink descriptor ="ui:input">ui:input</auradocs:defLink> component reference.</auradocs:info>
 
     <auradocs:example descriptor="auradocs:demoForm" />

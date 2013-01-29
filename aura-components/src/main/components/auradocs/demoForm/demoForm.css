@@ -26,4 +26,6 @@
 .THIS .label {
    font-family: Courier;
    width: 150px;
+   text-align: left;
+   padding-right: 20px;
 }

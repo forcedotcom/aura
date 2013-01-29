@@ -17,16 +17,17 @@
 -->
 <aura:component>
     <span>
-        <span class="label">ui:inputText</span>  <ui:inputText value="text input"/>
-        <div class="extends">
-           <span class="label">ui:inputPhone</span>    <ui:inputPhone value="000-000-0000"/>
-           <span class="label">ui:inputEmail</span>    <ui:inputEmail value="email field in disabled state" disabled="true"/>
-           <span class="label">ui:inputSecret</span>   <ui:inputSecret value="secret field"/>
-           <span class="label">ui:inputURL</span>      <ui:inputURL value="http://"/>
-          <!-- <span class="label">ui:inputDate</span>     <ui:inputDate value="01/28/2013"/>
-          <span class="label">ui:inputDateTime</span> <ui:inputDateTime value="I'm an inputDateTime"/>
-           <span class="label">ui:inputTime</span>     <ui:inputTime value="I'm an inputTime"/>
-           <span class="label">ui:inputNumber</span>   <ui:inputNumber value="42"/>-->
-        </div>
+        <p><span class="label">ui:inputText</span>  <ui:inputText value="text input"/> <ui:outputText value="{!v.value}"/></p>
+       
+        <p><span class="label">ui:inputPhone</span>    <ui:inputPhone value="000-000-0000"/></p>
+        <p><span class="label">ui:inputEmail</span>    <ui:inputEmail value="email field in disabled state" disabled="true"/></p>
+        <p><span class="label">ui:inputSecret</span>   <ui:inputSecret value="secret field"/></p>
+        <p><span class="label">ui:inputURL</span>      <ui:inputURL value="http://"/></p>
+        <p><span class="label">ui:inputDate</span>     <ui:inputDate value="2013-01-28"/></p>
+       <!-- <p><span class="label">ui:inputDateTime</span> <ui:inputDateTime value="2013-01-28 00:00"/></p>-->
+        <p><span class="label">ui:inputTime</span>     <ui:inputTime value="10:00"/></p>
+        <p><span class="label">ui:inputNumber</span>   <ui:inputNumber value="42"/></p>
+        
+        <ui:button label="Read input" press="{!c.handleClick}"></ui:button>
     </span>
 </aura:component>

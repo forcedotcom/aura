@@ -20,13 +20,13 @@
 
     <p>An app template bootstraps the loading of the Aura framework and the app. The default template is <code>aura:template</code>. Customize the default template by creating your own component that extends the default template. For example, the Aura Note sample app has a <code>auranote:template</code> template that extends <code>aura:template</code>. <code>auranote:template</code> looks like:</p>
     
-<auradocs:codeblock><![CDATA[<aura:component extends="aura:template">
+<auradocs:codeblock><![CDATA[<aura:component isTemplate="true" extends="aura:template">
     <aura:set attribute="title" value="Aura Notes"/>    
     ...    
 </aura:component>]]>
 </auradocs:codeblock>
 
-    <p>Note how the component extends <code>aura:template</code> and sets the <code>title</code> attribute using <code>aura:set</code>. Take a look at <code>aura:template</code> to see the other template attributes that you can customize.</p>
+    <p>Note how the component extends <code>aura:template</code> and sets the <code>title</code> attribute using <code>aura:set</code>.  Templates are also marked with an isTemplate="true" attribute which allows templates to contain certain otherwise restricted items such as script tags. Take a look at <code>aura:template</code> to see the other template attributes that you can customize.</p>
     
     <p>The <code>notes.app</code> file points at the custom template by setting the <code>template</code> system attribute in <code>&lt;aura:application&gt;</code>.</p>
     

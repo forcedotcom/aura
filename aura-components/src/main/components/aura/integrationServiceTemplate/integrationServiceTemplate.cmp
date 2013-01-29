@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="BETA" 
+<aura:component isTemplate="true" extensible="true" support="BETA" 
                  description="A server-rendered template used to bootstrap the loading of the Aura framework and an application or component embedded in other containers, such as Visualforce, Siteforce, and legacy Salesforce UI.">
 
     <aura:attribute name="auraStyleTags" type="String" 

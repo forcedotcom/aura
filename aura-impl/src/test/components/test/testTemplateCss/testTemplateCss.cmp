@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component isTemplate="true">
     <!-- Used in test: ThemeParserTest.testTemplateCssValid() -->
 </aura:component>

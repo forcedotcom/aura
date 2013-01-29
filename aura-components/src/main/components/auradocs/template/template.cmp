@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="aura:template" theme="templateCss://auradocs.template">
+<aura:component isTemplate="true" extends="aura:template" theme="templateCss://auradocs.template">
     <aura:set attribute="extraScriptTags">
         <script src="/auraFW/resources/codemirror/js/codemirror.js"></script>
     </aura:set>

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="aura:template">
+<aura:component isTemplate="true" extends="aura:template">
 
     <aura:set attribute="doctype" value=""/>
     <aura:set attribute="title" value="Aura Quick Fix"/>

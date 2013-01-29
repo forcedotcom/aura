@@ -33,6 +33,8 @@ public interface BaseComponentDef extends RootDefinition {
 
     boolean isAbstract();
 
+    boolean isTemplate();
+
     /**
      * Get the set of dependencies declared on this component.
      * 
@@ -55,9 +57,11 @@ public interface BaseComponentDef extends RootDefinition {
 
     DefDescriptor<ModelDef> getLocalModelDefDescriptor();
 
-    List<DefDescriptor<ModelDef>> getModelDefDescriptors() throws QuickFixException;
+    List<DefDescriptor<ModelDef>> getModelDefDescriptors()
+            throws QuickFixException;
 
-    List<DefDescriptor<ControllerDef>> getControllerDefDescriptors() throws QuickFixException;
+    List<DefDescriptor<ControllerDef>> getControllerDefDescriptors()
+            throws QuickFixException;
 
     ModelDef getModelDef() throws QuickFixException;
 

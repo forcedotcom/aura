@@ -62,9 +62,11 @@
                 <auradocs:contentsNode text="Component Composition" id="nestedComponents"/>
                 <auradocs:contentsNode text="Component Body and Facets" id="helloFacets"/>
                 <auradocs:contentsNode text="Lazy Loading a Component" id="lazyload"/>
-                <auradocs:contentsNode text="Using UI Components">
-                  <auradocs:contentsNode text="Using Menus" id="useMenu"/>
-                </auradocs:contentsNode>
+            <auradocs:contentsNode text="Using UI Components">
+                <auradocs:contentsNode text="Positioning UI Components" id="useLayout"/>
+                <auradocs:contentsNode text="Getting User Input" id="useForm"/>
+                <auradocs:contentsNode text="Using Menus" id="useMenu"/>
+            </auradocs:contentsNode>
             </auradocs:contentsNode>
             <auradocs:contentsNode text="Expressions" >
                 <auradocs:contentsNode text="Introduction" id="expressions"/>
@@ -94,11 +96,6 @@
             <auradocs:contentsNode text="Designing App UI" id="designAppLayout"/>
             <auradocs:contentsNode text="Creating App Templates" id="createAppTemplate"/>
             <auradocs:contentsNode text="Adding App Components" id="addAppComponents"/>
-              <auradocs:contentsNode text="Using UI Components">
-                <auradocs:contentsNode text="Positioning UI Components" id="useLayout"/>
-                <auradocs:contentsNode text="Getting User Input" id="useForm"/>
-                <auradocs:contentsNode text="Using Menus" id="useMenu"/>
-            </auradocs:contentsNode>
             <auradocs:contentsNode text="Styling Apps" id="styleApp"/>
             <auradocs:contentsNode text="Handling App Navigation" >
                 <auradocs:contentsNode text="Introduction" id="urlNav" />

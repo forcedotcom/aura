@@ -17,7 +17,7 @@
 -->
 <aura:component>
     <span>
-        <p><span class="label">ui:inputText</span>  <ui:inputText value="text input"/> <ui:outputText value="{!v.value}"/></p>
+        <p><span class="label">ui:inputText</span>  <ui:inputText aura:id="myinput" value="text input"/> <ui:outputText aura:id="result" value="Output here"/></p>
        
         <p><span class="label">ui:inputPhone</span>    <ui:inputPhone value="000-000-0000"/></p>
         <p><span class="label">ui:inputEmail</span>    <ui:inputEmail value="email field in disabled state" disabled="true"/></p>
@@ -28,6 +28,6 @@
         <p><span class="label">ui:inputTime</span>     <ui:inputTime value="10:00"/></p>
         <p><span class="label">ui:inputNumber</span>   <ui:inputNumber value="42"/></p>
         
-        <ui:button label="Read input" press="{!c.handleClick}"></ui:button>
+        <ui:button label="Read input" press="{!c.getInput}"></ui:button>
     </span>
 </aura:component>

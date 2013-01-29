@@ -25,7 +25,7 @@
 
     <h3><code>ui:input</code></h3>
     <p> <code>ui:input</code> is an abstract and extensible component that gets user input for processing. Child components that extends <code>ui:input</code>, such as <code>ui:inputText</code> and <code>ui:inputNumber</code>, inherit its attributes and events.
-    The demo below shows these commonly used <code>ui</code> components.</p>
+    The demo below shows commonly used <code>ui</code> components.</p>
     <auradocs:info>See the <auradocs:defLink descriptor ="ui:input">ui:input</auradocs:defLink> component reference.</auradocs:info>
 
     <auradocs:example descriptor="auradocs:demoForm" />

@@ -1,0 +1,105 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component model="java://org.auraframework.docs.MenuTestModel">
+<div style="margin:20px;">
+    <div style="display:inline-block;width:50%;vertical-align:top;">
+        <h2><code>ui:actionMenuItem</code></h2>
+        <ui:dropdown>
+            <ui:menuTriggerLink aura:id="trigger" label="Select your favorite team"/>
+            <ui:menu>
+                <ui:actionMenuItem label="Bayern München" click="{!c.updateTriggerLabel}"/>
+                <ui:actionMenuItem label="FC Barcelona" click="{!c.updateTriggerLabel}"/>
+                <ui:actionMenuItem label="Inter Milan" click="{!c.updateTriggerLabel}"/>
+                <ui:actionMenuItem label="Manchester United" click="{!c.updateTriggerLabel}"/>
+            </ui:menu>
+        </ui:dropdown>
+     </div>
+     <div style="display:inline-block;width:50%;">
+          <p>Clicking the menu triggers an action in the client-side controller, which updates the label.</p>
+     </div>
+</div>
+<hr/>
+<p/>
+<div style="margin:20px;">
+    <div style="display:inline-block;width:50%;vertical-align:top;">
+        <h2><code>ui:checkboxMenuItem</code></h2>         
+        <ui:dropdown>
+            <ui:menuTriggerLink label="Select your favorite teams"/>
+            <ui:menu>
+                <ui:checkboxMenuItem label="San Francisco 49ers"/>
+                <ui:checkboxMenuItem label="Seattle Seahawks"/>
+                <ui:checkboxMenuItem label="St. Louis Rams"/>
+                <ui:checkboxMenuItem label="Arizona Cardinals"/>
+            </ui:menu>
+        </ui:dropdown>
+      </div>
+      <div style="display:inline-block;width:50%;">
+          <p>Multiple checkbox menu items can be selected.</p>
+        </div>
+</div>
+<hr/>
+<p/>
+<div style="margin:20px;">
+    <div style="display:inline-block;width:50%;vertical-align:top;">
+        <h2><code>ui:radioMenuItem</code></h2>        
+        <ui:dropdown>
+            <ui:menuTriggerLink label="Select a team"/>
+            <ui:menu>
+                <ui:radioMenuItem label="San Francisco"/>
+                <ui:radioMenuItem label="LA Dodgers"/>
+                <ui:radioMenuItem label="Arizona"/>
+                <ui:radioMenuItem label="San Diego"/>
+                <ui:radioMenuItem label="Colorado"/>
+            </ui:menu>
+        </ui:dropdown>
+       </div>
+        <div style="display:inline-block;width:50%;">
+        	<p>Radio menu items allow an individual selection only.</p>
+        </div>
+</div>
+<hr/>
+<p/>
+<div style="margin:20px;">
+    <div style="display:inline-block;width:50%;vertical-align:top;">
+        <h2>Combination menu items</h2>
+        <ui:dropdown>
+            <ui:menuTriggerLink aura:id="mytrigger" label="Select teams"/>
+            <ui:menu>
+                <ui:actionMenuItem label="Bayern München" click="{!c.updateLabel}"/>
+                <ui:actionMenuItem label="FC Barcelona" click="{!c.updateLabel}"/>
+                <ui:actionMenuItem label="Inter Milan" click="{!c.updateLabel}"/>
+                <ui:actionMenuItem label="Manchester United" click="{!c.updateLabel}"/>
+                <ui:menuItemSeparator/>
+                <ui:checkboxMenuItem label="San Francisco 49ers"/>
+                <ui:checkboxMenuItem label="Seattle Seahawks"/>
+                <ui:checkboxMenuItem label="St. Louis Rams"/>
+                <ui:checkboxMenuItem label="Arizona Cardinals"/>
+                <ui:menuItemSeparator/>
+                <ui:radioMenuItem label="San Francisco"/>
+                <ui:radioMenuItem label="LA Dodgers"/>
+                <ui:radioMenuItem label="Arizona"/>
+                <ui:radioMenuItem label="San Diego"/>
+                <ui:radioMenuItem label="Colorado"/>
+            </ui:menu>
+        </ui:dropdown>
+      </div>
+      <div style="display:inline-block;width:50%;">
+         <p>Menu items can be combined in a <code>ui:menu</code> component.</p>
+        </div>
+</div>
+</aura:component>

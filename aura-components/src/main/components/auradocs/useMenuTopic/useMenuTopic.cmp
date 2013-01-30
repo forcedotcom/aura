@@ -38,21 +38,10 @@
     
     <p>The following demo shows how to use <code>ui:menu</code> to display menu items from a model and retrieve the selected items via the <code>menuItems</code> attribute.</p>
     <auradocs:example descriptor="auradocs:demoMenuMeta" />
+     <p>To access selected values using a controller action, pass in the event to your controller, as demonstrated in the <code>getMenuSelected</code> controller action. You can use
+    <code>cmp.find("myMenu").getValue("v.childMenuItems")</code> to retrieve the values.</p>
     
-    <h2>Rendering and Accessing Menu Items</h2>
-    <p>The <code>ui:menu</code> component is generally rendered as HTML elements in this order:</p>
-    <auradocs:codeblock>
-      &lt;span role="application"&gt;
-        &lt;span id="10:1" aria-haspopup="true"&gt;&lt;/span&gt;
-        &lt;div class="uiMenu" role="menu" aria-labelledby="10:1"&gt;&lt;/div&gt;
-          &lt;ul role="presentation"&gt;
-            &lt;li class="uiMenuItem" role="presentation"&gt;
-              &lt;a class="selectable" role="menuitem" href="javascript:void(0);"&gt;Menu item&lt;/a&gt;
-            &lt;/li&gt;
-            &lt;!--More menu items--&gt;
-          &lt;/ul&gt;
-      &lt;/span&gt;  
-    </auradocs:codeblock>
+    <h2>Keyboard Accessibility</h2>
     
     <p>To access the menu items using your keyboard, you can press these keys.</p>
     
@@ -86,8 +75,7 @@
             </tr>
         </tbody>
     </table>
-    <p>To access selected values using a controller action, pass in the event to your controller, as demonstrated in the <code>getMenuSelected</code> controller action. You can use
-    <code>cmp.find("myMenu").getValue("v.childMenuItems")</code> to retrieve the values.</p>
+   
       <p><b>See also:</b><br/>
       <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
       <auradocs:topicLink topic="models">Models</auradocs:topicLink>

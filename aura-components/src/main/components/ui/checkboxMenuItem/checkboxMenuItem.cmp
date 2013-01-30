@@ -19,7 +19,7 @@
     <aura:handler name="click" action="{!c.handleClick}"/>
     <aura:if isTrue="{!v.body.length == 0}">
         <li aura:id="listitem" class="{!v.class}" role="presentation">
-            <a aura:id="link" role="menuitemcheckbox" disabled="{!v.disabled}"><b></b>{!v.label}</a>
+            <a aura:id="link" role="menuitemcheckbox"><b></b>{!v.label}</a>
         </li>
         <aura:set attribute="else">
             {!v.body}

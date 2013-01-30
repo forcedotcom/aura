@@ -27,7 +27,7 @@
     <div aura:id="menu" role="menu" class="{!v.class}">
         <ul aura:id="datalist" role="presentation">
             <aura:iteration items="{!v.menuItems}" var="item">
-                <ui:menuItem aura:id="item" label="{!item.label}" selected="{!item.selected}" type="{!item.type}"/>
+                <ui:menuItem aura:id="item" class="{!item.className}" label="{!item.label}" selected="{!item.selected}" type="{!item.type}"/>
             </aura:iteration>
             {!v.body}
         </ul>

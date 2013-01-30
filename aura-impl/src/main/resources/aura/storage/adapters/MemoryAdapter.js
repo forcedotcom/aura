@@ -44,22 +44,21 @@ MemoryStorageValue.prototype.getSize = function() {
  * @constructor
  */
 var MemoryStorageAdapter = function MemoryStorageAdapter() {
-	/*
-	 * Note on sizing.  The following values are taken from the ECMAScript specification, where available.
-	 * Other values are guessed.
-	 * 
-	 * Source: http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
-	 */
-	this.CHARACTER_SIZE = 2;
-	this.NUMBER_SIZE = 8;
-	// note: this value is not defined by the spec.
-	this.BOOLEAN_SIZE = 4;
-
 	this.backingStore = {};
 	this.cachedSize = 0;
 	this.isDirtyForCachedSize = false;
-	
 };
+
+/*
+ * Note on sizing.  The following values are taken from the ECMAScript specification, where available.
+ * Other values are guessed.
+ * 
+ * Source: http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
+ */
+MemoryStorageAdapter.prototype.CHARACTER_SIZE = 2;
+MemoryStorageAdapter.prototype.NUMBER_SIZE = 8;
+// note: this value is not defined by the spec.
+MemoryStorageAdapter.prototype.BOOLEAN_SIZE = 4;
 
 MemoryStorageAdapter.NAME = "memory";
 
@@ -136,13 +135,12 @@ MemoryStorageAdapter.prototype.sizeOfString = function(value) {
 
 MemoryStorageAdapter.prototype.estimateSize = function(value) {
 	var bytes = 0;
-	var typeOfValue = typeof value;
 
-	if ('boolean' === typeOfValue) {
+	if ($A.util.isBoolean(value)) {
 		bytes = this.BOOLEAN_SIZE;
-	} else if ('string' === typeOfValue) {
+	} else if ($A.util.isString(value)) {
 		bytes = this.sizeOfString(value);
-	} else if ('number' === typeOfValue) {
+	} else if ($A.util.isNumber(value)) {
 		bytes = this.NUMBER_SIZE;
 	} else if ($A.util.isArray(value) || $A.util.isObject(value)) {
 		// recursive case

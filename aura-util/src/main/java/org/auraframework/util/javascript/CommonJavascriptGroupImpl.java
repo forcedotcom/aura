@@ -19,9 +19,13 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
+import java.util.Comparator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import org.auraframework.util.text.Hash;
 
 /**
  * Implementation of the common stuff shared between the main javascript library
@@ -29,15 +33,24 @@ import java.util.TreeSet;
  */
 public abstract class CommonJavascriptGroupImpl implements JavascriptGroup {
 
+    private static final Comparator<URL> compareUrls = new Comparator<URL>() {
+        @Override
+        public int compare(URL url1, URL url2) {
+            return url1.toString().compareTo(url2.toString());
+        }
+    };
+
     protected final String name;
     protected final File root;
     protected SortedSet<File> files;
     protected long lastMod = -1;
+    protected Hash groupHash;
 
     public CommonJavascriptGroupImpl(String name, File root) {
         this.name = name;
         this.root = root;
         this.files = new TreeSet<File>();
+        this.groupHash = null;
     }
 
     /**
@@ -46,11 +59,24 @@ public abstract class CommonJavascriptGroupImpl implements JavascriptGroup {
     protected void reset() {
         this.files.clear();
         this.lastMod = -1;
+        this.groupHash = null;
     }
 
     @Override
     public long getLastMod() {
         return lastMod;
+    }
+
+    @Override
+    public Hash getGroupHash() throws IOException {
+        if (groupHash == null) {
+            Set<URL> urls = new TreeSet<URL>(compareUrls);
+            for (File file : files) {
+                urls.add(file.toURI().toURL());
+            }
+            groupHash = new Hash(new MultiStreamReader(urls));
+        }
+        return groupHash;
     }
 
     @Override
@@ -65,6 +91,7 @@ public abstract class CommonJavascriptGroupImpl implements JavascriptGroup {
 
     protected void addFile(File f) {
         lastMod = Math.max(lastMod, f.lastModified());
+        groupHash = null;
         files.add(f);
     }
 

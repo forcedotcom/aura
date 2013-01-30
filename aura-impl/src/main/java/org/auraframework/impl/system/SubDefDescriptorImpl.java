@@ -179,7 +179,7 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
      * {@link ClassCastException} if {@code arg} is not a {@code DefDescriptor}.
      */
     @Override
-    public int compareTo(DefDescriptor other) {
+    public int compareTo(DefDescriptor<?> other) {
         return DefDescriptorImpl.compare(this, other);
     }
 }

@@ -63,6 +63,7 @@ import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.text.Hash;
 
 /**
  * Utility to easily get aura objects.
@@ -234,6 +235,11 @@ public class AuraImplUnitTestingUtil {
 
             @Override
             public String getDescription() {
+                return null;
+            }
+
+            @Override
+            public Hash getOwnHash() {
                 return null;
             }
         };

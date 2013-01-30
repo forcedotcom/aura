@@ -394,7 +394,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
      * ComponentDef's children to the provided set. The set may then be used to
      * analyze freshness of all of those types to see if any of them should be
      * recompiled from source.
-     * 
+     *
      * @param dependencies
      *            A Set that this method will append RootDescriptors to for
      *            every RootDef that this ComponentDef requires
@@ -457,7 +457,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     /**
      * This is used to validate by the compiler to validate EventDefRefs.
-     * 
+     *
      * @return all the events this component can fire, including those inherited
      * @throws QuickFixException
      */
@@ -1053,16 +1053,43 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         return ret;
     }
 
+    /**
+     * This should not be here it should be a call off of MDR.
+     */
     @Override
     public boolean isLocallyRenderable() throws QuickFixException {
         return isLocallyRenderable(Sets.<DefDescriptor<?>> newLinkedHashSet());
     }
 
-    private boolean isLocallyRenderable(Set<DefDescriptor<?>> already)
-            throws QuickFixException {
+    /**
+     * Helper routine for public call.
+     *
+     * DIE! please?
+     *
+     * @param already the set of processed descriptors.
+     */
+    private boolean isLocallyRenderable(Set<DefDescriptor<?>> already) throws QuickFixException {
         if (render == RenderType.CLIENT) {
             return false;
         } else if (render == RenderType.SERVER) {
+            return true;
+        }
+        //
+        // FIXME: OMG W-1501702 really?!?!?!
+        //
+        // We desperately need to make this go away. It is heinousness
+        // incarnate, but the entirety of server side rendering is blocking this.
+        //
+        // Currently, the server side throws an UnsupportedOperationException,
+        // so the themes (which is one part that currently breaks) never get
+        // rendered.
+        //
+        // also see W-922563
+        //
+        // This will probably stay here til we fix server side rendering (or at
+        // least the theme part). Also, we need to allow dual renderers.
+        //
+        if (this.getDescriptor().getQualifiedName().equals("markup://aura:placeholder")) {
             return true;
         }
 

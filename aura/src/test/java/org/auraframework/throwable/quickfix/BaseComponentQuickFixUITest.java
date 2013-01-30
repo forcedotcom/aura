@@ -197,9 +197,7 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
             quickFixUIWidget.verifyCustomizationMenu();
             quickFixUIWidget.setDescriptorNames("auratestasdf:innerCmpThatDoesntExist");
             String result = quickFixUIWidget.clickFix(false);
-            assertTrue("Incorrect error message text", result.contains("org.auraframework.throwable.quickfix."
-                    + "DefinitionNotFoundException: No COMPONENT named markup://auratest:innerCmpThatDoesntExist "
-                    + "found : markup://auratest:createInnerCmpQuickFix"));
+            assertTrue("Incorrect error message text: "+result, result.contains("Cannot find location to save definition."));
             assertFalse("Failed to locate the definition", defDescriptorChild.exists());
         } finally {
             quickFixUIWidget.deleteFiles(defDescriptorChild);

@@ -51,11 +51,12 @@ public class LazyComponentDefRef extends ComponentDefRefImpl {
         super(builder);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void validateReferences() throws QuickFixException {
+        @SuppressWarnings("unchecked")
         ComponentDef def = ((DefDescriptor<ComponentDef>) getAttributeDefRef("refDescriptor").getValue()).getDef();
 
+        @SuppressWarnings("unchecked")
         Map<DefDescriptor<AttributeDef>, Object> lazyAttributes = (Map<DefDescriptor<AttributeDef>, Object>) getAttributeDefRef(
                 "attributes").getValue();
 

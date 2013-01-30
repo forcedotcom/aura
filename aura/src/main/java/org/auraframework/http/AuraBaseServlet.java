@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -43,14 +45,27 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 @SuppressWarnings("serial")
 public abstract class AuraBaseServlet extends HttpServlet {
     public static final String AURA_PREFIX = "aura.";
     public static final String CSRF_PROTECT = "while(1);\n";
+
+    /**
+     * "Short" pages (such as manifest cookies and AuraFrameworkServlet pages)
+     * expire in 1 day.
+     */
     public static final long SHORT_EXPIRE_SECONDS = 24L * 60 * 60;
     public static final long SHORT_EXPIRE = SHORT_EXPIRE_SECONDS * 1000;
+
+    /**
+     * "Long" pages (such as resources and cached HTML templates) expire in 45
+     * days. We also use this to "pre-expire" no-cache pages, setting their
+     * expiration a month and a half into the past for user agents that don't
+     * understand Cache-Control: no-cache.
+     */
     public static final long LONG_EXPIRE = 45 * SHORT_EXPIRE;
     public static final String UTF_ENCODING = "UTF-8";
     public static final String HTML_CONTENT_TYPE = "text/html";
@@ -337,18 +352,17 @@ public abstract class AuraBaseServlet extends HttpServlet {
         return null;
     }
 
-    public static void addManifestCookie(HttpServletResponse response, String value, long expiry) {
+    /**
+     * Sets the manifest cookie on response.
+     *
+     * @param response the response
+     * @param value the value to set.
+     * @param expiry the expiry time for the cookie.
+     */ 
+    private static void addManifestCookie(HttpServletResponse response, String value, long expiry) {
         String cookieName = getManifestCookieName();
         if (cookieName != null) {
             addCookie(response, cookieName, value, expiry);
-        }
-    }
-
-    public static void addManifestCookie(HttpServletResponse response, long expiry) {
-        try {
-            addManifestCookie(response, Long.toString(getManifestLastMod()), expiry);
-        } catch (QuickFixException e) {
-            throw new AuraRuntimeException(e);
         }
     }
 
@@ -357,11 +371,28 @@ public abstract class AuraBaseServlet extends HttpServlet {
     }
 
     public static void addManifestCookie(HttpServletResponse response) {
-        addManifestCookie(response, SHORT_EXPIRE_SECONDS);
+        String uid = getContextAppUid();
+        String fwUid = Aura.getConfigAdapter().getAuraFrameworkNonce();
+        String value = (uid == null) ? fwUid : String.format("%s:%s", uid, fwUid);
+
+        addManifestCookie(response, value, SHORT_EXPIRE_SECONDS);
     }
 
     public static void deleteManifestCookie(HttpServletResponse response) {
         addManifestCookie(response, "", 0);
+    }
+
+    public static String getRequestUid(HttpServletRequest request) {
+        Cookie cookie = getManifestCookie(request);
+        if (cookie == null) {
+            return null;
+        }
+        String value = cookie.getValue();
+        int position = value.indexOf(':');
+        if (position < 0) {
+            return null; // Old-style format, timestamp or ERROR
+        }
+        return value.substring(0, position);
     }
 
     public static Cookie getManifestCookie(HttpServletRequest request) {
@@ -398,7 +429,30 @@ public abstract class AuraBaseServlet extends HttpServlet {
         return ("text/plain");
     }
 
-    public static long getLastMod() throws QuickFixException {
+    /**
+     * Gets the UID for the application descriptor of the current context, or
+     * {@code null} if there is no application (probably because of a compile
+     * error).
+     */
+    public static String getContextAppUid() {
+        DefinitionService definitionService = Aura.getDefinitionService();
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();
+
+        if (app != null) {
+            try {
+                return definitionService.getDefRegistry().getUid(null, app);
+            } catch (QuickFixException e) {
+                // This is perfectly possible, but the error is handled in more
+                // contextually-sensible places. For here, we know there's no
+                // meaningful uid, so we fall through and return null.
+            }
+        }
+        return null;
+    }
+
+    // This routine is about to die!
+    public static long getLastMod() {
         DefinitionService definitionService = Aura.getDefinitionService();
         AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();
@@ -416,11 +470,15 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 }
             }
             if (appLastMod == -1) {
-                appLastMod = definitionService.getLastMod(app);
-                lastModMap.put(app.getQualifiedName(), Long.valueOf(appLastMod));
+                try {
+                    String uid = definitionService.getDefRegistry().getUid(null, app);
+                    appLastMod = definitionService.getLastMod(uid);
+                    lastModMap.put(app.getQualifiedName(), Long.valueOf(appLastMod));
+                } catch (QuickFixException qfe) {
+                    // ignore. the QFE will get thrown elsewhere.
+                }
             }
         }
-
         preloads = new ArrayList<String>(context.getPreloads());
 
         if (preloads.size() > 0) {
@@ -433,8 +491,12 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 }
             }
             if (preloadsLastMod == -1) {
-                preloadsLastMod = definitionService.getNamespaceLastMod(preloads);
-                lastModMap.put(preloadsName, Long.valueOf(preloadsLastMod));
+                try {
+                    preloadsLastMod = definitionService.getNamespaceLastMod(preloads);
+                    lastModMap.put(preloadsName, Long.valueOf(preloadsLastMod));
+                } catch (QuickFixException qfe) {
+                    // ignore
+                }
             }
         }
         long lastMod = Aura.getConfigAdapter().getAuraJSLastMod();
@@ -447,14 +509,31 @@ public abstract class AuraBaseServlet extends HttpServlet {
         return lastMod;
     }
 
-    public static long getManifestLastMod() throws QuickFixException {
+    public static String getManifest() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        Mode mode = context.getMode();
-        if (!(mode == Mode.PROD || mode == Mode.PTEST || mode == Mode.CADENCE)) {
-            long auraJSLastMod = Aura.getConfigAdapter().getAuraJSLastMod();
-            long lastMod = getLastMod();
-            return (auraJSLastMod > lastMod) ? auraJSLastMod : lastMod;
+        Set<String> preloads = context.getPreloads();
+        String contextPath = context.getContextPath();
+        String ret = "";
+
+        if (preloads != null && !preloads.isEmpty()) {
+            boolean serPreloads = context.getSerializePreLoad();
+            boolean serLastMod = context.getSerializeLastMod();
+            context.setSerializePreLoad(false);
+            context.setSerializeLastMod(false);
+            StringBuilder defs = new StringBuilder(contextPath).append("/l/");
+            StringBuilder sb = new StringBuilder();
+            try {
+                Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
+            } catch (IOException e) {
+                throw new AuraRuntimeException(e);
+            }
+            context.setSerializePreLoad(serPreloads);
+            context.setSerializeLastMod(serLastMod);
+            String contextJson = AuraTextUtil.urlencode(sb.toString());
+            defs.append(contextJson);
+            defs.append("/app.manifest");
+            ret = defs.toString();
         }
-        return getLastMod();
+        return ret;
     }
 }

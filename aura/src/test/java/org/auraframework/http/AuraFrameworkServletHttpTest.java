@@ -24,6 +24,8 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHeaders;
+
+import org.auraframework.Aura;
 import org.auraframework.test.AuraHttpTestCase;
 
 /**
@@ -39,10 +41,9 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     public final String sampleBinaryResourcePath = "/auraFW/resources/aura/auraIdeLogo.png";
     public final String sampleTextResourcePath = "/auraFW/resources/aura/resetCSS.css";
     public final String sampleJavascriptResourcePath = "/auraFW/javascript/aura_dev.js";
-    public final String sampleBinaryResourcePathWithNonce = "/auraFW/resources/123456/aura/auraIdeLogo.png";
-    public final String sampleTextResourcePathWithNonce = "/auraFW/resources/123456/aura/resetCSS.css";
-    private final long timeWindowExpiry = 60000; // one minute expiration test
-                                                 // window
+    public final String sampleBinaryResourcePathWithNonce = "/auraFW/resources/%s/aura/auraIdeLogo.png";
+    public final String sampleTextResourcePathWithNonce = "/auraFW/resources/%s/aura/resetCSS.css";
+    private final long timeWindowExpiry = 60000; // one minute expiration test window
 
     public AuraFrameworkServletHttpTest(String name) {
         super(name);
@@ -50,6 +51,12 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
 
     private boolean ApproximatelyEqual(long a, long b, long delta) {
         return (Math.abs(a - b) < delta);
+    }
+
+    protected static GetMethod obtainNoncedGetMethod(String noncedPath) throws Exception {
+        String realPath = String.format(noncedPath, Aura.getConfigAdapter().getAuraFrameworkNonce());
+
+        return obtainGetMethod(realPath);
     }
 
     /**
@@ -124,7 +131,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
      * for a binary resource.
      */
     public void testRequestBinaryResourceWithNonce() throws Exception {
-        GetMethod get = obtainGetMethod(sampleBinaryResourcePathWithNonce);
+        GetMethod get = obtainNoncedGetMethod(sampleBinaryResourcePathWithNonce);
         int statusCode = getHttpClient().executeMethod(get);
         assertEquals("AuraResourceServlet failed to fetch a valid resource request.", HttpStatus.SC_OK, statusCode);
         assertNotNull(get.getResponseBodyAsString());
@@ -136,6 +143,12 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
                 .getTime());
         assertTrue("AuraFrameworkServlet is not setting the right value for expires header.",
                 ApproximatelyEqual(expirationMillis, AuraBaseServlet.LONG_EXPIRE, timeWindowExpiry));
+
+        get = obtainNoncedGetMethod(sampleBinaryResourcePathWithNonce);
+        // set the if modified since to a long time ago.
+        get.setRequestHeader("If-Modified-Since", df.format(new Date(1)));
+        statusCode = getHttpClient().executeMethod(get);
+        assertEquals("AuraResourceServlet failed to return not modified.", HttpStatus.SC_NOT_MODIFIED, statusCode);
     }
 
     /**
@@ -162,7 +175,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
      * for a text resource.
      */
     public void testRequestTextResourceWithNonce() throws Exception {
-        GetMethod get = obtainGetMethod(sampleTextResourcePathWithNonce);
+        GetMethod get = obtainNoncedGetMethod(sampleTextResourcePathWithNonce);
         int statusCode = getHttpClient().executeMethod(get);
         assertEquals("AuraResourceServlet failed to fetch a valid resource request.", HttpStatus.SC_OK, statusCode);
         assertNotNull(get.getResponseBodyAsString());
@@ -178,6 +191,12 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
                 .getTime());
         assertTrue("AuraFrameworkServlet is not setting the right value for expires header.",
                 ApproximatelyEqual(expirationMillis, AuraBaseServlet.LONG_EXPIRE, timeWindowExpiry));
+
+        get = obtainNoncedGetMethod(sampleTextResourcePathWithNonce);
+        // set the if modified since to a long time ago.
+        get.setRequestHeader("If-Modified-Since", df.format(new Date(1)));
+        statusCode = getHttpClient().executeMethod(get);
+        assertEquals("AuraResourceServlet failed to return not modified.", HttpStatus.SC_NOT_MODIFIED, statusCode);
     }
 
     /**

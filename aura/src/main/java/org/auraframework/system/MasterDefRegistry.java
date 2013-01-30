@@ -15,11 +15,13 @@
  */
 package org.auraframework.system;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -28,9 +30,12 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * All other (type-specific) registries are delegated to by a master def
  * registry. The master definition registry handles all of the compilation and
  * cross registry references.
+ * 
+ * The GUID referenced here is a globally unique ID for the top level definition
+ * passed in. This ID is used to ensure that the client version matches the
+ * local version.
  */
 public interface MasterDefRegistry {
-
     /**
      * Return the definition for this descriptor, or null if it does not exist.
      * 
@@ -92,4 +97,75 @@ public interface MasterDefRegistry {
      * assert that we have access to the definition given by a descriptor.
      */
     void assertAccess(DefDescriptor<?> desc) throws QuickFixException;
+
+    /**
+     * Filter our loaded set of dependencies on the preloads.
+     * 
+     * This filters the set of definitions currently loaded in the master def
+     * registry on the set of preloads given. This allows for definitions to be
+     * loaded with {@link getDef(DefDescriptor)} then filtered here for
+     * preloads. The resulting map of definitions is the complete set that has
+     * not been preloaded.
+     * 
+     * @param preloads The set of preloaded definitions.
+     * @return the full set of loaded definitions not included in the preload.
+     */
+    Map<DefDescriptor<? extends Definition>, Definition> filterRegistry(Set<DefDescriptor<?>> preloads);
+
+    /**
+     * Invalidate a descriptor in the cache.
+     * 
+     * @param descriptor the descriptor.
+     */
+    <T extends Definition> boolean invalidate(DefDescriptor<T> descriptor);
+
+    /**
+     * Get the UID associated with a descriptor.
+     * 
+     * This call must be made before any of the other UID based functions.
+     * Failing to do so will give incorrect results (null).
+     * 
+     * @param uid the old uid (or null if none).
+     * @param descriptor the top level descriptor for which we need the UID.
+     * @return Either the uid passed in, or if that was null, the correct UID
+     * @throws ClientOutOfSyncException if the UID is not null, and was a mismatch
+     * @throws QuickFixException if the definition cannot be compiled.
+     */
+    <T extends Definition> String getUid(String uid, DefDescriptor<T> descriptor) throws ClientOutOfSyncException,
+            QuickFixException;
+
+    /**
+     * Get the last mod time for set of descriptors.
+     * 
+     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
+     * @param descriptor the descriptor.
+     */
+    <T extends Definition> long getLastMod(String uid);
+
+    /**
+     * Get the dependencies for a descriptor.
+     * 
+     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
+     * @param descriptor the descriptor.
+     */
+    <T extends Definition> Set<DefDescriptor<?>> getDependencies(String uid);
+
+    /**
+     * Get a named string from the cache for a def.
+     * 
+     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
+     * @param descriptor the descriptor.
+     * @param key the key.
+     */
+    <T extends Definition> String getCachedString(String uid, DefDescriptor<?> descriptor, String key);
+
+    /**
+     * Put a named string in the cache for a def.
+     * 
+     * @param uid the UID for the definition (must have called {@link #getUid(String, DefDescriptor<?>)}).
+     * @param descriptor the descriptor.
+     * @param key the key (must be unique).
+     * @param key the value to store.
+     */
+    <T extends Definition> void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value);
 }

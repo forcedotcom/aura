@@ -28,6 +28,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json.Serialization;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
+import org.auraframework.util.text.Hash;
 
 import com.google.common.collect.Maps;
 
@@ -80,6 +81,14 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     @Override
     public String getName() {
         return descriptor == null ? getClass().getName() : descriptor.getName();
+    }
+
+    @Override
+    public Hash getOwnHash() {
+        if (this.location == null) {
+            return null;
+        }
+        return location.getHash();
     }
 
     /**

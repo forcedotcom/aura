@@ -138,24 +138,23 @@ public class ThemeDefImpl extends DefinitionImpl<ThemeDef> implements ThemeDef {
 
     @Override
     public String getCode(Client.Type type) {
-        if (browserCode != null && browserCode.containsKey(type)) {
-            return browserCode.get(type);
+        if (this.browserCode != null && this.browserCode.containsKey(type)) {
+            return this.browserCode.get(type);
         } else {
-            return code;
+            return this.code;
         }
     }
 
-    private Set<String> validateImageURLs(Set<String> imageURLs) {
-        if (imageURLs != null) {
-            Set<String> validImageURLs = new HashSet<String>(imageURLs.size());
-            for (String imgURL : imageURLs) {
+    private Set<String> validateImageURLs(Set<String> images) {
+        if (images != null) {
+            Set<String> validSet = new HashSet<String>(images.size());
+            for (String imgURL : images) {
                 if (AuraResourceServlet.isResourceLocallyAvailable(imgURL)) {
-                    validImageURLs.add(imgURL);
+                    validSet.add(imgURL);
                 }
             }
-            return validImageURLs;
+            return validSet;
         }
         return Collections.emptySet();
     }
-
 }

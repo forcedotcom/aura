@@ -59,6 +59,9 @@ import com.google.common.collect.Sets;
 
 public class AuraResourceServlet extends AuraBaseServlet {
 
+    private static final String RESOURCE_URLS = "resourceURLs";
+    private static final String LAST_MOD = "lastMod";
+    private static final String UID = "uid";
     private static final long serialVersionUID = -3642790050433142397L;
     public static final String ORIG_REQUEST_URI = "aura.origRequestURI";
 
@@ -179,18 +182,31 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 }
             }
 
-            String serverLastMod = Long.toString(getManifestLastMod());
+            Map<String, Object> attribs = Maps.newHashMap();
             Cookie cookie = getManifestCookie(request);
             if (cookie != null) {
                 if (MANIFEST_ERROR.equals(cookie.getValue())) {
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     deleteManifestCookie(response);
                     return;
+                } else {
+                    int pos = cookie.getValue().indexOf(':');
+                    if (pos > 0) {
+                        attribs.put(UID, cookie.getValue().substring(0, pos));
+                    }
                 }
             }
+            addManifestCookie(response);
 
-            Map<String, Object> attribs = Maps.newHashMap();
-            attribs.put("lastMod", serverLastMod);
+            //
+            // This writes both the app and framework signatures into
+            // the manifest, so that if either one changes, the 
+            // manifest will change. Note that in most cases, we will
+            // write these signatures in multiple places, but we just
+            // need to make sure that they are in at least one place.
+            //
+            attribs.put(LAST_MOD, String.format("app=%s, FW=%s", getContextAppUid(),
+                                                Aura.getConfigAdapter().getAuraFrameworkNonce()));
             StringWriter sw = new StringWriter();
             for (String s : AuraServlet.getStyles()) {
                 sw.write(s);
@@ -200,7 +216,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 sw.write(s);
                 sw.write('\n');
             }
-            attribs.put("resourceURLs", sw.toString());
+            attribs.put(RESOURCE_URLS, sw.toString());
             DefinitionService definitionService = Aura.getDefinitionService();
             InstanceService instanceService = Aura.getInstanceService();
             DefDescriptor<ComponentDef> tmplDesc = definitionService

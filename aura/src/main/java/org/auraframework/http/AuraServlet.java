@@ -69,7 +69,31 @@ import com.google.common.collect.Maps;
  import org.eclipse.jetty.webapp.*;*/
 
 /**
- * The servlet for Aura.
+ * The servlet for initialization and actions in Aura.
+ *
+ * The sequence of requests is:
+ * <ol>
+ *   <li>GET(AuraServlet): initial fetch of an aura app/component + Resource Fetches:
+ *     <ul>
+ *       <li>GET(AuraResourceServlet:MANIFESt):optional get the manifest</li>
+ *       <li>GET(AuraResourceServlet:CSS):get the styles for a component</li>
+ *       <li>GET(AuraResourceServlet:JS):get the definitions for a component</li>
+ *       <li>GET(AuraResourceServlet:JSON):???</li>
+ *     </ul>
+ *   </li>
+ *   <li>Application Execution
+ *     <ul>
+ *       <li>GET(AuraServlet:JSON): Fetch additional aura app/component
+ *         <ul>
+ *           <li>GET(AuraResourceServlet:MANIFESt):optional get the manifest</li>
+ *           <li>GET(AuraResourceServlet:CSS):get the styles for a component</li>
+ *           <li>GET(AuraResourceServlet:JS):get the definitions for a component</li>
+ *           <li>GET(AuraResourceServlet:JSON):???</li>
+ *         </ul></li>
+ *       <li>POST(AuraServlet:JSON): Execute actions.</li>
+ *     </ul>
+ *   </li>
+ * </ol>
  * 
  * Run from aura-jetty project. Pass in these vmargs: <code>
  * -Dconfig=${AURA_HOME}/config -Daura.home=${AURA_HOME} -DPORT=9090
@@ -95,6 +119,57 @@ public class AuraServlet extends AuraBaseServlet {
     @Override
     public void init() throws ServletException {
         super.init();
+    }
+
+    /**
+     * Check for the nocache parameter and redirect as necessary.
+     *
+     * Not entirely sure what this is used for (need doco). It is part of 
+     * the appcache refresh, forcing a reload while avoiding the appcache.
+     *
+     * It maybe should be done differently (e.g. a nonce).
+     *
+     * @param request The request to retrieve the parameter.
+     * @param response the response (for setting the location header.
+     * @returns true if we are finished with the request.
+     */
+    private boolean handleNoCacheRedirect(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        //
+        // FIXME:!!!
+        // This is part of the appcache refresh, forcing a reload while
+        // avoiding the appcache. It is here because (fill in the blank).
+        //
+        // This should probably be handled a little differently, maybe even
+        // before we do any checks at all.
+        //
+        String nocache = nocacheParam.get(request);
+        if (nocache == null || nocache.isEmpty()) {
+            return false;
+        }
+        response.setContentType("text/plain");
+        response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
+        
+        String newLocation =  "/";
+        
+        try{
+            URI uri = new URI(nocache,true);
+            String fragment = uri.getEscapedFragment();
+            StringBuilder sb = new StringBuilder(uri.getEscapedPathQuery());
+            if (fragment != null && !fragment.isEmpty()) {
+                sb.append("#");
+                sb.append(fragment);
+            }
+            newLocation = sb.toString();
+        } catch (Exception e) {
+            // This exception should never happen.
+            // If happened: log a gack and redirect
+            Aura.getExceptionAdapter().handleException(e);
+        }
+
+        setNoCache(response);
+        response.setHeader("Location", newLocation);
+        return true;
     }
 
     /**
@@ -136,47 +211,17 @@ public class AuraServlet extends AuraBaseServlet {
             defType = defTypeParam.get(request, DefType.COMPONENT);
 
             //
-            // FIXME: this should disappear!!!!! -GPO
+            // TODO: this should disappear!!!!! -GPO
+            // Verify why it is here.
             //
             if (handle404(request, response, tagName, defType)) {
                 return;
             }
 
             //
-            // FIXME:!!!
-            // This is part of the appcache refresh, forcing a reload while
-            // avoiding the
-            // appcache. It is here because (fill in the blank).
+            // TODO: evaluate this for security.
             //
-            // This should probably be handled a little differently, maybe even
-            // before
-            // we do any checks at all.
-            //
-            String nocache = nocacheParam.get(request);
-            if (nocache != null && !nocache.isEmpty()) {
-                response.setContentType("text/plain");
-                response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
-
-                String newLocation = "/";
-
-                try {
-                    URI uri = new URI(nocache, true);
-                    String fragment = uri.getEscapedFragment();
-                    StringBuilder sb = new StringBuilder(uri.getEscapedPathQuery());
-                    if (fragment != null && !fragment.isEmpty()) {
-                        sb.append("#");
-                        sb.append(fragment);
-                    }
-                    newLocation = sb.toString();
-                } catch (Exception e) {
-                    // This exception should never happen.
-                    // If happened: log a gack and redirect
-                    Aura.getExceptionAdapter().handleException(e);
-                }
-
-                response.setHeader("Location", newLocation);
-
-                setNoCache(response);
+            if (handleNoCacheRedirect(request, response)) {
                 return;
             }
 
@@ -442,35 +487,6 @@ public class AuraServlet extends AuraBaseServlet {
             throw new AuraRuntimeException(e);
         }
         return imgURLs;
-    }
-
-    public static String getManifest() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        Set<String> preloads = context.getPreloads();
-        String contextPath = context.getContextPath();
-
-        String ret = new String();
-
-        if (preloads != null && !preloads.isEmpty()) {
-            boolean serPreloads = context.getSerializePreLoad();
-            boolean serLastMod = context.getSerializeLastMod();
-            context.setSerializePreLoad(false);
-            context.setSerializeLastMod(false);
-            StringBuilder defs = new StringBuilder(contextPath).append("/l/");
-            StringBuilder sb = new StringBuilder();
-            try {
-                Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
-            } catch (IOException e) {
-                throw new AuraRuntimeException(e);
-            }
-            context.setSerializePreLoad(serPreloads);
-            context.setSerializeLastMod(serLastMod);
-            String contextJson = AuraTextUtil.urlencode(sb.toString());
-            defs.append(contextJson);
-            defs.append("/app.manifest");
-            ret = defs.toString();
-        }
-        return ret;
     }
 
     private Map<String, Object> getComponentAttributes(HttpServletRequest request) {

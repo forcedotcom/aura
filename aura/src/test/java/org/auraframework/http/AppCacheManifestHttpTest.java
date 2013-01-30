@@ -115,8 +115,14 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         }
     }
 
+    /**
+     * Check for the 'last mod' line.
+     *
+     * Note that since the reformat of this line, there is no real
+     * last mod date in the manifest.
+     */
     private void assertManifestLastMod(String manifestContent, String lastMod) throws Exception {
-        String lastModMarker = String.format("\n# LAST MOD: %s\n", lastMod);
+        String lastModMarker = String.format("\n# LAST MOD: app=");
         if (!manifestContent.contains(lastModMarker)) {
             fail("Line not found: " + lastModMarker);
         }

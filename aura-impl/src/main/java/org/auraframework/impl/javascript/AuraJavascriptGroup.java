@@ -29,6 +29,8 @@ import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
  */
 public class AuraJavascriptGroup extends DirectiveBasedJavascriptGroup {
 
+    static final String GROUP_NAME = "aura";
+
     public AuraJavascriptGroup() throws IOException {
         this(AuraImplFiles.AuraJavascriptSourceDirectory.asFile());
     }
@@ -38,7 +40,7 @@ public class AuraJavascriptGroup extends DirectiveBasedJavascriptGroup {
      * directory.
      */
     protected AuraJavascriptGroup(File rootDirectory) throws IOException {
-        super("aura", rootDirectory, "aura/Aura.js", DirectiveTypes.DEFAULT_TYPES, EnumSet.of(
+        super(GROUP_NAME, rootDirectory, "aura/Aura.js", DirectiveTypes.DEFAULT_TYPES, EnumSet.of(
                 JavascriptGeneratorMode.DEVELOPMENT, JavascriptGeneratorMode.STATS, JavascriptGeneratorMode.TESTING,
                 JavascriptGeneratorMode.AUTOTESTING, JavascriptGeneratorMode.TESTINGDEBUG,
                 JavascriptGeneratorMode.AUTOTESTINGDEBUG, JavascriptGeneratorMode.PRODUCTION,

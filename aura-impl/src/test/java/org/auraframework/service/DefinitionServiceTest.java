@@ -30,6 +30,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoContextException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -42,11 +43,9 @@ import com.google.common.collect.Sets;
  * @hierarchy Aura.Services.DefinitionService
  * @userStory a07B0000000Eb3M
  */
-public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, DefinitionServiceTest.Config> implements
-        DefinitionService {
+public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, DefinitionServiceTest.Config>
+        implements DefinitionService {
 
-    /**
-     */
     private static final long serialVersionUID = 8209766512828532228L;
 
     public DefinitionServiceTest(String name) {
@@ -231,12 +230,6 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
     }
 
     @Override
-    public <D extends Definition> long getLastMod(DefDescriptor<D> def) throws QuickFixException {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
     public long getNamespaceLastMod(Collection<String> preloads) throws QuickFixException {
         /**
          * TODO:RJ, Disabling it for now, to get jenkins back to normal. Will
@@ -304,7 +297,16 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
 
     @Override
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) throws QuickFixException {
-        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public <T extends Definition> long getLastMod(String uid) throws QuickFixException {
+        return 0;
+    }
+
+    @Override
+    public MasterDefRegistry getDefRegistry() {
         return null;
     }
 }

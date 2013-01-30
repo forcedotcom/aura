@@ -391,7 +391,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
      * {@link ClassCastException} if {@code arg} is not a {@code DefDescriptor}.
      */
     @Override
-    public int compareTo(DefDescriptor other) {
+    public int compareTo(DefDescriptor<?> other) {
         return compare(this, other);
     }
 
@@ -401,7 +401,13 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
      * have static methods, and since {@code DefDescriptor} is an interface
      * rather than an abstract class.
      */
-    public static int compare(DefDescriptor dd1, DefDescriptor dd2) {
-        return dd1.getQualifiedName().compareToIgnoreCase(dd2.getQualifiedName());
+    public static int compare(DefDescriptor<?> dd1, DefDescriptor<?> dd2) {
+        int value;
+
+        value = dd1.getQualifiedName().compareToIgnoreCase(dd2.getQualifiedName());
+        if (value != 0) {
+            return value;
+        }
+        return dd1.getDefType().compareTo(dd2.getDefType());
     }
 }

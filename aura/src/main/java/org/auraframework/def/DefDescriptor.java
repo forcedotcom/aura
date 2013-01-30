@@ -32,7 +32,8 @@ import org.auraframework.util.json.JsonSerializable;
  * @param <T> the more specific subtype of definition being described, e.g.
  *            {@link ComponentDef}, {@link EventDef}, etc.
  */
-public interface DefDescriptor<T extends Definition> extends JsonSerializable, Serializable, Comparable<DefDescriptor> {
+public interface DefDescriptor<T extends Definition> extends JsonSerializable, Serializable,
+        Comparable<DefDescriptor<?>> {
 
     public static final String MARKUP_PREFIX = "markup";
     public static final String CSS_PREFIX = "css";

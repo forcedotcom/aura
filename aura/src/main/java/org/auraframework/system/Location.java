@@ -17,6 +17,8 @@ package org.auraframework.system;
 
 import java.io.Serializable;
 
+import org.auraframework.util.text.Hash;
+
 /**
  * Information about a location in source code, including filename, line, and
  * column number. The "filename" will in most useful cases be an actual
@@ -38,11 +40,11 @@ public class Location implements Serializable {
      */
     private final String cacheFile;
 
-    public Location(Source source) {
+    public Location(Source<?> source) {
         this(source, -1, -1, null);
     }
 
-    public Location(Source source, int line, int column, String cacheFile) {
+    public Location(Source<?> source, int line, int column, String cacheFile) {
         this.fileName = source.getSystemId();
         this.lastModified = source.getLastModified();
         this.hash = source.getHash();

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.system;
+package org.auraframework.util.text;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,23 +25,48 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-import org.auraframework.throwable.AuraRuntimeException;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * A wrapper around an MD5 hash. This functions as a future, being created
  * before the hash value is actually computed.
  */
 public class Hash {
-
+    /**
+     * Radix for hash bytes to string, using 0-9a-f. We might someday want to be
+     * base64 to have a shorter string, but that makes the encoding marginally
+     * more complex since we have to handle byte-wrap boundaries ourselves.
+     */
     private byte[] value;
+
+    /**
+     * Creates a new, empty {@code Hash} to be filled in later with either
+     * {@link #setHash(byte[])} or {@link #setHash(Reader)}.
+     * 
+     * This is a static factory method to keep {@code Hash} not
+     * default-constructible, to avoid Java accidentally making empty promises
+     * that won't be filled.
+     */
+    public static Hash createPromise() {
+        return new Hash();
+    }
 
     /** Creates a Hash object with given contents. */
     public Hash(byte[] input) {
         setHash(input);
     }
 
-    /** Computes the hash of a Java file. */
-    public Hash(String classname) {
+    /**
+     * Computes the hash of a Java file, given its fully-qualified class name.
+     * 
+     * @param classname the name of the class file to read. It should be dotted,
+     *            not slash-separated, and should NOT be an inner class or
+     *            similar (if only because the entire class file participates in
+     *            the hashing).
+     * @throws IOException if the class file cannot be read.
+     */
+    public Hash(String classname) throws IOException {
+        assert classname.indexOf('$') < 0;
         InputStream bytecode = Hash.class.getResourceAsStream("/" + classname.replace('.', '/') + ".class");
         if (bytecode == null) {
             value = null;
@@ -57,9 +82,7 @@ public class Hash {
             }
             value = digest.digest();
         } catch (NoSuchAlgorithmException e) {
-            throw new AuraRuntimeException("MD-5 is a required hash algorithm, but isn't defined", e);
-        } catch (IOException e) {
-            throw new AuraRuntimeException("Can't read bytes for " + classname, e);
+            throw new RuntimeException("MD-5 is a required hash algorithm, but isn't defined", e);
         }
     }
 
@@ -70,12 +93,12 @@ public class Hash {
      * @throws IOException
      * @throws
      */
-    public Hash(Reader reader) throws IOException {
+    public Hash(Reader reader) throws IOException, RuntimeException {
         this();
         try {
             setHash(reader);
         } catch (IllegalStateException e) {
-            throw new AuraRuntimeException("A brand-new Hash unknown to anything else claims it was set twice?!");
+            throw new RuntimeException("A brand-new Hash unknown to anything else claims it was set twice?!");
         }
     }
 
@@ -88,12 +111,7 @@ public class Hash {
         if (value == null) {
             return "no-hash-value";
         }
-        StringBuilder builder = new StringBuilder(80);
-        for (byte b : value) {
-            builder.append(Character.forDigit(b >> 4, 16));
-            builder.append(Character.forDigit(b & 0xf, 16));
-        }
-        return builder.toString();
+        return Base64.encodeBase64URLSafeString(value);
     }
 
     @Override
@@ -148,4 +166,32 @@ public class Hash {
             throw new RuntimeException("MD5 is a required MessageDigest algorithm, but is not registered here.");
         }
     }
+
+    public static class StringBuilder {
+        private final MessageDigest digest;
+        private final Charset utf8;
+
+        public StringBuilder() {
+            utf8 = Charset.forName("UTF-8");
+            try {
+                digest = MessageDigest.getInstance("MD5");
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException("MD5 is a required MessageDigest algorithm, but is not registered here.");
+            }
+        }
+
+        /**
+         * Add data to a hash calculation.
+         */
+        public void addString(String string) {
+            ByteBuffer bytes = utf8.encode(string);
+            digest.update(bytes);
+        }
+
+        public Hash build() {
+            Hash hash = new Hash();
+            hash.setHash(digest.digest());
+            return hash;
+        }
+    };
 }

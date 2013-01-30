@@ -231,6 +231,10 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
             builder.controllerDescriptors.add(jsDescriptor);
         }
 
+        //
+        // TODO: W-1501702 
+        // Need to handle dual renderers for aura:placeholder
+        //
         String rendererName = getAttributeValue(ATTRIBUTE_RENDERER);
         if (rendererName != null) {
             List<String> rendererNames = AuraTextUtil.splitSimpleAndTrim(

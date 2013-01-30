@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.system;
 
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -189,7 +190,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
 
     public void testComparison() throws Exception {
         DefDescriptor<?> fakeComponent = DefDescriptorImpl.getInstance("aura:fakeComponent", ComponentDef.class);
-        DefDescriptor fakeComponent2 = DefDescriptorImpl.getInstance("Aura:FakeComponent", ComponentDef.class);
+        DefDescriptor<?> fakeComponent2 = DefDescriptorImpl.getInstance("Aura:FakeComponent", ComponentDef.class);
         DefDescriptor<?> fooComponent = DefDescriptorImpl.getInstance("aura:foo", ComponentDef.class);
 
         assertTrue(fakeComponent.compareTo(fakeComponent2) == 0);
@@ -197,28 +198,39 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         assertTrue(fakeComponent.compareTo(fooComponent) < 0);
     }
 
-    public void testEquals() throws Exception {
-        assertTrue(DefDescriptorImpl.getInstance("aura:fakeComponent", ComponentDef.class).equals(
-                vendor.makeComponentDefDescriptor("aura:fakeComponent")));
-        assertTrue(DefDescriptorImpl.getInstance("aurA:Fakecomponent", ComponentDef.class).equals(
-                vendor.makeComponentDefDescriptor("aura:fakeComponent")));
-        assertTrue(DefDescriptorImpl.getInstance("fake:component", ComponentDef.class).equals(
-                vendor.makeComponentDefDescriptor("fake:component")));
-        assertTrue(DefDescriptorImpl.getInstance("aura:text", ComponentDef.class).equals(
-                vendor.makeComponentDefDescriptor("aura:text")));
-
-        assertFalse(DefDescriptorImpl.getInstance("aura:fakeComponent", ComponentDef.class).equals(
-                vendor.makeComponentDefDescriptor("fake:component")));
-        assertFalse(DefDescriptorImpl.getInstance("aura:fakeComponent", ComponentDef.class).equals(
-                vendor.makeComponentDefDescriptor("aura:text")));
-        assertFalse(DefDescriptorImpl.getInstance("fake:component", ComponentDef.class).equals(
-                vendor.makeComponentDefDescriptor("aura:fakeComponent")));
-        assertFalse(DefDescriptorImpl.getInstance("fake:component", ComponentDef.class).equals(
-                vendor.makeComponentDefDescriptor("aura:text")));
-        assertFalse(DefDescriptorImpl.getInstance("aura:text", ComponentDef.class).equals(
-                vendor.makeComponentDefDescriptor("fake:component")));
-        assertFalse(DefDescriptorImpl.getInstance("aura:text", ComponentDef.class).equals(
-                vendor.makeComponentDefDescriptor("aura:fakeComponent")));
+    private void testEquals(DefDescriptor<?> x, DefDescriptor<?> y, int compareTo) throws Exception {
+        if (compareTo == 0) {
+            assertTrue(x + " equals " + y, x.equals(y));
+            assertEquals(x + " compareTo[" + compareTo + "] " + y, x.compareTo(y), compareTo);
+        } else {
+            assertFalse(x + " NOT equals " + y, x.equals(y));
+            assertTrue(x + " compareTo[" + compareTo + "] " + y, x.compareTo(y) * compareTo > 0);
+        }
     }
 
+    public void testEquals() throws Exception {
+        testEquals(DefDescriptorImpl.getInstance("aura:fakeComponent", ComponentDef.class),
+                vendor.makeComponentDefDescriptor("aura:fakeComponent"), 0);
+        testEquals(DefDescriptorImpl.getInstance("aurA:Fakecomponent", ComponentDef.class),
+                vendor.makeComponentDefDescriptor("aura:fakeComponent"), 0);
+        testEquals(DefDescriptorImpl.getInstance("fake:component", ComponentDef.class),
+                vendor.makeComponentDefDescriptor("fake:component"), 0);
+        testEquals(DefDescriptorImpl.getInstance("aura:text", ComponentDef.class),
+                vendor.makeComponentDefDescriptor("aura:text"), 0);
+
+        testEquals(DefDescriptorImpl.getInstance("aura:fakeComponent", ComponentDef.class),
+                vendor.makeComponentDefDescriptor("fake:component"), -1);
+        testEquals(DefDescriptorImpl.getInstance("aura:fakeComponent", ComponentDef.class),
+                vendor.makeComponentDefDescriptor("aura:text"), -1);
+        testEquals(DefDescriptorImpl.getInstance("fake:component", ComponentDef.class),
+                vendor.makeComponentDefDescriptor("aura:fakeComponent"), 1);
+        testEquals(DefDescriptorImpl.getInstance("fake:component", ComponentDef.class),
+                vendor.makeComponentDefDescriptor("aura:text"), 1);
+        testEquals(DefDescriptorImpl.getInstance("aura:text", ComponentDef.class),
+                vendor.makeComponentDefDescriptor("fake:component"), -1);
+        testEquals(DefDescriptorImpl.getInstance("aura:text", ComponentDef.class),
+                vendor.makeComponentDefDescriptor("aura:fakeComponent"), 1);
+        testEquals(DefDescriptorImpl.getInstance("aura:text", ApplicationDef.class),
+                vendor.makeComponentDefDescriptor("aura:text"), -1);
+    }
 }

@@ -29,6 +29,7 @@ import java.security.NoSuchAlgorithmException;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.Parser.Format;
+import org.auraframework.util.text.Hash;
 
 /**
  * Abstract base class for providing access to source code, and metadata about
@@ -117,7 +118,7 @@ public abstract class Source<D extends Definition> implements Serializable {
         this.systemId = systemId;
         this.format = format;
         this.descriptor = descriptor;
-        this.hash = new Hash();
+        this.hash = Hash.createPromise();
     }
 
     /**

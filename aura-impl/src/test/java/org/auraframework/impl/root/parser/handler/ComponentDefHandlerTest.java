@@ -60,6 +60,7 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
         assertEquals(vendor.getInterfaceDefDescriptor(), cd.getInterfaces().iterator().next());
         assertTrue(cd.isAbstract());
         assertTrue(cd.isExtensible());
+        assertFalse(cd.isTemplate());
     }
 
     public void testGetHandledTag() {

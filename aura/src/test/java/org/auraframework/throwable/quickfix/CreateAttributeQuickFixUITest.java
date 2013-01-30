@@ -15,8 +15,6 @@
  */
 package org.auraframework.throwable.quickfix;
 
-import java.io.File;
-
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
@@ -26,16 +24,19 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.Source;
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 /**
- * Tests to verify that users can add missing attributes to components via
- * QuickFixes through the browser.
+ * Tests to verify that users can add missing attributes to components via QuickFixes through the browser.
  */
+// TODO(W-1510267): QuickFix buttons do not show up in IE9
+@ExcludeBrowsers({ BrowserType.IE9 })
 public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
+    private final QuickFixUITestUtil util = new QuickFixUITestUtil(this);
     private final DefDescriptor<ComponentDef> defDescriptor = Aura.getDefinitionService().getDefDescriptor(
             "auratest:createAttributeQuickFix_child", ComponentDef.class);
 
@@ -53,7 +54,7 @@ public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
 
     @Override
     public void tearDown() throws Exception {
-        deleteFiles(defDescriptor);
+        util.deleteFiles(defDescriptor);
         super.tearDown();
     }
 
@@ -62,15 +63,14 @@ public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
     }
 
     /**
-     * Verify QuickFix is displayed to user and attribute can be inserted into
-     * component.
+     * Verify QuickFix is displayed to user and attribute can be inserted into component.
      */
-    public void testCreationQuickfix() throws Exception {
+    public void testCreationQuickFix() throws Exception {
         open("/auratest/createAttributeQuickFix.cmp", Mode.DEV);
         verifyToolbarAndClickCreateButton();
         verifyDefaultNameType("foo", "String");
-        String result = clickFix(true);
-        assertTrue("Component not loaded in browser after attribute added via Quickfix",
+        String result = util.clickFix(true);
+        assertTrue("Component not loaded in browser after attribute added via QuickFix",
                 result.contains("In component createAttributeQuickFix"));
 
         // check attribute created on component
@@ -79,14 +79,13 @@ public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
     }
 
     /**
-     * Enter invalid attribute type and verify proper error message is displayed
-     * to user.
+     * Enter invalid attribute type and verify proper error message is displayed to user.
      */
     public void testInvalidAttributeType() throws Exception {
         open("/auratest/createAttributeQuickFix.cmp", Mode.DEV);
         verifyToolbarAndClickCreateButton();
         setAttributeNameType("foo", "myInvalidType");
-        String result = clickFix(false);
+        String result = util.clickFix(false);
         assertTrue("Incorrect error message displayed to user.", result.contains("org.auraframework.throwable."
                 + "AuraRuntimeException: java.lang.ClassNotFoundException: myInvalidType"));
 
@@ -97,14 +96,13 @@ public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
     }
 
     /**
-     * Leave name of attribute empty and verify that proper error message is
-     * displayed.
+     * Leave name of attribute empty and verify that proper error message is displayed.
      */
     public void testEmptyNameType() throws Exception {
         open("/auratest/createAttributeQuickFix.cmp", Mode.DEV);
         verifyToolbarAndClickCreateButton();
         setAttributeNameType("", "String");
-        String result = clickFix(false);
+        String result = util.clickFix(false);
         assertTrue("Incorrect error message displayed to user.",
                 result.contains("QualifiedName is required for descriptors"));
 
@@ -140,52 +138,11 @@ public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
     }
 
     /**
-     * Verify message displayed in Quickfix toolbar at top of the screen and
-     * click the create attribute button.
+     * Verify message displayed in QuickFix toolbar at top of the screen and click the create attribute button.
      */
     private void verifyToolbarAndClickCreateButton() {
-        By toolbarXpath = By.xpath("//div[@class='toolbar']");
-        String toolbarText = getDriver().findElement(toolbarXpath).getText();
-        assertTrue("Incorrect message displayed on quickfix toolbar", toolbarText.contains("The attribute \"foo\" was "
-                + "not found on the COMPONENT markup://auratest:createAttributeQuickFix_child"));
-
-        By buttonXpath = By.xpath("//button[text()='Create Attribute']");
-        assertTrue("Create Attribute Quickfix button not present", isElementPresent(buttonXpath));
-        WebElement button = getDriver().findElement(buttonXpath);
-        button.click();
-    }
-
-    /**
-     * Click the 'Fix!' button and return text displayed in browser either from
-     * newly loaded component, or any error message that is displayed on
-     * failure.
-     */
-    private String clickFix(boolean expectedSuccess) {
-        By fixButton = By.xpath("//img[@alt='Fix!']");
-        WebElement button = getDriver().findElement(fixButton);
-        button.click();
-        waitFor(3);
-        if (expectedSuccess) {
-            return getDriver().findElement(By.tagName("body")).getText();
-        } else {
-            return getDriver().findElement(By.xpath("//div[@id='auraErrorMessage']")).getText();
-        }
-    }
-
-    /**
-     * Delete all files in component bundle, and then directory file itself.
-     */
-    private void deleteFiles(DefDescriptor<?> defDescriptor) {
-        Source<?> source = Aura.getContextService().getCurrentContext().getDefRegistry().getSource(defDescriptor);
-        if (source != null) {
-            File f = new File(source.getSystemId());
-            if (f.exists()) {
-                File dir = f.getParentFile();
-                for (File x : dir.listFiles()) {
-                    x.delete();
-                }
-                dir.delete();
-            }
-        }
+        util.verifyToolbarText("The attribute \"foo\" was "
+                + "not found on the COMPONENT markup://auratest:createAttributeQuickFix_child");
+        util.clickCreateButton("Create Attribute");
     }
 }

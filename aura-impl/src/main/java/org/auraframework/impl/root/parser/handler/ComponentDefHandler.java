@@ -18,6 +18,7 @@ package org.auraframework.impl.root.parser.handler;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
@@ -30,6 +31,7 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraError;
+import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Maps;
@@ -39,6 +41,7 @@ import com.google.common.collect.Maps;
 public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef> {
 
     public static final String TAG = "aura:component";
+    public static final String DISALLOWED_SCRIPT_TAG = "script";
 
     public ComponentDefHandler() {
         super();
@@ -57,6 +60,20 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef> {
     @Override
     public String getHandledTag() {
         return TAG;
+    }
+
+    @Override
+    protected void handleChildTag() throws XMLStreamException,
+            QuickFixException {
+
+        String tag = getTagName();
+
+        if (!builder.isTemplate && DISALLOWED_SCRIPT_TAG.equalsIgnoreCase(tag))
+        {
+            throw new AuraExecutionException("script tags only allowed in templates", builder.location);
+        }
+
+        super.handleChildTag();
     }
 
     @Override

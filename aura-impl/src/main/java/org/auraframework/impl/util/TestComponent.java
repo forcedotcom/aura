@@ -60,7 +60,14 @@ public final class TestComponent implements ComponentDef {
     }
 
     @Override
-    public Collection<EventHandlerDef> getHandlerDefs() throws QuickFixException {
+    public boolean isTemplate() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public Collection<EventHandlerDef> getHandlerDefs()
+            throws QuickFixException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -72,13 +79,15 @@ public final class TestComponent implements ComponentDef {
     }
 
     @Override
-    public List<DefDescriptor<ModelDef>> getModelDefDescriptors() throws QuickFixException {
+    public List<DefDescriptor<ModelDef>> getModelDefDescriptors()
+            throws QuickFixException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<DefDescriptor<ControllerDef>> getControllerDefDescriptors() throws QuickFixException {
+    public List<DefDescriptor<ControllerDef>> getControllerDefDescriptors()
+            throws QuickFixException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -102,7 +111,8 @@ public final class TestComponent implements ComponentDef {
     }
 
     @Override
-    public DefDescriptor<RendererDef> getRendererDescriptor() throws QuickFixException {
+    public DefDescriptor<RendererDef> getRendererDescriptor()
+            throws QuickFixException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -168,7 +178,8 @@ public final class TestComponent implements ComponentDef {
     }
 
     @Override
-    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
+    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs()
+            throws QuickFixException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -180,19 +191,22 @@ public final class TestComponent implements ComponentDef {
     }
 
     @Override
-    public Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException {
+    public Map<String, RegisterEventDef> getRegisterEventDefs()
+            throws QuickFixException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException {
+    public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other)
+            throws QuickFixException {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public DefDescriptor<ProviderDef> getProviderDescriptor() throws QuickFixException {
+    public DefDescriptor<ProviderDef> getProviderDescriptor()
+            throws QuickFixException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -237,7 +251,8 @@ public final class TestComponent implements ComponentDef {
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies)
+            throws QuickFixException {
         // TODO Auto-generated method stub
 
     }
@@ -261,7 +276,8 @@ public final class TestComponent implements ComponentDef {
     }
 
     @Override
-    public <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> descriptor) {
+    public <D extends Definition> D getSubDefinition(
+            SubDefDescriptor<D, ?> descriptor) {
         // TODO Auto-generated method stub
         return null;
     }

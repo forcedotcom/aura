@@ -14,23 +14,7 @@
  * limitations under the License.
  */
 ({
-    updateTriggerLabel: function(cmp, event) {
-        var triggerCmp = cmp.find("trigger");
-        if (triggerCmp) {
-            var source = event.getSource();
-            var label = source.get("v.label");
-            triggerCmp.setValue("{!v.label}", label); 
-        }
-    },
-    updateLabel: function(cmp, event) {
-        var triggerCmp = cmp.find("mytrigger");
-        if (triggerCmp) {
-            var source = event.getSource();
-            var label = source.get("v.label");
-            triggerCmp.setValue("{!v.label}", label); 
-        }
-    },
-    clickMenu: function(cmp, event) {
+     clickMenu: function(cmp, event) {
         var source = event.getSource();
         var label = source.get("v.label");
         console.log("click menu item " + label);

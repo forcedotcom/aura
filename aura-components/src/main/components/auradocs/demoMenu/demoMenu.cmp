@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.docs.MenuTestModel">
+<aura:component>
 <div style="margin:20px;">
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2><code>ui:actionMenuItem</code></h2>

@@ -21,18 +21,73 @@
     <p><code>ui:menu</code> is a menu component that contains list items. You can wire up list items to actions in a client-side controller so that selection of the item triggers an action.
     List items in the menu can be initialized from the menu's model. 
    </p>
-    <p><code>ui:menu</code> is nested in <code>ui:dropdown</code> and can contain these list item components:
-    <code>ui:actionMenuItem</code>, <code>ui:checkboxMenuItem</code>, <code>ui:radioMenuItem</code>, and a separator component <code>ui:menuItemSeparator</code>.
+    <p>You can nest <code>ui:menu</code> in a <code>ui:dropdown</code> component. A <code>ui:item</code>component can include these types of list item components:
+    <ul>
+        <li><code>ui:actionMenuItem</code> - an item that triggers a client-side controller action</li>
+        <li><code>ui:checkboxMenuItem</code> - an item that supports multiple selection and can trigger a client-side controller action</li>
+        <li><code>ui:radioMenuItem</code> - an item that supports single selection and can be trigger a client-side controller action</li>
+        <li><code>ui:menuItemSeparator</code> - a seperator for menu items</li>
+    </ul>
     </p>
 	<auradocs:info>See the <auradocs:defLink descriptor ="ui:menu">ui:menu</auradocs:defLink> component reference.</auradocs:info>
-	
+	<p>The dropdown menu and its menu items are hidden by default. You can change this by setting the <code>visible</code> attribute on the <code>ui:menu</code> component to <code>true</code>.
+	 The menu items are shown only when you click the <code>ui:menuTriggerLink</code> component.</p>
 	<p>The following demo shows how to use the list item components, which trigger an action on a client-side controller.
-	 The dropdown menu and its menu items are hidden by default and shown only when the <code>ui:menuTriggerLink</code> component is clicked, but can be changed by updating the <code>visible</code> attribute on the <code>ui:menu</code> component.</p>
+	</p>
     <auradocs:example descriptor="auradocs:demoMenu" />
     
     <p>The following demo shows how to use <code>ui:menu</code> to display menu items from a model and retrieve the selected items via the <code>menuItems</code> attribute.</p>
     <auradocs:example descriptor="auradocs:demoMenuMeta" />
     
+    <h2>Rendering and Accessing Menu Items</h2>
+    <p>The <code>ui:menu</code> component is generally rendered as HTML elements in this order:</p>
+    <auradocs:codeblock>
+      &lt;span role="application"&gt;
+        &lt;span id="10:1" aria-haspopup="true"&gt;&lt;/span&gt;
+        &lt;div class="uiMenu" role="menu" aria-labelledby="10:1"&gt;&lt;/div&gt;
+          &lt;ul role="presentation"&gt;
+            &lt;li class="uiMenuItem" role="presentation"&gt;
+              &lt;a class="selectable" role="menuitem" href="javascript:void(0);"&gt;Menu item&lt;/a&gt;
+            &lt;/li&gt;
+            &lt;!--More menu items--&gt;
+          &lt;/ul&gt;
+      &lt;/span&gt;  
+    </auradocs:codeblock>
+    
+    <p>To access the menu items using your keyboard, you can press these keys.</p>
+    
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Tab</td>
+                <td>Focus on the menu and its items</td>
+            </tr>
+            <tr>
+             	<td>Spacebar</td>
+             	<td>Toggle the menu</td>
+            </tr>
+            <tr>
+            	<td>Enter</td>
+            	<td>Select a menu item</td>
+            </tr>
+            <tr>
+            	<td>Esc</td>
+            	<td>Escape the menu</td>
+            </tr>
+           <tr>
+            	<td>Alphanumeric Character</td>
+            	<td>Navigate using the first letter of list items</td>
+            </tr>
+        </tbody>
+    </table>
+    <p>To access selected values using a controller action, pass in the event to your controller, as demonstrated in the <code>getMenuSelected</code> controller action. You can use
+    <code>cmp.find("myMenu").getValue("v.childMenuItems")</code> to retrieve the values.</p>
       <p><b>See also:</b><br/>
       <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
       <auradocs:topicLink topic="models">Models</auradocs:topicLink>

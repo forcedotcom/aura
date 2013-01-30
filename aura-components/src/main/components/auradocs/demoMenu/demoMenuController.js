@@ -29,31 +29,5 @@
             var label = source.get("v.label");
             triggerCmp.setValue("{!v.label}", label); 
         }
-    },
-    clickMenu: function(cmp, event) {
-        var source = event.getSource();
-        var label = source.get("v.label");
-        console.log("click menu item " + label);
-    },
-    pickPlace: function(cmp, event) {
-        var triggerCmp = cmp.find("metadataAction");
-        if (triggerCmp) {
-            var source = event.getParam("selectedItem");
-            var label = source.get("v.label");
-            triggerCmp.setValue("{!v.label}", label); 
-        }
-    },
-    getMenuSelected: function(cmp, event) {
-        var menuCmp = cmp.find("myMenu");
-        var menuItems = menuCmp.getValue("v.childMenuItems");
-        var values = [];
-        for (var i = 0; i < menuItems.getLength(); i++) {
-            var c = menuItems.getValue(i);
-            if (c.get("v.selected") === true) {
-                values.push(c.get("v.label"));
-            }
-        }
-        var resultCmp = cmp.find("result");
-        resultCmp.setValue("{!v.value}", values.join(","));
     }
 })

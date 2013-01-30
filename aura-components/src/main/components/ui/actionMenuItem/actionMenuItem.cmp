@@ -18,6 +18,6 @@
 <aura:component extends="ui:menuItem" extensible="true" support="GA" description="​A menu item that triggers an action.">
     <aura:handler name="click" action="{!c.handleClick}"/>
     <li aura:id="listitem" class="{!v.class}" role="presentation">
-        <a aura:id="link" role="menuitem" disabled="{!v.disabled}">{!v.label}</a>
+        <a aura:id="link" role="menuitem">{!v.label}</a>
     </li>
 </aura:component>

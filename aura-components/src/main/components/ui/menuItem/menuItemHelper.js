@@ -40,6 +40,19 @@
         return null;
     },
     
+    /**
+     * Override
+     *
+     */
+     fireEvent : function (component, event, helper) {
+        if (component.get("v.disabled") === true && event.type !== "mouseover") {
+            return;
+        }
+        var e = component.getEvent(event.type);
+        helper.setEventParams(e, event);
+        e.fire();
+     },
+    
     fireSelectEvent: function(component, event) {
         var concrete = component.getConcreteComponent();
         var parent = concrete.getValue("v.parent");
@@ -63,18 +76,50 @@
         if (parent) {
             if (parent.get("v.visible") === true) {
                 parent.setValue("{!v.visible}", false);
-            }
-            var grandParent = parent.getValue("v.parent");
-            if (grandParent && !grandParent.isEmpty()) {
-                var dropdownCmp = grandParent.getValue(0);
-                var dropdownHelper = dropdownCmp.getDef().getHelper();
-                var menuTriggerCmp = dropdownHelper.getTriggerComponent(dropdownCmp);
-                if (menuTriggerCmp) {
-                    var action =  menuTriggerCmp.get("c.focus");
-                    action.run();
+                if (component.get("v.disabled") === true) {
+                    // for disabled menu item, no Aura event gets fired, so we have to directly deal with DOM.
+                    var devCmp = parent.find("menu");
+                    if (devCmp) {
+                        var elem = devCmp.getElement();
+                        $A.util.removeClass(elem, "visible");
+                    }
+                }
+            }            
+        }
+        // put the focus back to menu trigger
+        this.setFocusToTrigger(component);
+    },
+    
+    /**
+     * Select the menu item when Space bar is pressed
+     *
+     */
+    handleSpacekeydown: function(component, event) {
+        if (component.get("v.disabled") === true) {
+            return;
+        }
+        var e = component.getEvent("click");
+        this.setEventParams(e, event);
+        e.fire();
+    },
+    
+    /**
+     * Dismiss the menu when tab key is pressed.
+     */
+    handleTabkeydown: function(component, event) {
+        var parent = this.getParentComponent(component);
+        if (parent) {
+            if (parent.get("v.visible") === true) {
+                parent.setValue("{!v.visible}", false);
+                if (component.get("v.disabled") === true) {
+                    // for disabled menu item, no Aura event gets fired, so we have to directly deal with DOM.
+                    var devCmp = parent.find("menu");
+                    if (devCmp) {
+                        var elem = devCmp.getElement();
+                        $A.util.removeClass(elem, "visible");
+                    }
                 }
             }
-            
         }
     },
     
@@ -147,27 +192,18 @@
         }
     },
     
-    supportKeyboardInteraction: function(component, event) {
-        var concreteCmp = component.getConcreteComponent();
-        if (event.type === "keydown") {
-            if (event.keyCode === 39 || event.keyCode === 40) {  // right or down arrow key
-                event.preventDefault();
-                this.setFocusToNextItem(concreteCmp);
-            } else if (event.keyCode === 37 || event.keyCode === 38) {  // left or up arrow key
-                event.preventDefault();
-                this.setFocusToPreviousItem(concreteCmp);
-            } else if (event.keyCode === 27) {  // Esc key
-                event.stopPropagation();
-                this.handleEsckeydown(concreteCmp, event);
-            } else if (event.keyCode === 9) {  // tab key: dismiss the menu
-                var parent = this.getParentComponent(component);
-                if (parent) {
-                    if (parent.get("v.visible") === true) {
-                        parent.setValue("{!v.visible}", false);
-                    }
+    setFocusToTrigger: function(component) {
+        var parent = this.getParentComponent(component);
+        if (parent) {
+            var grandParent = parent.getValue("v.parent");
+            if (grandParent && !grandParent.isEmpty()) {
+                var dropdownCmp = grandParent.getValue(0);
+                var dropdownHelper = dropdownCmp.getDef().getHelper();
+                var menuTriggerCmp = dropdownHelper.getTriggerComponent(dropdownCmp);
+                if (menuTriggerCmp) {
+                    var action =  menuTriggerCmp.get("c.focus");
+                    action.run();
                 }
-            } else {
-                this.setFocusToTypingChars(concreteCmp, event);
             }
         }
     },
@@ -206,5 +242,32 @@
                 parent._keyBuffer = [];
             }, 700);
         }
-    }   
+    },
+    
+    /**
+     * Handle keyboard interactions
+     *
+     */
+    supportKeyboardInteraction: function(component, event) {
+        var concreteCmp = component.getConcreteComponent();
+        if (event.type === "keydown") {
+            if (event.keyCode === 39 || event.keyCode === 40) {  // right or down arrow key
+                event.preventDefault();
+                this.setFocusToNextItem(concreteCmp);
+            } else if (event.keyCode === 37 || event.keyCode === 38) {  // left or up arrow key
+                event.preventDefault();
+                this.setFocusToPreviousItem(concreteCmp);
+            } else if (event.keyCode === 27) {  // Esc key
+                event.stopPropagation();
+                this.handleEsckeydown(concreteCmp, event);
+            } else if (event.keyCode === 9) {  // tab key: dismiss the menu
+                this.handleTabkeydown(concreteCmp, event);
+            } else if (event.keyCode === 32) {  // space key: select the menu item
+                event.preventDefault();
+                this.handleSpacekeydown(concreteCmp, event);
+            } else {
+                this.setFocusToTypingChars(concreteCmp, event);
+            }
+        }
+    },
 })

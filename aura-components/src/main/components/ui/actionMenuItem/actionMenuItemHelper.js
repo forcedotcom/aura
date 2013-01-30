@@ -15,12 +15,16 @@
  */
  ({
     preEventFiring : function(component, event){
-        if (event.type == "click") { // dismiss the parent menu
+        var isSpaceKeydown = event.type === "keydown" && event.keyCode === 32;
+        if ((isSpaceKeydown || event.type == "click") && 
+            component.get("v.disabled") !== true) { // dismiss the parent menu
             var parent = component.getValue("v.parent");
             if (parent && !parent.isEmpty()) {
                 p = parent.getValue(0);
                 p.setValue("{!v.visible}", false);
-            } 
+            }
+            // put the focus back to menu trigger
+            this.setFocusToTrigger(component);
         }
         this.supportKeyboardInteraction(component, event);
     }

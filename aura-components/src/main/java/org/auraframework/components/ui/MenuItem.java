@@ -27,17 +27,30 @@ import org.auraframework.util.json.JsonSerializable;
  * @since 184
  */
 public class MenuItem implements JsonSerializable {
+    private final String className;
     private final String label;    
     private final boolean selected;
     private final String type;
     
     public MenuItem(String label, boolean selected, String type) {
+        this("", label, selected, type);
+    }
+    
+    public MenuItem(String className, String label, boolean selected, String type) {
+        this.className = className;
         this.label = label;
-        
         this.selected = selected;
         this.type = type;
     }
 
+    /**
+     * Get the class name.
+     * @return the class name of this menu item
+     */
+    public String getClassName() {
+        return this.className;
+    }
+    
     /**
      * Get the label.
      * @return the label of this menu item
@@ -67,8 +80,8 @@ public class MenuItem implements JsonSerializable {
     @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
+        json.writeMapEntry("className", this.className);
         json.writeMapEntry("label", this.label);
-        
         json.writeMapEntry("selected", this.selected);
         json.writeMapEntry("type", this.type);
         json.writeMapEnd();
@@ -76,7 +89,7 @@ public class MenuItem implements JsonSerializable {
 
     @Override
     public String toString() {
-        return String.format("MenuItem(label[%s] selected[%s] type[%s])", this.label, this.selected, this.type);
+        return String.format("MenuItem(className[%s] label[%s] selected[%s] type[%s])", this.className, this.label, this.selected, this.type);
     }
 
 }

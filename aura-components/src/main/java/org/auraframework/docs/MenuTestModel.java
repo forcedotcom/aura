@@ -53,4 +53,16 @@ public class MenuTestModel {
         a.add(m3);
         return a;
     }
+    
+    @AuraEnabled
+    public List<MenuItem> getImages() {
+        ArrayList<MenuItem> a = new ArrayList<MenuItem>(3);
+        MenuItem m1 = new MenuItem("tiger1", "Tiger1", false, "action");
+        a.add(m1);
+        MenuItem m2 = new MenuItem("tiger3", "Tiger2", false, "action");
+        a.add(m2);
+        MenuItem m3 = new MenuItem("tiger4", "Tiger3", false, "action");
+        a.add(m3);
+        return a;
+    }
 }

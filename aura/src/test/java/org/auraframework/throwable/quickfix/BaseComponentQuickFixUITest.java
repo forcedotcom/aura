@@ -150,8 +150,8 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
     /**
      * Verify QuickFix works when we load a component that exists but contains an inner component that does not.
      */
-    // TODO(W-1507595): loading an .app with an inner component that doesn't
-    // exist will fail to create new inner component.
+    // TODO(W-1507595): loading an .app with an inner component that doesn't exist will fail to create new inner
+    // component.
     public void _testCreateInnerCmp() throws Exception {
         String namespace = "auratest";
         String cmpName = "innerCmpThatDoesntExist";
@@ -180,7 +180,9 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
     /**
      * Verify error message when creating inner component with a bad namespace.
      */
-    public void testCreateInnerCmpBadNamespace() throws Exception {
+    // TODO(W-1507595): Error messages differ when loading the cmp and app. They should be at least consistent, and
+    // ideally a little more informative.
+    public void _testCreateInnerCmpBadNamespace() throws Exception {
         String namespace = "auratest";
         String cmpName = "innerCmpThatDoesntExist";
         String parentName = "";
@@ -197,7 +199,8 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
             quickFixUIWidget.verifyCustomizationMenu();
             quickFixUIWidget.setDescriptorNames("auratestasdf:innerCmpThatDoesntExist");
             String result = quickFixUIWidget.clickFix(false);
-            assertTrue("Incorrect error message text: "+result, result.contains("Cannot find location to save definition."));
+            assertTrue("Incorrect error message text: " + result,
+                    result.contains("Cannot find location to save definition."));
             assertFalse("Failed to locate the definition", defDescriptorChild.exists());
         } finally {
             quickFixUIWidget.deleteFiles(defDescriptorChild);

@@ -94,4 +94,9 @@ invalid:
 <div id="output">
 output: <ui:outputText value="{!m.String}"/>
 </div>
+<div id="inspectBaseEvent"> 
+inspectBaseEvent: 
+<ui:inputText aura:id="keyup" class="keyup" value="{!m.String}" updateOn="keyup" keypress="{!c.inspectKeyEvent}" mousedown="{!c.inspectMouseEvent}"/><br/> 
+outputValue: <ui:outputText aura:id="outputValue" class="outputValue" value=""/> <br/><br/>
+</div>
 </aura:component>

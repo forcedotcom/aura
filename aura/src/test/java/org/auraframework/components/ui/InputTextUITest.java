@@ -29,6 +29,8 @@ import org.openqa.selenium.interactions.Actions;
  * UI tests for inputText Component
  */
 public class InputTextUITest extends WebDriverTestCase {
+	
+	public static final String TEST_CMP = "/uitest/inputtextupdateontest.cmp";
 
     public InputTextUITest(String name) {
         super(name);
@@ -60,7 +62,7 @@ public class InputTextUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE })
     public void testUpdateOnAttribute() throws Exception {
 
-        open("/uitest/inputtextupdateontest.cmp");
+        open(TEST_CMP);
         String value = getCurrentModelValue();
         WebDriver d = getDriver();
         Actions a = new Actions(d);
@@ -120,7 +122,7 @@ public class InputTextUITest extends WebDriverTestCase {
             BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.FIREFOX })
     public void testUpdateOnAttributeWithCertainEvents() throws Exception {
 
-        open("/uitest/inputtextupdateontest.cmp");
+        open(TEST_CMP);
         String value = getCurrentModelValue();
         WebDriver d = getDriver();
         Actions a = new Actions(d);
@@ -204,5 +206,36 @@ public class InputTextUITest extends WebDriverTestCase {
 
         WebElement input = getDriver().findElement(By.tagName("input"));
         assertEquals("Value of input is incorrect", "", input.getText());
+    }
+    
+    public void testBaseKeyboardEventValue() throws Exception {
+        open(TEST_CMP);
+        String inputText = "z";
+        WebElement input = findDomElement(By.cssSelector(".keyup"));
+        WebElement outputValue = findDomElement(By.cssSelector(".outputValue"));
+        input.clear();
+        input.sendKeys(inputText);
+        try {
+        	char outputText = (char) Integer.parseInt(outputValue.getText());
+            assertEquals("InputChar and outputChar are different ", inputText.charAt(0), outputText);
+        } catch (Exception e) {
+            fail("ParseInt failed with following error" + e.getMessage());
+        }
+    }
+    
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE })
+    public void testBaseMouseEventValue() throws Exception {
+        open(TEST_CMP);
+        WebElement input = findDomElement(By.cssSelector(".keyup"));
+        WebElement outputValue = findDomElement(By.cssSelector(".outputValue"));
+        
+        //left click behavior
+        input.click();
+        assertEquals("Left click not performed ", "0", outputValue.getText());
+        
+        //right click behavior
+        Actions actions = new Actions(getDriver());
+        actions.contextClick(input).perform();
+        assertEquals("Right click not performed ", "2", outputValue.getText());
     }
 }

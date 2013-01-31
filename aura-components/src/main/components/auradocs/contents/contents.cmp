@@ -62,6 +62,9 @@
                 <auradocs:contentsNode text="Component Composition" id="nestedComponents"/>
                 <auradocs:contentsNode text="Component Body and Facets" id="helloFacets"/>
                 <auradocs:contentsNode text="Lazy Loading a Component" id="lazyload"/>
+                <auradocs:contentsNode text="Using UI Components">
+                  <auradocs:contentsNode text="Using Menus" id="useMenu"/>
+                </auradocs:contentsNode>
             </auradocs:contentsNode>
             <auradocs:contentsNode text="Expressions" >
                 <auradocs:contentsNode text="Introduction" id="expressions"/>

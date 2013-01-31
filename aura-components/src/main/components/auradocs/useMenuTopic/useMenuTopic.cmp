@@ -19,7 +19,7 @@
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Using Menus" />
     <p><code>ui:menu</code> is a menu component that contains list items. You can wire up list items to actions in a client-side controller so that selection of the item triggers an action.
-    List items in the menu can be initialized from the menu's model. 
+    List items in the menu can be initialized from the menu's model. You can build your own menu items by extending <code>ui:menuItem</code>.
    </p>
     <p>You can nest <code>ui:menu</code> in a <code>ui:dropdown</code> component. A <code>ui:item</code> component can include these types of list item components:
     <ul>

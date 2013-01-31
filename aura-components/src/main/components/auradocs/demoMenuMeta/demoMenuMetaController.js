@@ -27,6 +27,14 @@
             triggerCmp.setValue("{!v.label}", label); 
         }
     },
+    pickTiger: function(cmp, event) {
+        var triggerCmp = cmp.find("imageTrigger");
+        if (triggerCmp) {
+            var source = event.getParam("selectedItem");
+            var className = source.get("v.class");
+            triggerCmp.setValue("{!v.class}", className); 
+        }
+    }, 
     getMenuSelected: function(cmp, event) {
         var menuCmp = cmp.find("myMenu");
         var menuItems = menuCmp.getValue("v.childMenuItems");

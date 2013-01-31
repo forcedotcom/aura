@@ -297,11 +297,12 @@
                 // it as an attribute on the DOM node
                 // IE renders null value as string "null" for input (text) element, we have to work around that.
                 if (!aura.util.isUndefined(value) && !($A.util.isIE && this.isInputNullValue(ret.tagName, name, value))) {
+                	var casedAttribute = this.caseAttribute(name);
                     var lowerName = name.toLowerCase();
-                    if (lowerName === "type" || lowerName === "href" || lowerName === "style") { // special case we have to use "setAttribute"
-                        ret.setAttribute(this.caseAttribute(name), value);
+                    if (lowerName === "type" || lowerName === "href" || lowerName === "style" || lowerName.indexOf("data-") === 0) { // special case we have to use "setAttribute"
+                        ret.setAttribute(casedAttribute, value);
                     } else {
-                        ret[this.caseAttribute(name)] = value;
+                        ret[casedAttribute] = value;
                     }
                 }
             }

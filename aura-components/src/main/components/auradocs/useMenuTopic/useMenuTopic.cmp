@@ -21,11 +21,11 @@
     <p><code>ui:menu</code> is a menu component that contains list items. You can wire up list items to actions in a client-side controller so that selection of the item triggers an action.
     List items in the menu can be initialized from the menu's model. 
    </p>
-    <p>You can nest <code>ui:menu</code> in a <code>ui:dropdown</code> component. A <code>ui:item</code>component can include these types of list item components:
+    <p>You can nest <code>ui:menu</code> in a <code>ui:dropdown</code> component. A <code>ui:item</code> component can include these types of list item components:
     <ul>
         <li><code>ui:actionMenuItem</code> - an item that triggers a client-side controller action</li>
         <li><code>ui:checkboxMenuItem</code> - an item that supports multiple selection and can trigger a client-side controller action</li>
-        <li><code>ui:radioMenuItem</code> - an item that supports single selection and can be trigger a client-side controller action</li>
+        <li><code>ui:radioMenuItem</code> - an item that supports single selection and can trigger a client-side controller action</li>
         <li><code>ui:menuItemSeparator</code> - a seperator for menu items</li>
     </ul>
     </p>
@@ -36,7 +36,8 @@
 	</p>
     <auradocs:example descriptor="auradocs:demoMenu" />
     
-    <p>The following demo shows how to use <code>ui:menu</code> to display menu items from a model and retrieve the selected items via the <code>menuItems</code> attribute.</p>
+    <p>The following demo shows how to use <code>ui:menu</code> to display menu items from a model and retrieve the selected items via the <code>menuItems</code> attribute, which is a list of items set using <code>ArrayList&lt;MenuItem&gt;</code>.
+    </p>
     <auradocs:example descriptor="auradocs:demoMenuMeta" />
      <p>To access selected values using a controller action, pass in the event to your controller, as demonstrated in the <code>getMenuSelected</code> controller action. You can use
     <code>cmp.find("myMenu").getValue("v.childMenuItems")</code> to retrieve the values. <code>childMenuItems</code> is a read-only attribute on the <code>ui:menu</code> component that contains the child menu items.</p>

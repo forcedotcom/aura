@@ -51,4 +51,13 @@
         </p>
     </div>
 </div>
+<div style="margin:20px;">
+    <div style="display:inline-block;width:50%;vertical-align:top;">
+        <h2>Example: custom Image Menu Item</h2>
+        <ui:dropdown>
+            <ui:menuTriggerLink aura:id="imageTrigger" class="imageLink" label="Tiger"/>
+            <ui:menu aura:id="tigerMenu" class="inline" menuItems="{!m.images}" menuSelect="{!c.pickTiger}"/>
+        </ui:dropdown>
+   </div>
+</div>
 </aura:component>

@@ -18,3 +18,41 @@
     font-weight: bold;
     padding-bottom: 15px;
 }
+
+.THIS .inline.uiMenu {
+    width: 1000px;
+    height: 220px;
+    white-space: nowrap;
+}
+
+.THIS .inline ul li {
+    display: inline-block;
+}
+
+.THIS a.imageLink {
+    background: url('/auraFW/resources/qa/images/tiger2.png') no-repeat center center;
+    width: 200px;
+    height: 300px;
+    display: block;
+}
+
+.THIS li.tiger1 > a, .THIS a.tiger1 {
+    background: url('/auraFW/resources/qa/images/tiger1.jpg') no-repeat center center;
+    width: 300px;
+    height: 200px;
+    display: block;
+}
+
+.THIS li.tiger3 > a, .THIS a.tiger3 {
+    background: url('/auraFW/resources/qa/images/tiger3.png') no-repeat center center;
+    width: 300px;
+    height: 200px;
+    display: block;
+}
+
+.THIS li.tiger4 > a, .THIS a.tiger4 {
+    background: url('/auraFW/resources/qa/images/tiger4.png') no-repeat center center;
+    width: 300px;
+    height: 200px;
+    display: block;
+}

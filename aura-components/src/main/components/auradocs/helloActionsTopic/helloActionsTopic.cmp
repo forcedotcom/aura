@@ -46,14 +46,17 @@
 
     <p>If you know some JavaScript, you might be tempted to write something like the first "Flawed" button in <code>helloActions.cmp</code> because you know that HTML tags are first-class citizens.</p>
 
-    <p>You'd be close, but that button won't do anything in Aura when you click it.  The reason is that Aura has its own event system.  Even though this markup looks like you're coding to a native browser onclick event (and should thus be able to write inline JavaScript to handle it), you're actually coding to anAura event. Remember how we said HTML tags are actually mapped to Aura components?  This is one of the side effects of that.</p>
+    <p>However, the "Flawed" button won't work with Aura.  The reason is that Aura has its own event system.  DOM events are mapped to Aura events, since HTML tags are mapped to Aura components.</p>
 
-    <p>Aura events must be handled by <em>client-side actions</em> in client-side component controllers.</p>
+    <h3>Handling Aura Events</h3>
+    <p>Handle Aura events using actions in client-side component controllers. Aura events for common mouse and keyboard interactions are available with components that come out-of-the-box with Aura.
+    When you extend these components, you have access to these events as well. For example, see the <auradocs:defLink descriptor="ui:button" defType="component">ui:button</auradocs:defLink> component reference. </p>
+    <p>Let's look at the <code>onclick</code> attribute in the "Auraized" button, which invokes the <code>handleClick</code> action in the controller. The "Native" button uses the same syntax with the <code>press</code> attribute in the <code>&lt;ui:button&gt;</code> component.</p>
 
-    <p>Next, let's look at the syntax for the <code>onclick</code> attribute in the "Auraized" button. The expression should look a little familiar, but now we see a new value provider prefix, <code>c</code>. Aura is an MVC framework, and <code>v</code> stands for "view", so it's a safe bet that <code>c</code> stands for "controller".  So we're referring to something called <code>handleClick</code> on a controller. The "Native" button uses the same syntax with the <code>press</code> attribute in the <code>&lt;ui:button&gt;</code> component.</p>
-
-    <p>In this simple scenario, there is little difference between working with the "Native" button or the "Auraized" HTML button. It's a matter of preference whether you prefer to work with HTML or Aura markup. However, when you start working with more complex reusable components, the components that come out-of-the-box with Aura can simplify your job by taking care of some of the plumbing that you would otherwise have to create yourself. See the Components folder in the <auradocs:navLink location="reference">Reference tab</auradocs:navLink> for all the components that come out-of-the-box with Aura. The <code>&lt;ui:button&gt;</code> component is under the <code>UI</code> folder.</p>
-
+    <p>In this simple scenario, there is little difference between working with the "Native" button or the "Auraized" HTML button. However, when you start working with more complex reusable components, the components that come out-of-the-box with Aura can simplify your job by taking care of some of the plumbing that you would otherwise have to create yourself. 
+    </p>
+	
+	<h3>Accessing Component Attributes</h3>
     <p>Click the <b>js://controller source</b> tab to view the code for <code>helloActionsController.js</code>.
     In the <code>handleClick</code> function, notice that the first argument to every action is the component to which the controller belongs. And one of the most common things you'll want to do with this component is look at and change its attribute values.</p>
 

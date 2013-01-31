@@ -18,9 +18,10 @@
         var textI = cmp.find("textI");
         var textvalue = textI.getValue("v.value");
         var textO = cmp.find("textO");
-      
+        var label = event.getSource().get("v.value");
+        
         console.log(textI);
         console.log(textO);
-        textO.push(textValue);
+        textO.setValue("{!v.value}", label);
    }
 }

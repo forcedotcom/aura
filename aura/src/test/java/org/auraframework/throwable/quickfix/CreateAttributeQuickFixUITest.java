@@ -27,14 +27,17 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 /**
  * Tests to verify that users can add missing attributes to components via QuickFixes through the browser.
  */
+// Unadaptable since running from jars in sfdc autobuilds so can't create new cmp/attributes
 // TODO(W-1510267): QuickFix buttons do not show up in IE9
 @ExcludeBrowsers({ BrowserType.IE9 })
+@UnAdaptableTest
 public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
     private final QuickFixUITestUtil util = new QuickFixUITestUtil(this);
     private final DefDescriptor<ComponentDef> defDescriptor = Aura.getDefinitionService().getDefDescriptor(

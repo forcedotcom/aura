@@ -360,8 +360,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
             assertAppCacheStatus(Status.IDLE);
 
             logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, replacement);
-            expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest"), new Request("/aura",
-                    namespace + ":" + appName, null, null));
+            expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest"),
+                                          new Request("/aura", namespace + ":" + appName, null, null));
             assertRequests(expected, logs);
             assertAppCacheStatus(Status.IDLE);
         } finally {
@@ -396,8 +396,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         if (context == null) {
             context = service.startContext(Mode.SELENIUM, Format.HTML, Access.AUTHENTICATED);
         }
-        return Aura.getDefinitionService()
-        .getDefinition(String.format("%s:%s", namespace, cmpName), ComponentDef.class);
+        return Aura.getDefinitionService().getDefinition(String.format("%s:%s", namespace, cmpName),
+                                                         ComponentDef.class);
     }
 
     private void assertRequests(List<Request> expected, List<Request> actual) throws Exception {

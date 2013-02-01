@@ -301,7 +301,12 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
     }
 
     @Override
-    public <T extends Definition> long getLastMod(String uid) throws QuickFixException {
+    public <T extends Definition> long getLastMod(DefDescriptor<T> desc) throws QuickFixException {
+        return 0;
+    }
+
+    @Override
+    public long getLastMod(String uid) throws QuickFixException {
         return 0;
     }
 

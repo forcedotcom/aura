@@ -115,13 +115,22 @@ public interface DefinitionService extends AuraService {
     MasterDefRegistry getDefRegistry();
 
     /**
-     * Get the latest timestamp for a given descriptor.
+     * [Temporary] Get the latest timestamp for a given descriptor.
      * 
      * This will check all dependencies of the definition.
      * 
      * @param descriptor the descriptor to check.
      */
-    <T extends Definition> long getLastMod(String uid) throws QuickFixException;
+    <T extends Definition> long getLastMod(DefDescriptor<T> desc) throws QuickFixException;
+    
+    /**
+     * Get the latest timestamp for a given uid.
+     * 
+     * This will check all dependencies of the definition.
+     * 
+     * @param descriptor the descriptor to check.
+     */
+    long getLastMod(String uid) throws QuickFixException;
 
     /**
      * Given a set of preload namespaces, calculate the last mod time. This will

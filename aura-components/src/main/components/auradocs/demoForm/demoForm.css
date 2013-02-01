@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS {
-    width: 400px;
-}
+
 .THIS .uiInput  {
     margin: 10px 10px 10px;
     padding: 5px;
@@ -28,4 +26,9 @@
    width: 150px;
    text-align: left;
    padding-right: 20px;
+}
+
+.THIS .uiButton {
+	font-family:Arial;
+	width:200px;
 }

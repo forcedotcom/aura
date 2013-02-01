@@ -16,12 +16,8 @@
 {
   getInput: function(cmp, event) {
         var textI = cmp.find("textI");
-        var textvalue = textI.getValue("v.value");
+        var textvalue = textI.getValue("v.value").getValue();
         var textO = cmp.find("textO");
-        var label = event.getSource().get("v.value");
-        
-        console.log(textI);
-        console.log(textO);
-        textO.setValue("{!v.value}", label);
+        textO.setValue("{!v.value}", textvalue);
    }
 }

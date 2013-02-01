@@ -19,13 +19,13 @@
     width: 800px;
 }
 
-.THIS.centerClass.theNorth, .THIS.centerClass.theSouth {
-    width: 200px;
+.THIS.theNorth, .THIS.theSouth {
+    width: 400px;
     border: 1px dashed #888;
     padding: 10px;
 }
 
-.THIS .centerClass {
+.THIS .body {
     color: #544D4D;
     line-height: 20px;
     width: 300px;

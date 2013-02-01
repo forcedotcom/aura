@@ -1,0 +1,5 @@
+<aura:component implements="ui:listInterface" extensible="true" support="proto">
+	<aura:iteration items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}">
+		
+	</aura:iteration>
+</aura:component>

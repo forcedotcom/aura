@@ -29,7 +29,7 @@ auraEclipsePrefs.epf.
 The Aura style format is based on the default Eclipse formatter. The notable
 deviations from the default style include:
   - Spaces only
-  - 120 columns for code (80 columsn for comments)
+  - 120 columns for code (120 columsn for comments)
   - enum constants are always wrapped
   - no new line after @param tags
 

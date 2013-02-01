@@ -27,3 +27,6 @@ exp(statement,
         "where", statement.where,
         "groupBy", statement.groupBy
 );
+exp(s,
+        "output", s.output
+);

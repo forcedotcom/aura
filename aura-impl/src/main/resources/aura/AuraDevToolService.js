@@ -345,6 +345,10 @@ var AuraDevToolService = function() {
             return new Statement();
         },
 
+        output : function(cmp) {
+            return cmp.output();
+        },
+
         help : function(){
             var ret = [];
             ret.push("\n COQL Usage");
@@ -360,6 +364,7 @@ var AuraDevToolService = function() {
             }
             return ret.join("");
         }
+
     };
 
     s.helpText = [

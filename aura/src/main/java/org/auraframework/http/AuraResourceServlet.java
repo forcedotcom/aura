@@ -189,11 +189,6 @@ public class AuraResourceServlet extends AuraBaseServlet {
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     deleteManifestCookie(response);
                     return;
-                } else {
-                    int pos = cookie.getValue().indexOf(':');
-                    if (pos > 0) {
-                        attribs.put(UID, cookie.getValue().substring(0, pos));
-                    }
                 }
             }
             addManifestCookie(response);
@@ -207,6 +202,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
             //
             attribs.put(LAST_MOD, String.format("app=%s, FW=%s", getContextAppUid(),
                                                 Aura.getConfigAdapter().getAuraFrameworkNonce()));
+            attribs.put(UID, getContextAppUid());
             StringWriter sw = new StringWriter();
             for (String s : AuraServlet.getStyles()) {
                 sw.write(s);
@@ -219,8 +215,8 @@ public class AuraResourceServlet extends AuraBaseServlet {
             attribs.put(RESOURCE_URLS, sw.toString());
             DefinitionService definitionService = Aura.getDefinitionService();
             InstanceService instanceService = Aura.getInstanceService();
-            DefDescriptor<ComponentDef> tmplDesc = definitionService
-                    .getDefDescriptor("ui:manifest", ComponentDef.class);
+            DefDescriptor<ComponentDef> tmplDesc = definitionService.getDefDescriptor("ui:manifest",
+                                                                                      ComponentDef.class);
             Component tmpl = instanceService.getInstance(tmplDesc, attribs);
             Aura.getRenderingService().render(tmpl, response.getWriter());
         } catch (Exception e) {

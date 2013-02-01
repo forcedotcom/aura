@@ -28,16 +28,26 @@ import org.auraframework.util.json.JsonSerializable;
  */
 public class MenuItem implements JsonSerializable {
     private final String className;
+    private final boolean disabled;
     private final String label;    
     private final boolean selected;
     private final String type;
+    
+    public MenuItem(String label, String type) {
+        this(label, false, type);
+    }
     
     public MenuItem(String label, boolean selected, String type) {
         this("", label, selected, type);
     }
     
     public MenuItem(String className, String label, boolean selected, String type) {
+        this(className, false, label, selected, type);
+    }
+    
+    public MenuItem(String className, boolean disabled, String label, boolean selected, String type) {
         this.className = className;
+        this.disabled = disabled;
         this.label = label;
         this.selected = selected;
         this.type = type;
@@ -59,7 +69,13 @@ public class MenuItem implements JsonSerializable {
         return this.label;
     }
 
-    
+    /**
+     * Is the component disabled.
+     * @return the true if disabled, otherwise false
+     */
+    public boolean isDisabled() {
+        return this.disabled;
+    }
 
     /**
      * Is the component selected.
@@ -81,6 +97,7 @@ public class MenuItem implements JsonSerializable {
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
         json.writeMapEntry("className", this.className);
+        json.writeMapEntry("disabled", this.disabled);
         json.writeMapEntry("label", this.label);
         json.writeMapEntry("selected", this.selected);
         json.writeMapEntry("type", this.type);
@@ -89,7 +106,8 @@ public class MenuItem implements JsonSerializable {
 
     @Override
     public String toString() {
-        return String.format("MenuItem(className[%s] label[%s] selected[%s] type[%s])", this.className, this.label, this.selected, this.type);
+        return String.format("MenuItem(className[%s] disabled[%s] label[%s] selected[%s] type[%s])", 
+                this.className, this.disabled, this.label, this.selected, this.type);
     }
 
 }

@@ -140,7 +140,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
                 desc.getDescriptorName(), getQualifiedName()));
         String expectedAttribute = " manifest=\"/l/" + expectedSubPath + "/app.manifest\"";
         if (!tag.contains(expectedAttribute)) {
-            fail("Did not find expected manifest attribute <" + expectedAttribute + ">:" + body);
+            fail("Did not find expected manifest attribute <" + expectedAttribute + "> in:" + tag);
         }
     }
 }

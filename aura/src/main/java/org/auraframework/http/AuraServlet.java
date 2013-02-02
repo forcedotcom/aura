@@ -18,13 +18,10 @@ package org.auraframework.http;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -32,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.URI;
 import org.auraframework.Aura;
-import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -40,7 +36,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.ThemeDef;
 import org.auraframework.http.RequestParam.EnumParam;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.instance.Action;
@@ -61,7 +56,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.SystemErrorException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Maps;
@@ -355,123 +349,6 @@ public class AuraServlet extends AuraBaseServlet {
         }
     }
 
-    public static List<String> getBaseScripts() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        String contextPath = context.getContextPath();
-        Mode mode = context.getMode();
-
-        ConfigAdapter config = Aura.getConfigAdapter();
-
-        List<String> ret = new ArrayList<String>();
-
-        switch (mode) {
-        case PTEST:
-            ret.add(config.getJiffyJSURL());
-            ret.add(config.getJiffyUIJSURL());
-            break;
-        case CADENCE:
-            ret.add(config.getJiffyJSURL());
-            break;
-        default:
-        }
-
-        ret.add(contextPath + config.getAuraJSURL());
-
-        return ret;
-    }
-
-    public static List<String> getNamespacesScripts() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        Set<String> preloads = context.getPreloads();
-        String contextPath = context.getContextPath();
-        List<String> ret = new ArrayList<String>();
-
-        if (preloads != null && !preloads.isEmpty()) {
-            StringBuilder defs = new StringBuilder(contextPath).append("/l/");
-            StringBuilder sb = new StringBuilder();
-
-            try {
-                Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
-            } catch (IOException e) {
-                throw new AuraRuntimeException(e);
-            }
-            String contextJson = AuraTextUtil.urlencode(sb.toString());
-            defs.append(contextJson);
-            defs.append("/app.js");
-            ret.add(defs.toString());
-        }
-        return ret;
-    }
-
-    public static List<String> getScripts() throws QuickFixException {
-        List<String> ret = new ArrayList<String>();
-        ret.addAll(getBaseScripts());
-        ret.addAll(getNamespacesScripts());
-        return ret;
-    }
-
-    public static List<String> getStyles() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        Set<String> preloads = context.getPreloads();
-        Mode mode = context.getMode();
-        String contextPath = context.getContextPath();
-        ConfigAdapter config = Aura.getConfigAdapter();
-
-        List<String> ret = new ArrayList<String>();
-
-        if (preloads != null && !preloads.isEmpty()) {
-            StringBuilder defs = new StringBuilder(contextPath).append("/l/");
-            StringBuilder sb = new StringBuilder();
-
-            try {
-                Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
-            } catch (IOException e) {
-                throw new AuraRuntimeException(e);
-            }
-            String contextJson = AuraTextUtil.urlencode(sb.toString());
-            defs.append(contextJson);
-            defs.append("/app.css");
-            ret.add(defs.toString());
-        }
-        switch (mode) {
-        case PTEST:
-            ret.add(config.getJiffyCSSURL());
-            break;
-        default:
-        }
-        return ret;
-    }
-
-    public static Set<String> getImages() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        Set<String> namespaces = context.getPreloads();
-        Set<String> imgURLs = new TreeSet<String>();
-
-        try {
-            DefinitionService definitionService = Aura.getDefinitionService();
-            for (String namespace : namespaces) {
-                DefDescriptor<ThemeDef> matcher = definitionService.getDefDescriptor(
-                        String.format("css://%s.*", namespace), ThemeDef.class);
-                Set<DefDescriptor<ThemeDef>> descriptors = definitionService.find(matcher);
-
-                for (DefDescriptor<ThemeDef> descriptor : descriptors) {
-                    if (!descriptor.getName().toLowerCase().endsWith("template")) {
-                        ThemeDef def = descriptor.getDef();
-                        if (def != null) {
-                            Set<String> imgs = def.getValidImageURLs();
-                            if (imgs != null && imgs.size() > 0) {
-                                imgURLs.addAll(imgs);
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new AuraRuntimeException(e);
-        }
-        return imgURLs;
-    }
-
     private Map<String, Object> getComponentAttributes(HttpServletRequest request) {
         Enumeration<String> attributeNames = request.getParameterNames();
         Map<String, Object> attributes = new HashMap<String, Object>();
@@ -533,7 +410,7 @@ public class AuraServlet extends AuraBaseServlet {
                 String name = action.getDescriptor().getQualifiedName();
                 if (name.equals("aura://ComponentController/ACTION$getApplication")
                         || (name.equals("aura://ComponentController/ACTION$getComponent")
-                            && !isProductionMode(context.getMode()))) {
+                        && !isProductionMode(context.getMode()))) {
                     isBootstrapAction = true;
                 }
             }

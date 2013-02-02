@@ -17,7 +17,10 @@ package org.auraframework.http;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -28,12 +31,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+
+import org.auraframework.def.ThemeDef;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
@@ -45,8 +51,11 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
+
+import com.google.common.collect.Lists;
 
 @SuppressWarnings("serial")
 public abstract class AuraBaseServlet extends HttpServlet {
@@ -73,8 +82,6 @@ public abstract class AuraBaseServlet extends HttpServlet {
     public static final String MANIFEST_CONTENT_TYPE = "text/cache-manifest";
     public static final String CSS_CONTENT_TYPE = "text/css";
     protected static MimetypesFileTypeMap mimeTypesMap;
-    protected static final String lastModCookieName = "_lm";
-    public static final String MANIFEST_ERROR = "error";
     public static final String OUTDATED_MESSAGE = "OUTDATED";
     protected final static StringParam csrfToken = new StringParam(AURA_PREFIX + "token", 0, true);
 
@@ -175,8 +182,8 @@ public abstract class AuraBaseServlet extends HttpServlet {
      * @throws ServletException if send404 does (should not generally happen).
      */
     protected void handleServletException(Throwable t, boolean quickfix, AuraContext context,
-            HttpServletRequest request, HttpServletResponse response, boolean written) throws IOException,
-            ServletException {
+                                          HttpServletRequest request, HttpServletResponse response,
+                                          boolean written) throws IOException, ServletException {
         Throwable mappedEx = t;
         boolean map = !quickfix;
         Format format = context.getFormat();
@@ -191,7 +198,6 @@ public abstract class AuraBaseServlet extends HttpServlet {
         // }
         if (!written) {
             // Should we only delete for JSON?
-            deleteManifestCookie(response);
             setNoCache(response);
         }
         if (mappedEx instanceof IOException) {
@@ -296,107 +302,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
         }
-        return !isManifestEnabled(request);
-    }
-
-    public static boolean isManifestEnabled(HttpServletRequest request) {
-        if (!Aura.getConfigAdapter().isClientAppcacheEnabled()) {
-            return false;
-        }
-        if (!request.getHeader("user-agent").contains("AppleWebKit")) {
-            return false;
-        }
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        try {
-            DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getApplicationDescriptor();
-            if (appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)) {
-                Boolean useAppcache = ((ApplicationDef) appDefDesc.getDef()).isAppcacheEnabled();
-                if (useAppcache != null) {
-                    return useAppcache.booleanValue();
-                }
-                return false;
-            }
-        } catch (QuickFixException e) {
-            throw new AuraRuntimeException(e);
-        }
-
-        return false;
-    }
-
-    private static String getManifestCookieName() {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        if (context.getApplicationDescriptor() != null) {
-            StringBuilder sb = new StringBuilder();
-            if (context.getMode() != Mode.PROD) {
-                sb.append(context.getMode());
-                sb.append("_");
-            }
-            sb.append(context.getApplicationDescriptor().getNamespace());
-            sb.append("_");
-            sb.append(context.getApplicationDescriptor().getName());
-            sb.append(lastModCookieName);
-            return sb.toString();
-        }
-        return null;
-    }
-
-    /**
-     * Sets the manifest cookie on response.
-     * 
-     * @param response the response
-     * @param value the value to set.
-     * @param expiry the expiry time for the cookie.
-     */
-    private static void addManifestCookie(HttpServletResponse response, String value, long expiry) {
-        String cookieName = getManifestCookieName();
-        if (cookieName != null) {
-            addCookie(response, cookieName, value, expiry);
-        }
-    }
-
-    public static void addManifestErrorCookie(HttpServletResponse response) {
-        addManifestCookie(response, MANIFEST_ERROR, SHORT_EXPIRE_SECONDS);
-    }
-
-    public static void addManifestCookie(HttpServletResponse response) {
-        String uid = getContextAppUid();
-        String fwUid = Aura.getConfigAdapter().getAuraFrameworkNonce();
-        String value = (uid == null) ? fwUid : String.format("%s:%s", uid, fwUid);
-
-        addManifestCookie(response, value, SHORT_EXPIRE_SECONDS);
-    }
-
-    public static void deleteManifestCookie(HttpServletResponse response) {
-        addManifestCookie(response, "", 0);
-    }
-
-    public static String getRequestUid(HttpServletRequest request) {
-        Cookie cookie = getManifestCookie(request);
-        if (cookie == null) {
-            return null;
-        }
-        String value = cookie.getValue();
-        int position = value.indexOf(':');
-        if (position < 0) {
-            return null; // Old-style format, timestamp or ERROR
-        }
-        return value.substring(0, position);
-    }
-
-    public static Cookie getManifestCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            String cookieName = getManifestCookieName();
-            if (cookieName != null) {
-                for (int i = 0; i < cookies.length; i++) {
-                    Cookie cookie = cookies[i];
-                    if (cookieName.equals(cookie.getName())) {
-                        return cookie;
-                    }
-                }
-            }
-        }
-        return null;
+        return !ManifestUtil.isManifestEnabled(request);
     }
 
     private final static ConcurrentHashMap<String, Long> lastModMap = new ConcurrentHashMap<String, Long>();
@@ -472,31 +378,6 @@ public abstract class AuraBaseServlet extends HttpServlet {
         return lastMod;
     }
 
-    public static String getManifest() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        Set<String> preloads = context.getPreloads();
-        String contextPath = context.getContextPath();
-        String ret = "";
-
-        if (preloads != null && !preloads.isEmpty()) {
-            boolean serLastMod = context.getSerializeLastMod();
-            context.setSerializeLastMod(false);
-            StringBuilder defs = new StringBuilder(contextPath).append("/l/");
-            StringBuilder sb = new StringBuilder();
-            try {
-                Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
-            } catch (IOException e) {
-                throw new AuraRuntimeException(e);
-            }
-            context.setSerializeLastMod(serLastMod);
-            String contextJson = AuraTextUtil.urlencode(sb.toString());
-            defs.append(contextJson);
-            defs.append("/app.manifest");
-            ret = defs.toString();
-        }
-        return ret;
-    }
-
     protected DefDescriptor<?> setupQuickFix(AuraContext context, boolean preload) {
         DefinitionService ds = Aura.getDefinitionService();
         MasterDefRegistry mdr = context.getDefRegistry();
@@ -520,4 +401,122 @@ public abstract class AuraBaseServlet extends HttpServlet {
             throw new AuraError(death);
         }
     }
+
+    public static List<String> getScripts() throws QuickFixException {
+        List<String> ret = Lists.newArrayList();
+        ret.addAll(getBaseScripts());
+        ret.addAll(getNamespacesScripts());
+        return ret;
+    }
+
+    public static List<String> getStyles() throws QuickFixException {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        Set<String> preloads = context.getPreloads();
+        Mode mode = context.getMode();
+        String contextPath = context.getContextPath();
+        ConfigAdapter config = Aura.getConfigAdapter();
+
+        List<String> ret = Lists.newArrayList();
+
+        if (preloads != null && !preloads.isEmpty()) {
+            StringBuilder defs = new StringBuilder(contextPath).append("/l/");
+            StringBuilder sb = new StringBuilder();
+
+            try {
+                Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
+            } catch (IOException e) {
+                throw new AuraRuntimeException(e);
+            }
+            String contextJson = AuraTextUtil.urlencode(sb.toString());
+            defs.append(contextJson);
+            defs.append("/app.css");
+            ret.add(defs.toString());
+        }
+        switch (mode) {
+        case PTEST:
+            ret.add(config.getJiffyCSSURL());
+            break;
+        default:
+        }
+        return ret;
+    }
+
+    public static Set<String> getImages() throws QuickFixException {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        Set<String> namespaces = context.getPreloads();
+        Set<String> imgURLs = new TreeSet<String>();
+
+        try {
+            DefinitionService definitionService = Aura.getDefinitionService();
+            for (String namespace : namespaces) {
+                DefDescriptor<ThemeDef> matcher = definitionService.getDefDescriptor(
+                        String.format("css://%s.*", namespace), ThemeDef.class);
+                Set<DefDescriptor<ThemeDef>> descriptors = definitionService.find(matcher);
+
+                for (DefDescriptor<ThemeDef> descriptor : descriptors) {
+                    if (!descriptor.getName().toLowerCase().endsWith("template")) {
+                        ThemeDef def = descriptor.getDef();
+                        if (def != null) {
+                            Set<String> imgs = def.getValidImageURLs();
+                            if (imgs != null && imgs.size() > 0) {
+                                imgURLs.addAll(imgs);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new AuraRuntimeException(e);
+        }
+        return imgURLs;
+    }
+
+    public static List<String> getBaseScripts() throws QuickFixException {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        String contextPath = context.getContextPath();
+        Mode mode = context.getMode();
+
+        ConfigAdapter config = Aura.getConfigAdapter();
+
+        List<String> ret = Lists.newArrayList();
+
+        switch (mode) {
+        case PTEST:
+            ret.add(config.getJiffyJSURL());
+            ret.add(config.getJiffyUIJSURL());
+            break;
+        case CADENCE:
+            ret.add(config.getJiffyJSURL());
+            break;
+        default:
+        }
+
+        ret.add(contextPath + config.getAuraJSURL());
+
+        return ret;
+    }
+
+    public static List<String> getNamespacesScripts() throws QuickFixException {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        Set<String> preloads = context.getPreloads();
+        String contextPath = context.getContextPath();
+        List<String> ret = Lists.newArrayList();
+
+        if (preloads != null && !preloads.isEmpty()) {
+            StringBuilder defs = new StringBuilder(contextPath).append("/l/");
+            StringBuilder sb = new StringBuilder();
+
+            try {
+                Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
+            } catch (IOException e) {
+                throw new AuraRuntimeException(e);
+            }
+            String contextJson = AuraTextUtil.urlencode(sb.toString());
+            defs.append(contextJson);
+            defs.append("/app.js");
+            ret.add(defs.toString());
+        }
+        return ret;
+    }
+
 }

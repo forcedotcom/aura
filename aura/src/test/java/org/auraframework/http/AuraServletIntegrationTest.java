@@ -323,8 +323,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
                 "appPreloadTest:appCacheNoPreload", ApplicationDef.class);
         AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, desc);
         context.clearPreloads();
-        String url = AuraBaseServlet.getManifest();
-        assertEquals("", url);
+        assertEquals(false, ManifestUtil.isManifestEnabled());
     }
 
     /**
@@ -337,7 +336,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
         context.clearPreloads();
         context.addPreload("aura");
         context.addPreload("ui");
-        String url = AuraBaseServlet.getManifest();
+        String url = ManifestUtil.getManifestUrl();
         assertEquals(
                 "/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22appPreloadTest%3AappCacheNoPreload%22%2C"
                         + "%22preloads%22%3A%5B%22aura%22%2C%22ui%22%5D%2C"

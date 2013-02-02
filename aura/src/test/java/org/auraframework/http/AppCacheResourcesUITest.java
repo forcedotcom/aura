@@ -444,12 +444,23 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         }
     }
 
-    // Some sanity checks that our simple test app is functional after cache
-    // resolutions.
-    // - updated markup text is rendered (markupToken)
-    // - updated client actions functional (jsToken)
-    // - updated styling applied (cssToken)
-    // - updated framework called (fwToken)
+    /**
+     * Load and get all the log lines for the app load.
+     *
+     * Some sanity checks that our simple test app is functional after cache
+     * resolutions.
+     * <ul>
+     * <li>updated markup text is rendered (markupToken)</li>
+     * <li>updated client actions functional (jsToken)</li>
+     * <li>updated styling applied (cssToken)</li>
+     * <li>updated framework called (fwToken)</li>
+     * </ul>
+     *
+     * @param markupToken The text to be found in the markup.
+     * @param jsToken The text to be found from js
+     * @param cssToken The text to be found from css.
+     * @param Token The text to be found from the framework.
+     */
     private List<Request> loadMonitorAndValidateApp(final String markupToken, String jsToken, String cssToken,
             String fwToken) throws Exception {
         TestLoggingAdapterController.beginCapture();

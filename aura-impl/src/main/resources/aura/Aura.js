@@ -355,11 +355,12 @@ Aura.prototype.initConfig = function AuraInitConfig(config, useExisting, doNotIn
 };
 
 /**
- * Initializes Aura with layout and history services.
+ * Initializes Aura in a specified mode.
  * @param {Object} config The descriptor ("markup://foo:bar"), attributes, defType ("APPLICATION" or "COMPONENT"), and timestamp of last modified change
  * @param {String} token
  * @param {Object} context The mode of the application or component ("DEV", "PROD", "PTEST")
  * @param {Object} container Sets the container for the component.
+ * @param {Boolean} doNotInitializeServices True if Layout and History services should not be initialized, or false if they should. 
  */
 Aura.prototype.init = function AuraInit(config, token, context, container, doNotInitializeServices){
     var component = $A.util.json.resolveRefs(config);
@@ -367,11 +368,12 @@ Aura.prototype.init = function AuraInit(config, token, context, container, doNot
 };
 
 /**
- * Initializes Aura with layout and history services in debug environment.
+ * Initializes Aura in debug environment.
  * @param {Object} config The descriptor ("markup://foo:bar"), attributes, defType ("APPLICATION" or "COMPONENT"), and timestamp of last modified change
  * @param {String} token
  * @param {Object} context The mode of the application or component ("DEV", "PROD", "PTEST"),
  * @param {Object} container Sets the container for the component.
+ * @private
  */
 Aura.prototype.initPriv = function AuraInitPriv(config, token, context, container, doNotInitializeServices){
     if (!$A["hasErrors"]) {

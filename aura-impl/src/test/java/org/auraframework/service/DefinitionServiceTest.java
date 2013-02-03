@@ -15,7 +15,6 @@
  */
 package org.auraframework.service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -227,15 +226,6 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
         }
 
         return null;
-    }
-
-    @Override
-    public long getNamespaceLastMod(Collection<String> preloads) throws QuickFixException {
-        /**
-         * TODO:RJ, Disabling it for now, to get jenkins back to normal. Will
-         * work on it locally
-         **/
-        return 0;
     }
 
     @Override

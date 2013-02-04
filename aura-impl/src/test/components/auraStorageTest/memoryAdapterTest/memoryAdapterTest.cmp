@@ -1,0 +1,13 @@
+<aura:component>
+    <aura:attribute name="clearStorageOnInit" type="Boolean" default="true"/>
+    <aura:attribute name="defaultExpiration" type="Integer" default="50"/>
+    <aura:attribute name="defaultAutoRefreshInterval" type="Integer" default="60"/>
+    <aura:attribute name="requireUseStorageQueryParam" type="Boolean"/>
+    
+    <auraStorage:init debugLoggingEnabled="true" 
+                      implementation="memory" 
+                      clearStorageOnInit="{!v.clearStorageOnInit}"
+                      defaultExpiration="{!v.defaultExpiration}" 
+                      defaultAutoRefreshInterval="{!v.defaultAutoRefreshInterval}" 
+                      requireUseStorageQueryParam="{!v.requireUseStorageQueryParam}"/>
+</aura:component>

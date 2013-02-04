@@ -14,13 +14,51 @@
  * limitations under the License.
  */
 /*jslint sub: true */
+
+/**
+ * @namespace The value Object used in the backing store of the MemoryStorageAdapter.
+ * @constructor
+ */
+var MemoryStorageValue = function MemoryStorageValue(item) {
+	this.setItem(item);
+};
+
+MemoryStorageValue.prototype.setItem = function(newItem) {
+	this.item = newItem;
+};
+
+MemoryStorageValue.prototype.setSize = function(newSize) {
+	this.size = newSize;
+};
+
+MemoryStorageValue.prototype.getItem = function() {
+	return this.item;
+};
+
+MemoryStorageValue.prototype.getSize = function() {
+	return this.size;
+};
+
 /**
  * @namespace The Memory adapter for storage service implementation
  * @constructor
  */
 var MemoryStorageAdapter = function MemoryStorageAdapter() {
-	this.clear();
+	this.backingStore = {};
+	this.cachedSize = 0;
+	this.isDirtyForCachedSize = false;
 };
+
+/*
+ * Note on sizing.  The following values are taken from the ECMAScript specification, where available.
+ * Other values are guessed.
+ * 
+ * Source: http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
+ */
+MemoryStorageAdapter.prototype.CHARACTER_SIZE = 2;
+MemoryStorageAdapter.prototype.NUMBER_SIZE = 8;
+// note: this value is not defined by the spec.
+MemoryStorageAdapter.prototype.BOOLEAN_SIZE = 4;
 
 MemoryStorageAdapter.NAME = "memory";
 
@@ -29,30 +67,50 @@ MemoryStorageAdapter.prototype.getName = function() {
 };
 
 MemoryStorageAdapter.prototype.getSize = function() {
-	return this.currentSize;
+	if (this.isDirtyForCachedSize === true) {
+		var newSize = 0;
+		for (var key in this.backingStore) {
+			// the size might be cached for the item, in order to avoid an expensive recalculation
+			var backingStoreValue = this.backingStore[key];
+			var itemSize = backingStoreValue.getSize();
+			if ($A.util.isUndefinedOrNull(itemSize)) {
+				// For the size calculation, consider only the inputs to the storage layer: key and value
+				// Ignore all the extras added by the Storage layer.
+				itemSize = this.sizeOfString(key) + this.estimateSize(backingStoreValue.getItem()["value"]);
+				backingStoreValue.setSize(itemSize);
+			}
+			newSize += itemSize;
+		}
+		this.cachedSize = newSize;
+		this.isDirtyForCachedSize = false;
+	}
+	
+	return this.cachedSize;
 };
 
 MemoryStorageAdapter.prototype.getItem = function(key, resultCallback) {
-	resultCallback(this.backingStore[key]);
+	var backingStoreValue = this.backingStore[key];
+	if (!$A.util.isUndefinedOrNull(backingStoreValue)) {
+		resultCallback(backingStoreValue.getItem());
+	} else {
+		resultCallback();
+	}
 };
 
 MemoryStorageAdapter.prototype.setItem = function(key, item) {
-	item.size = key.length + this.calculateSize(item["value"]);
-
-	this.currentSize += item.size;
-	this.backingStore[key] = item;
+	this.backingStore[key] = new MemoryStorageValue(item);
+	this.isDirtyForCachedSize = true;
 };
 
 MemoryStorageAdapter.prototype.removeItem = function(key) {
-	var item = this.backingStore[key];
-	this.currentSize -= item.size;
-	
 	delete this.backingStore[key];
+	this.isDirtyForCachedSize = true;
 };
 
 MemoryStorageAdapter.prototype.clear = function(key) {
 	this.backingStore = {};
-    this.currentSize = 0;
+	this.cachedSize = 0;
+	this.isDirtyForCachedSize = false;
 };
 
 MemoryStorageAdapter.prototype.getExpired = function(resultCallback) {
@@ -60,7 +118,7 @@ MemoryStorageAdapter.prototype.getExpired = function(resultCallback) {
 	var expired = [];
 	
 	for (var key in this.backingStore) {
-		var expires = this.backingStore[key]["expires"];
+		var expires = this.backingStore[key].getItem()["expires"];
 		if (now > expires) {
 			expired.push(key);
 		}
@@ -71,12 +129,29 @@ MemoryStorageAdapter.prototype.getExpired = function(resultCallback) {
 
 // Internals
 
-MemoryStorageAdapter.prototype.calculateSize = function(value) {
-	// DCHASMAN TODO create an object graph traversal size algorithm
-	return value ? $A.util.json.encode(value).length : 0;
+MemoryStorageAdapter.prototype.sizeOfString = function(value) {
+	return value.length * this.CHARACTER_SIZE;
 };
 
+MemoryStorageAdapter.prototype.estimateSize = function(value) {
+	var bytes = 0;
+
+	if ($A.util.isBoolean(value)) {
+		bytes = this.BOOLEAN_SIZE;
+	} else if ($A.util.isString(value)) {
+		bytes = this.sizeOfString(value);
+	} else if ($A.util.isNumber(value)) {
+		bytes = this.NUMBER_SIZE;
+	} else if ($A.util.isArray(value) || $A.util.isObject(value)) {
+		// recursive case
+		for (var i in value) {
+			bytes += this.sizeOfString(i);
+			bytes += 8; // an assumed existence overhead
+			bytes += this.estimateSize(value[i]);
+		}
+	}
+
+	return bytes;
+};
 
 $A.storageService.registerAdapter(MemoryStorageAdapter.NAME, MemoryStorageAdapter);
-
-

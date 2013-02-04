@@ -23,6 +23,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LayoutsDef;
+import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.system.Source;
 
@@ -47,6 +48,9 @@ public class RootTagHandlerFactory {
         case LAYOUTS:
             return (RootTagHandler<T>) new LayoutsDefHandler((DefDescriptor<LayoutsDef>) defDescriptor,
                     (Source<LayoutsDef>) source, xmlReader);
+        case NAMESPACE:
+            return (RootTagHandler<T>) new NamespaceDefHandler((DefDescriptor<NamespaceDef>) defDescriptor,
+                    (Source<NamespaceDef>) source, xmlReader);
         default:
             throw new UnsupportedOperationException();
         }

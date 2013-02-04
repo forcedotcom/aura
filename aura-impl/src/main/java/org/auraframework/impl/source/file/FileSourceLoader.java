@@ -60,6 +60,7 @@ public class FileSourceLoader extends BaseSourceLoader {
         filters.put(DefType.INTERFACE, new SourceFileFilter(DefType.INTERFACE));
         filters.put(DefType.STYLE, new SourceFileFilter(DefType.STYLE));
         filters.put(DefType.LAYOUTS, new SourceFileFilter(DefType.LAYOUTS));
+        filters.put(DefType.NAMESPACE, new SourceFileFilter(DefType.NAMESPACE));
     }
 
     public FileSourceLoader(File base) {

@@ -26,6 +26,7 @@ import org.auraframework.impl.css.theme.ThemeDefImpl;
 import org.auraframework.system.Client;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.ThemeParserException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -66,7 +67,8 @@ public class ThemeParser implements Parser {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws ThemeParserException {
+    public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws ThemeParserException,
+            QuickFixException {
 
         if (descriptor.getDefType() == DefType.STYLE) {
             String className = descriptor.getNamespace() + AuraTextUtil.initCap(descriptor.getName());
@@ -77,27 +79,31 @@ public class ThemeParser implements Parser {
             CSSParser parser;
 
             if (descriptor.getName().toLowerCase().endsWith("template")) {
-                parser = new CSSParser(false, className, source.getContents(), allowedConditions);
+                parser = new CSSParser(descriptor.getNamespace(), false, className, source.getContents(),
+                        allowedConditions);
             } else {
-                parser = new CSSParser(doValidation, className, source.getContents(), allowedConditions);
-            }
-            ThemeParserResultHolder resultHolder;
-            try {
-                resultHolder = parser.parse();
-            } catch (GssParserException e) {
-                throw new ThemeParserException(e.getMessage(), builder.getLocation());
+                parser = new CSSParser(descriptor.getNamespace(), doValidation, className,
+                        source.getContents(), allowedConditions);
+                ThemeParserResultHolder resultHolder;
+                try {
+                    resultHolder = parser.parse();
+                } catch (GssParserException e) {
+                    throw new ThemeParserException(e.getMessage(), builder.getLocation());
+                }
+
+                // scram if we found errors
+                if (parser.hasErrors()) {
+                    throw new ThemeParserException(parser.getErrorMessage(), builder.getLocation());
+                }
+
+                builder.setCode(resultHolder.getDefaultCss());
+                builder.setCode(resultHolder.getBrowserCssMap());
+                builder.setImageURLs(resultHolder.getImageURLs());
             }
 
-            // scram if we found errors
-            if (parser.hasErrors()) {
-                throw new ThemeParserException(parser.getErrorMessage(), builder.getLocation());
-            }
-
-            builder.setCode(resultHolder.getDefaultCss());
-            builder.setCode(resultHolder.getBrowserCssMap());
-            builder.setImageURLs(resultHolder.getImageURLs());
             return (D) builder.build();
         }
+
         return null;
     }
 }

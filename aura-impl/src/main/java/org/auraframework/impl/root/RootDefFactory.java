@@ -58,7 +58,12 @@ public final class RootDefFactory extends DefFactoryImpl<RootDefinition> impleme
         RootDefinition def;
 
         Source<?> source = sourceFactory.getSource(descriptor);
-        if (source == null || !source.exists()) {
+        /*
+         * We don't require the xml file to actually exist for namespaces. The
+         * existance of the dir is enough. If the dir doesn't exist, source will
+         * be null
+         */
+        if (source == null || (!source.exists() && descriptor.getDefType() != DefType.NAMESPACE)) {
             return null;
         }
 

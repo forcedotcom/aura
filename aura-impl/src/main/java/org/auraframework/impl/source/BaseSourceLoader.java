@@ -44,27 +44,30 @@ public abstract class BaseSourceLoader implements SourceLoader {
         extensions.put(DefType.INTERFACE, ".intf");
         extensions.put(DefType.STYLE, ".css");
         extensions.put(DefType.LAYOUTS, "Layouts.xml");
+        extensions.put(DefType.NAMESPACE, ".xml");
         extensions.put(DefType.TESTSUITE, "Test.js");
     }
 
     protected String getPath(DefDescriptor<?> descriptor) {
         // Get rid of the inner type qualifier.
         String name = AuraTextUtil.splitSimple("$", descriptor.getName()).get(0);
-
+        String namespace = descriptor.getNamespace();
         String filename = null;
-        if (extensions.containsKey(descriptor.getDefType())) {
+
+        if (descriptor.getDefType() == DefType.NAMESPACE) {
+
+            filename = String.format("%s/%s%s", namespace, namespace, extensions.get(descriptor.getDefType()));
+        } else if (extensions.containsKey(descriptor.getDefType())) {
             // Alongside knowing the extension, we also know that namespace+name
             // is a directory,
             // and name+ext is the file inside that directory:
-            filename = String.format("%s/%s/%s%s", descriptor.getNamespace(), name, name,
-                    extensions.get(descriptor.getDefType()));
+            filename = String.format("%s/%s/%s%s", namespace, name, name, extensions.get(descriptor.getDefType()));
         } else {
             // Otherwise, the extension matches the expected implementation
             // language, we need to
             // convert the namespace from dotted-package to slash-filename, and
             // we NOT repeat name:
-            filename = String.format("%s/%s.%s", descriptor.getNamespace().replace(".", FILE_SEPARATOR), name,
-                    descriptor.getPrefix());
+            filename = String.format("%s/%s.%s", namespace.replace(".", FILE_SEPARATOR), name, descriptor.getPrefix());
         }
         return filename;
     }

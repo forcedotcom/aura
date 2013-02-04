@@ -193,6 +193,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case EVENT:
             case DOCUMENTATION:
             case LAYOUTS:
+            case NAMESPACE:
                 Matcher tagMatcher = TAG_PATTERN.matcher(qualifiedName);
                 if (tagMatcher.matches()) {
                     prefix = tagMatcher.group(1);
@@ -222,8 +223,13 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             this.qualifiedName = qualifiedName;
             this.descriptorName = buildDescriptorName(prefix, namespace, name);
             this.prefix = prefix;
-            this.namespace = namespace;
-            this.name = name;
+            if (defType == DefType.NAMESPACE) {
+                this.namespace = name;
+                this.name = name;
+            } else {
+                this.namespace = namespace;
+                this.name = name;
+            }
             this.hashCode = createHashCode();
             this.nameParameters = nameParameters;
         } finally {

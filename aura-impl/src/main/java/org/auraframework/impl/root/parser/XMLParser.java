@@ -68,27 +68,30 @@ public class XMLParser implements Parser {
 
         D ret = null;
         try {
-            reader = new HTMLReader(source.getHashingReader());
+            if (source.exists()) {
+                reader = new HTMLReader(source.getHashingReader());
 
-            xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), reader);
-            // need to skip junk above the start that is ok
-            LOOP: while (xmlReader.hasNext()) {
-                int type = xmlReader.next();
-                switch (type) {
-                case XMLStreamConstants.START_ELEMENT:
-                    break LOOP;
-                case XMLStreamConstants.DTD:
-                case XMLStreamConstants.START_DOCUMENT:
-                case XMLStreamConstants.COMMENT:
-                case XMLStreamConstants.SPACE:
-                    break;
-                default:
-                    throw new InvalidDefinitionException(String.format("Found unexpected element of type %s", type),
-                            getLocation(xmlReader, source));
+                xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), reader);
+                // need to skip junk above the start that is ok
+                LOOP: while (xmlReader.hasNext()) {
+                    int type = xmlReader.next();
+                    switch (type) {
+                    case XMLStreamConstants.START_ELEMENT:
+                        break LOOP;
+                    case XMLStreamConstants.DTD:
+                    case XMLStreamConstants.START_DOCUMENT:
+                    case XMLStreamConstants.COMMENT:
+                    case XMLStreamConstants.SPACE:
+                        break;
+                    default:
+                        throw new InvalidDefinitionException(
+                                String.format("Found unexpected element of type %s", type), getLocation(xmlReader,
+                                        source));
+                    }
                 }
-            }
-            if (!xmlReader.hasNext()) {
-                throw new InvalidDefinitionException("Empty file", getLocation(xmlReader, source));
+                if (!xmlReader.hasNext()) {
+                    throw new InvalidDefinitionException("Empty file", getLocation(xmlReader, source));
+                }
             }
             ret = (D) RootTagHandlerFactory.newInstance((DefDescriptor<RootDefinition>) descriptor,
                     (Source<RootDefinition>) source, xmlReader).getElement();
@@ -96,18 +99,20 @@ public class XMLParser implements Parser {
             // the handler will stop at the END_ELEMENT, verify there is nothing
             // left
 
-            LOOP: while (xmlReader.hasNext()) {
-                int type = xmlReader.next();
-                switch (type) {
-                case XMLStreamConstants.END_DOCUMENT:
-                    break LOOP;
-                case XMLStreamConstants.COMMENT:
-                case XMLStreamConstants.SPACE:
-                    break;
-                default:
-                    throw new InvalidDefinitionException(String.format(
-                            "Found unexpected element of type %s when expecting end of file.", type), getLocation(
-                            xmlReader, source));
+            if (source.exists()) {
+                LOOP: while (xmlReader.hasNext()) {
+                    int type = xmlReader.next();
+                    switch (type) {
+                    case XMLStreamConstants.END_DOCUMENT:
+                        break LOOP;
+                    case XMLStreamConstants.COMMENT:
+                    case XMLStreamConstants.SPACE:
+                        break;
+                    default:
+                        throw new InvalidDefinitionException(String.format(
+                                "Found unexpected element of type %s when expecting end of file.", type), getLocation(
+                                xmlReader, source));
+                    }
                 }
             }
         } catch (XMLStreamException e) {

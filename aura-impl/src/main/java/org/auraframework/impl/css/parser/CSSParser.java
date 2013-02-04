@@ -18,25 +18,38 @@ package org.auraframework.impl.css.parser;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+
+import org.auraframework.Aura;
+import org.auraframework.def.NamespaceDef;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.css.JobDescription;
 import com.google.common.css.JobDescription.OutputFormat;
 import com.google.common.css.SourceCode;
 import com.google.common.css.SubstitutionMap;
+import com.google.common.css.compiler.ast.CssDefinitionNode;
+import com.google.common.css.compiler.ast.CssLiteralNode;
 import com.google.common.css.compiler.ast.CssRootNode;
 import com.google.common.css.compiler.ast.CssTree;
+import com.google.common.css.compiler.ast.CssValueNode;
 import com.google.common.css.compiler.ast.ErrorManager;
 import com.google.common.css.compiler.ast.GssError;
 import com.google.common.css.compiler.ast.GssParser;
 import com.google.common.css.compiler.ast.GssParserException;
 import com.google.common.css.compiler.passes.CompactPrinter;
+import com.google.common.css.compiler.passes.ConstantDefinitions;
 import com.google.common.css.compiler.passes.CreateConditionalNodes;
+import com.google.common.css.compiler.passes.CreateConstantReferences;
 import com.google.common.css.compiler.passes.CssClassRenaming;
 import com.google.common.css.compiler.passes.EliminateConditionalNodes;
 import com.google.common.css.compiler.passes.PrettyPrinter;
+import com.google.common.css.compiler.passes.ReplaceConstantReferences;
 
 /**
  * @since 0.0.369
@@ -56,6 +69,7 @@ public class CSSParser {
     private final ClosureErrorManager errorManager = new ClosureErrorManager();
 
     private final boolean validateNamespace;
+    private final String cssNamespace;
     private final String namespace;
     private final String contents;
     private final Set<String> allowedConditions;
@@ -67,8 +81,10 @@ public class CSSParser {
      * @param namespace
      * @param contents the actual css
      */
-    public CSSParser(boolean validateNamespace, String namespace, String contents, Set<String> allowedConditions) {
+    public CSSParser(String namespace, boolean validateNamespace, String cssNamespace, String contents,
+            Set<String> allowedConditions) {
         this.validateNamespace = validateNamespace;
+        this.cssNamespace = cssNamespace;
         this.namespace = namespace;
         this.contents = contents;
         this.allowedConditions = allowedConditions;
@@ -81,9 +97,9 @@ public class CSSParser {
      * 
      * @throws GssParserException
      */
-    public ThemeParserResultHolder parse() throws GssParserException {
+    public ThemeParserResultHolder parse() throws GssParserException, QuickFixException {
         ThemeParserResultHolder resultHolder = new ThemeParserResultHolder();
-        SourceCode sc = new SourceCode(namespace, contents);
+        SourceCode sc = new SourceCode(cssNamespace, contents);
         // parse the css tree
         GssParser parser = new GssParser(ImmutableList.of(sc));
         CssTree cssTree = parser.parse();
@@ -92,11 +108,27 @@ public class CSSParser {
         new CreateConditionalNodes(cssTree.getMutatingVisitController(), errorManager).runPass();
 
         // replaces .THIS with the current component class
-        new CssClassRenaming(cssTree.getMutatingVisitController(), new ThisSubstitutionMap(namespace), null).runPass();
+        new CssClassRenaming(cssTree.getMutatingVisitController(), new ThisSubstitutionMap(cssNamespace), null)
+                .runPass();
+
+        // replaces constant refs with refs defined in namespace config
+        ConstantDefinitions defs = new ConstantDefinitions();
+
+        NamespaceDef namespaceDef = Aura.getDefinitionService().getDefinition(namespace, NamespaceDef.class);
+        Map<String, String> nsDefs = namespaceDef.getThemeTokens();
+        if (nsDefs != null && !nsDefs.isEmpty()) {
+            for (Entry<String, String> entry : nsDefs.entrySet()) {
+                CssDefinitionNode def = new CssDefinitionNode(new CssLiteralNode(entry.getKey()));
+                def.setParameters(Lists.<CssValueNode> newArrayList(new CssLiteralNode(entry.getValue())));
+                defs.addConstantDefinition(def);
+            }
+            new CreateConstantReferences(cssTree.getMutatingVisitController()).runPass();
+            new ReplaceConstantReferences(cssTree, defs).runPass();
+        }
 
         if (validateNamespace) {
             // verifies all classes are namespaced
-            new VerifyComponentClass(namespace, cssTree.getMutatingVisitController(), errorManager).runPass();
+            new VerifyComponentClass(cssNamespace, cssTree.getMutatingVisitController(), errorManager).runPass();
         }
 
         // finds all the images referenced and adds cache busters

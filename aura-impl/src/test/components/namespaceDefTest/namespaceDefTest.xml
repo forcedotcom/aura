@@ -1,0 +1,8 @@
+<aura:namespace>
+	<theme>
+		<tokens>
+			<FOO>red</FOO>
+			<BAR>baz</BAR>
+		</tokens>
+	</theme>
+</aura:namespace>

@@ -100,7 +100,6 @@ public class JavaTypeDefFactory extends BaseJavaDefFactory<TypeDef> {
                         clazz = Class.forName("java.lang." + AuraTextUtil.initCap(className));
                     } catch (ClassNotFoundException e) {
                         // ignore
-                        clazz = null;
                     }
                 }
             } else {

@@ -185,12 +185,12 @@ public class LimitedLengthInputStream extends InputStream {
     }
 
     @Override
-    public void mark(int readlimit) {
+    public synchronized void mark(int readlimit) {
         // Do nothing, as the contract requires when markSupported is false
     }
 
     @Override
-    public void reset() throws IOException {
+    public synchronized void reset() throws IOException {
         throw new IOException("mark not supported");
     }
 

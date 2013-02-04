@@ -86,7 +86,7 @@ public class QuickFixUITestUtil {
      * Delete all files in component bundle, and then directory file itself.
      */
     public void deleteFiles(DefDescriptor<?> defDescriptor) {
-        Source source = Aura.getContextService().getCurrentContext().getDefRegistry().getSource(defDescriptor);
+        Source<?> source = Aura.getContextService().getCurrentContext().getDefRegistry().getSource(defDescriptor);
         if (source != null) {
             File f = new File(source.getSystemId());
             if (f.exists()) {

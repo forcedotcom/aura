@@ -54,7 +54,7 @@ public class BrowserValueProvider implements GlobalValueProvider {
             this.browserDetails = AuraUtil.immutableMap(m);
             return;
         }
-        BrowserInfo b = new BrowserInfo(context == null ? "" : context.getClient().getUserAgent());
+        BrowserInfo b = new BrowserInfo(context.getClient().getUserAgent());
         m.put(IS_TABLET, b.isTablet());
         m.put(IS_PHONE, b.isPhone());
         m.put(IS_ANDROID, b.isAndroid());

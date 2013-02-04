@@ -32,7 +32,8 @@ import org.auraframework.util.json.Json;
 
 public class NamespaceDefImpl extends RootDefinitionImpl<NamespaceDef> implements NamespaceDef {
 
-    private final Map<String, String> themeTokens;
+	private static final long serialVersionUID = 7336912248343144688L;
+	private final Map<String, String> themeTokens;
 
     protected NamespaceDefImpl(Builder builder) {
         super(builder);

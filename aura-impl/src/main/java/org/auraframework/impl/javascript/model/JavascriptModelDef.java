@@ -33,7 +33,8 @@ import com.google.common.collect.Maps;
 
 public class JavascriptModelDef extends DefinitionImpl<ModelDef> implements ModelDef {
 
-    private final Map<String, JavascriptValueDef> memberMap;
+	private static final long serialVersionUID = -7806398631336437625L;
+	private final Map<String, JavascriptValueDef> memberMap;
 
     protected JavascriptModelDef(Builder builder) {
         super(builder);

@@ -183,8 +183,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case LAYOUT:
             case LAYOUT_ITEM:
             case TESTCASE:
-                prefix = null;
-                namespace = null;
                 name = qualifiedName;
                 break;
             case APPLICATION:

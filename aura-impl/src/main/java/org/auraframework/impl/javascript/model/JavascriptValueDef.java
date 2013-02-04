@@ -25,7 +25,8 @@ import org.auraframework.util.json.Json;
 
 public class JavascriptValueDef extends DefinitionImpl<ValueDef> implements ValueDef {
 
-    private final String name;
+	private static final long serialVersionUID = 2067396461975067980L;
+	private final String name;
     private final DefDescriptor<TypeDef> typeDescriptor;
     private final Object defaultValue;
 

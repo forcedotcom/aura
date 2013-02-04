@@ -338,7 +338,9 @@ Aura.prototype.initAsync = function(config){
 /**
  * Initializes Aura with context info but without retrieving component from server.
  * Used for synchronous initialization.
- * @param {Object} config
+ * @param {Object} config The configuration attributes
+ * @param {Boolean} useExisting
+ * @param {Boolean} doNotInitializeServices True if Layout and History services should not be initialized, or false if they should. Defaults to true for Aura Integration Service.
  */
 Aura.prototype.initConfig = function AuraInitConfig(config, useExisting, doNotInitializeServices){
     config = $A.util.json.resolveRefs(config);
@@ -360,7 +362,7 @@ Aura.prototype.initConfig = function AuraInitConfig(config, useExisting, doNotIn
  * @param {String} token
  * @param {Object} context The mode of the application or component ("DEV", "PROD", "PTEST")
  * @param {Object} container Sets the container for the component.
- * @param {Boolean} doNotInitializeServices True if Layout and History services should not be initialized, or false if they should. 
+ * @param {Boolean} doNotInitializeServices True if Layout and History services should not be initialized, or false if they should. Defaults to true for Aura Integration Service.
  */
 Aura.prototype.init = function AuraInit(config, token, context, container, doNotInitializeServices){
     var component = $A.util.json.resolveRefs(config);
@@ -373,6 +375,7 @@ Aura.prototype.init = function AuraInit(config, token, context, container, doNot
  * @param {String} token
  * @param {Object} context The mode of the application or component ("DEV", "PROD", "PTEST"),
  * @param {Object} container Sets the container for the component.
+ * @param {Boolean} doNotInitializeServices True if Layout and History services should not be initialized, or false if they should. Defaults to true for Aura Integration Service.
  * @private
  */
 Aura.prototype.initPriv = function AuraInitPriv(config, token, context, container, doNotInitializeServices){

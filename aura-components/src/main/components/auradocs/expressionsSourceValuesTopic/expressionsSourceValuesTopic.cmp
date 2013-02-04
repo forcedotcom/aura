@@ -26,6 +26,8 @@
 
 <p>Values in a value provider are accessed as named properties. To use a value, separate the value provider and the property name with a dot (period). For example, <code>v.body</code> or <code>m.title</code>.</p>
 
+<auradocs:info>Expressions are bound to the specific component that contains them.  That component is also known as the attribute value provider, and is used to resolve any expressions that are passed to attributes of its contained components.</auradocs:info>
+
 <h2>Accessing Fields and Related Objects</h2>
 
 <p>When an attribute of a component is an object or other structured data (not a primitive value), access values on that attribute using the same dot notation.</p>

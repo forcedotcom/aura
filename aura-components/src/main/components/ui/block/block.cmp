@@ -25,8 +25,8 @@
     <aura:attribute name="overflow" type="Boolean" default="false" description="Allows you to specify whether the &lt;ui:block&gt; permits overflow for its contents. Defaults to false, which means that content that overflows the boundaries of the component will be clipped."/>
     <aura:attribute name="left" type="Aura.Component[]" description="The left facet of the component. Components added to left are aligned to the left side of the &lt;ui:block&gt;. The left facet, if set, is wrapped in a &lt;div&gt; tag with the CSS class &quot;bLeft&quot; for individual styling."/>
     <aura:attribute name="right" type="Aura.Component[]" description="The right facet of the component. Components added to right are aligned to the right side of the &lt;ui:block&gt;. The right facet, if set, is wrapped in a &lt;div&gt; tag with the CSS class &quot;bRight&quot; for individual styling."/>
-
-    <div class="{!v.class+(v.overflow == 'true' ?' overflow':'')}">
+	<aura:attribute name="tag" type="String" default="div" description="The HTML tag to use for this component.  Defaults to &quot;div&quot;"/>
+    <aura:html tag="{!v.tag}" class="{!v.class+(v.overflow == 'true' ?' overflow':'')}">
         <aura:if isTrue="{!v.left.length > 0}">
             <div class="bLeft">{!v.left}</div>
         </aura:if>
@@ -36,5 +36,5 @@
         <div class="bBody">
             {!v.body}
         </div>
-    </div>
+    </aura:html>
 </aura:component>

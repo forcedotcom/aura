@@ -112,6 +112,15 @@ Util.prototype.isNumber = function(obj){
 };
 
 /**
+ * Checks if the object is of type boolean.
+ * @param {Object} obj The object to check for.
+ * @returns {Boolean} True if the object is of type boolean, or false otherwise.
+ */
+Util.prototype.isBoolean = function(obj){
+    return typeof obj === 'boolean';
+};
+
+/**
  * Checks if the object is undefined.
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object type is undefined, or false otherwise.

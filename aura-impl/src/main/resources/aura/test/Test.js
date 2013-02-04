@@ -79,7 +79,7 @@ var Test = function(){
          * @returns {boolean} Returns true if there are pending server actions, or false otherwise.
          */
         isActionPending : function() {
-            return $A.clientService["priv"].inRequest;
+            return $A.clientService["priv"].requestQueue.length > 0;
         },
 
         /**

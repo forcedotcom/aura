@@ -29,6 +29,8 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.SecurityProviderDef;
+
+import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
@@ -219,6 +221,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         public final LoggingService loggingService = Aura.getLoggingService();
         public final Map<DefDescriptor<? extends Definition>, CompilingDef<?>> compiled = Maps.newHashMap();
         public final Map<DefDescriptor<? extends Definition>, Definition> dependencies;
+        public boolean addedPreloads = false;
 
         // public final Map<DefDescriptor<? extends Definition>, Definition>
         // dependencies = Maps.newHashMap();
@@ -299,21 +302,33 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     cc.context.setCurrentNamespace(canonical.getNamespace());
                     def.validateDefinition();
                 }
-                if (!defs.containsKey(def.getDescriptor())) {
-                    Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
+                Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
 
-                    defs.put(def.getDescriptor(), def);
-                    def.appendDependencies(newDeps);
-                    deps.addAll(newDeps);
-                    if (cc.dependencies != null) {
-                        cc.dependencies.put(canonical, def);
-                    }
-                    def.appendDependencies(newDeps);
-                    for (DefDescriptor<?> dep : newDeps) {
-                        if (!defs.containsKey(dep)) {
-                            CompilingDef<?> depcd = cc.getCompiling(dep);
-                            depcd.parents.add(def);
+                defs.put(def.getDescriptor(), def);
+                def.appendDependencies(newDeps);
+                deps.addAll(newDeps);
+                if (cc.dependencies != null) {
+                    cc.dependencies.put(canonical, def);
+                }
+                def.appendDependencies(newDeps);
+                //
+                // FIXME: this code will go away with preloads.
+                //
+                if (!cc.addedPreloads && def.getDescriptor().getDefType().equals(DefType.APPLICATION)) {
+                    Set<String> preloads = cc.context.getPreloads();
+                    for (String preload : preloads) {
+                        if (!preload.contains("_")) {
+                            DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
+                            ddb.setResource(preload);
+                            ddb.setType("APPLICATION,COMPONENT");
+                            ddb.build().appendDependencies(newDeps);
                         }
+                    }
+                }
+                for (DefDescriptor<?> dep : newDeps) {
+                    if (!defs.containsKey(dep)) {
+                        CompilingDef<?> depcd = cc.getCompiling(dep);
+                        depcd.parents.add(def);
                     }
                 }
                 return def;

@@ -15,8 +15,6 @@
  */
 package org.auraframework.impl;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
@@ -25,9 +23,7 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
-import org.auraframework.def.DependencyDef;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.service.ContextService;
@@ -37,9 +33,6 @@ import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 /**
  */
@@ -114,115 +107,6 @@ public class DefinitionServiceImpl implements DefinitionService {
             }
         }
         throw new DefinitionNotFoundException(desc);
-    }
-
-    /**
-     * A helper function to recurse a single definition to get the last mod.
-     * 
-     * This should probably go away once we get versions in.
-     * 
-     * @param desc the descriptor to handle.
-     * @param contextServce a handy pointer so we don't need to refetch.
-     * @param dependencies the dependencies to which we should append
-     * @param processed the set of already processed descriptors.
-     * @param lastMod the current 'lastMod' date.
-     * @return a modified lastMod after processing all of the dependencies.
-     */
-    private long checkOneDef(DefDescriptor<? extends Definition> desc, ContextService contextService,
-            Set<DefDescriptor<?>> dependencies, Set<DefDescriptor<?>> processed, long lastMod) throws QuickFixException {
-        if (processed.contains(desc)) {
-            return lastMod;
-        }
-        Definition def = contextService.getCurrentContext().getDefRegistry().getDef(desc);
-        if (def == null) {
-            return lastMod;
-        }
-        processed.add(desc);
-        def.appendDependencies(dependencies);
-        if (def.getLocation() != null) {
-            long tmp = def.getLocation().getLastModified();
-            if (tmp > lastMod) {
-                return tmp;
-            }
-        }
-        return lastMod;
-    }
-
-    /**
-     * A helper to process a set of dependencies.
-     * 
-     * @param input the input dependencies.
-     * @param contextService a handy pointer
-     * @param processed the set of previously processed descriptors.
-     * @param lastMod the last mod time to date
-     * @return a modified lastMod after processing all of the dependencies.
-     */
-    private long dependenciesHelper(Set<DefDescriptor<?>> input, ContextService contextService,
-            Set<DefDescriptor<?>> processed, long lastMod) throws QuickFixException {
-        Set<DefDescriptor<?>> loop;
-        Set<DefDescriptor<?>> dependencies = input;
-
-        while (dependencies.size() > 0) {
-            loop = dependencies;
-            dependencies = Sets.newHashSet();
-            for (DefDescriptor<?> desc : loop) {
-                lastMod = checkOneDef(desc, contextService, dependencies, processed, lastMod);
-            }
-        }
-        return lastMod;
-    }
-
-    /**
-     * Run a set of preloads.
-     * 
-     * This calculates the last mod time for a set of preloads.
-     * 
-     * @param dependencies the preloads to process.
-     * @param contextService a handy pointer.
-     * @param processed The set of already processed descriptors.
-     * @param lastMod the input last mod time
-     * @return a new last mod time.
-     */
-    private long preloadsHelper(Collection<DependencyDef> dependencySet, ContextService contextService,
-            Set<DefDescriptor<?>> processed, long lastMod) throws QuickFixException {
-        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        long ret = lastMod;
-
-        for (DependencyDef dependency : dependencySet) {
-            int count = 0;
-
-            for (DefDescriptor<? extends Definition> desc : find(dependency.getDependency())) {
-                ret = checkOneDef(desc, contextService, dependencies, processed, ret);
-                count += 1;
-            }
-            if (count == 0) {
-                throw new AuraRuntimeException("No definitions found by " + dependency.getDependency().toString());
-            }
-        }
-        return dependenciesHelper(dependencies, contextService, processed, ret);
-    }
-
-    /**
-     * Get the last modification time for a set of preloads.
-     * 
-     * TODO: this will go away.
-     */
-    @Override
-    public long getNamespaceLastMod(Collection<String> preloads) throws QuickFixException {
-        ContextService contextService = Aura.getContextService();
-        Set<DefDescriptor<?>> processed = Sets.newHashSet();
-        List<DependencyDef> dependencySet = Lists.newArrayList();
-
-        contextService.assertEstablished();
-        for (String preload : preloads) {
-            if (!preload.contains("_")) {
-                DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
-                ddb.setResource(preload);
-                ddb.setType("APPLICATION,COMPONENT");
-                dependencySet.add(ddb.build());
-            }
-        }
-        return preloadsHelper(dependencySet, contextService, processed, 0L);
     }
 
     /**

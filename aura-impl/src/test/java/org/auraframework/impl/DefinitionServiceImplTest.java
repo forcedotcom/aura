@@ -25,7 +25,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.EventDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.context.AuraRegistryProviderImpl;
 import org.auraframework.impl.source.StringSourceLoader;
@@ -38,13 +37,9 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.test.annotation.ThreadHostileTest;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoAccessException;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
-
-import com.google.common.collect.Sets;
 
 /**
  * Tests for DefinitionServiceImpl. ThreadHostile due to testGetLastMod
@@ -120,52 +115,6 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             fail("Expected NoAccessException from assertAccess");
         } catch (NoAccessException e) {
         }
-    }
-
-    /**
-     * DefinitionService.getLastMod() accepts a collection of descriptors and
-     * gives the last modified time of the group.
-     */
-    public void testGetLastMod() throws Exception {
-        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.PUBLIC);
-
-        // 3. Handle non existing namespace
-        try {
-            Aura.getDefinitionService().getNamespaceLastMod(Sets.newHashSet("foo"));
-            fail("Should not be able to specify non existing namespace");
-        } catch (AuraRuntimeException e) {
-            assertEquals("No definitions found by *://foo:*[APPLICATION, COMPONENT]", e.getMessage());
-        }
-
-        // 5. Non existing def as reference
-        // Create a descriptor but don't add it.
-        DefDescriptor<EventDef> nonExistingRef = StringSourceLoader.getInstance().createStringSourceDescriptor("barr",
-                EventDef.class);
-        DefDescriptor<?> desc = addSourceAutoCleanup(
-                ComponentDef.class,
-                String.format(
-                        baseComponentTag,
-                        String.format("controller='js://%s.%s'", nonExistingRef.getNamespace(),
-                                nonExistingRef.getName()), ""));
-        try {
-            Aura.getDefinitionService().getNamespaceLastMod(Sets.newHashSet("string"));
-            fail("Cannot find last mod when definitions are uncompilable.");
-        } catch (DefinitionNotFoundException e) {
-            assertEquals(String.format("No CONTROLLER named js://%s.%s found : %s", nonExistingRef.getNamespace(),
-                    nonExistingRef.getName(), desc.getQualifiedName()), e.getMessage());
-        }
-
-        /**
-         * TODO W-1312125 This throws a UnsupportedOperationException. We should
-         * restrict the usage of getLastMod() to just ApplicationDef and
-         * ComponentDef This can be done by just changing the signature of the
-         * function to public <D extends RootDefinition> long getLastMod()
-         * Collection<DefDescriptor<TypeDef>> typeMatchers =
-         * Lists.newArrayList();
-         * typeMatchers.add(definitionService.getDefDescriptor
-         * ("java://java.lang.String", TypeDef.class)); assertEquals(0 ,
-         * Aura.getDefinitionService().getLastMod(typeMatchers));
-         */
     }
 
     /**

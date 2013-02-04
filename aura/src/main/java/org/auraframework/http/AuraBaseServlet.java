@@ -17,9 +17,6 @@ package org.auraframework.http;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -457,9 +454,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
         AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();
         Mode mode = context.getMode();
-        List<String> preloads;
-        String preloadsName;
-        long appLastMod = -1, preloadsLastMod = -1;
+        long appLastMod = -1;
         boolean useCache = (Aura.getConfigAdapter().isProduction() || (mode == Mode.PROD || mode == Mode.PTEST || mode == Mode.CADENCE));
 
         if (app != null) {
@@ -479,32 +474,9 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 }
             }
         }
-        preloads = new ArrayList<String>(context.getPreloads());
-
-        if (preloads.size() > 0) {
-            Collections.sort(preloads);
-            preloadsName = preloads.toString();
-            if (useCache) {
-                Long tmp = lastModMap.get(preloadsName);
-                if (tmp != null) {
-                    preloadsLastMod = tmp.longValue();
-                }
-            }
-            if (preloadsLastMod == -1) {
-                try {
-                    preloadsLastMod = definitionService.getNamespaceLastMod(preloads);
-                    lastModMap.put(preloadsName, Long.valueOf(preloadsLastMod));
-                } catch (QuickFixException qfe) {
-                    // ignore
-                }
-            }
-        }
         long lastMod = Aura.getConfigAdapter().getAuraJSLastMod();
         if (appLastMod > lastMod) {
             lastMod = appLastMod;
-        }
-        if (preloadsLastMod > lastMod) {
-            lastMod = preloadsLastMod;
         }
         return lastMod;
     }

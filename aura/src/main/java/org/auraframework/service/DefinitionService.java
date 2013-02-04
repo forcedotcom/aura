@@ -15,7 +15,6 @@
  */
 package org.auraframework.service;
 
-import java.util.Collection;
 import java.util.Set;
 
 import org.auraframework.Aura;
@@ -131,15 +130,6 @@ public interface DefinitionService extends AuraService {
      * @param descriptor the descriptor to check.
      */
     long getLastMod(String uid) throws QuickFixException;
-
-    /**
-     * Given a set of preload namespaces, calculate the last mod time. This will
-     * calculate the last mod time of a set of namespaces and all dependencies
-     * of components/applications in that set of namespaces.
-     * 
-     * @throws QuickFixException
-     */
-    long getNamespaceLastMod(Collection<String> preloads) throws QuickFixException;
 
     /**
      * Given a {@link DefDescriptor} that contains search patterns or wildcards,

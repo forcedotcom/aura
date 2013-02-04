@@ -113,7 +113,7 @@ public interface Definition extends JsonSerializable, Serializable {
     /**
      * Fetches a non-recursive hash for this definition's contents. This does
      * not incorporate hash of dependent definitions, which are generally
-     * contxt-dependent (in that providers may give different users different
+     * context-dependent (in that providers may give different users different
      * dependencies for the same parent definition).
      */
     Hash getOwnHash();

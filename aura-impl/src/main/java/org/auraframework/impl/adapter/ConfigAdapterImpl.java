@@ -92,7 +92,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             // Question: hypothetically, could we have a hybrid with a subset
             // of files as files, and the rest in jars? This wouldn't be
             // accounted for here.
-            tempGroup = new AuraJavascriptResourceGroup("aura/javascript");
+            tempGroup = new AuraJavascriptResourceGroup();
         }
         jsGroup = tempGroup;
         Properties props = (jsGroup == null) ? loadProperties() : null;

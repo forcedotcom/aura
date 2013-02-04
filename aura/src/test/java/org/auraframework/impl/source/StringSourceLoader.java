@@ -35,6 +35,7 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LayoutsDef;
+import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.ThemeDef;
@@ -55,12 +56,15 @@ import com.google.common.collect.Sets;
 public class StringSourceLoader implements SourceLoader {
     public static final String DEFAULT_NAMESPACE = "string";
 
-    private static final String DEFAULT_NAME_PREFIX = "thing";
-    private static final Set<String> PREFIXES = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX,
-            DefDescriptor.JAVASCRIPT_PREFIX, DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX);
-    private static final Set<DefType> DEFTYPES = ImmutableSet.of(DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT,
-            DefType.INTERFACE, DefType.LAYOUTS, DefType.CONTROLLER, DefType.HELPER, DefType.RENDERER, DefType.STYLE,
-            DefType.TESTSUITE);
+	private static final String DEFAULT_NAME_PREFIX = "thing";
+	private static final Set<String> PREFIXES = ImmutableSet.of(
+			DefDescriptor.MARKUP_PREFIX, DefDescriptor.JAVASCRIPT_PREFIX,
+			DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX);
+	private static final Set<DefType> DEFTYPES = ImmutableSet.of(
+			DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT,
+			DefType.INTERFACE, DefType.LAYOUTS, DefType.CONTROLLER,
+			DefType.HELPER, DefType.NAMESPACE, DefType.RENDERER, DefType.STYLE,
+			DefType.TESTSUITE);
 
     /**
      * A counter that we can use to guarantee unique names across multiple calls
@@ -283,6 +287,7 @@ public class StringSourceLoader implements SourceLoader {
         EVENT(EventDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         INTERFACE(InterfaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         LAYOUTS(LayoutsDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        NAMESPACE(NamespaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ""),
         CONTROLLER(ControllerDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         HELPER(HelperDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         RENDERER(RendererDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
@@ -315,11 +320,15 @@ public class StringSourceLoader implements SourceLoader {
             return infoMap.get(defClass);
         }
 
-        @SuppressWarnings("unchecked")
-        private <D extends Definition> DefDescriptor<D> getDescriptor(String namespace, String name) {
-            return (DefDescriptor<D>) Aura.getDefinitionService().getDefDescriptor(
-                    String.format("%s://%s%s%s", prefix, namespace, delimiter, name), defClass);
-        }
+		@SuppressWarnings("unchecked")
+		private <D extends Definition> DefDescriptor<D> getDescriptor(
+				String namespace, String name) {
+			return (DefDescriptor<D>) Aura.getDefinitionService()
+					.getDefDescriptor(
+							String.format("%s://%s%s%s", prefix, namespace,
+									delimiter, name == null ? "" : name),
+							defClass);
+		}
 
         private Format getFormat() {
             return format;

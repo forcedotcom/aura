@@ -1,0 +1,8 @@
+<aura:component
+		model="java://org.auraframework.impl.java.model.TestJavaModel"
+		controller="java://org.auraframework.impl.java.controller.JavaTestController"
+		provider="java://org.auraframework.impl.java.provider.EmptyConfigProvider">
+	<aura:attribute name="providedAttribute" type="String"/>
+	<ui:button aura:id="trigger" press="{!c.getServerString}" label="get a string"/>
+	<div aura:id="output">{!v.providedAttribute}{!m.secret}<aura:iteration items="{!m.stringList}" var="x" start="{!m.integer}" end="{!m.integerString}">{!x}</aura:iteration></div>
+</aura:component>

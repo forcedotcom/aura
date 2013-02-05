@@ -33,8 +33,17 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * @since 0.0.178
  */
 public abstract class AuraTestCase extends UnitTestCase {
+    protected final static String baseApplicationTag = "<aura:application %s>%s</aura:application>";
+    protected final static String baseComponentTag = "<aura:component %s>%s</aura:component>";
+
     public AuraTestCase(String name) {
         super(name);
+    }
+    
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        Aura.get(TestContextAdapter.class).getTestContext(getQualifiedName());
     }
 
     @Override
@@ -44,9 +53,14 @@ public abstract class AuraTestCase extends UnitTestCase {
         }
         Aura.getLoggingService().release();
         ServletConfigController.resetMocks();
+        Aura.get(TestContextAdapter.class).release();
         super.tearDown();
     }
 
+    public String getQualifiedName() {
+        return getClass().getCanonicalName() + "." + getName();
+    }
+    
     /**
      * Useful for restoring a context in case a test needs to temporarily switch
      * contexts.

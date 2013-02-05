@@ -15,6 +15,7 @@
  */
 package org.auraframework.throwable.quickfix;
 
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
@@ -34,7 +35,7 @@ public class AuraQuickFixUITest extends WebDriverTestCase {
      * Verify that aura QuickFix UI appears in DEV mode.
      */
     public void testQuickFixDevMode() throws Exception {
-        openNoAura("/foo/bar.cmp?aura.mode=DEV");
+        open("/foo/bar.cmp", Mode.DEV, false);
         waitForAuraInit();
         Thread.sleep(1000);
         assertEquals("Create Component Definition", getText(CREATE_COMPONENT_BUTTON));
@@ -44,7 +45,7 @@ public class AuraQuickFixUITest extends WebDriverTestCase {
      * Verify that aura QuickFix UI does not appear in SELENIUM mode.
      */
     public void testQuickFixSeleniumMode() throws Exception {
-        openNoAura("/foo/bar.cmp?aura.mode=SELENIUM");
+        open("/foo/bar.cmp", Mode.SELENIUM, false);
         assertFalse(isElementPresent(CREATE_COMPONENT_BUTTON));
         assertTrue(getText(By.id("auraErrorMessage")).contains("org.auraframework.throwable.quickfix."
                 + "DefinitionNotFoundException: No COMPONENT named markup://foo:bar found"));
@@ -55,7 +56,7 @@ public class AuraQuickFixUITest extends WebDriverTestCase {
      */
     @UnAdaptableTest
     public void testQuickFixProdMode() throws Exception {
-        openNoAura("/aura/SomeNonExistingJunk.app?aura.mode=PROD");
+        open("/aura/SomeNonExistingJunk.app", Mode.PROD, false);
         assertFalse(isElementPresent(CREATE_COMPONENT_BUTTON));
         assertTrue(getText(By.tagName("body")).contains("404 Not Found"));
     }

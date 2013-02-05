@@ -24,7 +24,7 @@
     <aura:registerEvent name="menuSelect" type="ui:menuSelect" description="The event fired when the user select a menu item."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:attribute name="childMenuItems" type="Aura.Component[]" description="a read-only attribute pointing to child components."/>
-    <div aura:id="menu" role="menu" class="{!v.class}">
+    <div aura:id="menu" role="menu" class="{!v.class + (v.visible == true ? ' visible':'')}">
         <ul aura:id="datalist" role="presentation">
             <aura:iteration items="{!v.menuItems}" var="item">
                 <ui:menuItem aura:id="item" class="{!item.className}" disabled="{!item.disabled}" label="{!item.label}" selected="{!item.selected}" type="{!item.type}"/>

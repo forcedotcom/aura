@@ -17,6 +17,8 @@ package org.auraframework.throwable.quickfix;
 
 import java.util.Map;
 
+import org.auraframework.Aura;
+
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 
@@ -35,5 +37,9 @@ public abstract class CreateBaseComponentDefQuickFix extends AuraQuickFix {
         Map<String, Object> ret = Maps.newLinkedHashMap();
         ret.put("descriptor", String.format("%s:%s", descriptor.getNamespace(), descriptor.getName()));
         return ret;
+    }
+
+    protected void resetCache(DefDescriptor<?> descriptor) {
+        Aura.getContextService().getCurrentContext().getDefRegistry().invalidate(descriptor);
     }
 }

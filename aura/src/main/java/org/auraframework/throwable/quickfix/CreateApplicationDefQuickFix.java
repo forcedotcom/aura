@@ -54,6 +54,7 @@ public class CreateApplicationDefQuickFix extends CreateBaseComponentDefQuickFix
                         "css", ThemeDef.class);
                 new CreateThemeDefQuickFix(themeDescriptor).fix();
             }
+            resetCache(def.getDescriptor());
         }
     }
 }

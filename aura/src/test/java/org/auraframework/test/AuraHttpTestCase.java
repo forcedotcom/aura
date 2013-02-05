@@ -15,12 +15,20 @@
  */
 package org.auraframework.test;
 
+import java.io.IOException;
+
 import java.net.URI;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+
+import org.auraframework.Aura;
+
+import org.auraframework.system.AuraContext;
 import org.auraframework.test.annotation.ThreadHostileTest;
+
+import org.auraframework.throwable.AuraRuntimeException;
 
 /**
  * Base class with some helper methods specific to Aura.
@@ -96,4 +104,53 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         }
         fail("Missing cookie, expected " + expected);
     }
+
+    protected String getSerializedAuraContext(AuraContext ctx) throws Exception {
+        StringBuilder sb = new StringBuilder();
+        try {
+            Aura.getSerializationService().write(ctx, null, AuraContext.class, sb, "HTML");
+        } catch (IOException e) {
+            throw new AuraRuntimeException(e);
+        }
+        return sb.toString();
+    }
+
+
+    protected String getSerializedAuraContextWithModifiedUID(AuraContext ctx, boolean modify) throws Exception {
+        String uid;
+        if (modify) {
+            uid = getModifiedAppUID();
+        } else {
+            uid = getAppUID(ctx);
+        }
+        ctx.addLoaded(ctx.getApplicationDescriptor(), uid);
+        return getSerializedAuraContext(ctx);
+    }
+
+    protected String getAppUID() throws Exception {
+        return getAppUID(Aura.getContextService().getCurrentContext());
+    }
+
+    protected String getAppUID(AuraContext ctxt) throws Exception {
+        return ctxt.getDefRegistry().getUid(null, ctxt.getApplicationDescriptor());
+    }
+
+    protected String getModifiedAppUID(String old) throws Exception {
+        StringBuilder sb = new StringBuilder(old);
+        char flip = sb.charAt(3);
+
+        // change the character.
+        if (flip == 'a') {
+            flip = 'b';
+        } else {
+            flip = 'a';
+        }
+        sb.setCharAt(3, flip);
+        return sb.toString();
+    }
+
+    protected String getModifiedAppUID() throws Exception {
+        return getModifiedAppUID(getAppUID());
+    }
+
 }

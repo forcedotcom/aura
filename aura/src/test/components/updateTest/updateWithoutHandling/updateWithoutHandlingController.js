@@ -23,11 +23,21 @@
 
     sendOutdatedRequest:function(c,e,h){
         var ctx = $A.getContext();
-        for(var p in ctx){
-            var val = ctx[p];
-            if($A.util.isString(val) && !isNaN(val*1)){
-                ctx[p] = "" + (val - 1);
+        var nl = [];
+        var loaded = ctx.getLoaded();
+        for (var p in loaded) {
+            var x = loaded[p];
+            if (x.length > 10) {
+                var r = 'a';
+                if (x.charAt(5) == 'a') {
+                    r = 'b';
+                }
+                x = x.substr(0,4)+r+x.substr(5);
+                nl[p] = x;
             }
+        }
+        for (var q in nl) {
+            loaded[q] = nl[q];
         }
         c.getValue("v.text").setValue("i was updated");
         var a = c.get("c.noArgs");

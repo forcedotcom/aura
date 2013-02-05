@@ -36,8 +36,8 @@ import org.auraframework.test.annotation.UnAdaptableTest;
 @UnAdaptableTest
 public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
     protected String typeSuffix;
+    protected String capType;
     protected DefType defType;
-    BaseComponentQuickFixWidget quickFixUIWidget;
 
     @Override
     public void setUp() throws Exception {
@@ -54,7 +54,7 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
         super(name);
         this.typeSuffix = typeSuffix;
         this.defType = defType;
-        quickFixUIWidget = new BaseComponentQuickFixWidget(defType, this);
+        this.capType = typeSuffix.substring(1, 2).toUpperCase() + typeSuffix.substring(2);
     }
 
     /**
@@ -66,6 +66,8 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
         DefDescriptor<?> defDescriptor = createComponentDefDescriptor(namespace, cmpName);
         DefDescriptor<?> defDescriptorCss = Aura.getDefinitionService().getDefDescriptor(namespace + "." + cmpName,
                 ThemeDef.class);
+        BaseComponentQuickFixWidget quickFixUIWidget;
+        quickFixUIWidget = new BaseComponentQuickFixWidget(defType, this);
         try {
             open(String.format("/%s/%s%s", namespace, cmpName, typeSuffix), Mode.DEV);
             quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptor.getQualifiedName());
@@ -87,6 +89,8 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
         String namespace = String.format("nonExistentNamespace%s", System.currentTimeMillis());
         String cmpName = String.format("nonExistent%s%s", defType.name(), System.currentTimeMillis());
         DefDescriptor<?> defDescriptor = createComponentDefDescriptor(namespace, cmpName);
+        BaseComponentQuickFixWidget quickFixUIWidget;
+        quickFixUIWidget = new BaseComponentQuickFixWidget(defType, this);
         try {
             open(String.format("/%s/%s%s", namespace, cmpName, typeSuffix), Mode.DEV);
             quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptor.getQualifiedName());
@@ -105,6 +109,8 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
         String namespace = String.format("auratest", System.currentTimeMillis());
         String cmpName = String.format("nonExistent%s%s", defType.name(), System.currentTimeMillis());
         DefDescriptor<?> defDescriptor = createComponentDefDescriptor(namespace, cmpName);
+        BaseComponentQuickFixWidget quickFixUIWidget;
+        quickFixUIWidget = new BaseComponentQuickFixWidget(defType, this);
         try {
             open(String.format("/%s/%s%s", namespace, cmpName, typeSuffix), Mode.DEV);
             quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptor.getQualifiedName());
@@ -128,6 +134,8 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
         String cmpName2 = String.format("nonExistent2%s%s", defType.name(), System.currentTimeMillis());
         DefDescriptor<?> defDescriptor1 = createComponentDefDescriptor(namespace, cmpName1);
         DefDescriptor<?> defDescriptor2 = createComponentDefDescriptor(namespace, cmpName2);
+        BaseComponentQuickFixWidget quickFixUIWidget;
+        quickFixUIWidget = new BaseComponentQuickFixWidget(defType, this);
         try {
             open(String.format("/%s/%s%s", namespace, cmpName1, typeSuffix), Mode.DEV);
             quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptor1.getQualifiedName());
@@ -145,30 +153,26 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
     /**
      * Verify QuickFix works when we load a component that exists but contains an inner component that does not.
      */
-    // TODO(W-1507595): loading an .app with an inner component that doesn't exist will fail to create new inner
-    // component.
-    public void _testCreateInnerCmp() throws Exception {
+    public void testCreateInnerCmp() throws Exception {
         String namespace = "auratest";
         String cmpName = "innerCmpThatDoesntExist";
-        String parentFullName = "";
-        String parentCmpName = "";
-        if (defType == DefType.COMPONENT) {
-            parentFullName = "/" + namespace + "/createInnerCmpQuickFixCmp.cmp";
-            parentCmpName = "createInnerCmpQuickFixCmp";
-        } else if (defType == DefType.APPLICATION) {
-            parentFullName = "/" + namespace + "/createInnerCmpQuickFixApp.app";
-            parentCmpName = "createInnerCmpQuickFixApp";
-            // We're actually creating a .cmp file here so use that helper class
-            quickFixUIWidget = new BaseComponentQuickFixWidget(DefType.COMPONENT, this);
-        }
-        DefDescriptor<?> defDescriptorChild = createComponentDefDescriptor(namespace, cmpName);
+        String parentFullName;
+        String parentCmpName;
+        BaseComponentQuickFixWidget quickFixUIWidget;
+        DefDescriptor<?> defDescriptorChild;
+        // We're actually creating a .cmp file here so use that helper class
+        quickFixUIWidget = new BaseComponentQuickFixWidget(DefType.COMPONENT, this);
+        parentFullName = String.format("/%s/createInnerCmpQuickFix%s%s", namespace, capType, typeSuffix);
+        parentCmpName = String.format("createInnerCmpQuickFix%s", capType);
+        defDescriptorChild = Aura.getDefinitionService().getDefDescriptor(namespace + ":" + cmpName,
+                ComponentDef.class);
         try {
             open(parentFullName, Mode.DEV);
             quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptorChild.getQualifiedName());
             quickFixUIWidget.verifyCustomizationMenu();
             quickFixUIWidget.clickFix(true,
                     String.format("TODO: %s:%s\nIn component " + parentCmpName, namespace, cmpName));
-            assertTrue("Failed to locate the definition", defDescriptorChild.exists());
+            assertTrue("Failed to locate the definition: " + defDescriptorChild, defDescriptorChild.exists());
         } finally {
             quickFixUIWidget.deleteFiles(defDescriptorChild);
         }
@@ -177,22 +181,19 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
     /**
      * Verify error message when creating inner component with a bad namespace.
      */
-    // TODO(W-1507595): Error messages differ when loading the cmp and app. They should be at least consistent, and
-    // ideally a little more informative. The cmp error is currently more correct than the app error, so putting that
-    // in the test.
-    public void _testCreateInnerCmpBadNamespace() throws Exception {
+    public void testCreateInnerCmpBadNamespace() throws Exception {
         String namespace = "auratest";
         String cmpName = "innerCmpThatDoesntExist";
-        String parentName = "";
-        if (defType == DefType.COMPONENT) {
-            parentName = "/" + namespace + "/createInnerCmpQuickFixCmp.cmp";
-        } else if (defType == DefType.APPLICATION) {
-            parentName = "/" + namespace + "/createInnerCmpQuickFixApp.app";
-            quickFixUIWidget = new BaseComponentQuickFixWidget(DefType.COMPONENT, this);
-        }
-        DefDescriptor<?> defDescriptorChild = createComponentDefDescriptor(namespace, cmpName);
+        String parentFullName;
+        BaseComponentQuickFixWidget quickFixUIWidget;
+        DefDescriptor<?> defDescriptorChild;
+        // We're actually creating a .cmp file here so use that helper class
+        quickFixUIWidget = new BaseComponentQuickFixWidget(DefType.COMPONENT, this);
+        parentFullName = String.format("/%s/createInnerCmpQuickFix%s%s", namespace, capType, typeSuffix);
+        defDescriptorChild = Aura.getDefinitionService().getDefDescriptor(namespace + ":" + cmpName,
+                ComponentDef.class);
         try {
-            open(parentName, Mode.DEV);
+            open(parentFullName, Mode.DEV);
             quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptorChild.getQualifiedName());
             quickFixUIWidget.verifyCustomizationMenu();
             quickFixUIWidget.setDescriptorNames("auratestasdf:innerCmpThatDoesntExist");

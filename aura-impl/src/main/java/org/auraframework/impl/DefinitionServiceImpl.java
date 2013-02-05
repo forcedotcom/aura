@@ -15,10 +15,13 @@
  */
 package org.auraframework.impl;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
+import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -29,12 +32,21 @@ import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 /**
+ * The public access to definitions inside Aura.
+ *
+ * This class manages all of the permissions checking and fetching of implementations
+ * for consumers of aura definitions.
  */
 public class DefinitionServiceImpl implements DefinitionService {
     private static final long serialVersionUID = -2488984746420077688L;
@@ -62,26 +74,29 @@ public class DefinitionServiceImpl implements DefinitionService {
         contextService.assertEstablished();
         contextService.assertAccess(descriptor);
 
-        T ret = contextService.getCurrentContext().getDefRegistry().getDef(descriptor);
-        if (ret == null) {
+        T def = contextService.getCurrentContext().getDefRegistry().getDef(descriptor);
+
+        //
+        // Check authentication. All defs should really support this but right now
+        // it's specific to Applications, so putting this special case here until
+        // we have a more generic check on all defs.
+        //
+        if (def != null && def.getDescriptor().getDefType() == DefType.APPLICATION
+                && ((ApplicationDef) def).getAccess() == Access.AUTHENTICATED) {
+            AuraContext context = Aura.getContextService().getCurrentContext();
+            if (context.getAccess() != Access.AUTHENTICATED) {
+                def = null;
+            }
+        }
+        if (def == null) {
             throw new DefinitionNotFoundException(descriptor);
         }
-        return ret;
+        return def;
     }
 
     @Override
     public <T extends Definition> T getDefinition(String qualifiedName, Class<T> defClass) throws QuickFixException {
-        ContextService contextService = Aura.getContextService();
-        contextService.assertEstablished();
-
-        DefDescriptor<T> desc = DefDescriptorImpl.getInstance(qualifiedName, defClass);
-        contextService.assertAccess(desc);
-
-        T ret = contextService.getCurrentContext().getDefRegistry().getDef(desc);
-        if (ret == null) {
-            throw new DefinitionNotFoundException(desc);
-        }
-        return ret;
+        return getDefinition(DefDescriptorImpl.getInstance(qualifiedName, defClass));
     }
 
     @Override
@@ -168,5 +183,109 @@ public class DefinitionServiceImpl implements DefinitionService {
         contextService.assertAccess(def.getDescriptor());
 
         Aura.getContextService().getCurrentContext().getDefRegistry().save(def);
+    }
+
+    /**
+     * Take in the information off the context and sanitize, populating dependencies.
+     *
+     * This routine takes in the current descriptor, and a boolean to tell us
+     * if we are preloading. It then expands out dependencies and cleans up the
+     * set of explicitly loaded descriptors by removing descriptors that are
+     * implicitly loaded by others in the set. If there is a problem with the
+     * descriptor, it cleans up, and possibly sets the context descriptor to
+     * a quickfix, then lets the exception percolate up.
+     *
+     * Note that the client out of sync exception has higher 'precedence' than
+     * the quick fix exception. This allows the servlet to correctly refresh a
+     * client before presenting the quick fix (which would otherwise hide the
+     * fact that the server side code changed). This is because quick fix exceptions
+     * are thrown and swallowed during posts to avoid circular qfes, which cause
+     * the server to not process the quick fix.
+     *
+     * Once this routine has completed, the master def registiry should have a
+     * valid set of dependencies for the descriptor on the context.
+     *
+     * Note that removing things from the 'loaded' set should send them back to
+     * the client, and allow our future requests to be smaller.
+     *
+     * @param loading The descriptor we think we are loading.
+     * @param preload are we preloading?
+     * @throws ClientOutOfSyncException if the uid on something is a mismatch
+     * @throws QuickFixException if a definition can't be compiled.
+     */
+    @Override
+    public void updateLoaded(DefDescriptor<?> loading, boolean preload)
+            throws QuickFixException, ClientOutOfSyncException {
+        ContextService contextService = Aura.getContextService();
+        AuraContext context;
+        MasterDefRegistry mdr;
+        List<Map.Entry<DefDescriptor<?>,String>> entries;
+        Set<DefDescriptor<?>> loaded = Sets.newHashSet();
+
+        contextService.assertEstablished();
+        context = contextService.getCurrentContext();
+        mdr = context.getDefRegistry();
+        entries = Lists.newArrayList(context.getLoaded().entrySet());
+        //
+        // TODO (optimize): we could reverse this set randomly to try
+        // to sanitize the list in opposite directions. No need to be
+        // exact (hard to test though).
+        //
+        try {
+            for (Map.Entry<DefDescriptor<?>,String> entry : entries) {
+                DefDescriptor<?> descriptor = entry.getKey();
+                String uid = entry.getValue();
+                if (uid == null) {
+                    loaded.add(descriptor);
+                } else if (loaded.contains(descriptor)) {
+                    context.dropLoaded(descriptor);
+                } else {
+                    // validate the uid.
+                    //
+                    // TODO: dev caching, don't pass null in, ever.
+                    //
+                    String tuid = null;
+                    QuickFixException qfe = null;
+
+                    try {
+                        tuid = mdr.getUid(null, descriptor);
+                    } catch (QuickFixException broke) {
+                        //
+                        // See note above. This is how we enforce precedence of ClientOutOfSyncException
+                        //
+                        qfe = broke;
+                    }
+                    if (!uid.equals(tuid)) {
+                        throw new ClientOutOfSyncException(descriptor+": mismatched UIDs "+uid+" != "+tuid);
+                    }
+                    if (qfe != null) {
+                        throw qfe;
+                    }
+                    if (!descriptor.equals(loading)) {
+                        loaded.addAll(mdr.getDependencies(uid));
+                    }
+                }
+            }
+            //
+            // Now make sure that our current definition is somewhere there
+            // If this fails, we will throw an exception, and all will be
+            // well.
+            //
+            if (loading != null && !context.getLoaded().containsKey(loading)) {
+                String uid = mdr.getUid(null, loading);
+
+                if (uid == null) {
+                    throw new DefinitionNotFoundException(loading, null);
+                } else {
+                    context.addLoaded(loading, uid);
+                }
+            }
+        } finally {
+            // Future!
+            //if (!preload) {
+            //    context.setPreloadedDeps(loaded);
+            //}
+        }
+        return;
     }
 }

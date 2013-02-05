@@ -31,6 +31,7 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoContextException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -303,5 +304,10 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
     @Override
     public MasterDefRegistry getDefRegistry() {
         return null;
+    }
+
+    @Override
+    public void updateLoaded(DefDescriptor<?> loading, boolean preload) throws QuickFixException,
+            ClientOutOfSyncException {
     }
 }

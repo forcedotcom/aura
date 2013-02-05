@@ -30,7 +30,6 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
-import org.auraframework.throwable.ClientOutOfSyncException;
 
 import com.google.common.collect.Lists;
 
@@ -114,14 +113,10 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         // Check unchanged app gets same UID value
         assertEquals(uid, masterDefReg.getUid(uid, houseboat));
 
-        // Check asking with an incorrect "old UID" would throw
-        try {
-            String newUid = masterDefReg.getUid(uid + " or not", houseboat);
-            fail(String.format("Should have thrown when fetching from non-null stale UID, but returned %s (was %s)",
-                    newUid, uid));
-        } catch (Exception e) {
-            checkExceptionStart(e, ClientOutOfSyncException.class, "Mismatched UIDs");
-        }
+        //
+        // When given an incorrect UID, masterDefReg simply returns the correct one.
+        String newUid = masterDefReg.getUid(uid + " or not", houseboat);
+        assertEquals(uid, newUid);
     }
 
     /**
@@ -151,7 +146,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      */
     public void testUidValue() throws Exception {
         // Known UID, assuming no dependencies or the file itself have changed.
-        String knownUid = "3VBCHFMNOup__UlHicckgg";
+        String knownUid = "3ETNrNWouMMQR-ZOvdnPuA";
         String cmpName = "test:layoutNoLayout";
         DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpName, ApplicationDef.class);

@@ -25,14 +25,28 @@
 
     <h3><code>ui:block</code></h3>
     <p> <code>ui:block</code> creates a horizontal box area on an app page. This component contains the <code>left</code> and <code>right</code> attributes for your content,
-    and nests the <code>body</code> element in the middle. The DOM order is always <code>left</code>, <code>right</code>, and <code>body</code>.  </p>
+    and nests the <code>body</code> element in the middle. The DOM order is always <code>left</code>, <code>right</code>, and <code>body</code>.  
+    </p>
     <auradocs:info>See the <auradocs:defLink descriptor ="ui:block">ui:block</auradocs:defLink> component reference.</auradocs:info>
-
     <auradocs:example descriptor="auradocs:demoBlock" />
 
-    <h3><code>ui:vbox</code></h3>
+	<p>Notice that the output is nested in a <code>div</code> element. To change the default output to another element, such as <code>li</code>, set the <code>tag</code> attribute to <code>li</code>.</p>
+    <auradocs:codeblock>
+    &lt;ui:block&gt;
+      &lt;aura:set tag="li"&gt;
+        &lt;!--left and right attributes go here--&gt;
+      &lt;/aura:set&gt;
+    &lt;/ui:block&gt;    
+    </auradocs:codeblock>
+    
+	<h3><code>ui:vbox</code></h3>
     <p><code>ui:vbox</code> creates a vertical box area on an app page.  This component contains the <code>north</code> and <code>south</code> attributes for your content,
     and nests the <code>body</code> element in the middle.</p>
     <auradocs:info>See the <auradocs:defLink descriptor ="ui:vbox">ui:vbox</auradocs:defLink> component reference.</auradocs:info>
     <auradocs:example descriptor="auradocs:demoVbox" />
+    
+    <p>
+    <b>See Also:</b><br/>
+    <auradocs:topicLink topic="layouts">Using Layouts for Metadata-Driven Navigation</auradocs:topicLink>
+    </p>
  </aura:component>

@@ -19,5 +19,15 @@
         var textvalue = textI.getValue("v.value").getValue();
         var textO = cmp.find("textO");
         textO.setValue("{!v.value}", textvalue);
-   }
+   },
+   
+   inspectKeyEvent: function(cmp,event) {
+		var keyCodeValue =  event.getParam("keyCode");
+		cmp.find("outputValue").getAttributes().setValue("value", keyCodeValue);
+   },
+   
+   inspectMouseEvent: function(cmp,event) {
+   	var buttonValue =  event.getParam("button");
+       cmp.find("outputValue").getAttributes().setValue("value", buttonValue);
+     }
 }

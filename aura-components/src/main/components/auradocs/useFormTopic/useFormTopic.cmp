@@ -24,13 +24,18 @@
     </p>
 
     <h3><code>ui:input</code></h3>
-    <p> <code>ui:input</code> is an abstract and extensible component that gets user input for processing. Child components that extends <code>ui:input</code>, such as <code>ui:inputText</code> and <code>ui:inputNumber</code>, inherit its attributes and events.
-    The demo below shows commonly used components that extend <code>ui:input</code>.</p>
+    <p> <code>ui:input</code> is an extensible component that gets user input for processing. Child components that extends <code>ui:input</code>, such as <code>ui:inputText</code> and <code>ui:inputNumber</code>, inherit its attributes and events.</p>
     <auradocs:info>See the <auradocs:defLink descriptor ="ui:input">ui:input</auradocs:defLink> component reference.</auradocs:info>
 
+	<p>The demo below shows commonly used components that extend <code>ui:input</code>.
+	For example, the <code>ui:inputText</code> demo calls a client-side controller action to return the input value in a <code>ui:outputText</code> component.
+	The demo also identifies the value of the pressed key or mouse button.</p>
     <auradocs:example descriptor="auradocs:demoForm" />
-    You can extend these input and output components easily to take advantage of its built-in attributes and events.
+    <p>You can extend these input and output components easily to take advantage of its built-in attributes and events.
+    </p>
     <p>
+    <b>See Also:</b><br/>
+    <auradocs:topicLink topic="oodInheritedAttributes">Inherited Component Attributes</auradocs:topicLink><br/>
     <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
     <auradocs:topicLink topic="valueObjects">Value Objects</auradocs:topicLink>
     </p>

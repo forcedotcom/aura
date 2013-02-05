@@ -21,11 +21,11 @@
         <h2>Your favorite soccer club</h2>
         <ui:dropdown>
             <ui:menuTriggerLink aura:id="trigger" label="Please pick your favorite soccer club"/>
-            <ui:menu>
-                <ui:actionMenuItem label="Bayern München" click="{!c.updateTriggerLabel}" disabled="true"/>
-                <ui:actionMenuItem label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
-                <ui:actionMenuItem label="Inter Milan" click="{!c.updateTriggerLabel}"/>
-                <ui:actionMenuItem label="Manchester United" click="{!c.updateTriggerLabel}"/>
+            <ui:menu aura:id="actionMenu">
+                <ui:actionMenuItem aura:id="actionItem1" label="Bayern München" click="{!c.updateTriggerLabel}"/>
+                <ui:actionMenuItem aura:id="actionItem2" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
+                <ui:actionMenuItem aura:id="actionItem3" label="Inter Milan" click="{!c.updateTriggerLabel}"/>
+                <ui:actionMenuItem aura:id="actionItem4" label="Manchester United" click="{!c.updateTriggerLabel}"/>
             </ui:menu>
         </ui:dropdown> 
     </div>
@@ -56,12 +56,12 @@
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Your favorite football teams</h2>
         <ui:dropdown>
-            <ui:menuTriggerLink label="NFC West Teams"/>
+            <ui:menuTriggerLink aura:id="checkboxMenu" label="NFC West Teams"/>
             <ui:menu>
-                <ui:checkboxMenuItem label="San Francisco 49ers"/>
-                <ui:checkboxMenuItem label="Seattle Seahawks"/>
-                <ui:checkboxMenuItem label="St. Louis Rams"/>
-                <ui:checkboxMenuItem label="Arizona Cardinals" disabled="true"/>
+                <ui:checkboxMenuItem aura:id="checkboxItem1" label="San Francisco 49ers"/>
+                <ui:checkboxMenuItem aura:id="checkboxItem2" label="Seattle Seahawks"/>
+                <ui:checkboxMenuItem aura:id="checkboxItem3" label="St. Louis Rams"/>
+                <ui:checkboxMenuItem aura:id="checkboxItem4" label="Arizona Cardinals" disabled="true"/>
             </ui:menu>
         </ui:dropdown> 
     </div>
@@ -92,13 +92,13 @@
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Your favorite baseball teams</h2>
         <ui:dropdown>
-            <ui:menuTriggerLink label="National League West"/>
+            <ui:menuTriggerLink aura:id="radioMenu" label="National League West"/>
             <ui:menu>
-                <ui:radioMenuItem label="San Francisco"/>
-                <ui:radioMenuItem label="LA Dodgers"/>
-                <ui:radioMenuItem label="Arizona"/>
-                <ui:radioMenuItem label="San Diego" disabled="true"/>
-                <ui:radioMenuItem label="Colorado"/>
+                <ui:radioMenuItem aura:id="radioItem1" label="San Francisco"/>
+                <ui:radioMenuItem aura:id="radioItem2" label="LA Dodgers"/>
+                <ui:radioMenuItem aura:id="radioItem3" label="Arizona"/>
+                <ui:radioMenuItem aura:id="radioItem4" label="San Diego" disabled="true"/>
+                <ui:radioMenuItem aura:id="radioItem5" label="Colorado"/>
             </ui:menu>
         </ui:dropdown> 
     </div>

@@ -33,6 +33,7 @@ public interface LoggingService extends AuraService {
     public static final String AURA_REQUEST_URI = "auraRequestURI";
     public static final String MESSAGE = "message";
     public static final String REQUEST_METHOD = "requestMethod";
+    public static final String STATUS = "httpStatus";
     public static final String TIMER_ACTION = "action_";
     public static final String TIMER_COMPONENT_CREATION = "componentCreation";
     public static final String TIMER_DEF_DESCRIPTOR_CREATION = "defDescriptorCreation";

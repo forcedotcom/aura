@@ -72,7 +72,7 @@
      * Dismiss the menu and put the focus back to menu trigger.
      */
     handleEsckeydown: function(component, event) {
-        var parent = this.getParentComponent(component);
+    	var parent = this.getParentComponent(component);
         if (parent) {
             if (parent.get("v.visible") === true) {
                 parent.setValue("{!v.visible}", false);
@@ -128,11 +128,11 @@
     },
     
     setDisabled : function(component) {
-        var concreteCmp = component.getConcreteComponent();
+    	var concreteCmp = component.getConcreteComponent();
         var linkCmp = concreteCmp.find("link");
         var elem = linkCmp.getElement();
         if (elem) {
-            var disabled = component.get("v.disabled");
+            var disabled = concreteCmp.get("v.disabled");
             if (disabled === true) {
                 $A.util.removeClass(elem, "selectable");
                 elem.setAttribute("aria-disabled", "true");

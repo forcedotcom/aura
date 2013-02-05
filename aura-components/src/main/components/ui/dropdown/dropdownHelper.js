@@ -15,24 +15,23 @@
  */
 ({
     getMenuComponent : function(component){
-        var concrete = component.getConcreteComponent();
-        var body = concrete.getValue("v.body");
-        for (var i = 0; i < body.getLength(); i++) {
-            var c = body.getValue(i);
-            if (c.isInstanceOf("ui:menu")) {
-                return c;
-            }
-        }
+        return this.getComponent(component, "ui:menu");
     },
     
     getTriggerComponent : function(component){
+    	return this.getComponent(component, "ui:menuTrigger");
+    },
+    
+    getComponent: function(component,cmpName){
         var concrete = component.getConcreteComponent();
         var body = concrete.getValue("v.body");
-        for (var i = 0; i < body.getLength(); i++) {
-            var c = body.getValue(i);
-            if (c.isInstanceOf("ui:menuTrigger")) {
-                return c;
-            }
+        if(!$A.util.isUndefinedOrNull(cmpName)){
+	        for (var i = 0; i < body.getLength(); i++) {
+	            var c = body.getValue(i);
+	            if (c.isInstanceOf(cmpName)) {
+	                return c;
+	            }
+	        }
         }
     },
     
@@ -154,7 +153,7 @@
     },
     
     toggleMenuVisible : function(component, index) {
-        var c = this.getMenuComponent(component);
+    	var c = this.getMenuComponent(component);
         c.setValue("{!v.focusItemIndex}", index);
         var menuVisible = c.get("v.visible");
         c.setValue("{!v.visible}", !menuVisible);

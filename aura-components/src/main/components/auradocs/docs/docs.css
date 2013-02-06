@@ -107,6 +107,7 @@ footer.THIS{
 .THIS table {
     width: 100%;
     margin-bottom: 18px;
+    font-size: 13px;
 }
 .THIS table th,.THIS table td {
     padding: 8px;

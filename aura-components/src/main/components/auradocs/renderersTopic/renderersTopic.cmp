@@ -146,7 +146,11 @@
     helper.updateDisabled(cmp);
 }</auradocs:codeblock>
 
-    <p> Rendering components is part of the lifecycle of the framework and it's a bit trickier to demonstrate than some other concepts in Aura. The takeaway is that you don't need to think about it unless you need to customize the default rendering behavior for a component. If you are writing a renderer for a component, take a look at <auradocs:topicLink topic="valueObjects">value objects</auradocs:topicLink> to learn more about how Aura selectively rerenders and updates the UI in response to data changes.</p>
+      <h2>Ensuring client-side rendering</h2>
+    <p>Aura calls the default server-side renderer by default, or a client-side renderer if you have one. If you want to ensure client-side rendering of a top-level component, append <code>render="client"</code> to the <code>aura:component</code> tag. Setting this in the top-level component will take precedence over Aura's detection logic, which takes dependencies into consideration.
+    This is especially useful if you are testing the component directly in your browser and  want to inspect the component using the client-side framework when the test loads. Setting <code>render="client"</code> for test components ensures that the client-side framework is loaded, even though it normally wouldn't be needed.</p>
+    <auradocs:info> Rendering components is part of the lifecycle of the framework and it's a bit trickier to demonstrate than some other concepts in Aura. The takeaway is that you don't need to think about it unless you need to customize the default rendering behavior for a component. If you are writing a renderer for a component, take a look at <auradocs:topicLink topic="valueObjects">value objects</auradocs:topicLink> to learn more about how Aura selectively rerenders and updates the UI in response to data changes.</auradocs:info>
+
 
     <p><b>See also:</b><br/>
     <auradocs:topicLink topic="compBundle">Component Bundles</auradocs:topicLink><br/>

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" model="java://org.auraframework.impl.java.model.TestIterationModel">
+<aura:component model="java://org.auraframework.impl.java.model.TestIterationModel">
 
 <div class="testRoot">
 

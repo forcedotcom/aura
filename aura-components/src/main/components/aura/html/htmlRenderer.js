@@ -73,12 +73,7 @@
                             }
 
                             if (newValue !== oldValue) {
-                                // IE renders null value as string "null" for input (text) element, we have to work around that.
-                                if ($A.util.isIE && helper.isInputNullValue(element.tagName, name, newValue)) {
-                                    element[helper.caseAttribute(lowerName)] = "";
-                                } else {
-                                    element[helper.caseAttribute(lowerName)] = newValue;
-                                }
+                            	helper.createHtmlAttribute(lowerName, newValue, { scope: helper, ret: element, component: component });
                             }
                         }
                     }

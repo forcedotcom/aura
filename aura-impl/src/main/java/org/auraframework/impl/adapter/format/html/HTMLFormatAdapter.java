@@ -47,17 +47,13 @@ public abstract class HTMLFormatAdapter<T> extends BaseFormatAdapter<T> {
     }
 
     protected void writeHtmlScripts(List<String> scripts, Appendable out) throws IOException {
-        if (scripts != null) {
-            for (String script : scripts) {
-                out.append(String.format(HTML_SCRIPT, script));
-            }
-        }
+    	writeHtmlScripts(scripts, false, out);
     }
 
-    protected void writeLazyHtmlScripts(List<String> scripts, Appendable out) throws IOException {
+    protected void writeHtmlScripts(List<String> scripts, boolean lazy, Appendable out) throws IOException {
         if (scripts != null) {
             for (String script : scripts) {
-                out.append(String.format(HTML_LAZY_SCRIPT, script));
+                out.append(String.format(lazy ? HTML_LAZY_SCRIPT : HTML_SCRIPT, script));
             }
         }
     }

@@ -326,9 +326,7 @@ Aura.prototype.initAsync = function(config){
     aura.context = new AuraContext(config["context"]);
     clientService.initHost(config["host"]);
     clientService.loadComponent(config["descriptor"], config["attributes"], function(resp) {
-        aura.context = new AuraContext(resp["context"]);
-        aura.context.incrementNum();
-        $A.initPriv(resp["component"], resp["token"], resp["context"]);
+        $A.initPriv(resp);
         $A.measure("Component Load Complete", "Aura.initAsync");
     }, config["deftype"]);
 
@@ -366,19 +364,18 @@ Aura.prototype.initConfig = function AuraInitConfig(config, useExisting, doNotIn
  */
 Aura.prototype.init = function AuraInit(config, token, context, container, doNotInitializeServices){
     var component = $A.util.json.resolveRefs(config);
-    $A.initPriv(component, token, context, container, doNotInitializeServices);
+    $A.initPriv(component, token, container, doNotInitializeServices);
 };
 
 /**
  * Initializes Aura in debug environment.
  * @param {Object} config The descriptor ("markup://foo:bar"), attributes, defType ("APPLICATION" or "COMPONENT"), and timestamp of last modified change
  * @param {String} token
- * @param {Object} context The mode of the application or component ("DEV", "PROD", "PTEST"),
  * @param {Object} container Sets the container for the component.
  * @param {Boolean} doNotInitializeServices True if Layout and History services should not be initialized, or false if they should. Defaults to true for Aura Integration Service.
  * @private
  */
-Aura.prototype.initPriv = function AuraInitPriv(config, token, context, container, doNotInitializeServices){
+Aura.prototype.initPriv = function AuraInitPriv(config, token, container, doNotInitializeServices){
     if (!$A["hasErrors"]) {
         $A.mark("Aura.initPriv");
 

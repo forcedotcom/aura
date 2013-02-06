@@ -20,4 +20,9 @@
         <script src="/auraFW/resources/codemirror/js/codemirror.js"></script>
     </aura:set>
     <aura:set attribute="title" value="Aura Documentation"/>
+    
+    <aura:set attribute="auraPreInitBlock">
+		<auraStorage:init implementation="memory" maxSize="1024" defaultExpiration="600" 
+			defaultAutoRefreshInterval="600" debugLoggingEnabled="false" clearStorageOnInit="true"/>
+	</aura:set>    
 </aura:component>

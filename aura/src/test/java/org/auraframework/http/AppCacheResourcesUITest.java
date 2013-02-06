@@ -180,8 +180,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         // only expect a fetch for the manifest and the initAsync component load
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
-        List<Request> expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest"),
-                                                    new Request("/aura", namespace + ":" + appName, null, null));
+        List<Request> expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest"));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
     }
@@ -245,8 +244,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         replaceToken(getTargetComponent().getThemeDescriptor(), replacement);
 
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, replacement, TOKEN);
-        List<Request> expected = Lists.newArrayList(new Request("/aura", namespace + ":" + appName, null, null),
-                                                    new Request("/aura", namespace + ":" + appName, null, "HTML"),
+        List<Request> expected = Lists.newArrayList(new Request("/aura", namespace + ":" + appName, null, "HTML"),
                                                     new Request("/auraResource", null, null, "css"),
                                                     new Request("/auraResource", null, null, "js"),
                                                     new Request("/auraResource", null, null, "manifest"));
@@ -254,8 +252,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         assertAppCacheStatus(Status.IDLE);
 
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, replacement, TOKEN);
-        expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest"),
-                                      new Request("/aura", namespace + ":" + appName, null, null));
+        expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest"));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
     }
@@ -285,7 +282,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         logs = loadMonitorAndValidateApp(TOKEN, replacement, TOKEN, TOKEN);
         List<Request> expected = Lists.newArrayList(
-                new Request("/aura", namespace + ":" + appName, null, null), // initAsync (cached)
                 new Request("/aura", namespace + ":" + appName, null, "HTML"), // rest are cache updates
                 new Request("/auraResource", null, null, "css"),
                 new Request("/auraResource", null, null, "js"),
@@ -294,8 +290,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         assertAppCacheStatus(Status.IDLE);
 
         logs = loadMonitorAndValidateApp(TOKEN, replacement, TOKEN, TOKEN);
-        expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest"),
-                                      new Request("/aura", namespace + ":" + appName, null, null));
+        expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest"));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
     }
@@ -318,7 +313,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         logs = loadMonitorAndValidateApp(replacement, TOKEN, TOKEN, TOKEN);
         List<Request> expected = Lists.newArrayList(
-                new Request("/aura", namespace + ":" + appName, null, null), // initAsync (cached)
                 new Request("/aura", namespace + ":" + appName, null, "HTML"), // rest are cache updates
                 new Request("/auraResource", null, null, "css"),
                 new Request("/auraResource", null, null, "js"),
@@ -327,8 +321,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         assertAppCacheStatus(Status.IDLE);
 
         logs = loadMonitorAndValidateApp(replacement, TOKEN, TOKEN, TOKEN);
-        expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest"),
-                                      new Request("/aura", namespace + ":" + appName, null, null));
+        expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest"));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
     }
@@ -369,7 +362,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
             logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, replacement);
             List<Request> expected = Lists.newArrayList(
-                    new Request("/aura", namespace + ":" + appName, null, null), // initAsync (cached)
                     new Request("/aura", namespace + ":" + appName, null, "HTML"), // rest are cache updates
                     new Request("/auraResource", null, null, "css"),
                     new Request("/auraResource", null, null, "js"),
@@ -514,8 +506,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         return ImmutableList.of(new Request("/auraResource", null, null, "manifest"),
                                 new Request("/aura", namespace + ":" + appName, null, "HTML"),
                                 new Request("/auraResource", null, null, "css"),
-                                new Request("/auraResource", null, null, "js"),
-                                new Request("/aura", namespace + ":" + appName, null, null));
+                                new Request("/auraResource", null, null, "js"));
     }
 
     // keep only the info needed for these tests, from the available log info

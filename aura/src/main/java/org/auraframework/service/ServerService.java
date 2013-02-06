@@ -18,10 +18,9 @@ package org.auraframework.service;
 import java.io.IOException;
 import java.util.concurrent.Future;
 
-import org.auraframework.def.BaseComponentDef;
+import org.auraframework.Aura;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Message;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -33,11 +32,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * </p>
  */
 public interface ServerService extends AuraService {
-
     Message<?> run(Message<?> message, AuraContext context) throws QuickFixException, IOException;
-
-    <T extends BaseComponentDef> Message<T> temporaryGet(Message<T> message, AuraContext context)
-            throws DefinitionNotFoundException, QuickFixException;
-
     Future<?> runAsync(final Message<?> message, final Appendable callback, final AuraContext context);
 }

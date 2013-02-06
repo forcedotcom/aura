@@ -35,6 +35,7 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LayoutsDef;
+import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.ThemeDef;
@@ -60,7 +61,7 @@ public class StringSourceLoader implements SourceLoader {
             DefDescriptor.JAVASCRIPT_PREFIX, DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX);
     private static final Set<DefType> DEFTYPES = ImmutableSet.of(DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT,
             DefType.INTERFACE, DefType.LAYOUTS, DefType.CONTROLLER, DefType.HELPER, DefType.RENDERER, DefType.STYLE,
-            DefType.TESTSUITE);
+            DefType.TESTSUITE, DefType.NAMESPACE);
 
     /**
      * A counter that we can use to guarantee unique names across multiple calls
@@ -85,7 +86,7 @@ public class StringSourceLoader implements SourceLoader {
      */
     @GuardedBy("this")
     private final Map<String, Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>> namespaces = Maps
-            .newHashMap();
+    .newHashMap();
 
     private StringSourceLoader() {
         namespaces.put(DEFAULT_NAMESPACE,
@@ -182,7 +183,7 @@ public class StringSourceLoader implements SourceLoader {
             StringSource<D> source, boolean overwrite) {
         String namespace = descriptor.getNamespace();
         Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
-                .get(namespace);
+        .get(namespace);
         if (sourceMap == null) {
             sourceMap = Maps.newHashMap();
             namespaces.put(namespace, sourceMap);
@@ -202,7 +203,7 @@ public class StringSourceLoader implements SourceLoader {
     public synchronized final void removeSource(DefDescriptor<?> descriptor) {
         String namespace = descriptor.getNamespace();
         Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
-                .get(namespace);
+        .get(namespace);
         Preconditions.checkState(sourceMap != null);
         Preconditions.checkState(sourceMap.remove(descriptor) != null);
         if (!DEFAULT_NAMESPACE.equals(namespace) && sourceMap.isEmpty()) {
@@ -240,7 +241,7 @@ public class StringSourceLoader implements SourceLoader {
             String namespace) {
         Set<DefDescriptor<D>> ret = Sets.newHashSet();
         Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
-                .get(namespace);
+        .get(namespace);
         if (sourceMap != null) {
             for (DefDescriptor<? extends Definition> desc : sourceMap.keySet()) {
                 if (desc.getDefType().getPrimaryInterface() == primaryInterface && desc.getPrefix().equals(prefix)) {
@@ -270,24 +271,32 @@ public class StringSourceLoader implements SourceLoader {
     @Override
     public synchronized <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
         Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
-                .get(descriptor.getNamespace());
+        .get(descriptor.getNamespace());
         if (sourceMap != null) {
-            return (Source<D>) sourceMap.get(descriptor);
+            Source<D> ret = (Source<D>) sourceMap.get(descriptor);
+            if(ret!=null){
+                return ret;
+            }else if(descriptor.getDefType().equals(DefType.NAMESPACE) ){
+                //If we are looking for a NameSpaceDef for a namespace introduced using String Source and the test did not add one,
+                //We return a empty String Source just like RootDefFactory.getDef() does
+                return new StringSource<D>(descriptor, "", descriptor.getQualifiedName(), Format.XML);
+            }
         }
         return null;
     }
 
     private static enum DescriptorInfo {
-        APPLICATION(ApplicationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"), COMPONENT(ComponentDef.class,
-                Format.XML, DefDescriptor.MARKUP_PREFIX, ":"), EVENT(EventDef.class, Format.XML,
-                DefDescriptor.MARKUP_PREFIX, ":"), INTERFACE(InterfaceDef.class, Format.XML,
-                DefDescriptor.MARKUP_PREFIX, ":"), LAYOUTS(LayoutsDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX,
-                ":"), CONTROLLER(ControllerDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."), HELPER(
-                HelperDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."), RENDERER(RendererDef.class,
-                Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."), STYLE(ThemeDef.class, Format.CSS,
-                DefDescriptor.CSS_PREFIX, "."), TESTSUITE(TestSuiteDef.class, Format.JS,
-                DefDescriptor.JAVASCRIPT_PREFIX, ".");
-
+        APPLICATION(ApplicationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        COMPONENT(ComponentDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        EVENT(EventDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        INTERFACE(InterfaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        LAYOUTS(LayoutsDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        CONTROLLER(ControllerDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
+        HELPER(HelperDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
+        RENDERER(RendererDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
+        STYLE(ThemeDef.class, Format.CSS, DefDescriptor.CSS_PREFIX, "."),
+        TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
+        NAMESPACE(NamespaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":");
         private static Map<Class<? extends Definition>, DescriptorInfo> infoMap;
 
         private final Class<? extends Definition> defClass;

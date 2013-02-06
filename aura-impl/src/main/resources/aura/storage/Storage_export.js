@@ -19,5 +19,6 @@ exp(p,
     "getName", p.getName,
     "getSize", p.getSize,
     "getMaxSize", p.getMaxSize,
-    "suspendSweeping", p.suspendSweeping    
+    "suspendSweeping", p.suspendSweeping,
+    "resumeSweeping", p.resumeSweeping
 );

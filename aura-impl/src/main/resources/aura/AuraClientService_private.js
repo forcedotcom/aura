@@ -23,6 +23,7 @@ var priv = {
     appcacheDownloadingEventFired: false,
     isOutdated: false,
     isUnloading: false,
+    isDisconnected: false,
 
         /**
          * Take a json (hopefully) response and decode it.
@@ -33,13 +34,18 @@ var priv = {
             if(priv.isUnloading){
                 return null;
             }
-            
-    		var storage = $A.storageService.getStorage();
-            
+
+            var e;
+
             // failure to communicate with server
             if (priv.isDisconnectedOrCancelled(response)) {
-                var e = $A.get("e.aura:noConnection");
+                if (priv.isDisconnected) {
+                    return null;
+                }
+
+                e = $A.get("e.aura:noConnection");
                 if (e) {
+                    priv.isDisconnected = true;
                     e.fire();
                 } else {
                     // looks like no definitions loaded yet
@@ -48,10 +54,20 @@ var priv = {
 
                 return null;
             }
-            
+
+            //
+            // If a disconnect event was previously fired, fire a connection restored event
+            // now that we have a response from a server.
+            //
+            if (priv.isDisconnected) {
+                e = $A.get("e.aura:connectionResumed");
+                if (e) {
+                    priv.isDisconnected = false;
+                    e.fire();
+                }
+            }
+
             var text = response["responseText"];
-            var firstChar = '';
-            var firstPosn = 0;
 
             if (/^\s*</.test(text)) {
                 //
@@ -150,7 +166,7 @@ var priv = {
             return responseMessage;
     },
 
-	parseAndFireEvent : function(evtObj){
+    parseAndFireEvent : function(evtObj){
         var descriptor = evtObj["descriptor"];
 
         if (evtObj["eventDef"]) {
@@ -166,8 +182,8 @@ var priv = {
 
             evt.fire();
         }
-	
-	},
+
+    },
 
     throwExceptionEvent : function(resp) {
         var evtObj = resp["event"];
@@ -227,14 +243,14 @@ var priv = {
         if (responseMessage) {
             var ctx = responseMessage["context"];
             $A.getContext().join(ctx);
-			var events = responseMessage["events"];
-			if(events){
-				for(var en=0,len=events.length;en<len;en++){
-	    			priv.parseAndFireEvent(events[en]);					
-				}
-			}
+            var events = responseMessage["events"];
+            if(events){
+                for(var en=0,len=events.length;en<len;en++){
+                    priv.parseAndFireEvent(events[en]);
+                }
+            }
             var actionResponses = responseMessage["actions"];
-						
+
             for (var r = 0; r < actionResponses.length; r++) {
                 actionResponse = actionResponses[r];
 
@@ -323,84 +339,84 @@ var priv = {
         var fireDoneWaiting = false;
         var actionsToSend = [];
         var actionsToComplete = [];
-        
+
         // Aura Storage.get() requires an async/callback invocation flow
         var clientService = this;
         var actionsToCollect = actions.length;
         var actionCollected = function() {
-        	if(--actionsToCollect <= 0) {
-        		// We're done waiting for pending async operations to complete, let's light this candle!
-	            if(fireDoneWaiting) {
-	            	setTimeout(function(){ priv.fireDoneWaiting(); }, 1);
-	            }
-	
-	            if(actionsToComplete.length > 0) {
-	            	var that = this;
-	        		setTimeout(function() {
-	        			for(var n = 0; n < actionsToComplete.length; n++) {
-	        				var info = actionsToComplete[n];
-	        				info.action.complete(info.response);
-	        			}
-	        			
-	        			clientService.fireDoneWaiting();
-	        		}, 300);
-	            }
-	            
-	            if(actionsToSend.length > 0){
-	                queue.push({actions : actionsToSend, scope : scope, callback : callback, number : actionGroup, exclusive : exclusive});
-	                $A.measure("Action Group " + actionGroup + " enqueued", "AuraClientService.request");
-	                clientService.doRequest();
-	            }
-        	}
+            if(--actionsToCollect <= 0) {
+                // We're done waiting for pending async operations to complete, let's light this candle!
+                if(fireDoneWaiting) {
+                    setTimeout(function(){ priv.fireDoneWaiting(); }, 1);
+                }
+
+                if(actionsToComplete.length > 0) {
+                    var that = this;
+                    setTimeout(function() {
+                        for(var n = 0; n < actionsToComplete.length; n++) {
+                            var info = actionsToComplete[n];
+                            info.action.complete(info.response);
+                        }
+
+                        clientService.fireDoneWaiting();
+                    }, 300);
+                }
+
+                if(actionsToSend.length > 0){
+                    queue.push({actions : actionsToSend, scope : scope, callback : callback, number : actionGroup, exclusive : exclusive});
+                    $A.measure("Action Group " + actionGroup + " enqueued", "AuraClientService.request");
+                    clientService.doRequest();
+                }
+            }
         };
-        
+
         for(var i = 0; i < actions.length; i++){
             var action = actions[i];
             $A.assert(action.def.isServerAction(), "RunAfter() cannot be called on a client action. Use run() on a client action instead.");
-        
+
             // For cacheable actions check the storage service to see if we already have a viable cached action response we can complete immediately
-    		var storage = $A.storageService.getStorage();
+            var storage = $A.storageService.getStorage();
             if(action.isStorable() && storage){
-            	var key = action.getStorageKey();
-            	
-            	storage.get(key, this.createResultCallback(action, scope, actionGroup, callback, actionsToComplete, actionsToSend, actionCollected));
+                var key = action.getStorageKey();
+
+                storage.get(key, this.createResultCallback(action, scope, actionGroup, callback, actionsToComplete, actionsToSend, actionCollected));
             } else {
-            	this.collectAction(action, scope, actionGroup, callback, actionsToSend, actionCollected);
+                this.collectAction(action, scope, actionGroup, callback, actionsToSend, actionCollected);
             }
         }
     },
 
     createResultCallback: function(action, scope, actionGroup, callback, actionsToComplete, actionsToSend, actionCollected) {
         var that = this;
-    	return function(response) {
-        	if(response) {  
-        		actionsToComplete.push({
-        			action: action,
-        			response: response
-        		});
-        		
-        		actionCollected();
-        	} else {
-        		that.collectAction(action, scope, actionGroup, callback, actionsToSend, actionCollected);
-        	}
-    	};    	
+        return function(response) {
+            if(response) {
+                actionsToComplete.push({
+                    action: action,
+                    response: response
+                });
+
+                actionCollected();
+            } else {
+                that.collectAction(action, scope, actionGroup, callback, actionsToSend, actionCollected);
+            }
+        };
     },
-    
+
     collectAction: function(action, scope, actionGroup, callback, actionsToSend, actionCollectedCallback) {
         if(action.isAbortable()){
             this.newestAbortableGroup = actionGroup;
         }
-        
+
         if(action.isExclusive()){
             action.setExclusive(false);
             this.request([action], scope, callback, true);
         } else {
             actionsToSend.push(action);
         }
-        
+
         actionCollectedCallback();
     },
-    
+
     doRequest : function(){
         var queue = this.requestQueue;
         if(!this.inRequest && queue.length > 0){
@@ -542,17 +558,17 @@ var priv = {
         if(window.applicationCache.swapCache){
             window.applicationCache.swapCache();
         }
-        
-        // Clear out localStorage and sessionStorage to insure nothing that might depend 
+
+        // Clear out localStorage and sessionStorage to insure nothing that might depend
         // on out of date stuff is left lying about
         if (window.localStorage) {
-        	window.localStorage.clear();
+            window.localStorage.clear();
         }
 
         if (window.sessionStorage) {
-        	window.sessionStorage.clear();
+            window.sessionStorage.clear();
         }
-        
+
         location.reload(true);
     },
 

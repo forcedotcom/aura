@@ -37,6 +37,11 @@ public class AuraStorageTestController {
     public static ConcurrentHashMap<String, Integer> staticCounter = new ConcurrentHashMap<String, Integer>();
 
     @AuraEnabled
+    public static int getInt(@Key("param") int param) throws Exception {
+        return param;
+    }
+    
+    @AuraEnabled
     public static Record fetchDataRecord(@Key("testName") String testName) {
         staticCounter.putIfAbsent(testName, 0);
         AuraStorageTestController.Record r = new AuraStorageTestController.Record(staticCounter.get(testName),

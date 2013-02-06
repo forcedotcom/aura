@@ -99,6 +99,23 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             this.lastModTime = 0;
             this.qfe = qfe;
         }
+
+        @Override
+        public String toString() {
+            StringBuffer sb = new StringBuffer();
+
+            sb.append(uid);
+            sb.append(" : ");
+            if (qfe != null) {
+                sb.append(qfe);
+            } else {
+                sb.append("[");
+                sb.append(lastModTime);
+                sb.append("] :");
+                sb.append(dependencies);
+            }
+            return sb.toString();
+        }
     }
 
     private final static Cache<String, DependencyEntry> dependencies = CacheBuilder.newBuilder()
@@ -266,7 +283,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      *             validateDefinition() throws one.
      */
     private <D extends Definition> D getHelper(DefDescriptor<D> descriptor, CompileContext cc,
-            Set<DefDescriptor<?>> deps) throws QuickFixException {
+                                               Set<DefDescriptor<?>> deps) throws QuickFixException {
         @SuppressWarnings("unchecked")
         D def = (D) defs.get(descriptor);
 
@@ -307,11 +324,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
                 defs.put(def.getDescriptor(), def);
                 def.appendDependencies(newDeps);
-                deps.addAll(newDeps);
                 if (cc.dependencies != null) {
                     cc.dependencies.put(canonical, def);
                 }
-                def.appendDependencies(newDeps);
                 //
                 // FIXME: this code will go away with preloads.
                 //
@@ -332,6 +347,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                         depcd.parents.add(def);
                     }
                 }
+                deps.addAll(newDeps);
                 return def;
             }
         }

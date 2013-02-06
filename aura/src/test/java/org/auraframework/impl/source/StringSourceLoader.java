@@ -278,15 +278,16 @@ public class StringSourceLoader implements SourceLoader {
     }
 
     private static enum DescriptorInfo {
-        APPLICATION(ApplicationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"), COMPONENT(ComponentDef.class,
-                Format.XML, DefDescriptor.MARKUP_PREFIX, ":"), EVENT(EventDef.class, Format.XML,
-                DefDescriptor.MARKUP_PREFIX, ":"), INTERFACE(InterfaceDef.class, Format.XML,
-                DefDescriptor.MARKUP_PREFIX, ":"), LAYOUTS(LayoutsDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX,
-                ":"), CONTROLLER(ControllerDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."), HELPER(
-                HelperDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."), RENDERER(RendererDef.class,
-                Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."), STYLE(ThemeDef.class, Format.CSS,
-                DefDescriptor.CSS_PREFIX, "."), TESTSUITE(TestSuiteDef.class, Format.JS,
-                DefDescriptor.JAVASCRIPT_PREFIX, ".");
+        APPLICATION(ApplicationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        COMPONENT(ComponentDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        EVENT(EventDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        INTERFACE(InterfaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        LAYOUTS(LayoutsDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        CONTROLLER(ControllerDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
+        HELPER(HelperDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
+        RENDERER(RendererDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
+        STYLE(ThemeDef.class, Format.CSS, DefDescriptor.CSS_PREFIX, "."),
+        TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, ".");
 
         private static Map<Class<? extends Definition>, DescriptorInfo> infoMap;
 

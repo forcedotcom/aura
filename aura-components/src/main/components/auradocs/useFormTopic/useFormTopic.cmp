@@ -31,7 +31,7 @@
 	For example, the <code>ui:inputText</code> demo calls a client-side controller action to return the input value in a <code>ui:outputText</code> component.
 	The demo also identifies the value of the pressed key or mouse button.</p>
     <auradocs:example descriptor="auradocs:demoForm" />
-    <p>You can extend these input and output components easily to take advantage of its built-in attributes and events.
+    <p>You can extend these input and output components easily to take advantage of built-in attributes and events.
     </p>
     <p>
     <b>See Also:</b><br/>

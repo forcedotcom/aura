@@ -15,19 +15,20 @@
  */
 
 .THIS  {
-    margin-top: 20px;
-    width: 800px;
+    font-size:12px;
+    margin:20px;
+    padding:20px;
+}
+
+.THIS p {
+	width: 400px;
+	
+	margin-top:20px;
 }
 
 .THIS.theNorth, .THIS.theSouth {
     width: 400px;
     border: 1px dashed #888;
-    padding: 10px;
-}
-
-.THIS .body {
-    color: #544D4D;
-    line-height: 20px;
-    width: 300px;
-    padding: 10px;
+    padding: 20px;
+    margin-bottom:20px;
 }

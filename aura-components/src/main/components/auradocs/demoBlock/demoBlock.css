@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-.THIS  {
-    margin-top: 20px;
-    width: 800px;
+.THIS {
+	font-size:12px;
+	min-height:100px;
+	padding-top:20px;
+}
+
+.THIS p {
+	padding-left:20px;
 }
 
 .THIS .theLeft, .THIS .theRight {
-    width: 200px;
+    width: 30%;
     border: 1px dashed #888;
     padding: 10px;
+    margin-top: 20px;
 }
 
-.THIS .body {
-    color: #544D4D;
-    line-height: 20px;
-    width: 300px;
-    padding: 10px;
-}

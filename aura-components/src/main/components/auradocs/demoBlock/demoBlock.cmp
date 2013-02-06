@@ -18,17 +18,15 @@
 <aura:component>
     <ui:block>
             <aura:set attribute="left">
-                <div class="theLeft">
+                <span class="theLeft">
                 This <code>left</code> attribute is rendered in a div element.
-                </div>
+                </span>
             </aura:set>
             <aura:set attribute="right">
-                <div class="theRight">
+                <span class="theRight">
                      This <code>right</code> attribute is rendered in a div element.
-                 </div>
+                 </span>
             </aura:set>
-            <div class="body">
-              The body is nested in the middle of the <code>left</code> and <code>right</code> attributes.
-            </div>
+              <p>The body is nested in the middle of the <code>left</code> and <code>right</code> attributes.</p>
     </ui:block>
 </aura:component>

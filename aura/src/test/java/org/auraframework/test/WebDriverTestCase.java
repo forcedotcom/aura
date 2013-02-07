@@ -52,6 +52,7 @@ import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.AuraUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -639,14 +640,15 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             fail("Initialization error: document loaded without $A. Perhaps the initial GET failed.");
         }
 
-        WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSecs);
-        wait.until(new Function<WebDriver, Boolean>() {
-            @Override
-            public Boolean apply(WebDriver input) {
-                assertNoQuickFixMessage();
-                return isAuraFrameworkReady();
-            }
-        });
+		WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSecs);
+		wait.ignoring(StaleElementReferenceException.class).until(
+				new Function<WebDriver, Boolean>() {
+					@Override
+					public Boolean apply(WebDriver input) {
+						assertNoQuickFixMessage();
+						return isAuraFrameworkReady();
+					}
+				});
     }
 
     /**

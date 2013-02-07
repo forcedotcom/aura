@@ -30,6 +30,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
@@ -95,39 +96,64 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         timeoutInSecs = 60;
     }
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        originalAppCacheConfig = ServletConfigController.setAppCacheDisabled(false);
-        namespace = "appCacheResourcesUITest" + auraTestingUtil.getNonce();
-        appName = "cacheapplication";
-        cmpName = "cachecomponent";
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+		originalAppCacheConfig = ServletConfigController
+				.setAppCacheDisabled(false);
+		namespace = "appCacheResourcesUITest" + auraTestingUtil.getNonce();
+		appName = "cacheapplication";
+		cmpName = "cachecomponent";
 
-        DefDescriptor<ComponentDef> cmpDesc = createDef(ComponentDef.class, String.format("%s:%s", namespace, cmpName),
-                "<aura:component>" + "<aura:attribute name='output' type='String'/>"
-                + "<div class='clickableme' onclick='{!c.cssalert}'>@@@TOKEN@@@</div>"
-                + "<div class='attroutput'>{!v.output}</div>" + "</aura:component>");
+		DefDescriptor<ComponentDef> cmpDesc = createDef(
+				ComponentDef.class,
+				String.format("%s:%s", namespace, cmpName),
+				"<aura:component>"
+						+ "<aura:attribute name='output' type='String'/>"
+						+ "<div class='clickableme' onclick='{!c.cssalert}'>@@@TOKEN@@@</div>"
+						+ "<div class='attroutput'>{!v.output}</div>"
+						+ "</aura:component>");
 
-        createDef(ThemeDef.class, String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, namespace, cmpName),
-        ".THIS {background-image: url(/auraFW/resources/qa/images/s.gif?@@@TOKEN@@@);}");
+		createDef(NamespaceDef.class, String.format("%s://%s",
+				DefDescriptor.MARKUP_PREFIX, namespace),
+				"<aura:namespace></aura:namespace>");
 
-        createDef(ControllerDef.class,
-                String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, namespace, cmpName),
-                "{ cssalert:function(c){" + "function getStyle(elem, style){" + "var val = '';"
-                + "if(document.defaultView && document.defaultView.getComputedStyle){"
-                + "val = document.defaultView.getComputedStyle(elem, '').getPropertyValue(style);"
-                + "} else if(elem.currentStyle){" + "style = style.replace(/\\-(\\w)/g, function (s, ch){"
-                + "return ch.toUpperCase();" + "});" + "val = elem.currentStyle[style];" + "}" + "return val;"
-                + "};" + "var style = getStyle(c.getElement(),'background-image');"
-                + "c.getValue('v.output').setValue('@@@TOKEN@@@'"
-                + "+ style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')'))"
-                + "+ ($A.test ? $A.test.dummyFunction() : '@@@TOKEN@@@'));" + "}}");
+		createDef(ThemeDef.class, String.format("%s://%s.%s",
+				DefDescriptor.CSS_PREFIX, namespace, cmpName),
+				".THIS {background-image: url(/auraFW/resources/qa/images/s.gif?@@@TOKEN@@@);}");
 
-        createDef(ApplicationDef.class, String.format("%s:%s", namespace, appName), String.format(
-                "<aura:application useAppcache='true' render='client' preload='%s'"
-                + " securityProvider='java://org.auraframework.java.securityProvider.LaxSecurityProvider'>"
-                + "<%s:%s/>" + "</aura:application>", namespace, namespace, cmpDesc.getName()));
-    }
+		createDef(
+				ControllerDef.class,
+				String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX,
+						namespace, cmpName),
+				"{ cssalert:function(c){"
+						+ "function getStyle(elem, style){"
+						+ "var val = '';"
+						+ "if(document.defaultView && document.defaultView.getComputedStyle){"
+						+ "val = document.defaultView.getComputedStyle(elem, '').getPropertyValue(style);"
+						+ "} else if(elem.currentStyle){"
+						+ "style = style.replace(/\\-(\\w)/g, function (s, ch){"
+						+ "return ch.toUpperCase();"
+						+ "});"
+						+ "val = elem.currentStyle[style];"
+						+ "}"
+						+ "return val;"
+						+ "};"
+						+ "var style = getStyle(c.getElement(),'background-image');"
+						+ "c.getValue('v.output').setValue('@@@TOKEN@@@'"
+						+ "+ style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')'))"
+						+ "+ ($A.test ? $A.test.dummyFunction() : '@@@TOKEN@@@'));"
+						+ "}}");
+
+		createDef(
+				ApplicationDef.class,
+				String.format("%s:%s", namespace, appName),
+				String.format(
+						"<aura:application useAppcache='true' render='client' preload='%s'"
+								+ " securityProvider='java://org.auraframework.java.securityProvider.LaxSecurityProvider'>"
+								+ "<%s:%s/>" + "</aura:application>",
+						namespace, namespace, cmpDesc.getName()));
+	}
 
     @Override
     public void tearDown() throws Exception {

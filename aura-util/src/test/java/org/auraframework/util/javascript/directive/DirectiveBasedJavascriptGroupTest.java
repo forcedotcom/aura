@@ -63,8 +63,8 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
      * were to INCLUDE a new js file using a include directive in on of the
      * files in the group , then isStale() would still work.
      */
-    public void testisStale() throws Exception {
-        File newFile = getResourceFile("/testdata/javascript/testisStale.js");
+    public void testIsStale() throws Exception {
+        File newFile = getResourceFile("/testdata/javascript/testIsStale.js");
         newFile.getParentFile().mkdirs();
         Writer writer = new FileWriter(newFile, false);
         try {

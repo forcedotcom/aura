@@ -46,7 +46,7 @@ public class AuraJavascriptResourceGroup implements JavascriptGroup {
     private final long lastMod;
     private final Hash hash;
 
-    public AuraJavascriptResourceGroup(String resourceRoot) {
+    public AuraJavascriptResourceGroup() {
         // We're going to scan the classpath for resources /aura/javascript/...
         // and /aura/resources/..., and hash those.
         Reflections reflection = new Reflections(new ConfigurationBuilder().filterInputsBy(new Predicate<String>() {

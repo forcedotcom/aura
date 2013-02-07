@@ -83,17 +83,33 @@
                 <td><code>&lt;aura:attribute name="message" type="String" /&gt;</code></td>
                 <td>A sequence of characters.</td>
             </tr>
-            <!-- ML 5/29/12: Not documenting type="Object" for now as can't find valid use cases -->
-
         </tbody>
     </table>
 
     <h2>Support for Arrays</h2>
-
     <p>You can also use arrays for each of these basic types. For example:</p>
-
-
 <auradocs:codeblock><![CDATA[<aura:attribute name="favoriteColors" type="String[]" />
 ]]></auradocs:codeblock>
 
+    <h2>Support for  Objects</h2>
+    <p>An <code>aura:attribute</code> can have a type corresponding to an Object.
+    <auradocs:codeblock> &lt;aura:attribute name="data" type="Object" /&gt;</auradocs:codeblock>
+    </p>
+    <p>
+    For example, you want to create an attribute type to pass a JavaScript array as an event parameter.
+    <auradocs:codeblock>
+    // Set the event parameters
+    var event = component.getEvent(eventType);
+    event.setParams({
+        files:[]
+    });
+    event.fire();
+    </auradocs:codeblock>
+    In the component event, declare the event parameter using <code>aura:attribute</code>.
+    <auradocs:codeblock>
+    &lt;aura:event type="COMPONENT" support="GA"&gt;
+        &lt;aura:attribute name="data" type="Object" /&gt;
+    &lt;aura:event&gt;
+    </auradocs:codeblock>
+    </p>
 </aura:component>

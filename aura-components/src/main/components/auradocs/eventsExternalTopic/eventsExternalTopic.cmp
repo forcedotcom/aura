@@ -1,0 +1,38 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="Firing Aura Events from Non-Aura Code"/>
+
+    <p>You can fire an Aura event from JavaScript code outside an Aura app. For example, your Aura app might need to call out to some non-Aura code, and then have that code communicate back to the Aura code once it's done.</p>
+
+    <p>For example, you could call external code that needs to log into another system and return some data to your Aura app.
+    Let's call your new event <code>mynamespace:externalEvent</code>. You'll fire this event when your non-Aura code is done by including this JavaScript in your non-Aura code.</p>
+
+<auradocs:codeblock>
+var myExternalEvent;
+    if(window.opener.$A &amp;&amp; (myExternalEvent = window.opener.$A.get("e.mynamespace:externalEvent"))) {
+         myExternalEvent.setParams({isOauthed:true});
+         myExternalEvent.fire();
+       }
+</auradocs:codeblock>
+<p><code>window.opener.$A.get()</code> references the master window where your Aura app is loaded.</p>
+  <p><b>See also:</b><br/>
+      <auradocs:topicLink topic="eventsApp">Application Events</auradocs:topicLink>
+    </p>
+</aura:component>

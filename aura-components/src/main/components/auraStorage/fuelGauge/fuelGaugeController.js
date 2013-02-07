@@ -15,24 +15,6 @@
  */
 {
     update : function(cmp, event, helper){
-    	if (helper.isEnabled()) {
-    		var storage = $A.storageService.getStorage();
-	    	var size = storage.getSize();
-	    	var maxSize = storage.getMaxSize();
-	    	
-	    	var severity;
-	    	if (size < maxSize / 2) {
-	    		severity = "success";
-	    	} else if (size < maxSize) {
-	    		severity = "warning";
-	    	} else {
-	    		severity = "important";
-	    	}
-	    	
-	    	var stamp = cmp.find("stamp");
-	    	stamp.getValue("v.severity").setValue(severity);
-	    	
-	    	cmp.getValue("v.value").setValue(Math.round(size * 100) / 100);
-    	}
+    	helper.update(cmp);
     }
 }

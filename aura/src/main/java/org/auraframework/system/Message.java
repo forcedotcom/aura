@@ -18,7 +18,6 @@ package org.auraframework.system;
 import java.util.List;
 
 import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
 
@@ -27,21 +26,13 @@ public class Message<T extends BaseComponentDef> {
     private final List<Action> actions;
     private final List<Event> clientEvents;
 
-    // These two fields are for requesting component/app defs on a GET request.
-    // TODO: They should go away when we have a standard component
-    // controller--everything will be an action
-    private final DefDescriptor<T> defDescriptor;
-    private final T def;
-
-    public Message(List<Action> actions, DefDescriptor<T> defDescriptor, T def) {
-        this(actions, null, defDescriptor, def);
+    public Message(List<Action> actions) {
+        this(actions, null);
     }
 
-    public Message(List<Action> actions, List<Event> events, DefDescriptor<T> defDescriptor, T def) {
+    public Message(List<Action> actions, List<Event> events) {
         this.actions = actions;
         this.clientEvents = events;
-        this.defDescriptor = defDescriptor;
-        this.def = def;
     }
 
     public List<Action> getActions() {
@@ -50,13 +41,5 @@ public class Message<T extends BaseComponentDef> {
 
     public List<Event> getClientEvents() {
         return clientEvents;
-    }
-
-    public DefDescriptor<T> getDefDescriptor() {
-        return defDescriptor;
-    }
-
-    public T getDef() {
-        return def;
     }
 }

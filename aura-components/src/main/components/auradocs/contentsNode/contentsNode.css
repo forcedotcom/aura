@@ -13,18 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
-    render : function(cmp, helper){
-    	var enabled = helper.isEnabled();
-		cmp.getValue("v.enabled").setValue(enabled);
-		
-		if (enabled) {
-    		var storage = $A.storageService.getStorage();
-			cmp.getValue("v.implementation").setValue(storage.getName());
-			
-	    	helper.update(cmp);
-		}
-		
-    	return this.superRender(); 
-    }
+.THIS {
+    font-size: 13px;
 }

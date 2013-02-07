@@ -23,16 +23,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
-import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.Action;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.Message;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -90,7 +86,7 @@ public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServ
             params.put("param", param1);
             actionList.add((Action) Aura.getInstanceService().getInstance(actionDescriptor, params));
 
-            msg = new Message<BaseComponentDef>(actionList, null, null);
+            msg = new Message<BaseComponentDef>(actionList);
             result = service.run(msg, ctx);
 
             actions = result.getActions();
@@ -107,7 +103,7 @@ public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServ
             actionList.add((Action) Aura.getInstanceService().getInstance(
                     Aura.getDefinitionService().getDefDescriptor(action2, ActionDef.class), params));
 
-            msg = new Message<BaseComponentDef>(actionList, null, null);
+            msg = new Message<BaseComponentDef>(actionList);
             result = service.run(msg, ctx);
 
             actions = result.getActions();
@@ -126,49 +122,6 @@ public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServ
         } finally {
             contextService.endContext();
         }
-        return null;
-    }
-
-    @Override
-    public <T extends BaseComponentDef> Message<T> temporaryGet(Message<T> message, AuraContext context)
-            throws DefinitionNotFoundException, QuickFixException {
-        ContextService contextService = Aura.getContextService();
-        DefinitionService definitionService = Aura.getDefinitionService();
-        String appName = "auratest:testApplication3";
-        String cmpName = "auratest:testComponent1";
-        DefDescriptor<ApplicationDef> appDesc = definitionService.getDefDescriptor(appName, ApplicationDef.class);
-
-        try {
-            AuraContext ctx = contextService.startContext(config.mode, config.format, config.access, appDesc);
-
-            // test get application
-            DefDescriptor<ApplicationDef> appDefDescriptor = definitionService.getDefDescriptor(appName,
-                    ApplicationDef.class);
-            Message<ApplicationDef> appMsg = new Message<ApplicationDef>(null, appDefDescriptor, null);
-
-            try {
-                Message<ApplicationDef> appResult = service.temporaryGet(appMsg, ctx);
-                ApplicationDef appDef = appResult.getDef();
-                assertEquals(appDefDescriptor, appDef.getDescriptor());
-                // assertTrue(ctx.getPreloads().containsAll(appDef.getPreloads()));
-            } catch (DefinitionNotFoundException e) {
-                if (ctx.getAccess() != Access.PUBLIC) {
-                    throw e;
-                }
-            }
-
-            // test get component
-            DefDescriptor<ComponentDef> cmpDefDescriptor = definitionService.getDefDescriptor(cmpName,
-                    ComponentDef.class);
-            Message<ComponentDef> defMsg = new Message<ComponentDef>(null, cmpDefDescriptor, null);
-            Message<ComponentDef> defResult = service.temporaryGet(defMsg, ctx);
-
-            ComponentDef cmpDef = defResult.getDef();
-            assertEquals(cmpDefDescriptor, cmpDef.getDescriptor());
-        } finally {
-            contextService.endContext();
-        }
-
         return null;
     }
 
@@ -201,7 +154,7 @@ public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServ
                 fail();
             }
 
-            msg = new Message<BaseComponentDef>(actionList, null, null);
+            msg = new Message<BaseComponentDef>(actionList);
             asyncCallback = new StringBuilder();
             expectedCallback = new StringBuilder();
 
@@ -240,7 +193,7 @@ public class ServerServiceTest extends BaseServiceTest<ServerService, ServerServ
                 fail();
             }
 
-            msg = new Message<BaseComponentDef>(actionList, null, null);
+            msg = new Message<BaseComponentDef>(actionList);
             asyncCallback = new StringBuilder();
             expectedCallback = new StringBuilder();
 

@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.IOUtil;
+import org.auraframework.util.text.Hash;
 
 /**
  * Tests for CommonJavascriptGroupImpl class {@link CommonJavascriptGroupImpl}.
@@ -113,6 +115,85 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
             newFile.delete();
         }
     }
+
+	/**
+	 * Test that group hash is recalculated only during certain actions. We test
+	 * with recorded hash values because the value should only depend on the
+	 * file content which is defined in the test and shouldn't depend on file
+	 * names or other external factors.
+	 */
+	public void testGetGroupHash() throws Exception {
+		File newFile = getResourceFile("/testdata/javascript/testGetGroupHash.js");
+		newFile.getParentFile().mkdirs();
+		Writer writer = new FileWriter(newFile, false);
+		try {
+			writer.append("var simple='hi';");
+			writer.flush();
+		} finally {
+			writer.close();
+		}
+
+		File nestedFile = new File(newFile.getParentFile(),
+				"testDir/testGetGroupHashNested.js");
+		nestedFile.getParentFile().mkdir();
+
+		File dest = File.createTempFile(getName(), "");
+
+		try {
+			TestCommonJavascriptGroupImpl test = new TestCommonJavascriptGroupImpl(
+					"test", newFile.getParentFile());
+			Hash hash = test.getGroupHash();
+			assertEquals("Unexpected hash", "1B2M2Y8AsgTpgAmY7PhCfg",
+					hash.toString());
+
+			// Need this sleep so the last modified time changes, otherwise the
+			// test runs too fast and the test fails
+			// because the last modified time was not updated by the OS
+			Thread.sleep(2000);
+			// Update a js file which is part of the group
+			writer = new FileWriter(newFile, false);
+			writer.append("var simple='bye';");
+			writer.close();
+
+			// hash value is retained after update, but recalculated when adding
+			// file to the group
+			hash = test.getGroupHash();
+			assertEquals("Hash shouldn't be updated without a manual reset",
+					"1B2M2Y8AsgTpgAmY7PhCfg", hash.toString());
+			// just add same file to trigger
+			test.addFile("testGetGroupHash.js");
+			hash = test.getGroupHash();
+			assertEquals(
+					"Hash should have been updated after file added to group",
+					"4EZCacmVcFMwWJRaluefgw", hash.toString());
+
+			// hash value doesn't change when adding empty directory to group
+			test.addDirectory("testDir");
+			hash = test.getGroupHash();
+			assertEquals(
+					"Hash should not have changed after adding empty directory to group",
+					"4EZCacmVcFMwWJRaluefgw", hash.toString());
+
+			// hash value should change when adding non-empty directory to group
+			writer = new FileWriter(nestedFile, false);
+			try {
+				writer.append("var simple='sayonara';");
+				writer.flush();
+			} finally {
+				writer.close();
+			}
+
+			test.addDirectory("testDir");
+			hash = test.getGroupHash();
+			assertEquals(
+					"Hash should have been updated after adding non-empty directory to group",
+					"CUadD1uu9gF9HA_AFPb0Cg", hash.toString());
+		} finally {
+			IOUtil.delete(dest);
+			IOUtil.delete(nestedFile.getParentFile());
+			newFile.delete();
+		}
+	}
 
     /*
      * Helper Function, add more stuff as CommonJavascriptGroup gets Fleshed out

@@ -30,7 +30,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  */
 public interface Integration {
 	/**
-	 * Generate a <script> tag that will correctly embed an instance of an Aura
+	 * Generate a &lt;script&gt; tag that will correctly embed an instance of an Aura
 	 * application and context
 	 * 
 	 * @param out
@@ -41,7 +41,7 @@ public interface Integration {
 	void injectApplication(Appendable out) throws AuraRuntimeException, IOException;
 
 	/**
-	 * Generate a <script> tag that will correctly embed an instance of an Aura
+	 * Generate a &lt;script&gt; tag that will correctly embed an instance of an Aura
 	 * component bound to the DOM element identified by localDomId
 	 * 
 	 * @param tag

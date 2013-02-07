@@ -18,7 +18,6 @@ package org.auraframework.test.mock;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Callable;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ModelDef;

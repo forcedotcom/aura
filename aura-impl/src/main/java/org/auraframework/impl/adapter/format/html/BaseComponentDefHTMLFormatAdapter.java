@@ -114,7 +114,7 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
                 attributes.put("auraBaseScriptTags", sb.toString());
 
                 sb.setLength(0);
-                writeLazyHtmlScripts(AuraServlet.getNamespacesScripts(), sb);
+                writeHtmlScripts(AuraServlet.getNamespacesScripts(), sb);
                 attributes.put("auraNamespacesScriptTags", sb.toString());
 
                 Map<String, Object> auraInit = Maps.newHashMap();

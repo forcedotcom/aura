@@ -20,7 +20,7 @@
     controller="java://org.auraframework.docs.DocsController"
     securityProvider="java://org.auraframework.docs.DocsSecurityProvider"
     useAppcache="true"
-    preload="auradocs"
+    preload="auradocs,aurastorage"
     locationChangeEvent="auradocs:locationChange"
     implements="auraStorage:refreshObserver">
 
@@ -28,9 +28,6 @@
     <aura:handler event="aura:doneWaiting" action="{!c.doneWaiting}"/>
     <aura:handler name="refreshBegin" action="{!c.refreshBegin}"/>
     <aura:handler name="refreshEnd" action="{!c.refreshEnd}"/>
-
-	<auraStorage:init implementation="memory" maxSize="1024" defaultExpiration="600" 
-		defaultAutoRefreshInterval="600" debugLoggingEnabled="false" clearStorageOnInit="true"/>
 	
     <auradocs:nav aura:id="navbar"/>
 

@@ -215,10 +215,35 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * to avoid repeated lookups.
      */
     private static class CompilingDef<T extends Definition> {
+        /**
+         * The descriptor we are compiling.
+         */
         public DefDescriptor<T> descriptor;
+
+        /**
+         * The compiled def.
+         *
+         * Should be non-null by the end of compile.
+         */
         public T def;
+
+        /**
+         * The registry associated with the def.
+         */
         public DefRegistry<T> registry;
+
+        /**
+         * All of the parents (needed in the case that we fail).
+         */
         public Set<Definition> parents = Sets.newHashSet();
+
+        /**
+         * Did we build this definition?.
+         *
+         * If this is true, we need to do the validation steps after
+         * finishing.
+         */
+        public boolean built = false;
 
         public void markValid() {
             if (def != null) {
@@ -259,6 +284,35 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         }
     }
 
+    private void appendDependencies(Definition def, CompileContext cc, Set<DefDescriptor<?>> deps)
+            throws QuickFixException {
+        Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
+
+        def.appendDependencies(newDeps);
+        //
+        // FIXME: this code will go away with preloads.
+        //
+        if (!cc.addedPreloads && def.getDescriptor().getDefType().equals(DefType.APPLICATION)) {
+            cc.addedPreloads = true;
+            Set<String> preloads = cc.context.getPreloads();
+            for (String preload : preloads) {
+                if (!preload.contains("_")) {
+                    DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
+                    ddb.setResource(preload);
+                    ddb.setType("APPLICATION,COMPONENT,STYLE,EVENT");
+                    ddb.build().appendDependencies(newDeps);
+                }
+            }
+        }
+        for (DefDescriptor<?> dep : newDeps) {
+            if (!defs.containsKey(dep)) {
+                CompilingDef<?> depcd = cc.getCompiling(dep);
+                depcd.parents.add(def);
+            }
+        }
+        deps.addAll(newDeps);
+    }
+
     /**
      * A private helper routine to make the compiler code more sane.
      * 
@@ -286,6 +340,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                                                Set<DefDescriptor<?>> deps) throws QuickFixException {
         @SuppressWarnings("unchecked")
         D def = (D) defs.get(descriptor);
+        CompilingDef<D> cd = cc.getCompiling(descriptor);
 
         if (def != null) {
             //
@@ -294,14 +349,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             // have to continue the tree walk because some defs might not be
             // cached (FIXME: we should cache all defs).
             //
-            if (cc.dependencies != null && !cc.dependencies.containsKey(def.getDescriptor())) {
-                def.appendDependencies(deps);
-                cc.dependencies.put(def.getDescriptor(), def);
-            }
+            appendDependencies(def, cc, deps);
+            cc.dependencies.put(def.getDescriptor(), def);
+            cd.def = def;
             return def;
         }
         DefRegistry<D> registry = getRegistryFor(descriptor);
-        CompilingDef<D> cd = cc.getCompiling(descriptor);
 
         if (registry != null) {
             def = registry.getDef(descriptor);
@@ -312,42 +365,19 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 cd.descriptor = canonical;
                 cd.def = def;
                 cd.registry = registry;
+                cd.built = true;
                 // cc.dependencies.put(canonical, def);
                 if (!def.isValid()) {
                     cc.loggingService.incrementNum(LoggingService.DEF_COUNT);
-                    // FIXME: setting the current namespace on the context seems
-                    // extremely hackish
+                    // FIXME: setting the current namespace on the context seems extremely hackish
                     cc.context.setCurrentNamespace(canonical.getNamespace());
                     def.validateDefinition();
                 }
-                Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
-
                 defs.put(def.getDescriptor(), def);
-                def.appendDependencies(newDeps);
                 if (cc.dependencies != null) {
                     cc.dependencies.put(canonical, def);
                 }
-                //
-                // FIXME: this code will go away with preloads.
-                //
-                if (!cc.addedPreloads && def.getDescriptor().getDefType().equals(DefType.APPLICATION)) {
-                    Set<String> preloads = cc.context.getPreloads();
-                    for (String preload : preloads) {
-                        if (!preload.contains("_")) {
-                            DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
-                            ddb.setResource(preload);
-                            ddb.setType("APPLICATION,COMPONENT");
-                            ddb.build().appendDependencies(newDeps);
-                        }
-                    }
-                }
-                for (DefDescriptor<?> dep : newDeps) {
-                    if (!defs.containsKey(dep)) {
-                        CompilingDef<?> depcd = cc.getCompiling(dep);
-                        depcd.parents.add(def);
-                    }
-                }
-                deps.addAll(newDeps);
+                appendDependencies(def, cc, deps);
                 return def;
             }
         }
@@ -440,7 +470,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 Set<DefDescriptor<?>> current = next;
                 next = Sets.newHashSet();
                 for (DefDescriptor<?> cdesc : current) {
-                    if (!cc.compiled.containsKey(cdesc) || cc.compiled.get(cdesc).def == null) {
+                    if (!cc.compiled.containsKey(cdesc)
+                            || (!defs.containsKey(cdesc) && cc.compiled.get(cdesc).def == null)) {
                         getHelper(cdesc, cc, next);
                     }
                 }
@@ -457,7 +488,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             // now.
             //
             for (CompilingDef<?> cd : cc.compiled.values()) {
-                if (cd.def != null) {
+                if (cd.built) {
                     defs.put(cd.descriptor, cd.def);
                 }
             }
@@ -466,7 +497,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             // Now validate our references.
             //
             for (CompilingDef<?> cd : cc.compiled.values()) {
-                if (cd.def != null) {
+                if (cd.built) {
                     // FIXME: setting the current namespace on the context seems
                     // extremely hackish
                     cc.context.setCurrentNamespace(cd.descriptor.getNamespace());
@@ -489,7 +520,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             for (CompilingDef<?> cd : cc.compiled.values()) {
                 // FIXME: setting the current namespace on the context seems
                 // extremely hackish
-                if (cd.def != null) {
+                if (cd.built) {
                     cc.context.setCurrentNamespace(cd.descriptor.getNamespace());
                     cd.markValid();
                     if (defs != null) {

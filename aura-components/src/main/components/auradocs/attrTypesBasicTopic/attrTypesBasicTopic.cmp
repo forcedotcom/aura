@@ -96,20 +96,23 @@
     <auradocs:codeblock> &lt;aura:attribute name="data" type="Object" /&gt;</auradocs:codeblock>
     </p>
     <p>
-    For example, you want to create an attribute type to pass a JavaScript array as an event parameter.
+    For example, you may want to create an attribute of type Object to pass a JavaScript array as an event parameter.
+      In the component event, declare the event parameter using <code>aura:attribute</code>.
+    <auradocs:codeblock>
+    &lt;aura:event type="COMPONENT" support="GA"&gt;
+        &lt;aura:attribute name="arrayAsObject" type="Object" /&gt;
+    &lt;aura:event&gt;
+    </auradocs:codeblock>
+    </p>
+    <p>In JavaScript code, you can then set the attribute of type Object.
     <auradocs:codeblock>
     // Set the event parameters
     var event = component.getEvent(eventType);
     event.setParams({
-        files:[]
+        arrayAsObject:["file1", "file2", "file3"]
     });
     event.fire();
     </auradocs:codeblock>
-    In the component event, declare the event parameter using <code>aura:attribute</code>.
-    <auradocs:codeblock>
-    &lt;aura:event type="COMPONENT" support="GA"&gt;
-        &lt;aura:attribute name="data" type="Object" /&gt;
-    &lt;aura:event&gt;
-    </auradocs:codeblock>
+
     </p>
 </aura:component>

@@ -1,5 +1,8 @@
 ({
-	
+	setUp : function(component){
+		$A.storageService.getStorage().clear();
+    },
+    
 	testActionStorageProperties:{
 		attributes:{
 			implementation : "memory"
@@ -99,12 +102,13 @@
 			aThird.runAfter(aThird);
 			var requestTime = new Date().getTime();
 			//Make sure we haven't reached the autorefresh timeout already. Default is set to 60, so 30 is quite conservative
-			$A.test.assertTrue( ((requestTime-cmp._requestStoredTime)/1000<30), "Test setup failure, increase defaultAutoRefreshInterval time.");
+			$A.test.assertTrue( ((requestTime - cmp._requestStoredTime) / 1000 < 30), "Test setup failure, increase defaultAutoRefreshInterval time.");
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor("SUCCESS", function(){return aThird.getState()},
                     function(){
 							$A.test.assertTrue(aThird.isFromStorage(), "failed to fetch cached response");
 						});
+			
 			var refreshTime; 
 			$A.test.addWaitFor("refreshBegin", 
 					function(){
@@ -113,7 +117,7 @@
 					function(){
 						refreshTime = new Date().getTime();
 						//Verify that the refresh begin event kicked off
-						$A.test.assertTrue( ((refreshTime-requestTime)/1000)< 5 );
+						$A.test.assertTrue( ((refreshTime - requestTime) / 1000) < 5);
 						$A.test.addWaitFor("refreshEnd", 
 							function(){
 								return $A.test.getText(cmp.find("refreshEnd").getElement())

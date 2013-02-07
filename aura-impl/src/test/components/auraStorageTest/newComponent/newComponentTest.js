@@ -24,16 +24,16 @@
 	testActionIds:{
 		test:[function(cmp){
 			var a = cmp.get("c.getRoster");
-			$A.test.assertEquals("1." + $A.getContext().getNum(), a.getId(), "Action numbering gone wild - Client Action(1)");
+			$A.test.assertEquals("2." + $A.getContext().getNum(), a.getId(), "Action numbering gone wild - Client Action(1)");
 			var b = cmp.get("c.getRoster");
-			$A.test.assertEquals("2." + $A.getContext().getNum(), b.getId(), "Action numbering gone wild - Client Action(2)");
+			$A.test.assertEquals("3." + $A.getContext().getNum(), b.getId(), "Action numbering gone wild - Client Action(2)");
 		},function(cmp){
 			var a = cmp.get("c.getBaseball");
-			$A.test.assertEquals("3." + $A.getContext().getNum(), a.getId(), "Action numbering gone wild - Server Action(1)");
+			$A.test.assertEquals("4." + $A.getContext().getNum(), a.getId(), "Action numbering gone wild - Server Action(1)");
 			var b = cmp.get("c.getBaseball");
-			$A.test.assertEquals("4." + $A.getContext().getNum(), b.getId(), "Action Numbering gone wild - Server Action(2)");
+			$A.test.assertEquals("5." + $A.getContext().getNum(), b.getId(), "Action Numbering gone wild - Server Action(2)");
 			var c = cmp.get("c.resetCounter");
-			$A.test.assertEquals("5." + $A.getContext().getNum(), c.getId(), "Action Numbering gone wild - Server Action(3)");
+			$A.test.assertEquals("6." + $A.getContext().getNum(), c.getId(), "Action Numbering gone wild - Server Action(3)");
 			c.runAfter(c);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor(false, $A.test.isActionPending,
@@ -41,7 +41,7 @@
 							//After a action request was sent to server, context will increment its counter.
 							var d = cmp.get("c.getBaseball");
 							$A.test.assertEquals(2, $A.getContext().getNum(), "Context lost track of request numbers" )
-							$A.test.assertEquals("6." + $A.getContext().getNum(), d.getId(), "Action Numbering gone wild - Server Action(4)");
+							$A.test.assertEquals("7." + $A.getContext().getNum(), d.getId(), "Action Numbering gone wild - Server Action(4)");
 						});
 		}
 		]
@@ -59,7 +59,7 @@
 			/**
 			 * Group of actions.
 			 */
-			$A.test.assertEquals("1:1", cmp.getGlobalId(), "Invalid GlobalId for root component");
+			$A.test.assertEquals("1:1.1", cmp.getGlobalId(), "Invalid GlobalId for root component");
 			var a = cmp.get("c.getRoster");
 			a.run();
 			$A.eventService.finishFiring();
@@ -145,7 +145,7 @@
 			/**
 			 * Group of actions, store them.
 			 */
-			$A.test.assertEquals("1:1", cmp.getGlobalId(), "Invalid GlobalId for root component");
+			$A.test.assertEquals("1:1.1", cmp.getGlobalId(), "Invalid GlobalId for root component");
 			var a = cmp.get("c.getRosterFromStorage");
 			a.run();
 			$A.eventService.finishFiring();

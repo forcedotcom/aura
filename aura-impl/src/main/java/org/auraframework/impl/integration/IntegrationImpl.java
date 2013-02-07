@@ -107,7 +107,7 @@ public class IntegrationImpl implements Integration {
 				context.setCurrentAction(previous);
 			}
 
-			Message<?> message = new Message<ComponentDef>(Lists.newArrayList(action), null, null);
+			Message<?> message = new Message<ComponentDef>(Lists.newArrayList(action));
 
 			try {
 				StringBuilder init = new StringBuilder();

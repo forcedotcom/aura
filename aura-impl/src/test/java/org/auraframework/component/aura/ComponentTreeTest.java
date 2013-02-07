@@ -92,11 +92,11 @@ public class ComponentTreeTest extends WebDriverTestCase {
             BaseComponent<?, ?> vp = cmp.getAttributes().getValueProvider();
 
             serverIndexSB.setLength(0);
-            serverIndexSB.append(cmp.getGlobalId()).append(" : ").append(cmp.getDescriptor().toString());
+            serverIndexSB.append(cmp.getGlobalId()).append(".1 : ").append(cmp.getDescriptor().toString());
             serverIndexSB.append(" [ ");
 
             if (vp != null) {
-                serverIndexSB.append(vp.getGlobalId()).append(" : ").append(vp.getDescriptor().toString());
+                serverIndexSB.append(vp.getGlobalId()).append(".1 : ").append(vp.getDescriptor().toString());
             }
 
             serverIndexSB.append(" ] ");

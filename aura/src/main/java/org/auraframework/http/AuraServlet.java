@@ -184,16 +184,12 @@ public class AuraServlet extends AuraBaseServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Message<?> message;
-        Message<?> ret;
-        ServerService serverService;
         AuraContext context;
         String tagName;
         DefType defType;
 
         response.setCharacterEncoding(UTF_ENCODING);
         try {
-            serverService = Aura.getServerService();
             context = Aura.getContextService().getCurrentContext();
             response.setContentType(getContentType(context.getFormat()));
         } catch (RuntimeException re) {
@@ -206,7 +202,9 @@ public class AuraServlet extends AuraBaseServlet {
             send404(request, response);
             return;
         }
-        try {
+        
+        BaseComponentDef def;
+		try {
             tagName = tag.get(request);
             defType = defTypeParam.get(request, DefType.COMPONENT);
 
@@ -224,20 +222,21 @@ public class AuraServlet extends AuraBaseServlet {
             if (handleNoCacheRedirect(request, response)) {
                 return;
             }
-
-            message = getGetMessage(tagName, defType);
-
-            try {
-                ret = serverService.temporaryGet(message, context);
-            } catch (QuickFixException x) {
-                handleServletException(x, true, context, request, response, false);
-                return;
-            }
+            
+			DefinitionService definitionService = Aura.getDefinitionService();
+			DefDescriptor<? extends BaseComponentDef> defDescriptor = definitionService.getDefDescriptor(tagName, defType == DefType.APPLICATION ? ApplicationDef.class : ComponentDef.class);
+			
+			Aura.getContextService().getCurrentContext().setApplicationDescriptor(defDescriptor);
+			
+            def = defDescriptor.getDef();
         } catch (RequestParam.InvalidParamException ipe) {
             handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
             return;
         } catch (RequestParam.MissingParamException mpe) {
             handleServletException(new SystemErrorException(mpe), false, context, request, response, false);
+            return;
+        } catch (QuickFixException qfe) {
+            handleServletException(qfe, true, context, request, response, false);
             return;
         } catch (Throwable t) {
             handleServletException(t, false, context, request, response, false);
@@ -249,31 +248,11 @@ public class AuraServlet extends AuraBaseServlet {
             handleJsonFormat(request, response, tagName, defType, getComponentAttributes(request));
             break;
         case HTML:
-            handleHtmlFormat(request, response, ret.getDef(), getComponentAttributes(request));
+            handleHtmlFormat(request, response, def, getComponentAttributes(request));
             break;
         default:
             break;
         }
-    }
-
-    private Message<?> getGetMessage(String tagName, DefType defType) {
-        DefinitionService definitionService = Aura.getDefinitionService();
-        Message<?> message = null;
-
-        if (defType == DefType.APPLICATION) {
-            DefDescriptor<ApplicationDef> defDescriptor = definitionService.getDefDescriptor(tagName,
-                    ApplicationDef.class);
-            Aura.getContextService().getCurrentContext().setApplicationDescriptor(defDescriptor);
-            message = new Message<ApplicationDef>(null, defDescriptor, null);
-
-        } else if (defType == DefType.COMPONENT) {
-            DefDescriptor<ComponentDef> defDescriptor = definitionService.getDefDescriptor(tagName, ComponentDef.class);
-            message = new Message<ComponentDef>(null, defDescriptor, null);
-            Aura.getContextService().getCurrentContext().setApplicationDescriptor(defDescriptor);
-
-        }
-
-        return message;
     }
 
     /**

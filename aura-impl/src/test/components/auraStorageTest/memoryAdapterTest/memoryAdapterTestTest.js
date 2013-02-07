@@ -15,6 +15,10 @@
  */
  
 ({
+	setUp : function(component){
+		$A.storageService.getStorage().clear();
+    },
+
 	testSizeInitial:{
 		test:function(cmp) {
 			$A.test.assertEquals(0, $A.storageService.getStorage().getSize());

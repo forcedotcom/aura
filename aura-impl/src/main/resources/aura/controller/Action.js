@@ -377,12 +377,14 @@ Action.prototype.refresh = function() {
             storageService.log("Action.refresh(): auto refresh begin", action);
 
             var cmp = action.getComponent();
-            var isRefreshObserver = cmp.isInstanceOf("auraStorage:refreshObserver");
-            if (isRefreshObserver) {
-                // If our component implements auraStorage:refreshObserver then let it know that refreshing has started
-                cmp.getEvent("refreshBegin").setParams({
-                    "action": action
-                }).fire();
+            if (cmp) {            
+            	var isRefreshObserver = cmp.isInstanceOf("auraStorage:refreshObserver");
+	            if (isRefreshObserver) {
+	                // If our component implements auraStorage:refreshObserver then let it know that refreshing has started
+	                cmp.getEvent("refreshBegin").setParams({
+	                    "action": action
+	                }).fire();
+	            }
             }
 
             var refreshAction = action.getDef().newInstance(cmp);

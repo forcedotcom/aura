@@ -69,7 +69,7 @@ public class MessageJSONFormatAdapter extends JSONFormatAdapter<Message<?>> {
             }
         }
 
-        return new Message<ComponentDef>(actionList, null, null);
+        return new Message<ComponentDef>(actionList);
     }
 
     @Override

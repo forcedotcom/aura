@@ -66,6 +66,7 @@
     <p><b>See also:</b><br/>
     <auradocs:topicLink topic="eventsComp">Component Events</auradocs:topicLink><br/>
     <auradocs:topicLink topic="eventsApp">Application Events</auradocs:topicLink><br/>
-    <auradocs:topicLink topic="onchange">Detecting a Value Object Change</auradocs:topicLink>
+    <auradocs:topicLink topic="onchange">Detecting a Value Object Change</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="initHandler">Invoking Actions on Component Initialization</auradocs:topicLink>
     </p>
 </aura:component>

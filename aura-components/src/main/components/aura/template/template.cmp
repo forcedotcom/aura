@@ -256,8 +256,6 @@
             {!v.auraScriptTags}
             {!v.auraBaseScriptTags}
 
-            {!v.auraNamespacesScriptTags}
-
             {!v.auraPreInitBlock}
 
             <script>
@@ -273,6 +271,8 @@
             </script>
 
             {!v.auraInitBlock}
+
+            {!v.auraNamespacesScriptTags}
 
         </body>
     </html>

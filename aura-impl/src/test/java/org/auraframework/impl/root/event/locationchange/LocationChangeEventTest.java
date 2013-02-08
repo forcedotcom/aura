@@ -34,9 +34,8 @@ public class LocationChangeEventTest extends AuraImplTestCase {
     }
 
     /**
-     * A basic test to demonstrate how every application is registered to fire
-     * the LocationChange event. The definition(tree) of the application has a
-     * section called "locationChangeEventDef".
+     * A basic test to demonstrate how every application is registered to fire the LocationChange event. The
+     * definition(tree) of the application has a section called "locationChangeEventDef".
      * 
      * @throws Exception
      */
@@ -51,14 +50,15 @@ public class LocationChangeEventTest extends AuraImplTestCase {
     }
 
     /**
-     * Negative test case: Check that events used to handle location change
-     * always extend aura:locationChange.
+     * Negative test case: Check that events used to handle location change always extend aura:locationChange.
      */
     public void testRegisteredLocationChangeEventExtendsAuraLocationChange() throws Exception {
         try {
             Aura.getInstanceService().getInstance("test:test_LocChng_NoExtends", ApplicationDef.class);
             fail("Should have not fetched this component because the location change event does not extend aura:locationChange");
-        } catch (InvalidDefinitionException e) {
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class,
+                    "markup://test:test_LocChng_NoExtendsEvt must extend aura:locationChange", null);
         }
     }
 }

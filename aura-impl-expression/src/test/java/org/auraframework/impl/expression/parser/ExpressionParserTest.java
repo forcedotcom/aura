@@ -22,12 +22,11 @@ import org.auraframework.impl.expression.AuraImplExpressionTestCase;
 import org.auraframework.impl.expression.LiteralImpl;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
 
 /**
  * Tests for the expression parser
- * 
- * @hierarchy Aura.Runtime.Expression.Server.Parser
- * @userStory a07B0000000Ed9n
  */
 public class ExpressionParserTest extends AuraImplExpressionTestCase {
 
@@ -41,18 +40,18 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     public void testPrecedence() throws Exception {
         double result = 3.5 * 280 + 53145.3145 / -2.61;
         Expression e = buildExpression("3.5 * 280 + 53145.3145 / -2.61");
-        assertEquals(result, e.evaluate(null));
+        assertEquals("Unexpected expression evaluation", result, e.evaluate(null));
 
         result = (536 + .346) * 1.56 / 634 + 11 % 5;
         e = buildExpression("(536 + .346) * 1.56 / 634 + 11 % 5");
-        assertEquals(result, e.evaluate(null));
+        assertEquals("Unexpected expression evaluation", result, e.evaluate(null));
 
         result = 1 - -5;
         e = buildExpression("1 - -5");
-        assertEquals(result, e.evaluate(null));
+        assertEquals("Unexpected expression evaluation", result, e.evaluate(null));
 
         e = buildExpression("true ? true : false ? 16 : 21");
-        assertEquals(true, e.evaluate(null));
+        assertEquals("Unexpected expression evaluation", true, e.evaluate(null));
     }
 
     /**
@@ -61,64 +60,47 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
     public void testBoolPrecedence() throws Exception {
         boolean compare = 324.4326 < 259 / 134.6 + 2356;
         Expression e = buildExpression("324.4326 < 259 / 134.6 + 2356");
-        assertEquals(compare, e.evaluate(null));
+        assertEquals("Boolean precedence not evaluated correctly", compare, e.evaluate(null));
 
         compare = 324.4326 < 259 / (134.6 + 2356);
         e = buildExpression("324.4326 < 259 / (134.6 + 2356)");
-        assertEquals(compare, e.evaluate(null));
+        assertEquals("Boolean precedence not evaluated correctly", compare, e.evaluate(null));
 
         e = buildExpression("324.4326 == 259 / (134.6 + 2356) && (false || true)");
-        assertFalse(e.evaluate(null));
+        assertFalse("Boolean precedence not evaluated correctly", e.evaluate(null));
 
         e = buildExpression("346 > 346 ? 6541 / 21 - 77 : 235.66");
-        assertEquals(235.66, e.evaluate(null));
+        assertEquals("Boolean precedence not evaluated correctly", 235.66, e.evaluate(null));
 
         e = buildExpression("false == false ? 16 : 21");
-        assertEquals(16., e.evaluate(null));
+        assertEquals("Boolean precedence not evaluated correctly", 16., e.evaluate(null));
 
         e = buildExpression("false && false ? 16 : 21");
-        assertEquals(21., e.evaluate(null));
+        assertEquals("Boolean precedence not evaluated correctly", 21., e.evaluate(null));
 
         e = buildExpression("true ? 16 : 21 < 20");
-        assertEquals(16., e.evaluate(null));
+        assertEquals("Boolean precedence not evaluated correctly", 16., e.evaluate(null));
 
         e = buildExpression("! true && false");
-        assertEquals(false, e.evaluate(null));
+        assertEquals("Boolean precedence not evaluated correctly", false, e.evaluate(null));
     }
-
-    /**
-     * Consecutive boolean operations are parsed correctly.
-     */
-    // currently throws MismatchedTokenException
-    // W-930737 http://gus.soma.salesforce.com/a07B0000000EsUH
-    // @TestLabels(IgnoreFailureReason.IN_DEV)
-    // public void testBoolChain() throws Exception {
-    // Expression e = buildExpression("true == true == true");
-    // assertEquals(true, e.evaluate(null));
-    //
-    // e = buildExpression("1 > 2 == true");
-    // assertEquals(false, e.evaluate(null));
-    //
-    // e = buildExpression("true == 4 < 5");
-    // assertEquals(true, e.evaluate(null));
-    // }
 
     /**
      * Alternate relational operators can be parsed.
      */
     public void testAlternateNames() throws Exception {
         Expression e = buildExpression("55 eq 55");
-        assertTrue(e.evaluate(null));
+        assertTrue("Unexpected expression evaluation using alternate relational operators", e.evaluate(null));
         e = buildExpression("55 ne 55");
-        assertFalse(e.evaluate(null));
+        assertFalse("Unexpected expression evaluation using alternate relational operators", e.evaluate(null));
         e = buildExpression("55 ge 55");
-        assertTrue(e.evaluate(null));
+        assertTrue("Unexpected expression evaluation using alternate relational operators", e.evaluate(null));
         e = buildExpression("55 le 55");
-        assertTrue(e.evaluate(null));
+        assertTrue("Unexpected expression evaluation using alternate relational operators", e.evaluate(null));
         e = buildExpression("55 lt 55");
-        assertFalse(e.evaluate(null));
+        assertFalse("Unexpected expression evaluation using alternate relational operators", e.evaluate(null));
         e = buildExpression("55 gt 55");
-        assertFalse(e.evaluate(null));
+        assertFalse("Unexpected expression evaluation using alternate relational operators", e.evaluate(null));
     }
 
     /**
@@ -126,49 +108,49 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
      */
     public void testLiteralNumbers() throws Exception {
         Expression e = buildExpression("5");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         LiteralImpl l = (LiteralImpl) e;
-        assertEquals(5.0, l.getValue());
+        assertEquals("Unexpected number literal value", 5.0, l.getValue());
 
         e = buildExpression("5.345");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         l = (LiteralImpl) e;
-        assertEquals(5.345, l.getValue());
+        assertEquals("Unexpected number literal value", 5.345, l.getValue());
 
         e = buildExpression("911.");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         l = (LiteralImpl) e;
-        assertEquals(911., l.getValue());
+        assertEquals("Unexpected number literal value", 911., l.getValue());
 
         e = buildExpression(".119");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         l = (LiteralImpl) e;
-        assertEquals(.119, l.getValue());
+        assertEquals("Unexpected number literal value", .119, l.getValue());
 
         e = buildExpression("1e10");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         l = (LiteralImpl) e;
-        assertEquals(1e10, l.getValue());
+        assertEquals("Unexpected number literal value", 1e10, l.getValue());
 
         e = buildExpression("2.e20");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         l = (LiteralImpl) e;
-        assertEquals(2.e20, l.getValue());
+        assertEquals("Unexpected number literal value", 2.e20, l.getValue());
 
         e = buildExpression("0e0");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         l = (LiteralImpl) e;
-        assertEquals(0e0, l.getValue());
+        assertEquals("Unexpected number literal value", 0e0, l.getValue());
 
         e = buildExpression("1e01");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         l = (LiteralImpl) e;
-        assertEquals(1e01, l.getValue());
+        assertEquals("Unexpected number literal value", 1e01, l.getValue());
 
         e = buildExpression(".3e3");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         l = (LiteralImpl) e;
-        assertEquals(.3e3, l.getValue());
+        assertEquals("Unexpected number literal value", .3e3, l.getValue());
     }
 
     /**
@@ -176,12 +158,14 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
      */
     public void testLiteralStrings() throws Exception {
         Expression e = buildExpression("'ahfdh'");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         LiteralImpl l = (LiteralImpl) e;
         assertEquals("ahfdh", l.getValue());
 
+        verifyInvalidExpressionException("\"ahfdh\"", "unexpected token: '\"' at column 1 of expression: \"ahfdh\"");
+
         e = buildExpression("''");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         l = (LiteralImpl) e;
         assertEquals("", l.getValue());
     }
@@ -191,24 +175,24 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
      */
     public void testLiteralBools() throws Exception {
         Expression e = buildExpression("true");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         LiteralImpl l = (LiteralImpl) e;
-        assertTrue(l.getValue());
+        assertTrue("Case sensitivity of Boolean literlas failed", l.getValue());
 
         e = buildExpression("TRUE");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         l = (LiteralImpl) e;
-        assertTrue(l.getValue());
+        assertTrue("Case sensitivity of Boolean literlas failed", l.getValue());
 
         e = buildExpression("false");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         l = (LiteralImpl) e;
-        assertFalse(l.getValue());
+        assertFalse("Case sensitivity of Boolean literlas failed", l.getValue());
 
         e = buildExpression("FALSE");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         l = (LiteralImpl) e;
-        assertFalse(l.getValue());
+        assertFalse("Case sensitivity of Boolean literlas failed", l.getValue());
     }
 
     /**
@@ -216,40 +200,40 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
      */
     public void testPropertyReference() throws Exception {
         Expression e = buildExpression("im");
-        assertEquals(ExpressionType.PROPERTY, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.PROPERTY, e.getExpressionType());
         PropertyReference pr = (PropertyReference) e;
-        assertEquals("im", pr.getRoot());
-        assertNull(pr.getStem());
+        assertEquals("Unexpected root of PropertyReference", "im", pr.getRoot());
+        assertNull("Stemming end of PropertyReference should return null", pr.getStem());
 
         e = buildExpression("im.parsing");
-        assertEquals(ExpressionType.PROPERTY, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.PROPERTY, e.getExpressionType());
         pr = (PropertyReferenceImpl) e;
-        assertEquals("im", pr.getRoot());
+        assertEquals("Unexpected root of PropertyReference", "im", pr.getRoot());
         pr = pr.getStem();
-        assertEquals("parsing", pr.getRoot());
-        assertNull(pr.getStem());
+        assertEquals("Unexpected root of PropertyReference after stemming", "parsing", pr.getRoot());
+        assertNull("Stemming end of PropertyReference should return null", pr.getStem());
 
         e = buildExpression("im.not.nullish");
-        assertEquals(ExpressionType.PROPERTY, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.PROPERTY, e.getExpressionType());
         pr = (PropertyReferenceImpl) e;
-        assertEquals("im", pr.getRoot());
+        assertEquals("Unexpected root of PropertyReference", "im", pr.getRoot());
         pr = pr.getStem();
-        assertEquals("not", pr.getRoot());
+        assertEquals("Unexpected root of PropertyReference after stemming", "not", pr.getRoot());
         pr = pr.getStem();
-        assertEquals("nullish", pr.getRoot());
-        assertNull(pr.getStem());
+        assertEquals("Unexpected root of PropertyReference after stemming twice", "nullish", pr.getRoot());
+        assertNull("Stemming end of PropertyReference should return null", pr.getStem());
 
         e = buildExpression("_i.am_very._.readable_");
-        assertEquals(ExpressionType.PROPERTY, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.PROPERTY, e.getExpressionType());
         pr = (PropertyReferenceImpl) e;
-        assertEquals("_i", pr.getRoot());
+        assertEquals("Unexpected root of PropertyReference", "_i", pr.getRoot());
         pr = pr.getStem();
-        assertEquals("am_very", pr.getRoot());
+        assertEquals("Unexpected root of PropertyReference after stemming", "am_very", pr.getRoot());
         pr = pr.getStem();
-        assertEquals("_", pr.getRoot());
+        assertEquals("Unexpected root of PropertyReference after stemming twice", "_", pr.getRoot());
         pr = pr.getStem();
-        assertEquals("readable_", pr.getRoot());
-        assertNull(pr.getStem());
+        assertEquals("Unexpected root of PropertyReference after stemming thrice", "readable_", pr.getRoot());
+        assertNull("Stemming end of PropertyReference should return null", pr.getStem());
     }
 
     /**
@@ -257,61 +241,70 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
      */
     public void testArrayAccessors() throws Exception {
         Expression e = buildExpression("im[0]");
-        assertEquals(ExpressionType.PROPERTY, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.PROPERTY, e.getExpressionType());
         PropertyReference pr = (PropertyReference) e;
-        assertEquals("im", pr.getRoot());
+        assertEquals("Unexpected root of PropertyReference", "im", pr.getRoot());
         pr = pr.getStem();
-        assertEquals("0", pr.getRoot());
-        assertNull(pr.getStem());
+        assertEquals("Unable to access array member via PropertyReference", "0", pr.getRoot());
+        assertNull("Stemming end of PropertyReference should return null", pr.getStem());
 
         e = buildExpression("im.an[3151345]");
-        assertEquals(ExpressionType.PROPERTY, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.PROPERTY, e.getExpressionType());
         pr = (PropertyReference) e;
-        assertEquals("im", pr.getRoot());
+        assertEquals("Unexpected root of PropertyReference", "im", pr.getRoot());
         pr = pr.getStem();
-        assertEquals("an", pr.getRoot());
+        assertEquals("Unexpected root of PropertyReference after stemming", "an", pr.getRoot());
         pr = pr.getStem();
-        assertEquals("3151345", pr.getRoot());
-        assertNull(pr.getStem());
+        assertEquals("Unable to access array member via PropertyReference after stemming", "3151345", pr.getRoot());
+        assertNull("Stemming end of PropertyReference should return null", pr.getStem());
 
         e = buildExpression("im.an[3151345].array");
-        assertEquals(ExpressionType.PROPERTY, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.PROPERTY, e.getExpressionType());
         pr = (PropertyReference) e;
-        assertEquals("im", pr.getRoot());
+        assertEquals("Unexpected root of PropertyReference", "im", pr.getRoot());
         pr = pr.getStem();
-        assertEquals("an", pr.getRoot());
+        assertEquals("Unexpected root of PropertyReference after stemming", "an", pr.getRoot());
         pr = pr.getStem();
-        assertEquals("3151345", pr.getRoot());
+        assertEquals("Unable to access array member via PropertyReference after stemming", "3151345", pr.getRoot());
         pr = pr.getStem();
-        assertEquals("array", pr.getRoot());
-        assertNull(pr.getStem());
+        assertEquals("Unexpected root of PropertyReference after stemming and accessing array", "array", pr.getRoot());
+        assertNull("Stemming end of PropertyReference should return null", pr.getStem());
 
         e = buildExpression("multi[1][364]");
-        assertEquals(ExpressionType.PROPERTY, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.PROPERTY, e.getExpressionType());
         pr = (PropertyReference) e;
-        assertEquals("multi", pr.getRoot());
+        assertEquals("Unexpected root of PropertyReference", "multi", pr.getRoot());
         pr = pr.getStem();
-        assertEquals("1", pr.getRoot());
+        assertEquals("Unable to access array member via PropertyReference", "1", pr.getRoot());
         pr = pr.getStem();
-        assertEquals("364", pr.getRoot());
-        assertNull(pr.getStem());
+        assertEquals("Unable to access second array member via PropertyReference", "364", pr.getRoot());
+        assertNull("Stemming end of PropertyReference should return null", pr.getStem());
     }
 
     /**
-     * array access negative test
+     * Array access negative test cases
      */
     public void testInvalidArrayAccessor() throws Exception {
-        verifyParseException("[21]", "unexpected token: a left square bracket");
-        verifyParseException("blah[letters]", "expecting a positive integer, found 'letters'");
-        verifyParseException("postfix[5$]", "expecting a right square bracket, found '$'");
-        verifyParseException("prefix[$2]", "expecting a positive integer, found '$2'");
-        verifyParseException("negative[-5]", "expecting a positive integer, found '-'");
-        verifyParseException("positive[+5]", "expecting a positive integer, found '+'");
-        verifyParseException("decimal[5.5]", "expecting a positive integer, found '5.5'");
-        verifyParseException("unclosed[5", "unexpected end of expression");
-        verifyParseException("unopened5]", "unexpected token: an identifier");
-        verifyParseException("noindex[]", "expecting a positive integer, found ']'");
-        verifyParseException("paren[(33)]", "expecting a positive integer, found '('");
+        verifyInvalidExpressionException("[21]", "unexpected token: a left square bracket");
+        verifyInvalidExpressionException("blah[letters]", "expecting a positive integer, found 'letters'");
+        verifyInvalidExpressionException("postfix[5$]", "expecting a right square bracket, found '$'");
+        verifyInvalidExpressionException("prefix[$2]", "expecting a positive integer, found '$2'");
+        verifyInvalidExpressionException("negative[-5]", "expecting a positive integer, found '-'");
+        verifyInvalidExpressionException("positive[+5]", "expecting a positive integer, found '+'");
+        verifyInvalidExpressionException("decimal[5.5]", "expecting a positive integer, found '5.5'");
+        verifyInvalidExpressionException("unclosed[5", "unexpected end of expression");
+        verifyInvalidExpressionException("unopened5]", "unexpected token: an identifier");
+        verifyInvalidExpressionException("noindex[]", "expecting a positive integer, found ']'");
+        verifyInvalidExpressionException("paren[(33)]", "expecting a positive integer, found '('");
+    }
+
+    /**
+     * Consecutive boolean operations are parsed correctly.
+     */
+    public void testBoolChain() throws Exception {
+        verifyInvalidExpressionException("true == true == true", "unexpected token: '=='");
+        verifyInvalidExpressionException("1 > 2 == true", "unexpected token: '=='");
+        verifyInvalidExpressionException("true == 4 < 5", "unexpected token: '<'");
     }
 
     /**
@@ -319,26 +312,28 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
      */
     public void testEscapedString() throws Exception {
         Expression e = buildExpression("\t'over there! '\r\n\n");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         LiteralImpl l = (LiteralImpl) e;
-        assertEquals("over there! ", l.getValue());
+        assertEquals("Escape sequences not parsed correctly", "over there! ", l.getValue());
 
         e = buildExpression(" '\\'stuff me,\\' the unfilled teddy bear said to the child.'");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         l = (LiteralImpl) e;
-        assertEquals("'stuff me,' the unfilled teddy bear said to the child.", l.getValue());
+        assertEquals("Escape sequences not parsed correctly", "'stuff me,' the unfilled teddy bear said to the child.",
+                l.getValue());
 
         e = buildExpression("'the child blinked and replied,\n \t\\'I\\'d be delighted.\\''");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         l = (LiteralImpl) e;
-        assertEquals("the child blinked and replied,\n \t'I'd be delighted.'", l.getValue());
+        assertEquals("Escape sequences not parsed correctly", "the child blinked and replied,\n \t'I'd be delighted.'",
+                l.getValue());
 
-        // currently fails for escape characters
-        // W-929859 http://gus.soma.salesforce.com/a07B0000000Erv2
-        // e = buildExpression("'top\\\\\\\"2\\\"\\b\\f\\r\\n\\tbottom'");
-        // assertEquals(ExpressionType.LITERAL, e.getExpressionType());
-        // l = (LiteralImpl)e;
-        // assertEquals("top\2\b\f\r\n\tbottom", l.getValue());
+        /*
+         * TODO(W-1530127): Characters not escaped properly. e =
+         * buildExpression("'top\\\\\\\"2\\\"\\b\\f\\r\\n\\tbottom'"); assertEquals("Unexpected expression type",
+         * ExpressionType.LITERAL, e.getExpressionType()); l = (LiteralImpl) e;
+         * assertEquals("Escape sequences not parsed correctly", "top\"2\"\b\f\r\n\tbottom", l.getValue());
+         */
     }
 
     /**
@@ -346,63 +341,63 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
      */
     // currently fails when slash up front
     public void testNonEscapeBackslashInString() throws Exception {
-        verifyParseException("'not\\u32unicode'", "mismatched character 'u' expecting set null");
-        verifyParseException("'\\'", "expecting ''', found '<EOF>'");
-        // verifyParseException("'back \\ slash'",
-        // "!!!currently returns slash");
-        // verifyParseException("'\\escaped'", "!!!currently returns escaped");
-        // verifyParseException("'not\\'", "NoViableAltException");
+        verifyInvalidExpressionException("'not\\u32unicode'", "mismatched character 'u' expecting set null");
+        verifyInvalidExpressionException("'\\'", "expecting ''', found '<EOF>'");
+        verifyInvalidExpressionException("'back \\ slash'", "unexpected token: '\\'");
+        verifyInvalidExpressionException("'\\escaped'", "unexpected token: '\\'");
+        verifyInvalidExpressionException("'not\\'", "expecting ''', found '<EOF>'");
     }
 
     /**
      * Unicode escapes in strings are parsed correctly.
      */
     // currently fails
-    // public void testUnicodeEscapesInString() throws Exception {
-    // Expression e = buildExpression("'\\u0032'");
-    // assertEquals(ExpressionType.LITERAL, e.getExpressionType());
-    // LiteralImpl l = (LiteralImpl)e;
-    // assertEquals("2", l.getValue());
-    //
-    // e = buildExpression("'good\\u0032go'");
-    // assertEquals(ExpressionType.LITERAL, e.getExpressionType());
-    // l = (LiteralImpl)e;
-    // assertEquals("good2go", l.getValue());
-    //
-    // e = buildExpression("'Ocean\\'s \\u0031\\u0031'");
-    // assertEquals(ExpressionType.LITERAL, e.getExpressionType());
-    // l = (LiteralImpl)e;
-    // assertEquals("Ocean's 11", l.getValue());
-    //
-    // e = buildExpression("'\\u0031\\u0032\\u0020Monkeys\\u0020\\u0099'");
-    // assertEquals(ExpressionType.LITERAL, e.getExpressionType());
-    // l = (LiteralImpl)e;
-    // assertEquals("12 Monkeys \u0099", l.getValue());
-    // }
+    public void _testUnicodeEscapesInString() throws Exception {
+        Expression e = buildExpression("'\\u0032'");
+        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        LiteralImpl l = (LiteralImpl) e;
+        assertEquals("2", l.getValue());
+
+        e = buildExpression("'good\\u0032go'");
+        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        l = (LiteralImpl) e;
+        assertEquals("good2go", l.getValue());
+
+        e = buildExpression("'Ocean\\'s \\u0031\\u0031'");
+        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        l = (LiteralImpl) e;
+        assertEquals("Ocean's 11", l.getValue());
+
+        e = buildExpression("'\\u0031\\u0032\\u0020Monkeys\\u0020\\u0099'");
+        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
+        l = (LiteralImpl) e;
+        assertEquals("12 Monkeys \u0099", l.getValue());
+    }
 
     /**
      * Operators may be accessed as function calls and may be nested.
      */
     public void testFunctionCalls() throws Exception {
         Expression e = buildExpression("or(true, false)");
-        assertTrue(e.evaluate(null));
+        assertTrue("Operator could not be accessed as function call", e.evaluate(null));
         e = buildExpression("and(false, true)");
-        assertFalse(e.evaluate(null));
+        assertFalse("Operator could not be accessed as function call", e.evaluate(null));
         e = buildExpression("add(24, 23525)");
-        assertEquals(24 + 23525.0, e.evaluate(null));
+        assertEquals("Operator could not be accessed as function call", 24 + 23525.0, e.evaluate(null));
 
         e = buildExpression("sub(24, add(63, 23525))");
-        assertEquals(24 - (63 + 23525.0), e.evaluate(null));
+        assertEquals("Error evaluating nested operators as function calls", 24 - (63 + 23525.0), e.evaluate(null));
 
         e = buildExpression("add('The child', ' picked up the teddy bear in one hand')");
-        assertEquals("The child picked up the teddy bear in one hand", e.evaluate(null));
+        assertEquals("Error adding strings with add operator as function call",
+                "The child picked up the teddy bear in one hand", e.evaluate(null));
 
         e = buildExpression("notequals(add(' and grasped a', ' pick axe in the other.'), '\"Wait!\" screamed the bear.')");
-        assertTrue(e.evaluate(null));
+        assertTrue("Error in evaluating nested operators as funtion calls", e.evaluate(null));
 
         e = buildExpression("if(equals(true, greaterthan(-2, -52)), add('The child hesitated, ', '\"I cannot stuff you without making a hole to stuff into.\"'), ' The bear squinted and noodled on this for a minute.')");
-        assertEquals("The child hesitated, \"I cannot stuff you without making a hole to stuff into.\"",
-                e.evaluate(null));
+        assertEquals("Error in evaluating nested operators as funtion calls",
+                "The child hesitated, \"I cannot stuff you without making a hole to stuff into.\"", e.evaluate(null));
     }
 
     /**
@@ -410,28 +405,28 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
      */
     public void testNonEnglishString() throws Exception {
         Expression e = buildExpression("'天ぷらが食べたいです'");
-        assertEquals(ExpressionType.LITERAL, e.getExpressionType());
-        assertEquals("天ぷらが食べたいです", e.evaluate(null));
+        assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
+        assertEquals("Unexpected evaluation of non-english string", "天ぷらが食べたいです", e.evaluate(null));
     }
 
     /**
      * Missing operands throw a parse exception.
      */
     public void testMissingOperands() throws Exception {
-        verifyParseException("1+", "unexpected end of expression");
-        verifyParseException("2-", "unexpected end of expression");
-        verifyParseException("*3", "unexpected token: a multiplication");
-        verifyParseException("/4", "unexpected token: a division");
-        verifyParseException("5%", "unexpected end of expression");
-        verifyParseException("?", "unexpected token: a question mark");
+        verifyInvalidExpressionException("1+", "unexpected end of expression");
+        verifyInvalidExpressionException("2-", "unexpected end of expression");
+        verifyInvalidExpressionException("*3", "unexpected token: a multiplication");
+        verifyInvalidExpressionException("/4", "unexpected token: a division");
+        verifyInvalidExpressionException("5%", "unexpected end of expression");
+        verifyInvalidExpressionException("?", "unexpected token: a question mark");
     }
 
     /**
      * Mismatched parentheses throw a parse exception.
      */
     public void testIncompleteParentheses() throws Exception {
-        verifyParseException("(1", "unexpected end of expression");
-        verifyParseException("2)", "unexpected token: ')'");
+        verifyInvalidExpressionException("(1", "unexpected end of expression");
+        verifyInvalidExpressionException("2)", "unexpected token: ')'");
     }
 
     /**
@@ -439,95 +434,107 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
      */
     @UnAdaptableTest
     public void testIncompleteString() throws Exception {
-        verifyParseException("'unclosed string", "expecting ''', found '<EOF>'");
-        verifyParseException("unclosed string'", "unexpected token: an identifier");
+        verifyInvalidExpressionException("'unclosed string", "expecting ''', found '<EOF>'");
+        verifyInvalidExpressionException("unclosed string'", "unexpected token: an identifier");
     }
 
     /**
      * Unclosed braces throws a parse exception.
      */
     public void testIncompleteBraces() throws Exception {
-        verifyParseException("{!v.noend", "unclosed brace");
-        verifyParseException("v.dangled}", "unexpected token: '}'");
-        verifyParseException("v.x + {!v.inner}", "unexpected token: '{'");
+        verifyInvalidExpressionException("{!v.noend", "unclosed brace");
+        verifyInvalidExpressionException("v.dangled}", "unexpected token: '}'");
+        verifyInvalidExpressionException("v.x + {!v.inner}", "unexpected token: '{'");
     }
 
     /**
      * Invalid characters in property names throw a parse exception.
      */
     public void testPropertyNameInvalid() throws Exception {
-        verifyParseException("\\upfront", "unexpected token: '\\'");
-        verifyParseException("followup\\", "unexpected token: '\\'");
-        verifyParseException("in\\side", "unexpected token: '\\'");
-        verifyParseException("5horsemen", "unexpected token: 'horsemen'");
-        verifyParseException("9.1.1", "unexpected token: '.1'");
-        verifyParseException("in.2.u", "unexpected token: an identifier");
-        verifyParseException(".hidden", "unexpected token: a period");
-        verifyParseException("ends.with.", "unexpected end of expression");
-        verifyParseException("man...middle", "expecting an identifier, found '.'");
+        verifyInvalidExpressionException("\\upfront", "unexpected token: '\\'");
+        verifyInvalidExpressionException("followup\\", "unexpected token: '\\'");
+        verifyInvalidExpressionException("in\\side", "unexpected token: '\\'");
+        verifyInvalidExpressionException("5horsemen", "unexpected token: 'horsemen'");
+        verifyInvalidExpressionException("9.1.1", "unexpected token: '.1'");
+        verifyInvalidExpressionException("in.2.u", "unexpected token: an identifier");
+        verifyInvalidExpressionException(".hidden", "unexpected token: a period");
+        verifyInvalidExpressionException("ends.with.", "unexpected end of expression");
+        verifyInvalidExpressionException("man...middle", "expecting an identifier, found '.'");
     }
 
     /**
-     * Undefined function should throw a parse exception.
+     * Undefined function
      */
     public void testUndefinedFunction() throws Exception {
-        verifyParseException("undefined(4)", "No function found for key: undefined");
+        try {
+            buildExpression("undefined(4)");
+            fail("Expecting AuraRuntimeException for undefined function");
+        } catch (AuraRuntimeException e) {
+            assertTrue("Unexpected error message trying to parse <undefined(4)>. Expected to start with: "
+                    + "No function found for key: undefined" + ". But got: " + e.getMessage(), e.getMessage()
+                    .startsWith("No function found for key: undefined"));
+        }
     }
 
     /**
-     * Multiple statemts, separated by a semicolon, should throw a parse
-     * exception.
+     * Multiple statemts, separated by a semicolon
      */
     public void testMultipleStatements() throws Exception {
-        verifyParseException("5==1;5==1;", "unexpected token: ';' at column 5");
+        verifyInvalidExpressionException("5==1;5==1;", "unexpected token: ';' at column 5");
     }
 
     /**
-     * Invalid syntax - consecutive property names - throws a parse exception.
+     * Invalid syntax - consecutive property names
      */
     public void testMultipleProperties() throws Exception {
-        verifyParseException("test invalid", "unexpected token: an identifier");
+        verifyInvalidExpressionException("test invalid", "unexpected token: an identifier");
     }
 
     /**
-     * Invalid syntax - consecutive literals - throws a parse exception.
+     * Invalid syntax - consecutive literals
      */
     public void testMultipleLiterals() throws Exception {
-        verifyParseException("5 'invalid'", "unexpected token: ''invalid''");
+        verifyInvalidExpressionException("5 'invalid'", "unexpected token: ''invalid''");
     }
 
     /**
-     * Invalid syntax - consecutive functions - throws a parse exception.
+     * Invalid syntax - consecutive functions
      */
     public void testMultipleFunctions() throws Exception {
-        verifyParseException("add() subtract()", "unexpected token: 'subtract'");
+        verifyInvalidExpressionException("add() subtract()", "unexpected token: 'subtract'");
     }
 
     /**
-     * Invalid syntax - consecutive property names separated by newline - throws
-     * a parse exception.
+     * Invalid syntax - consecutive property names separated by newline
      */
     public void testMultilineProperty() throws Exception {
-        verifyParseException("invalid\r\ntest", "unexpected token: an identifier");
+        verifyInvalidExpressionException("invalid\r\ntest", "unexpected token: an identifier");
     }
 
     /**
-     * Invalid syntax - consecutive literals separated by newline - throws a
-     * parse exception.
+     * Invalid syntax - consecutive literals separated by newline
      */
     public void testMultilineLiteral() throws Exception {
-        verifyParseException("5\r\n1", "unexpected token: '1' at line 2, column 1");
+        verifyInvalidExpressionException("5\r\n1", "unexpected token: '1'");
     }
 
-    private void verifyParseException(String expression, String messageStartsWith) {
+    /**
+     * Invalid syntax - consecutive literals separated by newline
+     */
+    public void testLocationInErrorMessage() throws Exception {
+        verifyInvalidExpressionException("5\r\n  1", "unexpected token: '1' at line 2, column 3");
+    }
+
+    /**
+     * Verify the correct exception type is thrown and contains the correct error message.
+     */
+    private void verifyInvalidExpressionException(String expression, String msgStartsWith) throws Exception {
         try {
-            Expression e = buildExpression(expression);
-            fail("No execption thrown for <" + expression + ">. Instead, got: " + e);
-        } catch (Exception ex) {
-            if (ex.getMessage() != null && ex.getMessage().startsWith(messageStartsWith)) {
-                return;
-            }
-            failNotEquals("Unexpected exception for <" + expression + ">. ", messageStartsWith, ex);
+            buildExpression(expression);
+            fail("No execption thrown for <" + expression + ">. Expected InvalidExpressionException");
+        } catch (InvalidExpressionException e) {
+            assertTrue("Unexpected error message trying to parse <" + expression + ">. Expected to start with: "
+                    + msgStartsWith + ". But got: " + e.getMessage(), e.getMessage().startsWith(msgStartsWith));
         }
     }
 }

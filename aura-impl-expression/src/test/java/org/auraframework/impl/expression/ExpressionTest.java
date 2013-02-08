@@ -96,11 +96,11 @@ public class ExpressionTest extends AuraImplExpressionTestCase {
 
         e = new FunctionCallImpl(OR, ImmutableList.<Expression> of(blah, meh), l);
         o = e.evaluate(bools);
-        assertTrue(o);
+        assertTrue("Expected boolean expression to be true", o);
 
         e = new FunctionCallImpl(NOT, ImmutableList.<Expression> of(blah), l);
         o = e.evaluate(bools);
-        assertFalse(o);
+        assertFalse("Expected boolean expression to be false", o);
 
         // true && (false || !true)
         e = new FunctionCallImpl(AND, ImmutableList.<Expression> of(
@@ -108,7 +108,7 @@ public class ExpressionTest extends AuraImplExpressionTestCase {
                 new FunctionCallImpl(OR, ImmutableList.<Expression> of(new LiteralImpl(false, l), new FunctionCallImpl(
                         NOT, ImmutableList.<Expression> of(new LiteralImpl(true, l)), l)), l)), l);
         o = e.evaluate(bools);
-        assertFalse(o);
+        assertFalse("Expected boolean expression to be false", o);
     }
 
     public void testLiteralNull() throws Exception {

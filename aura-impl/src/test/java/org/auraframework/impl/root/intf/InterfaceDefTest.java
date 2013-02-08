@@ -35,6 +35,7 @@ import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 public class InterfaceDefTest extends AuraImplTestCase {
@@ -219,7 +220,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
         serializeAndGoldFile(intDef2);
     }
 
-    public void testInterfaceCannotExtendItself() throws Exception {
+    public void testExtendsItself() throws Exception {
         DefDescriptor<InterfaceDef> extendsSelf = addSourceAutoCleanup(InterfaceDef.class, "");
         StringSource<?> source = (StringSource<?>) auraTestingUtil.getSource(extendsSelf);
         source.addOrUpdate(String.format("<aura:interface extends='%s'> </aura:interface>",
@@ -233,7 +234,22 @@ public class InterfaceDefTest extends AuraImplTestCase {
         }
     }
 
-    public void testInterfaceCannotImplementAnInterface() throws Exception {
+    public void testExtendsNonExistent() {
+        DefDescriptor<InterfaceDef> cmpDesc = addSourceAutoCleanup(InterfaceDef.class,
+                "<aura:interface extends='aura:iDontExist'></aura:interface>");
+        try {
+            // Aura.getInstanceService().getInstance(cmpDesc.getDescriptorName(), ComponentDef.class);
+            InterfaceDef def = cmpDesc.getDef();
+            def.validateReferences();
+            fail("Did not get expected exception: " + DefinitionNotFoundException.class.getName());
+        } catch (Exception e) {
+            checkExceptionFull(e, DefinitionNotFoundException.class,
+                    "No INTERFACE named markup://aura:iDontExist found : " + cmpDesc.getQualifiedName(),
+                    cmpDesc.getQualifiedName());
+        }
+    }
+
+    public void testImplementsAnInterface() throws Exception {
         DefDescriptor<InterfaceDef> d = addSourceAutoCleanup(InterfaceDef.class,
                 "<aura:interface implements='test:fakeInterface'> </aura:interface>");
         try {
@@ -244,19 +260,15 @@ public class InterfaceDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Test to verify that InterfaceDef has information about server dependency.
-     * Creating instances of interface on the clientside would require server
-     * dependency information. Make sure this information is part of interface
-     * def.
+     * Test to verify that InterfaceDef has information about server dependency. Creating instances of interface on the
+     * clientside would require server dependency information. Make sure this information is part of interface def.
      */
     // TODO: W-1476870
     /*
      * public void testHasLocalDependencies(){ assertFalse(
      * "An interface with clientside provider does not depend on server.",
-     * definitionService.getDefinition("test:test_JSProvider_Interface",
-     * InterfaceDef.class).hasLocalDependencies());
-     * assertTrue("An interface with only serverside provider depends on server."
-     * , definitionService.getDefinition("test:test_Provider_Interface",
-     * InterfaceDef.class).hasLocalDependencies()); }
+     * definitionService.getDefinition("test:test_JSProvider_Interface", InterfaceDef.class).hasLocalDependencies());
+     * assertTrue("An interface with only serverside provider depends on server." ,
+     * definitionService.getDefinition("test:test_Provider_Interface", InterfaceDef.class).hasLocalDependencies()); }
      */
 }

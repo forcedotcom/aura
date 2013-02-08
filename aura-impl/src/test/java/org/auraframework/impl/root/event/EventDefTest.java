@@ -265,4 +265,17 @@ public class EventDefTest extends AuraImplTestCase {
         assertFalse("Hash code should have been different due to different extends descriptors",
                 def.hashCode() == def2.hashCode());
     }
+
+    public void testExtendsWrongEventType() {
+        DefDescriptor dd = addSourceAutoCleanup(EventDef.class,
+                "<aura:event type=\"component\" extends=\"test:applicationEvent\"></aura:event>");
+
+        try {
+            dd.getDef();
+            fail("Should not be able to create event with null type");
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "Event " + dd.getQualifiedName()
+                    + " cannot extend markup://test:applicationEvent", dd.getQualifiedName());
+        }
+    }
 }

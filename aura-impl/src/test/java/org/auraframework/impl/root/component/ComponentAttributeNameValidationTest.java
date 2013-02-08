@@ -40,12 +40,13 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
         return Aura.getInstanceService().getInstance(cmpDesc);
     }
 
-    private void assertAttributeNotFoundException(String markup) throws Exception {
+    private void assertAttributeNotFoundException(String markup, String missingAttr) throws Exception {
         try {
             getComponentInstance(markup);
             fail("Expected AttributeNotFoundException");
         } catch (AttributeNotFoundException e) {
-            assertNotNull(e);
+            assertTrue("Exception error message should point out missing attribute: " + missingAttr, e.getMessage()
+                    .contains("attribute \"" + missingAttr + "\" was not found"));
         }
     }
 
@@ -57,7 +58,7 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
     public void testInlineUnknownAttribute() throws Exception {
         DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
         assertAttributeNotFoundException("<aura:component><" + myCmp.getDescriptorName()
-                + " unknown=''/></aura:component>");
+                + " unknown=''/></aura:component>", "unknown");
     }
 
     /**
@@ -65,10 +66,10 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults AttributeNotFoundException thrown
      */
-    // https://gus.soma.salesforce.com/a07B000000091QAIAY
-    // fails with no exception thrown
+    // TODO(W-1231888): aura:set doesn't work on self
     public void _testSetUnknownAttribute() throws Exception {
-        assertAttributeNotFoundException("<aura:component><aura:set attribute='unknown' value='error'/></aura:component>");
+        assertAttributeNotFoundException(
+                "<aura:component><aura:set attribute='unknown' value='error'/></aura:component>", "unknown");
     }
 
     /**
@@ -78,8 +79,9 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
      */
     public void testSetUnknownAttributeInNestedComponent() throws Exception {
         DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
-        assertAttributeNotFoundException("<aura:component><" + myCmp.getDescriptorName()
-                + "><aura:set attribute='unknown' value='error'/></" + myCmp.getDescriptorName() + "></aura:component>");
+        assertAttributeNotFoundException(
+                "<aura:component><" + myCmp.getDescriptorName() + "><aura:set attribute='unknown' value='error'/></"
+                        + myCmp.getDescriptorName() + "></aura:component>", "unknown");
     }
 
     /**
@@ -87,12 +89,13 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults AttributeNotFoundException thrown
      */
-    // https://gus.soma.salesforce.com/a07B0000000Eys9IAC
+    // TODO(W-942303): attribute validation ignores name prefix.
     // fails with type error since it thinks other:body == body
     public void _testInlineUnknownAttributePrefix() throws Exception {
         DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
-        assertAttributeNotFoundException(String.format("<aura:component><%s other:body=''/></aura:component>",
-                myCmp.getDescriptorName()));
+        assertAttributeNotFoundException(
+                String.format("<aura:component><%s other:body=''/></aura:component>", myCmp.getDescriptorName()),
+                "other:body");
     }
 
     /**
@@ -100,11 +103,11 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults AttributeNotFoundException thrown
      */
-    // https://gus.soma.salesforce.com/a07B0000000Eys9IAC
-    // https://gus.soma.salesforce.com/a07B000000091QAIAY
-    // fails with no exception thrown
+    // TODO(W-1231888, W-942303): aura:set doesn't work on self / attribute
+    // validation ignores name prefix
     public void _testSetUnknownAttributePrefix() throws Exception {
-        assertAttributeNotFoundException("<aura:component><aura:set attribute='other:body' value=''/></aura:component>");
+        assertAttributeNotFoundException(
+                "<aura:component><aura:set attribute='other:body' value=''/></aura:component>", "unknown");
     }
 
     /**
@@ -117,7 +120,7 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
                 "<aura:component><aura:attribute name='value' type='String'/></aura:component>");
         assertAttributeNotFoundException(String.format(
                 "<aura:component><%1$s><aura:set attribute='other:value' value=''/></%1$s></aura:component>",
-                myCmp.getDescriptorName()));
+                myCmp.getDescriptorName()), "other:value");
     }
 
     /**
@@ -126,8 +129,8 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults attribute value is retrieved
      */
-    // https://gus.soma.salesforce.com/a07B0000000Eys9IAC
-    // fails since attrib was not set
+    // TODO(W-942303): attribute validation ignores name prefix.
+    // fails since attribute was not set
     public void _testInlineDefaultAttributePrefix() throws Exception {
         DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:attribute name='title' type='String'/></aura:component>");
@@ -144,9 +147,9 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults attribute value is retrieved
      */
-    // https://gus.soma.salesforce.com/a07B0000000Eys9IAC
-    // https://gus.soma.salesforce.com/a07B000000091QAIAY
-    // fails since attrib was not set
+    // TODO(W-1231888, W-942303): aura:set doesn't work on self / attribute
+    // validation ignores name prefix
+    // fails since attribute was not set
     public void _testSetDefaultAttributePrefix() throws Exception {
         Component cmp = getComponentInstance("<aura:component><aura:set attribute='aura:body'>hi</aura:set></aura:component>");
         @SuppressWarnings("unchecked")
@@ -160,8 +163,8 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults attribute value is retrieved
      */
-    // https://gus.soma.salesforce.com/a07B0000000Eys9IAC
-    // https://gus.soma.salesforce.com/a07B000000091QAIAY
+    // TODO(W-1231888, W-942303): aura:set doesn't work on self / attribute
+    // validation ignores name prefix
     // fails with attribute aura:value not found
     public void _testSetDefaultAttributePrefixInNestedComponent() throws Exception {
         DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup(ComponentDef.class,
@@ -179,7 +182,7 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults attribute value is retrieved
      */
-    // https://gus.soma.salesforce.com/a07B0000000Eys9IAC
+    // TODO(W-942303): attribute validation ignores name prefix.
     // fails for all cases since prefix is not included when validating on
     // instance creation
     @SuppressWarnings("unchecked")
@@ -202,8 +205,8 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
      * 
      * @expectedResults attribute value is retrieved
      */
-    // https://gus.soma.salesforce.com/a07B0000000Eys9IAC
-    // https://gus.soma.salesforce.com/a07B000000091QAIAY
+    // TODO(W-1231888, W-942303): aura:set doesn't work on self / attribute
+    // validation ignores name prefix
     // fails for all cases since attribute is not set on instance
     public void _testSetAttributePrefix() throws Exception {
         Component cmp = getComponentInstance("<aura:component>"

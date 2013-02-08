@@ -31,8 +31,7 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 /**
- * This class has automation for JavaRendererDefFactory. This factory fetches
- * definitions of renderers defined in Java.
+ * This class has automation for JavaRendererDefFactory. This factory fetches definitions of renderers defined in Java.
  * 
  * @hierarchy Aura.Components.Renderer
  * @priority high
@@ -74,14 +73,15 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
         try {
             cmpDesc.getDef();
             fail("Should not be able to retrieve component definition when specified renderer is invalid.");
-        } catch (DefinitionNotFoundException e) {
-            assertTrue(e.getMessage().contains("No RENDERER named java://ClassNotFound found"));
+        } catch (Exception e) {
+            checkExceptionStart(e, DefinitionNotFoundException.class,
+                    "No RENDERER named java://ClassNotFound found", null);
         }
     }
 
     /**
-     * Verify that Renderer interface declares method with correct properties.
-     * Renderer interface will be implemented by all Renderers.
+     * Verify that Renderer interface declares method with correct properties. Renderer interface will be implemented by
+     * all Renderers.
      * 
      * @throws Exception
      */
@@ -91,16 +91,14 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
             assertTrue("render method on Renderer interface should be declared public.",
                     Modifier.isPublic(renderMethod.getModifiers()));
         } catch (NoSuchMethodException e) {
-            // The interface org.auraframework.def.Renderer should declare a
-            // render method to be overriden by Java
-            // renderers.
+            // The interface org.auraframework.def.Renderer should declare a render method to be overriden by
+            // Java renderers.
             fail("Renderer interface does not declare a render method.");
         }
     }
 
     /**
-     * Verify that specifying an absrtact java class as renderer throws an
-     * Exception.
+     * Verify that specifying an absrtact java class as renderer throws an Exception.
      * 
      * @throws Exception
      */
@@ -111,15 +109,15 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
         try {
             descriptor.getDef();
             fail("JavaRenderers that extend Renderer interface cannot be abstract.");
-        } catch (InvalidDefinitionException e) {
-            assertTrue(e.getMessage().contains(
-                    "Cannot instantiate org.auraframework.impl.renderer.sampleJavaRenderers.TestAbstractRenderer"));
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class,
+                    "Cannot instantiate org.auraframework.impl.renderer.sampleJavaRenderers.TestAbstractRenderer",
+                    "org.auraframework.impl.renderer.sampleJavaRenderers.TestAbstractRenderer");
         }
     }
 
     /**
-     * Verify that a JavaRenderer extending Renderer interface cannot hide its
-     * constructor.
+     * Verify that a JavaRenderer extending Renderer interface cannot hide its constructor.
      */
     public void testRendererWithPrivateConstructor() throws Exception {
         DefDescriptor<RendererDef> descriptor = DefDescriptorImpl.getInstance(
@@ -128,17 +126,17 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
         try {
             descriptor.getDef();
             fail("JavaRenderers that implement Renderer interface cannot hide their constructor.");
-        } catch (InvalidDefinitionException e) {
-            assertTrue(e
-                    .getMessage()
-                    .contains(
-                            "Constructor is inaccessible for org.auraframework.impl.renderer.sampleJavaRenderers.TestPrivateConstructorInRendererExtension"));
+        } catch (Exception e) {
+            checkExceptionFull(
+                    e,
+                    InvalidDefinitionException.class,
+                    "Constructor is inaccessible for org.auraframework.impl.renderer.sampleJavaRenderers.TestPrivateConstructorInRendererExtension",
+                    "org.auraframework.impl.renderer.sampleJavaRenderers.TestPrivateConstructorInRendererExtension");
         }
     }
 
     /**
-     * Verify that specifying a Java class not implementing Renderer interface
-     * throws runtime exception.
+     * Verify that specifying a Java class not implementing Renderer interface throws runtime exception.
      */
     public void testClassDoesNotImplementRenderer() throws Exception {
         JavaRendererDef.Builder builder = new JavaRendererDef.Builder();
@@ -149,8 +147,9 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
         try {
             def.validateDefinition();
             fail("JavaRendererDef cannot be created if interface not implemented.");
-        } catch (InvalidDefinitionException e) {
-            assertTrue(e.getMessage().contains("Renderer must implement the Renderer interface."));
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "Renderer must implement the Renderer interface.",
+                    null);
         }
     }
 }

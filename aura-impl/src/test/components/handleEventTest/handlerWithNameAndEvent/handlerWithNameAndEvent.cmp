@@ -16,5 +16,6 @@
 
 -->
 <aura:component>
+    <aura:registerevent name="somename" type="handleEventTest:event"/>
     <aura:handler name="somename" event="handleEventTest:applicationEvent" action="{!c.handleIt}"/>
 </aura:component>

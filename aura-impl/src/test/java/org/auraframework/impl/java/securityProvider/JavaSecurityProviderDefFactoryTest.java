@@ -29,6 +29,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.SecurityProviderDef;
 import org.auraframework.test.AuraTestCase;
 import org.auraframework.throwable.NoAccessException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
@@ -45,14 +46,12 @@ public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
     /**
      * Assert that we get an exception when attempting to retrieve a definition.
      */
-    private Exception assertException(String className, String message, String filename) {
+    private void assertException(String className, String message, String filename, Class eType) {
         try {
             getSecurityProviderDef(className);
             fail("Expected Exception");
-            return null;
         } catch (Exception e) {
-            checkExceptionFull(e, null, message, filename);
-            return e;
+            checkExceptionFull(e, eType, message, filename);
         }
     }
 
@@ -77,7 +76,7 @@ public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
     public void testGetSecurityProviderDefWithoutAnnotation() throws Exception {
         assertException(SecurityProviderWithoutAnnotation.class.getName(),
                 "SecurityProviders must implement the SecurityProvider interface",
-                SecurityProviderWithoutAnnotation.class.getName());
+                SecurityProviderWithoutAnnotation.class.getName(), InvalidDefinitionException.class);
     }
 
     /**
@@ -98,7 +97,7 @@ public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
     public void testGetSecurityProviderDefWithoutStaticMethod() throws Exception {
         assertException(SecurityProviderWithoutStaticMethod.class.getName(),
                 "SecurityProviders must implement the SecurityProvider interface",
-                SecurityProviderWithoutStaticMethod.class.getName());
+                SecurityProviderWithoutStaticMethod.class.getName(), InvalidDefinitionException.class);
     }
 
     /**
@@ -107,7 +106,7 @@ public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
     public void testGetSecurityProviderDefWithoutMethodName() {
         assertException(SecurityProviderWithoutMethodName.class.getName(),
                 "SecurityProviders must implement the SecurityProvider interface",
-                SecurityProviderWithoutMethodName.class.getName());
+                SecurityProviderWithoutMethodName.class.getName(), InvalidDefinitionException.class);
     }
 
     /**
@@ -116,7 +115,7 @@ public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
     public void testGetSecurityProviderDefWithoutIfc() {
         assertException(SecurityProviderWithoutIfc.class.getName(),
                 "SecurityProviders must implement the SecurityProvider interface",
-                SecurityProviderWithoutIfc.class.getName());
+                SecurityProviderWithoutIfc.class.getName(), InvalidDefinitionException.class);
     }
 
     /**
@@ -124,7 +123,8 @@ public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
      */
     public void testGetSecurityProviderDefWithPrivateConst() {
         assertException(SecurityProviderWithPrivateConst.class.getName(), "Constructor is inaccessible for "
-                + SecurityProviderWithPrivateConst.class.getName(), SecurityProviderWithPrivateConst.class.getName());
+                + SecurityProviderWithPrivateConst.class.getName(), SecurityProviderWithPrivateConst.class.getName(),
+                InvalidDefinitionException.class);
     }
 
     /**
@@ -133,7 +133,7 @@ public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
     public void testGetSecurityProviderDefWithConstructorArgs() {
         assertException(SecurityProviderWithConstructorArgs.class.getName(), "Cannot instantiate "
                 + SecurityProviderWithConstructorArgs.class.getName(),
-                SecurityProviderWithConstructorArgs.class.getName());
+                SecurityProviderWithConstructorArgs.class.getName(), InvalidDefinitionException.class);
     }
 
     public void testSecurityProviderThrowsThrowable() throws Exception {

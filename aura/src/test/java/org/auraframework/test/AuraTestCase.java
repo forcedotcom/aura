@@ -76,8 +76,7 @@ public abstract class AuraTestCase extends UnitTestCase {
     }
 
     /**
-     * Useful for restoring a context in case a test needs to temporarily switch
-     * contexts.
+     * Useful for restoring a context in case a test needs to temporarily switch contexts.
      */
     protected static void setContext(AuraContext context) {
         ContextService service = Aura.getContextService();
@@ -98,20 +97,18 @@ public abstract class AuraTestCase extends UnitTestCase {
     }
 
     /**
-     * Check to ensure that an exception exactly matches both message and
-     * location.
+     * Check to ensure that an exception exactly matches both message and location.
      * 
      * @param e the exception to check.
      * @param clazz a class to match if it is not null.
      * @param message The message to match (must be exact match).
-     * @param filename a 'file name' to match the location (not checked if
-     *            null).
+     * @param filename a 'file name' to match the location (not checked if null).
      */
     protected void checkExceptionFull(Throwable e, Class<?> clazz, String message, String filename) {
-        assertEquals("unexpected message", message, e.getMessage());
         if (clazz != null) {
-            assertTrue("Exception must be " + clazz.getSimpleName(), clazz.equals(e.getClass()));
+            assertEquals("Exception must be " + clazz.getSimpleName(), clazz, e.getClass());
         }
+        assertEquals("unexpected message", message, e.getMessage());
         if (filename != null) {
             Location l = null;
 
@@ -126,14 +123,12 @@ public abstract class AuraTestCase extends UnitTestCase {
     }
 
     /**
-     * Check to ensure that an exception message starts with a given message and
-     * matches a location.
+     * Check to ensure that an exception message starts with a given message and matches a location.
      * 
      * @param e the exception to check.
      * @param clazz a class to match if it is not null.
      * @param message The message to match (must be exact match).
-     * @param filename a 'file name' to match the location (not checked if
-     *            null).
+     * @param filename a 'file name' to match the location (not checked if null).
      */
     protected void checkExceptionStart(Throwable e, Class<?> clazz, String message, String filename) {
         if (clazz != null) {

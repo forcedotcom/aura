@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
@@ -35,21 +37,17 @@ import com.google.common.collect.Maps;
 @Controller
 public class AuraStorageTestController {
     public static ConcurrentHashMap<String, Integer> staticCounter = new ConcurrentHashMap<String, Integer>();
-    static ConcurrentHashMap<String, String> pending = new ConcurrentHashMap<String, String>();
+    static ConcurrentHashMap<String, CountDownLatch> pending = new ConcurrentHashMap<String, CountDownLatch>();
 
     @AuraEnabled
     public static void block(@Key("testName") String testName){
-        pending.putIfAbsent(testName, testName);
+        pending.putIfAbsent(testName, new CountDownLatch(1));
     }
 
     @AuraEnabled
     public static void resume(@Key("testName") String testName){
-        String lock = pending.get(testName);
-        if(lock != null){
-            synchronized (lock) {
-                lock.notifyAll();
-            }
-        }
+        CountDownLatch lock = pending.get(testName);
+        lock.countDown();
         pending.remove(testName);
     }
     @AuraEnabled
@@ -58,12 +56,9 @@ public class AuraStorageTestController {
         AuraStorageTestController.Record r = new AuraStorageTestController.Record(staticCounter.get(testName),
         "StorageController");
         staticCounter.put(testName, new Integer(staticCounter.get(testName).intValue() + 1));
-        String lock = pending.get(testName);
-        if(lock!=null){
-            synchronized (lock) {
-                lock.wait(15000);
-            }
-        }
+        CountDownLatch lock = pending.get(testName);
+        if(lock!=null)
+            lock.await(15, TimeUnit.SECONDS);
         return r;
     }
 

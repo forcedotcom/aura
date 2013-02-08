@@ -21,9 +21,9 @@ package org.auraframework.test;
 public interface TestContextAdapter {
 
 	/**
-	 * Get the current TestContext, or create one if one isn't present.
+	 * Get the current TestContext, or null if one hasn't been created.
 	 * 
-	 * @return the current TestContext
+	 * @return the current TestContext, null if it doesn't exist
 	 */
 	TestContext getTestContext();
 

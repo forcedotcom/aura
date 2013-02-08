@@ -17,8 +17,11 @@ package org.auraframework.util.text;
 
 import java.io.StringReader;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.text.Hash.StringBuilder;
 
 public class HashTest extends UnitTestCase {
 
@@ -50,7 +53,7 @@ public class HashTest extends UnitTestCase {
                 sb.append(x);
             } else {
                 sb.append("[[[");
-                sb.append((int)x);
+                sb.append((int) x);
                 sb.append("]]]");
                 error = true;
             }
@@ -79,13 +82,12 @@ public class HashTest extends UnitTestCase {
         val = hash.toString();
         assertTrue(val.length() > 1);
         assertEquals("Bad character in string", "", findNonPrint(val));
-        
+
         hash = new Hash(new StringReader("why are you looking at this anyway"));
         val = hash.toString();
         assertTrue(val.length() > 1);
         assertEquals("Bad character in string", "", findNonPrint(val));
     }
-
 
     public void testFromBytes() {
         byte[] bytes1 = { 12, 34, 56, 78, 90 };
@@ -146,4 +148,54 @@ public class HashTest extends UnitTestCase {
         assertFalse(hash1.equals(hash2));
         assertFalse(hash1.hashCode() == hash2.hashCode());
     }
+
+    private int getHashCode(String string) throws NoSuchAlgorithmException {
+        return Arrays.hashCode(MessageDigest.getInstance("MD5").digest(string.getBytes()));
+    }
+
+    private void assertHash(Hash hash, boolean isSet, int hashCode) throws Exception {
+        assertEquals(isSet, hash.isSet());
+        assertEquals(hashCode, hash.hashCode());
+    }
+
+    private void assertStringBuilderHash(String toHash) throws Exception {
+        int expected = getHashCode(toHash);
+        StringBuilder builder = new StringBuilder();
+        builder.addString(toHash);
+        assertHash(builder.build(), true, expected);
+    }
+
+    public void testStringBuilderEmptyString() throws Exception {
+        assertStringBuilderHash("");
+    }
+
+    public void testStringBuilderSingleString() throws Exception {
+        assertStringBuilderHash("never can say goodbye");
+    }
+
+    public void testStringBuilderMultipleStrings() throws Exception {
+        String toHash = "never can say goodbye";
+        int expected = getHashCode(toHash);
+
+        StringBuilder builder = new StringBuilder();
+        // split string by word boundaries
+        for (String part : toHash.split("\\b")) {
+            builder.addString(part);
+        }
+        assertHash(builder.build(), true, expected);
+    }
+
+    public void testStringBuilderNoStrings() throws Exception {
+        int expected = Arrays.hashCode(MessageDigest.getInstance("MD5").digest());
+        StringBuilder builder = new StringBuilder();
+        assertHash(builder.build(), true, expected);
+    }
+
+    public void testStringBuilderNull() throws Exception {
+        int expected = Arrays.hashCode(MessageDigest.getInstance("MD5").digest());
+        StringBuilder builder = new StringBuilder();
+        builder.addString(null);
+        assertHash(builder.build(), true, expected);
+    }
+
 }

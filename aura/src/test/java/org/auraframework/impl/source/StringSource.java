@@ -66,7 +66,9 @@ public class StringSource<D extends Definition> extends Source<D> {
 
     public StringSource(DefDescriptor<D> descriptor, String contents, String id, Format format) {
         super(descriptor, id, format);
-        this.sb.append(contents);
+        if (contents != null) {
+            this.sb.append(contents);
+        }
         this.lastModified = 0;
     }
 

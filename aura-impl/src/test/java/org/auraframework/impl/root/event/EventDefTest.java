@@ -267,7 +267,7 @@ public class EventDefTest extends AuraImplTestCase {
     }
 
     public void testExtendsWrongEventType() {
-        DefDescriptor dd = addSourceAutoCleanup(EventDef.class,
+        DefDescriptor<?> dd = addSourceAutoCleanup(EventDef.class,
                 "<aura:event type=\"component\" extends=\"test:applicationEvent\"></aura:event>");
 
         try {

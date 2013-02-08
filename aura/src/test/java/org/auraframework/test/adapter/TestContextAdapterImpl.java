@@ -33,11 +33,7 @@ public class TestContextAdapterImpl implements TestContextAdapter {
 
     @Override
     public TestContext getTestContext() {
-        TestContext context = testContext.get();
-        if (context == null) {
-            return getTestContext("" + System.nanoTime());
-        }
-        return context;
+        return testContext.get();
     }
 
     @Override

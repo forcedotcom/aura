@@ -48,8 +48,14 @@ public class MockingUtil {
      * @throws QuickFixException
      */
     public <D extends Definition> void mockDef(D... mockDefs) throws QuickFixException {
-        if (mockDefs != null && mockDefs.length > 0) {
-            TestContext testContext = Aura.get(TestContextAdapter.class).getTestContext();
+		if (mockDefs != null && mockDefs.length > 0) {
+			TestContextAdapter testContextAdapter = Aura
+					.get(TestContextAdapter.class);
+			TestContext testContext = testContextAdapter.getTestContext();
+			if (testContext == null) {
+				throw new IllegalStateException(
+						"TestContext not established; use TestContextAdapter.getTestContext(String).");
+			}
             Set<Definition> mocks = testContext.getLocalDefs();
             if(mocks !=null){
                 mocks.addAll(Arrays.asList(mockDefs));

@@ -63,4 +63,8 @@
         <li>Attribute values are referenced from within component markup via <code><aura:text value="{!"/>v.&lt;attributeName&gt;}</code>.</li>
         <li>Aura throws an error if a component is provided an attribute it does not advertise.</li>
     </ul>
+
+  <p><b>See also:</b><br/>
+      <auradocs:topicLink topic="attrTypesOverview">Supported aura:attribute Types</auradocs:topicLink>
+    </p>
 </aura:component>

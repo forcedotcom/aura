@@ -16,7 +16,8 @@
 package org.auraframework.test;
 
 import org.auraframework.Aura;
-import org.auraframework.controller.java.ServletConfigController;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.MockConfigAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -39,7 +40,7 @@ public abstract class AuraTestCase extends UnitTestCase {
     public AuraTestCase(String name) {
         super(name);
     }
-    
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -52,15 +53,28 @@ public abstract class AuraTestCase extends UnitTestCase {
             Aura.getContextService().endContext();
         }
         Aura.getLoggingService().release();
-        ServletConfigController.resetMocks();
+        resetMocks();
         Aura.get(TestContextAdapter.class).release();
         super.tearDown();
     }
 
+    public static MockConfigAdapter getMockConfigAdapter() {
+        ConfigAdapter adapter = Aura.getConfigAdapter();
+        if (adapter instanceof MockConfigAdapter) {
+            return (MockConfigAdapter) adapter;
+        }
+        throw new Error("MockConfigAdapter is not configured!");
+    }
+
+    public static void resetMocks() throws Exception {
+        getMockConfigAdapter().reset();
+    }
+
+
     public String getQualifiedName() {
         return getClass().getCanonicalName() + "." + getName();
     }
-    
+
     /**
      * Useful for restoring a context in case a test needs to temporarily switch
      * contexts.
@@ -147,4 +161,5 @@ public abstract class AuraTestCase extends UnitTestCase {
         }
         return null;
     }
+
 }

@@ -56,15 +56,15 @@ import com.google.common.collect.Sets;
 public class StringSourceLoader implements SourceLoader {
     public static final String DEFAULT_NAMESPACE = "string";
 
-	private static final String DEFAULT_NAME_PREFIX = "thing";
-	private static final Set<String> PREFIXES = ImmutableSet.of(
-			DefDescriptor.MARKUP_PREFIX, DefDescriptor.JAVASCRIPT_PREFIX,
-			DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX);
-	private static final Set<DefType> DEFTYPES = ImmutableSet.of(
-			DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT,
-			DefType.INTERFACE, DefType.LAYOUTS, DefType.CONTROLLER,
-			DefType.HELPER, DefType.NAMESPACE, DefType.RENDERER, DefType.STYLE,
-			DefType.TESTSUITE);
+    private static final String DEFAULT_NAME_PREFIX = "thing";
+    private static final Set<String> PREFIXES = ImmutableSet.of(
+            DefDescriptor.MARKUP_PREFIX, DefDescriptor.JAVASCRIPT_PREFIX,
+            DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX);
+    private static final Set<DefType> DEFTYPES = ImmutableSet.of(
+            DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT,
+            DefType.INTERFACE, DefType.LAYOUTS, DefType.CONTROLLER,
+            DefType.HELPER, DefType.NAMESPACE, DefType.RENDERER, DefType.STYLE,
+            DefType.TESTSUITE);
 
     /**
      * A counter that we can use to guarantee unique names across multiple calls
@@ -89,7 +89,7 @@ public class StringSourceLoader implements SourceLoader {
      */
     @GuardedBy("this")
     private final Map<String, Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>> namespaces = Maps
-            .newHashMap();
+    .newHashMap();
 
     private StringSourceLoader() {
         namespaces.put(DEFAULT_NAMESPACE,
@@ -186,7 +186,7 @@ public class StringSourceLoader implements SourceLoader {
             StringSource<D> source, boolean overwrite) {
         String namespace = descriptor.getNamespace();
         Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
-                .get(namespace);
+        .get(namespace);
         if (sourceMap == null) {
             sourceMap = Maps.newHashMap();
             namespaces.put(namespace, sourceMap);
@@ -206,7 +206,7 @@ public class StringSourceLoader implements SourceLoader {
     public synchronized final void removeSource(DefDescriptor<?> descriptor) {
         String namespace = descriptor.getNamespace();
         Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
-                .get(namespace);
+        .get(namespace);
         Preconditions.checkState(sourceMap != null);
         Preconditions.checkState(sourceMap.remove(descriptor) != null);
         if (!DEFAULT_NAMESPACE.equals(namespace) && sourceMap.isEmpty()) {
@@ -244,7 +244,7 @@ public class StringSourceLoader implements SourceLoader {
             String namespace) {
         Set<DefDescriptor<D>> ret = Sets.newHashSet();
         Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
-                .get(namespace);
+        .get(namespace);
         if (sourceMap != null) {
             for (DefDescriptor<? extends Definition> desc : sourceMap.keySet()) {
                 if (desc.getDefType().getPrimaryInterface() == primaryInterface && desc.getPrefix().equals(prefix)) {
@@ -274,9 +274,16 @@ public class StringSourceLoader implements SourceLoader {
     @Override
     public synchronized <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
         Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
-                .get(descriptor.getNamespace());
+        .get(descriptor.getNamespace());
         if (sourceMap != null) {
-            return (Source<D>) sourceMap.get(descriptor);
+            Source<D> ret = (Source<D>) sourceMap.get(descriptor);
+            if(ret!=null){
+                return ret;
+            }else if(descriptor.getDefType().equals(DefType.NAMESPACE) ){
+                //If we are looking for a NameSpaceDef for a namespace introduced using String Source and the test did not add one,
+                //We return a empty String Source just like RootDefFactory.getDef() does
+                return new StringSource<D>(descriptor, "", descriptor.getQualifiedName(), Format.XML);
+            }
         }
         return null;
     }
@@ -320,15 +327,15 @@ public class StringSourceLoader implements SourceLoader {
             return infoMap.get(defClass);
         }
 
-		@SuppressWarnings("unchecked")
-		private <D extends Definition> DefDescriptor<D> getDescriptor(
-				String namespace, String name) {
-			return (DefDescriptor<D>) Aura.getDefinitionService()
-					.getDefDescriptor(
-							String.format("%s://%s%s%s", prefix, namespace,
-									delimiter, name == null ? "" : name),
-							defClass);
-		}
+        @SuppressWarnings("unchecked")
+        private <D extends Definition> DefDescriptor<D> getDescriptor(
+                String namespace, String name) {
+            return (DefDescriptor<D>) Aura.getDefinitionService()
+            .getDefDescriptor(
+                    String.format("%s://%s%s%s", prefix, namespace,
+                            delimiter, name == null ? "" : name),
+                            defClass);
+        }
 
         private Format getFormat() {
             return format;

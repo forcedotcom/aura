@@ -70,7 +70,7 @@
     <auradocs:info>These guidelines are very important when you customize rendering.
     <ul>
         <li>A renderer should only modify DOM elements that are part of the component. You should never break component encapsulation by reaching in to another component and changing its DOM elements, even if you are reaching in from the parent component.</li>
-        <li>A renderer should never fire an event.</li>
+        <li>A renderer should never fire an event. An alternative is to use an <auradocs:topicLink topic="initHandler">init event</auradocs:topicLink> instead.</li>
     </ul>
     </auradocs:info>
 

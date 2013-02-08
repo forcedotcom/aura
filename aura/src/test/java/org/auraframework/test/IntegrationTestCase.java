@@ -29,7 +29,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.auraframework.Aura;
-import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -42,6 +41,7 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.IntegrationTest;
+import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.configuration.TestServletConfig;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.util.AuraUtil;
@@ -80,7 +80,6 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     public void tearDown() throws Exception {
         httpClient = null;
         auraTestingUtil.tearDown();
-        ServletConfigController.resetMocks();
         super.tearDown();
     }
 
@@ -147,7 +146,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     }
 
     protected static GetMethod obtainGetMethod(String path, boolean followRedirects) throws MalformedURLException,
-            URISyntaxException {
+    URISyntaxException {
         String url = servletConfig.getBaseUrl().toURI().resolve(path).toString();
         GetMethod get = new GetMethod(url);
         if (System.getProperty(HttpMethodParams.USER_AGENT) != null) {
@@ -171,7 +170,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
      * @throws URISyntaxException
      */
     protected static PostMethod obtainPostMethod(String path, Map<String, String> params) throws MalformedURLException,
-            URISyntaxException {
+    URISyntaxException {
         PostMethod post = new PostMethod(servletConfig.getBaseUrl().toURI().resolve(path).toString());
         if (System.getProperty(HttpMethodParams.USER_AGENT) != null) {
             post.getParams().setParameter(HttpMethodParams.USER_AGENT, System.getProperty(HttpMethodParams.USER_AGENT));

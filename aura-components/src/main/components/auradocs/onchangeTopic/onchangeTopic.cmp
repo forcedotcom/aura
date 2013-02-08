@@ -78,6 +78,7 @@
 
     <p><b>See also:</b><br/>
     <auradocs:topicLink topic="eventsOverview">Event Handling Lifecycle</auradocs:topicLink><br/>
-    <auradocs:topicLink topic="valueObjectTypes">Value Object Types</auradocs:topicLink>
+    <auradocs:topicLink topic="valueObjectTypes">Value Object Types</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="initHandler">Executing Actions on Component Initialization</auradocs:topicLink>
      </p>
 </aura:component>

@@ -1,0 +1,50 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Invoking Actions on Component Initialization"/>
+
+<h2>Goal</h2>
+
+    <p>You want to update a component or fire an event after component construction but before rendering.</p>
+
+<h2>Code</h2>
+
+    <auradocs:example descriptor="auradocs:sampleInitHandler" />
+
+<h2>Discussion</h2>
+
+    <p>Let's look at the <b>Component source</b> tab to see how this works. The magic happens in this line.</p>
+    
+<auradocs:codeblock>
+&lt;aura:handler name="init" value="<aura:text value="{!"/>this}" action="<aura:text value="{!"/>c.doInit}"/&gt;
+</auradocs:codeblock>    
+    
+    <p>This registers an <code>init</code> event for the component. After the component is initialized, the <code>doInit</code> action is called in the component's controller. In this sample, the controller action sets an attribute value, but it could do something more interesting, such as firing an event.</p>
+    
+    <auradocs:info>You should never fire an event in a renderer so using the <code>init</code> event is a good alternative for many scenarios.</auradocs:info>
+    
+    <p>Setting <code>value="<aura:text value="{!"/>this}"</code> marks this as a value event. You should always use this setting for an <code>init</code> event.</p>
+
+<p><b>See also:</b><br/>
+    <auradocs:topicLink topic="helloAttributes">Component Attributes</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="renderers">Renderers</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="onchange">Detecting a Value Object Change</auradocs:topicLink>
+</p>  
+
+</aura:component>

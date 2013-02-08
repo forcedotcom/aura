@@ -16,11 +16,10 @@
 package org.auraframework.controller.java;
 
 import org.auraframework.Aura;
-import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.MockConfigAdapter;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.http.AuraServlet;
 import org.auraframework.system.Annotations.Key;
+import org.auraframework.test.AuraTestCase;
 
 /**
  * Let tests adjust servlet configuration.
@@ -35,7 +34,7 @@ public class ServletConfigController {
      * @param isProduction true/false
      */
     public static void setProductionConfig(@Key("isProduction") boolean isProduction) {
-        getMockConfigAdapter().setIsProduction(isProduction);
+        AuraTestCase.getMockConfigAdapter().setIsProduction(isProduction);
         System.out.println("PROD : " + isProduction + " , " + Aura.getConfigAdapter().isProduction() + " - "
                 + Aura.getConfigAdapter());
     }
@@ -47,7 +46,7 @@ public class ServletConfigController {
      * @param isAuraJSStatic true/false
      */
     public static void setIsAuraJSStatic(@Key("isAuraJSStatic") boolean isAuraJSStatic) {
-        getMockConfigAdapter().setIsAuraJSStatic(isAuraJSStatic);
+        AuraTestCase.getMockConfigAdapter().setIsAuraJSStatic(isAuraJSStatic);
     }
 
     /**
@@ -79,18 +78,6 @@ public class ServletConfigController {
 
     public static long getBuildTimestamp() throws Exception {
         return Aura.getConfigAdapter().getBuildTimestamp();
-    }
-
-    public static void resetMocks() throws Exception {
-        getMockConfigAdapter().reset();
-    }
-
-    public static MockConfigAdapter getMockConfigAdapter() {
-        ConfigAdapter adapter = Aura.getConfigAdapter();
-        if (adapter instanceof MockConfigAdapter) {
-            return (MockConfigAdapter) adapter;
-        }
-        throw new Error("MockConfigAdapter is not configured!");
     }
 
     public static void main(String[] args) {

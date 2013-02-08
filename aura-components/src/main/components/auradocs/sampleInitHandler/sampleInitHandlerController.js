@@ -13,20 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.adapter;
-
-import org.auraframework.test.MockBean;
-
-/**
- * Provide a configurable ConfigAdapter for tests.
- * 
- * 
- * @since 0.0.178
- */
-public interface MockConfigAdapter extends ConfigAdapter, MockBean {
-    void setIsProduction(boolean isProduction);
-
-    void setIsAuraJSStatic(boolean isAuraJSStatic);
-
-    void setValidateCss(boolean validateCss);
-}
+({
+	doInit: function(cmp) {
+		var attributes = cmp.getAttributes();
+		
+		// Set the value. This is not a very interesting sample as it just sets an attribute
+		// but you could fire an event here instead
+		attributes.setValue('setMeOnInit', "controller init magic!");
+	}
+})

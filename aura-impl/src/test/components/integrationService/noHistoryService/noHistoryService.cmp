@@ -1,0 +1,6 @@
+<aura:component>
+    <aura:handler event="aura:locationChange" action="{!c.locationChange}"/>
+    <aura:attribute name="txt" type="String" default=""/>
+    Injected Component
+    <div class="{!'testDiv ' + v.txt}">{!v.txt}</div>
+</aura:component>

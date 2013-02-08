@@ -39,7 +39,9 @@ var AuraClientService = function() {
 			// #if {"modes" : ["PRODUCTION"]}
 			try {
 				// #end
-				priv.token = token;
+				if (token) {
+					priv.token = token;
+				}
 
 				// Why is this happening in the ClientService? --JT
 				var component = componentService.newComponent(config, null,

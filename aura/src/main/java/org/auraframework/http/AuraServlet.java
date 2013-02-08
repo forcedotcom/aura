@@ -41,6 +41,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.http.RequestParam.EnumParam;
 import org.auraframework.http.RequestParam.StringParam;
+import org.auraframework.instance.Action;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
@@ -70,29 +71,31 @@ import com.google.common.collect.Maps;
 
 /**
  * The servlet for initialization and actions in Aura.
- *
+ * 
  * The sequence of requests is:
  * <ol>
- *   <li>GET(AuraServlet): initial fetch of an aura app/component + Resource Fetches:
- *     <ul>
- *       <li>GET(AuraResourceServlet:MANIFESt):optional get the manifest</li>
- *       <li>GET(AuraResourceServlet:CSS):get the styles for a component</li>
- *       <li>GET(AuraResourceServlet:JS):get the definitions for a component</li>
- *       <li>GET(AuraResourceServlet:JSON):???</li>
- *     </ul>
- *   </li>
- *   <li>Application Execution
- *     <ul>
- *       <li>GET(AuraServlet:JSON): Fetch additional aura app/component
- *         <ul>
- *           <li>GET(AuraResourceServlet:MANIFESt):optional get the manifest</li>
- *           <li>GET(AuraResourceServlet:CSS):get the styles for a component</li>
- *           <li>GET(AuraResourceServlet:JS):get the definitions for a component</li>
- *           <li>GET(AuraResourceServlet:JSON):???</li>
- *         </ul></li>
- *       <li>POST(AuraServlet:JSON): Execute actions.</li>
- *     </ul>
- *   </li>
+ * <li>GET(AuraServlet): initial fetch of an aura app/component + Resource
+ * Fetches:
+ * <ul>
+ * <li>GET(AuraResourceServlet:MANIFESt):optional get the manifest</li>
+ * <li>GET(AuraResourceServlet:CSS):get the styles for a component</li>
+ * <li>GET(AuraResourceServlet:JS):get the definitions for a component</li>
+ * <li>GET(AuraResourceServlet:JSON):???</li>
+ * </ul>
+ * </li>
+ * <li>Application Execution
+ * <ul>
+ * <li>GET(AuraServlet:JSON): Fetch additional aura app/component
+ * <ul>
+ * <li>GET(AuraResourceServlet:MANIFESt):optional get the manifest</li>
+ * <li>GET(AuraResourceServlet:CSS):get the styles for a component</li>
+ * <li>GET(AuraResourceServlet:JS):get the definitions for a component</li>
+ * <li>GET(AuraResourceServlet:JSON):???</li>
+ * </ul>
+ * </li>
+ * <li>POST(AuraServlet:JSON): Execute actions.</li>
+ * </ul>
+ * </li>
  * </ol>
  * 
  * Run from aura-jetty project. Pass in these vmargs: <code>
@@ -123,12 +126,12 @@ public class AuraServlet extends AuraBaseServlet {
 
     /**
      * Check for the nocache parameter and redirect as necessary.
-     *
-     * Not entirely sure what this is used for (need doco). It is part of 
+     * 
+     * Not entirely sure what this is used for (need doco). It is part of
      * the appcache refresh, forcing a reload while avoiding the appcache.
-     *
+     * 
      * It maybe should be done differently (e.g. a nonce).
-     *
+     * 
      * @param request The request to retrieve the parameter.
      * @param response the response (for setting the location header.
      * @returns true if we are finished with the request.
@@ -149,11 +152,11 @@ public class AuraServlet extends AuraBaseServlet {
         }
         response.setContentType("text/plain");
         response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
-        
-        String newLocation =  "/";
-        
-        try{
-            URI uri = new URI(nocache,true);
+
+        String newLocation = "/";
+
+        try {
+            URI uri = new URI(nocache, true);
             String fragment = uri.getEscapedFragment();
             StringBuilder sb = new StringBuilder(uri.getEscapedPathQuery());
             if (fragment != null && !fragment.isEmpty()) {
@@ -202,9 +205,9 @@ public class AuraServlet extends AuraBaseServlet {
             send404(request, response);
             return;
         }
-        
+
         BaseComponentDef def;
-		try {
+        try {
             tagName = tag.get(request);
             defType = defTypeParam.get(request, DefType.COMPONENT);
 
@@ -222,12 +225,13 @@ public class AuraServlet extends AuraBaseServlet {
             if (handleNoCacheRedirect(request, response)) {
                 return;
             }
-            
-			DefinitionService definitionService = Aura.getDefinitionService();
-			DefDescriptor<? extends BaseComponentDef> defDescriptor = definitionService.getDefDescriptor(tagName, defType == DefType.APPLICATION ? ApplicationDef.class : ComponentDef.class);
-			
-			Aura.getContextService().getCurrentContext().setApplicationDescriptor(defDescriptor);
-			
+
+            DefinitionService definitionService = Aura.getDefinitionService();
+            DefDescriptor<? extends BaseComponentDef> defDescriptor = definitionService.getDefDescriptor(tagName,
+                    defType == DefType.APPLICATION ? ApplicationDef.class : ComponentDef.class);
+
+            Aura.getContextService().getCurrentContext().setApplicationDescriptor(defDescriptor);
+
             def = defDescriptor.getDef();
         } catch (RequestParam.InvalidParamException ipe) {
             handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
@@ -514,17 +518,35 @@ public class AuraServlet extends AuraBaseServlet {
             }
 
             response.setContentType(getContentType(context.getFormat()));
-            validateCSRF(csrfToken.get(request));
             String msg = messageParam.get(request);
 
             if (msg == null) {
                 throw new AuraRuntimeException("Invalid request, no message");
             }
+
             loggingService.startTimer(LoggingService.TIMER_DESERIALIZATION);
             try {
                 message = serializationService.read(new StringReader(msg), Message.class);
             } finally {
                 loggingService.stopTimer(LoggingService.TIMER_DESERIALIZATION);
+            }
+
+            // The bootstrap action cannot not have a CSRF token so we let it
+            // through
+            boolean isBootstrapAction = false;
+            if (message.getActions().size() == 1) {
+                Action action = message.getActions().get(0);
+                String name = action.getDescriptor().getQualifiedName();
+                if (name.equals("aura://ComponentController/ACTION$getApplication")
+                        ||
+                        (name.equals("aura://ComponentController/ACTION$getComponent") && !isProductionMode(context
+                                .getMode()))) {
+                    isBootstrapAction = true;
+                }
+            }
+
+            if (!isBootstrapAction) {
+                validateCSRF(csrfToken.get(request));
             }
 
             Message<?> result = serverService.run(message, context);
@@ -536,7 +558,14 @@ public class AuraServlet extends AuraBaseServlet {
                     PrintWriter out = response.getWriter();
                     out.write(CSRF_PROTECT);
                     written = true;
-                    serializationService.write(result, null, out);
+
+                    Map<String, Object> attributes = null;
+                    if (isBootstrapAction) {
+                        attributes = Maps.newHashMap();
+                        attributes.put("token", getToken());
+                    }
+
+                    serializationService.write(result, attributes, out);
                 } finally {
                     loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION_AURA);
                     loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION);

@@ -228,6 +228,11 @@ var priv = {
 
 		var errors = [];
 		if (responseMessage) {
+		    var token = responseMessage["token"];
+		    if (token) {
+		        priv.token = token;
+		    }
+			
 			var ctx = responseMessage["context"];
 			$A.getContext().join(ctx);
 			var events = responseMessage["events"];

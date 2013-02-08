@@ -95,30 +95,43 @@
 						});
 		},function(cmp){
 			//Test case 2: Override auto refresh time, default is 60 seconds
-			var aThird = cmp.get("c.fetchDataRecord");
-			aThird.setParams({testName : "testSetStorableAPI"});
-			//Keeping the auto refresh time to 0, helps testing the override
-			aThird.setStorable({"refresh": 0});
-			aThird.runAfter(aThird);
-			var requestTime = new Date().getTime();
-			//Make sure we haven't reached the autorefresh timeout already. Default is set to 60, so 30 is quite conservative
-			$A.test.assertTrue( ((requestTime - cmp._requestStoredTime) / 1000 < 30), "Test setup failure, increase defaultAutoRefreshInterval time.");
-			$A.eventService.finishFiring();
-			$A.test.addWaitFor("SUCCESS", function(){return aThird.getState()},
-                    function(){
-							$A.test.assertTrue(aThird.isFromStorage(), "failed to fetch cached response");
-						});
-			
-			var refreshTime; 
+			var block = cmp.get("c.block");
+			block.setParams({testName : "testSetStorableAPI"});
+			$A.test.callServerAction(block, true);
+			var requestTime;
+			//Wait till the block action is executed
+			$A.test.addWaitFor(false, $A.test.isActionPending,
+				function(){
+	                var aThird = cmp.get("c.fetchDataRecord");
+					aThird.setParams({testName : "testSetStorableAPI"});
+					//Keeping the auto refresh time to 0, helps testing the override
+					aThird.setStorable({"refresh": 0});
+					aThird.runAfter(aThird);
+					requestTime = new Date().getTime();
+					//Make sure we haven't reached the autorefresh timeout already. Default is set to 60, so 30 is quite conservative
+					$A.test.assertTrue( ((requestTime - cmp._requestStoredTime) / 1000 < 30), "Test setup failure, increase defaultAutoRefreshInterval time.");
+					$A.eventService.finishFiring();
+					$A.test.addWaitFor("SUCCESS", function(){return aThird.getState()},
+	                    function(){
+								$A.test.assertTrue(aThird.isFromStorage(), "failed to fetch cached response");
+							});
+				});
+			//Verify that refreshBegin was fired
 			$A.test.addWaitFor("refreshBegin", 
 					function(){
 						return $A.test.getText(cmp.find("refreshBegin").getElement());
 					},
 					function(){
-						refreshTime = new Date().getTime();
+						var refreshTime = new Date().getTime();
 						//Verify that the refresh begin event kicked off
 						$A.test.assertTrue( ((refreshTime - requestTime) / 1000) < 5);
-						$A.test.addWaitFor("refreshEnd", 
+						//resume controller only after refreshBegin
+						var resume = cmp.get("c.resume");
+						resume.setParams({testName : "testSetStorableAPI"});
+		                $A.test.callServerAction(resume, true);
+					});	
+			//Verify that refreshEnd was fired
+			$A.test.addWaitFor("refreshEnd", 
 							function(){
 								return $A.test.getText(cmp.find("refreshEnd").getElement())
 							},
@@ -136,8 +149,7 @@
 														"aFourth should have fetched refreshed response");
 											});
 
-							})
-					});
+							});
 		}		
 		]
 	},

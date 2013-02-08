@@ -236,7 +236,7 @@
         } else {
             // ve is either an expression (and needs to be evaluated by
             // the expressionService), or a literal
-            if (ve.isExpression()) {
+            if (ve.isExpression && ve.isExpression()) {
                 value = $A.expressionService.getValue(valueProvider, ve);
 
                 // get the actual value from the Value object (if it's not null)
@@ -248,8 +248,10 @@
                         value = value.getValue();
                     }
                 }
-            } else {
+            } else if(ve.isExpression){
                 value = ve.getValue();
+            } else{
+            	value = ve; 
             }
 
             var isHash = value && value.indexOf && value.indexOf("#") === 0;

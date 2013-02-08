@@ -28,6 +28,7 @@ import org.auraframework.def.HtmlTag;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -37,6 +38,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 public abstract class ContainerTagHandler<T extends Definition> extends XMLHandler<T> {
     protected Location startLocation;
     protected WhitespaceBehavior whitespaceBehavior = BaseComponentDef.DefaultWhitespaceBehavior;
+    public static final String SCRIPT_TAG = "script";
 
     public ContainerTagHandler() {
         super();
@@ -150,6 +152,9 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
             RootTagHandler<P> parentHandler) {
         String tag = getTagName();
         if (HtmlTag.allowed(tag)) {
+            if (!parentHandler.getAllowsScript() && SCRIPT_TAG.equals(tag.toLowerCase())) {
+                throw new AuraExecutionException("script tags only allowed in templates", getLocation());
+            }
             return new HTMLComponentDefRefHandler<P>(parentHandler, tag, xmlReader, source);
         } else if (ForEachDefHandler.TAG.equalsIgnoreCase(tag)) {
             return new ForEachDefHandler<P>(parentHandler, xmlReader, source);

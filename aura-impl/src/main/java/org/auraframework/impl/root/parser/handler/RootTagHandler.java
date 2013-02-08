@@ -68,6 +68,16 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
         return ALLOWED_ATTRIBUTES;
     }
 
+    /**
+     * Determines whether HTML parsing will allow script tags to be embedded.
+     * False by default, so must be overridden to allow embedded script tag.
+     * 
+     * @return - return true if your instance should allow embedded script tags in HTML
+     */
+    public boolean getAllowsScript() {
+        return false;
+    }
+
     protected abstract RootDefinitionBuilder<T> getBuilder();
 
     @Override

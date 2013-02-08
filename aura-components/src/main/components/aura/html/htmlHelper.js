@@ -236,20 +236,22 @@
         } else {
             // ve is either an expression (and needs to be evaluated by
             // the expressionService), or a literal
-            if (ve.isExpression && ve.isExpression()) {
-                value = $A.expressionService.getValue(valueProvider, ve);
-
-                // get the actual value from the Value object (if it's not null)
-                if (value && value.auraType === "Value") {
-                    if (aura.util.arrayIndexOf(this.SPECIAL_BOOLEANS, name.toLowerCase()) > -1) {
-                        // TODO: values should someday know their type and do the right thing with getValue()
-                        value = value.getBooleanValue();
-                    } else {
-                        value = value.getValue();
-                    }
-                }
-            } else if(ve.isExpression){
-                value = ve.getValue();
+            if (ve && ve.isExpression) {
+            	if (ve.isExpression()) {
+	                value = $A.expressionService.getValue(valueProvider, ve);
+	
+	                // get the actual value from the Value object (if it's not null)
+	                if (value && value.auraType === "Value") {
+	                    if (aura.util.arrayIndexOf(this.SPECIAL_BOOLEANS, name.toLowerCase()) > -1) {
+	                        // TODO: values should someday know their type and do the right thing with getValue()
+	                        value = value.getBooleanValue();
+	                    } else {
+	                        value = value.getValue();
+	                    }
+	                }
+            	} else {
+                    value = ve.getValue();
+            	}
             } else{
             	value = ve; 
             }

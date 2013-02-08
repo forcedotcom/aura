@@ -93,8 +93,28 @@ var AuraClientService = function() {
 			$A.measure("Registered Components [" + comConfigs.length + "]",
 					"ClientService.initDefs");
 
-			delete this.initDefs;
 			$A.measure("Initial Scripts Finished", "PageStart");
+
+			// Let any interested parties know that defs have been initialized
+			for (var n = 0; n < priv.initDefsObservers.length; n++) {
+				priv.initDefsObservers[n]();
+			}
+			
+			delete priv.initDefsObservers;
+			
+			// Use the non-existence of initDefs() as the sentinel indicating that defs are good to go 
+			delete this.initDefs;
+		},
+		
+		/** @private */
+		runAfterInitDefs : function(callback) {
+			if (this.initDefs) {
+				// Add to the list of callbacks waiting until initDefs() is done
+				priv.initDefsObservers.push(callback);
+			} else {
+				// initDefs() is done and gone so just run the callback
+				callback();
+			}
 		},
 
 		/**
@@ -143,34 +163,36 @@ var AuraClientService = function() {
 		 * @private
 		 */
 		loadComponent : function(descriptor, attributes, callback, defType) {
-			var desc = new DefDescriptor(descriptor);
-			var tag = desc.getNamespace() + ":" + desc.getName();
-
-			var method = defType === "APPLICATION" ? "getApplication" : "getComponent";
-			var action = $A.get("c.aura://ComponentController." + method);
-			
-			action.setStorable();
-			
-			action.setParams({
-				name: tag,
-				attributes: attributes
+			this.runAfterInitDefs(function() {
+				var desc = new DefDescriptor(descriptor);
+				var tag = desc.getNamespace() + ":" + desc.getName();
+	
+				var method = defType === "APPLICATION" ? "getApplication" : "getComponent";
+				var action = $A.get("c.aura://ComponentController." + method);
+				
+				action.setStorable();
+				
+				action.setParams({
+					name: tag,
+					attributes: attributes
+				});
+				
+				action.setCallback(this, function(a) {
+					if (a.getState() === "SUCCESS") {
+						callback(a.getReturnValue());
+					} else {
+		                $A.error(a.getError()[0].message);
+					}
+	
+					$A.measure("Completed Component Callback", "Sending XHR " + $A.getContext().getNum());
+				});
+	
+				$A.services.event.startFiring("loadComponent");
+	
+				action.runAfter(action);
+	
+				$A.services.event.finishFiring("loadComponent");
 			});
-			
-			action.setCallback(this, function(a) {
-				if (a.getState() === "SUCCESS") {
-					callback(a.getReturnValue());
-				} else {
-	                $A.error(a.getError()[0].message);
-				}
-
-				$A.measure("Completed Component Callback", "Sending XHR " + $A.getContext().getNum());
-			});
-
-			$A.services.event.startFiring("loadComponent");
-
-			action.runAfter(action);
-
-			$A.services.event.finishFiring("loadComponent");
 		},
 
 		/**

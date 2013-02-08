@@ -23,6 +23,7 @@ var priv = {
 	appcacheDownloadingEventFired : false,
 	isOutdated : false,
 	isUnloading : false,
+	initDefsObservers : [],
 
 	/**
 	 * Take a json (hopefully) response and decode it.

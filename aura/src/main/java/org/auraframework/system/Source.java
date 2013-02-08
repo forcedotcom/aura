@@ -80,28 +80,25 @@ public abstract class Source<D extends Definition> implements Serializable {
         public int read(char[] cbuf, int off, int len) throws IOException {
             try {
                 int result = reader.read(cbuf, off, len);
-				if (digest != null) {
-					if (result > 0) {
-						ByteBuffer bytes = utf8.encode(CharBuffer.wrap(cbuf,
-								off, len));
-						digest.update(bytes);
-					} else if (result < 0) {
-						setChangeInfo();
-					}
-				}
+                if (digest != null) {
+                    if (result > 0) {
+                        ByteBuffer bytes = utf8.encode(CharBuffer.wrap(cbuf, off, result));
+                        digest.update(bytes);
+                    } else if (result < 0) {
+                        setChangeInfo();
+                    }
+                }
                 return result;
             } catch (IOException e) {
-                // Ensure we don't make a (probably wrong) hash from bad
-                // content.
-                // We'll probably be running away anyway, but it's easy to be
-                // sure.
+                // Ensure we don't make a (probably wrong) hash from bad content.
+                // We'll probably be running away anyway, but it's easy to be sure.
                 hadError = true;
                 throw e;
             }
         }
 
         private void setChangeInfo() {
-			if (!hadError && digest != null) {
+            if (!hadError && digest != null) {
                 synchronized (hash) {
                     // Multi-threading guard: if we have multiple readers for a
                     // single Source, only one needs to set the hash. Note that
@@ -111,8 +108,7 @@ public abstract class Source<D extends Definition> implements Serializable {
                         hash.setHash(digest.digest());
                     }
                 }
-                digest = null; // We're done; ensure we can't try to set it
-                               // again.
+                digest = null; // We're done; ensure we can't try to set it again.
             }
         }
     }

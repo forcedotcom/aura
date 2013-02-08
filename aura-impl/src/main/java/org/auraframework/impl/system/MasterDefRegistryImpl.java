@@ -29,7 +29,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.SecurityProviderDef;
-
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
@@ -55,10 +54,9 @@ import com.google.common.collect.Sets;
 /**
  * Overall Master definition registry implementation.
  * 
- * This 'master' definition registry is actually a single threaded, per request
- * registry that caches certain things in what is effectively a thread local
- * cache. This means that once something is pulled into the local thread, it
- * will not change.
+ * This 'master' definition registry is actually a single threaded, per request registry that caches certain things in
+ * what is effectively a thread local cache. This means that once something is pulled into the local thread, it will not
+ * change.
  */
 public class MasterDefRegistryImpl implements MasterDefRegistry {
     private static final Set<DefType> securedDefTypes = Sets.immutableEnumSet(DefType.APPLICATION, DefType.COMPONENT,
@@ -73,11 +71,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * A dependency entry for a uid+descriptor.
-     *
-     * This entry is created for each descriptor that a context uses at the
-     * top level. It is cached globally and locally. The second version of
-     * the entry (with a quick fix) is only ever cached locally.
-     *
+     * 
+     * This entry is created for each descriptor that a context uses at the top level. It is cached globally and
+     * locally. The second version of the entry (with a quick fix) is only ever cached locally.
+     * 
      * all values are final, and unmodifiable.
      */
     private static class DependencyEntry {
@@ -124,6 +121,21 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private final static Cache<String, String> strings = CacheBuilder.newBuilder().initialCapacity(STRING_CACHE_SIZE)
             .maximumSize(STRING_CACHE_SIZE).build();
 
+    /**
+     * A local dependencies cache.
+     * 
+     * We store both by descriptor and by uid. The descriptor keys must include the type, as the
+     * qualified name is not sufficient to distinguish it. In the case of the UID, we presume that
+     * we are safe.
+     *
+     * The two keys stored in the local cache are:
+     * <ul>
+     * <li>The UID, which should be sufficiently unique for a single request.</li>
+     * <li>The type+qualified name of the descriptor. We store this to avoid construction in the case
+     * where we don't have a UID. This is presumed safe because we assume that a single session will
+     * have a consistent set of permissions</li>
+     * </ul>
+     */
     private final Map<String, DependencyEntry> localDependencies = Maps.newHashMap();
 
     private final RegistryTrie delegateRegistries;
@@ -210,9 +222,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     /**
      * A compiling definition.
      * 
-     * This embodies a definition that is in the process of being compiled. It
-     * stores the descriptor, definition, and the registry to which it belongs
-     * to avoid repeated lookups.
+     * This embodies a definition that is in the process of being compiled. It stores the descriptor, definition, and
+     * the registry to which it belongs to avoid repeated lookups.
      */
     private static class CompilingDef<T extends Definition> {
         /**
@@ -222,7 +233,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
         /**
          * The compiled def.
-         *
+         * 
          * Should be non-null by the end of compile.
          */
         public T def;
@@ -239,9 +250,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
         /**
          * Did we build this definition?.
-         *
-         * If this is true, we need to do the validation steps after
-         * finishing.
+         * 
+         * If this is true, we need to do the validation steps after finishing.
          */
         public boolean built = false;
 
@@ -284,15 +294,96 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         }
     }
 
-    private void appendDependencies(Definition def, CompileContext cc, Set<DefDescriptor<?>> deps)
-            throws QuickFixException {
+    /**
+     * A private helper routine to make the compiler code more sane.
+     * 
+     * This processes a single definition in a dependency tree. It works as a single step in a breadth first traversal
+     * of the tree, accumulating children in the 'deps' set, and updating the compile context with the current
+     * definition.
+     * 
+     * Note that once the definition has been retrieved, this code uses the 'canonical' descriptor from the definition,
+     * discarding the incoming descriptor.
+     * 
+     * @param descriptor the descriptor that we are currently handling, must not be in the compiling defs.
+     * @param cc the compile context to allow us to accumulate information.
+     * @param deps the set of dependencies that we are accumulating.
+     * @throws QuickFixException if the definition is not found, or validateDefinition() throws one.
+     */
+    private <D extends Definition> D getHelper(DefDescriptor<D> descriptor, CompileContext cc,
+            Set<DefDescriptor<?>> deps) throws QuickFixException {
+        @SuppressWarnings("unchecked")
+        D def = (D) defs.get(descriptor);
+        CompilingDef<D> cd = cc.getCompiling(descriptor);
+        DefRegistry<D> registry = null;
+
+        if (cd.def != null) {
+            return cd.def;
+        }
+        if (def == null) {
+            registry = getRegistryFor(descriptor);
+            if (registry != null) {
+                def = registry.getDef(descriptor);
+            }
+            if (def == null) {
+                //
+                // At this point, we have failed to get the def, so we should throw an
+                // error. The first stanza is to provide a more useful error description
+                // including the set of components using the missing component.
+                //
+                if (!cd.parents.isEmpty()) {
+                    StringBuilder sb = new StringBuilder();
+                    Location handy = null;
+                    for (Definition parent : cd.parents) {
+                        handy = parent.getLocation();
+                        if (sb.length() != 0) {
+                            sb.append(", ");
+                        }
+                        sb.append(parent.getDescriptor().toString());
+                    }
+                    throw new DefinitionNotFoundException(descriptor, handy, sb.toString());
+                }
+                throw new DefinitionNotFoundException(descriptor);
+            }
+        }
+        //
+        // Ok. We have a def. let's figure out what to do with it.
+        //
+        @SuppressWarnings("unchecked")
+        DefDescriptor<D> canonical = (DefDescriptor<D>) def.getDescriptor();
         Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
 
+        //
+        // Make sure all of our fields are correct in our compiling def.
+        //
+        cd.def = def;
+        cd.descriptor = canonical;
+        cd.registry = registry;
+
+        if (!def.isValid()) {
+            //
+            // If our def is not 'valid', we must have built it, which means we need
+            // to validate. There is a subtle race condition here where more than one
+            // thread can grab a def from a registry, and they may all validate.
+            //
+            cd.built = true;
+            if (cd.registry == null) {
+                cd.registry = getRegistryFor(descriptor);
+            }
+            cc.loggingService.incrementNum(LoggingService.DEF_COUNT);
+            // FIXME: setting the current namespace on the context seems extremely hackish
+            cc.context.setCurrentNamespace(canonical.getNamespace());
+            def.validateDefinition();
+        }
+        //
+        // Store the def locally.
+        //
+        defs.put(canonical, def);
         def.appendDependencies(newDeps);
         //
         // FIXME: this code will go away with preloads.
+        // This pulls in the context preloads. not pretty, but it works.
         //
-        if (!cc.addedPreloads && def.getDescriptor().getDefType().equals(DefType.APPLICATION)) {
+        if (!cc.addedPreloads && canonical.getDefType().equals(DefType.APPLICATION)) {
             cc.addedPreloads = true;
             Set<String> preloads = cc.context.getPreloads();
             for (String preload : preloads) {
@@ -311,123 +402,30 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             }
         }
         deps.addAll(newDeps);
-    }
-
-    /**
-     * A private helper routine to make the compiler code more sane.
-     * 
-     * This processes a single definition in a dependency tree. It works as a
-     * single step in a breadth first traversal of the tree, accumulating
-     * children in the 'deps' set, and updating the compile context with the
-     * current definition.
-     * 
-     * This handles definitions already in the local cache specially, just
-     * skipping over the def and putting the children in the dependency tree.
-     * Since this is a per-request entity, that should be ok.
-     * 
-     * Note that once the definition has been retrieved, this code uses the
-     * 'canonical' descriptor from the definition, discarding the incoming
-     * descriptor.
-     * 
-     * @param descriptor the descriptor that we are currently handling, must not
-     *            be in the compiling defs.
-     * @param cc the compile context to allow us to accumulate information.
-     * @param deps the set of dependencies that we are accumulating.
-     * @throws QuickFixException if the definition is not found, or
-     *             validateDefinition() throws one.
-     */
-    private <D extends Definition> D getHelper(DefDescriptor<D> descriptor, CompileContext cc,
-                                               Set<DefDescriptor<?>> deps) throws QuickFixException {
-        @SuppressWarnings("unchecked")
-        D def = (D) defs.get(descriptor);
-        CompilingDef<D> cd = cc.getCompiling(descriptor);
-
-        if (def != null) {
-            //
-            // Short circuit on something already compiled in our registry.
-            // In this case, we have no need to compile this def, but we do
-            // have to continue the tree walk because some defs might not be
-            // cached (FIXME: we should cache all defs).
-            //
-            appendDependencies(def, cc, deps);
-            cc.dependencies.put(def.getDescriptor(), def);
-            cd.def = def;
-            return def;
-        }
-        DefRegistry<D> registry = getRegistryFor(descriptor);
-
-        if (registry != null) {
-            def = registry.getDef(descriptor);
-            if (def != null) {
-                @SuppressWarnings("unchecked")
-                DefDescriptor<D> canonical = (DefDescriptor<D>) def.getDescriptor();
-
-                cd.descriptor = canonical;
-                cd.def = def;
-                cd.registry = registry;
-                cd.built = true;
-                // cc.dependencies.put(canonical, def);
-                if (!def.isValid()) {
-                    cc.loggingService.incrementNum(LoggingService.DEF_COUNT);
-                    // FIXME: setting the current namespace on the context seems extremely hackish
-                    cc.context.setCurrentNamespace(canonical.getNamespace());
-                    def.validateDefinition();
-                }
-                defs.put(def.getDescriptor(), def);
-                if (cc.dependencies != null) {
-                    cc.dependencies.put(canonical, def);
-                }
-                appendDependencies(def, cc, deps);
-                return def;
-            }
-        }
-        //
-        // At this point, we have failed to get the def, so we should throw an
-        // error. The first stanza is to provide a more useful error description
-        // including the set of components using the missing component.
-        //
-        if (!cd.parents.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            Location handy = null;
-            for (Definition parent : cd.parents) {
-                handy = parent.getLocation();
-                if (sb.length() != 0) {
-                    sb.append(", ");
-                }
-                sb.append(parent.getDescriptor().toString());
-            }
-            throw new DefinitionNotFoundException(descriptor, handy, sb.toString());
-        }
-        throw new DefinitionNotFoundException(descriptor);
+        cc.dependencies.put(canonical, def);
+        return def;
     }
 
     /**
      * Compile a single definition, finding all of the static dependencies.
      * 
-     * This is the primary entry point for compiling a single definition. The
-     * basic guarantees enforced here are:
+     * This is the primary entry point for compiling a single definition. The basic guarantees enforced here are:
      * <ol>
-     * <li>Each definition has 'validateDefinition()' called on it exactly once.
-     * </li>
-     * <li>No definition is marked as valid until all definitions in the
-     * dependency set have been validated</li>
-     * <li>Each definition has 'validateReferences()' called on it exactly once,
-     * after the definitions have been put in local cache</li>
-     * <li>All definitions are marked valid by the DefRegistry after the
-     * validation is complete</li>
-     * <li>No definition should be available to other threads until it is marked
-     * valid</li>
+     * <li>Each definition has 'validateDefinition()' called on it exactly once.</li>
+     * <li>No definition is marked as valid until all definitions in the dependency set have been validated</li>
+     * <li>Each definition has 'validateReferences()' called on it exactly once, after the definitions have been put in
+     * local cache</li>
+     * <li>All definitions are marked valid by the DefRegistry after the validation is complete</li>
+     * <li>No definition should be available to other threads until it is marked valid</li>
      * <ol>
      * 
-     * In order to do all of this, we keep a set of 'compiling' definitions
-     * locally, and use that to calculate dependencies and walk the tree.
-     * Circular dependencies are handled gracefully, and no other thread can
-     * interfere because everything is local.
+     * In order to do all of this, we keep a set of 'compiling' definitions locally, and use that to calculate
+     * dependencies and walk the tree. Circular dependencies are handled gracefully, and no other thread can interfere
+     * because everything is local.
      * 
-     * FIXME: this should really cache invalid definitions and make sure that we
-     * don't bother re-compiling until there is some change of state. However,
-     * that is rather more complex than it sounds.... and shouldn't really
-     * manifest much in a released system.
+     * FIXME: this should really cache invalid definitions and make sure that we don't bother re-compiling until there
+     * is some change of state. However, that is rather more complex than it sounds.... and shouldn't really manifest
+     * much in a released system.
      * 
      * @param descriptor the descriptor that we wish to compile.
      */
@@ -440,12 +438,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         cc.loggingService.startTimer(LoggingService.TIMER_DEFINITION_CREATION);
         try {
             //
-            // FIXME: in the event of a compiled def, we should be done at the
-            // first fetch, though realistically,
+            // FIXME: in the event of a compiled def, we should be done at the first fetch, though realistically,
             // this should require that all defs be cached, or we _will_ break.
             //
-            // First, walk all dependencies, compiling them with
-            // validateDefinition.
+            // First, walk all dependencies, compiling them with validateDefinition.
             // and accumulating the set in a local map.
             //
             try {
@@ -460,36 +456,15 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 return null;
             }
             //
-            // This loop accumulates over a breadth first traversal of the
-            // dependency tree.
-            // All child definitions are added to the 'next' set, while walking
-            // the 'current'
+            // This loop accumulates over a breadth first traversal of the dependency tree.
+            // All child definitions are added to the 'next' set, while walking the 'current'
             // set.
             //
             while (next.size() > 0) {
                 Set<DefDescriptor<?>> current = next;
                 next = Sets.newHashSet();
                 for (DefDescriptor<?> cdesc : current) {
-                    if (!cc.compiled.containsKey(cdesc)
-                            || (!defs.containsKey(cdesc) && cc.compiled.get(cdesc).def == null)) {
-                        getHelper(cdesc, cc, next);
-                    }
-                }
-            }
-
-            //
-            // This is a bit odd, but necessary. We have to put the defs in our
-            // local cache
-            // even though they are not complete. This is so that when someone
-            // tries to get
-            // the defs, they will be returned from this registry. I suspect
-            // that there is
-            // a better way of doing this, but, well, this is all we have for
-            // now.
-            //
-            for (CompilingDef<?> cd : cc.compiled.values()) {
-                if (cd.built) {
-                    defs.put(cd.descriptor, cd.def);
+                    getHelper(cdesc, cc, next);
                 }
             }
 
@@ -506,12 +481,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             }
 
             //
-            // FIXME: figure out the global version here for the def being
-            // requested. Also, do
-            // something useful with dependencies to figure out if it is stale.
-            // If so, we'd have
-            // to invalidate the whole set and start over. Rather a painful
-            // thing to do.
+            // FIXME: figure out the global version here for the def being requested. Also, do
+            // something useful with dependencies to figure out if it is stale. If so, we'd have
+            // to invalidate the whole set and start over. Rather a painful thing to do.
             //
 
             //
@@ -538,56 +510,98 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * Internal routine to compile and return a DependencyEntry.
      */
     private <T extends Definition> DependencyEntry compileDE(DefDescriptor<T> descriptor) throws QuickFixException {
-        Map<DefDescriptor<?>, Definition> dds = Maps.newTreeMap();
-        String lk = descriptor.getQualifiedName().toLowerCase();
-        Definition def = compileDef(descriptor, dds);
-        DependencyEntry de;
-        String uid;
-        long lmt = 0;
+        // See localDependencies comment
+        String lowerk = descriptor.getQualifiedName().toLowerCase();
+        String localk = descriptor.getDefType().toString() + lowerk;
+        try {
+            Map<DefDescriptor<?>, Definition> dds = Maps.newTreeMap();
+            Definition def = compileDef(descriptor, dds);
+            DependencyEntry de;
+            String uid;
+            long lmt = 0;
 
-        if (def == null) {
+            if (def == null) {
+                return null;
+            }
+            for (Definition t : dds.values()) {
+                if (t.getLocation() != null && t.getLocation().getLastModified() > lmt) {
+                    lmt = t.getLocation().getLastModified();
+                }
+            }
+            StringBuilder sb = new StringBuilder(dds.size() * 20);
+
+            //
+            // Calculate our hash based on the descriptors and their hashes (if any).
+            // This uses a promise, and the string builder methods of Hash.
+            //
+            Hash.StringBuilder globalBuilder = new Hash.StringBuilder();
+            for (Map.Entry<DefDescriptor<?>, Definition> entry : dds.entrySet()) {
+                sb.setLength(0);
+                sb.append(entry.getKey().getQualifiedName().toLowerCase());
+                sb.append("|");
+                Hash hash = entry.getValue().getOwnHash();
+                if (hash != null) {
+                    // TODO: we need to ensure that null hashes are ok
+                    sb.append(hash.toString());
+                }
+                sb.append(",");
+                globalBuilder.addString(sb.toString());
+            }
+            uid = globalBuilder.build().toString();
+            //
+            // Now try a re-lookup. This may catch existing cached
+            // entries where uid was null.
+            //
+            // TODO : this breaks last mod time tests, as it causes the mod time
+            // to stay at the first compile time. We should phase out last mod
+            // time, and then re-instantiate this code.
+            //
+            // de = getDE(uid, lowerk);
+            // if (de == null) {
+            de = new DependencyEntry(uid, Sets.newTreeSet(dds.keySet()), lmt);
+            dependencies.put(de.uid + lowerk, de);
+            // See localDependencies comment
+            localDependencies.put(de.uid, de);
+            localDependencies.put(localk, de);
+            // }
+            return de;
+        } catch (QuickFixException qfe) {
+            // See localDependencies comment
+            localDependencies.put(localk, new DependencyEntry(qfe));
+            throw qfe;
+        }
+    }
+
+    /**
+     * Get a dependency entry for a given uid.
+     * 
+     * This is a convenience routine to check both the local and global cache for a value.
+     * 
+     * @param uid the uid (must not be null).
+     * @param descriptor the descriptor.
+     * @return the DependencyEntry or null if none present.
+     */
+    private DependencyEntry getDE(String uid, DefDescriptor<?> descriptor) {
+        // See localDependencies comment
+        String lowerk = descriptor.getQualifiedName().toLowerCase();
+        String localk = descriptor.getDefType().toString() + lowerk;
+        if (uid != null) {
+            DependencyEntry de = localDependencies.get(uid);
+            if (de != null) {
+                return de;
+            }
+            de = dependencies.getIfPresent(uid + lowerk);
+            if (de != null) {
+                // See localDependencies comment
+                localDependencies.put(uid, de);
+                localDependencies.put(localk, de);
+                return de;
+            }
             return null;
+        } else {
+            // See localDependencies comment
+            return localDependencies.get(localk);
         }
-        for (Definition t : dds.values()) {
-            if (t.getLocation() != null && t.getLocation().getLastModified() > lmt) {
-                lmt = t.getLocation().getLastModified();
-            }
-        }
-        StringBuilder sb = new StringBuilder(dds.size() * 20);
-
-        //
-        // Calculate our hash based on the descriptors and their hashes (if any).
-        // This uses a promise, and the string builder methods of Hash.
-        //
-        Hash.StringBuilder globalBuilder = new Hash.StringBuilder();
-        for (Map.Entry<DefDescriptor<?>, Definition> entry : dds.entrySet()) {
-            sb.setLength(0);
-            sb.append(entry.getKey().getQualifiedName().toLowerCase());
-            sb.append("|");
-            Hash hash = entry.getValue().getOwnHash();
-            if (hash != null) {
-                // TODO: we need to ensure that null hashes are ok
-                sb.append(hash.toString());
-            }
-            sb.append(",");
-            globalBuilder.addString(sb.toString());
-        }
-        uid = globalBuilder.build().toString();
-        //
-        // Now try a re-lookup. This may catch existing cached
-        // entries where uid was null.
-        //
-        // TODO : this breaks last mod time tests, as it causes the mod time
-        // to stay at the first compile time. We should phase out last mod
-        // time, and then re-instantiate this code.
-        //
-        //de = getDE(uid, lk);
-        //if (de == null) {
-        de = new DependencyEntry(uid, Sets.newTreeSet(dds.keySet()), lmt);
-        dependencies.put(de.uid + lk, de);
-        localDependencies.put(de.uid, de);
-        //}
-        return de;
     }
 
     @Override
@@ -673,8 +687,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     /**
-     * This figures out based on prefix what registry this component is for, it
-     * could return null if the prefix is not found.
+     * This figures out based on prefix what registry this component is for, it could return null if the prefix is not
+     * found.
      */
     @SuppressWarnings("unchecked")
     private <T extends Definition> DefRegistry<T> getRegistryFor(DefDescriptor<T> descriptor) {
@@ -777,8 +791,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     /**
      * Filter the entire set of current definitions by a set of preloads.
      * 
-     * This filtering is very simple, it just looks for local definitions that
-     * are not included in the preload set.
+     * This filtering is very simple, it just looks for local definitions that are not included in the preload set.
      */
     @Override
     public Map<DefDescriptor<? extends Definition>, Definition> filterRegistry(Set<DefDescriptor<?>> preloads) {
@@ -798,9 +811,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @Override
     public <T extends Definition> boolean invalidate(DefDescriptor<T> descriptor) {
-        if (localDependencies.containsKey(descriptor)) {
-            localDependencies.remove(descriptor);
-        }
         // TODO: this should be optimized.
         dependencies.invalidateAll();
         // TODO: need to remove from the registries.
@@ -831,36 +841,11 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     /**
-     * Get a dependency entry for a given uid.
-     *
-     * This is a convenience routine to check both the local and global
-     * cache for a value.
-     *
-     * @param uid the uid (must not be null).
-     * @param lk the lower case descriptor name.
-     * @return the DependencyEntry or null if none present.
-     */
-    private DependencyEntry getDE(String uid, String lk) {
-        DependencyEntry de = localDependencies.get(uid);
-        if (de != null) {
-            return de;
-        }
-        de = dependencies.getIfPresent(uid + lk);
-        if (de != null) {
-            localDependencies.put(uid, de);
-            localDependencies.put(lk, de);
-            return de;
-        }
-        return null;
-    }
-
-    /**
      * Get the UID.
-     *
-     * This uses some trickery to try to be efficient, including using a dual
-     * keyed local cache to avoid looking up values more than once even in
-     * the absense of remembered context.
-     *
+     * 
+     * This uses some trickery to try to be efficient, including using a dual keyed local cache to avoid looking up
+     * values more than once even in the absense of remembered context.
+     * 
      * @param uid the uid expected (null means unknown).
      * @param descriptor the descriptor to fetch.
      */
@@ -868,30 +853,26 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     public <T extends Definition> String getUid(String uid, DefDescriptor<T> descriptor) throws QuickFixException,
             ClientOutOfSyncException {
         DependencyEntry de = null;
-        String lk = descriptor.getQualifiedName().toLowerCase();
 
-        if (uid != null) {
-            de = getDE(uid, lk);
-        } else {
-            de = localDependencies.get(lk);
-        }
+        de = getDE(uid, descriptor);
         if (de == null) {
             try {
                 de = compileDE(descriptor);
             } catch (QuickFixException qfe) {
-                de = new DependencyEntry(qfe);
-                localDependencies.put(lk, de);
+                // try to pick it up from the cache.
+                de = getDE(null, descriptor);
+                // this should never happen.
+                if (de == null) {
+                    throw new AuraRuntimeException("unexpected null on QFE");
+                }
             }
             if (uid != null && !uid.equals(de.uid)) {
-                throw new ClientOutOfSyncException("Mismatched UIDs expected '"+de.uid+"' got '"+uid+"'");
+                throw new ClientOutOfSyncException("Mismatched UIDs expected '" + de.uid + "' got '" + uid + "'");
             }
-        } 
-        if (de != null) {
-            if (de.qfe != null) {
-                throw de.qfe;
-            }
-            return de.uid;
         }
-        return null;
+        if (de.qfe != null) {
+            throw de.qfe;
+        }
+        return de.uid;
     }
 }

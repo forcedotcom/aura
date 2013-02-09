@@ -25,12 +25,13 @@
 
     <h3><code>ui:block</code></h3>
     <p> <code>ui:block</code> creates a horizontal box area. This component contains the <code>left</code> and <code>right</code> attributes for your content,
-    and nests the <code>body</code> element in the middle. The DOM order is always <code>left</code>, <code>right</code>, and <code>body</code>.  
+    and nests the <code>body</code> element in the middle. The DOM order is always <code>left</code>, <code>right</code>, and <code>body</code>. 
+    The <code>left</code> and <code>right</code> attributes are optional. See <auradocs:topicLink topic="helloFacets">Component Body and Facets</auradocs:topicLink> to learn about how you can set the body content.
     </p>
     <auradocs:info>See the <auradocs:defLink descriptor ="ui:block">ui:block</auradocs:defLink> component reference.</auradocs:info>
     <auradocs:example descriptor="auradocs:demoBlock" />
 
-	<p>Notice that the HTML output is nested in a <code>div</code> element. To change the default output to another element, such as <code>li</code>, set the <code>tag</code> attribute to <code>li</code>.</p>
+	<p>Notice that the HTML output is nested in a <code>div</code> element. To change the default output to another element, such as <code>li</code>, set the <code>tag</code> attribute to <code>li</code> as shown below.</p>
     <auradocs:codeblock>
     &lt;ui:block&gt;
       &lt;aura:set tag="li"&gt;
@@ -41,7 +42,9 @@
     
 	<h3><code>ui:vbox</code></h3>
     <p><code>ui:vbox</code> creates a vertical box area on an app page.  This component contains the <code>north</code> and <code>south</code> attributes for your content,
-    and nests the <code>body</code> element in the middle.</p>
+    and nests the <code>body</code> element in the middle.
+    The <code>north</code> and <code>south</code> attributes are optional. See <auradocs:topicLink topic="helloFacets">Component Body and Facets</auradocs:topicLink> to learn about how you can set the body content.
+    </p>
     <auradocs:info>See the <auradocs:defLink descriptor ="ui:vbox">ui:vbox</auradocs:defLink> component reference.</auradocs:info>
     <auradocs:example descriptor="auradocs:demoVbox" />
     

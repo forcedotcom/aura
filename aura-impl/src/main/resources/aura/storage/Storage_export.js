@@ -16,6 +16,7 @@
 /*jslint sub: true */
 var p = AuraStorage.prototype;
 exp(p,
+    "clear", p.clear,
     "getName", p.getName,
     "getSize", p.getSize,
     "getMaxSize", p.getMaxSize,

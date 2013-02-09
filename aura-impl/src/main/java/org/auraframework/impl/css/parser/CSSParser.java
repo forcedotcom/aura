@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.def.NamespaceDef;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableList;
@@ -75,8 +76,7 @@ public class CSSParser {
     private final Set<String> allowedConditions;
 
     /**
-     * PlumeCSSParser uses the infrastructure supplied by Google's Closure
-     * Stylesheets project.
+     * PlumeCSSParser uses the infrastructure supplied by Google's Closure Stylesheets project.
      * 
      * @param namespace
      * @param contents the actual css
@@ -91,9 +91,8 @@ public class CSSParser {
     }
 
     /**
-     * Parse the css and return the results. If errors are found @see #hasErrors
-     * will return true, and the error message will be found here @see
-     * #getErrorMessage
+     * Parse the css and return the results. If errors are found @see #hasErrors will return true, and the error message
+     * will be found here @see #getErrorMessage
      * 
      * @throws GssParserException
      */
@@ -114,16 +113,20 @@ public class CSSParser {
         // replaces constant refs with refs defined in namespace config
         ConstantDefinitions defs = new ConstantDefinitions();
 
-        NamespaceDef namespaceDef = Aura.getDefinitionService().getDefinition(namespace, NamespaceDef.class);
-        Map<String, String> nsDefs = namespaceDef.getThemeTokens();
-        if (nsDefs != null && !nsDefs.isEmpty()) {
-            for (Entry<String, String> entry : nsDefs.entrySet()) {
-                CssDefinitionNode def = new CssDefinitionNode(new CssLiteralNode(entry.getKey()));
-                def.setParameters(Lists.<CssValueNode> newArrayList(new CssLiteralNode(entry.getValue())));
-                defs.addConstantDefinition(def);
+        try {
+            NamespaceDef namespaceDef = Aura.getDefinitionService().getDefinition(namespace, NamespaceDef.class);
+            Map<String, String> nsDefs = namespaceDef.getThemeTokens();
+            if (nsDefs != null && !nsDefs.isEmpty()) {
+                for (Entry<String, String> entry : nsDefs.entrySet()) {
+                    CssDefinitionNode def = new CssDefinitionNode(new CssLiteralNode(entry.getKey()));
+                    def.setParameters(Lists.<CssValueNode> newArrayList(new CssLiteralNode(entry.getValue())));
+                    defs.addConstantDefinition(def);
+                }
+                new CreateConstantReferences(cssTree.getMutatingVisitController()).runPass();
+                new ReplaceConstantReferences(cssTree, defs).runPass();
             }
-            new CreateConstantReferences(cssTree.getMutatingVisitController()).runPass();
-            new ReplaceConstantReferences(cssTree, defs).runPass();
+        } catch (DefinitionNotFoundException dnfe) {
+            // ignore.
         }
 
         if (validateNamespace) {
@@ -196,30 +199,18 @@ public class CSSParser {
      * 
      * @return
      * 
-     *         private JobDescription createJobDescription(List<String>
-     *         trueConditionNames) { JobDescriptionBuilder builder = new
-     *         JobDescriptionBuilder();
-     *         builder.setInputOrientation(JobDescription.InputOrientation.LTR);
-     *         builder
-     *         .setOutputOrientation(JobDescription.OutputOrientation.LTR);
-     *         builder
+     *         private JobDescription createJobDescription(List<String> trueConditionNames) { JobDescriptionBuilder
+     *         builder = new JobDescriptionBuilder(); builder.setInputOrientation(JobDescription.InputOrientation.LTR);
+     *         builder .setOutputOrientation(JobDescription.OutputOrientation.LTR); builder
      *         .setOutputFormat(JobDescription.OutputFormat.PRETTY_PRINTED);
-     *         builder.setAllowUnrecognizedFunctions(true);
-     *         builder.setAllowUnrecognizedProperties(true);
-     *         //builder.setAllowedNonStandardFunctions
-     *         (allowedNonStandardFunctions);
-     *         //builder.setAllowedUnrecognizedProperties
-     *         (allowNonRecognizedProperties);
-     *         builder.setAllowWebkitKeyframes(true);
-     *         builder.setProcessDependencies(true);
-     *         builder.setSimplifyCss(false);
-     *         builder.setEliminateDeadStyles(false); // not needed now, but
-     *         perhaps in the future? //builder.setCopyrightNotice(xxx);
-     *         //builder.setTrueConditionNames(xxx);
-     *         //builder.setExcludedClassesFromRenaming(xxx);
-     *         builder.addInput(new SourceCode(namespace, contents)); if
-     *         (trueConditionNames!=null) {
-     *         builder.setTrueConditionNames(trueConditionNames); } return
+     *         builder.setAllowUnrecognizedFunctions(true); builder.setAllowUnrecognizedProperties(true);
+     *         //builder.setAllowedNonStandardFunctions (allowedNonStandardFunctions);
+     *         //builder.setAllowedUnrecognizedProperties (allowNonRecognizedProperties);
+     *         builder.setAllowWebkitKeyframes(true); builder.setProcessDependencies(true);
+     *         builder.setSimplifyCss(false); builder.setEliminateDeadStyles(false); // not needed now, but perhaps in
+     *         the future? //builder.setCopyrightNotice(xxx); //builder.setTrueConditionNames(xxx);
+     *         //builder.setExcludedClassesFromRenaming(xxx); builder.addInput(new SourceCode(namespace, contents)); if
+     *         (trueConditionNames!=null) { builder.setTrueConditionNames(trueConditionNames); } return
      *         builder.getJobDescription(); }
      */
 

@@ -50,10 +50,12 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
 
     private void setProdConfig() throws Exception {
         ServletConfigController.setProductionConfig(true);
+        Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.AUTHENTICATED);
     }
 
     private void setProdContextWithoutConfig() throws Exception {
+        Aura.getContextService().endContext();
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED);
     }
 
@@ -131,7 +133,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         DefDescriptor<?> cdd = addSourceAutoCleanup(
                 InterfaceDef.class,
                 "<aura:interface provider='java://org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation'></aura:interface>");
-        openNoAura(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
+        openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
         assertNoStacktrace();
     }
 
@@ -144,7 +146,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         DefDescriptor<?> cdd = addSourceAutoCleanup(
                 InterfaceDef.class,
                 "<aura:interface provider='java://org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation'></aura:interface>");
-        openNoAura(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
+        openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
         assertStacktrace(
                 "java.lang.RuntimeException: that was intentional at org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation.",
                 "(TestProviderThrowsDuringInstantiation.java:");
@@ -156,7 +158,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
      */
     public void testProdAppProviderThrowsDuringInstantiation() throws Exception {
         setProdConfig();
-        openNoAura(getAppUrl(
+        openRaw(getAppUrl(
                 "provider='java://org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation'", ""));
         assertNoStacktrace();
     }
@@ -167,7 +169,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
      */
     public void testAppProviderThrowsDuringInstantiation() throws Exception {
         setProdContextWithoutConfig();
-        openNoAura(getAppUrl(
+        openRaw(getAppUrl(
                 "provider='java://org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation'", ""));
         assertStacktrace("that was intentional at org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation.");
     }
@@ -181,7 +183,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         DefDescriptor<?> cdd = addSourceAutoCleanup(
                 InterfaceDef.class,
                 "<aura:interface provider='java://org.auraframework.impl.java.provider.TestProviderThrowsDuringProvide'></aura:interface>");
-        openNoAura(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
+        openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
         assertNoStacktrace();
     }
 
@@ -194,7 +196,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         DefDescriptor<?> cdd = addSourceAutoCleanup(
                 InterfaceDef.class,
                 "<aura:interface provider='java://org.auraframework.impl.java.provider.TestProviderThrowsDuringProvide'></aura:interface>");
-        openNoAura(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
+        openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
         assertStacktrace("java.lang.RuntimeException: out of stock at .(org.auraframework.impl.java.provider.TestProviderThrowsDuringProvide)");
     }
 
@@ -206,7 +208,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         setProdConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component model='java://org.auraframework.impl.java.model.TestModelThrowsDuringInstantiation'></aura:component>");
-        openNoAura(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
+        openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
         assertNoStacktrace();
     }
 
@@ -218,7 +220,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         setProdContextWithoutConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component model='java://org.auraframework.impl.java.model.TestModelThrowsDuringInstantiation'></aura:component>");
-        openNoAura(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
+        openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
         assertStacktrace(
                 "java.lang.RuntimeException: surprise! at org.auraframework.impl.java.model.TestModelThrowsDuringInstantiation.",
                 "(TestModelThrowsDuringInstantiation.java:");
@@ -233,7 +235,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         DefDescriptor<?> cdd = addSourceAutoCleanup(
                 ComponentDef.class,
                 "<aura:component renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestRendererThrowsDuringInstantiation'></aura:component>");
-        openNoAura(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
+        openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
         assertNoStacktrace();
     }
 
@@ -246,7 +248,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         DefDescriptor<?> cdd = addSourceAutoCleanup(
                 ComponentDef.class,
                 "<aura:component renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestRendererThrowsDuringInstantiation'></aura:component>");
-        openNoAura(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
+        openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
         assertStacktrace(
                 "java.lang.Error: invisible me at org.auraframework.impl.renderer.sampleJavaRenderers.TestRendererThrowsDuringInstantiation.",
                 "(TestRendererThrowsDuringInstantiation.java:");
@@ -261,7 +263,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         DefDescriptor<?> cdd = addSourceAutoCleanup(
                 ComponentDef.class,
                 "<aura:component renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestRendererThrowingException'></aura:component>");
-        openNoAura(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
+        openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
         assertNoStacktraceServerRendering();
     }
 
@@ -273,7 +275,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         DefDescriptor<?> cdd = addSourceAutoCleanup(
                 ComponentDef.class,
                 "<aura:component renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestRendererThrowingException'></aura:component>");
-        openNoAura(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
+        openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
         assertStacktraceServerRendering("org.auraframework.throwable.AuraExecutionException: org.auraframework."
                 + "renderer.ComponentRenderer: org.auraframework.throwable.AuraExecutionException: org.auraframework."
                 + "renderer.HtmlRenderer: org.auraframework.throwable.AuraExecutionException: org.auraframework."
@@ -293,7 +295,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         DefDescriptor<?> add = addSourceAutoCleanup(
                 ApplicationDef.class,
                 "<aura:application securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows''></aura:application>");
-        openNoAura(String.format("/%s/%s.app", add.getNamespace(), add.getName()));
+        openRaw(String.format("/%s/%s.app", add.getNamespace(), add.getName()));
         assertStacktrace("org.auraframework.throwable.AuraUnhandledException: "
                 + String.format("markup://%s:%s:1,111: ParseError at [row,col]:[2,111]", add.getNamespace(),
                         add.getName()));
@@ -306,7 +308,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
 
     public void testCntrlThrowsWithFileName() throws Exception {
         String fileName = "auratest/parseError";
-        openNoAura(fileName + ".cmp");
+        openRaw(fileName + ".cmp");
         assertStacktrace("org.auraframework.throwable.AuraRuntimeException: ");
         assertStacktrace("auratest/parseError/parseErrorController.js");
     }

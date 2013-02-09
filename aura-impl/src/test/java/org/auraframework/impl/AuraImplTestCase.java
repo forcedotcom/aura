@@ -51,8 +51,6 @@ public abstract class AuraImplTestCase extends AuraTestCase {
     protected final DefinitionService definitionService = Aura.getDefinitionService();
     private boolean shouldSetupContext = true;
 
-    protected final static String baseComponentTag = "<aura:component %s>%s</aura:component>";
-    protected final static String baseApplicationTag = "<aura:application %s>%s</aura:application>";
     protected final DefDescriptor<ApplicationDef> laxSecurityApp = definitionService.getDefDescriptor(
             "test:laxSecurity", ApplicationDef.class);
 

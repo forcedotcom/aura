@@ -20,6 +20,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -192,10 +193,13 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         DefDescriptor<?> fakeComponent = DefDescriptorImpl.getInstance("aura:fakeComponent", ComponentDef.class);
         DefDescriptor<?> fakeComponent2 = DefDescriptorImpl.getInstance("Aura:FakeComponent", ComponentDef.class);
         DefDescriptor<?> fooComponent = DefDescriptorImpl.getInstance("aura:foo", ComponentDef.class);
+        DefDescriptor<?> fakeComponentLayout = DefDescriptorImpl.getInstance("aura:fakeComponent", LayoutsDef.class);
 
         assertTrue(fakeComponent.compareTo(fakeComponent2) == 0);
         assertTrue(fooComponent.compareTo(fakeComponent) > 0);
         assertTrue(fakeComponent.compareTo(fooComponent) < 0);
+        assertTrue(fakeComponent.compareTo(fakeComponentLayout) < 0);
+        assertTrue(fakeComponentLayout.compareTo(fakeComponent) > 0);
     }
 
     private void testEquals(DefDescriptor<?> x, DefDescriptor<?> y, int compareTo) throws Exception {

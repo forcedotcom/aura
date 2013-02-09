@@ -28,6 +28,8 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.AuraContext;
+import org.auraframework.test.TestContext;
+import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -37,7 +39,7 @@ public class JSTestModel {
     private final DefDescriptor<TestSuiteDef> descriptor;
     private final TestSuiteDef def;
     private final String url;
-    private final List<TestCaseDef> tcd;
+    private final List<TestCaseDef> tcds;
 
     public JSTestModel() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
@@ -59,7 +61,14 @@ public class JSTestModel {
                 descriptor.getName(), defType == DefType.COMPONENT ? "cmp" : "app", nonce, context.getMode().name());
 
         String test = (String) component.getAttributes().getValue("test");
-        tcd = filterTestCases(test);
+        tcds = filterTestCases(test);
+        
+        TestContextAdapter contextAdapter = Aura.get(TestContextAdapter.class);
+        for (TestCaseDef tcd : tcds) {
+            TestContext testContext = contextAdapter.getTestContext(tcd.getDescriptor().getQualifiedName());
+            testContext.getLocalDefs().clear();
+            testContext.getLocalDefs().addAll(tcd.getLocalDefs());
+        }
     }
 
     private List<TestCaseDef> filterTestCases(String test) throws QuickFixException {
@@ -83,7 +92,7 @@ public class JSTestModel {
 
     @AuraEnabled
     public List<TestCaseDef> getTestCases() throws QuickFixException {
-        return tcd;
+        return tcds;
     }
 
     @AuraEnabled

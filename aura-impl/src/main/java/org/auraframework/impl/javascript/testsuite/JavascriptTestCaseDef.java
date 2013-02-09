@@ -21,38 +21,53 @@ import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.def.TestCaseDef;
+import org.auraframework.def.TestSuiteDef;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.Location;
 import org.auraframework.util.json.Json;
 
 public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implements TestCaseDef {
-
+    
     private static final long serialVersionUID = -5460410624026635318L;
     private final Map<String, Object> attributes;
     private final DefType defType;
     private final Set<String> testLabels;
     private final Set<String> browsers;
+    private final Set<Definition> mocks;
+    private final String name;
 
-    public JavascriptTestCaseDef(DefDescriptor<TestCaseDef> descriptor, Location location,
-            Map<String, Object> attributes, DefType defType, Set<String> testLabels, Set<String> browsers) {
-        super(descriptor, location);
+    public JavascriptTestCaseDef(DefDescriptor<TestSuiteDef> suiteDescriptor, String name, Location location,
+            Map<String, Object> attributes, DefType defType, Set<String> testLabels, Set<String> browsers,
+            Set<Definition> mocks) {
+        super(DefDescriptorImpl.getInstance(suiteDescriptor.getQualifiedName() + "/" + DefType.TESTCASE + "$" + name,
+                TestCaseDef.class), location);
         this.attributes = AuraUtil.immutableMap(attributes);
         this.defType = defType;
         this.testLabels = AuraUtil.immutableSet(testLabels);
         this.browsers = AuraUtil.immutableSet(browsers);
+        this.mocks = AuraUtil.immutableSet(mocks);
+        this.name = name;
     }
 
     @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();
+        json.writeMapEntry("name", getName());
         json.writeMapEntry("descriptor", descriptor);
         json.writeMapEntry("attributes", attributes);
         json.writeMapEntry("defType", defType);
         json.writeMapEntry("testLabels", testLabels);
         json.writeMapEntry("browsers", browsers);
         json.writeMapEnd();
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -73,5 +88,10 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
     @Override
     public Set<String> getBrowsers() {
         return browsers;
+    }
+
+    @Override
+    public Set<Definition> getLocalDefs(){
+        return mocks;
     }
 }

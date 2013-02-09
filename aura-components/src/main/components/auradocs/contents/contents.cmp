@@ -85,6 +85,7 @@
                 <auradocs:contentsNode text="Component Events" id="eventsComp"/>
                 <auradocs:contentsNode text="Application Events" id="eventsApp"/>
                 <auradocs:contentsNode text="Events Demo" id="eventsDemo"/>
+                <auradocs:contentsNode text="Firing Aura Events from Non-Aura code" id="eventsExternal"/>
             </auradocs:contentsNode>
         </auradocs:contentsNode>
 
@@ -129,6 +130,7 @@
                     <auradocs:contentsNode text="Dynamically Creating Components" id="dynamicCmp" />
                     <auradocs:contentsNode text="Finding Components by ID" id="findById" />
                     <auradocs:contentsNode text="Dynamically Showing or Hiding Markup" id="hideMarkup" />
+                    <auradocs:contentsNode text="Invoking Actions on Component Initialization" id="initHandler" />
                 </auradocs:contentsNode>
             </auradocs:contentsNode>
 

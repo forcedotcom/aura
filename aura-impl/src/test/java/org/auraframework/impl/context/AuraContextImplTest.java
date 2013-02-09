@@ -141,11 +141,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.PUBLIC, desc);
         ctx.setSerializeLastMod(false);
         String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
-        assertEquals(
-                "{\"mode\":\"PROD\",\"app\":\"arbitrary:appname\",\"preloads\":[],"
-                        + "\"globalValueProviders\":["
-                        + "{\"type\":\"$Browser\",\"values\":{\"formFactor\":\"DESKTOP\",\"isPhone\":false,\"isIPad\":false,\"isAndroid\":false,\"isTablet\":false,\"isIPhone\":false,\"isIOS\":false}},"
-                        + "{\"type\":\"$Locale\"}]}", res);
+        goldFileJson(res);
     }
 
     /**
@@ -159,10 +155,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.PUBLIC, desc);
         ctx.setSerializeLastMod(false);
         String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
-        assertEquals(
-                "{\"mode\":\"PROD\",\"cmp\":\"arbitrary:cmpname\",\"preloads\":[],\"globalValueProviders\":["
-                        + "{\"type\":\"$Browser\",\"values\":{\"formFactor\":\"DESKTOP\",\"isPhone\":false,\"isIPad\":false,\"isAndroid\":false,\"isTablet\":false,\"isIPhone\":false,\"isIOS\":false}},"
-                        + "{\"type\":\"$Locale\"}]}", res);
+        goldFileJson(res);
     }
 
     /**
@@ -173,10 +166,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.PUBLIC);
         ctx.setSerializeLastMod(false);
         String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
-        assertEquals(
-                "{\"mode\":\"PROD\",\"preloads\":[],\"globalValueProviders\":["
-                        + "{\"type\":\"$Browser\",\"values\":{\"formFactor\":\"DESKTOP\",\"isPhone\":false,\"isIPad\":false,\"isAndroid\":false,\"isTablet\":false,\"isIPhone\":false,\"isIOS\":false}},"
-                        + "{\"type\":\"$Locale\"}]}", res);
+        goldFileJson(res);
     }
 
     /**

@@ -27,7 +27,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
 
     private Boolean isProduction = null;
     private Boolean isAuraJSStatic = null;
-
+    private Boolean validateCss = null;
     public MockConfigAdapterImpl() {
     }
 
@@ -35,6 +35,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     public void reset() {
         isProduction = null;
         isAuraJSStatic = null;
+        validateCss = null;
     }
 
     @Override
@@ -55,5 +56,15 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
     @Override
     public boolean isAuraJSStatic() {
         return (isAuraJSStatic == null) ? super.isAuraJSStatic() : isAuraJSStatic;
+    }
+
+    @Override
+    public void setValidateCss(boolean validateCss) {
+        this.validateCss = validateCss;
+    }
+
+    @Override
+    public boolean validateCss() {
+        return (validateCss == null) ? super.validateCss() : validateCss;
     }
 }

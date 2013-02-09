@@ -150,7 +150,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
     /**
      * Check to see if we are in production mode.
      */
-    private boolean isProductionMode(Mode mode) {
+    protected boolean isProductionMode(Mode mode) {
         return mode == Mode.PROD || Aura.getConfigAdapter().isProduction();
     }
 

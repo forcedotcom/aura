@@ -15,13 +15,13 @@
  */
 ({
     afterRender: function(component, helper) {
-        helper.setVisible(component);
+        helper.handleVisible(component);
         helper.setAriaAttributes(component);
         return this.superAfterRender();
     },
     
     rerender: function(component, helper) {
-        helper.setVisible(component);
+        helper.handleVisible(component);
         helper.setAriaAttributes(component);
         return this.superRerender();
     }

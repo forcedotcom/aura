@@ -58,7 +58,7 @@ public class AppCacheProgressBarUITest extends WebDriverTestCase {
     @FreshBrowserInstance
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testProgressBar() throws Exception {
-        openNoAura("/appCache/testApp.app?aura.mode=DEV");
+        open("/appCache/testApp.app", Mode.DEV, false);
         assertTrue("Progress bar for appCache did not show up.", findDomElement(appCacheProgressDiv).isDisplayed());
         waitForAuraInit();
         waitForElementAbsent("Progress bar for appCache is visible even after aura is ready.",
@@ -120,7 +120,7 @@ public class AppCacheProgressBarUITest extends WebDriverTestCase {
      */
     @FreshBrowserInstance
     public void testProgressbarNotVisibleInPRODMode() throws Exception {
-        openNoAura("/appCache/testApp.app?aura.mode=PROD");
+        open("/appCache/testApp.app", Mode.PROD, false);
         assertFalse("Progress bar for appCache should not show up in PROD mode.", findDomElement(appCacheProgressDiv)
                 .isDisplayed());
         // This time simulate the progress event and verify that the progress

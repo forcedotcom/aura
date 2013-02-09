@@ -48,7 +48,7 @@ public abstract class Source<D extends Definition> implements Serializable {
 
     /**
      * A {@link Reader} that, on completion will update the containing
-     * {@link Sou\ rce} with {@link ChangeInfo}. This provides a read-once
+     * {@link Source} with {@link ChangeInfo}. This provides a read-once
      * method to both parse and hash the contents.
      */
     public class HashingReader extends Reader {
@@ -80,12 +80,15 @@ public abstract class Source<D extends Definition> implements Serializable {
         public int read(char[] cbuf, int off, int len) throws IOException {
             try {
                 int result = reader.read(cbuf, off, len);
-                if (result > 0) {
-                    ByteBuffer bytes = utf8.encode(CharBuffer.wrap(cbuf, off, len));
-                    digest.update(bytes);
-                } else if (result < 0) {
-                    setChangeInfo();
-                }
+				if (digest != null) {
+					if (result > 0) {
+						ByteBuffer bytes = utf8.encode(CharBuffer.wrap(cbuf,
+								off, len));
+						digest.update(bytes);
+					} else if (result < 0) {
+						setChangeInfo();
+					}
+				}
                 return result;
             } catch (IOException e) {
                 // Ensure we don't make a (probably wrong) hash from bad
@@ -98,7 +101,7 @@ public abstract class Source<D extends Definition> implements Serializable {
         }
 
         private void setChangeInfo() {
-            if (!hadError) {
+			if (!hadError && digest != null) {
                 synchronized (hash) {
                     // Multi-threading guard: if we have multiple readers for a
                     // single Source, only one needs to set the hash. Note that

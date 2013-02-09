@@ -88,6 +88,16 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
         return TAG;
     }
 
+    /**
+     * Allows embedded script tags by default in applications
+     * 
+     * @return - return true if your instance should allow embedded script tags in HTML
+     */
+    @Override
+    public boolean getAllowsScript() {
+        return true;
+    }
+
     @Override
     protected void readAttributes() throws QuickFixException {
         super.readAttributes();

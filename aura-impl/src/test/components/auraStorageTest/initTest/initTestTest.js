@@ -1,4 +1,7 @@
 ({
+    setUp : function(component){
+        $A.storageService.getStorage().clear();
+    },
 
     testActionStorageProperties:{
         attributes:{
@@ -92,29 +95,43 @@
                         });
         },function(cmp){
             //Test case 2: Override auto refresh time, default is 60 seconds
-            var aThird = cmp.get("c.fetchDataRecord");
-            aThird.setParams({testName : "testSetStorableAPI"});
-            //Keeping the auto refresh time to 0, helps testing the override
-            aThird.setStorable({"refresh": 0});
-            aThird.runAfter(aThird);
-            var requestTime = new Date().getTime();
-            //Make sure we haven't reached the autorefresh timeout already. Default is set to 60, so 30 is quite conservative
-            $A.test.assertTrue( ((requestTime-cmp._requestStoredTime)/1000<30), "Test setup failure, increase defaultAutoRefreshInterval time.");
-            $A.eventService.finishFiring();
-            $A.test.addWaitFor("SUCCESS", function(){return aThird.getState()},
-                    function(){
-                            $A.test.assertTrue(aThird.isFromStorage(), "failed to fetch cached response");
-                        });
-            var refreshTime;
+            var block = cmp.get("c.block");
+            block.setParams({testName : "testSetStorableAPI"});
+            $A.test.callServerAction(block, true);
+            var requestTime;
+            //Wait till the block action is executed
+            $A.test.addWaitFor(false, $A.test.isActionPending,
+                function(){
+                    var aThird = cmp.get("c.fetchDataRecord");
+                    aThird.setParams({testName : "testSetStorableAPI"});
+                    //Keeping the auto refresh time to 0, helps testing the override
+                    aThird.setStorable({"refresh": 0});
+                    aThird.runAfter(aThird);
+                    requestTime = new Date().getTime();
+                    //Make sure we haven't reached the autorefresh timeout already. Default is set to 60, so 30 is quite conservative
+                    $A.test.assertTrue( ((requestTime - cmp._requestStoredTime) / 1000 < 30), "Test setup failure, increase defaultAutoRefreshInterval time.");
+                    $A.eventService.finishFiring();
+                    $A.test.addWaitFor("SUCCESS", function(){return aThird.getState()},
+                        function(){
+                                $A.test.assertTrue(aThird.isFromStorage(), "failed to fetch cached response");
+                            });
+                });
+            //Verify that refreshBegin was fired
             $A.test.addWaitFor("refreshBegin",
                     function(){
                         return $A.test.getText(cmp.find("refreshBegin").getElement());
                     },
                     function(){
-                        refreshTime = new Date().getTime();
+                        var refreshTime = new Date().getTime();
                         //Verify that the refresh begin event kicked off
-                        $A.test.assertTrue( ((refreshTime-requestTime)/1000)< 5 );
-                        $A.test.addWaitFor("refreshEnd",
+                        $A.test.assertTrue( ((refreshTime - requestTime) / 1000) < 5);
+                        //resume controller only after refreshBegin
+                        var resume = cmp.get("c.resume");
+                        resume.setParams({testName : "testSetStorableAPI"});
+                        $A.test.callServerAction(resume, true);
+                    });
+            //Verify that refreshEnd was fired
+            $A.test.addWaitFor("refreshEnd",
                             function(){
                                 return $A.test.getText(cmp.find("refreshEnd").getElement())
                             },
@@ -132,8 +149,7 @@
                                                         "aFourth should have fetched refreshed response");
                                             });
 
-                            })
-                    });
+                            });
         }
         ]
     },
@@ -257,7 +273,8 @@
             $A.eventService.finishFiring();
             $A.test.addWaitFor("SUCCESS", function(){return aUndefinedSecond.getState()},
                     function(){
-                        $A.test.assertTrue(aUndefinedSecond.isFromStorage(), "failed to fetch cached response");
+                            $A.test.assertTrue(aUndefinedSecond.isFromStorage(), "failed to fetch cached response");
+
                     },
                     function(){ $A.test.addWaitFor("refreshEnd",
                             function(){
@@ -354,7 +371,7 @@
                                 "Failed to inoke server action.");
                         $A.test.assertEquals(0, $A.storageService.getStorage().getSize(),
                                 "Storage service saw an increase in size.");
-                    });
+                        });
         },function(cmp){
             var btn = cmp.find("ForceActionAtServer");
             var evt = btn.get("e.press");
@@ -369,8 +386,8 @@
      */
     testCacheExpiration:{
         attributes:{
-            defaultExpiration : 5, //I am king
-            defaultAutoRefreshInterval : 60 //Very high but doesn't matter
+                defaultExpiration : 5, //I am king
+                defaultAutoRefreshInterval : 60 //Very high but doesn't matter
         },
         test:[function(cmp){
             $A.test.setTestTimeout(30000);
@@ -384,9 +401,9 @@
             $A.eventService.finishFiring();
             $A.test.addWaitFor(false, $A.test.isActionPending,
                     function(){
-                        $A.test.assertFalse(a.isFromStorage(), "Failed to excute action at server");
-                        $A.test.assertEquals(0, a.getReturnValue().Counter, "Wrong counter value seen in response");
-                    });
+                            $A.test.assertFalse(a.isFromStorage(), "Failed to excute action at server");
+                            $A.test.assertEquals(0, a.getReturnValue().Counter, "Wrong counter value seen in response");
+                        });
         },function(cmp){
             //Wait for atleast 5 seconds after the response has been stored
             $A.test.addWaitFor(true, function(){
@@ -403,9 +420,9 @@
             $A.eventService.finishFiring();
             $A.test.addWaitFor("SUCCESS", function(){return aSecond.getState()},
                     function(){
-                        $A.test.assertEquals(1, aSecond.getReturnValue().Counter, "aSecond response invalid.");
-                        $A.test.assertFalse(aSecond.isFromStorage(), "expected cache expiration");
-                    });
+                            $A.test.assertEquals(1, aSecond.getReturnValue().Counter, "aSecond response invalid.");
+                            $A.test.assertFalse(aSecond.isFromStorage(), "expected cache expiration");
+                        });
         }
         ]
     },
@@ -516,6 +533,7 @@
         }
         ]
     },
+
     testActionKeyOverloading:{
         test:[function(cmp){
             $A.test.setTestTimeout(30000);

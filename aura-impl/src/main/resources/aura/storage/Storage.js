@@ -29,8 +29,8 @@ var AuraStorage = function AuraStorage(implementation, maxSize, defaultExpiratio
     this.debugLoggingEnabled = debugLoggingEnabled;
     
 	this.log("AuraStorage:ctor() initializing storage adapter using { implementation: \""
-			+ implementation + "\", defaultExpiration: " + defaultExpiration
-			+ ", defaultAutoRefreshInterval: " + defaultAutoRefreshInterval + ", clearStorageOnInit: " + clearStorageOnInit + " }");
+			+ implementation + "\", maxSize: " + maxSize + ", defaultExpiration: " + defaultExpiration
+			+ ", defaultAutoRefreshInterval: " + defaultAutoRefreshInterval + ", clearStorageOnInit: " + clearStorageOnInit + ", debugLoggingEnabled: " + debugLoggingEnabled + " }");
     
     if (clearStorageOnInit) {
     	this.log("AuraStorage.ctor(): clearing " + this.getName() + " storage on init");
@@ -52,6 +52,10 @@ AuraStorage.prototype.getMaxSize = function() {
 
 AuraStorage.prototype.getDefaultAutoRefreshInterval = function() {
 	return this.defaultAutoRefreshInterval;
+};
+
+AuraStorage.prototype.clear = function() {
+	this.adapter.clear();
 };
 
 AuraStorage.prototype.get = function(key, resultCallback) {

@@ -35,29 +35,53 @@ import com.google.common.collect.Maps;
 @Controller
 public class AuraStorageTestController {
     public static ConcurrentHashMap<String, Integer> staticCounter = new ConcurrentHashMap<String, Integer>();
+    static ConcurrentHashMap<String, String> pending = new ConcurrentHashMap<String, String>();
+
+    @AuraEnabled
+    public static void block(@Key("testName") String testName){
+        pending.putIfAbsent(testName, testName);
+    }
+
+    @AuraEnabled
+    public static void resume(@Key("testName") String testName){
+        String lock = pending.get(testName);
+        if(lock != null){
+            synchronized (lock) {
+                lock.notifyAll();
+            }
+        }
+        pending.remove(testName);
+    }
+    @AuraEnabled
+    public static Record fetchDataRecord(@Key("testName") String testName) throws Exception{
+        staticCounter.putIfAbsent(testName, 0);
+        AuraStorageTestController.Record r = new AuraStorageTestController.Record(staticCounter.get(testName),
+        "StorageController");
+        staticCounter.put(testName, new Integer(staticCounter.get(testName).intValue() + 1));
+        String lock = pending.get(testName);
+        if(lock!=null){
+            synchronized (lock) {
+                lock.wait(15000);
+            }
+        }
+        return r;
+    }
 
     @AuraEnabled
     public static int getInt(@Key("param") int param) throws Exception {
         return param;
-    }
-    
-    @AuraEnabled
-    public static Record fetchDataRecord(@Key("testName") String testName) {
-        staticCounter.putIfAbsent(testName, 0);
-        AuraStorageTestController.Record r = new AuraStorageTestController.Record(staticCounter.get(testName),
-                "StorageController");
-        staticCounter.put(testName, new Integer(staticCounter.get(testName).intValue() + 1));
-        return r;
     }
 
     @AuraEnabled
     public static void resetCounter(@Key("testName") String testName) {
         if (testName != null) {
             staticCounter.remove(testName);
+            pending.remove(testName);
             return;
         } else {
             for (String s : staticCounter.keySet()) {
                 staticCounter.remove(s);
+                pending.remove(s);
             }
         }
     }
@@ -128,7 +152,7 @@ public class AuraStorageTestController {
             attr.put("name", "Giants");
             attr.put("city", "San Francisco");
             Component cmp = Aura.getInstanceService()
-                    .getInstance("auraStorageTest:teamFacet", ComponentDef.class, attr);
+            .getInstance("auraStorageTest:teamFacet", ComponentDef.class, attr);
             ret.add(cmp);
         } else {
             Map<String, Object> attr = Maps.newHashMap();

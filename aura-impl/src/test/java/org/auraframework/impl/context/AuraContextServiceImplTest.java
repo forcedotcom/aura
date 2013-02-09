@@ -27,17 +27,7 @@ import org.auraframework.system.AuraContext.Mode;
 public class AuraContextServiceImplTest extends AuraImplTestCase {
 
     public AuraContextServiceImplTest(String name) {
-        super(name);
-    }
-
-    @Override
-    public void setUp() throws Exception {
-        // override so it doesnt establish on its own
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        // override so it doesnt establish on its own
+        super(name, false);
     }
 
     public void testAuraContextServiceImpl() {

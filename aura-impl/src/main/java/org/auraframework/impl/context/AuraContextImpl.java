@@ -28,6 +28,7 @@ import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 
+import org.auraframework.Aura;
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -43,6 +44,8 @@ import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
 import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.test.TestContext;
+import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidEventTypeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -59,7 +62,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class AuraContextImpl implements AuraContext {
-    public static class SerializationContext extends BaseJsonSerializationContext {
+    public static class SerializationContext extends
+            BaseJsonSerializationContext {
         public SerializationContext() {
             super(false, false, -1, -1, false);
         }
@@ -94,12 +98,16 @@ public class AuraContextImpl implements AuraContext {
         public void serialize(Json json, AuraContext ctx) throws IOException {
             json.writeMapBegin();
             json.writeMapEntry("mode", ctx.getMode());
-            DefDescriptor<? extends BaseComponentDef> appDesc = ctx.getApplicationDescriptor();
+
+            DefDescriptor<? extends BaseComponentDef> appDesc = ctx
+                    .getApplicationDescriptor();
             if (appDesc != null) {
                 if (appDesc.getDefType().equals(DefType.APPLICATION)) {
-                    json.writeMapEntry("app", String.format("%s:%s", appDesc.getNamespace(), appDesc.getName()));
+                    json.writeMapEntry("app", String.format("%s:%s",
+                            appDesc.getNamespace(), appDesc.getName()));
                 } else {
-                    json.writeMapEntry("cmp", String.format("%s:%s", appDesc.getNamespace(), appDesc.getName()));
+                    json.writeMapEntry("cmp", String.format("%s:%s",
+                            appDesc.getNamespace(), appDesc.getName()));
                 }
             }
             if (ctx.getSerializePreLoad()) {
@@ -113,14 +121,24 @@ public class AuraContextImpl implements AuraContext {
                 json.writeMapEntry("requestedLocales", locales);
             }
             if (ctx.getSerializeLastMod()) {
-                json.writeMapEntry("lastmod", Long.toString(AuraBaseServlet.getLastMod()));
+                json.writeMapEntry("lastmod",
+                        Long.toString(AuraBaseServlet.getLastMod()));
+            }
+
+            TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
+            if (testContextAdapter != null) {
+                TestContext testContext = testContextAdapter.getTestContext();
+                if (testContext != null) {
+                    json.writeMapEntry("test", testContext.getName());
+                }
             }
 
             if (forClient) {
                 // client needs value providers, urls don't
                 boolean started = false;
 
-                for (GlobalValueProvider valueProvider : ctx.getGlobalProviders().values()) {
+                for (GlobalValueProvider valueProvider : ctx
+                        .getGlobalProviders().values()) {
                     if (!valueProvider.isEmpty()) {
                         if (!started) {
                             json.writeMapKey("globalValueProviders");
@@ -130,7 +148,8 @@ public class AuraContextImpl implements AuraContext {
                         json.writeComma();
                         json.writeIndent();
                         json.writeMapBegin();
-                        json.writeMapEntry("type", valueProvider.getValueProviderKey().getPrefix());
+                        json.writeMapEntry("type", valueProvider
+                                .getValueProviderKey().getPrefix());
                         json.writeMapEntry("values", valueProvider.getData());
                         json.writeMapEnd();
                     }
@@ -140,14 +159,16 @@ public class AuraContextImpl implements AuraContext {
                     json.writeArrayEnd();
                 }
 
-                Map<String, BaseComponent<?, ?>> components = ctx.getComponents();
+                Map<String, BaseComponent<?, ?>> components = ctx
+                        .getComponents();
                 if (!components.isEmpty()) {
                     json.writeMapKey("components");
                     json.writeMapBegin();
 
                     for (BaseComponent<?, ?> component : components.values()) {
                         if (component.hasLocalDependencies()) {
-                            json.writeMapEntry(component.getGlobalId(), component);
+                            json.writeMapEntry(component.getGlobalId(),
+                                    component);
                         }
                     }
 
@@ -187,13 +208,15 @@ public class AuraContextImpl implements AuraContext {
 
     private String currentNamespace;
 
-    private final LinkedHashSet<String> preloadedNamespaces = Sets.newLinkedHashSet();
+    private final LinkedHashSet<String> preloadedNamespaces = Sets
+            .newLinkedHashSet();
 
     private final Format format;
 
     private final Map<ValueProviderType, GlobalValueProvider> globalProviders;
 
-    private final Map<String, BaseComponent<?, ?>> componentRegistry = Maps.newLinkedHashMap();
+    private final Map<String, BaseComponent<?, ?>> componentRegistry = Maps
+            .newLinkedHashMap();
 
     private int nextId = 1;
 
@@ -215,8 +238,9 @@ public class AuraContextImpl implements AuraContext {
 
     private final List<Event> clientEvents = Lists.newArrayList();
 
-    public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
-            Format format, Access access, JsonSerializationContext jsonContext,
+    public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry,
+            Map<DefType, String> defaultPrefixes, Format format, Access access,
+            JsonSerializationContext jsonContext,
             Map<ValueProviderType, GlobalValueProvider> globalProviders,
             DefDescriptor<? extends BaseComponentDef> appDesc) {
         if (access == Access.AUTHENTICATED) {
@@ -342,7 +366,8 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public String getLabel(String section, String name, Object... params) {
-        return ServiceLocator.get().get(LocalizationAdapter.class).getLabel(section, name, params);
+        return ServiceLocator.get().get(LocalizationAdapter.class)
+                .getLabel(section, name, params);
     }
 
     @Override
@@ -411,7 +436,8 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public void setApplicationDescriptor(DefDescriptor<? extends BaseComponentDef> appDesc) {
+    public void setApplicationDescriptor(
+            DefDescriptor<? extends BaseComponentDef> appDesc) {
         //
         // This logic is twisted, but not unreasonable. If someone is setting an
         // application,
@@ -421,7 +447,9 @@ public class AuraContextImpl implements AuraContext {
         // this shouldn't
         // affect much. In fact, most use cases, this.appDesc will be null.
         //
-        if ((appDesc != null && appDesc.getDefType().equals(DefType.APPLICATION)) || this.appDesc == null
+        if ((appDesc != null && appDesc.getDefType()
+                .equals(DefType.APPLICATION))
+                || this.appDesc == null
                 || !this.appDesc.getDefType().equals(DefType.APPLICATION)) {
             this.appDesc = appDesc;
         }
@@ -445,7 +473,8 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public BaseComponent<?, ?> setCurrentComponent(BaseComponent<?, ?> nextComponent) {
+    public BaseComponent<?, ?> setCurrentComponent(
+            BaseComponent<?, ?> nextComponent) {
         BaseComponent<?, ?> old = currentComponent;
         currentComponent = nextComponent;
         return old;
@@ -495,8 +524,11 @@ public class AuraContextImpl implements AuraContext {
     public void addClientApplicationEvent(Event event) throws Exception {
         if (event != null) {
             if (event.getDescriptor().getDef().getEventType() != EventType.APPLICATION) {
-                throw new InvalidEventTypeException(String.format("%s is not an Application event. "
-                        + "Only Application events are allowed to be fired from server.", event.getDescriptor()), null);
+                throw new InvalidEventTypeException(
+                        String.format(
+                                "%s is not an Application event. "
+                                        + "Only Application events are allowed to be fired from server.",
+                                event.getDescriptor()), null);
             }
             clientEvents.add(event);
         }

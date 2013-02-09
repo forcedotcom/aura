@@ -20,13 +20,50 @@ import java.util.Set;
 
 import org.auraframework.def.DefDescriptor.DefType;
 
+/**
+ * An individual test case for a component. TestCaseDef is a sub-definition of TestSuiteDef.
+ */
 public interface TestCaseDef extends Definition {
 
+	/**
+	 * The attributes which should be used to instantiate the component under
+	 * test.
+	 * 
+	 * @return the Map of attribute names to values used to instantiate the
+	 *         component under test
+	 */
     Map<String, Object> getAttributeValues();
 
+	/**
+	 * The type of component under test, typically an Application or Component.
+	 * 
+	 * @return the DefType of the component under test
+	 */
     DefType getDefType();
 
+	/**
+	 * Labels intended to categorize test cases, although no explicit grouping
+	 * is applied.
+	 * 
+	 * @return the Set of labels this test is tagged with
+	 */
     Set<String> getTestLabels();
 
+	/**
+	 * Specialized labels intended to describe target client platforms for this
+	 * test case.
+	 * 
+	 * @return the Set of "browsers" this test should apply to
+	 */
     Set<String> getBrowsers();
+
+	/**
+	 * Definitions that are expected to be present for this test case to run,
+	 * typically stubbed implementations of actual Definitions. These should
+	 * take precedence over any existing Definitions with the same
+	 * DefDescriptor.
+	 * 
+	 * @return the Set of Definitions expected by this test case
+	 */
+    Set<Definition> getLocalDefs();
 }

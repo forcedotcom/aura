@@ -172,6 +172,16 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
         }
     }
 
+    /**
+     * Bases the decision for allowing embedded scripts on the system attribute isTemplate
+     * 
+     * @return - returns true is isTemplate is true
+     */
+    @Override
+    public boolean getAllowsScript() {
+        return builder.isTemplate;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     protected void readAttributes() throws QuickFixException {

@@ -6,7 +6,8 @@
       {
         "serId":2,
         "value":{
-          "descriptor":"testHelloWorld",
+          "name":"testHelloWorld",
+          "descriptor":"js://test.testJSTestSuite/TESTCASE$testHelloWorld",
           "attributes":{
             "num":"2"
           },
@@ -22,7 +23,8 @@
       {
         "serId":3,
         "value":{
-          "descriptor":"testHelloWorld2",
+          "name":"testHelloWorld2",
+          "descriptor":"js://test.testJSTestSuite/TESTCASE$testHelloWorld2",
           "attributes":{
             "num":"5"
           },
@@ -38,7 +40,8 @@
       {
         "serId":4,
         "value":{
-          "descriptor":"testHelloWorld3",
+          "name":"testHelloWorld3",
+          "descriptor":"js://test.testJSTestSuite/TESTCASE$testHelloWorld3",
           "attributes":{
             "num":"4",
             "alpha":"A"

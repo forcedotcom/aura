@@ -69,7 +69,7 @@ public class MessageJSONFormatAdapter extends JSONFormatAdapter<Message<?>> {
             }
         }
 
-        return new Message<ComponentDef>(actionList, null, null);
+        return new Message<ComponentDef>(actionList);
     }
 
     @Override
@@ -77,6 +77,10 @@ public class MessageJSONFormatAdapter extends JSONFormatAdapter<Message<?>> {
         Message<?> message = (Message<?>) value;
         AuraContext c = Aura.getContextService().getCurrentContext();
         Map<String, Object> m = new HashMap<String, Object>();
+        if (attributes != null) {
+            m.putAll(attributes);
+        }
+
         m.put("actions", message.getActions());
         m.put("context", c);
         List<Event> clientEvents = message.getClientEvents();

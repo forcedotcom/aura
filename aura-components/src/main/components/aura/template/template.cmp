@@ -24,6 +24,7 @@
     <aura:attribute name="auraInlineStyle" type="String" description="Loads Aura inline style from template.css."/>
     <aura:attribute name="auraInit" type="String" description="Creates an XMLHttpRequest object and retrieves the components from the server without reloading the page. Preferred over auraInitSync."/>
     <aura:attribute name="auraInitSync" type="String" description="Denotes synchronous initialization of Aura. Returns the same value as auraInit."/>
+    <aura:attribute name="auraPreInitBlock" type="String" description="The block of content that is rendered when before Aura initialization."/>
     <aura:attribute name="auraInitBlock" type="String" description="The block of content that is rendered when initialization is complete."/>
     <aura:attribute name="autoInitialize" type="String" default="true" description="Denotes whether Aura should auto-initialize (true) or not (false). Default value is &#8220;true&#8221;."/>
     <aura:attribute name="autoInitializeSync" type="String" default="false" description="Default value is &#8220;false&#8221;."/>
@@ -255,6 +256,7 @@
             {!v.auraScriptTags}
             {!v.auraBaseScriptTags}
 
+            {!v.auraPreInitBlock}
 
             <script>
             if ({!v.autoInitialize}) {
@@ -268,10 +270,9 @@
             }
             </script>
 
-            {!v.auraNamespacesScriptTags}
-
-
             {!v.auraInitBlock}
+
+            {!v.auraNamespacesScriptTags}
 
         </body>
     </html>

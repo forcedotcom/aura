@@ -21,7 +21,7 @@
     <aura:attribute name="url" type="String"/>
 
     <aura:set attribute="scroll" value="false"/>
-    <aura:set attribute="title" value="{!v.case.descriptor}"/>
+    <aura:set attribute="title" value="{!v.case.name}"/>
 
     <aura:registerevent name="done" type="aurajstest:testStatus"/>
 

@@ -27,4 +27,6 @@ public interface MockConfigAdapter extends ConfigAdapter, MockBean {
     void setIsProduction(boolean isProduction);
 
     void setIsAuraJSStatic(boolean isAuraJSStatic);
+
+    void setValidateCss(boolean validateCss);
 }

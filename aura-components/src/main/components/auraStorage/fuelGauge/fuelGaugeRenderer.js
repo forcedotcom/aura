@@ -21,6 +21,8 @@
 		if (enabled) {
     		var storage = $A.storageService.getStorage();
 			cmp.getValue("v.implementation").setValue(storage.getName());
+			
+	    	helper.update(cmp);
 		}
 		
     	return this.superRender(); 

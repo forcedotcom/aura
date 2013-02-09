@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component support="GA">
+<aura:component renderer="java://org.auraframework.component.auraStorage.InitRenderer" support="GA">
     <aura:attribute name="implementation" type="String" default="memory" description="The specific type of storage to use. Valid values are: memory, websql, indexeddb, smartstore."/>
     <aura:attribute name="clearStorageOnInit" type="Boolean" default="true" description="For persistent storage delete all previous data on initialization."/>
     <aura:attribute name="defaultExpiration" type="Integer" default="10" description="The default number of seconds that an object will be retained in storage if a request specific expiration has not been specified in the call to Action.setStorable()."/>

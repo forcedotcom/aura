@@ -52,6 +52,7 @@ import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.AuraUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -463,10 +464,17 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     /**
+     * Open a URL without any additional handling.
+     */
+    protected void openRaw(String url) throws MalformedURLException, URISyntaxException {
+        openRaw(getAbsoluteURI(url));
+    }
+
+    /**
      * Open a URL without the usual waitForAuraInit().
      */
     protected void openNoAura(String url) throws MalformedURLException, URISyntaxException {
-        openRaw(getAbsoluteURI(url));
+        open(url, getAuraModeForCurrentBrowser(), false);
     }
 
     /**
@@ -478,7 +486,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @throws URISyntaxException
      */
     protected void open(String url) throws MalformedURLException, URISyntaxException {
-        open(url, getAuraModeForCurrentBrowser());
+        open(url, getAuraModeForCurrentBrowser(), true);
     }
 
     /**
@@ -506,6 +514,10 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @throws URISyntaxException
      */
     protected void open(String url, Mode mode) throws MalformedURLException, URISyntaxException {
+        open(url, mode, true);
+    }
+
+    protected void open(String url, Mode mode, boolean waitForInit) throws MalformedURLException, URISyntaxException {
         // save any fragment
         int hashLoc = url.indexOf('#');
         String hash = "";
@@ -527,10 +539,13 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
         // update query with a nonce
         newParams.add(new BasicNameValuePair("aura.mode", mode.name()));
+        newParams.add(new BasicNameValuePair("aura.test", getQualifiedName()));
         url = url + "?" + URLEncodedUtils.format(newParams, "UTF-8") + hash;
 
-        openNoAura(url);
-        waitForAuraInit();
+        openRaw(url);
+        if(waitForInit){
+            waitForAuraInit();
+        }
     }
 
     /**
@@ -625,14 +640,15 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             fail("Initialization error: document loaded without $A. Perhaps the initial GET failed.");
         }
 
-        WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSecs);
-        wait.until(new Function<WebDriver, Boolean>() {
-            @Override
-            public Boolean apply(WebDriver input) {
-                assertNoQuickFixMessage();
-                return isAuraFrameworkReady();
-            }
-        });
+		WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSecs);
+		wait.ignoring(StaleElementReferenceException.class).until(
+				new Function<WebDriver, Boolean>() {
+					@Override
+					public Boolean apply(WebDriver input) {
+						assertNoQuickFixMessage();
+						return isAuraFrameworkReady();
+					}
+				});
     }
 
     /**

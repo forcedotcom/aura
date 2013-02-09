@@ -20,153 +20,159 @@ var priv = {
     requestQueue : [],
     inRequest : false,
     loadEventQueue : [],
-    appcacheDownloadingEventFired: false,
-    isOutdated: false,
-    isUnloading: false,
+    appcacheDownloadingEventFired : false,
+    isOutdated : false,
+    isUnloading : false,
+    initDefsObservers : [],
     isDisconnected: false,
 
-        /**
-         * Take a json (hopefully) response and decode it.
-         *
-         * If the input is invalid JSON, we try to handle it gracefully.
-         */
+    /**
+     * Take a json (hopefully) response and decode it.
+     *
+     * If the input is invalid JSON, we try to handle it gracefully.
+     */
     checkAndDecodeResponse : function(response, noStrip) {
-            if(priv.isUnloading){
-                return null;
-            }
+        if (priv.isUnloading) {
+            return null;
+        }
 
-            var e;
+        var storage = $A.storageService.getStorage();
+        var e;
 
-            // failure to communicate with server
-            if (priv.isDisconnectedOrCancelled(response)) {
-                if (priv.isDisconnected) {
-                    return null;
-                }
-
-                e = $A.get("e.aura:noConnection");
-                if (e) {
-                    priv.isDisconnected = true;
-                    e.fire();
-                } else {
-                    // looks like no definitions loaded yet
-                    alert('Connection lost');
-                }
-
-                return null;
-            }
-
-            //
-            // If a disconnect event was previously fired, fire a connection restored event
-            // now that we have a response from a server.
-            //
+        // failure to communicate with server
+        if (priv.isDisconnectedOrCancelled(response)) {
             if (priv.isDisconnected) {
-                e = $A.get("e.aura:connectionResumed");
-                if (e) {
-                    priv.isDisconnected = false;
-                    e.fire();
-                }
-            }
-
-            var text = response["responseText"];
-
-            if (/^\s*</.test(text)) {
-                //
-                // This is what happens when someone hands us a pile of HTML
-                // instead of JSON. There is no real hope of dealing with it,
-                // so just flag an error, and carry on.
-                //
-                aura.error(text);
                 return null;
             }
 
-            //
-            // server-side explosion. The new message is one where there is an /*ERROR*/ appended.
-            // this allows us to deal with the fact that we can get errors after the send has started.
-            // Of course, we also have the problem that we might not have valid JSON at all, in which case
-            // we have further problems...
-            //
-            if ((response["status"] != 200) || (text.length > 9
-                                                && text.charAt(text.length-9) == '/'
-                                                && text.charAt(text.length-8) == '*'
-                                                && text.charAt(text.length-7) == 'E'
-                                                && text.charAt(text.length-6) == 'R'
-                                                && text.charAt(text.length-5) == 'R'
-                                                && text.charAt(text.length-4) == 'O'
-                                                && text.charAt(text.length-3) == 'R'
-                                                && text.charAt(text.length-2) == '*'
-                                                && text.charAt(text.length-1) == '/')) {
-                if (response["status"] == 200) {
-                    // if we encountered an exception once the response was committed
-                    // ignore the malformed JSON
-                    text = "/*" + text;
-                } else if (!noStrip === true && text.charAt(0) == 'w') {
-                    //
-                    // strip off the while(1) at the beginning
-                    //
-                    text = "//"+text;
-                }
-                var resp = aura.util.json.decode(text, true);
-
-                // if the error on the server is meant to trigger a client-side
-                // event...
-                if (aura.util.isUndefinedOrNull(resp)) {
-                    //#if {"excludeModes" : ["PRODUCTION"]}
-                    aura.error("Communication error, invalid JSON: "+text);
-                    //#end
-                    //#if {"modes" : ["PRODUCTION"]}
-                    aura.error("Communication error, please retry or reload the page");
-                    //#end
-                    return null;
-                } else if (resp["exceptionEvent"] === true) {
-                    this.throwExceptionEvent(resp);
-                    return null;
-                } else {
-                    // !!!!!!!!!!HACK ALERT!!!!!!!!!!
-                    // The server side actually returns a response with 'message' and 'stack' defined
-                    // when there was a server side exception. Unfortunately, we don't really know what
-                    // we have... the code in aura.error has checks for those, but if they are not
-                    // there the error message will be meaningless. This code thus does much the same
-                    // thing, but in a different way so that we get a real error message.
-                    // !!!!!!!!!!HACK ALERT!!!!!!!!!!
-                    //#if {"excludeModes" : ["PRODUCTION"]}
-                    if (resp["message"] && resp["stack"]) {
-                        aura.error(resp["message"]+"\n"+resp["stack"]);
-                    } else {
-                        aura.error("Communication error, invalid JSON: "+text);
-                    }
-                    //#end
-                    //#if {"modes" : ["PRODUCTION"]}
-                    if (resp["message"]) {
-                        aura.error(resp["message"]);
-                    } else {
-                        aura.error("Communication error, please retry or reload the page");
-                    }
-                    //#end
-                    return null;
-                }
-            }
-            //
-            // strip off the while(1) at the beginning
-            //
-            if (!noStrip === true && text.charAt(0) == 'w') {
-                text = "//"+text;
+            e = $A.get("e.aura:noConnection");
+            if (e) {
+                priv.isDisconnected = true;
+                e.fire();
+            } else {
+                // looks like no definitions loaded yet
+                alert("Connection lost");
             }
 
+            return null;
+        }
 
-            var responseMessage = aura.util.json.decode(text, true);
-            if (aura.util.isUndefinedOrNull(responseMessage)) {
-                //#if {"excludeModes" : ["PRODUCTION"]}
-                aura.error("Communication error, invalid JSON: "+text);
-                //#end
-                //#if {"modes" : ["PRODUCTION"]}
+        //
+        // If a disconnect event was previously fired, fire a connection restored event
+        // now that we have a response from a server.
+        //
+        if (priv.isDisconnected) {
+            e = $A.get("e.aura:connectionResumed");
+            if (e) {
+                priv.isDisconnected = false;
+                e.fire();
+            }
+        }
+
+        var text = response["responseText"];
+
+        if (/^\s*</.test(text)) {
+            //
+            // This is what happens when someone hands us a pile of HTML
+            // instead of JSON. There is no real hope of dealing with it,
+            // so just flag an error, and carry on.
+            //
+            aura.error(text);
+            return null;
+        }
+
+        //
+        // server-side explosion. The new message is one where there is an
+        // /*ERROR*/ appended.
+        // this allows us to deal with the fact that we can get errors after the
+        // send has started.
+        // Of course, we also have the problem that we might not have valid JSON
+        // at all, in which case
+        // we have further problems...
+        //
+        if ((response["status"] != 200)
+                || (text.length > 9 && text.charAt(text.length - 9) == "/" && text.charAt(text.length - 8) == "*"
+                        && text.charAt(text.length - 7) == "E" && text.charAt(text.length - 6) == "R"
+                        && text.charAt(text.length - 5) == "R" && text.charAt(text.length - 4) == "O"
+                        && text.charAt(text.length - 3) == "R" && text.charAt(text.length - 2) == "*" && text
+                        .charAt(text.length - 1) == "/")) {
+            if (response["status"] == 200) {
+                // if we encountered an exception once the response was
+                // committed
+                // ignore the malformed JSON
+                text = "/*" + text;
+            } else if (!noStrip === true && text.charAt(0) == "w") {
+                //
+                // strip off the while(1) at the beginning
+                //
+                text = "//" + text;
+            }
+            var resp = aura.util.json.decode(text, true);
+
+            // if the error on the server is meant to trigger a client-side
+            // event...
+            if (aura.util.isUndefinedOrNull(resp)) {
+                // #if {"excludeModes" : ["PRODUCTION"]}
+                aura.error("Communication error, invalid JSON: " + text);
+                // #end
+                // #if {"modes" : ["PRODUCTION"]}
                 aura.error("Communication error, please retry or reload the page");
-                //#end
+                // #end
+                return null;
+            } else if (resp["exceptionEvent"] === true) {
+                this.throwExceptionEvent(resp);
+                return null;
+            } else {
+                // !!!!!!!!!!HACK ALERT!!!!!!!!!!
+                // The server side actually returns a response with 'message'
+                // and 'stack' defined
+                // when there was a server side exception. Unfortunately, we
+                // don't really know what
+                // we have... the code in aura.error has checks for those, but
+                // if they are not
+                // there the error message will be meaningless. This code thus
+                // does much the same
+                // thing, but in a different way so that we get a real error
+                // message.
+                // !!!!!!!!!!HACK ALERT!!!!!!!!!!
+                // #if {"excludeModes" : ["PRODUCTION"]}
+                if (resp["message"] && resp["stack"]) {
+                    aura.error(resp["message"] + "\n" + resp["stack"]);
+                } else {
+                    aura.error("Communication error, invalid JSON: " + text);
+                }
+                // #end
+                // #if {"modes" : ["PRODUCTION"]}
+                if (resp["message"]) {
+                    aura.error(resp["message"]);
+                } else {
+                    aura.error("Communication error, please retry or reload the page");
+                }
+                // #end
                 return null;
             }
-            return responseMessage;
+        }
+        //
+        // strip off the while(1) at the beginning
+        //
+        if (!noStrip === true && text.charAt(0) == "w") {
+            text = "//" + text;
+        }
+
+        var responseMessage = aura.util.json.decode(text, true);
+        if (aura.util.isUndefinedOrNull(responseMessage)) {
+            // #if {"excludeModes" : ["PRODUCTION"]}
+            aura.error("Communication error, invalid JSON: " + text);
+            // #end
+            // #if {"modes" : ["PRODUCTION"]}
+            aura.error("Communication error, please retry or reload the page");
+            // #end
+            return null;
+        }
+        return responseMessage;
     },
 
-    parseAndFireEvent : function(evtObj){
+    parseAndFireEvent : function(evtObj) {
         var descriptor = evtObj["descriptor"];
 
         if (evtObj["eventDef"]) {
@@ -205,8 +211,7 @@ var priv = {
             try {
                 aura.util.json.decodeString(resp["defaultHandler"])();
             } catch (e) {
-                aura.log("Error in defaultHandler for event: " + descriptor,
-                        resp["defaultHandler"]);
+                aura.log("Error in defaultHandler for event: " + descriptor, resp["defaultHandler"]);
                 throw e;
             }
         }
@@ -216,7 +221,7 @@ var priv = {
         priv.fireLoadEvent("e.aura:doneWaiting");
     },
 
-    findGroupAndAction: function(actionGroups, actionId) {
+    findGroupAndAction : function(actionGroups, actionId) {
         for (var i = 0; i < actionGroups.length; i++) {
             actionGroup = actionGroups[i];
 
@@ -225,8 +230,8 @@ var priv = {
                 action = actions[j];
                 if (actionId === action.getId()) {
                     return {
-                        group: actionGroup,
-                        action: action
+                        group : actionGroup,
+                        action : action
                     };
                 }
             }
@@ -241,11 +246,16 @@ var priv = {
 
         var errors = [];
         if (responseMessage) {
+            var token = responseMessage["token"];
+            if (token) {
+                priv.token = token;
+            }
+
             var ctx = responseMessage["context"];
             $A.getContext().join(ctx);
             var events = responseMessage["events"];
-            if(events){
-                for(var en=0,len=events.length;en<len;en++){
+            if (events) {
+                for (var en = 0, len = events.length; en < len; en++) {
                     priv.parseAndFireEvent(events[en]);
                 }
             }
@@ -285,8 +295,7 @@ var priv = {
                 for (var m = 0; m < actions.length; m++) {
                     try {
                         action = actions[m];
-                        if (!action.isAbortable()
-                                || this.newestAbortableGroup === actionGroup.number) {
+                        if (!action.isAbortable() || this.newestAbortableGroup === actionGroup.number) {
                             action.complete({
                                 returnValue : null,
                                 state : "INCOMPLETE"
@@ -320,7 +329,9 @@ var priv = {
         this.requestQueue = queue;
         var that = this;
         $A.measure("Completed Action Callback", "Sending XHR " + num);
-        setTimeout(function(){that.doRequest();}, 1);
+        setTimeout(function() {
+            that.doRequest();
+        }, 1);
     },
 
     actionGroupCounter : 0,
@@ -328,10 +339,10 @@ var priv = {
     /**
      * Serialize requests to the aura server from this client.
      *
-     * AuraContext.num needs to be synchronized across all requests, and pending a better fix, this
-     * works around that issue.
+     * AuraContext.num needs to be synchronized across all requests, and pending
+     * a better fix, this works around that issue.
      */
-    request : function(actions, scope, callback, exclusive){
+    request : function(actions, scope, callback, exclusive) {
         $A.mark("AuraClientService.request");
         var queue = this.requestQueue;
         var actionGroup = this.actionGroupCounter++;
@@ -344,16 +355,19 @@ var priv = {
         var clientService = this;
         var actionsToCollect = actions.length;
         var actionCollected = function() {
-            if(--actionsToCollect <= 0) {
-                // We're done waiting for pending async operations to complete, let's light this candle!
-                if(fireDoneWaiting) {
-                    setTimeout(function(){ priv.fireDoneWaiting(); }, 1);
+            if (--actionsToCollect <= 0) {
+                // We're done waiting for pending async operations to complete,
+                // let's light this candle!
+                if (fireDoneWaiting) {
+                    setTimeout(function() {
+                        priv.fireDoneWaiting();
+                    }, 1);
                 }
 
-                if(actionsToComplete.length > 0) {
+                if (actionsToComplete.length > 0) {
                     var that = this;
                     setTimeout(function() {
-                        for(var n = 0; n < actionsToComplete.length; n++) {
+                        for (var n = 0; n < actionsToComplete.length; n++) {
                             var info = actionsToComplete[n];
                             info.action.complete(info.response);
                         }
@@ -362,37 +376,48 @@ var priv = {
                     }, 300);
                 }
 
-                if(actionsToSend.length > 0){
-                    queue.push({actions : actionsToSend, scope : scope, callback : callback, number : actionGroup, exclusive : exclusive});
+                if (actionsToSend.length > 0) {
+                    queue.push({
+                        actions : actionsToSend,
+                        scope : scope,
+                        callback : callback,
+                        number : actionGroup,
+                        exclusive : exclusive
+                    });
                     $A.measure("Action Group " + actionGroup + " enqueued", "AuraClientService.request");
                     clientService.doRequest();
                 }
             }
         };
 
-        for(var i = 0; i < actions.length; i++){
+        for (var i = 0; i < actions.length; i++) {
             var action = actions[i];
-            $A.assert(action.def.isServerAction(), "RunAfter() cannot be called on a client action. Use run() on a client action instead.");
+            $A.assert(action.def.isServerAction(),
+                    "RunAfter() cannot be called on a client action. Use run() on a client action instead.");
 
-            // For cacheable actions check the storage service to see if we already have a viable cached action response we can complete immediately
+            // For cacheable actions check the storage service to see if we
+            // already have a viable cached action response we can complete
+            // immediately
             var storage = $A.storageService.getStorage();
-            if(action.isStorable() && storage){
+            if (action.isStorable() && storage) {
                 var key = action.getStorageKey();
 
-                storage.get(key, this.createResultCallback(action, scope, actionGroup, callback, actionsToComplete, actionsToSend, actionCollected));
+                storage.get(key, this.createResultCallback(action, scope, actionGroup, callback, actionsToComplete,
+                        actionsToSend, actionCollected));
             } else {
                 this.collectAction(action, scope, actionGroup, callback, actionsToSend, actionCollected);
             }
         }
     },
 
-    createResultCallback: function(action, scope, actionGroup, callback, actionsToComplete, actionsToSend, actionCollected) {
+    createResultCallback : function(action, scope, actionGroup, callback, actionsToComplete, actionsToSend,
+            actionCollected) {
         var that = this;
         return function(response) {
-            if(response) {
+            if (response) {
                 actionsToComplete.push({
-                    action: action,
-                    response: response
+                    action : action,
+                    response : response
                 });
 
                 actionCollected();
@@ -402,14 +427,14 @@ var priv = {
         };
     },
 
-    collectAction: function(action, scope, actionGroup, callback, actionsToSend, actionCollectedCallback) {
-        if(action.isAbortable()){
+    collectAction : function(action, scope, actionGroup, callback, actionsToSend, actionCollectedCallback) {
+        if (action.isAbortable()) {
             this.newestAbortableGroup = actionGroup;
         }
 
-        if(action.isExclusive()){
+        if (action.isExclusive()) {
             action.setExclusive(false);
-            this.request([action], scope, callback, true);
+            this.request([ action ], scope, callback, true);
         } else {
             actionsToSend.push(action);
         }
@@ -417,30 +442,31 @@ var priv = {
         actionCollectedCallback();
     },
 
-    doRequest : function(){
+    doRequest : function() {
         var queue = this.requestQueue;
-        if(!this.inRequest && queue.length > 0){
+        if (!this.inRequest && queue.length > 0) {
             this.inRequest = true;
             var num = aura.getContext().incrementNum();
 
             var actionsToRequest = [];
             var actionGroups = [];
 
-            for(var j=0;j<queue.length;j++){
+            for (var j = 0; j < queue.length; j++) {
                 var actionGroup = queue[j];
 
                 var status = actionGroup.status;
-                if(status !== "requested" && status !== "done"){
-                    actionGroups.splice(0,0,actionGroup);
+                if (status !== "requested" && status !== "done") {
+                    actionGroups.splice(0, 0, actionGroup);
                     var actions = actionGroup.actions;
                     var requestedActions = [];
                     var hasActionsToRequest = false;
-                    for(var m=0;m<actions.length;m++){
+                    for (var m = 0; m < actions.length; m++) {
                         var action = actions[m];
-                        if(!action.isAbortable() || this.newestAbortableGroup === actionGroup.number){
+                        if (!action.isAbortable() || this.newestAbortableGroup === actionGroup.number) {
                             hasActionsToRequest = true;
                             requestedActions.push(action);
-                            // Chained actions are transported and executed by custom code
+                            // Chained actions are transported and executed by
+                            // custom code
                             if (!action.isChained()) {
                                 actionsToRequest.push(action);
                             }
@@ -448,65 +474,68 @@ var priv = {
                     }
                     actionGroup.actions = requestedActions;
 
-                    actionGroup.status = hasActionsToRequest?"done":"requested";
-                    if(actionGroup.exclusive === true){
+                    actionGroup.status = hasActionsToRequest ? "done" : "requested";
+                    if (actionGroup.exclusive === true) {
                         break;
                     }
                 }
 
-
             }
             var requestConfig = {
-                "url": priv.host + '/aura',
-                "method": 'POST',
+                "url" : priv.host + "/aura",
+                "method" : "POST",
                 "scope" : this,
-                "callback" :function(response){this.actionCallback(response, actionGroups, num);},
+                "callback" : function(response) {
+                    this.actionCallback(response, actionGroups, num);
+                },
                 "params" : {
-                    "message": aura.util.json.encode({"actions" : actionsToRequest}),
-                    'aura.token' : priv.token,
-                    'aura.context' : $A.getContext().encodeForServer(),
-                    'aura.num' : num
+                    "message" : aura.util.json.encode({
+                        "actions" : actionsToRequest
+                    }),
+                    "aura.token" : priv.token,
+                    "aura.context" : $A.getContext().encodeForServer(),
+                    "aura.num" : num
                 }
             };
 
             $A.measure("Action Request Prepared", "AuraClientService.request");
             $A.util.transport.request(requestConfig);
-            setTimeout(function(){$A.get("e.aura:waiting").fire();},1);
+            setTimeout(function() {
+                $A.get("e.aura:waiting").fire();
+            }, 1);
         }
     },
 
     hardRefresh : function() {
         var url = location.href;
-        if(!priv.isManifestPresent() || url.indexOf('?nocache=')>-1){
+        if (!priv.isManifestPresent() || url.indexOf("?nocache=") > -1) {
             location.reload(true);
             return;
         }
-        var params = '?nocache=' + encodeURIComponent(url);
+        var params = "?nocache=" + encodeURIComponent(url);
 
         // insert nocache param here for hard refresh
-        var hIndex = url.indexOf('#');
-        var qIndex = url.indexOf('?');
+        var hIndex = url.indexOf("#");
+        var qIndex = url.indexOf("?");
         var cutIndex = -1;
-        if(hIndex > -1 && qIndex > -1){
-            cutIndex = (hIndex < qIndex)?hIndex:qIndex;
-        }
-        else if (hIndex > -1) {
+        if (hIndex > -1 && qIndex > -1) {
+            cutIndex = (hIndex < qIndex) ? hIndex : qIndex;
+        } else if (hIndex > -1) {
             cutIndex = hIndex;
-        }
-        else if (qIndex > -1) {
+        } else if (qIndex > -1) {
             cutIndex = qIndex;
         }
 
-        if(cutIndex > -1){
+        if (cutIndex > -1) {
             url = url.substring(0, cutIndex);
         }
 
         location.href = url + params;
     },
 
-    flushLoadEventQueue: function(){
-        if(priv.loadEventQueue){
-            for(var i=0,len=priv.loadEventQueue.length;i<len;i++){
+    flushLoadEventQueue : function() {
+        if (priv.loadEventQueue) {
+            for (var i = 0, len = priv.loadEventQueue.length; i < len; i++) {
                 var eventName = priv.loadEventQueue[i];
                 $A.get(eventName).fire();
             }
@@ -514,52 +543,48 @@ var priv = {
         priv.loadEventQueue = [];
     },
 
-    fireLoadEvent: function(eventName){
+    fireLoadEvent : function(eventName) {
         var e = $A.get(eventName);
-        if(e){
+        if (e) {
             e.fire();
-        }
-        else{
+        } else {
             priv.loadEventQueue.push(eventName);
         }
     },
 
-    isDevMode: function() {
+    isDevMode : function() {
         var context = $A.getContext();
-        return !$A.util.isUndefined(context) && context.getMode() === 'DEV';
+        return !$A.util.isUndefined(context) && context.getMode() === "DEV";
     },
 
-    getManifestURL: function(){
+    getManifestURL : function() {
         var htmlNode = document.body.parentNode;
-        return htmlNode ? htmlNode.getAttribute('manifest') : null;
+        return htmlNode ? htmlNode.getAttribute("manifest") : null;
     },
 
-    isManifestPresent: function(){
+    isManifestPresent : function() {
         return !!priv.getManifestURL();
     },
 
-    handleAppcacheChecking: function(e){
-        if (priv.isDevMode()){
-            // TODO IBOGDANOV Why are you checking in commented out code like this???
-/*
-            setTimeout(
-                function(){
-                    if(window.applicationCache.status === window.applicationCache.CHECKING){
-                        priv.showProgress(1);
-                    }
-                },
-                2000
-            );
-*/
+    handleAppcacheChecking : function(e) {
+        if (priv.isDevMode()) {
+            // TODO IBOGDANOV Why are you checking in commented out code like
+            // this???
+            /*
+             * setTimeout( function(){ if(window.applicationCache.status ===
+             * window.applicationCache.CHECKING){ priv.showProgress(1); } },
+             * 2000 );
+             */
         }
     },
 
-    handleAppcacheUpdateReady: function(event){
-        if(window.applicationCache.swapCache){
+    handleAppcacheUpdateReady : function(event) {
+        if (window.applicationCache.swapCache) {
             window.applicationCache.swapCache();
         }
 
-        // Clear out localStorage and sessionStorage to insure nothing that might depend
+        // Clear out localStorage and sessionStorage to insure nothing that
+        // might depend
         // on out of date stuff is left lying about
         if (window.localStorage) {
             window.localStorage.clear();
@@ -572,117 +597,111 @@ var priv = {
         location.reload(true);
     },
 
-
-    handleAppcacheError: function(e){
-        if(e.stopImmediatePropagation){
+    handleAppcacheError : function(e) {
+        if (e.stopImmediatePropagation) {
             e.stopImmediatePropagation();
         }
-        if(window.applicationCache && (window.applicationCache.status === window.applicationCache.UNCACHED || window.applicationCache.status === window.applicationCache.OBSOLETE)){
+        if (window.applicationCache
+                && (window.applicationCache.status === window.applicationCache.UNCACHED || window.applicationCache.status === window.applicationCache.OBSOLETE)) {
             return;
         }
         var manifestURL = priv.getManifestURL();
-        if(priv.isDevMode()){
+        if (priv.isDevMode()) {
             priv.showProgress(-1);
         }
 
-        if(manifestURL){
-            setTimeout(function(){
+        if (manifestURL) {
+            setTimeout(function() {
                 $A.util.transport.request({
-                    "url":manifestURL,
-                    "method":"GET",
-                    "callback":function(){},
-                    "params":{'aura.error':'true'}
+                    "url" : manifestURL,
+                    "method" : "GET",
+                    "callback" : function() {
+                    },
+                    "params" : {
+                        "aura.error" : "true"
+                    }
                 });
-            },500);
+            }, 500);
         }
 
-        if(priv.appcacheDownloadingEventFired && priv.isOutdated){
+        if (priv.appcacheDownloadingEventFired && priv.isOutdated) {
             // No one should get here.
-            $A.log('Outdated.');
+            $A.log("Outdated.");
         }
     },
 
-    handleAppcacheDownloading: function(e){
-        if (priv.isDevMode()){
-            var progress = Math.round(100*e.loaded/e.total);
-            priv.showProgress(progress+1);
+    handleAppcacheDownloading : function(e) {
+        if (priv.isDevMode()) {
+            var progress = Math.round(100 * e.loaded / e.total);
+            priv.showProgress(progress + 1);
         }
 
         priv.appcacheDownloadingEventFired = true;
     },
 
-    handleAppcacheProgress: function(e){
-        if (priv.isDevMode()){
-            var progress = Math.round(100*e.loaded/e.total);
+    handleAppcacheProgress : function(e) {
+        if (priv.isDevMode()) {
+            var progress = Math.round(100 * e.loaded / e.total);
             priv.showProgress(progress);
         }
     },
 
-    handleAppcacheNoUpdate: function(e){
-        if (priv.isDevMode()){
+    handleAppcacheNoUpdate : function(e) {
+        if (priv.isDevMode()) {
             priv.showProgress(100);
         }
     },
 
-    handleAppcacheCached: function(e){
+    handleAppcacheCached : function(e) {
         priv.showProgress(100);
     },
 
-    handleAppcacheObsolete: function(e){
+    handleAppcacheObsolete : function(e) {
         priv.hardRefresh();
     },
 
-    showProgress: function(progress){
-        var progressContEl = document.getElementById('auraAppcacheProgress');
-        if(progressContEl){
-            if(progress>0 && progress<100){
-                progressContEl.style.display = 'block';
+    showProgress : function(progress) {
+        var progressContEl = document.getElementById("auraAppcacheProgress");
+        if (progressContEl) {
+            if (progress > 0 && progress < 100) {
+                progressContEl.style.display = "block";
                 var progressEl = progressContEl.firstChild;
-                progressEl.firstChild.style.width = progress+'%';
-            }
-            else if(progress>=100){
-                progressContEl.style.display = 'none';
-            }
-            else if(progress<0){
-                progressContEl.className = 'error';
+                progressEl.firstChild.style.width = progress + "%";
+            } else if (progress >= 100) {
+                progressContEl.style.display = "none";
+            } else if (progress < 0) {
+                progressContEl.className = "error";
             }
         }
     },
 
-    setOutdated: function(){
+    setOutdated : function() {
         priv.isOutdated = true;
         var appCache = window.applicationCache;
-        if (!appCache
-                || (appCache && appCache.status === appCache.UNCACHED)) {
-            location['reload'](true);
-        }
-        else if(appCache.status === appCache.OBSOLETE){
+        if (!appCache || (appCache && appCache.status === appCache.UNCACHED)) {
+            location["reload"](true);
+        } else if (appCache.status === appCache.OBSOLETE) {
             location.reload(true);
-        }
-        else if (appCache.status !== appCache.CHECKING
-                && appCache.status !== appCache.DOWNLOADING) {
+        } else if (appCache.status !== appCache.CHECKING && appCache.status !== appCache.DOWNLOADING) {
             appCache.update();
         }
     },
 
     isDisconnectedOrCancelled : function(response) {
-        if(response && response.status){
-            if(response.status === 0){
+        if (response && response.status) {
+            if (response.status === 0) {
                 return true;
-            }
-            else if(response.status >= 12000 && response.status < 13000){
+            } else if (response.status >= 12000 && response.status < 13000) {
                 // WINHTTP CONNECTION ERRORS
                 return true;
             }
-        }
-        else{
+        } else {
             return true;
         }
         return false;
     }
 
 };
-
 
 window.onbeforeunload = function(event) {
     if (!$A.util.isIE) {
@@ -691,26 +710,26 @@ window.onbeforeunload = function(event) {
     }
 };
 
-Util.prototype.on(window,'load', function(event) {
-    var scripts = document.getElementsByTagName('script');
-    if(scripts){
-        for(var i=0,len=scripts.length;i<len;i++){
+Util.prototype.on(window, "load", function(event) {
+    // Lazy load data-src scripts
+    var scripts = document.getElementsByTagName("script");
+    if (scripts) {
+        for (var i = 0, len = scripts.length; i < len; i++) {
             var script = scripts[i];
-            if(script.getAttribute('data-src') && !script.getAttribute('src')){
-                script.src = script.getAttribute('data-src');
+            if (script.getAttribute("data-src") && !script.getAttribute("src")) {
+                script.src = script.getAttribute("data-src");
             }
         }
     }
 });
 
-
-if(window.applicationCache && window.applicationCache.addEventListener){
-    window.applicationCache.addEventListener('checking', priv.handleAppcacheChecking, false);
-    window.applicationCache.addEventListener('downloading', priv.handleAppcacheDownloading, false);
-    window.applicationCache.addEventListener('updateready', priv.handleAppcacheUpdateReady,false);
-    window.applicationCache.addEventListener('error', priv.handleAppcacheError, false);
-    window.applicationCache.addEventListener('progress', priv.handleAppcacheProgress, false);
-    window.applicationCache.addEventListener('noupdate', priv.handleAppcacheNoUpdate, false);
-    window.applicationCache.addEventListener('cached', priv.handleAppcacheCached, false);
-    window.applicationCache.addEventListener('obsolete', priv.handleAppcacheObsolete, false);
+if (window.applicationCache && window.applicationCache.addEventListener) {
+    window.applicationCache.addEventListener("checking", priv.handleAppcacheChecking, false);
+    window.applicationCache.addEventListener("downloading", priv.handleAppcacheDownloading, false);
+    window.applicationCache.addEventListener("updateready", priv.handleAppcacheUpdateReady, false);
+    window.applicationCache.addEventListener("error", priv.handleAppcacheError, false);
+    window.applicationCache.addEventListener("progress", priv.handleAppcacheProgress, false);
+    window.applicationCache.addEventListener("noupdate", priv.handleAppcacheNoUpdate, false);
+    window.applicationCache.addEventListener("cached", priv.handleAppcacheCached, false);
+    window.applicationCache.addEventListener("obsolete", priv.handleAppcacheObsolete, false);
 }

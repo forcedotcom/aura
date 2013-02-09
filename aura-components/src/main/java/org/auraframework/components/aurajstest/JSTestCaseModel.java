@@ -35,7 +35,6 @@ import com.google.common.collect.Lists;
 
 @Model
 public class JSTestCaseModel {
-
     private final String url;
     private final int count;
 
@@ -47,11 +46,9 @@ public class JSTestCaseModel {
 
         String baseUrl = component.getAttributes().getValue("url").toString();
         Set<Entry<String, Object>> attributes = caseDef.getAttributeValues().entrySet();
-        if (attributes.isEmpty()) {
-            url = baseUrl;
-        } else {
-            String hash = "";
-            List<NameValuePair> newParams = Lists.newArrayList();
+        List<NameValuePair> newParams = Lists.newArrayList();
+        String hash = "";
+        if (!attributes.isEmpty()) {
             for (Entry<String, Object> entry : attributes) {
                 String key = entry.getKey();
                 String value = entry.getValue().toString();
@@ -61,11 +58,10 @@ public class JSTestCaseModel {
                     newParams.add(new BasicNameValuePair(key, value));
                 }
             }
-            url = baseUrl + "&" + URLEncodedUtils.format(newParams, "UTF-8") + hash;
         }
-
+        newParams.add(new BasicNameValuePair("aura.test", caseDef.getDescriptor().getQualifiedName()));
+        url = baseUrl + "&" + URLEncodedUtils.format(newParams, "UTF-8") + hash;
         count = ((TestSuiteDef) component.getAttributes().getValue("suite")).getTestCaseDefs().size();
-
     }
 
     @AuraEnabled

@@ -16,6 +16,7 @@
 package org.auraframework.util.text;
 
 import java.io.StringReader;
+import java.security.MessageDigest;
 
 import org.auraframework.test.UnitTestCase;
 
@@ -107,7 +108,9 @@ public class HashTest extends UnitTestCase {
         Hash readerHash = new Hash(new StringReader(text));
         assertTrue(readerHash.isSet());
         Hash setHash = new ExposedHash();
-        setHash.setHash(new StringReader(text));
+        MessageDigest digest = MessageDigest.getInstance("MD5");
+        digest.update(text.getBytes());
+        setHash.setHash(digest.digest());
         assertEquals(readerHash, setHash);
         assertEquals(readerHash.hashCode(), setHash.hashCode());
     }

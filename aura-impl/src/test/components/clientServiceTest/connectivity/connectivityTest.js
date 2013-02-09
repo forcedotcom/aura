@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	browsers:["GOOGLECHROME"],
+    browsers:["GOOGLECHROME"],
     /**
      * Calling server action on default host succeeds.
      */
@@ -47,13 +47,18 @@
             }, function(component) {
                 $A.test.assertEquals("INCOMPLETE", component.get("v.actionStatus"));
                 $A.test.assertEquals("layoutChange noConnection", component.get("v.eventsFired").trim());
+                component.find("button").get("e.press").fire();
+                $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") != ""; });
+            }, function(component) {
+                // noConnection event is not repeated
+                $A.test.assertEquals("layoutChange noConnection", component.get("v.eventsFired").trim());
             }]
     },
 
     /**
-     * Calling server action after a prior connection failure succeeds.
+     * Calling server action succeeds after a prior connection failure.
      */
-    testConnectionRestored : {
+    testConnectionResumed : {
         testLabels : ["UnAdaptableTest"],
         attributes : { __layout : "#" },
         test : [function(component) {
@@ -70,7 +75,12 @@
                 component.find("button").get("e.press").fire();
                 $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") == "SUCCESS"; });
             }, function(component) {
-                $A.test.assertEquals("layoutChange noConnection", component.get("v.eventsFired").trim()); // no additional events
+                $A.test.assertEquals("layoutChange noConnection connectionResumed", component.get("v.eventsFired").trim());
+                component.find("button").get("e.press").fire();
+                $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") == "SUCCESS"; });
+            }, function(component) {
+                // connectionResumed event is not repeated
+                $A.test.assertEquals("layoutChange noConnection connectionResumed", component.get("v.eventsFired").trim());
             }]
     },
 
@@ -88,7 +98,7 @@
     /**
      * Changing layout after a prior connection failure succeeds.
      */
-    testConnectionRestoredForLayout : {
+    testConnectionResumedForLayout : {
         testLabels : ["UnAdaptableTest"],
         attributes : { host : "http://invalid.salesforce.com", __layout : "#" },
         test : [function(component) {
@@ -96,7 +106,7 @@
             }, function(component) {
                 component.getValue("v.host").setValue(undefined); // restore to default
                 $A.historyService.set("action");
-                $A.test.addWaitFor(true, function() { return component.get("v.eventsFired").trim() == "noConnection layoutFailed layoutChange layoutChange"; });
+                $A.test.addWaitFor(true, function() { return component.get("v.eventsFired").trim() == "noConnection layoutFailed layoutChange connectionResumed layoutChange"; });
             }]
     }
 })

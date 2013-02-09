@@ -63,6 +63,11 @@ public class AuraStorageTestController {
     }
 
     @AuraEnabled
+    public static int getInt(@Key("param") int param) throws Exception {
+        return param;
+    }
+
+    @AuraEnabled
     public static void resetCounter(@Key("testName") String testName) {
         if (testName != null) {
             staticCounter.remove(testName);

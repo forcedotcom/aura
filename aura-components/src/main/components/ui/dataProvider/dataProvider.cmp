@@ -1,0 +1,10 @@
+<aura:component 
+        implements="ui:dataProviderInterface,ui:pagingInterface,ui:sortingInterface,ui:searchInterface" 
+        abstract="true" description="A generic list data provider">
+    
+    <!-- these belong on the dataProviderInterface, but were not working there... -->    
+	<aura:registerEvent name="provide" type="ui:dataProvide"/>
+	<aura:registerEvent name="onchange" type="ui:dataChanged"/>
+
+    {!v.body}
+</aura:component>

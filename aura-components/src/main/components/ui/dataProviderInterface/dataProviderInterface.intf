@@ -1,0 +1,4 @@
+<aura:interface>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="items" type="List"/>
+</aura:interface>

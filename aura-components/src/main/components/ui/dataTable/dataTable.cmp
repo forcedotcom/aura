@@ -15,22 +15,16 @@
     limitations under the License.
 
 -->
-<aura:component implements="ui:listInterface"  model="java://org.auraframework.component.ui.DataTableModel" extensible="true" support="PROTO" description="A table that displays an item of data per row, which is defined by iterating over the set of data. &lt;ui:dataTable&gt; can be used inside a &lt;aura:forEach&gt; tag that specifies the collection of data to be iterated over. The body of &lt;ui:dataTable&gt; contains one or more &lt;ui:dataTableRow&gt; components.">
+<aura:component extensible="true" support="PROTO" description="A table that displays an item of data per row, which is defined by iterating over the set of data. &lt;ui:dataTable&gt; can be used inside a &lt;aura:forEach&gt; tag that specifies the collection of data to be iterated over. The body of &lt;ui:dataTable&gt; contains one or more &lt;ui:dataTableRow&gt; components.">
     <aura:attribute name="class" type="String" default="" description="The CSS style used to display the table."/>
+    <aura:attribute name="items" type="Object[]" description="The items to be iterated over and processed."/>
     <aura:attribute name="noDataText" type="String" default="No data found." description="The text to display when no data is found. Default value is &#8220;No data found.&#8221;"/>
+    <!-- DCHASMAN TODO Re-enable these in 176 when we have a complete story for using aura:forEach with a dynamically generated body
+    <aura:attribute name="var" type="String" default="row"/>
+    <aura:attribute name="rowClass" type="String"/>
+    -->
     <aura:attribute name="headerValues" type="String[]" description="The text that appears in the header row of the table."/>
     <aura:attribute name="striped" type="Boolean" default="false" description="Specifies whether or not the rows should be striped.  Defaults to 'false'."/>
-    
-    <aura:attribute name="itemTemplate" type="Aura.ComponentDefRef[]">
-    	<!-- THIS DOESN'T WORK YET, BUT SOMETHING SIMILAR IS THE IDEAL GOAL -->
-    	<ui:dataTableRow>
-    		<aura:iteration items="{!v.headerValues}" var="header">
-		        <ui:dataTableColumn>
-		            {!header}
-		        </ui:dataTableColumn>
-	        </aura:iteration>
-	    </ui:dataTableRow>
-    </aura:attribute>
 
     <aura:if isTrue="{!v.items.length > 0}">
         <div>
@@ -45,9 +39,7 @@
                         <ui:dataTableColumn>
                     </ui:dataTableRow>
                 </aura:foreach> -->
-                <tbody>
-                	<ui:list items="{!v.items}" itemVar="{!v.itemVar}" itemTemplate="{!m.itemTemplate}"/>
-                </tbody>
+                <tbody>{!v.body}</tbody>
 
             </table>
         </div>

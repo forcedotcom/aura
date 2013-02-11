@@ -24,6 +24,7 @@
  */
 function Model(def, data, component){
 	
+	/** BEGIN HACK--MUST BE REMOVED **/
 	if (def.getDescriptor().getQualifiedName() === "java://ui.aura.components.forceProto.FilterListModel") {
 
 		for (var i in data["rowTemplate"]) {
@@ -37,6 +38,7 @@ function Model(def, data, component){
 			data["itemTemplate"][j] = new SimpleValue(data["itemTemplate"][j], def, component); 
 		}
 	}
+	/** END HACK**/
 	
     return new MapValue(data, def, component);
 }

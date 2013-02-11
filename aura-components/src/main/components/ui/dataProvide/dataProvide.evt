@@ -1,0 +1,2 @@
+<aura:event type="COMPONENT" description="Used to trigger providing of data from a list dataProvider.">
+</aura:event>

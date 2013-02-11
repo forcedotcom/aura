@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="Event fired by dataProvider to signal to its parent list that data has changed">
+    <aura:attribute name="data" type="Object"/>
+</aura:event>

@@ -18,21 +18,21 @@
         var ret = this.superRender();
 
         var headerValues = component.get("v.headerValues");
-//        if (!headerValues) {
-//            // See if we can find the child ui:dataTableColumn(s) and ask them for their headerValue
-//            headerValues = [];
-//            var forEaches = component.get("v.body");
-//            if (forEaches.length > 0) {
-//                var forEach = forEaches[0];
-//                var row = forEach.getSuper().get("v.body")[0];
-//                var columns = row.get("v.body");
-//
-//                for (var i = 0; i < columns.length; i++) {
-//                    var column = columns[i];
-//                    headerValues.push(column.get("v.headerValue"));
-//                }
-//            }
-//        }
+        if (!headerValues) {
+            // See if we can find the child ui:dataTableColumn(s) and ask them for their headerValue
+            headerValues = [];
+            var forEaches = component.get("v.body");
+            if (forEaches.length > 0) {
+                var forEach = forEaches[0];
+                var row = forEach.getSuper().get("v.body")[0];
+                var columns = row.get("v.body");
+
+                for (var i = 0; i < columns.length; i++) {
+                    var column = columns[i];
+                    headerValues.push(column.get("v.headerValue"));
+                }
+            }
+        }
 
         var items = component.getValue("v.items");
         if (!items.isEmpty()) {

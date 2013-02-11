@@ -866,9 +866,15 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     throw new AuraRuntimeException("unexpected null on QFE");
                 }
             }
-            if (uid != null && !uid.equals(de.uid)) {
-                throw new ClientOutOfSyncException("Mismatched UIDs expected '" + de.uid + "' got '" + uid + "'");
+            if (uid != null) {
+                String deuid = ((de != null)?de.uid:null);
+                if (!uid.equals(deuid)) {
+                    throw new ClientOutOfSyncException("Mismatched UIDs expected '" + deuid + "' got '" + uid + "'");
+                }
             }
+        }
+        if (de == null) {
+            return null;
         }
         if (de.qfe != null) {
             throw de.qfe;

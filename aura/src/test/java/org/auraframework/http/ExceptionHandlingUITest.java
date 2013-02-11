@@ -327,7 +327,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
 
         // Wait till prior prior client-side change is gone indicating page
         // reload
-        WebDriverWait wait = new WebDriverWait(getDriver(), 15000);
+        WebDriverWait wait = new WebDriverWait(getDriver(), 30);
         wait.until(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {

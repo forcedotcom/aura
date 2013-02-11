@@ -251,37 +251,64 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertResponseSetToLongCache(get);
     }
 
+    /**
+     * Wiggle factor.
+     *
+     * This is intended to allow for variance between the local date and the server date, along with
+     * any latency that might occur. Currently it is set to 1 hour, which should be more than enough
+     * to account for offsets, but short enough so that we don't really care.
+     */
+    private final static long WIGGLE_FACTOR = (1000L*60*60*1);
+
+    /**
+     * Submit a request and check that the 'long cache' is set correctly.
+     *
+     * See documentation for {@link #WIGGLE_FACTOR}.
+     *
+     * @param request the request to execute.
+     */
     private void assertResponseSetToLongCache(HttpMethod request) throws Exception {
-        final long WIGGLE_FACTOR = 300000; // it's going to expire far off, so
-                                           // factor in some wiggle due to client
-                                           // latency timing
         Date expected = new Date(System.currentTimeMillis() + AuraBaseServlet.LONG_EXPIRE - WIGGLE_FACTOR);
         getHttpClient().executeMethod(request);
         assertEquals("Failed to execute request successfully.", HttpStatus.SC_OK, request.getStatusCode());
 
         assertEquals("Expected response to be marked for long cache",
-                String.format("max-age=%s, public", AuraBaseServlet.LONG_EXPIRE / 1000),
-                request.getResponseHeader("Cache-Control").getValue());
-        Date expires = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss z", Locale.ENGLISH).parse(request
-                .getResponseHeader("Expires").getValue());
-		assertTrue(
-				String.format(
-						"Expires header in response is set to an earlier date than expected. Expected !before %s, got %s.",
-						expected, expires), !expires.before(expected));
+                     String.format("max-age=%s, public", AuraBaseServlet.LONG_EXPIRE / 1000),
+                     request.getResponseHeader("Cache-Control").getValue());
+
+        String expiresHdr = request.getResponseHeader("Expires").getValue();
+        Date expires = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss z", Locale.ENGLISH).parse(expiresHdr);
+        //
+        // We show all of the related dates/strings to help with debugging.
+        //
+        assertTrue(String.format("Expires header is earlier than expected. Expected !before %s, got %s (%s).",
+                                 expected, expires, expiresHdr), !expires.before(expected));
     }
 
+    /**
+     * Submit a request and check that the 'no cache' is set correctly.
+     *
+     * We are very generous with the expires time here, as we really don't care other than to have it
+     * well in the past.
+     *
+     * @param request the request to execute.
+     */
     private void assertResponseSetToNoCache(HttpMethod request) throws Exception {
         Date expected = new Date(System.currentTimeMillis());
         getHttpClient().executeMethod(request);
         assertEquals("Failed to execute request successfully.", HttpStatus.SC_OK, request.getStatusCode());
 
         assertEquals("Expected response to be marked for no-cache", "no-cache, no-store",
-                request.getResponseHeader("Cache-Control").getValue());
+                     request.getResponseHeader("Cache-Control").getValue());
         assertEquals("no-cache", request.getResponseHeader("Pragma").getValue());
-        Date expires = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss z", Locale.ENGLISH).parse(request
-                .getResponseHeader("Expires").getValue());
-        assertTrue(String.format("Expires header in response should be in the past. Expected before %s, got %s.",
-                                 expected, expires), expires.before(expected));
+
+        String expiresHdr = request.getResponseHeader("Expires").getValue();
+        Date expires = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss z", Locale.ENGLISH).parse(expiresHdr);
+        //
+        // We show all of the related dates/strings to help with debugging.
+        //
+        assertTrue(String.format("Expires header should be in the past. Expected before %s, got %s (%s).",
+                                 expected, expires, expiresHdr), expires.before(expected));
     }
 
     /**

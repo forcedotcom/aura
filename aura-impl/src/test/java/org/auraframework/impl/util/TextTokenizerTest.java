@@ -75,7 +75,7 @@ public class TextTokenizerTest extends AuraImplTestCase {
             fail("Should have failed because of mixed expression and text");
         } catch (Exception e) {
             checkExceptionStart(e, InvalidExpressionException.class,
-                    "Cannot mix expression and literal string in attribute value", null);
+                    "Cannot mix expression and literal string in attribute value");
         }
     }
 
@@ -167,7 +167,7 @@ public class TextTokenizerTest extends AuraImplTestCase {
             TextTokenizer.tokenize("{!incompleteExpression", null);
             fail("Expected InvalidExpressionException");
         } catch (Exception e) {
-            checkExceptionFull(e, InvalidExpressionException.class, "Unterminated expression", null);
+            checkExceptionFull(e, InvalidExpressionException.class, "Unterminated expression");
         }
     }
 
@@ -177,7 +177,7 @@ public class TextTokenizerTest extends AuraImplTestCase {
             fail("Expected InvalidExpressionException");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidExpressionException.class,
-                    "Found an expression starting with '!{' but it should be '{!'", null);
+                    "Found an expression starting with '!{' but it should be '{!'");
         }
     }
 }

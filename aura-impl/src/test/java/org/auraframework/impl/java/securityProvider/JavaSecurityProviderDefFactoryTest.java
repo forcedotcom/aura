@@ -142,8 +142,8 @@ public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
             spd.isAllowed(null);
             fail("expected exception");
         } catch (Exception e) {
-            checkExceptionFull(e, NoAccessException.class, "Access Denied", null);
-            checkExceptionFull(e.getCause(), RuntimeException.class, "generated intentionally", null);
+            checkExceptionFull(e, NoAccessException.class, "Access Denied");
+            checkExceptionFull(e.getCause(), RuntimeException.class, "generated intentionally");
         }
     }
 }

@@ -52,7 +52,7 @@ public class AuraContextServiceImplAssertAccessTest extends AuraImplTestCase {
             fail("Expected " + exClass.getName());
             return null;
         } catch (Exception e) {
-            checkExceptionFull(e, exClass, message, null);
+            checkExceptionFull(e, exClass, message);
             return e;
         }
     }
@@ -64,8 +64,7 @@ public class AuraContextServiceImplAssertAccessTest extends AuraImplTestCase {
     }
 
     /**
-     * DEV mode component with invalid app context does not invoke security
-     * check.
+     * DEV mode component with invalid app context does not invoke security check.
      */
     public void testDevCmpWithUnknownApp() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor("nonexistant:application",
@@ -113,8 +112,7 @@ public class AuraContextServiceImplAssertAccessTest extends AuraImplTestCase {
     }
 
     /**
-     * PROD mode component with unsecured prefix does not invoke security
-     * provider.
+     * PROD mode component with unsecured prefix does not invoke security provider.
      */
     public void testProdCmpWithUnsecuredPrefix() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, String.format(
@@ -127,8 +125,7 @@ public class AuraContextServiceImplAssertAccessTest extends AuraImplTestCase {
     }
 
     /**
-     * PROD mode component with unsecured namespace does not invoke security
-     * provider.
+     * PROD mode component with unsecured namespace does not invoke security provider.
      */
     public void testProdCmpWithUnsecuredNamespace() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, String.format(
@@ -162,8 +159,7 @@ public class AuraContextServiceImplAssertAccessTest extends AuraImplTestCase {
     }
 
     /**
-     * PROD mode component with app context where SecurityProvider throws a
-     * Throwable is not allowed.
+     * PROD mode component with app context where SecurityProvider throws a Throwable is not allowed.
      */
     public void testProdCmpWithAppThatThrows() throws Exception {
         Throwable t;
@@ -174,12 +170,11 @@ public class AuraContextServiceImplAssertAccessTest extends AuraImplTestCase {
         Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED, appDesc);
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, cmpTag);
         t = assertException(cmpDesc, NoAccessException.class, "Access Denied");
-        checkExceptionFull(t.getCause(), RuntimeException.class, "generated intentionally", null);
+        checkExceptionFull(t.getCause(), RuntimeException.class, "generated intentionally");
     }
 
     /**
-     * PROD mode component with app context where SecurityProvider denies access
-     * is not allowed.
+     * PROD mode component with app context where SecurityProvider denies access is not allowed.
      */
     public void testProdCmpWithAppThatDenies() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, String.format(
@@ -192,8 +187,7 @@ public class AuraContextServiceImplAssertAccessTest extends AuraImplTestCase {
     }
 
     /**
-     * PROD mode component with app context where SecurityProvider allows access
-     * is allowed.
+     * PROD mode component with app context where SecurityProvider allows access is allowed.
      */
     public void testProdCmpWithAppThatAllows() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, String.format(

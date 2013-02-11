@@ -73,7 +73,7 @@ public class JavaControllerTest extends AuraImplTestCase {
         action.run();
         assertEquals(name + " State", expState, action.getState());
         assertEquals(name + " expected an error", 1, action.getErrors().size());
-        checkExceptionStart((Exception) action.getErrors().get(0), error, errorMessage, null);
+        checkExceptionStart((Exception) action.getErrors().get(0), error, errorMessage);
         assertEquals(name + " return", null, action.getReturnValue());
     }
 

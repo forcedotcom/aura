@@ -277,6 +277,78 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     }
 
     /**
+     * LayoutService is not initialized for a page which is using Integration service.
+     * This test verifies that calling LayoutService APIs don't cause Javascript Errors on the page.
+     */
+    @Ignore("W-1506261")
+    public void testLayoutServiceAPIs()throws Exception{
+        DefDescriptor<ComponentDef> cmpToInject = auraTestingUtil.addSourceAutoCleanup(ComponentDef.class,
+                String.format(AuraImplTestCase.baseComponentTag, "", "Injected Component"));
+
+        openIntegrationStub(cmpToInject, null);
+        auraUITestingUtil.getEval("$A.layoutService.changeLocation('forward')");
+        assertTrue("Failed to change window location using set()",
+                getDriver().getCurrentUrl().endsWith("#forward"));
+
+        //Execute all the public APIs of layoutService and make sure there are no Javascript errors
+        auraUITestingUtil.getEval("$A.layoutService.refreshLayout()");
+
+        auraUITestingUtil.getEval("$A.layoutService.pop()");
+
+        auraUITestingUtil.getEval("$A.layoutService.back()");
+
+        auraUITestingUtil.getEval("$A.layoutService.clearHistory()");
+
+        auraUITestingUtil.getEval("$A.layoutService.setCurrentLayoutTitle('Integration Service')");
+
+        auraUITestingUtil.getEval("$A.layoutService.layout('moreForward')");
+    }
+
+    /**
+     * HistoryService is not initialized for a page which is using Integration service.
+     * This test verifies that calling HistoryService APIs don't cause Javascript Errors on the page.
+     * HistoryService initialization takes care of attaching a event handler for # changes in the URL.
+     * In case of integration service, this initialization is skipped. So changing url #
+     * should not fire aura:locationChange event
+     */
+    public void testHistoryServiceAPIs()throws Exception{
+        String expectedTxt = "";
+        openIntegrationStub(Aura.getDefinitionService().getDefDescriptor("integrationService:noHistoryService", ComponentDef.class), null);
+        String initialUrl = getDriver().getCurrentUrl();
+        //open("/integrationService/noHistoryService.cmp");
+        assertEquals("At page initialization, aura:locationChange event should not be fired.", expectedTxt, getText(By.cssSelector("div.testDiv")));
+
+        //historyService.set() to a new location - W-1506261
+        auraUITestingUtil.getEval("$A.historyService.set('forward')");
+        assertTrue("Failed to change window location using set()",
+                getDriver().getCurrentUrl().endsWith("#forward"));
+        assertEquals("aura:locationChange should not have been fired on set()",
+                expectedTxt, getText(By.cssSelector("div.testDiv")));
+
+        //historyService.get()
+        assertEquals("get() failed to retrieve expected token",
+                "forward", auraUITestingUtil.getEval("return $A.historyService.get().token"));
+
+        //historyService.back()
+        auraUITestingUtil.getEval("$A.historyService.back()");
+        assertEquals("Failed to revert back to previous URL", initialUrl, getDriver().getCurrentUrl());
+        assertEquals("History service failed to go back",
+                "", auraUITestingUtil.getEval("return $A.historyService.get().token"));
+
+        //historyService.forward()
+        auraUITestingUtil.getEval("$A.historyService.forward()");
+        assertEquals("History service does provided unexpected # token",
+                "forward", auraUITestingUtil.getEval("return $A.historyService.get().token"));
+        assertTrue("Window location does not end with expected #", getDriver().getCurrentUrl().endsWith("#forward"));
+
+        //Manually firing locationChange event
+        expectedTxt = "Location Change fired:0";
+        auraUITestingUtil.getEval("$A.eventService.newEvent('aura:locationChange').fire()");
+        assertEquals("Manully firing locationChange event failed",
+                expectedTxt, getText(By.cssSelector("div.testDiv")));
+    }
+
+    /**
      * Utility method to obtain the required markup of the integration stub
      * component.
      */

@@ -277,7 +277,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
                      request.getResponseHeader("Cache-Control").getValue());
 
         String expiresHdr = request.getResponseHeader("Expires").getValue();
-        Date expires = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss z", Locale.ENGLISH).parse(expiresHdr);
+        Date expires = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH).parse(expiresHdr);
         //
         // We show all of the related dates/strings to help with debugging.
         //
@@ -303,7 +303,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("no-cache", request.getResponseHeader("Pragma").getValue());
 
         String expiresHdr = request.getResponseHeader("Expires").getValue();
-        Date expires = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss z", Locale.ENGLISH).parse(expiresHdr);
+        Date expires = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH).parse(expiresHdr);
         //
         // We show all of the related dates/strings to help with debugging.
         //

@@ -508,6 +508,25 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Internal routine to compile and return a DependencyEntry.
+     *
+     * This routine always compiles the definition, even if it is in the caches. If the incoming
+     * descriptor does not correspond to a definition, it will return null, otherwise, on failure
+     * it will throw a QuickFixException.
+     *
+     * Please look at {@link #localDependencies} if you are mucking in here.
+     *
+     * Side Effects:
+     * <ul>
+     * <li>All definitions that were encountered during the compile will be put in the local def cache, even if
+     * a QFE is thrown</li>
+     * <li>A hash is compiled for the definition if it compiles</li>
+     * <li>a dependency entry is cached locally in any case</li>
+     * <li>a dependency entry is cached globally if the definition compiled</li>
+     * </ul>
+     *
+     * @param descriptor the incoming descriptor to compile
+     * @return the definition compiled from the descriptor, or null if not found.
+     * @throws QuickFixException if the definition failed to compile.
      */
     private <T extends Definition> DependencyEntry compileDE(DefDescriptor<T> descriptor) throws QuickFixException {
         // See localDependencies comment
@@ -576,9 +595,16 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * Get a dependency entry for a given uid.
      * 
      * This is a convenience routine to check both the local and global cache for a value.
-     * 
-     * @param uid the uid (must not be null).
-     * @param descriptor the descriptor.
+     *
+     * Please look at {@link #localDependencies} if you are mucking in here.
+     *
+     * Side Effects:
+     * <ul>
+     * <li>If a dependency is found in the global cache, it is populated into the local cache.</li>
+     * </ul>
+     *
+     * @param uid the uid may be null, if so, it only checks the local cache.
+     * @param descriptor the descriptor, used for both global and local cache lookups.
      * @return the DependencyEntry or null if none present.
      */
     private DependencyEntry getDE(String uid, DefDescriptor<?> descriptor) {

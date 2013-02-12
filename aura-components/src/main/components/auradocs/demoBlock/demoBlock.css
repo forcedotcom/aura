@@ -13,11 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-.auradocsInfo.info{
-    border-color:#bee6ff;
-    background-color: #f5fcff;
-    background: 10px no-repeat url(/auraFW/resources/img/msg_icons/info24.png);
-    padding-left: 40px;
-    margin-bottom: 20px;
+
+.THIS {
+	font-size:12px;
+	min-height:100px;
+	padding-top:20px;
 }
+
+.THIS p {
+	padding-left:20px;
+}
+
+.THIS .theLeft, .THIS .theRight {
+    width: 30%;
+    border: 1px dashed #888;
+    padding: 10px;
+    margin-top: 20px;
+}
+

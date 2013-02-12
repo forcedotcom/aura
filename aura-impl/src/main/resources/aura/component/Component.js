@@ -617,6 +617,7 @@ Component.prototype.getValue = function(key){
 
 /**
  * Returns the raw value referenced using property syntax.
+ * get() calls getValue() and unwraps the value.
  * If you need the wrapper, which can be used for things like
  * isDirty(), getPreviousValue(), commit(), rollback(), getBooleanValue(),
  * use getWrapper() instead.

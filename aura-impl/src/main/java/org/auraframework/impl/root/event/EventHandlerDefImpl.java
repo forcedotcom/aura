@@ -102,7 +102,7 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
                         getLocation());
             }
         }
-        // TODO: validate action attribute
+        // TODO(W-1508416): validate action attribute
     }
 
     @Override

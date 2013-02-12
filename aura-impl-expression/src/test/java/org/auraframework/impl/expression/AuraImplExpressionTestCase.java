@@ -19,7 +19,7 @@ import org.auraframework.expression.Expression;
 import org.auraframework.test.UnitTestCase;
 
 /**
- * Ok, I will. Then do it already. I just did!
+ * Base test class for testing the expression parser.
  */
 public abstract class AuraImplExpressionTestCase extends UnitTestCase {
 
@@ -29,17 +29,17 @@ public abstract class AuraImplExpressionTestCase extends UnitTestCase {
     }
 
     /**
-     * the assertTrue/False methods in junit only takes a boolean
+     * The assertTrue/False methods in junit only takes a boolean
      */
-    public void assertTrue(Object o) {
+    public void assertTrue(String msg, Object o) {
         if (o != Boolean.TRUE) {
-            fail();
+            fail(msg);
         }
     }
 
-    public void assertFalse(Object o) {
+    public void assertFalse(String msg, Object o) {
         if (o != Boolean.FALSE) {
-            fail();
+            fail(msg);
         }
     }
 

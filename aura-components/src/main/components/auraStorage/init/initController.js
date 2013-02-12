@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 ({
-	init: function(cmp, event, helper) {
-		helper.init(cmp);
-	},
-	
-	noConnection: function(cmp) {
-		var storage = $A.storageService.getStorage();
-		if (storage) {
-			storage.suspendSweeping();
-		}
-	}
-	
-	// DCHASMAN TODO Need to introduce a new connectionRestored event I think!
+    init: function(cmp, event, helper) {
+        helper.init(cmp);
+    },
+
+    noConnection: function(cmp) {
+        var storage = $A.storageService.getStorage();
+        if (storage) {
+            storage.suspendSweeping();
+        }
+    },
+
+    connectionResumed: function(cmp) {
+        var storage = $A.storageService.getStorage();
+        if (storage) {
+            storage.resumeSweeping();
+        }
+    }
 })

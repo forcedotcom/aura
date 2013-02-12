@@ -23,6 +23,7 @@
     <ui:button label="Reset all counter" press="{!c.resetCounters}"/>
     <p/>
     Result: <p/>Static Counter:<div aura:id="staticCounter"/><p/>Response Data:<div aura:id="responseData"/>isFromStorage:<div aura:id="isFromStorage"/>
+    <p/>
     
     <aura:handler event="aura:doneWaiting" action="{!c.doneWaiting}"/>
     <aura:handler event="aura:waiting" action="{!c.waiting}"/>
@@ -34,4 +35,14 @@
     <div aura:id="refreshEnd"/>
     <aura:handler event="auraStorage:modified" action="{!c.storageModified}"/>
     StorageModifiedAt:<div aura:id="storageModified"/>
+    
+    <!-- attributes & handlers for mocking online/offline in AuraStorage  -->
+    <aura:attribute name="host" type="String" default=""/>
+    <aura:attribute name="actionStatus" type="String" default=""/>
+    <aura:handler name="init" value="{!this}" action="{!c.setHost}"/>
+    <aura:handler name="change" value="{!v.host}" action="{!c.setHost}"/>
+    
+    <ui:inputText aura:id="inputHost" value="{!v.host}"/>
+    <ui:button aura:id="TestConnectionButton" label="test connection" press="{!c.testConnection}"/><br/>
+    
 </aura:component>

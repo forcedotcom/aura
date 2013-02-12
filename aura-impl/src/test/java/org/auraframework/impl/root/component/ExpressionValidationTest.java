@@ -21,6 +21,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
 
 /**
  * Test expression validation
@@ -52,50 +53,44 @@ public class ExpressionValidationTest extends AuraImplTestCase {
     }
 
     /**
-     * Exceptions from parsing by ExpressionAdapter are forwarded. See
-     * ExpressionParserTest for more tests that result in parse exceptions.
+     * Exceptions from parsing by ExpressionAdapter are forwarded. See ExpressionParserTest for more tests that result
+     * in parse exceptions.
      * 
-     * @expectedResults AuraRuntimeException with underlying parse exception
-     *                  when instantiating the component
+     * @expectedResults AuraRuntimeException with underlying parse exception when instantiating the component
      */
     public void testParseExceptions() throws Exception {
-        verifyValidationException("{!too bad}", "", "unexpected token: an identifier");
-        verifyValidationException("{!5+(6-7}", "", "unexpected end of expression");
+        verifyInvalidExpressionException("{!too bad}", "", "unexpected token: an identifier");
+        verifyInvalidExpressionException("{!5+(6-7}", "", "unexpected end of expression");
     }
 
     /**
-     * Unknown value provider is not allowed. See ValueProviderType for
-     * acceptable providers.
+     * Unknown value provider is not allowed. See ValueProviderType for acceptable providers.
      * 
      * @expectedResults AuraRuntimeException when instantiating the component
      */
     // TODO(W-1480493): Expression Validation needs work
     public void _testUnknownValueProvider() throws Exception {
-        verifyValidationException("{!x.fit}", "", "!!!No current validation on ValueProvider");
+        verifyInvalidExpressionException("{!x.fit}", "", "!!!No current validation on ValueProvider");
     }
 
     /**
-     * Note: this test doesn't pass when using aura-impl unit test target
-     * Undefined label references are not allowed.
+     * Note: this test doesn't pass when using aura-impl unit test target Undefined label references are not allowed.
      * 
-     * @expectedResults InvalidExpressionException when instantiating the
-     *                  component
+     * @expectedResults InvalidExpressionException when instantiating the component
      */
     // TODO(W-1480493): Expression Validation needs work
     public void _testUnknownLabel() throws Exception {
-        verifyValidationException("{!$Label.Aura.goomba}", "",
-                "org.auraframework.throwable.InvalidExpressionException: No label found for Aura.goomba");
+        verifyInvalidExpressionException("{!$Label.Aura.goomba}", "", "No label found for Aura.goomba");
     }
 
     /**
      * Label references must have only section and name parts.
      * 
-     * @expectedResults InvalidExpressionException when instantiating the
-     *                  component
+     * @expectedResults InvalidExpressionException when instantiating the component
      */
     public void testInvalidLabelExpression() throws Exception {
-        verifyValidationException("{!$Label.SomeSection}", "", "Labels should have a section and a name:");
-        verifyValidationException("{!$Label.SomeSection.ExtraPart.Name}", "",
+        verifyInvalidExpressionException("{!$Label.SomeSection}", "", "Labels should have a section and a name:");
+        verifyInvalidExpressionException("{!$Label.SomeSection.ExtraPart.Name}", "",
                 "Labels should have a section and a name:");
     }
 
@@ -105,126 +100,124 @@ public class ExpressionValidationTest extends AuraImplTestCase {
      * @expectedResults AuraRuntimeException when instantiating the component
      */
     public void testNestedExpressions() throws Exception {
-        verifyValidationException("{!$'test'{!'Attribute'}}", "",
+        verifyInvalidExpressionException("{!$'test'{!'Attribute'}}", "",
                 "Cannot mix expression and literal string in attribute value");
     }
 
     /**
      * Expression return type must match the attribute type.
      * 
-     * @expectedResults InvalidExpressionException when instantiating the
-     *                  component
+     * @expectedResults InvalidExpressionException when instantiating the component
      */
     // TODO(W-1480493): Expression Validation needs work
     public void _testTypeChecking() throws Exception {
-        verifyValidationException("{!5+1}", "", "!!!No current type validation - returns null");
-        verifyValidationException("", "{!'NotANumber'}", "!!!No current type validation - returns null");
+        verifyInvalidExpressionException("{!5+1}", "", "!!!No current type validation - returns null");
+        verifyInvalidExpressionException("", "{!'NotANumber'}", "!!!No current type validation - returns null");
     }
 
     /**
-     * Expressions that directly or indirectly reference themselves are not
-     * allowed.
+     * Expressions that directly or indirectly reference themselves are not allowed.
      * 
-     * @expectedResults InvalidExpressionException when instantiating the
-     *                  component
+     * @expectedResults InvalidExpressionException when instantiating the component
      */
     // TODO(W-1480493): Expression Validation needs work
     public void _testCyclicalReference() throws Exception {
-        verifyValidationException("{!v.strAtt}again", "",
+        verifyInvalidExpressionException("{!v.strAtt}again", "",
                 "!!!No current validation of recursive expressions - returns arraylist of propref and string");
-        verifyValidationException("{!v.strAtt+'x'}", "",
+        verifyInvalidExpressionException("{!v.strAtt+'x'}", "",
                 "!!!No current validation of recursive expressions - returns null");
-        verifyValidationException("{!v.dblAtt}", "{!v.strAtt}",
+        verifyInvalidExpressionException("{!v.dblAtt}", "{!v.strAtt}",
                 "!!!No current validation of recursive expressions - returns null");
     }
 
     /**
      * Keywords not allowed in property names.
      * 
-     * @expectedResults SomeMeaningfulException when instantiating the component
+     * @expectedResults InvalidExpressionException when instantiating the component
      */
-    // W-1008453 https://gus.soma.salesforce.com/a07B0000000FVP8IAO
+    // TODO(W-1480493): Expression validation needs work
     public void _testKeywordsNotAllowed() throws Exception {
-        final String noKeywords = "!!!currently throws MismatchedTokenException which isn't very helpful";
-        verifyValidationException("{!v.null}", "", noKeywords);
-        verifyValidationException("{!add(m.integer, m.eq)}", "", noKeywords);
-        verifyValidationException("{!v.raise ? c.add : c.subtract}", "", noKeywords);
+        final String baseMsg = "expecting an identifier, found ";
+        verifyInvalidExpressionException("{!v.null}", "", baseMsg + "'null'");
+        verifyInvalidExpressionException("{!add(m.integer, m.eq)}", "", baseMsg + "'eq'");
+        verifyInvalidExpressionException("{!v.raise ? c.add : c.subtract}", "", baseMsg + "'raise'");
     }
 
     /**
      * Functions should validate the number of args passed in.
      * 
-     * @expectedResults SomeMeaningfulException when instantiating the component
+     * @expectedResults InvalidExpressionException when instantiating the component
      */
-    // W-1008501 https://gus.soma.salesforce.com/a07B0000000FVSMIA4
+    // TODO(W-1008501): Number of args in expression functions not validated
     public void _testNumberOfArgs() throws Exception {
         final String tooFew = "!!!No current validation of number of args - allows less than expected";
         final String tooMany = "!!!No current validation of number of args - allows more than expected";
-        verifyValidationException("{!equals()}", "", tooFew);
-        verifyValidationException("{!equals(true)}", "", tooFew);
-        verifyValidationException("{!equals('a','b','c')}", "", tooMany);
-        verifyValidationException("{!notequals()}", "", tooFew);
-        verifyValidationException("{!notequals(true)}", "", tooFew);
-        verifyValidationException("{!notequals('a','b','c')}", "", tooMany);
-        verifyValidationException("{!and()}", "", tooFew);
-        verifyValidationException("{!and(true)}", "", tooFew);
-        verifyValidationException("{!and('a','b','c')}", "", tooMany);
-        verifyValidationException("{!or()}", "", tooFew);
-        verifyValidationException("{!or(false)}", "", tooFew);
-        verifyValidationException("{!or('a','b','c')}", "", tooMany);
-        verifyValidationException("{!not()}", "", tooFew);
-        verifyValidationException("{!not(1,2)}", "", tooMany);
-        verifyValidationException("{!if()}", "", tooFew);
-        verifyValidationException("{!if(1,2)}", "", tooFew);
-        verifyValidationException("{!if(true,'a','b','c')}", "", tooMany);
-        verifyValidationException("{!add()}", "", tooFew);
-        verifyValidationException("{!add(false)}", "", tooFew);
-        verifyValidationException("{!add('a','b','c')}", "", tooMany);
-        verifyValidationException("{!concat()}", "", tooFew);
-        verifyValidationException("{!concat(false)}", "", tooFew);
-        verifyValidationException("{!concat('a','b','c')}", "", tooMany);
-        verifyValidationException("{!sub()}", "", tooFew);
-        verifyValidationException("{!sub(false)}", "", tooFew);
-        verifyValidationException("{!sub('a','b','c')}", "", tooMany);
-        verifyValidationException("{!subtract()}", "", tooFew);
-        verifyValidationException("{!subtract(false)}", "", tooFew);
-        verifyValidationException("{!subtract('a','b','c')}", "", tooMany);
-        verifyValidationException("{!mult()}", "", tooFew);
-        verifyValidationException("{!mult(false)}", "", tooFew);
-        verifyValidationException("{!mult('a','b','c')}", "", tooMany);
-        verifyValidationException("{!multiply()}", "", tooFew);
-        verifyValidationException("{!multiply(false)}", "", tooFew);
-        verifyValidationException("{!multiply('a','b','c')}", "", tooMany);
-        verifyValidationException("{!div()}", "", tooFew);
-        verifyValidationException("{!div(false)}", "", tooFew);
-        verifyValidationException("{!div('a','b','c')}", "", tooMany);
-        verifyValidationException("{!divide()}", "", tooFew);
-        verifyValidationException("{!divide(false)}", "", tooFew);
-        verifyValidationException("{!divide('a','b','c')}", "", tooMany);
-        verifyValidationException("{!mod()}", "", tooFew);
-        verifyValidationException("{!mod(false)}", "", tooFew);
-        verifyValidationException("{!mod('a','b','c')}", "", tooMany);
-        verifyValidationException("{!modulus()}", "", tooFew);
-        verifyValidationException("{!modulus(false)}", "", tooFew);
-        verifyValidationException("{!modulus('a','b','c')}", "", tooMany);
-        verifyValidationException("{!greaterthan()}", "", tooFew);
-        verifyValidationException("{!greaterthan(false)}", "", tooFew);
-        verifyValidationException("{!greaterthan('a','b','c')}", "", tooMany);
-        verifyValidationException("{!greaterthanorequal()}", "", tooFew);
-        verifyValidationException("{!greaterthanorequal(false)}", "", tooFew);
-        verifyValidationException("{!greaterthanorequal('a','b','c')}", "", tooMany);
-        verifyValidationException("{!lessthan()}", "", tooFew);
-        verifyValidationException("{!lessthan(false)}", "", tooFew);
-        verifyValidationException("{!lessthan('a','b','c')}", "", tooMany);
-        verifyValidationException("{!lessthanorequal()}", "", tooFew);
-        verifyValidationException("{!lessthanorequal(false)}", "", tooFew);
-        verifyValidationException("{!lessthanorequal('a','b','c')}", "", tooMany);
-        verifyValidationException("{!neg()}", "", tooFew);
-        verifyValidationException("{!neg(1,2)}", "", tooMany);
-        verifyValidationException("{!negate()}", "", tooFew);
-        verifyValidationException("{!negate(1,2)}", "", tooMany);
-        verifyValidationException("{!abs()}", "", tooFew);
-        verifyValidationException("{!abs(1,2)}", "", tooMany);
+
+        verifyInvalidExpressionException("{!equals()}", "", tooFew);
+        verifyInvalidExpressionException("{!equals(true)}", "", tooFew);
+        verifyInvalidExpressionException("{!equals('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!notequals()}", "", tooFew);
+        verifyInvalidExpressionException("{!notequals(true)}", "", tooFew);
+        verifyInvalidExpressionException("{!notequals('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!and()}", "", tooFew);
+        verifyInvalidExpressionException("{!and(true)}", "", tooFew);
+        verifyInvalidExpressionException("{!and('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!or()}", "", tooFew);
+        verifyInvalidExpressionException("{!or(false)}", "", tooFew);
+        verifyInvalidExpressionException("{!or('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!not()}", "", tooFew);
+        verifyInvalidExpressionException("{!not(1,2)}", "", tooMany);
+        verifyInvalidExpressionException("{!if()}", "", tooFew);
+        verifyInvalidExpressionException("{!if(1,2)}", "", tooFew);
+        verifyInvalidExpressionException("{!if(true,'a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!add()}", "", tooFew);
+        verifyInvalidExpressionException("{!add(false)}", "", tooFew);
+        verifyInvalidExpressionException("{!add('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!concat()}", "", tooFew);
+        verifyInvalidExpressionException("{!concat(false)}", "", tooFew);
+        verifyInvalidExpressionException("{!concat('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!sub()}", "", tooFew);
+        verifyInvalidExpressionException("{!sub(false)}", "", tooFew);
+        verifyInvalidExpressionException("{!sub('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!subtract()}", "", tooFew);
+        verifyInvalidExpressionException("{!subtract(false)}", "", tooFew);
+        verifyInvalidExpressionException("{!subtract('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!mult()}", "", tooFew);
+        verifyInvalidExpressionException("{!mult(false)}", "", tooFew);
+        verifyInvalidExpressionException("{!mult('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!multiply()}", "", tooFew);
+        verifyInvalidExpressionException("{!multiply(false)}", "", tooFew);
+        verifyInvalidExpressionException("{!multiply('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!div()}", "", tooFew);
+        verifyInvalidExpressionException("{!div(false)}", "", tooFew);
+        verifyInvalidExpressionException("{!div('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!divide()}", "", tooFew);
+        verifyInvalidExpressionException("{!divide(false)}", "", tooFew);
+        verifyInvalidExpressionException("{!divide('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!mod()}", "", tooFew);
+        verifyInvalidExpressionException("{!mod(false)}", "", tooFew);
+        verifyInvalidExpressionException("{!mod('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!modulus()}", "", tooFew);
+        verifyInvalidExpressionException("{!modulus(false)}", "", tooFew);
+        verifyInvalidExpressionException("{!modulus('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!greaterthan()}", "", tooFew);
+        verifyInvalidExpressionException("{!greaterthan(false)}", "", tooFew);
+        verifyInvalidExpressionException("{!greaterthan('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!greaterthanorequal()}", "", tooFew);
+        verifyInvalidExpressionException("{!greaterthanorequal(false)}", "", tooFew);
+        verifyInvalidExpressionException("{!greaterthanorequal('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!lessthan()}", "", tooFew);
+        verifyInvalidExpressionException("{!lessthan(false)}", "", tooFew);
+        verifyInvalidExpressionException("{!lessthan('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!lessthanorequal()}", "", tooFew);
+        verifyInvalidExpressionException("{!lessthanorequal(false)}", "", tooFew);
+        verifyInvalidExpressionException("{!lessthanorequal('a','b','c')}", "", tooMany);
+        verifyInvalidExpressionException("{!neg()}", "", tooFew);
+        verifyInvalidExpressionException("{!neg(1,2)}", "", tooMany);
+        verifyInvalidExpressionException("{!negate()}", "", tooFew);
+        verifyInvalidExpressionException("{!negate(1,2)}", "", tooMany);
+        verifyInvalidExpressionException("{!abs()}", "", tooFew);
+        verifyInvalidExpressionException("{!abs(1,2)}", "", tooMany);
     }
 
     /**
@@ -234,13 +227,23 @@ public class ExpressionValidationTest extends AuraImplTestCase {
      */
     public void testFunctionNotFound() throws Exception {
         final String noFunction = "No function found for key: ";
-        verifyValidationException("{!isNull(null)}", "", noFunction + "isNull");
-        verifyValidationException("{!1 > v.div ? isFinite(v.num/v.div) : true}", "", noFunction + "isFinite");
-        verifyValidationException("{!v.max > absolute(-1)}", "", noFunction + "absolute");
+        verifyAuraRuntimeException("{!isNull(null)}", "", noFunction + "isNull");
+        verifyAuraRuntimeException("{!1 > v.div ? isFinite(v.num/v.div) : true}", "", noFunction + "isFinite");
+        verifyAuraRuntimeException("{!v.max > absolute(-1)}", "", noFunction + "absolute");
     }
 
-    private void verifyValidationException(String strExpr, String dblExpr, String expectedMessageStartsWith)
+    private void verifyInvalidExpressionException(String strExpr, String dblExpr, String expectedMsgContains)
             throws Exception {
+        verifyValidationException(strExpr, dblExpr, expectedMsgContains, InvalidExpressionException.class);
+    }
+
+    private void verifyAuraRuntimeException(String strExpr, String dblExpr, String expectedMsgContains)
+            throws Exception {
+        verifyValidationException(strExpr, dblExpr, expectedMsgContains, AuraRuntimeException.class);
+    }
+
+    private void verifyValidationException(String strExpr, String dblExpr, String expectedMsgContains,
+            Class expectedClass) throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, String.format("<aura:component>"
                 + "<aura:attribute name='strAtt' type='String' default=\"%s\"/>"
                 + "<aura:attribute name='dblAtt' type='Double' default=\"%s\"/>" + "</aura:component>", strExpr,
@@ -253,9 +256,10 @@ public class ExpressionValidationTest extends AuraImplTestCase {
             fail("Expression validation did not result in a runtime exception for strAtt=\"" + strExpr + "\" dblAtt=\""
                     + dblExpr + "\"");
         } catch (Exception e) {
-            if (!e.getMessage().contains(expectedMessageStartsWith)) {
-                throw (e);
-            }
+            assertTrue("Wrong Exception type thrown. Expected: " + expectedClass + ". But got: " + e.getClass(),
+                    e.getClass().equals(expectedClass));
+            assertTrue("Wrong Exception message. Expected: " + expectedMsgContains + ". But got: " + e.getMessage(),
+                    e.getMessage().contains(expectedMsgContains));
         }
 
         cmpDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component>"
@@ -269,9 +273,10 @@ public class ExpressionValidationTest extends AuraImplTestCase {
             fail("Expression validation did not result in a runtime exception for strAtt=\"" + strExpr + "\" dblAtt=\""
                     + dblExpr + "\"");
         } catch (Exception e) {
-            if (!e.getMessage().contains(expectedMessageStartsWith)) {
-                throw (e);
-            }
+            assertTrue("Wrong Exception type thrown. Expected: " + expectedClass + ". But got: " + e.getClass(),
+                    e.getClass().equals(expectedClass));
+            assertTrue("Wrong Exception message. Expected: " + expectedMsgContains + ". But got: " + e.getMessage(),
+                    e.getMessage().contains(expectedMsgContains));
         }
     }
 }

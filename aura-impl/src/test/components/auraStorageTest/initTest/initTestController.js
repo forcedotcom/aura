@@ -51,5 +51,17 @@
 	},
 	storageModified:function(cmp, evt, helper){
 		helper.findAndSetText(cmp, "storageModified", new Date().getTime());
-	}
+	},
+    setHost : function(component, event, helper) {
+        $A.clientService.initHost(component.get("v.host"));
+    },
+    testConnection: function(component, event, helper) {
+        component.getValue("v.actionStatus").setValue("");
+        var a = component.get("c.getInt");
+        a.setParams({ param : 66 });
+        a.setCallback(this, function(action){
+            component.getValue("v.actionStatus").setValue(action.getState());
+        });
+        a.runAfter(a);
+    },
 })

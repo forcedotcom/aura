@@ -148,13 +148,12 @@ public class LayoutsDefImpl extends RootDefinitionImpl<LayoutsDef> implements La
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
-        if (AuraTextUtil.isNullEmptyOrWhitespace(defaultLayout)) { // default is
-                                                                   // required
-                                                                   // attribute
+        // default is required attribute
+        if (AuraTextUtil.isNullEmptyOrWhitespace(defaultLayout)) {
             throw new InvalidDefinitionException("The \"default\" attribute is required for layouts", getLocation());
         }
-        if (getLayoutDef(defaultLayout) == null) { // the default layout must
-                                                   // exist
+        // the default layout must exist
+        if (getLayoutDef(defaultLayout) == null) {
             throw new InvalidDefinitionException(
                     String.format("The default layout \"%s\" doesn't exist", defaultLayout), getLocation());
         }

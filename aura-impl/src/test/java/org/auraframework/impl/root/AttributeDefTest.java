@@ -21,6 +21,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 public class AttributeDefTest extends AuraImplTestCase {
@@ -218,6 +219,18 @@ public class AttributeDefTest extends AuraImplTestCase {
                 .getAttributeDef("attr").getDescription());
     }
 
+    public void testTypeInvalid() throws Exception {
+        String markup = "<aura:component ><aura:attribute type='iDontExist' name='attr'/></aura:component>";
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
+        try {
+            cmpDesc.getDef();
+            fail("Expected Exception to be thrown when attribute is a non-existent type");
+        } catch (Exception e) {
+            checkExceptionFull(e, DefinitionNotFoundException.class, "No TYPE named java://iDontExist found",
+                    cmpDesc.getQualifiedName());
+        }
+    }
+
     public void testSerializeTo() throws Exception {
         assertEquals(
                 AttributeDef.SerializeToType.BOTH,
@@ -274,9 +287,8 @@ public class AttributeDefTest extends AuraImplTestCase {
                     vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue", location), false,
                     AttributeDef.SerializeToType.INVALID, location).validateDefinition();
             fail("Did not get InvalidDefinitionException for Serialize to type INVALID");
-        } catch (InvalidDefinitionException e) {
-            assertEquals("Invalid serializeTo value", e.getMessage());
-            assertEquals(location, e.getLocation());
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "Invalid serializeTo value", location.getFileName());
         }
     }
 

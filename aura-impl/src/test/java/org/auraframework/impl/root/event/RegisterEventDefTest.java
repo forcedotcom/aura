@@ -23,6 +23,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.FakeRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 /**
 */
@@ -101,5 +102,19 @@ public class RegisterEventDefTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
         assertEquals("Description of registerevent not processed", "Describe the event", cmpDesc.getDef()
                 .getRegisterEventDefs().get("eventName").getDescription());
+    }
+
+    public void testValueEventException() throws Exception {
+        String cmpMarkup = "<aura:component >%s</aura:component>";
+        String markup = String.format(cmpMarkup,
+                "<aura:registerevent name='eventName' type='aura:valueEvent'/>");
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, markup);
+        try {
+            cmpDesc.getDef();
+            fail("Should have thrown exception when registering for an event of type Value");
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class,
+                    "Cannot fire event of type: markup://aura:valueEvent", cmpDesc.getQualifiedName());
+        }
     }
 }

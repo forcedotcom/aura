@@ -302,11 +302,9 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Parse error stack trace for controller includes filename along with
-     * row,col
+     * Parse error stack trace for controller includes filename
      */
-
-    public void testCntrlThrowsWithFileName() throws Exception {
+    public void testControllerThrowsWithFileName() throws Exception {
         String fileName = "auratest/parseError";
         openRaw(fileName + ".cmp");
         assertStacktrace("org.auraframework.throwable.AuraRuntimeException: ");

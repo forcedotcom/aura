@@ -22,6 +22,7 @@
     <aura:attribute name="eventsFired" type="String" default=""/>
 
     <aura:handler event="aura:noConnection" action="{!c.logEvent}"/>
+    <aura:handler event="aura:connectionResumed" action="{!c.logEvent}"/>
     <aura:handler event="aura:layoutChange" action="{!c.logEvent}"/>
     <aura:handler event="aura:layoutFailed" action="{!c.logEvent}"/>
     <aura:handler name="init" value="{!this}" action="{!c.setHost}"/>

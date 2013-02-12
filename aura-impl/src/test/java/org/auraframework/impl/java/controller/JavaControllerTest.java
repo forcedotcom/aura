@@ -98,10 +98,9 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     /**
-     * Ensure that an action must be public. Currently, we do not actualy
-     * process non-public members. This is due to a limitation in the way java
-     * returns methods. If we do want to do this, we'd have to process all
-     * methods in a rather complex way (walking up the class hierarchy).
+     * Ensure that an action must be public. Currently, we do not actualy process non-public members. This is due to a
+     * limitation in the way java returns methods. If we do want to do this, we'd have to process all methods in a
+     * rather complex way (walking up the class hierarchy).
      */
     public void testProtectedAction() throws Exception {
         ControllerDef cont = getJavaController("java://org.auraframework.impl.java.controller.TestControllerWithProtectedAction");
@@ -186,4 +185,9 @@ public class JavaControllerTest extends AuraImplTestCase {
         }
     }
 
+    public void testDuplicateAction() throws Exception {
+        assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerWithDuplicateAction",
+                InvalidDefinitionException.class, "Duplicate action appendStrings",
+                "org.auraframework.impl.java.controller.TestControllerWithDuplicateAction");
+    }
 }

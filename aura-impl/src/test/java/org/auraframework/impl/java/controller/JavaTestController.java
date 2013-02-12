@@ -248,4 +248,11 @@ public class JavaTestController {
         AuraRuntimeException e = new AuraRuntimeException("throwExceptionNoLineNums", loc);
         throw e;
     }
+
+    @AuraEnabled
+    public static void throwExceptionWithLineNums() {
+        Location loc = new Location("test-filename", 4444, 55555, 123456789);
+        AuraRuntimeException e = new AuraRuntimeException("throwExceptionNoLineNums", loc);
+        throw e;
+    }
 }

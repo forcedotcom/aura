@@ -32,10 +32,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 /**
- * The definition of an attribute. Holds all information about a given
- * component's AttributeDefRef, aside from the actual ValueDefRef.
- * AttrbitueInfos are immutable. Once they are created, they can only be
- * replaced, never changed.
+ * The definition of an attribute. Holds all information about a given component's AttributeDefRef, aside from the
+ * actual ValueDefRef. AttrbitueInfos are immutable. Once they are created, they can only be replaced, never changed.
  */
 public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> implements AttributeDef {
     /**
@@ -43,15 +41,11 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
      * 
      * @param descriptor the descriptor of this attribute
      * @param parentDescriptor the parent descriptor of this attribute
-     * @param typeDefDescriptor The TypeDef Descriptor for the Type of instances
-     *            of this AttributeDef
-     * @param defaultValue The ValueDef for the default value to be used if no
-     *            Value is set on the Attribute instance
-     * @param required true if is required that this attribute Value be set (not
-     *            defaulted) on Attribute instances that refer to this
-     *            AttributeDef
-     * @param location The location where this AttributeDef was defined in the
-     *            markup.
+     * @param typeDefDescriptor The TypeDef Descriptor for the Type of instances of this AttributeDef
+     * @param defaultValue The ValueDef for the default value to be used if no Value is set on the Attribute instance
+     * @param required true if is required that this attribute Value be set (not defaulted) on Attribute instances that
+     *            refer to this AttributeDef
+     * @param location The location where this AttributeDef was defined in the markup.
      */
     public AttributeDefImpl(DefDescriptor<AttributeDef> descriptor,
             DefDescriptor<? extends RootDefinition> parentDescriptor, DefDescriptor<TypeDef> typeDefDescriptor,
@@ -74,8 +68,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     }
 
     /**
-     * @return The ValueDef that defines type information about Values for
-     *         instances of this AttributeDef
+     * @return The ValueDef that defines type information about Values for instances of this AttributeDef
      * @throws QuickFixException
      */
     @Override
@@ -84,8 +77,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     }
 
     /**
-     * @return The default value to be used for instances of this AttributeDef
-     *         that do not have a Value explicitly set
+     * @return The default value to be used for instances of this AttributeDef that do not have a Value explicitly set
      */
     @Override
     public AttributeDefRef getDefaultValue() {
@@ -101,9 +93,8 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     }
 
     /**
-     * @return SERVER if this attribute should only be serialized from client to
-     *         server, BOTH if serialization should occur in both directions
-     *         (the default)
+     * @return SERVER if this attribute should only be serialized from client to server, BOTH if serialization should
+     *         occur in both directions (the default)
      */
     @Override
     public SerializeToType getSerializeTo() {
@@ -144,7 +135,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
             }
         } catch (AuraRuntimeException e) {
             if (e.getCause() instanceof ClassNotFoundException) {
-                throw new DefinitionNotFoundException(typeDefDescriptor);
+                throw new DefinitionNotFoundException(typeDefDescriptor, getLocation());
             } else {
                 throw e; // Don't try to be clever about unknown bad things!
             }
@@ -220,8 +211,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
         }
 
         /**
-         * Sets how this attribute should be serialized (to client, to server,
-         * or both (default)).
+         * Sets how this attribute should be serialized (to client, to server, or both (default)).
          */
         public Builder setSerializeTo(SerializeToType serializeTo) {
             this.serializeTo = serializeTo;

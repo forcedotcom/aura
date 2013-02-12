@@ -41,7 +41,7 @@ import com.google.common.collect.Lists;
  * interface. InterfaceDefs are immutable singletons per type. Once they are
  * created, they can only be replaced, never changed.
  */
-public final class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implements InterfaceDef {
+public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implements InterfaceDef {
 
     /**
      */

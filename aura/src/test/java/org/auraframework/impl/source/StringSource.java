@@ -69,7 +69,7 @@ public class StringSource<D extends Definition> extends Source<D> {
         if (contents != null) {
             this.sb.append(contents);
         }
-        this.lastModified = 0;
+        touch();
     }
 
     @Override

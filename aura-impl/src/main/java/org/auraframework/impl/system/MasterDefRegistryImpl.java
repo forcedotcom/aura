@@ -124,16 +124,15 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     /**
      * A local dependencies cache.
      * 
-     * We store both by descriptor and by uid. The descriptor keys must include the type, as the
-     * qualified name is not sufficient to distinguish it. In the case of the UID, we presume that
-     * we are safe.
-     *
+     * We store both by descriptor and by uid. The descriptor keys must include the type, as the qualified name is not
+     * sufficient to distinguish it. In the case of the UID, we presume that we are safe.
+     * 
      * The two keys stored in the local cache are:
      * <ul>
      * <li>The UID, which should be sufficiently unique for a single request.</li>
-     * <li>The type+qualified name of the descriptor. We store this to avoid construction in the case
-     * where we don't have a UID. This is presumed safe because we assume that a single session will
-     * have a consistent set of permissions</li>
+     * <li>The type+qualified name of the descriptor. We store this to avoid construction in the case where we don't
+     * have a UID. This is presumed safe because we assume that a single session will have a consistent set of
+     * permissions</li>
      * </ul>
      */
     private final Map<String, DependencyEntry> localDependencies = Maps.newHashMap();
@@ -326,8 +325,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             }
             if (def == null) {
                 //
-                // At this point, we have failed to get the def, so we should throw an
-                // error. The first stanza is to provide a more useful error description
+                // At this point, we have failed to get the def, so we should
+                // throw an
+                // error. The first stanza is to provide a more useful error
+                // description
                 // including the set of components using the missing component.
                 //
                 if (!cd.parents.isEmpty()) {
@@ -361,8 +362,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
         if (!def.isValid()) {
             //
-            // If our def is not 'valid', we must have built it, which means we need
-            // to validate. There is a subtle race condition here where more than one
+            // If our def is not 'valid', we must have built it, which means we
+            // need
+            // to validate. There is a subtle race condition here where more
+            // than one
             // thread can grab a def from a registry, and they may all validate.
             //
             cd.built = true;
@@ -370,7 +373,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 cd.registry = getRegistryFor(descriptor);
             }
             cc.loggingService.incrementNum(LoggingService.DEF_COUNT);
-            // FIXME: setting the current namespace on the context seems extremely hackish
+            // FIXME: setting the current namespace on the context seems
+            // extremely hackish
             cc.context.setCurrentNamespace(canonical.getNamespace());
             def.validateDefinition();
         }
@@ -438,10 +442,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         cc.loggingService.startTimer(LoggingService.TIMER_DEFINITION_CREATION);
         try {
             //
-            // FIXME: in the event of a compiled def, we should be done at the first fetch, though realistically,
+            // FIXME: in the event of a compiled def, we should be done at the
+            // first fetch, though realistically,
             // this should require that all defs be cached, or we _will_ break.
             //
-            // First, walk all dependencies, compiling them with validateDefinition.
+            // First, walk all dependencies, compiling them with
+            // validateDefinition.
             // and accumulating the set in a local map.
             //
             try {
@@ -456,8 +462,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 return null;
             }
             //
-            // This loop accumulates over a breadth first traversal of the dependency tree.
-            // All child definitions are added to the 'next' set, while walking the 'current'
+            // This loop accumulates over a breadth first traversal of the
+            // dependency tree.
+            // All child definitions are added to the 'next' set, while walking
+            // the 'current'
             // set.
             //
             while (next.size() > 0) {
@@ -481,9 +489,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             }
 
             //
-            // FIXME: figure out the global version here for the def being requested. Also, do
-            // something useful with dependencies to figure out if it is stale. If so, we'd have
-            // to invalidate the whole set and start over. Rather a painful thing to do.
+            // FIXME: figure out the global version here for the def being
+            // requested. Also, do
+            // something useful with dependencies to figure out if it is stale.
+            // If so, we'd have
+            // to invalidate the whole set and start over. Rather a painful
+            // thing to do.
             //
 
             //
@@ -508,30 +519,28 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Internal routine to compile and return a DependencyEntry.
-     *
-     * This routine always compiles the definition, even if it is in the caches. If the incoming
-     * descriptor does not correspond to a definition, it will return null, otherwise, on failure
-     * it will throw a QuickFixException.
-     *
+     * 
+     * This routine always compiles the definition, even if it is in the caches. If the incoming descriptor does not
+     * correspond to a definition, it will return null, otherwise, on failure it will throw a QuickFixException.
+     * 
      * Please look at {@link #localDependencies} if you are mucking in here.
-     *
+     * 
      * Side Effects:
      * <ul>
-     * <li>All definitions that were encountered during the compile will be put in the local def cache, even if
-     * a QFE is thrown</li>
+     * <li>All definitions that were encountered during the compile will be put in the local def cache, even if a QFE is
+     * thrown</li>
      * <li>A hash is compiled for the definition if it compiles</li>
      * <li>a dependency entry is cached locally in any case</li>
      * <li>a dependency entry is cached globally if the definition compiled</li>
      * </ul>
-     *
+     * 
      * @param descriptor the incoming descriptor to compile
      * @return the definition compiled from the descriptor, or null if not found.
      * @throws QuickFixException if the definition failed to compile.
      */
     private <T extends Definition> DependencyEntry compileDE(DefDescriptor<T> descriptor) throws QuickFixException {
         // See localDependencies comment
-        String lowerk = descriptor.getQualifiedName().toLowerCase();
-        String localk = descriptor.getDefType().toString() + lowerk;
+        String key = makeLocalKey(descriptor);
         try {
             Map<DefDescriptor<?>, Definition> dds = Maps.newTreeMap();
             Definition def = compileDef(descriptor, dds);
@@ -550,7 +559,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             StringBuilder sb = new StringBuilder(dds.size() * 20);
 
             //
-            // Calculate our hash based on the descriptors and their hashes (if any).
+            // Calculate our hash based on the descriptors and their hashes (if
+            // any).
             // This uses a promise, and the string builder methods of Hash.
             //
             Hash.StringBuilder globalBuilder = new Hash.StringBuilder();
@@ -575,18 +585,18 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             // to stay at the first compile time. We should phase out last mod
             // time, and then re-instantiate this code.
             //
-            // de = getDE(uid, lowerk);
+            // de = getDE(uid, key);
             // if (de == null) {
             de = new DependencyEntry(uid, Sets.newTreeSet(dds.keySet()), lmt);
-            dependencies.put(de.uid + lowerk, de);
+            dependencies.put(de.uid + key, de);
             // See localDependencies comment
             localDependencies.put(de.uid, de);
-            localDependencies.put(localk, de);
+            localDependencies.put(key, de);
             // }
             return de;
         } catch (QuickFixException qfe) {
             // See localDependencies comment
-            localDependencies.put(localk, new DependencyEntry(qfe));
+            localDependencies.put(key, new DependencyEntry(qfe));
             throw qfe;
         }
     }
@@ -595,38 +605,37 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * Get a dependency entry for a given uid.
      * 
      * This is a convenience routine to check both the local and global cache for a value.
-     *
+     * 
      * Please look at {@link #localDependencies} if you are mucking in here.
-     *
+     * 
      * Side Effects:
      * <ul>
      * <li>If a dependency is found in the global cache, it is populated into the local cache.</li>
      * </ul>
-     *
+     * 
      * @param uid the uid may be null, if so, it only checks the local cache.
      * @param descriptor the descriptor, used for both global and local cache lookups.
      * @return the DependencyEntry or null if none present.
      */
     private DependencyEntry getDE(String uid, DefDescriptor<?> descriptor) {
         // See localDependencies comment
-        String lowerk = descriptor.getQualifiedName().toLowerCase();
-        String localk = descriptor.getDefType().toString() + lowerk;
+        String key = makeLocalKey(descriptor);
         if (uid != null) {
             DependencyEntry de = localDependencies.get(uid);
             if (de != null) {
                 return de;
             }
-            de = dependencies.getIfPresent(uid + lowerk);
+            de = dependencies.getIfPresent(uid + key);
             if (de != null) {
                 // See localDependencies comment
                 localDependencies.put(uid, de);
-                localDependencies.put(localk, de);
+                localDependencies.put(key, de);
                 return de;
             }
             return null;
         } else {
             // See localDependencies comment
-            return localDependencies.get(localk);
+            return localDependencies.get(key);
         }
     }
 
@@ -893,7 +902,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 }
             }
             if (uid != null) {
-                String deuid = ((de != null)?de.uid:null);
+                String deuid = ((de != null) ? de.uid : null);
                 if (!uid.equals(deuid)) {
                     throw new ClientOutOfSyncException("Mismatched UIDs expected '" + deuid + "' got '" + uid + "'");
                 }
@@ -906,5 +915,17 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             throw de.qfe;
         }
         return de.uid;
+    }
+
+    /** Creates a key for the localDependencies, using DefType and FQN. */
+    private String makeLocalKey(DefDescriptor descriptor) {
+        return descriptor.getDefType().toString() + ":" + descriptor.getQualifiedName().toLowerCase();
+    }
+
+    /**
+     * Creates a key for the global {@link #dependencies}, using UID, type, and FQN.
+     */
+    private String makeGlobalKey(String uid, DefDescriptor descriptor) {
+        return uid + "/" + makeLocalKey(descriptor);
     }
 }

@@ -26,14 +26,14 @@
         if (parent && !parent.isEmpty()) {
             p = parent.getValue(0);
             if (visible === true) {
-                var e = p.getEvent("menuExpand");
-                if (e) {
-                    e.fire();
+                var action = p.get("c.handleMenuExpand");
+                if (action) {
+                    action.run();
                 }
             } else {
-                var e = p.getEvent("menuCollapse");
-                if (e) {
-                    e.fire();
+                var action = p.get("c.handleMenuCollapse");
+                if (action) {
+                    action.run();
                 }
             }
         }

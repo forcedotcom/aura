@@ -16,13 +16,9 @@
 
 -->
 <aura:component extensible="true" implements="ui:visible" description="A dropdown menu with a trigger that controls its visibility." support="GA">
-    <aura:registerEvent name="menuExpand" type="ui:menuExpand" description="The event fired when the menu expands."/>
-    <aura:registerEvent name="menuCollapse" type="ui:menuCollapse" description="The event fired when the menu collapses."/>
     <aura:registerEvent name="menuTriggerPress" type="ui:menuTriggerPress" description="The event fired when the menu trigger is pressed."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:handler name="menuTriggerPress" action="{!c.trigger}"/>
-    <aura:handler name="menuExpand" action="{!c.handleMenuExpand}"/>
-    <aura:handler name="menuCollapse" action="{!c.handleMenuCollapse}"/>
     <span aura:id="app" role="application">
         {!v.body}
     </span>

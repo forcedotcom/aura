@@ -16,6 +16,7 @@
 .THIS a {
     color: #ccc;
     display:block;
+    height: 1.1em;
     padding:3px 9px;
     text-decoration:none;
 }

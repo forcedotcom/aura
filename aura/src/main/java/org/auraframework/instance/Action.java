@@ -79,6 +79,21 @@ public interface Action extends Instance<ActionDef> {
             json.writeMapEntry("returnValue", returnValue);
             json.writeMapEntry("error", action.getErrors());
 
+            if (action instanceof StorableAction) {
+            	StorableAction storableAction = (StorableAction) action;
+	            if (storableAction.isStorable()) {
+	                json.writeMapEntry("storable", true);
+	
+	                json.writeMapEntry("action", action.getDescriptor().getQualifiedName());
+	
+	                // Include params for storable server actions
+	                Map<String, Object> params = storableAction.getParams();
+	                if (params != null && !params.isEmpty()) {
+	                    json.writeMapEntry("params", params);
+	                }
+	            }
+            }
+
             Map<String, BaseComponent<?, ?>> components = action.getComponents();
             if (!components.isEmpty()) {
                 json.writeMapKey("components");

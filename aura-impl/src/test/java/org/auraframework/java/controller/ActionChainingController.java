@@ -76,5 +76,4 @@ public class ActionChainingController {
                 ActionDef.class, null);
         currentAction.add(Lists.newArrayList(actions));
     }
-
 }

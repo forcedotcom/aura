@@ -264,11 +264,25 @@ var priv = {
             for (var r = 0; r < actionResponses.length; r++) {
                 actionResponse = actionResponses[r];
 
-                var groupAndAction = this.findGroupAndAction(actionGroups, actionResponse.id);
-                aura.assert(groupAndAction, "Unable to find action for action response " + actionResponse.id);
+                var actionGroupNumber;
+                var action;
+                if (actionResponse["storable"] === true) {
+                	// Create a client side action instance to go with the server created action response
+                	var descriptor = actionResponse["action"];
+                	var actionDef = $A.services.component.priv.actionDefRegistry.getDef({ descriptor: descriptor });
+                	action = actionDef.newInstance();
 
-                var actionGroupNumber = groupAndAction.group.number;
-                var action = groupAndAction.action;
+                	action.setStorable();
+                	action.setParams(actionResponse["params"]);
+                	
+	                actionGroupNumber = this.newestAbortableGroup;
+                } else {
+	                var groupAndAction = this.findGroupAndAction(actionGroups, actionResponse.id);
+	                aura.assert(groupAndAction, "Unable to find action for action response " + actionResponse.id);
+	
+	                actionGroupNumber = groupAndAction.group.number;
+	                action = groupAndAction.action;
+                }
 
                 try {
                     if (!action.isAbortable() || this.newestAbortableGroup === actionGroupNumber) {

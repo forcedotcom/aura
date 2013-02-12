@@ -150,6 +150,7 @@
             this.getOnClickEventProp.cache["onClickStartEvent"] = "mousedown";
             this.getOnClickEventProp.cache["onClickEndEvent"] = "mouseup";
         }
+        return this.getOnClickEventProp.cache[prop];
     },
     
     toggleMenuVisible : function(component, index) {

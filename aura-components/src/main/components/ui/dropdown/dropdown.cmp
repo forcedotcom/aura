@@ -19,7 +19,7 @@
     <aura:registerEvent name="menuTriggerPress" type="ui:menuTriggerPress" description="The event fired when the menu trigger is pressed."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:handler name="menuTriggerPress" action="{!c.trigger}"/>
-    <span aura:id="app" role="application">
+    <span aura:id="app" class="{!v.class}" role="application">
         {!v.body}
     </span>
 </aura:component>

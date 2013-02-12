@@ -243,7 +243,7 @@ public class ExpressionValidationTest extends AuraImplTestCase {
     }
 
     private void verifyValidationException(String strExpr, String dblExpr, String expectedMsgContains,
-            Class expectedClass) throws Exception {
+            Class<?> expectedClass) throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, String.format("<aura:component>"
                 + "<aura:attribute name='strAtt' type='String' default=\"%s\"/>"
                 + "<aura:attribute name='dblAtt' type='Double' default=\"%s\"/>" + "</aura:component>", strExpr,

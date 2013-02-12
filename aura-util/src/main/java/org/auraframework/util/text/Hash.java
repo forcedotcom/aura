@@ -184,8 +184,10 @@ public class Hash {
          * Add data to a hash calculation.
          */
         public void addString(String string) {
-            ByteBuffer bytes = utf8.encode(string);
-            digest.update(bytes);
+            if (string != null) {
+                ByteBuffer bytes = utf8.encode(string);
+                digest.update(bytes);
+            }
         }
 
         public Hash build() {

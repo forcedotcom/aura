@@ -46,7 +46,7 @@ public class JavaSecurityProviderDefFactoryTest extends AuraTestCase {
     /**
      * Assert that we get an exception when attempting to retrieve a definition.
      */
-    private void assertException(String className, String message, String filename, Class eType) {
+    private void assertException(String className, String message, String filename, Class<?> eType) {
         try {
             getSecurityProviderDef(className);
             fail("Expected Exception");

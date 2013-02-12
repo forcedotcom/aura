@@ -15,6 +15,9 @@
  */
 package org.auraframework.test;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.MockConfigAdapter;
@@ -22,6 +25,7 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -44,17 +48,31 @@ public abstract class AuraTestCase extends UnitTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        Aura.get(TestContextAdapter.class).getTestContext(getQualifiedName());
+        TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
+        if (testContextAdapter != null) {
+            testContextAdapter.getTestContext(getQualifiedName());
+        }
     }
 
     @Override
     public void tearDown() throws Exception {
-        if (Aura.getContextService().isEstablished()) {
-            Aura.getContextService().endContext();
+        LoggingService loggingService = Aura.getLoggingService();
+        if (loggingService != null) {
+            loggingService.release();
         }
-        Aura.getLoggingService().release();
-        resetMocks();
-        Aura.get(TestContextAdapter.class).release();
+        try {
+            resetMocks();
+        } catch (Throwable t) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, t.getMessage(), t);
+        }
+        ContextService contextService = Aura.getContextService();
+        if (contextService != null && contextService.isEstablished()) {
+            contextService.endContext();
+        }
+        TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
+        if (testContextAdapter != null) {
+            testContextAdapter.release();
+        }
         super.tearDown();
     }
 
@@ -69,7 +87,6 @@ public abstract class AuraTestCase extends UnitTestCase {
     public static void resetMocks() throws Exception {
         getMockConfigAdapter().reset();
     }
-
 
     public String getQualifiedName() {
         return getClass().getCanonicalName() + "." + getName();

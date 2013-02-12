@@ -96,6 +96,14 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         timeoutInSecs = 60;
     }
 
+    @Override
+    public void perBrowserSetUp() {
+    	super.perBrowserSetUp();
+    	WebDriver driver = getDriver();
+    	driver.get("/auraFW/resources/aura/s.gif");
+    	driver.manage().deleteAllCookies();
+    }
+    
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();

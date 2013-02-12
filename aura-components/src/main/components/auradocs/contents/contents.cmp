@@ -149,6 +149,7 @@
                     <auradocs:contentsNode text="Introduction" id="javaCookbook" />
                     <auradocs:contentsNode text="Getting a DefDescriptor" id="javaDefDesc" />
                     <auradocs:contentsNode text="Getting an Instance of a Component" id="javaInstanceCmp" />
+                    <auradocs:contentsNode text="Setting a Component ID" id="setIDdefref" />
                 </auradocs:contentsNode>
             </auradocs:contentsNode>
         </auradocs:contentsNode>

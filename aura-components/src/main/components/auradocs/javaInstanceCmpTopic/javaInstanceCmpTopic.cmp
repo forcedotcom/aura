@@ -22,7 +22,7 @@
 
 <h2>Goal</h2>
 
-<p>You want to get an instance of a component in Java code.</p>
+<p>You want to get an instance of a component in Java code. If you want to set the local ID of the instance, see <auradocs:topicLink topic="setIDdefref">Setting the Component ID</auradocs:topicLink>.</p>
 
 <h2>Code</h2>
 

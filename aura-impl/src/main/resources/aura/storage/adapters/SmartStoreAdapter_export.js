@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 /*jslint sub: true */
-exp(storageService,
-    "getStorage", storageService.getStorage
-    ,"setStorage", storageService.setStorage
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-        ,"createAdapter", storageService.createAdapter 
+var p = SmartStoreAdapter.prototype;
+exp(p
+    // Some magic is already exposing some SmartStoreAdapter methods.  Expose the rest for testing purposes.
+    //#if {"excludeModes" : ["PRODUCTION"]}
+        ,
+        "getExpired", p.getExpired,
+        "getNumItems", p.getNumItems,
+        "getSize", p.getSize,
+        "QUERY_PAGE_SIZE", p.QUERY_PAGE_SIZE
     //#end
 );

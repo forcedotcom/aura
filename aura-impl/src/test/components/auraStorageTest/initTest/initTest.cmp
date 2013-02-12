@@ -1,4 +1,4 @@
-<aura:component render="client" controller="java://org.auraframework.impl.java.controller.AuraStorageTestController" implements="auraStorage:refreshObserver">
+<aura:component render="client" extensible="true" controller="java://org.auraframework.impl.java.controller.AuraStorageTestController" implements="auraStorage:refreshObserver">
 
     <aura:attribute name="implementation" type="String" default="memory"/>
     <aura:attribute name="clearStorageOnInit" type="Boolean" default="true"/>

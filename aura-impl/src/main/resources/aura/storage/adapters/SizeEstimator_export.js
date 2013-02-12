@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 /*jslint sub: true */
-exp(storageService,
-    "getStorage", storageService.getStorage
-    ,"setStorage", storageService.setStorage
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-        ,"createAdapter", storageService.createAdapter 
+var p = SizeEstimator.prototype;
+exp(p
+    //#if {"excludeModes" : ["PRODUCTION"]}
+        ,
+        "estimateSize", p.estimateSize
     //#end
 );

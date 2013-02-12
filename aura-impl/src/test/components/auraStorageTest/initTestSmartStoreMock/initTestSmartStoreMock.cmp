@@ -1,0 +1,6 @@
+<aura:component extends="AuraStorageTest:initTest" render="client" template="AuraStorageTest:smartStoreMockTemplate">
+
+    <aura:attribute name="implementation" type="String" default="smartstore"/>
+    <aura:attribute name="clearStorageOnInit" type="Boolean" default="false"/>
+ 
+</aura:component>

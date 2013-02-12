@@ -1,0 +1,11 @@
+<aura:component isTemplate="true" extensible="true" extends="aura:template">
+    <aura:set attribute="extraScriptTags">
+        <!-- cordova has to be loaded in the test as well as the test runner template, not sure why yet -->
+        <script src="/auraFW/resources/smartstore/cordova-1.8.1.js"></script>
+        <script src="/auraFW/resources/smartstore/SFHybridApp.js"></script>
+        <script src="/auraFW/resources/smartstore/SFSmartStorePlugin.js"></script>
+
+        
+    </aura:set>
+    {!v.containerScripts}
+</aura:component>

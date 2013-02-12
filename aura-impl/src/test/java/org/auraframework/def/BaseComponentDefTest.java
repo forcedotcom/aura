@@ -682,9 +682,9 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             // compiles the definition, which causes the error to sometimes be the wrong one. Commenting out
             // for now.
             //
-            //checkExceptionFull(e, InvalidDefinitionException.class, childDesc.getQualifiedName()
-            //        + " cannot widen the support level to GA from " + grandParentDesc.getQualifiedName()
-            //        + "'s level of BETA", childDesc.getQualifiedName());
+            // checkExceptionFull(e, InvalidDefinitionException.class, childDesc.getQualifiedName()
+            // + " cannot widen the support level to GA from " + grandParentDesc.getQualifiedName()
+            // + "'s level of BETA", childDesc.getQualifiedName());
             assertTrue(e instanceof InvalidDefinitionException);
         }
         // Including a component, that violates support level restriction, as
@@ -756,6 +756,23 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             checkExceptionFull(e, InvalidDefinitionException.class,
                     "Component " + dd.getQualifiedName()
                             + " cannot implement the rootComponent interface because it is not in the aura namespace",
+                    dd.getQualifiedName());
+        }
+    }
+
+    /**
+     * Verify cannot reference an inner component that does not exist.
+     */
+    public void testInnerComponentNonExistent() {
+        DefDescriptor<T> dd = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "", "<aura:iDontExist/>"));
+        DefType defType = DefType.getDefType(this.getDefClass());
+        try {
+            dd.getDef();
+            fail(defType + " should not be able to reference inner component that does not exist");
+        } catch (Exception e) {
+            checkExceptionFull(e, DefinitionNotFoundException.class,
+                    "No COMPONENT named markup://aura:iDontExist found : " + dd.getQualifiedName(),
                     dd.getQualifiedName());
         }
     }

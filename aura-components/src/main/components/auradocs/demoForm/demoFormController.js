@@ -16,18 +16,36 @@
 {
   getInput: function(cmp, event) {
         var textI = cmp.find("textI");
-        var textvalue = textI.getValue("v.value").getValue();
+        
+      //Get the text value
+        var textvalue = textI.get("v.value");
         var textO = cmp.find("textO");
-        textO.setValue("{!v.value}", textvalue);
+        
+      //Set the text value in the ui:outputText component
+        textO.getValue("v.value").setValue(textvalue);
+   },
+   
+   getDate: function(cmp,event) {
+	   
+	 //Get the value in the ui:inputDate component
+	   var d = cmp.getValue("v.myDate");
+	   
+	 //Set the new date
+	   var newdate = new Date();
+	   d.setValue(newdate);
    },
    
    inspectKeyEvent: function(cmp,event) {
+	   
+	  //Get the keycode value of the pressed key
 		var keyCodeValue =  event.getParam("keyCode");
-		cmp.find("outputValue").getAttributes().setValue("value", keyCodeValue);
+		cmp.find("outputValue").getValue("v.value").setValue(keyCodeValue);
    },
    
    inspectMouseEvent: function(cmp,event) {
-   	var buttonValue =  event.getParam("button");
-       cmp.find("outputValue").getAttributes().setValue("value", buttonValue);
+	   
+	 //Get the button value of the pressed button: 0 (left), 1 (middle), or 2 (right)
+   	   var buttonValue =  event.getParam("button");
+       cmp.find("outputValue").getValue("v.value").setValue(buttonValue);
      }
 }

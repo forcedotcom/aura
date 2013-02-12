@@ -30,6 +30,8 @@
 	<p>The demo below shows commonly used components that extend <code>ui:input</code>.
 	For example, the <code>ui:inputText</code> demo calls a client-side controller action to return the input value in a <code>ui:outputText</code> component.
 	The demo also identifies the keycode value of the pressed key or mouse button.</p>
+	
+	<p>To see how we can bind an attribute value to a component, see the <code>ui:inputDate</code> demo below.</p>
     <auradocs:example descriptor="auradocs:demoForm" />
     <p>You can extend these input and output components easily to take advantage of built-in attributes and events. For example, you can update the component's value binding using the <code>updateOn</code> attribute. 
     In the demo, we set <code>updateOn="keyup"</code> to handle the <code>keyup</code> event and provide the keycode value as its parameter. See the list of attributes and events for <code>ui:input</code> in the <auradocs:defLink descriptor ="ui:input">component reference</auradocs:defLink>.
@@ -37,6 +39,7 @@
     <p>
     <b>See Also:</b><br/>
     <auradocs:topicLink topic="oodInheritedAttributes">Inherited Component Attributes</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="helloAttributes">Component Attributes</auradocs:topicLink><br/>
     <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
     <auradocs:topicLink topic="valueObjects">Value Objects</auradocs:topicLink>
     </p>

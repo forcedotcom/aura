@@ -84,22 +84,23 @@ public class ThemeParser implements Parser {
             } else {
                 parser = new CSSParser(descriptor.getNamespace(), doValidation, className,
                         source.getContents(), allowedConditions);
-                ThemeParserResultHolder resultHolder;
-                try {
-                    resultHolder = parser.parse();
-                } catch (GssParserException e) {
-                    throw new ThemeParserException(e.getMessage(), builder.getLocation());
-                }
-
-                // scram if we found errors
-                if (parser.hasErrors()) {
-                    throw new ThemeParserException(parser.getErrorMessage(), builder.getLocation());
-                }
-
-                builder.setCode(resultHolder.getDefaultCss());
-                builder.setCode(resultHolder.getBrowserCssMap());
-                builder.setImageURLs(resultHolder.getImageURLs());
             }
+
+            ThemeParserResultHolder resultHolder;
+            try {
+                resultHolder = parser.parse();
+            } catch (GssParserException e) {
+                throw new ThemeParserException(e.getMessage(), builder.getLocation());
+            }
+
+            // scram if we found errors
+            if (parser.hasErrors()) {
+                throw new ThemeParserException(parser.getErrorMessage(), builder.getLocation());
+            }
+
+            builder.setCode(resultHolder.getDefaultCss());
+            builder.setCode(resultHolder.getBrowserCssMap());
+            builder.setImageURLs(resultHolder.getImageURLs());
 
             return (D) builder.build();
         }

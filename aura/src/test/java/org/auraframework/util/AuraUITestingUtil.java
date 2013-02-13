@@ -28,6 +28,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 /**
  * A place to put common UI testing specific helper methods
@@ -81,7 +82,37 @@ public class AuraUITestingUtil {
         String exp = "window.$A.getRoot().find('" + cmp + "')";
         return exp;
     }
-
+    
+    /**
+     * Very useful to get handle on the component passing globalId
+     * @param cmp: globalId of the component
+     * @return
+     */
+    public String getCmpExpr(String cmp) {
+        String exp = "window.$A.getCmp('" + cmp + "')";
+        return exp;
+    }
+    
+    /**
+     * Return the javascript using which component's attribute value could be found out
+     * @param cmp : cmpName whose attribute you are looking for
+     * @param val : attribute name
+     * @return
+     */
+    public String getValueFromCmpRootExpression(String cmp, String val){
+		return this.prepareReturnStatement(this.getFindAtRootExpr(cmp) + ".get('" + val + "')");
+	}
+    
+    /**
+     * Very useful when we know the globalId of the component, inorder to get the attribute value of cmp
+     * @param cmp: globalId of the component
+     * @param val: attribute name of the component
+     * @return
+     */
+    public String getValueFromCmpExpression(String cmp, String val){
+		return this.prepareReturnStatement(this.getCmpExpr(cmp) + ".get('" + val + "')");
+	}
+    
     public void pressEnter(WebElement e) {
         e.sendKeys("\n");
     }
@@ -200,5 +231,25 @@ public class AuraUITestingUtil {
         Object returnVal = getEval(sb.toString());
         return returnVal == null ? null : returnVal.toString();
     }
+
+    /**
+     * use to do mouse over the element
+     * @param element
+     */
+	public void setHoverOverElement(String elem) {
+		Actions builder = new Actions(d);
+		// find the element a 2nd time which helps get around the IE hover issues by focusing the element
+		WebElement element = d.findElement(By.className(elem));
+		builder.moveToElement(element).build().perform();
+	}
+
+	/**
+     * Get the text content of a DOM node. Tries "innerText" followed by
+     * "textContext" to take browser differences into account.
+     * 
+     */
+	public String getActiveElementText() {
+		return (String) getEval("return $A.test.getActiveElementText()");
+	}
 
 }

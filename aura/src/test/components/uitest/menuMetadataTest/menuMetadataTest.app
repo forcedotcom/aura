@@ -21,7 +21,7 @@
         <h2>Checkbox - Metadata driven menu</h2>
         <ui:dropdown>
             <ui:menuTriggerLink aura:id="metadatatrigger" label="Snow Resorts"/>
-            <ui:menu menuItems="{!m.data}"/>
+            <ui:menu menuItems="{!m.resorts}"/>
         </ui:dropdown>
     </div>
     <div style="display:inline-block;width:50%;">
@@ -30,7 +30,7 @@
         <br/>   
         <ui:outputText value='&#160;&#160;&#60;ui:menuTriggerLink aura:id="metadatatrigger" label="Snow Resorts"/&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#60;ui:menu menuItems="{&#160;!m.data}"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#60;ui:menu menuItems="{&#160;!m.resorts}"/&#62;'/>
         <br/>
         <ui:outputText value='&#60;/ui:dropdown&#62;'/>      
     </div>
@@ -41,8 +41,8 @@
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Actions - Metadata driven menu</h2>
         <ui:dropdown>
-            <ui:menuTriggerLink aura:id="metadataAction" label="Pick a ski place"/>
-            <ui:menu menuItems="{!m.places}" menuSelect="{!c.pickPlace}"/>
+            <ui:menuTriggerLink class="trigger" aura:id="trigger" label="Please pick your favorite soccer club"/>
+            <ui:menu class="actionMenu" menuItems="{!m.places}" menuSelect="{!c.pickPlace}"/>
         </ui:dropdown> 
     </div>
     <div style="display:inline-block;width:50%;">
@@ -62,13 +62,13 @@
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Example: how to get menu selected values</h2>
         <ui:dropdown>
-            <ui:menuTriggerLink aura:id="metadatatrigger" label="Snow Resorts"/>
-            <ui:menu aura:id="myMenu" menuItems="{!m.data}"/>
+            <ui:menuTriggerLink class="checkboxMenuLabel" aura:id="checkboxMenuLabel" label="NFC West Teams"/>
+            <ui:menu class="checkboxMenu" aura:id="checkboxMenu" menuItems="{!m.data}"/>
         </ui:dropdown>
         <p/>
-        <ui:button press="{!c.getMenuSelected}" label="Check the selected menu items"/>
+        <ui:button class="checkboxButton" aura:id="checkboxButton" press="{!c.getMenuSelected}" label="Check the selected menu items"/>
         <p/>
-        <ui:outputText aura:id="result" value="Which items get selected"/>
+        <ui:outputText class="result" aura:id="result" value="Which items get selected"/>
     </div>
     <div style="display:inline-block;width:50%;">
         <h2>Source codes:</h2>

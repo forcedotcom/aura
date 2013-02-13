@@ -42,15 +42,19 @@ var Test = function(){
          *             Invoked after the comparison evaluates to true
          */
         addWaitFor : function(expected, testFunction, callback){
-            if (!$A.util.isFunction(testFunction)) {
+        	aura.test.addWaitForWithAssertOnError(expected, testFunction, null, callback);
+        },
+        
+        addWaitForWithFailureMessage : function(expected, testFunction, failureMessage, callback){
+        	if (!$A.util.isFunction(testFunction)) {
                 throw new Error("addWaitFor expects a function to evaluate for comparison, but got: " + testFunction);
             }
             if (callback && !$A.util.isFunction(callback)) {
                 throw new Error("addWaitFor expects a function for callback, but got: " + callback);
             }
-            priv.waits.push({ expected:expected, actual:testFunction, callback:callback });
+            priv.waits.push({ expected:expected, actual:testFunction, callback:callback , failureMessage:failureMessage});
         },
-
+        
         /**
          * Get an instance of an action based on the specified parameters and callback function.
          *
@@ -382,7 +386,7 @@ var Test = function(){
          * 				The message that is returned if the value is null
          */
         assertNotNull : function(arg1, assertMessage){
-            if(!assertMessage){
+        	if(!assertMessage){
                 assertMessage = "Assertion failure, Expected: {Non Null}, but Actual:{"+arg1+"}";
             }
             aura.test.assertTrue(arg1!==null,assertMessage);
@@ -650,11 +654,22 @@ var Test = function(){
             }
             return false;
         },
+        
+        /**
+         * Returns a reference to the object that is currently designated as the active element in the document.
+         */
+        getActiveElement : function(){
+        	return document.activeElement;
+        },
+        
+        getActiveElementText : function(){
+        	return aura.test.getText(document.activeElement);
+        },
 
         // Used by tests to modify framework source to trigger JS last mod update
         /** @ignore */
         dummyFunction : function(){
-            return '@@@TOKEN@@@';
+        	return '@@@TOKEN@@@';
         }
     };
 

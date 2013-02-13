@@ -20,12 +20,12 @@
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Your favorite soccer club</h2>
         <ui:dropdown>
-            <ui:menuTriggerLink aura:id="trigger" label="Please pick your favorite soccer club"/>
-            <ui:menu aura:id="actionMenu">
-                <ui:actionMenuItem aura:id="actionItem1" label="Bayern München" click="{!c.updateTriggerLabel}"/>
-                <ui:actionMenuItem aura:id="actionItem2" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
-                <ui:actionMenuItem aura:id="actionItem3" label="Inter Milan" click="{!c.updateTriggerLabel}"/>
-                <ui:actionMenuItem aura:id="actionItem4" label="Manchester United" click="{!c.updateTriggerLabel}"/>
+            <ui:menuTriggerLink class="trigger" aura:id="trigger" label="Please pick your favorite soccer club"/>
+            <ui:menu class="actionMenu" aura:id="actionMenu">
+                <ui:actionMenuItem class="actionItem1" aura:id="actionItem1" label="Bayern München" click="{!c.updateTriggerLabel}"/>
+                <ui:actionMenuItem class="actionItem2" aura:id="actionItem2" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
+                <ui:actionMenuItem class="actionItem3" aura:id="actionItem3" label="Inter Milan" click="{!c.updateTriggerLabel}"/>
+                <ui:actionMenuItem class="actionItem4" aura:id="actionItem4" label="Manchester United" click="{!c.updateTriggerLabel}"/>
             </ui:menu>
         </ui:dropdown> 
     </div>
@@ -33,17 +33,17 @@
         <h2>Action menu source codes:</h2>
         <ui:outputText value='&#60;ui:dropdown&#62;'/>
         <br/>   
-        <ui:outputText value='&#160;&#160;&#60;ui:menuTriggerLink label="Please pick your favorite soccer club"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#60;ui:menuTriggerLink aura:id="trigger" label="Please pick your favorite soccer club"/&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#60;ui:menu&#62;'/>
+        <ui:outputText value='&#160;&#160;&#60;ui:menu aura:id="actionMenu"&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:actionMenuItem label="Bayern München" click="{&#160;&#33;c.updateTriggerLabel}"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:actionMenuItem aura:id="actionItem1" label="Bayern München" click="{&#160;&#33;c.updateTriggerLabel}"/&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:actionMenuItem label="FC Barcelona" click="{&#160;&#33;c.updateTriggerLabel}"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:actionMenuItem aura:id="actionItem2" label="FC Barcelona" click="{&#160;&#33;c.updateTriggerLabel}"/&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:actionMenuItem label="Inter Milan" click="{&#160;&#33;c.updateTriggerLabel}"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:actionMenuItem aura:id="actionItem3" label="Inter Milan" click="{&#160;&#33;c.updateTriggerLabel}"/&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:actionMenuItem label="Manchester United" click="{&#160;&#33;c.updateTriggerLabel}"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:actionMenuItem aura:id="actionItem4" label="Manchester United" click="{&#160;&#33;c.updateTriggerLabel}"/&#62;'/>
         <br/>
         <ui:outputText value='&#160;&#160;&#60;/ui:menu&#62;'/>
         <br/>
@@ -56,34 +56,42 @@
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Your favorite football teams</h2>
         <ui:dropdown>
-            <ui:menuTriggerLink aura:id="checkboxMenu" label="NFC West Teams"/>
-            <ui:menu>
-                <ui:checkboxMenuItem aura:id="checkboxItem1" label="San Francisco 49ers"/>
-                <ui:checkboxMenuItem aura:id="checkboxItem2" label="Seattle Seahawks"/>
-                <ui:checkboxMenuItem aura:id="checkboxItem3" label="St. Louis Rams"/>
-                <ui:checkboxMenuItem aura:id="checkboxItem4" label="Arizona Cardinals" disabled="true"/>
+            <ui:menuTriggerLink class="checkboxMenuLabel" aura:id="checkboxMenuLabel" label="NFC West Teams"/>
+            <ui:menu aura:id="checkboxMenu" class="checkboxMenu">
+                <ui:checkboxMenuItem class="checkboxItem1" aura:id="checkboxItem1" label="San Francisco 49ers"/>
+                <ui:checkboxMenuItem class="checkboxItem2" aura:id="checkboxItem2" label="Seattle Seahawks"/>
+                <ui:checkboxMenuItem class="checkboxItem3" aura:id="checkboxItem3" label="St. Louis Rams"/>
+                <ui:checkboxMenuItem class="checkboxItem4" aura:id="checkboxItem4" label="Arizona Cardinals" disabled="true" selected="true"/>
             </ui:menu>
         </ui:dropdown> 
+        <p/>
+        <ui:button class="checkboxButton" aura:id="checkboxButton" press="{!c.getMenuSelected}" label="Check the selected menu items"/>
+        <p/>
+        <ui:outputText class="result" aura:id="result" value="Which items get selected"/>
     </div>
     <div style="display:inline-block;width:50%;">
         <h2>Checkbox menu source codes:</h2>
         <ui:outputText value='&#60;ui:dropdown&#62;'/>
         <br/>   
-        <ui:outputText value='&#160;&#160;&#60;ui:menuTriggerLink label="NFC West Teams"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#60;ui:menuTriggerLink aura:id="checkboxMenuLabel" label="NFC West Teams"/&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#60;ui:menu&#62;'/>
+        <ui:outputText value='&#160;&#160;&#60;ui:menu aura:id="checkboxMenu"&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:checkboxMenuItem label="San Francisco 49ers"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:checkboxMenuItem aura:id="checkboxItem1" label="San Francisco 49ers"/&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:checkboxMnuItem label="Seattle Seahawks"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:checkboxMnuItem aura:id="checkboxItem2" label="Seattle Seahawks"/&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:checkboxMenuItem label="St. Louis Rams"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:checkboxMenuItem aura:id="checkboxItem3" label="St. Louis Rams"/&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:checkboxMenuItem label="Arizona Cardinals"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:checkboxMenuItem aura:id="checkboxItem4" label="Arizona Cardinals" disabled="true" selected="true"/&#62;'/>
         <br/>
         <ui:outputText value='&#160;&#160;&#60;/ui:menu&#62;'/>
         <br/>
-        <ui:outputText value='&#60;/ui:dropdown&#62;'/>      
+        <ui:outputText value='&#60;/ui:dropdown&#62;'/>  
+        <br/>
+        <ui:outputText value='&#60;ui:button aura:id="checkboxButton" press="{&#160;!c.getMenuSelected}" label="Check the selected menu items"/&#62;'/>
+        <br/>
+        <ui:outputText value='&#60;ui:outputText aura:id="result" value="Which items get selected"/&#62;'/>    
     </div>
 </div>
 <hr/>
@@ -92,37 +100,45 @@
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Your favorite baseball teams</h2>
         <ui:dropdown>
-            <ui:menuTriggerLink aura:id="radioMenu" label="National League West"/>
-            <ui:menu>
-                <ui:radioMenuItem aura:id="radioItem1" label="San Francisco"/>
-                <ui:radioMenuItem aura:id="radioItem2" label="LA Dodgers"/>
-                <ui:radioMenuItem aura:id="radioItem3" label="Arizona"/>
-                <ui:radioMenuItem aura:id="radioItem4" label="San Diego" disabled="true"/>
-                <ui:radioMenuItem aura:id="radioItem5" label="Colorado"/>
+            <ui:menuTriggerLink class="radioMenuLabel" aura:id="radioMenuLabel" label="National League West"/>
+            <ui:menu class="radioMenu" aura:id="radioMenu">
+                <ui:radioMenuItem class="radioItem1" aura:id="radioItem1" label="San Francisco"/>
+                <ui:radioMenuItem class="radioItem2" aura:id="radioItem2" label="LA Dodgers"/>
+                <ui:radioMenuItem class="radioItem3" aura:id="radioItem3" label="Arizona"/>
+                <ui:radioMenuItem class="radioItem4" aura:id="radioItem4" label="Diego" disabled="true"/>
+                <ui:radioMenuItem class="radioItem5" aura:id="radioItem5" label="Colorado"/>
             </ui:menu>
-        </ui:dropdown> 
+        </ui:dropdown>
+        <p/>
+        <ui:button class="radioButton" aura:id="radioButton" press="{!c.getRadioMenuSelected}" label="Check the selected menu items"/>
+        <p/>
+        <ui:outputText class="radioResult" aura:id="radioResult" value="Which items get selected"/> 
     </div>
     <div style="display:inline-block;width:50%;">
         <h2>Radio menu source codes:</h2>
         <ui:outputText value='&#60;ui:dropdown&#62;'/>
         <br/>   
-        <ui:outputText value='&#160;&#160;&#60;ui:menuTriggerLink label="National League West"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#60;ui:menuTriggerLink aura:id="radioMenuLabel" label="National League West"/&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#60;ui:menu&#62;'/>
+        <ui:outputText value='&#160;&#160;&#60;ui:menu aura:id="radioMenu"&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:radioMenuItem label="San Francisco"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:radioMenuItem aura:id="radioItem1" label="San Francisco"/&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:radioMnuItem label="LA Dodgers"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:radioMnuItem aura:id="radioItem2" label="LA Dodgers"/&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:radioMenuItem label="Arizona"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:radioMenuItem aura:id="radioItem3" label="Arizona"/&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:radioMenuItem label="San Diego"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:radioMenuItem aura:id="radioItem4" label="Diego" disabled="true"/&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:radioMenuItem label="Colorado"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:radioMenuItem aura:id="radioItem5" label="Colorado"/&#62;'/>
         <br/>
         <ui:outputText value='&#160;&#160;&#60;/ui:menu&#62;'/>
         <br/>
-        <ui:outputText value='&#60;/ui:dropdown&#62;'/>      
+        <ui:outputText value='&#60;/ui:dropdown&#62;'/>    
+        <br/>
+        <ui:outputText value='&#60;ui:button aura:id="radioButton" press="{&#160;!c.getRadioMenuSelected}" label="Check the selected menu items"/&#62;'/>
+        <br/>
+        <ui:outputText value='&#60;ui:outputText aura:id="radioResult" value="Which items get selected"/&#62;'/>  
     </div>
 </div>
 <hr/>

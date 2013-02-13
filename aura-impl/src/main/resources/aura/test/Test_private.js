@@ -126,7 +126,11 @@ function run(name, code, count){
                         val = tact().toString();
                         tact = tact.toString();
                     }
-                    throw new Error("Test timed out waiting for: " + tact + "; Expected: " + texp + "; Actual: " + val);
+                    var failureMessage = "";
+                    if(!$A.util.isUndefinedOrNull(priv.waits[0].failureMessage)){
+                    	failureMessage = "; Failure Message: " + priv.waits[0].failureMessage;
+                    }
+                    throw new Error("Test timed out waiting for: " + tact + "; Expected: " + texp + "; Actual: " + val + failureMessage);
                 }else{
                     throw new Error("Test timed out");
                 }
@@ -195,7 +199,11 @@ function getDump() {
         try {
             actual = priv.waits[0].actual();
         } catch (e) {}
-        status += "waiting for {" + $A.test.print(priv.waits[0].expected) + "} currently {" + $A.test.print(actual) + "} from {" + $A.test.print(priv.waits[0].actual) + "} after {" + $A.test.print(priv.lastStage) + "} ";
+        var failureMessage = "";
+        if(!$A.util.isUndefinedOrNull(priv.waits[0].failureMessage)){
+        	failureMessage = " Failure Message: {" + priv.waits[0].failureMessage + "}";
+        }
+        status += "waiting for {" + $A.test.print(priv.waits[0].expected) + "} currently {" + $A.test.print(actual) + "}" + failureMessage + " from {" + $A.test.print(priv.waits[0].actual) + "} after {" + $A.test.print(priv.lastStage) + "} ";
     } else if (!$A.util.isUndefinedOrNull(priv.lastStage)) {
         status += "executing {" + $A.test.print(priv.lastStage) + "} ";
     }

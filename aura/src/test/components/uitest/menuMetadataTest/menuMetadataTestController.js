@@ -36,7 +36,7 @@
         console.log("click menu item " + label);
     },
     pickPlace: function(cmp, event) {
-        var triggerCmp = cmp.find("metadataAction");
+        var triggerCmp = cmp.find("trigger");
         if (triggerCmp) {
             var source = event.getParam("selectedItem");
             var label = source.get("v.label");
@@ -52,7 +52,7 @@
         }
     }, 
     getMenuSelected: function(cmp, event) {
-        var menuCmp = cmp.find("myMenu");
+    	var menuCmp = cmp.find("checkboxMenu");
         var menuItems = menuCmp.getValue("v.childMenuItems");
         var values = [];
         for (var i = 0; i < menuItems.getLength(); i++) {

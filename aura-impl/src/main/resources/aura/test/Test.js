@@ -42,7 +42,7 @@ var Test = function(){
          *             Invoked after the comparison evaluates to true
          */
         addWaitFor : function(expected, testFunction, callback){
-        	aura.test.addWaitForWithAssertOnError(expected, testFunction, null, callback);
+        	aura.test.addWaitForWithFailureMessage(expected, testFunction, null, callback);
         },
         
         addWaitForWithFailureMessage : function(expected, testFunction, failureMessage, callback){

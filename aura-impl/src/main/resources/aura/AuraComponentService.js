@@ -197,6 +197,14 @@ var AuraComponentService = function(){
         },
 
         /**
+         * Get the action definition from the registry.
+         * @private
+         */
+        getActionDef : function(config){
+            return priv.actionDefRegistry.getDef(config);
+        },
+
+        /**
          * Get the model definition from the registry.
          * @private
          */       

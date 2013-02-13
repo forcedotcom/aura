@@ -29,6 +29,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ValueDef;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.instance.StorableAction;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraExecutionException;
@@ -43,7 +44,7 @@ import com.google.common.collect.Maps;
 
 /**
  */
-public class JavaAction implements Action {
+public class JavaAction implements StorableAction {
     public JavaAction(DefDescriptor<ControllerDef> controllerDescriptor, JavaActionDef actionDef,
             Map<String, Object> paramValues) {
         this.controllerDescriptor = controllerDescriptor;
@@ -212,6 +213,21 @@ public class JavaAction implements Action {
         return nextId++;
     }
 
+    @Override
+    public boolean isStorable() {
+        return storable;
+    }
+
+    @Override
+    public void setStorable() {
+        storable = true;
+    }
+
+    @Override
+    public Map<String, Object> getParams() {
+        return paramValues;
+    }
+
     private final DefDescriptor<ControllerDef> controllerDescriptor;
     private final JavaActionDef actionDef;
     private final Map<String, Object> paramValues;
@@ -222,4 +238,5 @@ public class JavaAction implements Action {
     private String id;
     private final Map<String, BaseComponent<?, ?>> componentRegistry = Maps.newLinkedHashMap();
     private int nextId = 1;
+    private boolean storable;
 }

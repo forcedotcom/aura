@@ -67,6 +67,7 @@ var clientService;
 //#include aura.component.ComponentDef
 //#include aura.controller.ControllerDef
 //#include aura.controller.ControllerDefRegistry
+//#include aura.controller.ActionDefRegistry
 //#include aura.model.ModelDefRegistry
 //#include aura.provider.ProviderDefRegistry
 //#include aura.layouts.LayoutsDef

@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-  var priv = {
-    registry : new ComponentDefRegistry(),
-    controllerDefRegistry : new ControllerDefRegistry(),
-    actionDefRegistry : new ActionDefRegistry(),
-    modelDefRegistry : new ModelDefRegistry(),
-    providerDefRegistry : new ProviderDefRegistry(),
-    rendererDefRegistry : new RendererDefRegistry(),
-    helperDefRegistry : new HelperDefRegistry(),
-    indexes : {
-        globalId : {}
-    }
-};
+package org.auraframework.instance;
+
+import java.util.Map;
+
+public interface StorableAction extends Action {
+	public boolean isStorable();
+	public void setStorable();
+	public Map<String, Object> getParams();
+}

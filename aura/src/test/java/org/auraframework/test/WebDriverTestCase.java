@@ -62,6 +62,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -71,6 +72,9 @@ import com.google.common.collect.Sets;
 @WebDriverTest
 public abstract class WebDriverTestCase extends IntegrationTestCase {
     private static final Logger logger = Logger.getLogger("WebDriverTestCase");
+    private final static Set<BrowserType> browsersForPtestMode = ImmutableSet.of(BrowserType.ANDROID_PHONE,
+            BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE);
+
     protected int timeoutInSecs = 30;
     private WebDriver currentDriver = null;
     BrowserType currentBrowserType = null;
@@ -491,7 +495,11 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * in order to disable fast click.
      */
     protected Mode getAuraModeForCurrentBrowser() {
+        if (browsersForPtestMode.contains(currentBrowserType)) {
+            return Mode.CADENCE;
+        } else {
             return Mode.SELENIUM;
+        }
     }
 
     protected void open(DefDescriptor<?> dd) throws MalformedURLException, URISyntaxException {

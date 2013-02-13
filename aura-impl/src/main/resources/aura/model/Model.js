@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*jslint sub: true */
 /**
  * @namespace Creates a Model instance.
  * @constructor
@@ -22,5 +23,22 @@
  * @returns {Function}
  */
 function Model(def, data, component){
+	
+	/** BEGIN HACK--MUST BE REMOVED **/
+	if (def.getDescriptor().getQualifiedName() === "java://ui.aura.components.forceProto.FilterListModel") {
+
+		for (var i in data["rowTemplate"]) {
+			data["rowTemplate"][i] = new SimpleValue(data["rowTemplate"][i], def, component); 
+		}
+		
+	}
+	
+	if (def.getDescriptor().getQualifiedName() === "java://org.auraframework.component.ui.DataTableModel") {
+		for (var j in data["itemTemplate"]) {
+			data["itemTemplate"][j] = new SimpleValue(data["itemTemplate"][j], def, component); 
+		}
+	}
+	/** END HACK**/
+	
     return new MapValue(data, def, component);
 }

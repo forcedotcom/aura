@@ -27,10 +27,10 @@ import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 
 /**
- * UI automation to verify Action, checkbox and radio Menu interaction .
+ * UI automation to verify Action, checkbox and radio Menu using mouse and keyboard interaction .
  * @userStory a07B0000000TG3R
  * Excluding the test from IE due to know issue related to mouseOver 
- * Excluding it from Ipad for now due to js related error
+ * Excluding it from touch browsers due to to W-1478819 and mouse over related issues
  */
 @TargetBrowsers({BrowserType.GOOGLECHROME, BrowserType.FIREFOX})
 public class MenuUITest extends WebDriverTestCase{
@@ -144,6 +144,12 @@ public class MenuUITest extends WebDriverTestCase{
     	assertFalse("Menu list should not be visible", actionMenu.getAttribute("class").contains("visible"));
 	}
 	
+	/**
+	 * Test that verify's interaction with Action Menu
+	 * Excluding Ipad and iphone as hover wont work for touch devices
+	 * @throws MalformedURLException
+	 * @throws URISyntaxException
+	 */
 	public void testActionMenu() throws MalformedURLException, URISyntaxException{
 		testActionMenuForApp(MENUTEST_APP);
 	}

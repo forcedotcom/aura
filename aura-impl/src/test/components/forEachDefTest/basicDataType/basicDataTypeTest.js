@@ -25,7 +25,7 @@
         for(var i=0; i<itemCount;i++){
             var  stringValueAtInnerCmp = innerCmps[i].getValue(propertyOnInnerCmp).getValue();
             aura.test.assertEquals(valuesAtTopLevel[i], stringValueAtInnerCmp);
-            aura.test.assertEquals(''+valuesAtTopLevel[i], innerCmps[i].find(localIdOfInnerCmp).getElement().textContent);
+            aura.test.assertEquals(''+valuesAtTopLevel[i], $A.test.getText(innerCmps[i].find(localIdOfInnerCmp).getElement()));
         }
     },
     testIterationOfStringList:{

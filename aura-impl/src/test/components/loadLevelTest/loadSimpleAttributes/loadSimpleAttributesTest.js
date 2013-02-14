@@ -80,7 +80,7 @@
             //Currently there is a bug here with aura:renderif. Though new elements are created and rendered on screen, component still has reference to old dom elements and not new ones.
 
             // trim() to pass tests in IE9/IE10
-            $A.test.assertEquals("False",$A.test.getTextByComponent(cmp.find("booleanWrapper")).trim(), "Failed to rerender dirty boolean value.");
+            $A.test.assertEquals("False",$A.util.trim($A.test.getTextByComponent(cmp.find("booleanWrapper"))), "Failed to rerender dirty boolean value.");
         }]
     }
 })

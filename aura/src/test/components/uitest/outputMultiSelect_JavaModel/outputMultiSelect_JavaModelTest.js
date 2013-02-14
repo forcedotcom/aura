@@ -21,7 +21,7 @@
         test:function(cmp){
             var multiSelectCmp= cmp.find('String');
             aura.test.assertNotNull(multiSelectCmp);
-            aura.test.assertEquals('Model', multiSelectCmp.find('span').getElement().textContent, "Failed to display String from Java model");
+            aura.test.assertEquals('Model', $A.test.getText(multiSelectCmp.find('span').getElement()), "Failed to display String from Java model");
         }
     },
     /**
@@ -31,7 +31,7 @@
         test:function(cmp){
             var multiSelectCmp= cmp.find('StringArray');
             aura.test.assertNotNull(multiSelectCmp);
-            aura.test.assertEquals('red; green; blue', multiSelectCmp.find('span').getElement().textContent, "Failed to display String array from Java model");
+            aura.test.assertEquals('red; green; blue', $A.test.getText(multiSelectCmp.find('span').getElement()), "Failed to display String array from Java model");
         }
     },
     /**
@@ -41,7 +41,7 @@
         test:function(cmp){
             var multiSelectCmp= cmp.find('StringList');
             aura.test.assertNotNull(multiSelectCmp);
-            aura.test.assertEquals('one; two; three', multiSelectCmp.find('span').getElement().textContent, "Failed to display String arraylist from Java model");
+            aura.test.assertEquals('one; two; three', $A.test.getText(multiSelectCmp.find('span').getElement()), "Failed to display String arraylist from Java model");
         }
     },
     /**
@@ -51,7 +51,7 @@
         test:function(cmp){
             var multiSelectCmp= cmp.find('IntegerArray');
             aura.test.assertNotNull(multiSelectCmp);
-            aura.test.assertEquals('123; 999; 666', multiSelectCmp.find('span').getElement().textContent, "Failed to display String arraylist from Java model");
+            aura.test.assertEquals('123; 999; 666', $A.test.getText(multiSelectCmp.find('span').getElement()), "Failed to display String arraylist from Java model");
         }
     }
 

@@ -27,7 +27,7 @@
             aura.test.assertEquals('markup://setAttributesTest:implementation',testCmp.getDef().getDescriptor().getQualifiedName());
             aura.test.assertEquals('implementationX',testCmp.getValue('v.SimpleAttribute').getValue());
             //Verify the content of the HTML element
-            aura.test.assertEquals('The value of SimpleAttribute = implementationX',testCmp.getElement().textContent);
+            aura.test.assertEquals('The value of SimpleAttribute = implementationX',$A.test.getText(testCmp.getElement()));
         }
     }
 })

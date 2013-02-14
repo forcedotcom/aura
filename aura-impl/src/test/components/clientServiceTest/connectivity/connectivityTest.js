@@ -21,7 +21,7 @@
     testConnection : {
         attributes : { __layout : "#" },
         test : [function(component) {
-                $A.test.addWaitFor(true, function() { return component.get("v.eventsFired").trim() == "layoutChange"; });
+                $A.test.addWaitFor(true, function() { return aura.util.trim(component.get("v.eventsFired")) == "layoutChange"; });
             }, function(component) {
                 component.find("button").get("e.press").fire();
                 $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") != ""; });
@@ -38,7 +38,7 @@
         testLabels : ["UnAdaptableTest"],
         attributes : { __layout : "#" },
         test : [function(component) {
-                $A.test.addWaitFor(true, function() { return component.get("v.eventsFired").trim() == "layoutChange"; });
+                $A.test.addWaitFor(true, function() { return aura.util.trim(component.get("v.eventsFired")) == "layoutChange"; });
             }, function(component) {
                 $A.test.setTestTimeout(30000);
                 component.getValue("v.host").setValue("http://invalid.salesforce.com");
@@ -46,12 +46,12 @@
                 $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") != ""; });
             }, function(component) {
                 $A.test.assertEquals("INCOMPLETE", component.get("v.actionStatus"));
-                $A.test.assertEquals("layoutChange noConnection", component.get("v.eventsFired").trim());
+                $A.test.assertEquals("layoutChange noConnection", aura.util.trim(component.get("v.eventsFired")));
                 component.find("button").get("e.press").fire();
                 $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") != ""; });
             }, function(component) {
                 // noConnection event is not repeated
-                $A.test.assertEquals("layoutChange noConnection", component.get("v.eventsFired").trim());
+                $A.test.assertEquals("layoutChange noConnection", aura.util.trim(component.get("v.eventsFired")));
             }]
     },
 
@@ -62,7 +62,7 @@
         testLabels : ["UnAdaptableTest"],
         attributes : { __layout : "#" },
         test : [function(component) {
-                $A.test.addWaitFor(true, function() { return component.get("v.eventsFired").trim() == "layoutChange"; });
+                $A.test.addWaitFor(true, function() { return aura.util.trim(component.get("v.eventsFired")) == "layoutChange"; });
             }, function(component) {
                 $A.test.setTestTimeout(30000);
                 component.getValue("v.host").setValue("http://invalid.salesforce.com");
@@ -70,17 +70,17 @@
                 $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") != ""; });
             }, function(component) {
                 $A.test.assertEquals("INCOMPLETE", component.get("v.actionStatus"));
-                $A.test.assertEquals("layoutChange noConnection", component.get("v.eventsFired").trim());
+                $A.test.assertEquals("layoutChange noConnection", aura.util.trim(component.get("v.eventsFired")));
                 component.getValue("v.host").setValue(undefined); // restore to default
                 component.find("button").get("e.press").fire();
                 $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") == "SUCCESS"; });
             }, function(component) {
-                $A.test.assertEquals("layoutChange noConnection connectionResumed", component.get("v.eventsFired").trim());
+                $A.test.assertEquals("layoutChange noConnection connectionResumed", aura.util.trim(component.get("v.eventsFired")));
                 component.find("button").get("e.press").fire();
                 $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") == "SUCCESS"; });
             }, function(component) {
                 // connectionResumed event is not repeated
-                $A.test.assertEquals("layoutChange noConnection connectionResumed", component.get("v.eventsFired").trim());
+                $A.test.assertEquals("layoutChange noConnection connectionResumed", aura.util.trim(component.get("v.eventsFired")));
             }]
     },
 
@@ -91,7 +91,7 @@
         testLabels : ["UnAdaptableTest"],
         attributes : { host : "http://invalid.salesforce.com", __layout : "#" },
         test : [function(component) {
-                $A.test.addWaitFor(true, function() { return component.get("v.eventsFired").trim() == "noConnection layoutFailed layoutChange"; });
+                $A.test.addWaitFor(true, function() { return aura.util.trim(component.get("v.eventsFired")) == "noConnection layoutFailed layoutChange"; });
             }]
     },
 
@@ -102,11 +102,11 @@
         testLabels : ["UnAdaptableTest"],
         attributes : { host : "http://invalid.salesforce.com", __layout : "#" },
         test : [function(component) {
-                $A.test.addWaitFor(true, function() { return component.get("v.eventsFired").trim() == "noConnection layoutFailed layoutChange"; });
+                $A.test.addWaitFor(true, function() { return aura.util.trim(component.get("v.eventsFired")) == "noConnection layoutFailed layoutChange"; });
             }, function(component) {
                 component.getValue("v.host").setValue(undefined); // restore to default
                 $A.historyService.set("action");
-                $A.test.addWaitFor(true, function() { return component.get("v.eventsFired").trim() == "noConnection layoutFailed layoutChange connectionResumed layoutChange"; });
+                $A.test.addWaitFor(true, function() { return aura.util.trim(component.get("v.eventsFired")) == "noConnection layoutFailed layoutChange connectionResumed layoutChange"; });
             }]
     }
 })

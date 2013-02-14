@@ -21,7 +21,7 @@
         attributes : {value : 'aura-test@salesforce.com', label: 'Email us'},
         test: function(component){
         	var link = component.find("link").getElement();
-            aura.test.assertEquals('Email us', link.textContent, "Value attribute not correct");
+            aura.test.assertEquals('Email us', $A.test.getText(link), "Value attribute not correct");
             aura.test.assertTrue(aura.test.contains(link.href,'mailto:aura-test@salesforce.com'), "Value attribute not correct");
         }
     },
@@ -34,7 +34,7 @@
         test: function(component){
         	var link = component.find("link").getElement();
             aura.test.assertTrue(aura.test.contains(link.href,'mailto:aura-test@salesforce.com'), "Value attribute not correct");
-            aura.test.assertEquals('aura-test@salesforce.com', link.textContent, "Label attribute not correct");
+            aura.test.assertEquals('aura-test@salesforce.com', $A.test.getText(link), "Label attribute not correct");
         }
     },
 
@@ -46,7 +46,7 @@
         test: function(component){
         	var link = component.find("link").getElement();
         	aura.test.assertTrue(aura.test.contains(link.href,'mailto:aura-test@salesforce.com'), "Value attribute not correct");
-            aura.test.assertEquals('aura-test@salesforce.com', link.textContent, "Label attribute not correct");
+            aura.test.assertEquals('aura-test@salesforce.com', $A.test.getText(link), "Label attribute not correct");
             aura.test.assertTrue($A.util.hasClass(link, "myClass"), "myClass class not correctly added");
         }
     },
@@ -60,7 +60,7 @@
         test: function(component){
         	var link = component.find("link").getElement();
             aura.test.assertTrue(aura.test.contains(link.href,'mailto:salesforce.com'), "Value attribute not correct");
-            aura.test.assertEquals('salesforce.com', link.textContent, "label attribute not correct");
+            aura.test.assertEquals('salesforce.com', $A.test.getText(link), "label attribute not correct");
         }
     },
 
@@ -71,7 +71,7 @@
         attributes : {value : 'salesforce.com', 'class' : 'myClass'},
         test: function(component){
             aura.test.assertTrue($A.util.hasClass(component.find("link").getElement(), "myClass"), "myClass class not correctly added");
-            aura.test.assertEquals('salesforce.com', component.find("link").getElement().textContent, "label attribute not correct");
+            aura.test.assertEquals('salesforce.com', $A.test.getText(component.find("link").getElement()), "label attribute not correct");
         }
     },
 

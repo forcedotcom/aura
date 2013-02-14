@@ -23,7 +23,7 @@
             aura.test.assertEquals('markup://setAttributesTest:abstractCmpExtension',testCmp.getDef().getDescriptor().getQualifiedName());
             aura.test.assertEquals('abstractExtensionX',testCmp.getSuper().getValue('v.SimpleAttribute').getValue());
             //Verify the content of the HTML element
-            aura.test.assertEquals('The value of SimpleAttribute = abstractExtensionX',testCmp.getElement().textContent);
+            aura.test.assertEquals('The value of SimpleAttribute = abstractExtensionX',$A.test.getText(testCmp.getElement()));
         }
     }
 })

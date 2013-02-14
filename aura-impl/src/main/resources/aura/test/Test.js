@@ -522,18 +522,28 @@ var Test = function(){
 
         /**
          * Get the text content of a DOM node. Tries "innerText" followed by
-         * "textContext" to take browser differences into account.
+         * "textContext", followed by "nodeValue" to take browser differences into account.
          * @param {Node} node
          * 				The node to get the text content from
          * @returns {String}
          * 				The text content of the specified DOM node
          */
         getText : function(node) {
-            var t = node.innerText;
-            if($A.util.isUndefinedOrNull(t)){
-                t = node.textContent;
-            }
-            return (typeof t == "string") ? t : node.innerText;
+        	var t;            
+            //text nodes
+            if(node.nodeType === 3){
+            	t = node.nodeValue;
+            }            
+            else{
+            	// chrome, safari, IE have this
+            	t = node.innerText;
+            
+            	// FF
+            	if($A.util.isUndefinedOrNull(t)){
+                	t = node.textContent;
+            	}
+            }         
+            return t;
         },
 
         /**

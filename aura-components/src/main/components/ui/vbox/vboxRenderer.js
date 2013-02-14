@@ -29,7 +29,7 @@
             var foundNonComment = false;
             for(var i=0;i<center.length;i++){
                 var el = center[i];
-                if(el.nodeType !== 8 && (el.nodeType !== 3 || el.nodeValue.trim().length > 0)){
+                if(el.nodeType !== 8 && (el.nodeType !== 3 || aura.util.trim(el.nodeValue).length > 0)){
                     if(foundNonComment){
                         onlyOne = false;
                     }

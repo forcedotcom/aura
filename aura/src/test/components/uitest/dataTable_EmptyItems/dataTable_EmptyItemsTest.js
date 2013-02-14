@@ -15,6 +15,7 @@
  */
 ({
     testEmptyItems:{
+        browsers: ["-IE7", "-IE8"],
         test:function(cmp){
             var element = cmp.getElement();
             aura.test.assertTrue(element.className.indexOf("uiMessage")!=-1, "Expected to see a message to indicate no data.");

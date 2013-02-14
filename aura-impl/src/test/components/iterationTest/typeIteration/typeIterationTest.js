@@ -114,7 +114,7 @@
             $A.test.assertEquals(2, container.find("iteration").get("v.realbody").length);
 
             $A.test.assertTrue(elements[0] instanceof Text)
-            $A.test.assertEquals("textOnBody" , elements[0].textContent);
+            $A.test.assertEquals("textOnBody" , $A.test.getText(elements[0]));
 
             $A.test.assertTrue(elements[1] instanceof HTMLDivElement)
 

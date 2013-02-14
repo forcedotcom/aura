@@ -31,7 +31,7 @@
 //                var cmp = component.find("value");
 //                var e = cmp.getElement();
 //                $A.test.assertEquals("B", e.tagName.toUpperCase());
-//                $A.test.assertEquals("some value", e.textContent || e.innerText, "new value not rendered");
+//                $A.test.assertEquals("some value", $A.test.getText(e) || e.innerText, "new value not rendered");
 //                component.find("toggle").get("e.press").fire();
 //                $A.test.addWaitFor(true, function(){
 //                    return !component.getValue("v.value").isDirty();
@@ -58,7 +58,7 @@
 //                var cmp = component.find("value");
 //                var e = cmp.getElement();
 //                $A.test.assertEquals("B", e.tagName.toUpperCase());
-//                $A.test.assertEquals("some value", e.textContent || e.innerText, "new value not rendered");
+//                $A.test.assertEquals("some value", $A.test.getText(e) || e.innerText, "new value not rendered");
 //                component.find("toggle").get("e.press").fire();
 //                $A.test.addWaitFor(true, function(){
 //                    return !component.getValue("v.value").isDirty();

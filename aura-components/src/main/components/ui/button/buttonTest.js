@@ -17,7 +17,7 @@
     testLabel: {
         attributes : {label : 'shucks'},
         test: function(component){
-            aura.test.assertEquals('shucks', component.find("span").getElement().textContent, "Label not found");
+            aura.test.assertEquals('shucks', $A.test.getText(component.find("span").getElement()), "Label not found");
         }
     },
     testHTMLElementType:{
@@ -74,7 +74,7 @@
     testLabelHidden: {
         attributes : {label : 'shucks', labelDisplay: "false"},
         test: function(component){
-            aura.test.assertEquals('shucks', component.find("hidden").getElement().textContent, "Label not found");
+            aura.test.assertEquals('shucks', $A.test.getText(component.find("hidden").getElement()), "Label not found");
         }
     },
     testButtonWithIcon:{
@@ -125,7 +125,7 @@
     _testRerender:{
         attributes:{label:"Like", disabled:false, hasIcon:true, iconImgSrc:'/auraFW/resources/aura/images/bug.png'},
         test:function(component){
-            aura.test.assertEquals('Like', component.find("div").getElement().textContent, "Label not correct");
+            aura.test.assertEquals('Like', $A.test.getText(component.find("div").getElement()), "Label not correct");
             aura.test.assertFalse(component.find("button").getElement().disabled, "Button was rendered in disabled state");
 
             component.getAttributes().setValue('disabled', true);
@@ -133,7 +133,7 @@
             component.getAttributes().setValue('iconImgSrc', '/auraFW/resources/aura/images/clear.png');
             $A.renderingService.rerender(component);
 
-            aura.test.assertEquals('clear', component.find("div").getElement().textContent, "New label not rerendered");
+            aura.test.assertEquals('clear', $A.test.getText(component.find("div").getElement()), "New label not rerendered");
             aura.test.assertTrue(component.find("button").getElement().disabled, "Button was not rerendered in disabled state");
             for(var i in component.find('button').getElement().children){
                 var child = component.find('button').getElement().children[i];

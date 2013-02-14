@@ -24,7 +24,7 @@
             var span = cmp.find('span');
             //Make sure a span tag is used for outputTextArea. Failure might mean breaking styling of third party app
             aura.test.assertEquals('SPAN', span.getElement().tagName, "OutputTextArea is expected to use a span tag to display value.");
-            aura.test.assertEquals('Salesforce.com, ....some literature about the company.', span.getElement().textContent);
+            aura.test.assertEquals('Salesforce.com, ....some literature about the company.', $A.test.getText(span.getElement()));
         }
     },
     /**
@@ -35,7 +35,7 @@
         test:function(cmp){
             var span = cmp.find('span');
             aura.test.assertNotNull(span);
-            aura.test.assertEquals('', span.getElement().textContent);
+            aura.test.assertEquals('', $A.test.getText(span.getElement()));
         }
     }
 })

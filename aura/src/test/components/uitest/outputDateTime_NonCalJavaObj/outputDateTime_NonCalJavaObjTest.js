@@ -17,7 +17,7 @@
     testNonDateTimeJavaObj:{
         test:function(cmp){
             var testCmp = cmp.find('NonCalendarFromJava');
-            aura.test.assertEquals("Value must be bound to a model value that resolves to a java.util.Calendar", testCmp.find('span').getElement().textContent, "Expected an error message");
+            aura.test.assertEquals("Value must be bound to a model value that resolves to a java.util.Calendar", $A.test.getText(testCmp.find('span').getElement()), "Expected an error message");
         }
     }
 })

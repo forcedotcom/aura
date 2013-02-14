@@ -21,7 +21,7 @@
         test:function(cmp){
             var testCmp = cmp.find('dateFromJava');
             aura.test.assertNotNull(testCmp);
-            aura.test.assertEquals('9/23/04', testCmp.find('span').getElement().textContent, "Failed to display Date from Java model");
+            aura.test.assertEquals('9/23/04', $A.test.getText(testCmp.find('span').getElement()), "Failed to display Date from Java model");
         }
     }
 })

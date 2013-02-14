@@ -25,7 +25,7 @@
         ]
     },
     verifyTextContent:function(cmp, expectedText){
-        $A.test.assertEquals(expectedText, cmp.find('divOnBody').getElement().textContent,
+        $A.test.assertEquals(expectedText, $A.test.getText(cmp.find('divOnBody').getElement()),
                 "Value not rendered in elements on top level component's body.");
         //Make sure CSS selector for elements also get updated
         $A.test.assertEquals(expectedText+' input insideFacet', cmp.find('input').getElement().className,
@@ -33,7 +33,7 @@
 
         $A.test.assertEquals(expectedText, cmp.find('input').getElement().value,
                 "Value not rerenderer in component array of facet");
-        $A.test.assertEquals(expectedText, cmp.find('div').getElement().textContent,
+        $A.test.assertEquals(expectedText, $A.test.getText(cmp.find('div').getElement()),
                 "Value not rerenderer in component array of facet");
     }
 })

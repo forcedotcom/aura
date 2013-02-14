@@ -20,13 +20,13 @@
     testEmptyValue:{
         attributes : {value: ''},
         test: function(component){
-            aura.test.assertEquals('', component.find('span').getElement().textContent, "When value is initialized to an empty string, nothing should be shown.");
+            aura.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "When value is initialized to an empty string, nothing should be shown.");
         }
     },
     testSingleEntry:{
         attributes : {value: 'foo'},
         test: function(component){
-            aura.test.assertEquals('foo', component.find('span').getElement().textContent, "Multiselect failed to display a single entry.");
+            aura.test.assertEquals('foo', $A.test.getText(component.find('span').getElement()), "Multiselect failed to display a single entry.");
         }
     }
 })

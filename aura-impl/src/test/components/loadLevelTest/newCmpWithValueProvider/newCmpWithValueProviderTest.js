@@ -26,7 +26,7 @@
             var body = cmp.get('v.body');
             $A.test.assertEquals(1,body.length);
             $A.test.assertEquals("markup://aura:text",body[0].getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals("fooBar", body[0].getElement().textContent);
+            $A.test.assertEquals("fooBar", $A.test.getText(body[0].getElement()));
 
             //Verify that local ID can be used to find the component
             var newTextCmp = cmp.find("txt_Id");
@@ -50,7 +50,7 @@
 
             $A.test.assertEquals("markup://aura:text", newTextCmp.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("Washington", newTextCmp.getAttributes().getValue('value').getValue());
-            $A.test.assertEquals("Washington", newTextCmp.getElement().textContent);
+            $A.test.assertEquals("Washington", $A.test.getText(newTextCmp.getElement()));
         }
     },
     /**
@@ -158,7 +158,7 @@
             var body = cmp.get('v.body');
             $A.test.assertEquals(1,body.length);
             $A.test.assertEquals("markup://aura:text",body[0].getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals("SelfSustaining", body[0].getElement().textContent);
+            $A.test.assertEquals("SelfSustaining", $A.test.getText(body[0].getElement()));
         }
     }
 })

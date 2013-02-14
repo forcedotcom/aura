@@ -108,7 +108,7 @@
             $A.test.assertEquals("markup://aura:text",body[0].getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("TextComponent",body[0].get('v.value'));
             $A.test.assertEquals(6,body[0].get('v.truncate'));
-            $A.test.assertEquals("Tex...",body[0].getElement().textContent);
+            $A.test.assertEquals("Tex...",$A.test.getText(body[0].getElement()));
         }]
     },
     /**

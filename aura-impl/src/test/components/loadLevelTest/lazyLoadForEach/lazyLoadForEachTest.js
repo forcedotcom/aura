@@ -37,7 +37,7 @@
                 for(var i=0; i<3;i++){
                     var  stringValueAtInnerCmp = innerCmps[i].get("v.string");
                     aura.test.assertEquals(valuesAtTopLevel[i], stringValueAtInnerCmp, "Failed to load lazy component from server.");
-                    aura.test.assertEquals(''+valuesAtTopLevel[i], innerCmps[i].find('string').getElement().textContent, "value mismatch.");
+                    aura.test.assertEquals(''+valuesAtTopLevel[i], $A.test.getText(innerCmps[i].find('string').getElement()), "value mismatch.");
                 }
             });
         }

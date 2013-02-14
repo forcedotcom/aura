@@ -24,7 +24,7 @@
             aura.test.assertEquals('childX',cmp.getSuper().getValue('v.SimpleAttribute').getValue(), "Attribute value should have been overriden in child component.");
 
             //UI verification to check that renderer used the right attribute value
-            aura.test.assertEquals('The value of SimpleAttribute = childX', cmp.getSuper().getSuper().find('simpleAttr_id').getElement().textContent);
+            aura.test.assertEquals('The value of SimpleAttribute = childX', $A.test.getText(cmp.getSuper().getSuper().find('simpleAttr_id').getElement()));
         }
     },
 
@@ -38,10 +38,10 @@
              * aura.test.assertEquals('Component',cmp.getValue('v.ComponentTypeAttribute').getValue()[0].auraType, "Attribute value was expected to be a component.")
             var attrValue = cmp.getValue('v.ComponentTypeAttribute').getValue()[0];
             aura.test.assertEquals('markup://test:test_button',attrValue.getDef().getDescriptor().getQualifiedName(), "Attribute should have been a button.")
-            aura.test.assertEquals('childX_Button',attrValue.getElement().textContent, "ComponentTypeAttribute should have been assigned a button with label: childX_Button.");
+            aura.test.assertEquals('childX_Button',$A.test.getText(attrValue.getElement()), "ComponentTypeAttribute should have been assigned a button with label: childX_Button.");
             */
             aura.log(cmp.find("btn").getElements());
-            aura.test.assertEquals('childX_Button', cmp.find('btn').getElement().textContent, "ComponentTypeAttribute should have been assigned a button with label: childX_Button.");
+            aura.test.assertEquals('childX_Button', $A.test.getText(cmp.find('btn').getElement()), "ComponentTypeAttribute should have been assigned a button with label: childX_Button.");
         }
     }
 })

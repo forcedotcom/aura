@@ -20,7 +20,7 @@
 
         for (var n = 0; n < el.length; n++) {
             var node = el[n];
-            if (node.nodeType !== 3 || node.nodeValue.trim().length > 0) {
+            if (node.nodeType !== 3 || aura.util.trim(node.nodeValue).length > 0) {
                 filteredElements.push(node);
             }
         }

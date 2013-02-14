@@ -20,7 +20,7 @@
     testEmptyValue:{
         attributes : {value: ''},
         test: function(component){
-            aura.test.assertEquals('', component.find('span').getElement().textContent, "When value is initialized to an empty string, nothing should be shown.");
+            aura.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "When value is initialized to an empty string, nothing should be shown.");
         }
     },
 
@@ -30,7 +30,7 @@
     testValue: {
         attributes : {value : 'holy guacamole!'},
         test: function(component){
-            aura.test.assertEquals('holy guacamole!', component.find('span').getElement().textContent, "Select text not correct");
+            aura.test.assertEquals('holy guacamole!', $A.test.getText(component.find('span').getElement()), "Select text not correct");
         }
     }
 })

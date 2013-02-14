@@ -21,7 +21,7 @@
         test:function(cmp){
             aura.test.assertEquals('grandparentX',cmp.getValue('v.SimpleAttribute').getValue(), "Value of attribute has the wrong default value.");
             //UI verification to check that renderer used the right attribute value
-            aura.test.assertEquals('The value of SimpleAttribute = grandparentX',cmp.find('simpleAttr_id').getElement().textContent);
+            aura.test.assertEquals('The value of SimpleAttribute = grandparentX',$A.test.getText(cmp.find('simpleAttr_id').getElement()));
         }
     },
     /**
@@ -34,7 +34,7 @@
             var cmpAttrValue = cmp.getValue('v.ComponentTypeAttribute').getValue(0);
             aura.test.assertEquals('markup://test:test_button',cmpAttrValue.getDef().getDescriptor().getQualifiedName(), "Attribute should have been a button.")
             //Verify the label of the button
-            aura.test.assertEquals('grandParentX_Button',cmpAttrValue.getElement().textContent, "Button should have had text set in this (base) component.");
+            aura.test.assertEquals('grandParentX_Button',$A.test.getText(cmpAttrValue.getElement()), "Button should have had text set in this (base) component.");
         }
     }
 })

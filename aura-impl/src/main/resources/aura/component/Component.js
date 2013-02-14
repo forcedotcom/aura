@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
+/*jslint sub: true*/
 //#include aura.component.Component_private
 
 /**
@@ -810,6 +810,36 @@ Component.prototype.hasEventHandler = function(eventName) {
         return handledEvents[eventName.toLowerCase()];
     }
     return false;
+};
+
+/**
+ * Returns an array of this component's facets, i.e., attributes of type aura://Aura.Component[]
+ */
+Component.prototype.getFacets = function() {
+	if (!this.getFacets.cachedFacetNames) {
+		// grab the names of each of the facets from the ComponentDef
+		var facetNames = [];
+		var attributeDefs = this.getDef().getAttributeDefs();
+		
+		attributeDefs.each(function(attrDef) {
+			if (attrDef.getTypeDefDescriptor() === "aura://Aura.Component[]") {
+				facetNames.push(attrDef.getDescriptor().getName());
+			}
+		});
+		
+		// cache the names--they're not going to change
+		this.getFacets.cachedFacetNames = facetNames;
+	}
+
+	// then grab each of the facets themselves
+	var names = this.getFacets.cachedFacetNames;
+	var facets = [];
+
+	for (var i=0, len=names.length; i<len; i++) {
+		facets.push(this.getValue("v." + names[i]));
+	}
+	
+	return facets;
 };
 
 //#include aura.component.Component_export

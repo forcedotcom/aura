@@ -14,6 +14,24 @@
  * limitations under the License.
  */
 ({
+	handlePageChange: function(component, event, helper) {
+		var currentPage = event.getParam("currentPage");
+		var pageSize = event.getParam("pageSize");
+		
+		var dataProvider = component.get("v.dataProvider")[0];
+		dataProvider.getValue("v.currentPage").setValue(currentPage);
+		dataProvider.getValue("v.pageSize").setValue(pageSize);
+		
+		// THIS SHOULD HAPPEN ON DATACHANGE BELOW, NOT HERE.
+		var pagers = component.getValue("v.header");
+		pagers.each(function(pager) {
+			pager.getValue("v.currentPage").setValue(currentPage);
+			pager.getValue("v.pageSize").setValue(pageSize);
+		});
+		
+		dataProvider.get("e.provide").fire();
+	},
+	
 	handleDataChange: function(component, event, helper) {
 		component.getValue("v.items").setValue(event.getParam("data"));
 	},

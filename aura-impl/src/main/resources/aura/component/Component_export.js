@@ -48,5 +48,6 @@ exp(p,
     "removeClass", p.removeClass,
     "getHandledEvents", p.getHandledEvents,
     "hasEventHandler", p.hasEventHandler,
-    "addValueHandler", p.addValueHandler
+    "addValueHandler", p.addValueHandler,
+    "getFacets", p.getFacets
 );

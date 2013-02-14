@@ -17,10 +17,13 @@
 -->
 <aura:component implements="ui:listInterface" extensible="true" support="proto">
 	<aura:handler name="init" action="{!c.init}" value="{!this}"/>
+	{!v.header}
 	
 	<div>
 		<aura:iteration items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}">
 			
 		</aura:iteration>
 	</div>
+	
+	{!v.footer}
 </aura:component>

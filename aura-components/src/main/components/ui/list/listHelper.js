@@ -15,12 +15,42 @@
  */
 ({
  	init: function(component) {
+ 		this.initDataProvider(component);
+ 		this.initPagers(component);
+	},
+
+	initDataProvider: function(component) {
 		var dataProvider = component.getValue("v.dataProvider").unwrap();
 		
 		if (dataProvider && dataProvider.length && dataProvider.length > 0) {
 			dataProvider = dataProvider[0];
 			dataProvider.addHandler("onchange", component, "c.handleDataChange");
 			dataProvider.get("e.provide").fire();
+		}		
+	},
+	
+	initPagers: function(component) {
+		var facets = component.getFacets();
+		var pagers = [];
+		
+		// walk each facet looking for instances of ui:pager
+		for (var i=0, len=facets.length; i<len; i++) {
+			var facet = facets[i];
+
+			facet.each(function(facet) {
+				if (facet.getDef().getDescriptor().getQualifiedName() != "markup://aura:unescapedHtml") {
+		        	if (facet.isInstanceOf("ui:pager")) {
+		        		pagers.push(facet);
+		        	} else {
+		        		pagers.concat(facet.find({instancesOf:"ui:pager"}));
+		        	}
+		        }	
+			});
+        }
+		
+		// add handlers to each
+		for (var j=0, len=pagers.length; j<len; j++) {
+			pagers[j].addHandler("onPageChange", component, "c.handlePageChange");
 		}
 	}
 })

@@ -38,7 +38,7 @@
 
     fireEvent:function(component,eventType,pageData,domEvent){
         if(domEvent&&domEvent.preventDefault)domEvent.preventDefault();
-        var pageEvent = component.getEvent("onpage");
+        var pageEvent = component.getEvent("onPageChange");
         pageEvent.setParams({
             type:eventType,
             context:{
@@ -55,26 +55,26 @@
         component=component.getConcreteComponent();
         var pageSize = component.get("v.pageSize") || 0;
         var totalItems = parseInt(component.get("v.totalItems"),10);
-        if (pageSize > 0) {
-            var pageCount=component.getValue("v.pageCount");
-            var newPageCount=Math.ceil(totalItems / pageSize);
-            if(!isNaN(newPageCount)&&pageCount.getValue()!=newPageCount){
-                pageCount.setValue(newPageCount);
-            }
-        }else{
-            component.getValue("v.pageCount").setValue(1);
-            pageSize=totalItems;
-        }
-        if(totalItems>0){
-            var endIndex = (component.get("v.currentPage") * pageSize) - 1;
-            var startIndex = Math.max(0, endIndex - pageSize + 1);
-            component.getValue("v.startIndex").setValue(startIndex);
-            component.getValue("v.endIndex").setValue(Math.min(endIndex, totalItems - 1));
-        }else{
-            component.getValue("v.currentPage").setValue(0,true);
-            component.getValue("v.startIndex").setValue(-1);
-            component.getValue("v.endIndex").setValue(-1);
-        }
+//        if (pageSize > 0) {
+//            var pageCount=component.getValue("v.pageCount");
+//            var newPageCount=Math.ceil(totalItems / pageSize);
+//            if(!isNaN(newPageCount)&&pageCount.getValue()!=newPageCount){
+//                pageCount.setValue(newPageCount);
+//            }
+//        }else{
+//            component.getValue("v.pageCount").setValue(1);
+//            pageSize=totalItems;
+//        }
+//        if(totalItems>0){
+//            var endIndex = (component.get("v.currentPage") * pageSize) - 1;
+//            var startIndex = Math.max(0, endIndex - pageSize + 1);
+//            component.getValue("v.startIndex").setValue(startIndex);
+//            component.getValue("v.endIndex").setValue(Math.min(endIndex, totalItems - 1));
+//        }else{
+//            component.getValue("v.currentPage").setValue(0,true);
+//            component.getValue("v.startIndex").setValue(-1);
+//            component.getValue("v.endIndex").setValue(-1);
+//        }
         var updateDisplay=component.getDef().getHelper().updateDisplay;
         if(updateDisplay)updateDisplay.call(component,component);
     },

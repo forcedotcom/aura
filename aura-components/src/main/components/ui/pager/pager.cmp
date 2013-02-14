@@ -16,6 +16,6 @@
 
 -->
 <aura:component implements="ui:elementInterface,ui:pagingInterface" abstract="true" extensible="true" provider="java://org.auraframework.component.ui.PagerProvider,js://ui.pager" support="GA" description="An abstract pager component, used to specify common behavior across implementations.">
-    <aura:registerEvent name="onpage" type="ui:pagerEvent" description="The event that is fired when a concrete pager triggers a paging event."/>
+    <aura:registerEvent name="onPageChange" type="ui:pagerEvent" description="The event that is fired when a concrete pager triggers a paging event."/>
     {!v.body}
 </aura:component>

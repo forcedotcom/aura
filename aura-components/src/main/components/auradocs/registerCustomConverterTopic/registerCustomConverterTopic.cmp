@@ -28,9 +28,9 @@
 
 <ol>
     <li>Create a class that implements the <code>Converter</code> interface.<br/>
-    <p>Add <code>implements Converter&lt;<i>Type1</i>, <i>Type2</i>></code> at the end of the first line of your class definition, after the class name. Replace <code><i>Type1</i></code> with the original Java type and <code><i>Type2</i></code> with the target Java type. Next, implement each method in the <code>Converter</code> interface.</p>
- <p>For better readability of your code, we recommend you name the class using the format <code><i>Type1</i>To<i>Type2</i>Converter</code>.</p><br/>
- <p>This is an example of a skeletal class implementing the <code>Converter</code> interface. <code><i>Type1</i></code> and <code><i>Type2</i></code> are placeholders for the Java original type and the converted type, respectively.</p>
+    Add <code>implements Converter&lt;<i>Type1</i>, <i>Type2</i>></code> at the end of the first line of your class definition, after the class name. Replace <code><i>Type1</i></code> with the original Java type and <code><i>Type2</i></code> with the target Java type. Next, implement each method in the <code>Converter</code> interface.<br/>
+For better readability of your code, we recommend you name the class using the format <code><i>Type1</i>To<i>Type2</i>Converter</code>.<br/>
+ This is an example of a skeletal class implementing the <code>Converter</code> interface. <code><i>Type1</i></code> and <code><i>Type2</i></code> are placeholders for the Java original type and the converted type, respectively.<br/><br/>
 <auradocs:codeblock>
 public class <i>Type1</i>To<i>Type2</i>Converter implements Converter&lt;<i>Type1</i>, <i>Type2</i>> {
 
@@ -59,7 +59,7 @@ public class <i>Type1</i>To<i>Type2</i>Converter implements Converter&lt;<i>Type
 </auradocs:codeblock><br/>
 <br/></li>
     <li>Create another class annotated with <code>@AuraConfiguration</code>. The class must be in the <code>configuration</code> package.</li>
-    <li>Add a <code>public static</code> method to this class annotated with <code>@Impl</code>. The method should return either the <code>Converter&lt;?, ?></code> type or <code>Converter&lt;<i>Type1</i>, <i>Type2</i>></code> with the actual original and target Java types.<br/> The method returns a new instance of the class you created earlier, which implements the <code>Converter</code> interface.<br/>
+    <li>Add a <code>public static</code> method to this class annotated with <code>@Impl</code>. The method should return either the <code>Converter&lt;?, ?></code> type or <code>Converter&lt;<i>Type1</i>, <i>Type2</i>></code> with the actual original and target Java types.<br/> The method returns a new instance of the class you created earlier, which implements the <code>Converter</code> interface.<br/><br/>
 <auradocs:codeblock>
 package configuration;
 

@@ -32,6 +32,7 @@ import org.auraframework.throwable.NoAccessException;
  * 
  * @since 0.0.178
  */
+
 public class AuraContextServiceImplAssertAccessTest extends AuraImplTestCase {
     private static final String cmpTag = String.format(baseComponentTag, "", "");
 
@@ -57,7 +58,7 @@ public class AuraContextServiceImplAssertAccessTest extends AuraImplTestCase {
     }
 
     public void testDevCmpWithoutApp() throws Exception {
-        Aura.getContextService().startContext(Mode.DEV, Format.JSON, Access.AUTHENTICATED);
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, cmpTag);
         Aura.getContextService().assertAccess(cmpDesc);
     }
@@ -69,7 +70,7 @@ public class AuraContextServiceImplAssertAccessTest extends AuraImplTestCase {
     public void testDevCmpWithUnknownApp() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor("nonexistant:application",
                 ApplicationDef.class);
-        Aura.getContextService().startContext(Mode.DEV, Format.JSON, Access.AUTHENTICATED, appDesc);
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED, appDesc);
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, cmpTag);
         Aura.getContextService().assertAccess(cmpDesc);
     }
@@ -81,7 +82,7 @@ public class AuraContextServiceImplAssertAccessTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, String.format(
                 baseApplicationTag,
                 "securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysDenies'", ""));
-        Aura.getContextService().startContext(Mode.DEV, Format.JSON, Access.AUTHENTICATED, appDesc);
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED, appDesc);
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, cmpTag);
         assertException(cmpDesc, NoAccessException.class,
                 String.format("Access to %s disallowed by SecurityProviderAlwaysDenies", cmpDesc.getQualifiedName()));
@@ -94,7 +95,7 @@ public class AuraContextServiceImplAssertAccessTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class, String.format(
                 baseApplicationTag,
                 "securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows'", ""));
-        Aura.getContextService().startContext(Mode.DEV, Format.JSON, Access.AUTHENTICATED, appDesc);
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED, appDesc);
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, cmpTag);
         Aura.getContextService().assertAccess(cmpDesc);
     }

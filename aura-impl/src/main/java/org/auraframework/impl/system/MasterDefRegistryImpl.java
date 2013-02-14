@@ -588,7 +588,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             // de = getDE(uid, key);
             // if (de == null) {
             de = new DependencyEntry(uid, Sets.newTreeSet(dds.keySet()), lmt);
-            dependencies.put(de.uid + key, de);
+            dependencies.put(makeGlobalKey(de.uid, descriptor), de);
             // See localDependencies comment
             localDependencies.put(de.uid, de);
             localDependencies.put(key, de);
@@ -625,7 +625,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             if (de != null) {
                 return de;
             }
-            de = dependencies.getIfPresent(uid + key);
+            de = dependencies.getIfPresent(makeGlobalKey(uid, descriptor));
             if (de != null) {
                 // See localDependencies comment
                 localDependencies.put(uid, de);

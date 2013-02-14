@@ -208,4 +208,5 @@
             </auradocs:contentsNode>
         </auradocs:contentsNode>
     </ui:tree>
+    <auradocs:search />
 </aura:component>

@@ -1,0 +1,274 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Registering a Custom Converter"/>
+
+<p>A custom converter enables the conversion of one Java type to another Java type for client data sent to the server or for server markup data.</p>
+
+<p>When a client calls a server-side controller action, data that the client sends, such as input parameters for a server action, is sent in JSON format. The JSON representation of data is converted to target Java types on the server. Similarly, values in Aura markup on the server, such as component attribute values, are evaluated as Java strings. These strings are converted to corresponding Java types. For primitive Java types, the type conversion is implicit and doesn't require the addition of any converters. For example, a JSON string is converted to a Java string, and a JSON list is converted to a Java ArrayList. For custom types, Aura calls the custom converter that you provide to create an instance of the custom Java type corresponding to the JSON representation on the client or the markup attribute value on the server.</p>
+
+<p>For example, a component attribute of type List can have a default value in markup of a comma-delimited string of values. Aura converts the attribute string value into a list by calling a String to ArrayList converter.</p>   
+
+<p>To register a custom converter:</p>
+
+<ol>
+    <li>Create a class that implements the <code>Converter</code> interface.<br/>
+    Add <code>implements Converter&lt;<i>Type1</i>, <i>Type2</i>></code> at the end of the first line of your class definition, after the class name. Replace <code><i>Type1</i></code> with the original Java type and <code><i>Type2</i></code> with the target Java type. Next, implement each method in the <code>Converter</code> interface.<br/>
+For better readability of your code, we recommend you name the class using the format <code><i>Type1</i>To<i>Type2</i>Converter</code>.<br/>
+ This is an example of a skeletal class implementing the <code>Converter</code> interface. <code><i>Type1</i></code> and <code><i>Type2</i></code> are placeholders for the Java original type and the converted type, respectively.<br/><br/>
+<auradocs:codeblock>
+public class <i>Type1</i>To<i>Type2</i>Converter implements Converter&lt;<i>Type1</i>, <i>Type2</i>> {
+
+    @Override
+    public <i>Type2</i> convert(<i>Type1</i> value) {
+        // Convert value into a value of Type2 and return it.
+        // Return converted value.
+    }
+
+    @Override
+    public Class&lt;<i>Type1</i>> getFrom() {
+        // return Type1.class;
+    }
+
+    @Override
+    public Class&lt;<i>Type2</i>> getTo() {
+        // return Type2.class;
+    }
+
+    @Override
+    public Class&lt;?>[] getToParameters() {
+        // Return the types contained in the custom type. 
+    }
+
+}
+</auradocs:codeblock><br/>
+<br/></li>
+    <li>Create another class annotated with <code>@AuraConfiguration</code>. The class must be in the <code>configuration</code> package.</li>
+    <li>Add a <code>public static</code> method to this class annotated with <code>@Impl</code>. The method should return either the <code>Converter&lt;?, ?></code> type or <code>Converter&lt;<i>Type1</i>, <i>Type2</i>></code> with the actual original and target Java types.<br/> The method returns a new instance of the class you created earlier, which implements the <code>Converter</code> interface.<br/><br/>
+<auradocs:codeblock>
+package configuration;
+
+@AuraConfiguration
+public class MyTypeConverterConfig {
+   @Impl
+    public static Converter&lt;<i>Type1</i>, <i>Type2</i>> exampleTypeConverter() {
+        return new <i>Type1</i>To<i>Type2</i>Converter();
+    }
+}
+</auradocs:codeblock><br/>
+    </li>
+    <li>To specify additional conversions, repeat the previous steps. Each new conversion requires a converter implementation class and the addition of a corresponding method to the Aura configuration class.</li>       
+</ol>
+
+<auradocs:info>To marshall data from the server to the client, see <auradocs:topicLink topic="attrTypes​Java">Custom Java Class Types</auradocs:topicLink>.</auradocs:info>
+
+<h3>Example 1: Custom Type Conversion for a Component Attribute</h3>
+
+<p>This example shows how to add a converter to convert an attribute string value to the corresponding custom type. It contains the definition of the custom type, <code>MyCustomType</code>, an example of the attribute, the corresponding converter, and a method in the Aura configuration class.</p>
+
+<p>This is the definition of the custom type, <code>MyCustomType</code>.</p>
+<auradocs:codeblock>
+package doc.sample;
+
+public class MyCustomType implements JsonSerializable {
+    private String val;
+
+    public MyCustomType(String val) {
+        this.val = val;
+    }
+
+    @Override
+    public void serialize(Json json) throws IOException {
+        json.writeString(val);
+    }
+}
+</auradocs:codeblock><br/>
+
+<p>This is the attribute of type <code>MyCustomType</code> with a default value of <code>"x"</code>.</p>
+<auradocs:codeblock>
+&lt;aura:attribute name="myObj" type="java://doc.sample.MyCustomType" default="x"/>
+</auradocs:codeblock><br/>
+
+<p>This is the converter implementation for converting a string (the attribute value) to an object of type <code>MyCustomType</code> (the target Java type.)</p> 
+<auradocs:codeblock>
+public class StringToMyCustomTypeConverter implements Converter&lt;String, MyCustomType> {
+
+    @Override
+    public MyCustomType convert(String value) {        
+        return new MyCustomType(value);
+    }
+
+    @Override
+    public Class&lt;String> getFrom() {
+        return String.class;
+    }
+
+    @Override
+    public Class&lt;MyCustomType> getTo() {
+        return MyCustomType.class;
+    }
+
+    @Override
+    public Class&lt;?>[] getToParameters() {
+        return null;
+    }
+
+}
+</auradocs:codeblock><br/>
+
+<p>This is the corresponding Aura Configuration method.</p>
+<auradocs:codeblock>
+package configuration;
+
+@AuraConfiguration
+public class MyCustomTypeConverterConfig {
+   @Impl
+    public static Converter&lt;String, MyCustomType> exampleTypeConverter() {
+        return new StringToMyCustomTypeConverter();
+    }
+}
+</auradocs:codeblock><br/>
+
+
+<h3>Example 2: Parameterized Type Conversion for a Server Action Call</h3>
+
+<p>This example shows how to add a converter to convert the type of a parameter passed to a server-side controller action call that a client makes. The target type of the conversion is a parameterized type, <code>List&lt;MyCustomType></code>, which is a list of <code>MyCustomType</code> objects. </p>  
+
+<p>This example is based on the <code>MyCustomType</code> class defined earlier.</p> 
+
+<p>This is the client call to the <code>accept</code> action on the server-side controller. The client passes an array of three string values that corresponds to a list of <code>MyCustomType</code> objects. Because the parameter value is an array of objects, the original type of the conversion is ArrayList.</p>  
+<auradocs:codeblock>
+custom : function(c) {
+    var a = c.get("c.accept");
+    a.setParams({myObjs:["x","y","z"]});
+    this.runAfter(a);
+},
+</auradocs:codeblock><br/>
+
+<p>This is how the <code>accept</code> method looks like in the server-side controller. Notice the parameter of the <code>accept</code> method is of type <code>List&lt;MyCustomType></code>. This is the target type of the conversion.</p>  
+<auradocs:codeblock>
+@AuraEnabled
+public static void accept(@Key("myObjs") List&lt;MyCustomType> myObjs) {
+    for (MyCustomType obj : myObjs) {
+        System.err.println("MyCustomType:" + obj);
+    }
+}
+</auradocs:codeblock><br/>
+
+<p>This is the converter implementation that converts an ArrayList (the parameter array sent by the client) to a List of <code>MyCustomType</code> objects on the server.</p>  
+<auradocs:codeblock>
+public class ArrayListToMyCustomTypeListConverter implements Converter&lt;ArrayList, List> {
+
+    @Override
+    public List&lt;MyCustomType> convert(ArrayList value) {
+        List&lt;MyCustomType> retList = Lists.newLinkedList();
+        for (Object part : value) {
+            retList.add(new MyCustomType(part.toString()));
+        }
+        return retList;
+    }
+
+    @Override
+    public Class&lt;ArrayList> getFrom() {
+        return ArrayList.class;
+    }
+
+    @Override
+    public Class&lt;List> getTo() {
+        return List.class;
+    }
+
+    @Override
+    public Class&lt;?>[] getToParameters() {
+        return new Class[] { MyCustomType.class };
+    }
+}
+</auradocs:codeblock><br/>
+
+<p>This is the corresponding Aura Configuration method.</p>
+<auradocs:codeblock>
+package configuration;
+
+@AuraConfiguration
+public class MyCustomTypeListConverterConfig {
+   @Impl
+    public static Converter&lt;ArrayList, List&lt;MyCustomType>> exampleTypeConverter() {
+        return new ArrayListToList&lt;MyCustomType>Converter();
+    }
+}
+</auradocs:codeblock><br/>
+
+<h3>Example 3: Parameterized Type Conversion for a Component Attribute</h3>
+
+<p>This example is similar to the previous one except that the conversion is done for an attribute value. In this example, consider the following attribute that holds a list of <code>MyCustomType</code> objects and with a default value of <code>"x,y,z"</code>. Because the attribute value is a string, the original type of the conversion is String. The target type is <code>List&lt;MyCustomType></code>.</p>
+ 
+<p>This example is based on the <code>MyCustomType</code> class defined earlier.</p>
+
+<auradocs:codeblock>
+&lt;aura:attribute name="myObjs" type="java://java.util.List&lt;doc.sample.MyCustomType&gt;" default="x,y,z"/>
+</auradocs:codeblock><br/>
+
+<p>This is the converter implementation for converting  a string to a list of <code>MyCustomType</code> objects.</p>
+<auradocs:codeblock>
+public class StringToMyCustomTypeListConverter implements Converter&lt;String, List> {
+
+    @Override
+    public List&lt;MyCustomType> convert(String value) {
+        List&lt;MyCustomType> retList = Lists.newLinkedList();
+        for (String part : AuraTextUtil.splitSimple(",", value)) {
+            retList.add(new MyCustomType(part));
+        }
+        return retList;
+    }
+
+    @Override
+    public Class&lt;String> getFrom() {
+        return String.class;
+    }
+
+    @Override
+    public Class&lt;List> getTo() {
+        return List.class;
+    }
+
+    @Override
+    public Class&lt;?>[] getToParameters() {
+        return new Class[] { MyCustomType.class };
+    }
+}
+</auradocs:codeblock><br/>
+
+<p>This is the corresponding Aura Configuration method.</p>
+<auradocs:codeblock>
+package configuration;
+
+@AuraConfiguration
+public class MyCustomTypeList2ConverterConfig {
+   @Impl
+    public static Converter&lt;String, List&lt;MyCustomType>> exampleTypeConverter() {
+        return new StringToList&lt;MyCustomType>Converter();
+    }
+}
+</auradocs:codeblock><br/>
+
+<p><b>See also:</b><br/>    
+    <auradocs:topicLink topic="converterInterface">Converter Interface</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink><br/>    
+    <auradocs:topicLink topic="attrTypesOverview">Supported aura:attribute Types</auradocs:topicLink>
+ </p>  
+</aura:component>

@@ -62,11 +62,11 @@
                 <auradocs:contentsNode text="Component Composition" id="nestedComponents"/>
                 <auradocs:contentsNode text="Component Body and Facets" id="helloFacets"/>
                 <auradocs:contentsNode text="Lazy Loading a Component" id="lazyload"/>
-            <auradocs:contentsNode text="Using UI Components">
-                <auradocs:contentsNode text="Positioning UI Components" id="useLayout"/>
-                <auradocs:contentsNode text="Getting User Input" id="useForm"/>
-                <auradocs:contentsNode text="Using Menus" id="useMenu"/>
-            </auradocs:contentsNode>
+                <auradocs:contentsNode text="Using UI Components">
+                    <auradocs:contentsNode text="Positioning UI Components" id="useLayout"/>
+                    <auradocs:contentsNode text="Getting User Input" id="useForm"/>
+                    <auradocs:contentsNode text="Using Menus" id="useMenu"/>
+                </auradocs:contentsNode>
             </auradocs:contentsNode>
             <auradocs:contentsNode text="Expressions" >
                 <auradocs:contentsNode text="Introduction" id="expressions"/>
@@ -87,7 +87,7 @@
                 <auradocs:contentsNode text="Component Events" id="eventsComp"/>
                 <auradocs:contentsNode text="Application Events" id="eventsApp"/>
                 <auradocs:contentsNode text="Events Demo" id="eventsDemo"/>
-                <auradocs:contentsNode text="Firing Aura Events from Non-Aura code" id="eventsExternal"/>
+                <auradocs:contentsNode text="Firing Aura Events from non-Aura code" id="eventsExternal"/>
             </auradocs:contentsNode>
         </auradocs:contentsNode>
 
@@ -141,10 +141,11 @@
                 <auradocs:contentsNode text="Models" id="models" />
                 <auradocs:contentsNode text="Server-Side Controllers" id="serverSideControllers" />
                 <auradocs:contentsNode text="Server-Side Renderers" id="renderersServerSide" />
+                <auradocs:contentsNode text="Aura Integration Service" id="auraIntegrationService"/>
                 <auradocs:contentsNode text="Custom Converters">
                     <auradocs:contentsNode text="Registering a Custom Converter" id="registerCustomConverter"/>
                     <auradocs:contentsNode text="Converter Interface" id="converterInterface"/>
-                </auradocs:contentsNode>
+                </auradocs:contentsNode>                
                 <auradocs:contentsNode text="Java Cookbook">
                     <auradocs:contentsNode text="Introduction" id="javaCookbook" />
                     <auradocs:contentsNode text="Getting a DefDescriptor" id="javaDefDesc" />
@@ -180,7 +181,7 @@
                 <auradocs:contentsNode text="Client-Side Process" id="clientInit" />
                 <auradocs:contentsNode text="Component Request Glossary" id="cycleRefs" />                
             </auradocs:contentsNode>            
-            <auradocs:contentsNode text="Querying State and Statistics" id="queryLang"/>
+            <auradocs:contentsNode text="Querying State and Statistics" id="queryLang"/>            
         </auradocs:contentsNode>
 
         <auradocs:contentsNode text="Reference" >

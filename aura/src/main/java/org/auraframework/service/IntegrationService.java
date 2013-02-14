@@ -30,14 +30,21 @@ import org.auraframework.system.AuraContext.Mode;
 public interface IntegrationService extends AuraService {
     /**
      * Create an Integration object that represents a set of components that
-     * will be injected into a non-Aura container
+     * will be injected into a non-Aura container.
      * 
-     * @param securityProviderDescr
      * @param contextPath
+     *              The portion of the request URI that is used to select the context of the request. 
+     *              This is the first part of a request URI. The path starts with a / character 
+     *              but does not end with a / character. 
+     *              For servlets in the default (root) context, the context path is an empty string.
      * @param mode
+     *              The Aura mode.
      * @param initializeAura
-     * @param injectApplication
+     *              Indicates whether to create an internal integration app (true) or not (false). 
+     *              Passing a value of false allows for partial page updates, that is, adding additional 
+     *              components on subsequent trips to the server after an app has already been loaded.
      * @return
+     *              A new integration.
      */
     Integration createIntegration(String contextPath, Mode mode, boolean initializeAura);
 }

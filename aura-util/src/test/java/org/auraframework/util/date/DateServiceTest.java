@@ -29,6 +29,8 @@ import org.auraframework.test.UnitTestCase;
  */
 public class DateServiceTest extends UnitTestCase {
 
+    private StringBuilder sb;
+
     @SuppressWarnings("serial")
     private static class DebugDate extends Date {
 
@@ -53,7 +55,11 @@ public class DateServiceTest extends UnitTestCase {
         }
     }
 
-    public StringBuilder sb = new StringBuilder();
+    @Override
+    public void setUp() throws Exception{
+        super.setUp();
+        sb = new StringBuilder();
+    }
     /**
      * Test Data
      */
@@ -63,10 +69,10 @@ public class DateServiceTest extends UnitTestCase {
             new DebugDate(0) // 00:00:00.000 GMT
     };
     public static final int[] DATE_TIME_STYLES = { DateFormat.SHORT, DateFormat.MEDIUM, DateFormat.LONG,
-            DateFormat.FULL, -1 };
+        DateFormat.FULL, -1 };
     public static final String[] SIMPLE_DATE_FORMAT_PATTERNS = { "yyyy.MM.dd G 'at' HH:mm:ss z", "EEE, MMM d, ''yy",
-            "h:mm a", "hh 'o''clock' a, zzzz", "K:mm a, z", "yyyyy.MMMMM.dd GGG hh:mm aaa",
-            "EEE, d MMM yyyy HH:mm:ss Z", "yyMMddHHmmssZ", "yyyy-MM-dd'T'HH:mm:ss.SSSZ" };
+        "h:mm a", "hh 'o''clock' a, zzzz", "K:mm a, z", "yyyyy.MMMMM.dd GGG hh:mm aaa",
+        "EEE, d MMM yyyy HH:mm:ss Z", "yyMMddHHmmssZ", "yyyy-MM-dd'T'HH:mm:ss.SSSZ" };
 
     public List<LocaleConfig> getConfigs() {
         List<LocaleConfig> configs = new ArrayList<LocaleConfig>();
@@ -131,7 +137,7 @@ public class DateServiceTest extends UnitTestCase {
                 // parsing
                 Date parsedDate = converter.parse(formattedDate, tz);
                 String text = "Input date:" + d.toString() + "\t\tFormatted date:" + formattedDate + "\t\tParsed date:"
-                        + parsedDate.getTime() + "\t\tTimezone:" + tz.getID() + "\n";
+                + parsedDate.getTime() + "\t\tTimezone:" + tz.getID() + "\n";
                 sb.append(text);
             }
         }
@@ -151,7 +157,7 @@ public class DateServiceTest extends UnitTestCase {
                 // parsing
                 Date parsedDate = converter.parse(formattedDate, tz);
                 String text = "Input date:" + d.toString() + "\t\tFormatted date:" + formattedDate + "\t\tParsed date:"
-                        + parsedDate.getTime() + "\t\tTimezone:" + tz.getID() + "\n";
+                + parsedDate.getTime() + "\t\tTimezone:" + tz.getID() + "\n";
                 sb.append(text);
             }
         }
@@ -174,7 +180,7 @@ public class DateServiceTest extends UnitTestCase {
                 // parsing
                 Date parsedDate = converter.parse(formattedDate, tz);
                 text = "Input date:" + d.toString() + "\t\tFormatted date:" + formattedDate + "\t\tParsed date:"
-                        + parsedDate.getTime() + "\t\tTimezone:" + tz.getID() + "\n";
+                + parsedDate.getTime() + "\t\tTimezone:" + tz.getID() + "\n";
                 sb.append(text);
             }
         }
@@ -190,7 +196,7 @@ public class DateServiceTest extends UnitTestCase {
                     // formatting
                     String formattedDate = converter.format(parsedDate, tz);
                     text = "Input date:" + d.toString() + "\t\tFormatted date:" + formattedDate + "\t\tParsed date:"
-                            + parsedDate.getTime() + "\n";
+                    + parsedDate.getTime() + "\n";
                     sb.append(text);
                 } catch (IllegalArgumentException e) {
                     sb.append(e.getMessage() + "\n");
@@ -218,8 +224,8 @@ public class DateServiceTest extends UnitTestCase {
                         try {
                             Date parsedDate = converter.parse(formattedDate, tz);
                             text = "Input date:" + d.toString() + "\t\tFormatted date:" + formattedDate
-                                    + "\t\tParsed date:" + parsedDate.getTime() + "\t\tLocale:" + l.getDisplayName()
-                                    + "\t\tTimeZone: " + tz.getID() + "\t\tDate style: " + ds + "\n";
+                            + "\t\tParsed date:" + parsedDate.getTime() + "\t\tLocale:" + l.getDisplayName()
+                            + "\t\tTimeZone: " + tz.getID() + "\t\tDate style: " + ds + "\n";
                             sb.append(text);
                         } catch (IllegalArgumentException e) {
                             sb.append(e.getMessage() + "\n");
@@ -250,8 +256,8 @@ public class DateServiceTest extends UnitTestCase {
                         try {
                             Date parsedDate = converter.parse(formattedDate, tz);
                             text = "Input date:" + d.toString() + "\t\tFormatted date:" + formattedDate
-                                    + "\t\tParsed date:" + parsedDate.getTime() + "\t\tLocale:" + l.getDisplayName()
-                                    + "\t\tTimeZone: " + tz.getID() + "\t\tTime style: " + ts + "\n";
+                            + "\t\tParsed date:" + parsedDate.getTime() + "\t\tLocale:" + l.getDisplayName()
+                            + "\t\tTimeZone: " + tz.getID() + "\t\tTime style: " + ts + "\n";
                             sb.append(text);
                         } catch (IllegalArgumentException e) {
                             sb.append(e.getMessage() + "\n");
@@ -283,9 +289,9 @@ public class DateServiceTest extends UnitTestCase {
                             try {
                                 Date parsedDate = converter.parse(formattedDate, tz);
                                 text = "Input date:" + d.toString() + "\t\tFormatted date:" + formattedDate
-                                        + "\t\tParsed date:" + parsedDate.getTime() + "\t\tLocale:"
-                                        + l.getDisplayName() + "\t\tTimeZone: " + tz.getID() + "\t\tDate style: " + ds
-                                        + "\t\tTime style: " + ts + "\n";
+                                + "\t\tParsed date:" + parsedDate.getTime() + "\t\tLocale:"
+                                + l.getDisplayName() + "\t\tTimeZone: " + tz.getID() + "\t\tDate style: " + ds
+                                + "\t\tTime style: " + ts + "\n";
                                 sb.append(text);
                             } catch (IllegalArgumentException e) {
                                 sb.append(e.getMessage() + "\n");
@@ -318,8 +324,8 @@ public class DateServiceTest extends UnitTestCase {
                     try {
                         Date parsedDate = converter.parse(formattedDate, tz);
                         text = "Input date:" + d.toString() + "\t\tFormatted date:" + formattedDate
-                                + "\t\tParsed date:" + parsedDate.getTime() + "\t\tLocale:" + l.getDisplayName()
-                                + "\t\tTimeZone:" + tz.getID() + "\t\tSimpleDateFormat pattern:" + pattern + "\n";
+                        + "\t\tParsed date:" + parsedDate.getTime() + "\t\tLocale:" + l.getDisplayName()
+                        + "\t\tTimeZone:" + tz.getID() + "\t\tSimpleDateFormat pattern:" + pattern + "\n";
                         sb.append(text);
                     } catch (IllegalArgumentException e) {
                         sb.append(e.getMessage() + "\n");

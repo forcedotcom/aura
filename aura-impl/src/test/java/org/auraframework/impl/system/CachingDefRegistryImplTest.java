@@ -75,7 +75,7 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         // the
         // layoutsDefDescriptor is null
         ApplicationDef appWithNoLayout = auraTestingUtil.addSourceAutoCleanup(ApplicationDef.class,
-                "<aura:application></aura:application>").getDef();
+        "<aura:application></aura:application>").getDef();
         DefDescriptor<ApplicationDef> appDesc = appWithNoLayout.getDescriptor();
         assertNotNull("Test failed to retrieve definition of an application.", appWithNoLayout);
         assertNull("Application should not have had any layouts associted with it.",
@@ -85,8 +85,8 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         DefDescriptor<LayoutsDef> layoutDesc = DefDescriptorImpl.getInstance(appDesc.getDescriptorName(),
                 LayoutsDef.class);
         String layoutData = "<aura:layouts catchall='home' default='home'>" + "<aura:layout name='home' title='Home'>"
-                + "<aura:layoutItem container='content'>" + "Home" + "</aura:layoutItem>" + "</aura:layout>"
-                + "</aura:layouts>";
+        + "<aura:layoutItem container='content'>" + "Home" + "</aura:layoutItem>" + "</aura:layout>"
+        + "</aura:layouts>";
         auraTestingUtil.addSourceAutoCleanup(layoutDesc, layoutData);
 
         // We are still fetching definition in PROD mode, so it should fetch the

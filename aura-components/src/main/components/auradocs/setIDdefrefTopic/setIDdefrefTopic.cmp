@@ -1,0 +1,61 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Setting a Component ID"/>
+    <h2>Goal</h2>
+
+    <p>You want to create a component with a local ID and attributes in Java code. If you want to create a component and set its local Id on the client, see <auradocs:topicLink topic="dynamicCmp">Dynamically Creating Components</auradocs:topicLink>.</p>
+
+    <h2>Code</h2>
+    <auradocs:codeblock>
+    ComponentDefRefBuilder builder = Aura.getBuilderService().getComponentDefRefBuilder();
+
+    //Set the descriptor for your new component
+    builder.setDescriptor("namespace:newCmp");
+
+    //Set the local Id for your new component
+    builder.setLocalId("newId");
+
+    //Set attributes on the new component
+    builder.setAttribute("attr1", false);
+    builder.setAttribute("attr2", attrVal);
+
+    //Create a new instance of the component
+    Component aNewCmp = builder.build().newInstance(null).get(0);
+    </auradocs:codeblock>
+
+    <h2>Discussion</h2>
+    <p>To create a component on the server, use <code>ComponentDefRefBuilder</code> to set the component definition reference, also known as <code>ComponentDefRef</code>.
+    The <code>ComponentDefRef</code> creates the definition of the component instance and turns it into an instance of the component during runtime.</p>
+
+    <p>You can also create an instance of a component using <code>Aura.getInstanceService().getInstance()</code>, but you should use the <code>ComponentDefRefBuilder</code> if you want to:</p>
+    <ul>
+        <li>Set an ID on the new component.</li>
+        <li>Set a facet on a top-level component. See <auradocs:topicLink topic="helloFacets">Component Body and Facets</auradocs:topicLink> for more information.</li>
+        <li>Create multiple instances of the components with minimal updates to the definition.</li>
+    </ul>
+
+   <auradocs:info>The XML Parser in Aura reads in  files, such as .cmp, .intf, and .evt, by using  the BuilderService to construct  definitions. The BuilderService doesn't know anything about XML.
+    If you want to create reusable definitions that are the equivalent of what you could type into an XML file, but don't want to use XML as the storage format, use the BuilderService.</auradocs:info>
+
+    <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="javaInstanceCmp">Getting an Instance of a Component</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="cycleRefs">Component Request Glossary</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="cycleInit">Server-Side Process</auradocs:topicLink>
+    </p>
+</aura:component>

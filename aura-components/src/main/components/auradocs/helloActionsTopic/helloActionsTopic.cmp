@@ -26,18 +26,18 @@
     <p>The contents of an action can be any valid JavaScript.  There's nothing stopping you from writing <code>alert()</code> statements here except the ridicule of your peers.  However, it's typically more useful to actually update the UI.</p>
 
     <h2>Creating a Client-Side Controller </h2>
-    
+
     <p>A client-side controller file is part of the component bundle and is auto-wired if you follow the naming convention, <code>&lt;componentName&gt;Controller.js</code>.</p>
 
-    <p>To reuse a client-side controller from another component, you can use the <code>controller</code> system attribute in <code>aura:component</code> instead. For example, this component uses the auto-wired client-side controller for <code>auradocs.sampleComponent</code> in <code>auradocs/sampleComponent/sampleComponentController.js</code>.</p> 
-    
+    <p>To reuse a client-side controller from another component, you can use the <code>controller</code> system attribute in <code>aura:component</code> instead. For example, this component uses the auto-wired client-side controller for <code>auradocs.sampleComponent</code> in <code>auradocs/sampleComponent/sampleComponentController.js</code>.</p>
+
 <auradocs:codeblock><![CDATA[
-<aura:component 
+<aura:component
     controller="js://auradocs.sampleComponent">
-    ... 
+    ...
 </aura:component>]]>
-</auradocs:codeblock>     
-    
+</auradocs:codeblock>
+
     <h2>Calling Client-Side Controller Actions</h2>
 
     <p>Let's start by looking at events on an HTML tag.  You can see the contents of <code>helloActions.cmp</code> in the <b>Component source</b> tab.</p>
@@ -53,10 +53,10 @@
     When you extend these components, you have access to these events as well. For example, see the <auradocs:defLink descriptor="ui:button" defType="component">ui:button</auradocs:defLink> component reference. </p>
     <p>Let's look at the <code>onclick</code> attribute in the "Auraized" button, which invokes the <code>handleClick</code> action in the controller. The "Native" button uses the same syntax with the <code>press</code> attribute in the <code>&lt;ui:button&gt;</code> component.</p>
 
-    <p>In this simple scenario, there is little difference between working with the "Native" button or the "Auraized" HTML button. However, when you start working with more complex reusable components, the components that come out-of-the-box with Aura can simplify your job by taking care of some of the plumbing that you would otherwise have to create yourself. 
+    <p>In this simple scenario, there is little difference between working with the "Native" button or the "Auraized" HTML button. However, when you start working with more complex reusable components, the components that come out-of-the-box with Aura can simplify your job by taking care of some of the plumbing that you would otherwise have to create yourself.
     </p>
-	
-	<h3>Accessing Component Attributes</h3>
+
+    <h3>Accessing Component Attributes</h3>
     <p>Click the <b>js://controller source</b> tab to view the code for <code>helloActionsController.js</code>.
     In the <code>handleClick</code> function, notice that the first argument to every action is the component to which the controller belongs. And one of the most common things you'll want to do with this component is look at and change its attribute values.</p>
 
@@ -64,7 +64,20 @@
 
     <auradocs:info>For more information on Aura's JavaScript API, see JavaScript API in the <auradocs:navLink location="reference">Reference tab</auradocs:navLink>.</auradocs:info>
 
+    <h3>Invoking another Action in the Controller</h3>
+    <p>To call an action method from another method, add the component as an argument to get the other action.</p>
+    <auradocs:codeblock>
+    runIt : function(cmp) {
+        var a = cmp.get("c.otherFunction");
+        //Set parameters or do something else
+        a.run();
+    }
+    </auradocs:codeblock>
+     <p>You can also move the common call to a helper file. See <auradocs:topicLink topic="helper">Helpers</auradocs:topicLink> for more information.</p>
+
     <p><b>See also:</b><br/>
-    <auradocs:topicLink topic="eventsOverview">Event Handling Lifecycle</auradocs:topicLink></p>
+    <auradocs:topicLink topic="eventsOverview">Event Handling Lifecycle</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="initHandler">Invoking Actions on Component Initialization</auradocs:topicLink>
+    </p>
 
 </aura:component>

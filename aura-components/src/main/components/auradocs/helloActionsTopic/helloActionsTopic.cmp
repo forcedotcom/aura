@@ -73,8 +73,11 @@
         a.run();
     }
     </auradocs:codeblock>
-    <p>You can also move the common call into the helper file. See <auradocs:topicLink topic="helper">Helpers</auradocs:topicLink> for more information.</p>
+     <p>You can also move the common call to a helper file. See <auradocs:topicLink topic="helper">Helpers</auradocs:topicLink> for more information.</p>
+
     <p><b>See also:</b><br/>
-    <auradocs:topicLink topic="eventsOverview">Event Handling Lifecycle</auradocs:topicLink></p>
+    <auradocs:topicLink topic="eventsOverview">Event Handling Lifecycle</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="initHandler">Invoking Actions on Component Initialization</auradocs:topicLink>
+    </p>
 
 </aura:component>

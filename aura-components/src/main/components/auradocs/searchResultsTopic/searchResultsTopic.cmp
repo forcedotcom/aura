@@ -24,7 +24,7 @@
 	<aura:attribute name="myQuery" type="String[]" default="Search Results" />
 	
 	<p>You searched for "{!v.searchTerm}".</p>
-	<p><ui:outputText value="{!v.queryNum}" /> results found.</p>
+	<p><ui:outputText value="{!v.queryNum}" /> result(s) found.</p>
     <!--<p><ui:outputText value="{!v.myQuery}" /></p>-->
     
     <ol>
@@ -42,4 +42,5 @@
 			</aura:set>
 		</aura:if>-->
 	</ol>
+	<p><a href="#help?topic=welcome">Back to Search</a></p>
 </aura:component>

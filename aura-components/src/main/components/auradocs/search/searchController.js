@@ -17,7 +17,7 @@
 {
 	handleSearch : function(cmp,event){
 		 var searchTerm = event.getParam('searchTerm') || event.getSource().getElement().value;
-		 var results_location = "/auradocs#help?topic=searchResults";
+		 var results_location = "#help?topic=searchResults";
 		 
 		 if (searchTerm.length > 0) {
 			 var date = new Date();

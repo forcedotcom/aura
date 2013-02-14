@@ -47,6 +47,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-remote-driver</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-firefox-driver</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.auraframework.external</groupId>
             <artifactId>closure-stylesheets</artifactId>
         </dependency>

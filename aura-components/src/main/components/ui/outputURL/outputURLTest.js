@@ -153,31 +153,31 @@
     testLabel: {
         attributes : {label: 'link', value: 'www.salesforce.com'},
         test: function(component){
-            aura.test.assertEquals('link', component.find("link").getElement().textContent, "Label attribute not correct");
+            aura.test.assertEquals('link', $A.test.getText(component.find('link').getElement()), "Label attribute not correct");
         }
     },
 
     testLabelEmpty: {
         attributes : {label: '', value: 'www.salesforce.com'},
         test: function(component){
-            aura.test.assertEquals('', component.find("link").getElement().textContent, "Label attribute not correct");
+            aura.test.assertEquals('', $A.test.getText(component.find('link').getElement()), "Label attribute not correct");
         }
     },
 
     testLabelMissing: {
         attributes : {value: 'www.salesforce.com'},
         test: function(component){
-            aura.test.assertEquals('', component.find("link").getElement().textContent, "Label attribute not correct");
+            aura.test.assertEquals('', $A.test.getText(component.find('link').getElement()), "Label attribute not correct");
         }
     },
 
     testLabelDirty: {
         attributes : {label: 'link', value: 'www.salesforce.com'},
         test: function(component){
-            aura.test.assertEquals('link', component.find("link").getElement().textContent, "Label attribute not correct");
+            aura.test.assertEquals('link', $A.test.getText(component.find('link').getElement()), "Label attribute not correct");
             component.getAttributes().setValue("label", "updated link");
             $A.renderingService.rerender(component);
-            aura.test.assertEquals('updated link', component.find("link").getElement().textContent, "Label attribute not updated");
+            aura.test.assertEquals('updated link', $A.test.getText(component.find('link').getElement()), "Label attribute not updated");
         }
     },
 

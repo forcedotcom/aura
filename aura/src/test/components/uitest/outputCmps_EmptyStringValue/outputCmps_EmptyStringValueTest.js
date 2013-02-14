@@ -21,31 +21,31 @@
      */
     testOutputDateEmptyStringValue: {
         test: function(component){
-            $A.test.assertEquals("", component.find('date').getElement().textContent, "Expected an empty span for outputDate.");
+            $A.test.assertEquals("", $A.test.getText(component.find('date').getElement()), "Expected an empty span for outputDate.");
         }
     },
 
     testOutputCurrencyEmptyStringValue: {
         test: function(component){
-            $A.test.assertEquals("", component.find('currency').getElement().textContent, "Expected an empty span for outputCurrency.");
+            $A.test.assertEquals("", $A.test.getText(component.find('currency').getElement()), "Expected an empty span for outputCurrency.");
         }
     },
 
     testOutputDateTimeEmptyStringValue: {
         test: function(component){
-            $A.test.assertEquals("", component.find('dateTime').getElement().textContent, "Expected an empty span for outputDateTime.");
+            $A.test.assertEquals("", $A.test.getText(component.find('dateTime').getElement()), "Expected an empty span for outputDateTime.");
         }
     },
 
     testOutputNumberEmptyStringValue: {
         test: function(component){
-            $A.test.assertEquals("", component.find('number').getElement().textContent, "Expected an empty span for outputNumber.");
+            $A.test.assertEquals("", $A.test.getText(component.find('number').getElement()), "Expected an empty span for outputNumber.");
         }
     },
 
     testOutputPercentEmptyStringValue: {
         test: function(component){
-            $A.test.assertEquals("", component.find('percent').getElement().textContent, "Expected an empty span for outputPercent.");
+            $A.test.assertEquals("", $A.test.getText(component.find('percent').getElement()), "Expected an empty span for outputPercent.");
         }
     },
 })

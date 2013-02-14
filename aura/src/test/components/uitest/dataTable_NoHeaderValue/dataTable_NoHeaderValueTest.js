@@ -28,7 +28,7 @@
 
             var dataRow = tableElement.firstChild;
             aura.test.assertTrue(dataRow instanceof HTMLTableRowElement, "Expected table row dom element." )
-            aura.test.assertEquals("Row1 Col1Row1 Col2" , dataRow.textContent, "Text set in markup of dataTable not displayed." )
+            aura.test.assertEquals("Row1 Col1Row1 Col2" , $A.test.getText(dataRow), "Text set in markup of dataTable not displayed." )
             aura.test.assertTrue(dataRow.cells[0] instanceof HTMLTableCellElement)
             aura.test.assertEquals('TD', dataRow.cells[0].tagName, 'Data in non header row should be shown using TD tags')
             aura.test.assertFalse( $A.util.hasClass(dataRow.cells[0],'header') , "data cells should not have header class" );

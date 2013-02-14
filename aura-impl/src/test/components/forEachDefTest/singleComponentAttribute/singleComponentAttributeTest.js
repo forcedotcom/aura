@@ -25,9 +25,9 @@
                 }
             }
             aura.test.assertEquals(children.length, 3);
-            aura.test.assertEquals(children[0].textContent, "for");
-            aura.test.assertEquals(children[1].textContent, "each");
-            aura.test.assertEquals(children[2].textContent, "hooray");
+            aura.test.assertEquals($A.test.getText(children[0]), "for");
+            aura.test.assertEquals($A.test.getText(children[1]), "each");
+            aura.test.assertEquals($A.test.getText(children[2]), "hooray");
         }
     }
 })

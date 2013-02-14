@@ -236,7 +236,7 @@ var AuraDevToolService = function() {
         },
 
         filterFields : function(fields, derivedFields, rows){
-            fields = fields.trim();
+            fields = $A.util.trim(fields);
             if(fields === this.defaultFields && derivedFields === this.defaultDerivedFields){
                 return rows;
             }
@@ -249,7 +249,7 @@ var AuraDevToolService = function() {
                 var fieldSplit = fields.split(",");
                 fields = [];
                 for(var k=0;k<fieldSplit.length;k++){
-                    var field = fieldSplit[k].trim();
+                    var field = $A.util.trim(fieldSplit[k]);
                     var fieldConfig = {};
                     fields[k] = fieldConfig;
                     var splitField = field.match(/^(\S+)(?: as (\w+))?$/i);

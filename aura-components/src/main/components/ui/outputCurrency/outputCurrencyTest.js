@@ -20,7 +20,7 @@
     testNegativeValue:{
         attributes: {value : -123},
         test: function(component){
-            aura.test.assertEquals('($123.00)', component.find('span').getElement().textContent, "Negative values not displayed correctly.");
+            aura.test.assertEquals('($123.00)', $A.test.getText(component.find('span').getElement()), "Negative values not displayed correctly.");
         }
     },
     /**
@@ -29,7 +29,7 @@
     testFractionalValue:{
         attributes: {value : .5},
         test: function(component){
-            aura.test.assertEquals('$0.50', component.find('span').getElement().textContent, "Fractional values should be displayed in 0.XX format.");
+            aura.test.assertEquals('$0.50', $A.test.getText(component.find('span').getElement()), "Fractional values should be displayed in 0.XX format.");
         }
     },
     /**
@@ -38,7 +38,7 @@
     testValue: {
         attributes : {value : 123},
         test: function(component){
-            aura.test.assertEquals('$123.00', component.find('span').getElement().textContent, "Positive value attribute not displayed correctly");
+            aura.test.assertEquals('$123.00', $A.test.getText(component.find('span').getElement()), "Positive value attribute not displayed correctly");
         }
     },
     /**
@@ -49,7 +49,7 @@
     _testEmptyStringValue: {
         attributes : {value : ''},
         test: function(component){
-            aura.test.assertEquals('', component.find('span').getElement().textContent, "Should have displayed empty span.");
+            aura.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Should have displayed empty span.");
         }
     },
     /**
@@ -59,7 +59,7 @@
     _testNonNumericValue: {
         attributes : {value : 'foo'},
         test: function(component){
-            aura.test.assertEquals('The value attribute must be assigned a numeric value', component.find('span').getElement().textContent, "Should have displayed an error message.");
+            aura.test.assertEquals('The value attribute must be assigned a numeric value', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message.");
         }
     },
 
@@ -69,7 +69,7 @@
     testEmptyStringCurrencyCode: {
         attributes : {value : 123, currencyCode: ''},
         test: function(component){
-            aura.test.assertEquals('The currencyCode attribute must be a valid ISO 4217 currency code', component.find('span').getElement().textContent, "Should have used USD as default currency code.");
+            aura.test.assertEquals('The currencyCode attribute must be a valid ISO 4217 currency code', $A.test.getText(component.find('span').getElement()), "Should have used USD as default currency code.");
         }
     },
     /**
@@ -78,7 +78,7 @@
     testNonCharCurrencyCode: {
         attributes : {value : 123, currencyCode: 123.4},
         test: function(component){
-            aura.test.assertEquals('The currencyCode attribute must be a valid ISO 4217 currency code', component.find('span').getElement().textContent, "Should have used USD as default currency code.");
+            aura.test.assertEquals('The currencyCode attribute must be a valid ISO 4217 currency code', $A.test.getText(component.find('span').getElement()), "Should have used USD as default currency code.");
         }
     },
     /**
@@ -87,7 +87,7 @@
     testInvalidCurrencyCode: {
         attributes : {value : 123, currencyCode : 'ABC'},
         test: function(component){
-            aura.test.assertEquals('The currencyCode attribute must be a valid ISO 4217 currency code', component.find('span').getElement().textContent, "Should have displayed an error message");
+            aura.test.assertEquals('The currencyCode attribute must be a valid ISO 4217 currency code', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message");
         }
     },
     /**
@@ -96,7 +96,7 @@
     testDefaultCurrencyCode: {
         attributes : {value : 123},
         test: function(component){
-            aura.test.assertEquals('$123.00', component.find('span').getElement().textContent, "Should have used USD as default currency code.");
+            aura.test.assertEquals('$123.00', $A.test.getText(component.find('span').getElement()), "Should have used USD as default currency code.");
         }
     },
     /**
@@ -105,7 +105,7 @@
     testCurrencyCodeUSD: {
         attributes : {value : 123, currencyCode : 'USD'},
         test: function(component){
-            aura.test.assertEquals('$123.00', component.find('span').getElement().textContent, "Text not correct when currencyCode is specified");
+            aura.test.assertEquals('$123.00', $A.test.getText(component.find('span').getElement()), "Text not correct when currencyCode is specified");
         }
     },
     /**
@@ -115,7 +115,7 @@
     _testCurrencyCodeWithSpaces: {
         attributes : {value : 123, currencyCode : '   USD   '},
         test: function(component){
-            aura.test.assertEquals('$123.00', component.find('span').getElement().textContent, "outputCurrency does not process currencyDode after trimming");
+            aura.test.assertEquals('$123.00', $A.test.getText(component.find('span').getElement()), "outputCurrency does not process currencyDode after trimming");
         }
     },
     /**
@@ -124,7 +124,7 @@
     testSymbolAsCurrencyCode: {
         attributes : {value : 123, currencyCode : '$'},
         test: function(component){
-            aura.test.assertEquals('The currencyCode attribute must be a valid ISO 4217 currency code', component.find('span').getElement().textContent, "Should have displayed an error message");
+            aura.test.assertEquals('The currencyCode attribute must be a valid ISO 4217 currency code', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message");
         }
     },
     /**
@@ -133,7 +133,7 @@
     testCurrencyCodeGBP: {
         attributes : {value : 123, currencyCode : 'GBP'},
         test: function(component){
-            aura.test.assertEquals('GBP123.00', component.find('span').getElement().textContent, "Text not correct when currencyCode is specified");
+            aura.test.assertEquals('GBP123.00', $A.test.getText(component.find('span').getElement()), "Text not correct when currencyCode is specified");
         }
     },
     /**
@@ -144,7 +144,7 @@
     testCurrencyCodeINR_NumberGrouping: {
         attributes : {value : 121212000.54, currencyCode : 'INR'},
         test: function(component){
-            aura.test.assertEquals('INR121,212,000.54', component.find('span').getElement().textContent, "Should follow three digit grouping regardless of currency.");
+            aura.test.assertEquals('INR121,212,000.54', $A.test.getText(component.find('span').getElement()), "Should follow three digit grouping regardless of currency.");
         }
     },
     /**
@@ -155,7 +155,7 @@
     testCurrencyCodeEUR_CommaDecimalSeperator: {
         attributes : {value : 121212000.54, currencyCode : 'EUR'},
         test: function(component){
-            aura.test.assertEquals('EUR121,212,000.54', component.find('span').getElement().textContent, "Show follow US locale since outputCurrency is not locale aware.");
+            aura.test.assertEquals('EUR121,212,000.54', $A.test.getText(component.find('span').getElement()), "Show follow US locale since outputCurrency is not locale aware.");
         }
     },
     /**
@@ -165,7 +165,7 @@
         attributes : {value : '12345678909876543.444'},
         test: function(component){
             aura.test.assertEquals(2, component.getValue('v.fractionDigits').getValue(), "Expected fractionDigits attribute to be 2");
-            aura.test.assertEquals('$12,345,678,909,876,543.44', component.find('span').getElement().textContent, "Failed to use default value of fractionDigits attribute.");
+            aura.test.assertEquals('$12,345,678,909,876,543.44', $A.test.getText(component.find('span').getElement()), "Failed to use default value of fractionDigits attribute.");
         }
 
     },
@@ -176,7 +176,7 @@
     testFractionDigitsNegativeValue:{
         attributes : {value : 123.789, fractionDigits : '-1'},
         test: function(component){
-            aura.test.assertEquals('The fractionDigits attribute must be assigned a non-negative integer value',component.find('span').getElement().textContent, "Negative values should not be accepted for fractionDigits attribute");
+            aura.test.assertEquals('The fractionDigits attribute must be assigned a non-negative integer value',$A.test.getText(component.find('span').getElement()), "Negative values should not be accepted for fractionDigits attribute");
         }
     },
     /**
@@ -186,7 +186,7 @@
     _testFractionDigitsNonIntegerValue:{
         attributes: {value: 123.789, fractionDigits : '2.5'},
         test:function(component){
-            aura.test.assertEquals('The fractionDigits attribute must be assigned a non-negative integer value', component.find('span').getElement().textContent, "Should have displayed an error message for using fractional values for fractionDigits attribute.");
+            aura.test.assertEquals('The fractionDigits attribute must be assigned a non-negative integer value', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message for using fractional values for fractionDigits attribute.");
         }
     },
     /**
@@ -196,7 +196,7 @@
     _testFractionDigitsStringValue:{
         attributes: {value: 123.789, fractionDigits : 'ABC'},
         test:function(component){
-            aura.test.assertEquals('The fractionDigits attribute must be assigned a non-negative integer value', component.find('span').getElement().textContent, "Should have displayed an error message for using literal values for fractionDigits attribute.");
+            aura.test.assertEquals('The fractionDigits attribute must be assigned a non-negative integer value', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message for using literal values for fractionDigits attribute.");
         }
     },
     /**
@@ -207,7 +207,7 @@
     _testFractionDigitsEmptyString: {
         attributes : {value : 123.45, fractionDigits : ''},
         test: function(component){
-            aura.test.assertEquals('The fractionDigits attribute must be assigned a non-negative integer value', component.find('span').getElement().textContent, "Should have displayed an error message if fractionDigits attribute is assigned a non integer value.");
+            aura.test.assertEquals('The fractionDigits attribute must be assigned a non-negative integer value', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message if fractionDigits attribute is assigned a non integer value.");
         }
     },
     /**
@@ -216,7 +216,7 @@
    testFractionDigits: {
         attributes : {value : 1234567890.45, fractionDigits : '2'},
         test: function(component){
-            aura.test.assertEquals('$1,234,567,890.45', component.find('span').getElement().textContent, "Value not displayed correctly when fractionDigits is specified.");
+            aura.test.assertEquals('$1,234,567,890.45', $A.test.getText(component.find('span').getElement()), "Value not displayed correctly when fractionDigits is specified.");
         }
     },
     /**
@@ -227,7 +227,7 @@
     testFractionDigitsMaxValue:{
         attributes: {value: 123, fractionDigits : '341'},
         test:function(component){
-            aura.test.assertTrue(component.find('span').getElement().textContent.indexOf('$123.00')===0, "Failed to process big values for fractionDigits.");
+            aura.test.assertTrue($A.test.getText(component.find('span').getElement()).indexOf('$123.00')===0, "Failed to process big values for fractionDigits.");
         }
     },
     /**
@@ -236,7 +236,7 @@
     testFractionDigitsPad: {
         attributes : {value : 1234567890, fractionDigits : '4'},
         test: function(component){
-            aura.test.assertEquals('$1,234,567,890.0000', component.find('span').getElement().textContent, "Value not displayed correctly when fractionDigits is specified and pads with zeros.");
+            aura.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not displayed correctly when fractionDigits is specified and pads with zeros.");
         }
     },
     /**
@@ -245,7 +245,7 @@
     testFractionDigitsTruncate_RoundDown: {
         attributes : {value : 1234567890.7654321, fractionDigits : '4'},
         test: function(component){
-            aura.test.assertEquals('$1,234,567,890.7654', component.find('span').getElement().textContent, "Value not displayed correctly when fractionDigits is specified and truncates.");
+            aura.test.assertEquals('$1,234,567,890.7654', $A.test.getText(component.find('span').getElement()), "Value not displayed correctly when fractionDigits is specified and truncates.");
         }
     },
     /**
@@ -254,7 +254,7 @@
     testFractionDigitsTruncate_RoundUp: {
         attributes : {value : 1234567890.7654521, fractionDigits : '4'},
         test: function(component){
-            aura.test.assertEquals('$1,234,567,890.7655', component.find('span').getElement().textContent, "Value not displayed correctly when fractionDigits is specified and truncates.");
+            aura.test.assertEquals('$1,234,567,890.7655', $A.test.getText(component.find('span').getElement()), "Value not displayed correctly when fractionDigits is specified and truncates.");
         }
     },
     /**
@@ -264,7 +264,7 @@
     testFractionDigitsZeroValue: {
         attributes : {value : 123.45, fractionDigits : '0'},
         test: function(component){
-            aura.test.assertEquals('$123', component.find('span').getElement().textContent, "fractionDigits should be allowed to take value of 0.");
+            aura.test.assertEquals('$123', $A.test.getText(component.find('span').getElement()), "fractionDigits should be allowed to take value of 0.");
         }
     },
 
@@ -274,7 +274,7 @@
     testBigDecimal:{
         attributes : {value : '1234567890123456789012345678901234567890.12'},
         test: function(component){
-            aura.test.assertEquals('$1,234,567,890,123,456,789,012,345,678,901,234,567,890.12', component.find('span').getElement().textContent, "Unexpected value.");
+            aura.test.assertEquals('$1,234,567,890,123,456,789,012,345,678,901,234,567,890.12', $A.test.getText(component.find('span').getElement()), "Unexpected value.");
         }
     }
 })

@@ -20,12 +20,12 @@
     testComponent:{
         test:function(cmp){
             cmp.find("Charlie").getEvent("A").fire();
-            aura.test.assertEquals("", cmp.find("events").getElement().textContent);
-            aura.test.assertEquals("", cmp.find("Martin").find("events").getElement().textContent);
-            aura.test.assertEquals("", cmp.find("Brooke").find("events").getElement().textContent);
-            aura.test.assertEquals("", cmp.find("Bob").find("events").getElement().textContent);
-            aura.test.assertEquals("", cmp.find("Max").find("events").getElement().textContent);
-            var text = cmp.find("Charlie").find("events").getElement().textContent;
+            aura.test.assertEquals("", $A.test.getText(cmp.find("events").getElement()));
+            aura.test.assertEquals("", $A.test.getText(cmp.find("Martin").find("events").getElement()));
+            aura.test.assertEquals("", $A.test.getText(cmp.find("Brooke").find("events").getElement()));
+            aura.test.assertEquals("", $A.test.getText(cmp.find("Bob").find("events").getElement()));
+            aura.test.assertEquals("", $A.test.getText(cmp.find("Max").find("events").getElement()));
+            var text = $A.test.getText(cmp.find("Charlie").find("events").getElement());
             aura.test.assertTrue(text=="AB" || text=="BA");
         }
     },
@@ -36,12 +36,12 @@
     testApplication:{
         test:function(cmp){
             $A.get("e.handleEventTest:applicationEvent").fire();
-            aura.test.assertEquals("A", cmp.find("events").getElement().textContent);
-            aura.test.assertEquals("C", cmp.find("Martin").find("events").getElement().textContent);
-            aura.test.assertEquals("C", cmp.find("Charlie").find("events").getElement().textContent);
-            aura.test.assertEquals("C", cmp.find("Brooke").find("events").getElement().textContent);
-            aura.test.assertEquals("C", cmp.find("Bob").find("events").getElement().textContent);
-            aura.test.assertEquals("C", cmp.find("Max").find("events").getElement().textContent);
+            aura.test.assertEquals("A", $A.test.getText(cmp.find("events").getElement()));
+            aura.test.assertEquals("C", $A.test.getText(cmp.find("Martin").find("events").getElement()));
+            aura.test.assertEquals("C", $A.test.getText(cmp.find("Charlie").find("events").getElement()));
+            aura.test.assertEquals("C", $A.test.getText(cmp.find("Brooke").find("events").getElement()));
+            aura.test.assertEquals("C", $A.test.getText(cmp.find("Bob").find("events").getElement()));
+            aura.test.assertEquals("C", $A.test.getText(cmp.find("Max").find("events").getElement()));
         }
     }
 })

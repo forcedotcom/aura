@@ -17,14 +17,14 @@
     testPositiveValue: {
         attributes : {value : 1.145, format : '0000.0'},
         test: function(component){
-            aura.test.assertEquals('0114.5%', component.find('span').getElement().textContent, "Percentage not correct");
+            aura.test.assertEquals('0114.5%', $A.test.getText(component.find('span').getElement()), "Percentage not correct");
         }
     },
 
     testNegativeValue: {
         attributes : {value : -0.14, format : '.000'},
         test: function(component){
-            aura.test.assertEquals('-14.000%', component.find('span').getElement().textContent, "Percentage not correct");
+            aura.test.assertEquals('-14.000%', $A.test.getText(component.find('span').getElement()), "Percentage not correct");
         }
     },
 
@@ -32,35 +32,35 @@
     _testEmptyStringValue: {
         attributes : {value : ''},
         test: function(component){
-            aura.test.assertEquals('', component.find('span').getElement().textContent, "Expect to see an empty span.");
+            aura.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Expect to see an empty span.");
         }
     },
 
     testUnassignedFormat: {
         attributes : {value : 0.006},
         test: function(component){
-            aura.test.assertEquals('0.006%', component.find('span').getElement().textContent, "Expected default format to be used");
+            aura.test.assertEquals('0.006%', $A.test.getText(component.find('span').getElement()), "Expected default format to be used");
         }
     },
 
     testInvalidFormat: {
         attributes : {value : 30, format: ',,'},
         test: function(component){
-            aura.test.assertEquals('Invalid format attribute', component.find('span').getElement().textContent, "Expected error message");
+            aura.test.assertEquals('Invalid format attribute', $A.test.getText(component.find('span').getElement()), "Expected error message");
         }
     },
 
     testRounding: {
         attributes : {value : 0.14566, format: '0.00'},
         test: function(component){
-            aura.test.assertEquals('14.57%', component.find('span').getElement().textContent, "Rounding not correct");
+            aura.test.assertEquals('14.57%', $A.test.getText(component.find('span').getElement()), "Rounding not correct");
         }
     },
 
     testPrecision: {
         attributes : {value : .05, format : '.0'},
         test: function(component){
-            aura.test.assertEquals('5.0%', component.find('span').getElement().textContent, "Percentage not correct");
+            aura.test.assertEquals('5.0%', $A.test.getText(component.find('span').getElement()), "Percentage not correct");
         }
     },
 
@@ -68,7 +68,7 @@
     _testNonNumericValue: {
         attributes : {value : 'true'},
         test: function(component){
-            aura.test.assertEquals('The value attribute must be assigned a numeric value', component.find('span').getElement().textContent, "Expected error message");
+            aura.test.assertEquals('The value attribute must be assigned a numeric value', $A.test.getText(component.find('span').getElement()), "Expected error message");
         }
     }
 })

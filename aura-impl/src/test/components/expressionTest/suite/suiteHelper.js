@@ -18,7 +18,7 @@
         while(cmp && cmp.getDef().toString() !== "markup://expressionTest:suite"){
             cmp = cmp.getSuper();
         }
-        var errors = cmp.find("errors").getElement().textContent.trim();
+        var errors = $A.util.trim(cmp.find("errors").getElement().textContent);
         if(errors !== ""){
             throw new Error("Unexpected expression evaluation(s):\n" + errors);
         }

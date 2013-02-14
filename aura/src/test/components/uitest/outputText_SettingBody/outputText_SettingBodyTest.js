@@ -21,7 +21,7 @@
     testSettingBodyDoesNotAffectDisplay:{
         test:function(cmp){
             var testOutputTextCmp = cmp.find('settingBody');
-            aura.test.assertEquals('foo', testOutputTextCmp.find('span').getElement().textContent, "outputText should display only text initialized in value attribute.");
+            aura.test.assertEquals('foo', $A.test.getText(testOutputTextCmp.find('span').getElement()), "outputText should display only text initialized in value attribute.");
         }
     }
 })

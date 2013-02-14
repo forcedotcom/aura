@@ -44,7 +44,7 @@ public class RendererForTestingIntegrationService implements Renderer {
         integration.injectApplication(out);
         integration.injectComponent(desc, attr, localId ,placeholder , out);
         
-        //The only not-so-ideal part of this approach to testing INTegrationService is that we have to start the 
+        //The only not-so-ideal part of this approach to testing IntegrationService is that we have to start the 
         //context for the rendering of the original stub component to continue. IntegrationService sets up and tears down its context.
         Aura.getContextService().startContext(ctx.getMode(), ctx.getFormat(), ctx.getAccess(), ctx.getApplicationDescriptor());
     }

@@ -20,7 +20,7 @@
     testEmptyValue:{
         attributes : {value: ''},
         test: function(component){
-            aura.test.assertEquals('', component.find('link').getElement().textContent, "When value is initialized to an empty string, nothing should be shown.");
+            aura.test.assertEquals('', $A.test.getText(component.find('link').getElement()), "When value is initialized to an empty string, nothing should be shown.");
         }
     },
 
@@ -30,7 +30,7 @@
     testValue: {
         attributes : {value : '+1 (415) 867-5309'},
         test: function(component){
-        	aura.test.assertEquals('+1 (415) 867-5309', component.find('link').getElement().textContent, "Visible phone number not correct");
+        	aura.test.assertEquals('+1 (415) 867-5309', $A.test.getText(component.find('link').getElement()), "Visible phone number not correct");
             aura.test.assertTrue(aura.test.contains(unescape(component.find('link').getElement().href),'tel:+1(415)867-5309'), "Link not correct");
         }
     },
@@ -42,7 +42,7 @@
     testValueContainsAsterisk: {
         attributes : {value : '867-5309*222'},
         test: function(component){
-            aura.test.assertEquals('867-5309*222', component.find('link').getElement().textContent, "Visible phone number not correct");
+            aura.test.assertEquals('867-5309*222', $A.test.getText(component.find('link').getElement()), "Visible phone number not correct");
             aura.test.assertEquals('', component.find('link').getElement().href, "Number should not be linked");
         }
     },
@@ -54,7 +54,7 @@
     testValueStartsWithAsterisk: {
         attributes : {value : '*69'},
         test: function(component){
-            aura.test.assertEquals('*69', component.find('link').getElement().textContent, "Visible phone number not correct");
+            aura.test.assertEquals('*69', $A.test.getText(component.find('link').getElement()), "Visible phone number not correct");
             aura.test.assertEquals('', component.find('link').getElement().href, "Number should not be linked");
         }
     },
@@ -66,7 +66,7 @@
     testValueContainsPound: {
         attributes : {value : '867-5309 # 2222'},
         test: function(component){
-            aura.test.assertEquals('867-5309 # 2222', component.find('link').getElement().textContent, "Visible phone number not correct");
+            aura.test.assertEquals('867-5309 # 2222', $A.test.getText(component.find('link').getElement()), "Visible phone number not correct");
             aura.test.assertEquals('', component.find('link').getElement().href, "Number should not be linked");
         }
     },
@@ -78,7 +78,7 @@
     testValueStartsWithPound: {
         attributes : {value : '#2222'},
         test: function(component){
-            aura.test.assertEquals('#2222', component.find('link').getElement().textContent, "Visible phone number not correct");
+            aura.test.assertEquals('#2222', $A.test.getText(component.find('link').getElement()), "Visible phone number not correct");
             aura.test.assertEquals('', component.find('link').getElement().href, "Number should not be linked");
         }
     },
@@ -90,7 +90,7 @@
     	attributes : {value : '   555-1234   '},
         test: function(component){
         	var link = component.find('link').getElement();
-            aura.test.assertTrue(aura.test.contains(link.textContent, '555-1234'), "Visible phone number not correct");
+            aura.test.assertTrue(aura.test.contains($A.test.getText(link), '555-1234'), "Visible phone number not correct");
             aura.test.assertEquals('tel:555-1234', link.href, "Link not correct");
         }
     }

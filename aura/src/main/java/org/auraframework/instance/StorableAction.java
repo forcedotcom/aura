@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    testNonDateTimeJavaObj:{
-        test:function(cmp){
-            var testCmp = cmp.find('NonCalendarFromJava');
-            aura.test.assertEquals("Value must be bound to a model value that resolves to a java.util.Calendar", $A.test.getText(testCmp.find('span').getElement()), "Expected an error message");
-        }
-    }
-})
+package org.auraframework.instance;
+
+import java.util.Map;
+
+public interface StorableAction extends Action {
+	public boolean isStorable();
+	public void setStorable();
+	public Map<String, Object> getParams();
+}

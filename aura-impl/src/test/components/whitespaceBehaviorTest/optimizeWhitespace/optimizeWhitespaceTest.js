@@ -20,8 +20,8 @@
             var divText = cmp.find("divText").getElement().innerHTML;
 
             // check no whitespace elements present, only 'true', 'false', and the div elements
-            $A.test.assertEquals("true", cmpElems[0].textContent, "First element in body of component should be 'true'.");
-            $A.test.assertEquals("false", cmpElems[1].textContent, "Second element in body of component should be 'false'.");
+            $A.test.assertEquals("true", $A.test.getText(cmpElems[0]), "First element in body of component should be 'true'.");
+            $A.test.assertEquals("false", $A.test.getText(cmpElems[1]), "Second element in body of component should be 'false'.");
             $A.test.assertTrue(cmpElems[2] instanceof HTMLDivElement, "Third element in body of component should be div");
 
             $A.test.assertEquals("truefalse", divText, "Whitespace for text within div should not be present.");

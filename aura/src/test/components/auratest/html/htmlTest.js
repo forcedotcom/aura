@@ -20,7 +20,7 @@
     testAnchorNoFragment: {
         test: function(component){
             var tag = component.find("nohash").getElement();
-            aura.test.assertEquals("salesforce", tag.textContent, "textContent not expected");
+            aura.test.assertEquals("salesforce", $A.test.getText(tag), "textContent not expected");
             aura.test.assertTrue(aura.test.contains(tag.href, "http://www.salesforce.com/"), "href not expected");
         }
     },
@@ -31,7 +31,7 @@
     testAnchorFragment: {
         test: function(component){
             var tag = component.find("hash").getElement();
-            aura.test.assertEquals("hash", tag.textContent, "textContent not expected");
+            aura.test.assertEquals("hash", $A.test.getText(tag), "textContent not expected");
             aura.test.assertEquals("javascript:void(0/*#*/);", tag.href, "href not expected");
         }
     },
@@ -42,7 +42,7 @@
     testAnchorFragmentString: {
         test: function(component){
             var tag = component.find("hashString").getElement();
-            aura.test.assertEquals("layout", tag.textContent, "textContent not expected");
+            aura.test.assertEquals("layout", $A.test.getText(tag), "textContent not expected");
             aura.test.assertEquals("javascript:void(0/*#layout*/);", tag.href, "href not expected");
         }
     },

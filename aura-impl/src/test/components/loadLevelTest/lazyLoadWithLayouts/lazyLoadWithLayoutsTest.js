@@ -49,10 +49,10 @@
             // Call back after layout Items loaded
             function(){
                 aura.test.assertEquals(expectedContentAfterLayoutLoad["containerA"],
-                        component.find("containerA").getElement().textContent, "A content not expected");
-                aura.test.assertEquals(expectedContentAfterLayoutLoad["containerB"], component.find("containerB").getElement().textContent,
+                        $A.test.getText(component.find("containerA").getElement()), "A content not expected");
+                aura.test.assertEquals(expectedContentAfterLayoutLoad["containerB"], $A.test.getText(component.find("containerB").getElement()),
                         "B content not expected");
-                aura.test.assertEquals(expectedContentAfterLayoutLoad["containerC"], component.find("containerB").getElement().textContent,
+                aura.test.assertEquals(expectedContentAfterLayoutLoad["containerC"], $A.test.getText(component.find("containerB").getElement()),
                         "C content not expected");
             });
         });

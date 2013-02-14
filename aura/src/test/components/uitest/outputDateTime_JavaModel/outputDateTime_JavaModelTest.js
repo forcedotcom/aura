@@ -22,7 +22,7 @@
         test:function(cmp){
             var testCmp = cmp.find('calendarFromJava');
             aura.test.assertNotNull(testCmp);
-            aura.test.assertEquals('10/23/2004 16:30:00 GMT', testCmp.find('span').getElement().textContent, "Failed to display DateTime from Java model");
+            aura.test.assertEquals('10/23/2004 16:30:00 GMT', $A.test.getText(testCmp.find('span').getElement()), "Failed to display DateTime from Java model");
         }
     },
     /**
@@ -32,7 +32,7 @@
         test:function(cmp){
         var testCmp = cmp.find('calendarFromJavaWithTZOverride');
         aura.test.assertNotNull(testCmp);
-        aura.test.assertEquals('2005-07-04 09:30:00 MST', testCmp.find('span').getElement().textContent, "Failed to display DateTime from Java model");
+        aura.test.assertEquals('2005-07-04 09:30:00 MST', $A.test.getText(testCmp.find('span').getElement()), "Failed to display DateTime from Java model");
         }
     }
 })

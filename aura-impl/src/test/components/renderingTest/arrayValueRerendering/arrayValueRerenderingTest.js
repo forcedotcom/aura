@@ -18,7 +18,7 @@
         test : function(component) {
             var values = component.getElement().childNodes;
             for (var n = 0; n < values.length; n++) {
-                $A.test.assertEquals("Value " + (n + 1), values[n].textContent);
+                $A.test.assertEquals("Value " + (n + 1), $A.test.getText(values[n]));
             }
 
             var body = component.find("me").getValue("v.body");
@@ -56,7 +56,7 @@
 
                 values = component.getElement().childNodes;
                 for (n = 0; n < values.length; n++) {
-                    $A.test.assertEquals("Value " + (n + 1), values[n].textContent);
+                    $A.test.assertEquals("Value " + (n + 1), $A.test.getText(values[n]));
                 }
             }
 
@@ -74,14 +74,14 @@
                 body.insert(0, c);
             });
             $A.rerender(component);
-            $A.test.assertEquals("Value inserted at index 0", values[0].textContent);
+            $A.test.assertEquals("Value inserted at index 0", $A.test.getText(values[0]));
             $A.test.assertEquals(13, values.length);*/
 
             addComponent("Value inserted at index 1", function(body, c) {
                 body.insert(1, c);
             });
             $A.rerender(component);
-            $A.test.assertEquals("Value inserted at index 1", values[1].textContent, "Value not inserted at proper index");
+            $A.test.assertEquals("Value inserted at index 1", $A.test.getText(values[1]), "Value not inserted at proper index");
             $A.test.assertEquals(13, values.length);
 
             // TODO(W-1479653): after test is changed to insert at index 0, modify this block of code to insert at last index again
@@ -89,7 +89,7 @@
                 body.insert(13, c);
             });
             $A.rerender(component);
-            $A.test.assertEquals("Value inserted at last index", values[13].textContent, "Value not inserted at end of array");
+            $A.test.assertEquals("Value inserted at last index", $A.test.getText(values[13]), "Value not inserted at end of array");
             $A.test.assertEquals(14, values.length);
         }
     }

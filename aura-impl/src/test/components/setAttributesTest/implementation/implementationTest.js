@@ -24,7 +24,7 @@
             //Another way of accessing attributes
             aura.test.assertEquals('implementationX',cmp.getAttributes('SimpleAttribute').getValue());
             //UI verification to check that renderer used the right attribute value
-            aura.test.assertEquals('The value of SimpleAttribute = implementationX',cmp.find('simpleAttr_id').getElement().textContent);
+            aura.test.assertEquals('The value of SimpleAttribute = implementationX',$A.test.getText(cmp.find('simpleAttr_id').getElement()));
         }
     }
 })

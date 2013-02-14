@@ -16,6 +16,7 @@
   var priv = {
     registry : new ComponentDefRegistry(),
     controllerDefRegistry : new ControllerDefRegistry(),
+    actionDefRegistry : new ActionDefRegistry(),
     modelDefRegistry : new ModelDefRegistry(),
     providerDefRegistry : new ProviderDefRegistry(),
     rendererDefRegistry : new RendererDefRegistry(),

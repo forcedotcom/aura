@@ -136,7 +136,7 @@
         var elements = component.getElements();
         aura.test.assertTrue(elements[0] instanceof HTMLInputElement, "Input element not found");
         aura.test.assertTrue(elements[1] instanceof Text, "Label not found with checkbox");
-        aura.test.assertEquals(expectedLabel, elements[1].textContent, "Label attribute not correctly set");
+        aura.test.assertEquals(expectedLabel, $A.test.getText(elements[1]), "Label attribute not correctly set");
     }
 
 })

@@ -146,7 +146,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     }
 
     protected static GetMethod obtainGetMethod(String path, boolean followRedirects) throws MalformedURLException,
-    URISyntaxException {
+            URISyntaxException {
         String url = servletConfig.getBaseUrl().toURI().resolve(path).toString();
         GetMethod get = new GetMethod(url);
         if (System.getProperty(HttpMethodParams.USER_AGENT) != null) {
@@ -170,7 +170,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
      * @throws URISyntaxException
      */
     protected static PostMethod obtainPostMethod(String path, Map<String, String> params) throws MalformedURLException,
-    URISyntaxException {
+            URISyntaxException {
         PostMethod post = new PostMethod(servletConfig.getBaseUrl().toURI().resolve(path).toString());
         if (System.getProperty(HttpMethodParams.USER_AGENT) != null) {
             post.getParams().setParameter(HttpMethodParams.USER_AGENT, System.getProperty(HttpMethodParams.USER_AGENT));

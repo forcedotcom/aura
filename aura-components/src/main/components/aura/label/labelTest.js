@@ -20,10 +20,10 @@
     testValueEmpty: {
         attributes : {value: ""},
         test: function(component){
-            aura.test.assertEquals("", component.getElement().textContent, "value not expected");
+            aura.test.assertEquals("", $A.test.getText(component.getElement()), "value not expected");
 //            component.getAttributes().setValue("value", "newness");
 //            $A.renderingService.rerender(component);
-//            aura.test.assertEquals("newness", component.getElement().textContent, "value not expected");
+//            aura.test.assertEquals("newness", $A.test.getText(component.getElement()), "value not expected");
         }
     },
 
@@ -33,10 +33,10 @@
     testValueString: {
         attributes : {value: "easy peasy"},
         test: function(component){
-            aura.test.assertEquals("easy peasy", component.getElement().textContent, "value not expected");
+            aura.test.assertEquals("easy peasy", $A.test.getText(component.getElement()), "value not expected");
 //            component.getAttributes().setValue("value", "");
 //            $A.renderingService.rerender(component);
-//            aura.test.assertEquals("", component.getElement().textContent, "value not expected");
+//            aura.test.assertEquals("", $A.test.getText(component.getElement()), "value not expected");
         }
     },
 
@@ -46,7 +46,7 @@
     testValueWithTokens: {
         attributes : {value: "In a galaxy {0} {0} away..."},
         test: function(component){
-            aura.test.assertEquals("In a galaxy {0} {0} away...", component.getElement().textContent, "value not expected");
+            aura.test.assertEquals("In a galaxy {0} {0} away...", $A.test.getText(component.getElement()), "value not expected");
         }
     },
 
@@ -56,7 +56,7 @@
     testValueOfTokenOnly: {
         attributes : {value: "{0}"},
         test: function(component){
-            aura.test.assertEquals("{0}", component.getElement().textContent, "value not expected");
+            aura.test.assertEquals("{0}", $A.test.getText(component.getElement()), "value not expected");
         }
     }
 })

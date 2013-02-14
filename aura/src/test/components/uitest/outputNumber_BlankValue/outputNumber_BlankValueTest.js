@@ -23,7 +23,7 @@
         test:function(cmp){
             var testOutputNumberCmp = cmp.find('uninitializedVariable');
             aura.test.assertNotNull(testOutputNumberCmp);
-            aura.test.assertEquals('', testOutputNumberCmp.find('span').getElement().textContent, "Should have displayed a blank value.");
+            aura.test.assertEquals('', $A.test.getText(testOutputNumberCmp.find('span').getElement()), "Should have displayed a blank value.");
         }
     }
 })

@@ -22,11 +22,11 @@
             $A.test.setTestTimeout(30000);
             var element = component.find("auraDiv").getElement();
             $A.test.assertNotNull(element, "element not present");
-            $A.test.assertEquals("my text", component.find("container").getElement().textContent);
+            $A.test.assertEquals("my text", $A.test.getText(component.find("container").getElement()));
             $A.test.assertEquals(element, document.getElementById("domDiv"));
             $A.util.removeElement(element);
             var trash = element.parentNode;
-            $A.test.assertEquals("", component.find("container").getElement().textContent, "element not removed");
+            $A.test.assertEquals("", $A.test.getText(component.find("container").getElement()), "element not removed");
             $A.test.assertEquals(null, document.getElementById("domDiv"), "element found in document");
             $A.test.runAfterIf(function(){return trash !== element.parentNode;}); // check that element emptied from trash
         }
@@ -40,10 +40,10 @@
             $A.test.setTestTimeout(30000);
             var element = component.find("auraDiv").getElement().childNodes[0];
             $A.test.assertNotNull(element, "element not present");
-            $A.test.assertEquals("my text", component.find("container").getElement().textContent);
+            $A.test.assertEquals("my text", $A.test.getText(component.find("container").getElement()));
             $A.util.removeElement(element);
             var trash = element.parentNode;
-            $A.test.assertEquals("", component.find("container").getElement().textContent, "element not removed");
+            $A.test.assertEquals("", $A.test.getText(component.find("container").getElement()), "element not removed");
             $A.test.assertEquals(0, document.getElementById("domDiv").childNodes.length, "element found in document");
             $A.test.runAfterIf(function(){return trash !== element.parentNode;}); // check that element emptied from trash
         }
@@ -60,7 +60,7 @@
             element.parentNode.removeChild(element);
             $A.util.removeElement(element);
             $A.test.assertTrue($A.util.$trash$.length > 0, "element never placed in trash");
-            $A.test.assertEquals("", component.find("container").getElement().textContent, "element not removed");
+            $A.test.assertEquals("", $A.test.getText(component.find("container").getElement()), "element not removed");
             $A.test.runAfterIf(function(){return $A.util.$trash$.length === 0;}); // check that element emptied from trash
         }
     },
@@ -75,7 +75,7 @@
             $A.util.removeElement(element);
             if(document.implementation["createHTMLDocument"]){
                 $A.test.assertTrue($A.util.$trash$.length > 0, "element never placed in trash");
-            $A.test.assertEquals("", component.find("container").getElement().textContent, "element not removed");
+            $A.test.assertEquals("", $A.test.getText(component.find("container").getElement()), "element not removed");
             $A.test.runAfterIf(function(){return $A.util.$trash$.length === 0;}); // check that element emptied from trash
             }else{
                 $A.test.assertNull(element.parentNode);

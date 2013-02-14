@@ -26,7 +26,7 @@
             aura.test.assertEquals('parentX', cmp.getSuper().getAttributes().getValue('SimpleAttribute').getValue());
 
             //UI verification to check that renderer used the right attribute value
-            aura.test.assertEquals('The value of SimpleAttribute = parentX', cmp.getSuper().find('simpleAttr_id').getElement().textContent);
+            aura.test.assertEquals('The value of SimpleAttribute = parentX', $A.test.getText(cmp.getSuper().find('simpleAttr_id').getElement()));
         }
     }
 })

@@ -27,8 +27,8 @@
         attributes : {__layout: '#markup'},
         test: function(component){
             this.waitForLayoutItems(component, function(){
-                aura.test.assertEquals('text1text2', component.find("containerA").getElement().textContent, "A content not expected");
-                aura.test.assertEquals('', component.find("containerB").getElement().textContent, "B content not expected");
+                aura.test.assertEquals('text1text2', $A.test.getText(component.find("containerA").getElement()), "A content not expected");
+                aura.test.assertEquals('', $A.test.getText(component.find("containerB").getElement()), "B content not expected");
             });
         }
     },
@@ -40,8 +40,8 @@
         attributes : {__layout: '#action?input=1'},
         test: function(component){
             this.waitForLayoutItems(component, function(){
-                aura.test.assertEquals('action:java:0', component.find("containerA").getElement().textContent, "A content not expected");
-                aura.test.assertEquals('initial', component.find("containerB").getElement().textContent, "B content not expected");
+                aura.test.assertEquals('action:java:0', $A.test.getText(component.find("containerA").getElement()), "A content not expected");
+                aura.test.assertEquals('initial', $A.test.getText(component.find("containerB").getElement()), "B content not expected");
             });
         }
     },
@@ -53,8 +53,8 @@
         attributes : {__layout: '#action?input=3'},
         test: function(component){
             this.waitForLayoutItems(component, function(){
-                aura.test.assertEquals('action:java:2action:java:1action:java:0', component.find("containerA").getElement().textContent, "A content not expected");
-                aura.test.assertEquals('initial', component.find("containerB").getElement().textContent, "B content not expected");
+                aura.test.assertEquals('action:java:2action:java:1action:java:0', $A.test.getText(component.find("containerA").getElement()), "A content not expected");
+                aura.test.assertEquals('initial', $A.test.getText(component.find("containerB").getElement()), "B content not expected");
             });
         }
     },
@@ -66,8 +66,8 @@
         attributes : {__layout: '#action?input=0'},
         test: function(component){
             this.waitForLayoutItems(component, function(){
-                aura.test.assertEquals('', component.find("containerA").getElement().textContent, "A content not expected");
-                aura.test.assertEquals('initial', component.find("containerB").getElement().textContent, "B content not expected");
+                aura.test.assertEquals('', $A.test.getText(component.find("containerA").getElement()), "A content not expected");
+                aura.test.assertEquals('initial', $A.test.getText(component.find("containerB").getElement()), "B content not expected");
             });
         }
     },
@@ -79,8 +79,8 @@
         attributes : {__layout: '#markupAndAction?input=1'},
         test: function(component){
             this.waitForLayoutItems(component, function(){
-                aura.test.assertEquals('text', component.find("containerA").getElement().textContent, "A content not expected");
-                aura.test.assertEquals('markupAndAction:java:0', component.find("containerB").getElement().textContent, "B content not expected");
+                aura.test.assertEquals('text', $A.test.getText(component.find("containerA").getElement()), "A content not expected");
+                aura.test.assertEquals('markupAndAction:java:0', $A.test.getText(component.find("containerB").getElement()), "B content not expected");
             });
         }
     },
@@ -93,8 +93,8 @@
         attributes : {__layout: '#markupAndAction?input=2'},
         test: function(component){
             this.waitForLayoutItems(component, function(){
-                aura.test.assertEquals('text', component.find("containerA").getElement().textContent, "A content not expected");
-                aura.test.assertEquals('markupAndAction:java:1markupAndAction:java:0', component.find("containerB").getElement().textContent, "B content not expected");
+                aura.test.assertEquals('text', $A.test.getText(component.find("containerA").getElement()), "A content not expected");
+                aura.test.assertEquals('markupAndAction:java:1markupAndAction:java:0', $A.test.getText(component.find("containerB").getElement()), "B content not expected");
             });
         }
     },
@@ -106,8 +106,8 @@
         attributes : {__layout: '#markupAndAction?input=0'},
         test: function(component){
             this.waitForLayoutItems(component, function(){
-                aura.test.assertEquals('text', component.find("containerA").getElement().textContent, "A content not expected");
-                aura.test.assertEquals('', component.find("containerB").getElement().textContent, "B content not expected");
+                aura.test.assertEquals('text', $A.test.getText(component.find("containerA").getElement()), "A content not expected");
+                aura.test.assertEquals('', $A.test.getText(component.find("containerB").getElement()), "B content not expected");
             });
         }
     },
@@ -119,8 +119,8 @@
         attributes : {__layout: '#actionAndMarkup?input=1'},
         test: function(component){
             this.waitForLayoutItems(component, function(){
-                aura.test.assertEquals('actionAndMarkup:java:0', component.find("containerA").getElement().textContent, "A content not expected");
-                aura.test.assertEquals('text', component.find("containerB").getElement().textContent, "B content not expected");
+                aura.test.assertEquals('actionAndMarkup:java:0', $A.test.getText(component.find("containerA").getElement()), "A content not expected");
+                aura.test.assertEquals('text', $A.test.getText(component.find("containerB").getElement()), "B content not expected");
             });
         }
     },
@@ -133,8 +133,8 @@
         attributes : {__layout: '#actionAndMarkup?input=3'},
         test: function(component){
             this.waitForLayoutItems(component, function(){
-                aura.test.assertEquals('actionAndMarkup:java:2actionAndMarkup:java:1actionAndMarkup:java:0', component.find("containerA").getElement().textContent, "A content not expected");
-                aura.test.assertEquals('text', component.find("containerB").getElement().textContent, "B content not expected");
+                aura.test.assertEquals('actionAndMarkup:java:2actionAndMarkup:java:1actionAndMarkup:java:0', $A.test.getText(component.find("containerA").getElement()), "A content not expected");
+                aura.test.assertEquals('text', $A.test.getText(component.find("containerB").getElement()), "B content not expected");
             });
         }
     },
@@ -146,8 +146,8 @@
         attributes : {__layout: '#actionAndMarkup?input=0'},
         test: function(component){
             this.waitForLayoutItems(component, function(){
-                aura.test.assertEquals('', component.find("containerA").getElement().textContent, "A content not expected");
-                aura.test.assertEquals('text', component.find("containerB").getElement().textContent, "B content not expected");
+                aura.test.assertEquals('', $A.test.getText(component.find("containerA").getElement()), "A content not expected");
+                aura.test.assertEquals('text', $A.test.getText(component.find("containerB").getElement()), "B content not expected");
             });
         }
     }

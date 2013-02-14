@@ -58,7 +58,7 @@
             $A.test.assertTrue(text.isRendered());
             $A.test.assertTrue(div.isRendered());
 
-            $A.test.assertEquals("textInsideFacet", text.getElement().textContent);
+            $A.test.assertEquals("textInsideFacet", $A.test.getText(text.getElement()));
             $A.test.assertEquals("divInsideFacet", div.getElement().title);
         } ]
     },
@@ -77,7 +77,7 @@
             $A.test.assertTrue(text.isRendered());
             $A.test.assertTrue(div.isRendered());
 
-            $A.test.assertEquals("textOnBody", text.getElement().textContent);
+            $A.test.assertEquals("textOnBody", $A.test.getText(text.getElement()));
             $A.test.assertEquals("divOnBody", div.getElement().title);
         } ]
     },

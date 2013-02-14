@@ -20,7 +20,7 @@
     testEmptyValue:{
         attributes : {value: ''},
         test: function(component){
-            aura.test.assertEquals('', component.find("span").getElement().textContent, "When value is initialized to an empty string, nothing should be shown.");
+            aura.test.assertEquals('', $A.test.getText(component.find("span").getElement()), "When value is initialized to an empty string, nothing should be shown.");
         }
     },
     /**
@@ -29,7 +29,7 @@
     testValue: {
         attributes : {value : 'Hello World!'},
         test: function(component){
-            aura.test.assertEquals('Hello World!', component.find("span").getElement().textContent, "Value attribute not correct");
+            aura.test.assertEquals('Hello World!', $A.test.getText(component.find("span").getElement()), "Value attribute not correct");
         }
     },
     /**
@@ -56,7 +56,7 @@
     testNonStringValue:{
         attributes: {value: 3.1415},
         test: function(component){
-            aura.test.assertEquals('3.1415', component.find("span").getElement().textContent, "Failed to display string form of numeric value");
+            aura.test.assertEquals('3.1415', $A.test.getText(component.find("span").getElement()), "Failed to display string form of numeric value");
         }
     },
     /**
@@ -66,7 +66,7 @@
     _testTrimmingSpaces:{
         attributes: {value: '   '},
         test: function(component){
-            aura.test.assertEquals('', component.find("span").getElement().textContent, "Failed to trim spaces");
+            aura.test.assertEquals('', $A.test.getText(component.find("span").getElement()), "Failed to trim spaces");
         }
     },
     /**
@@ -76,13 +76,14 @@
     _testTrimmingSpacesAtFrontAndEnd:{
         attributes: {value: '   foo '},
         test: function(component){
-            aura.test.assertEquals('foo', component.find("span").getElement().textContent, "Failed to trim spaces");
+            aura.test.assertEquals('foo', $A.test.getText(component.find("span").getElement()), "Failed to trim spaces");
         }
     },
     /**
      * Output text with linefeed.
      */
     testLineFeed:{
+        browsers: ["-IE7", "-IE8"],
         attributes: {value: '\n'},
         test: function(component){
             aura.test.assertEquals('\n', component.find("span").getElement().textContent, "Failed to trim spaces");
@@ -92,6 +93,7 @@
      * Output text with linefeeds.
      */
     testLineFeeds:{
+        browsers: ["-IE7", "-IE8"],
         attributes: {value: '\n1\n2\n'},
         test: function(component){
             aura.test.assertEquals('\n1\n2\n', component.find("span").getElement().textContent, "Failed to trim spaces");
@@ -101,8 +103,10 @@
      * Output text with carriage returns & linefeeds.  Carriage returns are output as \n by browser.
      */
     testCarriageReturnLineFeeds:{
+        browsers: ["-IE7", "-IE8"],
         attributes: {value: '\r\na\r\nb\r\n'},
         test: function(component){
+            debugger;
             aura.test.assertEquals('\r\na\r\nb\r\n', component.find("span").getElement().textContent, "Failed to trim spaces");
         }
     },

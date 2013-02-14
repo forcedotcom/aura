@@ -89,7 +89,7 @@
                     return cmp.find("lazyWReqAttr").getDef().getDescriptor().getName();
                 },function(){
                     $A.test.assertTrue(cmp.find("lazyWReqAttr").isRendered());
-                    $A.test.assertTrue(cmp.find("lazyWReqAttr").getElement().textContent.indexOf(
+                    $A.test.assertTrue($A.test.getText(cmp.find("lazyWReqAttr").getElement()).indexOf(
                                 "org.auraframework.throwable.quickfix.MissingRequiredAttributeException: COMPONENT markup://loadlevelTest:serverComponentWReqAttr is missing required attribute 'stringAttribute'") != -1);
                 });
         }]

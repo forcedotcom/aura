@@ -20,7 +20,7 @@
     testComponent:{
         test:function(cmp){
             cmp.getEvent("A").fire();
-            aura.test.assertEquals("AB", cmp.find("events").getElement().textContent);
+            aura.test.assertEquals("AB", $A.test.getText(cmp.find("events").getElement()));
         }
     },
 
@@ -30,7 +30,7 @@
     testApplication:{
         test:function(cmp){
             $A.get("e.handleEventTest:applicationEvent").fire();
-            aura.test.assertEquals("CC", cmp.find("events").getElement().textContent);
+            aura.test.assertEquals("CC", $A.test.getText(cmp.find("events").getElement()));
         }
     }
 })

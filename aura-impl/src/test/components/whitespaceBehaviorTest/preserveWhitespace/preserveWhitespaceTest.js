@@ -24,13 +24,13 @@
             var divText = cmp.find("divText").getElement().innerHTML;
 
             // check component elements, verify whitespace included
-            $A.test.assertTrue(this.isWhitespace(cmpElems[0].textContent), "First element in body of component should be whitespace.");
-            $A.test.assertEquals("true", cmpElems[1].textContent, "Second element in body of component should be 'true'.");
-            $A.test.assertTrue(this.isWhitespace(cmpElems[2].textContent), "Third element in body of component should be whitespace.");
-            $A.test.assertEquals("false", cmpElems[3].textContent, "Fourth element in body of component should be 'false'.");
-            $A.test.assertTrue(this.isWhitespace(cmpElems[4].textContent), "Fifth element in body of component should be whitespace.");
+            $A.test.assertTrue(this.isWhitespace($A.test.getText(cmpElems[0])), "First element in body of component should be whitespace.");
+            $A.test.assertEquals("true", $A.test.getText(cmpElems[1]), "Second element in body of component should be 'true'.");
+            $A.test.assertTrue(this.isWhitespace($A.test.getText(cmpElems[2])), "Third element in body of component should be whitespace.");
+            $A.test.assertEquals("false", $A.test.getText(cmpElems[3]), "Fourth element in body of component should be 'false'.");
+            $A.test.assertTrue(this.isWhitespace($A.test.getText(cmpElems[4])), "Fifth element in body of component should be whitespace.");
             $A.test.assertTrue(cmpElems[5] instanceof HTMLDivElement, "Sixth element in body of component should be div.");
-            $A.test.assertTrue(this.isWhitespace(cmpElems[6].textContent, "Newline should be present after div."));
+            $A.test.assertTrue(this.isWhitespace($A.test.getText(cmpElems[6]), "Newline should be present after div."));
 
             // check whitespace within div
             $A.test.assertEquals("\n        true     false\n    ", divText, "Div text does not contain proper whitespace.");

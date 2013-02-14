@@ -34,33 +34,25 @@ import com.google.common.collect.Maps;
  * A simple Action used when mocking Controller creations.
  */
 public class MockAction implements Action {
-    private final DefDescriptor<ActionDef> descriptor;
-    private String id;
-    private State state;
-    private Object returnValue;
-    private final List<Action> actions;
-    private final Map<String, BaseComponent<?, ?>> components;
-    private final List<Object> errors;
+    public MockAction(DefDescriptor<ActionDef> descriptor, State state,
+            Object returnValue) {
+        this(descriptor, state, returnValue, null, null, null);
+    }
 
-	public MockAction(DefDescriptor<ActionDef> descriptor, State state,
-			Object returnValue) {
-		this(descriptor, state, returnValue, null, null, null);
-	}
-
-	public MockAction(DefDescriptor<ActionDef> descriptor, State state,
-			Object returnValue, List<Action> actions,
-			Map<String, BaseComponent<?, ?>> components, List<Object> errors) {
-		this.descriptor = descriptor;
-		this.id = null;
-		this.state = (state == null ? State.SUCCESS : state);
-		this.returnValue = returnValue;
-		this.actions = (actions == null) ? Lists.<Action> newLinkedList()
-				: actions;
-		this.components = (components == null) ? Maps
-				.<String, BaseComponent<?, ?>> newHashMap() : components;
-		this.errors = (errors == null) ? Lists.<Object> newLinkedList()
-				: errors;
-	}
+    public MockAction(DefDescriptor<ActionDef> descriptor, State state,
+            Object returnValue, List<Action> actions,
+            Map<String, BaseComponent<?, ?>> components, List<Object> errors) {
+        this.descriptor = descriptor;
+        this.id = null;
+        this.state = (state == null ? State.SUCCESS : state);
+        this.returnValue = returnValue;
+        this.actions = (actions == null) ? Lists.<Action> newLinkedList()
+                : actions;
+        this.components = (components == null) ? Maps
+                .<String, BaseComponent<?, ?>> newHashMap() : components;
+        this.errors = (errors == null) ? Lists.<Object> newLinkedList()
+                : errors;
+    }
 
     @Override
     public DefDescriptor<ActionDef> getDescriptor() {
@@ -69,7 +61,7 @@ public class MockAction implements Action {
 
     @Override
     public Object getReturnValue() {
-		return returnValue;
+        return returnValue;
     }
 
     @Override
@@ -84,7 +76,7 @@ public class MockAction implements Action {
 
     @Override
     public void run() throws AuraExecutionException {
-    	
+
     }
 
     @Override
@@ -141,4 +133,12 @@ public class MockAction implements Action {
         }
         json.writeMapEnd();
     }
+
+    private final DefDescriptor<ActionDef> descriptor;
+    private String id;
+    private final State state;
+    private final Object returnValue;
+    private final List<Action> actions;
+    private final Map<String, BaseComponent<?, ?>> components;
+    private final List<Object> errors;
 }

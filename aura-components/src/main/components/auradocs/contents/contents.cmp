@@ -141,6 +141,10 @@
                 <auradocs:contentsNode text="Models" id="models" />
                 <auradocs:contentsNode text="Server-Side Controllers" id="serverSideControllers" />
                 <auradocs:contentsNode text="Server-Side Renderers" id="renderersServerSide" />
+                <auradocs:contentsNode text="Custom Converters">
+                    <auradocs:contentsNode text="Registering a Custom Converter" id="registerCustomConverter"/>
+                    <auradocs:contentsNode text="Converter Interface" id="converterInterface"/>
+                </auradocs:contentsNode>
                 <auradocs:contentsNode text="Java Cookbook">
                     <auradocs:contentsNode text="Introduction" id="javaCookbook" />
                     <auradocs:contentsNode text="Getting a DefDescriptor" id="javaDefDesc" />
@@ -173,8 +177,8 @@
                 <auradocs:contentsNode text="Component Request Overview" id="cycleComp" />
                 <auradocs:contentsNode text="Server-Side Process" id="cycleInit" />
                 <auradocs:contentsNode text="Client-Side Process" id="clientInit" />
-                <auradocs:contentsNode text="Component Request Glossary" id="cycleRefs" />
-            </auradocs:contentsNode>
+                <auradocs:contentsNode text="Component Request Glossary" id="cycleRefs" />                
+            </auradocs:contentsNode>            
             <auradocs:contentsNode text="Querying State and Statistics" id="queryLang"/>
         </auradocs:contentsNode>
 

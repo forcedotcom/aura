@@ -45,11 +45,11 @@ public class MenuTestModel {
     @AuraEnabled
     public List<MenuItem> getResorts() {
         ArrayList<MenuItem> a = new ArrayList<MenuItem>(3);
-        MenuItem m1 = new MenuItem("Heavenly", true, "action");
+        MenuItem m1 = new MenuItem("Heavenly", true, "checkbox");
         a.add(m1);
-        MenuItem m2 = new MenuItem("North Star", false, "action");
+        MenuItem m2 = new MenuItem("North Star", false, "checkbox");
         a.add(m2);
-        MenuItem m3 = new MenuItem("Square Valley", true, "action");
+        MenuItem m3 = new MenuItem("Square Valley", true, "checkbox");
         a.add(m3);
         return a;
     }

@@ -170,9 +170,9 @@ public class InputTextUITest extends WebDriverTestCase {
             BrowserType.SAFARI })
     // Issue with Webdriver API ignores maxlength HTML5 attribute - W-1465209
     public void testMaxLength() throws Exception {
-        open("/uitest/inputTextMaxLength.cmp");
+    	open("/uitest/inputTextMaxLength.cmp");
         WebElement input = findDomElement(By.cssSelector("input.uiInputText.uiInput"));
-        input.clear();
+        input.click();
         input.sendKeys("1234567890");
         assertEquals("Text not truncated to 5 chars correctly", "12345", input.getAttribute("value"));
     }
@@ -180,7 +180,7 @@ public class InputTextUITest extends WebDriverTestCase {
     public void testNoMaxLength() throws Exception {
         open("/uitest/inputTextNoMaxLength.cmp");
         WebElement input = findDomElement(By.cssSelector("input.uiInputText.uiInput"));
-        input.clear();
+        input.click();
         String inputText = "1234567890";
         input.sendKeys(inputText);
         assertEquals("Expected untruncated text", inputText, input.getAttribute("value"));
@@ -213,7 +213,7 @@ public class InputTextUITest extends WebDriverTestCase {
         String inputText = "z";
         WebElement input = findDomElement(By.cssSelector(".keyup"));
         WebElement outputValue = findDomElement(By.cssSelector(".outputValue"));
-        input.clear();
+        input.click();
         input.sendKeys(inputText);
         try {
         	char outputText = (char) Integer.parseInt(outputValue.getText());

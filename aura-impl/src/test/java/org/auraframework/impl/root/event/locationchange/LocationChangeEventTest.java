@@ -17,6 +17,7 @@ package org.auraframework.impl.root.event.locationchange;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Application;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -53,12 +54,14 @@ public class LocationChangeEventTest extends AuraImplTestCase {
      * Negative test case: Check that events used to handle location change always extend aura:locationChange.
      */
     public void testRegisteredLocationChangeEventExtendsAuraLocationChange() throws Exception {
+        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(
+                "test:test_LocChng_NoExtends", ApplicationDef.class);
         try {
-            Aura.getInstanceService().getInstance("test:test_LocChng_NoExtends", ApplicationDef.class);
+            Aura.getInstanceService().getInstance(desc);
             fail("Should have not fetched this component because the location change event does not extend aura:locationChange");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class,
-                    "markup://test:test_LocChng_NoExtendsEvt must extend aura:locationChange", null);
+                    "markup://test:test_LocChng_NoExtendsEvt must extend aura:locationChange", getSource(desc));
         }
     }
 }

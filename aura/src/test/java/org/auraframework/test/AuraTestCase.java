@@ -28,6 +28,7 @@ import org.auraframework.service.ContextService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
+import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -119,24 +120,34 @@ public abstract class AuraTestCase extends UnitTestCase {
      * @param e the exception to check.
      * @param clazz a class to match if it is not null.
      * @param message The message to match (must be exact match).
-     * @param filename a 'file name' to match the location (not checked if null).
+     * @param filename a 'file name' to match the location.
      */
     protected void checkExceptionFull(Throwable e, Class<?> clazz, String message, String filename) {
+        checkExceptionFull(e, clazz, message);
+        assertLocation(e, filename);
+    }
+
+    /**
+     * Check the exception exactly matches the message and check the location of an Exception using the Source of the
+     * file in error. Use this method when the location is a full filesystem path to the file (instead of just a
+     * qualified name).
+     * 
+     * Depending on whether we are reading form jars or source, the location in the exception is different. When reading
+     * from source we need to strip the "file:" prefix. When reading from jars we leave the "jar:file:" prefix.
+     */
+    protected void checkExceptionFull(Throwable e, Class<?> clazz, String message, Source<?> src) {
+        checkExceptionFull(e, clazz, message);
+        assertLocation(e, src);
+    }
+
+    /**
+     * Check that an exception exactly matches the message, ignore location.
+     */
+    protected void checkExceptionFull(Throwable e, Class<?> clazz, String message) {
         if (clazz != null) {
             assertEquals("Exception must be " + clazz.getSimpleName(), clazz, e.getClass());
         }
-        assertEquals("unexpected message", message, e.getMessage());
-        if (filename != null) {
-            Location l = null;
-
-            if (e instanceof QuickFixException) {
-                l = ((QuickFixException) e).getLocation();
-            } else if (e instanceof AuraRuntimeException) {
-                l = ((AuraRuntimeException) e).getLocation();
-            }
-            assertNotNull("Unable to find location, expected " + filename, l);
-            assertEquals("Unexpected location", filename, l.getFileName());
-        }
+        assertEquals("Unexpected message", message, e.getMessage());
     }
 
     /**
@@ -148,20 +159,55 @@ public abstract class AuraTestCase extends UnitTestCase {
      * @param filename a 'file name' to match the location (not checked if null).
      */
     protected void checkExceptionStart(Throwable e, Class<?> clazz, String message, String filename) {
+        checkExceptionStart(e, clazz, message);
+        assertLocation(e, filename);
+    }
+
+    /**
+     * Check the exception message starts with a given message and check the location of an Exception using the Source
+     * of the file in error. Use this method when the location is a full filesystem path to the file (instead of just a
+     * qualified name).
+     * 
+     * Depending on whether we are reading form jars or source, the location in the exception is different. When reading
+     * from source we need to strip the "file:" prefix. When reading from jars we leave the "jar:file:" prefix.
+     */
+    protected void checkExceptionStart(Throwable e, Class<?> clazz, String message, Source<?> src) {
+        checkExceptionStart(e, clazz, message);
+        assertLocation(e, src);
+    }
+
+    /**
+     * Just check the exception and message, ignore location.
+     */
+    protected void checkExceptionStart(Throwable e, Class<?> clazz, String message) {
         if (clazz != null) {
             assertEquals("Exception must be " + clazz.getSimpleName(), clazz, e.getClass());
         }
-        assertTrue("unexpected message: " + e.getMessage() + "!=" + message, e.getMessage().startsWith(message));
-        if (filename != null) {
-            Location l = null;
+        assertTrue("Unexpected message: " + e.getMessage() + "!=" + message, e.getMessage().startsWith(message));
+    }
 
-            if (e instanceof QuickFixException) {
-                l = ((QuickFixException) e).getLocation();
-            } else if (e instanceof AuraRuntimeException) {
-                l = ((AuraRuntimeException) e).getLocation();
-            }
-            assertNotNull("Unable to find location, expected " + filename, l);
-            assertEquals("Unexpected location", filename, l.getFileName());
+    /**
+     * Check to ensure that an exception message starts with a given message, ignore location.
+     */
+    private void assertLocation(Throwable e, String expectedLoc) {
+        Location l = null;
+        if (e instanceof QuickFixException) {
+            l = ((QuickFixException) e).getLocation();
+        } else if (e instanceof AuraRuntimeException) {
+            l = ((AuraRuntimeException) e).getLocation();
+        }
+        assertNotNull("Unable to find location, expected " + expectedLoc, l);
+        assertEquals("Unexpected location.", expectedLoc, l.getFileName());
+    }
+
+    private void assertLocation(Throwable e, Source<?> src) {
+        String fileUrl = src.getUrl();
+        if (fileUrl.startsWith("jar")) {
+            assertLocation(e, fileUrl);
+        } else if (fileUrl.startsWith("file")) {
+            // If running from source, strip "file:" prefix, as in XMLParser.getLocation()
+            String filePath = fileUrl.substring(5);
+            assertLocation(e, filePath);
         }
     }
 

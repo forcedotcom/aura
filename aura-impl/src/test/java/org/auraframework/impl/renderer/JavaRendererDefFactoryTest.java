@@ -75,7 +75,7 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
             fail("Should not be able to retrieve component definition when specified renderer is invalid.");
         } catch (Exception e) {
             checkExceptionStart(e, DefinitionNotFoundException.class,
-                    "No RENDERER named java://ClassNotFound found", null);
+                    "No RENDERER named java://ClassNotFound found");
         }
     }
 
@@ -148,8 +148,7 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
             def.validateDefinition();
             fail("JavaRendererDef cannot be created if interface not implemented.");
         } catch (Exception e) {
-            checkExceptionFull(e, InvalidDefinitionException.class, "Renderer must implement the Renderer interface.",
-                    null);
+            checkExceptionFull(e, InvalidDefinitionException.class, "Renderer must implement the Renderer interface.");
         }
     }
 }

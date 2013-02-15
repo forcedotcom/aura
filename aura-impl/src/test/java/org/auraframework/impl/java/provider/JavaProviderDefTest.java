@@ -122,8 +122,7 @@ public class JavaProviderDefTest extends AuraImplTestCase {
             fail("expected exception for bad provider return");
         } catch (Exception e) {
             checkExceptionFull(e, AuraRuntimeException.class,
-                    "java://org.auraframework.impl.java.provider.ConcreteProvider did not provide a valid component",
-                    null);
+                    "java://org.auraframework.impl.java.provider.ConcreteProvider did not provide a valid component");
         }
     }
 
@@ -136,8 +135,7 @@ public class JavaProviderDefTest extends AuraImplTestCase {
             fail("expected exception for bad provider return");
         } catch (Exception e) {
             checkExceptionFull(e, AuraRuntimeException.class,
-                    "java://org.auraframework.impl.java.provider.ConcreteProvider did not provide a valid component",
-                    null);
+                    "java://org.auraframework.impl.java.provider.ConcreteProvider did not provide a valid component");
         }
     }
 

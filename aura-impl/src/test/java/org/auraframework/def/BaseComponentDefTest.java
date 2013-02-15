@@ -260,7 +260,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             fail("IllegalArgumentException should have been thrown for bad whitespace value.");
         } catch (Exception e) {
             checkExceptionFull(e, IllegalArgumentException.class,
-                    "No enum const class org.auraframework.def.BaseComponentDef$WhitespaceBehavior.BOGUS", null);
+                    "No enum const class org.auraframework.def.BaseComponentDef$WhitespaceBehavior.BOGUS");
         }
     }
 
@@ -285,8 +285,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*://idontexist:*\"/>");
             fail("Should not be able to load non-existant resource as dependency");
         } catch (Exception e) {
-            checkExceptionFull(e, InvalidDefinitionException.class, "Invalid dependency *://idontexist:*[COMPONENT]",
-                    null);
+            checkExceptionFull(e, InvalidDefinitionException.class, "Invalid dependency *://idontexist:*[COMPONENT]");
         }
 
         // Invalid descriptor pattern
@@ -294,7 +293,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*://auratest.*\"/>");
             fail("Should not be able to load resource, bad DefDescriptor format");
         } catch (Exception e) {
-            checkExceptionFull(e, InvalidDefinitionException.class, "Illegal namespace in *://auratest.*", null);
+            checkExceptionFull(e, InvalidDefinitionException.class, "Illegal namespace in *://auratest.*");
         }
 
         // Another Invalid descriptor pattern
@@ -302,7 +301,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             baseComponentDef = define(baseTag, "", "<aura:dependency resource=\"*:auratest:*\"/>");
             fail("Should not be able to load resource, bad DefDescriptor format");
         } catch (Exception e) {
-            checkExceptionFull(e, InvalidDefinitionException.class, "Illegal name in *:auratest:*", null);
+            checkExceptionFull(e, InvalidDefinitionException.class, "Illegal name in *:auratest:*");
         }
     }
 

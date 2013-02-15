@@ -61,7 +61,7 @@ public class JavascriptModelDefTest extends AuraImplTestCase {
             Aura.getDefinitionService().getDefinition("test:jsModelBadValueType", ComponentDef.class);
             fail("Bad value in javascript model should throw Exception");
         } catch (Exception e) {
-            checkExceptionFull(e, InvalidDefinitionException.class, "Invalid value type in model definition.", null);
+            checkExceptionFull(e, InvalidDefinitionException.class, "Invalid value type in model definition.");
         }
     }
 

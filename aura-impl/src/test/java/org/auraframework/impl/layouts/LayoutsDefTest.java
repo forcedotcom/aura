@@ -22,6 +22,7 @@ import java.util.List;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LayoutDef;
 import org.auraframework.def.LayoutItemDef;
 import org.auraframework.def.LayoutsDef;
@@ -76,12 +77,14 @@ public class LayoutsDefTest extends AuraImplTestCase {
      * be thrown.
      */
     public void testLayoutsNoDefault() throws Exception {
+        DefDescriptor<LayoutsDef> desc = Aura.getDefinitionService().getDefDescriptor("test:layoutsNoDefault",
+                LayoutsDef.class);
         try {
-            Aura.getDefinitionService().getDefinition("test:layoutsNoDefault", LayoutsDef.class);
+            desc.getDef();
             fail("Not specifying a default layout should have caused an Exception.");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class,
-                    "The \"default\" attribute is required for layouts", null);
+                    "The \"default\" attribute is required for layouts", getSource(desc));
         }
     }
 
@@ -89,12 +92,14 @@ public class LayoutsDefTest extends AuraImplTestCase {
      * The "default" layout must exist. Otherwise we should throw an exception.
      */
     public void testLayoutsNonExistDefault() throws Exception {
+        DefDescriptor<LayoutsDef> desc = Aura.getDefinitionService().getDefDescriptor("test:layoutsNonExistDefault",
+                LayoutsDef.class);
         try {
-            Aura.getDefinitionService().getDefinition("test:layoutsNonExistDefault", LayoutsDef.class);
+            desc.getDef();
             fail("Specifying a non existing default layout should have caused an Exception.");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class,
-                    "The default layout \"nonExist\" doesn't exist", null);
+                    "The default layout \"nonExist\" doesn't exist", getSource(desc));
         }
     }
 
@@ -102,12 +107,14 @@ public class LayoutsDefTest extends AuraImplTestCase {
      * The "catchall" layout must exist if it gets specified. Otherwise we should throw an exception.
      */
     public void testLayoutsNonExistCatchall() throws Exception {
+        DefDescriptor<LayoutsDef> desc = Aura.getDefinitionService().getDefDescriptor("test:layoutsNonExistCatchall",
+                LayoutsDef.class);
         try {
-            Aura.getDefinitionService().getDefinition("test:layoutsNonExistCatchall", LayoutsDef.class);
+            desc.getDef();
             fail("Specifying a non existing layout for catch all should have caused an Exception.");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class,
-                    "The catchall layout \"nonExist\" doesn't exist", null);
+                    "The catchall layout \"nonExist\" doesn't exist", getSource(desc));
         }
     }
 

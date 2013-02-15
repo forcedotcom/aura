@@ -397,8 +397,11 @@ Util.prototype.removeElement = function(element) {
             // the property should never live longer than the delay between this
             // reparenting and the gc below.
             //
-            aura.assert(this.isUndefined(element["aura_deleted"]),"Element was reused after delete");
-            element["aura_deleted"] = true;
+        	if (element.nodeType !== 3) {
+	            aura.assert(this.isUndefined(element["aura_deleted"]), "Element was reused after delete");
+	            element["aura_deleted"] = true;
+        	}
+        	
             this.trashcan.appendChild(element);
         } else{
             this.trash.push(element);
@@ -412,7 +415,11 @@ Util.prototype.removeElement = function(element) {
                 var trashcan = that.trashcan;
                 while (trashcan.hasChildNodes()) {
                     var node = trashcan.lastChild;
-                    delete node["aura_deleted"];
+                    
+                    if (node.nodeType !== 3) {
+                    	delete node["aura_deleted"];
+                    }
+                    
                     trashcan.removeChild(node);
                 }
 

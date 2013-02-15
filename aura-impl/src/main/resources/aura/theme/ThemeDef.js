@@ -31,7 +31,7 @@ ThemeDef.prototype.auraType = "ThemeDef";
  * Applies style to element. If this ThemeDef's style has not been added to the DOM, add it to the DOM.
  */
 ThemeDef.prototype.apply = function(){
-    if(!$A.getContext().isPreloaded(this.descriptor.getNamespace())){
+	if(!$A.getContext().isPreloaded(this.descriptor.getNamespace().toLowerCase())){
         var element = this.element;
         var code = this.code;
         if (!element && code) {

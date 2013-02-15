@@ -18,35 +18,24 @@ package org.auraframework.impl.renderer.sampleJavaRenderers;
 import java.io.IOException;
 import java.util.Map;
 
-import org.auraframework.Aura;
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
-import org.auraframework.integration.Integration;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-public class RendererForTestingIntegrationService implements Renderer {
+public class RendererForTestingIntegrationService extends AbstractRendererForTestingIntegrationService implements
+        Renderer {
 
     @Override
     public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
-        
-        String desc = (String)component.getAttributes().getValue("desc");
+        String desc = (String) component.getAttributes().getValue("desc");
         @SuppressWarnings("unchecked")
-        Map<String,Object> attr = (Map<String,Object>)component.getAttributes().getValue("attrMap");
-        String placeholder = (String)component.getAttributes().getValue("placeholder");
-        String localId = (String)component.getAttributes().getValue("localId");
-        
+        Map<String, Object> attr = (Map<String, Object>) component.getAttributes().getValue("attrMap");
+        String placeholder = (String) component.getAttributes().getValue("placeholder");
+        String localId = (String) component.getAttributes().getValue("localId");
+
         out.append(String.format("<div id='%s' style='border: 1px solid black'/>", placeholder));
-        AuraContext ctx = Aura.getContextService().getCurrentContext();
-        Integration integration = Aura.getIntegrationService().createIntegration(
-                "", Mode.DEV);
-        integration.injectApplication(out);
-        integration.injectComponent(desc, attr, localId ,placeholder , out);
-        
-        //The only not-so-ideal part of this approach to testing IntegrationService is that we have to start the 
-        //context for the rendering of the original stub component to continue. IntegrationService sets up and tears down its context.
-        Aura.getContextService().startContext(ctx.getMode(), ctx.getFormat(), ctx.getAccess(), ctx.getApplicationDescriptor());
+
+        injectComponent(desc, attr, localId, placeholder, out);
     }
 
 }

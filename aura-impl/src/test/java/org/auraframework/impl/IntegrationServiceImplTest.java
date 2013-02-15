@@ -70,13 +70,13 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Integration integration = null;
         assertNotNull("Failed to locate integration service implementation.", service);
         // All Nulls
-        integration = service.createIntegration(null, null);
+        integration = service.createIntegration(null, null, true);
         assertException(integration);
         // No Context Path
-        integration = service.createIntegration(null, Mode.UTEST);
+        integration = service.createIntegration(null, Mode.UTEST, true);
         assertException(integration);
         // No mode specified
-        integration = service.createIntegration("", null);
+        integration = service.createIntegration("", null, true);
         assertException(integration);
     }
 
@@ -87,7 +87,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      */
     @Ignore("W-1495981")
     public void testNullsForCreateIntegration() throws Exception {
-        Integration integration = service.createIntegration("", Mode.UTEST);
+        Integration integration = service.createIntegration("", Mode.UTEST, true);
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("label", "Click Me");
         Appendable out = new StringBuffer();
@@ -119,7 +119,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
 
         Mode[] testModes = new Mode[] { Mode.UTEST, Mode.PROD };
         for (Mode m : testModes) {
-            Integration integration = service.createIntegration("", m);
+            Integration integration = service.createIntegration("", m, true);
             assertNotNull(String.format(
                     "Failed to create an integration object using IntegrationService in %s mode. Returned null.", m),
                     integration);
@@ -145,9 +145,8 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
                 String.format(baseComponentTag, "", ""));
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST);
+        Integration integration = service.createIntegration("", Mode.UTEST, true);
         try {
-            integration.injectApplication(out);
             integration.injectComponent(cmp1.getDescriptorName(), attributes, "", "", out);
             integration.injectComponent(cmp2.getDescriptorName(), attributes, "", "", out);
         } catch (Exception unexpected) {
@@ -194,7 +193,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         attributes.put("obj", "Object");
 
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST);
+        Integration integration = service.createIntegration("", Mode.UTEST, true);
         try {
             integration.injectComponent(cmp.getDescriptorName(), attributes, "", "", out);
         } catch (Exception unexpected) {
@@ -222,7 +221,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         attributes.put("mouseout", "function(e){alert('mouseout')}");
 
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST);
+        Integration integration = service.createIntegration("", Mode.UTEST, true);
         try {
             integration.injectComponent(cmp.getDescriptorName(), attributes, "", "", out);
         } catch (Exception unexpected) {
@@ -239,7 +238,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("fooBar", "");
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST);
+        Integration integration = service.createIntegration("", Mode.UTEST, true);
         try {
             integration.injectComponent(simpleComponentTag, attributes, "", "", out);
             fail("Using nonexisting attribute names should have failed.");
@@ -255,7 +254,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         // Non String attribute for functions
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST);
+        Integration integration = service.createIntegration("", Mode.UTEST, true);
         attributes.put("label", "Click Me");
         attributes.put("press", new Integer(10));
         try {
@@ -296,7 +295,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
     public void testInjectingNonExistingComponent() throws Exception {
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST);
+        Integration integration = service.createIntegration("", Mode.UTEST, true);
         try {
             integration.injectComponent("foo:bared", attributes, "", "", out);
             fail("Instantiating component through integration service should have failed because of missing component def.");
@@ -313,7 +312,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         String validApp = "test:laxSecurity";
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST);
+        Integration integration = service.createIntegration("", Mode.UTEST, true);
         try {
             integration.injectComponent(validApp, attributes, "", "", out);
             fail("Injecting an application through integration service should have failed.");
@@ -335,7 +334,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
                 String.format(baseComponentTag, "", "<aura:attribute name='reqAttr' required='true' type='String'/>"));
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST);
+        Integration integration = service.createIntegration("", Mode.UTEST, true);
         try {
             integration.injectComponent(cmp.getDescriptorName(), attributes, "", "", out);
         } catch (Exception unexpected) {
@@ -370,7 +369,6 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("label", "Click Me");
         Appendable out = new StringBuffer();
-        obj.injectApplication(out);
         obj.injectComponent(simpleComponentTag, attributes, "", "", out);
         return out;
     }

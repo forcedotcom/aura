@@ -44,149 +44,160 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class IntegrationImpl implements Integration {
-	public IntegrationImpl(String contextPath, Mode mode) {
-		this.contextPath = contextPath;
-		this.mode = mode;
-	}
+    public IntegrationImpl(String contextPath, Mode mode, boolean initializeAura) {
+        this.contextPath = contextPath;
+        this.mode = mode;
+        this.initializeAura = initializeAura;
+    }
 
-	@Override
-	public void injectApplication(Appendable out) throws AuraRuntimeException, IOException {
-		if (!hasApplicationBeenWritten) {
-			hasApplicationBeenWritten = true;
+    @Override
+    public void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
+            Appendable out) throws IOException,
+            QuickFixException {
 
-			writeApplication(out);
-		}
-	}
+        if (Aura.getContextService().isEstablished()) {
+            throw new AuraRuntimeException(
+                    "Integration.injectComponent() cannot be called with an established Aura context!");
+        }
 
-	@Override
-	public void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId, Appendable out) throws IOException,
-			QuickFixException {
-		AuraContext context = startContext("is");
-		try {
-			DefDescriptor<ComponentDef> descriptor = Aura.getDefinitionService().getDefDescriptor(tag, ComponentDef.class);
-			DefinitionService definitionService = Aura.getDefinitionService();
-			ControllerDef componentControllerDef = definitionService.getDefDescriptor("aura://ComponentController", ControllerDef.class).getDef();
+        if (initializeAura && !hasApplicationBeenWritten) {
+            hasApplicationBeenWritten = true;
+            writeApplication(out);
+        }
 
-			Map<String, Object> paramValues = Maps.newHashMap();
-			paramValues.put("name", descriptor.getQualifiedName());
+        AuraContext context = startContext("is");
+        try {
+            DefDescriptor<ComponentDef> descriptor = Aura.getDefinitionService().getDefDescriptor(tag,
+                    ComponentDef.class);
+            DefinitionService definitionService = Aura.getDefinitionService();
+            ControllerDef componentControllerDef = definitionService.getDefDescriptor("aura://ComponentController",
+                    ControllerDef.class).getDef();
 
-			Map<String, Object> actionAttributes = Maps.newHashMap();
-			Map<String, String> actionEventHandlers = Maps.newHashMap();
+            Map<String, Object> paramValues = Maps.newHashMap();
+            paramValues.put("name", descriptor.getQualifiedName());
 
-			ComponentDef componentDef = descriptor.getDef();
-			for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-				String key = entry.getKey();
+            Map<String, Object> actionAttributes = Maps.newHashMap();
+            Map<String, String> actionEventHandlers = Maps.newHashMap();
 
-				AttributeDef attributeDef = componentDef.getAttributeDef(key);
-				if (attributeDef != null) {
-					String name = attributeDef.getName();
-					actionAttributes.put(name, entry.getValue());
-				} else {
-					RegisterEventDef eventDef = componentDef.getRegisterEventDefs().get(key);
-					if (eventDef != null) {
-						// Emit component.addHandler() wired to special
-						// global
-						// scope value provider
-						String name = eventDef.getAttributeName();
-						actionEventHandlers.put(name, (String) entry.getValue());
-					} else {
-						throw new AuraRuntimeException(String.format("Unknown attribute or event %s - %s", tag, key));
-					}
-				}
-			}
+            ComponentDef componentDef = descriptor.getDef();
+            for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+                String key = entry.getKey();
 
-			paramValues.put("attributes", actionAttributes);
+                AttributeDef attributeDef = componentDef.getAttributeDef(key);
+                if (attributeDef != null) {
+                    String name = attributeDef.getName();
+                    actionAttributes.put(name, entry.getValue());
+                } else {
+                    RegisterEventDef eventDef = componentDef.getRegisterEventDefs().get(key);
+                    if (eventDef != null) {
+                        // Emit component.addHandler() wired to special
+                        // global
+                        // scope value provider
+                        String name = eventDef.getAttributeName();
+                        actionEventHandlers.put(name, (String) entry.getValue());
+                    } else {
+                        throw new AuraRuntimeException(String.format("Unknown attribute or event %s - %s", tag, key));
+                    }
+                }
+            }
 
-			Action action = componentControllerDef.createAction("getComponent", paramValues);
-			action.setId("ais");
+            paramValues.put("attributes", actionAttributes);
 
-			Action previous = context.setCurrentAction(action);
-			try {
-				action.run();
-			} finally {
-				context.setCurrentAction(previous);
-			}
+            Action action = componentControllerDef.createAction("getComponent", paramValues);
+            action.setId("ais");
 
-			Message<?> message = new Message<ComponentDef>(Lists.newArrayList(action));
+            Action previous = context.setCurrentAction(action);
+            try {
+                action.run();
+            } finally {
+                context.setCurrentAction(previous);
+            }
 
-			try {
-				StringBuilder init = new StringBuilder();
+            Message<?> message = new Message<ComponentDef>(Lists.newArrayList(action));
 
-				init.append("var config = ");
-				Aura.getSerializationService().write(message, null, Message.class, init);
-				init.append(";\n");
+            try {
+                StringBuilder init = new StringBuilder();
 
-				if (!actionEventHandlers.isEmpty()) {
-					init.append("config.actionEventHandlers = ");
-					Json.serialize(actionEventHandlers, init);
-					init.append(";\n");
-				}
+                init.append("var config = ");
+                Aura.getSerializationService().write(message, null, Message.class, init);
+                init.append(";\n");
 
-				init.append(String.format(
-						"$A.getRoot().get(\"e.addComponent\").setParams({ config: config, locatorDomId: \"%s\", localId: \"%s\" }).fire();\n", locatorDomId,
-						localId));
+                if (!actionEventHandlers.isEmpty()) {
+                    init.append("config.actionEventHandlers = ");
+                    Json.serialize(actionEventHandlers, init);
+                    init.append(";\n");
+                }
 
-				out.append("<script>").append(init).append("</script>");
-			} catch (Throwable t) {
-				// DCHASMAN TODO W-1498425 Refine this approach - we currently
-				// have 2
-				// conflicting exception handling mechanisms kicking in that
-				// need to be reconciled
-				out.append("<script>").append("$A.log('failed to create component: " + t.toString() + "')").append("</script>");
-			}
-		} finally {
-			Aura.getContextService().endContext();
-		}
-	}
+                init.append(String
+                        .format(
+                                "$A.getRoot().get(\"e.addComponent\").setParams({ config: config, locatorDomId: \"%s\", localId: \"%s\" }).fire();\n",
+                                locatorDomId,
+                                localId));
 
-	@Override
-	@Deprecated
-	public void addPreload(String namespace) {
-		if (namespace != null && !namespace.isEmpty()) {
-			preloads.add(namespace);
-		}
-	}
+                out.append("<script>").append(init).append("</script>");
+            } catch (Throwable t) {
+                // DCHASMAN TODO W-1498425 Refine this approach - we currently
+                // have 2
+                // conflicting exception handling mechanisms kicking in that
+                // need to be reconciled
+                out.append("<script>").append("$A.log('failed to create component: " + t.toString() + "')")
+                        .append("</script>");
+            }
+        } finally {
+            Aura.getContextService().endContext();
+        }
+    }
 
-	private AuraContext startContext(String num) {
-		ContextService contextService = Aura.getContextService();
+    @Override
+    @Deprecated
+    public void addPreload(String namespace) {
+        if (namespace != null && !namespace.isEmpty()) {
+            preloads.add(namespace);
+        }
+    }
 
-		AuraContext context = contextService.startContext(mode, Format.JSON, Access.AUTHENTICATED);
-		context.setApplicationDescriptor(getApplicationDescriptor());
-		context.setContextPath(contextPath);
+    private AuraContext startContext(String num) {
+        ContextService contextService = Aura.getContextService();
 
-		if (num != null) {
-			context.setNum(num);
-		}
+        AuraContext context = contextService.startContext(mode, Format.JSON, Access.AUTHENTICATED);
+        context.setApplicationDescriptor(getApplicationDescriptor());
+        context.setContextPath(contextPath);
 
-		// Always include ui: because we need ui:message etc for error handling
-		context.addPreload("ui");
+        if (num != null) {
+            context.setNum(num);
+        }
 
-		for (String preload : preloads) {
-			context.addPreload(preload);
-		}
+        // Always include ui: because we need ui:message etc for error handling
+        context.addPreload("ui");
 
-		return context;
-	}
+        for (String preload : preloads) {
+            context.addPreload(preload);
+        }
 
-	private void writeApplication(Appendable out) throws IOException, AuraRuntimeException {
-		startContext(null);
-		try {
-			ApplicationDef appDef = getApplicationDescriptor().getDef();
-			Aura.getSerializationService().write(appDef, null, appDef.getDescriptor().getDefType().getPrimaryInterface(), out, "EMBEDDED_HTML");
-		} catch (QuickFixException e) {
-			throw new AuraRuntimeException(e);
-		} finally {
-			Aura.getContextService().endContext();
-		}
-	}
+        return context;
+    }
 
-	private static DefDescriptor<ApplicationDef> getApplicationDescriptor() {
-		DefinitionService definitionService = Aura.getDefinitionService();
-		return definitionService.getDefDescriptor("aura:integrationServiceApp", ApplicationDef.class);
-	}
+    private void writeApplication(Appendable out) throws IOException, AuraRuntimeException {
+        startContext(null);
+        try {
+            ApplicationDef appDef = getApplicationDescriptor().getDef();
+            Aura.getSerializationService().write(appDef, null,
+                    appDef.getDescriptor().getDefType().getPrimaryInterface(), out, "EMBEDDED_HTML");
+        } catch (QuickFixException e) {
+            throw new AuraRuntimeException(e);
+        } finally {
+            Aura.getContextService().endContext();
+        }
+    }
 
-	private final String contextPath;
-	private final Mode mode;
-	private final Set<String> preloads = Sets.newHashSet();
-	private boolean hasApplicationBeenWritten;
+    private static DefDescriptor<ApplicationDef> getApplicationDescriptor() {
+        DefinitionService definitionService = Aura.getDefinitionService();
+        return definitionService.getDefDescriptor("aura:integrationServiceApp", ApplicationDef.class);
+    }
+
+    private final String contextPath;
+    private final Mode mode;
+    private final boolean initializeAura;
+    private final Set<String> preloads = Sets.newHashSet();
+    private boolean hasApplicationBeenWritten;
 }

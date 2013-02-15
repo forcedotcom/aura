@@ -16,36 +16,22 @@
 package org.auraframework.impl.renderer.sampleJavaRenderers;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.Collections;
 
-import org.auraframework.Aura;
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
-import org.auraframework.integration.Integration;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.collect.Maps;
-
-public class RendererToInjectCmpInNonExistingPlaceholder implements Renderer {
+public class RendererToInjectCmpInNonExistingPlaceholder extends AbstractRendererForTestingIntegrationService implements
+        Renderer {
 
     @Override
     public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
-        String desc = (String)component.getAttributes().getValue("desc");
-        String placeholder = (String)component.getAttributes().getValue("placeholder");
-        String localId = (String)component.getAttributes().getValue("localId");
-        
-        Map<String,Object> attr = Maps.newHashMap();
-        AuraContext ctx = Aura.getContextService().getCurrentContext();
-        Integration integration = Aura.getIntegrationService().createIntegration(
-                "", Mode.DEV);
-        integration.injectApplication(out);
-        integration.injectComponent(desc, attr, localId , placeholder , out);
-        
-        //The only not-so-ideal part of this approach to testing IntegrationService is that we have to start the 
-        //context for the rendering of the original stub component to continue. IntegrationService sets up and tears down its context.
-        Aura.getContextService().startContext(ctx.getMode(), ctx.getFormat(), ctx.getAccess(), ctx.getApplicationDescriptor());
+        String desc = (String) component.getAttributes().getValue("desc");
+        String placeholder = (String) component.getAttributes().getValue("placeholder");
+        String localId = (String) component.getAttributes().getValue("localId");
+
+        injectComponent(desc, Collections.<String, Object> emptyMap(), localId, placeholder, out);
     }
 
 }

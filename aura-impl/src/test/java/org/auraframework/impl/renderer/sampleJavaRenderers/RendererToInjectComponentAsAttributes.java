@@ -19,24 +19,21 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.Renderer;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.instance.BaseComponent;
-import org.auraframework.integration.Integration;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-public class RendererToInjectComponentAsAttributes implements Renderer {
+public class RendererToInjectComponentAsAttributes extends AbstractRendererForTestingIntegrationService implements
+        Renderer {
 
     @Override
     public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
-        String desc = (String)component.getAttributes().getValue("desc");
+        String desc = (String) component.getAttributes().getValue("desc");
         Map<String, Object> auratextAttr = Maps.newHashMap();
         auratextAttr.put("value", "Grape Fruit");
         ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
@@ -48,20 +45,13 @@ public class RendererToInjectComponentAsAttributes implements Renderer {
         builder.setAttribute("value", "Water Melon");
         ComponentDefRef waterMelon = builder.build();
 
-        List<ComponentDefRef> cmps = Lists.newArrayList(grapeFruit,waterMelon);
+        List<ComponentDefRef> cmps = Lists.newArrayList(grapeFruit, waterMelon);
 
         out.append("<div id='placeholder' class='placeholder' style='border: 1px solid black'/>");
-        AuraContext ctx = Aura.getContextService().getCurrentContext();
-        Integration integration = Aura.getIntegrationService().createIntegration(
-                "", Mode.DEV);
-        integration.injectApplication(out);
-        Map<String,Object> attr = Maps.newHashMap();
-        attr.put("cmps", cmps);
-        integration.injectComponent(desc, attr, "localId" ,"placeholder" , out);
 
-        //The only not-so-ideal part of this approach to testing IntegrationService is that we have to start the
-        //context for the rendering of the original stub component to continue. IntegrationService sets up and tears down its context.
-        Aura.getContextService().startContext(ctx.getMode(), ctx.getFormat(), ctx.getAccess(), ctx.getApplicationDescriptor());
+        Map<String, Object> attr = Maps.newHashMap();
+        attr.put("cmps", cmps);
+        injectComponent(desc, attr, "localId", "placeholder", out);
     }
 
 }

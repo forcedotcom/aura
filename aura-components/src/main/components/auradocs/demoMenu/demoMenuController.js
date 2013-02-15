@@ -19,7 +19,7 @@
         if (triggerCmp) {
             var source = event.getSource();
             var label = source.get("v.label");
-            triggerCmp.setValue("{!v.label}", label); 
+            triggerCmp.setValue("{!v.label}", label);
         }
     },
     updateLabel: function(cmp, event) {
@@ -27,7 +27,33 @@
         if (triggerCmp) {
             var source = event.getSource();
             var label = source.get("v.label");
-            triggerCmp.setValue("{!v.label}", label); 
+            triggerCmp.setValue("{!v.label}", label);
         }
+    },
+    getMenuSelected: function(cmp, event) {
+        var menuCmp = cmp.find("checkboxMenu");
+        var menuItems = menuCmp.getValue("v.childMenuItems");
+        var values = [];
+        for (var i = 0; i < menuItems.getLength(); i++) {
+            var c = menuItems.getValue(i);
+            if (c.get("v.selected") === true) {
+                values.push(c.get("v.label"));
+            }
+        }
+        var resultCmp = cmp.find("result");
+        resultCmp.setValue("{!v.value}", values.join(","));
+    },
+    getRadioMenuSelected: function(cmp, event) {
+        var menuCmp = cmp.find("radioMenu");
+        var menuItems = menuCmp.getValue("v.childMenuItems");
+        var values = [];
+        for (var i = 0; i < menuItems.getLength(); i++) {
+            var c = menuItems.getValue(i);
+            if (c.get("v.selected") === true) {
+                values.push(c.get("v.label"));
+            }
+        }
+        var resultCmp = cmp.find("radioResult");
+        resultCmp.setValue("{!v.value}", values.join(","));
     }
 })

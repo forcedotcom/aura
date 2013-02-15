@@ -38,6 +38,8 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DependencyDef;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.http.RequestParam.EnumParam;
 import org.auraframework.http.RequestParam.StringParam;
@@ -74,8 +76,7 @@ import com.google.common.collect.Maps;
  * 
  * The sequence of requests is:
  * <ol>
- * <li>GET(AuraServlet): initial fetch of an aura app/component + Resource
- * Fetches:
+ * <li>GET(AuraServlet): initial fetch of an aura app/component + Resource Fetches:
  * <ul>
  * <li>GET(AuraResourceServlet:MANIFESt):optional get the manifest</li>
  * <li>GET(AuraResourceServlet:CSS):get the styles for a component</li>
@@ -230,9 +231,22 @@ public class AuraServlet extends AuraBaseServlet {
             DefDescriptor<? extends BaseComponentDef> defDescriptor = definitionService.getDefDescriptor(tagName,
                     defType == DefType.APPLICATION ? ApplicationDef.class : ComponentDef.class);
 
-            Aura.getContextService().getCurrentContext().setApplicationDescriptor(defDescriptor);
+            AuraContext curContext = Aura.getContextService().getCurrentContext();
+            curContext.setApplicationDescriptor(defDescriptor);
 
             def = defDescriptor.getDef();
+
+            // discover dependent items that must be added to the context
+            // (to ensure related items such as CSS make it to client)
+            List<DependencyDef> dds = def.getDependencies();
+            for (DependencyDef dd : dds) {
+                DescriptorFilter df = dd.getDependency();
+                if (df.getNamespaceMatch().isConstant()) {
+                    String targetNamespace = df.getNamespaceMatch().toString();
+                    curContext.addPreload(targetNamespace);
+                }
+            }
+
         } catch (RequestParam.InvalidParamException ipe) {
             handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
             return;

@@ -25,9 +25,13 @@ import org.auraframework.system.Source;
 import org.auraframework.test.WebDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
- * Utility class for browser QuickFixes. These functions should be common to all QuickFixes.
+ * Utility class for browser QuickFixes. Logic here should be common to all QuickFixes.
  */
 public class QuickFixUITestUtil {
     private final WebDriverTestCase testCase;
@@ -53,17 +57,33 @@ public class QuickFixUITestUtil {
     }
 
     /**
-     * Click the 'Fix!' button and return text displayed in browser either from newly loaded component, or any error
+     * Click the 'Fix!' button and verify text displayed in browser either from newly loaded component, or any error
      * message that is displayed on failure.
      */
-    public String clickFix(boolean expectedSuccess) {
+    public void clickFix(boolean expectedSuccess, String text) {
         clickButtonByLocalId("fixButton");
-        testCase.waitFor(3);
         if (expectedSuccess) {
-            return testCase.getDriver().findElement(By.tagName("body")).getText();
+            // Newly created component should be loaded with it's contents displayed to the user
+            waitForFixToProcess("Text from newly created component never displayed", By.tagName("body"), text);
         } else {
-            return testCase.getDriver().findElement(By.xpath("//div[@id='auraErrorMessage']")).getText();
+            // Expecting error message to pop up
+            waitForFixToProcess("Quickfix error text never displayed", By.xpath("//div[@id='auraErrorMessage']"), text);
         }
+    }
+
+    /**
+     * Wait for the browser to refresh and display the given text, or timeout with error.
+     */
+    private void waitForFixToProcess(String msg, final By elementSelector, final String text) {
+        WebDriverWait wait = new WebDriverWait(testCase.getDriver(), 30);
+        // Expect StaleElementReferenceException if browser hasn't displayed new text yet, so ignore until timeout
+        wait.withMessage(msg).ignoring(StaleElementReferenceException.class).until(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                String elementText = testCase.getDriver().findElement(elementSelector).getText();
+                return elementText.contains(text);
+            }
+        });
     }
 
     /**

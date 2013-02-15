@@ -26,6 +26,10 @@ import org.openqa.selenium.WebElement;
 /**
  * Widget class for QuickFixes to create new component/application bundles. This class handles verificaiton of UI
  * differences between creating a component and application bundle.
+ * 
+ * Logic that is different between handling component and application bundles is passed to inner class
+ * BaseComponentQuickFixUtil. Logic common to all Quickfixes, including adding/removing attribtues etc, is passed to
+ * QuickFixUITestUtil.
  */
 public class BaseComponentQuickFixWidget {
     private BaseComponentQuickFixUtil baseCmpUtil;
@@ -63,10 +67,10 @@ public class BaseComponentQuickFixWidget {
     }
 
     /**
-     * Click on fix button and verify what happens.
+     * Click on fix button and verify text displayed to user.
      */
-    public String clickFix(Boolean expectedSuccess) throws Exception {
-        return testUtil.clickFix(expectedSuccess);
+    public void clickFix(Boolean expectedSuccess, String text) throws Exception {
+        testUtil.clickFix(expectedSuccess, text);
     }
 
     /**

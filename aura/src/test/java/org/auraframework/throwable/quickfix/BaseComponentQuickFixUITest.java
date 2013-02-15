@@ -27,13 +27,13 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.TestLabels;
 import org.auraframework.test.annotation.UnAdaptableTest;
 
 /**
  * Tests for creating new markup bundles when you attempt to load a component that doesn't exist in the browser.
  */
-@TestLabels("auraSanity")
+// Unadaptable since does not function properly when running from jars
+@UnAdaptableTest
 public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
     protected String typeSuffix;
     protected DefType defType;
@@ -71,8 +71,7 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
             quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptor.getQualifiedName());
             quickFixUIWidget.verifyCustomizationMenu();
             quickFixUIWidget.selectCssCheckbox(true);
-            String result = quickFixUIWidget.clickFix(true);
-            assertEquals(String.format("TODO: %s:%s", namespace, cmpName), result);
+            quickFixUIWidget.clickFix(true, String.format("TODO: %s:%s", namespace, cmpName));
             // Serverside verification
             assertTrue("Failed to locate the definition", defDescriptor.exists());
             assertTrue("Failed to locate the css definition", defDescriptorCss.exists());
@@ -92,10 +91,7 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
             open(String.format("/%s/%s%s", namespace, cmpName, typeSuffix), Mode.DEV);
             quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptor.getQualifiedName());
             quickFixUIWidget.verifyCustomizationMenu();
-            String result = quickFixUIWidget.clickFix(false);
-            assertEquals("Incorrect message in alert", "java://org.auraframework.throwable.quickfix."
-                    + "AuraQuickFixController: org.auraframework.throwable.AuraRuntimeException: "
-                    + "Cannot find location to save definition.", result);
+            quickFixUIWidget.clickFix(false, "Cannot find location to save definition");
             assertFalse("Should not have created component bundle", defDescriptor.exists());
         } finally {
             quickFixUIWidget.deleteFiles(defDescriptor);
@@ -114,10 +110,7 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
             quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptor.getQualifiedName());
             quickFixUIWidget.verifyCustomizationMenu();
             quickFixUIWidget.setDescriptorNames("auratest:aaa.java");
-            String result = quickFixUIWidget.clickFix(false);
-            assertEquals("Incorrect message in alert", "java://org.auraframework.throwable.quickfix."
-                    + "AuraQuickFixController: org.auraframework.throwable.AuraRuntimeException: Invalid "
-                    + "Descriptor Format: auratest:aaa.java", result);
+            quickFixUIWidget.clickFix(false, "Invalid Descriptor Format: auratest:aaa.java");
             assertFalse("Should not have created component bundle", defDescriptor.exists());
         } finally {
             quickFixUIWidget.deleteFiles(defDescriptor);
@@ -129,7 +122,6 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
      */
     // TODO(tbliss): W-1510001 Why is this failing on touch's autobuild? Passes locally and testCreationQuickFix, which
     // is very similar, seems to be passing fine.
-    @UnAdaptableTest
     public void testMultipleDescriptors() throws Exception {
         String namespace = String.format("auratest", System.currentTimeMillis());
         String cmpName1 = String.format("nonExistent1%s%s", defType.name(), System.currentTimeMillis());
@@ -141,8 +133,7 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
             quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptor1.getQualifiedName());
             quickFixUIWidget.verifyCustomizationMenu();
             quickFixUIWidget.setDescriptorNames(namespace + ":" + cmpName1 + ", " + namespace + ":" + cmpName2);
-            String result = quickFixUIWidget.clickFix(true);
-            assertEquals(String.format("TODO: %s:%s", namespace, cmpName1), result);
+            quickFixUIWidget.clickFix(true, String.format("TODO: %s:%s", namespace, cmpName1));
             assertTrue("Should not have created component bundle", defDescriptor1.exists());
             assertTrue("Should not have created component bundle", defDescriptor2.exists());
         } finally {
@@ -159,22 +150,24 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
     public void _testCreateInnerCmp() throws Exception {
         String namespace = "auratest";
         String cmpName = "innerCmpThatDoesntExist";
-        String parentName = "";
+        String parentFullName = "";
+        String parentCmpName = "";
         if (defType == DefType.COMPONENT) {
-            parentName = "/" + namespace + "/createInnerCmpQuickFixCmp.cmp";
+            parentFullName = "/" + namespace + "/createInnerCmpQuickFixCmp.cmp";
+            parentCmpName = "createInnerCmpQuickFixCmp";
         } else if (defType == DefType.APPLICATION) {
-            parentName = "/" + namespace + "/createInnerCmpQuickFixApp.app";
+            parentFullName = "/" + namespace + "/createInnerCmpQuickFixApp.app";
+            parentCmpName = "createInnerCmpQuickFixApp";
             // We're actually creating a .cmp file here so use that helper class
             quickFixUIWidget = new BaseComponentQuickFixWidget(DefType.COMPONENT, this);
         }
         DefDescriptor<?> defDescriptorChild = createComponentDefDescriptor(namespace, cmpName);
         try {
-            open(parentName, Mode.DEV);
+            open(parentFullName, Mode.DEV);
             quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptorChild.getQualifiedName());
             quickFixUIWidget.verifyCustomizationMenu();
-            String result = quickFixUIWidget.clickFix(true);
-            assertTrue("Newly created inner component text not displayed to user", result.contains(String.format(
-                    "TODO: %s:%s\nIn component createInnerCmpQuickFix", namespace, cmpName)));
+            quickFixUIWidget.clickFix(true,
+                    String.format("TODO: %s:%s\nIn component " + parentCmpName, namespace, cmpName));
             assertTrue("Failed to locate the definition", defDescriptorChild.exists());
         } finally {
             quickFixUIWidget.deleteFiles(defDescriptorChild);
@@ -185,7 +178,8 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
      * Verify error message when creating inner component with a bad namespace.
      */
     // TODO(W-1507595): Error messages differ when loading the cmp and app. They should be at least consistent, and
-    // ideally a little more informative.
+    // ideally a little more informative. The cmp error is currently more correct than the app error, so putting that
+    // in the test.
     public void _testCreateInnerCmpBadNamespace() throws Exception {
         String namespace = "auratest";
         String cmpName = "innerCmpThatDoesntExist";
@@ -202,10 +196,8 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
             quickFixUIWidget.verifyToolbarAndClickCreate(defDescriptorChild.getQualifiedName());
             quickFixUIWidget.verifyCustomizationMenu();
             quickFixUIWidget.setDescriptorNames("auratestasdf:innerCmpThatDoesntExist");
-            String result = quickFixUIWidget.clickFix(false);
-            assertTrue("Incorrect error message text: " + result,
-                    result.contains("Cannot find location to save definition."));
-            assertFalse("Failed to locate the definition", defDescriptorChild.exists());
+            quickFixUIWidget.clickFix(false, "Cannot find location to save definition.");
+            assertFalse("Should not have created the component bundle with bad namespace", defDescriptorChild.exists());
         } finally {
             quickFixUIWidget.deleteFiles(defDescriptorChild);
         }

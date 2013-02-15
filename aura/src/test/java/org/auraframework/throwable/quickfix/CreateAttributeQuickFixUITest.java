@@ -34,9 +34,9 @@ import org.openqa.selenium.WebElement;
 /**
  * Tests to verify that users can add missing attributes to components via QuickFixes through the browser.
  */
-// Unadaptable since running from jars in sfdc autobuilds so can't create new cmp/attributes
 // TODO(W-1510267): QuickFix buttons do not show up in IE9
 @ExcludeBrowsers({ BrowserType.IE9 })
+// Unadaptable since does not function properly when running from jars
 @UnAdaptableTest
 public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
     private final QuickFixUITestUtil util = new QuickFixUITestUtil(this);
@@ -72,9 +72,7 @@ public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
         open("/auratest/createAttributeQuickFix.cmp", Mode.DEV);
         verifyToolbarAndClickCreateButton();
         verifyDefaultNameType("foo", "String");
-        String result = util.clickFix(true);
-        assertTrue("Component not loaded in browser after attribute added via QuickFix",
-                result.contains("In component createAttributeQuickFix"));
+        util.clickFix(true, "TODO: auratest:createAttributeQuickFix_child\nIn component createAttributeQuickFix");
 
         // check attribute created on component
         AttributeDef fooAttr = defDescriptor.getDef().getAttributeDef("foo");
@@ -88,9 +86,8 @@ public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
         open("/auratest/createAttributeQuickFix.cmp", Mode.DEV);
         verifyToolbarAndClickCreateButton();
         setAttributeNameType("foo", "myInvalidType");
-        String result = util.clickFix(false);
-        assertTrue("Incorrect error message displayed to user.", result.contains("org.auraframework.throwable."
-                + "AuraRuntimeException: java.lang.ClassNotFoundException: myInvalidType"));
+        util.clickFix(false,
+                "org.auraframework.throwable.AuraRuntimeException: java.lang.ClassNotFoundException: myInvalidType");
 
         // TODO(W-1506170): attribute still created when given invalid input
         // check attribute _not_ created
@@ -105,9 +102,7 @@ public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
         open("/auratest/createAttributeQuickFix.cmp", Mode.DEV);
         verifyToolbarAndClickCreateButton();
         setAttributeNameType("", "String");
-        String result = util.clickFix(false);
-        assertTrue("Incorrect error message displayed to user.",
-                result.contains("QualifiedName is required for descriptors"));
+        util.clickFix(false, "QualifiedName is required for descriptors");
 
         // TODO(W-1506170): attribute still created when given invalid input
         // check attribute _not_ created

@@ -27,8 +27,8 @@
 	        	$A.test.assertFalse(actionMenu.get('v.visible'),"Action Menu should not be visible");
 	            
 	        	//check menu is default to hidden by using DOM API
-	        	$A.test.assertTrue($A.util.hasClass(actionMenu.find("menu").getElement(),"uiMenu"), "Class name should be just uiMenu");
-	        	$A.test.assertFalse($A.util.hasClass(actionMenu.find("menu").getElement(),"visible"), "Class name should not contain visible");
+	        	$A.test.assertTrue($A.util.hasClass(actionMenu.getElement(),"uiMenu"), "Class name should be just uiMenu");
+	        	$A.test.assertFalse($A.util.hasClass(actionMenu.getElement(),"visible"), "Class name should not contain visible");
 	        	menuLabel.get("e.click").fire();
 	            
 	            //Check if secondItem in the menu is disabled
@@ -40,7 +40,7 @@
 				//check menu is visible by using AURA API
 	        	$A.test.assertTrue(actionMenu.get('v.visible'),"Menu should be visible");
 	            
-	        	$A.test.assertTrue($A.util.hasClass(actionMenu.find("menu").getElement(),"visible"), "Class name should be uiMenu visible");
+	        	$A.test.assertTrue($A.util.hasClass(actionMenu.getElement(),"visible"), "Class name should be uiMenu visible");
 	        	
 	        	//disable ActionItem1
 	        	cmp.find("actionItem1").getAttributes().setValue("disabled", true);
@@ -70,7 +70,7 @@
 			},function(cmp){
 				menuLabel.get("e.click").fire();
 	            //Check if menu is visible
-	            $A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(checkboxMenu.find("menu").getElement(),"visible")}, "Checkbox Menu Should be visible");
+	            $A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(checkboxMenu.getElement(),"visible")}, "Checkbox Menu Should be visible");
 			}, function(cmp){
 				//check item 1 is not selected
 				$A.test.assertFalse(cmp.find("checkboxItem1").get('v.selected'),"Checkbox Menu item 1 should not be selected");
@@ -79,7 +79,7 @@
 				$A.test.addWaitForWithFailureMessage(true, function(){return cmp.find("checkboxItem1").get('v.selected')}, "Checkbox Menu item 1 should be selected");
 			}, function(cmp){
 				menuLabel.get("e.click").fire();
-				$A.test.addWaitForWithFailureMessage(false, function(){return $A.util.hasClass(checkboxMenu.find("menu").getElement(),"visible")}, "Checkbox Menu Should be not be visible");
+				$A.test.addWaitForWithFailureMessage(false, function(){return $A.util.hasClass(checkboxMenu.getElement(),"visible")}, "Checkbox Menu Should be not be visible");
 		    }, function(cmp){
 		    	//check output result
 				ouptutButton.get('e.press').fire();
@@ -115,7 +115,7 @@
 				
 				menuLabel.get("e.click").fire();
 				//check if menu is visible
-				$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(radioMenu.find("menu").getElement(),"visible")}, "Radio Menu should be visible");
+				$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(radioMenu.getElement(),"visible")}, "Radio Menu should be visible");
 			},function(cmp){
 				//Select first item from the menu
 				item1.get('e.click').fire();
@@ -129,7 +129,7 @@
 				//menu item 1 should be unchecked after selecting item2
 				$A.test.assertFalse(item1.get('v.selected'),"Radio Menu item 1 should be unchecked");
 				menuLabel.get("e.click").fire();
-				$A.test.addWaitForWithFailureMessage(false, function(){return $A.util.hasClass(radioMenu.find("menu").getElement(),"visible")}, "Radio Menu should not be visible");
+				$A.test.addWaitForWithFailureMessage(false, function(){return $A.util.hasClass(radioMenu.getElement(),"visible")}, "Radio Menu should not be visible");
 	    	}, function(cmp){
 	    		ouptutButton.get('e.press').fire();
 				var expectedOutputText = item2.get('v.label');

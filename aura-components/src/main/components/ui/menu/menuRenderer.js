@@ -21,8 +21,18 @@
     },
     
     rerender: function(component, helper) {
-        helper.handleVisible(component);
+        var currentlyVisible = false;
+        var concreteCmp = component.getConcreteComponent();
+        var divCmp = concreteCmp.find("menu");
+        if (divCmp) {
+            var elem = divCmp.getElement();
+            if (elem) {
+                currentlyVisible = $A.util.hasClass(elem, "visible");
+            }
+        }
+        var ret = this.superRerender();
+        helper.handleVisible(component, currentlyVisible);
         helper.setAriaAttributes(component);
-        return this.superRerender();
+        return ret;
     }
 })

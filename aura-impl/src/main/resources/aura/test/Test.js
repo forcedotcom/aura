@@ -676,6 +676,28 @@ var Test = function(){
         	return aura.test.getText(document.activeElement);
         },
 
+		/**
+ 		* Gets the first element on the page that have the specified class name.
+ 		* @param {String} classname The CSS class name.
+ 		* @returns {Object} The element denoting the class, or null if none is found.
+ 		*/
+		getElementByClass : function(classname){
+    		var ret;
+    
+	  	  	if(document.getElementsByClassName){
+    			ret = document.getElementsByClassName(classname);
+    		}
+    
+	  	  	else if(document.querySelectorAll){
+    			ret = document.querySelectorAll("." + classname);
+    	  	}
+    
+	   	 	if (ret && ret.length > 0) {
+       	 		return ret[0];
+    		}
+    		return null;
+		},
+
         // Used by tests to modify framework source to trigger JS last mod update
         /** @ignore */
         dummyFunction : function(){

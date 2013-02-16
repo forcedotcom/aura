@@ -58,15 +58,15 @@
     
     whatItIs : function(component, name, value){
         if (value) {
-            aura.test.assertNotNull(aura.util.getElementByClass("itIsTrue"), name+" didn't evaluate as true");
-            aura.test.assertNull(aura.util.getElementByClass("itWishesItWasTrue"), name+" evaluated as true");
-            aura.test.assertNull(aura.util.getElementByClass("itIsNotTrue"), name+" evaluated as not true");
-            aura.test.assertNotNull(aura.util.getElementByClass("itWishesItWasNotTrue"), name+" didn't evaluate as not true");
+            aura.test.assertNotNull($A.test.getElementByClass("itIsTrue"), name+" didn't evaluate as true");
+            aura.test.assertNull($A.test.getElementByClass("itWishesItWasTrue"), name+" evaluated as true");
+            aura.test.assertNull($A.test.getElementByClass("itIsNotTrue"), name+" evaluated as not true");
+            aura.test.assertNotNull($A.test.getElementByClass("itWishesItWasNotTrue"), name+" didn't evaluate as not true");
         }else{
-            aura.test.assertNull(aura.util.getElementByClass("itIsTrue"), name+" evaluated as true");
-            aura.test.assertNotNull(aura.util.getElementByClass("itWishesItWasTrue"), name+" didn't evaluate as true");
-            aura.test.assertNotNull(aura.util.getElementByClass("itIsNotTrue"), name+" didn't evaluate as not true");
-            aura.test.assertNull(aura.util.getElementByClass("itWishesItWasNotTrue"), name+" evaluated as not true");
+            aura.test.assertNull($A.test.getElementByClass("itIsTrue"), name+" evaluated as true");
+            aura.test.assertNotNull($A.test.getElementByClass("itWishesItWasTrue"), name+" didn't evaluate as true");
+            aura.test.assertNotNull($A.test.getElementByClass("itIsNotTrue"), name+" didn't evaluate as not true");
+            aura.test.assertNull($A.test.getElementByClass("itWishesItWasNotTrue"), name+" evaluated as not true");
         }
     }
 })

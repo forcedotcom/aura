@@ -46,7 +46,8 @@ exp(p,
     "select", p.select,
     "getActiveElement", p.getActiveElement,
     "getActiveElementText", p.getActiveElementText,
-
+    "getElementByClass", p.getElementByClass,
+    
     // javascript
     "getPrototype", p.getPrototype,
     "overrideFunction", p.overrideFunction,

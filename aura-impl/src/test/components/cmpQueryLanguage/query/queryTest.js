@@ -17,10 +17,11 @@
     // Checks if undefined variable message is correct. Message varies across browsers.
     checkUndefinedMsg : function(variable, msg) {
         var chromeMsg = variable + " is not defined";
-        var ieMsg = "\'" + variable + "\' is undefined";
+        var ieMsg = "\'" + variable + "\' is undefined";       
+        var ieOldMsg= "The value of the property \'" + variable + "\' is null or undefined, not a Function object"
         var iosMsg = "Can't find variable: " + variable;
 
-        if (msg == chromeMsg || msg == ieMsg || msg == iosMsg) {
+        if (msg == chromeMsg || msg == ieMsg || msg == iosMsg || ieOldMsg) {
             return true;
         } else {
             return false;
@@ -132,14 +133,14 @@
             var row = result.rows[0];
             $A.test.assertTruthy(row.globalId);
             $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
-            $A.test.assertEquals(1, Object.keys(row).length, "Query with 1 field specification returned extra fields in result set.");
+            $A.test.assertEquals(1, this.objectKeys(row).length, "Query with 1 field specification returned extra fields in result set.");
 
         // 3. Multiple fields (one for get function and one for is function)
         // with repetition
             result = $A.getQueryStatement().field('globalId').field('Concrete').field('auraType').field('globalId').query();
             this.verifyQueryResultCount(result, 2);
             var row = result.rows[0];
-            $A.test.assertEquals(3, Object.keys(row).length, "Query with 3 field specification returned extra fields in result set.");
+            $A.test.assertEquals(3, this.objectKeys(row).length, "Query with 3 field specification returned extra fields in result set.");
             $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
             $A.test.assertEquals(cmp.isConcrete(), row.Concrete);
             $A.test.assertEquals(cmp.auraType, row.auraType);
@@ -152,7 +153,7 @@
             var result = $A.getQueryStatement().field('foo').query();
             this.verifyQueryResultCount(result, 2);
             var row = result.rows[0];
-            $A.test.assertEquals(1, Object.keys(row).length, "Query with invalid field returned extra fields in result set.");
+            $A.test.assertEquals(1, this.objectKeys(row).length, "Query with invalid field returned extra fields in result set.");
             // Verify that the result set has undefined as the value for a
             // invalid query field
             $A.test.assertTrue(row.foo === undefined, "Invalid fields should result in 'undefined' values in result set.");
@@ -171,9 +172,10 @@
             row = result.rows[0];
             $A.test.assertTruthy(row.globalId);
             $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
-            $A.test.assertEquals(3, Object.keys(row).length, "Query returned extra fields in result set.");
-            $A.test.assertTrue(row.null === undefined);
+            $A.test.assertEquals(3, this.objectKeys(row).length, "Query returned extra fields in result set.");
+            $A.test.assertTrue(row["null"] === undefined);
             $A.test.assertTrue(row.undefined === undefined);
+
 
         // 4. Verify specifying * as field
             result = $A.getQueryStatement().field('*').query();
@@ -192,7 +194,7 @@
             var result = $A.getQueryStatement().field('descriptor', 'getDef().getDescriptor().toString()').query();
             this.verifyQueryResultCount(result, 2);
             var row = result.rows[0];
-            $A.test.assertEquals(1, Object.keys(row).length, "Query returned extra fields in result set.");
+            $A.test.assertEquals(1, this.objectKeys(row).length, "Query returned extra fields in result set.");
             $A.test.assertEquals(cmp.getDef().getDescriptor().toString() , row.descriptor,
                     "Query failed to return correct result for derived field");
 
@@ -200,7 +202,7 @@
             result = $A.getQueryStatement().field('descriptor', 'getDef().getDescriptor().toString()').field('concrete', 'isConcrete()').field('globalId').query();
             this.verifyQueryResultCount(result, 2);
             row = result.rows[0];
-            $A.test.assertEquals(3, Object.keys(row).length, "Query with multiple derived fields returned extra fields in result set.");
+            $A.test.assertEquals(3, this.objectKeys(row).length, "Query with multiple derived fields returned extra fields in result set.");
             $A.test.assertEquals(cmp.getDef().getDescriptor().toString(), row.descriptor);
             $A.test.assertEquals(cmp.isConcrete(), row.concrete);
             $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
@@ -250,7 +252,7 @@
             var result = $A.getQueryStatement().fields('concrete, globalId').query();
             this.verifyQueryResultCount(result, 2);
             row = result.rows[0];
-            $A.test.assertEquals(2, Object.keys(row).length, "Query with multiple fields is CSV format returned extra fields in result set.");
+            $A.test.assertEquals(2, this.objectKeys(row).length, "Query with multiple fields is CSV format returned extra fields in result set.");
             $A.test.assertEquals(cmp.isConcrete(), row.concrete);
             $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
 
@@ -261,7 +263,7 @@
             /**
              * result = $A.getQueryStatement().fields(['concrete', 'globalId']).query();
              * this.verifyQueryResultCount(result, 2); row = result.rows[0];
-             * $A.test.assertEquals(2, Object.keys(row).length, "Query with
+             * $A.test.assertEquals(2, this.objectKeys(row).length, "Query with
              * multiple fields in array format returned extra fields in result
              * set."); $A.test.assertEquals(cmp.isConcrete(), row.concrete);
              * $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
@@ -274,7 +276,7 @@
             var result = $A.getQueryStatement().fields('concrete, foo, globalId').query();
             this.verifyQueryResultCount(result, 2);
             row = result.rows[0];
-            $A.test.assertEquals(3, Object.keys(row).length, "Query with multiple derived fields returned extra fields in result set.");
+            $A.test.assertEquals(3, this.objectKeys(row).length, "Query with multiple derived fields returned extra fields in result set.");
             $A.test.assertEquals(cmp.isConcrete(), row.concrete);
             $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
             $A.test.assertTrue( row.foo == undefined);
@@ -283,7 +285,7 @@
             var result = $A.getQueryStatement().fields('concrete, getDef().getDescriptor().toString(), globalId').query();
             this.verifyQueryResultCount(result, 2);
             row = result.rows[0];
-            $A.test.assertEquals(3, Object.keys(row).length, "Query with multiple derived fields returned extra fields in result set.");
+            $A.test.assertEquals(3, this.objectKeys(row).length, "Query with multiple derived fields returned extra fields in result set.");
             $A.test.assertEquals(cmp.isConcrete(), row.concrete);
             $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
             $A.test.assertTrue(row["getDef().getDescriptor().toString()"] == undefined);
@@ -329,7 +331,7 @@
                         .field("desc","getDef().getDescriptor().toString()")
                         .query();
             this.verifyQueryResultCount(result, 1);
-            $A.test.assertEquals(1, Object.keys(result.rows[0]).length, "Query returned extra fields in result set.");
+            $A.test.assertEquals(1, this.objectKeys(result.rows[0]).length, "Query returned extra fields in result set.");
             $A.test.assertEquals(cmp.getDef().getDescriptor().toString() , result.rows[0].desc);
             // Where clause on unselected fields
             try{
@@ -368,7 +370,7 @@
         test:[function(cmp){
             var result = $A.getQueryStatement().from('componentDef').field('nameSpace','getDescriptor().getNamespace()').groupBy('nameSpace').query();
             this.verifyQueryResultCount(result, $A.componentService.getRegisteredComponentDescriptors().length);
-            var preloadNamespaceCount = Object.keys($A.getContext().getPreloads()).length;
+            var preloadNamespaceCount = this.objectKeys($A.getContext().getPreloads()).length;
             //Number of namespaces = preloadNamespaces + the current test component namespace
             $A.test.assertEquals(preloadNamespaceCount + 1, result.groupCount);
         },
@@ -402,5 +404,19 @@
         $A.test.assertEquals(0, diff.added.rowCount, "Results sets are not identical.");
         $A.test.assertEquals(0, diff.removed.rowCount , "Result sets are not identical.");
         $A.test.assertEquals(set1.rowCount , diff.existing.rowCount, "Result sets are not identical.");
+    },
+    
+    objectKeys:function(obj){
+    	if(Object.keys){
+    		return Object.keys(obj);
+    	}
+    	else{
+    		var result = [];  
+    		for(var name in obj) {  
+        		if (obj.hasOwnProperty(name))  
+          			result.push(name);  
+    			}			  
+    		return result;  
+    	}
     }
 })

@@ -109,8 +109,7 @@ public class MenuUITest extends WebDriverTestCase{
     	//check menu list is visible after the click
     	assertTrue("Menu list should be visible", actionMenu.getAttribute("class").contains("visible"));
     	
-    	//focus on action item1
-    	auraUITestingUtil.setHoverOverElement(menuItem1);
+    	//default focus on action item1
     	assertEquals("Focus should be on actionItem1", actionItem1Element.getText(), auraUITestingUtil.getActiveElementText());
 		
 		//press down key twice

@@ -22,7 +22,7 @@
     <aura:set attribute="title" value="Aura Documentation"/>
     
     <aura:set attribute="auraPreInitBlock">
-		<auraStorage:init implementation="memory" maxSize="1024" defaultExpiration="600" 
-			defaultAutoRefreshInterval="600" debugLoggingEnabled="false" clearStorageOnInit="true"/>
+		<auraStorage:init name="actions" maxSize="1024" defaultExpiration="600" secure="true" persistent="false" 
+			defaultAutoRefreshInterval="600" debugLoggingEnabled="true" clearStorageOnInit="true"/>
 	</aura:set>    
 </aura:component>

@@ -18,15 +18,15 @@
         helper.init(cmp);
     },
 
-    noConnection: function(cmp) {
-        var storage = $A.storageService.getStorage();
+    noConnection: function(cmp, event, helper) {
+        var storage = helper.getStorage(cmp);
         if (storage) {
             storage.suspendSweeping();
         }
     },
 
-    connectionResumed: function(cmp) {
-        var storage = $A.storageService.getStorage();
+    connectionResumed: function(cmp, event, helper) {
+        var storage = helper.getStorage(cmp);
         if (storage) {
             storage.resumeSweeping();
         }

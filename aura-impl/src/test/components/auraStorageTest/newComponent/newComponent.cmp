@@ -4,7 +4,7 @@
     
     <!--Control the values per test case-->
     <auraStorage:init debugLoggingEnabled="true" 
-                      implementation="memory" 
+                      name="actions" secure="true" 
                       defaultExpiration="{!v.defaultExpiration}" 
                       defaultAutoRefreshInterval="{!v.defaultAutoRefreshInterval}"/>   
     

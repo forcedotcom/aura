@@ -45,7 +45,7 @@ MemoryStorageValue.prototype.getSize = function() {
  * @namespace The Memory adapter for storage service implementation
  * @constructor
  */
-var MemoryStorageAdapter = function MemoryStorageAdapter() {
+var MemoryStorageAdapter = function MemoryStorageAdapter(config) {
 	this.backingStore = {};
 	this.cachedSize = 0;
 	this.isDirtyForCachedSize = false;
@@ -125,4 +125,8 @@ MemoryStorageAdapter.prototype.getSizeEstimator = function() {
 
 //#include aura.storage.adapters.MemoryAdapter_export
 
-$A.storageService.registerAdapter(MemoryStorageAdapter.NAME, MemoryStorageAdapter);
+$A.storageService.registerAdapter({ 
+	"name": MemoryStorageAdapter.NAME, 
+	"adapterClass": MemoryStorageAdapter,
+	"secure": true
+});

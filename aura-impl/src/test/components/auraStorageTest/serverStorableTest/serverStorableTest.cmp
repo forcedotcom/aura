@@ -18,7 +18,7 @@
 <aura:component controller="java://org.auraframework.java.controller.ServerStorableActionController" render="client">
     <aura:attribute type="String" name="responseOrder" default=""/>
     
-	<auraStorage:init implementation="memory" debugLoggingEnabled="true"/>
+	<auraStorage:init name="actions" secure="true" debugLoggingEnabled="true"/>
 	     
     <ui:button press="{!c.handleClick}" aura:id="button" label="Get a stored action from the server"/>
 </aura:component>

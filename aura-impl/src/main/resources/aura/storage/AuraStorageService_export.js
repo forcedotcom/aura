@@ -15,9 +15,10 @@
  */
 /*jslint sub: true */
 exp(storageService,
-    "getStorage", storageService.getStorage
-    ,"setStorage", storageService.setStorage
+    "getStorage", storageService.getStorage,
+    "initStorage", storageService.initStorage
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         ,"createAdapter", storageService.createAdapter 
+        , "selectAdapter", storageService.selectAdapter
     //#end
 );

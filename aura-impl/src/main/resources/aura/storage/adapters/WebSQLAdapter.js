@@ -18,11 +18,11 @@
  * @namespace The WebSQL adapter for storage service implementation
  * @constructor
  */
-var WebSQLStorageAdapter = function WebSQLStorageAdapter() {
+var WebSQLStorageAdapter = function WebSQLStorageAdapter(config) {
     this.size = 0;
 	
-	this.db = openDatabase("webSQLStorageAdapter", "1.0",
-			"WebSQLStorageAdapter database", 50 * 1024 * 1024);
+    var instanceName = "AIS:" + config["name"];
+	this.db = openDatabase(instanceName, "1.0", instanceName + " database", 50 * 1024 * 1024);
 
 	this.createSchema(false);
 };
@@ -119,7 +119,7 @@ WebSQLStorageAdapter.prototype.updateSize = function() {
 				var rows = results.rows;
 				that.size = rows.item(0)["totalSize"];
 				
-				$A.storageService.getStorage().fireModified();
+				$A.storageService.fireModified();
 			},
 			function(tx, error) {
 				throw new Error("WebSQLStorageAdapter.updateSize() failed: " + error.message);
@@ -143,4 +143,11 @@ WebSQLStorageAdapter.prototype.createSchema = function(dropFirst) {
 	this.updateSize();
 };
 
-$A.storageService.registerAdapter(WebSQLStorageAdapter.NAME, WebSQLStorageAdapter);
+// Only register this adapter if the WebSQL API is present
+if (window.openDatabase) {
+	$A.storageService.registerAdapter({ 
+		"name": WebSQLStorageAdapter.NAME, 
+		"adapterClass": WebSQLStorageAdapter,
+		"persistent": true
+	});
+}

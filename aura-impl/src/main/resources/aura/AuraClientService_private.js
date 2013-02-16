@@ -36,7 +36,7 @@ var priv = {
             return null;
         }
 
-        var storage = $A.storageService.getStorage();
+        var storage = Action.prototype.getStorage();
         var e;
 
         // failure to communicate with server
@@ -269,7 +269,7 @@ var priv = {
                 if (actionResponse["storable"] === true) {
                 	// Create a client side action instance to go with the server created action response
                 	var descriptor = actionResponse["action"];
-                	var actionDef = $A.services.component.priv.actionDefRegistry.getDef({ descriptor: descriptor });
+                	var actionDef = $A.services.component.getActionDef({ descriptor: descriptor });
                 	action = actionDef.newInstance();
 
                 	action.setStorable();
@@ -412,7 +412,7 @@ var priv = {
             // For cacheable actions check the storage service to see if we
             // already have a viable cached action response we can complete
             // immediately
-            var storage = $A.storageService.getStorage();
+            var storage = Action.prototype.getStorage();
             if (action.isStorable() && storage) {
                 var key = action.getStorageKey();
 

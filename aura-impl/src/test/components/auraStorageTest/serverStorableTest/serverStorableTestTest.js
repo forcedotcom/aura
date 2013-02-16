@@ -1,11 +1,11 @@
 ({
 	setUp : function(component){
-        $A.storageService.getStorage().clear();
+    	$A.storageService.getStorage("actions").clear();
     },
     
     testStorageOfServerAction:{
         test:function(cmp){
-        	var storage = $A.storageService.getStorage();
+        	var storage = $A.storageService.getStorage("actions");
         	
 			cmp.find("button").getEvent("press").fire();
 

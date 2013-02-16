@@ -344,7 +344,7 @@
                 this.assertNumItems(1, "SetItem should have set 1 item");
             },
             function(cmp){
-                    this.adapter = new $A.storageService.adapters["smartstore"]();
+                this.adapter = new $A.storageService.createAdapter("smartstore");
                 this.assertGet("key1", {"value":{"oh":"hey"}});
             }
         ]

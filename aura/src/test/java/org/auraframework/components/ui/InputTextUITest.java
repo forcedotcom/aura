@@ -119,7 +119,7 @@ public class InputTextUITest extends WebDriverTestCase {
     @UnAdaptableTest
     // because it fails in FIREFOX
     @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.IPAD, BrowserType.ANDROID_PHONE,
-            BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.FIREFOX })
+            BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.FIREFOX, BrowserType.IE7 })
     public void testUpdateOnAttributeWithCertainEvents() throws Exception {
 
         open(TEST_CMP);

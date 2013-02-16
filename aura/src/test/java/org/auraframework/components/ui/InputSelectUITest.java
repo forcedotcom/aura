@@ -52,12 +52,14 @@ public class InputSelectUITest extends WebDriverTestCase {
         assertEquals("The select option's label is wrong", "Ant", inputSelect.getOptions().get(5).getText());
 
         // Change selection
+        inputSelectElement.click();
         inputSelect.selectByValue("Bear");
         assertFalse("Lion should not be selected any longer", inputSelect.getOptions().get(1).isSelected());
         assertTrue("Bear should be selected", inputSelect.getOptions().get(2).isSelected());
         assertEquals("InputSelect Component is not returning the selected value correctly", "Bear", inputSelect
                 .getOptions().get(2).getText());
 
+        inputSelectElement.click();
         inputSelect.selectByValue("Dragonfly");
         assertFalse("Bear should not be selected any longer", inputSelect.getOptions().get(2).isSelected());
         assertTrue("Dragonfly should be selected", inputSelect.getOptions().get(4).isSelected());
@@ -95,6 +97,7 @@ public class InputSelectUITest extends WebDriverTestCase {
         // IE10.
         inputSelectElement.click();
         // change selection
+        inputSelectElement.click();
         inputSelect.selectByValue("Butterfly");
         inputSelectElement.sendKeys(Keys.TAB);
         selectedOptions = inputSelect.getAllSelectedOptions();
@@ -133,6 +136,7 @@ public class InputSelectUITest extends WebDriverTestCase {
         assertTrue("Option2 should be selected", selectedLabels.get(1).isSelected());
 
         // Change selection
+        inputSelectElement.click();
         inputSelect.selectByValue("option1");
         selectedLabels = inputSelect.getOptions();
         assertTrue("Option1 should be selected", selectedLabels.get(0).isSelected());

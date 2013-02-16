@@ -68,25 +68,20 @@
         }
     },
     
-    handleVisible : function(component) {
+    handleVisible : function(component, currentlyVisible) {
         var concreteCmp = component.getConcreteComponent();
         var visible = concreteCmp.get("v.visible");
-        var divCmp = concreteCmp.find("menu");
-        if (divCmp) {
-            var elem = divCmp.getElement();
-            var currentlyVisible = $A.util.hasClass(elem, "visible");
-            if (visible === true) {
-                if (!currentlyVisible) { // If menu changes from invisible to visible, let's set the initial focus
-                    var index = concreteCmp.get("v.focusItemIndex");
-                    if (index < 0) {
-                        index = concreteCmp.getValue("v.childMenuItems").getLength() - 1;
-                    }
-                    this.setMenuItemFocus(concreteCmp, index);
+        if (visible === true) {
+            if (currentlyVisible !== true) { // If menu changes from invisible to visible, let's set the initial focus
+                var index = concreteCmp.get("v.focusItemIndex");
+                if (index < 0) {
+                    index = concreteCmp.getValue("v.childMenuItems").getLength() - 1;
                 }
-            } else {
-                concreteCmp.setValue("{!v.focusItemIndex}", 0);
+                this.setMenuItemFocus(concreteCmp, index);
             }
-            this.handleGlobalClick(concreteCmp, visible);
+        } else {
+            concreteCmp.setValue("{!v.focusItemIndex}", 0);
         }
+        this.handleGlobalClick(concreteCmp, visible);
     }
 })

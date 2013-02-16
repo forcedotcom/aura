@@ -41,15 +41,15 @@
             aura.test.assertTrue(li.getElement().className.indexOf('active')==-1, "Active css selector applied to tab when attribute was set to false.")
             //Verify that tab title is visible
             var a = cmp.find('a');
-            aura.test.assertEquals('block', window.getComputedStyle(a.getElement())['display'], "Title of tab to be displayed even if tab is inactive");
+            aura.test.assertEquals('block', this.getComputedStyle(a.getElement())['display'], "Title of tab to be displayed even if tab is inactive");
             var tabBody = cmp.find('tabBody');
-            aura.test.assertEquals('none', window.getComputedStyle(tabBody.getElement())['display'], "Tabbody should not be displayed if tab is inactive");
+            aura.test.assertEquals('none', this.getComputedStyle(tabBody.getElement())['display'], "Tabbody should not be displayed if tab is inactive");
 
             //Make the tab active and verify that CSS rule makes the tabBody Visible
             cmp.getAttributes().setValue('active',true);
             $A.renderingService.rerender(cmp);
             tabBody = cmp.find('tabBody');
-            aura.test.assertEquals('block', window.getComputedStyle(tabBody.getElement())['display'], "tabbody should be displayed if tab is active");
+            aura.test.assertEquals('block', this.getComputedStyle(tabBody.getElement())['display'], "tabbody should be displayed if tab is active");
 
         }
     },
@@ -82,5 +82,12 @@
             aura.test.assertNotNull(tabBody);
             aura.test.assertEquals("true", tabBody.getElement().getAttribute("aria-expanded"), "The aria-expanded attribute is not set correctly on div.tabBody element");
         }
+    },
+    
+    getComputedStyle: function(element){
+    	if(!window.getComputedStyle){
+    		return element.currentStyle;
+    	}
+    	return window.getComputedStyle(element);    	
     }
 })

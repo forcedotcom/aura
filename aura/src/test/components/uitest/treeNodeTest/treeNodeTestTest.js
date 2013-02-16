@@ -88,9 +88,11 @@
                     "gamma", "G", "pi", "rho", "tau", "E", "alpha", "beta",
                     "F", "H", "chi", "psi", "omega", "C" ];
             var expected = [];
-            expectedIds.forEach(function(id) {
-                expected.push(cmp.find(id));
-            });
+            
+            for(var id in expectedIds){
+            	expected.push(cmp.find(expectedIds[id]));
+            }
+           
             var nodes = [];
             var root = cmp.find('root');
             var collect = function(node) {

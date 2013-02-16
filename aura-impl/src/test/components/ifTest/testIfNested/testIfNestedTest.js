@@ -44,22 +44,22 @@
     
     whatItIs : function(component, name, outervalue, innervalue){
     	if(outervalue){
-    		aura.test.assertNotNull(aura.util.getElementByClass("outerIsTrue"), name+"Outer If was not displayed.");
-    		aura.test.assertNull(aura.util.getElementByClass("outerIsFalse"), name+"Outer else was displayed");
+    		aura.test.assertNotNull($A.test.getElementByClass("outerIsTrue"), name+"Outer If was not displayed.");
+    		aura.test.assertNull($A.test.getElementByClass("outerIsFalse"), name+"Outer else was displayed");
     	}else{
-    		aura.test.assertNull(aura.util.getElementByClass("outerIsTrue"), name+"Outer rIf was displayed.");
-    		aura.test.assertNotNull(aura.util.getElementByClass("outerIsFalse"), name+"Outer else was not displayed");
+    		aura.test.assertNull($A.test.getElementByClass("outerIsTrue"), name+"Outer rIf was displayed.");
+    		aura.test.assertNotNull($A.test.getElementByClass("outerIsFalse"), name+"Outer else was not displayed");
     	}
     	if (innervalue) {
-            aura.test.assertNotNull(aura.util.getElementByClass("itIsTrue"), name+"{!v.inner} didn't evaluate as true");
-            aura.test.assertNull(aura.util.getElementByClass("itWishesItWasTrue"), name+"{!v.inner} evaluated as false");
-            aura.test.assertNull(aura.util.getElementByClass("itIsNotTrue"), name+"{! !v.inner} evaluated as true");
-            aura.test.assertNotNull(aura.util.getElementByClass("itWishesItWasNotTrue"), name+"{! !v.inner} didn't evaluate as false");
+            aura.test.assertNotNull($A.test.getElementByClass("itIsTrue"), name+"{!v.inner} didn't evaluate as true");
+            aura.test.assertNull($A.test.getElementByClass("itWishesItWasTrue"), name+"{!v.inner} evaluated as false");
+            aura.test.assertNull($A.test.getElementByClass("itIsNotTrue"), name+"{! !v.inner} evaluated as true");
+            aura.test.assertNotNull($A.test.getElementByClass("itWishesItWasNotTrue"), name+"{! !v.inner} didn't evaluate as false");
         }else{
-            aura.test.assertNull(aura.util.getElementByClass("itIsTrue"), name+"{!v.inner} evaluated as true");
-            aura.test.assertNotNull(aura.util.getElementByClass("itWishesItWasTrue"), name+"{!v.inner} didn't evaluate as false");
-            aura.test.assertNotNull(aura.util.getElementByClass("itIsNotTrue"), name+"{! !v.inner} didn't evaluate as true");
-            aura.test.assertNull(aura.util.getElementByClass("itWishesItWasNotTrue"), name+"{! !v.inner} evaluated as false");
+            aura.test.assertNull($A.test.getElementByClass("itIsTrue"), name+"{!v.inner} evaluated as true");
+            aura.test.assertNotNull($A.test.getElementByClass("itWishesItWasTrue"), name+"{!v.inner} didn't evaluate as false");
+            aura.test.assertNotNull($A.test.getElementByClass("itIsNotTrue"), name+"{! !v.inner} didn't evaluate as true");
+            aura.test.assertNull($A.test.getElementByClass("itWishesItWasNotTrue"), name+"{! !v.inner} evaluated as false");
         }
     }
 })

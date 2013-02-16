@@ -50,8 +50,8 @@
     testLiterals: {
 
         test: function(component){
-            aura.test.assertNull(aura.util.getElementByClass("itIsLiterallyFalse"), "Literal false didn't evaluate as false");
-            aura.test.assertNotNull(aura.util.getElementByClass("itIsLiterallyNotFalse"), "Literal true evaluated as false");
+            aura.test.assertNull($A.test.getElementByClass("itIsLiterallyFalse"), "Literal false didn't evaluate as false");
+            aura.test.assertNotNull($A.test.getElementByClass("itIsLiterallyNotFalse"), "Literal true evaluated as false");
         }
     },
 
@@ -67,11 +67,11 @@
     },
     whatItIs : function(component, name, value){
         if (!value) {
-            aura.test.assertNotNull(aura.util.getElementByClass("itIsFalse"), name+" didn't evaluate as false");
-            aura.test.assertNull(aura.util.getElementByClass("itIsTrue"), name+" evaluated as true");
+            aura.test.assertNotNull($A.test.getElementByClass("itIsFalse"), name+" didn't evaluate as false");
+            aura.test.assertNull($A.test.getElementByClass("itIsTrue"), name+" evaluated as true");
         }else{
-            aura.test.assertNotNull(aura.util.getElementByClass("itIsTrue"), name+" didn't evaluate as true");
-            aura.test.assertNull(aura.util.getElementByClass("itIsFalse"), name+" evaluated as false");
+            aura.test.assertNotNull($A.test.getElementByClass("itIsTrue"), name+" didn't evaluate as true");
+            aura.test.assertNull($A.test.getElementByClass("itIsFalse"), name+" evaluated as false");
         }
     }
 })

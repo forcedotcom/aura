@@ -63,7 +63,7 @@
     testPullToRefreshDiv: {
         test: function(component) {
             // Make sure the "pull to refresh" div exists at the top of the scroll contents
-            var pullDownDiv = $A.util.getElementByClass("pullToRefresh");
+            var pullDownDiv = $A.test.getElementByClass("pullToRefresh");
             $A.test.assertNotNull(pullDownDiv, "There should be a 'pullToRefresh' div");
             var scroller = component.find("pullToRefresh");
             $A.test.assertTrue(scroller._scroller.options.topOffset > 0, "Scroller should have a top offset");

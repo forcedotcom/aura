@@ -158,18 +158,6 @@ Util.prototype.getElement = function(id){
     return document.getElementById(id);
 };
 
-/**
- * Gets the first element on the page that have the specified class name.
- * @param {String} classname The CSS class name.
- * @returns {Object} The element denoting the class, or null if none is found.
- */
-Util.prototype.getElementByClass = function(classname){
-    var ret = document.getElementsByClassName(classname);
-    if (ret && ret.length > 0) {
-        return ret[0];
-    }
-    return null;
-};
 
 /**
  * Checks whether the element has the specified class.

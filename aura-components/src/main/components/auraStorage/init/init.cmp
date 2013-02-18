@@ -25,6 +25,6 @@
     <aura:attribute name="requireUseStorageQueryParam" type="Boolean" default="false" description="Temporary control override for conditional enablement via aura.useStorage=true query param."/>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-    <aura:handler event="aura:noConnection" action="{!c.noConnection}"/>
+    <aura:handler event="aura:connectionLost" action="{!c.connectionLost}"/>
     <aura:handler event="aura:connectionResumed" action="{!c.connectionResumed}"/>
 </aura:component>

@@ -64,11 +64,6 @@ public class JavaModelTest extends AuraImplTestCase {
         }
 
         @Override
-        public String getFullyQualifiedName() {
-            return DefType.MODEL.getSType()+"@"+getQualifiedName();
-        }
-
-        @Override
         public String getQualifiedName() {
             return getPrefix() + "://" + TestModel.class.getName();
         }
@@ -89,7 +84,7 @@ public class JavaModelTest extends AuraImplTestCase {
         }
 
         @Override
-        public DefType getDefType() {
+        public org.auraframework.def.DefDescriptor.DefType getDefType() {
             return DefType.MODEL;
         }
 

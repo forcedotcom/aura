@@ -38,7 +38,6 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
     private static final long serialVersionUID = -4922652464026095847L;
     protected final String name;
     protected final String qualifiedName;
-    protected final String fullyQualifiedName;
     protected final String descriptorName;
     protected final DefType defType;
     protected final DefDescriptor<P> parentDescriptor;
@@ -66,7 +65,6 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
             this.descriptorName = String.format("%s/%s$%s", parentDescriptor.getDescriptorName(), defType.toString(),
                     name);
             this.hashCode = this.qualifiedName.toLowerCase().hashCode();
-            this.fullyQualifiedName = this.defType.getSType()+"@"+this.qualifiedName;
         } finally {
             loggingService.stopTimer(LoggingService.TIMER_DEF_DESCRIPTOR_CREATION);
         }
@@ -183,10 +181,5 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
     @Override
     public int compareTo(DefDescriptor<?> other) {
         return DefDescriptorImpl.compare(this, other);
-    }
-
-    @Override
-    public String getFullyQualifiedName() {
-        return this.fullyQualifiedName;
     }
 }

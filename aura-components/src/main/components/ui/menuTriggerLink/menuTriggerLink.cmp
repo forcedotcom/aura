@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" extends="ui:menuTrigger" description="​A link that triggers a dropdown menu." support="GA">
+<aura:component extensible="true" extends="ui:menuTrigger" description="A link that triggers a dropdown menu." support="GA">
     <aura:attribute name="title" type="String" default="" description="The text to display as a tooltip when the mouse pointer hovers over this component."/>
     <aura:if isTrue="{!v.body.length == 0}">
         <a aura:id="link" class="{!v.class}" title="{!v.title}">{!v.label}</a>

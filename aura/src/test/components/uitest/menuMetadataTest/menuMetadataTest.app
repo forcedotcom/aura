@@ -19,20 +19,20 @@
 <div style="margin:20px;">
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Checkbox - Metadata driven menu</h2>
-        <ui:dropdown>
+        <ui:menu>
             <ui:menuTriggerLink aura:id="metadatatrigger" label="Snow Resorts"/>
-            <ui:menu menuItems="{!m.resorts}"/>
-        </ui:dropdown>
+            <ui:menuList menuItems="{!m.resorts}"/>
+        </ui:menu>
     </div>
     <div style="display:inline-block;width:50%;">
         <h2>Checkbox - Metadata driven menu source codes:</h2>
-        <ui:outputText value='&#60;ui:dropdown&#62;'/>
+        <ui:outputText value='&#60;ui:menu&#62;'/>
         <br/>   
         <ui:outputText value='&#160;&#160;&#60;ui:menuTriggerLink aura:id="metadatatrigger" label="Snow Resorts"/&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#60;ui:menu menuItems="{&#160;!m.resorts}"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#60;ui:menuList menuItems="{&#160;!m.resorts}"/&#62;'/>
         <br/>
-        <ui:outputText value='&#60;/ui:dropdown&#62;'/>      
+        <ui:outputText value='&#60;/ui:menu&#62;'/>      
     </div>
 </div>
 <hr/>
@@ -40,20 +40,20 @@
 <div style="margin:20px;">
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Actions - Metadata driven menu</h2>
-        <ui:dropdown>
+        <ui:menu>
             <ui:menuTriggerLink class="trigger" aura:id="trigger" label="Please pick your favorite soccer club"/>
-            <ui:menu class="actionMenu" menuItems="{!m.places}" menuSelect="{!c.pickPlace}"/>
-        </ui:dropdown> 
+            <ui:menuList class="actionMenu" menuItems="{!m.places}" menuSelect="{!c.pickPlace}"/>
+        </ui:menu> 
     </div>
     <div style="display:inline-block;width:50%;">
         <h2>Actions - Metadata driven menu source codes:</h2>
-        <ui:outputText value='&#60;ui:dropdown&#62;'/>
+        <ui:outputText value='&#60;ui:menu&#62;'/>
         <br/>   
         <ui:outputText value='&#160;&#160;&#60;ui:menuTriggerLink aura:id="metadataAction" label="Pick a ski place"/&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#60;ui:menu menuItems="{&#160;!m.places}" menuSelect="{&#160;!c.pickPlace}"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#60;ui:menuList menuItems="{&#160;!m.places}" menuSelect="{&#160;!c.pickPlace}"/&#62;'/>
         <br/>
-        <ui:outputText value='&#60;/ui:dropdown&#62;'/>      
+        <ui:outputText value='&#60;/ui:menu&#62;'/>      
     </div>
 </div>
 <hr/>
@@ -61,10 +61,10 @@
 <div style="margin:20px;">
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Example: how to get menu selected values</h2>
-        <ui:dropdown>
+        <ui:menu>
             <ui:menuTriggerLink class="checkboxMenuLabel" aura:id="checkboxMenuLabel" label="NFC West Teams"/>
-            <ui:menu class="checkboxMenu" aura:id="checkboxMenu" menuItems="{!m.data}"/>
-        </ui:dropdown>
+            <ui:menuList class="checkboxMenu" aura:id="checkboxMenu" menuItems="{!m.data}"/>
+        </ui:menu>
         <p/>
         <ui:button class="checkboxButton" aura:id="checkboxButton" press="{!c.getMenuSelected}" label="Check the selected menu items"/>
         <p/>
@@ -72,13 +72,13 @@
     </div>
     <div style="display:inline-block;width:50%;">
         <h2>Source codes:</h2>
-        <ui:outputText value='&#60;ui:dropdown&#62;'/>
+        <ui:outputText value='&#60;ui:menu&#62;'/>
         <br/>   
         <ui:outputText value='&#160;&#160;&#60;ui:menuTriggerLink aura:id="metadatatrigger" label="Snow Resorts"/&#62;'/>
         <br/>
-        <ui:outputText value='&#160;&#160;&#60;ui:menu aura:id="myMenu" menuItems="{&#160;!m.data}"/&#62;'/>
+        <ui:outputText value='&#160;&#160;&#60;ui:menuList aura:id="myMenu" menuItems="{&#160;!m.data}"/&#62;'/>
         <br/>
-        <ui:outputText value='&#60;/ui:dropdown&#62;'/>
+        <ui:outputText value='&#60;/ui:menu&#62;'/>
         <br/>
         <ui:outputText value='&#60;ui:button press="{&#160;!c.getMenuSelected}" label="Check the selected menu items"/&#62;'/>
         <br/>
@@ -90,10 +90,10 @@
 <div style="margin:20px;">
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Example: custom Image Menu Item</h2>
-        <ui:dropdown>
+        <ui:menu>
             <ui:menuTriggerLink aura:id="imageTrigger" class="imageLink" label="Tiger"/>
-            <ui:menu aura:id="tigerMenu" class="inline" menuItems="{!m.images}" menuSelect="{!c.pickTiger}"/>
-        </ui:dropdown>
+            <ui:menuList aura:id="tigerMenu" class="inline" menuItems="{!m.images}" menuSelect="{!c.pickTiger}"/>
+        </ui:menu>
    </div>
 </div>
 </aura:application>

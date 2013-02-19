@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (C) 2012 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,28 +15,31 @@
  */
 ({
     doInit: function(component, event, helper) {
+        var children = [];
+        // Set "parent" for menu items in body
         var body = component.getValue("v.body");
         for (var i = 0; i < body.getLength(); i++) {
             var c = body.getValue(i);
+            if (c.isInstanceOf("ui:menuItem")) {
+                children.push(c);
+            }
             if (c.getDef().getAttributeDefs().getDef("parent")) {
                 c.setValue("{!v.parent}", [component]);
             }
         }
-    },
-    
-    trigger: function(component, event, helper) {
-        var index = event.getParam("focusItemIndex");
-        helper.toggleMenuVisible(component, index);
-    },
-    
-    handleMenuExpand: function(component, event, helper) {
-        document.body.addEventListener(helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(component));
-        document.body.addEventListener(helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(component));
-        
-    },
-    
-    handleMenuCollapse: function(component, event, helper) {
-        document.body.removeEventListener(helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(component));
-        document.body.removeEventListener(helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(component));
+        // Set "parent" for menu items in iteration
+        var items = component.find("item");
+        if (items && $A.util.isArray(items)) {
+            for (var j = 0; j < items.length; j++) {
+                var item = items[j];
+                if (item.isInstanceOf("ui:menuItem")) {
+                    children.push(item);
+                }
+                if (item.getDef().getAttributeDefs().getDef("parent")) {
+                    item.setValue("{!v.parent}", [component]);
+                }
+            }
+        }
+        component.setValue("{!v.childMenuItems}", children);
     }
 })

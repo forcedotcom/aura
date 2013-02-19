@@ -14,74 +14,149 @@
  * limitations under the License.
  */
 ({
-    getMenuItem: function(component, index) {
-        var menuItems = component.getValue("v.childMenuItems");
-        if (menuItems) {
-            return menuItems.getValue(index);
-        }
+    getMenuComponent : function(component){
+        return this.getComponent(component, "ui:menuList");
     },
-
-    handleGlobalClick: function(component, visible) {
-        var parent = component.getValue("v.parent");
-        if (parent && !parent.isEmpty()) {
-            p = parent.getValue(0);
-            if (visible === true) {
-                var action = p.get("c.handleMenuExpand");
-                if (action) {
-                    action.run();
-                }
-            } else {
-                var action = p.get("c.handleMenuCollapse");
-                if (action) {
-                    action.run();
-                }
-            }
+    
+    getTriggerComponent : function(component){
+    	return this.getComponent(component, "ui:menuTrigger");
+    },
+    
+    getComponent: function(component,cmpName){
+        var concrete = component.getConcreteComponent();
+        var body = concrete.getValue("v.body");
+        if(!$A.util.isUndefinedOrNull(cmpName)){
+	        for (var i = 0; i < body.getLength(); i++) {
+	            var c = body.getValue(i);
+	            if (c.isInstanceOf(cmpName)) {
+	                return c;
+	            }
+	        }
         }
     },
     
-    setAriaAttributes: function(component) {
-        var concrete = component.getConcreteComponent();
-        var elem = concrete.getElement();
-        var parent = concrete.getValue("v.parent");
-        if (parent && !parent.isEmpty()) {
-            var p = parent.getValue(0);
-            var pHelper = p.getDef().getHelper();
-            if (pHelper.getTriggerComponent) {
-                var triggerCmp = pHelper.getTriggerComponent(p);
-                if (triggerCmp) {
-                    var triggerElem = triggerCmp.getElement();
-                    if (triggerElem && elem) {
-                        elem.setAttribute("aria-labelledby", triggerElem.getAttribute("id"));
+    isElementInComponent : function(component, targetElem) {
+        var componentElements = [];
+
+        //grab all the siblings
+        var elements = component.getElements();
+        for(var index in elements) {
+            if (elements.hasOwnProperty(index)){
+                componentElements.push(elements[index]);
+            }
+        }
+
+        //go up the chain until it hits either a sibling or the root
+        var currentNode = targetElem;
+
+        do {
+            for (var index = 0; index < componentElements.length ; index++) {
+                if (componentElements[index] === currentNode) { return true; }
+            }
+
+            currentNode = currentNode.parentNode;
+        } while(currentNode);
+
+        return false;
+    },
+    
+    getOnClickStartFunction: function(component) {
+        if ($A.util.isUndefined(component._onClickStartFunc)) {
+            var helper = this;
+            var f = function(event) {
+                if (helper.getOnClickEventProp("isTouchDevice")) {
+                    var touch = event.changedTouches[0];
+                    // record the ID to ensure it's the same finger on a multi-touch device
+                    component._onStartId = touch.identifier;
+                    component._onStartX = touch.clientX;
+                    component._onStartY = touch.clientY;
+                } else {
+                    component._onStartX = event.clientX;
+                    component._onStartY = event.clientY;
+                }
+            };
+            component._onClickStartFunc = f;
+        }
+        return component._onClickStartFunc;
+    },
+    
+    getOnClickEndFunction : function(component) {
+        if ($A.util.isUndefined(component._onClickEndFunc)) {
+            var helper = this;
+            var f = function(event) {
+                // ignore gestures/swipes; only run the click handler if it's a click or tap
+                var clickEndEvent;
+            
+                if (helper.getOnClickEventProp("isTouchDevice")) {
+                    var touchIdFound = false;
+                    for (var i = 0; i < event.changedTouches.length; i++) {
+                        clickEndEvent = event.changedTouches[i];
+                        if (clickEndEvent.identifier === component._onStartId) {
+                            touchIdFound = true;
+                            break;
+                        }
+                    }
+                
+                    if (helper.getOnClickEventProp("isTouchDevice") && !touchIdFound) {
+                        return;
+                    }
+                } else {
+                    clickEndEvent = event;
+                }
+            
+                var startX = component._onStartX, startY = component._onStartY;
+                var endX = clickEndEvent.clientX, endY = clickEndEvent.clientY;
+
+                if (Math.abs(endX - startX) > 0 || Math.abs(endY - startY) > 0) {
+                    return;
+                }
+            
+                var menuComponent = helper.getMenuComponent(component);
+                var triggerComponent = helper.getTriggerComponent(component);
+                if (!helper.isElementInComponent(menuComponent, event.target) && 
+                        !helper.isElementInComponent(triggerComponent, event.target)) {
+                    // Collapse the menu
+                    menuComponent.setValue("{!v.visible}", false);
+                    var divCmp = menuComponent.find("menu");
+                    if (divCmp) {
+                        var elem = divCmp.getElement();
+                        $A.util.removeClass(elem, "visible");
                     }
                 }
-            }
+            };
+            component._onClickEndFunc = f;
         }
+        return component._onClickEndFunc;
     },
     
-    setMenuItemFocus: function(component, index) {
-        var menuItem = this.getMenuItem(component, index);
-        if (menuItem) {
-            var action = menuItem.get("c.setFocus");
-            if (action) {
-                action.run();
-            }
+    getOnClickEventProp: function(prop) {
+        // create the cache
+        if ($A.util.isUndefined(this.getOnClickEventProp.cache)) {
+            this.getOnClickEventProp.cache = {};
         }
-    },
-    
-    handleVisible : function(component, currentlyVisible) {
-        var concreteCmp = component.getConcreteComponent();
-        var visible = concreteCmp.get("v.visible");
-        if (visible === true) {
-            if (currentlyVisible !== true) { // If menu changes from invisible to visible, let's set the initial focus
-                var index = concreteCmp.get("v.focusItemIndex");
-                if (index < 0) {
-                    index = concreteCmp.getValue("v.childMenuItems").getLength() - 1;
-                }
-                this.setMenuItemFocus(concreteCmp, index);
-            }
+
+        // check the cache
+        var cached = this.getOnClickEventProp.cache[prop];
+        if (!$A.util.isUndefined(cached)) {
+            return cached;
+        }
+
+        // fill the cache
+        this.getOnClickEventProp.cache["isTouchDevice"] = !$A.util.isUndefined(document.ontouchstart);
+        if (this.getOnClickEventProp.cache["isTouchDevice"]) {
+            this.getOnClickEventProp.cache["onClickStartEvent"] = "touchstart";
+            this.getOnClickEventProp.cache["onClickEndEvent"] = "touchend";
         } else {
-            concreteCmp.setValue("{!v.focusItemIndex}", 0);
+            this.getOnClickEventProp.cache["onClickStartEvent"] = "mousedown";
+            this.getOnClickEventProp.cache["onClickEndEvent"] = "mouseup";
         }
-        this.handleGlobalClick(concreteCmp, visible);
-    }
+        return this.getOnClickEventProp.cache[prop];
+    },
+    
+    toggleMenuVisible : function(component, index) {
+    	var c = this.getMenuComponent(component);
+        c.setValue("{!v.focusItemIndex}", index);
+        var menuVisible = c.get("v.visible");
+        c.setValue("{!v.visible}", !menuVisible);
+    },
 })

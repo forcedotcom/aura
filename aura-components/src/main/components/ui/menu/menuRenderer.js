@@ -13,26 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    afterRender: function(component, helper) {
-        helper.handleVisible(component);
-        helper.setAriaAttributes(component);
-        return this.superAfterRender();
-    },
-    
-    rerender: function(component, helper) {
-        var currentlyVisible = false;
-        var concreteCmp = component.getConcreteComponent();
-        var divCmp = concreteCmp.find("menu");
-        if (divCmp) {
-            var elem = divCmp.getElement();
-            if (elem) {
-                currentlyVisible = $A.util.hasClass(elem, "visible");
-            }
+ ({
+    unrender: function(cmp, helper) {
+        if (helper.cache.onClickStartEvent && helper.cache.onClickStartFunction) {
+            document.body.removeEventListener(helper.cache.onClickStartEvent, helper.cache.onClickStartFunction);
         }
-        var ret = this.superRerender();
-        helper.handleVisible(component, currentlyVisible);
-        helper.setAriaAttributes(component);
-        return ret;
+        if (helper.cache.onClickEndEvent && helper.cache.onClickEndFunction) {
+            document.body.removeEventListener(helper.cache.onClickEndEvent, helper.cache.onClickEndFunction);
+        }
+        this.superUnrender();
     }
 })

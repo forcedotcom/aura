@@ -31,8 +31,8 @@ public class TabsetUITest extends WebDriverTestCase {
         open(URL);
 
         WebDriver d = getDriver();
-        WebElement tab1 = d.findElement(By.xpath("//ul[@class='tabLabels']/li[1]"));
-        WebElement tab2 = d.findElement(By.xpath("//ul[@class='tabLabels']/li[2]"));
+        WebElement tab1 = d.findElement(By.cssSelector("ul[class='tabLabels'] li:first-child"));
+        WebElement tab2 = d.findElement(By.cssSelector("ul[class='tabLabels'] li:first-child+li"));
 
         // verify initial setup
         verifyTab(tab1, "tab 1 contents", true);
@@ -66,7 +66,7 @@ public class TabsetUITest extends WebDriverTestCase {
             auraUITestingUtil.assertClassNameDoesNotContain(tab, "active");
             assertFalse("Since tab is inactive should not be able to read tab body: " + tabBody,
                     tabBodyActual.contains(tabBody));
-            assertNull("Since tab is inactive link should not have aria set (for accessability)", tabLinkAria);
+            assertFalse("Since tab is inactive link should not have aria set (for accessability)",Boolean.valueOf(tabLinkAria));
         }
 
     }

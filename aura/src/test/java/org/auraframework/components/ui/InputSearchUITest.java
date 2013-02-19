@@ -58,7 +58,7 @@ public class InputSearchUITest extends WebDriverTestCase {
         assertEquals("The initial value in input Search is wrong", "search", input.getAttribute("value"));
 
         WebDriver d = getDriver();
-        WebElement clearButton = d.findElement(By.xpath("//button[contains(@class, 'clear')]"));
+        WebElement clearButton = d.findElement(By.cssSelector("button[class*='clear']"));
         assertTrue("input search clear button doesn't show up", clearButton.isDisplayed());
 
         auraUITestingUtil.pressEnter(clearButton);

@@ -106,7 +106,7 @@ public class BaseComponentQuickFixWidget {
          * Set the css file checkbox to be selected or not.
          */
         public void selectCssCheckbox(Boolean select) {
-            By css = By.xpath("//input[@name='client.css' and @type='checkbox']");
+            By css = By.cssSelector("input[name='client.css']");
             WebElement checkbox = testCase.getDriver().findElement(css);
             if ((select && !checkbox.isSelected()) || (!select && checkbox.isSelected())) {
                 checkbox.click();
@@ -117,8 +117,9 @@ public class BaseComponentQuickFixWidget {
          * Set the name of the component bundle before creating it.
          */
         public void setDescriptorNames(String text) {
-            By xpath = By.xpath("//textarea[@name='descriptor']");
+            By xpath = By.cssSelector("textarea[name='descriptor']");
             WebElement textBox = testCase.getDriver().findElement(xpath);
+            textBox.click();
             textBox.clear();
             textBox.sendKeys(text);
         }
@@ -138,26 +139,27 @@ public class BaseComponentQuickFixWidget {
         public void verifyCustomizationMenu() {
             // No support for controller yet
             By jsController = By
-                    .xpath("//input[@name='client.controller' and @type='checkbox' and @disabled='disabled']");
+                    .cssSelector("input[name='client.controller']");
             Assert.assertTrue("Could not locate checkbox to create JS controller file.",
                     testCase.isElementPresent(jsController));
 
             // No support for renderer yet
-            By jsRenderer = By.xpath("//input[@name='client.renderer' and @type='checkbox' and @disabled='disabled']");
+            By jsRenderer = By.cssSelector("input[name='client.renderer']");
+            
             Assert.assertTrue("Could not locate checkbox to create JS renderer file.",
                     testCase.isElementPresent(jsRenderer));
 
-            By css = By.xpath("//input[@name='client.css' and @type='checkbox']");
+            By css = By.cssSelector("input[name='client.css']");
             Assert.assertTrue("Could not locate checkbox to create css theme file.", testCase.isElementPresent(css));
 
             // No support for controller yet
             By javaController = By
-                    .xpath("//input[@name='java.controller' and @type='checkbox' and @disabled='disabled']");
+                    .cssSelector("input[name='java.controller']");
             Assert.assertTrue("Could not locate checkbox to create java controller file.",
                     testCase.isElementPresent(javaController));
 
             // No support for renderer yet
-            By javaRenderer = By.xpath("//input[@name='java.renderer' and @type='checkbox' and @disabled='disabled']");
+            By javaRenderer = By.cssSelector("input[name='java.renderer']");
             Assert.assertTrue("Could not locate checkbox to create java renderer file.",
                     testCase.isElementPresent(javaRenderer));
         }
@@ -172,15 +174,15 @@ public class BaseComponentQuickFixWidget {
         @Override
         public void verifyCustomizationMenu() {
             super.verifyCustomizationMenu();
-            By app = By.xpath("//input[@name='client.cmp' and @type='checkbox']");
+            By app = By.cssSelector("input[name='client.cmp']");
             Assert.assertTrue("Could not locate checkbox to create component markup file.",
                     testCase.isElementPresent(app));
             // No support for provider yet
-            By jsProvider = By.xpath("//input[@name='client.provider' and @type='checkbox' and @disabled='disabled']");
+            By jsProvider = By.cssSelector("input[name='client.provider']");
             Assert.assertTrue("Could not locate checkbox to create JS provider file.",
                     testCase.isElementPresent(jsProvider));
             // No support for provider yet
-            By javaProvider = By.xpath("//input[@name='java.provider' and @type='checkbox' and @disabled='disabled']");
+            By javaProvider = By.cssSelector("input[name='java.provider']");
             Assert.assertTrue("Could not locate checkbox to create java provider file.",
                     testCase.isElementPresent(javaProvider));
         }
@@ -201,7 +203,7 @@ public class BaseComponentQuickFixWidget {
         @Override
         public void verifyCustomizationMenu() {
             super.verifyCustomizationMenu();
-            By app = By.xpath("//input[@name='client.app' and @type='checkbox']");
+            By app = By.cssSelector("input[name='client.app'][type='checkbox']");
             Assert.assertTrue("Could not locate checkbox to create application markup file.",
                     testCase.isElementPresent(app));
         }

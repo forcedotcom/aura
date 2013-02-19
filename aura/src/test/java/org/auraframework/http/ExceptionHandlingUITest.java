@@ -48,6 +48,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
 
     private static final String baseAppTag = "<aura:application %s securityProvider='java://org.auraframework.components.security.SecurityProviderAlwaysAllows'>%s</aura:application>";
 
+    private static final String errorBoxPath = "//div[@class='auraMsgMask auraForcedErrorBox']//div[@id='auraErrorMessage']";
     private void setProdConfig() throws Exception {
         ServletConfigController.setProductionConfig(true);
         Aura.getContextService().endContext();
@@ -72,7 +73,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
      */
     private void assertNoStacktraceServerRendering() throws Exception {
         WebElement elem = findDomElement(By
-                .xpath("//div[@class='auraMsgMask auraForcedErrorBox']//div[@id='auraErrorMessage']"));
+                .xpath(errorBoxPath));
         if (elem == null) {
             fail("error message not found");
         }
@@ -92,7 +93,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
      */
     private void assertStacktraceServerRendering(String messageStartsWith, String... causeStartsWith) throws Exception {
         WebElement elem = findDomElement(By
-                .xpath("//div[@class='auraMsgMask auraForcedErrorBox']//div[@id='auraErrorMessage']"));
+                .xpath(errorBoxPath));
         if (elem == null) {
             fail("error message not found");
         }
@@ -112,7 +113,6 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         }
         String childSelector = "#auraErrorMessage";
         for (String expectedCause : causeStartsWith) {
-            childSelector = childSelector + " > init";
             WebElement childElem = findDomElement(By.cssSelector(childSelector));
             if (childElem == null) {
                 fail("cause not found");

@@ -111,26 +111,28 @@ public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
     }
 
     private void verifyDefaultNameType(String name, String type) {
-        By nameXpath = By.xpath("//input[@name='attName']");
-        By typeXpath = By.xpath("//input[@name='type']");
+        By nameCssPath = By.cssSelector("input[name='attName']");
+        By typeCssPath = By.cssSelector("input[name='type']");
 
         // Verify attribute name
-        WebElement nameTextBox = getDriver().findElement(nameXpath);
+        WebElement nameTextBox = getDriver().findElement(nameCssPath);
         assertEquals("Default attribute name incorrect", name, nameTextBox.getAttribute("value"));
 
         // Set attribute type
-        WebElement typeTextBox = getDriver().findElement(typeXpath);
+        WebElement typeTextBox = getDriver().findElement(typeCssPath);
         assertEquals("Default attribute type incorrect", type, typeTextBox.getAttribute("value"));
     }
 
     private void setAttributeNameType(String name, String type) {
-        By nameXpath = By.xpath("//input[@name='attName']");
-        WebElement nameTextBox = getDriver().findElement(nameXpath);
+    	By nameCssPath = By.cssSelector("input[name='attName']");
+        WebElement nameTextBox = getDriver().findElement(nameCssPath);
+        nameTextBox.click();
         nameTextBox.clear();
         nameTextBox.sendKeys(name);
 
-        By typeXpath = By.xpath("//input[@name='type']");
-        WebElement typeTextBox = getDriver().findElement(typeXpath);
+        By typeCssPath = By.cssSelector("input[name='type']");
+        WebElement typeTextBox = getDriver().findElement(typeCssPath);
+        typeTextBox.click();
         typeTextBox.clear();
         typeTextBox.sendKeys(type);
     }

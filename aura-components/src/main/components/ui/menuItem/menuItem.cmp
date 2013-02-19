@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" abstract="true" extends="ui:interactive" provider="js://ui.menuItem" description="A UI menu item in a ui:menu component." support="GA">
+<aura:component extensible="true" abstract="true" extends="ui:interactive" provider="js://ui.menuItem" description="A UI menu item in a ui:menuList component." support="GA">
     <aura:attribute name="selected" type="Boolean" default="{!false}" description="The status of the menu item. True means this menu item is selected; False is not selected."/>
     <aura:attribute name="parent" type="Aura.Component[]" description="The parent of this menu item, which should be a menu or menuGroup."/>
     <aura:attribute name="type" type="String" description="The concrete type of the menu item. Accepted values are 'action', 'checkbox', 'radio', 'separator' or any namespaced component descriptor, e.g. ns:xxxxmenuItem."/>

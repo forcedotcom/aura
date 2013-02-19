@@ -63,8 +63,36 @@
 		//Code
 		s[33]= "Code^code^The quick start introduces you to the structure of apps and components but there is no code beyond markup. This section helps you to start writing code...^JavaScript, Java, sample app, sample code";
 		s[34]= "JavaScript^codeJavaScriptIntro^Use JavaScript for client-side Aura code. The Aura object is the top-level object in the JavaScript framework code. For all the methods available in the Aura class, see Aura in the JavaScript API in the Reference tab. You can use $A in JavaScript code to denote the Aura object...^controller, helper, renderer, testing, DOM, API, mode";
-			
+		s[35]= "Accessing the DOM^domAccess^The Document Object Model (DOM) is the language-independent model for representing and interacting with objects in HTML and XML documents. The Aura rendering service takes in-memory component state and updates the component in the DOM...^rendering service, renderer";
+		s[36]= "Using JavaScript Libraries^jsLibs^To use a JavaScript library, you must reference it in your app's template. Use aura:set to set the extraScriptTags attribute in the template component. This sets the extraScriptTags attribute in aura:template, which your app's template extends...^third-party, library";
+		s[37]= "Helpers^helper^A helper file contains JavaScript functions that can be called from a client-side controller or renderer for a component. Put functions that you want to reuse and call from a controller and renderer in the component's helper file...^renderer, bundle, controller";
+		s[38]= "Renderers^renderers^The Aura rendering service takes in-memory component state and updates the component in the Document Object Model (DOM). The DOM is the language-independent model for representing and interacting with objects in HTML and XML documents...^rendering lifecycle, component rendering, customize rendering, rerendering, unrendering, render";
+		s[39]= "Client-side Providers^providersClientSide^A provider enables you to use an abstract component or an interface in markup. The framework uses the provider to determine the concrete component to use at runtime. Server-side providers are more common, but if you don't need to access the server when you're creating a component, you can use a client-side provider instead...^external provider, componentDef, concrete, reuse provider";
+		s[30]= "JavaScript Services^services^Aura provides a set of client-side services that helps you develop apps faster. You can call these services from your JavaScript code, using the syntax $A.<service>.<method>. For example, use $A.componentService.newComponent() to create a component dynamically...^AuraComponentService, AuraDevToolService, AuraEventService, AuraExpressionService, AuraHistoryService, AuraLayoutService, AuraRenderingService";
+		s[31]= "Error Handling^error^This topic shows you how to handle client-side errors using JavaScript. Typically, you validate the user input, identify any errors, and display the error messages. You can use Aura's default error handling or customize it with your own error handlers.^ui:inputDefaultError, custom error handling, input error, validation error";
+		s[32]= "Testing Components^docTests^Aura's loosely coupled components facilitate maintainability, enable efficient testing, and isolate each component from their application context for easier testing. Aura supports JavaScript testing for components and applications in production mode when you develop using the framework...^debugging, user interactions, tools, JavaScript test, JSTEST, test mode";
+		s[33]= "Assertions^testsAssert^Assertions evaluate an object or expression for expected results and are the foundation of Aura Component testing. Each JavaScript test can contain one or more assertions. The test passes only when all the assertions are successful...^assert, fail, assertTrue";
+		s[34]= "Utility Functions^testsUtility^Utility functions provide additional support for Aura's unit testing and should be prefixed with aura.test or $A.test...^addFunctionHandler, addWaitFor, callServerAction, getDump, getErrors, outer HTML, prototype, getAction, getText, isComplete,overrideFunction, runAfterIf, select, setTestTimeout";
+		s[35]= "Sample Test Cases^testsCases^ The following test case use the utility function runAfterIf and assert statements to check that the right buttons are displayed in order...^initial render, rerender";
+		s[36]= "Value Objects^valueObjects^All expressions resolve to a value object, which is a thin wrapper around the actual data. The wrapper layer around the literal JavaScript objects enables you to modify data in a transactional manner and selectively rerender and update the UI in response to data changes...^access value, set value, getValue, setValue, literal value, expressions, rerender, isDirty, commit, rollback, getPreviousValue, get previous value";
+		s[37]= "Value Object Types^valueObjectTypes^These are the most commonly used value object types. Available methods can be found via the links in the Value Object column...^simple value, array, map, action reference, function call, property reference, immutable types";
+		s[38]= "Detecting a Value Object Change^onchange^You can configure a component to automatically invoke a client-side controller action when a value in one of the component's model or attributes changes. When the value changes, the valueChange.evt event is automatically fired...^events, handler, value change, aura:handler, attribute change, aura:iteration,";
+		s[39]= "Dynamically Creating Components^dynamicCmp^When the value changes, the valueChange.evt event is automatically fired. This sample code adds a component to a div element...^setParams, set parameters, destroy component, setValue, getValue, set value, get value, localId, local id, newComponent, action value, API";
+		s[40]= "Finding Components by ID^findById^You want to retrieve a component by its ID in JavaScript code. For example, a component has a local ID of button1...^get, find, value provider, global id, globalId";
+		s[41]= "Dynamically Showing or Hiding Markup^hideMarkup^You want to show or hide markup when a button is pressed...^toggle, visible, renderIf, toggle value, DOM";
+		s[42]= "Invoking Actions on Component Initialization^initHandler^You want to update a component or fire an event after component construction but before rendering...^set init value, initialize, controller";
+		s[43]= "Java^codeJavaIntro^Use Java for server-side Aura code. Services are the API in front of Aura. The Aura class is the entry point in Java for accessing server-side services...^models, initialize data, controller, provider, security provider, control access, definition, metadata, defdescriptor, instance, registry";
+		s[44]= "Models^models^A model is a component's main source for dynamic data. Use a model to read your initial component data in Aura. For example, the model could read the component's data from a database. The component generates an appropriate user interface from the model's data...^value provider, rendering, evaluate value, initialize data, auraenabled, client-side model, java model, access model";
+		s[45]= "Server-Side Controllers^serverSideControllers^ You can use client-side and server-side controllers in Aura. An event is always wired to a client-side controller action, which can in turn call a server-side controller action. For example, a client-side controller might handle an event and call a server-side controller action to persist data to a database...^call action, server action, callback, JSON, name-value, echo, abortable, action queue, auraenabled, serverEcho";
+		s[46]= "Server-Side Renderers^renderersServerSide^The Aura rendering service takes in-memory component state and updates the component in the Document Object Model (DOM). The DOM is the language-independent model for representing and interacting with objects in HTML and XML documents...^Java renderer, rerender";
+		s[47]= "Registering a Custom Converter^registerCustomConverter^A custom converter enables the conversion of one Java type to another Java type for client data sent to the server or for server markup data. When a client calls a server-side controller action, data that the client sends, such as input parameters for a server action, is sent in JSON format...^register converter, auraconfiguration, configuration, impl, custom type conversion, attribute conversion, action call conversion, parameterized type, convert type";
+		s[48]= "Converter Interface^converterInterface^ The Converter interface is a type converter that converts a value from one Java type to another Java type. You can implement this interface to provide a custom converter for your own custom type for converting data sent from the client to the server, such as input parameters of server-side controller actions or component attributes...^return Java type, return Java parameter";
+		s[49]= "Getting a DefDescriptor^javaDefDesc^A DefDescriptor is an Aura class that contains the metadata for any definition used in Aura, such as a component, action, or event. In the example of a model, it is a nicely parsed description with methods to retrieve the language, class name, and package name. Rather than passing a more heavyweight definition around in code, Aura usually passes around a DefDescriptor instead...^definitionservice, definition service, metadata";
+		s[50]= "Getting an Instance of a Component^javaInstanceCmp^An instance represents the data for a component. You want to get an instance of a component in Java code...^instanceservice, instance service, get instance, componentdef, map, attribute map";
+		s[51]= "Setting a Component ID^setIDdefref^You want to create a component with a local ID and attributes in Java code. If you want to create a component and set its local Id on the client, see Dynamically Creating Components...^componentdefrefbuilder, component definition reference, set id, set facet, set body, instance";
 		
+			
+			
 		
 		cookies = document.cookie;
 		var p = cookies.indexOf("d=");
@@ -155,26 +183,25 @@
 		var queryCount = cmp.getValue("v.queryNum");
 		queryCount.setValue(co);
 		var myQuery = cmp.getValue("v.myQuery");
+		var noResults = cmp.getValue("v.noResults");
 		//Display results
 		if (co==0){
-			var noResults = "Please try another search term."
-			myQuery.setValue(noResults);
+			var noneFound = "Please try another search term.";
+			noResults.setValue(noneFound);
 			return;
 		}
-		for (var a=0; a < r.length; a++){
-			var os = r[a].split("^");
-			if(bold==1){
-				console.log(r.length);
+		
+			for (var a=0; a < r.length; a++){
+				var os = r[a].split("^");
 				var br="<b>" + d + "</b>";
 				os[2] = os[2].replace(pat, br);
-				
+			
+				var result = [];
+				//for (var i=0; i<co; i++){ 
+					result[a] = "<a href=\"#help?topic=" + os[1] + "\" />" + os[0] + "</a><br/>" + os[2];
+				//}
+				myQuery.setValue(result);
+				console.log(result[a]);
 			}
-			var result = [];
-			for (var i=0; i<co; i++){
-				result[i] = "<a href=\"#help?topic=" + os[1] + "\" />" + os[0] + "</a><br/>" + os[2];
-				myQuery.setValue(result[i]);
-			}
-		}
 	}
-  }
 }

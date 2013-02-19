@@ -21,26 +21,18 @@
 	
 	<aura:attribute name="searchTerm" type="String" default="Search Term" />
 	<aura:attribute name="queryNum" type="Integer" default="0" />
+	<aura:attribute name="noResults" type="String" default="Please enter another search term."/>
 	<aura:attribute name="myQuery" type="String[]" default="Search Results" />
 	
 	<p>You searched for "{!v.searchTerm}".</p>
 	<p><ui:outputText value="{!v.queryNum}" /> result(s) found.</p>
-    <!--<p><ui:outputText value="{!v.myQuery}" /></p>-->
     
+    <p><ui:outputText value="{!v.noResults}" /></p>    
     <ol>
-    <aura:iteration items="{!v.myQuery}" var="s">
-    <li>
-    <aura:unescapedHtml value="{!s}">
-   
-    </aura:unescapedHtml>
-    </li>
+   <aura:iteration items="{!v.myQuery}" var="s" indexVar="index">
+    <li><aura:unescapedHtml value="{!s}" /></li>
     </aura:iteration>
-	<!--<aura:if isTrue="{!v.myQuery}">
-			<p>{!v.myQuery}</p>
-			<aura:set attribute="else">
-			<p>No results found! Please try another search term.</p>
-			</aura:set>
-		</aura:if>-->
-	</ol>
+    </ol>
+	
 	<p><a href="#help?topic=welcome">Back to Search</a></p>
 </aura:component>

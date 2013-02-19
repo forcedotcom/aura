@@ -150,6 +150,7 @@ public class InputTextUITest extends WebDriverTestCase {
         eventName = "mouseover";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
+        outputDiv.click();
         a.moveToElement(input).build().perform();
         value = assertModelValue(eventName);
 
@@ -193,7 +194,7 @@ public class InputTextUITest extends WebDriverTestCase {
     }
 
     private String getCurrentModelValue() {
-        String valueExpression = "return window.$A.get('root.m.string')";
+    	String valueExpression = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil.getValueFromRootExpr("m.string"));
         String value = (String) auraUITestingUtil.getEval(valueExpression);
         return value;
     }

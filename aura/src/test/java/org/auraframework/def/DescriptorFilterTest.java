@@ -348,6 +348,12 @@ public class DescriptorFilterTest extends UnitTestCase {
             // package...
             return getQualifiedName().compareToIgnoreCase(other.getQualifiedName());
         }
+
+        @Override
+        public String getFullyQualifiedName() {
+            // TODO Auto-generated method stub
+            return null;
+        }
     }
 
     public void testDescriptor() {

@@ -18,3 +18,7 @@
 <aura:application>
 </aura:application>
 <!--This application is used in CachingDefRegistryImplTest.java -->
+
+<!-- Also used in MasterDefRegistryImplTest.testUidValue(). If you change
+     anything in this file/bundle or it's direct dependencies, you'll need
+     to modify the tests -->

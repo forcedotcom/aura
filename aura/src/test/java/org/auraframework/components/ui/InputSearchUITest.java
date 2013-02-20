@@ -31,7 +31,7 @@ public class InputSearchUITest extends WebDriverTestCase {
 
     }
 
-    // Excluding safari due to W-1478819
+    // W-1551076: Webdriver not firing search event in Safari
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
             BrowserType.SAFARI })
     public void testSearch() throws Exception {
@@ -46,7 +46,7 @@ public class InputSearchUITest extends WebDriverTestCase {
         assertTrue("Search event should have been triggered", auraUITestingUtil.getBooleanEval(valueExpression));
     }
 
-    // Excluding safari due to W-1478819
+    // W-1551076: Webdriver not firing search event in Safari
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
             BrowserType.SAFARI })
     public void testClearSelection() throws Exception {

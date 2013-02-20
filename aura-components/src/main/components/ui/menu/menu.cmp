@@ -15,21 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" description="A menu component that can contain menu items: ui:actionMenuItem, ui:checkboxMenuItem, and ui:radioMenuItem, and a separator component ui:menuItemSeparator. This component can be nested in a ui:dropdown component and can be used together with a ui:menuTriggerLink component, which triggers the menu items." support="GA">
-    <aura:attribute name="parent" type="Aura.Component[]" description="The parent component of this menu."/>
-    <aura:attribute name="visible" type="Boolean" default="{!false}" description="​Controls the visibility of the menu. The default is false, which hides the menu."/>
-    <aura:attribute name="focusItemIndex" type="Integer" default="0" 
-                    description="The index of the item which should be on focus when the menu displays. 0 means the first item and -1 refers to the last."/>
-    <aura:attribute name="menuItems" type="List" description="A list of menu items set explicitly using instances of the Java class: aura.​components.​ui.MenuItem."/>
-    <aura:registerEvent name="menuSelect" type="ui:menuSelect" description="The event fired when the user select a menu item."/>
+<aura:component extensible="true" implements="ui:visible" description="A dropdown menu with a trigger that controls its visibility." support="GA">
+    <aura:registerEvent name="menuTriggerPress" type="ui:menuTriggerPress" description="The event fired when the menu trigger is pressed."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-    <aura:attribute name="childMenuItems" type="Aura.Component[]" description="a read-only attribute pointing to child components."/>
-    <div aura:id="menu" role="menu" class="{!v.class + (v.visible == true ? ' visible':'')}">
-        <ul aura:id="datalist" role="presentation">
-            <aura:iteration items="{!v.menuItems}" var="item">
-                <ui:menuItem aura:id="item" class="{!item.className}" disabled="{!item.disabled}" label="{!item.label}" selected="{!item.selected}" type="{!item.type}"/>
-            </aura:iteration>
-            {!v.body}
-        </ul>
-    </div>
+    <aura:handler name="menuTriggerPress" action="{!c.trigger}"/>
+    <span aura:id="app" class="{!v.class}" role="application">
+        {!v.body}
+    </span>
 </aura:component>

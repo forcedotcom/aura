@@ -15,8 +15,10 @@
  */
 package org.auraframework.impl.system;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -32,14 +34,12 @@ import org.auraframework.def.SecurityProviderDef;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Location;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -48,22 +48,24 @@ import org.auraframework.util.text.Hash;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
- * Overall Master definition registry implementation.
+ * Overall Master definition registry implementation, there be dragons here.
  * 
  * This 'master' definition registry is actually a single threaded, per request registry that caches certain things in
  * what is effectively a thread local cache. This means that once something is pulled into the local thread, it will not
  * change.
+ *
  */
 public class MasterDefRegistryImpl implements MasterDefRegistry {
     private static final Set<DefType> securedDefTypes = Sets.immutableEnumSet(DefType.APPLICATION, DefType.COMPONENT,
-            DefType.CONTROLLER, DefType.ACTION);
+                                                                              DefType.CONTROLLER, DefType.ACTION);
     private static final Set<String> unsecuredPrefixes = ImmutableSet.of("aura");
     private static final Set<String> unsecuredNamespaces = ImmutableSet.of("aura", "ui", "os", "auradev",
-            "org.auraframework");
+                                                                           "org.auraframework");
     private static final Set<String> unsecuredNonProductionNamespaces = ImmutableSet.of("auradev");
 
     private final static int DEPENDENCY_CACHE_SIZE = 100;
@@ -409,6 +411,36 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         cc.dependencies.put(canonical, def);
         return def;
     }
+    
+    /**
+     * finish up the validation of a set of compiling defs.
+     *
+     * @param context only needed to do setCurrentNamspace.
+     */
+    private void finishValidation(AuraContext context, Collection<CompilingDef<?>> compiling) throws QuickFixException {
+        //
+        // Now validate our references.
+        //
+        for (CompilingDef<?> cd : compiling) {
+            if (cd.built) {
+                // FIXME: setting the current namespace on the context seems extremely hackish
+                context.setCurrentNamespace(cd.descriptor.getNamespace());
+                cd.def.validateReferences();
+            }
+        }
+
+        //
+        // And finally, mark everything as happily compiled.
+        //
+        for (CompilingDef<?> cd : compiling) {
+            // FIXME: setting the current namespace on the context seems extremely hackish
+            if (cd.built) {
+                context.setCurrentNamespace(cd.descriptor.getNamespace());
+                cd.markValid();
+                defs.put(cd.descriptor, cd.def);
+            }
+        }
+    }
 
     /**
      * Compile a single definition, finding all of the static dependencies.
@@ -475,42 +507,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     getHelper(cdesc, cc, next);
                 }
             }
-
-            //
-            // Now validate our references.
-            //
-            for (CompilingDef<?> cd : cc.compiled.values()) {
-                if (cd.built) {
-                    // FIXME: setting the current namespace on the context seems
-                    // extremely hackish
-                    cc.context.setCurrentNamespace(cd.descriptor.getNamespace());
-                    cd.def.validateReferences();
-                }
-            }
-
-            //
-            // FIXME: figure out the global version here for the def being
-            // requested. Also, do
-            // something useful with dependencies to figure out if it is stale.
-            // If so, we'd have
-            // to invalidate the whole set and start over. Rather a painful
-            // thing to do.
-            //
-
-            //
-            // And finally, mark everything as happily compiled.
-            //
-            for (CompilingDef<?> cd : cc.compiled.values()) {
-                // FIXME: setting the current namespace on the context seems
-                // extremely hackish
-                if (cd.built) {
-                    cc.context.setCurrentNamespace(cd.descriptor.getNamespace());
-                    cd.markValid();
-                    if (defs != null) {
-                        defs.put(cd.descriptor, cd.def);
-                    }
-                }
-            }
+            
+            finishValidation(cc.context, cc.compiled.values());
             return def;
         } finally {
             cc.loggingService.stopTimer(LoggingService.TIMER_DEFINITION_CREATION);
@@ -639,6 +637,44 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         }
     }
 
+    /**
+     * Get a definition from a registry, and build a compilingDef if needed.
+     *
+     * This retrieves the definition, and if it is validated, simply puts it in the
+     * local cache, otherwise, it builds a CompilingDef for it, and returns that
+     * for further processing.
+     *
+     * @param context The aura context for the compiling def.
+     * @param descriptor the descriptor for which we need a definition.
+     * @return A compilingDef for the definition, or null if not needed.
+     */
+    private <D extends Definition> CompilingDef<D> validateHelper(AuraContext context, DefDescriptor<D> descriptor)
+            throws QuickFixException {
+        DefRegistry<D> registry = null;
+        D def;
+
+        registry = getRegistryFor(descriptor);
+        def = registry.getDef(descriptor);
+        if (!def.isValid()) {
+            CompilingDef<D> cd = new CompilingDef<D>();
+            //
+            // If our def is not 'valid', we must have built it, which means we need
+            // to validate. There is a subtle race condition here where more than one
+            // thread can grab a def from a registry, and they may all validate.
+            //
+            context.setCurrentNamespace(def.getDescriptor().getNamespace());
+            def.validateDefinition();
+            cd.def = def;
+            cd.registry = registry;
+            cd.built = true;
+            cd.descriptor = descriptor;
+            return cd;
+        } else {
+            defs.put(descriptor, def);
+        }
+        return null;
+    }
+
     @Override
     public <T extends Definition> long getLastMod(String uid) {
         DependencyEntry de = localDependencies.get(uid);
@@ -659,50 +695,65 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * Get a definition.
+     *
+     * This does a scan of the loaded dependency entries to check if there is something to
+     * pull, otherwise, it just compiles the entry. This should log a warning somewhere, as
+     * it is a dependency that was not noted.
+     *
+     * @param descriptor the descriptor to find.
+     * @return the corresponding definition, or null if it doesn't exist.
+     * @throws QuickFixException if there is a compile time error.
+     */
     @Override
     public <D extends Definition> D getDef(DefDescriptor<D> descriptor) throws QuickFixException {
-        Definition def;
-
-        if (!defs.containsKey(descriptor)) {
-            //
-            // Go and build the dependency tree.
-            //
-            if (compileDE(descriptor) == null) {
-                return null;
+        if (defs.containsKey(descriptor)) {
+            @SuppressWarnings("unchecked")
+            D def = (D) defs.get(descriptor);
+            return def;
+        }
+        DependencyEntry de = getDE(null, descriptor);
+        if (de == null) {
+            for (DependencyEntry det : localDependencies.values()) {
+                if (det.dependencies != null && det.dependencies.contains(descriptor)) {
+                    de = det;
+                    break;
+                }
             }
         }
-
+        if (de == null) {
+            //
+            // Not in any dependecies.
+            // This is often a bug, and should be logged.
+            //
+            compileDE(descriptor);
+            @SuppressWarnings("unchecked")
+            D def = (D) defs.get(descriptor);
+            return def;
+        }
         //
-        // If we have stored the def in our table, use it, whether null or
-        // not. Note that the above call _must_ generate a def. If it fails
-        // we'll either get a null here (top level not found), or an
-        // exception. Either of which will simply be sent back to the
-        // caller.
+        // found an entry.
+        // In this case, throw a QFE if we have one.
         //
-        def = defs.get(descriptor);
-
+        if (de.qfe != null ) {
+            throw de.qfe;
+        }
         //
-        // Check authentication. All defs should really support this but right
-        // now
-        // it's specific to Applications, so putting this special case here
-        // until
-        // we have a more generic check on all defs.
+        // Now we need to actually do the build..
         //
-        // Not sure why this is here, as we should be doing something at a
-        // higher level.
-        //
-        if (def != null && def.getDescriptor().getDefType() == DefType.APPLICATION
-                && ((ApplicationDef) def).getAccess() == Access.AUTHENTICATED) {
-            AuraContext context = Aura.getContextService().getCurrentContext();
-            if (context.getAccess() != Access.AUTHENTICATED) {
-                //
-                // FIXME: Should we store this in the local table as null?
-                //
-                def = null;
+        List<CompilingDef<?>> compiled = Lists.newArrayList();
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        for (DefDescriptor<?> dd : de.dependencies) {
+            CompilingDef<?> def = validateHelper(context, dd);
+            if (def != null) {
+                compiled.add(def);
             }
         }
-        return (D) def;
+        finishValidation(context, compiled);
+        @SuppressWarnings("unchecked")
+        D def = (D) defs.get(descriptor);
+        return def;
     }
 
     @SuppressWarnings("unchecked")
@@ -749,6 +800,15 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         return delegateRegistries.getAllNamespaces().contains(ns);
     }
 
+    /**
+     * Get a security provider for the application.
+     *
+     * This should probably catch the quick fix exception and simply treat it
+     * as a null security provider. This caches the security provider.
+     *
+     * @return the sucurity provider for the application or null if none.
+     * @throws QuickFixException if there was a problem compiling.
+     */
     private SecurityProviderDef getSecurityProvider() throws QuickFixException {
         if (securityProvider == null) {
             DefDescriptor<? extends BaseComponentDef> rootDesc = Aura.getContextService().getCurrentContext()
@@ -846,9 +906,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @Override
     public <T extends Definition> boolean invalidate(DefDescriptor<T> descriptor) {
-        // TODO: this should be optimized.
+        defs.clear();
+        localDependencies.clear();
         dependencies.invalidateAll();
-        // TODO: need to remove from the registries.
         return false;
     }
 
@@ -880,19 +940,28 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * 
      * This uses some trickery to try to be efficient, including using a dual keyed local cache to avoid looking up
      * values more than once even in the absense of remembered context.
+     *
+     * Note: there is no guarantee that the definitions have been fetched from cache here, so there is a very subtle
+     * race condition.
      * 
-     * @param uid the uid expected (null means unknown).
+     * @param uid the uid for cache lookup (null means unknown).
      * @param descriptor the descriptor to fetch.
+     * @return the correct uid for the definition, or null if there is none.
+     * @throws QuickFixException if the definition cannot be compiled.
      */
     @Override
-    public <T extends Definition> String getUid(String uid, DefDescriptor<T> descriptor) throws QuickFixException,
-            ClientOutOfSyncException {
+    public <T extends Definition> String getUid(String uid, DefDescriptor<T> descriptor) throws QuickFixException {
         DependencyEntry de = null;
 
         de = getDE(uid, descriptor);
         if (de == null) {
             try {
                 de = compileDE(descriptor);
+                //
+                // If we can't find our descriptor, we just give back a null.
+                if (de == null) {
+                    return null;
+                }
             } catch (QuickFixException qfe) {
                 // try to pick it up from the cache.
                 de = getDE(null, descriptor);
@@ -901,15 +970,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     throw new AuraRuntimeException("unexpected null on QFE");
                 }
             }
-            if (uid != null) {
-                String deuid = ((de != null) ? de.uid : null);
-                if (!uid.equals(deuid)) {
-                    throw new ClientOutOfSyncException("Mismatched UIDs expected '" + deuid + "' got '" + uid + "'");
-                }
-            }
-        }
-        if (de == null) {
-            return null;
         }
         if (de.qfe != null) {
             throw de.qfe;
@@ -918,14 +978,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     /** Creates a key for the localDependencies, using DefType and FQN. */
-    private String makeLocalKey(DefDescriptor descriptor) {
+    private String makeLocalKey(DefDescriptor<?> descriptor) {
         return descriptor.getDefType().toString() + ":" + descriptor.getQualifiedName().toLowerCase();
     }
 
     /**
      * Creates a key for the global {@link #dependencies}, using UID, type, and FQN.
      */
-    private String makeGlobalKey(String uid, DefDescriptor descriptor) {
+    private String makeGlobalKey(String uid, DefDescriptor<?> descriptor) {
         return uid + "/" + makeLocalKey(descriptor);
     }
 }

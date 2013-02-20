@@ -23,6 +23,8 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.system.MasterDefRegistry;
+
+import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -157,4 +159,14 @@ public interface DefinitionService extends AuraService {
      * @throws QuickFixException
      */
     void save(Definition def) throws QuickFixException;
+
+    /**
+     * update the set of loaded descriptors, and validate.
+     *
+     * @param loading the descriptor that we are loading if any.
+     * @param preload are we in 'preload'?
+     * @throws ClientOutOfSyncException if one of the defs is out of date.
+     * @throws QuickFixException if a definition can't be compiled.
+     */
+    void updateLoaded(DefDescriptor<?> loading, boolean preload) throws QuickFixException, ClientOutOfSyncException;
 }

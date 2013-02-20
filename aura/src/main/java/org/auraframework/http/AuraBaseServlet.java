@@ -31,6 +31,7 @@ import org.auraframework.Aura;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.RequestParam.StringParam;
@@ -38,6 +39,9 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+
+import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.NoAccessException;
@@ -246,19 +250,16 @@ public abstract class AuraBaseServlet extends HttpServlet {
             }
             //
             // If an exception happened while we were emitting JSON, we want the
-            // client to ignore the
-            // now-corrupt data structure. 404s and 500s cause the client to
-            // prepend /*, so we can effectively
-            // erase the bad data by appending a */ here and then serializing
-            // the exception info.
+            // client to ignore the now-corrupt data structure. 404s and 500s
+            // cause the client to prepend /*, so we can effectively erase the
+            // bad data by appending a */ here and then serializing the exception
+            // info.
             //
             out.write("*/");
             //
             // Unfortunately we can't do the following now. It might be possible
-            // in some cases, but we don't
-            // want to go there unless we have to.
+            // in some cases, but we don't want to go there unless we have to.
             //
-            // response.setHeader("ser", "1");
         }
         if (format == Format.JSON || format == Format.HTML || format == Format.JS || format == Format.CSS) {
             //
@@ -270,15 +271,6 @@ public abstract class AuraBaseServlet extends HttpServlet {
             // that this is still a bit dangerous, as we seem to have a lot
             // of magic in the serializer.
             //
-            if (!(mappedEx instanceof QuickFixException)) {
-                context.setPreloading(true);
-                context.clearPreloads();
-                //
-                // Don't serialize preloads.
-                //
-                context.setSerializePreLoad(false);
-            }
-            // last mod makes no sense here
             context.setSerializeLastMod(false);
             try {
                 Aura.getSerializationService().write(mappedEx, null, out);
@@ -505,7 +497,31 @@ public abstract class AuraBaseServlet extends HttpServlet {
             defs.append(contextJson);
             defs.append("/app.manifest");
             ret = defs.toString();
+         }
+         return ret;
+     }
+
+    protected DefDescriptor<?> setupQuickFix(AuraContext context, boolean preload) {
+        DefinitionService ds = Aura.getDefinitionService();
+        MasterDefRegistry mdr = context.getDefRegistry();
+
+        try {
+            DefDescriptor<?> qfdesc = ds.getDefDescriptor("auradev:quickFixException", ComponentDef.class);
+            String uid = mdr.getUid(null, qfdesc);
+            //if (!preload) {
+            //    Set<DefDescriptor<?>> loaded = Sets.newHashSet();
+            //    loaded.addAll(mdr.getDependencies(uid));
+            //    context.setPreloadedDeps(loaded);
+            //}
+            context.addLoaded(qfdesc, uid);
+            context.setPreloading(qfdesc);
+            return qfdesc;
+        } catch (QuickFixException death) {
+            //
+            // DOH! something is seriously wrong, just die!
+            // This should _never_ happen, but if you muck up basic aura stuff, it might.
+            //
+            throw new AuraError(death);
         }
-        return ret;
     }
 }

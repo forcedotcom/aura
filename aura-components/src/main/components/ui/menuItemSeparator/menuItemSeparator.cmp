@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" description="A menu separator to divide menu items, such as ui:radioMenuItem, and used in a ui:menu component." support="GA">
+<aura:component extensible="true" implements="ui:visible" description="A menu separator to divide menu items, such as ui:radioMenuItem, and used in a ui:menuList component." support="GA">
     <li role="separator" class="{!v.class}"/>
 </aura:component>

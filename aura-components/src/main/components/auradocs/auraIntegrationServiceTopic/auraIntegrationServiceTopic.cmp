@@ -1,0 +1,79 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Aura Integration Service"/>
+
+<p>The Aura Integration Service enables plugging Aura components into non-Aura HTML containers without having to create an Aura application. Because Aura requires an app to start and to render components, the Aura Integration Service creates and manages an internal integration app and a security provider on your behalf for the components you're embedding. This makes it easy to use Aura components in an HTML-based application.</p>
+
+<p>Also, the Aura Integration Service allows partial page updates. You can add additional components to a page that has already been loaded and after an app has already been created.</p>
+
+<p>An Aura component instance is embedded in a page inside a script tag and is bound to its parent DOM element.</p>
+
+<p>The Aura Integration Service provides a set of Java APIs that allow you to embed a component. The Java APIs are included in the following interfaces and their class implementations.</p>
+<ul>
+    <li><a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/org/auraframework/service/IntegrationService.html" target="_new">IntegrationService Interface</a> (implemented by <code>IntegrationServiceImpl</code>): Enables the creation of an integration using the <code>createIntegration()</code> method.</li>
+    <li><a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/org/auraframework/integration/Integration.html" target="_new">Integration Interface</a> (implemented by <code>IntegrationImpl</code>): Enables adding components using the <code>injectComponent()</code> method.</li></ul>
+
+<p>Suppose you'd like to add an Aura button inside an HTML <code>div</code> container. To do so:</p>
+<ol>
+    <li>Create an instance of the Aura Integration Service.<br/><br/>
+    <auradocs:codeblock>
+    IntegrationService svc = Aura.getIntegrationService();
+    </auradocs:codeblock><br/></li>
+    <li>Next, create an integration, which allows you to embed components in your page.<br/>
+    For the first argument, pass the context path. For servlets in the default root context, it is an empty string.<br/>
+    For the second argument, pass the mode. In this example, we're specifying the <code>DEV</code> mode.<br/>
+    For the third argument, pass a Boolean value to indicate whether Aura should create an integration app or not. In this case, we're passing <code>true</code>.<br/><br/>
+    <auradocs:codeblock>    
+    Integration integ = svc.createIntegration("", Mode.DEV, true);
+    </auradocs:codeblock><br/>
+    <auradocs:info>If you want to perform a partial page update, pass <code>false</code> for the last argument. This allows you to add more components after a page has been loaded and an app has already been created.</auradocs:info>
+    </li>
+    <li>Call the <code>injectComponent</code> method to embed a component in a parent container.<br/>
+    For the first argument, pass the component's fully qualified name. In this case, it is  <code>"ui:button"</code> (<code>ui</code> is the namespace and <code>button</code> is the component's name).<br/>
+    For the second argument, pass the component's attributes as a map. This example creates a map  with one attribute and passes it as the second argument.<br/>
+    For the third argument, pass the local component ID. In this example, it is <code>"button1"</code>.<br/>
+    For the fourth argument, pass the DOM identifier for the parent container element. In this example, it is <code>"div1"</code>.<br/>
+    For the fifth argument, pass a buffer that will contain the script output.<br/><br/> 
+    <auradocs:codeblock>
+    Map&lt;String, Object> attributes = Maps.newHashMap();
+    attributes.put("label", "Click Me");
+    Appendable out = new StringBuffer();
+    integration.injectComponent("ui:button", attributes, "button1", "div1", out);
+    </auradocs:codeblock><br/>
+    <p>The following is the full listing of the sample.</p>
+    <auradocs:codeblock>    
+    IntegrationService svc = Aura.getIntegrationService();    
+    Integration integration = svc.createIntegration("", Mode.DEV, true);
+    Map&lt;String, Object> attributes = Maps.newHashMap();
+    attributes.put("label", "Click Me");
+    Appendable out = new StringBuffer();
+    integration.injectComponent("ui:button", attributes, "button1", "div1", out);
+    </auradocs:codeblock><br/>
+    </li>
+</ol>
+
+<auradocs:warning>The Aura History Service and Aura Layout Service are not supported with the Aura Integration Service, and hence embedded components can't make use of these services.</auradocs:warning>
+
+<p><b>See also:</b><br/>    
+    <auradocs:topicLink topic="modesIntro">Modes</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="securityProviders">Controlling Access with Security Providers</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="compIds">Component IDs</auradocs:topicLink>
+</p>
+
+</aura:component>

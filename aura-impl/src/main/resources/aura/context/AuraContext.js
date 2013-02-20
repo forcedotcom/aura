@@ -23,6 +23,10 @@
 function AuraContext(config) {
     this.mode = config["mode"];
     this.preloads = config["preloads"];
+    this.loaded = config["loaded"];
+    if (this.loaded === undefined) {
+        this.loaded = {};
+    }
     this.lastmod = config["lastmod"];
     this.preloadLookup = {};
     for(var j=0;j<this.preloads.length;j++){
@@ -95,6 +99,7 @@ AuraContext.prototype.encodeForServer = function(includePreloads) {
     return aura.util.json.encode({
 		"mode" : this.mode,
 		"preloads" : preloads,
+		"loaded" : this.loaded,
 		"app" : this.app,
 		"cmp" : this.cmp,
 		"lastmod" : this.lastmod,
@@ -128,6 +133,7 @@ AuraContext.prototype.join = function(otherContext) {
     }
     this.joinGlobalValueProviders(otherContext["globalValueProviders"]);
     this.joinComponentConfigs(otherContext["components"]);
+    this.joinLoaded(otherContext["loaded"]);
 };
 
 /**
@@ -207,10 +213,37 @@ AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs){
 };
 
 /**
+ * @private
+ */
+AuraContext.prototype.joinLoaded = function(loaded) {
+    if (this.loaded === undefined) {
+        this.loaded = {};
+    }
+    if (loaded) {
+        for (var i in loaded) {
+            var newL = loaded[i];
+            if (newL === 'deleted') {
+                delete this.loaded[i];
+            } else {
+                this.loaded[i] = newL;
+            }
+        }
+    }
+};
+
+
+/**
+ * This should be private but is needed for testing... ideas?
+ */
+AuraContext.prototype.getLoaded = function(){
+    return this.loaded;
+};
+
+/**
  * DCHASMAN Will be private again soon as part of the second phase of W-1450251
  */
 AuraContext.prototype.setCurrentAction = function(action){
-	var previous = this.currentAction;
+    var previous = this.currentAction;
     this.currentAction = action;
     return previous;
 };

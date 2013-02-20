@@ -30,21 +30,22 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  */
 public interface Integration {
     /**
-     * Generate a &lt;script&gt; tag that will correctly embed an instance of an
+     * Generates a &lt;script&gt; tag that will correctly embed an instance of an
      * Aura
-     * component bound to the DOM element identified by localDomId
+     * component bound to the DOM element identified by localDomId.
      * 
      * @param tag
-     *            Fully qualified (namespace:name) name of the Aura component
+     *            Fully qualified (namespace:name) name of the Aura component.
      * @param attributes
+     *            A map of the component's attributes as key/value pairs.
      * @param localId
-     *            Specify the user provided locally unique id of this component
-     *            that can be used with $A.getRoot().find(localId)
+     *            The user-provided locally unique ID of this component
+     *            that can be used with $A.getRoot().find(localId).
      * @param locatorDomId
      *            The DOM identifier for the element that will be used as the
-     *            parent of the component's elements
+     *            parent of the component's elements.
      * @param out
-     *            Destination for injection script content
+     *            Destination for injection script content.
      * @throws AuraRuntimeException
      * @throws IOException
      * @throws QuickFixException

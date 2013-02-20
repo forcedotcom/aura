@@ -27,7 +27,7 @@
 	        	$A.test.assertFalse(actionMenu.get('v.visible'),"Action Menu should not be visible");
 	            
 	        	//check menu is default to hidden by using DOM API
-	        	$A.test.assertTrue($A.util.hasClass(actionMenu.getElement(),"uiMenu"), "Class name should be just uiMenu");
+	        	$A.test.assertTrue($A.util.hasClass(actionMenu.getElement(),"uiMenuList"), "Class name should be just uiMenuList");
 	        	$A.test.assertFalse($A.util.hasClass(actionMenu.getElement(),"visible"), "Class name should not contain visible");
 	        	menuLabel.get("e.click").fire();
 	            
@@ -40,7 +40,7 @@
 				//check menu is visible by using AURA API
 	        	$A.test.assertTrue(actionMenu.get('v.visible'),"Menu should be visible");
 	            
-	        	$A.test.assertTrue($A.util.hasClass(actionMenu.getElement(),"visible"), "Class name should be uiMenu visible");
+	        	$A.test.assertTrue($A.util.hasClass(actionMenu.getElement(),"visible"), "Class name should be uiMenuList visible");
 	        	
 	        	//disable ActionItem1
 	        	cmp.find("actionItem1").getAttributes().setValue("disabled", true);

@@ -129,14 +129,19 @@ public interface AuraContext {
 
     /**
      * Set the current component, so that the components controller can access
-     * it
+     * it.
+     *
+     * TODO: what is this for.
+     * TODO: this is not handled as a stack, so it is almost certainly broken.
      * 
-     * @param nextComponent
+     * @param nextComponent The component to set.
      * @return the previous component
      */
     BaseComponent<?, ?> setCurrentComponent(BaseComponent<?, ?> nextComponent);
 
     /**
+     * Get the currently processing action.
+     *
      * @return the current action being processed (for use by controllers)
      */
     Action getCurrentAction();
@@ -253,6 +258,70 @@ public interface AuraContext {
     boolean isPreloading();
 
     void setPreloading(boolean p);
+
+    /**
+     * Set the current descriptor to send.
+     *
+     * This sets a descriptor that is intended to be 'preloaded'
+     * on the client. This means that it, and all of the non-loaded
+     * dependencies will be sent to the client. This is set by the
+     * servlet to allow us to know what we should send without
+     * changing the context sent to the client.
+     *
+     * TODO: move this W-1474844
+     */
+    void setPreloading(DefDescriptor<?> descriptor);
+
+    /**
+     * Get the currently preloading descriptor.
+     *
+     * TODO: move this W-1474844
+     */
+    DefDescriptor<?> getPreloading();
+
+    /**
+     * Add a loaded descriptor+UID pair.
+     *
+     * This routine will remember a descriptor in the set of loaded
+     * descriptors along with a uid for validating the load (and
+     * 'timestamping' it). This should be used with care, as it will
+     * be serialized with every request, so size should be a
+     * consideration.
+     *
+     * @param descriptor The loaded descriptor.
+     * @param uid the UID that was loaded.
+     */
+    void addLoaded(DefDescriptor<?> descriptor, String uid);
+
+    /**
+     * Drop a component from the set of loaded components.
+     *
+     * Sober up our set. This can be used to remove a descriptor
+     * that is already covered by the set of loaded components.
+     *
+     * @param descriptor the previously marked 'loaded' descriptor.
+     */
+    public void dropLoaded(DefDescriptor<?> descriptor);
+
+
+    /**
+     * Get the uid string for a descriptor.
+     *
+     * @param descriptor the descriptor that we need a UID for.
+     * @return the uid from the request (null if none).
+     */
+    public String getUid(DefDescriptor<?> descriptor);
+
+    /**
+     * Get the set of loaded descriptors with the uid.
+     *
+     * This set of descriptors should be the complete set of loaded
+     * descriptors that we choose to remember. Things outside of the
+     * dependency set will be resent.
+     *
+     * @return the map of descriptors to UIDs, UIDs are allowed to be null
+     */
+    Map<DefDescriptor<?>,String> getLoaded();
 
     /**
      * Check if a descriptor has been preloaded.

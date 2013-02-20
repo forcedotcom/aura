@@ -35,10 +35,12 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.http.RequestParam.EnumParam;
 import org.auraframework.http.RequestParam.InvalidParamException;
 import org.auraframework.http.RequestParam.StringParam;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
@@ -141,39 +143,79 @@ public class AuraContextFilter implements Filter {
                     context.addPreload((String) preload);
                 }
             }
+            getLoaded(context, configMap.get("loaded"));
         }
-        
-		if (!isProduction) {
-			TestContextAdapter testContextAdapter = Aura
-					.get(TestContextAdapter.class);
-			if (testContextAdapter != null) {
-				String testName = null;
-				// config takes precedence over param because the value is not
-				// expected to change during a test and it is less likely
-				// to have been modified unintentionally when from the config
-				if (configMap != null) {
-					testName = (String) configMap.get("test");
-				}
-				if (testName == null) {
-					testName = test.get(request);
-				}
-				if (testName != null) {
-					TestContext testContext = testContextAdapter
-							.getTestContext(testName);
-					if (testContext != null) {
-						MasterDefRegistry registry = context.getDefRegistry();
-						Set<Definition> mocks = testContext.getLocalDefs();
-						if (mocks != null) {
-							for (Definition def : mocks) {
-								registry.addLocalDef(def);
-							}
-						}
-					}
-				}
-			}
-		}
-        
+
+        if (!isProduction) {
+            TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
+            if (testContextAdapter != null) {
+                String testName = null;
+                // config takes precedence over param because the value is not
+                // expected to change during a test and it is less likely
+                // to have been modified unintentionally when from the config
+                if (configMap != null) {
+                    testName = (String) configMap.get("test");
+                }
+                if (testName == null) {
+                    testName = test.get(request);
+                }
+                if (testName != null) {
+                    TestContext testContext = testContextAdapter.getTestContext(testName);
+                    if (testContext != null) {
+                        MasterDefRegistry registry = context.getDefRegistry();
+                        Set<Definition> mocks = testContext.getLocalDefs();
+                        if (mocks != null) {
+                            for (Definition def : mocks) {
+                                registry.addLocalDef(def);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         return context;
+    }
+
+    /**
+     * Pull in the map of loaded defDescriptors and uids from the context.
+     */
+    private void getLoaded(AuraContext context, Object loadedEntry) {
+        if (loadedEntry == null || !(loadedEntry instanceof Map)) {
+            //
+            // If someone gives us bogus input, just ignore it.
+            //
+            return;
+        }
+        @SuppressWarnings("unchecked")
+        Map<String,String> loaded = (Map<String,String>)loadedEntry;
+        DefinitionService definitionService = Aura.getDefinitionService();
+
+        for (Map.Entry<String,String> entry: loaded.entrySet()) {
+            String uid = entry.getValue();
+            if (uid != null && !uid.equals("null")) {
+                String key = entry.getKey();
+                int posn = key.indexOf("@");
+                if (posn > 0) {
+                    String typeStr = key.substring(0, posn);
+                    String defStr = key.substring(posn+1);
+                    DefType type = null;
+                    try {
+                        type = DefType.valueOf(typeStr);
+                    } catch (Throwable t) {
+                        // ignore unknown types...
+                        // We really should log these at a level where we can
+                        // see them, but, well, we don't have that now.
+                    }
+                    if (type != null) {
+                        DefDescriptor<?> ld = null;
+
+                        ld = definitionService.getDefDescriptor(defStr, type.getPrimaryInterface());
+                        context.addLoaded(ld, uid);
+                    }
+                }
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")

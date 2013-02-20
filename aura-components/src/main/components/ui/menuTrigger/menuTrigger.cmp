@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component abstract="true" extensible="true" extends="ui:interactive" description="A trigger that expands and collapses a menu, used in a ui:dropdown component." support="GA">
+<aura:component abstract="true" extensible="true" extends="ui:interactive" description="A trigger that expands and collapses a menu, used in a ui:menu component." support="GA">
     <aura:attribute name="parent" type="Aura.Component[]" description="The parent of this menu trigger."/>
     <aura:handler name="click" action="{!c.handleClick}"/>
     <span id="{!globalId}" aura:id="menuTrigger" aria-haspopup="true">

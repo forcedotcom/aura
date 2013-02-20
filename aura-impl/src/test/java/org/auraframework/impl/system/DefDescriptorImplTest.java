@@ -97,7 +97,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
             testDescriptorNullTag = DefDescriptorImpl.getInstance(null, ComponentDef.class);
             fail("Should have thrown AuraException for null tag in ComponentDefDescriptor");
         } catch (AuraRuntimeException expected) {
-            assertEquals("name and class required for descriptors", expected.getMessage());
+            assertEquals("descriptor is null", expected.getMessage());
         }
 
         // test getInstance(name, null)
@@ -105,7 +105,7 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
             testDescriptorNullTag = DefDescriptorImpl.getInstance("aura:text", null);
             fail("Should have thrown AuraException for null defClass in ComponentDefDescriptor");
         } catch (AuraRuntimeException expected) {
-            assertEquals("name and class required for descriptors", expected.getMessage());
+            assertEquals("descriptor is null", expected.getMessage());
         }
 
         assertNull(testDescriptorNullTag);

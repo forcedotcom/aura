@@ -49,6 +49,8 @@ import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
+
+import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptWriter;
@@ -57,6 +59,16 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+/**
+ * The aura resource servlet.
+ *
+ * This servlet serves up the application content for 'preloaded' definitions. It should
+ * be cacheable, as there is no data present (or available to the defs). These 'preloaded'
+ * definitions should never be ommitted, and should never be replaced by an exception response,
+ * as there are no defs on the client with which to handle them.
+ *
+ * TODO: 'preload': use dependencies instead of namespaces here.
+ */
 public class AuraResourceServlet extends AuraBaseServlet {
 
     private static final String RESOURCE_URLS = "resourceURLs";
@@ -144,6 +156,49 @@ public class AuraResourceServlet extends AuraBaseServlet {
         return filters;
     }
 
+
+    /**
+     * check the top level component/app.
+     *
+     * This routine checks to see that we have a valid top level component. If our top level component has some
+     * problem (QFE/out of sync) we totally ignore it, and continue with the preloading as if everything was ok.
+     * Otherwise, if we have no descriptor, we give back an empty response.
+     *
+     * @param request the request (for exception handling)
+     * @param response the response (for exception handling)
+     * @param context the context to get the definition.
+     * @return true if the definition is ok, false if we have handled the response and should short circuit out.
+     * @throws IOException if there was an IO exception handling a client out of sync exception
+     * @throws ServletException if there was a problem handling the out of sync
+     */
+    private boolean handleTopLevel(HttpServletRequest request, HttpServletResponse response, AuraContext context)
+            throws IOException,ServletException {
+        DefDescriptor<? extends BaseComponentDef> appDesc = context.getApplicationDescriptor();
+        DefinitionService definitionService = Aura.getDefinitionService();
+
+        if (appDesc == null) {
+            //
+            // This means we have nothing to say to the client, so the response is
+            // left completely empty.
+            //
+            return false;
+        }
+        try {
+            definitionService.updateLoaded(appDesc, true);
+        } catch (QuickFixException qfe) {
+            //
+            // A quickfix exception means that we couldn't compile something.
+            // In this case, we still want to preload things, so we ignore it.
+            //
+        } catch (ClientOutOfSyncException coose) {
+            //
+            // We can't actually handle an out of sync here, since we are doing a
+            // preload. We have to ignore it, and continue as if nothing happened.
+            //
+        }
+        return true;
+    }
+
     /**
      * Write out the manifest.
      * 
@@ -157,10 +212,11 @@ public class AuraResourceServlet extends AuraBaseServlet {
      * @throws IOException if unable to write out the response
      */
     private void writeManifest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+
         setNoCache(response);
 
         try {
-
             if (errorParam.get(request) != null) {
                 addManifestErrorCookie(response);
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -180,6 +236,40 @@ public class AuraResourceServlet extends AuraBaseServlet {
                     deleteManifestCookie(response);
                     return;
                 }
+            }
+
+            boolean appOk = false;
+
+            try {
+                DefDescriptor<? extends BaseComponentDef> appDesc = context.getApplicationDescriptor();
+
+                if (appDesc != null) {
+                    Aura.getDefinitionService().updateLoaded(appDesc, true);
+                    appOk = true;
+                }
+            } catch (QuickFixException qfe) {
+                //
+                // ignore qfe, since we really don't care... the manifest will be 404ed.
+                // This will eventually cause the browser to give up. Note that this case
+                // should almost never occur, as it requires the qfe to be introduced between
+                // the initial request (which will not set a manifest if it gets a qfe) and
+                // the manifest request.
+                //
+            } catch (ClientOutOfSyncException coose) {
+                //
+                // In this case, we want to force a reload... A 404 on the manifest is
+                // supposed to handle this. we hope that the client will do the right
+                // thing, and reload everything. Note that this case really should only
+                // happen if the client already has content, and thus should be refreshing
+                // However, there are very odd edge cases that we probably can't detect
+                // without keeping server side state, such as the case that something
+                // is updated between the initial HTML request and the manifest request.
+                // Not sure what browsers will do in this case.
+                //
+            }
+            if (!appOk) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return;
             }
 
             Map<String, Object> attribs = Maps.newHashMap();
@@ -322,13 +412,11 @@ public class AuraResourceServlet extends AuraBaseServlet {
         List<DescriptorFilter> filters = getFilters();
         Mode mode = context.getMode();
         //
-        // create a temp buffer in case anything bad happens while we're
-        // processing this.
+        // create a temp buffer in case anything bad happens while we're processing this.
         // don't want to end up with a half a JS init function
-        // TODO: get rid of this buffering by adding functionality to
-        // Json.serialize that will help us
-        // make sure serialized JS is valid, non-error-producing syntax if an
-        // exception happens in the
+        //
+        // TODO: get rid of this buffering by adding functionality to Json.serialize that will help us
+        // make sure serialized JS is valid, non-error-producing syntax if an exception happens in the
         // middle of serialization.
         //
         String ret = null;
@@ -450,12 +538,6 @@ public class AuraResourceServlet extends AuraBaseServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
-        long now = System.currentTimeMillis();
-        long ifModifiedSince = request.getDateHeader("If-Modified-Since");
-        if (ifModifiedSince != -1 && ifModifiedSince + 1000 > now) {
-            response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
-            return;
-        }
 
         setLongCache(response);
         AuraContext.Format format = context.getFormat();
@@ -465,6 +547,9 @@ public class AuraResourceServlet extends AuraBaseServlet {
             writeManifest(request, response);
             break;
         case CSS:
+            if (!handleTopLevel(request, response, context)) {
+                return;
+            }
             try {
                 writeCss(response.getWriter());
             } catch (Throwable t) {
@@ -472,6 +557,9 @@ public class AuraResourceServlet extends AuraBaseServlet {
             }
             break;
         case JS:
+            if (!handleTopLevel(request, response, context)) {
+                return;
+            }
             try {
                 writeDefinitions(response.getWriter());
             } catch (Throwable t) {
@@ -481,6 +569,14 @@ public class AuraResourceServlet extends AuraBaseServlet {
         case JSON:
             try {
                 Aura.getConfigAdapter().validateCSRFToken(csrfToken.get(request));
+            } catch (Throwable t) {
+                handleServletException(t, true, context, request, response, false);
+                return;
+            }
+            if (!handleTopLevel(request, response, context)) {
+                return;
+            }
+            try {
                 writeComponents(response.getWriter());
             } catch (Throwable t) {
                 handleServletException(t, true, context, request, response, true);

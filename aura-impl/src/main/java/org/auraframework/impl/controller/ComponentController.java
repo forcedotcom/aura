@@ -24,6 +24,8 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.Component;
+
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
@@ -37,14 +39,18 @@ public class ComponentController {
     @AuraEnabled
     public static Component getComponent(@Key("name") String name, @Key("attributes") Map<String, Object> attributes)
             throws QuickFixException {
-        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(name, ComponentDef.class);
+        DefinitionService definitionService = Aura.getDefinitionService();
+        DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(name, ComponentDef.class);
+        definitionService.updateLoaded(desc, false);
         return Aura.getInstanceService().getInstance(desc, attributes);
     }
 
     @AuraEnabled
     public static Application getApplication(@Key("name") String name, @Key("attributes") Map<String, Object> attributes)
             throws QuickFixException {
-        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(name, ApplicationDef.class);
+        DefinitionService definitionService = Aura.getDefinitionService();
+        DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor(name, ApplicationDef.class);
+        definitionService.updateLoaded(desc, false);
         return Aura.getInstanceService().getInstance(desc, attributes);
     }
 

@@ -19,8 +19,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.AuraImpl;
@@ -28,7 +30,8 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
-import org.auraframework.throwable.ClientOutOfSyncException;
+
+import org.junit.Ignore;
 
 import com.google.common.collect.Lists;
 
@@ -112,13 +115,47 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         // Check unchanged app gets same UID value
         assertEquals(uid, masterDefReg.getUid(uid, houseboat));
 
-        // Check asking with an incorrect "old UID" would throw
-        try {
-            String newUid = masterDefReg.getUid(uid + " or not", houseboat);
-            fail(String.format("Should have thrown when fetching from non-null stale UID, but returned %s (was %s)",
-                    newUid, uid));
-        } catch (ClientOutOfSyncException e) {
-            // pass.
-        }
+        //
+        // When given an incorrect UID, masterDefReg simply returns the correct one.
+        String newUid = masterDefReg.getUid(uid + " or not", houseboat);
+        assertEquals(uid, newUid);
+    }
+
+    /**
+     * Verify getting the UID of a dependency doesn't affect the original UID.
+     */
+    public void testUidDependencies() throws Exception {
+        DefDescriptor<ComponentDef> child = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component></aura:component>",
+                "testUidDependenciesChild");
+        DefDescriptor<ApplicationDef> parent = addSourceAutoCleanup(ApplicationDef.class,
+                "<aura:application><" + child.getDescriptorName() + "/></aura:application>",
+                "testUidDependenciesParent");
+
+        MasterDefRegistryImpl masterDefReg1 = getDefRegistry();
+        String parentUid1 = masterDefReg1.getUid(null, parent);
+
+        MasterDefRegistryImpl masterDefReg2 = getDefRegistry();
+        masterDefReg2.getUid(null, child);
+        String parentUid2 = masterDefReg2.getUid(null, parent);
+
+        assertTrue("UIDs do not match after getting a dependencies UID", parentUid1.equals(parentUid2));
+    }
+
+    /**
+     * Verify getUid() returns the correct value. If the component itself, any of it's dependencies, or the logic to
+     * calculate the UID are modified, then this hard-coded UID will need to be changed as well.
+     */
+    @Ignore("W-1551219")
+    public void testUidValue() throws Exception {
+        // Known UID, assuming no dependencies or the file itself have changed.
+        String knownUid = "3VBCHFMNOup__UlHicckgg";
+        String cmpName = "test:layoutNoLayout";
+        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService()
+                .getDefDescriptor(cmpName, ApplicationDef.class);
+        MasterDefRegistryImpl masterDefReg = getDefRegistry();
+        String uid = masterDefReg.getUid(null, desc);
+        assertNotNull("Could not retrieve UID for component " + cmpName, uid);
+        assertEquals("Unexpected UID value on component " + cmpName, knownUid, uid);
     }
 }

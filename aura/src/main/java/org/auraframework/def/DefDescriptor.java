@@ -19,17 +19,18 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
 
 /**
- * A descriptor "handle" for a definition. For applications which care about sorting, such as generating a unique hash
- * from an application and all its dependencies, descriptors are comparable by their qualified name
+ * A descriptor "handle" for a definition. For applications which care about
+ * sorting, such as generating a unique hash from an application and all its
+ * dependencies, descriptors are comparable by their qualified name
  * (case-insensitively).
  * 
- * @param <T> the more specific subtype of definition being described, e.g. {@link ComponentDef}, {@link EventDef}, etc.
+ * @param <T> the more specific subtype of definition being described, e.g.
+ *            {@link ComponentDef}, {@link EventDef}, etc.
  */
 public interface DefDescriptor<T extends Definition> extends JsonSerializable, Serializable,
         Comparable<DefDescriptor<?>> {
@@ -42,62 +43,48 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable, S
     public static final String JAVA_PREFIX = "java";
 
     public static enum DefType {
-        ATTRIBUTE(AttributeDef.class, 'B'), //
-        APPLICATION(ApplicationDef.class, 'A'), //
-        COMPONENT(ComponentDef.class, 'C'), //
-        EVENT(EventDef.class, 'E'), //
-        HELPER(HelperDef.class, 'H'), //
-        INTERFACE(InterfaceDef.class, 'I'), //
-        CONTROLLER(ControllerDef.class, 'X'), //
-        MODEL(ModelDef.class, 'M'), //
-        RENDERER(RendererDef.class, 'R'), //
-        SECURITY_PROVIDER(SecurityProviderDef.class, 'S'), //
-        ACTION(ActionDef.class, 'O'), //
-        TYPE(TypeDef.class, 'T'), //
-        STYLE(ThemeDef.class, 'Y'), //
-        DOCUMENTATION(DocumentationDef.class, 'D'), //
-        TESTSUITE(TestSuiteDef.class, 'U'), //
-        TESTCASE(TestCaseDef.class, 'V'), //
-        PROVIDER(ProviderDef.class, 'P'), //
-        LAYOUTS(LayoutsDef.class, 'K'), //
-        LAYOUT(LayoutDef.class, 'L'), //
-        LAYOUT_ITEM(LayoutItemDef.class, 'J'),
-        NAMESPACE(NamespaceDef.class, 'N');
+        ATTRIBUTE(AttributeDef.class), //
+        APPLICATION(ApplicationDef.class), //
+        COMPONENT(ComponentDef.class), //
+        EVENT(EventDef.class), //
+        HELPER(HelperDef.class), //
+        INTERFACE(InterfaceDef.class), //
+        CONTROLLER(ControllerDef.class), //
+        MODEL(ModelDef.class), //
+        RENDERER(RendererDef.class), //
+        SECURITY_PROVIDER(SecurityProviderDef.class), //
+        ACTION(ActionDef.class), //
+        TYPE(TypeDef.class), //
+        STYLE(ThemeDef.class), //
+        DOCUMENTATION(DocumentationDef.class), //
+        TESTSUITE(TestSuiteDef.class), //
+        TESTCASE(TestCaseDef.class), //
+        PROVIDER(ProviderDef.class), //
+        LAYOUTS(LayoutsDef.class), //
+        LAYOUT(LayoutDef.class), //
+        LAYOUT_ITEM(LayoutItemDef.class),
+        NAMESPACE(NamespaceDef.class);
 
         private static Map<Class<? extends Definition>, DefType> defTypeMap;
-        private static Map<String, DefType> sTypeMap;
 
         private final Class<? extends Definition> clz;
-        private final String stype;
 
-        private DefType(Class<? extends Definition> clz, char stype) {
+        private DefType(Class<? extends Definition> clz) {
             this.clz = clz;
-            this.stype = String.valueOf(stype);
 
-            mapDefType(clz, this.stype, this);
+            mapDefType(clz, this);
         }
 
-        private static void mapDefType(Class<? extends Definition> clz, String stype, DefType defType) {
+        private static void mapDefType(Class<? extends Definition> clz, DefType defType) {
             if (defTypeMap == null) {
                 defTypeMap = new HashMap<Class<? extends Definition>, DefType>();
-                sTypeMap = new HashMap<String, DefType>();
             }
-            if (defTypeMap.get(clz) != null) {
-                throw new AuraError("Duplicate types for " + clz);
-            }
-            if (sTypeMap.get(stype) != null) {
-                throw new AuraError("Duplicate marker for " + stype);
-            }
+
             defTypeMap.put(clz, defType);
-            sTypeMap.put(stype, defType);
         }
 
         public Class<? extends Definition> getPrimaryInterface() {
             return clz;
-        }
-
-        public String getSType() {
-            return stype;
         }
 
         public static boolean hasDefType(Class<?> primaryInterface) {
@@ -114,17 +101,6 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable, S
             }
             return ret;
         }
-
-        public static DefType getDefType(String stype) {
-            DefType ret = sTypeMap.get(stype);
-            if (ret == null) {
-                String message = String.format(
-                        "Unsupported marker %s specified for DefDescriptor. Valid markers are : %s",
-                        stype, sTypeMap.keySet().toString());
-                throw new AuraRuntimeException(message);
-            }
-            return ret;
-        }
     }
 
     /**
@@ -133,17 +109,13 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable, S
     String getName();
 
     /**
-     * @return The type, pseudo-protocol, namespace, and name of this descriptor
-     */
-    String getFullyQualifiedName();
-
-    /**
      * @return The pseudo-protocol, namespace, and name of this descriptor
      */
     String getQualifiedName();
 
     /**
-     * @return the namespace and name portion of this descriptor for cases where the prefix/protocol is already known.
+     * @return the namespace and name portion of this descriptor for cases where
+     *         the prefix/protocol is already known.
      */
     String getDescriptorName();
 
@@ -158,24 +130,26 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable, S
     String getNamespace();
 
     /**
-     * @return The portion of a name occurring within any generic delimiters, such as < >, including said delimiters
+     * @return The portion of a name occurring within any generic delimiters,
+     *         such as < >, including said delimiters
      */
     String getNameParameters();
 
     /**
-     * @return isParameterized - identifies if additional processing is warranted to consider generic collections should
-     *         be considered
+     * @return isParameterized - identifies if additional processing is
+     *         warranted to consider generic collections should be considered
      */
     boolean isParameterized();
 
     /**
-     * @return The type of this definition, which can be used to branch and parse serialized representations
+     * @return The type of this definition, which can be used to branch and
+     *         parse serialized representations
      */
     DefType getDefType();
 
     /**
-     * Gets the actual definition described by this descriptor, compiling it if necessary, from Aura's definition
-     * service.
+     * Gets the actual definition described by this descriptor, compiling it if
+     * necessary, from Aura's definition service.
      * 
      * @return the definition (compiles it if necessary)
      * @throws QuickFixException if the definition is not found
@@ -183,7 +157,8 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable, S
     T getDef() throws QuickFixException;
 
     /**
-     * @return true if the definition represented by this descriptor exists at all. does not compile the definition
+     * @return true if the definition represented by this descriptor exists at
+     *         all. does not compile the definition
      */
     boolean exists();
 }

@@ -40,6 +40,8 @@ import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 
+import org.junit.Ignore;
+
 /**
  * Automation to verify the handling of AuraServlet requests.
  * 
@@ -111,12 +113,18 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertFalse("preloads shouldn't get serialized on posts", context.containsKey("preloads"));
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * This is actually an invalid test.
+     *
+     * We should never be posting without an app.
+     * This test needs to be fixed/deleted to make it actually work, as the context must be valid.
+     */
+    @Ignore("W-1528708")
     public void testPostWithOldLastMod() throws Exception {
         Map<String, Object> message = new HashMap<String, Object>();
         Map<String, Object> actionInstance = new HashMap<String, Object>();
         actionInstance.put("descriptor",
-                "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString");
+                           "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString");
         Map<String, Object> actionParams = new HashMap<String, Object>();
         actionParams.put("param", "some string");
         actionInstance.put("params", actionParams);
@@ -136,16 +144,19 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         String response = post.getResponseBodyAsString();
         if (HttpStatus.SC_OK != statusCode) {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
-                    HttpStatus.SC_OK, response));
+                               HttpStatus.SC_OK, response));
         }
 
-        assertTrue("response not wrapped with ERROR marker", response.startsWith(AuraBaseServlet.CSRF_PROTECT + "*/")
-                && response.endsWith("/*ERROR*/"));
+        assertTrue("response not wrapped with ERROR marker",
+                   response.startsWith(AuraBaseServlet.CSRF_PROTECT + "*/") && response.endsWith("/*ERROR*/"));
         response = response.substring(AuraBaseServlet.CSRF_PROTECT.length() + 2,
-                response.length() - "/*ERROR*/".length());
+                                      response.length() - "/*ERROR*/".length());
+        @SuppressWarnings("unchecked")
         Map<String, Object> json = (Map<String, Object>) new JsonReader().read(response);
         assertEquals(true, json.get("exceptionEvent"));
-        assertEquals("markup://aura:clientOutOfSync", ((Map<String, Object>) json.get("event")).get("descriptor"));
+        @SuppressWarnings("unchecked")
+        Map<String, Object> eventJson = (Map<String, Object>) json.get("event");
+        assertEquals("markup://aura:clientOutOfSync", eventJson.get("descriptor"));
         Object f = json.get("defaultHandler");
         assertEquals(JsFunction.class, f.getClass());
         assertEquals("try{$A.clientService.setOutdated()}catch(e){$L.clientService.setOutdated()}",

@@ -60,7 +60,7 @@
 		s[29]= "URL-Centric Navigation^urlNav^It's useful to understand how Aura handles page requests. The initial GET request for an app retrieves a template containing all the Aura JavaScript and a skeletal HTML response. All subsequent changes to everything after the # in the URL trigger an XMLHttpRequest (XHR) request for the content. The client service makes the request, and returns the result to the browser...^initial request, navigation events, custom events, aura:locationChange, AuraHistoryService, locationChangeEvent, tokenized attributes, AuraEnabled";
 		s[30]= "Using Layouts for Metadata-Driven Navigation^layouts^Layouts are a metadata-driven description of navigation in an application. You can describe in an XML file how you want the application to respond to changes to everything after the # (hash) in the URL. You can use Aura without layouts, but they offer a centralized location for managing URL-centric navigation...^container, aside, article, aura:layout, aura:layoutItem, sidebar, content, regex, regular expression, aura:layouts, custom events, override layout, layout handling, handle layout, layout service, AuraLayoutService, changeLocation, aura:layoutHandler";
 		s[31]= "Using Appcache^appcache^Application cache (AppCache) speeds up app response time and reduces server load by only downloading resources that have changed. It improves page loads affected by limited browser cache persistence on some devices. You can take advantage of application cache capabilities in Aura...^useAppcache, aura:application, cache, browser, load resources, load js, load css, manifest, preload";
-		s[32]= "Controlling Access with Security Providers^securityProviders^A security provider centralizes the security logic to control access to your app, including components and actions. The default security provider is aura/components/DefaultSecurityProvider.java. It doesn't allow access to any resources when the app is in PROD (production) mode so you must write a Java class to implement your own security provider to enable access in PROD mode...^securityprovider, interface, DefDescriptor, metadata";
+		s[32]= "Controlling Access with Security Providers^securityProviders^A security provider centralizes the security logic to control access to your app, including components and actions. The default security provider is aura/components/DefaultSecurityProvider.java... It doesn't allow access to any resources when the app is in PROD (production) mode...^securityprovider, security provider, interface, DefDescriptor, metadata";
 		
 		//Code
 		s[33]= "Code^code^The quick start introduces you to the structure of apps and components but there is no code beyond markup. This section helps you to start writing code...^JavaScript, Java, sample app, sample code";
@@ -133,6 +133,15 @@
 		s[84]= "Add a Component^eclipseCreateCmp^An Aura app is represented by a .app file composed of a series of Aura components and HTML tags. In Eclipse, we'll add a component to the simple app that we just created...^create component";
 		s[85]= "Build Aura from Source^buildFromSource^You don't have to build Aura from source to use it. However, if you want to customize the source code or submit a pull request with enhancements to the framework, here's how to do it...^download aura, git, run aura";
 		s[86]= "Aura Demo^buildApp^We built a simple app on the Aura framework to demonstrate its capabilities. Aura Note is a note-taking app showcasing the simplicity of building apps on Aura...^aura source";
+			
+		//FAQs
+		s[87]= "What are the benefits of using Aura?^faqBenefits^Performance, flexible integration, event-driven architecture, MVC architecture, parallel design and development^inheritance, encapsulation, object-oriented, cross browser, HTML5, CSS3, FAQ";
+		s[88]= "What is an Aura Component?^faqComp^Components are the self-contained and reusable units of an Aura app. They represent a reusable section of the UI, and can range in granularity from a single line of text to an entire app. Components are rendered to produce HTML DOM elements within the browser. The framework includes a rich set of prebuilt components. You can assemble and configure components to form new components in an app...^FAQ";
+		s[89]= "What is an Aura App?^faqApp^An Aura app is a special top-level component whose markup is in a .app file. The markup looks similar to HTML and can contain Aura components as well as a set of supported HTML tags...^FAQ";
+		s[90]= "How do I use Events in Aura?^faqEvents^You may be familiar with event-driven programming as it's used in many languages and frameworks, such as JavaScript and Java Swing. The idea is that you write handlers that respond to interface events as they occur. In Aura, you write the handlers in client-side controller actions with JavaScript...^FAQ";
+		s[91]= "What happens when I make an initial request?^faqInit^When you make a request to load an application on a browser, Aura returns an HTTP response with a default template, denoted by the template attribute in the .app file. The template contains JavaScript tags that make requests to get your application data.^preload namespace, rendering, DOM, HTML";
+		s[92]= "Which browsers does Aura support?^faqBrowsers^Aura supports the most recent stable version of the following web browsers across major platforms, with exceptions noted...^Chrome, Safari, Firefox, IE, Internet Explorer, HTML, browser support";
+		s[93]= "What do Aura version numbers mean?^faqVersions^Aura uses version numbers that are consistent with other Maven projects. This makes it easy for projects built with Maven to express their dependency on Aura...^maven, build, snapshot, release build, getauraversion";
 			
 		
 		cookies = document.cookie;
@@ -226,26 +235,30 @@
 		
 		//Return help text if number of results exceeds 10
 		var help = cmp.getValue("v.helpText");
+		if (co>5) {
+			var helpStr = "Improve your search by using double quotes \"\" for exact keyword matches or omitting terms by using a hyphen - before the term.";
+			help.setValue(helpStr);
+		}
 		if (co>10) {
-			var helpStr = "Narrow your search by using double quotes \"\" or omitting terms with a hyphen -. For example, instead of searching for \"component\", try searching for \"component attribute\" with double quotes or \"component -value\".";
+			var helpStr = "Narrow your search by using double quotes \"\" for exact keyword matches or omitting terms with a hyphen -. For example, instead of searching for \"component\", try searching for \"component attribute\" with double quotes or \"component -value\".";
 			help.setValue(helpStr);
 		}
 		
 		var myQuery = cmp.getValue("v.myQuery");
-		
+		var result = [];
 		//Display results
 			for (var a=0; a < r.length; a++){
 				var os = r[a].split("^");
 				var br="<b>" + d + "</b>";
 				os[2] = os[2].replace(pat, br);
 			
-				var result = [];
+				
 				//for (var i=0; i<co; i++){ 
 					result[a] = "<a href=\"#help?topic=" + os[1] + "\" />" + os[0] + "</a><br/>" + os[2];
 				//}
-				
+							
 			}
 			myQuery.setValue(result);
-			console.log(result);
+			console.log(result[a]);	
 	}
 }

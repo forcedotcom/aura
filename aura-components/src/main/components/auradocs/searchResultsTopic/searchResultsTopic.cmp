@@ -19,18 +19,19 @@
 	<aura:set attribute="title" value="Search Results"/>
 	<aura:handler name="init" value="{!this}" action="{!c.searchDocs}" />
 	
-	<aura:attribute name="searchTerm" type="String" default="Search Term" />
-	<aura:attribute name="queryNum" type="Integer" default="0" />
-	<aura:attribute name="noResults" type="String" default="Please enter another search term."/>
-	<aura:attribute name="myQuery" type="String[]" default="Search Results" />
+	<aura:attribute name="searchTerm" type="String" default="Search Term" description="Displays the search term back to the user." />
+	<aura:attribute name="helpText" type="String" default="" description="Displays suggestions on narrowing the search results." />
+	<aura:attribute name="queryNum" type="Integer" default="0" description="Displays the number of results." />
+	<aura:attribute name="myQuery" type="String[]" default="" description="Returns the search results."/>
 	
 	<p>You searched for "{!v.searchTerm}".</p>
+	
 	<p><ui:outputText value="{!v.queryNum}" /> result(s) found.</p>
+    <p>{!v.helpText}</p>
     
-    <p><ui:outputText value="{!v.noResults}" /></p>    
     <ol>
-   <aura:iteration items="{!v.myQuery}" var="s" indexVar="index">
-    <li><aura:unescapedHtml value="{!s}" /></li>
+  	<aura:iteration items="{!v.myQuery}" var="s" indexVar="index">
+    	<li><aura:unescapedHtml value="{!s}" /></li>
     </aura:iteration>
     </ol>
 	

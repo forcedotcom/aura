@@ -21,7 +21,7 @@
 		 
 		 if (searchTerm.length > 0) {
 			 var date = new Date();
-			 var expire = date.getTime()+10;
+			 var expire = date.getTime()+5000;
 			 document.cookie = "d=" + escape(searchTerm) + "; expires=" + expire;
 			 window.location = results_location;
 		 }

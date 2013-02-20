@@ -26,7 +26,9 @@
 </aura:component>]]>
 </auradocs:codeblock>
 
-    <p>Note how the component extends <code>aura:template</code> and sets the <code>title</code> attribute using <code>aura:set</code>.  Templates are also marked with an isTemplate="true" attribute which allows templates to contain certain otherwise restricted items such as script tags. Take a look at <code>aura:template</code> to see the other template attributes that you can customize.</p>
+    <p>Note how the component extends <code>aura:template</code> and sets the <code>title</code> attribute using <code>aura:set</code>. Take a look at <auradocs:defLink descriptor="aura:template">aura:template</auradocs:defLink> to see the other template attributes that you can customize.</p>
+    
+    <p>A template must have the <code>isTemplate</code> system attribute in the <code>&lt;aura:component&gt;</code> tag set to <code>true</code>. This informs the framework to allow restricted items, such as <code>&lt;script&gt;</code> tags, which aren't allowed in regular components.</p>
     
     <p>The <code>notes.app</code> file points at the custom template by setting the <code>template</code> system attribute in <code>&lt;aura:application&gt;</code>.</p>
     
@@ -37,7 +39,7 @@
 
     <h2>JavaScript Libraries</h2>
     
-    <p>To use a JavaScript library, you must reference it in your app's template. See <auradocs:topicLink topic="jsLibs">Using JavaScript Libraries</auradocs:topicLink>.</p>
+    <p>To use a JavaScript library, you must reference it in your app's template or include a <code>&lt;script&gt;</code> tag in the <code>.app</code> file. See <auradocs:topicLink topic="jsLibs">Using JavaScript Libraries</auradocs:topicLink>.</p>
         
     <h2>External CSS</h2>
         
@@ -75,7 +77,6 @@
     <p><b>See also:</b><br/>
         <auradocs:topicLink topic="buildApp">Aura Note Demo App</auradocs:topicLink><br/>
         <auradocs:topicLink topic="appOverview">aura:application</auradocs:topicLink><br/>
-        <auradocs:defLink descriptor="aura:template">aura:template</auradocs:defLink><br/>
         <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink>
     </p>
     

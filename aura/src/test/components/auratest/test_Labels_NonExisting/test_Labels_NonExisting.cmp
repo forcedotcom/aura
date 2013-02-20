@@ -17,6 +17,6 @@
 -->
 <aura:component>
 
-    <auratest:test_button label="{!$Label.SomeNonExistingSection_BLURF.title}" class=""/>
+    <auratest:test_button label="{!$Label.Buttons.doesNotExist}" class="doesNotExist"/>
 
 </aura:component>

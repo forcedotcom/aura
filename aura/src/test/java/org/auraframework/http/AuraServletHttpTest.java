@@ -32,15 +32,15 @@ import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.system.AuraContext.Mode;
+
+import org.auraframework.system.AuraContext.Format;
+
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.client.UserAgent;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
-
-import org.junit.Ignore;
 
 /**
  * Automation to verify the handling of AuraServlet requests.
@@ -58,9 +58,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      */
     @SuppressWarnings("unchecked")
     public void testGetContextHasPreloads() throws Exception {
-        String modeAndContext = "{'mode':'DEV','preloads':['preloadTest']}";
-        String url = "/aura?aura.tag=test%3Atext&aura.context=" + AuraTextUtil.urlencode(modeAndContext)
-                + "&aura.lastmod=" + getLastMod(Mode.DEV, "preloadTest");
+        String url = "/aura?aura.tag=test%3Atext&aura.context="
+                + AuraTextUtil.urlencode(getSimpleContext(Format.JSON, false));
         GetMethod get = obtainGetMethod(url);
         int statusCode = getHttpClient().executeMethod(get);
         String response = get.getResponseBodyAsString();
@@ -80,7 +79,6 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     /**
      * Post requests should not have preloads serialzied.
      */
-    @SuppressWarnings("unchecked")
     public void testPostContextWithoutPreloads() throws Exception {
         Map<String, Object> message = new HashMap<String, Object>();
         Map<String, Object> actionInstance = new HashMap<String, Object>();
@@ -98,7 +96,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         Map<String, String> params = new HashMap<String, String>();
         params.put("message", jsonMessage);
         params.put("aura.token", getCsrfToken());
-        params.put("aura.context", "{'mode':'DEV','preloads':['preloadTest']}");
+        params.put("aura.context", getSimpleContext(Format.JSON, false));
         PostMethod post = obtainPostMethod("/aura", params);
 
         int statusCode = getHttpClient().executeMethod(post);
@@ -107,24 +105,23 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
                     HttpStatus.SC_OK, response));
         }
+        @SuppressWarnings("unchecked")
         Map<String, Object> json = (Map<String, Object>) new JsonReader().read(response
                 .substring(AuraBaseServlet.CSRF_PROTECT.length()));
+        @SuppressWarnings("unchecked")
         Map<String, Object> context = (Map<String, Object>) json.get("context");
         assertFalse("preloads shouldn't get serialized on posts", context.containsKey("preloads"));
     }
 
     /**
      * This is actually an invalid test.
-     *
-     * We should never be posting without an app.
-     * This test needs to be fixed/deleted to make it actually work, as the context must be valid.
+     * 
      */
-    @Ignore("W-1528708")
     public void testPostWithOldLastMod() throws Exception {
         Map<String, Object> message = new HashMap<String, Object>();
         Map<String, Object> actionInstance = new HashMap<String, Object>();
         actionInstance.put("descriptor",
-                           "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString");
+                "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString");
         Map<String, Object> actionParams = new HashMap<String, Object>();
         actionParams.put("param", "some string");
         actionInstance.put("params", actionParams);
@@ -137,20 +134,20 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         Map<String, String> params = new HashMap<String, String>();
         params.put("message", jsonMessage);
         params.put("aura.token", getCsrfToken());
-        params.put("aura.context", String.format("{'mode':'DEV','lastmod':'%s'}", getLastMod(Mode.DEV) - 1));
+        params.put("aura.context", getSimpleContext(Format.JSON, true));
         PostMethod post = obtainPostMethod("/aura", params);
 
         int statusCode = getHttpClient().executeMethod(post);
         String response = post.getResponseBodyAsString();
         if (HttpStatus.SC_OK != statusCode) {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
-                               HttpStatus.SC_OK, response));
+                    HttpStatus.SC_OK, response));
         }
 
         assertTrue("response not wrapped with ERROR marker",
-                   response.startsWith(AuraBaseServlet.CSRF_PROTECT + "*/") && response.endsWith("/*ERROR*/"));
+                response.startsWith(AuraBaseServlet.CSRF_PROTECT + "*/") && response.endsWith("/*ERROR*/"));
         response = response.substring(AuraBaseServlet.CSRF_PROTECT.length() + 2,
-                                      response.length() - "/*ERROR*/".length());
+                response.length() - "/*ERROR*/".length());
         @SuppressWarnings("unchecked")
         Map<String, Object> json = (Map<String, Object>) new JsonReader().read(response);
         assertEquals(true, json.get("exceptionEvent"));
@@ -264,18 +261,18 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     /**
      * Wiggle factor.
-     *
+     * 
      * This is intended to allow for variance between the local date and the server date, along with
      * any latency that might occur. Currently it is set to 1 hour, which should be more than enough
      * to account for offsets, but short enough so that we don't really care.
      */
-    private final static long WIGGLE_FACTOR = (1000L*60*60*1);
+    private final static long WIGGLE_FACTOR = (1000L * 60 * 60 * 1);
 
     /**
      * Submit a request and check that the 'long cache' is set correctly.
-     *
+     * 
      * See documentation for {@link #WIGGLE_FACTOR}.
-     *
+     * 
      * @param request the request to execute.
      */
     private void assertResponseSetToLongCache(HttpMethod request) throws Exception {
@@ -284,8 +281,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("Failed to execute request successfully.", HttpStatus.SC_OK, request.getStatusCode());
 
         assertEquals("Expected response to be marked for long cache",
-                     String.format("max-age=%s, public", AuraBaseServlet.LONG_EXPIRE / 1000),
-                     request.getResponseHeader("Cache-Control").getValue());
+                String.format("max-age=%s, public", AuraBaseServlet.LONG_EXPIRE / 1000),
+                request.getResponseHeader("Cache-Control").getValue());
 
         String expiresHdr = request.getResponseHeader("Expires").getValue();
         Date expires = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH).parse(expiresHdr);
@@ -293,15 +290,15 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         // We show all of the related dates/strings to help with debugging.
         //
         assertTrue(String.format("Expires header is earlier than expected. Expected !before %s, got %s (%s).",
-                                 expected, expires, expiresHdr), !expires.before(expected));
+                expected, expires, expiresHdr), !expires.before(expected));
     }
 
     /**
      * Submit a request and check that the 'no cache' is set correctly.
-     *
+     * 
      * We are very generous with the expires time here, as we really don't care other than to have it
      * well in the past.
-     *
+     * 
      * @param request the request to execute.
      */
     private void assertResponseSetToNoCache(HttpMethod request) throws Exception {
@@ -310,7 +307,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals("Failed to execute request successfully.", HttpStatus.SC_OK, request.getStatusCode());
 
         assertEquals("Expected response to be marked for no-cache", "no-cache, no-store",
-                     request.getResponseHeader("Cache-Control").getValue());
+                request.getResponseHeader("Cache-Control").getValue());
         assertEquals("no-cache", request.getResponseHeader("Pragma").getValue());
 
         String expiresHdr = request.getResponseHeader("Expires").getValue();
@@ -319,7 +316,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         // We show all of the related dates/strings to help with debugging.
         //
         assertTrue(String.format("Expires header should be in the past. Expected before %s, got %s (%s).",
-                                 expected, expires, expiresHdr), expires.before(expected));
+                expected, expires, expiresHdr), expires.before(expected));
     }
 
     /**
@@ -339,9 +336,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals(HttpStatus.SC_OK, get.getStatusCode());
         // Fetch the latest timestamp of the JS group and construct URL for DEV mode.
         String expectedFWUrl = String.format("/auraFW/javascript/%s/aura_dev.js",
-                                             Aura.getConfigAdapter().getAuraFrameworkNonce());
+                Aura.getConfigAdapter().getAuraFrameworkNonce());
         String scriptTag = String.format("<script src=\"%s\" ></script>", expectedFWUrl);
-        assertTrue("Expected Aura FW Script tag not found. Expected to see: "+scriptTag,
-                   get.getResponseBodyAsString().contains(scriptTag));
+        assertTrue("Expected Aura FW Script tag not found. Expected to see: " + scriptTag,
+                get.getResponseBodyAsString().contains(scriptTag));
     }
 }

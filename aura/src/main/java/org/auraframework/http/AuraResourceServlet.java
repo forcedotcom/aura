@@ -61,12 +61,12 @@ import com.google.common.collect.Sets;
 
 /**
  * The aura resource servlet.
- *
+ * 
  * This servlet serves up the application content for 'preloaded' definitions. It should
  * be cacheable, as there is no data present (or available to the defs). These 'preloaded'
  * definitions should never be ommitted, and should never be replaced by an exception response,
  * as there are no defs on the client with which to handle them.
- *
+ * 
  * TODO: 'preload': use dependencies instead of namespaces here.
  */
 public class AuraResourceServlet extends AuraBaseServlet {
@@ -156,23 +156,25 @@ public class AuraResourceServlet extends AuraBaseServlet {
         return filters;
     }
 
-
     /**
      * check the top level component/app.
-     *
+     * 
      * This routine checks to see that we have a valid top level component. If our top level component has some
      * problem (QFE/out of sync) we totally ignore it, and continue with the preloading as if everything was ok.
      * Otherwise, if we have no descriptor, we give back an empty response.
      *
+     * Also note that this handles the 'if-modified-since' header, as we want to tell the browser that nothing
+     * changed in that case.
+     * 
      * @param request the request (for exception handling)
      * @param response the response (for exception handling)
      * @param context the context to get the definition.
-     * @return true if the definition is ok, false if we have handled the response and should short circuit out.
+     * @return true if processing should continue, false if we are done.
      * @throws IOException if there was an IO exception handling a client out of sync exception
      * @throws ServletException if there was a problem handling the out of sync
      */
     private boolean handleTopLevel(HttpServletRequest request, HttpServletResponse response, AuraContext context)
-            throws IOException,ServletException {
+            throws IOException, ServletException {
         DefDescriptor<? extends BaseComponentDef> appDesc = context.getApplicationDescriptor();
         DefinitionService definitionService = Aura.getDefinitionService();
 
@@ -183,8 +185,22 @@ public class AuraResourceServlet extends AuraBaseServlet {
             //
             return false;
         }
+        long ifModifiedSince = request.getDateHeader("If-Modified-Since");
+        String uid = null;
+
+        if (ifModifiedSince != -1) {
+            uid = context.getUid(appDesc);
+        }
         try {
             definitionService.updateLoaded(appDesc, true);
+            if (uid != null) {
+                //
+                // In this case, we have an unmodified descriptor, so just tell
+                // the client that.
+                //
+                response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
+                return false;
+            }
         } catch (QuickFixException qfe) {
             //
             // A quickfix exception means that we couldn't compile something.
@@ -285,13 +301,13 @@ public class AuraResourceServlet extends AuraBaseServlet {
 
             //
             // This writes both the app and framework signatures into
-            // the manifest, so that if either one changes, the 
+            // the manifest, so that if either one changes, the
             // manifest will change. Note that in most cases, we will
             // write these signatures in multiple places, but we just
             // need to make sure that they are in at least one place.
             //
             attribs.put(LAST_MOD, String.format("app=%s, FW=%s", getContextAppUid(),
-                                                Aura.getConfigAdapter().getAuraFrameworkNonce()));
+                    Aura.getConfigAdapter().getAuraFrameworkNonce()));
             attribs.put(UID, getContextAppUid());
             StringWriter sw = new StringWriter();
             for (String s : AuraServlet.getStyles()) {
@@ -306,7 +322,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
             DefinitionService definitionService = Aura.getDefinitionService();
             InstanceService instanceService = Aura.getInstanceService();
             DefDescriptor<ComponentDef> tmplDesc = definitionService.getDefDescriptor("ui:manifest",
-                                                                                      ComponentDef.class);
+                    ComponentDef.class);
             Component tmpl = instanceService.getInstance(tmplDesc, attribs);
             Aura.getRenderingService().render(tmpl, response.getWriter());
         } catch (Exception e) {

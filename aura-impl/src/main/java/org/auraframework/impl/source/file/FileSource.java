@@ -16,12 +16,14 @@
 package org.auraframework.impl.source.file;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
 import org.auraframework.Aura;
@@ -29,6 +31,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.IOUtil;
 
@@ -59,9 +62,11 @@ public class FileSource<D extends Definition> extends Source<D> {
     @Override
     public Reader getReader() {
         try {
-            return new FileReader(file);
+            return new InputStreamReader(new FileInputStream(file), "UTF8");
         } catch (FileNotFoundException e) {
             throw new AuraRuntimeException(e);
+        } catch (UnsupportedEncodingException uee) {
+            throw new AuraError(uee);
         }
     }
 

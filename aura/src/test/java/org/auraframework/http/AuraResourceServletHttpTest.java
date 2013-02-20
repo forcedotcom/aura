@@ -22,6 +22,8 @@ import java.util.Calendar;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.http.HttpHeaders;
+
+import org.auraframework.system.AuraContext.Format;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.TestLabels;
 import org.auraframework.test.annotation.UnAdaptableTest;
@@ -50,7 +52,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
      */
     @UnAdaptableTest
     public void testSpecialCharactersInCSSAreSerialized() throws Exception {
-        String modeAndContext = "{'mode':'DEV','preloads':['preloadTest']}";
+        String modeAndContext = getSimpleContext(Format.CSS, false);
         String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.css";
         GetMethod get = obtainGetMethod(url);
         int statusCode = getHttpClient().executeMethod(get);
@@ -76,27 +78,43 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
      */
     @UnAdaptableTest
     public void testSpecialCharactersInMarkupAreSerialized() throws Exception {
-        String modeAndContext = "{'mode':'DEV','preloads':['preloadTest']}";
+        String modeAndContext = getSimpleContext(Format.JS, false);
         String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.js";
         GetMethod get = obtainGetMethod(url);
         int statusCode = getHttpClient().executeMethod(get);
         assertEquals(HttpStatus.SC_OK, statusCode);
         String response = get.getResponseBodyAsString();
-        String expected = Arrays.toString("공유".getBytes());
+        String expected = Arrays.toString("공유".getBytes("UTF8"));
         String token = "Test whether the special character shows up: ";
         int start = response.indexOf(token) + token.length();
-        String actual = Arrays.toString(response.substring(start, response.indexOf(" ", start)).getBytes());
+        String actual = Arrays.toString(response.substring(start, response.indexOf(" ", start)).getBytes("UTF8"));
         assertEquals(String.format("Failed to see the special character in the Component definition (%s)", url),
                 expected, actual);
     }
 
     /**
-     * GET with If-Modified-Since header from an hour ago, will return the
-     * expected resource.
+     * GET with If-Modified-Since header from an hour ago, will return 304 if the UID is correct.
      */
     @TestLabels("auraSanity")
     public void testGetWithIfModifiedSinceOld() throws Exception {
-        String requestContext = "{'mode':'DEV'}";
+        String requestContext = getSimpleContext(Format.JS, false);
+        String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/app.js";
+        GetMethod get = obtainGetMethod(url);
+        Calendar stamp = Calendar.getInstance();
+        stamp.add(Calendar.HOUR, -1);
+        get.setRequestHeader(HttpHeaders.IF_MODIFIED_SINCE,
+                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime()));
+        int statusCode = getHttpClient().executeMethod(get);
+        assertEquals(HttpStatus.SC_NOT_MODIFIED, statusCode);
+        assertNull(get.getResponseBodyAsString());
+    }
+
+    /**
+     * GET with If-Modified-Since header from an hour ago, will return 304 if the UID is correct.
+     */
+    @TestLabels("auraSanity")
+    public void testGetWithIfModifiedSinceOldModified() throws Exception {
+        String requestContext = getSimpleContext(Format.JS, true);
         String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/app.js";
         GetMethod get = obtainGetMethod(url);
         Calendar stamp = Calendar.getInstance();
@@ -111,27 +129,18 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     /**
      * GET with If-Modified-Since header 45 days from now, will return 304 with
      * empty body.
-     *
-     * This is no longer true, as we use md5s.
      */
     @TestLabels("auraSanity")
     public void testGetWithIfModifiedSinceNew() throws Exception {
-        String requestContext = "{'mode':'DEV'}";
-        String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/app.js";
+        String url = "/l/" + AuraTextUtil.urlencode(getSimpleContext(Format.JS, false)) + "/app.js";
         GetMethod get = obtainGetMethod(url);
         Calendar stamp = Calendar.getInstance();
         stamp.add(Calendar.DAY_OF_YEAR, 45);
         get.setRequestHeader(HttpHeaders.IF_MODIFIED_SINCE,
                 new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime()));
         int statusCode = getHttpClient().executeMethod(get);
-        //
-        //FIXME: we should be sending a valid UID.
-        //
-        //assertEquals(HttpStatus.SC_NOT_MODIFIED, statusCode);
-        //assertNull(get.getResponseBodyAsString());
-        //
-        assertEquals(HttpStatus.SC_OK, statusCode);
-        assertNotNull(get.getResponseBodyAsString());
+        assertEquals(HttpStatus.SC_NOT_MODIFIED, statusCode);
+        assertNull(get.getResponseBodyAsString());
     }
 
     /**
@@ -140,7 +149,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
      */
     @TestLabels("auraSanity")
     public void testGetWithoutIfModifiedSince() throws Exception {
-        String requestContext = "{'mode':'DEV'}";
+        String requestContext = getSimpleContext(Format.JS, false);
         String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/app.js";
         GetMethod get = obtainGetMethod(url);
         get.removeRequestHeader(HttpHeaders.IF_MODIFIED_SINCE);

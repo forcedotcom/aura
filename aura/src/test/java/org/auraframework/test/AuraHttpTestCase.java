@@ -25,7 +25,14 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 
 import org.auraframework.Aura;
 
+import org.auraframework.def.ApplicationDef;
+
+import org.auraframework.service.ContextService;
+
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.ThreadHostileTest;
 
 import org.auraframework.throwable.AuraRuntimeException;
@@ -105,6 +112,22 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         fail("Missing cookie, expected " + expected);
     }
 
+    /**
+     * This gets a simple context string that uses a single preload.
+     */
+    protected String getSimpleContext(Format format, boolean modified) throws Exception {
+        ContextService contextService = Aura.getContextService();
+        String ctxtString;
+        AuraContext ctxt = contextService.startContext(Mode.DEV, format, Access.AUTHENTICATED,
+                                    Aura.getDefinitionService().getDefDescriptor("auratest:test_SimpleServerRenderedPage",
+                                                                                 ApplicationDef.class));
+        ctxt.addPreload("preloadTest");
+        ctxtString = getSerializedAuraContextWithModifiedUID(ctxt, modified);
+        contextService.endContext();
+        return ctxtString;
+    }
+
+
     protected String getSerializedAuraContext(AuraContext ctx) throws Exception {
         StringBuilder sb = new StringBuilder();
         try {
@@ -114,7 +137,6 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         }
         return sb.toString();
     }
-
 
     protected String getSerializedAuraContextWithModifiedUID(AuraContext ctx, boolean modify) throws Exception {
         String uid;

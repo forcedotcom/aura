@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.caching;
 
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +23,8 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
@@ -33,7 +33,6 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.TestLabels;
 import org.auraframework.test.annotation.ThreadHostileTest;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 
@@ -54,38 +53,20 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
 
     /**
      * Verify that AuraServlet returns an error code in the response body when
-     * an expired lastmod timestamp is used in a GET request.
+     * a different UID.
      * 
      * @throws Exception
      */
     @TestLabels("auraSanity")
-    public void testGetRequestWithOldTimeStamp() throws Exception {
+    public void testGetRequestWithModifiedUID() throws Exception {
         // When last mod time stamp is older than a year (400 days).
-        AuraContext ctx = startContext("auratest:test_TokenValidation");
-        String uri = getGetURIWithModifiedLastMod(ctx, (getAuraLastMod() - 400L * 24 * 60 * 60 * 1000));
+        AuraContext ctx = startContext("auratest:test_TokenValidation", ComponentDef.class);
+        String uri = getGetURIWithModifiedUID(ctx, true);
         GetMethod get = obtainGetMethod(uri);
         int statusCode = getHttpClient().executeMethod(get);
         assertTrue("Aura servlet should return 200.", statusCode == HttpStatus.SC_OK);
         String response = get.getResponseBodyAsString();
 
-        assertOutdated(response);
-    }
-
-    /**
-     * Verify that AuraServlet returns an error code in the response body when a
-     * future lastmod timestamp is used in a GET request.
-     * 
-     * @throws Exception
-     */
-    public void testGetRequestWithFutureTimeStamp() throws Exception {
-        // When last mod time stamp is older than a year.
-        AuraContext ctx = startContext("auratest:test_TokenValidation");
-        long lm = getAuraLastMod();
-        String uri = getGetURIWithModifiedLastMod(ctx, lm + 1);
-        GetMethod get = obtainGetMethod(uri);
-        int statusCode = getHttpClient().executeMethod(get);
-        assertTrue("Aura servlet should return 200.", statusCode == HttpStatus.SC_OK);
-        String response = get.getResponseBodyAsString();
         assertOutdated(response);
     }
 
@@ -98,9 +79,8 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
     @TestLabels("auraSanity")
     public void testGetRequestWithValidTimeStamp() throws Exception {
         // When last mod time stamp is older than a year.
-        AuraContext ctx = startContext("auratest:test_TokenValidation");
-        long lm = getAuraLastMod();
-        String uri = getGetURIWithModifiedLastMod(ctx, lm);
+        AuraContext ctx = startContext("auratest:test_TokenValidation", ComponentDef.class);
+        String uri = getGetURIWithModifiedUID(ctx, false);
         GetMethod get = obtainGetMethod(uri);
         int statusCode = getHttpClient().executeMethod(get);
         assertTrue("Failed to reach aura servlet.", statusCode == HttpStatus.SC_OK);
@@ -115,25 +95,10 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
      * 
      * @throws Exception
      */
-    public void testPostRequestWithOldTimeStamp() throws Exception {
-        AuraContext ctx = startContext("auratest:test_TokenValidation");
-        PostMethod post = getPostObject(ctx, String.valueOf(getAuraLastMod() - 400L * 24 * 60 * 60 * 1000)); // 400
+    public void testPostRequestWithDifferentUID() throws Exception {
+        AuraContext ctx = startContext("auratest:test_TokenValidation", ComponentDef.class);
+        PostMethod post = getPostObject(ctx, true);
                                                                                                              // days
-        int statusCode = this.getHttpClient().executeMethod(post);
-        assertTrue("Aura servlet should return 200.", statusCode == HttpStatus.SC_OK);
-        String response = post.getResponseBodyAsString();
-        assertOutdated(response);
-    }
-
-    /**
-     * Verify that AuraServlet returns an error code in the response body when a
-     * future lastmod timestamp is used in a POST request.
-     * 
-     * @throws Exception
-     */
-    public void testPostRequestWithFutureTimeStamp() throws Exception {
-        AuraContext ctx = startContext("auratest:test_TokenValidation");
-        PostMethod post = getPostObject(ctx, String.valueOf(getAuraLastMod() + 1));
         int statusCode = this.getHttpClient().executeMethod(post);
         assertTrue("Aura servlet should return 200.", statusCode == HttpStatus.SC_OK);
         String response = post.getResponseBodyAsString();
@@ -147,10 +112,9 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
      * @throws Exception
      */
     @TestLabels("auraSanity")
-    public void testPostRequestWithValidTimeStamp() throws Exception {
-        AuraContext ctx = startContext("auratest:test_TokenValidation");
-        long lm = getAuraLastMod();
-        PostMethod post = getPostObject(ctx, String.valueOf(lm));
+    public void testPostRequestWithValidUID() throws Exception {
+        AuraContext ctx = startContext("auratest:test_TokenValidation", ComponentDef.class);
+        PostMethod post = getPostObject(ctx, false);
         int statusCode = this.getHttpClient().executeMethod(post);
         String response = post.getResponseBodyAsString();
         if (HttpStatus.SC_OK != statusCode) {
@@ -169,8 +133,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
      * @return
      * @throws Exception
      */
-    private PostMethod getPostObject(AuraContext ctx, String lastModToken) throws Exception {
-
+    private PostMethod getPostObject(AuraContext ctx, boolean modified) throws Exception {
         Map<String, Object> message = new HashMap<String, Object>();
         Map<String, Object> actionInstance = new HashMap<String, Object>();
         actionInstance.put("descriptor",
@@ -189,49 +152,16 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
         PostMethod post = null;
         params.put("aura.token", getCsrfToken());
 
-        String serContext = getSerializedAuraContextWithModifiedLastMod(ctx, Long.parseLong(lastModToken));
+        String serContext = getSerializedAuraContextWithModifiedUID(ctx, modified);
 
         params.put("aura.context", serContext);
         post = obtainPostMethod("/aura", params);
         return post;
     }
 
-    private AuraContext startContext(String qualifiedName) {
+    private AuraContext startContext(String qualifiedName, Class<? extends BaseComponentDef> clazz) {
         return Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
-                Aura.getDefinitionService().getDefDescriptor(qualifiedName, ApplicationDef.class));
-    }
-
-    private String getSerializedAuraContext(AuraContext ctx) throws Exception {
-        StringBuilder sb = new StringBuilder();
-        try {
-            Aura.getSerializationService().write(ctx, null, AuraContext.class, sb, "HTML");
-        } catch (IOException e) {
-            throw new AuraRuntimeException(e);
-        }
-        return sb.toString();
-    }
-
-    private String getSerializedAuraContextWithModifiedLastMod(AuraContext ctx, long lastMod) throws Exception {
-        String serContext = getSerializedAuraContext(ctx);
-        long lm = getAuraLastMod();
-        String curLastMod = Long.toString(lm);
-        String newLastMod = Long.toString(lastMod);
-        if (!curLastMod.equals(newLastMod)) {
-            serContext = serContext.replace(curLastMod, newLastMod);
-        }
-        return serContext;
-    }
-
-    private long getAuraLastMod() throws Exception {
-        String uriLM = getGetURI(Aura.getContextService().getCurrentContext());
-        GetMethod getLM = obtainGetMethod(uriLM);
-        getHttpClient().executeMethod(getLM);
-        return AuraBaseServlet.getLastMod();
-    }
-
-    private String getGetURI(AuraContext ctx) throws Exception {
-        return getGetURI(Aura.getContextService().getCurrentContext().getApplicationDescriptor().getQualifiedName(),
-                getSerializedAuraContext(ctx));
+                Aura.getDefinitionService().getDefDescriptor(qualifiedName, clazz));
     }
 
     private String getGetURI(String appQName, String serializedCtx) throws Exception {
@@ -239,8 +169,8 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
                 + URLEncoder.encode(serializedCtx, "UTF-8");
     }
 
-    private String getGetURIWithModifiedLastMod(AuraContext ctx, long lastMod) throws Exception {
-        String serContext = getSerializedAuraContextWithModifiedLastMod(ctx, lastMod);
+    private String getGetURIWithModifiedUID(AuraContext ctx, boolean modify) throws Exception {
+        String serContext = getSerializedAuraContextWithModifiedUID(ctx, modify);
         return getGetURI(ctx.getApplicationDescriptor().getQualifiedName(), serContext);
     }
 

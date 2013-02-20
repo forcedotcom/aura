@@ -52,8 +52,8 @@ public class AuraQuickFixExceptionHTMLFormatAdapter extends HTMLFormatAdapter<Qu
             Map<String, Object> attribs = Maps.newHashMap();
             attribs.put("exception", value);
             Aura.getContextService().getCurrentContext().setPreloading(false);
-            Component cmp = Aura.getInstanceService().getInstance("auradev:quickFixException", ComponentDef.class,
-                    attribs);
+            Component cmp = Aura.getInstanceService()
+                                .getInstance("auradev:quickFixException", ComponentDef.class, attribs);
             Aura.getSerializationService().write(cmp, attribs, Component.class, out);
         } catch (QuickFixException e) {
             throw new AuraError(e);

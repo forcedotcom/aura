@@ -34,6 +34,9 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * The GUID referenced here is a globally unique ID for the top level definition
  * passed in. This ID is used to ensure that the client version matches the
  * local version.
+ *
+ * TODO: To handle global invalidates (e.g. a filesystem watcher or DB update watcher),
+ * there will be a callback mechanism that clears out the global cache.
  */
 public interface MasterDefRegistry {
     /**
@@ -42,8 +45,13 @@ public interface MasterDefRegistry {
      * If the definition was not already compiled, this method will cause it to
      * be compiled before it is returned. Any dependent definitions will be
      * loaded.
-     * 
-     * @throws QuickFixException if there is a problem during compilation.
+     *
+     * Note that this does no permissions checking, and so will return the definition
+     * even if the caller should not have access. It should only be used internally
+     *
+     * @param descriptor the descriptor to find.
+     * @return the corresponding definition, or null if it doesn't exist.
+     * @throws QuickFixException if there is a compile time error.
      */
     <D extends Definition> D getDef(DefDescriptor<D> descriptor) throws QuickFixException;
 
@@ -114,7 +122,9 @@ public interface MasterDefRegistry {
 
     /**
      * Invalidate a descriptor in the cache.
-     * 
+     *
+     * This method is only definitive for the local cache. See the class comment.
+     *
      * @param descriptor the descriptor.
      */
     <T extends Definition> boolean invalidate(DefDescriptor<T> descriptor);

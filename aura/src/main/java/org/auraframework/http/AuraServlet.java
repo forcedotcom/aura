@@ -58,7 +58,6 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.SystemErrorException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -103,9 +102,8 @@ import com.google.common.collect.Maps;
  * -Dconfig=${AURA_HOME}/config -Daura.home=${AURA_HOME} -DPORT=9090
  * </code>
  * 
- * Exception handling is dealt with in {@link #handleServletException} which
- * should almost always be called when exceptions are caught. This routine will
- * use {@link org.auraframework.adapter.ExceptionAdapter ExceptionAdapter} to
+ * Exception handling is dealt with in {@link #handleServletException} which should almost always be called when
+ * exceptions are caught. This routine will use {@link org.auraframework.adapter.ExceptionAdapter ExceptionAdapter} to
  * log and rewrite exceptions as necessary.
  */
 public class AuraServlet extends AuraBaseServlet {
@@ -128,8 +126,8 @@ public class AuraServlet extends AuraBaseServlet {
     /**
      * Check for the nocache parameter and redirect as necessary.
      * 
-     * Not entirely sure what this is used for (need doco). It is part of
-     * the appcache refresh, forcing a reload while avoiding the appcache.
+     * Not entirely sure what this is used for (need doco). It is part of the appcache refresh, forcing a reload while
+     * avoiding the appcache.
      * 
      * It maybe should be done differently (e.g. a nonce).
      * 
@@ -179,9 +177,8 @@ public class AuraServlet extends AuraBaseServlet {
     /**
      * Handle an HTTP GET operation.
      * 
-     * The HTTP GET operation is used to retrieve resources from the Aura
-     * servlet. It is only used for this purpose, where POST is used for
-     * actions.
+     * The HTTP GET operation is used to retrieve resources from the Aura servlet. It is only used for this purpose,
+     * where POST is used for actions.
      * 
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
@@ -233,7 +230,7 @@ public class AuraServlet extends AuraBaseServlet {
 
             AuraContext curContext = Aura.getContextService().getCurrentContext();
             curContext.setApplicationDescriptor(defDescriptor);
-
+            definitionService.updateLoaded(defDescriptor, false);
             def = defDescriptor.getDef();
 
             // discover dependent items that must be added to the context
@@ -276,8 +273,7 @@ public class AuraServlet extends AuraBaseServlet {
     /**
      * Allow the servlet to override page access.
      * 
-     * FIXME: this is totally bogus and should be handled by the security
-     * provider - GPO.
+     * FIXME: this is totally bogus and should be handled by the security provider - GPO.
      */
     private boolean handle404(HttpServletRequest request, HttpServletResponse response, String tagName, DefType defType)
             throws ServletException, IOException {
@@ -312,12 +308,6 @@ public class AuraServlet extends AuraBaseServlet {
                 component = app;
             } else if (defType == DefType.COMPONENT) {
                 component = (Component) instanceService.getInstance(tagName, ComponentDef.class, attributes);
-            }
-
-            if (context.getLastMod() != null && !context.getLastMod().isEmpty()
-                    && !isUpToDate(Long.parseLong(context.getLastMod()))) {
-                deleteManifestCookie(response);
-                throw new ClientOutOfSyncException(OUTDATED_MESSAGE);
             }
             Map<String, Object> map = Maps.newHashMap();
             map.put("token", getToken());
@@ -363,10 +353,6 @@ public class AuraServlet extends AuraBaseServlet {
             loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION_AURA);
             loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION);
         }
-    }
-
-    private static boolean isUpToDate(long lastMod) throws QuickFixException {
-        return (lastMod == -1) || (lastMod == getLastMod());
     }
 
     public static List<String> getBaseScripts() throws QuickFixException {
@@ -525,12 +511,6 @@ public class AuraServlet extends AuraBaseServlet {
             Message<?> message;
             setNoCache(response);
 
-            if (context.getLastMod() != null && !context.getLastMod().isEmpty()
-                    && !isUpToDate(Long.parseLong(context.getLastMod()))) {
-                AuraBaseServlet.deleteManifestCookie(response);
-                throw new ClientOutOfSyncException(OUTDATED_MESSAGE);
-            }
-
             response.setContentType(getContentType(context.getFormat()));
             String msg = messageParam.get(request);
 
@@ -552,15 +532,26 @@ public class AuraServlet extends AuraBaseServlet {
                 Action action = message.getActions().get(0);
                 String name = action.getDescriptor().getQualifiedName();
                 if (name.equals("aura://ComponentController/ACTION$getApplication")
-                        ||
-                        (name.equals("aura://ComponentController/ACTION$getComponent") && !isProductionMode(context
-                                .getMode()))) {
+                        || (name.equals("aura://ComponentController/ACTION$getComponent")
+                            && !isProductionMode(context.getMode()))) {
                     isBootstrapAction = true;
                 }
             }
 
             if (!isBootstrapAction) {
                 validateCSRF(csrfToken.get(request));
+            }
+
+            if (context.getApplicationDescriptor() != null) {
+                // ClientOutOfSync will drop down.
+                try {
+                    Aura.getDefinitionService().updateLoaded(context.getApplicationDescriptor(), false);
+                } catch (QuickFixException qfe) {
+                    //
+                    // ignore quick fix. If we got a 'new' quickfix, it will be thrown as
+                    // a client out of sync exception, since the UID will not match.
+                    //
+                }
             }
 
             Message<?> result = serverService.run(message, context);

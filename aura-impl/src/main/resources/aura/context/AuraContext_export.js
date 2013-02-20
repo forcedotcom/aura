@@ -22,6 +22,7 @@ exp(p,
     //#if {"excludeModes" : ["PRODUCTION"]}
 	    ,
 	    "getPreloads", p.getPreloads,
-	    "getNum", p.getNum
+	    "getNum", p.getNum,
+	    "getLoaded", p.getLoaded
     //#end
 );

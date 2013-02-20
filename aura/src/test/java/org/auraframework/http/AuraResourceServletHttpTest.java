@@ -111,6 +111,8 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     /**
      * GET with If-Modified-Since header 45 days from now, will return 304 with
      * empty body.
+     *
+     * This is no longer true, as we use md5s.
      */
     @TestLabels("auraSanity")
     public void testGetWithIfModifiedSinceNew() throws Exception {
@@ -122,8 +124,14 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         get.setRequestHeader(HttpHeaders.IF_MODIFIED_SINCE,
                 new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime()));
         int statusCode = getHttpClient().executeMethod(get);
-        assertEquals(HttpStatus.SC_NOT_MODIFIED, statusCode);
-        assertNull(get.getResponseBodyAsString());
+        //
+        //FIXME: we should be sending a valid UID.
+        //
+        //assertEquals(HttpStatus.SC_NOT_MODIFIED, statusCode);
+        //assertNull(get.getResponseBodyAsString());
+        //
+        assertEquals(HttpStatus.SC_OK, statusCode);
+        assertNotNull(get.getResponseBodyAsString());
     }
 
     /**

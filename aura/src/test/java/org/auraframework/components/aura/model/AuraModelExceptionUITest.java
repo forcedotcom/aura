@@ -20,7 +20,10 @@ import java.util.List;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * aura:interation UI tests.
@@ -48,8 +51,17 @@ public class AuraModelExceptionUITest extends WebDriverTestCase {
         waitForDocumentReady();
         List<WebElement> errorBoxes = getDriver().findElements(By.cssSelector(".auraForcedErrorBox"));
         assertEquals("Renderer element found", 0, errorBoxes.size());
-        errorBoxes = getDriver().findElements(By.cssSelector(".auraErrorBox"));
-        assertEquals("Element not found", 1, errorBoxes.size());
-        assertTrue(errorBoxes.get(0).isDisplayed());
+        WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSecs);
+        errorBoxes = wait.until(new ExpectedCondition<List<WebElement>>() {
+            @Override
+            public List<WebElement> apply(WebDriver d) {
+                List<WebElement> errors = getDriver().findElements(By.cssSelector(".auraErrorBox"));
+                if (errors.size() > 0 && errors.get(0).isDisplayed()) {
+                    return errors;
+                }
+                return null;
+            }
+        });
+        assertNotNull(errorBoxes);
     }
 }

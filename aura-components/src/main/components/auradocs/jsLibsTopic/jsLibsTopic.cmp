@@ -18,7 +18,7 @@
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Using JavaScript Libraries"/>
 
-    <p>To use a JavaScript library, you must reference it in your app's template. Use <code>aura:set</code> to set the <code>extraScriptTags</code> attribute in the template component. This sets the <code>extraScriptTags</code> attribute in <code>aura:template</code>, which your app's template extends.</p>
+    <p>To use a JavaScript library, you must reference it in your app's template or include a <code>&lt;script&gt;</code> tag in the <code>.app</code> file. Use <code>aura:set</code> to set the <code>extraScriptTags</code> attribute in the template component. This sets the <code>extraScriptTags</code> attribute in <code>aura:template</code>, which your app's template extends.</p>
     
     <p>For example, the Aura Note sample app uses <code>ckeditor.js</code>, which is a third-party JavaScript library. <code>auranote:template</code> includes this markup to include the library.</p>
     
@@ -42,7 +42,8 @@
     <p><b>See also:</b><br/>
         <auradocs:topicLink topic="buildApp">Aura Note Demo App</auradocs:topicLink><br/>
         <auradocs:topicLink topic="createAppTemplate">Creating an App Template</auradocs:topicLink><br/>
-        <auradocs:defLink descriptor="aura:template">aura:template</auradocs:defLink>
+        <auradocs:defLink descriptor="aura:template">aura:template</auradocs:defLink><br/>
+        <auradocs:topicLink topic="appOverview">aura:application</auradocs:topicLink>
     </p>
             
 </aura:component>

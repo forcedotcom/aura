@@ -13,6 +13,7 @@
      *   I believe it's safe to assume that these are large enough to hold our keys and objects. to be 100% sure we would need
      *   to have tests running on the devices
      */
+	browsers: ['GOOGLECHROME', 'SAFARI'],
     setUp:function(cmp){
         this.adapter = new $A.storageService.createAdapter("smartstore");
         this.setItemCallCounter = 0;
@@ -431,7 +432,7 @@
 
     /**
      * Test that getExpired does not return an item that is in the future.
-     */
+     */    
     testGetExpiredReturnsNoItems:{
         test:[
             function(cmp){

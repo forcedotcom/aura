@@ -58,14 +58,14 @@ import com.google.common.collect.Sets;
  * This 'master' definition registry is actually a single threaded, per request registry that caches certain things in
  * what is effectively a thread local cache. This means that once something is pulled into the local thread, it will not
  * change.
- *
+ * 
  */
 public class MasterDefRegistryImpl implements MasterDefRegistry {
     private static final Set<DefType> securedDefTypes = Sets.immutableEnumSet(DefType.APPLICATION, DefType.COMPONENT,
-                                                                              DefType.CONTROLLER, DefType.ACTION);
+            DefType.CONTROLLER, DefType.ACTION);
     private static final Set<String> unsecuredPrefixes = ImmutableSet.of("aura");
     private static final Set<String> unsecuredNamespaces = ImmutableSet.of("aura", "ui", "os", "auradev",
-                                                                           "org.auraframework");
+            "org.auraframework");
     private static final Set<String> unsecuredNonProductionNamespaces = ImmutableSet.of("auradev");
 
     private final static int DEPENDENCY_CACHE_SIZE = 100;
@@ -411,10 +411,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         cc.dependencies.put(canonical, def);
         return def;
     }
-    
+
     /**
      * finish up the validation of a set of compiling defs.
-     *
+     * 
      * @param context only needed to do setCurrentNamspace.
      */
     private void finishValidation(AuraContext context, Collection<CompilingDef<?>> compiling) throws QuickFixException {
@@ -507,7 +507,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     getHelper(cdesc, cc, next);
                 }
             }
-            
+
             finishValidation(cc.context, cc.compiled.values());
             return def;
         } finally {
@@ -639,11 +639,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Get a definition from a registry, and build a compilingDef if needed.
-     *
-     * This retrieves the definition, and if it is validated, simply puts it in the
-     * local cache, otherwise, it builds a CompilingDef for it, and returns that
-     * for further processing.
-     *
+     * 
+     * This retrieves the definition, and if it is validated, simply puts it in the local cache, otherwise, it builds a
+     * CompilingDef for it, and returns that for further processing.
+     * 
      * @param context The aura context for the compiling def.
      * @param descriptor the descriptor for which we need a definition.
      * @return A compilingDef for the definition, or null if not needed.
@@ -697,17 +696,19 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Get a definition.
-     *
-     * This does a scan of the loaded dependency entries to check if there is something to
-     * pull, otherwise, it just compiles the entry. This should log a warning somewhere, as
-     * it is a dependency that was not noted.
-     *
+     * 
+     * This does a scan of the loaded dependency entries to check if there is something to pull, otherwise, it just
+     * compiles the entry. This should log a warning somewhere, as it is a dependency that was not noted.
+     * 
      * @param descriptor the descriptor to find.
      * @return the corresponding definition, or null if it doesn't exist.
      * @throws QuickFixException if there is a compile time error.
      */
     @Override
     public <D extends Definition> D getDef(DefDescriptor<D> descriptor) throws QuickFixException {
+        if (descriptor == null) {
+            return null;
+        }
         if (defs.containsKey(descriptor)) {
             @SuppressWarnings("unchecked")
             D def = (D) defs.get(descriptor);
@@ -736,7 +737,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         // found an entry.
         // In this case, throw a QFE if we have one.
         //
-        if (de.qfe != null ) {
+        if (de.qfe != null) {
             throw de.qfe;
         }
         //
@@ -802,10 +803,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Get a security provider for the application.
-     *
-     * This should probably catch the quick fix exception and simply treat it
-     * as a null security provider. This caches the security provider.
-     *
+     * 
+     * This should probably catch the quick fix exception and simply treat it as a null security provider. This caches
+     * the security provider.
+     * 
      * @return the sucurity provider for the application or null if none.
      * @throws QuickFixException if there was a problem compiling.
      */
@@ -940,7 +941,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * 
      * This uses some trickery to try to be efficient, including using a dual keyed local cache to avoid looking up
      * values more than once even in the absense of remembered context.
-     *
+     * 
      * Note: there is no guarantee that the definitions have been fetched from cache here, so there is a very subtle
      * race condition.
      * 
@@ -951,6 +952,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      */
     @Override
     public <T extends Definition> String getUid(String uid, DefDescriptor<T> descriptor) throws QuickFixException {
+        if (descriptor == null) {
+            return null;
+        }
+
         DependencyEntry de = null;
 
         de = getDE(uid, descriptor);

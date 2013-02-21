@@ -18,7 +18,7 @@
         helper.init(cmp);
     },
 
-    connectionLost: function(cmp) {
+    connectionLost: function(cmp, event, helper) {
         var storage = helper.getStorage(cmp);
         if (storage) {
             storage.suspendSweeping();

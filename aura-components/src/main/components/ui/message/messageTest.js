@@ -56,7 +56,7 @@
                 "ui:message closable attribute is not being respected");
 
         // verify background color is correct, based on severity attribute
-        var backgroundColor = getComputedStyle(rootDiv).getPropertyValue("background-color");
+        var backgroundColor = this.getComputedStyle(rootDiv)['background-color'];
         if ($A.util.isUndefined(this.bgColors[severity])) {
             severity = "message";
         }
@@ -130,5 +130,13 @@
             $A.test.assertTrue($A.util.hasClass(div, "-able"),
                     "ui:message rendered without -able CSS class");
         }
-    }
+    },
+    
+     getComputedStyle: function(element){
+     	if(!window.getComputedStyle){
+       		return element.currentStyle;
+      	}
+	
+      	return window.getComputedStyle(element);      
+     }
 })

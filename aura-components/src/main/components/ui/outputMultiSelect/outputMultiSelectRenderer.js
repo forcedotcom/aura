@@ -18,11 +18,17 @@
         var ret = this.superRender();
         var element = cmp.find("span").getElement();
         var delimiter = cmp.getAttributes().getValue("delimiter").getValue();
+        
         var value = cmp.getAttributes().get("value");
         if($A.util.isArray(value)){
-            element.textContent = value.join(delimiter);
-        }else{
-            element.textContent = value;
+            value = value.join(delimiter);
+        }
+        
+        if(element.textContent !== undefined){
+        	element.textContent = value;
+        }
+        else{
+        	element.innerText = value;
         }
         return ret;
     }

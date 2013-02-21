@@ -116,12 +116,15 @@
     extractCmpFromPlaceholder:function(placeholder, cmpName){
         var body = placeholder.get("v.body");
         var ret;
-        if(body.forEach){
-            body.forEach(function(key){
-                if(key.auraType && key.auraType === 'Component' && key.getDef().getDescriptor().getQualifiedName()===cmpName)
-                    ret= key;
-            });
+        
+         if(body && body.length > 0){
+        	for(var key in body){
+        		if(body[key].auraType && body[key].auraType === 'Component' && body[key].getDef().getDescriptor().getQualifiedName()===cmpName){
+                    ret= body[key];
+            	}
+        	}         
         }
+        
         return ret;
     }
 })

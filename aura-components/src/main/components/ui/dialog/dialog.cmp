@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component description="A dialog window used for overlays or modals. To use this component, you must also include one (and only one) ui:dialogManager component in your app. Regardless of how many instances of ui:dialog you use, only one ui:dialogManager component is required. We recommend putting the ui:dialogManager component in your .app file.">
+<aura:component extensible="true" support="GA" description="A dialog window used for overlays or modals. To use this component, you must also include one (and only one) ui:dialogManager component in your app. Regardless of how many instances of ui:dialog you use, only one ui:dialogManager component is required. We recommend putting the ui:dialogManager component in your .app file.">
 
     <!-- public attributes -->
     <aura:attribute name="ariaRole" type="String" default="dialog" description="The ARIA role assigned to the dialog's outermost &lt;div&gt; wrapper. Valid values are 'dialog' and 'alertdialog'. Use 'dialog' when there are one or more form fields present in your dialog. Use 'alertdialog' when there is only text and confirmation and/or cancel buttons."/>

@@ -13,22 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var p = MapValue.prototype;
-exp(p,
-    "auraType", p.auraType,
-    "getValue", p.getValue,
-    "get", p.get,
-    "merge", p.merge,
-    "setValue", p.setValue,
-    "isExpression", p.isExpression,
-    "isLiteral", p.isLiteral,
-    "isDirty", p.isDirty,
-    "each", p.each,
-    "getRawValue", p.getRawValue,
-    "destroy", p.destroy,
-    "toString", p.toString,
-    "unwrap", p.unwrap,
-    "put", p.put,
-    "addHandler", p.addHandler
-);
+({
+    onValueChange : function(cmp, evt, helper){
+        if(cmp._log===undefined){
+            cmp._log=[];
+        }
+        cmp._log.push(evt.getParams());
+    }
+})

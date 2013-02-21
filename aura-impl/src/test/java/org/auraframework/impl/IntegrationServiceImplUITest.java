@@ -204,9 +204,9 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                         true));
 
         openIntegrationStub(customStubCmp, cmpToInject, null, "fooBared");
-
-        assertTrue("IntegrationService failed to display error message when no locatorDomId was specified",
-                isElementPresent(By.xpath("//span[contains(@title,'Invalid locatorDomId specified - no element found in the DOM with id=fooBared')]")));
+        String expectedErrorMessage = "Invalid locatorDomId specified - no element found in the DOM with id=fooBared";
+        boolean isErrorPresent = findDomElement(By.cssSelector("span[class='uiOutputText']")).getText().contains(expectedErrorMessage);
+        assertTrue("IntegrationService failed to display error message when no locatorDomId was specified",isErrorPresent);
     }
 
     /**
@@ -233,9 +233,10 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 String.format(AuraImplTestCase.baseComponentTag, "", "<aura:attribute name='reqAttr' required='true' type='String'/>"));
         Map<String, Object> attributes = Maps.newHashMap();
         openIntegrationStub(cmpWithReqAttr, attributes);
-
-        assertTrue("IntegrationService failed to display error message",
-                isElementPresent(By.xpath("//span[contains(@title,\"is missing required attribute 'reqAttr'\")]")));
+        
+        String expectedErrorMessage = "is missing required attribute 'reqAttr'";
+        boolean isErrorPresent = findDomElement(By.cssSelector("span[class='uiOutputText']")).getText().contains(expectedErrorMessage);
+        assertTrue("IntegrationService failed to display error message",isErrorPresent);
     }
 
     /**

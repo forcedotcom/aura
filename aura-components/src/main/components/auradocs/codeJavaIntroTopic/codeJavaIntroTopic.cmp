@@ -27,7 +27,7 @@
 <ul>
     <li><auradocs:topicLink topic="models">Models</auradocs:topicLink> for initializing component data</li>
     <li><auradocs:topicLink topic="serverSideControllers">Server-side controllers</auradocs:topicLink> for handling requests from client-side controllers</li>
-    <li><auradocs:topicLink topic="oodProviders">Providers</auradocs:topicLink> for returning a concrete component at runtime for an abstract component or an interface in markup</li>
+    <li><auradocs:topicLink topic="oodProviders">Server-Side Providers</auradocs:topicLink> for returning a concrete component at runtime for an abstract component or an interface in markup</li>
     <li><auradocs:topicLink topic="securityProviders">Security Providers</auradocs:topicLink> for centralized security logic to control access to your app</li>
 </ul>
 

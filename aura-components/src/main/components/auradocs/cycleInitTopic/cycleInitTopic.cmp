@@ -119,6 +119,6 @@ $A.initAsync({"context":{"mode":"DEV","app":"auradocs:ide","preloads":
    <p>Next, we'll see what happens during the <auradocs:topicLink topic="clientInit">Client-Side Process</auradocs:topicLink>.</p>
 
    <p><b>See also:</b><br/>
-    <auradocs:topicLink topic="oodProviders">Providers</auradocs:topicLink>
+    <auradocs:topicLink topic="oodProviders">Server-Side Providers</auradocs:topicLink>
      </p>
 </aura:component>

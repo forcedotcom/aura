@@ -147,7 +147,7 @@ public class TrivialModel throws QuickFixException {
 
   <p><b>See also:</b><br/>
       <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink><br/>
-      <auradocs:topicLink topic="oodProviders">Providers</auradocs:topicLink>
+      <auradocs:topicLink topic="oodProviders">Server-Side Providers</auradocs:topicLink>
     </p>
 
 </aura:component>

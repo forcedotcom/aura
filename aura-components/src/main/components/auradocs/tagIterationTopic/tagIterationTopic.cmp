@@ -95,4 +95,12 @@
 
         <p>When you click Go in the component, it calls <code>changeOneValue</code> in the client-side controller. The function changes the <code>tochange</code> attribute to <code>newvalue</code> and the updated value is rerendered on the page.</p>
 
+        <h4>Using Models and Providers</h4>
+        <p>The demo uses a server-side model, <code>java://org.auraframework.docs.SampleIterationModel</code>, which initializes a HashMap with the <code>letters</code> key. Note that you can't retrieve more data from the server after initial rendering. For example, you can't get more data from the model to support pagination through a data set. </p>
+        <p>If you are creating a component on the client with a server-side dependency and want to use a provider, use both a client-side provider and a server-side provider.  You can use a client-side provider on its own for components without a server-side dependency.</p>
+
+  <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="providersClientSide">Client-Side Providers</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="oodProviders">Server-Side Providers</auradocs:topicLink>
+    </p>
 </aura:component>

@@ -16,11 +16,5 @@
 
 -->
 <aura:component>
-
-    <aura:registerevent name="press" type="ui:press"/>
-    <test:test_ErrorMsg_SimpleCmp1/>
-
-    <test:test_button label="Button 3: (Button on Composite Component)"/>
-
-    <aura:handler event="aura:systemError" action="{!c.outerSystemError}"/>
+    <test:test_button label="Button 1" class="createErrorButton"  press="{!c.clicked}"/>
 </aura:component>

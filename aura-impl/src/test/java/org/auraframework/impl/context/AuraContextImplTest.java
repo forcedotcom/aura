@@ -222,12 +222,12 @@ public class AuraContextImplTest extends AuraImplTestCase {
         lc = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
         Event evt1 = Aura.getInstanceService().getInstance("markup://aura:applicationEvent", EventDef.class, null);
         lc.addClientApplicationEvent(evt1);
-        Event evt2 = Aura.getInstanceService().getInstance("markup://aura:noConnection", EventDef.class, null);
+        Event evt2 = Aura.getInstanceService().getInstance("markup://aura:connectionLost", EventDef.class, null);
         lc.addClientApplicationEvent(evt2);
         List<Event> evnts = lc.getClientEvents();
         assertEquals("Found unexpected number of events on context", 2, evnts.size());
         assertEquals("markup://aura:applicationEvent", evnts.get(0).getDescriptor().getQualifiedName());
-        assertEquals("markup://aura:noConnection", evnts.get(1).getDescriptor().getQualifiedName());
+        assertEquals("markup://aura:connectionLost", evnts.get(1).getDescriptor().getQualifiedName());
         Aura.getContextService().endContext();
 
         // Adding same event again should not cause an error, same event can be

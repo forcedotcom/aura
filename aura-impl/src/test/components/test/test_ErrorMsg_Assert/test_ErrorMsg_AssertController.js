@@ -15,10 +15,6 @@
  */
 {
     clicked: function(cmp, event){
-        aura.assert(false, "System Error was fired");
+        aura.assert(false, "Assert failed in test_ErrorMsg_AssertController!");
     },
-
-    systemError: function(cmp, event){
-        document.write("systemError from test_ErrorMsg_SimpleCmp1 ");
-    }
 }

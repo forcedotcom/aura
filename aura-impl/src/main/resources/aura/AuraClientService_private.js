@@ -45,7 +45,7 @@ var priv = {
                 return null;
             }
 
-            e = $A.get("e.aura:noConnection");
+            e = $A.get("e.aura:connectionLost");
             if (e) {
                 priv.isDisconnected = true;
                 e.fire();

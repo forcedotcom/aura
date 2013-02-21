@@ -28,6 +28,6 @@
     <aura:attribute name="implementation" type="String" description="The specific type of storage to use. Valid values are: memory, websql, indexeddb, smartstore. Defaults to requirement based auto selection. Primarily used for testing."/>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-    <aura:handler event="aura:noConnection" action="{!c.noConnection}"/>
+    <aura:handler event="aura:connectionLost" action="{!c.connectionLost}"/>
     <aura:handler event="aura:connectionResumed" action="{!c.connectionResumed}"/>
 </aura:component>

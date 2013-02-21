@@ -224,9 +224,9 @@ SimpleValue.prototype.addErrors = function(messages) {
         }
 
         if ($A.util.isArray(messages)) {
-            messages.forEach(function(m, i, messages) {
-                that.errors.push(m);
-            });
+        	for(var i=0; i< messages.length; i++){
+        		that.errors.push(messages[i]);
+        	}
         } else {
             that.errors.push(messages);
         }

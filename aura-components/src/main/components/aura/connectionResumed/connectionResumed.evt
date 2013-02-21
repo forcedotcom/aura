@@ -15,4 +15,4 @@
     limitations under the License.
 
 -->
-<aura:event type="APPLICATION" support="GA" description="Indicates that the framework has detected that the browser can again access the server. This event will be preceded by a noConnection event."/>
+<aura:event type="APPLICATION" support="GA" description="Indicates that the framework has detected that the browser can again access the server. This event will be preceded by a connectionLost event."/>

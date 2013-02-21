@@ -1,0 +1,72 @@
+/*
+ * Copyright (C) 2012 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.uiDialog.hidden{
+    display:none;
+}
+.uiDialog.mask,
+.uiDialog.dialog{
+    position:fixed;
+    z-index:99999;
+}
+.uiDialog.mask{
+    top:0;
+    right:0;
+    bottom:0;
+    left:0;
+    background-color:#000;
+    opacity:.75;
+}
+.uiDialog.dialog{
+    /* actual screen positioning will be done by the component helper on display, based on content dimensions */
+    min-width:300px;    /* default */
+    min-height:150px;   /* default */
+    top:33%;            /* default */
+    margin-top:-75px;   /* default */
+    left:50%;           /* default */
+    margin-left:-150px; /* default */
+    background-color:#FFF;
+    overflow:hidden;
+    border-radius:3px;
+    box-shadow:0 0 20px #000;
+}
+.uiDialog .title{
+    height:1.78em;
+    line-height:1.75em;
+    text-indent:.5em;
+    border-bottom:1px solid #666;
+}
+.uiDialog .content,
+.uiDialog .buttons{
+    margin:.4em .5em;
+}
+.uiDialog .close{
+    display:block;
+    position:absolute;
+    top:.22em;
+    right:.25em;
+    width:1.25em;
+    height:1.25em;
+    line-height:1.25em;
+    font-weight:bold;
+    text-align:center;
+    border-radius:2px;
+}
+.uiDialog .close:hover{
+    background-color:#DDD;
+}
+.uiDialog .buttons{
+    text-align:center;
+}

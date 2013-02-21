@@ -545,7 +545,14 @@ Util.prototype.createTimeoutCallback = function(callback, toleranceMillis) {
 };
 
 /**
- * Adds an event listener for the named type of event on the given element.
+ * Adds an event listener to a DOM element.
+ *
+ * @param {HTMLElement} element The DOM element to which to apply the listener.
+ * @param {String} eventName The name of the DOM event, minus the "on" prefix (e.g. "click", "focus", "blur", etc.).
+ * @param {Object} handler The JS listener function to add.
+ * @param {Boolean} useCapture Whether to use event capturing.
+ * @param {Integer} timeout Optional timeout (in milliseconds) that will delay the handler execution.
+ * @returns {Object} Either a function (success) or null (fail)
  */
 Util.prototype.on = (function() {
     if (window["addEventListener"]) {
@@ -590,6 +597,25 @@ Util.prototype.on = (function() {
     }
     return null;
 })();
+
+/**
+ * Removes an event listener from a DOM element. See also Util.on() a.k.a. $A.util.on()
+ *
+ * @param {HTMLElement} element The DOM element from which to remove the listener.
+ * @param {String} eventName The name of the DOM event, minus the "on" prefix (e.g. "click", "focus", "blur", etc.).
+ * @param {Function} listener The JS listener function to remove.
+ * @param {Boolean} useCapture Whether to use event capturing.
+ * @returns {void}
+ */
+Util.prototype.removeOn = function(element, eventName, listener, useCapture) {
+    if (window["removeEventListener"]) {
+        element.removeEventListener(eventName, listener, useCapture);
+    } else if (window["detachEvent"]) {
+        element.detachEvent("on" + eventName, listener);
+    } else {
+        $A.assert(false, "user agent must support either removeEventListener or detachEvent to remove an event handler.");
+    }
+};
 
 /**
  * Stores the values of a form to a Map object. Values from a checkbox, radio, drop-down list, and textarea
@@ -996,6 +1022,29 @@ Util.prototype.emptyComponentTrash = function() {
     }
 
     this.componentGCPending = false;
+};
+
+/**
+ * Determines if an element is a descendant of another element in the DOM tree. Both arguments to this function must be of type HTMLElement.
+ * 
+ * @param {HTMLElement} container The element you think is the outermost container.
+ * @param {HTMLElement} element The element you think is buried inside the container.
+ * @returns {Boolean} Returns true if 'element' is indeed inside 'container', false otherwise.
+ */
+Util.prototype.contains = function(container, element) {
+    var theTruth = false;
+    if ($A.util.isElement(container) && $A.util.isElement(element)) {
+        while(element.parentNode) {
+            if (element.parentNode === container) {
+                theTruth = true;
+                break;
+            }
+            element = element.parentNode;
+        }
+    } else {
+        $A.assert(false, "All arguments for this function must be HTMLElement objects.");
+    }
+    return theTruth;
 };
 
 

@@ -1,0 +1,72 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component description="A dialog window used for overlays or modals. To use this component, you must also include one (and only one) ui:dialogManager component in your app. Regardless of how many instances of ui:dialog you use, only one ui:dialogManager component is required. We recommend putting the ui:dialogManager component in your .app file.">
+
+    <!-- public attributes -->
+    <aura:attribute name="ariaRole" type="String" default="dialog" description="The ARIA role assigned to the dialog's outermost &lt;div&gt; wrapper. Valid values are 'dialog' and 'alertdialog'. Use 'dialog' when there are one or more form fields present in your dialog. Use 'alertdialog' when there is only text and confirmation and/or cancel buttons."/>
+    <aura:attribute name="autoFocus" type="Boolean" default="{!true}" description="Automatically focus on the first focusable element when the dialog is displayed."/>
+    <aura:attribute name="buttons" type="Aura.Component[]" description="Buttons that should be displayed at the bottom of the dialog (e.g., 'Save', 'Cancel', etc.)."/>
+    <aura:attribute name="clickOutToClose" type="Boolean" default="{!true}" description="Specifies if the dialog should be closed when any element outside the dialog is clicked."/>
+    <aura:attribute name="closeTitle" type="String" default="Close this window" description="The title attribute of the 'close' link."/>
+    <aura:attribute name="dialogClass" type="String" description="Additional CSS classes to apply to the dialog's outermost &lt;div&gt; wrapper."/>
+    <aura:attribute name="isModal" type="Boolean" default="{!false}" description="Specifies if the dialog is modal (i.e., the dialog's contents are the only focusable/actionable items on the page when the dialog is open)."/>
+    <aura:attribute name="maskClass" type="String" description="Additional CSS classes to apply to the window mask located behind a modal dialog."/>
+    <aura:attribute name="title" type="String" description="The title displayed in the dialog's header. Required for accessibility." required="{!true}"/>
+    <aura:attribute name="titleDescription" type="String" description="Instructional information about the purpose of the dialog. This text will not be visible on-screen, but still readable by assistive technologies."/>
+
+    <!-- private attributes -->
+    <aura:attribute name="_ariaId" type="String" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The id needed to identify the dialog window to assistive technologies."/>
+    <aura:attribute name="_dialogManager" type="Aura.Component" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The ui:dialogManager component that will control this dialog's display and DOM events."/>
+    <aura:attribute name="_isVisible" type="Boolean" default="{!false}" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. Specifies if the dialog is displayed. To control visibility of the dialog, fire either the ui:openDialog or ui:closeDialog event."/>
+
+    <!-- events -->
+    <aura:registerEvent name="close" type="ui:closeDialog" description="Event fired when the dialog window requests to close itself."/>
+    <aura:handler event="ui:dialogManagerReady" action="{!c.registerDialog}"/>
+
+<!--
+    <aura:attribute name="priv_clickHandler" type="Object" description="Private attribute. Reference to the closure for click handling"/>
+    <aura:attribute name="priv_keyHandler" type="Object" description="Private attribute. Reference to the closure for key handling"/>
+    <aura:attribute name="priv_focusHandler" type="Object" description="Private attribute. Reference to the closure for focus handling"/>
+    <aura:attribute name="priv_resizeHandler" type="Object" description="Private attribute. Reference to the closure for resize handling"/>
+    TODO Create a window manager component to allow for the modal version to have a window context and component-->
+
+    <!-- modal background -->
+    <aura:if isTrue="{!v.isModal}">
+        <div aura:id="mask" class="{!'mask' + (v._isVisible ? ' ' : ' hidden ') + v.maskClass}"></div>
+    </aura:if>
+
+    <!-- dialog container -->
+    <div aura:id="dialog" class="{!'dialog' + (v._isVisible ? ' ' : ' hidden ') + v.dialogClass}" role="{!v.ariaRole}" aria-live="assertive" aria-atmoic="true" aria-labelledby="{!v._ariaId}">
+
+        <!-- header -->
+        <h2 aura:id="title" class="title">{!v.title}<span class="assistiveText"> {!v.titleDescription}</span></h2>
+
+        <!-- content -->
+        <div aura:id="content" class="content">{!v.body}</div>
+
+        <!-- buttons -->
+        <aura:if isTrue="{!v.buttons.length > 0}">
+            <div class="buttons">{!v.buttons}</div>
+        </aura:if>
+
+        <!-- close ("x") link - this DOM placement is intentional. DO NOT move, hide, or remove this element. see dialogManagerHelper.addHandlers() for more info -->
+        <a aura:id="close" class="close" href="javascript:void(0);" title="{!v.closeTitle}" onclick="{!c.closeDialog}">X</a>
+
+    </div>
+
+</aura:component>

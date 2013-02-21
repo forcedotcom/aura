@@ -15,7 +15,7 @@
         		cmp._fooValue1 = v;
         	});
 
-        	// Insure that foo and bar are truly isoalted stores and do not contain each other's values
+        	// Insure that foo and bar are truly isolated stores and do not contain each other's values
         	foo.get("key2", function(v) {
         		cmp._fooValue2Retrieved = $A.util.isUndefined(v);
         	});
@@ -24,7 +24,7 @@
         		cmp._barValue2 = v;
         	});
 
-        	// Insure that foo and bar are truly isoalted stores and do not contain each other's values
+        	// Insure that foo and bar are truly isolated stores and do not contain each other's values
         	bar.get("key1", function(v) {
         		cmp._barValue1Retrieved = $A.util.isUndefined(v);
         	});

@@ -87,7 +87,7 @@
                 <auradocs:contentsNode text="Component Events" id="eventsComp"/>
                 <auradocs:contentsNode text="Application Events" id="eventsApp"/>
                 <auradocs:contentsNode text="Events Demo" id="eventsDemo"/>
-                <auradocs:contentsNode text="Firing Aura Events from non-Aura code" id="eventsExternal"/>
+                <auradocs:contentsNode text="Firing Aura Events from Non-Aura code" id="eventsExternal"/>
             </auradocs:contentsNode>
         </auradocs:contentsNode>
 
@@ -143,6 +143,7 @@
                 <auradocs:contentsNode text="Server-Side Renderers" id="renderersServerSide" />
                  <auradocs:contentsNode text="Server-Side Providers" id="oodProviders" />
                 <auradocs:contentsNode text="Aura Integration Service" id="auraIntegrationService"/>
+                <auradocs:contentsNode text="Label Adapters" id="labelAdapter"/>
                 <auradocs:contentsNode text="Custom Converters">
                     <auradocs:contentsNode text="Registering a Custom Converter" id="registerCustomConverter"/>
                     <auradocs:contentsNode text="Converter Interface" id="converterInterface"/>

@@ -39,7 +39,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -343,11 +342,11 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     /**
      * Sets the manifest cookie on response.
-     *
+     * 
      * @param response the response
      * @param value the value to set.
      * @param expiry the expiry time for the cookie.
-     */ 
+     */
     private static void addManifestCookie(HttpServletResponse response, String value, long expiry) {
         String cookieName = getManifestCookieName();
         if (cookieName != null) {
@@ -419,8 +418,8 @@ public abstract class AuraBaseServlet extends HttpServlet {
     }
 
     /**
-     * Gets the UID for the application descriptor of the current context, or
-     * {@code null} if there is no application (probably because of a compile
+     * Gets the UID for the application descriptor of the current context, or {@code null} if there is no application
+     * (probably because of a compile
      * error).
      */
     public static String getContextAppUid() {
@@ -480,9 +479,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
         String ret = "";
 
         if (preloads != null && !preloads.isEmpty()) {
-            boolean serPreloads = context.getSerializePreLoad();
             boolean serLastMod = context.getSerializeLastMod();
-            context.setSerializePreLoad(false);
             context.setSerializeLastMod(false);
             StringBuilder defs = new StringBuilder(contextPath).append("/l/");
             StringBuilder sb = new StringBuilder();
@@ -491,15 +488,14 @@ public abstract class AuraBaseServlet extends HttpServlet {
             } catch (IOException e) {
                 throw new AuraRuntimeException(e);
             }
-            context.setSerializePreLoad(serPreloads);
             context.setSerializeLastMod(serLastMod);
             String contextJson = AuraTextUtil.urlencode(sb.toString());
             defs.append(contextJson);
             defs.append("/app.manifest");
             ret = defs.toString();
-         }
-         return ret;
-     }
+        }
+        return ret;
+    }
 
     protected DefDescriptor<?> setupQuickFix(AuraContext context, boolean preload) {
         DefinitionService ds = Aura.getDefinitionService();
@@ -508,11 +504,11 @@ public abstract class AuraBaseServlet extends HttpServlet {
         try {
             DefDescriptor<?> qfdesc = ds.getDefDescriptor("auradev:quickFixException", ComponentDef.class);
             String uid = mdr.getUid(null, qfdesc);
-            //if (!preload) {
-            //    Set<DefDescriptor<?>> loaded = Sets.newHashSet();
-            //    loaded.addAll(mdr.getDependencies(uid));
-            //    context.setPreloadedDeps(loaded);
-            //}
+            // if (!preload) {
+            // Set<DefDescriptor<?>> loaded = Sets.newHashSet();
+            // loaded.addAll(mdr.getDependencies(uid));
+            // context.setPreloadedDeps(loaded);
+            // }
             context.addLoaded(qfdesc, uid);
             context.setPreloading(qfdesc);
             return qfdesc;

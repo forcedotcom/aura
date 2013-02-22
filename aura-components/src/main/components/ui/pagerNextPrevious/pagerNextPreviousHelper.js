@@ -14,27 +14,31 @@
  * limitations under the License.
  */
 ({
-//    updateDisplay:function (component) {
-//        var currentPage=component.get("v.currentPage");
-//        var pageCount=component.get("v.pageCount");
-//        var isFirstOrEmpty=(currentPage<=1);
-//        var isLast=(currentPage==pageCount);
-//        var triggers={
-//            first:component.find("pager:first").getElement(),
-//            previous:component.find("pager:previous").getElement(),
-//            next:component.find("pager:next").getElement(),
-//            last:component.find("pager:last").getElement()
-//        };
-//        $A.util[isFirstOrEmpty ? "addClass" : "removeClass"](triggers.first,"off");
-//        $A.util[isFirstOrEmpty ? "addClass" : "removeClass"](triggers.previous,"off");
-//        triggers.first.disabled = triggers.previous.disabled = isFirstOrEmpty;
-//        triggers.first.setAttribute("aria-disabled",isFirstOrEmpty);
-//        triggers.previous.setAttribute("aria-disabled", isFirstOrEmpty);
-//
-//        $A.util[isLast ? "addClass" : "removeClass"](triggers.next, "off");
-//        $A.util[isLast ? "addClass": "removeClass"](triggers.last, "off");
-//        triggers.next.disabled = triggers.last.disabled = isLast;
-//        triggers.next.setAttribute("aria-disabled", isLast);
-//        triggers.last.setAttribute("aria-disabled", isLast);
-//    }
+	updateDisplay : function(component) {
+		if (!component.isRendered()) {
+			return;
+		}
+		
+		var currentPage = component.get("v.currentPage");
+		var pageCount = component.get("v.pageCount");
+		var isFirstOrEmpty = (currentPage <= 1);
+		var isLast = (currentPage == pageCount);
+		var triggers = {
+			first : component.find("pager:first").getElement(),
+			previous : component.find("pager:previous").getElement(),
+			next : component.find("pager:next").getElement(),
+			last : component.find("pager:last").getElement()
+		};
+		$A.util[isFirstOrEmpty ? "addClass" : "removeClass"](triggers.first,"off");
+		$A.util[isFirstOrEmpty ? "addClass" : "removeClass"](triggers.previous,"off");
+		triggers.first.disabled = triggers.previous.disabled = isFirstOrEmpty;
+		triggers.first.setAttribute("aria-disabled", isFirstOrEmpty);
+		triggers.previous.setAttribute("aria-disabled", isFirstOrEmpty);
+
+		$A.util[isLast ? "addClass" : "removeClass"](triggers.next, "off");
+		$A.util[isLast ? "addClass" : "removeClass"](triggers.last, "off");
+		triggers.next.disabled = triggers.last.disabled = isLast;
+		triggers.next.setAttribute("aria-disabled", isLast);
+		triggers.last.setAttribute("aria-disabled", isLast);
+	}
 })

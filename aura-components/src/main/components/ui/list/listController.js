@@ -25,7 +25,6 @@
 		console.log("Handling page change:");
 		console.log(" currentPage : " + currentPage);
 		console.log(" pageSize : " + pageSize);
-		helper.logPagers(component);
 		//==
 		
 		helper.triggerDataProvider(component);

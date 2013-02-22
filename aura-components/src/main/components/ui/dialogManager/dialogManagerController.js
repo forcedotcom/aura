@@ -15,16 +15,29 @@
  */
 ({
 
+
     openDialog : function(cmp, evt, hlp) {
-        var dialog = evt.getParam("dialog");
-        cmp.getAttributes().setValue("_activeDialog", dialog);
+
+        var atts       = cmp.getAttributes(),
+            dialog     = evt.getParam("dialog");
+
+        /* if there's already another dialog active, deactivate it first */
+        if (atts.get("_activeDialog")) {
+            hlp.deactivateDialog(atts.get("_activeDialog"), cmp);
+        }
+
         hlp.activateDialog(dialog, cmp);
+
     },
 
+
     closeDialog : function(cmp, evt, hlp) {
+
         var dialog = evt.getParam("dialog");
-        cmp.getAttributes().setValue("_activeDialog", null);
+
         hlp.deactivateDialog(dialog, cmp);
+
     }
+
 
 })

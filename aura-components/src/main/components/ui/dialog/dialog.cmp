@@ -32,7 +32,7 @@
 
     <!-- private attributes -->
     <aura:attribute name="_ariaId" type="String" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The id needed to identify the dialog window to assistive technologies."/>
-    <aura:attribute name="_dialogManager" type="Aura.Component" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The ui:dialogManager component that will control this dialog's display and DOM events."/>
+    <aura:attribute name="_dialogManager" type="Aura.Component" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The ui:dialogManager component that will control this dialog's display, positioning, and DOM events."/>
     <aura:attribute name="_handlerConfig" type="Object" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The map of event handlers that should be applied after rendering (keyup, click, blur, resize)."/>
     <aura:attribute name="_isVisible" type="Boolean" default="{!false}" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. Specifies if the dialog is displayed. To control visibility of the dialog, fire either the ui:openDialog or ui:closeDialog event."/>
 

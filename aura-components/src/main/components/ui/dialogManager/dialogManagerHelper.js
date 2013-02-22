@@ -24,8 +24,6 @@
         managerCmp.getAttributes().setValue("_ready", true);
         evt.fire();
 
-        setTimeout(function(){$A.log(managerCmp.get("v._dialogs"));}, 5000)
-
     },
 
 
@@ -38,6 +36,7 @@
 
         atts.setValue("_handlerConfig", handlerConfig);
         atts.setValue("_isVisible", true);
+        managerCmp.getAttributes().setValue("_activeDialog", dialogCmp);
 
     },
 
@@ -93,29 +92,39 @@
     },
 
 
-    getKeydownHandler : function(dialogCmp, managerCmp, isModal, focusElement, event) {
+    getKeydownHandler : function(dialogCmp, managerCmp, isModal, firstFocusable, event) {
 
         event            = event || window.event;
-        var close        = dialogCmp.find("close").getElement(),
+        var closeLink    = dialogCmp.find("close").getElement(),
             shiftPressed = event.shiftKey,
-            active       = document.activeElement,
-            auraEvent;
+            currentFocus = document.activeElement,
+            closeEvent   = $A.get("e.ui:closeDialog");
+
+        closeEvent.setParams({ dialog : dialogCmp });
 
         switch (event.keyCode) {
-            case 27: // esc key - close dialog
-                auraEvent = $A.get("e.ui:closeDialog");
-                auraEvent.setParams({ dialog : dialogCmp });
-                auraEvent.fire();
+            case 32: // space bar - if "close" link is active, close dialog
+                if (currentFocus !== closeLink) {
+                    break;
+                }
+                // fallthrough to the same behaviour as the escape key
+            case 27: // escape key - close dialog
+                closeEvent.fire();
                 break;
             case 9: // tab key - if modal, keep focus inside the dialog
                 if (isModal) {
-                    if (active === close && !shiftPressed) {
+                    if (currentFocus === closeLink && !shiftPressed) {
                         this.cancelEvent(event);
-                        focusElement.focus();
-                    } else if (active === focusElement && shiftPressed) {
+                        firstFocusable.focus();
+                    } else if (currentFocus === firstFocusable && shiftPressed) {
                         this.cancelEvent(event);
-                        close.focus();
+                        closeLink.focus();
                     }
+                // if not modal, close the dialog when you tab out of it
+                } else if ((currentFocus === closeLink && !shiftPressed) ||
+                    (currentFocus === firstFocusable && shiftPressed)) {
+                    this.cancelEvent(event);
+                    closeEvent.fire();
                 }
                 break;
         }
@@ -143,7 +152,10 @@
 
 
     deactivateDialog : function(dialogCmp, managerCmp) {
+
         dialogCmp.getAttributes().setValue("_isVisible", false);
+        managerCmp.getAttributes().setValue("_activeDialog", null);
+
     }
 
 

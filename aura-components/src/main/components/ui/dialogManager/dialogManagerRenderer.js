@@ -15,12 +15,17 @@
  */
 ({
 
+
     afterRender : function(cmp, hlp) {
+
         var ready = cmp.get("v._ready");
+
         this.superAfterRender(cmp);
         if(!ready) {
             hlp.initialize(cmp);
         }
+
     }
+
 
 })

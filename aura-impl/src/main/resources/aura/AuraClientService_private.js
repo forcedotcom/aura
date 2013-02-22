@@ -262,7 +262,7 @@ var priv = {
             var actionResponses = responseMessage["actions"];
 
             for (var r = 0; r < actionResponses.length; r++) {
-                actionResponse = actionResponses[r];
+                var actionResponse = actionResponses[r];
 
                 var actionGroupNumber;
                 var action;

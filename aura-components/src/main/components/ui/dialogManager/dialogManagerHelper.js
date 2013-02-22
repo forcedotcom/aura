@@ -48,14 +48,17 @@
      */
     activateDialog : function(dialogCmp, managerCmp) {
 
-        var atts            = dialogCmp.getAttributes(),
-            isModal         = atts.getRawValue("isModal"),
-            clickOutToClose = atts.getRawValue("clickOutToClose"),
+        var dialogAtts      = dialogCmp.getAttributes(),
+            isModal         = dialogAtts.getRawValue("isModal"),
+            clickOutToClose = dialogAtts.getRawValue("clickOutToClose"),
+            managerAtts     = managerCmp.getAttributes(),
+            currentlyActive = managerAtts.get("_activeDialogs"),
             handlerConfig   = this.getHandlerConfig(dialogCmp, isModal, clickOutToClose, managerCmp);
 
-        atts.setValue("_handlerConfig", handlerConfig);
-        atts.setValue("_isVisible", true);
-        managerCmp.getAttributes().setValue("_activeDialog", dialogCmp);
+        dialogAtts.setValue("_handlerConfig", handlerConfig);
+        dialogAtts.setValue("_isVisible", true);
+        currentlyActive.push(dialogCmp);
+        managerAtts.setValue("_activeDialogs", currentlyActive);
 
     },
 
@@ -71,15 +74,25 @@
      */
     deactivateDialog : function(dialogCmp, managerCmp) {
 
+        var managerAtts     = managerCmp.getAttributes(),
+            currentlyActive = managerAtts.get("_activeDialogs"),
+            length          = currentlyActive.length;
+
+        for (var i=0; i<length; i++) {
+            if (dialogCmp === currentlyActive[i]) {
+                currentlyActive.splice(i,1);
+                managerAtts.setValue("_activeDialogs", currentlyActive);
+                break;
+            }
+        }
         dialogCmp.getAttributes().setValue("_isVisible", false);
-        managerCmp.getAttributes().setValue("_activeDialog", null);
 
     },
 
 
     /**
      * Builds the appropriate DOM event handlers necessary to interact with the
-     * active ui:dialog component, as well as references to the document's currently
+     * active ui:dialog component, as well as references to the document's previously
      * focused element (before the dialog opens), and the first focusable element
      * inside the dialog.
      * 
@@ -113,7 +126,8 @@
      * Retrieves the first focusable element inside the active dialog component. Should
      * ALWAYS return a non-null value (unless using IE7 - see note), as the
      * "x" (i.e. dialog close) link should always be visible and positioned as the very
-     * last element in the dialog window.
+     * last element in the dialog window. (Having a known element as the last item
+     * in the dialog makes keyboard management much easier.)
      *
      * NOTE: This method uses querySelectorAll(), which IE7 doesn't like, but it's not
      * a mission-critical feature to auto-focus on the first element in the dialog, so
@@ -175,12 +189,13 @@
         closeEvent.setParams({ dialog : dialogCmp });
 
         switch (event.keyCode) {
-            case 32: // space bar - if "close" link is active, close dialog
+            case 32: // space bar - if "close" link is active, allow space bar can trigger it
                 if (currentFocus !== closeLink) {
                     break;
                 }
-                // fallthrough to the same behaviour as the escape key
-            case 27: // escape key - close dialog
+                // fallthrough here is intentional - same behaviour as the escape key
+            case 27: // escape key - always closes all dialogs
+                this.cancelEvent(event);
                 closeEvent.fire();
                 break;
             case 9: // tab key - if modal, keep focus inside the dialog
@@ -192,11 +207,13 @@
                         this.cancelEvent(event);
                         closeLink.focus();
                     }
-                // if not modal, close the dialog when you tab out of it
-                } else if ((currentFocus === closeLink && !shiftPressed) ||
-                    (currentFocus === firstFocusable && shiftPressed)) {
-                    this.cancelEvent(event);
-                    closeEvent.fire();
+                // if not modal, close the dialog when you tab out of it (unless you allow multiple active dialogs)
+                } else if (!managerCmp.get("v.allowMultipleActiveDialogs")) {
+                    if ((currentFocus === closeLink && !shiftPressed) ||
+                        (currentFocus === firstFocusable && shiftPressed)) {
+                        this.cancelEvent(event);
+                        closeEvent.fire();
+                    }
                 }
                 break;
         }

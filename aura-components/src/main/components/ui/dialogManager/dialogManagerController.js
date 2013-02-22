@@ -22,12 +22,17 @@
      */
     openDialog : function(cmp, evt, hlp) {
 
-        var atts       = cmp.getAttributes(),
-            dialog     = evt.getParam("dialog");
+        var atts          = cmp.getAttributes(),
+            allowMultiple = atts.get("allowMultipleActiveDialogs"),
+            activeDialogs = atts.get("_activeDialogs"),
+            length        = activeDialogs.length,
+            dialog        = evt.getParam("dialog");
 
-        /* if there's already another dialog active, deactivate it first */
-        if (atts.get("_activeDialog")) {
-            hlp.deactivateDialog(atts.get("_activeDialog"), cmp);
+        /* if we don't allow multiple active dialogs, or the dialog is modal, deactivate all the old ones */
+        if (!allowMultiple || dialog.get("v.isModal")) {
+            for (var i=0; i<length; i++) {
+                hlp.deactivateDialog(activeDialogs[i], cmp);
+            }
         }
 
         hlp.activateDialog(dialog, cmp);

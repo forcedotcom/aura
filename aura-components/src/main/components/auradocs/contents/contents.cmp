@@ -132,6 +132,7 @@
                     <auradocs:contentsNode text="Dynamically Creating Components" id="dynamicCmp" />
                     <auradocs:contentsNode text="Finding Components by ID" id="findById" />
                     <auradocs:contentsNode text="Dynamically Showing or Hiding Markup" id="hideMarkup" />
+                    <auradocs:contentsNode text="Invoking Actions on Component Initialization" id="initHandler" />
                 </auradocs:contentsNode>
             </auradocs:contentsNode>
 

@@ -25,8 +25,6 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
-import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -34,8 +32,6 @@ import org.openqa.selenium.WebElement;
 /**
  * Tests to verify that users can add missing attributes to components via QuickFixes through the browser.
  */
-// TODO(W-1510267): QuickFix buttons do not show up in IE9
-@ExcludeBrowsers({ BrowserType.IE9 })
 // Unadaptable since does not function properly when running from jars
 @UnAdaptableTest
 public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
@@ -124,7 +120,7 @@ public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
     }
 
     private void setAttributeNameType(String name, String type) {
-    	By nameCssPath = By.cssSelector("input[name='attName']");
+        By nameCssPath = By.cssSelector("input[name='attName']");
         WebElement nameTextBox = getDriver().findElement(nameCssPath);
         nameTextBox.click();
         nameTextBox.clear();

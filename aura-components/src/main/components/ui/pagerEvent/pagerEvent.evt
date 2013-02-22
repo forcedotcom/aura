@@ -16,8 +16,6 @@
 
 -->
 <aura:event type="COMPONENT" support="GA" description="The standard event object that is fired for paging events.">
-    <aura:attribute name="type" type="String"          description="The type of event that was fired."/>
-    <aura:attribute name="context" type="Object"       description="Context relevant to the execution of the event."/>
     <aura:attribute name="pageSize" type="Integer"     description="The desired pageSize to be set."/>
     <aura:attribute name="currentPage" type="Integer"  description="The desired page to be set."/>
 </aura:event>

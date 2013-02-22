@@ -14,88 +14,94 @@
  * limitations under the License.
  */
 ({
-    changePage:function(component,targetPage,domEvent){
-        targetPage=parseInt(targetPage,10);
-        var pageCount=parseInt(component.get("v.pageCount"),10);
-        if(isNaN(targetPage)||isNaN(pageCount)||targetPage>pageCount)return false;
-        var pageSize= parseInt(component.get("v.pageSize"), 10);
-        this.fireEvent(component,"changePage",{page:targetPage,pageSize:pageSize},domEvent);
-        component.getValue("v.currentPage").setValue(targetPage);
-        return true;
-    },
+	changePage : function(component, targetPage, domEvent) {
+		targetPage = parseInt(targetPage, 10);
+		var pageCount = parseInt(component.get("v.pageCount"), 10);
+		if (isNaN(targetPage) || isNaN(pageCount) || targetPage > pageCount) {
+			return false;
+		}
 
-    changePageSize:function (component, targetPageSize, domEvent) {
-        targetPageSize=parseInt(targetPageSize,10);
-        if (isNaN(targetPageSize))return false;
-        var pageSize= parseInt(component.getValue("v.pageSize"),10);
-        if(pageSize==targetPageSize)return false;
-        var targetPage = 1;
-        this.fireEvent(component,"changePageSize", {page:targetPage,pageSize:targetPageSize}, domEvent);
-        component.getValue("v.currentPage").setValue(targetPage);
-        component.getValue("v.pageSize").setValue(targetPageSize);
-        return true;
-    },
+		var pageSize = parseInt(component.get("v.pageSize"), 10);
 
-    fireEvent:function(component,eventType,pageData,domEvent){
-        if(domEvent&&domEvent.preventDefault)domEvent.preventDefault();
-        var pageEvent = component.getEvent("onPageChange");
-        pageEvent.setParams({
-            type:eventType,
-            context:{
-                source:component,
-                event:domEvent,
-                helper:this
-            },
-            currentPage:pageData&&pageData.page||1,
-            pageSize:pageData&&pageData.pageSize||0
-        }).fire();
-    },
+		this.firePageChangeEvent(component, {
+			page : targetPage,
+			pageSize : pageSize
+		}, domEvent);
 
-    updateCalculatedFields:function(component){
-        component=component.getConcreteComponent();
-        var pageSize = component.get("v.pageSize") || 0;
-        var totalItems = parseInt(component.get("v.totalItems"),10);
-//        if (pageSize > 0) {
-//            var pageCount=component.getValue("v.pageCount");
-//            var newPageCount=Math.ceil(totalItems / pageSize);
-//            if(!isNaN(newPageCount)&&pageCount.getValue()!=newPageCount){
-//                pageCount.setValue(newPageCount);
-//            }
-//        }else{
-//            component.getValue("v.pageCount").setValue(1);
-//            pageSize=totalItems;
-//        }
-//        if(totalItems>0){
-//            var endIndex = (component.get("v.currentPage") * pageSize) - 1;
-//            var startIndex = Math.max(0, endIndex - pageSize + 1);
-//            component.getValue("v.startIndex").setValue(startIndex);
-//            component.getValue("v.endIndex").setValue(Math.min(endIndex, totalItems - 1));
-//        }else{
-//            component.getValue("v.currentPage").setValue(0,true);
-//            component.getValue("v.startIndex").setValue(-1);
-//            component.getValue("v.endIndex").setValue(-1);
-//        }
-        var updateDisplay=component.getDef().getHelper().updateDisplay;
-        if(updateDisplay)updateDisplay.call(component,component);
-    },
+		component.getValue("v.currentPage").setValue(targetPage);
+		
+		this.updateCalculatedFields(component);
+		
+		return true;
+	},
 
-    // IObserver Members
-    addObservers:function (component, actionDelegate, propertyList) {
-        component=component.getConcreteComponent();
-        var attributes = propertyList.join(',');
-        var attribute = null;
-        for (var i = 0; i < propertyList.length; i++) {
-            attribute = component.getValue("v." + propertyList[i]);
-            attribute.setValue = this.setValueObserver.bind(this, component, attributes, attribute, attribute.setValue.bind(attribute), actionDelegate);
-        }
-    },
+	changePageSize : function(component, targetPageSize, domEvent) {
+		targetPageSize = parseInt(targetPageSize, 10);
+		if (isNaN(targetPageSize)) {
+			return false;
+		}
 
-    setValueObserver:function (component, attributes, attribute, setValueDelegate, actionDelegate, value, skipObserver) {
-        if(attribute.unwrap()===value)return;
-        setValueDelegate(value);
-        if(!component.observerTimers)component.observerTimers = [];
-        if(component.observerTimers[attributes])clearTimeout(component.observerTimers[attributes]);
-        if(!skipObserver)component.observerTimers[attributes] = setTimeout(actionDelegate.bind(this, component), 13);
-    }
+		var pageSize = parseInt(component.getValue("v.pageSize"), 10);
+		if (pageSize == targetPageSize) {
+			return false;
+		}
 
+		var targetPage = 1;
+		this.firePageChangeEvent(component, {
+			page : targetPage,
+			pageSize : targetPageSize
+		}, domEvent);
+
+		component.getValue("v.currentPage").setValue(targetPage);
+		component.getValue("v.pageSize").setValue(targetPageSize);
+		
+		this.updateCalculatedFields(component);
+
+		return true;
+	},
+
+	firePageChangeEvent : function(component, pageData, domEvent) {
+		if (domEvent && domEvent.preventDefault) {
+			domEvent.preventDefault();
+		}
+
+		var pageEvent = component.getEvent("onPageChange");
+		pageEvent.setParams({
+			currentPage : pageData && pageData.page || 1,
+			pageSize : pageData && pageData.pageSize || 0
+		}).fire();
+	},
+
+	updateCalculatedFields : function(component) {
+		component = component.getConcreteComponent();
+		
+		var pageSize = component.get("v.pageSize") || 0;
+		var totalItems = parseInt(component.get("v.totalItems"), 10);
+		if (pageSize > 0) {
+			var pageCount = component.getValue("v.pageCount");
+			var newPageCount = Math.ceil(totalItems / pageSize);
+			if (!isNaN(newPageCount) && pageCount.getValue() != newPageCount) {
+				pageCount.setValue(newPageCount);
+			}
+		} else {
+			component.getValue("v.pageCount").setValue(1);
+			pageSize = totalItems;
+		}
+		if (totalItems > 0) {
+			var endIndex = (component.get("v.currentPage") * pageSize) - 1;
+			var startIndex = Math.max(0, endIndex - pageSize + 1);
+			component.getValue("v.startIndex").setValue(startIndex);
+			component.getValue("v.endIndex").setValue(
+					Math.min(endIndex, totalItems - 1));
+		} else {
+			component.getValue("v.currentPage").setValue(0, true);
+			component.getValue("v.startIndex").setValue(-1);
+			component.getValue("v.endIndex").setValue(-1);
+		}
+		
+		var updateDisplay = component.getDef().getHelper().updateDisplay;
+		if (updateDisplay) {
+			updateDisplay.call(component, component);
+		}
+	}
 })

@@ -17,6 +17,8 @@
  	init: function(component) {
  		this.initDataProvider(component);
  		this.initPagers(component);
+ 		
+ 		this.triggerDataProvider(component);
 	},
 
 	initDataProvider: function(component) {
@@ -25,7 +27,7 @@
 		if (dataProvider && dataProvider.length && dataProvider.length > 0) {
 			dataProvider = dataProvider[0];
 			dataProvider.addHandler("onchange", component, "c.handleDataChange");
-			dataProvider.get("e.provide").fire();
+			component._dataProvider = dataProvider;
 		}		
 	},
 	
@@ -48,9 +50,49 @@
 			});
         }
 		
-		// add handlers to each
-		for (var j=0, len=pagers.length; j<len; j++) {
-			pagers[j].addHandler("onPageChange", component, "c.handlePageChange");
+		// wireup handlers and values
+		var chainedAttrs = ["currentPage", "pageSize", "totalItems"];
+		var j = pagers.length;
+		while (j--) {
+			var pager = pagers[j];
+			pager.addHandler("onPageChange", component, "c.handlePageChange");
+			
+//			TODO: need to get this working so that the expressions are actually chained and all point back to the same underlying value
+//				  (like they would be via markup)
+//			var k = chainedAttrs.length;
+//			while (k--) {
+//				var exp = "v." + chainedAttrs[k];
+//				pager.getValue(exp).setValue(component.getValue(exp));	
+//			}
+		}
+		
+		// cache the pagers
+		component._pagers = pagers;
+	},
+	
+	triggerDataProvider: function(component) {
+		//==
+		console.log("Triggering data provider:");
+		console.log("  currentPage : " + component._dataProvider.get("v.currentPage"));
+		//==
+		component._dataProvider.get("e.provide").fire();
+	},
+	
+	logPagers: function(component) {
+		var pagers = component._pagers;
+		if (!pagers) { return; }
+		
+		var i = pagers.length;
+		
+		var attrs = ["currentPage", "pageCount", "pageSize", "totalItems", "startIndex", "endIndex"];
+		
+		while (i--) {
+			console.log(pagers[i].getDef().toString());
+			
+			j = attrs.length;
+			while (j--) {
+				console.log("  " + attrs[j] + " : " + pagers[i].get("v."+attrs[j]));	
+			}
 		}
 	}
 })

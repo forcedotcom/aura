@@ -15,7 +15,10 @@
  */
 ({
     updateDisplay:function (component) {
-        component.find("pager:pageSize").getElement().value = component.get("v.pageSize");
+    	// TODO: this whole function should go away if we switch this cmp to use ui:inputSelect
+    	var el = component.find("pager:pageSize").getElement(); 
+        if (el) {
+        	el.value = component.get("v.pageSize");
+        }
     }
-
 })

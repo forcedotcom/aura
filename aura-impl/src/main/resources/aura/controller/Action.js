@@ -441,9 +441,9 @@ Action.prototype.sanitizeStoredResponse = function(response) {
 };
 
 /**
- * Gets the Action stroage.
+ * Gets the Action storage.
  * @private
- * @returns {Stroage}
+ * @returns {Storage}
  */
 Action.prototype.getStorage = function() {
     return $A.storageService.getStorage("actions");

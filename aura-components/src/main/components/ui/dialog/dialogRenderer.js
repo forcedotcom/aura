@@ -21,6 +21,37 @@
         var title = cmp.find("title");
         this.superAfterRender(cmp);
         /*cmp.getAttributes().setValue("_ariaId", title.toString());*/
+    },
+
+    rerender : function(cmp) {
+
+        var isVisible = cmp.get("v._isVisible"),
+            config    = cmp.get("v._handlerConfig"),
+            autoFocus = cmp.get("v.autoFocus"),
+            isModal   = cmp.get("v.isModal"),
+            dialog    = cmp.find("dialog").getElement(),
+            close     = cmp.find("close").getElement();
+
+        this.superRerender(cmp);
+
+        if (config && dialog && close) {
+            if (isVisible) {
+                $A.util.on(document, "keydown", config.keydownHandler, false);
+                $A.util.on(document, "click", config.clickHandler, false);
+                $A.util.on(window, "resize", config.resizeHandler, false);
+                if ((autoFocus || isModal) && config.newFocus) {
+                    config.newFocus.focus();
+                }
+            } else {
+                $A.util.removeOn(document, "keydown", config.keydownHandler, false);
+                $A.util.removeOn(document, "click", config.clickHandler, false);
+                $A.util.removeOn(window, "resize", config.resizeHandler, false);
+                if (config.oldFocus) {
+                    config.oldFocus.focus();
+                }
+            }
+        }
+
     }
 
 })

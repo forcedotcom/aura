@@ -17,9 +17,10 @@
 -->
 <aura:component extensible="true" support="GA" description="Manages all instances of ui:dialog in an application, by handling visibility and all DOM events. One (and only one) instance of this component is required if you wish to use the ui:dialog component.">
 
+    <!-- TODO: how do we handle ui:dialog instances that are created dynamically, after the ui:dialogManagerReady event is fired? -->
+
     <!-- private attributes -->
     <aura:attribute name="_activeDialog" type="Aura.Component" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The currently active (i.e. displayed) ui:dialog component."/>
-    <aura:attribute name="_activeHandlers" type="Object" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. JS object that holds the active dialog's event handlers (for removal when the dialog closes)."/>
     <aura:attribute name="_dialogs" type="Aura.Component[]" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. Map of dialog components managed by this manager."/>
     <aura:attribute name="_ready" type="Boolean" default="{!false}" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. Specifies whether the dialogManager has been initialized."/>
 

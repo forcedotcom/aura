@@ -21,10 +21,11 @@
     <aura:attribute name="ariaRole" type="String" default="dialog" description="The ARIA role assigned to the dialog's outermost &lt;div&gt; wrapper. Valid values are 'dialog' and 'alertdialog'. Use 'dialog' when there are one or more form fields present in your dialog. Use 'alertdialog' when there is only text and confirmation and/or cancel buttons."/>
     <aura:attribute name="autoFocus" type="Boolean" default="{!true}" description="Automatically focus on the first focusable element when the dialog is displayed."/>
     <aura:attribute name="buttons" type="Aura.Component[]" description="Buttons that should be displayed at the bottom of the dialog (e.g., 'Save', 'Cancel', etc.)."/>
-    <aura:attribute name="clickOutToClose" type="Boolean" default="{!true}" description="Specifies if the dialog should be closed when any element outside the dialog is clicked."/>
+    <!-- clickOutToClose isn't working right now, because ui:press is being fired AFTER ui:openDialog ... needs fixed -->
+    <!--<aura:attribute name="clickOutToClose" type="Boolean" default="{!true}" description="Specifies if the dialog should be closed when any element outside the dialog is clicked."/>-->
     <aura:attribute name="closeTitle" type="String" default="Close this window" description="The title attribute of the 'close' link."/>
     <aura:attribute name="dialogClass" type="String" description="Additional CSS classes to apply to the dialog's outermost &lt;div&gt; wrapper."/>
-    <aura:attribute name="isModal" type="Boolean" default="{!false}" description="Specifies if the dialog is modal (i.e., the dialog's contents are the only focusable/actionable items on the page when the dialog is open)."/>
+    <aura:attribute name="isModal" type="Boolean" default="{!true}" description="Specifies if the dialog is modal (i.e., the dialog's contents are the only focusable/actionable items on the page when the dialog is open)."/>
     <aura:attribute name="maskClass" type="String" description="Additional CSS classes to apply to the window mask located behind a modal dialog."/>
     <aura:attribute name="title" type="String" description="The title displayed in the dialog's header. Required for accessibility." required="{!true}"/>
     <aura:attribute name="titleDescription" type="String" description="Instructional information about the purpose of the dialog. This text will not be visible on-screen, but still readable by assistive technologies."/>
@@ -32,6 +33,7 @@
     <!-- private attributes -->
     <aura:attribute name="_ariaId" type="String" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The id needed to identify the dialog window to assistive technologies."/>
     <aura:attribute name="_dialogManager" type="Aura.Component" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The ui:dialogManager component that will control this dialog's display and DOM events."/>
+    <aura:attribute name="_handlerConfig" type="Object" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The map of event handlers that should be applied after rendering (keyup, click, blur, resize)."/>
     <aura:attribute name="_isVisible" type="Boolean" default="{!false}" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. Specifies if the dialog is displayed. To control visibility of the dialog, fire either the ui:openDialog or ui:closeDialog event."/>
 
     <!-- events -->
@@ -51,7 +53,7 @@
     </aura:if>
 
     <!-- dialog container -->
-    <div aura:id="dialog" class="{!'dialog' + (v._isVisible ? ' ' : ' hidden ') + v.dialogClass}" role="{!v.ariaRole}" aria-live="assertive" aria-atmoic="true" aria-labelledby="{!v._ariaId}">
+    <div aura:id="dialog" class="{!'dialog' + (v._isVisible ? ' ' : ' hidden ') + v.dialogClass + (v.isModal ? ' modal ' : ' ')}" role="{!v.ariaRole}" aria-live="assertive" aria-atmoic="true" aria-labelledby="{!v._ariaId}">
 
         <!-- header -->
         <h2 aura:id="title" class="title">{!v.title}<span class="assistiveText"> {!v.titleDescription}</span></h2>

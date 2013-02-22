@@ -15,7 +15,7 @@
  */
 ({
 
-    /* app-level event handlers */
+    /* handler for application event ui:dialogManagerReady */
     registerDialog : function(cmp, evt, hlp) {
         var manager = evt.getParam("manager"),
             dialogs = manager.get("v._dialogs");

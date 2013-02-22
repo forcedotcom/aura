@@ -16,17 +16,15 @@
 ({
 
     openDialog : function(cmp, evt, hlp) {
-        // TODO: wire up all the events for accessibility
         var dialog = evt.getParam("dialog");
         cmp.getAttributes().setValue("_activeDialog", dialog);
         hlp.activateDialog(dialog, cmp);
     },
 
     closeDialog : function(cmp, evt, hlp) {
-        // TODO: clean up all the events
         var dialog = evt.getParam("dialog");
-        dialog.getAttributes().setValue("_isVisible", false);
         cmp.getAttributes().setValue("_activeDialog", null);
+        hlp.deactivateDialog(dialog, cmp);
     }
 
 })

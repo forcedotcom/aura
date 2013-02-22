@@ -16,8 +16,11 @@
 .uiDialog.hidden{
     display:none;
 }
-.uiDialog.mask,
 .uiDialog.dialog{
+    position:absolute;
+}
+.uiDialog.mask,
+.uiDialog.modal{
     position:fixed;
     z-index:99999;
 }
@@ -33,14 +36,16 @@
     /* actual screen positioning will be done by the component helper on display, based on content dimensions */
     min-width:300px;    /* default */
     min-height:150px;   /* default */
-    top:33%;            /* default */
-    margin-top:-75px;   /* default */
-    left:50%;           /* default */
-    margin-left:-150px; /* default */
     background-color:#FFF;
     overflow:hidden;
     border-radius:3px;
     box-shadow:0 0 20px #000;
+}
+.uiDialog.modal{
+    top:33%;            /* default */
+    margin-top:-75px;   /* default */
+    left:50%;           /* default */
+    margin-left:-150px; /* default */
 }
 .uiDialog .title{
     height:1.78em;

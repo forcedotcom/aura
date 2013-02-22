@@ -15,98 +15,136 @@
  */
 ({
 
+
     initialize : function(managerCmp) {
+
         var evt = $A.get("e.ui:dialogManagerReady");
+
         evt.setParams({ manager : managerCmp });
         managerCmp.getAttributes().setValue("_ready", true);
         evt.fire();
+
+        setTimeout(function(){$A.log(managerCmp.get("v._dialogs"));}, 5000)
+
     },
+
 
     activateDialog : function(dialogCmp, managerCmp) {
-        var atts = dialogCmp.getAttributes(),
-            isModal = atts.getRawValue("isModal"),
+
+        var atts            = dialogCmp.getAttributes(),
+            isModal         = atts.getRawValue("isModal"),
             clickOutToClose = atts.getRawValue("clickOutToClose"),
-            autoFocus = atts.getRawValue("autoFocus");
-        this.addHandlers(dialogCmp, isModal, clickOutToClose, managerCmp);
-        dialogCmp.getAttributes().setValue("_isVisible", true);
-        if(autoFocus) {
-            // TODO: the dialog isn't displayed yet at this point, so focusing does nothing. need to fix.
-            this.setFocusOnFirstField(dialogCmp.find("content").getElement());
-        }
+            handlerConfig   = this.getHandlerConfig(dialogCmp, isModal, clickOutToClose, managerCmp);
+
+        atts.setValue("_handlerConfig", handlerConfig);
+        atts.setValue("_isVisible", true);
+
     },
 
-    addHandlers : function(dialogCmp, isModal, clickOutToClose, managerCmp) {
-        var self          = this,
-            keyupHandler  =                   function(event) { self.handleKeyUp(dialogCmp, managerCmp, event) },
-            blurHandler   = isModal         ? function(event) { self.handleBlur(dialogCmp, managerCmp, isModal, event)} : null,
-            /* ui:press is being fired AFTER ui:openDialog, so the ordering is fucked here. need to fix this */
-            clickHandler  = /*clickOutToClose ? function(event) { self.handleClick(dialogCmp, managerCmp, clickOutToClose, event) } :*/ null,
-            resizeHandler = isModal         ? function(event) { self.handleResize(dialogCmp, managerCmp, event)} : null,
-            allHandlers   = {
-                keyup  : keyupHandler,
-                blur   : blurHandler,
-                click  : clickHandler,
-                resize : resizeHandler
-            };
-        managerCmp.getAttributes().setValue("_activeHandlers", allHandlers);
-        $A.log(managerCmp.get("v._activeHandlers"));
-        $A.util.on(dialogCmp.find("dialog").getElement(), "keyup", keyupHandler, false);
-        $A.util.on(dialogCmp.find("close").getElement(), "blur", blurHandler, false);
-        $A.util.on(document, "click", clickHandler, false);
-        $A.util.on(window, "resize", resizeHandler, false);
+
+    getHandlerConfig : function(dialogCmp, isModal, clickOutToClose, managerCmp) {
+
+        var self     = this,
+            oldFocus = document.activeElement,
+            newFocus = this.getFocusElement(dialogCmp),
+            keydown  = function(event) { self.getKeydownHandler(dialogCmp, managerCmp, isModal, newFocus, event) },
+            click    = function(event) { self.getClickHandler(dialogCmp, managerCmp, isModal, clickOutToClose, event) },
+            resize   = function(event) { self.getResizeHandler(dialogCmp, managerCmp, isModal, event)};
+
+        return {
+            oldFocus       : oldFocus,
+            newFocus       : newFocus,
+            keydownHandler : keydown,
+            clickHandler   : click,
+            resizeHandler  : resize,
+        };
+
     },
 
-    handleKeyUp : function(dialogCmp, managerCmp, event) {
-        
-    },
 
-    handleBlur : function(dialogCmp, managerCmp, isModal, event) {
-        
-    },
+    getFocusElement : function(dialogCmp) {
 
-    /* ui:press is being fired AFTER ui:openDialog, so the ordering is fucked here. need to fix this */
-    handleClick : function(dialogCmp, managerCmp, clickOutToClose, event) {
-        var e = event || window.event,
-            target = e.target || e.srcElement,
-            dialog = dialogCmp.find("dialog").getElement(),
-            auraEvent;
-        $A.log(target);
-        var clickedInsideDialog = $A.util.contains(dialog, target);
-        if(clickOutToClose && !clickedInsideDialog) {
-            auraEvent = $A.get("e.ui:closeDialog");
-            auraEvent.setParams({
-                dialog : dialogCmp
-            });
-            auraEvent.fire();
-        }
-    },
+        var container    = dialogCmp.find("dialog").getElement(),
+            formElements = [],
+            length       = 0,
+            element      = null;
 
-    handleResize : function(dialogCmp, managerCmp, event) {
-        
-    },
-
-    /* won't work in IE7 because of querySelectorAll */
-    setFocusOnFirstField : function(container) {
-        var formFields = [],
-            length = 0;
-        if(!container) {
-            $A.assert(false, "Tried to set focus on first available field, but no container was specified.");
-        } else if(document.querySelectorAll) {
-            formFields = container.querySelectorAll("input,button,a,textarea,select");
-            length = formFields.length;
-            if(length > 0) {
-                for(var i=0; i<length; i++) {
-                    if(!formFields[i].disabled) {
-                        formFields[i].focus();
+        if (!container) {
+            $A.assert(false, "You must specify a container element in which to search for a focusable element.");
+        } else if (document.querySelectorAll) {
+            /* NOTE: will not work in IE7, as it does not support querySelectorAll() */
+            formElements = container.querySelectorAll("input,button,a,textarea,select");
+            length = formElements.length;
+            if (length > 0) {
+                for (var i=0; i<length; i++) {
+                    if (!formElements[i].disabled && formElements[i].type != "hidden") {
+                        element = formElements[i];
                         break;
                     }
                 }
+            } else {
+                /* we should never get here - at a minimum, the "close" link should always be present */
+                $A.assert(false, "No focusable element found, which is super effed up.");
             }
+        }
+
+        return element;
+
+    },
+
+
+    getKeydownHandler : function(dialogCmp, managerCmp, isModal, focusElement, event) {
+
+        event            = event || window.event;
+        var close        = dialogCmp.find("close").getElement(),
+            shiftPressed = event.shiftKey,
+            active       = document.activeElement,
+            auraEvent;
+
+        switch (event.keyCode) {
+            case 27: // esc key - close dialog
+                auraEvent = $A.get("e.ui:closeDialog");
+                auraEvent.setParams({ dialog : dialogCmp });
+                auraEvent.fire();
+                break;
+            case 9: // tab key - if modal, keep focus inside the dialog
+                if (isModal) {
+                    if (active === close && !shiftPressed) {
+                        this.cancelEvent(event);
+                        focusElement.focus();
+                    } else if (active === focusElement && shiftPressed) {
+                        this.cancelEvent(event);
+                        close.focus();
+                    }
+                }
+                break;
+        }
+
+    },
+
+
+    cancelEvent : function(event) {
+        event.stopPropagation();
+        event.cancelBubble = true;
+        event.preventDefault();
+    },
+
+
+    getClickHandler : function(dialogCmp, managerCmp, isModal, clickOutToClose, event) {
+        // TODO: need to figure out how to deal w/ ui:press firing AFTER ui:openDialog first
+    },
+
+
+    getResizeHandler : function(dialogCmp, managerCmp, isModal, event) {
+        if (isModal) {
+            
         }
     },
 
+
     deactivateDialog : function(dialogCmp, managerCmp) {
-        $A.log("Deactivating " + dialogCmp.toString());
+        dialogCmp.getAttributes().setValue("_isVisible", false);
     }
+
 
 })

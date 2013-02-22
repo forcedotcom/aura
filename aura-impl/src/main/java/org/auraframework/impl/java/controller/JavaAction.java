@@ -221,6 +221,7 @@ public class JavaAction implements StorableAction {
     @Override
     public void setStorable() {
         storable = true;
+        setId("s");
     }
 
     @Override

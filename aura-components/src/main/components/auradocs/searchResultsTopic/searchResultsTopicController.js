@@ -124,6 +124,7 @@
 		s[78]= "Collection Types^attrTypesCollection^This table lists the supported type values for collection types.^list, map, set";
 		s[79]= "Custom Java Class Types^attrTypesJava^A aura:attribute can have a type corresponding to a Java class...^list, Java type, JsonSerializable, JSON";
 		s[80]= "Aura-Specific Types^attrTypesAuraSpecific^This table lists the supported type values for types that are specific to Aura...^Aura.Component, Aura.Action, action type, component type";
+		s[94]= "Setting Label Parameters^labelParameters^The aura:label component accepts parameters, allowing you to provide different values for the labels. This can be useful for localizing your labels...^$Label, label provider"
 		
 		//Quick Start
 		s[81]= "Create an Aura App from the Command Line^qsCmdLine^You can generate a basic Aura app quickly using the command line...^maven, archetype, aura template, jetty";

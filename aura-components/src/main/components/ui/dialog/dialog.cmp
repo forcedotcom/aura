@@ -40,13 +40,6 @@
     <aura:registerEvent name="close" type="ui:closeDialog" description="Event fired when the dialog window requests to close itself."/>
     <aura:handler event="ui:dialogManagerReady" action="{!c.registerDialog}"/>
 
-<!--
-    <aura:attribute name="priv_clickHandler" type="Object" description="Private attribute. Reference to the closure for click handling"/>
-    <aura:attribute name="priv_keyHandler" type="Object" description="Private attribute. Reference to the closure for key handling"/>
-    <aura:attribute name="priv_focusHandler" type="Object" description="Private attribute. Reference to the closure for focus handling"/>
-    <aura:attribute name="priv_resizeHandler" type="Object" description="Private attribute. Reference to the closure for resize handling"/>
-    TODO Create a window manager component to allow for the modal version to have a window context and component-->
-
     <!-- modal background -->
     <aura:if isTrue="{!v.isModal}">
         <div aura:id="mask" class="{!'mask' + (v._isVisible ? ' ' : ' hidden ') + v.maskClass}"></div>
@@ -66,7 +59,7 @@
             <div class="buttons">{!v.buttons}</div>
         </aura:if>
 
-        <!-- close ("x") link - this DOM placement is intentional. DO NOT move, hide, or remove this element. see dialogManagerHelper.addHandlers() for more info -->
+        <!-- close ("x") link - this DOM placement is intentional. DO NOT move, hide, or remove this element. see dialogManagerHelper.getFocusElement() for more info -->
         <a aura:id="close" class="close" href="javascript:void(0);" title="{!v.closeTitle}" onclick="{!c.closeDialog}">X</a>
 
     </div>

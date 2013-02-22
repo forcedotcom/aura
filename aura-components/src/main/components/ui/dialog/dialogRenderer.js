@@ -15,14 +15,26 @@
  */
 ({
 
+
+    /**
+     * Ensures that the proper ARIA role attribute is defined for the
+     * dialog component. Also ties the <h2> tag in the dialog header
+     * to the dialog container using aria-labelledby.
+     */
     afterRender : function(cmp) {
-        // TODO: attach the title to the dialog w/ aria-labelledby
+
         // TODO: fix the "ariaRole" attribute, if necessary
-        var title = cmp.find("title");
+        // TODO: attach the title to the dialog w/ aria-labelledby
         this.superAfterRender(cmp);
-        /*cmp.getAttributes().setValue("_ariaId", title.toString());*/
+
     },
 
+
+    /**
+     * Applies/removes event handlers to/from various DOM elements for
+     * proper interaction semantics. Handlers are applied upon dialog
+     * activation, and removed upon dialog deactivation.
+     */
     rerender : function(cmp) {
 
         var isVisible = cmp.get("v._isVisible"),
@@ -35,6 +47,7 @@
         this.superRerender(cmp);
 
         if (config && dialog && close) {
+            // if the dialog is active, add the handlers & apply focus to the appropriate element
             if (isVisible) {
                 $A.util.on(document, "keydown", config.keydownHandler, false);
                 $A.util.on(document, "click", config.clickHandler, false);
@@ -42,6 +55,7 @@
                 if ((autoFocus || isModal) && config.newFocus) {
                     config.newFocus.focus();
                 }
+            // if the dialog is inactive, remove the handlers & return focus to the previously focused element
             } else {
                 $A.util.removeOn(document, "keydown", config.keydownHandler, false);
                 $A.util.removeOn(document, "click", config.clickHandler, false);
@@ -53,5 +67,6 @@
         }
 
     }
+
 
 })

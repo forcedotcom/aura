@@ -16,6 +16,10 @@
 ({
 
 
+    /**
+     * Handler for the ui:openDialog application-level event. Activates a
+     * single ui:dialog component.
+     */
     openDialog : function(cmp, evt, hlp) {
 
         var atts       = cmp.getAttributes(),
@@ -31,6 +35,10 @@
     },
 
 
+    /**
+     * Handler for the ui:closeDialog application-level event. Deactivates a
+     * single ui:dialog component.
+     */
     closeDialog : function(cmp, evt, hlp) {
 
         var dialog = evt.getParam("dialog");

@@ -15,22 +15,35 @@
  */
 ({
 
-    /* handler for application event ui:dialogManagerReady */
+
+    /**
+     * Handler for the ui:dialogManagerReady application-level event.
+     * Registers this instance of ui:dialog with the manager.
+     */
     registerDialog : function(cmp, evt, hlp) {
+
         var manager = evt.getParam("manager"),
             dialogs = manager.get("v._dialogs");
+
         cmp.getAttributes().setValue("_dialogManager", manager);
         dialogs.push(cmp);
         manager.getAttributes().setValue("_dialogs", dialogs);
+
     },
 
-    /* local handlers */
+
+    /*
+     * Handles click of the "x" (close) link. Fires the application-level
+     * event ui:closeDialog.
+     */
     closeDialog : function(cmp) {
+
         var evt = $A.get("e.ui:closeDialog");
-        evt.setParams({
-            dialog : cmp
-        });
+
+        evt.setParams({ dialog : cmp });
         evt.fire();
+
     }
+
 
 })

@@ -16,6 +16,9 @@
 ({
 
 
+    /**
+     * Initializes the ui:dialogManager component.
+     */
     afterRender : function(cmp, hlp) {
 
         var ready = cmp.get("v._ready");

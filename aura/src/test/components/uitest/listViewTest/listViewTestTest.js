@@ -623,30 +623,9 @@
                 });
 
         var element = this.getTableBodyCellComponentAt(component, 0, 0).getElement();
-        this.fireDomEvent(element, eventName);
+        $A.test.fireDomEvent(element, eventName);
 
         truthVerifier(fireEventsCalled, failureMessage + ": " + eventName);
-    },
-
-    /**
-     * Given an HTML element and an eventName, fire the corresponding DOM event. Code adapted from a stack overflow
-     * question's answer.
-     */
-    fireDomEvent: function (element, eventName) {
-        var event;
-        if (document.createEvent) {
-            event = document.createEvent("HTMLEvents");
-            event.initEvent(eventName, true, true);
-        } else {
-            event = document.createEventObject();
-            event.eventType = eventName;
-        }
-
-        if (document.createEvent) {
-            element.dispatchEvent(event);
-        } else {
-            element.fireEvent("on" + event.eventType, event);
-        }
     },
 
     /**

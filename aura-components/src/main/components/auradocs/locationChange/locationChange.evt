@@ -18,5 +18,6 @@
 <aura:event type="APPLICATION" extends="aura:locationChange">
     <aura:attribute name="defType" type="String"/>
     <aura:attribute name="topic" type="String"/>
+    <aura:attribute name="searchTerm" type="String"/>
     <aura:attribute name="descriptor" type="String"/>
 </aura:event>

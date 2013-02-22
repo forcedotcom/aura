@@ -17,7 +17,7 @@
 -->
 <aura:component extends="auradocs:topicPanel">
 	<aura:set attribute="title" value="Search Results"/>
-	<aura:handler name="init" value="{!this}" action="{!c.searchDocs}" />
+	<aura:handler name="init" value="{!this}" action="{!c.displaySearch}" />
 	
 	<aura:attribute name="searchTerm" type="String" default="Search Term" description="Displays the search term back to the user." />
 	<aura:attribute name="helpText" type="String" default="" description="Displays suggestions on narrowing the search results." />

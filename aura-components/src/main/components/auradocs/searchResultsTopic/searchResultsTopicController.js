@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 {
-	searchDocs : function(cmp,event){
-		console.log("in search results");
-		var include_num = 1;
-		
+	displaySearch : function(cmp,event){
+		var searchURL = window.location; 
+		var searchTerm = searchURL.hash.substr(37);
 		//Highlight search term in results
 		var bold = 1;
 		var s = new Array();
 
-		/**Indexer**/
+		/**Client-side Indexer**/
 		//Components
 		s[0] = "Components Overview^helloWorld^Components are the functional units of Aura. They encapsulate a modular and potentially reusable section of UI, and can range in granularity from a single line of text to an entire application...^markup, bundles, browser, url";
 		s[1] = "Component Bundles^compBundle^A component bundle is a folder containing a component or an app and all related resources for that component or app. It can contain the following files...^ resources, css, controller, renderer, helper, provider, app, client-side";
@@ -144,25 +143,12 @@
 		s[93]= "What do Aura version numbers mean?^faqVersions^Aura uses version numbers that are consistent with other Maven projects. This makes it easy for projects built with Maven to express their dependency on Aura...^maven, build, snapshot, release build, getauraversion";
 			
 		
-		cookies = document.cookie;
-		var p = cookies.indexOf("d=");
-		console.log("p = " + p);
-		
-		if (p != -1) {
-			var st = p + 2;
-			var en = cookies.indexOf(";", st);
-			if (en == -1) {
-				en = cookies.length;
-			}
-			var d = cookies.substring(st, en);
-			d = unescape(d);
-			console.log("cookies.substring d= " + d);
-		}
-		od = d;
-		console.log("od = " + od);
+		searchTerm = unescape(searchTerm);
+		var od = searchTerm;
 		var m = 0;
-		if (d.charAt(0) == '"' && d.charAt(d.length - 1) == '"') {
+		if (searchTerm.charAt(0) == '"' && searchTerm.charAt(searchTerm.length - 1) == '"') {
 			m = 1;
+
 		}
 
 		var r = new Array();
@@ -170,7 +156,7 @@
 
 		if (m == 0) {
 			var woin = new Array();
-			var w = d.split(" ");
+			var w = searchTerm.split(" ");
 			for (var a = 0; a < w.length; a++) {
 				woin[a] = 0;
 				if (w[a].charAt(0) == '-') {
@@ -212,9 +198,9 @@
 		}
 
 		if (m == 1) {
-			d = d.replace(/\"/gi, "");
+			searchTerm = searchTerm.replace(/\"/gi, "");
 			var a = 0;
-			var pat = new RegExp(d, "i");
+			var pat = new RegExp(searchTerm, "i");
 			for (var c = 0; c < s.length; c++) {
 				var rn = s[c].search(pat);
 				if (rn >= 0) {
@@ -233,8 +219,12 @@
 		var queryCount = cmp.getValue("v.queryNum");
 		queryCount.setValue(co);
 		
-		//Return help text if number of results exceeds 10
+		//Return help text
 		var help = cmp.getValue("v.helpText");
+		if (co==0) {
+			var helpStr = "Please enter another search term.";
+			help.setValue(helpStr);
+		}
 		if (co>5) {
 			var helpStr = "Improve your search by using double quotes \"\" for exact keyword matches or omitting terms by using a hyphen - before the term.";
 			help.setValue(helpStr);
@@ -245,20 +235,19 @@
 		}
 		
 		var myQuery = cmp.getValue("v.myQuery");
+		
+		//Create an array to store search results
 		var result = [];
+		
 		//Display results
 			for (var a=0; a < r.length; a++){
 				var os = r[a].split("^");
-				var br="<b>" + d + "</b>";
+				var br="<b>" + od + "</b>";
 				os[2] = os[2].replace(pat, br);
 			
-				
-				//for (var i=0; i<co; i++){ 
-					result[a] = "<a href=\"#help?topic=" + os[1] + "\" />" + os[0] + "</a><br/>" + os[2];
-				//}
-							
+				//Set the format of the search result
+				result[a] = "<a href=\"#help?topic=" + os[1] + "\" />" + os[0] + "</a><br/>" + os[2];	
 			}
 			myQuery.setValue(result);
-			console.log(result[a]);	
-	}
+			}
 }

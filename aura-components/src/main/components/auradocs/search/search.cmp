@@ -18,6 +18,7 @@
 
 <aura:component>
 	<aura:registerEvent name="search" type="ui:searchEvent" />
+	<aura:handler event="auradocs:locationChange" action="{!c.handleSearch}" />
 	<aura:handler name="search" action="{!c.handleSearch}" />
 	<ui:inputSearch search="{!c.handleSearch}" aura:id="d" class="searchIt" placeholder="Search Aura Help" />
 		{!v.body}

@@ -15,12 +15,10 @@
     limitations under the License.
 
 -->
-
 <aura:component>
-    <aura:registerEvent name="search" type="ui:searchEvent" />
-    <aura:handler name="search" action="{!c.handleSearch}" />
-	<aura:attribute name="tree" type="Aura.Component" />
-	
-	<ui:inputSearch search="{!c.handleSearch}" aura:id="searchBox" class="searchBox" placeholder="Search TOC" />
-	{!v.body}
+    <ui:button labelDisplay="false" label="Label for assistive text">
+        <aura:label value="Label with link: {0}">
+            <ui:outputURL value="http://www.salesforce.com" label="Test Link"/>
+        </aura:label>
+    </ui:button>
 </aura:component>

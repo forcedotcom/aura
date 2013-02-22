@@ -96,6 +96,12 @@ public class AuraContextFilter implements Filter {
 
             try {
                 if (loggingService != null) {
+                    try {
+                        loggingService.setValue(LoggingService.STATUS,
+                                                String.valueOf(((HttpServletResponse)res).getStatus()));
+                    } catch (Throwable t) {
+                        // ignore.
+                    }
                     loggingService.doLog(); // flush out logging values
                 }
             } finally {

@@ -35,7 +35,6 @@ import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttrib
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.DefRegistry;
-import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.mockito.Mockito;

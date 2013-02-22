@@ -1,0 +1,109 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Setting Label Parameters"/>
+       
+<p>The <code>aura:label</code> component accepts parameters, allowing you to provide different values for the labels. This can be useful for localizing your labels.</p>
+
+<p>The label component value attribute accepts one or more numbered parameters, such as:</p>
+
+<auradocs:codeblock>
+&lt;aura:label value="{0} Members">
+    <aura:text value="{!"/>v.numberOfMembers}
+&lt;/aura:label>
+</auradocs:codeblock><br/>
+
+<p>You can substitute the <code>{0}</code> parameter with an expression or a component. The previous example showed the use of an expression. This example shows the output and source of a label with a hardcoded expression value.</p>
+
+<auradocs:example descriptor="auradocs:sampleLabelParamSimple" />
+
+<p>Typically, your labels are defined in a separate file in your application, and your labels each have a unique name. You can access your label values by using the <code>$Label</code> dot notation, which uses your label adapter implementation. For example, to access a label named <code>Object.Title</code>, use the <code>$Label.Object.Title</code> expression.</p>
+
+<p>Parameters can also be specified for labels in label definition files. For example, the value of the <code>Object.Title</code> label in your label file can be <code>{0} Members</code>. You can provide a value for the parameter when you reference the label in the <code>aura:label</code> component, as follows.</p> 
+
+<auradocs:codeblock>
+&lt;aura:label value="<aura:text value="{!"/>$Label.Object.Title}">
+    <aura:text value="{!"/>v.numberOfMembers}
+&lt;/aura:label>
+</auradocs:codeblock><br/>
+
+<p>If the <code>v.numberOfMembers</code> expression evaluates to 5, the output will be:</p>
+<auradocs:codeblock>5 Members</auradocs:codeblock><br/>
+
+<p>You can add as many parameters as you need. The parameters are numbered and are zero-based. For example, if you have three parameters, they will be named {0}, {1}, and {2}, and they will be substituted in the order they're specified.</p> 
+
+<p>This example shows the <code>Object.Title</code> label referenced in an <code>aura:label</code> component and with three parameter substitutions. Suppose the label value is defined as <code>"{0} Members, {1} New Members, and {2} Guests"</code> in the label file.</p>
+
+<auradocs:codeblock>
+&lt;aura:label value="<aura:text value="{!"/>$Label.Object.Title}">
+    <aura:text value="{!"/>v.numberOfMembers}
+    <aura:text value="{!"/>v.numberOfNewMembers}
+    <aura:text value="{!"/>v.numberOfGuests}   
+&lt;/aura:label>
+</auradocs:codeblock><br/>
+
+<p>Assuming that <code><aura:text value="{!"/>v.numberOfMembers}</code> evaluates to 5,  <code><aura:text value="{!"/>v.numberOfNewMembers}</code> evaluates to 2, and <code><aura:text value="{!"/>v.numberOfGuests}</code> evaluates to 8, the output is:</p>
+<auradocs:codeblock>
+5 Members, 2 New Members, and 8 Guests
+</auradocs:codeblock><br/>
+
+<p>You can specify an Aura or HTML component as a parameter substitution value in the body of an <code>aura:label</code> component. This example shows how to include a link in a label by substituting the <code>{0}</code> parameter with the embedded <code>ui:outputURL</code> Aura component. The <code>$Label.Object.LinkLabel</code> label is defined as <code>Label with link: {0}</code>.</p>
+
+<auradocs:codeblock>
+&lt;aura:label value="<aura:text value="{!"/>$Label.Object.LinkLabel}">
+    &lt;ui:outputURL value="http://www.salesforce.com" label="Test Link"/>
+&lt;/aura:label>
+</auradocs:codeblock><br/>
+
+<p>This example is similar to the previous one except that the label value is hardcoded and doesn't use the label provider. You can view the output, which is the label text containing a link.</p>
+
+<auradocs:example descriptor="auradocs:sampleLabelParam" />
+
+<p>This is equivalent to embedding the HTML anchor tag:</p> 
+
+<auradocs:codeblock>
+&lt;aura:label value="<aura:text value="{!"/>$Label.Object.LinkLabel}">
+    &lt;a href="http://www.salesforce.com">Test Link&lt;/a>
+&lt;/aura:label>
+</auradocs:codeblock><br/>
+
+<h3>Using a Label with Parameter Values in Another Component</h3>
+
+<p>You can use an <code>aura:label</code> component with parameter substitutions as the label of another component. For example, you can use an <code>aura:label</code> component as the label of a button. To do so, embed the <code>aura:label</code> component in the body of your component. Set the <code>labelDisplay</code> attribute to <code>false</code> so that the label attribute won't be rendered, but instead the embedded label will. The required label attribute value is used for accessibility.</p>
+
+<p>This example embeds the label component from the previous example inside a <code>ui:button</code> component. The button label is taken from this embedded label component, which in turn contains an <code>ui:outputURL</code> component in its body for substituting a parameter with a link. The label provider value, <code>$Label.Object.LinkLabel</code>, is defined as <code>Label with link: {0}</code>.</p> 
+
+<auradocs:codeblock>
+&lt;ui:button labelDisplay="false" label="Label for assistive text">
+    &lt;aura:label value="<aura:text value="{!"/>$Label.Object.Title}">
+        &lt;ui:outputURL value="http://www.salesforce.com" label="Test Link"/>
+    &lt;/aura:label>
+&lt;/ui:button>
+</auradocs:codeblock><br/>
+
+<p>This shows the output of a button that has an embedded label with the link parameter substitution. This example uses a hardcoded label value rather than a value from the label provider.</p> 
+
+<auradocs:example descriptor="auradocs:sampleLabelEmbedded" />
+
+<p><b>See also:</b><br/>   
+    <auradocs:defLink descriptor="aura:label">aura:label</auradocs:defLink><br/>
+    <auradocs:topicLink topic="expressions">Expressions</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="globalValueProviders">Global Value Providers</auradocs:topicLink>    
+ </p>
+
+</aura:component>

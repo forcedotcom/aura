@@ -15,12 +15,8 @@
     limitations under the License.
 
 -->
-
 <aura:component>
-    <aura:registerEvent name="search" type="ui:searchEvent" />
-    <aura:handler name="search" action="{!c.handleSearch}" />
-	<aura:attribute name="tree" type="Aura.Component" />
-	
-	<ui:inputSearch search="{!c.handleSearch}" aura:id="searchBox" class="searchBox" placeholder="Search TOC" />
-	{!v.body}
+    <aura:label value="Your balance is {0} points.">
+        {!500}
+    </aura:label>
 </aura:component>

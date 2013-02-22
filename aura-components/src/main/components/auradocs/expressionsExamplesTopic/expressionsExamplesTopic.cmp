@@ -33,7 +33,9 @@
     &lt;p class="note-body"><aura:text value="{!"/>m.body}&lt;/p>
 &lt;/div></auradocs:codeblock>
 
-<p>The expressions here display values retrieved from the server, held in an object <code>m</code>, the component's model. More details on using <code>m</code> and <code>v</code> in <auradocs:topicLink topic="expressionsSourceValues">Sources for Values Available for Use in Expressions</auradocs:topicLink>. The title attribute is concatenated with the literal value "Title: ".</p>
+<p>The expressions here display values retrieved from the server, held in an object <code>m</code>, the component's model. More details on using <code>m</code> and <code>v</code> in <auradocs:topicLink topic="expressionsSourceValues">Sources for Values Available for Use in Expressions</auradocs:topicLink>. The title attribute is concatenated with the literal value 'Title: '.</p>
+
+<p>If you're including literal values in expressions, enclose text values within single quotes, such as <code><aura:text value="{!"/>'Some text'}</code>. Include numbers without quotes, for example, <code><aura:text value="{!"/>123}</code>.</p>
 
 <h2>Passing Values</h2>
 

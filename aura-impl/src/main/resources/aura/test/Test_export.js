@@ -47,6 +47,7 @@ exp(p,
     "getActiveElement", p.getActiveElement,
     "getActiveElementText", p.getActiveElementText,
     "getElementByClass", p.getElementByClass,
+    "fireDomEvent",	p.fireDomEvent,
     
     // javascript
     "getPrototype", p.getPrototype,

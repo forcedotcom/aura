@@ -21,7 +21,10 @@
 		var bold = 1;
 		var s = new Array();
 
-		/**Client-side Indexer**/
+		/*
+		 * Client-side Indexer
+		 * Format: TITLE^URL OR FILENAME^DESCRIPTIVE LINE(first few sentences of the topic)^KEYWORDS
+		 */
 		//Components
 		s[0] = "Components Overview^helloWorld^Components are the functional units of Aura. They encapsulate a modular and potentially reusable section of UI, and can range in granularity from a single line of text to an entire application...^markup, bundles, browser, url";
 		s[1] = "Component Bundles^compBundle^A component bundle is a folder containing a component or an app and all related resources for that component or app. It can contain the following files...^ resources, css, controller, renderer, helper, provider, app, client-side";
@@ -124,6 +127,7 @@
 		s[78]= "Collection Types^attrTypesCollection^This table lists the supported type values for collection types.^list, map, set";
 		s[79]= "Custom Java Class Types^attrTypesJava^A aura:attribute can have a type corresponding to a Java class...^list, Java type, JsonSerializable, JSON";
 		s[80]= "Aura-Specific Types^attrTypesAuraSpecific^This table lists the supported type values for types that are specific to Aura...^Aura.Component, Aura.Action, action type, component type";
+		s[94]= "Setting Label Parameters^labelParameters^The aura:label component accepts parameters, allowing you to provide different values for the labels. This can be useful for localizing your labels...^$Label, label provider"
 		
 		//Quick Start
 		s[81]= "Create an Aura App from the Command Line^qsCmdLine^You can generate a basic Aura app quickly using the command line...^maven, archetype, aura template, jetty";
@@ -144,6 +148,12 @@
 			
 		
 		searchTerm = unescape(searchTerm);
+		
+		/**
+		 * Open-source JavaScript Search Kit 1.0
+		 * Supports double-quote exact matches 
+		 * and omitting of keywords with hyphens
+		 */
 		var od = searchTerm;
 		var m = 0;
 		if (searchTerm.charAt(0) == '"' && searchTerm.charAt(searchTerm.length - 1) == '"') {
@@ -210,7 +220,7 @@
 			}
 			co = a;
 		}
-		console.log("return query");
+		
 		//Return search term
 		var searchTerm = cmp.getValue("v.searchTerm");
 		searchTerm.setValue(od);	
@@ -249,5 +259,6 @@
 				result[a] = "<a href=\"#help?topic=" + os[1] + "\" />" + os[0] + "</a><br/>" + os[2];	
 			}
 			myQuery.setValue(result);
-			}
+	}
+			
 }

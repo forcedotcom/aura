@@ -113,10 +113,12 @@ SimpleValue.prototype.getPreviousValue = function() {
  * called.
  * @param {Object} v The value to be set.
  */
-SimpleValue.prototype.setValue = function(v) {
+SimpleValue.prototype.setValue = function(v, skipChange) {
     this.makeDirty();
     this.newValue = v;
-    this.fire("change");
+    if (!skipChange) {
+    	this.fire("change");	
+    }
 };
 
 /**

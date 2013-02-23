@@ -26,12 +26,12 @@
     },
     nextPage:function (component, domEvent, helper) {
         if(domEvent.currentTarget.disabled)return;
-        var targetPage = Math.min(component.get("v.currentPage")+1, component.get("v.pageCount"));
+        var targetPage = Math.min(parseInt(component.get("v.currentPage"),10)+1, component.get("v.pageCount"));
         helper.changePage(component, targetPage, domEvent);
     },
     previousPage:function (component, domEvent, helper) {
         if(domEvent.currentTarget.disabled)return;
-        var targetPage = Math.max(component.get("v.currentPage")-1, 1);
+        var targetPage = Math.max(parseInt(component.get("v.currentPage"),10)-1, 1);
         helper.changePage(component, targetPage, domEvent);
     }
 })

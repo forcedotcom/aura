@@ -21,21 +21,10 @@
 		component.getValue("v.currentPage").setValue(currentPage);
 		component.getValue("v.pageSize").setValue(pageSize);
 		
-		//==
-		console.log("Handling page change:");
-		console.log(" currentPage : " + currentPage);
-		console.log(" pageSize : " + pageSize);
-		//==
-		
 		helper.triggerDataProvider(component);
 	},
 	
 	handleDataChange: function(component, event, helper) {
-		//==
-		console.log("Handling data change:")
-		console.log(event.getParam("data"));
-		//==
-		
 		component.getValue("v.items").setValue(event.getParam("data"));
 	},
 	

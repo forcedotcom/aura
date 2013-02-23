@@ -29,9 +29,7 @@
 		}, domEvent);
 
 		component.getValue("v.currentPage").setValue(targetPage);
-		
-		this.updateCalculatedFields(component);
-		
+
 		return true;
 	},
 
@@ -54,8 +52,6 @@
 
 		component.getValue("v.currentPage").setValue(targetPage);
 		component.getValue("v.pageSize").setValue(targetPageSize);
-		
-		this.updateCalculatedFields(component);
 
 		return true;
 	},

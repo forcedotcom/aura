@@ -71,28 +71,6 @@
 	},
 	
 	triggerDataProvider: function(component) {
-		//==
-		console.log("Triggering data provider:");
-		console.log("  currentPage : " + component._dataProvider.get("v.currentPage"));
-		//==
 		component._dataProvider.get("e.provide").fire();
-	},
-	
-	logPagers: function(component) {
-		var pagers = component._pagers;
-		if (!pagers) { return; }
-		
-		var i = pagers.length;
-		
-		var attrs = ["currentPage", "pageCount", "pageSize", "totalItems", "startIndex", "endIndex"];
-		
-		while (i--) {
-			console.log(pagers[i].getDef().toString());
-			
-			j = attrs.length;
-			while (j--) {
-				console.log("  " + attrs[j] + " : " + pagers[i].get("v."+attrs[j]));	
-			}
-		}
 	}
 })

@@ -37,12 +37,11 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.junit.Ignore;
 import org.mockito.Mockito;
 import org.mockito.internal.util.MockUtil;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-
-import org.junit.Ignore;
 
 import com.google.common.collect.Lists;
 
@@ -50,8 +49,6 @@ import com.google.common.collect.Lists;
  * @see org.auraframework.impl.registry.RootDefFactoryTest
  */
 public class MasterDefRegistryImplTest extends AuraImplTestCase {
-    private final static String baseContents = "<aura:application></aura:application>";
-
     public MasterDefRegistryImplTest(String name) {
         super(name);
     }
@@ -117,10 +114,12 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     public void testFindRegex() throws Exception {
         String namespace = "testFindRegex" + auraTestingUtil.getNonce();
-        DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class, baseContents,
-                String.format("%s:houseboat", namespace));
-        addSourceAutoCleanup(ApplicationDef.class, baseContents, String.format("%s:houseparty", namespace));
-        addSourceAutoCleanup(ApplicationDef.class, baseContents, String.format("%s:pantsparty", namespace));
+        DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseApplicationTag, "", ""), String.format("%s:houseboat", namespace));
+        addSourceAutoCleanup(ApplicationDef.class, String.format(baseApplicationTag, "", ""),
+                String.format("%s:houseparty", namespace));
+        addSourceAutoCleanup(ApplicationDef.class, String.format(baseApplicationTag, "", ""),
+                String.format("%s:pantsparty", namespace));
 
         MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
 
@@ -147,8 +146,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     public void testStringCache() throws Exception {
         String namespace = "testStringCache" + auraTestingUtil.getNonce();
-        DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class, baseContents,
-                String.format("%s:houseboat", namespace));
+        DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseApplicationTag, "", ""), String.format("%s:houseboat", namespace));
         MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
         String uid = masterDefReg.getUid(null, houseboat);
         assertNull("Found string in new MDR", masterDefReg.getCachedString(uid, houseboat, "test1"));
@@ -159,7 +158,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void testGetUidClientOutOfSync() throws Exception {
         String namespace = "testStringCache" + auraTestingUtil.getNonce();
         String namePrefix = String.format("%s:houseboat", namespace);
-        DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class, baseContents, namePrefix);
+        DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseApplicationTag, "", ""), namePrefix);
         MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
         String uid = masterDefReg.getUid(null, houseboat);
         assertNotNull(uid);
@@ -177,8 +177,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      */
     public void testUidDependencies() throws Exception {
         DefDescriptor<ComponentDef> child = addSourceAutoCleanup(ComponentDef.class,
-                "<aura:component></aura:component>",
-                "testUidDependenciesChild");
+                "<aura:component></aura:component>", "testUidDependenciesChild");
         DefDescriptor<ApplicationDef> parent = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application><" + child.getDescriptorName() + "/></aura:application>",
                 "testUidDependenciesParent");
@@ -212,12 +211,12 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     public void testGetUidDescriptorNull() throws Exception {
         MasterDefRegistryImpl registry = getDefRegistry(false);
-        assertEquals(null, registry.getUid(null, null));
+        assertNull(registry.getUid(null, null));
     }
 
     public void testGetUidDescriptorDoesntExist() throws Exception {
         MasterDefRegistryImpl registry = getDefRegistry(false);
-        assertEquals(null, registry.getUid(null, DefDescriptorImpl.getInstance("unknown:soldier", ComponentDef.class)));
+        assertNull(registry.getUid(null, DefDescriptorImpl.getInstance("unknown:soldier", ComponentDef.class)));
     }
 
     public void testGetUidLocalDef() throws Exception {
@@ -300,8 +299,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             registry.getUid(null, cmpDesc);
             fail("Expected DefinitionNotFoundException");
         } catch (DefinitionNotFoundException e) {
-            checkExceptionStart(e, null,
-                    "No COMPONENT named markup://unknown:component found");
+            checkExceptionStart(e, null, "No COMPONENT named markup://unknown:component found");
         }
         Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(cmpDesc),
                 Mockito.<Map<DefDescriptor<?>, Definition>> any());
@@ -312,8 +310,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             registry.getUid(null, cmpDesc);
             fail("Expected DefinitionNotFoundException");
         } catch (DefinitionNotFoundException e) {
-            checkExceptionStart(e, null,
-                    "No COMPONENT named markup://unknown:component found");
+            checkExceptionStart(e, null, "No COMPONENT named markup://unknown:component found");
         }
         Mockito.verify(registry, Mockito.times(0)).compileDef(Mockito.eq(cmpDesc),
                 Mockito.<Map<DefDescriptor<?>, Definition>> any());
@@ -386,8 +383,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         // build a mock def
         String descName = String.format("%s:ghost", System.nanoTime());
         Definition def = Mockito.mock(RootDefinition.class);
-        Mockito.doReturn(DefDescriptorImpl.getInstance(descName, ComponentDef.class)).when(def)
-                .getDescriptor();
+        Mockito.doReturn(DefDescriptorImpl.getInstance(descName, ComponentDef.class)).when(def).getDescriptor();
 
         // spy on MDR's registries to spy on defs
         final MasterDefRegistryImpl registry = getDefRegistry(true);
@@ -438,12 +434,12 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     public void testGetDefDescriptorNull() throws Exception {
         MasterDefRegistryImpl registry = getDefRegistry(false);
-        assertEquals(null, registry.getDef(null));
+        assertNull(registry.getDef(null));
     }
 
     public void testGetDefDescriptorDoesntExist() throws Exception {
         MasterDefRegistryImpl registry = getDefRegistry(false);
-        assertEquals(null, registry.getDef(DefDescriptorImpl.getInstance("unknown:soldier", ComponentDef.class)));
+        assertNull(registry.getDef(DefDescriptorImpl.getInstance("unknown:soldier", ComponentDef.class)));
     }
 
     public void testGetDefCachedForChangedDefinition() throws Exception {

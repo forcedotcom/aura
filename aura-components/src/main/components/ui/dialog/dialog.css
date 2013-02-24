@@ -23,9 +23,9 @@
     left:0;
     background-color:#222;
     background-color:rgba(0,0,0,0.9);
-    -webkit-transition:all 0.3s ease-in-out;
-    -mox-transition:all 0.3s ease-in-out;
-    transition:all 0.3s ease-in-out;
+    -webkit-transition:all 0.3s linear;
+    -mox-transition:all 0.3s linear;
+    transition:all 0.3s linear;
     opacity:0;
 }
 .uiDialog.fadeIn{
@@ -67,16 +67,16 @@
     margin-left:-470px;
 }
 .uiDialog.modal{
+    top:-1px;
+    left:50%;
+    border-radius:0 0 4px 4px;
+    box-shadow:0 0 25px rgba(255,255,255,.8);
     -webkit-transition:all 0.3s ease-in-out;
     -mox-transition:all 0.3s ease-in-out;
     transition:all 0.3s ease-in-out;
     -webkit-transform:translate3d(0,-1000px,0);
     -moz-transform:translate3d(0,-1000px,0);
     transform:translate3d(0,-1000px,0);
-    top:-1px;
-    left:50%;
-    border-radius:0 0 4px 4px;
-    box-shadow:0 0 25px rgba(255,255,255,.8);
 }
 .uiDialog.modal.dropIn{
     -webkit-transform:translate3d(0,0,0);

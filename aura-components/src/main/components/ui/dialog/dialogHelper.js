@@ -51,16 +51,16 @@
      */
     doAnimation : function(isVisible, mask, dialog, autoFocus, isModal, config) {
 
-        var flickerDelay = 5,
+        var flickerDelay = 50,
             focusDelay   = 300,
-            hideDelay    = 1000;
+            hideDelay    = 500;
 
         // if the dialog is active, remove the 'hidden' classes and apply the animation classes
         if (isVisible) {
             $A.util.removeClass(dialog, "hidden");
             if (isModal) {
                 $A.util.removeClass(mask, "hidden");
-                // delay the application of animation classes by just a hair ... webkit rendering bug
+                // delay the application of animation classes by just a hair ... webkit + firefox rendering bug
                 window.setTimeout(function() { $A.util.addClass(mask, "fadeIn"); }, flickerDelay);
                 window.setTimeout(function() { $A.util.addClass(dialog, "dropIn"); }, flickerDelay);
             }

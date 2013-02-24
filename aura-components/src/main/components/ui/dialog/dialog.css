@@ -13,9 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/* TODO: need proper default styling */
 .uiDialog.hidden{
     display:none;
+}
+.uiDialog.mask{
+    top:0;
+    right:0;
+    bottom:0;
+    left:0;
+    background-color:#222;
+    background-color:rgba(0,0,0,0.9);
+    -webkit-transition:all 0.3s ease-in-out;
+    -mox-transition:all 0.3s ease-in-out;
+    transition:all 0.3s ease-in-out;
+    opacity:0;
+}
+.uiDialog.fadeIn{
+    opacity:1;
 }
 .uiDialog.dialog{
     position:absolute;
@@ -25,54 +39,73 @@
     position:fixed;
     z-index:99999;
 }
-.uiDialog.mask{
-    top:0;
-    right:0;
-    bottom:0;
-    left:0;
-    background-color:#000;
-    opacity:.75;
-}
 .uiDialog.dialog{
-    /* actual screen positioning will be done by the component helper on display, based on content dimensions */
-    min-width:300px;    /* default */
-    min-height:150px;   /* default */
-    background-color:#FFF;
-    overflow:hidden;
-    border-radius:3px;
-    box-shadow:0 0 20px #000;
+    background:#666;
+    background:-webkit-gradient(linear,0% 0%,0% 100%,from(#888),to(#2A2A2A));
+    background:-webkit-linear-gradient(#888,#444 1.4em,#444 75%,#111);
+    background:linear-gradient(#888,#444 1.4em,#444 75%,#111);
+    border:1px solid #222;
+    border-radius:4px;
+    box-shadow:0 0 25px rgba(0,0,0,.8);
+}
+.uiDialog.dialog.small{
+    width:310px;
+}
+.uiDialog.dialog.medium{
+    width:620px;
+}
+.uiDialog.dialog.large{
+    width:940px;
+}
+.uiDialog.modal.small{
+    margin-left:-155px;
+}
+.uiDialog.modal.medium{
+    margin-left:-310px;
+}
+.uiDialog.modal.large{
+    margin-left:-470px;
 }
 .uiDialog.modal{
-    top:33%;            /* default */
-    margin-top:-75px;   /* default */
-    left:50%;           /* default */
-    margin-left:-150px; /* default */
+    -webkit-transition:all 0.3s ease-in-out;
+    -mox-transition:all 0.3s ease-in-out;
+    transition:all 0.3s ease-in-out;
+    -webkit-transform:translate3d(0,-1000px,0);
+    -moz-transform:translate3d(0,-1000px,0);
+    transform:translate3d(0,-1000px,0);
+    top:-1px;
+    left:50%;
+    border-radius:0 0 4px 4px;
+    box-shadow:0 0 25px rgba(255,255,255,.8);
 }
-.uiDialog .title{
-    height:1.78em;
-    line-height:1.75em;
-    text-indent:.5em;
-    border-bottom:1px solid #666;
+.uiDialog.modal.dropIn{
+    -webkit-transform:translate3d(0,0,0);
+    -moz-transform:translate3d(0,0,0);
+    transform:translate3d(0,0,0);
 }
+.uiDialog .title,
 .uiDialog .content,
 .uiDialog .buttons{
-    margin:.4em .5em;
+    margin:10px;
 }
-.uiDialog .close{
-    display:block;
-    position:absolute;
-    top:.22em;
-    right:.25em;
-    width:1.25em;
-    height:1.25em;
-    line-height:1.25em;
+.uiDialog .title{
+    color:#FFF;
     font-weight:bold;
-    text-align:center;
-    border-radius:2px;
+    font-size:1.1em;
+    text-shadow:0 -1px #000;
 }
-.uiDialog .close:hover{
-    background-color:#DDD;
+.uiDialog .content{
+    padding:10px;
+    border-radius:2px;
+    background-color:#FFF;
+    box-shadow:inset 0 0 6px #000;
+    border:2px solid #FFF;
 }
 .uiDialog .buttons{
     text-align:center;
+}
+.uiDialog .close{
+    position:absolute;
+    top:3px;
+    right:8px;
 }

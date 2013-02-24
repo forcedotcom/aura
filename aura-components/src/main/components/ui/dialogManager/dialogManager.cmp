@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="GA" description="Manages all instances of ui:dialog in an application, by handling visibility and all DOM events. One (and only one) instance of this component is required if you wish to use the ui:dialog component.">
+<aura:component extensible="true" support="GA" description="Manages all instances of ui:dialog in an application, by handling visibility and all DOM events. One (and only one) instance of this component is required if you wish to use the ui:dialog component. We recommend putting the ui:dialogManager component at the end of your .app file.">
 
     <aura:attribute name="allowMultipleActiveDialogs" type="Boolean" default="{!false}" description="Determines whether multiple active (i.e., open) dialogs are allowed. There are almost no use cases where this should be set to {!true}, but, it's an option anyway. Note that this setting only applies to non-modal dialogs. If a modal dialog is active, all other dialogs will be deactivated."/>
 

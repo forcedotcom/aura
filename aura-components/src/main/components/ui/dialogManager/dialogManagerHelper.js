@@ -56,9 +56,9 @@
             handlerConfig   = this.getHandlerConfig(dialogCmp, isModal, clickOutToClose, managerCmp);
 
         dialogAtts.setValue("_handlerConfig", handlerConfig);
-        dialogAtts.setValue("_isVisible", true);
         currentlyActive.push(dialogCmp);
         managerAtts.setValue("_activeDialogs", currentlyActive);
+        dialogAtts.setValue("_isVisible", true);
 
     },
 
@@ -69,8 +69,9 @@
      *
      * NOTE: The ui:dialog's renderer handles removing existing event handlers.
      * 
-     * @param {Object} dialogCmp
-     * @param {Object} managerCmp
+     * @param {Object} dialogCmp the ui:dialog component to deactivate
+     * @param {Object} managerCmp the ui:dialogManager component
+     * @return {void}
      */
     deactivateDialog : function(dialogCmp, managerCmp) {
 
@@ -80,6 +81,7 @@
 
         for (var i=0; i<length; i++) {
             if (dialogCmp === currentlyActive[i]) {
+                // remove the dialog from the array and re-set the value of the manager's attribute'
                 currentlyActive.splice(i,1);
                 managerAtts.setValue("_activeDialogs", currentlyActive);
                 break;
@@ -168,8 +170,8 @@
 
 
     /**
-     * Constructs the handler for the DOM keydown event. Includes handlers for 1) space bar,
-     * 2) escape key, and 3) tab key (including shift+tab).
+     * Constructs the handler for the DOM keydown event. Includes handlers for 1) escape key,
+     * and 2) tab key (including shift+tab).
      * 
      * @param {Aura.Component} dialogCmp the active ui:dialog component
      * @param {Aura.Component} managerCmp the ui:dialogManager component
@@ -186,14 +188,9 @@
             currentFocus = document.activeElement,
             closeEvent   = $A.get("e.ui:closeDialog");
 
-        closeEvent.setParams({ dialog : dialogCmp });
+        closeEvent.setParams({ dialog : dialogCmp, confirmClicked : false });
 
         switch (event.keyCode) {
-            case 32: // space bar - if "close" link is active, allow space bar can trigger it
-                if (currentFocus !== closeLink) {
-                    break;
-                }
-                // fallthrough here is intentional - same behaviour as the escape key
             case 27: // escape key - always closes all dialogs
                 this.cancelEvent(event);
                 closeEvent.fire();

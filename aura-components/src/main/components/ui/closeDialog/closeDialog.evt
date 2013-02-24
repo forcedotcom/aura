@@ -17,4 +17,5 @@
 -->
 <aura:event type="APPLICATION" description="Event fired to close a dialog window. Handled by ui:dialogManager.">
     <aura:attribute name="dialog" type="Aura.Component" description="The dialog that should be closed."/>
+    <aura:attribute name="confirmClicked" type="Boolean" description="true if the confirmation button in the dialog was clicked, false otherwise."/>
 </aura:event>

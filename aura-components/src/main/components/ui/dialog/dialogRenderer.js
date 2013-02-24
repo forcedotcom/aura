@@ -17,15 +17,27 @@
 
 
     /**
-     * Ensures that the proper ARIA role attribute is defined for the
-     * dialog component. Also ties the <h2> tag in the dialog header
-     * to the dialog container using aria-labelledby.
+     * Moves modal windows to the bottom of the DOM so they display properly,
+     * and ties the <h2> tag in the dialog header to the dialog container
+     * using aria-labelledby.
      */
     afterRender : function(cmp) {
 
-        // TODO: fix the "ariaRole" attribute, if necessary
-        // TODO: attach the title to the dialog w/ aria-labelledby
+        var atts    = cmp.getAttributes(),
+            isModal = atts.get("isModal"),
+            ariaId  = atts.get("_ariaId"),
+            mask    = cmp.find("mask"),
+            dialog  = cmp.find("dialog"),
+            title   = cmp.find("title");
+
         this.superAfterRender(cmp);
+
+        if (isModal) {
+            document.body.appendChild(mask.getElement());
+            document.body.appendChild(dialog.getElement());
+        }
+
+        atts.setValue("_ariaId", title.getGlobalId());
 
     },
 
@@ -35,36 +47,34 @@
      * proper interaction semantics. Handlers are applied upon dialog
      * activation, and removed upon dialog deactivation.
      */
-    rerender : function(cmp) {
+    rerender : function(cmp, hlp) {
 
         var isVisible = cmp.get("v._isVisible"),
             config    = cmp.get("v._handlerConfig"),
             autoFocus = cmp.get("v.autoFocus"),
             isModal   = cmp.get("v.isModal"),
+            maskCmp   = cmp.find("mask"),
+            mask      = maskCmp ? maskCmp.getElement() : null,
             dialog    = cmp.find("dialog").getElement(),
             close     = cmp.find("close").getElement();
 
-        this.superRerender(cmp);
+        this.superRerender(cmp, hlp);
 
         if (config && dialog && close) {
-            // if the dialog is active, add the handlers & apply focus to the appropriate element
+            // if the dialog is active, add the appropriate handlers
             if (isVisible) {
                 $A.util.on(document, "keydown", config.keydownHandler, false);
                 $A.util.on(document, "click", config.clickHandler, false);
                 $A.util.on(window, "resize", config.resizeHandler, false);
-                if ((autoFocus || isModal) && config.newFocus) {
-                    config.newFocus.focus();
-                }
-            // if the dialog is inactive, remove the handlers & return focus to the previously focused element
+            // else, remove them
             } else {
                 $A.util.removeOn(document, "keydown", config.keydownHandler, false);
                 $A.util.removeOn(document, "click", config.clickHandler, false);
                 $A.util.removeOn(window, "resize", config.resizeHandler, false);
-                if (config.oldFocus) {
-                    config.oldFocus.focus();
-                }
             }
-        }
+            // apply/remove the appropriate css classes and focus the right element
+            hlp.doAnimation(isVisible, mask, dialog, autoFocus, isModal, config);
+       }
 
     }
 

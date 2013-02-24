@@ -15,24 +15,29 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="GA" description="A dialog window used for overlays or modals. To use this component, you must also include one (and only one) ui:dialogManager component in your app. Regardless of how many instances of ui:dialog you use, only one ui:dialogManager component is required. We recommend putting the ui:dialogManager component in your .app file.">
+<aura:component extensible="true" support="GA" description="A dialog window used for overlays or modals. To use this component, you must also include one (and only one) ui:dialogManager component in your app. Regardless of how many instances of ui:dialog you use, only one ui:dialogManager component is required. We recommend putting the ui:dialogManager component at the end of your .app file.">
 
     <!-- public attributes -->
-    <aura:attribute name="ariaRole" type="String" default="dialog" description="The ARIA role assigned to the dialog's outermost &lt;div&gt; wrapper. Valid values are 'dialog' and 'alertdialog'. Use 'dialog' when there are one or more form fields present in your dialog. Use 'alertdialog' when there is only text and confirmation and/or cancel buttons."/>
+    <aura:attribute name="ariaRole" type="String" default="dialog" description="The ARIA role assigned to the dialog's outermost &lt;div&gt; wrapper. Valid values are 'dialog' and 'alertdialog'. Use 'dialog' when there are one or more form fields present in your dialog. Use 'alertdialog' when there is only informational text and confirmation and/or cancel buttons."/>
     <aura:attribute name="autoFocus" type="Boolean" default="{!true}" description="Automatically focus on the first focusable element when the dialog is displayed."/>
     <aura:attribute name="buttons" type="Aura.Component[]" description="Buttons that should be displayed at the bottom of the dialog (e.g., 'Save', 'Cancel', etc.)."/>
-    <!-- clickOutToClose isn't working right now, because ui:press is being fired AFTER ui:openDialog ... needs fixed -->
+    <!-- clickOutToClose isn't working right now, because ui:press finishes firing AFTER ui:openDialog -->
     <!--<aura:attribute name="clickOutToClose" type="Boolean" default="{!true}" description="Specifies if the dialog should be closed when any element outside the dialog is clicked."/>-->
+    <aura:attribute name="cancelButtonLabel" type="String" default="Cancel" description="The label of the default cancel button that is displayed when the 'ariaRole' attribute is set to 'alertdialog'."/>
+    <aura:attribute name="cancelButtonTitle" type="String" default="Click to cancel" description="The title attribute of the default cancel button that is displayed when the 'ariaRole' attribute is set to 'alertdialog'."/>
     <aura:attribute name="closeTitle" type="String" default="Close this window" description="The title attribute of the 'close' link."/>
+    <aura:attribute name="confirmButtonLabel" type="String" default="OK" description="The label of the default confirm button that is displayed when the 'ariaRole' attribute is set to 'alertdialog'."/>
+    <aura:attribute name="confirmButtonTitle" type="String" default="Click to confirm" description="The title attribute of the default confirm button that is displayed when the 'ariaRole' attribute is set to 'alertdialog'."/>
+    <aura:attribute name="defaultButtons" type="String" default="both" description="When the 'ariaRole' attribute is set to 'alertdialog', determines what default buttons should appear at the bottom of the dialog. Valid values are 'confim', 'cancel', 'both', or 'none'."/>
     <aura:attribute name="dialogClass" type="String" description="Additional CSS classes to apply to the dialog's outermost &lt;div&gt; wrapper."/>
     <aura:attribute name="isModal" type="Boolean" default="{!true}" description="Specifies if the dialog is modal (i.e., the dialog's contents are the only focusable/actionable items on the page when the dialog is open)."/>
     <aura:attribute name="maskClass" type="String" description="Additional CSS classes to apply to the window mask located behind a modal dialog."/>
+    <aura:attribute name="width" type="String" default="medium" description="The width of the dialog. Valid values are 'small', 'medium', or 'large' (which equal 310px, 620px, or 940px, respectively)."/>
     <aura:attribute name="title" type="String" description="The title displayed in the dialog's header. Required for accessibility." required="{!true}"/>
     <aura:attribute name="titleDescription" type="String" description="Instructional information about the purpose of the dialog. This text will not be visible on-screen, but still readable by assistive technologies."/>
 
     <!-- private attributes -->
     <aura:attribute name="_ariaId" type="String" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The id needed to identify the dialog window to assistive technologies."/>
-    <aura:attribute name="_dialogManager" type="Aura.Component" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The ui:dialogManager component that will control this dialog's display, positioning, and DOM events."/>
     <aura:attribute name="_handlerConfig" type="Object" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The map of event handlers that should be applied after rendering (keyup, click, blur, resize)."/>
     <aura:attribute name="_isVisible" type="Boolean" default="{!false}" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. Specifies if the dialog is displayed. To control visibility of the dialog, fire either the ui:openDialog or ui:closeDialog event."/>
 
@@ -42,25 +47,35 @@
 
     <!-- modal background -->
     <aura:if isTrue="{!v.isModal}">
-        <div aura:id="mask" class="{!'mask' + (v._isVisible ? ' ' : ' hidden ') + v.maskClass}"></div>
+        <div aura:id="mask" class="{!'mask hidden ' + v.maskClass}"></div>
     </aura:if>
 
     <!-- dialog container -->
-    <div aura:id="dialog" class="{!'dialog' + (v._isVisible ? ' ' : ' hidden ') + v.dialogClass + (v.isModal ? ' modal ' : ' ')}" role="{!v.ariaRole}" aria-live="assertive" aria-atmoic="true" aria-labelledby="{!v._ariaId}">
+    <div aura:id="dialog" class="{!'dialog hidden ' + v.dialogClass + (v.isModal ? ' modal ' : ' ') + v.width}" role="{!v.ariaRole}" aria-live="assertive" aria-atmoic="true" aria-labelledby="{!v._ariaId}">
 
         <!-- header -->
-        <h2 aura:id="title" class="title">{!v.title}<span class="assistiveText"> {!v.titleDescription}</span></h2>
+        <h2 aura:id="title" id="{!v._ariaId}" class="title">{!v.title}<span class="assistiveText"> {!v.titleDescription}</span></h2>
 
         <!-- content -->
         <div aura:id="content" class="content">{!v.body}</div>
 
         <!-- buttons -->
-        <aura:if isTrue="{!v.buttons.length > 0}">
-            <div class="buttons">{!v.buttons}</div>
+        <aura:if isTrue="{!v.buttons.length > 0 || v.ariaRole == 'alertdialog'}">
+            <div class="buttons">
+                <aura:if isTrue="{!v.ariaRole == 'alertdialog' &amp;&amp; !v.defaultButtons != 'none'}">
+                    <aura:if isTrue="{!v.defaultButtons == 'cancel' || v.defaultButtons == 'both'}">
+                        <ui:button class="defaultDialogButton" label="{!v.cancelButtonLabel}" buttonTitle="{!v.cancelButtonTitle}" press="{!c.cancel}"/>
+                    </aura:if>
+                    <aura:if isTrue="{!v.defaultButtons == 'confirm' || v.defaultButtons == 'both'}">
+                        <ui:button class="defaultDialogButton" label="{!v.confirmButtonLabel}" buttonTitle="{!v.confirmButtonTitle}" press="{!c.confirm}"/>
+                    </aura:if>
+                </aura:if>
+                {!v.buttons}
+            </div>
         </aura:if>
 
         <!-- close ("x") link - this DOM placement is intentional. DO NOT move, hide, or remove this element. see dialogManagerHelper.getFocusElement() for more info -->
-        <a aura:id="close" class="close" href="javascript:void(0);" title="{!v.closeTitle}" onclick="{!c.closeDialog}">X</a>
+        <ui:button aura:id="close" class="close" label="X" buttonTitle="{!v.closeTitle}" press="{!c.cancel}"/>
 
     </div>
 

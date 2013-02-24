@@ -25,7 +25,6 @@
         var manager = evt.getParam("manager"),
             dialogs = manager.get("v._dialogs");
 
-        cmp.getAttributes().setValue("_dialogManager", manager);
         dialogs.push(cmp);
         manager.getAttributes().setValue("_dialogs", dialogs);
 
@@ -33,17 +32,27 @@
 
 
     /*
-     * Handles click of the "x" (close) link. Fires the application-level
-     * event ui:closeDialog.
+     * Handles the click of the "x" (close) button, or the default cancel button of
+     * the dialog (used when ariaRole='alertdialog'). Fires the application-level
+     * event ui:closeDialog, setting the 'confirmClicked' attribute to false.
      */
-    closeDialog : function(cmp) {
+    cancel : function(cmp, evt, hlp) {
 
-        var evt = $A.get("e.ui:closeDialog");
+        hlp.confirmOrCancel(cmp, false);
 
-        evt.setParams({ dialog : cmp });
-        evt.fire();
+    },
 
-    }
+
+    /*
+     * Handles the click of default confirm button of the dialog (used when
+     * ariaRole='alertdialog'). Fires the application-level event ui:closeDialog,
+     * setting the 'confirmClicked' attribute to true.
+     */
+    confirm : function(cmp, evt, hlp) {
+
+        hlp.confirmOrCancel(cmp, true);
+
+    },
 
 
 })

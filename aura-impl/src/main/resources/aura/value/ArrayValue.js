@@ -114,7 +114,7 @@ ArrayValue.prototype.clear = function() {
  *
  * @param newArray The new array. This can be an array of literal JavaScript values or an array of value objects.
  */
-ArrayValue.prototype.setValue = function(newArray) {
+ArrayValue.prototype.setValue = function(newArray, skipChange) {
     this.fireEvents = false;
 
     this.newArray = [];
@@ -135,7 +135,9 @@ ArrayValue.prototype.setValue = function(newArray) {
     }
 
     this.fireEvents = true;
-    this.fire("change");
+    if (!skipChange) {
+    	this.fire("change");
+    }
 };
 
 /**

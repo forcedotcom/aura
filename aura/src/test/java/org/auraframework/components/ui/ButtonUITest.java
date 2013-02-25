@@ -31,11 +31,11 @@ public class ButtonUITest extends WebDriverTestCase {
         openNoAura("/uitest/buttonLabelRequiredTest.cmp");
         waitForDocumentReady();
         WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSecs);
-        wait.withMessage("Required label error not displayed, instead got error:" + this.getQuickFixMessage());
+        wait.withMessage("Required label error not displayed, instead got error:" + this.getQuickFixMessage() + " ,Expected Error: "+ errorMsg + " ,Expected Result:" + this.getQuickFixMessage().contains(errorMsg));
                 wait.until(new ExpectedCondition<Boolean>() {
                     @Override
                     public Boolean apply(WebDriver d) {
-                    	return (errorMsg.contains(getQuickFixMessage()));
+                    	return (getQuickFixMessage().contains(errorMsg));
                     }
                 });
     }

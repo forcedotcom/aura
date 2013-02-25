@@ -21,16 +21,9 @@
  * @namespace The value Object used in the backing store of the MemoryStorageAdapter.
  * @constructor
  */
-var MemoryStorageValue = function MemoryStorageValue(item) {
-	this.setItem(item);
-};
-
-MemoryStorageValue.prototype.setItem = function(newItem) {
-	this.item = newItem;
-};
-
-MemoryStorageValue.prototype.setSize = function(newSize) {
-	this.size = newSize;
+var MemoryStorageValue = function MemoryStorageValue(item, size) {
+	this.item = item;
+	this.size = size;
 };
 
 MemoryStorageValue.prototype.getItem = function() {
@@ -47,9 +40,12 @@ MemoryStorageValue.prototype.getSize = function() {
  */
 var MemoryStorageAdapter = function MemoryStorageAdapter(config) {
 	this.backingStore = {};
+	this.mru = [];
 	this.cachedSize = 0;
 	this.isDirtyForCachedSize = false;
 	this.sizeEstimator = new SizeEstimator();
+	this.maxSize = config["maxSize"];
+	this.debugLoggingEnabled = config["debugLoggingEnabled"];
 };
 
 MemoryStorageAdapter.NAME = "memory";
@@ -62,17 +58,10 @@ MemoryStorageAdapter.prototype.getSize = function() {
 	if (this.isDirtyForCachedSize === true) {
 		var newSize = 0;
 		for (var key in this.backingStore) {
-			// the size might be cached for the item, in order to avoid an expensive recalculation
 			var backingStoreValue = this.backingStore[key];
-			var itemSize = backingStoreValue.getSize();
-			if ($A.util.isUndefinedOrNull(itemSize)) {
-				// For the size calculation, consider only the inputs to the storage layer: key and value
-				// Ignore all the extras added by the Storage layer.
-				itemSize = this.sizeEstimator.estimateSize(key) + this.sizeEstimator.estimateSize(backingStoreValue.getItem()["value"]);
-				backingStoreValue.setSize(itemSize);
-			}
-			newSize += itemSize;
+			newSize += backingStoreValue.getSize();
 		}
+		
 		this.cachedSize = newSize;
 		this.isDirtyForCachedSize = false;
 	}
@@ -81,22 +70,48 @@ MemoryStorageAdapter.prototype.getSize = function() {
 };
 
 MemoryStorageAdapter.prototype.getItem = function(key, resultCallback) {
-	var backingStoreValue = this.backingStore[key];
-	if (!$A.util.isUndefinedOrNull(backingStoreValue)) {
-		resultCallback(backingStoreValue.getItem());
+	var value = this.backingStore[key];
+	if (!$A.util.isUndefinedOrNull(value)) {
+		// Update the MRU
+		var index = this.mru.indexOf(key);
+		this.mru.splice(index, 1);
+		this.mru.push(key);
+
+		resultCallback(value.getItem());
 	} else {
 		resultCallback();
 	}
 };
 
 MemoryStorageAdapter.prototype.setItem = function(key, item) {
-	this.backingStore[key] = new MemoryStorageValue(item);
+	// For the size calculation, consider only the inputs to the storage layer: key and value
+	// Ignore all the extras added by the Storage layer.
+	var size = this.sizeEstimator.estimateSize(key) + this.sizeEstimator.estimateSize(item["value"]);
+	var spaceNeeded = (size + this.getSize()) - this.maxSize;
+	if (spaceNeeded > 0) {
+		this.evict(spaceNeeded);
+	}
+	
+	var value = new MemoryStorageValue(item, size);
+	this.backingStore[key] = value;
+	
+	// Update the MRU
+	this.mru.push(key);
+	
 	this.isDirtyForCachedSize = true;
 };
 
 MemoryStorageAdapter.prototype.removeItem = function(key) {
+	// Update the MRU
+	var value = this.backingStore[key];
+	var index = this.mru.indexOf(key);
+	this.mru.splice(index, 1);
+	
 	delete this.backingStore[key];
+	
 	this.isDirtyForCachedSize = true;
+	
+	return value;
 };
 
 MemoryStorageAdapter.prototype.clear = function(key) {
@@ -119,9 +134,28 @@ MemoryStorageAdapter.prototype.getExpired = function(resultCallback) {
 	resultCallback(expired);
 };
 
+MemoryStorageAdapter.prototype.evict = function(spaceNeeded) {
+	var spaceReclaimed = 0;
+	while (spaceReclaimed < spaceNeeded && this.mru.length > 0) {
+		var key = this.mru[0];
+		var value = this.removeItem(key);
+		spaceReclaimed += value.getSize();
+		
+		if (this.debugLoggingEnabled) {
+			$A.log("MemoryStorageAdapter.evict(): evicted", [key, value, spaceReclaimed]);
+		}
+	}
+};
+
 MemoryStorageAdapter.prototype.getSizeEstimator = function() {
 	return this.sizeEstimator;
 };
+
+// #if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+MemoryStorageAdapter.prototype.getMRU = function() {
+	return this.mru;
+};
+// #end
 
 //#include aura.storage.adapters.MemoryAdapter_export
 

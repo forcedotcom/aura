@@ -16,7 +16,7 @@
  
 ({
 	setUp:function(cmp){
-		this.adapter = new $A.storageService.createAdapter("memory");
+		this.adapter = new $A.storageService.createAdapter("memory", "test", 4096, true);
 	},
 	
 	testSizeInitial:{
@@ -104,6 +104,50 @@
 			// adding a new key, new size of object.  70 bytes
 			this.adapter.setItem("key1", {"value": {"who":"Brian2", "what":"Developer3"}});
 			$A.test.assertEquals(136, this.adapter.getSize());
+		}
+	},
+	
+	testLeastRecentlyUsedEviction:{
+		test:function(cmp) {
+			var adapter = this.adapter;
+			
+			adapter.setItem("key1", {"value": {"foo":new Array(256).join("x")}});
+			var size1 = adapter.getSize();
+			$A.test.assertEquals(532, size1);
+			$A.test.assertEquals("key1", adapter.getMRU().toString());
+			
+			adapter.setItem("key2", {"value": {"bar":new Array(512).join("y")}});
+			var size2 = adapter.getSize();
+			$A.test.assertEquals(1576, size2);
+			$A.test.assertEquals("key1,key2", adapter.getMRU().toString());
+			
+			// Touch key1 to move it up to the top of the MRU
+			// Oldest (key2) item should have been evicted
+			var item1WasTouched;
+			$A.test.addWaitFor(true, function() {
+				adapter.getItem("key1", function(item) {
+					item1WasTouched = !$A.util.isUndefined(item);
+				});
+				
+				return item1WasTouched;
+			}, function(cmp) {
+				$A.test.assertEquals("key2,key1", adapter.getMRU().toString());
+				
+				adapter.setItem("key3", {"value": {"baz":new Array(1500).join("z")}});
+				
+				// Oldest (key2) item should have been evicted
+				var itemWasEvicted;
+				$A.test.addWaitFor(true, function() {
+					adapter.getItem("key2", function(item) {
+						itemWasEvicted = $A.util.isUndefined(item);
+					});
+					
+					return itemWasEvicted;
+				}, function(cmp) {
+					$A.test.assertEquals(3552, adapter.getSize());
+					$A.test.assertEquals("key1,key3", adapter.getMRU().toString());
+				});
+			});
 		}
 	}
 	

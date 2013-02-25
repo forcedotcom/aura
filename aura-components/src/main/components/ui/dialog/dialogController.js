@@ -33,7 +33,7 @@
 
     /*
      * Handles the click of the "x" (close) button, or the default cancel button of
-     * the dialog (used when ariaRole='alertdialog'). Fires the application-level
+     * the dialog (present when type='alert'). Fires the application-level
      * event ui:closeDialog, setting the 'confirmClicked' attribute to false.
      */
     cancel : function(cmp, evt, hlp) {
@@ -44,9 +44,9 @@
 
 
     /*
-     * Handles the click of default confirm button of the dialog (used when
-     * ariaRole='alertdialog'). Fires the application-level event ui:closeDialog,
-     * setting the 'confirmClicked' attribute to true.
+     * Handles the click of default confirm button of the dialog (present when
+     * type='alert'). Fires the application-level event ui:closeDialog, setting
+     * the 'confirmClicked' attribute to true.
      */
     confirm : function(cmp, evt, hlp) {
 

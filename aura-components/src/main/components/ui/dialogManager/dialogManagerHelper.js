@@ -49,7 +49,8 @@
     activateDialog : function(dialogCmp, managerCmp) {
 
         var dialogAtts      = dialogCmp.getAttributes(),
-            isModal         = dialogAtts.getRawValue("isModal"),
+            dialogType      = dialogAtts.get("type"),
+            isModal         = dialogType === "alert" || dialogType === "modal",
             clickOutToClose = dialogAtts.getRawValue("clickOutToClose"),
             managerAtts     = managerCmp.getAttributes(),
             currentlyActive = managerAtts.get("_activeDialogs"),
@@ -126,21 +127,21 @@
 
     /**
      * Retrieves the first focusable element inside the active dialog component. Should
-     * ALWAYS return a non-null value (unless using IE7 - see note), as the
-     * "x" (i.e. dialog close) link should always be visible and positioned as the very
-     * last element in the dialog window. (Having a known element as the last item
-     * in the dialog makes keyboard management much easier.)
+     * ALWAYS return a non-null value, as the "x" (i.e. dialog close) link should always
+     * be visible and positioned as the very last element in the dialog window.
+     * (Having a known element as the last item in the dialog makes keyboard management
+     * much easier.)
      *
-     * NOTE: This method uses querySelectorAll(), which IE7 doesn't like, but it's not
-     * a mission-critical feature to auto-focus on the first element in the dialog, so
-     * I'm not going to create some heinous recursive DOM walker just for <=IE7.
+     * NOTE: This method uses querySelectorAll(), which IE7 doesn't like, so IE7 will
+     * always focus on the "x" link, instead of the first element.
      * 
      * @param {Aura.Component} dialogCmp the active ui:dialog component
-     * @return {HTMLElement|Object} the first focusable element inside the dialog, or null for IE7
+     * @return {HTMLElement|Object} the first focusable element inside the dialog, or the "x" link for IE7
      */
     getFocusElement : function(dialogCmp) {
 
         var container    = dialogCmp.find("dialog").getElement(),
+            close        = dialogCmp.find("close").getElement(),
             formElements = [],
             length       = 0,
             element      = null;
@@ -162,6 +163,8 @@
                 // we should never get here - at a minimum, the "close" link should always be present
                 $A.assert(false, "No focusable element found, which es muy no bueno.");
             }
+        } else {
+            element = close;
         }
 
         return element;
@@ -205,7 +208,7 @@
                         closeLink.focus();
                     }
                 // if not modal, close the dialog when you tab out of it (unless you allow multiple active dialogs)
-                } else if (!managerCmp.get("v.allowMultipleActiveDialogs")) {
+                } else if (!managerCmp.get("v.allowMultipleOpen")) {
                     if ((currentFocus === closeLink && !shiftPressed) ||
                         (currentFocus === firstFocusable && shiftPressed)) {
                         this.cancelEvent(event);
@@ -243,6 +246,7 @@
      */
     getClickHandler : function(dialogCmp, managerCmp, isModal, clickOutToClose, event) {
         // TODO: need to figure out how to deal w/ ui:press firing AFTER ui:openDialog first
+        // TODO: add z-index management for multiple open dialogs at the same time
     },
 
 

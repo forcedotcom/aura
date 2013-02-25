@@ -24,7 +24,8 @@
     afterRender : function(cmp) {
 
         var atts    = cmp.getAttributes(),
-            isModal = atts.get("isModal"),
+            type    = atts.get("type"),
+            isModal = type === "alert" || type === "modal",
             ariaId  = atts.get("_ariaId"),
             mask    = cmp.find("mask"),
             dialog  = cmp.find("dialog"),
@@ -49,10 +50,12 @@
      */
     rerender : function(cmp, hlp) {
 
-        var isVisible = cmp.get("v._isVisible"),
-            config    = cmp.get("v._handlerConfig"),
-            autoFocus = cmp.get("v.autoFocus"),
-            isModal   = cmp.get("v.isModal"),
+        var atts      = cmp.getAttributes(),
+            isVisible = atts.get("_isVisible"),
+            config    = atts.get("_handlerConfig"),
+            autoFocus = atts.get("autoFocus"),
+            type      = atts.get("type"),
+            isModal   = type === "alert" || type === "modal",
             maskCmp   = cmp.find("mask"),
             mask      = maskCmp ? maskCmp.getElement() : null,
             dialog    = cmp.find("dialog").getElement(),

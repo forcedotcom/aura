@@ -27,17 +27,18 @@
     -moz-transition:all 0.3s linear;
     transition:all 0.3s linear;
     opacity:0;
+    z-index:99999;
 }
 .uiDialog.fadeIn{
     opacity:1;
 }
 .uiDialog.dialog{
     position:absolute;
+    z-index:99999;
 }
 .uiDialog.mask,
 .uiDialog.modal{
     position:fixed;
-    z-index:99999;
 }
 .uiDialog.dialog{
     background:#666;

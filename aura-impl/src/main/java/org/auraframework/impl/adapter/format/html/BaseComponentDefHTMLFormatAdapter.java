@@ -29,6 +29,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.http.AuraServlet;
+import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.service.InstanceService;
@@ -52,7 +53,6 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
     @Override
     public void write(Object value, Map<String, Object> componentAttributes, Appendable out) throws IOException {
         try {
-
             InstanceService instanceService = Aura.getInstanceService();
             RenderingService renderingService = Aura.getRenderingService();
             BaseComponentDef def = (BaseComponentDef) value;
@@ -65,7 +65,6 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
             attributes.put("auraStyleTags", sb.toString());
             sb.setLength(0);
             writeHtmlScripts(AuraServlet.getScripts(), sb);
-            String manifest = AuraBaseServlet.getManifest();
             AuraContext context = Aura.getContextService().getCurrentContext();
 
             attributes.put("lastMod", Long.toString(AuraBaseServlet.getLastMod()));
@@ -80,7 +79,6 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
             Mode mode = context.getMode();
 
             if (mode.allowLocalRendering() && def.isLocallyRenderable()) {
-
                 DefType defType = def.getDescriptor().getDefType();
                 BaseComponent<?, ?> cmp = null;
 
@@ -94,19 +92,9 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
                 attributes.put("bodyClass", "");
                 attributes.put("defaultBodyClass", "");
                 attributes.put("autoInitialize", "false");
-
-                Component template = instanceService.getInstance(templateDef.getDescriptor(), attributes);
-
-                renderingService.render(template, out);
             } else {
-
-                DefType defType = def.getDescriptor().getDefType();
-
-                if (Aura.getConfigAdapter().isClientAppcacheEnabled() && defType == DefType.APPLICATION
-                        && manifest != null && !manifest.isEmpty()) {
-                    if (((ApplicationDef) def).isAppcacheEnabled()) {
-                        attributes.put("manifest", manifest);
-                    }
+                if (ManifestUtil.isManifestEnabled()) {
+                    attributes.put("manifest", ManifestUtil.getManifestUrl());
                 }
 
                 sb.setLength(0);
@@ -130,10 +118,9 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
                 auraInit.put("context", new Literal(contextWriter.toString()));
 
                 attributes.put("auraInit", Json.serialize(auraInit));
-
-                Component template = instanceService.getInstance(templateDef.getDescriptor(), attributes);
-                renderingService.render(template, out);
             }
+            Component template = instanceService.getInstance(templateDef.getDescriptor(), attributes);
+            renderingService.render(template, out);
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
         }

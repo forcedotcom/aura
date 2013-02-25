@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.RegistryAdapter;
@@ -37,13 +38,13 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.junit.Ignore;
 import org.mockito.Mockito;
 import org.mockito.internal.util.MockUtil;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * @see org.auraframework.impl.registry.RootDefFactoryTest
@@ -193,20 +194,42 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify getUid() returns the correct value. If the component itself, any of it's dependencies, or the logic to
-     * calculate the UID are modified, then this hard-coded UID will need to be changed as well.
+     * Verify UID values and dependencies against a gold file.
+     *
+     * This does a recursive set of dependencies checks to build a gold file with the 
+     * resulting descriptors and UIDs to ensure that we get both a valid set and can
+     * tell what changed (and thus verify that it should have changed).
+     *
+     * The format of the file is:
+     * <ul>
+     * <li>Top level descriptor ':' global UID.<li>
+     * <li>dependency ':' own hash<li>
+     * <li>...</li>
+     * </ul>
      */
-    @Ignore("W-1551219")
     public void testUidValue() throws Exception {
-        // Known UID, assuming no dependencies or the file itself have changed.
-        String knownUid = "3VBCHFMNOup__UlHicckgg";
+        StringBuilder buffer = new StringBuilder();
         String cmpName = "test:layoutNoLayout";
-        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService()
-                .getDefDescriptor(cmpName, ApplicationDef.class);
+        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(cmpName, ApplicationDef.class);
         MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
         String uid = masterDefReg.getUid(null, desc);
         assertNotNull("Could not retrieve UID for component " + cmpName, uid);
-        assertEquals("Unexpected UID value on component " + cmpName, knownUid, uid);
+        Set<DefDescriptor<?>> dependencies = masterDefReg.getDependencies(uid);
+        assertNotNull("Could not retrieve dependencies for component " + cmpName, dependencies);
+
+        buffer.append(desc.toString());
+        buffer.append(" : ");
+        buffer.append(uid);
+        buffer.append("\n");
+
+        SortedSet<DefDescriptor<?>> sorted = Sets.newTreeSet(dependencies);
+        for (DefDescriptor<?> dep : sorted) {
+            buffer.append(dep);
+            buffer.append(" : ");
+            buffer.append(masterDefReg.getDef(dep).getOwnHash());
+            buffer.append("\n");
+        }
+        goldFileText(buffer.toString());
     }
 
     public void testGetUidDescriptorNull() throws Exception {

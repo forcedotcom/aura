@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 ({
-    render:function (component, helper) {
-        // Add AOP to common attributes
-        helper.addObservers(component, helper.updateCalculatedFields, ["currentPage","pageSize","totalItems"]);
-
-        return this.superRender();
-    }
+	updateCalculatedFields: function(component, event, helper) {
+		helper.updateCalculatedFields(component);
+	}
 })

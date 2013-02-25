@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component implements="ui:listInterface" extensible="true" support="proto">
+<aura:component implements="ui:listInterface, ui:pagingInterface" extensible="true" support="proto">
 	<aura:handler name="init" action="{!c.init}" value="{!this}"/>
 	{!v.header}
 	

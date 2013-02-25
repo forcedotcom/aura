@@ -15,7 +15,12 @@
     limitations under the License.
 
 -->
-<aura:component implements="ui:elementInterface,ui:pagingInterface" abstract="true" extensible="true" provider="java://org.auraframework.component.ui.PagerProvider,js://ui.pager" support="GA" description="An abstract pager component, used to specify common behavior across implementations.">
+<aura:component implements="ui:visible, ui:pagingInterface" abstract="true" extensible="true" provider="java://org.auraframework.component.ui.PagerProvider,js://ui.pager" support="GA" description="An abstract pager component, used to specify common behavior across implementations.">
     <aura:registerEvent name="onPageChange" type="ui:pagerEvent" description="The event that is fired when a concrete pager triggers a paging event."/>
+    <aura:handler name="init" value="{!this}" action="{!c.updateCalculatedFields}"/>
+    
+    <aura:handler name="change" value="{!v.currentPage}" action="{!c.updateCalculatedFields}"/>
+    <aura:handler name="change" value="{!v.pageSize}" action="{!c.updateCalculatedFields}"/>
+    <aura:handler name="change" value="{!v.totalItems}" action="{!c.updateCalculatedFields}"/>
     {!v.body}
 </aura:component>

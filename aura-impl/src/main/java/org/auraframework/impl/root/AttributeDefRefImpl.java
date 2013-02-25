@@ -128,7 +128,7 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
     @Override
     public String toString() {
         // output the original value
-        return value.toString();
+        return String.valueOf(value);
     }
 
     @Override
@@ -153,6 +153,9 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
          * Sets the value for this instance.
          */
         public Builder setValue(Object value) {
+            if (value == null) {
+                throw new NullPointerException("Value cannot be null");
+            }
             this.value = value;
             return this;
         }

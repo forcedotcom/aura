@@ -147,6 +147,18 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         assertEquals(vendor.makeComponentDefRef(), vendor.makeComponentDefRef());
     }
 
+    public void testNullSetAttribute() {
+        ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
+        ComponentDefRef built;
+
+        builder.setDescriptor("aura:text");
+        builder.setAttribute("truncate", new Integer(5));
+        builder.setAttribute("value", "some text");
+        builder.setAttribute("value", null);
+        built = builder.build();
+        assertEquals("{truncate=5}", built.getAttributeValues().toString());
+    }
+
     public void testEqualsWithDifferentDescriptor() {
         ComponentDefRef cdr1 = vendor.makeComponentDefRef();
         ComponentDefRef cdr2 = vendor.makeComponentDefRef(vendor.getParentComponentDefDescriptor(), null, null);

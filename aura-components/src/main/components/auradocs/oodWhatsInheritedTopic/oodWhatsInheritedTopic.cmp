@@ -25,26 +25,47 @@
 
     <p>All attributes are inherited. You can override an attribute in a sub-component using <code>&lt;aura:attribute&gt;</code>. However, you should only do this if you want to change the attribute's default value in the sub-component.</p>
 
-    <p>Use <code>&lt;aura:set&gt;</code> in a sub-component to set an attribute on the parent component.</p>
+    <p>Use <code>&lt;aura:set&gt;</code> in a sub-component to set an attribute in a super component when you are extending a component or implementing an interface.</p>
+    
+    <p><auradocs:topicLink topic="helloAttributes">Read more</auradocs:topicLink> about component attributes.</p>
 
     <h2>Events</h2>
 
-    <p>A sub-component can handle component events fired by the super component. The super and sub-component can handle the same event in different ways. Aura doesn't guarantee the order of event handling.</p>
+    <p>A child component that extends a super component can handle events fired by the super component. The child component automatically inherits the event handlers from the super component.</p>
+    
+    <p>The super and sub-component can handle the same event in different ways by adding an <code>&lt;aura:handler&gt;</code> tag to the child component. Aura doesn't guarantee the order of event handling.</p>
 
     <p>When an event fires, handlers for the event are executed. Handlers for any event that extend the event are also fired.</p>
 
+    <p><auradocs:topicLink topic="helloEvents">Read more</auradocs:topicLink> about events.</p>
+    
     <h2>Helpers</h2>
 
     <p>A child component's helper inherits the methods from the helper of its super component. A child component can override a super component's helper method by defining a method with the same name as an inherited method.</p>
 
-    <h2>What Isn't Inherited?</h2>
+    <p><auradocs:topicLink topic="helper">Read more</auradocs:topicLink> about helpers.</p>
 
-    <p>Neither controllers nor the model are inherited by a sub-component.</p>
+    <h2>Controllers</h2>
+    
+    <p>A child component that extends a super component can call actions in the super component's client-side controller. For example, if the super component has an action called <code>doSomething</code>, the child component can directly call the action using the <code><aura:text value="{!"/>c.doSomething}</code> syntax.</p>
+    
+    <auradocs:warning>We don't recommend using inheritance of client-side controllers as this feature may be deprecated in the future to preserve better component encapsulation.  We recommend that you put common code in a helper instead.</auradocs:warning>
+
+    <p><auradocs:topicLink topic="helloActions">Read more</auradocs:topicLink> about client-side controllers.</p>
+
+    <h2>Models</h2>
+
+    <p>A component's model is <b>not</b> inherited by a component that extends the super component.</p>
+    
+    <h2>Reaching Into a Super Component</h2>
+    
+    <p>You can use the <code>super</code> value provider in markup to reach in to a super component. Use <code>getSuper()</code> in JavaScript code. For example, if a sub component needs to access an attribute set in an action in the super's controller, use <code>cmp.getSuper().getValue("v.parentAttributeName")</code>, where <code>parentAttributeName</code> is an attribute in the super component.</p>
+    
+    <auradocs:info>We don't recommend using <code>super</code> and <code>getSuper()</code> unless you must as it reduces component encapsulation. It's rare to have to use this syntax but it can be useful when you are writing tests.</auradocs:info>
 
     <p><b>See also:</b><br/>
         <auradocs:topicLink topic="tagAuraSet">aura:set</auradocs:topicLink><br/>
-        <auradocs:topicLink topic="helloEvents">Events Overview</auradocs:topicLink><br/>
-        <auradocs:topicLink topic="helper">Helpers</auradocs:topicLink>
+        <auradocs:topicLink topic="models">Models</auradocs:topicLink>
     </p>
 
 </aura:component>

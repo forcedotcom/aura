@@ -16,8 +16,7 @@
 
 {
 	handleSearch : function(cmp,event){
-	var searchTerm = event.getParam('searchTerm') || event.getSource().getElement().value;
- 
+		var searchTerm = event.getParam('searchTerm') || (event.getSource() && event.getSource().getElement().value);
 		if (searchTerm.length > 0) {
 			 var results_location = "#help?topic=searchResults&searchTerm=" + escape(searchTerm);
 			 window.location = results_location;

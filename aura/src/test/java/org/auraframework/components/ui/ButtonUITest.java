@@ -31,7 +31,7 @@ public class ButtonUITest extends WebDriverTestCase {
         openNoAura("/uitest/buttonLabelRequiredTest.cmp");
         waitForDocumentReady();
         WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSecs);
-        wait.withMessage("Required label error not displayed");
+        wait.withMessage("Required label error not displayed, instead got error:" + this.getQuickFixMessage());
                 wait.until(new ExpectedCondition<Boolean>() {
                     @Override
                     public Boolean apply(WebDriver d) {

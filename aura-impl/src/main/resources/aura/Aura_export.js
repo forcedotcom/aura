@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 /*jslint sub: true */
-var p = Aura.prototype;
-exp(p,
-    "initAsync", p.initAsync,
-    "initConfig", p.initConfig,
-    "init", p.init,
-    "error", p.error,
-    "message", p.message,
-    "get", p.get,
-    "getRoot", p.getRoot,
-    "getContext", p.getContext,
-    "unwrap", p.unwrap,
-    "assert", p.assert,
-    "userAssert", p.userAssert,
-    "log", p.log,
-    "logf", p.logf,
-    "trace", p.trace,
-    "mark", p.mark,
-    "measure", p.measure,
-    "logLevel", p.logLevel,
-    "fitTo", p.fitTo
-    //#if {"excludeModes" : ["PRODUCTION"]}
-        ,
-        "devToolService", p.devToolService,
-        "getQueryStatement", p.getQueryStatement,
-        "qhelp", p.qhelp
-    //#end
 
-);
+// //#exportSymbols $A.ns.Aura
+$A.ns.Aura.prototype["initAsync"] = $A.ns.Aura.prototype.initAsync;
+$A.ns.Aura.prototype["initConfig"] = $A.ns.Aura.prototype.initConfig;
+$A.ns.Aura.prototype["init"] = $A.ns.Aura.prototype.init;
+$A.ns.Aura.prototype["error"] = $A.ns.Aura.prototype.error;
+$A.ns.Aura.prototype["message"] = $A.ns.Aura.prototype.message;
+$A.ns.Aura.prototype["get"] = $A.ns.Aura.prototype.get;
+$A.ns.Aura.prototype["getRoot"] = $A.ns.Aura.prototype.getRoot;
+$A.ns.Aura.prototype["getContext"] = $A.ns.Aura.prototype.getContext;
+$A.ns.Aura.prototype["unwrap"] = $A.ns.Aura.prototype.unwrap;
+$A.ns.Aura.prototype["assert"] = $A.ns.Aura.prototype.assert;
+$A.ns.Aura.prototype["userAssert"] = $A.ns.Aura.prototype.userAssert;
+$A.ns.Aura.prototype["log"] = $A.ns.Aura.prototype.log;
+$A.ns.Aura.prototype["logf"] = $A.ns.Aura.prototype.logf;
+$A.ns.Aura.prototype["trace"] = $A.ns.Aura.prototype.trace;
+$A.ns.Aura.prototype["mark"] = $A.ns.Aura.prototype.mark;
+$A.ns.Aura.prototype["measure"] = $A.ns.Aura.prototype.measure;
+$A.ns.Aura.prototype["logLevel"] = $A.ns.Aura.prototype.logLevel;
+$A.ns.Aura.prototype["fitTo"] = $A.ns.Aura.prototype.fitTo;
+// //#end
+
+//#if {"excludeModes" : ["PRODUCTION"]}
+$A.ns.Aura.prototype["devToolService"] = $A.ns.Aura.prototype.devToolService; 
+$A.ns.Aura.prototype["getQueryStatement"] = $A.ns.Aura.prototype.getQueryStatement;
+$A.ns.Aura.prototype["qhelp"] = $A.ns.Aura.prototype.qhelp;
+//#end
+

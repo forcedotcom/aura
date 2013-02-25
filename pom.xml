@@ -277,6 +277,12 @@
 	            <artifactId>selenium-firefox-driver</artifactId>
             	<version>2.29.0</version>
         	</dependency>
+			<dependency>
+				<!-- needed by selenium -->
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpcore</artifactId>
+				<version>4.2.3</version>
+			</dependency>
             <dependency>
                 <groupId>net.sourceforge.pjl-comp-filter</groupId>
                 <artifactId>pjl-comp-filter</artifactId>

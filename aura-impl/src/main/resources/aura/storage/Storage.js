@@ -17,9 +17,7 @@
 /**
  * @namespace The storage service implementation
  * @constructor
- * @param {Object} adapter The backing data store that the storage service uses for persistence.
- * @param {Decimal} maxSize The physical cap on the amount of space the service will use before it attempts evictions.
- * @param {Decimal} defaultExpiration The default value of TTL in seconds.
+ * @param {Object} config The configuration describing the characteristics of the storage to be created.
  */
 var AuraStorage = function AuraStorage(config) {
     this.adapter = config["adapter"];
@@ -80,11 +78,6 @@ AuraStorage.prototype.get = function(key, resultCallback) {
 AuraStorage.prototype.put = function(key, value) {
 	this.sweep();
 
-	// DCHASMAN TODO Revive cost based eviction
-	/*if (this.size + cost > this.maxSize) {
-		this.evict(cost);
-	}*/
-	
 	var now = new Date().getTime();
 	
 	var item = {
@@ -143,10 +136,6 @@ AuraStorage.prototype.resumeSweeping = function() {
 
 	this._sweepingSuspended = false;
 	this.sweep();
-};
-
-AuraStorage.prototype.evict = function(spaceNeeded) {
-	this.log("AuraStorage.evict(): Exceeded maximum space usage allowed in storage: DCHASMAN TODO implement LRU/expiry eviction strategy!", [spaceNeeded / 1024.0, this.getMaxSize() / 1024.0, this.getSize()]);
 };
 
 

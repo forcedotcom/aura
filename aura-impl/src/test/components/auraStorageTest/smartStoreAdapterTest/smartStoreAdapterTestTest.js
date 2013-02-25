@@ -15,7 +15,7 @@
      */
 	browsers: ['GOOGLECHROME', 'SAFARI'],
     setUp:function(cmp){
-        this.adapter = new $A.storageService.createAdapter("smartstore");
+        this.adapter = new $A.storageService.createAdapter("smartstore", "test");
         this.setItemCallCounter = 0;
         this.removeItemCallCounter = 0;
         
@@ -344,7 +344,7 @@
                 this.assertNumItems(1, "SetItem should have set 1 item");
             },
             function(cmp){
-                this.adapter = new $A.storageService.createAdapter("smartstore");
+                this.adapter = new $A.storageService.createAdapter("smartstore", "test");
                 this.assertGet("key1", {"value":{"oh":"hey"}});
             }
         ]

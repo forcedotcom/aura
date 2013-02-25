@@ -32,8 +32,7 @@ var AuraStorageService = function(){
         		throw new Error("Storage named '" + name + "' already exists!");
         	}
         	
-        	var implementation = this.selectAdapter(persistent, secure);
-            var adapter = this.createAdapter(implementation);
+            var adapter = this.createAdapter(this.selectAdapter(persistent, secure), name, maxSize, debugLoggingEnabled);
         	
         	var config = {
         		"name": name,
@@ -62,14 +61,21 @@ var AuraStorageService = function(){
         	adapters[name] = config;
         },
         
-        createAdapter : function(implementation) {
-        	var config = adapters[implementation];
+        createAdapter : function(adapter, name, maxSize, debugLoggingEnabled) {
+        	var config = adapters[adapter];
         	if (!config) {
         		throw new Error("StorageService.getAdapter() unknown adapter '" + implementation + "'!");
-        	}        	
+        	}        
         	
         	var AdapterClass = config["adapterClass"];
-        	return new AdapterClass(config);
+        	
+        	var adapterConfig = {
+        		"name": name,
+        		"maxSize": maxSize,
+        		"debugLoggingEnabled": debugLoggingEnabled
+        	};        	
+        	
+        	return new AdapterClass(adapterConfig);
         },
         
         fireModified : function() {

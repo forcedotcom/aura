@@ -17,11 +17,19 @@
 -->
 <aura:component extensible="true" support="GA" description="A dialog window used for overlays or modals. To use this component, you must also include one (and only one) ui:dialogManager component in your app. Regardless of how many instances of ui:dialog you use, only one ui:dialogManager component is required. We recommend putting the ui:dialogManager component at the end of your .app file.">
 
-    <!-- public attributes -->
+    <!-- main attributes -->
     <aura:attribute name="autoFocus" type="Boolean" default="{!true}" description="Automatically focus on the first focusable element when the dialog is displayed."/>
     <aura:attribute name="buttons" type="Aura.Component[]" description="Buttons that should be displayed at the bottom of the dialog (e.g., 'Save', 'Cancel', etc.). If the dialog type is set to 'alert' and you are using the default 'cancel' and 'confirm' buttons, any custom buttons you provide here will be placed between the 'cancel' and 'confirm' buttons."/>
     <!-- clickOutToClose isn't working right now, because ui:press finishes firing AFTER ui:openDialog -->
     <!--<aura:attribute name="clickOutToClose" type="Boolean" default="{!true}" description="Specifies if the dialog should be closed when any element outside the dialog is clicked."/>-->
+    <aura:attribute name="defaultAlertButtons" type="String" default="both" description="When the 'type' attribute is set to 'alert', determines which default buttons should appear at the bottom of the dialog. Valid values are 'confim', 'cancel', 'both', or 'none'."/>
+    <aura:attribute name="doubleConfirm" type="Boolean" default="{!false}" description="When the 'type' attribute is set to 'alert' and the 'defaultAlertButtons' attribute is set to 'confirm' or 'both', this setting will display a confirmation checkbox in addition to the confirmation button. The checkbox must be checked in order for the confirmation button to return true upon click."/>
+    <aura:attribute name="title" type="String" description="The title displayed in the dialog's header. Required for accessibility." required="true"/>
+    <aura:attribute name="titleDescription" type="String" description="Instructional information about the purpose of the dialog. This text will not be visible on-screen, but still readable by assistive technologies." required="true"/>
+    <aura:attribute name="type" type="String" description="The type of dialog window. Possible choices are 'alert', 'modal', and 'nonmodal'. TODO: explain the difference between these." required="true"/>
+    <aura:attribute name="width" type="String" default="medium" description="The width of the dialog. Valid values are 'small', 'medium', 'large' (which equal 310px, 620px, and 940px, respectively), and 'auto', which sizes based on the contents of the dialog. Note that 'auto' will only work properly when the dialog type is set to 'nonmodal'."/>
+
+    <!-- css, label, and title hooks -->
     <aura:attribute name="cancelButtonClass" type="String" description="Additional CSS classes to apply to the default cancel button that is displayed when the 'type' attribute is set to 'alert'."/>
     <aura:attribute name="cancelButtonLabel" type="String" default="Cancel" description="The label of the default cancel button that is displayed when the 'type' attribute is set to 'alert'."/>
     <aura:attribute name="cancelButtonTitle" type="String" default="Click to cancel" description="The title attribute of the default cancel button that is displayed when the 'type' attribute is set to 'alert'."/>
@@ -33,15 +41,9 @@
     <aura:attribute name="confirmButtonClass" type="String" description="Additional CSS classes to apply to the default confirm button that is displayed when the 'type' attribute is set to 'alert'."/>
     <aura:attribute name="confirmButtonLabel" type="String" default="OK" description="The label of the default confirm button that is displayed when the 'type' attribute is set to 'alert'."/>
     <aura:attribute name="confirmButtonTitle" type="String" default="Click to confirm" description="The title attribute of the default confirm button that is displayed when the 'type' attribute is set to 'alert'."/>
-    <aura:attribute name="defaultAlertButtons" type="String" default="both" description="When the 'type' attribute is set to 'alert', determines which default buttons should appear at the bottom of the dialog. Valid values are 'confim', 'cancel', 'both', or 'none'."/>
     <aura:attribute name="dialogClass" type="String" description="Additional CSS classes to apply to the dialog's outermost &lt;div&gt; wrapper."/>
-    <aura:attribute name="doubleConfirm" type="Boolean" default="{!false}" description="When the 'type' attribute is set to 'alert' and the 'defaultAlertButtons' attribute is set to 'confirm' or 'both', this setting will display a confirmation checkbox in addition to the confirmation button. The checkbox must be checked in order for the confirmation button to return true upon click."/>
     <aura:attribute name="doubleConfirmLabel" type="String" default="Are you sure?" description="The default label of the double-confirmation checkbox."/>
     <aura:attribute name="maskClass" type="String" description="Additional CSS classes to apply to the window mask located behind a modal dialog."/>
-    <aura:attribute name="width" type="String" default="medium" description="The width of the dialog. Valid values are 'small', 'medium', 'large' (which equal 310px, 620px, and 940px, respectively), and 'auto', which sizes based on the contents of the dialog. Note that 'auto' will only work properly when the dialog type is set to 'nonmodal'."/>
-    <aura:attribute name="title" type="String" description="The title displayed in the dialog's header. Required for accessibility." required="true"/>
-    <aura:attribute name="titleDescription" type="String" description="Instructional information about the purpose of the dialog. This text will not be visible on-screen, but still readable by assistive technologies." required="true"/>
-    <aura:attribute name="type" type="String" description="The type of dialog window. Possible choices are 'alert', 'modal', and 'nonmodal'. TODO: explain the difference between these." required="true"/>
 
     <!-- private attributes -->
     <aura:attribute name="_ariaId" type="String" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The id needed to identify the dialog window to assistive technologies."/>

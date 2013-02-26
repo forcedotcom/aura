@@ -112,7 +112,7 @@
             newFocus = this.getFocusElement(dialogCmp),
             keydown  = function(event) { self.getKeydownHandler(dialogCmp, managerCmp, isModal, newFocus, event) },
             click    = function(event) { self.getClickHandler(dialogCmp, managerCmp, isModal, clickOutToClose, event) },
-            resize   = function(event) { self.getResizeHandler(dialogCmp, managerCmp, isModal, event)};
+            resize   = function(event) { self.getResizeHandler(dialogCmp, isModal)};
 
         return {
             oldFocus       : oldFocus,
@@ -254,13 +254,15 @@
      * Constructs the handler for the DOM window.resize event.
      * 
      * @param {Aura.Component} dialogCmp
-     * @param {Aura.Component} managerCmp
      * @param {Boolean} isModal
-     * @param {UIEvent} event
      * @return {void}
      */
-    getResizeHandler : function(dialogCmp, managerCmp, isModal, event) {
-        // TODO
+    getResizeHandler : function(dialogCmp, isModal) {
+
+        if (isModal) {
+            dialogCmp.getDef().getHelper().setContentMaxHeight(dialogCmp.find("content"));
+        }
+
     },
 
 

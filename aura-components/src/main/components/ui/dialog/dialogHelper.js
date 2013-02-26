@@ -37,6 +37,22 @@
 
 
     /**
+     * Sets the max-height CSS attribute of the content <div> in a modal window so
+     * it doesn't extend outside the viewport.
+     * 
+     * @param {Aura.Component} contentCmp the content box component
+     * @return {void}
+     */
+    setContentMaxHeight : function(contentCmp) {
+
+        var maxHeight = Math.min(this.getWindowHeight(), 1000) - 150;
+
+        contentCmp.getElement().style.maxHeight = maxHeight + "px";
+
+    },
+
+
+    /**
      * Simple cross-browser function to get the height of the client viewport
      * 
      * @return {Integer} the height of the client viewport

@@ -69,7 +69,7 @@
                 if (isModal) {
                     // delay focus until the modal slides into place, otherwise the scroll jumps
                     window.setTimeout(function() { config.newFocus.focus(); }, flickerDelay + focusDelay);
-                } else {
+                } else {    
                     config.newFocus.focus();
                 }
             }

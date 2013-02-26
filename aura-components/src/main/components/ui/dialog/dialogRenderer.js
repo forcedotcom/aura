@@ -18,18 +18,23 @@
 
     /**
      * Moves modal windows to the bottom of the DOM so they display properly,
-     * and ties the <h2> tag in the dialog header to the dialog container
-     * using aria-labelledby.
+     * ties the <h2> tag in the dialog header to the dialog container using
+     * aria-labelledby, and ties the double-confirmation label to its corresponding
+     * checkbox.
      */
     afterRender : function(cmp) {
 
-        var atts    = cmp.getAttributes(),
-            type    = atts.get("type"),
-            isModal = type === "alert" || type === "modal",
-            ariaId  = atts.get("_ariaId"),
-            mask    = cmp.find("mask"),
-            dialog  = cmp.find("dialog"),
-            title   = cmp.find("title");
+        var atts          = cmp.getAttributes(),
+            type          = atts.get("type"),
+            doubleConfirm = atts.get("doubleConfirm"),
+            isModal       = type === "alert" || type === "modal",
+            ariaId        = atts.get("_ariaId"),
+            mask          = cmp.find("mask"),
+            dialog        = cmp.find("dialog"),
+            title         = cmp.find("title"),
+            confirmBoxCmp = doubleConfirm ? cmp.find("confirmBox") : null,
+            confirmBox    = doubleConfirm ? confirmBoxCmp.getElement() : null,
+            confirmLabel  = doubleConfirm ? cmp.find("confirmBoxLabel").getElement() : null;
 
         this.superAfterRender(cmp);
 
@@ -39,6 +44,10 @@
         }
 
         atts.setValue("_ariaId", title.getGlobalId());
+        if (doubleConfirm) {
+            confirmBox.id = confirmBoxCmp.getGlobalId();
+            confirmLabel.htmlFor = confirmBox.id;
+        }
 
     },
 
@@ -58,12 +67,11 @@
             isModal   = type === "alert" || type === "modal",
             maskCmp   = cmp.find("mask"),
             mask      = maskCmp ? maskCmp.getElement() : null,
-            dialog    = cmp.find("dialog").getElement(),
-            close     = cmp.find("close").getElement();
+            dialog    = cmp.find("dialog").getElement();
 
         this.superRerender(cmp, hlp);
 
-        if (config && dialog && close) {
+        if (config && dialog) {
             // if the dialog is active, add the appropriate handlers
             if (isVisible) {
                 $A.util.on(document, "keydown", config.keydownHandler, false);

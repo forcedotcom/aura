@@ -55,4 +55,15 @@
     },
 
 
+    setConfirmButtonState : function(cmp, evt) {
+
+        if (cmp.find("confirmBox").get("v.value")) {
+            cmp.find("confirmButton").getAttributes().setValue("disabled", false);
+        } else {
+            cmp.find("confirmButton").getAttributes().setValue("disabled", false);
+        }
+
+    }
+
+
 })

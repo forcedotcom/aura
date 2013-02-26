@@ -38,7 +38,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.junit.Ignore;
 import org.mockito.Mockito;
 import org.mockito.internal.util.MockUtil;
 import org.mockito.invocation.InvocationOnMock;
@@ -196,22 +195,24 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Verify UID values and dependencies against a gold file.
-     *
-     * This does a recursive set of dependencies checks to build a gold file with the 
-     * resulting descriptors and UIDs to ensure that we get both a valid set and can
-     * tell what changed (and thus verify that it should have changed).
-     *
+     * 
+     * This does a recursive set of dependencies checks to build a gold file with the resulting descriptors and UIDs to
+     * ensure that we get both a valid set and can tell what changed (and thus verify that it should have changed).
+     * 
      * The format of the file is:
      * <ul>
-     * <li>Top level descriptor ':' global UID.<li>
-     * <li>dependency ':' own hash<li>
+     * <li>Top level descriptor ':' global UID.
+     * <li>
+     * <li>dependency ':' own hash
+     * <li>
      * <li>...</li>
      * </ul>
      */
     public void testUidValue() throws Exception {
         StringBuilder buffer = new StringBuilder();
         String cmpName = "test:layoutNoLayout";
-        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(cmpName, ApplicationDef.class);
+        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService()
+                .getDefDescriptor(cmpName, ApplicationDef.class);
         MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
         String uid = masterDefReg.getUid(null, desc);
         assertNotNull("Could not retrieve UID for component " + cmpName, uid);

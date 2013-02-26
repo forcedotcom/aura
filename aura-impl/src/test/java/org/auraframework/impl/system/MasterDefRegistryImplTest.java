@@ -284,10 +284,10 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         String uidNew = registry.getUid(null, cmpDesc);
         assertEquals("UID not cached", uid, uidNew);
 
-        // UID also cached for new registry
+        // UID not cached for new registry
         MasterDefRegistryImpl registryNext = getDefRegistry(false);
         String uidNext = registryNext.getUid(null, cmpDesc);
-        assertEquals("UID not cached in new registry", uid, uidNext);
+        assertFalse("UID not cached in new registry", uid.equals(uidNext));
     }
 
     public void testGetUidCachedForRemovedDefinition() throws Exception {

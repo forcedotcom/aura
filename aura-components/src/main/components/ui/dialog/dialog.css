@@ -58,14 +58,8 @@
 .uiDialog.dialog.large{
     width:940px;
 }
-.uiDialog.modal.small{
-    margin-left:-155px;
-}
-.uiDialog.modal.medium{
-    margin-left:-310px;
-}
-.uiDialog.modal.large{
-    margin-left:-470px;
+.uiDialog.dialog.auto{
+    width:auto;
 }
 .uiDialog.modal{
     top:-1px;
@@ -78,6 +72,18 @@
     -webkit-transform:translate3d(0,-1000px,0);
     -moz-transform:translate3d(0,-1000px,0);
     transform:translate3d(0,-1000px,0);
+}
+.uiDialog.modal.small{
+    margin-left:-155px;
+}
+.uiDialog.modal.medium{
+    margin-left:-310px;
+}
+.uiDialog.modal.large{
+    margin-left:-470px;
+}
+.uiDialog.modal.auto{
+    left:0;
 }
 .uiDialog.modal.dropIn{
     -webkit-transform:translate3d(0,0,0);

@@ -29,7 +29,6 @@
             type          = atts.get("type"),
             doubleConfirm = atts.get("doubleConfirm"),
             isModal       = type === "alert" || type === "modal",
-            ariaId        = atts.get("_ariaId"),
             mask          = cmp.find("mask"),
             dialog        = cmp.find("dialog"),
             title         = cmp.find("title"),

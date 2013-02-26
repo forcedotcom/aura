@@ -78,18 +78,14 @@
         <!-- buttons -->
         <aura:if isTrue="{!v.buttons.length > 0 || (v.type == 'alert' &amp;&amp; v.defaultAlertButtons != 'none')}">
             <div class="buttons">
-                <aura:if isTrue="{!v.type == 'alert' &amp;&amp; v.defaultAlertButtons != 'none'}">
-                    <aura:if isTrue="{!v.defaultButtons == 'cancel' || v.defaultAlertButtons == 'both'}">
-                        <ui:button aura:id="cancelButton" label="{!v.cancelButtonLabel}" buttonTitle="{!v.cancelButtonTitle}" press="{!c.cancel}"/>
-                    </aura:if>
+                <aura:if isTrue="{!v.type == 'alert' &amp;&amp; (v.defaultAlertButtons == 'cancel' || v.defaultAlertButtons == 'both')}">
+                    <ui:button aura:id="cancelButton" label="{!v.cancelButtonLabel}" buttonTitle="{!v.cancelButtonTitle}" press="{!c.cancel}"/>
                 </aura:if>
                 <!-- custom buttons go between 'cancel' and 'confirm', because 'cancel' buttons should always be on the far left
                      and 'confirm' buttons should always be on the far right. any other custom action should be in the middle. -->
                 {!v.buttons}
-                <aura:if isTrue="{!v.type == 'alert' &amp;&amp; v.defaultAlertButtons != 'none'}">
-                    <aura:if isTrue="{!v.defaultButtons == 'confirm' || v.defaultAlertButtons == 'both'}">
-                        <ui:button aura:id="confirmButton" label="{!v.confirmButtonLabel}" buttonTitle="{!v.confirmButtonTitle}" disabled="{!v.doubleConfirm}" press="{!c.confirm}"/>
-                    </aura:if>
+                <aura:if isTrue="{!v.type == 'alert' &amp;&amp; (v.defaultAlertButtons == 'confirm' || v.defaultAlertButtons == 'both')}">
+                    <ui:button aura:id="confirmButton" label="{!v.confirmButtonLabel}" buttonTitle="{!v.confirmButtonTitle}" disabled="{!v.doubleConfirm}" press="{!c.confirm}"/>
                 </aura:if>
             </div>
         </aura:if>

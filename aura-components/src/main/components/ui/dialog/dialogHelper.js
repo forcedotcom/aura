@@ -36,6 +36,13 @@
     },
 
 
+    getWindowHeight : function() {
+
+        return window.innerHeight || document.body.clientHeight;
+
+    },
+
+
     /**
      * Handles the application or removal of CSS classes that control the visibility of
      * all dialog types, as well as the animation behaviour of modal dialogs. This method

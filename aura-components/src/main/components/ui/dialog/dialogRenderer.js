@@ -22,7 +22,7 @@
      * aria-labelledby, and ties the double-confirmation label to its corresponding
      * checkbox.
      */
-    afterRender : function(cmp) {
+    afterRender : function(cmp, hlp) {
 
         var atts          = cmp.getAttributes(),
             type          = atts.get("type"),
@@ -32,13 +32,17 @@
             mask          = cmp.find("mask"),
             dialog        = cmp.find("dialog"),
             title         = cmp.find("title"),
+            content       = cmp.find("content"),
             confirmBoxCmp = doubleConfirm ? cmp.find("confirmBox") : null,
             confirmBox    = doubleConfirm ? confirmBoxCmp.getElement() : null,
-            confirmLabel  = doubleConfirm ? cmp.find("confirmBoxLabel").getElement() : null;
+            confirmLabel  = doubleConfirm ? cmp.find("confirmBoxLabel").getElement() : null,
+            maxHeight;
 
         this.superAfterRender(cmp);
 
         if (isModal) {
+            maxHeight = Math.min(hlp.getWindowHeight(), 1000) - 150;
+            content.getElement().style.maxHeight = maxHeight + "px";
             document.body.appendChild(mask.getElement());
             document.body.appendChild(dialog.getElement());
         }

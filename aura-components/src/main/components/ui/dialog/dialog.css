@@ -96,6 +96,8 @@
     text-shadow:0 -1px #000;
 }
 .uiDialog .content{
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
     padding:10px;
     border-radius:2px;
     background-color:#FFF;

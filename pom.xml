@@ -735,11 +735,13 @@
                                 <ignore>org.auraframework.components.auradocs</ignore>
                                 <ignore>org.auraframework.components.aurajstest</ignore>
                                 <ignore>org.auraframework.components.*proto</ignore>
+                                <ignore>org.auraframework.docs</ignore>
                             </ignores>
                             <excludes>
                                 <exclude>org/auraframework/components/auradocs/*.class</exclude>
                                 <exclude>org/auraframework/components/aurajstest/*.class</exclude>
                                 <exclude>org/auraframework/components/*proto/*.class</exclude>
+                                <exclude>org/auraframework/docs/*.class</exclude>
                             </excludes>
                         </instrumentation>
                     </configuration>

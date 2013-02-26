@@ -16,4 +16,8 @@
 
 -->
 <aura:component>
+  <aura:attribute name="descriptor" type="String" />
+  <aura:attribute name="uid" type="String" />
+  <aura:attribute name="error" type="Boolean" />
+  <li><span class="{!v.error==true?'error':'pass'}">{!v.descriptor}<span class="uid">{!v.uid}</span></span></li>
 </aura:component>

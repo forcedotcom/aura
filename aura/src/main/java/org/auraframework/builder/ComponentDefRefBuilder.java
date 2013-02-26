@@ -23,13 +23,32 @@ import org.auraframework.def.ComponentDefRef.Load;
 import org.auraframework.def.DefDescriptor;
 
 /**
+ * A builder for a {@link ComponentDef} reference.
  */
 public interface ComponentDefRefBuilder extends DefBuilder<ComponentDef, ComponentDefRef> {
+    /**
+     * Set an attribute.
+     *
+     * If the value is null, the default value will be used (previous setAttributes will
+     * be nullified) for this attribute.
+     *
+     * @param key the attribute key (must be a valid attribute).
+     * @param value the value to set (must be appropriate for the attribute).
+     */
     ComponentDefRefBuilder setAttribute(String key, Object value);
 
+    /**
+     * Get the attribute value for a descriptor.
+     */
     AttributeDefRef getAttributeValue(DefDescriptor<AttributeDef> key);
 
+    /**
+     * set the local id for the component instance.
+     */
     ComponentDefRefBuilder setLocalId(String value);
 
+    /**
+     * set whether the component is lazy loadable or not.
+     */
     ComponentDefRefBuilder setLoad(Load load);
 }

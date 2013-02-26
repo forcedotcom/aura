@@ -46,6 +46,12 @@ public class AuraTextUtil {
     private static final String[] ESCAPED_HTML = { "&lt;", "&gt;", "&amp;", "&quot;", "&apos;", "&#39;", "&copy;" };
     private static final String[] ESCAPED_TEXT = { "<", ">", "&", "\"", "'", "'", "©" };
     private static final TrieMatcher HTML_TO_TEXT_ESCAPED_ONLY = TrieMatcher.compile(ESCAPED_HTML, ESCAPED_TEXT);
+
+    private static final TrieMatcher TEXT_TO_HTML = TrieMatcher.compile(
+            ObjectArrays.concat(ESCAPED_TEXT, new String[] { "\n" }, String.class),
+            ObjectArrays.concat(ESCAPED_HTML, new String[] { "<br/>" }, String.class));
+
+
     // w/ html tags
     private static final TrieMatcher HTML_TO_TEXT = TrieMatcher.compile(
             ObjectArrays.concat(ESCAPED_HTML, new String[] { "<br>", "<br/>" }, String.class),
@@ -533,6 +539,21 @@ public class AuraTextUtil {
             buf.append(s.substring(pos)); // append the tail
         }
         return buf.toString();
+    }
+
+    /**
+     * Escape given unescaped text to make it safe for HTML.
+     *
+     * Note that this routine will only escape a string for use at the 'top' level of
+     * html. You MUST NOT use this for attributes, or inside a script tag, as in that
+     * case it does not escape a sufficient set of characters. This IS safe for escaping
+     * arbitrary text into UTF-8 encoded HTML.
+     * 
+     * @param input the input text string.
+     * @return escaped text
+     */
+    public static String escapeForHTML(String input) {
+        return TrieMatcher.replaceMultiple(input, TEXT_TO_HTML);
     }
 
     /**

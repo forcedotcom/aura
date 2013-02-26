@@ -16,6 +16,7 @@
 package org.auraframework.test;
 
 import java.util.EnumSet;
+import java.util.Properties;
 import java.util.Set;
 
 import junit.framework.Assert;
@@ -28,11 +29,11 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 /**
  * Utility methods related to WebDriver
  * 
- * Test cases can be annotated with @TargetBrowsers and @ExcludeBrowsers. These
- * annotations are applicable for Methods(TestCase) and Classes.
+ * Test cases can be annotated with @TargetBrowsers and @ExcludeBrowsers. These annotations are applicable for
+ * Methods(TestCase) and Classes.
  */
 public final class WebDriverUtil {
-    private static final String SELENIUM_VERSION = new BuildInfo().getReleaseLabel();
+    private static String SELENIUM_VERSION = null;
     private static Set<BrowserType> defaultBrowsers = EnumSet.of(BrowserType.GOOGLECHROME);
     private static Set<BrowserType> availableBrowsers = null;
 
@@ -137,8 +138,7 @@ public final class WebDriverUtil {
     }
 
     /**
-     * Allow override of browser from command line using
-     * -Dwebdriver.browser.type=""
+     * Allow override of browser from command line using -Dwebdriver.browser.type=""
      * 
      * @return
      */
@@ -163,7 +163,26 @@ public final class WebDriverUtil {
         return EnumSet.copyOf(availableBrowsers);
     }
 
+    /**
+     * Get the expected Selenium client version based on the current server version. Used when requesting drivers from
+     * Sauce.
+     */
     public static String getSeleniumClientVersion() {
+        if (SELENIUM_VERSION == null) {
+            String version = new BuildInfo().getReleaseLabel();
+            if (version.matches("^\\d+\\.\\d+\\.\\d+$")) {
+                SELENIUM_VERSION = version;
+            } else {
+                try {
+                    Properties p = new Properties();
+                    p.load(WebDriverUtil.class.getResourceAsStream("/VERSION.txt"));
+                    SELENIUM_VERSION = String.format("%s%s", p.getProperty("selenium.core.version"),
+                            p.getProperty("selenium.core.revision"));
+                } catch (Throwable t) {
+                    throw new Error("Unable to determine Selenium version");
+                }
+            }
+        }
         return SELENIUM_VERSION;
     }
 }

@@ -195,22 +195,24 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Verify UID values and dependencies against a gold file.
-     *
-     * This does a recursive set of dependencies checks to build a gold file with the 
-     * resulting descriptors and UIDs to ensure that we get both a valid set and can
-     * tell what changed (and thus verify that it should have changed).
-     *
+     * 
+     * This does a recursive set of dependencies checks to build a gold file with the resulting descriptors and UIDs to
+     * ensure that we get both a valid set and can tell what changed (and thus verify that it should have changed).
+     * 
      * The format of the file is:
      * <ul>
-     * <li>Top level descriptor ':' global UID.<li>
-     * <li>dependency ':' own hash<li>
+     * <li>Top level descriptor ':' global UID.
+     * <li>
+     * <li>dependency ':' own hash
+     * <li>
      * <li>...</li>
      * </ul>
      */
     public void testUidValue() throws Exception {
         StringBuilder buffer = new StringBuilder();
         String cmpName = "test:layoutNoLayout";
-        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService().getDefDescriptor(cmpName, ApplicationDef.class);
+        DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService()
+                .getDefDescriptor(cmpName, ApplicationDef.class);
         MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
         String uid = masterDefReg.getUid(null, desc);
         assertNotNull("Could not retrieve UID for component " + cmpName, uid);
@@ -507,5 +509,52 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 StringSourceLoader.getInstance().removeSource(cmpDesc);
             }
         }
+    }
+
+    public void testGetDependencies() throws Exception {
+        DefDescriptor<ComponentDef> depCmpDesc1 = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        DefDescriptor<ComponentDef> depCmpDesc2 = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        DefDescriptor<ComponentDef> cmpDesc1 = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        // Manually add dependency to inner component
+        DefDescriptor<ComponentDef> cmpDesc2 = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component><aura:dependency resource=\"" + depCmpDesc1.getQualifiedName()
+                        + "\"/></aura:component>");
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(
+                        baseComponentTag,
+                        "",
+                        String.format("<aura:dependency resource=\"" + depCmpDesc2.getQualifiedName()
+                                + "\"/><%s/><%s/>",
+                                cmpDesc1.getDescriptorName(), cmpDesc2.getDescriptorName())));
+
+        MasterDefRegistryImpl registry = getDefRegistry(false);
+        String uid = registry.getUid(null, cmpDesc);
+        Set<DefDescriptor<?>> deps = registry.getDependencies(uid);
+        assertTrue("Component should have dependency on aura:component by default",
+                checkDependenciesContains(deps, "markup://aura:component"));
+        assertTrue("Component should have dependency on aura:rootComponent by default",
+                checkDependenciesContains(deps, "markup://aura:rootComponent"));
+        assertTrue("Component should not have a dependency on aura:application",
+                !checkDependenciesContains(deps, "markup://aura:application"));
+        assertTrue("No dependency on self found in Component",
+                checkDependenciesContains(deps, cmpDesc.getQualifiedName()));
+        assertTrue("Dependency on inner component not found",
+                checkDependenciesContains(deps, cmpDesc1.getQualifiedName()));
+        assertTrue("Dependency on inner component not found",
+                checkDependenciesContains(deps, cmpDesc2.getQualifiedName()));
+        assertTrue("Explicitly declared dependency on inner component not found",
+                checkDependenciesContains(deps, depCmpDesc1.getQualifiedName()));
+        assertTrue("Explicitly declared dependency on top level component not found",
+                checkDependenciesContains(deps, depCmpDesc2.getQualifiedName()));
+    }
+
+    private boolean checkDependenciesContains(Set<DefDescriptor<?>> deps, String depSearch) {
+        for (DefDescriptor<?> dep : deps) {
+            if (dep.getQualifiedName().equals(depSearch)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

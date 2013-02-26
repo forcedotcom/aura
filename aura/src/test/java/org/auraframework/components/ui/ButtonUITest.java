@@ -35,7 +35,7 @@ public class ButtonUITest extends WebDriverTestCase {
                 wait.until(new ExpectedCondition<Boolean>() {
                     @Override
                     public Boolean apply(WebDriver d) {
-                    	return (errorMsg.contains(getQuickFixMessage()));
+                    	return (getQuickFixMessage().contains(errorMsg));
                     }
                 });
     }

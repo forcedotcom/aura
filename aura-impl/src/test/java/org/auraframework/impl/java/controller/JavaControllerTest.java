@@ -85,7 +85,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     public void testClassLevelAnnotationForJavaController() throws Exception {
         assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerWithoutAnnotation",
                 InvalidDefinitionException.class, "@Controller annotation is required on all Controllers.",
-                "org.auraframework.impl.java.controller.TestControllerWithoutAnnotation");
+        "org.auraframework.impl.java.controller.TestControllerWithoutAnnotation");
     }
 
     /**
@@ -94,7 +94,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     public void testMissingKeyAnnotation() throws Exception {
         assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerMissingKey",
                 InvalidDefinitionException.class, "@Key annotation is required on all action parameters",
-                "org.auraframework.impl.java.controller.TestControllerMissingKey.appendStrings");
+        "org.auraframework.impl.java.controller.TestControllerMissingKey.appendStrings");
     }
 
     /**
@@ -118,7 +118,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     public void testNonStaticAction() throws Exception {
         assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerWithNonStaticAction",
                 InvalidDefinitionException.class, "Actions must be public static methods",
-                "org.auraframework.impl.java.controller.TestControllerWithNonStaticAction.appendStrings");
+        "org.auraframework.impl.java.controller.TestControllerWithNonStaticAction.appendStrings");
     }
 
     public void testActionNoParameters() throws Exception {
@@ -132,9 +132,9 @@ public class JavaControllerTest extends AuraImplTestCase {
         checkPassAction(controller, "doSomething", hasOne, State.SUCCESS, null);
         checkPassAction(controller, "getString", empty, State.SUCCESS, "TestController");
         checkFailAction(controller, "throwException", empty, State.ERROR, AuraExecutionException.class,
-                "java://org.auraframework.impl.java.controller.TestController: java.lang.RuntimeException: intentionally generated");
+        "java://org.auraframework.impl.java.controller.TestController: java.lang.RuntimeException: intentionally generated");
         checkFailAction(controller, "imNotHere", empty, State.ERROR, InvalidDefinitionException.class,
-                "No action found");
+        "No action found");
     }
 
     /**
@@ -158,12 +158,12 @@ public class JavaControllerTest extends AuraImplTestCase {
 
         args.clear();
         checkFailAction(controller, "sumValues", args, State.ERROR, AuraExecutionException.class,
-                "java://org.auraframework.impl.java.controller.TestControllerWithParameters: java.lang.NullPointerException");
+        "java://org.auraframework.impl.java.controller.TestControllerWithParameters: java.lang.NullPointerException");
 
         args.put("a", "x");
         args.put("b", "y");
         checkFailAction(controller, "sumValues", args, State.ERROR, AuraUnhandledException.class,
-                "Invalid value for a: java://java.lang.Integer");
+        "Invalid value for a: java://java.lang.Integer");
 
         args.put("a", "1");
         args.put("b", "2");
@@ -175,7 +175,7 @@ public class JavaControllerTest extends AuraImplTestCase {
      */
     public void testControllerNotFound() throws Exception {
         DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(ComponentDef.class,
-                "<aura:component controller='java://goats'/>");
+        "<aura:component controller='java://goats'/>");
         try {
             Aura.getInstanceService().getInstance(dd);
             fail("Expected DefinitionNotFoundException");
@@ -188,6 +188,27 @@ public class JavaControllerTest extends AuraImplTestCase {
     public void testDuplicateAction() throws Exception {
         assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerWithDuplicateAction",
                 InvalidDefinitionException.class, "Duplicate action appendStrings",
-                "org.auraframework.impl.java.controller.TestControllerWithDuplicateAction");
+        "org.auraframework.impl.java.controller.TestControllerWithDuplicateAction");
+    }
+
+    /**
+     * Tests to verify the APIs on Action to mark actions as storable.
+     */
+    public void testStorable() throws Exception{
+        ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestController");
+        Action freshAction = controller.createAction("getString", null);
+
+        assertTrue("Expected an instance of JavaAction", freshAction instanceof JavaAction);
+        JavaAction action = (JavaAction) freshAction;
+        assertFalse("Actions should not be storable by default.", action.isStorable());
+        action.run();
+        assertFalse("isStorabel should not change values after action execution.", action.isStorable());
+
+        Action storableAction = controller.createAction("getString", null);
+        action = (JavaAction) storableAction;
+        action.setStorable();
+        assertTrue("Failed to mark a action as storable.", action.isStorable());
+        action.run();
+        assertTrue("Storable action was unmarked during execution", action.isStorable());
     }
 }

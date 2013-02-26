@@ -36,6 +36,11 @@
     },
 
 
+    /**
+     * Simple cross-browser function to get the height of the client viewport
+     * 
+     * @return {Integer} the height of the client viewport
+     */
     getWindowHeight : function() {
 
         return window.innerHeight || document.body.clientHeight;

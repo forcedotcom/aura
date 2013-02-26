@@ -19,8 +19,9 @@
     /**
      * Moves modal windows to the bottom of the DOM so they display properly,
      * ties the <h2> tag in the dialog header to the dialog container using
-     * aria-labelledby, and ties the double-confirmation label to its corresponding
-     * checkbox.
+     * aria-labelledby, ties the double-confirmation label to its corresponding
+     * checkbox, and makes sure modal windows with tons of content don't extend
+     * outside the viewport.
      */
     afterRender : function(cmp, hlp) {
 
@@ -46,7 +47,6 @@
             document.body.appendChild(mask.getElement());
             document.body.appendChild(dialog.getElement());
         }
-
         atts.setValue("_ariaId", title.getGlobalId());
         if (doubleConfirm) {
             confirmBox.id = confirmBoxCmp.getGlobalId();

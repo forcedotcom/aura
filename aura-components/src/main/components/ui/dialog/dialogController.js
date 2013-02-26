@@ -55,6 +55,10 @@
     },
 
 
+    /**
+     * For alert dialogs where the "doubleConfirm" attribute is true, this method
+     * enables the confirm button only when the confirm checkbox is checked.
+     */
     setConfirmButtonState : function(cmp, evt) {
 
         if (cmp.find("confirmBox").get("v.value")) {

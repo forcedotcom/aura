@@ -26,7 +26,6 @@ import org.auraframework.system.Client.Type;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 public class NamespaceDefTest extends AuraImplTestCase {
 
@@ -73,17 +72,5 @@ public class NamespaceDefTest extends AuraImplTestCase {
         assertEquals(
                 ".namespaceDefTestTestThemeTokens {\n  background-color: red;\n  color: FOOL;\n  border-color: black;\n}\n",
                 themeDef.getCode(Type.WEBKIT));
-    }
-
-    public void testThemeTokensLowercaseKeys() throws Exception {
-        DefDescriptor<NamespaceDef> desc = Aura.getDefinitionService().getDefDescriptor(
-                "namespaceDefTestLowercaseKeys", NamespaceDef.class);
-        try {
-            desc.getDef();
-            fail("Expected Exception when trying to compile invalid NamespaceDef");
-        } catch (Exception e) {
-            checkExceptionFull(e, InvalidDefinitionException.class,
-                    "All keys in theme tokens must be all caps.  bar is not.", getSource(desc));
-        }
     }
 }

@@ -25,17 +25,19 @@
      */
     afterRender : function(cmp, hlp) {
 
-        var atts          = cmp.getAttributes(),
-            type          = atts.get("type"),
-            doubleConfirm = atts.get("doubleConfirm"),
-            isModal       = type === "alert" || type === "modal",
-            mask          = cmp.find("mask"),
-            dialog        = cmp.find("dialog"),
-            title         = cmp.find("title"),
-            content       = cmp.find("content"),
-            confirmBoxCmp = doubleConfirm ? cmp.find("confirmBox") : null,
-            confirmBox    = doubleConfirm ? confirmBoxCmp.getElement() : null,
-            confirmLabel  = doubleConfirm ? cmp.find("confirmBoxLabel").getElement() : null;
+        var atts           = cmp.getAttributes(),
+            type           = atts.get("type"),
+            doubleConfirm  = atts.get("doubleConfirm"),
+            defaultButtons = atts.get("defaultAlertButtons"),
+            isModal        = type === "alert" || type === "modal",
+            confirmButton  = cmp.find("confirmButton"),
+            mask           = cmp.find("mask"),
+            dialog         = cmp.find("dialog"),
+            title          = cmp.find("title"),
+            content        = cmp.find("content"),
+            confirmBoxCmp  = doubleConfirm ? cmp.find("confirmBox") : null,
+            confirmBox     = doubleConfirm ? confirmBoxCmp.getElement() : null,
+            confirmLabel   = doubleConfirm ? cmp.find("confirmBoxLabel").getElement() : null;
 
         this.superAfterRender(cmp);
 
@@ -46,6 +48,10 @@
         }
         atts.setValue("_ariaId", title.getGlobalId());
         if (doubleConfirm) {
+            // initialize the confirm button to disabled
+            if (confirmButton) {
+                confirmButton.getAttributes().setValue("disabled", true);
+            }
             confirmBox.id = confirmBoxCmp.getGlobalId();
             confirmLabel.htmlFor = confirmBox.id;
         }

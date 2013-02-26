@@ -61,10 +61,10 @@
      */
     setConfirmButtonState : function(cmp, evt) {
 
-        if (cmp.find("confirmBox").get("v.value")) {
+        if (cmp.find("confirmBox").getElement().checked) {
             cmp.find("confirmButton").getAttributes().setValue("disabled", false);
         } else {
-            cmp.find("confirmButton").getAttributes().setValue("disabled", false);
+            cmp.find("confirmButton").getAttributes().setValue("disabled", true);
         }
 
     }

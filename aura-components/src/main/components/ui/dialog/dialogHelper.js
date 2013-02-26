@@ -81,7 +81,7 @@
                 if (isModal) {
                     // delay focus until the modal slides into place, otherwise the scroll jumps
                     window.setTimeout(function() { config.newFocus.focus(); }, flickerDelay + focusDelay);
-                } else {    
+                } else {
                     config.newFocus.focus();
                 }
             }
@@ -90,8 +90,8 @@
             if (isModal) {
                 // remove the animation classes immediately, but delay adding 'hidden' back until animation completes
                 $A.util.removeClass(mask, "fadeIn");
-                window.setTimeout(function() { $A.util.addClass(mask, "hidden"); }, hideDelay);
                 $A.util.removeClass(dialog, "dropIn");
+                window.setTimeout(function() { $A.util.addClass(mask, "hidden"); }, hideDelay);
                 window.setTimeout(function() { $A.util.addClass(dialog, "hidden"); }, hideDelay);
             } else {
                 // if not a modal, then just hide the dialog immediately

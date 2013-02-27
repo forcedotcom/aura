@@ -29,7 +29,81 @@ import org.auraframework.system.Source;
 public class StringSource<D extends Definition> extends Source<D> {
 
     private static final long serialVersionUID = 8822758262106180101L;
-    private final transient StringWriter writer = new StringWriter() {
+    private final transient StringData data;
+
+    public StringSource(DefDescriptor<D> descriptor, String contents, String id, Format format) {
+        super(descriptor, id, format);
+        data = new StringData();
+        if (contents != null) {
+            data.write(contents);
+        }
+    }
+
+    /**
+     * Copy an existing StringSource with shared backing data.
+     * 
+     * @param original
+     */
+    public StringSource(StringSource<D> original) {
+        super(original.getDescriptor(), original.getSystemId(), original.getFormat());
+        data = original.data;
+    }
+
+    @Override
+    public long getLastModified() {
+        return data.lastModified;
+    }
+
+    @Override
+    public Reader getReader() {
+        return new StringReader(getContents());
+    }
+
+    @Override
+    public String getContents() {
+        return data.getBuffer().toString();
+    }
+
+    @Override
+    public Writer getWriter() {
+        return data;
+    }
+
+    /** StringSource returns a "URL" like "markup://string:foo". */
+    @Override
+    public String getUrl() {
+        return getSystemId(); // e.g. "markup://string:thing"
+    }
+
+    @Override
+    public boolean exists() {
+        return data.getBuffer().length() > 0;
+    }
+
+    @Override
+    public boolean addOrUpdate(CharSequence newContents) {
+        if (newContents != null) {
+            clearContents();
+            data.write(newContents.toString());
+        }
+        return true;
+    }
+
+    @Override
+    public void clearContents() {
+        data.getBuffer().setLength(0);
+        data.touch();
+    }
+
+    public long setLastModified(long lastModified) {
+        long previous = data.lastModified;
+        data.lastModified = lastModified;
+        return previous;
+    }
+
+    private class StringData extends StringWriter {
+        long lastModified = System.currentTimeMillis();
+
         @Override
         public void write(int c) {
             super.write(c);
@@ -59,73 +133,9 @@ public class StringSource<D extends Definition> extends Source<D> {
             super.write(str, off, len);
             touch();
         }
-    };
 
-    private final StringBuffer sb = writer.getBuffer();
-    private long lastModified;
-
-    public StringSource(DefDescriptor<D> descriptor, String contents, String id, Format format) {
-        super(descriptor, id, format);
-        if (contents != null) {
-            this.sb.append(contents);
+        private void touch() {
+            lastModified = System.currentTimeMillis();
         }
-        touch();
-    }
-
-    @Override
-    public long getLastModified() {
-        return lastModified;
-    }
-
-    @Override
-    public Reader getReader() {
-        return new StringReader(getContents());
-    }
-
-    @Override
-    public String getContents() {
-        return sb.toString();
-    }
-
-    @Override
-    public Writer getWriter() {
-        return writer;
-    }
-
-    /** StringSource returns a "URL" like "markup://string:foo". */
-    @Override
-    public String getUrl() {
-        return getSystemId(); // e.g. "markup://string:thing"
-    }
-
-    @Override
-    public boolean exists() {
-        return sb.length() > 0;
-    }
-
-    @Override
-    public boolean addOrUpdate(CharSequence newContents) {
-        if (newContents != null) {
-            clearContents();
-            sb.append(newContents);
-        }
-        touch();
-        return true;
-    }
-
-    @Override
-    public void clearContents() {
-        sb.setLength(0);
-        touch();
-    }
-
-    public long setLastModified(long lastModified) {
-        long previous = this.lastModified;
-        this.lastModified = lastModified;
-        return previous;
-    }
-
-    private void touch() {
-        setLastModified(System.currentTimeMillis());
     }
 }

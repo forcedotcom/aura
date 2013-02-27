@@ -13,19 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
-var w = window;
-function exp(){
+/*jslint sub: true, debug: true */
+
+/**
+ * Export symbols.  TODO(fabbott): Destroy this when we're consistently using
+ * Closure's exportSymbols directive instead.
+ */
+function exp() {
     var obj = arguments[0];
 
-    for(var i=1;i<arguments.length;i++){
+    for(var i=1;i<arguments.length;i++) {
         var name = arguments[i];
         i++;
         var val = arguments[i];
         obj[name] = val;
     }
 }
-var $A;
+
+/**
+ * @namespace This, $A, is supposed to be our ONLY window-polluting top-level
+ * variable.  Everything else is attached to it.  Note that this more-or-less
+ * empty-object $A is replaced later, after $A.ns (created below) is populated
+ * with the types that can be used to populate the "real" $A.
+ *
+ * TODO(fabbott): Make that "only gobal name" goal become true; today it ain't.
+ */
+window['$A'] = {};
+
+/**
+ * @namespace The separate Aura "namespace" object contains Aura types, as
+ * opposed to instances and properties and such which might hang off $A.
+ *
+ * This allows some colliding or near-miss variable duplication (e.g. $A.util
+ * is an instance of $A.ns.Util), and collects our proper types into one place.
+ * The types themselves must be proper functional objects with prototypes, or
+ * Closure can't deal with obfuscating them (and particularly their exports)
+ * properly.
+ */
+$A.ns = {};
+$A['ns'] = $A.ns;   // TODO: use exportSymbols when available
+
 var clientService;
 
 //#include aura.util.Function
@@ -93,7 +120,7 @@ var clientService;
  * @class The Aura framework.  Default global instance name is $A.
  * @constructor
  */
-function Aura(){
+$A.ns.Aura = function() {
     this.util = new Util();
     this["util"] = this.util;
     //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
@@ -198,15 +225,14 @@ function Aura(){
          */
         l10n : aura.localizationService,
 
-        getValue : function(key){
+        getValue : function(key) {
             var ret = $A.services[key];
-            if(!ret && key === "root"){
+            if(!ret && key === "root") {
                 return $A.getRoot();
             }
             return ret;
         }
     };
-
 
     /**
      * @public
@@ -258,7 +284,7 @@ function Aura(){
      */
     this.getEvt = this.eventService.newEvent;
 
-
+     // TODO: convert to //#exportSymbols when available
     exp(aura,
             "clientService", aura.clientService,
             "componentService", aura.componentService,
@@ -279,12 +305,13 @@ function Aura(){
             //#if {"excludeModes" : ["PRODUCTION"]}
                 "devToolService", aura.devToolService,
                 "getQueryStatement", aura.devToolService.newStatement,
-                "qhelp", function(){return aura.devToolService.help()},
+                "qhelp", function() {return aura.devToolService.help()},
             //#end
             "newCmp", aura.newCmp,
             "getEvt", aura.getEvt      );
-        var services = aura.services;
-        exp(services,
+    var services = aura.services;
+    // TODO: convert to //#exportSymbols when available
+    exp(services,
             "rendering", services.rendering,
             "event", services.event,
             "component", services.component,
@@ -296,19 +323,18 @@ function Aura(){
             "e", services.e,
             "getValue", services.getValue,
             "c" , {
-                getValue : function(name){
+                getValue : function(name) {
                     return services.cmp.getControllerDef({descriptor : name});
                 }
             }
         );
 
-        this.eventService.addHandler({event : 'aura:systemError',
+    this.eventService.addHandler({event : 'aura:systemError',
             "globalId" : "Aura",
-            "handler" : function(evt){
+            "handler" : function(evt) {
                 aura.log(evt.getParam('message'), evt.getParam('error'));
         }});
-
-}
+};
 
 /**
  * Initializes Aura with context info about the app that should be loaded.
@@ -322,9 +348,9 @@ function Aura(){
  * }
  * @public
  */
-Aura.prototype.initAsync = function(config){
+$A.ns.Aura.prototype.initAsync = function (config) {
     $A.mark("Aura.initAsync");
-    aura.context = new AuraContext(config["context"]);
+    $A.context = new AuraContext(config["context"]);
     clientService.initHost(config["host"]);
     clientService.loadComponent(config["descriptor"], config["attributes"], function(resp) {
         $A.initPriv(resp);
@@ -341,18 +367,18 @@ Aura.prototype.initAsync = function(config){
  * @param {Boolean} useExisting
  * @param {Boolean} doNotInitializeServices True if Layout and History services should not be initialized, or false if they should. Defaults to true for Aura Integration Service.
  */
-Aura.prototype.initConfig = function AuraInitConfig(config, useExisting, doNotInitializeServices){
+$A.ns.Aura.prototype.initConfig = function (config, useExisting, doNotInitializeServices) {
     config = $A.util.json.resolveRefs(config);
     
-	if (!useExisting || $A.util.isUndefined($A.getContext())) {
-	    clientService.initHost(config["host"]);
-	
-	    aura.context = new AuraContext(config["context"]);
-	    this.init(config["instance"], config["token"], config["context"], null, doNotInitializeServices);
-	} else {
-		// Use the existing context and just join the new context into it
-		$A.getContext().join(config["context"]);
-	}
+    if (!useExisting || $A.util.isUndefined($A.getContext())) {
+        clientService.initHost(config["host"]);
+
+        $A.context = new AuraContext(config["context"]);
+        this.init(config["instance"], config["token"], config["context"], null, doNotInitializeServices);
+    } else {
+        // Use the existing context and just join the new context into it
+        $A.getContext().join(config["context"]);
+    }
 };
 
 /**
@@ -363,7 +389,7 @@ Aura.prototype.initConfig = function AuraInitConfig(config, useExisting, doNotIn
  * @param {Object} container Sets the container for the component.
  * @param {Boolean} doNotInitializeServices True if Layout and History services should not be initialized, or false if they should. Defaults to true for Aura Integration Service.
  */
-Aura.prototype.init = function AuraInit(config, token, context, container, doNotInitializeServices){
+$A.ns.Aura.prototype.init = function (config, token, context, container, doNotInitializeServices) {
     var component = $A.util.json.resolveRefs(config);
     $A.initPriv(component, token, container, doNotInitializeServices);
 };
@@ -376,23 +402,23 @@ Aura.prototype.init = function AuraInit(config, token, context, container, doNot
  * @param {Boolean} doNotInitializeServices True if Layout and History services should not be initialized, or false if they should. Defaults to true for Aura Integration Service.
  * @private
  */
-Aura.prototype.initPriv = function AuraInitPriv(config, token, container, doNotInitializeServices){
+$A.ns.Aura.prototype.initPriv = function (config, token, container, doNotInitializeServices) {
     if (!$A["hasErrors"]) {
         $A.mark("Aura.initPriv");
 
-        clientService.init(config, token, function(cmp){
+        clientService.init(config, token, function(cmp) {
             $A.measure("ClientService.init","Aura.initPriv", $A.logLevel["DEBUG"]);
-            aura.setRoot(cmp);
+            $A.setRoot(cmp);
 
             if (!$A.initialized) {
-            	if (!doNotInitializeServices) {
-	                $A.layoutService.init(cmp);
-	                $A.measure("LayoutService.init","Aura.initPriv", $A.logLevel["DEBUG"]);
-	
-	                $A.historyService.init();
-	                $A.measure("HistoryService.init","Aura.initPriv", $A.logLevel["DEBUG"]);
-            	}
-            	
+                if (!doNotInitializeServices) {
+                    $A.layoutService.init(cmp);
+                    $A.measure("LayoutService.init","Aura.initPriv", $A.logLevel["DEBUG"]);
+
+                    $A.historyService.init();
+                    $A.measure("HistoryService.init","Aura.initPriv", $A.logLevel["DEBUG"]);
+                }
+
                 $A.initialized = true;
             }
 
@@ -404,7 +430,7 @@ Aura.prototype.initPriv = function AuraInitPriv(config, token, container, doNotI
 /**
  * Signals that initialization has completed.
  */
-Aura.prototype.finishInit = function(){
+$A.ns.Aura.prototype.finishInit = function() {
     if (!this["finishedInit"]) {
         $A.mark("Aura.finishInit");
         $A.util.removeClass(document.body, "loading");
@@ -426,7 +452,7 @@ Aura.prototype.finishInit = function(){
  * @public
  * @param {Error} e
  */
-Aura.prototype.error = function(e){
+$A.ns.Aura.prototype.error = function(e) {
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     $A.log(e.stack || e);
     //#end
@@ -434,19 +460,19 @@ Aura.prototype.error = function(e){
     if ($A.util.isString(e)) {
         str = e;
     // we treat error objects differently from object object, isObject means is it a map
-    } else if ($A.util.isObject(e) || $A.util.isError(e)){
-        for(var k in e){
+    } else if ($A.util.isObject(e) || $A.util.isError(e)) {
+        for(var k in e) {
             try {
                 var val = e[k];
 
                 if ($A.util.isString(val)) {
                     str = str + '\n' + val;
                 }
-            }catch(e2){
+            }catch(e2) {
                 //Ignore serialization errors
             }
         }
-        if(!str){
+        if(!str) {
             str = e.message + e.stack;
         }
     } else {
@@ -471,7 +497,7 @@ Aura.prototype.error = function(e){
  * @public
  * @param {String} msg The alert message to display.
  */
-Aura.prototype.message = function(msg) {
+$A.ns.Aura.prototype.message = function(msg) {
     alert(msg);
 };
 
@@ -482,7 +508,7 @@ Aura.prototype.message = function(msg) {
  * @function
  * @param {String} key The data key to look up on element. E.g. $A.get("root.v.mapAttring.key")
  */
-Aura.prototype.get = function(key){
+$A.ns.Aura.prototype.get = function(key) {
     return this.expressionService.get($A.services, key);
 };
 
@@ -490,14 +516,14 @@ Aura.prototype.get = function(key){
  * @public
  * @function
  */
-Aura.prototype.getRoot = function(){
+$A.ns.Aura.prototype.getRoot = function() {
     return this.root;
 };
 
 /**
  * @private
  */
-Aura.prototype.setRoot = function(root){
+$A.ns.Aura.prototype.setRoot = function(root) {
     this.root = root;
 };
 
@@ -506,7 +532,7 @@ Aura.prototype.setRoot = function(root){
  * @public
  * @function
  */
-Aura.prototype.getContext = function(){
+$A.ns.Aura.prototype.getContext = function() {
     return this.context;
 };
 
@@ -514,9 +540,9 @@ Aura.prototype.getContext = function(){
  * Returns the unwrapped value.
  * @param {Object} val If the Aura type corresponds to "Value", returns the unwrapped value.
  */
-Aura.prototype.unwrap = function(val){
-    if(val && val.auraType){
-        if(val.auraType === "Value"){
+$A.ns.Aura.prototype.unwrap = function(val) {
+    if(val && val.auraType) {
+        if(val.auraType === "Value") {
             return val.unwrap();
         }
     }
@@ -535,28 +561,28 @@ Aura.prototype.unwrap = function(val){
  * @protected
  * Internal assertion, should never happen
  */
-Aura.prototype.assert = function(condition, assertMessage) {
+$A.ns.Aura.prototype.assert = function(condition, assertMessage) {
     //#if {"excludeModes" : ["PRODUCTION"]}
     if (!condition) {
         var message = "Assertion Failed!: "+assertMessage+" : "+condition;
         var error = new Error(message);
-        aura.trace();
+        $A.trace();
         //
         // Trying to fire an event here is a very dangerous thing to do, as
         // we have no idea of where we are, or what went wrong to cause a call
         // to assert(). In order to avoid problems, we do the most basic thing
         // to alert the user.
         //
-        //var event = aura.get("e.aura:systemError");
+        //var event = $A.get("e.aura:systemError");
         //if (event) {
         //    event.setParams({message : message, error : error});
         //    event.fire();
         //}
-        var elt = aura.util.getElement("auraErrorMessage");
+        var elt = $A.util.getElement("auraErrorMessage");
         if (elt) {
             elt.innerHTML = message;
-            aura.util.removeClass(document.body, "loading");
-            aura.util.addClass(document.body, "auraError");
+            $A.util.removeClass(document.body, "loading");
+            $A.util.addClass(document.body, "auraError");
         } else {
             alert(message);
         }
@@ -575,9 +601,9 @@ Aura.prototype.assert = function(condition, assertMessage) {
  * @param {String} msg The message to be displayed when the condition is false.
  * @public
  */
-Aura.prototype.userAssert = function(condition, msg) {
+$A.ns.Aura.prototype.userAssert = function(condition, msg) {
     // For now use the same method
-    aura.assert(condition, msg);
+    $A.assert(condition, msg);
 };
 
 /**
@@ -588,28 +614,28 @@ Aura.prototype.userAssert = function(condition, msg) {
  * @param {Object} value The first object to log.
  * @param {Object} error The error messages to be logged in the stack trace.
  */
-Aura.prototype.log = function(value, error){
-    if (w["console"]) {
-        if(this.util.isError(value) && value.stack){
+$A.ns.Aura.prototype.log = function(value, error) {
+    if (window["console"]) {
+        if(this.util.isError(value) && value.stack) {
             value = value.stack;
         }
-        var console = w["console"];
+        var console = window["console"];
         if (error !== undefined && console["group"]) {
             console["group"](value);
             console["debug"](error);
             var trace = this.getStackTrace(error);
-            if(trace){
+            if(trace) {
                 console["group"]("stack");
-                for(var i=0;i<trace.length;i++){
+                for(var i=0;i<trace.length;i++) {
                     console["debug"](trace[i]);
                 }
                 console["groupEnd"]();
             }
             console["groupEnd"]();
         }
-        else if(console && console["debug"]){
+        else if(console && console["debug"]) {
             console["debug"](value);
-        }else if(console && console["log"]){
+        }else if(console && console["log"]) {
             console["log"](value);
         }
     }
@@ -618,9 +644,9 @@ Aura.prototype.log = function(value, error){
 /**
  * Logs using console.log() if defined on the console implementation.
  */
-Aura.prototype.logf = function(){
-    if (w["console"]) {
-        w["console"]["log"].apply(w["console"], arguments);
+$A.ns.Aura.prototype.logf = function() {
+    if (window["console"]) {
+        window["console"]["log"].apply(window["console"], arguments);
     }
 };
 
@@ -630,7 +656,7 @@ Aura.prototype.logf = function(){
  * @param {Object} value The object to be resolved.
  * @param {Number} size The length of the output string.
  */
-Aura.prototype.fitTo = function(value, size) {
+$A.ns.Aura.prototype.fitTo = function(value, size) {
     if (typeof (value) != "string") {
         if ($A.util.isUndefinedOrNull(value)) {
             return null;
@@ -649,8 +675,7 @@ Aura.prototype.fitTo = function(value, size) {
  * @param {String} padString The padding to be inserted.
  * @param {Number} length The length of the padding.
  */
-//pads right
-Aura.prototype.rpad = function(str, padString, length) {
+$A.ns.Aura.prototype.rpad = function(str, padString, length) {
     while (str.length < length) {
         str = str + padString;
     }
@@ -662,7 +687,7 @@ Aura.prototype.rpad = function(str, padString, length) {
  * Values are not logged.
  * @private
  */
-Aura.prototype.getStackTrace = function(e) {
+$A.ns.Aura.prototype.getStackTrace = function(e) {
     if (e.stack) {
         var ret = e.stack.replace(/(?:\n@:0)?\s+$/m, '');
         ret = ret.replace(new RegExp('^\\(','gm'), '{anonymous}(');
@@ -677,69 +702,80 @@ Aura.prototype.getStackTrace = function(e) {
  * Logs a stack trace. Trace calls using console.trace() if defined on the console implementation.
  * @public
  */
-Aura.prototype.trace = function(){
-    if(w["console"] && w["console"]["trace"]){
-        w["console"]["trace"]();
+$A.ns.Aura.prototype.trace = function() {
+    if(window["console"] && window["console"]["trace"]) {
+        window["console"]["trace"]();
     }
 };
 
 /**
  * Map through to Jiffy.mark if Jiffy is loaded, otherwise a no-op.
+ *
  * @public
  * @function
  */
-Aura.prototype.mark = (function() {
-    if (w["Jiffy"]) {
-        return w["Jiffy"]["mark"];
+$A.ns.Aura.prototype.mark = (function() {
+    if (window["Jiffy"]) {
+        return window["Jiffy"]["mark"];
     } else {
-        return function(){};
+        return function() {};
     }
 })();
 
 /**
  * Map through to Jiffy.measure if Jiffy is loaded, otherwise a no-op.
+ * This will be the same no-op as $A.ns.Aura.prototype.mark, since both
+ * are no-ops when Jiffy is missing; we only need one noop object.
+ *
  * @public
  * @function
  */
-Aura.prototype.measure = (function() {
-    if (w["Jiffy"]) {
-        return w["Jiffy"]["measure"];
+$A.ns.Aura.prototype.measure = (function() {
+    if (window["Jiffy"]) {
+        return window["Jiffy"]["measure"];
     } else {
-        return function(){};
+        return $A.ns.Aura.prototype.mark;
     }
 })();
 
-Aura.prototype.logLevel = w["PerfLogLevel"] || {};
+$A.ns.Aura.prototype.logLevel = (window["PerfLogLevel"] || {});
 
 /**
  * Sets mode to production (default), development, or testing.
  * @private
  * @param {String} mode Possible values are production "PROD", development "DEV", or testing "PTEST".
  */
-Aura.prototype.setMode = function(mode){
+$A.ns.Aura.prototype.setMode = function(mode) {
     this.mode = mode;
     this.enableAssertions = (mode != 'PROD' && mode != 'PTEST');
 };
 
-
-
 //#include aura.Aura_export
 
-aura = new Aura();
-$A = aura;
-w["$A"] = aura;
+// At this point, $A.ns has been defined with all our types on it, but $A itself
+// is just a placeholder.  Use this function to preserve $A.ns while populating
+// $A, without making a new top-level name:
+(function bootstrap() {
+    var ns = $A.ns;
+    window['$A'] = new ns.Aura();
+    window['$A']['ns'] = ns;
+})();
 
 //shortcuts for using throughout the framework code.
-clientService = aura.clientService;
-var componentService = aura.componentService;
-var serializationService = aura.serializationService;
-var renderingService = aura.renderingService;
-var expressionService = aura.expressionService;
-var historyService = aura.historyService;
-var eventService = aura.eventService;
-var layoutService = aura.layoutService;
+// TODO(fabbott): All of these need to move into $A only.
+clientService = $A.clientService;
+var componentService = $A.componentService;
+var serializationService = $A.serializationService;
+var renderingService = $A.renderingService;
+var expressionService = $A.expressionService;
+var historyService = $A.historyService;
+var eventService = $A.eventService;
+var layoutService = $A.layoutService;
 
-var services = aura.services;
+var services = $A.services;
+
+// TODO(fabbott): Remove the legacy 'aura' top-level name.
+window['aura'] = window['$A'];
 
 //#include aura.storage.adapters.MemoryAdapter
 //#include aura.storage.adapters.IndexedDBAdapter

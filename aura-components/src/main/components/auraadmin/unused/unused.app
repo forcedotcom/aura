@@ -15,12 +15,21 @@
     limitations under the License.
 
 -->
-<aura:component>
-
-    <aura:registerevent name="press" type="ui:press"/>
-    <test:test_ErrorMsg_SimpleCmp1/>
-
-    <test:test_button label="Button 3: (Button on Composite Component)"/>
-
-    <aura:handler event="aura:systemError" action="{!c.outerSystemError}"/>
-</aura:component>
+<aura:application model="java://org.auraframework.components.auraadmin.UnusedModel">
+	<table>
+		<thead>
+			<tr>
+				<th></th>
+				<th>Name</th>
+			</tr>
+		</thead>
+		<tbody>
+		    <aura:iteration items="{!m.components}" var="cmp" indexVar="index">
+		    	<tr>
+		    		<td>{!index}</td>
+		    		<td>{!cmp.name}</td>
+		    	</tr>
+		    </aura:iteration>
+		</tbody>
+    </table>
+</aura:application>

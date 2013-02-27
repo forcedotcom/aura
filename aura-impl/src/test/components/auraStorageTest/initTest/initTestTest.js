@@ -1,18 +1,14 @@
 ({
     setUp : function(component){
-        $A.storageService.getStorage().clear();
+    	$A.storageService.getStorage("actions").clear();
     },
 
     testActionStorageProperties:{
-        attributes:{
-            implementation : "memory"
-        },
         test:[function(cmp){
             $A.test.assertTruthy($A.storageService, "Aura Storage service is undefined.");
-            var storage = $A.storageService.getStorage();
+            var storage = $A.storageService.getStorage("actions");
             $A.test.assertTruthy(storage, "Aura Storage object is undefined.");
-            var name = this['testActionStorageProperties']['attributes']['implementation'];
-            $A.test.assertEquals(name, storage.getName());
+            $A.test.assertEquals("memory", storage.getName());
             this.resetCounter(cmp, "testBasicStorageServiceInitialization");
         },function(cmp){
             //Verify API for server actions
@@ -235,7 +231,7 @@
             evt.fire();
             $A.test.addWaitFor(false, $A.test.isActionPending,
                     function(){
-                        $A.test.assertTrue($A.storageService.getStorage().getSize() > 0,
+                        $A.test.assertTrue($A.storageService.getStorage("actions").getSize() > 0,
                                 "Expected first action to be stored in storage service.");
                         $A.test.assertEquals("StorageController", $A.test.getText(cmp.find("responseData").getElement()));
                         $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
@@ -274,7 +270,7 @@
         test:[function(cmp){
                 cmp._testName = "testUnmarkedActionAreNotStored";
                 this.resetCounter(cmp, "testUnmarkedActionAreNotStored");
-                $A.test.assertEquals(0, $A.storageService.getStorage().getSize());
+                $A.test.assertEquals(0, $A.storageService.getStorage("actions").getSize());
         },function(cmp){
             //Run the action without marking it as storable.
             var btn = cmp.find("ForceActionAtServer");
@@ -285,7 +281,7 @@
                         $A.test.assertEquals("StorageController", $A.test.getText(cmp.find("responseData").getElement()));
                         $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()),
                                 "Failed to inoke server action.");
-                        $A.test.assertEquals(0, $A.storageService.getStorage().getSize(),
+                        $A.test.assertEquals(0, $A.storageService.getStorage("actions").getSize(),
                                 "Storage service saw an increase in size.");
                         });
         },function(cmp){

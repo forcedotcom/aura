@@ -268,8 +268,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      * Verify that we are able to build a component that declares dependencies and those dependencies are found and
      * built, or that the correct Exception is thrown.
      */
-    // TODO(W-1166679): Dependencies not attached to ComponentDef yet, add more
-    // tests to check what dependencies are actually found after this story.
     public void testGetDependencies() throws Exception {
         // No dependencies by default
         T baseComponentDef = define(baseTag, "", "");

@@ -19,37 +19,108 @@
  * @constructor
  */
 var AuraStorageService = function(){
-	var storage = null;
+	var storages = {};
 	var adapters = {};
 	
     var storageService = {
-        getStorage : function() {
+        getStorage : function(name) {
+        	return storages[name];
+        },
+        
+        initStorage : function(name, persistent, secure, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit) {
+        	if (storages[name]) {
+        		throw new Error("Storage named '" + name + "' already exists!");
+        	}
+        	
+            var adapter = this.createAdapter(this.selectAdapter(persistent, secure), name, maxSize, debugLoggingEnabled);
+        	
+        	var config = {
+        		"name": name,
+        		"adapter": adapter,
+        		"maxSize": maxSize, 
+        		"defaultExpiration": defaultExpiration, 
+        		"defaultAutoRefreshInterval": defaultAutoRefreshInterval, 
+        		"debugLoggingEnabled": debugLoggingEnabled, 
+        		"clearStorageOnInit": clearStorageOnInit
+        	};
+        	
+        	var storage = new AuraStorage(config);
+        	storages[name] = storage;
+        	
         	return storage;
         },
         
-        setStorage : function(implementation, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit) {
-        	storage = new AuraStorage(implementation, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit);
-        },
-        
-        registerAdapter : function(name, adapterClass) {
+        registerAdapter : function(config) {
+        	var name = config["name"];
+        	var adapterClass = config["adapterClass"];
+        	
         	if (adapters[name]) {
         		throw new Error("StorageService.registerAdapter() adapter '" + name + "' already registered!");
         	}
         	
-        	adapters[name] = adapterClass;
+        	adapters[name] = config;
         },
         
-        createAdapter : function(name) {
-        	var AdapterClass = adapters[name];
-        	if (!AdapterClass) {
-        		throw new Error("StorageService.getAdapter() unknown adapter '" + name + "'!");
-        	}
+        createAdapter : function(adapter, name, maxSize, debugLoggingEnabled) {
+        	var config = adapters[adapter];
+        	if (!config) {
+        		throw new Error("StorageService.getAdapter() unknown adapter '" + implementation + "'!");
+        	}        
+        	
+        	var AdapterClass = config["adapterClass"];
+        	
+        	var adapterConfig = {
+        		"name": name,
+        		"maxSize": maxSize,
+        		"debugLoggingEnabled": debugLoggingEnabled
+        	};        	
+        	
+        	return new AdapterClass(adapterConfig);
+        },
         
-        	return new AdapterClass();
+        fireModified : function() {
+        	var e = $A.get("e.auraStorage:modified");
+        	if (e) {
+        		e.fire();
+        	}
+        },
+        
+        selectAdapter : function(persistent, secure) {
+        	// Find the best match for the specific implementation based on the requested configuration 
+
+        	var candidates = [];
+        	for (var name in adapters) {
+        		var adapter = adapters[name];
+        		
+            	// If secure is required then find all secure adapters otherwise use any adapter
+        		if (!secure || adapter["secure"] === true) {
+        			candidates.push(adapter);
+        		}
+        	}
+
+        	if (candidates.length === 0) {
+        		throw new Error("StorageService.selectAdapter() unable to find a secure adapter implementation!");
+        	}
+        	
+        	// Now take the set of candidates and weed out any non-persistent if persistence is requested (not required)
+        	var match;
+        	for (var n = 0; !match && n < candidates.length; n++) {
+        		adapter = candidates[n];
+        		var adapterIsPersistent = adapter["persistent"];
+        		if ((persistent && adapterIsPersistent === true) || (!persistent && !adapterIsPersistent)) {
+        			match = adapter;
+        		}
+        	}
+        	
+        	if (!match) {
+        		match = candidates[0];
+        	}
+        	
+        	return match["name"];
         }
         
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-        ,"storage" : storage
+        ,"storages" : storages
         ,"adapters" : adapters
         //#end
     };

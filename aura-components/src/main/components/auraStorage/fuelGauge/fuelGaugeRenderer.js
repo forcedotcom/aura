@@ -15,11 +15,11 @@
  */
 {
     render : function(cmp, helper){
-    	var enabled = helper.isEnabled();
+    	var enabled = helper.isEnabled(cmp);
 		cmp.getValue("v.enabled").setValue(enabled);
 		
 		if (enabled) {
-    		var storage = $A.storageService.getStorage();
+    		var storage = helper.getStorage(cmp);
 			cmp.getValue("v.implementation").setValue(storage.getName());
 			
 	    	helper.update(cmp);

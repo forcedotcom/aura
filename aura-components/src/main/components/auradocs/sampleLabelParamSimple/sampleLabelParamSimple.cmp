@@ -16,8 +16,7 @@
 
 -->
 <aura:component>
-    <aura:registerevent name="press" type="ui:press"/>
-    <test:test_button label="Button 1" class="SimpleCmp1"  press="{!c.clicked}"/>
-
-    <aura:handler event="aura:systemError" action="{!c.systemError}"/>
+    <aura:label value="Your balance is {0} points.">
+        {!500}
+    </aura:label>
 </aura:component>

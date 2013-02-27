@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 ({
+	getStorage: function(cmp) {
+		return $A.storageService.getStorage(cmp.get("v.name"));
+	},
+	
 	init : function(cmp) {
-		if ($A.storageService.getStorage()) {
+		if (this.getStorage(cmp)) {
 			return;
 		}
 
@@ -25,8 +29,7 @@
 		// Temporary query param support to allow one extra level of switch so I
 		// can turn on storage
 		// w/out enabling it for the world right now
-		var onlyUseStorageIfRequested = cmp.getValue(
-				"v.requireUseStorageQueryParam").getBooleanValue();
+		var onlyUseStorageIfRequested = cmp.getValue("v.requireUseStorageQueryParam").getBooleanValue();
 		if (onlyUseStorageIfRequested) {
 			var useStorage = window.location.href.toLowerCase().indexOf(
 					"aura.usestorage=true") > 0;
@@ -39,12 +42,14 @@
 			}
 		}
 
-		var implementation = cmp.get("v.implementation");
+		var name = cmp.get("v.name");
 		var defaultExpiration = parseInt(cmp.get("v.defaultExpiration"));
 		var defaultAutoRefreshInterval = parseInt(cmp.get("v.defaultAutoRefreshInterval"));
 		var maxSize = cmp.get("v.maxSize") * 1024.0;
 		var clearStorageOnInit = cmp.getValue("v.clearStorageOnInit").getBooleanValue();
+		var persistent = cmp.getValue("v.persistent").getBooleanValue();
+		var secure = cmp.getValue("v.secure").getBooleanValue();
 
-		$A.storageService.setStorage(implementation, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit);
+		$A.storageService.initStorage(name, persistent, secure, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit);
 	}
 })

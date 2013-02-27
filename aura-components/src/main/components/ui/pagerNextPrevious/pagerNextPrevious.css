@@ -14,9 +14,17 @@
  * limitations under the License.
  */
 .uiPagerNextPrevious .pagerControl {
-    color: #333;
-    margin:0 .25em;
+	color: #000;
+    margin: 0 .25em;
     text-decoration: none;
+}
+
+.uiPagerNextPrevious .pagerControl.first {
+	margin-left: 0;
+}
+
+.uiPagerNextPrevious .pagerControl.last {
+	margin-right: 0;
 }
 
 .uiPagerNextPrevious .pagerControl.off {

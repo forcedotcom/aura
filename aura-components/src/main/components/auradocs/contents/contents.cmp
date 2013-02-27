@@ -66,7 +66,7 @@
                     <auradocs:contentsNode text="Positioning UI Components" id="useLayout"/>
                     <auradocs:contentsNode text="Getting User Input" id="useForm"/>
                     <auradocs:contentsNode text="Using Menus" id="useMenu"/>
-                </auradocs:contentsNode>
+                </auradocs:contentsNode>                
             </auradocs:contentsNode>
             <auradocs:contentsNode text="Expressions" >
                 <auradocs:contentsNode text="Introduction" id="expressions"/>
@@ -141,11 +141,12 @@
                 <auradocs:contentsNode text="Models" id="models" />
                 <auradocs:contentsNode text="Server-Side Controllers" id="serverSideControllers" />
                 <auradocs:contentsNode text="Server-Side Renderers" id="renderersServerSide" />
+                 <auradocs:contentsNode text="Server-Side Providers" id="oodProviders" />
                 <auradocs:contentsNode text="Aura Integration Service" id="auraIntegrationService"/>
                 <auradocs:contentsNode text="Custom Converters">
                     <auradocs:contentsNode text="Registering a Custom Converter" id="registerCustomConverter"/>
                     <auradocs:contentsNode text="Converter Interface" id="converterInterface"/>
-                </auradocs:contentsNode>                
+                </auradocs:contentsNode>
                 <auradocs:contentsNode text="Java Cookbook">
                     <auradocs:contentsNode text="Introduction" id="javaCookbook" />
                     <auradocs:contentsNode text="Getting a DefDescriptor" id="javaDefDesc" />
@@ -165,7 +166,6 @@
                 <auradocs:contentsNode text="Traversing a Component’s Extension Hierarchy" id="oodCmpTraverse" />
                 <auradocs:contentsNode text="Abstract Components" id="oodCmpAbstract" />
                 <auradocs:contentsNode text="Interfaces" id="oodInterfaces" />
-                <auradocs:contentsNode text="Providers" id="oodProviders" />
             </auradocs:contentsNode>
             <auradocs:contentsNode text="Modes" >
                 <auradocs:contentsNode text="Introduction" id="modesIntro" />
@@ -179,9 +179,9 @@
                 <auradocs:contentsNode text="Component Request Overview" id="cycleComp" />
                 <auradocs:contentsNode text="Server-Side Process" id="cycleInit" />
                 <auradocs:contentsNode text="Client-Side Process" id="clientInit" />
-                <auradocs:contentsNode text="Component Request Glossary" id="cycleRefs" />                
-            </auradocs:contentsNode>            
-            <auradocs:contentsNode text="Querying State and Statistics" id="queryLang"/>            
+                <auradocs:contentsNode text="Component Request Glossary" id="cycleRefs" />
+            </auradocs:contentsNode>
+            <auradocs:contentsNode text="Querying State and Statistics" id="queryLang"/>
         </auradocs:contentsNode>
 
         <auradocs:contentsNode text="Reference" >
@@ -189,6 +189,7 @@
             <auradocs:contentsNode text="Javadoc" id="javadoc"/>
             <auradocs:contentsNode text="aura:if " id="tagIf" />
             <auradocs:contentsNode text="aura:iteration" id="tagIteration" />
+            <auradocs:contentsNode text="Setting Label Parameters" id="labelParameters"/>
             <auradocs:contentsNode text="System Tags">
                 <auradocs:contentsNode text="aura:application" id="appOverview"/>
                 <auradocs:contentsNode text="aura:set">

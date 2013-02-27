@@ -36,7 +36,7 @@ var priv = {
             return null;
         }
 
-        var storage = $A.storageService.getStorage();
+        var storage = Action.prototype.getStorage();
         var e;
 
         // failure to communicate with server
@@ -45,7 +45,7 @@ var priv = {
                 return null;
             }
 
-            e = $A.get("e.aura:noConnection");
+            e = $A.get("e.aura:connectionLost");
             if (e) {
                 priv.isDisconnected = true;
                 e.fire();
@@ -262,14 +262,14 @@ var priv = {
             var actionResponses = responseMessage["actions"];
 
             for (var r = 0; r < actionResponses.length; r++) {
-                actionResponse = actionResponses[r];
+                var actionResponse = actionResponses[r];
 
                 var actionGroupNumber;
                 var action;
                 if (actionResponse["storable"] === true) {
                 	// Create a client side action instance to go with the server created action response
                 	var descriptor = actionResponse["action"];
-                	var actionDef = $A.services.component.priv.actionDefRegistry.getDef({ descriptor: descriptor });
+                	var actionDef = $A.services.component.getActionDef({ descriptor: descriptor });
                 	action = actionDef.newInstance();
 
                 	action.setStorable();
@@ -412,7 +412,7 @@ var priv = {
             // For cacheable actions check the storage service to see if we
             // already have a viable cached action response we can complete
             // immediately
-            var storage = $A.storageService.getStorage();
+            var storage = Action.prototype.getStorage();
             if (action.isStorable() && storage) {
                 var key = action.getStorageKey();
 

@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.RegistryAdapter;
@@ -35,7 +36,6 @@ import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttrib
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.DefRegistry;
-import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.mockito.Mockito;
@@ -43,16 +43,13 @@ import org.mockito.internal.util.MockUtil;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import org.junit.Ignore;
-
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * @see org.auraframework.impl.registry.RootDefFactoryTest
  */
 public class MasterDefRegistryImplTest extends AuraImplTestCase {
-    private final static String baseContents = "<aura:application></aura:application>";
-
     public MasterDefRegistryImplTest(String name) {
         super(name);
     }
@@ -118,10 +115,12 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     public void testFindRegex() throws Exception {
         String namespace = "testFindRegex" + auraTestingUtil.getNonce();
-        DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class, baseContents,
-                String.format("%s:houseboat", namespace));
-        addSourceAutoCleanup(ApplicationDef.class, baseContents, String.format("%s:houseparty", namespace));
-        addSourceAutoCleanup(ApplicationDef.class, baseContents, String.format("%s:pantsparty", namespace));
+        DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseApplicationTag, "", ""), String.format("%s:houseboat", namespace));
+        addSourceAutoCleanup(ApplicationDef.class, String.format(baseApplicationTag, "", ""),
+                String.format("%s:houseparty", namespace));
+        addSourceAutoCleanup(ApplicationDef.class, String.format(baseApplicationTag, "", ""),
+                String.format("%s:pantsparty", namespace));
 
         MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
 
@@ -148,8 +147,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     public void testStringCache() throws Exception {
         String namespace = "testStringCache" + auraTestingUtil.getNonce();
-        DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class, baseContents,
-                String.format("%s:houseboat", namespace));
+        DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseApplicationTag, "", ""), String.format("%s:houseboat", namespace));
         MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
         String uid = masterDefReg.getUid(null, houseboat);
         assertNull("Found string in new MDR", masterDefReg.getCachedString(uid, houseboat, "test1"));
@@ -160,7 +159,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     public void testGetUidClientOutOfSync() throws Exception {
         String namespace = "testStringCache" + auraTestingUtil.getNonce();
         String namePrefix = String.format("%s:houseboat", namespace);
-        DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class, baseContents, namePrefix);
+        DefDescriptor<ApplicationDef> houseboat = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseApplicationTag, "", ""), namePrefix);
         MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
         String uid = masterDefReg.getUid(null, houseboat);
         assertNotNull(uid);
@@ -178,8 +178,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      */
     public void testUidDependencies() throws Exception {
         DefDescriptor<ComponentDef> child = addSourceAutoCleanup(ComponentDef.class,
-                "<aura:component></aura:component>",
-                "testUidDependenciesChild");
+                "<aura:component></aura:component>", "testUidDependenciesChild");
         DefDescriptor<ApplicationDef> parent = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application><" + child.getDescriptorName() + "/></aura:application>",
                 "testUidDependenciesParent");
@@ -195,30 +194,55 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify getUid() returns the correct value. If the component itself, any of it's dependencies, or the logic to
-     * calculate the UID are modified, then this hard-coded UID will need to be changed as well.
+     * Verify UID values and dependencies against a gold file.
+     * 
+     * This does a recursive set of dependencies checks to build a gold file with the resulting descriptors and UIDs to
+     * ensure that we get both a valid set and can tell what changed (and thus verify that it should have changed).
+     * 
+     * The format of the file is:
+     * <ul>
+     * <li>Top level descriptor ':' global UID.
+     * <li>
+     * <li>dependency ':' own hash
+     * <li>
+     * <li>...</li>
+     * </ul>
      */
-    @Ignore("W-1551219")
     public void testUidValue() throws Exception {
-        // Known UID, assuming no dependencies or the file itself have changed.
-        String knownUid = "3VBCHFMNOup__UlHicckgg";
+        StringBuilder buffer = new StringBuilder();
         String cmpName = "test:layoutNoLayout";
         DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpName, ApplicationDef.class);
         MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
+        Aura.getContextService().getCurrentContext().clearPreloads();
         String uid = masterDefReg.getUid(null, desc);
         assertNotNull("Could not retrieve UID for component " + cmpName, uid);
-        assertEquals("Unexpected UID value on component " + cmpName, knownUid, uid);
+        Set<DefDescriptor<?>> dependencies = masterDefReg.getDependencies(uid);
+        assertNotNull("Could not retrieve dependencies for component " + cmpName, dependencies);
+
+        buffer.append(desc.toString());
+        buffer.append(" : ");
+        buffer.append(uid);
+        buffer.append("\n");
+
+        SortedSet<DefDescriptor<?>> sorted = Sets.newTreeSet(dependencies);
+        for (DefDescriptor<?> dep : sorted) {
+            buffer.append(dep);
+            buffer.append(" : ");
+            buffer.append(masterDefReg.getDef(dep).getOwnHash());
+            buffer.append("\n");
+        }
+        goldFileText(buffer.toString());
     }
 
     public void testGetUidDescriptorNull() throws Exception {
         MasterDefRegistryImpl registry = getDefRegistry(false);
-        assertEquals(null, registry.getUid(null, null));
+        assertNull(registry.getUid(null, null));
     }
 
     public void testGetUidDescriptorDoesntExist() throws Exception {
         MasterDefRegistryImpl registry = getDefRegistry(false);
-        assertEquals(null, registry.getUid(null, DefDescriptorImpl.getInstance("unknown:soldier", ComponentDef.class)));
+        assertNull(registry.getUid(null, DefDescriptorImpl.getInstance("unknown:soldier", ComponentDef.class)));
     }
 
     public void testGetUidLocalDef() throws Exception {
@@ -301,8 +325,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             registry.getUid(null, cmpDesc);
             fail("Expected DefinitionNotFoundException");
         } catch (DefinitionNotFoundException e) {
-            checkExceptionStart(e, null,
-                    "No COMPONENT named markup://unknown:component found");
+            checkExceptionStart(e, null, "No COMPONENT named markup://unknown:component found");
         }
         Mockito.verify(registry, Mockito.times(1)).compileDef(Mockito.eq(cmpDesc),
                 Mockito.<Map<DefDescriptor<?>, Definition>> any());
@@ -313,8 +336,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             registry.getUid(null, cmpDesc);
             fail("Expected DefinitionNotFoundException");
         } catch (DefinitionNotFoundException e) {
-            checkExceptionStart(e, null,
-                    "No COMPONENT named markup://unknown:component found");
+            checkExceptionStart(e, null, "No COMPONENT named markup://unknown:component found");
         }
         Mockito.verify(registry, Mockito.times(0)).compileDef(Mockito.eq(cmpDesc),
                 Mockito.<Map<DefDescriptor<?>, Definition>> any());
@@ -387,8 +409,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         // build a mock def
         String descName = String.format("%s:ghost", System.nanoTime());
         Definition def = Mockito.mock(RootDefinition.class);
-        Mockito.doReturn(DefDescriptorImpl.getInstance(descName, ComponentDef.class)).when(def)
-                .getDescriptor();
+        Mockito.doReturn(DefDescriptorImpl.getInstance(descName, ComponentDef.class)).when(def).getDescriptor();
 
         // spy on MDR's registries to spy on defs
         final MasterDefRegistryImpl registry = getDefRegistry(true);
@@ -439,12 +460,12 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     public void testGetDefDescriptorNull() throws Exception {
         MasterDefRegistryImpl registry = getDefRegistry(false);
-        assertEquals(null, registry.getDef(null));
+        assertNull(registry.getDef(null));
     }
 
     public void testGetDefDescriptorDoesntExist() throws Exception {
         MasterDefRegistryImpl registry = getDefRegistry(false);
-        assertEquals(null, registry.getDef(DefDescriptorImpl.getInstance("unknown:soldier", ComponentDef.class)));
+        assertNull(registry.getDef(DefDescriptorImpl.getInstance("unknown:soldier", ComponentDef.class)));
     }
 
     public void testGetDefCachedForChangedDefinition() throws Exception {
@@ -489,5 +510,52 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 StringSourceLoader.getInstance().removeSource(cmpDesc);
             }
         }
+    }
+
+    public void testGetDependencies() throws Exception {
+        DefDescriptor<ComponentDef> depCmpDesc1 = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        DefDescriptor<ComponentDef> depCmpDesc2 = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        DefDescriptor<ComponentDef> cmpDesc1 = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        // Manually add dependency to inner component
+        DefDescriptor<ComponentDef> cmpDesc2 = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component><aura:dependency resource=\"" + depCmpDesc1.getQualifiedName()
+                        + "\"/></aura:component>");
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(
+                        baseComponentTag,
+                        "",
+                        String.format("<aura:dependency resource=\"" + depCmpDesc2.getQualifiedName()
+                                + "\"/><%s/><%s/>",
+                                cmpDesc1.getDescriptorName(), cmpDesc2.getDescriptorName())));
+
+        MasterDefRegistryImpl registry = getDefRegistry(false);
+        String uid = registry.getUid(null, cmpDesc);
+        Set<DefDescriptor<?>> deps = registry.getDependencies(uid);
+        assertTrue("Component should have dependency on aura:component by default",
+                checkDependenciesContains(deps, "markup://aura:component"));
+        assertTrue("Component should have dependency on aura:rootComponent by default",
+                checkDependenciesContains(deps, "markup://aura:rootComponent"));
+        assertTrue("Component should not have a dependency on aura:application",
+                !checkDependenciesContains(deps, "markup://aura:application"));
+        assertTrue("No dependency on self found in Component",
+                checkDependenciesContains(deps, cmpDesc.getQualifiedName()));
+        assertTrue("Dependency on inner component not found",
+                checkDependenciesContains(deps, cmpDesc1.getQualifiedName()));
+        assertTrue("Dependency on inner component not found",
+                checkDependenciesContains(deps, cmpDesc2.getQualifiedName()));
+        assertTrue("Explicitly declared dependency on inner component not found",
+                checkDependenciesContains(deps, depCmpDesc1.getQualifiedName()));
+        assertTrue("Explicitly declared dependency on top level component not found",
+                checkDependenciesContains(deps, depCmpDesc2.getQualifiedName()));
+    }
+
+    private boolean checkDependenciesContains(Set<DefDescriptor<?>> deps, String depSearch) {
+        for (DefDescriptor<?> dep : deps) {
+            if (dep.getQualifiedName().equals(depSearch)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

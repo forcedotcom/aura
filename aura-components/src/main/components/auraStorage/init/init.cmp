@@ -16,15 +16,18 @@
 
 -->
 <aura:component renderer="java://org.auraframework.component.auraStorage.InitRenderer" support="GA">
-    <aura:attribute name="implementation" type="String" default="memory" description="The specific type of storage to use. Valid values are: memory, websql, indexeddb, smartstore."/>
+    <aura:attribute name="name" type="String" required="true" description="The programmatic name for the storage instance."/>
+    <aura:attribute name="persistent" type="Boolean" default="false" description="True if this storage requires persistent storage support."/>
+    <aura:attribute name="secure" type="Boolean" default="false" description="True if this storage requires secure storage support."/>
     <aura:attribute name="clearStorageOnInit" type="Boolean" default="true" description="For persistent storage delete all previous data on initialization."/>
     <aura:attribute name="defaultExpiration" type="Integer" default="10" description="The default number of seconds that an object will be retained in storage if a request specific expiration has not been specified in the call to Action.setStorable()."/>
     <aura:attribute name="defaultAutoRefreshInterval" type="Integer" default="30" description="The default number of seconds before an auto refresh request will be initiated if a request specific interval has not been specified in the call to Action.setStorable()."/>
     <aura:attribute name="maxSize" type="Integer" default="1000" description="Maximum size in kilobytes that will be used in the memory adapter's storage. Existing items will be evicted to make room for new items using LRU and expiry strategies."/>
     <aura:attribute name="debugLoggingEnabled" type="Boolean" default="false" description="Controls if additional $A.log() messages are generated."/>
     <aura:attribute name="requireUseStorageQueryParam" type="Boolean" default="false" description="Temporary control override for conditional enablement via aura.useStorage=true query param."/>
+    <aura:attribute name="implementation" type="String" description="The specific type of storage to use. Valid values are: memory, websql, indexeddb, smartstore. Defaults to requirement based auto selection. Primarily used for testing."/>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-    <aura:handler event="aura:noConnection" action="{!c.noConnection}"/>
+    <aura:handler event="aura:connectionLost" action="{!c.connectionLost}"/>
     <aura:handler event="aura:connectionResumed" action="{!c.connectionResumed}"/>
 </aura:component>

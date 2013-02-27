@@ -13,8 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
-    outerSystemError: function(cmp, event){
-        document.write("sysemError from test_ErrorMsg_CompositeCmp \n");
-    }
+.THIS {
+    background-color: #AABEBF;
+}
+
+.THIS .header {
+    font-weight: bold;
+}
+
+.THIS ol {
+    margin-top : 0px;
+}
+
+.THIS .headerline {
+    font-weight: bold;
+    margin-top : 10px;
+    margin-bottom : 0px;
+}
+
+.THIS .headerline li {
+    list-style: none;
+}
+
+.THIS .error{
+    background-color: #FF8EAF;
+}
+
+.THIS .uid {
+    float : right;
+    margin-right : 20px;
+    font-family : monospace;
 }

@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 ({
-	isEnabled: function() {
+	getStorage: function(cmp) {
+		return $A.storageService.getStorage(cmp.get("v.storageName"));
+	},
+	
+	isEnabled: function(cmp) {
 	    var mode = $A.getContext().getMode();
-	    return !$A.util.isUndefinedOrNull($A.storageService.getStorage()) && (mode !== "PROD");
+	    return !$A.util.isUndefinedOrNull(this.getStorage(cmp)) && (mode !== "PROD");
 	},
 	
 	update: function(cmp){
-    	if (this.isEnabled()) {
-    		var storage = $A.storageService.getStorage();
+    	if (this.isEnabled(cmp)) {
+    		var storage = this.getStorage(cmp);
 	    	var size = storage.getSize();
 	    	var maxSize = storage.getMaxSize();
 	    	

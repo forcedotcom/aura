@@ -169,14 +169,6 @@ Action.prototype.getError = function() {
 };
 
 /**
- * Gets the storage that provided the Action.
- * @returns {String}
- */
-Action.prototype.getStorage = function() {
-    return this.storage;
-};
-
-/**
  * Adds the server-side action to the queue. Checks that the event is server-side before enqueuing.<br/>
  * For client-side Action, use run() instead.<br/>
  * @param {Action} action The action to run after the function.
@@ -212,7 +204,7 @@ Action.prototype.complete = function(response) {
             this.callback.call(this.callbackScope, this);
         }
 
-        var storage = $A.storageService.getStorage();
+        var storage = this.getStorage();
         if (storage && this._isStorable() && this.getState() === "SUCCESS") {
             var storageName = storage.getName();
             var key = this.getStorageKey();
@@ -365,9 +357,9 @@ Action.prototype.toJSON = function() {
  */
 Action.prototype.refresh = function() {
     // If this action was served from storage let's automatically try to get the latest from the server too
-    var storage = this.getStorage();
+    var storage = this.storage;
     if (storage) {
-        var storageService = $A.storageService.getStorage();
+        var storageService = this.getStorage();
         var autoRefreshInterval = this.storableConfig ? this.storableConfig["refresh"] * 1000 : storageService.getDefaultAutoRefreshInterval();
 
         // Only auto refresh if the data we have is more than v.autoRefreshInterval seconds old
@@ -448,5 +440,13 @@ Action.prototype.sanitizeStoredResponse = function(response) {
 	}
 };
 
+/**
+ * Gets the Action storage.
+ * @private
+ * @returns {Storage}
+ */
+Action.prototype.getStorage = function() {
+    return $A.storageService.getStorage("actions");
+};
 
 //#include aura.controller.Action_export

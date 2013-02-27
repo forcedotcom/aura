@@ -13,11 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    render:function (component, helper) {
-        // Add AOP to common attributes
-        helper.addObservers(component, helper.updateCalculatedFields, ["currentPage","pageSize","totalItems"]);
-
-        return this.superRender();
-    }
-})
+{
+    clicked: function(cmp, event){
+        aura.assert(false, "Assert failed in test_ErrorMsg_AssertController!");
+    },
+}

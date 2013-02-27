@@ -27,7 +27,13 @@
  * @constructor
  * The constructor does not call setup (which is asynchronous) because it does not work on device
  */
-var SmartStoreAdapter = function SmartStoreAdapter() {
+var SmartStoreAdapter = function SmartStoreAdapter(config) {
+	
+	
+	// DCHASMAN TODO Figure out how to wire up config["name"] to create instances of this adapter!
+	// Looks like we just need to append the config["name"] to the SOUP_NAME prefix in SmartStoreAdapter.prototype.registerSoup() 
+	
+	
     this.setupStage = this.SETUP_STAGE_NOT_STARTED;
     this.clearRegisterSoupFailed = false;
     this._currentSize = 0;
@@ -42,8 +48,10 @@ SmartStoreAdapter.prototype.SOUP_NAME = "cache";
 //Soup item properties
 SmartStoreAdapter.prototype.SOUP_KEY = "key";
 SmartStoreAdapter.prototype.SOUP_VALUE = "soup_value";
+
 //A property inside soup_value
 SmartStoreAdapter.prototype.SOUP_EXPIRES = "expires";
+
 //Stages of setup
 SmartStoreAdapter.prototype.SETUP_STAGE_NOT_STARTED = "not_started";
 SmartStoreAdapter.prototype.SETUP_STAGE_IN_PROGRESS = "in_progress";
@@ -491,5 +499,9 @@ SmartStoreAdapter.prototype.handleSmartStoreError = function(adapterOperationNam
 
 //#include aura.storage.adapters.SmartStoreAdapter_export
 
-$A.storageService.registerAdapter(SmartStoreAdapter.NAME, SmartStoreAdapter);
-
+$A.storageService.registerAdapter({ 
+	"name": SmartStoreAdapter.NAME, 
+	"adapterClass": SmartStoreAdapter,
+	"persistent": true,
+	"secure": true
+});

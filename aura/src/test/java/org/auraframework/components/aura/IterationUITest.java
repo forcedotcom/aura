@@ -64,13 +64,24 @@ public class IterationUITest extends WebDriverTestCase {
                                                                      // doesn't
                                                                      // render
                                                                      // class?
+        // For ie8 className does not have quotes
+        clientHtml = clientHtml.replaceAll(" class=[^>]+", "");
+        
         serverHtml = serverHtml.replaceAll("\\s+", " "); // replace whitespace
                                                          // with a single space
         serverHtml = serverHtml.replaceAll(" id=\"[^\"]+\"", ""); // server
                                                                   // renders
                                                                   // aura:id as
                                                                   // id
-
+        // fix for ie7 and ie8, 
+        //as id of div does not have quotes
+        serverHtml = serverHtml.replaceAll(" id=[^>]+", "");
+        //remove type from button
+        serverHtml = serverHtml.replaceAll(" type=[^>]+", ""); 
+        //needs an extra space
+        serverHtml = serverHtml.replaceAll("(?i)</DIV>from", "</DIV> from"); 
+        serverHtml = serverHtml.replaceAll("(?i)<BR>from", "<BR> from"); 
+        
         assertEquals(clientHtml, serverHtml);
         goldFileText(clientHtml);
     }
@@ -104,9 +115,12 @@ public class IterationUITest extends WebDriverTestCase {
         serverHtml = serverHtml.replaceAll(";\"", "\""); // replace semicolon
                                                          // and doubleQuotes
                                                          // with a doubleQuotes
-        serverHtml = serverHtml.replaceAll("</?tbody>", ""); // server has extra
+        // for ie7 and 8, servers adds extra tbody with space
+        serverHtml = serverHtml.replaceAll("<(?i)/?tbody> ", ""); // server has extra
+        serverHtml = serverHtml.replaceAll("</DIV>but indexVar", "</DIV> but indexVar"); 
+        
+        serverHtml = serverHtml.replaceAll("<(?i)/?tbody>", ""); // server has extra
                                                              // tbody?
-
         assertEquals(clientHtml, serverHtml);
         goldFileText(clientHtml);
     }

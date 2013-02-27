@@ -58,7 +58,10 @@
     <br/>
     <ui:button label="Push component to page" press="{!c.pushComponent}"/>
     <ui:button label="Measure time to destroy component (Component.destroy())" press="{!c.destroyComponent}"/>
-    <ui:button label="Measure time to destroy dom elements (Util.removeElement())" press="{!c.removeElement}"/>
+    
+    <!-- TODO W-1557952 re-enable when we figure out why the mark/measure in Util.removeElement() was causing issues -->
+    <!-- <ui:button label="Measure time to destroy dom elements (Util.removeElement())" press="{!c.removeElement}"/> -->
+    
     <div class="placeholder" aura:id="placeHolder"/>
     
 </aura:application>

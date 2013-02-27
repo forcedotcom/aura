@@ -21,7 +21,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.controller.java.ServletConfigController;
@@ -61,7 +60,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 /**
  * Tests for AppCache functionality by watching the requests received at the
@@ -71,7 +69,7 @@ import com.google.common.collect.Sets;
  */
 // FF pops a dialog for appCache
 // IE < 10 don't support appCache
-@ExcludeBrowsers({ BrowserType.FIREFOX, BrowserType.IE7, BrowserType.IE8, BrowserType.IE9, BrowserType.IE10})
+@ExcludeBrowsers({ BrowserType.FIREFOX, BrowserType.IE7, BrowserType.IE8, BrowserType.IE9, BrowserType.IE10 })
 @FreshBrowserInstance
 @ThreadHostileTest
 public class AppCacheResourcesUITest extends WebDriverTestCase {
@@ -98,70 +96,69 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     @Override
     public void perBrowserSetUp() {
-    	super.perBrowserSetUp();
-    	WebDriver driver = getDriver();
-    	driver.get("/auraFW/resources/aura/s.gif");
-    	driver.manage().deleteAllCookies();
+        super.perBrowserSetUp();
+        WebDriver driver = getDriver();
+        driver.get("/auraFW/resources/aura/s.gif");
+        driver.manage().deleteAllCookies();
     }
-    
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-		originalAppCacheConfig = ServletConfigController
-				.setAppCacheDisabled(false);
-		namespace = "appCacheResourcesUITest" + auraTestingUtil.getNonce();
-		appName = "cacheapplication";
-		cmpName = "cachecomponent";
 
-		DefDescriptor<ComponentDef> cmpDesc = createDef(
-				ComponentDef.class,
-				String.format("%s:%s", namespace, cmpName),
-				"<aura:component>"
-						+ "<aura:attribute name='output' type='String'/>"
-						+ "<div class='clickableme' onclick='{!c.cssalert}'>@@@TOKEN@@@</div>"
-						+ "<div class='attroutput'>{!v.output}</div>"
-						+ "</aura:component>");
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        originalAppCacheConfig = ServletConfigController
+                .setAppCacheDisabled(false);
+        namespace = "appCacheResourcesUITest" + auraTestingUtil.getNonce();
+        appName = "cacheapplication";
+        cmpName = "cachecomponent";
 
-		createDef(NamespaceDef.class, String.format("%s://%s",
-				DefDescriptor.MARKUP_PREFIX, namespace),
-				"<aura:namespace></aura:namespace>");
+        DefDescriptor<ComponentDef> cmpDesc = createDef(ComponentDef.class,
+                String.format("%s:%s", namespace, cmpName),
+                "<aura:component>"
+                        + "<aura:attribute name='output' type='String'/>"
+                        + "<div class='clickableme' onclick='{!c.cssalert}'>@@@TOKEN@@@</div>"
+                        + "<div class='attroutput'>{!v.output}</div>"
+                        + "</aura:component>");
 
-		createDef(ThemeDef.class, String.format("%s://%s.%s",
-				DefDescriptor.CSS_PREFIX, namespace, cmpName),
-				".THIS {background-image: url(/auraFW/resources/qa/images/s.gif?@@@TOKEN@@@);}");
+        createDef(NamespaceDef.class, String.format("%s://%s",
+                DefDescriptor.MARKUP_PREFIX, namespace),
+                "<aura:namespace></aura:namespace>");
 
-		createDef(
-				ControllerDef.class,
-				String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX,
-						namespace, cmpName),
-				"{ cssalert:function(c){"
-						+ "function getStyle(elem, style){"
-						+ "var val = '';"
-						+ "if(document.defaultView && document.defaultView.getComputedStyle){"
-						+ "val = document.defaultView.getComputedStyle(elem, '').getPropertyValue(style);"
-						+ "} else if(elem.currentStyle){"
-						+ "style = style.replace(/\\-(\\w)/g, function (s, ch){"
-						+ "return ch.toUpperCase();"
-						+ "});"
-						+ "val = elem.currentStyle[style];"
-						+ "}"
-						+ "return val;"
-						+ "};"
-						+ "var style = getStyle(c.getElement(),'background-image');"
-						+ "c.getValue('v.output').setValue('@@@TOKEN@@@'"
-						+ "+ style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')'))"
-						+ "+ ($A.test ? $A.test.dummyFunction() : '@@@TOKEN@@@'));"
-						+ "}}");
+        createDef(ThemeDef.class, String.format("%s://%s.%s",
+                DefDescriptor.CSS_PREFIX, namespace, cmpName),
+                ".THIS {background-image: url(/auraFW/resources/qa/images/s.gif?@@@TOKEN@@@);}");
 
-		createDef(
-				ApplicationDef.class,
-				String.format("%s:%s", namespace, appName),
-				String.format(
-						"<aura:application useAppcache='true' render='client' preload='%s'"
-								+ " securityProvider='java://org.auraframework.java.securityProvider.LaxSecurityProvider'>"
-								+ "<%s:%s/>" + "</aura:application>",
-						namespace, namespace, cmpDesc.getName()));
-	}
+        createDef(
+                ControllerDef.class,
+                String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX,
+                        namespace, cmpName),
+                "{ cssalert:function(c){"
+                        + "function getStyle(elem, style){"
+                        + "var val = '';"
+                        + "if(document.defaultView && document.defaultView.getComputedStyle){"
+                        + "val = document.defaultView.getComputedStyle(elem, '').getPropertyValue(style);"
+                        + "} else if(elem.currentStyle){"
+                        + "style = style.replace(/\\-(\\w)/g, function (s, ch){"
+                        + "return ch.toUpperCase();"
+                        + "});"
+                        + "val = elem.currentStyle[style];"
+                        + "}"
+                        + "return val;"
+                        + "};"
+                        + "var style = getStyle(c.getElement(),'background-image');"
+                        + "c.getValue('v.output').setValue('@@@TOKEN@@@'"
+                        + "+ style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')'))"
+                        + "+ ($A.test ? $A.test.dummyFunction() : '@@@TOKEN@@@'));"
+                        + "}}");
+
+        createDef(
+                ApplicationDef.class,
+                String.format("%s:%s", namespace, appName),
+                String.format(
+                        "<aura:application useAppcache='true' render='client' preload='%s'"
+                                + " securityProvider='java://org.auraframework.java.securityProvider.LaxSecurityProvider'>"
+                                + "<%s:%s/>" + "</aura:application>",
+                        namespace, namespace, cmpDesc.getName()));
+    }
 
     @Override
     public void tearDown() throws Exception {
@@ -188,7 +185,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         // only expect a fetch for the manifest and the initAsync component load
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
-        List<Request> expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest"));
+        List<Request> expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest", 200));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
     }
@@ -212,7 +209,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         // There may be a varying number of requests, depending on when the
         // initial manifest response is received.
         Cookie cookie = getDriver().manage().getCookieNamed(cookieName);
-        assertFalse("Manifest cookie was not changed "+cookie.getValue(), "error".equals(cookie.getValue()));
+        assertFalse("Manifest cookie was not changed " + cookie.getValue(), "error".equals(cookie.getValue()));
     }
 
     /**
@@ -252,15 +249,11 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         replaceToken(getTargetComponent().getThemeDescriptor(), replacement);
 
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, replacement, TOKEN);
-        List<Request> expected = Lists.newArrayList(new Request("/aura", namespace + ":" + appName, null, "HTML"),
-                                                    new Request("/auraResource", null, null, "css"),
-                                                    new Request("/auraResource", null, null, "js"),
-                                                    new Request("/auraResource", null, null, "manifest"));
-        assertRequests(expected, logs);
+        assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
 
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, replacement, TOKEN);
-        expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest"));
+        List<Request> expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest", 200));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
     }
@@ -289,16 +282,11 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         replaceToken(desc, replacement);
 
         logs = loadMonitorAndValidateApp(TOKEN, replacement, TOKEN, TOKEN);
-        List<Request> expected = Lists.newArrayList(
-                new Request("/aura", namespace + ":" + appName, null, "HTML"), // rest are cache updates
-                new Request("/auraResource", null, null, "css"),
-                new Request("/auraResource", null, null, "js"),
-                new Request("/auraResource", null, null, "manifest"));
-        assertRequests(expected, logs);
+        assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
 
         logs = loadMonitorAndValidateApp(TOKEN, replacement, TOKEN, TOKEN);
-        expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest"));
+        List<Request> expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest", 200));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
     }
@@ -320,16 +308,11 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         replaceToken(getTargetComponent().getDescriptor(), replacement);
 
         logs = loadMonitorAndValidateApp(replacement, TOKEN, TOKEN, TOKEN);
-        List<Request> expected = Lists.newArrayList(
-                new Request("/aura", namespace + ":" + appName, null, "HTML"), // rest are cache updates
-                new Request("/auraResource", null, null, "css"),
-                new Request("/auraResource", null, null, "js"),
-                new Request("/auraResource", null, null, "manifest"));
-        assertRequests(expected, logs);
+        assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
 
         logs = loadMonitorAndValidateApp(replacement, TOKEN, TOKEN, TOKEN);
-        expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest"));
+        List<Request> expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest", 200));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
     }
@@ -369,17 +352,12 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
             testJs.setLastModified(System.currentTimeMillis());
 
             logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, replacement);
-            List<Request> expected = Lists.newArrayList(
-                    new Request("/aura", namespace + ":" + appName, null, "HTML"), // rest are cache updates
-                    new Request("/auraResource", null, null, "css"),
-                    new Request("/auraResource", null, null, "js"),
-                    new Request("/auraResource", null, null, "manifest"));
-            assertRequests(expected, logs);
+            assertRequests(getExpectedChangeRequests(), logs);
             assertAppCacheStatus(Status.IDLE);
 
             logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, replacement);
-            expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest"),
-                                          new Request("/aura", namespace + ":" + appName, null, null));
+            List<Request> expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest", 200),
+                    new Request("/aura", namespace + ":" + appName, null, null, 200));
             assertRequests(expected, logs);
             assertAppCacheStatus(Status.IDLE);
         } finally {
@@ -402,7 +380,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     private void assertAppCacheStatus(Status status) {
         Status actual = Status.values()[Integer.parseInt(auraUITestingUtil.getEval(
-        "return window.applicationCache.status;").toString())];
+                "return window.applicationCache.status;").toString())];
         assertEquals("Unexpected status", status.name(), actual.name());
     }
 
@@ -415,7 +393,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
             context = service.startContext(Mode.SELENIUM, Format.HTML, Access.AUTHENTICATED);
         }
         return Aura.getDefinitionService().getDefinition(String.format("%s:%s", namespace, cmpName),
-                                                         ComponentDef.class);
+                ComponentDef.class);
     }
 
     private void assertRequests(List<Request> expected, List<Request> actual) throws Exception {
@@ -428,29 +406,61 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         for (Request r : actual) {
             System.out.println("A: " + r);
         }
+        List<Request> unexpectedRequests = Lists.newArrayList();
+        List<Request> expectedRequests = Lists.newArrayList(expected);
+        List<Request> missingRequests = Lists.newArrayList();
 
-        Set<Request> actualCopy = Sets.newHashSet(actual);
-        for (Request r : expected) {
-            actualCopy.remove(r);
+        for (Request r : actual) {
+            int idx = expectedRequests.indexOf(r);
+
+            if (idx != -1) {
+                if (expectedRequests.get(idx).mark()) {
+                    expectedRequests.remove(idx);
+                }
+            } else {
+                unexpectedRequests.add(r);
+            }
         }
-        if (actualCopy.size() > 0) {
-            fail("Unexpected requests:\n" + actualCopy);
+        for (Request r : expectedRequests) {
+            if (!r.passed()) {
+                missingRequests.add(r);
+            }
         }
-        List<Request> expectedCopy = Lists.newArrayList(expected);
-        for (Request l : actual) {
-            expectedCopy.remove(l);
-        }
-        if (expectedCopy.size() > 0) {
-            fail("Missing requests:\n" + expectedCopy);
+        if (unexpectedRequests.size() > 0 || missingRequests.size() > 0) {
+            StringBuffer sb = new StringBuffer();
+            String separator = "";
+
+            if (unexpectedRequests.size() > 0) {
+                sb.append("Unexpected requests:\n");
+                sb.append(unexpectedRequests);
+                separator = "\n";
+            }
+            if (missingRequests.size() > 0) {
+                sb.append(separator);
+                sb.append("Missing Requests:\n");
+                sb.append(missingRequests);
+            }
+            fail(sb.toString());
         }
     }
 
-    // Some sanity checks that our simple test app is functional after cache
-    // resolutions.
-    // - updated markup text is rendered (markupToken)
-    // - updated client actions functional (jsToken)
-    // - updated styling applied (cssToken)
-    // - updated framework called (fwToken)
+    /**
+     * Load and get all the log lines for the app load.
+     *
+     * Some sanity checks that our simple test app is functional after cache
+     * resolutions.
+     * <ul>
+     * <li>updated markup text is rendered (markupToken)</li>
+     * <li>updated client actions functional (jsToken)</li>
+     * <li>updated styling applied (cssToken)</li>
+     * <li>updated framework called (fwToken)</li>
+     * </ul>
+     *
+     * @param markupToken The text to be found in the markup.
+     * @param jsToken The text to be found from js
+     * @param cssToken The text to be found from css.
+     * @param Token The text to be found from the framework.
+     */
     private List<Request> loadMonitorAndValidateApp(final String markupToken, String jsToken, String cssToken,
             String fwToken) throws Exception {
         TestLoggingAdapterController.beginCapture();
@@ -498,7 +508,15 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                 System.out.println("IGNORED: " + log);
                 continue;
             }
-            Request toAdd = new Request(log.get("auraRequestURI").toString(), null, null, null);
+            int status = -1;
+
+            if (log.get("httpStatus") != null) {
+                try {
+                    status = Integer.parseInt((String) log.get("httpStatus"));
+                } catch (NumberFormatException nfe) {
+                }
+            }
+            Request toAdd = new Request(log.get("auraRequestURI").toString(), null, null, null, status);
             for (String part : AuraTextUtil.urldecode(log.get("auraRequestQuery").toString()).split("&")) {
                 String[] parts = part.split("=", 2);
                 String key = parts[0].substring(AURA.length() + 1);
@@ -510,24 +528,91 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         return logs;
     }
 
-    private List<Request> getExpectedInitialRequests() {
-        return ImmutableList.of(new Request("/auraResource", null, null, "manifest"),
-                                new Request("/aura", namespace + ":" + appName, null, "HTML"),
-                                new Request("/auraResource", null, null, "css"),
-                                new Request("/auraResource", null, null, "js"));
+    /**
+     * Get the set of expected requests on change.
+     * 
+     * These are the requests that we expect for filling the app cache. The explanation is as follows.
+     * <ul>
+     * <li>The manifest is pulled</li>
+     * <li>The browser now gets all three components, initial, css, and js</li>
+     * <li>Finally, the browser re-fetches the manifest to check contents</li>
+     * <ul>
+     * 
+     * The primary difference between this and the initial requests is that we don't get the initial page twice, and we
+     * get the manifest three times... odd that.
+     * 
+     * @return the list of request objects, not necessarily in order.
+     */
+    private List<Request> getExpectedChangeRequests() {
+        return ImmutableList.of(
+                new Request(3, "/auraResource", null, null, "manifest", 200),
+                new Request("/aura", namespace + ":" + appName, null, "HTML", 200), // rest are cache updates
+                new Request("/auraResource", null, null, "css", 200),
+                new Request("/auraResource", null, null, "js", 200));
     }
 
-    // keep only the info needed for these tests, from the available log info
+    /**
+     * Get the set of expected initial requests.
+     * 
+     * These are the requests that we expect for filling the app cache. The explanation is as follows.
+     * <ul>
+     * <li>The browser requests the initial page from the server</li>
+     * <li>The manifest is pulled</li>
+     * <li>The browser now gets all three components, initial, css, and js</li>
+     * <li>Finally, the browser re-fetches the manifest to check contents</li>
+     * <ul>
+     * 
+     * Note that there are two requests for the initial page, one as the first request, and one to fill the app cache
+     * (odd, but true). There are also two manifest requests.
+     * 
+     * @return the list of request objects, not necessarily in order.
+     */
+    private List<Request> getExpectedInitialRequests() {
+        return ImmutableList.of(
+                new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200),
+                new Request(2, "/auraResource", null, null, "manifest", 200),
+                new Request("/auraResource", null, null, "css", 200),
+                new Request("/auraResource", null, null, "js", 200));
+    }
+
+    /**
+     * A request object, which can either be an 'expected' request, or an 'actual' request.
+     * 
+     * Expected requests can also have a fudge factor allowing multiple requests for the resource.
+     * This is very helpful for different browsers doing diferent things with the manifest.
+     * We allow multiple fetches of both the manifest and initial page in both the initial request
+     * and the requests on change of resource.
+     */
     static class Request extends HashMap<String, String> {
         private static final long serialVersionUID = 4149738936658714181L;
-        private static final ImmutableSet<String> validKeys = ImmutableSet.of("URI", "tag", "namespaces", "format");
+        private static final ImmutableSet<String> validKeys = ImmutableSet.of("URI", "tag", "namespaces", "format",
+                "httpStatus");
 
-        Request(String URI, String tag, String namespaces, String format) {
+        private final int fudge;
+        private int count = 0;
+
+        Request(int fudge, String URI, String tag, String namespaces, String format, int status) {
             super();
+            this.fudge = fudge;
             put("URI", URI);
             put("tag", tag);
             put("namespaces", namespaces);
             put("format", format);
+            if (status != -1) {
+                put("httpStatus", String.valueOf(status));
+            }
+        }
+
+        Request(String URI, String tag, String namespaces, String format, int status) {
+            super();
+            this.fudge = 0;
+            put("URI", URI);
+            put("tag", tag);
+            put("namespaces", namespaces);
+            put("format", format);
+            if (status != -1) {
+                put("httpStatus", String.valueOf(status));
+            }
         }
 
         @Override
@@ -537,7 +622,31 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
             }
             return null;
         }
+
+        /**
+         * We passed the test for this request.
+         * 
+         * @return true if we got the request.
+         */
+        public boolean passed() {
+            return fudge > 0 && count > 0;
+        }
+
+        /**
+         * Mark the request as found.
+         * 
+         * @return true if it should be removed.
+         */
+        public boolean mark() {
+            if (fudge == 0) {
+                return true;
+            } else {
+                count += 1;
+                return count > fudge;
+            }
+        }
     }
+
     @Override
     protected Mode getAuraModeForCurrentBrowser() {
         return Mode.SELENIUM;

@@ -18,7 +18,7 @@
  * @namespace The IndexedDB adapter for storage service implementation
  * @constructor
  */
-var IndexedDBStorageAdapter = function IndexedDBStorageAdapter() {
+var IndexedDBStorageAdapter = function IndexedDBStorageAdapter(config) {
 };
 
 IndexedDBStorageAdapter.NAME= "indexeddb";
@@ -58,4 +58,10 @@ IndexedDBStorageAdapter.prototype.getExpired = function(resultCallback) {
 	resultCallback(expired);
 };
 
-$A.storageService.registerAdapter(IndexedDBStorageAdapter.NAME, IndexedDBStorageAdapter);
+
+// DCHASMAN TODO Register IndexedDBAdapter when it is ready for prime time
+/*$A.storageService.registerAdapter({ 
+	"name": IndexedDBStorageAdapter.NAME, 
+	"adapterClass": IndexedDBStorageAdapter,
+	"persistent": true
+});*/

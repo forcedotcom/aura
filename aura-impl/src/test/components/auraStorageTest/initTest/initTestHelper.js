@@ -266,7 +266,7 @@
         $A.eventService.finishFiring();
         $A.test.addWaitFor("SUCCESS", function(){return a2.getState()},
             function(){
-                $A.log($A.storageService.getStorage());
+                $A.log($A.storageService.getStorage("actions"));
                 $A.test.assertTrue(a2.isFromStorage(), "Failed to fetch action from storage");
                 $A.test.assertEquals(0, a2.getReturnValue()[0], "Wrong counter value seen in response");
                 $A.test.assertEquals(999, a2.getReturnValue()[1]);

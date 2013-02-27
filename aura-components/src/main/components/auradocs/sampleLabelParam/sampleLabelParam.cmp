@@ -16,4 +16,7 @@
 
 -->
 <aura:component>
+    <aura:label value="Label with link: {0}">
+        <ui:outputURL value="http://www.salesforce.com" label="Test Link"/>
+    </aura:label>
 </aura:component>

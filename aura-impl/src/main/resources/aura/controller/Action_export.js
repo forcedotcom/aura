@@ -39,5 +39,6 @@ exp(p,
     "toJSON", p.toJSON
     //#if {"excludeModes" : ["PRODUCTION"]}
      ,"getId", p.getId
+     ,"getStorageKey", p.getStorageKey 
 	//#end
 );

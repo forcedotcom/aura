@@ -21,6 +21,6 @@
     <aura:handler name="search" action="{!c.handleSearch}" />
 	<aura:attribute name="tree" type="Aura.Component" />
 	
-	<ui:inputSearch search="{!c.handleSearch}" aura:id="searchBox" class="searchBox" />
+	<ui:inputSearch search="{!c.handleSearch}" aura:id="searchBox" class="searchBox" placeholder="Search TOC" />
 	{!v.body}
 </aura:component>

@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
-    clicked: function(cmp, event){
-        aura.assert(false, "System Error was fired");
-    },
 
-    systemError: function(cmp, event){
-        document.write("systemError from test_ErrorMsg_SimpleCmp1 ");
-    }
+{
+	handleSearch : function(cmp,event){
+	var searchTerm = event.getParam('searchTerm') || event.getSource().getElement().value;
+ 
+		if (searchTerm.length > 0) {
+			 var results_location = "#help?topic=searchResults&searchTerm=" + escape(searchTerm);
+			 window.location = results_location;
+			 
+		 }
+	}
 }

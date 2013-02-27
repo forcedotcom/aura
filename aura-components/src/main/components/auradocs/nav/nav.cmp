@@ -25,7 +25,7 @@
             <li aura:id="reference"><auradocs:navLink location="reference">Reference</auradocs:navLink></li>
             <li aura:id="demos"><auradocs:navLink location="demos">Demos</auradocs:navLink></li>
         </ul>
-        <div class="fuelGauge"><auraStorage:fuelGauge/></div>
+        <div class="fuelGauge"><auraStorage:fuelGauge storageName="actions"/></div>
         <ui:image class="spinner"/>
     </nav>
 </aura:component>

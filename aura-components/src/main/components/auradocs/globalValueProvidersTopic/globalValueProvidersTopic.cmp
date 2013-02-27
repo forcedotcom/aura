@@ -107,4 +107,7 @@
 <p>This example shows how to get all <code>$Browser</code> attributes.</p>
 <auradocs:example descriptor="auradocs:sampleBrowser" />
 
+<p><b>See also:</b><br/>   
+    <auradocs:topicLink topic="labelParametersTopic">Setting Label Parameters</auradocs:topicLink>    
+</p>
 </aura:component>

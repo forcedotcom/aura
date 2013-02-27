@@ -273,12 +273,17 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
 
         @Override
         public Builder setAttribute(String key, Object value) {
-            AttributeDefRefImpl.Builder valueBuilder = new AttributeDefRefImpl.Builder();
-            valueBuilder.setDescriptor(DefDescriptorImpl.getInstance(key, AttributeDef.class));
-            valueBuilder.setValue(value);
+            if (value != null) {
+                AttributeDefRefImpl.Builder valueBuilder = new AttributeDefRefImpl.Builder();
+                valueBuilder.setDescriptor(DefDescriptorImpl.getInstance(key, AttributeDef.class));
+                valueBuilder.setValue(value);
 
-            AttributeDefRef adr = valueBuilder.build();
-            setAttribute(adr.getDescriptor(), adr);
+                AttributeDefRef adr = valueBuilder.build();
+                setAttribute(adr.getDescriptor(), adr);
+            } else if (attributeValues != null) {
+                DefDescriptor<AttributeDef> attr = DefDescriptorImpl.getInstance(key, AttributeDef.class);
+                attributeValues.remove(attr);
+            }
             return this;
         }
 
@@ -301,6 +306,9 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
         }
 
         public Builder setAttribute(DefDescriptor<AttributeDef> desc, AttributeDefRef value) {
+            if (value == null) {
+                throw new NullPointerException("Value cannot be null");
+            }
             if (attributeValues == null) {
                 attributeValues = Maps.newHashMap();
             }

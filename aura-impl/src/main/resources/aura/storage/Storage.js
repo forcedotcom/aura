@@ -17,22 +17,22 @@
 /**
  * @namespace The storage service implementation
  * @constructor
- * @param {Object} adapter The backing data store that the storage service uses for persistence.
- * @param {Decimal} maxSize The physical cap on the amount of space the service will use before it attempts evictions.
- * @param {Decimal} defaultExpiration The default value of TTL in seconds.
+ * @param {Object} config The configuration describing the characteristics of the storage to be created.
  */
-var AuraStorage = function AuraStorage(implementation, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit) {
-    this.adapter = $A.storageService.createAdapter(implementation);
-    this.maxSize = maxSize;
-    this.defaultExpiration = defaultExpiration * 1000;
-    this.defaultAutoRefreshInterval = defaultAutoRefreshInterval * 1000;
-    this.debugLoggingEnabled = debugLoggingEnabled;
+var AuraStorage = function AuraStorage(config) {
+    this.adapter = config["adapter"];
+    this.maxSize = config["maxSize"];
+    this.defaultExpiration = config["defaultExpiration"] * 1000;
+    this.defaultAutoRefreshInterval = config["defaultAutoRefreshInterval"] * 1000;
+    this.debugLoggingEnabled = config["debugLoggingEnabled"];
     
-	this.log("AuraStorage:ctor() initializing storage adapter using { implementation: \""
-			+ implementation + "\", maxSize: " + maxSize + ", defaultExpiration: " + defaultExpiration
-			+ ", defaultAutoRefreshInterval: " + defaultAutoRefreshInterval + ", clearStorageOnInit: " + clearStorageOnInit + ", debugLoggingEnabled: " + debugLoggingEnabled + " }");
+    var clearStorageOnInit = config["clearStorageOnInit"];
     
-    if (clearStorageOnInit) {
+	this.log("AuraStorage:ctor() initializing storage adapter using { name: \"" + config["name"] + "\", implementation: \""
+			+ this.adapter.getName() + "\", maxSize: " + this.maxSize + ", defaultExpiration: " + this.defaultExpiration
+			+ ", defaultAutoRefreshInterval: " + this.defaultAutoRefreshInterval + ", clearStorageOnInit: " + clearStorageOnInit + ", debugLoggingEnabled: " + this.debugLoggingEnabled + " }");
+    
+    if (clearStorageOnInit === true) {
     	this.log("AuraStorage.ctor(): clearing " + this.getName() + " storage on init");
     	this.adapter.clear();
     }
@@ -78,11 +78,6 @@ AuraStorage.prototype.get = function(key, resultCallback) {
 AuraStorage.prototype.put = function(key, value) {
 	this.sweep();
 
-	// DCHASMAN TODO Revive cost based eviction
-	/*if (this.size + cost > this.maxSize) {
-		this.evict(cost);
-	}*/
-	
 	var now = new Date().getTime();
 	
 	var item = {
@@ -95,14 +90,14 @@ AuraStorage.prototype.put = function(key, value) {
 
 	this.log("AuraStorage.put(): persisting action to " + this.getName() + " storage", [key, item]);
 	
-	this.fireModified();
+	$A.storageService.fireModified();
 };
 
 AuraStorage.prototype.remove = function(key, doNotFireModified) {
 	this.adapter.removeItem(key);
 	
 	if (!doNotFireModified) {
-		this.fireModified();
+		$A.storageService.fireModified();
 	}
 };
 
@@ -124,7 +119,7 @@ AuraStorage.prototype.sweep = function() {
 			}
 			
 			if (removedSomething) {
-				that.fireModified();
+				$A.storageService.fireModified();
 			}
 		});
 	}
@@ -143,16 +138,6 @@ AuraStorage.prototype.resumeSweeping = function() {
 	this.sweep();
 };
 
-AuraStorage.prototype.evict = function(spaceNeeded) {
-	this.log("AuraStorage.evict(): Exceeded maximum space usage allowed in storage: DCHASMAN TODO implement LRU/expiry eviction strategy!", [spaceNeeded / 1024.0, this.getMaxSize() / 1024.0, this.getSize()]);
-};
-
-AuraStorage.prototype.fireModified = function() {
-	var e = $A.get("e.auraStorage:modified");
-	if (e) {
-		e.fire();
-	}
-};
 
 /**
  * Gets the current storage implementation name.

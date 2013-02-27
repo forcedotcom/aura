@@ -16,11 +16,13 @@
 
 -->
 <aura:component support="GA">
+	<aura:attribute name="storageName" type="String" required="true"/>
+
 	<aura:attribute name="value" type="Decimal" default="0.0"/>
 	<aura:attribute name="enabled" type="Boolean"/>
 	<aura:attribute name="implementation" type="String"/>
     <aura:handler event="auraStorage:modified" action="{!c.update}"/>
     <aura:if isTrue="{!v.enabled}">
-    	<ui:stamp aura:id="stamp" severity="success">{!v.value} K ({!v.implementation})</ui:stamp>
+    	<ui:stamp aura:id="stamp" severity="success">{!v.value} K ({!v.storageName}:{!v.implementation})</ui:stamp>
    	</aura:if>
 </aura:component>

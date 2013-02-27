@@ -30,8 +30,10 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
@@ -58,8 +60,7 @@ import com.google.common.collect.Maps;
 @IntegrationTest
 public abstract class IntegrationTestCase extends AuraTestCase {
     /**
-     * Note, any tests that write to the servletConfig are
-     * {@link ThreadHostileTest}.
+     * Note, any tests that write to the servletConfig are {@link ThreadHostileTest}.
      */
     protected static TestServletConfig servletConfig = AuraUtil.get(TestServletConfig.class);
     protected final AuraTestingUtil auraTestingUtil;
@@ -95,8 +96,8 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     }
 
     /**
-     * Note: Any tests utilizing getLastMod are suspects for
-     * {@link ThreadHostileTest} since the last mod is shared global state.
+     * Note: Any tests utilizing getLastMod are suspects for {@link ThreadHostileTest} since the last mod is shared
+     * global state.
      */
     protected static long getLastMod(Mode mode, String... preloads) throws Exception {
         // AuraContextImpl adds aura & ui namespaces as default
@@ -130,13 +131,10 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     }
 
     /**
-     * Given a path on the api server, return a {@link GetMethod} that has the
-     * appropriate headers and server name.
+     * Given a path on the api server, return a {@link GetMethod} that has the appropriate headers and server name.
      * 
-     * @param path the relative path to the server, such as
-     *            <tt>/services/Soap</tt> or
-     *            <tt>/servlet/servlet.SForceMailMerge</tt> Follows redirects by
-     *            default.
+     * @param path the relative path to the server, such as <tt>/services/Soap</tt> or
+     *            <tt>/servlet/servlet.SForceMailMerge</tt> Follows redirects by default.
      * @return a {@link GetMethod}
      * @throws MalformedURLException if the path is invalid.
      * @throws URISyntaxException
@@ -157,14 +155,11 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     }
 
     /**
-     * Given the a path on the api server, return a {@link PostMethod} that has
-     * the appropriate headers and server name.
+     * Given the a path on the api server, return a {@link PostMethod} that has the appropriate headers and server name.
      * 
-     * @param path the relative path to the server, such as
-     *            <tt>/services/Soap</tt> or
+     * @param path the relative path to the server, such as <tt>/services/Soap</tt> or
      *            <tt>/servlet/servlet.SForceMailMerge</tt>.
-     * @param params a set of name value string pairs to use as parameters to
-     *            the post call.
+     * @param params a set of name value string pairs to use as parameters to the post call.
      * @return a {@link PostMethod}
      * @throws MalformedURLException if the path is invalid.
      * @throws URISyntaxException
@@ -195,6 +190,17 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 
     protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents) {
         return auraTestingUtil.addSourceAutoCleanup(descriptor, contents);
+    }
+
+    /**
+     * Get the relative URL for a given BaseComponentDef descriptor.
+     * 
+     * @param desc the DefDescriptor of a BaseComponentDef
+     * @return the relative URL for the descriptor
+     */
+    protected String getUrl(DefDescriptor<? extends BaseComponentDef> desc) {
+        return String.format("/%s/%s.%s", desc.getNamespace(), desc.getName(),
+                DefType.APPLICATION.equals(desc.getDefType()) ? "app" : "cmp");
     }
 
     public static class ServerAction implements Action {

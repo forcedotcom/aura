@@ -104,8 +104,11 @@ MemoryStorageAdapter.prototype.setItem = function(key, item) {
 MemoryStorageAdapter.prototype.removeItem = function(key) {
 	// Update the MRU
 	var value = this.backingStore[key];
+	
 	var index = this.mru.indexOf(key);
-	this.mru.splice(index, 1);
+	if (index >= 0) {
+		this.mru.splice(index, 1);
+	}
 	
 	delete this.backingStore[key];
 	

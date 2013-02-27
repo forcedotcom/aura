@@ -1,0 +1,72 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Label Adapters"/>
+    
+<p>The label adapter enables you to access your application labels. Your label adapter implementation encapsulates the details of finding and returning labels defined outside the application code. Typically, labels are defined separately from the source code to make localization of labels easier.</p>
+
+<p>To provide a label adapter implementation, implement the <code>LocalizationAdapter</code> interface with the following two methods.</p>
+
+<auradocs:codeblock>
+public class MyLocalizationAdapterImpl implements LocalizationAdapter {
+
+    @Override
+    public String getLabel(String section, String name, Object... params) {
+        // Return specified label.
+    }
+
+    @Override
+    public boolean labelExists(String section, String name) {
+        // Return true if the label exists; otherwise false.
+    }   
+
+}
+</auradocs:codeblock><br/>
+
+<p>The <code>getLabel</code> method contains the implementation for finding the specified label and returning it. Here is a description of its  parameters.</p>
+
+<table class="table table-bordered table-striped">
+<thead>
+    <tr>         
+        <th>Parameter</th>      
+        <th>Description</th>        
+    </tr>
+</thead>
+<tbody>
+<tr>
+    <td>String <i>section</i></td>
+    <td>The section in the label definition file where the label is defined. This assumes your label name has two parts (section.name). This parameter can be <code>null</code> depending on your label system implementation.</td>
+</tr>
+<tr>
+    <td>String <i>name</i></td>
+    <td>The label name.</td>
+</tr>
+<tr>
+    <td>Object... <i>params</i></td>
+    <td>A list of parameter values for substitution on the server. This parameter can be <code>null</code> if parameter substitution is done on the client.</td>
+</tr>
+</tbody>
+</table>
+
+<p>The <code>labelExists</code> method indicates whether the specified label is defined or not. Its method parameters are identical to the first two parameters for <code>getLabel</code>. See the parameter descriptions for <code>getLabel</code>.</p>
+
+<p><b>See also:</b><br/>    
+    <auradocs:topicLink topic="globalValueProviders">Global Value Providers</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="labelParameters">Setting Label Parameters</auradocs:topicLink>
+</p>   
+</aura:component>

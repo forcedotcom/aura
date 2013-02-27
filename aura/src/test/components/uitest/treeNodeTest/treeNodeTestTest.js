@@ -60,9 +60,11 @@
                     "tau", "G", "D", "alpha", "beta", "E", "F", "chi", "psi",
                     "omega", "H", "B", "C", "A", "root" ];
             var expected = [];
-            expectedIds.forEach(function(id) {
-                expected.push(cmp.find(id));
-            });
+            
+            for(var i=0; i < expectedIds.length; i++){
+            	expected.push(cmp.find(expectedIds[i]));
+            }
+            
             var nodes = [];
             var root = cmp.find('root');
             var collect = function(node) {
@@ -156,7 +158,7 @@
         test : function(cmp) {
             // Get our initial state.
             var A = cmp.find('A');
-            debugger;
+            
             aura.test.assertFalse(A.get('v.expanded'));
             // First click expands.
             var elemA = document.getElementById('node_' + A.getGlobalId());

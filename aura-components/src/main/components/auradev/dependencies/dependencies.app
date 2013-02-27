@@ -16,13 +16,16 @@
 
 -->
 <aura:application>
-    <aura:attribute type="String" name="component"/>
+    <aura:attribute type="String" name="component" default="aura:application" />
+    <aura:attribute type="Boolean" name="clearPreloads" default="true"/>
     <p>
     To use this application, please specify the app/cmp on the request (?component=&lt;namespace&gt;:&lt;name&gt;)
-    The descriptor must be for either an application or a component.
+    The descriptor must be for either an application or a component. You can also turn on or off the 'clearPreloads'
+    flag, which controls whether the full set of preloads appears in the dependencies. By default, it is on, meaning
+    that no preloads are shown.
     This application will show the full set of dependencies for any definition given. If there is an error processing
     the definition, then the top line will be highlighted as pink, and any definitions that could not be retrieved
     may also show up in the list.
     </p>
-    <auradev:showDependencies component="{!v.component}" />
+    <auradev:showDependencies component="{!v.component}" clearPreloads="{!v.clearPreloads}" />
 </aura:application>

@@ -40,7 +40,8 @@
             aura.test.assertTrue(linkElement instanceof HTMLAnchorElement, "Expected to see a anchor element.")
             aura.test.assertTrue(aura.test.contains(linkElement.href,'http://www.salesforce.com'), linkElement.href + " Expected a link with specified address.")
             aura.test.assertEquals('_self',linkElement.target, "Expected target to be _self by default.")
-            aura.test.assertEquals(1, linkElement.childElementCount);
+            
+            aura.test.assertEquals(1, linkElement.childElementCount || linkElement.children.length); //IE8 and below don't have childElementCount
 
             var imgElement = linkElement.children[0];
             aura.test.assertTrue(imgElement instanceof HTMLImageElement, "Expected to see a image element embedded in the anchor tag.")

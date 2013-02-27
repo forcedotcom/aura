@@ -17,6 +17,7 @@
 -->
 <aura:component model="java://org.auraframework.component.auradev.ShowDependenciesModel">
     <aura:attribute type="String" name="component" default="aura:application" />
+    <aura:attribute type="Boolean" name="clearPreloads" default="true" />
     <div>
         <div class="{!'header'+(m.error==true?' error':'')}">
             {!m.title}

@@ -214,6 +214,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpName, ApplicationDef.class);
         MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
+        Aura.getContextService().getCurrentContext().clearPreloads();
         String uid = masterDefReg.getUid(null, desc);
         assertNotNull("Could not retrieve UID for component " + cmpName, uid);
         Set<DefDescriptor<?>> dependencies = masterDefReg.getDependencies(uid);

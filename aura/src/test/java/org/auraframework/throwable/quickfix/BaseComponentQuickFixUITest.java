@@ -126,8 +126,6 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
     /**
      * Verify that multiple component bundles can be created by entering the DefDescriptors in, comma separated.
      */
-    // TODO(tbliss): W-1510001 Why is this failing on touch's autobuild? Passes locally and testCreationQuickFix, which
-    // is very similar, seems to be passing fine.
     public void testMultipleDescriptors() throws Exception {
         String namespace = String.format("auratest", System.currentTimeMillis());
         String cmpName1 = String.format("nonExistent1%s%s", defType.name(), System.currentTimeMillis());

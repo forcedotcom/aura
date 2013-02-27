@@ -90,7 +90,7 @@
 
 <auradocs:codeblock>
 &lt;ui:button labelDisplay="false" label="Label for assistive text">
-    &lt;aura:label value="<aura:text value="{!"/>$Label.Object.Title}">
+    &lt;aura:label value="<aura:text value="{!"/>$Label.Object.LinkLabel}">
         &lt;ui:outputURL value="http://www.salesforce.com" label="Test Link"/>
     &lt;/aura:label>
 &lt;/ui:button>
@@ -103,7 +103,8 @@
 <p><b>See also:</b><br/>   
     <auradocs:defLink descriptor="aura:label">aura:label</auradocs:defLink><br/>
     <auradocs:topicLink topic="expressions">Expressions</auradocs:topicLink><br/>
-    <auradocs:topicLink topic="globalValueProviders">Global Value Providers</auradocs:topicLink>    
+    <auradocs:topicLink topic="globalValueProviders">Global Value Providers</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="labelAdapter">Label Adapters</auradocs:topicLink>    
  </p>
 
 </aura:component>

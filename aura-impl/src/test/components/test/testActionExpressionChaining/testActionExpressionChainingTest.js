@@ -38,10 +38,14 @@
             var fixture = component.find("fixture");
             var div = fixture.find("theDiv");
 
-            var evt = document.createEvent("Events");
-            evt.initEvent("click",true,true);
-            div.getElement().dispatchEvent(evt);
-
+			if(div.getElement().click){
+				div.getElement().click();
+			}
+			else if(document.createEvent){
+            	var evt = document.createEvent("Events");
+            	evt.initEvent("click",true,true);
+            	div.getElement().dispatchEvent(evt);
+			}
             var results = component.find("resultsGoHere");
             $A.test.assertEquals("Chained press action ran", results.getElement().innerHTML);
         }
@@ -73,10 +77,14 @@
             var fixture = component.find("function");
             var div = fixture.find("theDiv");
 
-            var evt = document.createEvent("Events");
-            evt.initEvent("click",true,true);
-            div.getElement().dispatchEvent(evt);
-
+			if(div.getElement().click){
+				div.getElement().click();
+			}
+			else if(document.createEvent){
+            	var evt = document.createEvent("Events");
+            	evt.initEvent("click",true,true);
+            	div.getElement().dispatchEvent(evt);
+			}
             var results = component.find("resultsGoHere");
             $A.test.assertEquals("Chained push action ran", results.getElement().innerHTML);
         }

@@ -137,7 +137,7 @@
             oldFocus = document.activeElement,
             newFocus = this.getFirstFocusableElement(dialogCmp),
             keydown  = function(event) { self.getKeydownHandler(dialogCmp, managerCmp, isModal, newFocus, event) },
-            click    = function(event) { self.getClickHandler(dialogCmp, managerCmp, isModal, clickOutToClose, event) },
+            click    = clickOutToClose ? function(event) { self.getClickHandler(dialogCmp, event) } : null,
             resize   = isModal ? function() { self.getResizeHandler(dialogCmp) } : null;
 
         return {
@@ -203,20 +203,43 @@
     /**
      * Constructs the handler for the DOM click event.
      * 
-     * @param {Aura.Component} dialogCmp
-     * @param {Aura.Component} managerCmp
-     * @param {Boolean} isModal
-     * @param {Boolean} clickOutToClose
-     * @param {UIEvent} event
+     * @param {Aura.Component} dialogCmp the ui:dialog component
+     * @param {UIEvent} event the DOM click event
      * @return {void}
      */
-    getClickHandler : function(dialogCmp, managerCmp, isModal, clickOutToClose, event) {
+    getClickHandler : function(dialogCmp, event) {
+
         // TODO: need to figure out how to deal w/ ui:press firing AFTER ui:openDialog first
         // TODO: add z-index management for multiple open dialogs at the same time
+        event = event || window.event;
+        var target = event.target || event.srcElement,
+            container = dialogCmp.find("dialog").getElement(),
+            closeEvent;
+
+            if (!$A.util.contains(container, target)) {
+                closeEvent = $A.get("e.ui:closeDialog");
+                closeEvent.setParams({
+                    dialog : dialogCmp,
+                    confirmClicked : false
+                });
+                closeEvent.fire();
+            }
+
     },
 
 
+    /**
+     * Constructs the handler for the window.resize DOM event
+     * 
+     * @param {Aura.Component} dialog the ui:dialog component
+     * @return {void}
+     */
     getResizeHandler : function(dialog) {
+
+        var max     = dialog.getDef().getHelper().getContentMaxHeight(),
+            element = dialog.find("content").getElement();
+
+        element.style.maxHeight = max + "px";
 
     },
 

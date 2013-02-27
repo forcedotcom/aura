@@ -15,11 +15,13 @@
  */
 {
     press : function(cmp, event){
+        var press = cmp.getEvent("press");
         if (cmp.getAttributes().getValue("disabled").getBooleanValue()) {
             event.preventDefault();
             return false;
         }
-        cmp.getEvent("press").fire();
+        press.setParams({ domEvent : event });
+        press.fire();
         return true;
     }
 }

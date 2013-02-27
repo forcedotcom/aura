@@ -15,4 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" support="GA" description="Indicates that the component has been pressed."/>
+<aura:event type="COMPONENT" support="GA" description="Indicates that the component has been pressed.">
+    <aura:attribute name="domEvent" type="Object"/>
+</aura:event>

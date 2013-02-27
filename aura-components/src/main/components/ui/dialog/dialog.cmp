@@ -20,8 +20,7 @@
     <!-- main attributes -->
     <aura:attribute name="autoFocus" type="Boolean" default="{!true}" description="Automatically focus on the first focusable element when the dialog is displayed."/>
     <aura:attribute name="buttons" type="Aura.Component[]" description="Buttons that should be displayed at the bottom of the dialog (e.g., 'Save', 'Cancel', etc.). If the dialog type is set to 'alert' and you are using the default 'cancel' and 'confirm' buttons, any custom buttons you provide here will be placed between the 'cancel' and 'confirm' buttons."/>
-    <!-- clickOutToClose isn't working right now, because ui:press finishes firing AFTER ui:openDialog -->
-    <!--<aura:attribute name="clickOutToClose" type="Boolean" default="{!true}" description="Specifies if the dialog should be closed when any element outside the dialog is clicked."/>-->
+    <aura:attribute name="clickOutToClose" type="Boolean" default="{!true}" description="Specifies if the dialog should be closed when any element outside the dialog is clicked."/>
     <aura:attribute name="defaultAlertButtons" type="String" default="both" description="When the 'type' attribute is set to 'alert', determines which default buttons should appear at the bottom of the dialog. Valid values are 'confim', 'cancel', 'both', or 'none'."/>
     <aura:attribute name="doubleConfirm" type="Boolean" default="{!false}" description="When the 'type' attribute is set to 'alert' and the 'defaultAlertButtons' attribute is set to 'confirm' or 'both', this setting will display a confirmation checkbox in addition to the confirmation button. The checkbox must be checked in order for the confirmation button to return true upon click."/>
     <aura:attribute name="title" type="String" description="The title displayed in the dialog's header. Required for accessibility." required="true"/>

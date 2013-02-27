@@ -1025,26 +1025,45 @@ Util.prototype.emptyComponentTrash = function() {
 };
 
 /**
- * Determines if an element is a descendant of another element in the DOM tree. Both arguments to this function must be of type HTMLElement.
+ * Determines if an element is either a descendant of, or the same as, another element in the DOM tree.
+ * Both arguments to this function must be of type HTMLElement.
  * 
  * @param {HTMLElement} container The element you think is the outermost container.
  * @param {HTMLElement} element The element you think is buried inside the container.
  * @returns {Boolean} Returns true if 'element' is indeed inside 'container', false otherwise.
  */
 Util.prototype.contains = function(container, element) {
-    var theTruth = false;
     if ($A.util.isElement(container) && $A.util.isElement(element)) {
+        if (container === element) {
+            return true;
+        }
         while(element.parentNode) {
             if (element.parentNode === container) {
-                theTruth = true;
-                break;
+                return true;
             }
             element = element.parentNode;
         }
     } else {
-        $A.assert(false, "All arguments for this function must be HTMLElement objects.");
+        $A.assert(false, "Both arguments for this function must be HTMLElement objects.");
     }
-    return theTruth;
+    return false;
+};
+
+
+/**
+ * Simple event squasher.
+
+ * @param {UIEvent} event the DOM event to squash
+ * @param {Boolean} preventDefault if preventDefault() should also be called
+ * @return {void}
+ */
+Util.prototype.squash = function(event, preventDefault) {
+    event = event || window.event;
+    event.stopPropagation();
+    event.cancelBubble = true;
+    if (preventDefault) {
+        event.preventDefault();
+    }
 };
 
 

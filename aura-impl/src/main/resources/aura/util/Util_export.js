@@ -50,5 +50,6 @@ exp(p,
     "hasDataAttribute", p.hasDataAttribute,
     "createTimeoutCallback", p.createTimeoutCallback,
     "arrayIndexOf", p.arrayIndexOf,
-    "contains", p.contains
+    "contains", p.contains,
+    "squash", p.squash
 );

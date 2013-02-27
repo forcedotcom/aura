@@ -23,14 +23,15 @@
     openDialog : function(cmp, evt, hlp) {
 
         var atts          = cmp.getAttributes(),
-            type          = atts.get("type"),
+            type          = evt.getParam("dialog").get("v.type"),
             allowMultiple = atts.get("allowMultipleOpen"),
             activeDialogs = atts.get("_activeDialogs"),
             isModal       = type === "alert" || type === "modal",
             length        = activeDialogs.length,
             dialog        = evt.getParam("dialog");
 
-        /* if we don't allow multiple active dialogs, or the dialog is modal, deactivate all the old ones */
+        // if we don't allow multiple active dialogs, or the dialog is modal,
+        // deactivate all the old ones first
         if (!allowMultiple || isModal) {
             for (var i=0; i<length; i++) {
                 hlp.deactivateDialog(activeDialogs[i], cmp);

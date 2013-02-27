@@ -57,6 +57,7 @@
     color: #FFF;
 }
 .uiButton.default:disabled{
+    cursor:default;
     background:#B9B9B9;
     -webkit-box-shadow:none;
     box-shadow:none;

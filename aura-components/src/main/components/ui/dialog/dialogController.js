@@ -17,16 +17,43 @@
 
 
     /**
-     * Handler for the ui:dialogManagerReady application-level event.
-     * Registers this instance of ui:dialog with the manager.
+     * Moves modal windows to the top of the DOM for accessibility purposes,
+     * ties the <h2> tag in the dialog header to the dialog container using
+     * aria-labelledby, ties the double-confirmation label to its corresponding
+     * checkbox, and makes sure modal windows with tons of content don't extend
+     * outside the viewport.
      */
-    registerDialog : function(cmp, evt, hlp) {
+    initialize : function(cmp, evt, hlp) {
 
-        var manager = evt.getParam("manager"),
-            dialogs = manager.get("v._dialogs");
+        var atts             = cmp.getAttributes(),
+            type             = atts.get("type"),
+            autoFocus        = atts.get("autoFocus"),
+            doubleConfirm    = atts.get("doubleConfirm"),
+            isModal          = type === "alert" || type === "modal",
+            mask             = cmp.find("mask"),
+            dialog           = cmp.find("dialog"),
+            title            = cmp.find("title"),
+            confirmBox       = cmp.find("confirmBox"),
+            confirmButton    = cmp.find("confirmButton"),
+            firstBodyElement = document.body.firstChild;
+            attributeMap     = {};
 
-        dialogs.push(cmp);
-        manager.getAttributes().setValue("_dialogs", dialogs);
+        if (isModal) {
+            // this gets applied as "style=max-height:{!v._maxHeight}" on the content <div>
+            attributeMap["_maxHeight"] = hlp.getContentMaxHeight();
+        }
+
+        if (doubleConfirm) {
+            // this gets applied to the checkbox 'id' and the label 'for'
+            attributeMap["_checkboxId"] = confirmBox.getGlobalId();
+        }
+
+        attributeMap["_ariaId"] = title.getGlobalId();
+
+        // set all the attributes at once
+        for (var name in attributeMap) {
+            atts.setValue(name, attributeMap[name]);
+        }
 
     },
 
@@ -61,7 +88,7 @@
      */
     setConfirmButtonState : function(cmp, evt) {
 
-        if (cmp.find("confirmBox").get("v.value")) {
+        if (cmp.find("confirmBox").getElement().checked) {
             cmp.find("confirmButton").getAttributes().setValue("disabled", false);
         } else {
             cmp.find("confirmButton").getAttributes().setValue("disabled", true);

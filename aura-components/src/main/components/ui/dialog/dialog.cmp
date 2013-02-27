@@ -47,12 +47,13 @@
 
     <!-- private attributes -->
     <aura:attribute name="_ariaId" type="String" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The id needed to identify the dialog window to assistive technologies."/>
+    <aura:attribute name="_checkboxId" type="String" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The id needed to tie the double-confirm checkbox to its label."/>
     <aura:attribute name="_handlerConfig" type="Object" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The map of event handlers that should be applied after rendering (keyup, click, blur, resize)."/>
-    <aura:attribute name="_isVisible" type="Boolean" default="{!false}" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. Specifies if the dialog is displayed. To control visibility of the dialog, fire either the ui:openDialog or ui:closeDialog event."/>
+    <aura:attribute name="_maxHeight" type="Double" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The maximum height of the content &lt;div&gt;."/>
 
     <!-- events -->
     <aura:registerEvent name="close" type="ui:closeDialog" description="Event fired when the dialog window requests to close itself."/>
-    <aura:handler event="ui:dialogManagerReady" action="{!c.registerDialog}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
 
     <!-- modal background -->
     <aura:if isTrue="{!v.type == 'alert' || v.type == 'modal'}">
@@ -66,16 +67,16 @@
         <h2 aura:id="title" id="{!v._ariaId}" class="title">{!v.title}<span class="assistiveText"> {!v.titleDescription}</span></h2>
 
         <!-- content -->
-        <div aura:id="content" class="content">
+        <div aura:id="content" class="content" style="{!'max-height:' + v._maxHeight + 'px'}">
             {!v.body}
             <aura:if isTrue="{!v.type == 'alert' &amp;&amp; v.doubleConfirm}">
                 <div class="confirmWrapper">
                     <ui:block class="confirm">
                         <aura:set attribute="left">
-                            <ui:inputCheckbox aura:id="confirmBox" class="{!v.confirmCheckboxClass}" click="{!c.setConfirmButtonState}"/>
+                            <input aura:id="confirmBox" id="{!v._checkboxId}" type="checkbox" class="{!v.confirmCheckboxClass}" onclick="{!c.setConfirmButtonState}"/>
                         </aura:set>
                         <aura:set attribute="body">
-                            <label aura:id="confirmBoxLabel" class="{!'confirmBoxLabel ' + v.confirmCheckboxLabelClass}">{!v.doubleConfirmLabel}</label>
+                            <label aura:id="confirmBoxLabel" for="{!v._checkboxId}" class="{!'confirmBoxLabel ' + v.confirmCheckboxLabelClass}">{!v.doubleConfirmLabel}</label>
                         </aura:set>
                     </ui:block>
                 </div>
@@ -92,7 +93,7 @@
                      and 'confirm' buttons should always be on the far right. any other custom action should be in the middle. -->
                 {!v.buttons}
                 <aura:if isTrue="{!v.type == 'alert' &amp;&amp; (v.defaultAlertButtons == 'confirm' || v.defaultAlertButtons == 'both' || v.doubleConfirm)}">
-                    <ui:button aura:id="confirmButton" class="{!v.confirmButtonClass}" label="{!v.confirmButtonLabel}" buttonTitle="{!v.confirmButtonTitle}" press="{!c.confirm}"/>
+                    <ui:button aura:id="confirmButton" class="{!v.confirmButtonClass}" label="{!v.confirmButtonLabel}" buttonTitle="{!v.confirmButtonTitle}" disabled="{!v.doubleConfirm}" press="{!c.confirm}"/>
                 </aura:if>
             </div>
         </aura:if>

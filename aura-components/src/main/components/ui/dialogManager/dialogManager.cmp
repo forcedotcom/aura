@@ -23,11 +23,8 @@
 
     <!-- private attributes -->
     <aura:attribute name="_activeDialogs" type="Aura.Component[]" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The currently active (i.e. open) ui:dialog components."/>
-    <aura:attribute name="_dialogs" type="Aura.Component[]" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. Array of dialog components managed by this manager."/>
-    <aura:attribute name="_ready" type="Boolean" default="{!false}" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. Specifies whether the dialogManager has been initialized."/>
 
     <!-- events -->
-    <aura:registerEvent name="ready" type="ui:dialogManagerReady"/>
     <aura:registerEvent name="close" type="ui:closeDialog"/>
     <aura:handler event="ui:openDialog" action="{!c.openDialog}"/>
     <aura:handler event="ui:closeDialog" action="{!c.closeDialog}"/>

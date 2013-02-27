@@ -69,9 +69,9 @@
     -webkit-transition:all 0.3s ease-in-out;
     -moz-transition:all 0.3s ease-in-out;
     transition:all 0.3s ease-in-out;
-    -webkit-transform:translate3d(0,-1000px,0);
-    -moz-transform:translate3d(0,-1000px,0);
-    transform:translate3d(0,-1000px,0);
+    -webkit-transform:translate3d(0,1250px,0);
+    -moz-transform:translate3d(0,1250px,0);
+    transform:translate3d(0,1250px,0);
 }
 .uiDialog.modal.small{
     margin-left:-155px;

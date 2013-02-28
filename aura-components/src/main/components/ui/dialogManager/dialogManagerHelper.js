@@ -213,8 +213,6 @@
 
         if (!event) { var event = window.event; }
 
-        $A.log(event);
-
         var atts                   = dialogCmp.getAttributes(),
             zIndex                 = atts.get("_zIndex"),
             target                 = event.target || event.srcElement,
@@ -278,7 +276,7 @@
         var atts   = manager.getAttributes(),
             zIndex = atts.get("_nextZIndex");
 
-        // set the z-index, then increment for the next dialog to get focus
+        // set the z-index, then increment for the next dialog that gets focus
         dialog.find("dialog").getElement().style.zIndex = zIndex;
         atts.setValue("_nextZIndex", zIndex + 1);
 

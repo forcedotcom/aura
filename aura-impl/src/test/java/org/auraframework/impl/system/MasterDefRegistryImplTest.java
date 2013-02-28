@@ -36,6 +36,7 @@ import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttrib
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.mockito.Mockito;
@@ -111,6 +112,35 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Mockito.verify(def, Mockito.times(1)).validateReferences();
         Mockito.verify(def, Mockito.times(1)).markValid();
         assertEquals("definition not valid: " + def, true, def.isValid());
+    }
+
+    private void assertIdenticalDependencies(DefDescriptor<?> desc1, DefDescriptor<?> desc2) throws Exception {
+        MasterDefRegistryImpl registry = getDefRegistry(false);
+        Set<DefDescriptor<?>> deps1 = registry.getDependencies(registry.getUid(null, desc1));
+        Set<DefDescriptor<?>> deps2 = registry.getDependencies(registry.getUid(null, desc2));
+        assertNotNull(deps1);
+        assertNotNull(deps2);
+        assertEquals("Descriptors should have the same number of dependencies", deps1.size(), deps2.size());
+
+        // Loop through and check individual dependencies. Order doesn't matter.
+        for (DefDescriptor<?> dep : deps1) {
+            assertTrue("Descriptors do not have identical dependencies",
+                    checkDependenciesContains(deps2, dep.getQualifiedName()));
+        }
+    }
+
+    private boolean checkDependenciesContains(Set<DefDescriptor<?>> deps, String depSearch) {
+        for (DefDescriptor<?> dep : deps) {
+            if (dep.getQualifiedName().equals(depSearch)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void updateStringSource(DefDescriptor<?> desc, String content) {
+        Source<?> src = StringSourceLoader.getInstance().getSource(desc);
+        src.addOrUpdate(content);
     }
 
     public void testFindRegex() throws Exception {
@@ -512,6 +542,58 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         }
     }
 
+    /**
+     * Circular dependencies case 1: A has inner component B, and B has an explicit dependency on A (via aura:dependency
+     * tag)
+     */
+    public void testCircularDependenciesInnerCmp() throws Exception {
+        DefDescriptor<ComponentDef> cmpDescA = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        DefDescriptor<ComponentDef> cmpDescB = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format("<aura:component><aura:dependency resource=\"%s\"/></aura:component>",
+                        cmpDescA.getQualifiedName()));
+        updateStringSource(cmpDescA,
+                String.format("<aura:component><%s/></aura:component>", cmpDescB.getDescriptorName()));
+        // Circular dependency cases should result in identical dependencies
+        assertIdenticalDependencies(cmpDescA, cmpDescB);
+    }
+
+    /**
+     * Circular dependencies case 2: D extends C, and C has explicit dependency on D (via aura:dependency tag)
+     */
+    public void testCircularDependenciesExtendsCmp() throws Exception {
+        DefDescriptor<ComponentDef> cmpDescC = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        DefDescriptor<ComponentDef> cmpDescD = addSourceAutoCleanup(ComponentDef.class,
+                String.format("<aura:component extends=\"%s\"/>", cmpDescC.getDescriptorName()));
+        updateStringSource(
+                cmpDescC,
+                String.format(
+                        "<aura:component extensible=\"true\"><aura:dependency resource=\"%s\"/></aura:component>",
+                        cmpDescD.getQualifiedName()));
+        // Circular dependency cases should result in identical dependencies
+        assertIdenticalDependencies(cmpDescC, cmpDescD);
+    }
+
+    /**
+     * Circular dependencies case 3: E has dependency on F, and F has dependency on E (both through aura:dependency tag)
+     */
+    public void testCircularDependenciesDepTag() throws Exception {
+        DefDescriptor<ComponentDef> cmpDescE = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        DefDescriptor<ComponentDef> cmpDescF = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format("<aura:component><aura:dependency resource=\"%s\"/></aura:component>",
+                        cmpDescE.getQualifiedName()));
+        updateStringSource(
+                cmpDescE,
+                String.format("<aura:component><aura:dependency resource=\"%s\"/></aura:component>",
+                        cmpDescF.getQualifiedName()));
+        // Circular dependency cases should result in identical dependencies
+        assertIdenticalDependencies(cmpDescE, cmpDescF);
+    }
+
+    /**
+     * Verify correct dependencies are attached to a component.
+     */
     public void testGetDependencies() throws Exception {
         DefDescriptor<ComponentDef> depCmpDesc1 = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
         DefDescriptor<ComponentDef> depCmpDesc2 = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
@@ -548,14 +630,5 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 checkDependenciesContains(deps, depCmpDesc1.getQualifiedName()));
         assertTrue("Explicitly declared dependency on top level component not found",
                 checkDependenciesContains(deps, depCmpDesc2.getQualifiedName()));
-    }
-
-    private boolean checkDependenciesContains(Set<DefDescriptor<?>> deps, String depSearch) {
-        for (DefDescriptor<?> dep : deps) {
-            if (dep.getQualifiedName().equals(depSearch)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

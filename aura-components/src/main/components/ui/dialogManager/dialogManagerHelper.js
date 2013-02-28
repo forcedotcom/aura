@@ -163,7 +163,8 @@
      */
     getKeydownHandler : function(dialogCmp, managerCmp, isModal, firstFocusable, event) {
 
-        event            = event || window.event;
+        if (!event) { var event = window.event; }
+
         var closeLink    = dialogCmp.find("close").getElement(),
             shiftPressed = event.shiftKey,
             currentFocus = document.activeElement,

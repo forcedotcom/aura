@@ -16,18 +16,13 @@
 
 -->
 <aura:component extends="ui:input" implements="ui:inputDateComponent" extensible="true" support="BETA" description="An input field for entering a date as specified by the format attribute.">
-    <aura:attribute name="format" type="String" default="yyyy-MM-dd" description="The java.text.SimpleDateFormat style format string that does not include the time of day or timezone pattern letters. Default value is &#8220;yyyy-MM-dd&#8221;."/>
-    <aura:attribute name="placeholder" type="String" default="" description="The text that is displayed by default."/>
+    <aura:attribute name="format" type="String" default="YYYY-MM-DD" description="The date format in user's locale."/>
+    <aura:attribute name="placeholder" type="String" default="YYYY-MM-DD" description="The hint for the date input format."/>
     <aura:set attribute="updateOn" value="blur"/>
-    <aura:renderif isTrue="{!v.body.length == 0}">
-        <aura:renderif isTrue="{!$Browser.isTablet || $Browser.isPhone || $Browser.isContainer}">
-            <input type="date" value="{!v.value}" class="{!v.class}" max="{!v.max}" min="{!v.min}" step="{!v.step}" required="{!v.required}" disabled="{!v.disabled}"/>
-            <aura:set attribute="else"> 
-                <input type="text" value="{!v.value}" class="{!v.class}" placeholder="{!v.placeholder}" required="{!v.required}" disabled="{!v.disabled}"/>
-            </aura:set> 
-        </aura:renderif> 
-        <aura:set attribute="else">
-            {!v.body}
-        </aura:set>
-    </aura:renderif>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <input aura:id="inputText" class="{!v.class}" type="text" placeholder="{!v.placeholder}"/>
+    <aura:if isTrue="{!v.displayDatePicker}">
+        <a aura:id="datePickerOpener" class="datePicker-openIcon" aria-haspopup="true" onclick="{!c.openDatePicker}"/>
+        <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}"/>
+    </aura:if>
 </aura:component>

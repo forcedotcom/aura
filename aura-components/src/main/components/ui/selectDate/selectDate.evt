@@ -15,9 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" support="GA">
-    <aura:attribute name="ctrlKey" type="Boolean" description="Indicate if ctrl key is pressed."/>
-    <aura:attribute name="keyCode" type="Integer" description="A numerical code identifying the value of the pressed key."/>
-    <aura:attribute name="shiftKey" type="Boolean" description="Indicate if shift key is pressed."/>
-    <aura:attribute name="domEvent" type="Object" description="The corresponding DOM event if there is any."/>
+<aura:event type="COMPONENT">
+    <aura:attribute name="value" type="Date"/>
 </aura:event>

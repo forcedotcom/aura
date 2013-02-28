@@ -269,7 +269,9 @@
                 $A.util.removeClass(auraErrorMask,'auraForcedErrorBox');
             }
             </script>
-
+            
+            <script src="/auraFW/resources/moment/moment.js"></script>
+            
             {!v.auraInitBlock}
 
             {!v.auraNamespacesScriptTags}

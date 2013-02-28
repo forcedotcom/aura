@@ -15,19 +15,16 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" implements="ui:inputDateComponent" extensible="true" support="BETA" description="An input field for entering a date and time as specified by the format attribute.">
-    <aura:attribute name="format" type="String" default="yyyy-MM-dd HH:mm" description="The java.text.SimpleDateFormat style format string. Default value is &#8220;yyyy-MM-dd HH:mm&#8221;."/>
-    <aura:attribute name="placeholder" type="String" default="" description="The text that is displayed by default."/>
+<aura:component extends="ui:input" implements="ui:inputDateComponent" extensible="true" support="BETA" description="An input field for entering a date and time as specified by the format attribute.">    
+    <aura:attribute name="value" type="String" description="The input value of the date/time."/>
+    <aura:attribute name="format" type="String" default="YYYY-MM-dd HH:mm" description="The java.text.SimpleDateFormat style format string. Default value is &#8220;yyyy-MM-dd HH:mm&#8221;."/>
+    <aura:attribute name="placeholder" type="String" default="YYYY-MM-dd HH:mm" description="The text that is displayed by default."/>
+    <aura:attribute name="langLocale" type="String" default="en" description="The language locale used to format date value."/>
     <aura:set attribute="updateOn" value="blur"/>
-    <aura:renderif isTrue="{!v.body.length == 0}">
-        <aura:renderif isTrue="{!$Browser.isTablet || $Browser.isPhone || $Browser.isContainer}">
-            <input type="datetime" value="{!v.value}" class="{!v.class}" max="{!v.max}" min="{!v.min}" step="{!v.step}" required="{!v.required}" disabled="{!v.disabled}"/>
-            <aura:set attribute="else">
-                <input type="text" value="{!v.value}" class="{!v.class}" placeholder="{!v.placeholder}" required="{!v.required}" disabled="{!v.disabled}"/>
-            </aura:set>
-        </aura:renderif>
-        <aura:set attribute="else">
-            {!v.body}
-        </aura:set>
-    </aura:renderif>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <input aura:id="inputText" class="{!v.class}" type="text" value="{!v.value}" placeholder="{!v.placeholder}"/>
+    <aura:if isTrue="{!v.displayDatePicker}">
+        <a aura:id="datePickerOpener" class="datePicker-openIcon" aria-haspopup="true" onclick="{!c.openDatePicker}"/>
+        <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}"/>
+    </aura:if>
 </aura:component>

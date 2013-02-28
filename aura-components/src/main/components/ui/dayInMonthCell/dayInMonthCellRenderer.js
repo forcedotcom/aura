@@ -15,12 +15,12 @@
  */
 ({
     afterRender: function(component, helper) {
-        helper.displayValue(component);
+        helper.updateCell(component);
         return this.superAfterRender();
-	},
-	
-	rerender: function(component, helper) {
-        helper.displayValue(component);
-        return this.superRerender();
+    },
+
+    rerender: function(component, helper) {
+        helper.updateCell(component);
+        this.superRerender();
     }
 })

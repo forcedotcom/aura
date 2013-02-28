@@ -502,8 +502,8 @@ SmartStoreAdapter.prototype.handleSmartStoreError = function(adapterOperationNam
 var smartStoreAvailable = true;
 try {
     cordova["require"]("salesforce/plugin/smartstore");
-} catch (registerErr) {
-    smartStoreAvailable = false;	
+} catch (cordovaRequireErr) {
+    smartStoreAvailable = false;
 }
 try {
     if(smartStoreAvailable){
@@ -516,4 +516,3 @@ try {
     }
 } catch(auraErr) {
 }
-

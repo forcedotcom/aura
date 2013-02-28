@@ -17,6 +17,7 @@ package org.auraframework.test.testsetrunner;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.SortedMap;
@@ -60,19 +61,21 @@ public class TestSetRunnerState {
     private static class SingletonHolder {
         private static TestSetRunnerState INSTANCE = new TestSetRunnerState();
     }
-
+    private static class ContainerEnabledSingletonHolder {
+        private static TestSetRunnerState HYBRIDCONTAINER_INSTANCE = new TestSetRunnerState(TestInventory.CONTAINER_TYPE_TESTS);
+    }
     /**
      * The inventory tracks all test cases available for execution.
      */
     @GuardedBy("this")
-    private static Map<String, Test> inventory = Maps.newHashMap();
+    private Map<String, Test> inventory = Maps.newHashMap();
 
     /**
      * Parallel to the inventory, this map is used as a data bag to store
      * various properties about tests (e.g. status, exceptions, etc...)
      */
     @GuardedBy("this")
-    private static SortedMap<String, Map<String, Object>> testsWithPropsMap = Maps.newTreeMap();
+    private SortedMap<String, Map<String, Object>> testsWithPropsMap = Maps.newTreeMap();
 
     /**
      * @return the singleton instance.
@@ -80,9 +83,17 @@ public class TestSetRunnerState {
     public static TestSetRunnerState getInstance() {
         return SingletonHolder.INSTANCE;
     }
+    
+    public static TestSetRunnerState getHybridContainerInstance() {
+    	return ContainerEnabledSingletonHolder.HYBRIDCONTAINER_INSTANCE;
+    }
 
+    private TestSetRunnerState(EnumSet<TestInventory.Type> scope) {
+    	populateInventory(scope);
+    }
+    
     private TestSetRunnerState() {
-        populateInventory();
+    	this(TestInventory.CONTAINERLESS_TYPE_TESTS);
     }
 
     /**
@@ -102,10 +113,11 @@ public class TestSetRunnerState {
     /**
      * Populates the model by querying for all implementations of
      * {@link TestInventory}.
+     * @param scope 
      */
-    private synchronized void populateInventory() {
+    private synchronized void populateInventory(EnumSet<Type> scope) {
         // Load the inventory in a separate thread.
-        InventoryPopulator populator = new InventoryPopulator();
+        InventoryPopulator populator = new InventoryPopulator(scope);
         Thread t = new Thread(populator, "TestSetRunnerState Inventory Populator");
         t.start();
         try {
@@ -123,11 +135,17 @@ public class TestSetRunnerState {
      * {@link TestSetRunnerController}.
      */
     private class InventoryPopulator implements Runnable {
-        @Override
+        private EnumSet<Type> scope;
+
+		public InventoryPopulator(EnumSet<Type> scope) {
+			this.scope = scope;
+		}
+
+		@Override
         public void run() {
             Collection<TestInventory> inventories = ServiceLocator.get().getAll(TestInventory.class);
             for (TestInventory i : inventories) {
-                for (Type type : TestInventory.Type.values()) {
+                for (Type type : scope) {
                     TestSuite suite = i.getTestSuite(type);
                     if (suite.testCount() > 0) {
                         addSuite(suite);

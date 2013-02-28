@@ -1,0 +1,4 @@
+<aura:component extends="AuraStorageTest:initTest" render="client" template="hybridContainerTest:hybridContainerTemplate">
+    <aura:set attribute="persistent" value="true"/>
+    <aura:set attribute="clearStorageOnInit" value="true"/>
+</aura:component>

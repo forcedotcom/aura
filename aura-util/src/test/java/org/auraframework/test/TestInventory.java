@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.jar.JarEntry;
@@ -32,6 +33,8 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.auraframework.test.TestInventory.Type;
+import org.auraframework.test.annotation.HybridContainerTest;
 import org.auraframework.test.annotation.IntegrationTest;
 import org.auraframework.test.annotation.UnitTest;
 import org.auraframework.test.annotation.WebDriverTest;
@@ -43,9 +46,11 @@ import com.google.common.collect.Sets;
 public class TestInventory {
     public final static String TEST_CLASS_SUFFIX = "Test";
     private final static String CLASS_SUFFIX = ".class";
+	public static final EnumSet<Type> CONTAINER_TYPE_TESTS = EnumSet.of(Type.HYBRID_CONTAINER);
+	public static final EnumSet<Type> CONTAINERLESS_TYPE_TESTS = EnumSet.complementOf(CONTAINER_TYPE_TESTS);
 
     public enum Type {
-        UNIT, WEB, INTEGRATION, IGNORED;
+        UNIT, WEB, INTEGRATION, IGNORED, HYBRID_CONTAINER;
     }
 
     private URI rootUri;
@@ -89,7 +94,9 @@ public class TestInventory {
             }
 
             Type target = null;
-            if (testClass.getAnnotation(WebDriverTest.class) != null) {
+            if (testClass.getAnnotation(HybridContainerTest.class) != null) {
+                target = Type.HYBRID_CONTAINER;
+            } else if (testClass.getAnnotation(WebDriverTest.class) != null) {
                 target = Type.WEB;
             } else if (testClass.getAnnotation(IntegrationTest.class) != null) {
                 target = Type.INTEGRATION;

@@ -424,7 +424,9 @@
                         <exclude>**/version.prop</exclude>
                         <exclude>aura-resources/src/main/resources/**/codemirror/**</exclude>
                         <exclude>aura-resources/src/main/resources/**/jiffy/**</exclude>
-                        <exclude>aura-resources/src/main/resources/**/smartstore/**</exclude>
+                        <exclude>aura-resources/src/main/resources/**/mocksmartstore/**</exclude>
+                        <exclude>aura-resources/src/main/resources/**/hybridcontainer1.3/**</exclude>
+                        <exclude>aura-resources/src/main/resources/**/hybridcontainer1.5/**</exclude>
                         <exclude>**/target/**</exclude>
                     </excludes>
                 </configuration>

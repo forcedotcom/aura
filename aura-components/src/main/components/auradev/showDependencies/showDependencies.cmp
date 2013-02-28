@@ -23,11 +23,11 @@
             {!m.title}
         </div>
         <div class="{!'headerline'+(m.error==true?' error':'')}">
-            <auradev:dependencyItem error='{!false}' descriptor="Descriptor" uid="UID" />
+            <auradev:dependencyItem error='{!false}' descriptor="Descriptor" type="Type" uid="UID" />
         </div>
         <ol>
             <aura:iteration items="{!m.items}" var="item" >
-                <auradev:dependencyItem error="{!item.error}" descriptor="{!item.descriptor}" uid="{!item.uid}" />
+                <auradev:dependencyItem error="{!item.error}" descriptor="{!item.descriptor}" type="{!item.type}" uid="{!item.uid}" />
             </aura:iteration>
         </ol>
     </div>

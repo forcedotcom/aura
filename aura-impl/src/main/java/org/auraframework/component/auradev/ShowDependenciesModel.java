@@ -26,8 +26,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 
-import org.auraframework.instance.BaseComponent;
-
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.AuraContext;
@@ -43,94 +41,103 @@ import com.google.common.collect.Sets;
 
 @Model
 public class ShowDependenciesModel {
-    private String title;
-    private boolean error;
-    private List<Map<String,String>> items;
+	public ShowDependenciesModel() throws QuickFixException {
+		this((String) getAttributeValue("component"),
+				(Boolean) getAttributeValue("clearPreloads"));
+	}
 
-    public ShowDependenciesModel() {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        BaseComponent<?, ?> component = context.getCurrentComponent();
-        String cmpname = null;
-        DefDescriptor<?> descriptor;
-        SortedSet<DefDescriptor<?>> sorted;
-        MasterDefRegistry mdr = context.getDefRegistry();
-        Set<String> preloads = null;
-        boolean clearPreloads = false;
-        String uid;
+	private static Object getAttributeValue(String name)
+			throws QuickFixException {
+		return Aura.getContextService().getCurrentContext()
+				.getCurrentComponent().getAttributes().getValue(name);
+	}
 
-        this.error = true;
-        this.items = Lists.newArrayList();
-        try {
-            try {
-                clearPreloads = (Boolean)component.getAttributes().getValue("clearPreloads");
-            } catch (QuickFixException doh) {
-                // ignore this.
-            }
-            if (clearPreloads) {
-                preloads = context.getPreloads();
-                context.clearPreloads();
-            }
-            try {
-                cmpname = (String)component.getAttributes().getValue("component");
-            } catch (QuickFixException doh) {
-                // ignore this.
-            }
-            Definition def = Aura.getDefinitionService().getDefinition(cmpname, DefType.COMPONENT, DefType.APPLICATION);
-            if (def == null) {
-                this.title = "Unable to find component for input " + AuraTextUtil.escapeForHTML(cmpname);
-                return;
-            }
-            descriptor = def.getDescriptor();
-            uid = mdr.getUid(null, descriptor);
-            sorted = Sets.newTreeSet(mdr.getDependencies(uid));
-            this.title = String.format("Dependencies for %s [uid=%s]", descriptor.toString(), uid);
-            this.error = false;
-        } catch (Throwable t) {
-            // If we get an exception, try to tell the user what happened.
-            this.title = String.format("%s: %s : list of reached components...",
-                    AuraTextUtil.escapeForHTML(cmpname), t.getMessage());
-            sorted = Sets.newTreeSet(mdr.filterRegistry(null).keySet());
-        } finally {
-            if (preloads != null) {
-                for (String p : preloads) {
-                    context.addPreload(p);
-                }
-            }
-        }
-        try {
-            for (DefDescriptor<?> dep : sorted) {
-                Map<String, String> itemData = Maps.newHashMap();
-                Definition def = mdr.getDef(dep);
-                boolean valid = false;
-                String hash = "------";
+	public ShowDependenciesModel(final String cmpname,
+			final boolean clearPreloads) {
+		AuraContext context = Aura.getContextService().getCurrentContext();
+		DefDescriptor<?> descriptor;
+		SortedSet<DefDescriptor<?>> sorted;
+		MasterDefRegistry mdr = context.getDefRegistry();
+		Set<String> preloads = null;
+		String uid;
 
-                if (def != null) {
-                    valid = def.isValid();
-                    hash = String.valueOf(def.getOwnHash());
-                }
-                itemData.put("error", String.valueOf(!valid));
-                itemData.put("descriptor", dep.toString());
-                itemData.put("uid", hash);
-                this.items.add(itemData);
-            }
-        } catch (QuickFixException qfe) {
-            // nothing useful to do here.
-            this.error = true;
-        }
-    }
+		this.error = true;
+		this.items = Lists.newArrayList();
+		try {
+			if (clearPreloads) {
+				preloads = context.getPreloads();
+				context.clearPreloads();
+			}
 
-    @AuraEnabled
-    public Boolean isError() {
-        return Boolean.valueOf(error);
-    }
+			Definition def = Aura.getDefinitionService().getDefinition(cmpname,
+					DefType.COMPONENT, DefType.APPLICATION);
+			if (def == null) {
+				this.title = "Unable to find component for input "
+						+ AuraTextUtil.escapeForHTML(cmpname);
+				return;
+			}
+			descriptor = def.getDescriptor();
+			uid = mdr.getUid(null, descriptor);
+			sorted = Sets.newTreeSet(mdr.getDependencies(uid));
+			this.title = String.format("Dependencies for %s [uid=%s]",
+					descriptor.toString(), uid);
+			this.error = false;
+		} catch (Throwable t) {
+			// If we get an exception, try to tell the user what happened.
+			this.title = String.format(
+					"%s: %s : list of reached components...",
+					AuraTextUtil.escapeForHTML(cmpname), t.getMessage());
+			sorted = Sets.newTreeSet(mdr.filterRegistry(null).keySet());
+		} finally {
+			if (preloads != null) {
+				for (String p : preloads) {
+					context.addPreload(p);
+				}
+			}
+		}
+		
+		try {
+			for (DefDescriptor<?> dep : sorted) {
+				Map<String, Object> itemData = Maps.newHashMap();
+				Definition def = mdr.getDef(dep);
+				boolean valid = false;
+				String hash = "------";
 
-    @AuraEnabled
-    public String getTitle() {
-        return title;
-    }
+				if (def != null) {
+					valid = def.isValid();
+					hash = String.valueOf(def.getOwnHash());
+				}
+				
+				itemData.put("descriptor", dep.toString());
+				itemData.put("type", dep.getDefType());
+				itemData.put("uid", hash);
+				itemData.put("error", !valid);
+				
+				this.items.add(itemData);
+			}
+		} catch (QuickFixException qfe) {
+			// nothing useful to do here.
+			this.error = true;
+		}
+	}
 
-    @AuraEnabled
-    public List<?> getItems() {
-        return items;
-    }
+	@AuraEnabled
+	public Boolean isError() {
+		return Boolean.valueOf(error);
+	}
+
+	@AuraEnabled
+	public String getTitle() {
+		return title;
+	}
+
+	@AuraEnabled
+	public List<Map<String, Object>> getItems() {
+		return items;
+	}
+
+	private final List<Map<String, Object>> items;
+
+	private String title;
+	private boolean error;
 }

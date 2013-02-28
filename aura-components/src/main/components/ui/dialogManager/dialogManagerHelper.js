@@ -18,13 +18,10 @@
 
     /**
      * Activates a single ui:dialog component by setting its visibility
-     * to true and constructs a JS object with references to all the
-     * event handlers necessary to interact w/ it. Also adds a reference
-     * to the activated dialog to the dialogManager.
-     * 
-     * NOTE: The ui:dialogManager's job is to just figure out what the
-     * event handlers should be. The ui:dialog's renderer actually handles
-     * applying those handlers to the various DOM elements.
+     * to true, applies event handlers for proper interaction (and sets
+     * a reference to those handlers on a component attribute, for removal
+     * later)), manages the application of CSS classes, and updates the
+     * manager's _activeDialogs attribute.
      * 
      * @param {Aura.Component} dialogCmp the ui:dialog component to activate
      * @param {Aura.Component} managerCmp the ui:dialogManager component
@@ -53,13 +50,13 @@
 
 
     /**
-     * Deactivates the currently active ui:dialog component by setting its visibility
-     * to false and removes the reference the ui:dialogManager has to it.
+     * Deactivates a single ui:dialog component by setting its visibility
+     * to false, removes the event handlers applied during dialog activation,
+     * manages the application of CSS classes, and updates the manager's
+     * _activeDialogs attribute.
      *
-     * NOTE: The ui:dialog's renderer handles removing existing event handlers.
-     * 
-     * @param {Object} dialogCmp the ui:dialog component to deactivate
-     * @param {Object} managerCmp the ui:dialogManager component
+     * @param {Aura.Component} dialogCmp the ui:dialog component to deactivate
+     * @param {Aura.Component} managerCmp the ui:dialogManager component
      * @return {void}
      */
     deactivateDialog : function(dialogCmp, managerCmp) {
@@ -174,23 +171,23 @@
 
         switch (event.keyCode) {
             case 27: // escape key - always closes all dialogs
-                this.cancelEvent(event);
+                $A.util.squash(event, true);
                 closeEvent.fire();
                 break;
             case 9: // tab key - if modal, keep focus inside the dialog
                 if (isModal) {
                     if (currentFocus === closeLink && !shiftPressed) {
-                        this.cancelEvent(event);
+                        $A.util.squash(event, true);
                         firstFocusable.focus();
                     } else if (currentFocus === firstFocusable && shiftPressed) {
-                        this.cancelEvent(event);
+                        $A.util.squash(event, true);
                         closeLink.focus();
                     }
                 // if not modal, close the dialog when you tab out of it (unless you allow multiple active dialogs)
                 } else if (!managerCmp.get("v.allowMultipleOpen")) {
                     if ((currentFocus === closeLink && !shiftPressed) ||
                         (currentFocus === firstFocusable && shiftPressed)) {
-                        this.cancelEvent(event);
+                        $A.util.squash(event, true);
                         closeEvent.fire();
                     }
                 }
@@ -209,7 +206,6 @@
      */
     getClickHandler : function(dialogCmp, event) {
 
-        // TODO: need to figure out how to deal w/ ui:press firing AFTER ui:openDialog first
         // TODO: add z-index management for multiple open dialogs at the same time
         event = event || window.event;
         var target = event.target || event.srcElement,
@@ -217,6 +213,7 @@
             closeEvent;
 
             if (!$A.util.contains(container, target)) {
+                $A.util.squash(event);
                 closeEvent = $A.get("e.ui:closeDialog");
                 closeEvent.setParams({
                     dialog : dialogCmp,
@@ -239,6 +236,9 @@
         var max     = dialog.getDef().getHelper().getContentMaxHeight(),
             element = dialog.find("content").getElement();
 
+        // set the style attribute on the DOM element directly, as updating
+        // the private _maxHeight attribute of the component takes too long
+        // to complete rerendering.
         element.style.maxHeight = max + "px";
 
     },
@@ -255,7 +255,7 @@
      * always focus on the "x" link, instead of the first element.
      * 
      * @param {Aura.Component} cmp the ui:dialog component
-     * @return {HTMLElement|Object} the first focusable element inside the dialog, or the "x" link for IE7
+     * @return {HTMLElement} the first focusable element inside the dialog, or the "x" link for IE7
      */
     getFirstFocusableElement : function(dialogCmp) {
 
@@ -266,7 +266,7 @@
             element      = null;
 
         if (!container) {
-            //$A.assert(false, "You must specify a container element in which to search for a focusable element.");
+            $A.assert(false, "Trying to find a focusable element in the dialog, but no container specified.");
         } else if (document.querySelectorAll) {
             // sorry IE7, you're outta luck
             formElements = container.querySelectorAll("input,button,a,textarea,select");
@@ -280,7 +280,7 @@
                 }
             } else {
                 // we should never get here - at a minimum, the "close" link should always be present
-                $A.assert(false, "No focusable element found, which es muy no bueno.");
+                $A.assert(false, "No focusable element found.");
             }
         } else {
             element = close;
@@ -348,19 +348,6 @@
             }
         }
 
-    },
-
-
-    /**
-     * Quick helper to cancel event bubbling and default behaviour cross-browser.
-     * 
-     * @param {UIEvent} event DOM event
-     * @return {void}
-     */
-    cancelEvent : function(event) {
-        event.stopPropagation();
-        event.cancelBubble = true;
-        event.preventDefault();
     }
 
 

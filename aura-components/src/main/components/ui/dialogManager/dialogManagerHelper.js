@@ -136,7 +136,7 @@
             oldFocus      = document.activeElement,
             newFocus      = this.getFirstFocusableElement(dialogCmp),
             keydown       = function(event) { self.getKeydownHandler(dialogCmp, managerCmp, isModal, newFocus, event) },
-            click         = function(event) { self.getClickHandler(dialogCmp, managerCmp, clickOutToClose, isModal, event) },
+            click         = function(event) { self.getClickHandler(dialogCmp, managerCmp, clickOutToClose, event) },
             resize        = function() { self.getResizeHandler(dialogCmp, isModal) };
 
         return {
@@ -210,7 +210,10 @@
      */
     getClickHandler : function(dialogCmp, managerCmp, clickOutToClose, event) {
 
-        event                      = event || window.event;
+        if (!event) { var event = window.event; }
+
+        $A.log(event);
+
         var atts                   = dialogCmp.getAttributes(),
             zIndex                 = atts.get("_zIndex"),
             target                 = event.target || event.srcElement,
@@ -220,7 +223,7 @@
             otherOpenDialogClicked = this.otherOpenDialogClicked(dialogCmp, allOpen, target),
             closeEvent;
 
-        $A.util.squash(event, true);
+        $A.util.squash(event);
 
         if (clickedInside) {
             this.bringToFront(dialogCmp, managerCmp);

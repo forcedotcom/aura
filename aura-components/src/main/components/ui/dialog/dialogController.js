@@ -17,8 +17,7 @@
 
 
     /**
-     * Moves modal windows to the top of the DOM for accessibility purposes,
-     * ties the <h2> tag in the dialog header to the dialog container using
+     * Ties the <h2> tag in the dialog header to the dialog container using
      * aria-labelledby, ties the double-confirmation label to its corresponding
      * checkbox, and makes sure modal windows with tons of content don't extend
      * outside the viewport.

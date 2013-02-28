@@ -213,15 +213,14 @@
 
         if (!event) { var event = window.event; }
 
-        var atts                   = dialogCmp.getAttributes(),
-            zIndex                 = atts.get("_zIndex"),
-            target                 = event.target || event.srcElement,
+        var target                 = event.target || event.srcElement,
             container              = dialogCmp.find("dialog").getElement(),
             allOpen                = managerCmp.get("v._activeDialogs"),
             clickedInside          = $A.util.contains(container, target),
             otherOpenDialogClicked = this.otherOpenDialogClicked(dialogCmp, allOpen, target),
             closeEvent;
 
+        // don't let the click event bubble up, as it will close other open dialogs
         $A.util.squash(event);
 
         if (clickedInside) {

@@ -31,9 +31,8 @@
             length        = activeDialogs.length,
             dialog        = evt.getParam("dialog");
 
-        // if the dialog was opened via a ui:press event, kill the "click" event
-        // bubble so that we don't immediately close the dialog if "clickOutToClose"
-        // is true
+        // kill the "click" event generated from ui:press so it doesn't bubble
+        // up to the document and immediately close the dialog
         if (triggerEvent && triggerEvent.getName() === "press") {
             $A.util.squash(triggerEvent.getParam("domEvent"));
         }
@@ -57,7 +56,14 @@
      */
     closeDialog : function(cmp, evt, hlp) {
 
-        var dialog = evt.getParam("dialog");
+        var dialog       = evt.getParam("dialog"),
+            triggerEvent = evt.getParam("triggerEvent");
+
+        // kill the "click" event generated from ui:press so it doesn't bubble
+        // up to the document and close other open dialogs
+        if (triggerEvent && triggerEvent.getName() === "press") {
+            $A.util.squash(triggerEvent.getParam("domEvent"));
+        }
 
         hlp.deactivateDialog(dialog, cmp);
 

@@ -59,7 +59,7 @@
      */
     cancel : function(cmp, evt, hlp) {
 
-        hlp.confirmOrCancel(cmp, false);
+        hlp.confirmOrCancel(cmp, evt, false);
 
     },
 
@@ -71,7 +71,7 @@
      */
     confirm : function(cmp, evt, hlp) {
 
-        hlp.confirmOrCancel(cmp, true);
+        hlp.confirmOrCancel(cmp, evt, true);
 
     },
 

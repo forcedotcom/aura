@@ -23,12 +23,13 @@
      * @param {Boolean} confirmClicked if the 'confirm' or 'cancel' button was clicked
      * @return {void}
      */
-    confirmOrCancel : function(cmp, confirmClicked) {
+    confirmOrCancel : function(cmp, evt, confirmClicked) {
 
         var closeEvent = $A.get("e.ui:closeDialog");
 
         closeEvent.setParams({
             dialog : cmp,
+            triggerEvent : evt,
             confirmClicked : confirmClicked
         });
         closeEvent.fire();

@@ -26,15 +26,10 @@
 
         var atts             = cmp.getAttributes(),
             type             = atts.get("type"),
-            autoFocus        = atts.get("autoFocus"),
             doubleConfirm    = atts.get("doubleConfirm"),
             isModal          = type === "alert" || type === "modal",
-            mask             = cmp.find("mask"),
-            dialog           = cmp.find("dialog"),
             title            = cmp.find("title"),
             confirmBox       = cmp.find("confirmBox"),
-            confirmButton    = cmp.find("confirmButton"),
-            firstBodyElement = document.body.firstChild;
             attributeMap     = {};
 
         if (isModal) {

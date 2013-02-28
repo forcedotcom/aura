@@ -75,6 +75,62 @@ MapValue.prototype.getValue = function(k){
 };
 
 /**
+ * Sets the map to newMap.
+ *
+ * There are a variety of special conditions here. The most important is that an
+ * empty input value will simply clear the array. This means that null, undefined,
+ * or a SimpleValue representing this will clear it.
+ *
+ * MapValue or an object will set the internal map to match the input. If you need to
+ * do as the constructor and create a map based on a model, you would need to first
+ * construct a MapValue, then call this.
+ *
+ * Note also that this is a bit pricey, as it will unwrap and rewrap maps that are contained.
+ * We have no way of knowing if this is safe otherwise...
+ *
+ * @param newMap The new map.
+ */
+MapValue.prototype.setValue = function(newMap) {
+    this.value = {};
+    this.keys = {};
+    this.makeDirty();
+    if ($A.util.isUndefinedOrNull(newMap) || (newMap.isDefined && !newMap.isDefined())) {
+        return;
+    }
+    if (!$A.util.isObject(newMap)) {
+        $A.assert(false, "newMap must be an object");
+    }
+    var type = (newMap.toString?newMap.toString():'');
+    if (type === 'MapValue') {
+        // we have a map value, let's go and copy things.
+        newMap.each(function(k, v) {
+            //
+            // Be very careful here. v could represent null
+            // or undefined, which would fail if we use put.
+            //
+            config = {};
+            config[k] = v.unwrap();
+            this.add(k, config);
+        }, { scope: this });
+    } else if (type === 'SimpleValue') {
+        if (newMap.unwrap() === null) {
+            return;
+        }
+        // bad.
+        $A.assert(false, "Defined simplevalue cannot be passed to MapValue.setValue");
+        return;
+    } else if (type === 'ArrayValue') {
+        // bad.
+        $A.assert(false, "Defined ArrayValue cannot be passed to MapValue.setValue");
+        return;
+    } else {
+        for (var k in newMap) {
+            this.add(k, newMap);
+        }
+    }
+};
+
+/**
  * Returns the unwrapped value for the key. Shortcut for getValue(key).unwrap().
  *
  * @param key The key for the value to return.
@@ -95,7 +151,7 @@ MapValue.prototype.merge = function(yourMap, overwrite) {
     for (var key in keys) {
         var yourvalue = yourMap.getValue(key);
         var myvalue = this.getValue(key);
-        if (myvalue && myvalue.isDefined?myvalue.isDefined():true) {
+        if (myvalue && (myvalue.isDefined?myvalue.isDefined():true) && myvalue.merge) {
             myvalue.merge(yourvalue, overwrite);
         } else {
             my[key] = yourvalue;
@@ -230,7 +286,10 @@ MapValue.prototype.unwrap = function(){
 };
 
 /**
- * wraps the value in a simple or map value and adds to this map
+ * wraps the value in a simple or map value and adds to this map.
+ *
+ * The use of config allows null or undefined to be passed in as the value.
+ *
  * @private
  */
 MapValue.prototype.add = function(k, config) {

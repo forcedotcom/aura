@@ -308,7 +308,11 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         replaceToken(getTargetComponent().getDescriptor(), replacement);
 
         logs = loadMonitorAndValidateApp(replacement, TOKEN, TOKEN, TOKEN);
-        assertRequests(getExpectedChangeRequests(), logs);
+        List<Request> expectedChange = Lists.newArrayList(getExpectedChangeRequests());
+        expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
+        expectedChange.add(new Request("/aura", namespace + ":" + appName, null, "HTML", 302)); //hard refresh
+        expectedChange.add(new Request("/aura", namespace + ":" + appName, null, "HTML", 200)); //re-fetch
+        assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.IDLE);
 
         logs = loadMonitorAndValidateApp(replacement, TOKEN, TOKEN, TOKEN);

@@ -23,12 +23,20 @@
     openDialog : function(cmp, evt, hlp) {
 
         var atts          = cmp.getAttributes(),
+            triggerEvent  = evt.getParam("triggerEvent"),
             type          = evt.getParam("dialog").get("v.type"),
             allowMultiple = atts.get("allowMultipleOpen"),
             activeDialogs = atts.get("_activeDialogs"),
             isModal       = type === "alert" || type === "modal",
             length        = activeDialogs.length,
             dialog        = evt.getParam("dialog");
+
+        // if the dialog was opened via a ui:press event, kill the "click" event
+        // bubble so that we don't immediately close the dialog if "clickOutToClose"
+        // is true
+        if (triggerEvent && triggerEvent.getName() === "press") {
+            $A.util.squash(triggerEvent.getParam("domEvent"));
+        }
 
         // if we don't allow multiple active dialogs, or the dialog is modal,
         // deactivate all the old ones first

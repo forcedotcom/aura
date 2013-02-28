@@ -43,6 +43,7 @@
         dialogAtts.setValue("_handlerConfig", handlerConfig);
         currentlyActive.push(dialogCmp);
         managerAtts.setValue("_activeDialogs", currentlyActive);
+        this.bringToFront(dialogCmp, managerCmp);
         this.applyEventHandlers(handlerConfig);
         this.doAnimation(true, maskCmp, dialogInnerCmp, autoFocus, isModal, handlerConfig);
 
@@ -130,12 +131,13 @@
      */
     getHandlerConfig : function(dialogCmp, isModal, clickOutToClose, managerCmp) {
 
-        var self     = this,
-            oldFocus = document.activeElement,
-            newFocus = this.getFirstFocusableElement(dialogCmp),
-            keydown  = function(event) { self.getKeydownHandler(dialogCmp, managerCmp, isModal, newFocus, event) },
-            click    = clickOutToClose ? function(event) { self.getClickHandler(dialogCmp, event) } : null,
-            resize   = isModal ? function() { self.getResizeHandler(dialogCmp) } : null;
+        var self          = this,
+            allowMultiple = managerCmp.get("v.allowMultiple"),
+            oldFocus      = document.activeElement,
+            newFocus      = this.getFirstFocusableElement(dialogCmp),
+            keydown       = function(event) { self.getKeydownHandler(dialogCmp, managerCmp, isModal, newFocus, event) },
+            click         = function(event) { self.getClickHandler(dialogCmp, managerCmp, clickOutToClose, isModal, event) },
+            resize        = function() { self.getResizeHandler(dialogCmp, isModal) };
 
         return {
             oldFocus       : oldFocus,
@@ -201,19 +203,32 @@
      * Constructs the handler for the DOM click event.
      * 
      * @param {Aura.Component} dialogCmp the ui:dialog component
+     * @param {Aura.Component} managerCmp the ui:dialogManager component
+     * @param {Boolean} clickOutToClose whether the dialog should be closed on click outside the dialog
      * @param {UIEvent} event the DOM click event
      * @return {void}
      */
-    getClickHandler : function(dialogCmp, event) {
+    getClickHandler : function(dialogCmp, managerCmp, clickOutToClose, event) {
 
-        // TODO: add z-index management for multiple open dialogs at the same time
-        event = event || window.event;
-        var target = event.target || event.srcElement,
-            container = dialogCmp.find("dialog").getElement(),
+        event                      = event || window.event;
+        var atts                   = dialogCmp.getAttributes(),
+            zIndex                 = atts.get("_zIndex"),
+            target                 = event.target || event.srcElement,
+            container              = dialogCmp.find("dialog").getElement(),
+            allOpen                = managerCmp.get("v._activeDialogs"),
+            clickedInside          = $A.util.contains(container, target),
+            otherOpenDialogClicked = this.otherOpenDialogClicked(dialogCmp, allOpen, target),
             closeEvent;
 
-            if (!$A.util.contains(container, target)) {
-                $A.util.squash(event);
+        $A.util.squash(event, true);
+
+        if (clickedInside) {
+            this.bringToFront(dialogCmp, managerCmp);
+            return;
+        } else {
+            if (otherOpenDialogClicked) {
+                return;
+            } else if (clickOutToClose) {
                 closeEvent = $A.get("e.ui:closeDialog");
                 closeEvent.setParams({
                     dialog : dialogCmp,
@@ -221,25 +236,47 @@
                 });
                 closeEvent.fire();
             }
+        }
 
     },
 
 
     /**
-     * Constructs the handler for the window.resize DOM event
+     * Constructs the handler for the window.resize DOM event.
      * 
      * @param {Aura.Component} dialog the ui:dialog component
+     * @param {Boolean} isModal whether the dialog is modal or not
      * @return {void}
      */
-    getResizeHandler : function(dialog) {
+    getResizeHandler : function(dialog, isModal) {
 
-        var max     = dialog.getDef().getHelper().getContentMaxHeight(),
+        var max,
+            element;
+
+        if (isModal) {
+            max = dialog.getDef().getHelper().getContentMaxHeight(),
             element = dialog.find("content").getElement();
+            element.style.maxHeight = max + "px";
+        }
 
-        // set the style attribute on the DOM element directly, as updating
-        // the private _maxHeight attribute of the component takes too long
-        // to complete rerendering.
-        element.style.maxHeight = max + "px";
+    },
+
+
+    /**
+     * Brings the dialog visually to the front, then increments the z-index
+     * for the next dialog to be activated.
+     * 
+     * @param {Aura.Component} dialog the ui:dialog component
+     * @param {Aura.Component} manager the ui:dialogManager component
+     */
+    bringToFront : function(dialog, manager) {
+
+        var atts   = manager.getAttributes(),
+            zIndex = atts.get("_nextZIndex");
+
+        // set the z-index, then increment for the next dialog to get focus
+        dialog.find("dialog").getElement().style.zIndex = zIndex;
+        atts.setValue("_nextZIndex", zIndex + 1);
 
     },
 
@@ -297,8 +334,8 @@
      * also handles focusing on the proper element when a dialog is opened or closed.
      * 
      * @param {Boolean} isVisible specifies if the dialog should be displayed or hidden
-     * @param {Aura.Component} maskCmp the mask <div> component
-     * @param {HTMLElement} dialogCmp the dialog <div> component
+     * @param {Aura.Component} maskCmp the ui:dialog's "mask" component
+     * @param {Aura.Component} dialogCmp the ui:dialog component
      * @param {Boolean} autoFocus specifies if focus should automatically be applied to the first element in the dialog
      * @param {Boolean} isModal specifies if this dialog is modal
      * @param {Object} config JS object that contains references to the elements to focus
@@ -347,6 +384,33 @@
                 config.oldFocus.focus();
             }
         }
+
+    },
+
+
+    /**
+     * Determines if an open dialog - other than the one currently being evaluated - was clicked.
+     *
+     * @param {Aura.Component} currentDialog the current ui:dialog component
+     * @param {Aura.Component[]} allOpenDialogs the array of active (i.e. open) dialogs currently registered w/ the ui:dialogManager
+     * @param {HTMLElement} clickTarget the DOM element that was the target of the click
+     * @return {Boolean}
+     */
+    otherOpenDialogClicked : function(currentDialog, allOpenDialogs, clickTarget) {
+
+        var length = allOpenDialogs.length,
+            dialog;
+
+        for (var i=0; i<length; i++) {
+            if (currentDialog === allOpenDialogs[i]) {
+                continue;
+            }
+            dialog = allOpenDialogs[i].getElement();
+            if ($A.util.contains(dialog, clickTarget)) {
+                return true;
+            }
+        }
+        return false;
 
     }
 

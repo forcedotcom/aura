@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
+({
     press : function(cmp, event){
         var press = cmp.getEvent("press");
         if (cmp.getAttributes().getValue("disabled").getBooleanValue()) {
@@ -24,4 +24,4 @@
         press.fire();
         return true;
     }
-}
+})

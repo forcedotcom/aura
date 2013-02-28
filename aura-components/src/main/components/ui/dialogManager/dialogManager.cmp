@@ -22,6 +22,7 @@
 
     <!-- private attributes -->
     <aura:attribute name="_activeDialogs" type="Aura.Component[]" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The currently active (i.e. open) ui:dialog components."/>
+    <aura:attribute name="_nextZIndex" type="Integer" default="{!99999}" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The z-index value to apply to the next dialog activated."/>
 
     <!-- events -->
     <aura:registerEvent name="close" type="ui:closeDialog"/>

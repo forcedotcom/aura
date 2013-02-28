@@ -66,7 +66,7 @@
         <h2 aura:id="title" id="{!v._ariaId}" class="title">{!v.title}<span class="assistiveText"> {!v.titleDescription}</span></h2>
 
         <!-- content -->
-        <div aura:id="content" class="content" style="{!'max-height:' + v._maxHeight + 'px'}">
+        <div aura:id="content" class="content" style="{!'max-height:' + v._maxHeight + 'px;'}">
             {!v.body}
             <aura:if isTrue="{!v.type == 'alert' &amp;&amp; v.doubleConfirm}">
                 <div class="confirmWrapper">

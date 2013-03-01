@@ -405,9 +405,4 @@ public class TestJavaModel {
     public String getUrl() {
         return "http://www.salesforce.com";
     }
-    
-    @AuraEnabled
-    public String getSelectValue() {
-        return "option1";
-    }
 }

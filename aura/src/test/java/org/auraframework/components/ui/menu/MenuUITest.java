@@ -314,4 +314,18 @@ public class MenuUITest extends WebDriverTestCase{
     	button.click();
     	assertEquals("Checkbox items selected are not correct", "Colorado", result.getText());
     }
+	
+	/*
+	 * Test case for: W-1559070
+	 */
+	public void testRemovingMenuDoesNotThrowJsError() throws MalformedURLException, URISyntaxException{
+		open(MENUTEST_APP);
+		WebDriver driver = this.getDriver();
+		String uiMenuClassName = "uiMenu";
+		WebElement menuLabel = driver.findElement(By.className(uiMenuClassName));
+		assertTrue("UiMenu should be present on the page",menuLabel.isDisplayed());
+		String uiMenu = auraUITestingUtil.getFindAtRootExpr(uiMenuClassName);
+		auraUITestingUtil.getEval("$A.unrender(" + uiMenu + ")");
+		assertFalse("UiMenu should not be present after unrender", isElementPresent(By.className(uiMenuClassName)));
+	}
 }

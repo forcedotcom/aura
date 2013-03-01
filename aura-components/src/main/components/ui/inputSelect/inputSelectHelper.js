@@ -134,14 +134,16 @@
             for (var i=0, len=options.length; i < len; i++) {
                 var option = options[i];
 
-                if (aura.util.arrayIndexOf(newValues, option.value) > -1) {
+            	if (($A.util.isArray(newValues) && aura.util.arrayIndexOf(newValues, option.value) > -1) || newValues === option.value) {
                     option.selected = true;
                 } else {
                     option.selected = false;
                 }
             }
 
+            cmp._suspendChangeHandlers = true;
             optionsValue.setValue(options);
+            cmp._suspendChangeHandlers = false;
             
         } else {
         // case 2:
@@ -181,6 +183,10 @@
      * Updates this component's "value" attribute based on the state of its options' "selected" attributes
      */
     updateValueFromOptions: function(cmp) {
+        if (cmp._suspendChangeHandlers) {
+        	return;
+    	}
+        
         var value = cmp.getValue("v.value");
         var optionValue = this.getValueFromOptionCmps(cmp);
 

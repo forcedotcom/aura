@@ -32,11 +32,17 @@
     },
     
     unrender: function(component, helper) {
-        if (helper.getOnClickEventProp.cache.onClickStartEvent && helper.getOnClickEventProp.cache.onClickStartFunction) {
-            document.body.removeEventListener(helper.cache.onClickStartEvent, helper.cache.onClickStartFunction);
+        if (helper.getOnClickEventProp.cache && 
+            helper.getOnClickEventProp.cache.onClickStartEvent && 
+            component._onClickStartFunc) {
+            document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickStartEvent, 
+                                              component._onClickStartFunc);
         }
-        if (helper.getOnClickEventProp.cache.onClickEndEvent && helper.getOnClickEventProp.cache.onClickEndFunction) {
-            document.body.removeEventListener(helper.cache.onClickEndEvent, helper.cache.onClickEndFunction);
+        if (helper.getOnClickEventProp.cache &&
+            helper.getOnClickEventProp.cache.onClickEndEvent && 
+            component._onClickEndFunc) {
+            document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickEndEvent, 
+                                              component._onClickEndFunc);
         }
         this.superUnrender();
     }

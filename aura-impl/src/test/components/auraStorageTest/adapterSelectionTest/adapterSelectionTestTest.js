@@ -3,13 +3,13 @@
      * Verify AuraStorageService.selectAdapter(persistent, secure) combinations
      */
 
-	testSelectNotPersistentAndNotSecure: {
+    testSelectNotPersistentAndNotSecure: {
         test: function(cmp){
             $A.test.assertEquals("memory", $A.storageService.selectAdapter(false, false));
         }
     },
 
-	testSelectPersistentAndNotSecure: {
+    testSelectPersistentAndNotSecure: {
         test: function(cmp){
             $A.test.assertEquals("smartstore", $A.storageService.selectAdapter(true, false));
         }
@@ -25,5 +25,10 @@
         test: function(cmp){
             $A.test.assertEquals("smartstore", $A.storageService.selectAdapter(true, true));
         }
+    },
+    testSelectDefault:{
+	test: function(cmp){
+	    $A.test.assertEquals("memory", $A.storageService.selectAdapter());
+	}
     }
 })

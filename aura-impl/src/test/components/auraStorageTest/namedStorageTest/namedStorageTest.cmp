@@ -1,2 +1,2 @@
-<aura:component render="client">
+<aura:component render="client" template="auraStorageTest:namedStorageTemplate">
 </aura:component>

@@ -50,8 +50,6 @@ public abstract class XMLHandler<T extends Definition> {
     protected final Source<?> source;
 
     public static class InvalidSystemAttributeException extends AuraRuntimeException {
-        /**
-         */
         private static final long serialVersionUID = -7339542343645451510L;
         private static final String message = "Invalid attribute \"%s\"";
 

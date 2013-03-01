@@ -69,6 +69,7 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
         builder.setLocation("aura://ComponentController", -1);
         builder.setDescriptor(componentControllerDesc);
         Map<DefDescriptor<ControllerDef>, ControllerDef> ret = Maps.newHashMap();
+        // FIXME="need an md5";
         ret.put(builder.getDescriptor(), builder.build());
         return ret;
     }

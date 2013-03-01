@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.builder.DefBuilder;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.expression.PropertyReference;
@@ -36,12 +38,11 @@ import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 /**
  * base class for javascripty source handling gnomes.
  */
-public abstract class JavascriptHandler<D extends DefDescriptor<? extends Definition>, T extends Definition> implements
-        ExpressionContainerHandler {
+public abstract class JavascriptHandler<D extends Definition, T extends Definition> implements ExpressionContainerHandler {
     protected final Source<?> source;
-    protected final D descriptor;
+    protected final DefDescriptor<D> descriptor;
 
-    protected JavascriptHandler(D descriptor, Source<?> source) {
+    protected JavascriptHandler(DefDescriptor<D> descriptor, Source<?> source) {
         this.source = source;
         this.descriptor = descriptor;
     }
@@ -50,7 +51,7 @@ public abstract class JavascriptHandler<D extends DefDescriptor<? extends Defini
         return new Location(source.getSystemId(), source.getLastModified());
     }
 
-    public D getDescriptor() {
+    public DefDescriptor<D> getDescriptor() {
         return descriptor;
     }
 
@@ -63,10 +64,16 @@ public abstract class JavascriptHandler<D extends DefDescriptor<? extends Defini
         return null;
     }
 
+    protected void setDefBuilderFields(DefBuilder<D,D> builder) {
+        builder.setDescriptor(descriptor);
+        builder.setOwnHash(source.getHash());
+        builder.setLocation(getLocation());
+    }
+
     public T getDefinition() throws QuickFixException {
         JsonStreamReader in = null;
         try {
-            in = new JsonStreamReader(source.getReader(), getHandlerProvider());
+            in = new JsonStreamReader(source.getHashingReader(), getHandlerProvider());
             JsonConstant token = in.next();
             if (token == JsonConstant.FUNCTION_ARGS_START) {
                 in.next();

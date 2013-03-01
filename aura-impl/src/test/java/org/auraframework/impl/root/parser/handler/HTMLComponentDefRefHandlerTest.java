@@ -52,7 +52,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
                 "<div class='MyClass'>Child Text<br/></div>", "myID", Format.XML);
         xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());
+        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader);
         htmlHandler = new HTMLComponentDefRefHandler<ComponentDef>(cdh, "div", xmlReader, source);
@@ -87,7 +87,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
                 "<div><aura:set attribute='header' value='false'/></div>", "myID", Format.XML);
         xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());
+        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader);
         htmlHandler = new HTMLComponentDefRefHandler<ComponentDef>(cdh, "div", xmlReader, source);

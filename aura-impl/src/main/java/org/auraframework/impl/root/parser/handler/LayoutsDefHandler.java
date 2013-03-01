@@ -49,6 +49,7 @@ public class LayoutsDefHandler extends RootTagHandler<LayoutsDef> {
         super(defDescriptor, source, xmlReader);
         builder.setDescriptor(defDescriptor);
         builder.setLocation(getLocation());
+        builder.setOwnHash(source.getHash());
     }
 
     @Override

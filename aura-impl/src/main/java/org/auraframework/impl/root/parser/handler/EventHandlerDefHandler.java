@@ -95,6 +95,7 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
         if (next != XMLStreamConstants.END_ELEMENT || !TAG.equalsIgnoreCase(getTagName())) {
             error("expected end of %s tag", TAG);
         }
+        builder.setOwnHash(source.getHash());
 
         return builder.build();
     }

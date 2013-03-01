@@ -51,6 +51,7 @@ public class LayoutDefHandler<P extends RootDefinition> extends ParentedTagHandl
     public LayoutDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
         builder.setLocation(getLocation());
+        builder.setOwnHash(source.getHash());
     }
 
     @Override

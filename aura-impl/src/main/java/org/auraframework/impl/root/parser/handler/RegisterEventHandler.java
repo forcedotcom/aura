@@ -58,6 +58,7 @@ public class RegisterEventHandler extends XMLHandler<RegisterEventDefImpl> {
 
     public RegisterEventHandler(XMLStreamReader xmlReader, Source<?> source) {
         super(xmlReader, source);
+        builder.setOwnHash(source.getHash());
     }
 
     @Override

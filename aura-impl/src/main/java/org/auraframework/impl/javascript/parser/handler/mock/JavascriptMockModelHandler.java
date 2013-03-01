@@ -37,8 +37,8 @@ import com.google.common.collect.Maps;
  * Parse JSTEST mock Models.
  */
 public class JavascriptMockModelHandler extends JavascriptMockHandler<ModelDef> {
-	private DefDescriptor<ModelDef> modelDefDescriptor = null;
-    
+    private DefDescriptor<ModelDef> modelDefDescriptor = null;
+
     public JavascriptMockModelHandler(DefDescriptor<TestSuiteDef> descriptor, Source<?> source,
             DefDescriptor<? extends BaseComponentDef> targetDescriptor, Map<String, Object> map) {
         super(descriptor, source, targetDescriptor, map);
@@ -46,46 +46,41 @@ public class JavascriptMockModelHandler extends JavascriptMockHandler<ModelDef> 
 
     @Override
     protected ModelDef createDefinition(Map<String, Object> map) throws QuickFixException {
-    	ModelDef baseDef = getBaseDefinition((String)map.get("descriptor"), ModelDef.class);
-    	modelDefDescriptor = baseDef.getDescriptor();
-    	
+        ModelDef baseDef = getBaseDefinition((String) map.get("descriptor"), ModelDef.class);
+        modelDefDescriptor = baseDef.getDescriptor();
+
         List<Stub<?>> stubs = getStubs(map.get("stubs"));
 
-		return (ModelDef) Proxy.newProxyInstance(this.getClass()
-				.getClassLoader(), new Class<?>[] { ModelDef.class },
-				new DelegatingStubHandler(baseDef, stubs));
+        return (ModelDef) Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[] { ModelDef.class },
+                new DelegatingStubHandler(baseDef, stubs));
     }
-    
-	@SuppressWarnings("unchecked")
-	@Override
-	protected <T> T getValue(Object object, Class<T> retClass)
-			throws QuickFixException {
-		if(object !=null && Model.class.equals(retClass)){
-			if (!(object instanceof Map)) {
-				throw new InvalidDefinitionException(
-						"Mock Model expects a map of property names to Answers.",
-						getLocation());
-			}
-			Map<String, Object> properties = Maps.newHashMap();
-			Map<?, ?> propMap = (Map<?, ?>) object;
-			for (Object key : propMap.keySet()) {
-				properties.put((String) key,
-						getAnswer(propMap.get(key), Object.class));
-			}
-			return (T) new MockModel(modelDefDescriptor, properties);
-		} else {
-			return super.getValue(object, retClass);
-		}
-	}
-    
-	@Override
-	protected ModelDef getDefaultBaseDefinition() throws QuickFixException {
-		return getTargetDescriptor().getDef().getModelDef();
-	}
 
-	@Override
-	protected Invocation getDefaultInvocation() throws QuickFixException {
-		return new Invocation("newInstance", null, Model.class);
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    protected <T> T getValue(Object object, Class<T> retClass) throws QuickFixException {
+        if (object != null && Model.class.equals(retClass)) {
+            if (!(object instanceof Map)) {
+                throw new InvalidDefinitionException("Mock Model expects a map of property names to Answers.", getLocation());
+            }
+            Map<String, Object> properties = Maps.newHashMap();
+            Map<?, ?> propMap = (Map<?, ?>) object;
+            for (Object key : propMap.keySet()) {
+                properties.put((String) key, getAnswer(propMap.get(key), Object.class));
+            }
+            return (T) new MockModel(modelDefDescriptor, properties);
+        } else {
+            return super.getValue(object, retClass);
+        }
+    }
+
+    @Override
+    protected ModelDef getDefaultBaseDefinition() throws QuickFixException {
+        return getTargetDescriptor().getDef().getModelDef();
+    }
+
+    @Override
+    protected Invocation getDefaultInvocation() throws QuickFixException {
+        return new Invocation("newInstance", null, Model.class);
+    }
 
 }

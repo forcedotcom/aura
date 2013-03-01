@@ -42,8 +42,6 @@ import org.auraframework.util.AuraTextUtil;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
-/**
- */
 public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDef> {
 
     public static final String TAG = "aura:application";
@@ -165,5 +163,4 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             throw new AuraError(x);
         }
     }
-
 }

@@ -41,7 +41,6 @@ import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.text.Hash;
 
 public final class TestComponent implements ComponentDef {
 
@@ -49,195 +48,156 @@ public final class TestComponent implements ComponentDef {
 
     @Override
     public final boolean isExtensible() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean isAbstract() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean isTemplate() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public Collection<EventHandlerDef> getHandlerDefs()
-            throws QuickFixException {
-        // TODO Auto-generated method stub
+    public Collection<EventHandlerDef> getHandlerDefs() throws QuickFixException {
         return null;
     }
 
     @Override
     public DefDescriptor<ModelDef> getLocalModelDefDescriptor() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<DefDescriptor<ModelDef>> getModelDefDescriptors()
-            throws QuickFixException {
-        // TODO Auto-generated method stub
+    public List<DefDescriptor<ModelDef>> getModelDefDescriptors() throws QuickFixException {
         return null;
     }
 
     @Override
-    public List<DefDescriptor<ControllerDef>> getControllerDefDescriptors()
-            throws QuickFixException {
-        // TODO Auto-generated method stub
+    public List<DefDescriptor<ControllerDef>> getControllerDefDescriptors() throws QuickFixException {
         return null;
     }
 
     @Override
     public ModelDef getModelDef() throws QuickFixException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ControllerDef getControllerDef() throws QuickFixException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public DefDescriptor<ComponentDef> getExtendsDescriptor() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public DefDescriptor<RendererDef> getRendererDescriptor()
-            throws QuickFixException {
-        // TODO Auto-generated method stub
+    public DefDescriptor<RendererDef> getRendererDescriptor() throws QuickFixException {
         return null;
     }
 
     @Override
     public DefDescriptor<ThemeDef> getThemeDescriptor() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public List<AttributeDefRef> getFacets() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public RendererDef getLocalRendererDef() throws QuickFixException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public boolean isLocallyRenderable() throws QuickFixException {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public ComponentDef getTemplateDef() throws QuickFixException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public DefDescriptor<ComponentDef> getTemplateDefDescriptor() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public org.auraframework.def.BaseComponentDef.RenderType getRender() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public org.auraframework.def.BaseComponentDef.WhitespaceBehavior getWhitespaceBehavior() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public HelperDef getHelperDef() throws QuickFixException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getDeclaredAttributeDefs() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs()
-            throws QuickFixException {
-        // TODO Auto-generated method stub
+    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
         return null;
     }
 
     @Override
     public AttributeDef getAttributeDef(String name) throws QuickFixException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Map<String, RegisterEventDef> getRegisterEventDefs()
-            throws QuickFixException {
-        // TODO Auto-generated method stub
+    public Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException {
         return null;
     }
 
     @Override
-    public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other)
-            throws QuickFixException {
-        // TODO Auto-generated method stub
+    public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException {
         return false;
     }
 
     @Override
-    public DefDescriptor<ProviderDef> getProviderDescriptor()
-            throws QuickFixException {
-        // TODO Auto-generated method stub
+    public DefDescriptor<ProviderDef> getProviderDescriptor() throws QuickFixException {
         return null;
     }
 
     @Override
     public ProviderDef getProviderDef() throws QuickFixException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public List<DefDescriptor<?>> getBundle() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ProviderDef getLocalProviderDef() throws QuickFixException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void validateDefinition() throws QuickFixException {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void validateReferences() throws QuickFixException {
-        // TODO Auto-generated method stub
 
     }
 
@@ -251,47 +211,36 @@ public final class TestComponent implements ComponentDef {
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies)
-            throws QuickFixException {
-        // TODO Auto-generated method stub
-
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
     }
 
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Location getLocation() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public DefDescriptor<ComponentDef> getDescriptor() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public <D extends Definition> D getSubDefinition(
-            SubDefDescriptor<D, ?> descriptor) {
-        // TODO Auto-generated method stub
+    public <D extends Definition> D getSubDefinition( SubDefDescriptor<D, ?> descriptor) {
         return null;
     }
 
     @Override
     public void retrieveLabels() throws QuickFixException {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void serialize(Json json) throws IOException {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -316,12 +265,11 @@ public final class TestComponent implements ComponentDef {
 
     @Override
     public List<DependencyDef> getDependencies() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Hash getOwnHash() {
+    public String getOwnHash() {
         return null;
     }
 }

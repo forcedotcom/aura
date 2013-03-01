@@ -36,8 +36,7 @@ import com.google.common.collect.Maps;
 /**
  * Javascript handler for controller defs
  */
-public class JavascriptControllerDefHandler extends
-        JavascriptHandler<DefDescriptor<ControllerDef>, JavascriptControllerDef> {
+public class JavascriptControllerDefHandler extends JavascriptHandler<ControllerDef, ControllerDef> {
 
     private final Builder builder = new Builder();
 
@@ -52,8 +51,7 @@ public class JavascriptControllerDefHandler extends
 
     @Override
     protected JavascriptControllerDef createDefinition(Map<String, Object> map) {
-        builder.setDescriptor(descriptor);
-        builder.setLocation(getLocation());
+        setDefBuilderFields(builder);
         builder.actionDefs = Maps.newTreeMap();
         for (Map.Entry<String, Object> e : map.entrySet()) {
             JsFunction f = (JsFunction) e.getValue();
@@ -76,5 +74,4 @@ public class JavascriptControllerDefHandler extends
     public void addExpressionReferences(Set<PropertyReference> propRefs) {
         builder.expressionRefs.addAll(propRefs);
     }
-
 }

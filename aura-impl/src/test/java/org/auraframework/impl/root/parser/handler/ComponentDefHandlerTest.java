@@ -48,7 +48,7 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
                         + "' abstract='true'>Child Text<aura:foo/></aura:component>", "myID", Format.XML);
         xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());
+        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
         xmlReader.next();
         cdHandler = new ComponentDefHandler(vendor.getComponentDefDescriptor(), source, xmlReader);
     }

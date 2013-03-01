@@ -181,7 +181,7 @@ public class XMLParser implements Parser {
             }
             URL cacheUrl = source.getCacheUrl();
             return new Location(location, xmlLocation.getLineNumber() - 1, xmlLocation.getColumnNumber(),
-                    source.getLastModified(), cacheUrl == null ? null : cacheUrl.toString(), source.getHash());
+                    source.getLastModified(), cacheUrl == null ? null : cacheUrl.toString());
         } else if (source != null) {
             return new Location(source.getSystemId(), source.getLastModified());
         }

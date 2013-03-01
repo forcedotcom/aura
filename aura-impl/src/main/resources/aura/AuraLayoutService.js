@@ -110,7 +110,7 @@ var AuraLayoutService = function(){
         },
 
         /**
-         * Load the previous layout and update the history.
+         * Load the previous layout and update the history, or the default layout
          * @memberOf AuraLayoutService
          * @public 
          */
@@ -123,6 +123,8 @@ var AuraLayoutService = function(){
                 // don't double-layout.
                 skipLocationChangeHandlerSemaphore++;
                 historyService.back();
+            }else{
+            	historyService.set(priv.layouts.getDefault().getName());
             }
         },
 
@@ -230,6 +232,7 @@ var AuraLayoutService = function(){
             if (!noTrack) {
                 priv.push(layout, params);
             }
+            priv.fireLayoutChangeEvent(true);
 
             if (actions.length > 0 || config.length > 0) {
                 window.scrollTo(0,0);

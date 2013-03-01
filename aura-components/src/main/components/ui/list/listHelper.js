@@ -17,8 +17,6 @@
  	init: function(component) {
  		this.initDataProvider(component);
  		this.initPagers(component);
- 		
- 		this.triggerDataProvider(component);
 	},
 
 	initDataProvider: function(component) {
@@ -57,8 +55,8 @@
 			var pager = pagers[j];
 			pager.addHandler("onPageChange", component, "c.handlePageChange");
 			
-//			TODO: need to get this working so that the expressions are actually chained and all point back to the same underlying value
-//				  (like they would be via markup)
+//			TODO: want to wire this up so that the valueProvider for these attributes is always the parent list, not the component
+//				in which the paginators were referenced, but not sure we can do that today...
 //			var k = chainedAttrs.length;
 //			while (k--) {
 //				var exp = "v." + chainedAttrs[k];
@@ -70,7 +68,12 @@
 		component._pagers = pagers;
 	},
 	
+    showLoading:function (component, visible) {
+        $A.util[visible ? "addClass" : "removeClass"](component.getElement(), "loading");
+    },
+	
 	triggerDataProvider: function(component) {
+		this.showLoading(component, true);
 		component._dataProvider.get("e.provide").fire();
 	}
 })

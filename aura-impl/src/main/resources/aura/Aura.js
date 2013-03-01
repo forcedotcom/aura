@@ -480,7 +480,10 @@ $A.ns.Aura.prototype.error = function(e) {
         return;
     }
 
-    $A.util.getElement("auraErrorMessage").innerHTML = str;
+    var message = $A.util.getElement("auraErrorMessage");
+    message.innerHTML = "";
+    message.appendChild(document.createTextNode(str));
+    
     $A.util.removeClass(document.body, "loading");
     $A.util.addClass(document.body, "auraError");
    

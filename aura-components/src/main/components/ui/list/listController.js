@@ -18,17 +18,21 @@
 		var currentPage = event.getParam("currentPage");
 		var pageSize = event.getParam("pageSize");
 		
-		component.getValue("v.currentPage").setValue(currentPage);
+		component.getValue("v.currentPage").setValue(currentPage, true);
 		component.getValue("v.pageSize").setValue(pageSize);
 		
 		helper.triggerDataProvider(component);
 	},
 	
-	handleDataChange: function(component, event, helper) {
+	handleDataChange: function(component, event, helper) {	
 		component.getValue("v.items").setValue(event.getParam("data"));
+		
+		helper.showLoading(component, false);
 	},
 	
 	init: function(component, event, helper) {
 		helper.init(component);
+		
+ 		helper.triggerDataProvider(component);
 	}
 })

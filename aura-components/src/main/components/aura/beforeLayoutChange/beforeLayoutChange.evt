@@ -15,21 +15,9 @@
     limitations under the License.
 
 -->
-<aura:component implements="ui:listInterface, ui:pagingInterface" extensible="true" support="proto">
-	<aura:handler name="init" action="{!c.init}" value="{!this}"/>
-	<div>
-		{!v.header}
-		
-		<div class="listContent">
-			<aura:iteration items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}">
-				
-			</aura:iteration>
-			<div class="loadingIndicator">
-                <div class="background"></div>
-                <span class="label">Loading...</span>
-            </div>
-		</div>
-		
-		{!v.footer}
-	</div>
-</aura:component>
+<aura:event type="APPLICATION" support="GA" description="Indicates that a layout change is about to occur.  Fired by the Layout Service.">
+	<aura:attribute name="title" type="String" description="The new title."/>
+    <aura:attribute name="prevTitle" type="String" description="The old title."/>
+    <aura:attribute name="layoutName" type="String" description="The name of the new layout."/>
+    <aura:attribute name="prevLayoutName" type="String" description="The name of the layout that was loaded prior to this layoutChange."/>
+</aura:event>

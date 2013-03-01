@@ -1,0 +1,265 @@
+/*
+ * Copyright (C) 2012 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+({
+    WeekdayLabels: [{
+        fullName: "Sunday",
+        shortName: "Sun"
+    }, {
+        fullName: "Monday",
+        shortName: "Mon"
+    }, {
+        fullName: "Tuesday",
+        shortName: "Tue"
+    }, {
+        fullName: "Wednesday",
+        shortName: "Wed"
+    }, {
+        fullName: "Thursday",
+        shortName: "Thu"
+    }, {
+        fullName: "Friday",
+        shortName: "Fri"
+    }, {
+        fullName: "Saturday",
+        shortName: "Sat"
+    }],
+    
+    changeCalendar: function(component, localId, deltaMonth, deltaYear) {
+        var cellCmp = component.find(localId);
+        var date = cellCmp.get("v.label");
+        this.changeMonthYear(component, deltaMonth, deltaYear, date);
+    },
+    
+    changeMonthYear: function(component, monthChange, yearChange, date) {
+        var currentDate = new Date(component.get("v.year"), component.get("v.month"), date);
+        var targetDate = new Date(currentDate.getFullYear() + yearChange,
+                                  currentDate.getMonth() + monthChange,
+                                  1);
+        var daysInMonth = moment(targetDate).daysInMonth();
+        if (daysInMonth < date) { // The target month doesn't have the current date. Just set it to the last date.
+            date = daysInMonth;
+        }
+        component.setValue("{!v.year}", targetDate.getFullYear());
+        component.setValue("{!v.month}", targetDate.getMonth());
+        component.setValue("{!v.date}", date);
+        this.updateTitle(component, targetDate.getMonth(), targetDate.getFullYear());
+    },
+    
+    dateCompare: function(date1, date2) {
+        if (date1.getFullYear() != date2.getFullYear()) {
+            return date1.getFullYear() - date2.getFullYear();
+        } else {
+            if (date1.getMonth() != date2.getMonth()) {
+                return date1.getMonth() - date2.getMonth();
+            } else {
+                return date1.getDate() - date2.getDate();
+            }
+        }
+    },
+    
+    /**
+     * Java style date comparisons. Compares by day, month, and year only.
+     */
+    dateEquals: function(date1, date2) {
+        return date1 && date2 && this.dateCompare(date1, date2) === 0;
+    },
+    
+    /**
+     * Find the cell component for a specific date in a month.
+     * @date - Date object
+     */
+    findDateComponent: function(component, date) {
+        var firstDate = new Date(date.getTime());
+        firstDate.setDate(1);
+        var initialPos = firstDate.getDay();
+        var pos = initialPos + date.getDate() - 1;
+        return component.find(pos);
+    },
+    
+    /**
+     * generates the days for the current selected month.
+     */
+    generateMonth: function(component) {
+        var dayOfMonth = component.get("v.date");
+        var month = component.get("v.month");
+        var year = component.get("v.year");
+        var date = new Date(year, month, dayOfMonth);
+        var selectedDate = new Date(component.get("v.selectedDate"));
+        var today = new Date();
+        
+        var d = new Date();
+        d.setDate(1);
+        d.setFullYear(year);
+        d.setMonth(month);
+        // java days are indexed from 1-7, javascript 0-6
+        // The startPoint will indicate the first date displayed at the top-left
+        // corner of the calendar. Negative dates in JS will subtract days from
+        // the 1st of the given month
+        var startOfWeek = 0;
+        var startPoint = startOfWeek - d.getDay() + 1;
+        d.setDate(startPoint);
+        //component.find("calRow5").getElement().style.display = "";
+        //component.find("calRow6").getElement().style.display = "";
+        for (var i = 0; i < 42; i++) {
+            var cellCmp = component.find(i);
+            if (cellCmp) {
+                var dayOfWeek = d.getDay();
+                var clazz;
+                if (dayOfWeek == 0 || dayOfWeek == 6) {
+                    clazz = "weekend";
+                } else {
+                    clazz = "weekday";
+                }
+                if (d.getMonth() == month - 1 || d.getFullYear() == year - 1) {
+                    clazz += " prevMonth"
+                } else if (d.getMonth() == month + 1 || d.getFullYear() == year + 1) {
+                    /*
+                    if (i % 7 == 0) {
+                        // done, hide the remaining rows.
+                        component.find("calRow6").getElement().style.display = "none";
+                        if (i == 21) {
+                            component.find("calRow5").getElement().style.display = "none";
+                        }
+                        break;
+                    }
+                    */
+                    clazz += " nextMonth"
+                }
+        
+                if (this.dateEquals(d, today)) {
+                    clazz += " todayDate";
+                }
+                if (this.dateEquals(d, selectedDate)) {
+                    clazz += " selectedDate"
+                    cellCmp.getElement().setAttribute("tabindex", "1");              
+                } else {
+                    cellCmp.getElement().setAttribute("tabindex", "-1");
+                }
+                cellCmp.setValue("{!v.class}", clazz);
+                cellCmp.setValue("{!v.label}", d.getDate());
+                cellCmp.setValue("{!v.value}", d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate());
+                
+                if (this.dateEquals(d, date)) {
+                    cellCmp.getElement().focus();                 
+                }
+            }
+            d.setDate(d.getDate() + 1);
+        }
+    },
+    
+    getEventTarget: function(e) {
+        return (window.event) ? e.srcElement : e.target;
+    },
+    
+    goToFirstOfMonth: function(component) {
+        var date = new Date(component.get("v.year"), component.get("v.month"), 1);
+        var localId = date.getDay();
+        var cellCmp = component.find(localId);
+        cellCmp.getElement().focus();
+        component.setValue("{!v.date}", 1);
+    },
+    
+    goToLastOfMonth: function(component) {
+        var date = new Date(component.get("v.year"), component.get("v.month") + 1, 0);
+        var cellCmp = this.findDateComponent(component, date);
+        if (cellCmp) {
+            cellCmp.getElement().focus();
+            component.setValue("{!v.date}", cellCmp.get("v.label"));
+        }
+    },
+    
+    handleArrowKey: function(component, localId, deltaDays) {
+        var currentYear = component.get("v.year");
+        var currentMonth = component.get("v.month");
+        var cellCmp = component.find(localId);
+        var date = new Date(currentYear, currentMonth, cellCmp.get("v.label"));
+        var targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + deltaDays);
+        if (targetDate.getFullYear() != currentYear || targetDate.getMonth() != currentMonth) {
+            component.setValue("{!v.year}", targetDate.getFullYear());
+            component.setValue("{!v.month}", targetDate.getMonth());
+            component.setValue("{!v.date}", targetDate.getDate());
+            this.updateTitle(component, targetDate.getMonth(), targetDate.getFullYear());
+        } else {
+            var targetCellCmp = component.find(parseInt(localId) + deltaDays);
+            targetCellCmp.getElement().focus();
+            component.setValue("{!v.date}", targetCellCmp.get("v.label"));
+        }
+    },
+    
+    handleESC: function(component) {
+        component.get("e.hide").fire();
+    },
+    
+    /**
+     * Support keyboard interaction.
+     *
+     */
+    handleKeydown: function(component, event) {
+        var cellCmp = event.getSource();
+        var keyCode = event.getParam("keyCode");
+        var shiftKey = event.getParam("shiftKey");
+        var ctrlKey = event.getParam("ctrlKey");
+        var domEvent = event.getParam("domEvent");
+        var localId = cellCmp.getLocalId();
+        
+        if (keyCode == 39) {  // right arrow key
+            //event.preventDefault();
+            this.handleArrowKey(component, localId, 1);
+        } else if (keyCode == 37) { // left arrow key
+            this.handleArrowKey(component, localId, -1);
+        } else if (keyCode == 38) { // up arrow key
+            this.handleArrowKey(component, localId, -7);
+        } else if (keyCode == 40) { // down arrow key
+            this.handleArrowKey(component, localId, 7);
+        } else if (keyCode == 9 && shiftKey == true) { // Tab + shift
+            component.get("e.hide").fire();
+        } else if (keyCode == 33 && shiftKey == true) { // Page Up + shift
+            this.changeCalendar(component, localId, 0, -1);
+        } else if (keyCode == 34 && shiftKey == true) { // Page Down + shift
+            this.changeCalendar(component, localId, 0, 1);
+        } else if (keyCode == 32) { // space bar
+            this.selectDate(component, event);
+        } else if (keyCode == 36) { // Home key
+            this.goToFirstOfMonth(component);
+        } else if (keyCode == 35) { // End key
+            this.goToLastOfMonth(component);
+        } else if (keyCode == 33 && shiftKey != true) { // Page Up
+            this.changeCalendar(component, localId, -1, 0);
+        } else if (keyCode == 34 && shiftKey != true) { // Page Down
+            this.changeCalendar(component, localId, 1, 0            );
+        } else if (keyCode == 27) { // ESC
+            this.handleESC(component);
+        }
+    },
+    
+    renderGrid: function(component) {
+        this.generateMonth(component);
+    },
+    
+    selectDate: function(component, event) {
+        var source = event.getSource();
+        // fire selectdate event
+        var selectDateEvent = component.getEvent("selectDate");
+        selectDateEvent.setParams({"value": source.get("v.value")});
+        selectDateEvent.fire();
+    },
+    
+    updateTitle: function(component, month, year) {
+        var updateTitleEvent = component.get("e.updateCalendarTitle");
+        updateTitleEvent.setParams({month: month, year: year});
+        updateTitleEvent.fire();
+    }
+})

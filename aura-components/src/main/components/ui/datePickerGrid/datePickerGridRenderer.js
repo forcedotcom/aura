@@ -15,12 +15,22 @@
  */
 ({
     afterRender: function(component, helper) {
-        helper.displayValue(component);
+        helper.renderGrid(component);
         return this.superAfterRender();
-	},
-	
-	rerender: function(component, helper) {
-        helper.displayValue(component);
-        return this.superRerender();
+    },
+
+    rerender: function(component, helper) {
+        var shouldRender = false;
+        var attributes = component.getDef().getAttributeDefs();
+        attributes.each(function(attributeDef) {
+            var name = attributeDef.getDescriptor().getName();
+            if (name !== "date" && component.getAttributes().getValue(name).isDirty()) { // if only date changes, no need to rerender
+                shouldRender = true;
+            }
+        });
+        if (shouldRender) {
+            helper.renderGrid(component);
+            this.superRerender();
+        }
     }
 })

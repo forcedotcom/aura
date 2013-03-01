@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 ({
-    render: function(component, helper) {
-        if (helper.isHTML5Input("datetime")) {
-            // HTML5 date fields require this format
-            component.setValue("{!v.format}", "yyyy-MM-dd'T'HH:mm'Z'");
+    updateCell: function(component) {
+        var value = component.get("v.value");
+        if (!$A.util.isUndefinedOrNull(value)) {
+            var date = new Date(value);
+            var elem = component.getElement();
+            if (elem) {
+                elem.setAttribute("data-datevalue", date.toLocaleDateString());
+            }
         }
-        return this.superRender();
     }
 })

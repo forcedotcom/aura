@@ -20,5 +20,6 @@
     <aura:attribute name="max" type="Date" description="Specifies the maximum date allowed. Works with HTML5 only."/>
     <aura:attribute name="min" type="Date" description="Specifies the minimum date allowed. Works with HTML5 only."/>
     <aura:attribute name="step" type="Integer" description="Specifies the legal date intervals. Works with HTML5 only."/>
+    <aura:attribute name="displayDatePicker" type="Boolean" default="false" description="Indicate if ui:datePicker is displayed."/>
     <aura:attribute name="updateOn" type="String" default="blur" description="Default value is &#8220;blur&#8221;."/>
 </aura:interface>

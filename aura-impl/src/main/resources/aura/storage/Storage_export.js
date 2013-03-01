@@ -21,5 +21,7 @@ exp(p,
     "getSize", p.getSize,
     "getMaxSize", p.getMaxSize,
     "suspendSweeping", p.suspendSweeping,
-    "resumeSweeping", p.resumeSweeping
+    "resumeSweeping", p.resumeSweeping,
+    "get", p.get,
+    "put", p.put
 );

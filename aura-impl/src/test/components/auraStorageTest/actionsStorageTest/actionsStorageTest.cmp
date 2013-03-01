@@ -1,0 +1,6 @@
+<aura:component render="client">
+    <aura:attribute type="Boolean" default="false" name="actionsStorageOn"></aura:attribute>
+    <aura:if isTrue="{!v.actionsStorageOn}">
+        <auraStorage:init name="actions"/>
+    </aura:if>
+</aura:component>

@@ -1,0 +1,7 @@
+<aura:component isTemplate="true" extends="aura:template">
+    <aura:set attribute="auraPreInitBlock">
+        <auraStorage:init name="actions" persistent="false" secure="false" maxSize="9999"/>
+        <auraStorage:init name="savings" persistent="false" secure="true" maxSize="6666"/>
+        <auraStorage:init name="checking" maxSize="7777"/>
+    </aura:set>    
+</aura:component>

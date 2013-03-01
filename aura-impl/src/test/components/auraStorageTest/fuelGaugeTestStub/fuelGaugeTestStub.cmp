@@ -1,0 +1,10 @@
+<aura:component render="client" template="auraStorageTest:namedStorageTemplate">
+    <auraStorage:fuelGauge storageName="actions" aura:id="actionsGauge"/>
+    <auraStorage:fuelGauge storageName="savings" aura:id="savingsGauge"/>
+    
+    <auraStorage:fuelGauge storageName="checking" aura:id="checkingGauge1"/>
+    <auraStorage:fuelGauge storageName="checking" aura:id="checkingGauge2"/>
+    
+    <auraStorage:fuelGauge storageName="bogus" aura:id="bogusGauge"/>
+    <auraStorage:fuelGauge storageName="" aura:id="noName"/>
+</aura:component>

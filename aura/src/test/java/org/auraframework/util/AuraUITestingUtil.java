@@ -15,20 +15,13 @@
  */
 package org.auraframework.util;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import junit.framework.Assert;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.auraframework.util.json.JsonReader;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -256,10 +249,10 @@ public class AuraUITestingUtil {
      * account.
      * 
      */
-    public String getActiveElementText() {
-        return (String) getEval("return $A.test.getActiveElementText()");
-    }
-
+	public String getActiveElementText() {
+		return (String) getEval("return $A.test.getActiveElementText()");
+	}
+	
     /**
      * Check for uncaught Aura or Javascript errors after executing a particular WebDriver function.
      * 

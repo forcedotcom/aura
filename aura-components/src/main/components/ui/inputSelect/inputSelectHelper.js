@@ -141,7 +141,7 @@
                 }
             }
 
-            optionsValue.setValue(options);
+            optionsValue.setValue(options, true);
             
         } else {
         // case 2:

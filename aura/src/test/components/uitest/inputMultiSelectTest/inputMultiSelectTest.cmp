@@ -19,8 +19,8 @@
 
     <aura:attribute name="testCmpName" type="string" default="SelectMulti"/>
 
-    <ui:inputSelect multiple="true" aura:id="SelectMulti" options="{!m.selectOptions}" value="{!m.selectValue}" updateOn="blur"/> <br/>
+    <ui:inputSelect multiple="true" aura:id="SelectMulti" options="{!m.selectOptions}" value="{!m.string}" updateOn="blur"/> <br/>
 
-    <auratest:baseInputTest cmpType="{!v.testCmpName}" ref="{!m.selectValue}"/>
+    <auratest:baseInputTest cmpType="{!v.testCmpName}" ref="{!m.string}"/>
 
 </aura:component>

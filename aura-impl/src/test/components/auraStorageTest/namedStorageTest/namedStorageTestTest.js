@@ -1,8 +1,8 @@
 ({
     /**
-     * Verify AuraStorageService.initStorage() with various name related
-     * scenarios
-     */
+	 * Verify AuraStorageService.initStorage() with various name related
+	 * scenarios
+	 */
 
     testCreateMultipleUniquelyNamedStores : {
 	test : [
@@ -94,8 +94,8 @@
 	}
     },
     /**
-     * Test case to verify the behavior of $A.storageService.getStorage()
-     */
+	 * Test case to verify the behavior of $A.storageService.getStorage()
+	 */
     testGetStorageApi:{
 	test: function(cmp){
 	    $A.test.assertFalsy($A.storageService.getStorage());
@@ -106,32 +106,36 @@
 	}
     },
     /**
-     * Test case to verify the behavior of $A.storageService.initStorage()
-     * function(name, persistent, secure, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit)
-     */
-    //TODO W-1560185 - Validation needed
+	 * Test case to verify the behavior of $A.storageService.initStorage()
+	 * function(name, persistent, secure, maxSize, defaultExpiration,
+	 * defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit)
+	 */
+    // TODO W-1560185 - Validation needed
     _testInitStorage:{
-	test:[function(cmp){ //Bad values for name
+	test:[function(cmp){ 
+		// Bad values for name
 	    $A.test.assertFalsy($A.storageService.initStorage(undefined, false, true,100, 200, 300, true, true), 
 		    "Name of storage cannot be undefined");
 	    $A.test.assertFalsy($A.storageService.initStorage("", false, true,100, 200, 300, true, true), 
 		    "Storage needs a name");
 	    $A.test.assertFalsy($A.storageService.initStorage(null, false, true,100, 200, 300, true, true), 
 		    "Name of storage cannot be null");
-	},function(cmp){ //Bad values for maxSize
-	    $A.test.assertFalsy($A.storageService.initStorage("oranges", false, true, -100, 200, 300, true, true), 
+	},function(cmp){ 
+		// Bad values for maxSize
+	    $A.test.assertFalsy($A.storageService.initStorage("oranges1", false, true, -100, 200, 300, true, true), 
 		    "Storage maxSize cannot be negative");
-	    $A.test.assertFalsy($A.storageService.initStorage("oranges", false, true, undefined, 200, 300, true, true), 
+	    $A.test.assertFalsy($A.storageService.initStorage("oranges2", false, true, undefined, 200, 300, true, true), 
 		    "Storage maxSize cannot be undefined");
-	},function(cmp)
-	    $A.test.assertFalsy($A.storageService.initStorage("apples", false, true, 100, -200, 300, true, true), 
+	},function(cmp){
+	    $A.test.assertFalsy($A.storageService.initStorage("apples1", false, true, 100, -200, 300, true, true), 
 		    "defaultExpiration cannot be negative");
-	    $A.test.assertFalsy($A.storageService.initStorage("apples", false, true, 100, undefined, 300, true, true), 
+	    $A.test.assertFalsy($A.storageService.initStorage("apples2", false, true, 100, undefined, 300, true, true), 
 		    "defaultExpiration cannot be undefined");
-	    $A.test.assertFalsy($A.storageService.initStorage("apples", false, true, 100, 200, undefined, true, true), 
+	    $A.test.assertFalsy($A.storageService.initStorage("apples3", false, true, 100, 200, undefined, true, true), 
 		    "defaultRefreshInterval cannot be undefined");
-	    $A.test.assertFalsy($A.storageService.initStorage("apples", false, true, 100, 200, -300, true, true), 
+	    $A.test.assertFalsy($A.storageService.initStorage("apples4", false, true, 100, 200, -300, true, true), 
 		    "defaultRefreshInterval cannot be negative");
+	}
 	]
     }
 })

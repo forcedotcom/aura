@@ -15,21 +15,17 @@
     limitations under the License.
 
 -->
-<aura:component implements="ui:listInterface, ui:pagingInterface" extensible="true" support="proto">
-	<aura:handler name="init" action="{!c.init}" value="{!this}"/>
-	<div>
-		{!v.header}
-		
-		<div class="listContent">
-			<aura:iteration items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}">
-				
-			</aura:iteration>
-			<div class="loadingIndicator">
-                <div class="background"></div>
-                <span class="label">Loading...</span>
-            </div>
-		</div>
-		
-		{!v.footer}
-	</div>
+<aura:component model="java://org.auraframework.impl.java.model.TestJavaModel">
+
+    <aura:attribute name="testCmpName" type="string" default="SelectMulti"/>
+
+    <ui:inputSelect multiple="true" aura:id="SelectMulti" value="{!m.selectValue}" updateOn="blur">
+    	<ui:inputSelectOption name="Opt1" value="false" text="option1" label="Option1"/>
+    	<ui:inputSelectOption name="Opt2" value="false" text="option2" label="Option2"/>
+    	<ui:inputSelectOption name="Opt3" value="false" text="option3" label="Option3"/>
+    </ui:inputSelect>
+    <br/>
+
+    <auratest:baseInputTest cmpType="{!v.testCmpName}" ref="{!m.selectValue}"/>
+
 </aura:component>

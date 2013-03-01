@@ -13,6 +13,56 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS.loading {
-	background-color: red;	
+.THIS .listContent {
+    min-height:100px;
+    clear:both;
+    position:relative;
+}
+
+.THIS .loadingIndicator{
+    display: none;
+    height:100%;
+    left:0;
+    position:absolute;
+    text-align:center;
+    top:0;
+    width:100%;
+    z-index:80;
+}
+
+.THIS.loading .loadingIndicator {
+    display:block;
+}
+
+.THIS .loadingIndicator .background{
+    background-color: #fff;
+    height:100%;
+    left:0;
+    opacity: 0.6;
+    -ms-filter: alpha(opacity=60);
+    filter: alpha(opacity=60);
+    display: inline;
+    position:absolute;
+    top:0;
+    width: 100%;
+    z-index:0;
+    zoom:1;
+}
+
+.THIS .loadingIndicator .label{
+    background-image:url('/img/loading.gif');
+    background-position:left center;
+    background-repeat:no-repeat;
+    color:#666;
+    display: inline-block;
+    font-weight:bold;
+    line-height:normal;
+    height:16px;
+    padding-left:25px;
+    position:relative;
+    text-shadow: 0.1em 0.1em 0.01em #fff, 0.1em -0.1em 0.01em #fff, -0.1em -0.1em 0.01em #fff, -0.1em 0.1em 0.01em #fff;
+    top: 65px;
+    vertical-align: middle;
+    z-index:1;
+    zoom: 1;
 }

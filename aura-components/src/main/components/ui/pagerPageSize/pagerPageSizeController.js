@@ -15,7 +15,6 @@
  */
 ({
     changePageSize:function(component,domEvent,helper){
-        var pageSizeDropdown = component.find("pager:pageSize").getElement();
-        helper.changePageSize(component, pageSizeDropdown.value, domEvent);
+        helper.changePageSize(component, component.get("v.pageSize"), domEvent);
     }
 })

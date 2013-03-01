@@ -1,4 +1,4 @@
-markup://test:layoutNoLayout : V2Cpd4o8krqsGnU7NCvz-A
+markup://test:layoutNoLayout : 6FJ2JyjHki7fi4BB988WLg
 aura://ComponentController : null
 css://aura.placeholder : null
 java://org.auraframework.renderer.ComponentRenderer : null
@@ -15,6 +15,7 @@ js://aura.text : null
 markup://aura:addIntegrationComponent : ZSRLsrsHycFNOUYHQJOzqA
 markup://aura:application : GJehGi9vSc2aG8qmbDyxKg
 markup://aura:applicationEvent : Scw4ve7rQ0sSjRgn-0AuvA
+markup://aura:beforeLayoutChange : OK95MBcSoSLgFIxyRydiHA
 markup://aura:clientOutOfSync : kIDrPUY80urgoPEx_GnKmg
 markup://aura:component : CG22YRTEL1f4T57iKTywqw
 markup://aura:componentEvent : y_S2alkVrAWtb97h5_J8Eg

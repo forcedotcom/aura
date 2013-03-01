@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    doInit: function(cmp, evt, helper) {
+    doInit: function(cmp, evt, helper) {    
         var currentValue = cmp.getValue("v.value");
 
         if (currentValue.isDefined()) {

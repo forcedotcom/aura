@@ -17,13 +17,19 @@
 -->
 <aura:component implements="ui:listInterface, ui:pagingInterface" extensible="true" support="proto">
 	<aura:handler name="init" action="{!c.init}" value="{!this}"/>
-	{!v.header}
-	
 	<div>
-		<aura:iteration items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}">
-			
-		</aura:iteration>
+		{!v.header}
+		
+		<div class="listContent">
+			<aura:iteration items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}">
+				
+			</aura:iteration>
+			<div class="loadingIndicator">
+                <div class="background"></div>
+                <span class="label">Loading...</span>
+            </div>
+		</div>
+		
+		{!v.footer}
 	</div>
-	
-	{!v.footer}
 </aura:component>

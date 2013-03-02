@@ -18,7 +18,7 @@
         $A.test.assertTrue(undefined !== component._log, "change handler not invoked");
         $A.test.assertEquals(1, component._log.length, "unexpected number of change events recorded");
         $A.test.assertEquals(index, component._log[0].index, "unexpected index of change");
-        $A.test.assertEquals(value !== undefined ? value : component.getValue("v.map"), component._log[0].value, "unexpected value of change");
+        $A.test.assertEquals(value, component._log[0].value.unwrap(), "unexpected value of change");
         component._log = undefined; // reset log
     },
 
@@ -54,7 +54,25 @@
             $A.test.assertEquals("way", setval.get("right"), "wrong third value");
         }
     },
-
+    /**
+     * Setting a MapValue to a MapValue where the new map has some values which are PropertyReferenceValues.
+     */
+    //TODO: W-1332111
+    _testSetValueMapValueWithPropertyReferences:{
+	test:function(component){
+	    var newMap = component.find('htmlDiv').getAttributes().getValue('htmlattributes');
+	    $A.test.assertEquals("MapValue", newMap.toString());
+	    var setval = $A.expressionService.create(null, {});
+	    try{
+        	setval.setValue(newMap);
+        	$A.test.assertEquals("MapValue", setval.toString(), "expected an MapValue");
+                $A.test.assertEquals("true", setval.get("readonly"), "wrong first value");
+                $A.test.assertEquals("false", setval.get("disabled"), "failed to resolve propertyReferenceValue");
+	    }catch(e){
+		$A.test.fail("Failed to copy PropertyReferenceValues using setValue(). Error :" + e);
+	    }
+	}
+    },
     /**
      * Setting a MapValue to a simple value that is not null should fail.
      */
@@ -197,28 +215,40 @@
         }
     },
 
-
+    testSetValueLiteral:{
+	test:function(cmp){
+	    var setval = $A.expressionService.create(null, {});
+            $A.test.assertEquals("MapValue", setval.toString());
+            $A.test.assertEquals(0, this.calculateSize(setval));
+            $A.test.assertEquals(false, setval.isDirty());
+            try{
+        	setval.setValue("foo");
+        	$A.test.fail("Expected exception from setValue(String literals)");
+            }catch(e){
+        	
+            }
+	}
+    },
     /**
      * Unwrapping a map should give a primitive object
      *
-     * This is from ArrayValue, and needs to be rewritten.
      */
-    _testUnwrap: {
+    testUnwrap: {
         test: function(component){
             var simval = $A.expressionService.create(null,"simplicity");
             var mapval = $A.expressionService.create(null,{go:"there"});
             var arrval = $A.expressionService.create(null,["quickly"]);
-            var setval = $A.expressionService.create(null,[simval,mapval,arrval]);
+            var setval = $A.expressionService.create(null,{"simpleValue":simval,"mapValue":mapval,"arrayValue":arrval});
             var val = setval.unwrap();
-            $A.test.assertEquals(true, $A.util.isArray(val), "expected an array");
-            $A.test.assertEquals(3, val.length, "expected 3 values");
-            $A.test.assertEquals("string", typeof val[0], "wrong first value type");
-            $A.test.assertEquals("simplicity", val[0], "wrong first value");
-            $A.test.assertEquals("object", typeof val[1], "wrong second value type");
-            $A.test.assertEquals("there", val[1].go, "wrong second value");
-            $A.test.assertEquals(true, $A.util.isArray(val[2]), "expected an array value");
-            $A.test.assertEquals(1, val[2].length, "wrong length for third value");
-            $A.test.assertEquals("quickly", val[2][0], "wrong value in third value");
+            $A.test.assertEquals(true, $A.util.isObject(val), "expected a map");
+            $A.test.assertEquals(3, Object.keys(val).length, "expected 3 values");
+            $A.test.assertEquals("string", typeof val["simpleValue"], "wrong first value type");
+            $A.test.assertEquals("simplicity", val["simpleValue"], "wrong first value");
+            $A.test.assertEquals("object", typeof val["mapValue"], "wrong second value type");
+            $A.test.assertEquals("there", val["mapValue"].go, "wrong second value");
+            $A.test.assertEquals(true, $A.util.isArray(val["arrayValue"]), "expected an array value");
+            $A.test.assertEquals(1, val["arrayValue"].length, "wrong length for third value");
+            $A.test.assertEquals("quickly", val["arrayValue"][0], "wrong value in third value");
         }
     },
 
@@ -227,133 +257,55 @@
      *
      * This test is from ArrayValue, and needs to be rewritten.
      */
-    _testOnChange: {
-        test: function(component){
-            var array = component.getValue("v.array");
-
+    testOnChange: {
+        test: [function(component){
+            var map = component.getValue("m.map");
+            component._log = undefined;
+        },function(component){
+            var map = component.getValue("m.map");
             $A.log("for setValue");
-            array.setValue("anything");
-            this.assertChangeEvent(component);
+            map.setValue({"juice":"jamba"});
+            this.assertChangeEvent(component, "juice", "jamba");
 
             $A.log("for item setValue");
-            var val = array.getValue(0);
+            var val = map.getValue("juice");
             val.setValue("something");
-            this.assertChangeEvent(component, 0, val);
+            this.assertChangeEvent(component, "juice", "something");
 
-            $A.log("for insert");
-            array.insert(0, "squeeze");
-            this.assertChangeEvent(component);
-
-              // TODO(W-1322739): change event not firing when array item is destroyed
+            $A.log("for put");
+            map.put("bagel", "noah");
+            this.assertChangeEvent(component, "bagel", "noah");
+            
+            // TODO(W-1322739): change event not firing when map entry is destroyed
 //            $A.log("for destroy");
 //            val.destroy();
 //            this.assertChangeEvent(component, 1, val);
 
-            $A.log("for clear");
-            array.clear();
-            this.assertChangeEvent(component);
-
-            // SimpleValue
-            val = $A.expressionService.create(null, "ooh");
-            val.setValue("ahh");
+            $A.log("for updating value object of existing key")
+            val = $A.expressionService.create(null, "costco");
+            val.setValue("kirkland");
             this.assertNoChangeEvent(component);
 
-            $A.log("for pushing existing simple value");
-            array.push(val);
-            this.assertChangeEvent(component);
-
-            $A.log("for updating existing simple value");
-            val.setValue("wow");
-            this.assertChangeEvent(component, 0, val);
-
-            $A.log("for removing existing simple value");
-            array.remove(0);
-            this.assertChangeEvent(component);
-
-            $A.log("for updating former simple value item");
-            val.setValue("hmm");
+            $A.log("for updating existing key with a new value object");
+            map.put("bagel", val);
+            this.assertChangeEvent(component, "bagel", val);
+            
+            $A.log("for updating existing simple value of a key");
+            val.setValue("Sarah Lee");
             this.assertNoChangeEvent(component);
-
-//            $A.log("for destroying existing simple value");
-//            array.push(val);
-//            this.assertChangeEvent(component);
-//            val.destroy();
-//            this.assertChangeEvent(component, 0, val);
-//            array.clear();
-//            this.assertChangeEvent(component);
-
-            // ArrayValue
-            val = $A.expressionService.create(null, ["circle"]);
-
-            $A.log("for pushing existing array value");
-            array.push(val);
-            this.assertChangeEvent(component);
-
-            $A.log("for updating existing array value with push");
-            val.push("oval");
-            this.assertChangeEvent(component, 0, val);
-
-            $A.log("for updating existing array value with insert");
-            val.insert(0, "ellipse");
-            this.assertChangeEvent(component, 0, val);
-
-            $A.log("for updating existing array value with remove");
-            val.remove(1);
-            this.assertChangeEvent(component, 0, val);
-
-            $A.log("for updating existing array value with clear");
-            val.clear();
-            this.assertChangeEvent(component, 0, val);
-
-            $A.log("for removing existing array value");
-            array.remove(0);
-            this.assertChangeEvent(component);
-
-//            $A.log("for updating former array value item");
-//            val.push("ellipse");
-//            this.assertNoChangeEvent(component);
-
-//            $A.log("for destroying existing array value");
-//            array.push(val);
-//            this.assertChangeEvent(component);
-//            val.destroy();
-//            this.assertChangeEvent(component, 0, val);
 
             // MapValue
-            val = $A.expressionService.create(null, {"direction":"north"});
-            val.put("distance","5km");
-            this.assertNoChangeEvent(component);
+            //var newMap = $A.expressionService.create(null, {"Banana":"Del Monte"});
+            //$A.log("for merging new map");
+            //map.merge(newMap);
+            //TODO W-1562377 - No Change event for merging new map
+            //this.assertChangeEvent(component);
 
-            $A.log("for pushing existing map value");
-            array.push(val);
-            this.assertChangeEvent(component);
-
-            $A.log("for updating existing map value with put");
-            val.put("speed","20 kmph");
-            this.assertChangeEvent(component, "speed", val.getValue("speed"));
-
-            // TODO: update map with merge should fire change event
-
-            $A.log("for removing existing map value");
-            array.remove(0);
-            this.assertChangeEvent(component);
-
-            $A.log("for updating former map value item");
-            val.put("load","2 tons");
-            this.assertNoChangeEvent(component);
-
-//            $A.log("for destroying existing map value");
-//            array.push(val);
-//            this.assertChangeEvent(component);
-//            val.destroy();
-//            this.assertChangeEvent(component, 0, val);
-
-            $A.log("for clearing empty");
-            array.clear();
-            this.assertChangeEvent(component);
-            array.clear();
-            this.assertChangeEvent(component);
-        }
+            //$A.log("for updating new map value with setValue");
+            //newMap.setValue({"Oranges":"Florida"});
+            //TODO W-1562377: Doesn't really update the original map, since merge() does a copy
+            //this.assertChangeEvent(component, "Orange", "Florida");
+        }]
     }
 
 })

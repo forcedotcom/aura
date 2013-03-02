@@ -56,7 +56,7 @@
 
 <h3><code>$Browser</code></h3>
 
-<p>The <code>$Browser</code> global variable provides information about the hardware and operating system of the browser accessing the application. Here are the attributes for <code>$Browser</code>.</p>
+<p>The <code>$Browser</code> global value provider provides information about the hardware and operating system of the browser accessing the application. Here are the attributes for <code>$Browser</code>.</p>
 
 <table class="table table-bordered table-striped">
 <thead>
@@ -104,7 +104,7 @@
 </table>
  
 <p><b>Example</b></p>
-<p>This example shows how to get all <code>$Browser</code> attributes.</p>
+<p>This example shows how to get some <code>$Browser</code> attributes.</p>
 <auradocs:example descriptor="auradocs:sampleBrowser" />
 
 <p><b>See also:</b><br/>   

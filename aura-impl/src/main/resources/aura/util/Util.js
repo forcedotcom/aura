@@ -855,9 +855,9 @@ Util.prototype.setDataAttribute = function(element, key, value) {
 
     if (!this.isUndefined(value)) {
         return element.setAttribute(key, value);
-    } else {
-        return element.removeAttribute(key);
     }
+    return element.removeAttribute(key);
+
 };
 
 /**

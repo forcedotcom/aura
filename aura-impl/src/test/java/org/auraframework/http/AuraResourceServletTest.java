@@ -117,7 +117,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         String startTimeStr = cookie.getValue().substring(countStr.length() + 1);
         try {
             int count = Integer.parseInt(countStr);
-            assertTrue("count should be between 1 & 5 was "+count, (count >= 0 && count < 6));
+            assertTrue("count should be between 1 & 8 was "+count, (count >= 0 && count < 9));
         } catch (NumberFormatException nfe) {
             fail("Invalid count of "+countStr);
         }

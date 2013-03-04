@@ -96,5 +96,5 @@
         test : function(component){
             $A.test.assertEquals(undefined, component.get("v.value"), "value does not equal expected");
         }
-    },
+    }
 })

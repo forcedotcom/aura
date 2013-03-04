@@ -691,13 +691,16 @@ var Test = function(){
 	  	  	else if(document.querySelectorAll){
     			ret = document.querySelectorAll("." + classname);
     	  	}
+    	  	else{
+    	  		ret = aura.test.getElementsByClassNameCustom(classname);
+    	  	}
     
 	   	 	if (ret && ret.length > 0) {
        	 		return ret[0];
     		}
     		return null;
 		},
-		
+
 		/**
 	     * Given an HTML element and an eventName, fire the corresponding DOM event. Code adapted from a stack overflow
 	     * question's answer.
@@ -718,6 +721,80 @@ var Test = function(){
 	            element.fireEvent("on" + event.eventType, event);
 	        }
 	    },
+			
+	/**
+	* Used by getElementsByClassNameCustom for IE7
+ 	* @private
+ 	*/	
+	walkTheDOM: function (node, func) {
+      func(node);
+      node = node.firstChild;
+      while (node) {
+        aura.test.walkTheDOM(node, func);
+        node = node.nextSibling;
+      }
+    },
+    
+    /**
+    * custom util to get element by class name for IE7
+ 	* @private
+ 	*/
+    getElementsByClassNameCustom: function (className) {
+      var results = [];
+      aura.test.walkTheDOM(document.body, function(node) {
+        var a, c = node.className,
+            i;
+        if (c) {
+          a = c.split(' ');
+          for (i = 0; i < a.length; i++) {
+            if (a[i] === className) {
+              results.push(node);
+              break;
+            }
+          }
+        }
+      });
+      return results;
+    },
+	
+	isInstanceOfText: function(node){
+		if(window.Text){
+			return node instanceof window.Text;
+		}
+		return node.nodeType == 3;
+	},
+	
+	isInstanceOfAnchorElement: function(element){
+		return aura.test.isInstanceOf(element, window.HTMLAnchorElement, "a");
+	},
+	isInstanceOfInputElement: function(element){
+		return aura.test.isInstanceOf(element, window.HTMLInputElement, "input");
+	},
+	isInstanceOfLiElement: function(element){
+		return aura.test.isInstanceOf(element, window.HTMLLiElement, "li");
+	},
+	isInstanceOfParagraphElement: function(element){
+		return aura.test.isInstanceOf(element, window.HTMLParagraphElement, "p");
+	},
+			
+	isInstanceOfButtonElement: function(element){
+		return aura.test.isInstanceOf(element, window.HTMLButtonElement, "button");
+	},
+		
+	isInstanceOfImageElement: function(element){
+		return aura.test.isInstanceOf(element, window.HTMLImageElement, "img");
+	},
+	
+	isInstanceOfDivElement: function(element){
+		return aura.test.isInstanceOf(element, window.HTMLDivElement, "div");
+	},
+	
+	isInstanceOf: function(element, elementType, tag){
+		if(elementType){
+			return element instanceof elementType; 
+		}
+		return element.nodeType == 1 && element.tagName.toLowerCase() == tag;
+	},
 		
         // Used by tests to modify framework source to trigger JS last mod update
         /** @ignore */

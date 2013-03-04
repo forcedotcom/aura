@@ -38,7 +38,7 @@
     testDefaultDirection:{
         attributes : {value : 'some text'},
         test:function(component){
-            aura.test.assertEquals('ltr', component.getValue('{!v.dir}').getValue(), "Default direction should be left to right.");
+            aura.test.assertEquals('ltr', component.get('v.dir'), "Default direction should be left to right.");
         }
     },
     /**
@@ -106,8 +106,7 @@
         browsers: ["-IE7", "-IE8"],
         attributes: {value: '\r\na\r\nb\r\n'},
         test: function(component){
-            debugger;
             aura.test.assertEquals('\r\na\r\nb\r\n', component.find("span").getElement().textContent, "Failed to trim spaces");
         }
-    },
+    }
 })

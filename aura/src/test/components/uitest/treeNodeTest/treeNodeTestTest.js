@@ -180,5 +180,5 @@
             aura.test.assertFalse(A.get('v.expanded'));
             aura.test.assertFalse(cmp.find('root').get('v.expanded'));
         }
-    },
+    }
 })

@@ -19,5 +19,5 @@
             var model = component.getModel();
             aura.test.assertTrue(model === undefined, 'Model should not exist');
         }
-    },
+    }
 })

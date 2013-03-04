@@ -65,7 +65,7 @@
                 var itrElements = iteration.getElements();
                 for(var i in itrElements){
                     if(itrElements[i].className){
-                        flag = flag || ( (itrElements[i] instanceof HTMLDivElement) &&
+                        flag = flag || (($A.test.isInstanceOfDivElement(itrElements[i])) &&
                                          (itrElements[i].className.indexOf("auraPlaceholder")!=-1 ) );
                     }
                 }

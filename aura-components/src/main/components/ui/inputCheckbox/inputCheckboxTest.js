@@ -134,8 +134,8 @@
     // W-943203
     verifyLabel: function(component, expectedLabel){
         var elements = component.getElements();
-        aura.test.assertTrue(elements[0] instanceof HTMLInputElement, "Input element not found");
-        aura.test.assertTrue(elements[1] instanceof Text, "Label not found with checkbox");
+        aura.test.assertTrue($A.test.isInstanceofInputElement(elements[0]), "Input element not found");
+        aura.test.assertTrue($A.test.isInstanceOfText(elements[1]), "Label not found with checkbox");
         aura.test.assertEquals(expectedLabel, $A.test.getText(elements[1]), "Label attribute not correctly set");
     }
 

@@ -71,9 +71,9 @@
                     	  values:{
                               number:expr
                           }
-                      },
+                      }
                       /**TODO W-1318095: Cannot specify localId for defs fetched from server
-                      localId:"num_Id"*/
+                      , localId:"num_Id"*/
                      };
 
         //Specify current component as value provider
@@ -133,5 +133,5 @@
                       }
                      };
         helper.createComponentAndPushToBody(cmp,config,undefined);
-    },
+    }
 })

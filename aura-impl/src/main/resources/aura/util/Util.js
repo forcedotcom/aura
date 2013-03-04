@@ -385,7 +385,7 @@ Util.prototype.removeElement = function(element) {
             // the property should never live longer than the delay between this
             // reparenting and the gc below.
             //
-        	if (element.nodeType !== 3) {
+        	if (element.nodeType !== 3 && element.nodeType !== 8) {
 	            aura.assert(this.isUndefined(element["aura_deleted"]), "Element was reused after delete");
 	            element["aura_deleted"] = true;
         	}
@@ -403,7 +403,7 @@ Util.prototype.removeElement = function(element) {
                 while (trashcan.hasChildNodes()) {
                     var node = trashcan.lastChild;
                     
-                    if (node.nodeType !== 3) {
+                    if (node.nodeType !== 3 && element.nodeType !== 8) {
                     	delete node["aura_deleted"];
                     }
                     

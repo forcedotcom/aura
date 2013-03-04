@@ -113,10 +113,10 @@
             //Verify that iteration component's body has only two components.
             $A.test.assertEquals(2, container.find("iteration").get("v.realbody").length);
 
-            $A.test.assertTrue(elements[0] instanceof Text)
+            $A.test.assertTrue($A.test.isInstanceOfText(elements[0]));
             $A.test.assertEquals("textOnBody" , $A.test.getText(elements[0]));
 
-            $A.test.assertTrue(elements[1] instanceof HTMLDivElement)
+            $A.test.assertTrue($A.test.isInstanceOfDivElement(elements[1]));
 
         }
     },

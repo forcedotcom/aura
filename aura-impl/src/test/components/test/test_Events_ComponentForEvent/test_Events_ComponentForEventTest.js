@@ -60,7 +60,7 @@
             }catch (expected){
             }
         }
-    },
+    }
 
 
 })

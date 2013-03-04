@@ -19,7 +19,7 @@
             //Assert that a tab is enclosed in a list element, changing the element type can lead to breaking third party app styling.
             var li = cmp.find('li');
             aura.test.assertNotNull(li);
-            aura.test.assertTrue(li.getElement() instanceof HTMLLIElement, "The element type used to display tab has changed.")
+            aura.test.assertTrue($A.test.isInstanceOfLiElement(li.getElement()), "The element type used to display tab has changed.")
 
         }
     },

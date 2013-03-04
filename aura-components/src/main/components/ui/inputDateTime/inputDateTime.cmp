@@ -24,7 +24,9 @@
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <input aura:id="inputText" class="{!v.class}" type="text" value="{!v.value}" placeholder="{!v.placeholder}"/>
     <aura:if isTrue="{!v.displayDatePicker}">
-        <a aura:id="datePickerOpener" class="datePicker-openIcon" aria-haspopup="true" onclick="{!c.openDatePicker}"/>
+        <a aura:id="datePickerOpener" class="datePicker-openIcon" aria-haspopup="true" onclick="{!c.openDatePicker}">
+            <span class="assistiveText">Date Picker</span>
+        </a>
         <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}"/>
     </aura:if>
 </aura:component>

@@ -21,6 +21,7 @@ import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.system.DefFactoryImpl;
+import org.auraframework.system.DefFactory;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -72,8 +73,7 @@ public abstract class BaseJavaDefFactory<D extends Definition> extends DefFactor
      * 
      * This function must be implemented by all subclasses. It should return a
      * builder from which only the 'build()' function will be executed. It is
-     * allowed to return a null, in which case the
-     * {@link #getDef(DefDescriptor)} function will return a null.
+     * allowed to return a null, in which case the {@link #getDef(DefDescriptor)} function will return a null.
      * 
      * Note that this can throw a QuickFixException as there are certain things
      * that will cause a builder to fail early. It would be possible to force
@@ -96,6 +96,7 @@ public abstract class BaseJavaDefFactory<D extends Definition> extends DefFactor
         if (builder == null) {
             return null;
         }
+        // FIXME = "need md5 in builder";
         def = builder.build();
         return def;
     }

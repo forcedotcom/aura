@@ -28,7 +28,7 @@ import org.auraframework.util.json.JsFunction;
 
 /**
  */
-public class JavascriptHelperDefHandler extends JavascriptHandler<DefDescriptor<HelperDef>, HelperDef> {
+public class JavascriptHelperDefHandler extends JavascriptHandler<HelperDef, HelperDef> {
 
     private final JavascriptHelperDef.Builder builder = new JavascriptHelperDef.Builder();
 
@@ -38,8 +38,7 @@ public class JavascriptHelperDefHandler extends JavascriptHandler<DefDescriptor<
 
     @Override
     protected HelperDef createDefinition(Map<String, Object> map) {
-        builder.setDescriptor(descriptor);
-        builder.setLocation(getLocation());
+        setDefBuilderFields(builder);
         builder.functions = map;
         for (Entry<String, Object> entry : map.entrySet()) {
             Object value = entry.getValue();

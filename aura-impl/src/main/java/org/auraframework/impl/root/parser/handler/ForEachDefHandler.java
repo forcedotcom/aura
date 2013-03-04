@@ -110,6 +110,7 @@ public class ForEachDefHandler<P extends RootDefinition> extends ParentedTagHand
         ComponentDef body = componentBuilder.build();
         builder.setBody(body);
         builder.setDescriptor(body.getDescriptor());
+        builder.setOwnHash(source.getHash());
 
         parentHandler.addSubDef(subDefDescriptor, body);
 

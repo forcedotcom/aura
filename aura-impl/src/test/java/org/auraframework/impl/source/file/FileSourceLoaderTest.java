@@ -83,7 +83,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
         assertTrue(src.getSystemId().endsWith("parent.cmp"));
         Reader reader = null;
         try {
-            reader = src.getReader();
+            reader = src.getHashingReader();
             assertNotNull(reader);
         } finally {
             if (reader != null) {
@@ -113,7 +113,7 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
         assertTrue(src.getSystemId().endsWith("anevent.evt"));
         Reader reader = null;
         try {
-            reader = src.getReader();
+            reader = src.getHashingReader();
             assertNotNull(reader);
         } finally {
             if (reader != null) {

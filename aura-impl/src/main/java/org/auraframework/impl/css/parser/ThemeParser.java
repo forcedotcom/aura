@@ -101,6 +101,7 @@ public class ThemeParser implements Parser {
             builder.setCode(resultHolder.getDefaultCss());
             builder.setCode(resultHolder.getBrowserCssMap());
             builder.setImageURLs(resultHolder.getImageURLs());
+            builder.setOwnHash(source.getHash());
 
             return (D) builder.build();
         }

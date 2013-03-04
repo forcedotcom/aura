@@ -36,9 +36,7 @@
         <thead>
             <tr>
                 <aura:iteration items="{!v.weekDays}" var="day">
-                    <th scope="col" class="dayOfWeek">{!day.shortName}
-                        <span class="assistiveText">day</span>
-                    </th>
+                    <th scope="col" class="dayOfWeek">{!day.shortName}</th>
                 </aura:iteration>
             </tr>
         </thead>

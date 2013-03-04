@@ -53,6 +53,7 @@ public class LayoutItemDefHandler<P extends RootDefinition> extends ParentedTagH
         super(parentHandler, xmlReader, source);
         builder.setLocation(getLocation());
         builder.setLayoutName(layoutName);
+        builder.setOwnHash(source.getHash());
     }
 
     @Override

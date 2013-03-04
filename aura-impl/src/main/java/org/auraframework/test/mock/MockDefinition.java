@@ -26,80 +26,76 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Json.Serialization;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
-import org.auraframework.util.text.Hash;
 
 /**
  * A simple Definition.
  */
 @Serialization(referenceType = ReferenceType.IDENTITY)
-public abstract class MockDefinition<D extends Definition> implements
-		Definition {
-	private static final long serialVersionUID = 9040467312474951787L;
-	private final DefDescriptor<D> descriptor;
-	protected Location location = null;
+public abstract class MockDefinition<D extends Definition> implements Definition {
+    private static final long serialVersionUID = 9040467312474951787L;
+    private final DefDescriptor<D> descriptor;
+    protected Location location = null;
 
-	public MockDefinition(DefDescriptor<D> descriptor) {
-		this.descriptor = descriptor;
-	}
+    public MockDefinition(DefDescriptor<D> descriptor) {
+        this.descriptor = descriptor;
+    }
 
-	@Override
-	public DefDescriptor<D> getDescriptor() {
-		return descriptor;
-	}
+    @Override
+    public DefDescriptor<D> getDescriptor() {
+        return descriptor;
+    }
 
-	@Override
-	public String getDescription() {
-		return "";
-	}
+    @Override
+    public String getDescription() {
+        return "";
+    }
 
-	@Override
-	public String getName() {
-		return descriptor.getName();
-	}
+    @Override
+    public String getName() {
+        return descriptor.getName();
+    }
 
-	@Override
-	public Location getLocation() {
-		return location;
-	}
+    @Override
+    public Location getLocation() {
+        return location;
+    }
 
-	@Override
-	public void serialize(Json json) throws IOException {
-	}
+    @Override
+    public void serialize(Json json) throws IOException {
+    }
 
-	@Override
-	public boolean isValid() {
-		return true;
-	}
+    @Override
+    public boolean isValid() {
+        return true;
+    }
 
-	@Override
-	public void markValid() {
-	}
+    @Override
+    public void markValid() {
+    }
 
-	@Override
-	public void appendDependencies(Set<DefDescriptor<?>> dependencies)
-			throws QuickFixException {
-	}
+    @Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
+    }
 
-	@Override
-	public void retrieveLabels() throws QuickFixException {
-	}
+    @Override
+    public void retrieveLabels() throws QuickFixException {
+    }
 
-	@Override
-	public void validateDefinition() throws QuickFixException {
-	}
+    @Override
+    public void validateDefinition() throws QuickFixException {
+    }
 
-	@Override
-	public void validateReferences() throws QuickFixException {
-	}
+    @Override
+    public void validateReferences() throws QuickFixException {
+    }
 
-	@Override
-	public <S extends Definition> S getSubDefinition(
-			SubDefDescriptor<S, ?> descriptor) {
-		return null;
-	}
+    @Override
+    public <S extends Definition> S getSubDefinition(SubDefDescriptor<S, ?> descriptor) {
+        return null;
+    }
 
-	@Override
-	public Hash getOwnHash() {
-		return null;
-	}
+    @Override
+    public String getOwnHash() {
+        return null;
+    }
 }

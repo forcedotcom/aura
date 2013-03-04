@@ -566,7 +566,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 sb.setLength(0);
                 sb.append(entry.getKey().getQualifiedName().toLowerCase());
                 sb.append("|");
-                Hash hash = entry.getValue().getOwnHash();
+                String hash = entry.getValue().getOwnHash();
                 if (hash != null) {
                     // TODO: we need to ensure that null hashes are ok
                     sb.append(hash.toString());

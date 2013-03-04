@@ -41,6 +41,7 @@ public class HTMLComponentDefRefHandler<P extends RootDefinition> extends Compon
         super(parentHandler, xmlReader, source);
         builder = htmlBuilder;
         builder.setLocation(getLocation());
+        builder.setOwnHash(source.getHash());
         htmlBuilder.setTag(tag.trim());
     }
 

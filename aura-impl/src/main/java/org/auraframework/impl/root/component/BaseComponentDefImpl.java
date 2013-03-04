@@ -107,8 +107,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     protected BaseComponentDefImpl(Builder<T> builder) {
         super(builder);
         this.modelDefDescriptor = builder.modelDefDescriptor;
-        this.controllerDescriptors = AuraUtil
-                .immutableList(builder.controllerDescriptors);
+        this.controllerDescriptors = AuraUtil.immutableList(builder.controllerDescriptors);
         this.interfaces = AuraUtil.immutableSet(builder.interfaces);
 
         if (builder.extendsDescriptor != null) {
@@ -144,9 +143,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.whitespaceBehavior = builder.whitespaceBehavior;
 
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
-        this.compoundControllerDescriptor = DefDescriptorImpl
-                .getAssociateDescriptor(getDescriptor(), ControllerDef.class,
-                        DefDescriptor.COMPOUND_PREFIX);
+        this.compoundControllerDescriptor = DefDescriptorImpl.getAssociateDescriptor(getDescriptor(),
+                ControllerDef.class, DefDescriptor.COMPOUND_PREFIX);
         this.hashCode = AuraUtil.hashCode(super.hashCode(), attributeDefs,
                 events, controllerDescriptors, modelDefDescriptor,
                 extendsDescriptor);
@@ -401,8 +399,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
      * @throws QuickFixException
      */
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies)
-            throws QuickFixException {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
         for (AttributeDefRef facet : this.facets) {
             facet.appendDependencies(dependencies);
         }
@@ -450,6 +447,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         if (templateDefDescriptor != null) {
             dependencies.add(templateDefDescriptor);
         }
+
         for (DependencyDef dep : this.dependencies) {
             dep.appendDependencies(dependencies);
         }

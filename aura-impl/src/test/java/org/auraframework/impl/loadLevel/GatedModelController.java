@@ -40,8 +40,10 @@ public class GatedModelController {
     public static void resumeAll() {
         for (String key : GatedModel.pending.keySet()) {
             String lock = GatedModel.pending.remove(key);
-            synchronized (lock) {
-                lock.notifyAll();
+            if (lock != null) {
+                synchronized (lock) {
+                    lock.notifyAll();
+                }
             }
         }
     }

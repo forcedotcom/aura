@@ -220,7 +220,10 @@ public class AuraResourceServlet extends AuraBaseServlet {
      * This writes out the full manifest for an application so that we can use
      * the AppCache.
      * 
-     * TODO: W-1486764 we should document what goes in the manifest and why.
+     * The manifest contains CSS and JavaScript URLs. These specified resources are copied into the AppCache
+     * with the HTML template. When the page is reloaded, the existing manifest is compared to the new manifest.
+     * If they are identical, the resources are served from the AppCache. Otherwise, 
+     * the resources are requested from the server and the AppCache is updated.
      * 
      * @param request the request
      * @param response the response

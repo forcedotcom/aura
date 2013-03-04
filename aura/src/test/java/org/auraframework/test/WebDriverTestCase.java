@@ -471,7 +471,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     /**
-     * Open a Aura URL in given aura.mode and wait for intialization.
+     * Open a Aura URL in given aura.mode and wait for initialization.
      * 
      * @throws MalformedURLException
      * @throws URISyntaxException
@@ -554,11 +554,19 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     private void assertNoQuickFixMessage() {
         String auraErrorMsg = getQuickFixMessage();
         if (!auraErrorMsg.isEmpty()) {
-            fail("Initialization error: " + auraErrorMsg);
+        	// Compare against any expected failures
+        	Set<String> allowedExceptions = getExceptionsAllowedDuringInit();
+        	if (!allowedExceptions.contains(auraErrorMsg)) {
+	            fail("Initialization error: " + auraErrorMsg);
+        	}
         }
     }
 
-    protected String getQuickFixMessage() {
+    protected Set<String> getExceptionsAllowedDuringInit() {
+    	return Collections.emptySet();
+    }
+
+	protected String getQuickFixMessage() {
         WebElement errorBox = getDriver().findElement(By.id("auraErrorMessage"));
         if (errorBox == null) {
             fail("Aura quick fix errorBox not found.");

@@ -31,18 +31,9 @@ import org.auraframework.system.Location;
 import org.auraframework.util.json.Json;
 
 public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implements TestCaseDef {
-    
-    private static final long serialVersionUID = -5460410624026635318L;
-    private final Map<String, Object> attributes;
-    private final DefType defType;
-    private final Set<String> testLabels;
-    private final Set<String> browsers;
-    private final Set<Definition> mocks;
-    private final String name;
-
     public JavascriptTestCaseDef(DefDescriptor<TestSuiteDef> suiteDescriptor, String name, Location location,
             Map<String, Object> attributes, DefType defType, Set<String> testLabels, Set<String> browsers,
-            Set<Definition> mocks) {
+            Set<Definition> mocks, Set<String> exceptionsAllowedDuringInit) {
         super(DefDescriptorImpl.getInstance(suiteDescriptor.getQualifiedName() + "/" + DefType.TESTCASE + "$" + name,
                 TestCaseDef.class), location);
         this.attributes = AuraUtil.immutableMap(attributes);
@@ -51,6 +42,7 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
         this.browsers = AuraUtil.immutableSet(browsers);
         this.mocks = AuraUtil.immutableSet(mocks);
         this.name = name;
+        this.exceptionsAllowedDuringInit = exceptionsAllowedDuringInit;
     }
 
     @Override
@@ -62,6 +54,7 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
         json.writeMapEntry("defType", defType);
         json.writeMapEntry("testLabels", testLabels);
         json.writeMapEntry("browsers", browsers);
+        json.writeMapEntry("exceptionsAllowedDuringInit", exceptionsAllowedDuringInit);
         json.writeMapEnd();
     }
 
@@ -94,4 +87,18 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
     public Set<Definition> getLocalDefs(){
         return mocks;
     }
+
+	@Override
+	public Set<String> getExceptionsAllowedDuringInit() {
+		return exceptionsAllowedDuringInit;
+	}
+	
+    private static final long serialVersionUID = -5460410624026635318L;
+    private final Map<String, Object> attributes;
+    private final DefType defType;
+    private final Set<String> testLabels;
+    private final Set<String> browsers;
+    private final Set<Definition> mocks;
+    private final Set<String> exceptionsAllowedDuringInit;
+    private final String name;
 }

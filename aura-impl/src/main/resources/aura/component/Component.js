@@ -717,11 +717,11 @@ Component.prototype.toString = function(){
 };
 
 /**
- * Returns JSON.stringify to serialize Components to JSON.
+ * Returns component serialized as Json string
  */
 Component.prototype.toJSON = function(){
 
-    return JSON.stringify(this.output());
+    return $A.util.json.encode(this.output());
 };
 
 /**

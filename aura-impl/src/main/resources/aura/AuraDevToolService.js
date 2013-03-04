@@ -26,7 +26,7 @@ var AuraDevToolService = function() {
     port.style.display = "none";
     document.body.appendChild(port);
 
-    Util.prototype.on(document.body,'getComponentTreeEvent', function() {
+    $A.ns.Util.prototype.on(document.body,'getComponentTreeEvent', function() {
         var root = $A.getRoot();
         if(root){
             port.innerText = $A.getRoot().toJSON();
@@ -39,7 +39,7 @@ var AuraDevToolService = function() {
 
     var appliedHighlightStyle = false;
 
-    Util.prototype.on(document.body,'highlightElementsEvent', function(event) {
+    $A.ns.Util.prototype.on(document.body,'highlightElementsEvent', function(event) {
 
         if(!appliedHighlightStyle){
             aura.util.style.apply(".auraDevToolServiceHighlight:before{position:absolute;display:block;width:100%;height:100%;" +

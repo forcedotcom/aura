@@ -32,8 +32,8 @@ function exp() {
 
 /**
  * @namespace This, $A, is supposed to be our ONLY window-polluting top-level
- * variable.  Everything else is attached to it.  Note that this more-or-less
- * empty-object $A is replaced later, after $A.ns (created below) is populated
+ * variable.  Everything else in Aura is attached to it.  Note that this almost
+ * empty object $A is replaced later, after $A.ns (created below) is populated
  * with the types that can be used to populate the "real" $A.
  *
  * TODO(fabbott): Make that "only gobal name" goal become true; today it ain't.
@@ -121,7 +121,7 @@ var clientService;
  * @constructor
  */
 $A.ns.Aura = function() {
-    this.util = new Util();
+    this.util = new $A.ns.Util();
     this["util"] = this.util;
     //#if {"modes" : ["TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"]}
          this.test = new Test();
@@ -284,7 +284,7 @@ $A.ns.Aura = function() {
      */
     this.getEvt = this.eventService.newEvent;
 
-     // TODO: convert to //#exportSymbols when available
+    // TODO: convert to //#exportSymbols when available
     exp(aura,
             "clientService", aura.clientService,
             "componentService", aura.componentService,
@@ -308,7 +308,7 @@ $A.ns.Aura = function() {
                 "qhelp", function() {return aura.devToolService.help()},
             //#end
             "newCmp", aura.newCmp,
-            "getEvt", aura.getEvt      );
+            "getEvt", aura.getEvt);
     var services = aura.services;
     // TODO: convert to //#exportSymbols when available
     exp(services,

@@ -31,8 +31,8 @@
 <p>Label files make it easier to translate and localize your applications by separating messages from source code. <code>$Label</code> makes it easy for you to use label files in your Aura application. Labels are hierarchical, and you access them using dot notation, <code>$Label.&lt;section&gt;.&lt;message_name&gt;</code>. For example, see the Like Button code sample previously shown, where messages are retrieved from labels:</p>
 
 <code><aura:text value="{!"/>$Label.SocialApp.YouAndOthersLike}</code>
-
-<p>A label has a two-part name: a section name and a label name. Each name must start with a letter or underscore so that the label can be accessed in an expression. For example, <code><aura:text value="{!"/>$Label.1SocialApp.2YouAndOthersLike}</code> is not valid because the section and label name start each with a number.</p>
+<br/>
+<p>A label has a two-part name: a section name and a label name. Each name must start with a letter or underscore so that the label can be accessed in an expression. For example, <code><aura:text value="{!"/>$Label.1SocialApp.2YouAndOthersLike}</code> is not valid because the section and label name each start with a number.</p>
 
 <h3><code>globalID</code></h3>
 

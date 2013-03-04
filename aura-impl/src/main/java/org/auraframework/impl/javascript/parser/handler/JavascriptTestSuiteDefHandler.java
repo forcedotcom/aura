@@ -129,6 +129,12 @@ public class JavascriptTestSuiteDefHandler extends
 				Set<String> browsers = browserListForTestCase == null ? (browserListForTestSet == null ? Collections.EMPTY_SET
 						: Sets.newHashSet(browserListForTestSet))
 						: Sets.newHashSet(browserListForTestCase);
+				
+				List<String> exceptionsAllowedDuringInitList = (List<String>) (List<?>) value
+						.get("exceptionsAllowedDuringInit");
+				Set<String> exceptionsAllowedDuringInit = exceptionsAllowedDuringInitList == null ? Collections.EMPTY_SET
+						: Sets.newHashSet(exceptionsAllowedDuringInitList);
+				
 				DefDescriptor<? extends BaseComponentDef> compDesc = DefDescriptorImpl
 						.getAssociateDescriptor(descriptor, ComponentDef.class,
 								DefDescriptor.MARKUP_PREFIX);
@@ -154,7 +160,7 @@ public class JavascriptTestSuiteDefHandler extends
 				builder.caseDefs.add(new JavascriptTestCaseDef(descriptor, key,
 						null, attributes != null ? attributes
 								: defaultAttributes, defType, labels, browsers,
-						mocks));
+						mocks, exceptionsAllowedDuringInit));
 			}
 		}
 

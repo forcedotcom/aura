@@ -166,13 +166,6 @@ public class ComponentJSTestSuiteTest extends TestSuite {
     }
 
     public static class ComponentTestCase extends WebDriverTestCase {
-
-        private final ComponentTestSuite suite;
-        private final TestCaseDef caseDef;
-        private final String name;
-        private final Set<BrowserType> targetBrowsers = EnumSet.noneOf(BrowserType.class);
-        private final Set<BrowserType> excludedBrowsers = EnumSet.noneOf(BrowserType.class);
-
         private ComponentTestCase(ComponentTestSuite suite, TestCaseDef caseDef) {
             super("testRun");
             this.name = String.format("%s$%s", suite.descriptor.getQualifiedName(), caseDef.getName());
@@ -237,11 +230,14 @@ public class ComponentJSTestSuiteTest extends TestSuite {
 				Aura.get(TestContextAdapter.class).getTestContext()
 						.getLocalDefs().addAll(mocks);
 			}
-            open(getUrl(), Mode.AUTOJSTEST);
+            
+			open(getUrl(), Mode.AUTOJSTEST);
+            
 			String ret = (String) auraUITestingUtil.getEval(String.format(
 					"return window.aura.test.run('%s', '%s')",
 					AuraTextUtil.escapeForJavascriptString(caseDef.getName()),
 					AuraTextUtil.escapeForJavascriptString(suite.getCode())));
+			
 			if (ret != null && !"null".equals(ret)) {
 				@SuppressWarnings("unchecked")
 				Map<String, Object> e = (Map<String, Object>) new JsonReader()
@@ -263,5 +259,16 @@ public class ComponentJSTestSuiteTest extends TestSuite {
         public Set<BrowserType> getExcludedBrowsers() {
             return excludedBrowsers;
         }
+        
+        @Override
+        protected Set<String> getExceptionsAllowedDuringInit() {
+        	return caseDef.getExceptionsAllowedDuringInit();
+        }
+        
+        private final ComponentTestSuite suite;
+        private final TestCaseDef caseDef;
+        private final String name;
+        private final Set<BrowserType> targetBrowsers = EnumSet.noneOf(BrowserType.class);
+        private final Set<BrowserType> excludedBrowsers = EnumSet.noneOf(BrowserType.class);
     }
 }

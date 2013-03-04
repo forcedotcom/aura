@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 ({
+    handleKeydown: function(component, event, helper) {
+        //var keyCode = event.keyCode;
+        //var shiftKey = event.shiftKey;
+        //if (keyCode == 9 && shiftKey == true) {
+        //    component.setValue("{!v.visible}", false);
+        //}
+    },
+    
     handleTabToday: function(component, event, helper) {
         var keycode = event.keyCode;
         if (keycode == 9 && event.shiftKey != true) { // Tab key

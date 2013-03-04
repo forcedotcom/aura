@@ -111,8 +111,6 @@
         var startOfWeek = 0;
         var startPoint = startOfWeek - d.getDay() + 1;
         d.setDate(startPoint);
-        //component.find("calRow5").getElement().style.display = "";
-        //component.find("calRow6").getElement().style.display = "";
         for (var i = 0; i < 42; i++) {
             var cellCmp = component.find(i);
             if (cellCmp) {
@@ -126,16 +124,6 @@
                 if (d.getMonth() == month - 1 || d.getFullYear() == year - 1) {
                     clazz += " prevMonth"
                 } else if (d.getMonth() == month + 1 || d.getFullYear() == year + 1) {
-                    /*
-                    if (i % 7 == 0) {
-                        // done, hide the remaining rows.
-                        component.find("calRow6").getElement().style.display = "none";
-                        if (i == 21) {
-                            component.find("calRow5").getElement().style.display = "none";
-                        }
-                        break;
-                    }
-                    */
                     clazz += " nextMonth"
                 }
         
@@ -144,7 +132,7 @@
                 }
                 if (this.dateEquals(d, selectedDate)) {
                     clazz += " selectedDate"
-                    cellCmp.getElement().setAttribute("tabindex", "1");              
+                    cellCmp.getElement().removeAttribute("tabindex");              
                 } else {
                     cellCmp.getElement().setAttribute("tabindex", "-1");
                 }
@@ -152,8 +140,9 @@
                 cellCmp.setValue("{!v.label}", d.getDate());
                 cellCmp.setValue("{!v.value}", d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate());
                 
+                cellCmp.getElement().setAttribute("aria-selected", "false");
                 if (this.dateEquals(d, date)) {
-                    cellCmp.getElement().focus();                 
+                    cellCmp.getElement().focus();
                 }
             }
             d.setDate(d.getDate() + 1);
@@ -164,19 +153,19 @@
         return (window.event) ? e.srcElement : e.target;
     },
     
-    goToFirstOfMonth: function(component) {
+    goToFirstOfMonth: function(component, localId) {
         var date = new Date(component.get("v.year"), component.get("v.month"), 1);
-        var localId = date.getDay();
-        var cellCmp = component.find(localId);
-        cellCmp.getElement().focus();
+        var targetId = date.getDay();
+        var targetCellCmp = component.find(targetId);
+        targetCellCmp.getElement().focus();
         component.setValue("{!v.date}", 1);
     },
     
-    goToLastOfMonth: function(component) {
+    goToLastOfMonth: function(component, localId) {
         var date = new Date(component.get("v.year"), component.get("v.month") + 1, 0);
-        var cellCmp = this.findDateComponent(component, date);
-        if (cellCmp) {
-            cellCmp.getElement().focus();
+        var targetCellCmp = this.findDateComponent(component, date);
+        if (targetCellCmp) {
+            targetCellCmp.getElement().focus();
             component.setValue("{!v.date}", cellCmp.get("v.label"));
         }
     },
@@ -233,9 +222,9 @@
         } else if (keyCode == 32) { // space bar
             this.selectDate(component, event);
         } else if (keyCode == 36) { // Home key
-            this.goToFirstOfMonth(component);
+            this.goToFirstOfMonth(component, localId);
         } else if (keyCode == 35) { // End key
-            this.goToLastOfMonth(component);
+            this.goToLastOfMonth(component, localId);
         } else if (keyCode == 33 && shiftKey != true) { // Page Up
             this.changeCalendar(component, localId, -1, 0);
         } else if (keyCode == 34 && shiftKey != true) { // Page Down

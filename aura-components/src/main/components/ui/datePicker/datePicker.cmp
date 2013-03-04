@@ -22,18 +22,26 @@
     <div aura:id="datePicker" class="{!v.class + (v.visible == true ? ' visible' : '')}">
         <div class="dateBar">
             <div class="prevLinks">
-                <a aura:id="prevYear" class="navLink prevYear" title="Go to previous year" onclick="{!c.goToPrevYear}" tabindex="-1"/>
-                <a aura:id="prevMonth" class="navLink prevMonth" title="Go to previous month" onclick="{!c.goToPrevMonth}" tabindex="-1"/>
+                <a aura:id="prevYear" class="navLink prevYear" title="Go to previous year" onclick="{!c.goToPrevYear}" onkeydown="{!c.handleKeydown}" tabindex="-1">
+                    <span class="assistiveText">Go to previous year</span>
+                </a>
+                <a aura:id="prevMonth" class="navLink prevMonth" title="Go to previous month" onclick="{!c.goToPrevMonth}" tabindex="-1">
+                    <span class="assistiveText">Go to previous month</span>
+                </a>
             </div>
             <div class="nextLinks">
-                <a aura:id="nextMonth" class="navLink nextMonth" title="Go to next month" onclick="{!c.goToNextMonth}" tabindex="-1"/>
-                <a aura:id="nextYear" class="navLink nextYear" title="Go to next year" onclick="{!c.goToNextYear}" tabindex="-1"/>
+                <a aura:id="nextMonth" class="navLink nextMonth" title="Go to next month" onclick="{!c.goToNextMonth}" tabindex="-1">
+                    <span class="assistiveText">Go to next month</span>
+                </a>
+                <a aura:id="nextYear" class="navLink nextYear" title="Go to next year" onclick="{!c.goToNextYear}" tabindex="-1">
+                    <span class="assistiveText">Go to next year</span>
+                </a>
             </div>
-            <h4 class="monthYear" aura:id="calTitle"/>
+            <h4 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle"/>
         </div>
         <ui:datePickerGrid aura:id="grid" weekDays="{!m.weekdayLabels}" hide="{!c.hide}" selectDate="{!c.selectDate}" updateCalendarTitle="{!c.updateCalendarTitle}"/>
         <div class="buttonBar">
-            <a aura:id="today" onclick="{!c.selectToday}" onkeydown="{!c.handleTabToday}" class="calToday" href="javascript:void(0);" tabindex="2">Today</a>
+            <a aura:id="today" onclick="{!c.selectToday}" onkeydown="{!c.handleTabToday}" class="calToday" href="javascript:void(0);">Today</a>
         </div>
     </div>
 </aura:component>

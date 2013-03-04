@@ -29,6 +29,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 /**
@@ -120,6 +121,13 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
+        String name = this.descriptor.getName();
+        // Calls the validateAttributeName method in AuraTextUtil.java to check if its a valid attribute name
+        if ((AuraTextUtil.validateAttributeName(name)) != true) {
+            throw new InvalidDefinitionException("Invalid Attribute Name :'" + name
+                    + "',Refer AuraDocs for valid attribute names", getLocation());
+        }
+
         if (this.serializeTo == SerializeToType.INVALID) {
             throw new InvalidDefinitionException("Invalid serializeTo value", getLocation());
         }

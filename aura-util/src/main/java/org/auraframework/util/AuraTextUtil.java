@@ -21,6 +21,8 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.google.common.collect.ObjectArrays;
 
@@ -51,7 +53,6 @@ public class AuraTextUtil {
             ObjectArrays.concat(ESCAPED_TEXT, new String[] { "\n" }, String.class),
             ObjectArrays.concat(ESCAPED_HTML, new String[] { "<br/>" }, String.class));
 
-
     // w/ html tags
     private static final TrieMatcher HTML_TO_TEXT = TrieMatcher.compile(
             ObjectArrays.concat(ESCAPED_HTML, new String[] { "<br>", "<br/>" }, String.class),
@@ -74,11 +75,10 @@ public class AuraTextUtil {
 
     /**
      * @param delim what delimiter to use in between array elements.
-     * @param maxValues how many array elements to include. When less than 0,
-     *            all values are included. If <code>maxValues</code> is greater
-     *            than the number of elements in <code>array</code>, then all
-     *            elements are included. If any elements are not included,
-     *            <code>...</code> will be inserted after the last element.
+     * @param maxValues how many array elements to include. When less than 0, all values are included. If
+     *            <code>maxValues</code> is greater than the number of elements in <code>array</code>, then all elements
+     *            are included. If any elements are not included, <code>...</code> will be inserted after the last
+     *            element.
      * @param useBrackets add [] to outside of string iff true
      * @see #collectionToString(Iterable, String, String)
      */
@@ -88,15 +88,13 @@ public class AuraTextUtil {
 
     /**
      * @param delim what delimiter to use in between array elements.
-     * @param maxValues how many array elements to include. When less than 0,
-     *            all values are included. If <code>maxValues</code> is greater
-     *            than the number of elements in <code>array</code>, then all
-     *            elements are included. If any elements are not included and
-     *            appendEllipsis is set, <code>...</code> will be inserted after
-     *            the last element.
+     * @param maxValues how many array elements to include. When less than 0, all values are included. If
+     *            <code>maxValues</code> is greater than the number of elements in <code>array</code>, then all elements
+     *            are included. If any elements are not included and appendEllipsis is set, <code>...</code> will be
+     *            inserted after the last element.
      * @param useBrackets add [] to outside of string iff true
-     * @param appendEllipsis if set and, and any elements are not included,
-     *            <code>...</code> will be inserted after the last element.
+     * @param appendEllipsis if set and, and any elements are not included, <code>...</code> will be inserted after the
+     *            last element.
      * @see #collectionToString(Iterable, String, String)
      */
     public static String arrayToString(Object[] array, String delim, int maxValues, boolean useBrackets,
@@ -164,17 +162,13 @@ public class AuraTextUtil {
     }
 
     /**
-     * Properly escapes strings to be displayed in Javascript Strings. This
-     * means that backslashes and single quotes are escaped. Double quotes also
-     * since javascript string may use either single or double. And HTML comment
-     * start, because IE recognizes it even in a javascript string. It is
-     * escaped by embedding backslash in it, which JS will ignore, but breaks
-     * the pattern for the browser comment recognizer. <br>
+     * Properly escapes strings to be displayed in Javascript Strings. This means that backslashes and single quotes are
+     * escaped. Double quotes also since javascript string may use either single or double. And HTML comment start,
+     * because IE recognizes it even in a javascript string. It is escaped by embedding backslash in it, which JS will
+     * ignore, but breaks the pattern for the browser comment recognizer. <br>
      * <br>
-     * The Javascript escaping methods are the only methods you should call
-     * outside of Element classes. Whenever you are passing Javascript into
-     * elements, you should escape any potentially dangerous portions of the
-     * script.
+     * The Javascript escaping methods are the only methods you should call outside of Element classes. Whenever you are
+     * passing Javascript into elements, you should escape any potentially dangerous portions of the script.
      */
     public static String escapeForJavascriptString(String in) {
         return TrieMatcher.replaceMultiple(in, JS_SEARCH_REPLACE);
@@ -188,21 +182,18 @@ public class AuraTextUtil {
     }
 
     /**
-     * Splits the given string str using the given delimiter and returns the
-     * result as a string list. If str is null, then null is returned.<br>
+     * Splits the given string str using the given delimiter and returns the result as a string list. If str is null,
+     * then null is returned.<br>
      * <br>
-     * The returned string list is an ArrayList that is constructed using the 4
-     * as the ArrayList's initial size. If you expect to have more than four
-     * elements more than just on the rare occasion, then please consider using
-     * another splitSimple overload that lets you pass in the expected size.<br>
+     * The returned string list is an ArrayList that is constructed using the 4 as the ArrayList's initial size. If you
+     * expect to have more than four elements more than just on the rare occasion, then please consider using another
+     * splitSimple overload that lets you pass in the expected size.<br>
      * <br>
-     * This is more efficient than String.split or TextUtil.split because it
-     * does not use a regular expression.<br>
+     * This is more efficient than String.split or TextUtil.split because it does not use a regular expression.<br>
      * <br>
-     * <b>CAUTION:</b> The str and delimiter parameters are in an order that
-     * differs from other string splitting methods. Be absolutely sure that you
-     * get the str and delimiter parameter arguments correct. This may
-     * eventually be fixed with a refactoring.
+     * <b>CAUTION:</b> The str and delimiter parameters are in an order that differs from other string splitting
+     * methods. Be absolutely sure that you get the str and delimiter parameter arguments correct. This may eventually
+     * be fixed with a refactoring.
      * 
      * @param delimiter The delimiter to split the string using
      * @param str The string to split
@@ -213,28 +204,24 @@ public class AuraTextUtil {
     }
 
     /**
-     * Splits the given string str using the given delimiter and returns the
-     * result as a string list. If str is null, then null is returned.<br>
+     * Splits the given string str using the given delimiter and returns the result as a string list. If str is null,
+     * then null is returned.<br>
      * <br>
-     * The returned string list is an ArrayList that is constructed using the
-     * given expected size as the ArrayList's initial size. If you are not aware
-     * of the expected size, then use 0, which will cause this method to use a
+     * The returned string list is an ArrayList that is constructed using the given expected size as the ArrayList's
+     * initial size. If you are not aware of the expected size, then use 0, which will cause this method to use a
      * LinkedList instead of an ArrayList.<br>
      * <br>
-     * This is more efficient than String.split or TextUtil.split because it
-     * does not use a regular expression.<br>
+     * This is more efficient than String.split or TextUtil.split because it does not use a regular expression.<br>
      * <br>
-     * <b>CAUTION:</b> The str and delimiter parameters are in an order that
-     * differs from other string splitting methods. Be absolutely sure that you
-     * get the str and delimiter parameter arguments correct. This may
-     * eventually be fixed with a refactoring.
+     * <b>CAUTION:</b> The str and delimiter parameters are in an order that differs from other string splitting
+     * methods. Be absolutely sure that you get the str and delimiter parameter arguments correct. This may eventually
+     * be fixed with a refactoring.
      * 
      * @param delimiter The delimiter to split the string using
      * @param str The string to split
-     * @param expectedSize The expected number of elements in the output list.
-     *            If you don't know, or if it could be arbitrarily large, and if
-     *            you will only access the returned list sequentially with an
-     *            iterator, then use 0 to tell this method to use a LinkedList
+     * @param expectedSize The expected number of elements in the output list. If you don't know, or if it could be
+     *            arbitrarily large, and if you will only access the returned list sequentially with an iterator, then
+     *            use 0 to tell this method to use a LinkedList
      * @return String list or, if str was null, then null
      */
     public static List<String> splitSimple(String delimiter, String str, int expectedSize) {
@@ -365,9 +352,8 @@ public class AuraTextUtil {
     }
 
     /**
-     * Properly decode a URL according to the standard. This is a convenience
-     * method users don't have to catch this exception everywhere (the exception
-     * should never be thrown anyway), or worry about the encoding string.
+     * Properly decode a URL according to the standard. This is a convenience method users don't have to catch this
+     * exception everywhere (the exception should never be thrown anyway), or worry about the encoding string.
      * 
      * @see URLDecoder#decode(java.lang.String, java.lang.String)
      */
@@ -384,8 +370,8 @@ public class AuraTextUtil {
     /**
      * Properly encode a URL according to the standard.
      * 
-     * This is a convenience method users don't have to catch this exception
-     * everywhere (the exception should never be thrown anyway).
+     * This is a convenience method users don't have to catch this exception everywhere (the exception should never be
+     * thrown anyway).
      * 
      * @see URLEncoder#encode(java.lang.String, java.lang.String)
      */
@@ -425,24 +411,20 @@ public class AuraTextUtil {
     }
 
     /**
-     * Splits the given string str using the given delimiter, trims each
-     * element, and returns the result as a string list. If str is null, then
-     * null is returned.<br>
+     * Splits the given string str using the given delimiter, trims each element, and returns the result as a string
+     * list. If str is null, then null is returned.<br>
      * <br>
-     * The returned string list is an ArrayList that is constructed using the
-     * given expected size as the ArrayList's initial size. If you are not aware
-     * of the expected size, then use 0, which will cause this method to use a
+     * The returned string list is an ArrayList that is constructed using the given expected size as the ArrayList's
+     * initial size. If you are not aware of the expected size, then use 0, which will cause this method to use a
      * LinkedList instead of an ArrayList.<br>
      * <br>
-     * This is more efficient than String.split or TextUtil.split because it
-     * does not use a regular expression.
+     * This is more efficient than String.split or TextUtil.split because it does not use a regular expression.
      * 
      * @param str The string to split
      * @param delimiter The delimiter to split the string using
-     * @param expectedSize The expected number of elements in the output list.
-     *            If you don't know, or if it could be arbitrarily large, and if
-     *            you will only access the returned list sequentially with an
-     *            iterator, then use 0 to tell this method to use a LinkedList
+     * @param expectedSize The expected number of elements in the output list. If you don't know, or if it could be
+     *            arbitrarily large, and if you will only access the returned list sequentially with an iterator, then
+     *            use 0 to tell this method to use a LinkedList
      * @return String list or, if str was null, then null
      */
     public static List<String> splitSimpleAndTrim(String str, String delimiter, int expectedSize) {
@@ -450,13 +432,11 @@ public class AuraTextUtil {
     }
 
     /**
-     * Note, if you are going to search/replace for the same set of source and
-     * target many times, you can get a performance win by using the form of
-     * this call that takes a TrieMatcher instead.
+     * Note, if you are going to search/replace for the same set of source and target many times, you can get a
+     * performance win by using the form of this call that takes a TrieMatcher instead.
      * 
-     * @return the replacement of all occurrences of src[i] with target[i] in s.
-     *         Src and target are not regex's so this uses simple searching with
-     *         indexOf()
+     * @return the replacement of all occurrences of src[i] with target[i] in s. Src and target are not regex's so this
+     *         uses simple searching with indexOf()
      * @see TrieMatcher#replaceMultiple(String, TrieMatcher)
      * @see #replaceChar(String, char, CharSequence)
      * @see #replaceSimple(String, String[], String[])
@@ -504,8 +484,7 @@ public class AuraTextUtil {
     }
 
     /**
-     * @return the replacement of src with target in s, using simple string
-     *         replacement
+     * @return the replacement of src with target in s, using simple string replacement
      */
     public static String replaceSimple(String s, String src, String target) {
         assert src != null && src.length() > 0;
@@ -543,11 +522,10 @@ public class AuraTextUtil {
 
     /**
      * Escape given unescaped text to make it safe for HTML.
-     *
-     * Note that this routine will only escape a string for use at the 'top' level of
-     * html. You MUST NOT use this for attributes, or inside a script tag, as in that
-     * case it does not escape a sufficient set of characters. This IS safe for escaping
-     * arbitrary text into UTF-8 encoded HTML.
+     * 
+     * Note that this routine will only escape a string for use at the 'top' level of html. You MUST NOT use this for
+     * attributes, or inside a script tag, as in that case it does not escape a sufficient set of characters. This IS
+     * safe for escaping arbitrary text into UTF-8 encoded HTML.
      * 
      * @param input the input text string.
      * @return escaped text
@@ -574,9 +552,8 @@ public class AuraTextUtil {
     }
 
     /**
-     * @return a delim-separated string from the contents of the given
-     *         collection where the last separation is <delim><lastDelim>, for
-     *         lists like "apple, banana, and orange"
+     * @return a delim-separated string from the contents of the given collection where the last separation is
+     *         <delim><lastDelim>, for lists like "apple, banana, and orange"
      */
     public static String collectionToString(Iterable<?> c, String delim, String lastDelim) {
         return collectionToString(c, delim, lastDelim, null, null);
@@ -602,6 +579,20 @@ public class AuraTextUtil {
             sb.append(suffix);
         }
         return sb.toString();
+    }
+
+    /**
+     * Attribute Name validation: This is done here since we want to validate attribute names entered in quick fix as
+     * well.
+     * 
+     * @param attName is the attribute name which is being validated
+     * @return a : true if the name is valid and false if its invalid
+     */
+    public static boolean validateAttributeName(String attrName) {
+        Pattern p = Pattern.compile("^[a-zA-Z_].[-a-zA-Z0-9_:]*$");
+        Matcher m = p.matcher(attrName);
+        boolean a = m.find();
+        return a;
     }
 
     /**

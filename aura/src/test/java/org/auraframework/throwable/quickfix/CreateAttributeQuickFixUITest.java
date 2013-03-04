@@ -76,19 +76,27 @@ public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
     }
 
     /**
+     * Enter Invalid attribute name and test if proper error message is displayed to the user
+     */
+    public void testInvalidAttributeName() throws Exception {
+        open("/auratest/createAttributeQuickFix.cmp", Mode.DEV);
+        verifyToolbarAndClickCreateButton();
+        setAttributeNameType("!foo", "String");
+        util.clickFix(false, "Invalid attribute name:'!foo',Refer to Auradocs for valid attribute names");
+        AttributeDef fooAttr = defDescriptor.getDef().getAttributeDef("!foo");
+        assertNull(fooAttr);
+    }
+
+    /**
      * Enter invalid attribute type and verify proper error message is displayed to user.
      */
     public void testInvalidAttributeType() throws Exception {
         open("/auratest/createAttributeQuickFix.cmp", Mode.DEV);
         verifyToolbarAndClickCreateButton();
         setAttributeNameType("foo", "myInvalidType");
-        util.clickFix(false,
-                "org.auraframework.throwable.AuraRuntimeException: java.lang.ClassNotFoundException: myInvalidType");
-
-        // TODO(W-1506170): attribute still created when given invalid input
-        // check attribute _not_ created
-        // AttributeDef fooAttr = defDescriptor.getDef().getAttributeDef("foo");
-        // assertNull(fooAttr);
+        util.clickFix(false, "Invalid attribute type:myInvalidType");
+        AttributeDef fooAttr = defDescriptor.getDef().getAttributeDef("foo");
+        assertNull(fooAttr);
     }
 
     /**
@@ -98,12 +106,9 @@ public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
         open("/auratest/createAttributeQuickFix.cmp", Mode.DEV);
         verifyToolbarAndClickCreateButton();
         setAttributeNameType("", "String");
-        util.clickFix(false, "QualifiedName is required for descriptors");
-
-        // TODO(W-1506170): attribute still created when given invalid input
-        // check attribute _not_ created
-        // AttributeDef fooAttr = defDescriptor.getDef().getAttributeDef("foo");
-        // assertNull(fooAttr);
+        util.clickFix(false, "Cannot leave the field blank");
+        AttributeDef fooAttr = defDescriptor.getDef().getAttributeDef("foo");
+        assertNull(fooAttr);
     }
 
     private void verifyDefaultNameType(String name, String type) {

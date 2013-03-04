@@ -40,7 +40,7 @@
             /*Get source returns the name of the component generating the event along with the Dom id of the element*/
             aura.test.assertTrue(event.getSource().toString().indexOf("test:test_Events_BiggerComponentForEvent")!=-1,"Source of the event is incorrect");
         }
-    },
+    }
 
 
 })

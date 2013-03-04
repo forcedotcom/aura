@@ -40,7 +40,7 @@
             $A.test.assertTrue(ele[1]===undefined, "div element has more than one element.");
 
             $A.test.assertTrue(ele[0]!==undefined, "div element should have one element.");
-            $A.test.assertTrue(ele[0] instanceof HTMLDivElement);
+            $A.test.assertTrue($A.test.isInstanceOfDivElement(ele[0]));
             //There should be only 1 comment node for each html element that does not have anything in its body.
             $A.test.assertEquals(1, ele[0].childNodes.length,
                     "Did not expect to see more than 1 child node in this div. but saw "+ele[0].childNodes.length);
@@ -52,15 +52,15 @@
             $A.test.assertTrue(ele[1]===undefined, "div element has more than one element.");
 
             $A.test.assertTrue(ele[0]!==undefined, "div element should have one element.");
-            $A.test.assertTrue(ele[0] instanceof HTMLDivElement);
+            $A.test.assertTrue($A.test.isInstanceOfDivElement(ele[0]));
 
             $A.test.assertEquals(1, ele[0].childNodes.length,
                     "Did not expect to see more than 1 child node in div. but saw "+ele[0].childNodes.length);
-            $A.test.assertTrue(ele[0].childNodes[0] instanceof HTMLParagraphElement);
+            $A.test.assertTrue($A.test.isInstanceOfParagraphElement(ele[0].childNodes[0]));
 
             $A.test.assertEquals(1, ele[0].childNodes[0].childNodes.length,
                     "Did not expect to see more than 1 child node in paragraph. but saw "+ele[0].childNodes.length);
-            $A.test.assertTrue(ele[0].childNodes[0].childNodes[0] instanceof Text);
+            $A.test.assertTrue($A.test.isInstanceOfText(ele[0].childNodes[0].childNodes[0]));
 
         }]
     }

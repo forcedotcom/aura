@@ -60,7 +60,7 @@
     //TODO W-1320697
     _testValueProviderForDefFetchedFromServer:{
         attributes:{numberAttribute:999},
-        test:[function(cmp){
+        test: function(cmp){
             var action = cmp.get('c.createCmpByFetchingDefFromServer');
             action.run();
             $A.eventService.finishFiring();
@@ -81,7 +81,7 @@
                         $A.test.assertTruthy(cmp.find("num_Id"));
                         $A.test.assertEquals(numberCmp, cmp.find("num_Id"));*/
                     });
-        }]
+        }
     },
 
     /**

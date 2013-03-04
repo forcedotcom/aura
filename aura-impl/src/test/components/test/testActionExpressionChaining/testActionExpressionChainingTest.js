@@ -88,5 +88,5 @@
             var results = component.find("resultsGoHere");
             $A.test.assertEquals("Chained push action ran", results.getElement().innerHTML);
         }
-    },
+    }
 })

@@ -18,7 +18,7 @@
     testDefaultAttributes:{
         test:function(cmp){
             var imgElement = cmp.getElement();
-            aura.test.assertTrue(imgElement instanceof HTMLImageElement, "Expected to see a image element.")
+            aura.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element.")
             aura.test.assertTrue(this.endsWith(imgElement.src, '/auraFW/resources/aura/s.gif'), "Expected src to be '/auraFW/resources/aura/s.gif' by default");
             aura.test.assertUndefinedOrNull(cmp.find('link'), 'By default there should be no link on the image.');
         }
@@ -27,7 +27,7 @@
         attributes : {src: '/auraFW/resources/aura/auralogo.png'},
         test: function(cmp){
             var imgElement = cmp.getElement();
-            aura.test.assertTrue(imgElement instanceof HTMLImageElement, "Expected to see a image element.")
+            aura.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element.")
             aura.test.assertTrue(this.endsWith(imgElement.src, '/auraFW/resources/aura/auralogo.png'), "Failed to display specified image source.");
             aura.test.assertUndefinedOrNull(cmp.find('link'), 'By default there should be no link on the image.');
         }
@@ -37,14 +37,14 @@
         attributes : {src: '/auraFW/resources/aura/auralogo.png', href: 'http://www.salesforce.com'},
         test: function(cmp){
             var linkElement = cmp.find('link').getElement();
-            aura.test.assertTrue(linkElement instanceof HTMLAnchorElement, "Expected to see a anchor element.")
+            aura.test.assertTrue($A.test.isInstanceOfAnchorElement(linkElement), "Expected to see a anchor element.")
             aura.test.assertTrue(aura.test.contains(linkElement.href,'http://www.salesforce.com'), linkElement.href + " Expected a link with specified address.")
             aura.test.assertEquals('_self',linkElement.target, "Expected target to be _self by default.")
             
             aura.test.assertEquals(1, linkElement.childElementCount || linkElement.children.length); //IE8 and below don't have childElementCount
 
             var imgElement = linkElement.children[0];
-            aura.test.assertTrue(imgElement instanceof HTMLImageElement, "Expected to see a image element embedded in the anchor tag.")
+            aura.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element embedded in the anchor tag.")
             aura.test.assertTrue(this.endsWith(imgElement.src, '/auraFW/resources/aura/auralogo.png'), "Failed to display specified image source.");
 
         }
@@ -53,7 +53,7 @@
         attributes : {src: '/auraFW/resources/aura/images/bug.png', href: 'http://www.salesforce.com', linkClass:'logo', alt:'Company', target:'_top'},
         test: function(cmp){
             var linkElement = cmp.find('link').getElement();
-            aura.test.assertTrue(linkElement instanceof HTMLAnchorElement, "Expected to see a anchor element.")
+            aura.test.assertTrue($A.test.isInstanceOfAnchorElement(linkElement), "Expected to see a anchor element.")
             aura.test.assertTrue(aura.test.contains(linkElement.href,'http://www.salesforce.com'), linkElement.href + " Expected a link with specified address.")
             aura.test.assertEquals('_top',linkElement.target, "Expected target to be _top.")
             aura.test.assertTrue(linkElement.className.indexOf('logo')!==-1, "Expected link element to have specified class selector.");
@@ -68,7 +68,7 @@
     _testAccessibility:{
         test:function(cmp){
             var imgElement = cmp.getElement();
-            aura.test.assertTrue(imgElement instanceof HTMLImageElement)
+            aura.test.assertTrue($A.test.isInstanceOfImageElement(imgElement))
             aura.test.assertEquals("",imgElement.alt, "Expected a empty alt text for all image tags.");
             cmp.getAttributes().setValue("alt",'Help Accessibility');
             cmp.getAttributes().setValue("src",'http://www.google.com/intl/en_com/images/srpr/logo3w.png');

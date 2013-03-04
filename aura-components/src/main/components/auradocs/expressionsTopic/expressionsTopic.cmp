@@ -36,6 +36,8 @@
 
 <p>If you're familiar with other languages, you may be tempted to read the <code>!</code> as the "bang" operator, which negates boolean values in many programming languages. In Aura, <code><aura:text value="{!"/></code> is simply the delimiter used to begin an expression in Aura.</p></auradocs:warning>
 
+<p>Identifiers in an expression, such as attribute names accessed through the view, model values, controller values, or labels, must start with a letter or underscore. They can also contain numbers or hyphens after the first character. For example, <code><aura:text value="{!"/>v.2count</code> is not valid, but <code><aura:text value="{!"/>v.count</code> is.</p>
+
 <p>Only use the <code><aura:text value="{!"/> }</code> syntax in markup in <code>.app</code> or <code>.cmp</code> files. In JavaScript, use string syntax to evaluate an expression. For example:</p>
 
 <auradocs:codeblock>var theLabel = cmp.get("v.label");

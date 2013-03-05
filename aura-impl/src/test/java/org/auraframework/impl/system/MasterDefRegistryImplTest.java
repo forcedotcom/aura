@@ -37,6 +37,8 @@ import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Source;
+
+import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.mockito.Mockito;
@@ -630,5 +632,83 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 checkDependenciesContains(deps, depCmpDesc1.getQualifiedName()));
         assertTrue("Explicitly declared dependency on top level component not found",
                 checkDependenciesContains(deps, depCmpDesc2.getQualifiedName()));
+    }
+
+    /**
+     * Check access assertion on abstract applications.
+     */
+    public void testAssertAcessAbstractApp() throws Exception {
+        DefDescriptor<ApplicationDef> abApp = addSourceAutoCleanup(ApplicationDef.class,
+                "<aura:application abstract=\"true\"/>");
+        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class,
+                String.format("<aura:application extends=\"%s:%s\"/>", abApp.getNamespace(), abApp.getName()));
+        DefDescriptor<ApplicationDef> auraApp = Aura.getDefinitionService().getDefDescriptor("markup://aura:application",
+                 ApplicationDef.class);
+        MasterDefRegistryImpl mdr = getDefRegistry(false);
+        AuraContext context = Aura.getContextService().getCurrentContext();
+
+        //
+        // Check aura:application for failure first, as it will get put in the cache later.
+        //
+        context.setApplicationDescriptor(auraApp);
+        try {
+            mdr.assertAccess(auraApp);
+            fail("should fail to grant access to aura:application");
+        } catch (NoAccessException nae) {
+            assertTrue("exception should say something about abstract",
+                    nae.getMessage().contains("Abstract definition"));
+        }
+
+        //
+        // Check for failure when abstract app is top level.
+        //
+        context.setApplicationDescriptor(abApp);
+        try {
+            mdr.assertAccess(abApp);
+            fail("should fail to grant access to an abstract application");
+        } catch (NoAccessException nae) {
+            assertTrue("exception should say something about abstract",
+                    nae.getMessage().contains("Abstract definition"));
+        }
+        mdr.assertAccess(auraApp);
+
+        //
+        // Check for success when non-abstract app is top level.
+        //
+        context.setApplicationDescriptor(app);
+        mdr.assertAccess(app);
+        mdr.assertAccess(abApp);
+        mdr.assertAccess(auraApp);
+    }
+
+    /**
+     * Check access assertion on abstract components.
+     */
+    public void testAssertAcessAbstractComponent() throws Exception {
+        DefDescriptor<ComponentDef> abComp = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component abstract=\"true\"/>");
+        DefDescriptor<ComponentDef> comp = addSourceAutoCleanup(ComponentDef.class,
+                String.format("<aura:component extends=\"%s:%s\"/>", abComp.getNamespace(), abComp.getName()));
+        MasterDefRegistryImpl mdr = getDefRegistry(false);
+        AuraContext context = Aura.getContextService().getCurrentContext();
+
+        //
+        // Check for failure when abstract app is top level.
+        //
+        context.setApplicationDescriptor(abComp);
+        try {
+            mdr.assertAccess(abComp);
+            fail("should fail to grant access to an abstract component");
+        } catch (NoAccessException nae) {
+            assertTrue("exception should say something about abstract",
+                    nae.getMessage().contains("Abstract definition"));
+        }
+
+        //
+        // Check for success when non-abstract app is top level.
+        //
+        context.setApplicationDescriptor(comp);
+        mdr.assertAccess(comp);
+        mdr.assertAccess(abComp);
     }
 }

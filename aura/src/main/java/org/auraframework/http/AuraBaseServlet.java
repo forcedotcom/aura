@@ -50,6 +50,7 @@ import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.NoAccessException;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import org.auraframework.util.AuraTextUtil;
@@ -184,107 +185,136 @@ public abstract class AuraBaseServlet extends HttpServlet {
     protected void handleServletException(Throwable t, boolean quickfix, AuraContext context,
                                           HttpServletRequest request, HttpServletResponse response,
                                           boolean written) throws IOException, ServletException {
-        Throwable mappedEx = t;
-        boolean map = !quickfix;
-        Format format = context.getFormat();
+        try {
+            Throwable mappedEx = t;
+            boolean map = !quickfix;
+            Format format = context.getFormat();
 
-        //
-        // This seems to fail, though the documentation implies that you can do
-        // it.
-        //
-        // if (written && !response.isCommitted()) {
-        // response.resetBuffer();
-        // written = false;
-        // }
-        if (!written) {
-            // Should we only delete for JSON?
-            setNoCache(response);
-        }
-        if (mappedEx instanceof IOException) {
             //
-            // Just re-throw IOExceptions.
+            // This seems to fail, though the documentation implies that you can do
+            // it.
             //
-            throw (IOException) mappedEx;
-        } else if (mappedEx instanceof NoAccessException) {
-            Throwable cause = mappedEx.getCause();
-            String denyMessage = mappedEx.getMessage();
-
-            map = false;
-            if (cause != null) {
-                //
-                // Note that the exception handler can remap the cause here.
-                //
-                cause = Aura.getExceptionAdapter().handleException(cause);
-                denyMessage += ": cause = " + cause.getMessage();
+            // if (written && !response.isCommitted()) {
+            // response.resetBuffer();
+            // written = false;
+            // }
+            if (!written) {
+                // Should we only delete for JSON?
+                setNoCache(response);
             }
+            if (mappedEx instanceof IOException) {
+                //
+                // Just re-throw IOExceptions.
+                //
+                throw (IOException) mappedEx;
+            } else if (mappedEx instanceof NoAccessException) {
+                Throwable cause = mappedEx.getCause();
+                String denyMessage = mappedEx.getMessage();
+
+                map = false;
+                if (cause != null) {
+                    //
+                    // Note that the exception handler can remap the cause here.
+                    //
+                    cause = Aura.getExceptionAdapter().handleException(cause);
+                    denyMessage += ": cause = " + cause.getMessage();
+                }
+                //
+                // Is this correct?!?!?!
+                //
+                if (format != Format.JSON) {
+                    send404(request, response);
+                    if (!isProductionMode(context.getMode())) {
+                        response.getWriter().println(denyMessage);
+                    }
+                    return;
+                }
+            } else if (mappedEx instanceof QuickFixException) {
+                if (quickfix && !isProductionMode(context.getMode())) {
+                    map = false;
+                } else {
+                    //
+                    // In production environments, we want wrap the quick-fix. But be a little careful here.
+                    // We should never mark the top level as a quick-fix, because that means that we gack
+                    // on every mis-spelled app. In this case we simply send a 404 and bolt.
+                    //
+                    if (mappedEx instanceof DefinitionNotFoundException) {
+                        DefinitionNotFoundException dnfe = (DefinitionNotFoundException)mappedEx;
+
+                        if (dnfe.getDescriptor() != null && dnfe.getDescriptor().equals(context.getApplicationDescriptor())) {
+                            send404(request, response);
+                            return;
+                        }
+                    }
+                    map = true;
+                    mappedEx = new AuraUnhandledException("404 Not Found (Application Error)", mappedEx);
+                }
+            }
+            if (map) {
+                mappedEx = Aura.getExceptionAdapter().handleException(mappedEx);
+            }
+
+            PrintWriter out = response.getWriter();
+
             //
-            // Is this correct?!?!?!
+            // If we have written out data, We are kinda toast in this case.
+            // We really want to roll it all back, but we can't, so we opt
+            // for the best we can do. For HTML we can do nothing at all.
             //
-            if (format != Format.JSON) {
+            if (format == Format.JSON) {
+                if (!written) {
+                    out.write(CSRF_PROTECT);
+                }
+                //
+                // If an exception happened while we were emitting JSON, we want the
+                // client to ignore the now-corrupt data structure. 404s and 500s
+                // cause the client to prepend /*, so we can effectively erase the
+                // bad data by appending a */ here and then serializing the exception
+                // info.
+                //
+                out.write("*/");
+                //
+                // Unfortunately we can't do the following now. It might be possible
+                // in some cases, but we don't want to go there unless we have to.
+                //
+            }
+            if (format == Format.JSON || format == Format.HTML || format == Format.JS || format == Format.CSS) {
+                //
+                // We only write out exceptions for HTML or JSON.
+                // Seems bogus, but here it is.
+                //
+                // Start out by cleaning out some settings to ensure we don't
+                // check too many things, leading to a circular failure. Note
+                // that this is still a bit dangerous, as we seem to have a lot
+                // of magic in the serializer.
+                //
+                context.setSerializeLastMod(false);
+                Aura.getSerializationService().write(mappedEx, null, out);
+                if (format == Format.JSON) {
+                    out.write("/*ERROR*/");
+                }
+            }
+        } catch (IOException ioe) {
+            throw ioe;
+        } catch (Throwable death) {
+            //
+            // Catch any other exception and log it. This is actually kinda bad, because something has
+            // gone horribly wrong. We should write out some sort of generic page other than a 404,
+            // but at this point, it is unclear what we can do, as stuff is breaking right and left.
+            //
+            try {
+                Aura.getExceptionAdapter().handleException(death);
                 send404(request, response);
                 if (!isProductionMode(context.getMode())) {
-                    response.getWriter().println(denyMessage);
+                    response.getWriter().println(death.getMessage());
                 }
-                return;
-            }
-        } else if (mappedEx instanceof QuickFixException) {
-            if (quickfix && !isProductionMode(context.getMode())) {
-                map = false;
-            } else {
-                //
-                // In production environments, we want wrap the quick-fix.
-                //
-                map = true;
-                mappedEx = new AuraUnhandledException("404 Not Found (Application Error)", mappedEx);
-            }
-        }
-        if (map) {
-            mappedEx = Aura.getExceptionAdapter().handleException(mappedEx);
-        }
-
-        PrintWriter out = response.getWriter();
-
-        //
-        // If we have written out data, We are kinda toast in this case.
-        // We really want to roll it all back, but we can't, so we opt
-        // for the best we can do. For HTML we can do nothing at all.
-        //
-        if (format == Format.JSON) {
-            if (!written) {
-                out.write(CSRF_PROTECT);
-            }
-            //
-            // If an exception happened while we were emitting JSON, we want the
-            // client to ignore the now-corrupt data structure. 404s and 500s
-            // cause the client to prepend /*, so we can effectively erase the
-            // bad data by appending a */ here and then serializing the exception
-            // info.
-            //
-            out.write("*/");
-            //
-            // Unfortunately we can't do the following now. It might be possible
-            // in some cases, but we don't want to go there unless we have to.
-            //
-        }
-        if (format == Format.JSON || format == Format.HTML || format == Format.JS || format == Format.CSS) {
-            //
-            // We only write out exceptions for HTML or JSON.
-            // Seems bogus, but here it is.
-            //
-            // Start out by cleaning out some settings to ensure we don't
-            // check too many things, leading to a circular failure. Note
-            // that this is still a bit dangerous, as we seem to have a lot
-            // of magic in the serializer.
-            //
-            context.setSerializeLastMod(false);
-            try {
-                Aura.getSerializationService().write(mappedEx, null, out);
-            } catch (QuickFixException qfe) {
-                // TODO emit boilerplate "something bad happened" response
-                Aura.getExceptionAdapter().handleException(qfe);
-            }
-            if (format == Format.JSON) {
-                out.write("/*ERROR*/");
+            } catch (IOException ioe) {
+                throw ioe;
+            } catch (Throwable doubleDeath) {
+                // we are totally hosed.
+                if (!isProductionMode(context.getMode())) {
+                    response.getWriter().println(doubleDeath.getMessage());
+                }
             }
         }
     }

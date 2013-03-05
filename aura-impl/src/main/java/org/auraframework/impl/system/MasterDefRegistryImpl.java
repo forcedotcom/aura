@@ -839,21 +839,43 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             AuraContext context = Aura.getContextService().getCurrentContext();
             Mode mode = context.getMode();
             String prefix = desc.getPrefix();
-            if (!securedDefTypes.contains(defType)
-                    || unsecuredPrefixes.contains(prefix)
-                    || unsecuredNamespaces.contains(ns)
-                    || (mode != Mode.PROD && (!Aura.getConfigAdapter().isProduction()) && unsecuredNonProductionNamespaces
-                            .contains(ns))) {
-                accessCache.add(desc);
-                return;
-            }
+            //
+            // This breaks encapsulation! -gordon
+            //
+            boolean isTopLevel = desc.equals(context.getApplicationDescriptor());
 
-            if (ns != null && DefDescriptor.JAVA_PREFIX.equals(prefix)) {
-                // handle java packages that have namespaces like aura.impl.blah
-                for (String okNs : unsecuredNamespaces) {
-                    if (ns.startsWith(okNs)) {
-                        accessCache.add(desc);
-                        return;
+            if (isTopLevel) {
+                //
+                // If we are trying to access the top level component, we need to ensure
+                // that it is _not_ abstract.
+                //
+                BaseComponentDef def = getDef(context.getApplicationDescriptor());
+                if (def != null && def.isAbstract() && def.getProviderDescriptor() == null) {
+                    throw new NoAccessException(String.format("Access to %s disallowed. Abstract definition.", desc));
+                }
+            }
+            //
+            // If this is _not_ the top level, we allow circumventing the security provider.
+            // This means that certain things will short-circuit, hopefully making checks faster...
+            // Not sure if this is premature optimization or not.
+            //
+            if (!isTopLevel || desc.getDefType().equals(DefType.COMPONENT)) {
+                if (!securedDefTypes.contains(defType)
+                        || unsecuredPrefixes.contains(prefix)
+                        || unsecuredNamespaces.contains(ns)
+                        || (mode != Mode.PROD && (!Aura.getConfigAdapter().isProduction())
+                            && unsecuredNonProductionNamespaces .contains(ns))) {
+                    accessCache.add(desc);
+                    return;
+                }
+
+                if (ns != null && DefDescriptor.JAVA_PREFIX.equals(prefix)) {
+                    // handle java packages that have namespaces like aura.impl.blah
+                    for (String okNs : unsecuredNamespaces) {
+                        if (ns.startsWith(okNs)) {
+                            accessCache.add(desc);
+                            return;
+                        }
                     }
                 }
             }

@@ -57,9 +57,9 @@
 
     <p>A component's model is <b>not</b> inherited by a component that extends the super component.</p>
     
-    <h2>Reaching Into a Super Component</h2>
+    <h2>Accessing a Super Component</h2>
     
-    <p>You can use the <code>super</code> value provider in markup to reach in to a super component. Use <code>getSuper()</code> in JavaScript code. For example, if a sub component needs to access an attribute set in an action in the super's controller, use <code>cmp.getSuper().getValue("v.parentAttributeName")</code>, where <code>parentAttributeName</code> is an attribute in the super component.</p>
+    <p>You can use the <code>super</code> value provider in markup to access a super component. Use <code>getSuper()</code> in JavaScript code. For example, if a sub component needs to access an attribute set in an action in the super's controller, use <code>cmp.getSuper().getValue("v.parentAttributeName")</code>, where <code>parentAttributeName</code> is an attribute in the super component.</p>
     
     <auradocs:info>We don't recommend using <code>super</code> and <code>getSuper()</code> unless you must as it reduces component encapsulation. It's rare to have to use this syntax but it can be useful when you are writing tests.</auradocs:info>
 

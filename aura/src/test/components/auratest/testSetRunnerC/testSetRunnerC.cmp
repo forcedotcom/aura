@@ -27,6 +27,9 @@
         <ui:button label="Run Tests!" press="{!c.runTests}"/>
         </span>
         <span class="menuItem">
+        <ui:inputCheckbox aura:id="showOnlyIntegrationTests" value="false" change="{!c.toggleShowOnlyIntegrationTests}"/>Show Only Integration Tests
+        </span>
+        <span class="menuItem">
         <ui:inputCheckbox aura:id="showFailedTests" value="false" change="{!c.toggleShowFailedTests}"/>Show Only Failed Tests
         </span>
     </div>

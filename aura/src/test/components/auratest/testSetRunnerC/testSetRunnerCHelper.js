@@ -20,5 +20,32 @@
                 event.fire();
 
             }, freq);
-    }
+    },
+    
+    updateDisplay: function(cmp, helper){    
+     cmp.getValue("m.testsWithProps").each(function(map){
+	 	if(helper.searchFilter(cmp, map) && helper.failedFilter(cmp, map) && helper.integrationFilter(cmp, map)){
+	 		map.getValue("isHidden").setValue("");
+	 	}
+	 	else{
+	 		map.getValue("isHidden").setValue("HIDDEN");
+	 	}	     
+     });
+    },
+    
+    searchFilter: function(cmp, propMap){
+    	var searchText = cmp.find("searchText").get("v.value");
+    	return $A.util.isUndefinedOrNull(searchText) || propMap.get("name").toLowerCase().indexOf(searchText.toLowerCase()) != -1;  
+    },
+    
+    failedFilter: function(cmp, propMap){
+    	var isShowOnlyFailedTests =  cmp.find("showFailedTests").getValue("v.value").getBooleanValue();
+    	var status = propMap.get("status");
+    	return !isShowOnlyFailedTests || status === "FAILED";
+    },
+    integrationFilter: function(cmp, propMap){
+    	var isShowOnlyIntegrationTests =  cmp.find("showOnlyIntegrationTests").getValue("v.value").getBooleanValue();
+    	var isIntegration = propMap.get("isInteg");
+    	return !isShowOnlyIntegrationTests || isIntegration;
+    }    
 })

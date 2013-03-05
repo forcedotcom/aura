@@ -14,30 +14,28 @@
  * limitations under the License.
  */
 ({
-    handleKeydown: function(component, event, helper) {
-        //var keyCode = event.keyCode;
-        //var shiftKey = event.shiftKey;
-        //if (keyCode == 9 && shiftKey == true) {
-        //    component.setValue("{!v.visible}", false);
-        //}
-    },
-    
-    handleTabToday: function(component, event, helper) {
-        var keycode = event.keyCode;
-        if (keycode == 9 && event.shiftKey != true) { // Tab key
+    closeOnTab: function(component, event, helper) {
+        var keyCode = event.keyCode;
+        var shiftKey = event.shiftKey;
+        if (keyCode == 9 && shiftKey == true) { // Tab + shift
             component.setValue("{!v.visible}", false);
         }
     },
     
-    hide: function(component, event, helper) {
-        component.setValue("{!v.visible}", false);
+    focusDateOnTab: function(component, event, helper) {
+        var keyCode = event.keyCode;
+        var shiftKey = event.shiftKey;
+        if (keyCode == 9 && shiftKey != true) { // Tab
+            event.preventDefault();
+            helper.focusDate(component);
+        }
     },
 	
 	goToPrevYear: function(component, event, helper) {
 	    var grid = component.find("grid");
 	    var e = grid.get("e.updateCalendar");
 	    if (e) {
-	        e.setParams({monthChange: 0, yearChange: -1});
+	        e.setParams({monthChange: 0, yearChange: -1, setFocus: false});
 	        e.fire();
 	    }
 	},
@@ -46,7 +44,7 @@
         var grid = component.find("grid");
         var e = grid.get("e.updateCalendar");
         if (e) {
-            e.setParams({monthChange: -1, yearChange: 0});
+            e.setParams({monthChange: -1, yearChange: 0, setFocus: false});
             e.fire();
         }
     },
@@ -55,7 +53,7 @@
         var grid = component.find("grid");
         var e = grid.get("e.updateCalendar");
         if (e) {
-            e.setParams({monthChange: 1, yearChange: 0});
+            e.setParams({monthChange: 1, yearChange: 0, setFocus: false});
             e.fire();
         }
     },
@@ -64,9 +62,25 @@
         var grid = component.find("grid");
         var e = grid.get("e.updateCalendar");
         if (e) {
-            e.setParams({monthChange: 0, yearChange: 1});
+            e.setParams({monthChange: 0, yearChange: 1, setFocus: false});
             e.fire();
         }
+    },
+    
+    handleTabToday: function(component, event, helper) {
+        var keycode = event.keyCode;
+        if (keycode == 9) {
+            if (event.shiftKey == true) { // Tab + shift
+                event.preventDefault();
+                helper.focusDate(component);
+            } else { // Tab
+                component.setValue("{!v.visible}", false);
+            }
+        }
+    },
+    
+    hide: function(component, event, helper) {
+        component.setValue("{!v.visible}", false);
     },
     
     selectDate: function(component, event, helper) {

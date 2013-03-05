@@ -52,6 +52,12 @@
         shortName: "Dec"
     }],
     
+    focusDate: function(component) {
+        var grid = component.find("grid");
+        var e = grid.get("e.focus");
+        e.fire();
+    },
+    
     getOnClickEndFunction : function(component) {
         if ($A.util.isUndefined(component._onClickEndFunc)) {
             var helper = this;

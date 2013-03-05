@@ -19,7 +19,7 @@
         helper.updateMonthYear(component, component.get("v.value"));
         helper.updateGlobalEventListeners(component);
         var ret = this.superAfterRender();
-        helper.localizeToday(component);
+        //helper.localizeToday(component);
         return ret;
     },
 
@@ -28,7 +28,7 @@
         helper.updateMonthYear(component, component.get("v.value"));
         helper.updateGlobalEventListeners(component);
         this.superRerender();
-        helper.localizeToday(component);
+        //helper.localizeToday(component);
     },
     
     unrender: function(component, helper) {

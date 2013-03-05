@@ -23,11 +23,16 @@
     <aura:attribute name="selectedDate" type="Date" description="The selected date."/>
     <aura:attribute name="weekDays" type="Object" description="The localized weekday labels."/>
     
+    <!-- private attributes -->
+    <aura:attribute name="_setFocus" type="Boolean" default="true" description="Control if we should focus any date when we render the month."/>
+    
     <aura:registerevent name="hide" type="ui:change"/>
+    <aura:registerevent name="focus" type="ui:focus"/>
     <aura:registerevent name="selectDate" type="ui:selectDate"/>
     <aura:registerevent name="updateCalendar" type="ui:updateCalendar"/>
     <aura:registerevent name="updateCalendarTitle" type="ui:updateCalendarTitle"/>
     
+    <aura:handler name="focus" action="{!c.focus}"/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:handler name="updateCalendar" action="{!c.updateCalendar}"/>
     

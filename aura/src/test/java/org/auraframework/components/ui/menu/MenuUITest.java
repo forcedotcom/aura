@@ -324,6 +324,9 @@ public class MenuUITest extends WebDriverTestCase{
 		String uiMenuClassName = "uiMenu";
 		WebElement menuLabel = driver.findElement(By.className(uiMenuClassName));
 		assertTrue("UiMenu should be present on the page",menuLabel.isDisplayed());
+		
+		//For W-1540590
+		assertEquals("ui:menu's wrapper element should be div", "div", menuLabel.getTagName());
 		String uiMenu = auraUITestingUtil.getFindAtRootExpr(uiMenuClassName);
 		auraUITestingUtil.getEval("$A.unrender(" + uiMenu + ")");
 		assertFalse("UiMenu should not be present after unrender", isElementPresent(By.className(uiMenuClassName)));

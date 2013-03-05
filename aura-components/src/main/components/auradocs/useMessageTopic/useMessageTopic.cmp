@@ -19,12 +19,13 @@
 
     <aura:set attribute="title" value="Displaying Messages"/>
 	<p>Use <code>ui:message</code> to display a message and use the <code>severity</code> attribute to indicate its severity level, which determines the style to use when displaying the message. 
-	If the <code>closable</code> attribute is set to true, the message is hidden when the &times; symbol is pressed.</p>    
+	If the <code>closable</code> attribute is set to true, the message is hidden when the &times; symbol is pressed. Additionally, you can wire an action to the <code>ui:message</code> component using the <code>actionable</code> attribute.</p>    
 	<auradocs:info>See the <auradocs:defLink descriptor ="ui:message">ui:message</auradocs:defLink> component reference.</auradocs:info>
 	
 	<auradocs:example descriptor="auradocs:demoMessage" />
 	
 	<p><b>See also:</b><br/>
+	  <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
       <auradocs:topicLink topic="error">Error Handling</auradocs:topicLink>
     </p>
 </aura:component>

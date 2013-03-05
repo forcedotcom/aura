@@ -141,12 +141,14 @@
                 cellCmp.setValue("{!v.value}", d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate());
                 
                 cellCmp.getElement().setAttribute("aria-selected", "false");
-                if (this.dateEquals(d, date)) {
+                var setFocus = component.get("{!v._setFocus}");
+                if (this.dateEquals(d, date) && setFocus === true) {
                     cellCmp.getElement().focus();
                 }
             }
             d.setDate(d.getDate() + 1);
         }
+        component.setValue("{!v._setFocus}", true);
     },
     
     getEventTarget: function(e) {
@@ -214,7 +216,7 @@
         } else if (keyCode == 40) { // down arrow key
             this.handleArrowKey(component, localId, 7);
         } else if (keyCode == 9 && shiftKey == true) { // Tab + shift
-            component.get("e.hide").fire();
+            //component.get("e.hide").fire();
         } else if (keyCode == 33 && shiftKey == true) { // Page Up + shift
             this.changeCalendar(component, localId, 0, -1);
         } else if (keyCode == 34 && shiftKey == true) { // Page Down + shift
@@ -244,6 +246,19 @@
         var selectDateEvent = component.getEvent("selectDate");
         selectDateEvent.setParams({"value": source.get("v.value")});
         selectDateEvent.fire();
+    },
+    
+    setFocus: function(component) {
+        var date = component.get("v.date");
+        if (!date) {
+            date = 1;
+        }
+        var year = component.get("v.year");
+        var month = component.get("v.month");
+        var cellCmp = this.findDateComponent(component, new Date(year, month, date));
+        if (cellCmp) {
+            cellCmp.getElement().focus();
+        }
     },
     
     updateTitle: function(component, month, year) {

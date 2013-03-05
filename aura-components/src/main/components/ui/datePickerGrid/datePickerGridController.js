@@ -26,6 +26,10 @@
         }
     },
     
+    focus: function(component, event, helper) {
+        helper.setFocus(component);
+    },
+    
     handleBlur: function(component, event, helper) {
         var source = event.getSource();
         if (source) {
@@ -61,6 +65,10 @@
         }
         var monthChange = event.getParam("monthChange");
         var yearChange = event.getParam("yearChange");
+        var setFocus = event.getParam("setFocus");
+        if (setFocus === false) {
+            component.setValue("{!v._setFocus}", setFocus);
+        }
         helper.changeMonthYear(component, monthChange, yearChange, date);
     }
 })

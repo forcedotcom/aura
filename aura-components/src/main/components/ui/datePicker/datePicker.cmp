@@ -22,18 +22,18 @@
     <div aura:id="datePicker" class="{!v.class + (v.visible == true ? ' visible' : '')}">
         <div class="dateBar">
             <div class="prevLinks">
-                <a aura:id="prevYear" class="navLink prevYear" title="Go to previous year" onclick="{!c.goToPrevYear}" onkeydown="{!c.handleKeydown}" tabindex="-1">
+                <a aura:id="prevYear" class="navLink prevYear" title="Go to previous year" onclick="{!c.goToPrevYear}" onkeydown="{!c.closeOnTab}">
                     <span class="assistiveText">Go to previous year</span>
                 </a>
-                <a aura:id="prevMonth" class="navLink prevMonth" title="Go to previous month" onclick="{!c.goToPrevMonth}" tabindex="-1">
+                <a aura:id="prevMonth" class="navLink prevMonth" title="Go to previous month" onclick="{!c.goToPrevMonth}">
                     <span class="assistiveText">Go to previous month</span>
                 </a>
             </div>
             <div class="nextLinks">
-                <a aura:id="nextMonth" class="navLink nextMonth" title="Go to next month" onclick="{!c.goToNextMonth}" tabindex="-1">
+                <a aura:id="nextMonth" class="navLink nextMonth" title="Go to next month" onclick="{!c.goToNextMonth}">
                     <span class="assistiveText">Go to next month</span>
                 </a>
-                <a aura:id="nextYear" class="navLink nextYear" title="Go to next year" onclick="{!c.goToNextYear}" tabindex="-1">
+                <a aura:id="nextYear" class="navLink nextYear" title="Go to next year" onclick="{!c.goToNextYear}" onkeydown="{!c.focusDateOnTab}">
                     <span class="assistiveText">Go to next year</span>
                 </a>
             </div>

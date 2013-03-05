@@ -18,4 +18,5 @@
 <aura:event type="COMPONENT">
     <aura:attribute name="monthChange" type="Integer"/>
     <aura:attribute name="yearChange" type="Integer"/>
+    <aura:attribute name="setFocus" type="Boolean" default="true"/>
 </aura:event>

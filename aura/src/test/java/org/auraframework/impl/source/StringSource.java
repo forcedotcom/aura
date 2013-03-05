@@ -26,6 +26,10 @@ import org.auraframework.def.Definition;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
 
+import org.auraframework.throwable.AuraRuntimeException;
+
+import org.auraframework.util.IOUtil;
+
 public class StringSource<D extends Definition> extends Source<D> {
 
     private static final long serialVersionUID = 8822758262106180101L;
@@ -56,12 +60,24 @@ public class StringSource<D extends Definition> extends Source<D> {
 
     @Override
     public Reader getReader() {
-        return new StringReader(getContents());
+        return new StringReader(data.getBuffer().toString());
     }
 
     @Override
     public String getContents() {
-        return data.getBuffer().toString();
+        //
+        // TODO: W-1562068 - do something different.
+        // This looks very strange, but it causes the hash to be calculated. 
+        // We could perhaps do this other ways, but for the moment, we will
+        // force it through a hashing reader.
+        //
+        try {
+            StringWriter sw = new StringWriter();
+            IOUtil.copyStream(getHashingReader(), sw);
+            return sw.toString();
+        } catch (IOException e) {
+            throw new AuraRuntimeException(e);
+        }
     }
 
     @Override

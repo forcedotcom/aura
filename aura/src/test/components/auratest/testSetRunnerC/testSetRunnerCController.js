@@ -64,16 +64,8 @@
          });
      },
 
-     filterOnSearchText : function (cmp){
-         var searchText = cmp.find("searchText").get("v.value").toLowerCase();
-         cmp.getValue("m.testsWithProps").each(function(map){
-             if (map.get("name").toLowerCase().indexOf(searchText) != -1){
-                 map.getValue("isHidden").setValue('');
-             }
-             else{
-                 map.getValue("isHidden").setValue('HIDDEN');
-             }
-         });
+     filterOnSearchText : function (cmp, event, helper){
+     	helper.updateDisplay(cmp, helper);
      },
 
     toggleShowFailedTest : function(cmp, event){
@@ -81,24 +73,11 @@
         event.getSource().getValue("v.value").commit();
     },
 
-     toggleShowFailedTests : function(cmp){
-         var isShowOnlyFailedTests =  cmp.find("showFailedTests").getValue("v.value").getBooleanValue();
-         cmp.find("searchText").getValue("v.value").setValue("");
-
-         cmp.getValue("m.testsWithProps").each(function(map){
-             var status = map.get("status");
-             var isHidden = map.get("isHidden");
-             if(isShowOnlyFailedTests){
-                 if(status !== 'FAILED'){
-                     map.getValue("isHidden").setValue("HIDDEN");
-                 }
-                 else{
-                     map.getValue("isHidden").setValue("");
-                 }
-             }
-             else{
-                      map.getValue("isHidden").setValue("");
-             }
-         });
+     toggleShowFailedTests : function(cmp, event, helper){
+     	helper.updateDisplay(cmp, helper);
+     },
+     
+     toggleShowOnlyIntegrationTests: function(cmp, event, helper){
+     	helper.updateDisplay(cmp, helper);
      }
 }

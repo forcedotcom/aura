@@ -28,6 +28,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.auraframework.test.ComponentJSTestSuiteTest.ComponentTestCase;
+import org.auraframework.test.IntegrationTestCase;
 import org.auraframework.test.TestInventory;
 import org.auraframework.test.TestInventory.Type;
 import org.auraframework.util.ServiceLocator;
@@ -141,6 +142,8 @@ public class TestSetRunnerState {
                 testWithProps.put("status", "Not Run Yet");
                 testWithProps.put("exception", "");
                 testWithProps.put("isHidden", "");
+                testWithProps.put("isInteg", t instanceof IntegrationTestCase);
+                
                 String url = "";
                 if (t instanceof ComponentTestCase) {
                     url = ((ComponentTestCase) t).getTestUrlForManualRun();

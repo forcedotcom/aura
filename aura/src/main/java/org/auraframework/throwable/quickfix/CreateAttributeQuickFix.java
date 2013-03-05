@@ -25,8 +25,11 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.TypeDef;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraError;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.Maps;
 
@@ -42,8 +45,7 @@ public class CreateAttributeQuickFix extends AuraQuickFix {
     /**
      * Create an attribute quick-fix.
      * 
-     * @param descriptor the descriptor on which we wish to create the
-     *            attribute.
+     * @param descriptor the descriptor on which we wish to create the attribute.
      * @param attName the name of the attribute
      */
     public CreateAttributeQuickFix(DefDescriptor<?> descriptor, String attName) {
@@ -53,8 +55,7 @@ public class CreateAttributeQuickFix extends AuraQuickFix {
     /**
      * Create an attribute quick-fix from a map.
      * 
-     * @param attributes A map with 'descriptor', 'attName', and 'intf' set
-     *            appropriately.
+     * @param attributes A map with 'descriptor', 'attName', and 'intf' set appropriately.
      */
     public CreateAttributeQuickFix(Map<String, Object> attributes) {
         super("Create Attribute", attributes, Aura.getDefinitionService().getDefDescriptor(
@@ -81,6 +82,24 @@ public class CreateAttributeQuickFix extends AuraQuickFix {
         DefDescriptor<?> desc = Aura.getDefinitionService().getDefDescriptor(descriptor,
                 intf ? InterfaceDef.class : ComponentDef.class);
         Source<?> source = Aura.getContextService().getCurrentContext().getDefRegistry().getSource(desc);
+
+        // checks for an empty attribute name or type
+        if ("".equals(attName) || "".equals(type)) {
+            throw new AuraRuntimeException("Cannot leave the field blank");
+        }
+        // Validates the attribute name
+        if ((AuraTextUtil.validateAttributeName(attName)) != true) {
+            throw new AuraRuntimeException("Invalid attribute name:'" + attName
+                    + "',Refer to Auradocs for valid attribute names");
+        }
+        // validates the type
+        try {
+            DefDescriptor<TypeDef> typeDesc = Aura.getDefinitionService().getDefDescriptor(type, TypeDef.class);
+            typeDesc.getDef();
+        } catch (AuraRuntimeException e) {
+            throw new AuraRuntimeException("Invalid attribute type:" + type);
+        }
+
         if (!source.exists()) {
             throw new AuraError("Cannot find source for " + desc.getQualifiedName());
         }
@@ -107,5 +126,4 @@ public class CreateAttributeQuickFix extends AuraQuickFix {
         }
 
     }
-
 }

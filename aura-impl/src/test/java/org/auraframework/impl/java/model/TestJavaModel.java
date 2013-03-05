@@ -17,19 +17,14 @@ package org.auraframework.impl.java.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 import org.auraframework.components.ui.InputOption;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 import org.auraframework.util.date.DateOnly;
+
+import com.google.common.collect.Maps;
 
 /**
  * Used by /expressionTest/expressionFunction.cmp which expects the current
@@ -409,5 +404,13 @@ public class TestJavaModel {
     @AuraEnabled
     public String getSelectValue() {
         return "option1";
+    }
+    
+    @AuraEnabled
+    public Map<String,String> getMap(){
+        Map<String,String> items= Maps.newHashMap();
+        items.put("fruit", "apple");
+        items.put("animal", "bear");
+        return items;
     }
 }

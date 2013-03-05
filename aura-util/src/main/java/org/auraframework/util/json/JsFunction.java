@@ -32,17 +32,41 @@ import org.auraframework.util.AuraTextUtil;
  * functions, like: BAD: function foo(arg1, arg2){}
  */
 public class JsFunction implements JsonSerializable, Serializable {
-    /**
-     */
     private static final long serialVersionUID = 1186050562190474668L;
     private String name;
     private final List<String> arguments;
     private final String body;
     private final int line;
     private final int col;
+    private String sanitized;
 
     public JsFunction(List<String> arguments, String body) {
         this(null, arguments, body, -1, -1);
+    }
+
+    private String sanitize() {
+        StringBuilder func = new StringBuilder("function ");
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(name)) {
+            func.append(name);
+        }
+        func.append("(");
+        boolean first = true;
+        for (String arg : arguments) {
+            if (!first) {
+                func.append(", ");
+            } else {
+                first = false;
+            }
+            func.append(arg);
+        }
+        func.append(") {");
+        func.append(body);
+        func.append('}');
+
+        //
+        // Now make sure we escape the right sequences.
+        //
+        return AuraTextUtil.escapeForJSONFunction(func.toString());
     }
 
     public JsFunction(String name, List<String> arguments, String body, int line, int col) {
@@ -51,6 +75,7 @@ public class JsFunction implements JsonSerializable, Serializable {
         this.body = body;
         this.line = line;
         this.col = col;
+        this.sanitized = null;
     }
 
     /**
@@ -92,8 +117,8 @@ public class JsFunction implements JsonSerializable, Serializable {
      * @param name The name to set.
      */
     public void setName(String name) {
-        // Clear out the cache of the serialized form since the name is
-        // changing.
+        // Clear out the cache of the serialized form since the name is changing.
+        this.sanitized = null;
         this.name = name;
     }
 
@@ -110,24 +135,10 @@ public class JsFunction implements JsonSerializable, Serializable {
 
     @Override
     public String toString() {
-        StringBuilder func = new StringBuilder("function ");
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(name)) {
-            func.append(name);
+        if (sanitized == null) {
+            sanitized = sanitize();
         }
-        func.append("(");
-        boolean first = true;
-        for (String arg : arguments) {
-            if (!first) {
-                func.append(", ");
-            } else {
-                first = false;
-            }
-            func.append(arg);
-        }
-        func.append(") {");
-        func.append(body);
-        func.append('}');
-        return func.toString();
+        return sanitized;
     }
 
     @Override

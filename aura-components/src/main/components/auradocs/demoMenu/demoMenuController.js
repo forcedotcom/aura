@@ -19,7 +19,7 @@
         if (triggerCmp) {
             var source = event.getSource();
             var label = source.get("v.label");
-            triggerCmp.setValue("{!v.label}", label);
+            triggerCmp.setValue("v.label", label);
         }
     },
     updateLabel: function(cmp, event) {
@@ -27,7 +27,7 @@
         if (triggerCmp) {
             var source = event.getSource();
             var label = source.get("v.label");
-            triggerCmp.setValue("{!v.label}", label);
+            triggerCmp.setValue("v.label", label);
         }
     },
     getMenuSelected: function(cmp, event) {
@@ -41,7 +41,7 @@
             }
         }
         var resultCmp = cmp.find("result");
-        resultCmp.setValue("{!v.value}", values.join(","));
+        resultCmp.setValue("v.value", values.join(","));
     },
     getRadioMenuSelected: function(cmp, event) {
         var menuCmp = cmp.find("radioMenu");
@@ -54,6 +54,6 @@
             }
         }
         var resultCmp = cmp.find("radioResult");
-        resultCmp.setValue("{!v.value}", values.join(","));
+        resultCmp.setValue("v.value", values.join(","));
     }
 })

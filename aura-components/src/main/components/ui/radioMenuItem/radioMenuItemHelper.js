@@ -42,7 +42,7 @@
                 if (c.isInstanceOf("ui:radioMenuItem") && 
                     c.getValue("v.selected").getBooleanValue() && 
                     c.getGlobalId() != component.getGlobalId()) {
-                    c.setValue("{!v.selected}", false);     
+                    c.setValue("v.selected", false);     
                     break;
                 }
             }

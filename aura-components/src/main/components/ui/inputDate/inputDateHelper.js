@@ -34,8 +34,8 @@
             currentDate = d.toDate();
         }
         var datePicker = component.find("datePicker");
-        datePicker.setValue("{!v.value}", this.getDateString(currentDate));
-        datePicker.setValue("{!v.visible}", true);
+        datePicker.setValue("v.value", this.getDateString(currentDate));
+        datePicker.setValue("v.visible", true);
     },
     
     /**
@@ -49,7 +49,7 @@
             var mDisplayValue = moment.utc(value, format);
             ret = mDisplayValue.format("YYYY-MM-DD");
         }
-        component.setValue("{!v.value}", ret);
+        component.setValue("v.value", ret);
     },
     
     getDateString: function(date) {

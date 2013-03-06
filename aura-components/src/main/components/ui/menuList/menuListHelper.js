@@ -80,7 +80,7 @@
                 this.setMenuItemFocus(concreteCmp, index);
             }
         } else {
-            concreteCmp.setValue("{!v.focusItemIndex}", 0);
+            concreteCmp.setValue("v.focusItemIndex", 0);
         }
         this.handleGlobalClick(concreteCmp, visible);
     }

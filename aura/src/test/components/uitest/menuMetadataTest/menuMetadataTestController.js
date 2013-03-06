@@ -19,7 +19,7 @@
         if (triggerCmp) {
             var source = event.getSource();
             var label = source.get("v.label");
-            triggerCmp.setValue("{!v.label}", label);
+            triggerCmp.setValue("v.label", label);
         }
     },
     updateLabel: function(cmp, event) {
@@ -27,7 +27,7 @@
         if (triggerCmp) {
             var source = event.getSource();
             var label = source.get("v.label");
-            triggerCmp.setValue("{!v.label}", label);
+            triggerCmp.setValue("v.label", label);
         }
     },
     clickMenu: function(cmp, event) {
@@ -40,7 +40,7 @@
         if (triggerCmp) {
             var source = event.getParam("selectedItem");
             var label = source.get("v.label");
-            triggerCmp.setValue("{!v.label}", label);
+            triggerCmp.setValue("v.label", label);
         }
     },
     pickTiger: function(cmp, event) {
@@ -48,7 +48,7 @@
         if (triggerCmp) {
             var source = event.getParam("selectedItem");
             var className = source.get("v.class");
-            triggerCmp.setValue("{!v.class}", className);
+            triggerCmp.setValue("v.class", className);
         }
     },
     getMenuSelected: function(cmp, event) {
@@ -62,6 +62,6 @@
             }
         }
         var resultCmp = cmp.find("result");
-        resultCmp.setValue("{!v.value}", values.join(","));
+        resultCmp.setValue("v.value", values.join(","));
     }
 })

@@ -18,7 +18,7 @@
         var parent = component.getValue("v.parent");
         if (parent && !parent.isEmpty()) {
             p = parent.getValue(0);
-            p.setValue("{!v.visible}", false);
+            p.setValue("v.visible", false);
             helper.fireSelectEvent(component, event);
         } 
     }

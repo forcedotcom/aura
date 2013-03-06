@@ -18,6 +18,6 @@
         if (value) {
             value = value.replace(/%+$/g, '');
         }
-        component.setValue("{!v.value}", value);
+        component.setValue("v.value", value);
     }
 })

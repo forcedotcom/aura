@@ -18,7 +18,7 @@
         var keyCode = event.keyCode;
         var shiftKey = event.shiftKey;
         if (keyCode == 9 && shiftKey == true) { // Tab + shift
-            component.setValue("{!v.visible}", false);
+            component.setValue("v.visible", false);
         }
     },
     
@@ -74,13 +74,13 @@
                 event.preventDefault();
                 helper.focusDate(component);
             } else { // Tab
-                component.setValue("{!v.visible}", false);
+                component.setValue("v.visible", false);
             }
         }
     },
     
     hide: function(component, event, helper) {
-        component.setValue("{!v.visible}", false);
+        component.setValue("v.visible", false);
     },
     
     selectDate: function(component, event, helper) {
@@ -88,7 +88,7 @@
         var selectDateEvent = component.getEvent("selectDate");
         selectDateEvent.setParams({"value": selectedDate});
         selectDateEvent.fire();
-        component.setValue("{!v.visible}", false);
+        component.setValue("v.visible", false);
     },
     
     selectToday: function(component, event, helper) {
@@ -96,7 +96,7 @@
         var selectDateEvent = component.getEvent("selectDate");
         selectDateEvent.setParams({"value": mDate.format("YYYY-MM-DD")});
         selectDateEvent.fire();
-        component.setValue("{!v.visible}", false);
+        component.setValue("v.visible", false);
     },
 	
 	updateCalendarTitle: function(component, event, helper) {

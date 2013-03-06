@@ -18,13 +18,13 @@
         var format = component.get("v.format");
         if (format) {
             format = format.toUpperCase();
-            component.setValue("{!v.format}", format);
+            component.setValue("v.format", format);
         }
         var value = component.get("v.value");
         if (value) {
             var mDate = moment.utc(value, "YYYY-MM-DD");
             if (mDate.isValid()) {
-                component.setValue("{!v.value}", mDate.format("YYYY-MM-DD"));
+                component.setValue("v.value", mDate.format("YYYY-MM-DD"));
             }
         }
     },
@@ -36,7 +36,7 @@
     setValue: function(component, event, helper) {
         var dateValue = event.getParam("value");
         if (dateValue) {
-            component.setValue("{!v.value}", dateValue);
+            component.setValue("v.value", dateValue);
         }
     }
 })

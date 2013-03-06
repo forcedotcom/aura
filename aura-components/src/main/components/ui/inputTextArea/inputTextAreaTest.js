@@ -20,7 +20,6 @@
     testValue: {
         attributes : {value: "Initial value"},
         test: function(component){
-        debugger;
             aura.test.assertEquals("Initial value", component.getElement().value, "Textarea value not correctly initialized.");
             component.getValue("v.value").setValue("Changed value");
             $A.rerender(component);

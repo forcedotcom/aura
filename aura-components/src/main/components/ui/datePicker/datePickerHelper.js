@@ -91,7 +91,7 @@
             
                 if (!helper.isElementInComponent(component, event.target)) {
                     // Hide the component
-                    component.setValue("{!v.visible}", false);
+                    component.setValue("v.visible", false);
                     var divCmp = component.find("datePicker");
                     if (divCmp) {
                         var elem = divCmp.getElement();
@@ -224,10 +224,10 @@
         }
         var grid = component.find("grid");
         if (grid) {
-            grid.setValue("{!v.selectedDate}", value.getFullYear() + "-" + (value.getMonth() + 1) + "-" + value.getDate());
-            grid.setValue("{!v.date}", value.getDate());
-            grid.setValue("{!v.month}", value.getMonth());
-            grid.setValue("{!v.year}", value.getFullYear());
+            grid.setValue("v.selectedDate", value.getFullYear() + "-" + (value.getMonth() + 1) + "-" + value.getDate());
+            grid.setValue("v.date", value.getDate());
+            grid.setValue("v.month", value.getMonth());
+            grid.setValue("v.year", value.getFullYear());
         }
     },
     

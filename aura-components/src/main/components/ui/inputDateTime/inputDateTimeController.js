@@ -23,7 +23,7 @@
         var format = component.get("v.format");
         if (format) {
             format = format.replace(/y/g, "Y").replace(/d/g, "D");
-            component.setValue("{!v.format}", format);
+            component.setValue("v.format", format);
         }
     },
     
@@ -57,6 +57,6 @@
                                   secs,
                                   ms);
         var m = moment.utc(targetTime).lang(helper.getLangLocale(component));
-        component.setValue("{!v.value}", m.format(format));
+        component.setValue("v.value", m.format(format));
     }
 })

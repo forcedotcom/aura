@@ -17,7 +17,7 @@
     handleClick : function(component, event, helper) {
         var concrete = component.getConcreteComponent();
         var current = concrete.get("v.selected");
-        concrete.setValue("{!v.selected}", !current);
+        concrete.setValue("v.selected", !current);
         helper.fireSelectEvent(component, event);
     }
 })

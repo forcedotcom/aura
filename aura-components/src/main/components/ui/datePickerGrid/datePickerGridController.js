@@ -67,7 +67,7 @@
         var yearChange = event.getParam("yearChange");
         var setFocus = event.getParam("setFocus");
         if (setFocus === false) {
-            component.setValue("{!v._setFocus}", setFocus);
+            component.setValue("v._setFocus", setFocus);
         }
         helper.changeMonthYear(component, monthChange, yearChange, date);
     }

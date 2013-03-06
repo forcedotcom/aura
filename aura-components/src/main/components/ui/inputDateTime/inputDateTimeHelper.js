@@ -25,8 +25,8 @@
             }
         }
         var datePicker = component.find("datePicker");
-        datePicker.setValue("{!v.value}", this.getUTCDateString(currentDate));
-        datePicker.setValue("{!v.visible}", true);
+        datePicker.setValue("v.value", this.getUTCDateString(currentDate));
+        datePicker.setValue("v.visible", true);
     },
     
     /**

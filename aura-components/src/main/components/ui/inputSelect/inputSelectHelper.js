@@ -80,7 +80,7 @@
         }
         var originalStatus = optionCmp.getValue("v.value").getBooleanValue();
         if (originalStatus !== selected) {
-            optionCmp.setValue("{!v.value}", selected);
+            optionCmp.setValue("v.value", selected);
         }
     },
 

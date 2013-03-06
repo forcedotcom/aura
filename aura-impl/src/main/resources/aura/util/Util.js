@@ -404,7 +404,13 @@ $A.ns.Util.prototype.removeElement = function(element) {
                     var node = trashcan.lastChild;
                     
                     if (node.nodeType !== 3 && node.nodeType !== 8) {
-                    	delete node["aura_deleted"];
+                    	try{
+                    		delete node["aura_deleted"];
+                    	}
+                    	catch(e){
+                    		//IE7 having issue with delete
+                    		node.removeAttribute("aura_deleted");
+                    	}
                     }
                     
                     trashcan.removeChild(node);

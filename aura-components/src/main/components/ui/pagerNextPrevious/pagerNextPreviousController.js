@@ -15,23 +15,37 @@
  */
 ({
     firstPage:function (component, domEvent, helper) {
-        if(domEvent.currentTarget.disabled)return;
-        var targetPage=1;
+    	var currentPage = parseInt(component.get("v.currentPage"), 10);
+    	if (currentPage <= 1) {
+    		return;
+		}
+        var targetPage = 1;
         helper.changePage(component,targetPage,domEvent);
     },
     lastPage:function (component, domEvent, helper) {
-        if(domEvent.currentTarget.disabled)return;
-        var targetPage = component.get("v.pageCount");
+    	var currentPage = parseInt(component.get("v.currentPage"), 10);
+    	var pageCount = parseInt(component.get("v.pageCount"), 10);
+    	if (currentPage == pageCount) {
+    		return;
+    	}
+        var targetPage = pageCount;
         helper.changePage(component, targetPage, domEvent);
     },
     nextPage:function (component, domEvent, helper) {
-        if(domEvent.currentTarget.disabled)return;
-        var targetPage = Math.min(parseInt(component.get("v.currentPage"),10)+1, component.get("v.pageCount"));
+    	var currentPage = parseInt(component.get("v.currentPage"), 10);
+    	var pageCount = parseInt(component.get("v.pageCount"), 10);
+    	if (currentPage == pageCount) {
+    		return;
+    	}
+        var targetPage = Math.min(currentPage+1, pageCount);
         helper.changePage(component, targetPage, domEvent);
     },
     previousPage:function (component, domEvent, helper) {
-        if(domEvent.currentTarget.disabled)return;
-        var targetPage = Math.max(parseInt(component.get("v.currentPage"),10)-1, 1);
+    	var currentPage = parseInt(component.get("v.currentPage"), 10);
+    	if (currentPage <= 1) {
+    		return;
+		}
+        var targetPage = Math.max(currentPage-1, 1);
         helper.changePage(component, targetPage, domEvent);
     }
 })

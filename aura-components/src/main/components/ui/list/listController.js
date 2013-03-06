@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	handlePageChange: function(component, event, helper) {
+	handlePageChange: function(component, event, helper) {		
 		var currentPage = event.getParam("currentPage");
 		var pageSize = event.getParam("pageSize");
 		

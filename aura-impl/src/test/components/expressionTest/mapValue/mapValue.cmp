@@ -19,6 +19,6 @@
     <aura:attribute name="map" type="Map" />
     <aura:handler name="change" value="{!m.map}" action="{!c.onValueChange}"/>
     
-    <aura:attribute name="disabled" type="Boolean" default="false"/>
-    <div disabled="{!v.disabled}" readonly="true" aura:id="htmlDiv"/>
+    <aura:attribute name="fribble" type="Boolean" default="false"/>
+    <div disabled="{!v.fribble}" readonly="true" aura:id="htmlDiv"/>
 </aura:component>

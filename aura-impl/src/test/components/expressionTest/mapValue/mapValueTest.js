@@ -36,6 +36,22 @@
     },
 
     /**
+     * Test getting a property reference from a MapValue.
+     */
+    // FIXME: W-1563175
+    _testGetWithPropertyReference:{
+        test:function(component){
+            var newMap = component.find('htmlDiv').getAttributes().getValue('htmlattributes');
+            $A.test.assertEquals("MapValue", newMap.toString());
+            try{
+                $A.test.assertEquals("false", newMap.get("disabled"), "failed to resolve propertyReferenceValue");
+            }catch(e){
+                $A.test.fail("Failed to resolve PropertyReferenceValues before setValue(). Error :" + e);
+            }
+        }
+    },
+
+    /**
      * Setting map value to MapValue should use the provided value.
      */
     testSetValueMapValue: {
@@ -57,21 +73,27 @@
     /**
      * Setting a MapValue to a MapValue where the new map has some values which are PropertyReferenceValues.
      */
-    //TODO: W-1332111
-    _testSetValueMapValueWithPropertyReferences:{
-	test:function(component){
-	    var newMap = component.find('htmlDiv').getAttributes().getValue('htmlattributes');
-	    $A.test.assertEquals("MapValue", newMap.toString());
-	    var setval = $A.expressionService.create(null, {});
-	    try{
-        	setval.setValue(newMap);
-        	$A.test.assertEquals("MapValue", setval.toString(), "expected an MapValue");
-                $A.test.assertEquals("true", setval.get("readonly"), "wrong first value");
-                $A.test.assertEquals("false", setval.get("disabled"), "failed to resolve propertyReferenceValue");
-	    }catch(e){
-		$A.test.fail("Failed to copy PropertyReferenceValues using setValue(). Error :" + e);
-	    }
-	}
+    testSetValueMapValueWithPropertyReferences:{
+        test:function(component){
+            var newMap = component.find('htmlDiv').getAttributes().getValue('htmlattributes');
+            $A.test.assertEquals("MapValue", newMap.toString());
+            var setval = $A.expressionService.create(component.find('htmlDiv'), {});
+            try{
+                setval.setValue(newMap);
+            }catch(e){
+                $A.test.fail("Failed to copy PropertyReferenceValues using setValue(). Error :" + e);
+            }
+            $A.test.assertEquals("MapValue", setval.toString(), "expected an MapValue");
+            $A.test.assertEquals("true", setval.get("readonly"), "wrong first value");
+            $A.test.assertEquals("PropertyReferenceValue", setval.getValue("disabled").toString(),
+                "failed to copy propertyReferenceValue");
+            //FIXME: W-1563175
+            //try{
+            //    $A.test.assertEquals("false", setval.get("disabled"), "failed to resolve propertyReferenceValue");
+            //}catch(e){
+            //  $A.test.fail("Failed to resolve PropertyReferenceValues after setValue(). Error :" + e);
+            //}
+        }
     },
     /**
      * Setting a MapValue to a simple value that is not null should fail.
@@ -216,18 +238,18 @@
     },
 
     testSetValueLiteral:{
-	test:function(cmp){
-	    var setval = $A.expressionService.create(null, {});
+        test:function(cmp){
+            var setval = $A.expressionService.create(null, {});
             $A.test.assertEquals("MapValue", setval.toString());
             $A.test.assertEquals(0, this.calculateSize(setval));
             $A.test.assertEquals(false, setval.isDirty());
             try{
-        	setval.setValue("foo");
-        	$A.test.fail("Expected exception from setValue(String literals)");
+                setval.setValue("foo");
+                $A.test.fail("Expected exception from setValue(String literals)");
             }catch(e){
-        	
+                
             }
-	}
+        }
     },
     /**
      * Unwrapping a map should give a primitive object

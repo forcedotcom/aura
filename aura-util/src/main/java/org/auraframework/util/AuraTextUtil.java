@@ -613,7 +613,7 @@ public class AuraTextUtil {
      * @return a : true if the name is valid and false if its invalid
      */
     public static boolean validateAttributeName(String attrName) {
-        Pattern p = Pattern.compile("^[a-zA-Z_].[-a-zA-Z0-9_:]*$");
+        Pattern p = Pattern.compile("^[a-zA-Z_].[-a-zA-Z0-9_]*$");
         Matcher m = p.matcher(attrName);
         boolean a = m.find();
         return a;

@@ -124,8 +124,7 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
     }
 
     /**
-     * Simple attribute name may be referenced with "aura" prefix on component
-     * tag
+     * Simple attribute name may be referenced with "aura" prefix on component tag
      * 
      * @expectedResults attribute value is retrieved
      */
@@ -142,8 +141,7 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
     }
 
     /**
-     * Simple attribute name may be referenced with "aura" prefix from aura:set
-     * tag
+     * Simple attribute name may be referenced with "aura" prefix from aura:set tag
      * 
      * @expectedResults attribute value is retrieved
      */
@@ -158,8 +156,7 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
     }
 
     /**
-     * Simple attribute name may be referenced with "aura" prefix from aura:set
-     * tag on nested component
+     * Simple attribute name may be referenced with "aura" prefix from aura:set tag on nested component
      * 
      * @expectedResults attribute value is retrieved
      */
@@ -219,28 +216,4 @@ public class ComponentAttributeNameValidationTest extends AuraImplTestCase {
         assertEquals("bye", cmp.getSuper().getAttributes().getValue("aura:special"));
     }
 
-    /**
-     * Prefixed attribute name must be referenced with prefix from aura:set tag
-     * on nested component
-     * 
-     * @expectedResults attribute value is retrieved
-     */
-    @SuppressWarnings("unchecked")
-    public void testSetAttributePrefixInNestedComponent() throws Exception {
-        DefDescriptor<ComponentDef> myCmp = addSourceAutoCleanup(ComponentDef.class, "<aura:component>"
-                + "<aura:attribute name='aura:special1' type='String' default='hi'/>"
-                + "<aura:attribute name='other:special2' type='String' default='bye'/>" + "</aura:component>");
-
-        Component cmp = getComponentInstance(String.format("<aura:component><%1$s>"
-                + "<aura:set attribute='other:special2' value='bye'/>" + "</%1$s></aura:component>",
-                myCmp.getDescriptorName()));
-        Component innerCmp = ((List<Component>) cmp.getSuper().getAttributes().getValue("body")).get(0);
-        assertEquals("bye", innerCmp.getAttributes().getValue("other:special2"));
-
-        cmp = getComponentInstance(String.format("<aura:component><%1$s>"
-                + "<aura:set attribute='aura:special1' value='bye'/>" + "</%1$s></aura:component>",
-                myCmp.getDescriptorName()));
-        innerCmp = ((List<Component>) cmp.getSuper().getAttributes().getValue("body")).get(0);
-        assertEquals("bye", innerCmp.getAttributes().getValue("aura:special1"));
-    }
 }

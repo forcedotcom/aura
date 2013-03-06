@@ -330,10 +330,10 @@ public class AuraTextUtilTest extends UnitTestCase {
     public void testvalidateAttributeName() {
         assertTrue("Attribute name<name> should be valid ", AuraTextUtil.validateAttributeName("name"));
         assertTrue("Attribute name<_name> should be valid", AuraTextUtil.validateAttributeName("_name"));
-        assertTrue("Attribute name<na-me> should be valid", AuraTextUtil.validateAttributeName("na-:me"));
+        assertTrue("Attribute name<na-me> should be valid", AuraTextUtil.validateAttributeName("na-me"));
         assertTrue("Attribute name<na_me> should be valid", AuraTextUtil.validateAttributeName("na_me"));
         assertTrue("Attribute name<nam123e> should be valid", AuraTextUtil.validateAttributeName("nam123e"));
-        assertFalse("Attribute name <na$%me> should be invalid", AuraTextUtil.validateAttributeName("na$me"));
+        assertFalse("Attribute name <na$:me> should be invalid", AuraTextUtil.validateAttributeName("na$:me"));
         assertFalse("Attribute name <123name> should be invalid", AuraTextUtil.validateAttributeName("123name"));
         assertFalse("Attribute name <nam e> should be invalid", AuraTextUtil.validateAttributeName("nam e"));
         assertFalse("Attribute name <nam'a'e> should be invalid", AuraTextUtil.validateAttributeName("nam'a'e"));

@@ -46,7 +46,6 @@ import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
-import org.junit.Ignore;
 
 /**
  * Tests for DefinitionServiceImpl. ThreadHostile due to testGetLastMod ThreadHostile at least since

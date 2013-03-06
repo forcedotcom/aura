@@ -32,28 +32,80 @@ public class ManifestUtilTest extends UnitTestCase {
         int ccount = Integer.parseInt(parts.get(0));
         long ctime = Long.parseLong(parts.get(1));
 
-        assertEquals("Count mismatch for "+cookie, count, ccount);
+        assertEquals("Count mismatch for " + cookie, count, ccount);
         if (time != 0) {
-            assertEquals("Time mismatch for "+cookie, time, ctime);
+            assertEquals("Time mismatch for " + cookie, time, ctime);
         } else {
             long now = System.currentTimeMillis();
 
-            assertTrue("Too much time for "+cookie, now-ctime < 60*1000);
+            assertTrue("Too much time for " + cookie, now - ctime < 60 * 1000);
         }
         return ctime;
     }
 
-    public void testManifestCookieUpdate() {
+    /**
+     * Null cookie value returns "start" cookie.
+     */
+    public void testUpdateManifestCookieNull() {
+        String value = ManifestUtil.updateManifestCookieValue(null);
+        checkManifestCookieValue(value, 1, 0);
+    }
+
+    /**
+     * Empty cookie value returns "start" cookie.
+     */
+    public void testUpdateManifestCookieEmpty() {
+        String value = ManifestUtil.updateManifestCookieValue("");
+        checkManifestCookieValue(value, 1, 0);
+    }
+
+    /**
+     * Unexpected cookie format (colon-delimited) returns "start" cookie.
+     */
+    public void testUpdateManifestCookieInvalidFormat() {
+        String value = ManifestUtil.updateManifestCookieValue("12345678");
+        checkManifestCookieValue(value, 1, 0);
+
+        value = ManifestUtil.updateManifestCookieValue("stringy");
+        checkManifestCookieValue(value, 1, 0);
+    }
+
+    /**
+     * Error cookie value returns null.
+     */
+    public void testUpdateManifestCookieError() {
+        assertNull(ManifestUtil.updateManifestCookieValue("error"));
+    }
+
+    /**
+     * Invalid count cookie value returns null.
+     */
+    public void testUpdateManifestCookieBadCount() {
+        assertNull(ManifestUtil.updateManifestCookieValue("one:123456789"));
+    }
+
+    /**
+     * Invalid time cookie value returns null.
+     */
+    public void testUpdateManifestCookieBadTime() {
+        assertNull(ManifestUtil.updateManifestCookieValue("1:jan 6 2013"));
+    }
+
+    /**
+     * Age check before count check.
+     */
+    public void testUpdateManifestCookieExpired() {
+        String value = ManifestUtil.updateManifestCookieValue("99:0");
+        checkManifestCookieValue(value, 1, 0);
+    }
+
+    /**
+     * Cookie count overflow.
+     */
+    public void testUpdateManifestCookieOverCount() {
         String value;
         long time;
 
-        value = ManifestUtil.updateManifestCookieValue("0:0");
-        checkManifestCookieValue(value, 1, 0);
-        //
-        // Verify that time overrides count
-        //
-        value = ManifestUtil.updateManifestCookieValue("6:0");
-        checkManifestCookieValue(value, 1, 0);
         value = ManifestUtil.updateManifestCookieValue("");
         time = checkManifestCookieValue(value, 1, 0);
         value = ManifestUtil.updateManifestCookieValue(value);
@@ -71,6 +123,6 @@ public class ManifestUtilTest extends UnitTestCase {
         value = ManifestUtil.updateManifestCookieValue(value);
         time = checkManifestCookieValue(value, 8, time);
         value = ManifestUtil.updateManifestCookieValue(value);
-        assertNull("Did not expire cookie "+value, value);
+        assertNull("Did not expire cookie " + value, value);
     }
 }

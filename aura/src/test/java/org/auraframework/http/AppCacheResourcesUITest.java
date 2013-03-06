@@ -62,8 +62,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 /**
- * Tests for AppCache functionality by watching the requests received at the
- * server and verifying that the updated content is being used by the browser.
+ * Tests for AppCache functionality by watching the requests received at the server and verifying that the updated
+ * content is being used by the browser.
  * 
  * @since 0.0.224
  */
@@ -166,8 +166,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     /**
-     * Opening cached app will only query server for the manifest and the
-     * component load.
+     * Opening cached app will only query server for the manifest and the component load.
      */
     @TestLabels("auraSanity")
     public void testNoChanges() throws Exception {
@@ -198,7 +197,13 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         Date expiry = new Date(System.currentTimeMillis() + 60000);
         String cookieName = getManifestCookieName();
         getDriver().manage().addCookie(new Cookie(cookieName, "error", null, "/", expiry));
-        loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
+        logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
+        List<Request> expectedChange = Lists.newArrayList();
+        expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
+        expectedChange.add(new Request("/aura", namespace + ":" + appName, null, "HTML", 302)); // hard refresh
+        expectedChange.add(new Request(3, "/auraResource", null, null, "manifest", 200));
+        expectedChange.add(new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200));
+        assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.IDLE);
 
         // There may be a varying number of requests, depending on when the
@@ -208,8 +213,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     /**
-     * Opening uncached app that had a prior cache error will have limited
-     * caching.
+     * Opening uncached app that had a prior cache error will have limited caching.
      */
     public void testCacheErrorWithEmptyCache() throws Exception {
         openNoAura("/aura/application.app"); // just need a domain page to set
@@ -218,7 +222,13 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         String cookieName = getManifestCookieName();
         getDriver().manage().addCookie(new Cookie(cookieName, "error", null, "/", expiry));
 
-        loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
+        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
+        List<Request> expectedChange = Lists.newArrayList();
+        expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
+        expectedChange.add(new Request("/aura", namespace + ":" + appName, null, "HTML", 200));
+        expectedChange.add(new Request("/auraResource", null, null, "css", 200));
+        expectedChange.add(new Request("/auraResource", null, null, "js", 200));
+        assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.UNCACHED);
 
         // There may be a varying number of requests, depending on when the
@@ -228,8 +238,32 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     /**
-     * Opening cached app after namespace style change will trigger cache
-     * update.
+     * Manifest request limit exceeded for the time period should result in reset.
+     */
+    public void testManifestRequestLimitExceeded() throws Exception {
+        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
+
+        assertRequests(getExpectedInitialRequests(), logs);
+        assertAppCacheStatus(Status.IDLE);
+
+        Date expiry = new Date(System.currentTimeMillis() + 60000);
+        String cookieName = getManifestCookieName();
+        Cookie cookie = getDriver().manage().getCookieNamed(cookieName);
+        String timeVal = cookie.getValue().split(":")[1];
+        getDriver().manage().addCookie(
+                new Cookie(cookieName, "8:" + timeVal, null, "/", expiry));
+        logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
+        List<Request> expectedChange = Lists.newArrayList();
+        expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
+        expectedChange.add(new Request("/aura", namespace + ":" + appName, null, "HTML", 302)); // hard refresh
+        expectedChange.add(new Request(3, "/auraResource", null, null, "manifest", 200));
+        expectedChange.add(new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200));
+        assertRequests(expectedChange, logs);
+        assertAppCacheStatus(Status.IDLE);
+    }
+
+    /**
+     * Opening cached app after namespace style change will trigger cache update.
      */
     // Can't run on iOS because PROD modes will just cache components so changes
     // are not picked up
@@ -254,8 +288,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     /**
-     * Opening cached app after namespace controller change will trigger cache
-     * update.
+     * Opening cached app after namespace controller change will trigger cache update.
      */
     // Can't run on iOS because PROD modes will just cache components so changes
     // are not picked up
@@ -287,8 +320,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     /**
-     * Opening cached app after component markup change will trigger cache
-     * update.
+     * Opening cached app after component markup change will trigger cache update.
      */
     // Can't run on iOS because PROD modes will just cache components so changes
     // are not picked up
@@ -313,8 +345,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     /**
-     * Opening cached app after framework javascript change will trigger cache
-     * update.
+     * Opening cached app after framework javascript change will trigger cache update.
      */
     // Can't run on iOS because PROD modes will just cache components so changes
     // are not picked up
@@ -442,8 +473,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * Load and get all the log lines for the app load.
      * 
-     * Some sanity checks that our simple test app is functional after cache
-     * resolutions.
+     * Some sanity checks that our simple test app is functional after cache resolutions.
      * <ul>
      * <li>updated markup text is rendered (markupToken)</li>
      * <li>updated client actions functional (jsToken)</li>
@@ -576,10 +606,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * A request object, which can either be an 'expected' request, or an 'actual' request.
      * 
-     * Expected requests can also have a fudge factor allowing multiple requests for the resource.
-     * This is very helpful for different browsers doing diferent things with the manifest.
-     * We allow multiple fetches of both the manifest and initial page in both the initial request
-     * and the requests on change of resource.
+     * Expected requests can also have a fudge factor allowing multiple requests for the resource. This is very helpful
+     * for different browsers doing diferent things with the manifest. We allow multiple fetches of both the manifest
+     * and initial page in both the initial request and the requests on change of resource.
      */
     static class Request extends HashMap<String, String> {
         private static final long serialVersionUID = 4149738936658714181L;

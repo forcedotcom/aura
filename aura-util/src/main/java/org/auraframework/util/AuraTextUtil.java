@@ -38,10 +38,20 @@ public class AuraTextUtil {
     private static final TrieMatcher JS_SEARCH_REPLACE = TrieMatcher.compile(JS_IN, JS_OUT);
 
     private static final String[] JSON_IN = new String[] { "\\", "\n", "\r", "\t", "\"", "!--", "<", ">", "\u2028",
-            "\u2029", "\u0000" };
+            "\u2029", "\u0000", "*/" };
     private static final String[] JSON_OUT = new String[] { "\\\\", "\\n", "\\r", "\\t", "\\\"", "\\u0021--",
-            "\\u003C", "\\u003E", "\\n", "\\u2029", "" };
+            "\\u003C", "\\u003E", "\\n", "\\u2029", "", "\\u002A/" };
     private static final TrieMatcher JSON_SEARCH_REPLACE = TrieMatcher.compile(JSON_IN, JSON_OUT);
+
+    //
+    // Note that unicode 2028 is encoded as a raw newline. This means that putting it in a string will break,
+    // but at least it will break consistently (i.e. the string will become illegal js), while putting it in code
+    // will work.
+    //
+    private static final String[] JSON_FUNC_IN = new String[] { "!--", "\u2028", "\u2029", "\u0000", "*/" };
+    private static final String[] JSON_FUNC_OUT = new String[] { "\\u0021--", "\n", "\\u2029", "", "\\u002A/" };
+    private static final TrieMatcher JSON_FUNC_SEARCH_REPLACE = TrieMatcher.compile(JSON_FUNC_IN, JSON_FUNC_OUT);
+
 
     // replace escaped w/ non-escaped
     // w/o html tags
@@ -182,8 +192,22 @@ public class AuraTextUtil {
     }
 
     /**
-     * Splits the given string str using the given delimiter and returns the result as a string list. If str is null,
-     * then null is returned.<br>
+     * Properly escapes string for JSON Function.
+     *
+     * This ensures that a very few sequences are not present, the most important of
+     * which is the end comment string, as that causes severe breakage when used in
+     * a broken JSON string that is commented out by the error handling.
+     *
+     * @param in the incoming (unsafe) string
+     * @return a string with the sequences replaced appropriately
+     */
+    public static String escapeForJSONFunction(String in) {
+        return TrieMatcher.replaceMultiple(in, JSON_FUNC_SEARCH_REPLACE);
+    }
+
+    /**
+     * Splits the given string str using the given delimiter and returns the
+     * result as a string list. If str is null, then null is returned.<br>
      * <br>
      * The returned string list is an ArrayList that is constructed using the 4 as the ArrayList's initial size. If you
      * expect to have more than four elements more than just on the rare occasion, then please consider using another

@@ -38,10 +38,11 @@
     
     fireEvent: function(component, event) {
         var e = component.getEvent(event.type);
+        this.setEventParams(e, event);
         if (event.type === "search") {
-            e.setParams({
-                searchTerm: component.find("search").getElement().value
-            });
+            var params = e.getParams();
+            params["searchTerm"] = component.find("search").getElement().value;
+            e.setParams(params);
         }
         e.fire();
     },

@@ -108,7 +108,11 @@
         var attributeDefs = e.getDef().getAttributeDefs();
         var params = {};
         for (var key in attributeDefs) {
-            params[key] = DOMEvent[key];
+            if (key === "domEvent") {
+                params[key] = DOMEvent;
+            } else {
+                params[key] = DOMEvent[key];
+            }
         };
         e.setParams(params);
     }

@@ -25,12 +25,12 @@
                 <a aura:id="prevYear" class="navLink prevYear" title="Go to previous year" onclick="{!c.goToPrevYear}" onkeydown="{!c.closeOnTab}">
                     <span class="assistiveText">Go to previous year</span>
                 </a>
-                <a aura:id="prevMonth" class="navLink prevMonth" title="Go to previous month" onclick="{!c.goToPrevMonth}">
+                <a aura:id="prevMonth" class="navLink prevMonth" title="Go to previous month" onclick="{!c.goToPrevMonth}" onkeydown="{!c.handleKeydown}">
                     <span class="assistiveText">Go to previous month</span>
                 </a>
             </div>
             <div class="nextLinks">
-                <a aura:id="nextMonth" class="navLink nextMonth" title="Go to next month" onclick="{!c.goToNextMonth}">
+                <a aura:id="nextMonth" class="navLink nextMonth" title="Go to next month" onclick="{!c.goToNextMonth}" onkeydown="{!c.handleKeydown}">
                     <span class="assistiveText">Go to next month</span>
                 </a>
                 <a aura:id="nextYear" class="navLink nextYear" title="Go to next year" onclick="{!c.goToNextYear}" onkeydown="{!c.focusDateOnTab}">

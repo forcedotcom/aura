@@ -15,6 +15,7 @@
  */
 ({
     closeOnTab: function(component, event, helper) {
+        helper.handleESCKey(component, event);
         var keyCode = event.keyCode;
         var shiftKey = event.shiftKey;
         if (keyCode == 9 && shiftKey == true) { // Tab + shift
@@ -23,6 +24,7 @@
     },
     
     focusDateOnTab: function(component, event, helper) {
+        helper.handleESCKey(component, event);
         var keyCode = event.keyCode;
         var shiftKey = event.shiftKey;
         if (keyCode == 9 && shiftKey != true) { // Tab
@@ -65,6 +67,10 @@
             e.setParams({monthChange: 0, yearChange: 1, setFocus: false});
             e.fire();
         }
+    },
+    
+    handleKeydown: function(component, event, helper) {
+        helper.handleESCKey(component, event);
     },
     
     handleTabToday: function(component, event, helper) {

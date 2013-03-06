@@ -207,13 +207,16 @@
         var localId = cellCmp.getLocalId();
         
         if (keyCode == 39) {  // right arrow key
-            //event.preventDefault();
+            domEvent.preventDefault();
             this.handleArrowKey(component, localId, 1);
         } else if (keyCode == 37) { // left arrow key
+            domEvent.preventDefault();
             this.handleArrowKey(component, localId, -1);
         } else if (keyCode == 38) { // up arrow key
+            domEvent.preventDefault();
             this.handleArrowKey(component, localId, -7);
         } else if (keyCode == 40) { // down arrow key
+            domEvent.preventDefault();
             this.handleArrowKey(component, localId, 7);
         } else if (keyCode == 9 && shiftKey == true) { // Tab + shift
             //component.get("e.hide").fire();
@@ -232,6 +235,7 @@
         } else if (keyCode == 34 && shiftKey != true) { // Page Down
             this.changeCalendar(component, localId, 1, 0            );
         } else if (keyCode == 27) { // ESC
+            domEvent.stopPropagation();
             this.handleESC(component);
         }
     },

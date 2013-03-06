@@ -42,14 +42,14 @@
 		        	if (facet.isInstanceOf("ui:pager")) {
 		        		pagers.push(facet);
 		        	} else {
-		        		pagers.concat(facet.find({instancesOf:"ui:pager"}));
+		        		pagers = pagers.concat(facet.find({instancesOf:"ui:pager"}));
 		        	}
 		        }	
 			});
         }
 		
 		// wireup handlers and values
-		var chainedAttrs = ["currentPage", "pageSize", "totalItems"];
+//		var chainedAttrs = ["currentPage", "pageSize", "totalItems"];
 		var j = pagers.length;
 		while (j--) {
 			var pager = pagers[j];

@@ -27,17 +27,31 @@
     padding: 4px 6px;
     text-decoration:none;
     text-align:center;
-    border-radius:4px;
-    -webkit-border-radius:4px;
+    border-radius:4px;    
     border:0;
-    border-top:1px solid rgba(255,255,255,.45);     
-	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#F8F8F9), to(#DDDFE1));
+    border-top:1px solid rgba(255,255,255,.45);    
+	
+	background: -moz-linear-gradient(#F8F8F9, #DDDFE1);  
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #F8F8F9), color-stop(100%, #DDDFE1));  
+    background: -webkit-linear-gradient(#F8F8F9, #DDDFE1);
+    background: linear-gradient(#F8F8F9, #DDDFE1);
+    
 	text-shadow: white 0px 1px 1px;	
-	-webkit-box-shadow: rgba(0, 0, 0, 0.699219) 0px 1px 3px, rgba(0, 0, 0, 0.296875) 0px 1px 0px;
+	-webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.69922), 0px 1px 0px rgba(0, 0, 0, 0.29688);
+    -moz-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.69922), 0px 1px 0px rgba(0, 0, 0, 0.29688);
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.69922), 0px 1px 0px rgba(0, 0, 0, 0.29688); 
 	
 }
 .uiButton.default:hover{
+	border-radius:4px;
 	background: #757D8A -webkit-gradient(linear, 0% 0%, 0% 100%, from(#7F8792), to(#535B68));
+	
+	background: #757D8A -moz-linear-gradient(#7F8792, #535B68);   
+    background: #757D8A -webkit-gradient(linear, left top, left bottom, color-stop(0%, #7F8792), color-stop(100%, #535B68));  
+    background: #757D8A -webkit-linear-gradient(#7F8792, #535B68);
+    background: #757D8A linear-gradient(#7F8792, #535B68);
+    
+	
     border:0;
     border-top:1px solid rgba(255,255,255,.45);     
 	text-shadow: rgba(0, 0, 0, 0.5) 0px -1px 1px;

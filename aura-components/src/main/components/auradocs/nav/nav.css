@@ -91,25 +91,25 @@
 }
 
 .THIS.waiting .spinner{
-	display: block;
-	-moz-animation-iteration-count: infinite;
-    -moz-animation-name: spinner;
-    -moz-animation-duration: .3s;
-    -moz-animation-timing-function: linear;
+	display: block;	
 	-webkit-animation-iteration-count: infinite;
 	-webkit-animation-name: spinner;
 	-webkit-animation-duration: 1s;
 	-webkit-animation-timing-function: linear;
-}
-
-@-moz-keyframes spinner {
-    from { -moz-transform:rotate(0deg);}
-    to {-moz-transform: rotate(360deg);}
+	animation-iteration-count: infinite;
+    animation-name: spinner;
+    animation-duration: .3s;
+    animation-timing-function: linear;
 }
 
 @-webkit-keyframes spinner {
     from { -webkit-transform:rotate(0deg);}
     to {-webkit-transform: rotate(360deg);}
+}
+
+@keyframes spinner {
+    from {transform:rotate(0deg);}
+    to {transform: rotate(360deg);}
 }
 
 .THIS .fuelGauge {

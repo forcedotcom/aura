@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 @-webkit-keyframes auraPlaceholderSpin {
   from {
   	-webkit-transform: rotate(0deg);
@@ -21,22 +22,37 @@
   to {
   	-webkit-transform: rotate(720deg);
   }
-} 
+}
+
+@keyframes auraPlaceholderSpin {
+  from {
+  	transform: rotate(0deg);  	
+  }
+  to {
+  	transform: rotate(720deg);
+  }
+}
+
 .auraPlaceholder.spin{
 	display:inline-block;
 	border:1px solid #666;
 	background-color:#888;
-	-webkit-border-radius:16px;
+	border-radius: 16px;	
 	width:9px;
-	height:9px;
+	height:9px;	
+    
     -webkit-animation-iteration-count:infinite;
     -webkit-animation-name: auraPlaceholderSpin;
     -webkit-animation-duration:0.75s;
     -webkit-animation-timing-function:ease-in-out;
+    animation-iteration-count:infinite;
+    animation-name: auraPlaceholderSpin;
+    animation-duration:0.75s;
+    animation-timing-function:ease-in-out;
 }
 .auraPlaceholder.spin:AFTER, .auraPlaceholder.spin:BEFORE{
 	content:"";
-	-webkit-border-radius:4px;
+	border-radius: 4px;	
 	background-color:#666;
 	position:absolute;
 }

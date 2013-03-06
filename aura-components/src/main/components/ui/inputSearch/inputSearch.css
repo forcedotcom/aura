@@ -19,8 +19,9 @@ input.THIS {
 }
 
 .THIS::-webkit-search-cancel-button {
-   /* Remove default */
+   /* Remove default */    
     -webkit-appearance: none;
+    appearance: none;
 }
 
 .THIS.clear {
@@ -31,8 +32,9 @@ input.THIS {
     outline: 0;
     position: relative;
     top: 3px;
-    left: -27px;
+    left: -27px;    
     -webkit-box-shadow: none;
+    box-shadow: none;
 }
 
 .THIS.hide {

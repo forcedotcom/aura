@@ -49,29 +49,46 @@
     width: 40px;
     height: 40px;
     background: url(/auraFW/resources/aura/images/pull_down_icon.png) 0 0 no-repeat;
-    -webkit-transition-property: -webkit-transform;
+    -webkit-transition-property: -webkit-transform;        
     -webkit-transition-duration: 250ms;
+    transition-property: transform;        
+    transition-duration: 250ms;
 }
 
-.uiScroller .pullDown .pullDownIcon {
+.uiScroller .pullDown .pullDownIcon {	
     -webkit-transform: rotate(0deg) translateZ(0);
+    transform: rotate(0deg) translateZ(0);
 }
 
-.uiScroller .pullFlip .pullDownIcon {
+.uiScroller .pullFlip .pullDownIcon {	
     -webkit-transform: rotate(-180deg) translateZ(0);
+    transform: rotate(-180deg) translateZ(0);
 }
 
 .uiScroller .pullLoading .pullDownIcon {
     background-position: 0 100%;
-    -webkit-transform: rotate(0deg) translateZ(0);
+       
+    -webkit-transform: rotate(0deg) translateZ(0);    
     -webkit-transition-duration: 0ms;
     -webkit-animation-name: pullSpinner;
     -webkit-animation-duration: 2s;
     -webkit-animation-iteration-count: infinite;
     -webkit-animation-timing-function: linear;
+    
+    transform: rotate(0deg) translateZ(0);
+    transition-duration: 0ms;
+    animation-name: pullSpinner;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
 }
 
 @-webkit-keyframes pullSpinner {
     from { -webkit-transform: rotate(0deg) translateZ(0); }
     to { -webkit-transform: rotate(360deg) translateZ(0); }
+}
+
+@keyframes pullSpinner {
+    from {transform: rotate(0deg) translateZ(0); }
+    to {transform: rotate(360deg) translateZ(0); }
 }

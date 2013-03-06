@@ -265,7 +265,6 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         auraUITestingUtil.waitForElementText(By.cssSelector("#sample"), "deposit", true);
     }
 
-    @Ignore("W-1558668 should detect theme changes")
     public void testPostAfterThemeChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent("", "<div id='out'>hi</div>");
         String className = cmpDesc.getNamespace() + StringUtils.capitalize(cmpDesc.getName());
@@ -285,7 +284,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         });
     }
 
-    @Ignore("W-1558668 should detect theme changes")
+    @Ignore("still not detected")
     public void testPostAfterNamespaceChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent("", "<div id='out'>hi</div>");
         String className = cmpDesc.getNamespace() + StringUtils.capitalize(cmpDesc.getName());
@@ -310,7 +309,6 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         });
     }
 
-    @Ignore("W-1558668 should detect js controller changes")
     public void testPostAfterJsControllerChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -331,22 +329,22 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 controllerDesc,
                 "{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});this.runAfter(a);},clicked:function(){window.tempVar='meaningful'}}");
         triggerServerAction();
+        // wait for page to reload by checking that our tempVar is undefined again
         waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver input) {
-                return auraUITestingUtil.getEval("return window.tempVar;") != null;
+                return (Boolean) auraUITestingUtil.getEval("return !window.tempVar;");
             }
         });
         auraUITestingUtil.findDomElement(By.cssSelector("#click")).click();
-        assertEquals("meaningful", waitUntil(new ExpectedCondition<String>() {
+        waitUntil(new ExpectedCondition<Boolean>() {
             @Override
-            public String apply(WebDriver input) {
-                return (String) auraUITestingUtil.getEval("return window.tempVar;");
+            public Boolean apply(WebDriver input) {
+                return "meaningful".equals(auraUITestingUtil.getEval("return window.tempVar;"));
             }
-        }));
+        });
     }
 
-    @Ignore("W-1558668 should detect js provider changes")
     public void testPostAfterJsProviderChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = StringSourceLoader.getInstance().createStringSourceDescriptor(null,
                 ComponentDef.class);
@@ -373,7 +371,6 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         auraUITestingUtil.waitForElementText(By.cssSelector("#result"), "golden egg", true);
     }
 
-    @Ignore("W-1558668 should detect js helper changes")
     public void testPostAfterJsHelperChange() throws Exception {
         DefDescriptor<?> helperDesc = addSourceAutoCleanup(HelperDef.class,
                 "({getHelp:function(){return 'simply';}})");
@@ -387,12 +384,11 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
             @Override
             public Boolean apply(WebDriver input) {
                 return "complicated".equals(auraUITestingUtil
-                        .getEval("return $A.getRoot().getDef().getHelper().getHelp();"));
+                        .getEval("return $A.getRoot() && $A.getRoot().getDef().getHelper().getHelp();"));
             }
         });
     }
 
-    @Ignore("W-1558668 should detect js renderer changes")
     public void testPostAfterJsRendererChange() throws Exception {
         DefDescriptor<?> rendererDesc = addSourceAutoCleanup(
                 RendererDef.class,
@@ -446,12 +442,11 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         auraUITestingUtil.waitForElementText(By.cssSelector("#target"), "secret", true);
     }
 
-    @Ignore("W-1558668 should detect layout changes")
     public void testPostAfterLayoutChange() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseApplicationTag,
                         "controller='java://org.auraframework.impl.java.controller.JavaTestController'",
-                        "<button onclick='{!c.post}'>post</button><div aura:id='xspot'/>"));
+                        "<button onclick='{!c.post}'>post</button><div aura:id='xspot' id='xspot'/>"));
         DefDescriptor<?> controllerDesc = Aura.getDefinitionService().getDefDescriptor(appDesc,
                 DefDescriptor.JAVASCRIPT_PREFIX, ControllerDef.class);
         addSourceAutoCleanup(controllerDesc,

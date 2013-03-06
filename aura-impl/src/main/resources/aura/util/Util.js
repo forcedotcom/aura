@@ -403,7 +403,7 @@ $A.ns.Util.prototype.removeElement = function(element) {
                 while (trashcan.hasChildNodes()) {
                     var node = trashcan.lastChild;
                     
-                    if (node.nodeType !== 3 && element.nodeType !== 8) {
+                    if (node.nodeType !== 3 && node.nodeType !== 8) {
                     	delete node["aura_deleted"];
                     }
                     

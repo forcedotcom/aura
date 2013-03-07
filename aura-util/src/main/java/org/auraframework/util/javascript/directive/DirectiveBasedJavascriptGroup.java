@@ -29,11 +29,11 @@ import org.auraframework.util.javascript.CommonJavascriptGroupImpl;
 import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptValidator;
 import org.auraframework.util.javascript.JavascriptWriter.CompressionLevel;
+import org.auraframework.util.text.Hash;
 
 /**
- * Javascript group that contains directives for parsing instructions or
- * metadata or other fun stuff. It starts from one file which should include the
- * others.
+ * Javascript group that contains directives for parsing instructions or metadata or other fun stuff. It starts from one
+ * file which should include the others.
  */
 public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
     // name for threads that compress and write the output
@@ -160,12 +160,19 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
     @Override
     public boolean isStale() {
-        for (File f : getFiles()) {
-            if (f.lastModified() > getLastMod()) {
-                return true;
-            }
+        // Short circuit the unknown-contents case; it's always stale.
+        if (groupHash == null) {
+            return true;
         }
-        return false;
+
+        // Otherwise, we're stale IFF we have changed contents.
+        try {
+            Hash currentTextHash = computeGroupHash();
+            return !currentTextHash.equals(groupHash);
+        } catch (IOException e) {
+            // presume we're stale; we'll probably try to regenerate and die from that.
+            return true;
+        }
     }
 
     @Override

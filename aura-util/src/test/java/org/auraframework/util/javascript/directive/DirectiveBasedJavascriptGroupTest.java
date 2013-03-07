@@ -29,9 +29,8 @@ import org.auraframework.test.annotation.ThreadHostileTest;
 import com.google.common.collect.ImmutableList;
 
 /**
- * Automation for verifying the implementation in
- * DirectiveBasedJavascriptGroupTest {@link DirectiveBasedJavascriptGroup}.
- * Javascript files can be grouped in modules. This helps in keeping the
+ * Automation for verifying the implementation in DirectiveBasedJavascriptGroupTest
+ * {@link DirectiveBasedJavascriptGroup}. Javascript files can be grouped in modules. This helps in keeping the
  * javascript modularized.
  */
 @ThreadHostileTest
@@ -41,8 +40,7 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
     }
 
     /**
-     * Should not be able to specify a Directory as start file for a Javascript
-     * group
+     * Should not be able to specify a Directory as start file for a Javascript group
      */
     public void testPassingDirForStartFile() throws Exception {
         try {
@@ -57,11 +55,9 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
     }
 
     /**
-     * Check the workings of isStale(). isStale() only checks the last modified
-     * time stamp of EXISTING files in the group. If new files are added, then
-     * isStale() will not reflect the real state of the group. However, if you
-     * were to INCLUDE a new js file using a include directive in on of the
-     * files in the group , then isStale() would still work.
+     * Check the workings of isStale(). isStale() only checks the hash of EXISTING files in the group. If new files are
+     * added, then isStale() will not reflect the real state of the group. However, if you were to INCLUDE a new js file
+     * using a include directive in on of the files in the group, then isStale() would still work.
      */
     public void testIsStale() throws Exception {
         File newFile = getResourceFile("/testdata/javascript/testIsStale.js");
@@ -79,12 +75,11 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
                     newFile.getName(), ImmutableList.<DirectiveType<?>> of(DirectiveFactory.getDummyDirectiveType()),
                     EnumSet.of(JavascriptGeneratorMode.TESTING));
             // Immediately after the javascript group is instantiated, the group
-            // is not stale yet
-            assertFalse(test.isStale());
-            // Need this sleep so the last modified time changes, otherwise the
-            // test runs too fast and the test fails
-            // because the last modified time was not updated by the OS
-            Thread.sleep(2000);
+            // is stale because it has not yet been hashed.
+            assertTrue("initial group should be unhashed and so stale", test.isStale());
+            test.getGroupHash(); // hash it.
+            // But without modification, after that it is stale.
+            assertFalse("unmodified group should be un-stale", test.isStale());
             // Update a js file which is part of the group
             writer = new FileWriter(newFile, false);
             writer.append(new Long(System.currentTimeMillis()).toString());
@@ -97,10 +92,8 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
     }
 
     /**
-     * Use the javascript processor to generate javascript files in 5 modes.
-     * Gold file the five modes and also verify that the file was not created in
-     * the 6th mode. TODO: investigate why this test is
-     * {@link ThreadHostileTest}.
+     * Use the javascript processor to generate javascript files in 5 modes. Gold file the five modes and also verify
+     * that the file was not created in the 6th mode. TODO: investigate why this test is {@link ThreadHostileTest}.
      */
     public void testJavascriptGeneration() throws Exception {
         File file = getResourceFile("/testdata/javascript/testAllKindsOfDirectiveGenerate.js");
@@ -153,8 +146,7 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
     }
 
     /**
-     * Make sure the processor regeneration stops when there are errors in the
-     * source file
+     * Make sure the processor regeneration stops when there are errors in the source file
      */
     public void testJavascriptReGenerationFails() throws Exception {
         File file = getResourceFile("/testdata/javascript/testJavascriptReGenerationFails.js");

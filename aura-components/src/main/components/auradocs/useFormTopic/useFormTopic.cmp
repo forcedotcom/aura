@@ -37,6 +37,14 @@
     <p>You can extend these input and output components easily to take advantage of built-in attributes and events. For example, you can update the component's value binding using the <code>updateOn</code> attribute. 
     In the demo, we set <code>updateOn="keyup"</code> to handle the <code>keyup</code> event and provide the keycode value as its parameter. See the list of attributes and events for <code>ui:input</code> in the <auradocs:defLink descriptor ="ui:input">component reference</auradocs:defLink>.
     </p>
+    
+    <h3>Getting Selections from a List</h3>
+    <p>Use <code>ui:inputSelect</code> to create a list of options, which is a wrapper for an HTML <code>select</code> element. Group options together using <code>ui:inputSelectOptionGroup</code>. Options are represented by <code>ui:inputSelectOption</code>.
+    You can allow multiple selections by setting the <code>multiple</code> attribute to true. 
+    Alternatively, display a list of options from a model by using the format <code>&lt;ui:inputSelect options="<aura:text value="{!"/>m.selectOptions}" /&gt;</code> and creating the list of options in the model using <code>ArrayList&lt;InputOption&gt;</code>.
+    <auradocs:info>See the <auradocs:defLink descriptor="ui:inputSelect">ui:inputSelect</auradocs:defLink> component reference.</auradocs:info>
+    </p>
+    <auradocs:example descriptor="auradocs:demoSelect" />
     <p>
     <b>See Also:</b><br/>
     <auradocs:topicLink topic="oodInheritedAttributes">Inherited Component Attributes</auradocs:topicLink><br/>

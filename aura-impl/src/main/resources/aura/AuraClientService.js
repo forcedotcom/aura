@@ -20,360 +20,371 @@
  * @constructor
  */
 var AuraClientService = function() {
-	// #include aura.AuraClientService_private
+    // #include aura.AuraClientService_private
 
-	var clientService = {
+    var clientService = {
 
-		/** @private */
-		initHost : function(host) {
-			priv.host = host || "";
-			// #if {"modes" : ["PRODUCTION"]}
-			delete this.initHost;
-			// #end
-		},
+        /** @private */
+        initHost : function(host) {
+            priv.host = host || "";
+            // #if {"modes" : ["PRODUCTION"]}
+            delete this.initHost;
+            // #end
+        },
 
-		/** @private */
-		init : function(config, token, callback, container) {
-			$A.mark("ClientService.init");
-			var body = document.body;
-			// #if {"modes" : ["PRODUCTION"]}
-			try {
-				// #end
-				if (token) {
-					priv.token = token;
-				}
+        /** @private */
+        init : function(config, token, callback, container) {
+            $A.mark("ClientService.init");
+            var body = document.body;
+            // #if {"modes" : ["PRODUCTION"]}
+            try {
+                // #end
+                if (token) {
+                    priv.token = token;
+                }
 
-				// Why is this happening in the ClientService? --JT
-				var component = componentService.newComponent(config, null,
-						false, true);
+                // Why is this happening in the ClientService? --JT
+                var component = componentService.newComponent(config, null,
+                        false, true);
 
-				$A.measure("Initial Component Created", "ClientService.init",
-						$A.logLevel["DEBUG"]);
+                $A.measure("Initial Component Created", "ClientService.init",
+                        $A.logLevel["DEBUG"]);
 
-				renderingService.render(component, container || body);
-				renderingService.afterRender(component);
+                renderingService.render(component, container || body);
+                renderingService.afterRender(component);
 
-				$A.measure("Initial Component Rendered", "ClientService.init",
-						$A.logLevel["DEBUG"]);
-				callback(component);
+                $A.measure("Initial Component Rendered", "ClientService.init",
+                        $A.logLevel["DEBUG"]);
+                callback(component);
 
-				// not on in dev modes to preserve stacktrace in debug tools
-				// #if {"modes" : ["PRODUCTION"]}
-			} catch (e) {
-				$A.error(e);
-				throw e;
-			}
-			// #end
-			delete this.init;
-		},
+                // not on in dev modes to preserve stacktrace in debug tools
+                // #if {"modes" : ["PRODUCTION"]}
+            } catch (e) {
+                $A.error(e);
+                throw e;
+            }
+            // #end
+            delete this.init;
+        },
 
-		/** @private */
-		initDefs : function(config) {
-			$A.mark("ClientService.initDefs");
-			var evtConfigs = aura.util.json.resolveRefs(config["eventDefs"]);
-			for ( var j = 0; j < evtConfigs.length; j++) {
-				eventService.getEventDef(evtConfigs[j]);
-			}
-			$A.measure("Registered Events [" + evtConfigs.length + "]",
-					"ClientService.initDefs");
+        /** @private */
+        initDefs : function(config) {
+            $A.mark("ClientService.initDefs");
+            var evtConfigs = aura.util.json.resolveRefs(config["eventDefs"]);
+            for ( var j = 0; j < evtConfigs.length; j++) {
+                eventService.getEventDef(evtConfigs[j]);
+            }
+            $A.measure("Registered Events [" + evtConfigs.length + "]",
+                    "ClientService.initDefs");
 
-			var controllerConfigs = aura.util.json
-					.resolveRefs(config["controllerDefs"]);
-			for (j = 0; j < controllerConfigs.length; j++) {
-				componentService.getControllerDef(controllerConfigs[j]);
-			}
-			$A.measure("Registered Controllers [" + controllerConfigs.length
-					+ "]", "ClientService.initDefs");
+            var controllerConfigs = aura.util.json
+                    .resolveRefs(config["controllerDefs"]);
+            for (j = 0; j < controllerConfigs.length; j++) {
+                componentService.getControllerDef(controllerConfigs[j]);
+            }
+            $A.measure("Registered Controllers [" + controllerConfigs.length
+                    + "]", "ClientService.initDefs");
 
-			var comConfigs = aura.util.json
-					.resolveRefs(config["componentDefs"]);
-			for ( var i = 0; i < comConfigs.length; i++) {
-				componentService.getDef(comConfigs[i]);
-			}
-			$A.measure("Registered Components [" + comConfigs.length + "]",
-					"ClientService.initDefs");
+            var comConfigs = aura.util.json
+                    .resolveRefs(config["componentDefs"]);
+            for ( var i = 0; i < comConfigs.length; i++) {
+                componentService.getDef(comConfigs[i]);
+            }
+            $A.measure("Registered Components [" + comConfigs.length + "]",
+                    "ClientService.initDefs");
 
-			$A.measure("Initial Scripts Finished", "PageStart");
+            $A.measure("Initial Scripts Finished", "PageStart");
 
-			// Let any interested parties know that defs have been initialized
-			for (var n = 0; n < priv.initDefsObservers.length; n++) {
-				priv.initDefsObservers[n]();
-			}
-			
-			priv.initDefsObservers = [];
-			
-			// Use the non-existence of initDefs() as the sentinel indicating that defs are good to go 
-			delete this.initDefs;
-		},
-		
-		/** @private */
-		runAfterInitDefs : function(callback) {
-			if (this.initDefs) {
-				// Add to the list of callbacks waiting until initDefs() is done
-				priv.initDefsObservers.push(callback);
-			} else {
-				// initDefs() is done and gone so just run the callback
-				callback();
-			}
-		},
+            // Let any interested parties know that defs have been initialized
+            for (var n = 0; n < priv.initDefsObservers.length; n++) {
+                priv.initDefsObservers[n]();
+            }
 
-		/**
-		 * Load an app by calling loadComponent.
-		 * 
-		 * @param {DefDescriptor}
-		 *            descriptor The key for a definition with a qualified name
-		 *            of the format prefix://namespace:name.
-		 * @param {Map}
-		 *            attributes The configuration data to use in the app
-		 * @param {function}
-		 *            callback The callback function to run
-		 * @memberOf AuraClientService
-		 * @private
-		 */
-		loadApplication : function(descriptor, attributes, callback) {
-			this.loadComponent(descriptor, attributes, callback, "APPLICATION");
-		},
+            priv.initDefsObservers = [];
 
-		/**
-		 * Throw an exception.
-		 * 
-		 * @param {Object}
-		 *            config The data for the exception event
-		 * @memberOf AuraClientService
-		 * @private
-		 */
-		throwExceptionEvent : function(config) {
-			priv.thowExceptionEvent(config);
-		},
+            // Use the non-existence of initDefs() as the sentinel indicating that defs are good to go
+            delete this.initDefs;
+        },
 
-		/**
-		 * Load a component.
-		 * 
-		 * @param {DefDescriptor}
-		 *            descriptor The key for a definition with a qualified name
-		 *            of the format prefix://namespace:name
-		 * @param {Map}
-		 *            attributes The configuration data to use. If specified,
-		 *            attributes are used as a key value pair.
-		 * @param {function}
-		 *            callback The callback function to run
-		 * @param {String}
-		 *            defType Sets the defType to "COMPONENT"
-		 * @memberOf AuraClientService
-		 * @private
-		 */
-		loadComponent : function(descriptor, attributes, callback, defType) {
-			this.runAfterInitDefs(function() {
-				var desc = new DefDescriptor(descriptor);
-				var tag = desc.getNamespace() + ":" + desc.getName();
-	
-				var method = defType === "APPLICATION" ? "getApplication" : "getComponent";
-				var action = $A.get("c.aura://ComponentController." + method);
-				
-				action.setStorable();
-				
-				action.setParams({
-					name: tag,
-					attributes: attributes
-				});
-				
-				action.setCallback(this, function(a) {
-					if (a.getState() === "SUCCESS") {
-						callback(a.getReturnValue());
-					} else {
-		                $A.error(a.getError()[0].message);
-					}
-	
-					$A.measure("Completed Component Callback", "Sending XHR " + $A.getContext().getNum());
-				});
-	
-				$A.services.event.startFiring("loadComponent");
-	
-				action.runAfter(action);
-	
-				$A.services.event.finishFiring("loadComponent");
-			});
-		},
+        /** @private */
+        runAfterInitDefs : function(callback) {
+            if (this.initDefs) {
+                // Add to the list of callbacks waiting until initDefs() is done
+                priv.initDefsObservers.push(callback);
+            } else {
+                // initDefs() is done and gone so just run the callback
+                callback();
+            }
+        },
 
-		/**
-		 * Perform a hard refresh.
-		 * 
-		 * @memberOf AuraClientService
-		 * @private
-		 */
-		hardRefresh : function() {
-			return priv.hardRefresh();
-		},
+        /**
+         * Load an app by calling loadComponent.
+         *
+         * @param {DefDescriptor}
+         *            descriptor The key for a definition with a qualified name
+         *            of the format prefix://namespace:name.
+         * @param {Map}
+         *            attributes The configuration data to use in the app
+         * @param {function}
+         *            callback The callback function to run
+         * @memberOf AuraClientService
+         * @private
+         */
+        loadApplication : function(descriptor, attributes, callback) {
+            this.loadComponent(descriptor, attributes, callback, "APPLICATION");
+        },
 
-		/**
-		 * Marks the application as outdated.
-		 * 
-		 * @memberOf AuraClientService
-		 * @private
-		 */
-		setOutdated : function() {
-			return priv.setOutdated();
-		},
+        /**
+         * Throw an exception.
+         *
+         * @param {Object}
+         *            config The data for the exception event
+         * @memberOf AuraClientService
+         * @private
+         */
+        throwExceptionEvent : function(config) {
+            priv.thowExceptionEvent(config);
+        },
 
-		/**
-		 * For bootstrapping only
-		 * 
-		 * @private
-		 */
-		fireLoadEvent : function(eventName) {
-			return priv.fireLoadEvent(eventName);
-		},
+        /**
+         * Load a component.
+         *
+         * @param {DefDescriptor}
+         *            descriptor The key for a definition with a qualified name
+         *            of the format prefix://namespace:name
+         * @param {Map}
+         *            attributes The configuration data to use. If specified,
+         *            attributes are used as a key value pair.
+         * @param {function}
+         *            callback The callback function to run
+         * @param {String}
+         *            defType Sets the defType to "COMPONENT"
+         * @memberOf AuraClientService
+         * @private
+         */
+        loadComponent : function(descriptor, attributes, callback, defType) {
+            this.runAfterInitDefs(function() {
+                var desc = new DefDescriptor(descriptor);
+                var tag = desc.getNamespace() + ":" + desc.getName();
 
-		/**
-		 * Reset the token.
-		 * 
-		 * @param {Object}
-		 *            newToken Refresh the current token with a new one.
-		 * @memberOf AuraClientService
-		 * @private
-		 */
-		resetToken : function(newToken) {
-			priv.token = newToken;
-		},
+                var method = defType === "APPLICATION" ? "getApplication" : "getComponent";
+                var action = $A.get("c.aura://ComponentController." + method);
 
-		/**
-		 * Run the actions.
-		 * 
-		 * @param {Object}
-		 *            actions
-		 * @param {function}
-		 *            scope The scope in which the function is executed
-		 * @param {function}
-		 *            callback The callback function to run
-		 * @memberOf AuraClientService
-		 * @private
-		 */
-		runActions : function(actions, scope, callback) {
-			priv.request(actions, scope, callback);
-		},
+                action.setStorable();
 
-		/**
-		 * Inject a component and set up its event handlers. For Integration
-		 * Service.
-		 * 
-		 * @param {Component}
-		 *            parent
-		 * @param {Object}
-		 *            rawConfig
-		 * @param {String}
-		 *            placeholderId
-		 * @param {String}
-		 *            localId
-		 * @memberOf AuraClientService
-		 * @private
-		 */
-		injectComponent : function(rawConfig, locatorDomId, localId) {
-			var config = $A.util.json.resolveRefs(rawConfig);
+                action.setParams({
+                    name: tag,
+                    attributes: attributes
+                });
 
-			// Save off any context global stuff like new labels
-			$A.getContext().join(config["context"]);
+                action.setCallback(this, function(a) {
+                    if (a.getState() === "SUCCESS") {
+                        callback(a.getReturnValue());
+                    } else {
+                        $A.error(a.getError()[0].message);
+                    }
 
-			var actionResult = config["actions"][0];
-			var action = $A.get("c.aura://ComponentController.getComponent");
+                    $A.measure("Completed Component Callback", "Sending XHR " + $A.getContext().getNum());
+                });
 
-			action
-					.setCallback(
-							action,
-							function(a) {
-								var element = $A.util.getElement(locatorDomId);
+                $A.services.event.startFiring("loadComponent");
 
-								// Check for bogus locatorDomId
-								var errors;
-								if (!element) {
-									// We have no other place to display this
-									// critical failure - fallback to the
-									// document.body
-									element = document.body;
-									errors = [ "Invalid locatorDomId specified - no element found in the DOM with id="
-											+ locatorDomId ];
-								} else {
-									errors = a.getState() === "SUCCESS" ? undefined
-											: action.getError();
-								}
+                action.runAfter(action);
 
-								var componentConfig;
-								if (!errors) {
-									componentConfig = a.getReturnValue();
-								} else {
-									// Display the errors in a ui:message
-									// instead
-									componentConfig = {
-										"componentDef" : {
-											"descriptor" : "markup://ui:message"
-										},
+                $A.services.event.finishFiring("loadComponent");
+            });
+        },
 
-										"attributes" : {
-											"values" : {
-												"title" : "Aura Integration Service Error",
-												"severity" : "error",
-												"body" : [ {
-													"componentDef" : {
-														"descriptor" : "markup://ui:outputText"
-													},
+        /**
+         * Perform a hard refresh.
+         *
+         * @memberOf AuraClientService
+         * @private
+         */
+        hardRefresh : function() {
+            return priv.hardRefresh();
+        },
 
-													"attributes" : {
-														"values" : {
-															"value" : $A.util.json
-																	.encode(errors)
-														}
-													}
-												} ]
-											}
-										}
-									};
-								}
+        /**
+         * Marks the application as outdated.
+         *
+         * @memberOf AuraClientService
+         * @private
+         */
+        setOutdated : function() {
+            return priv.setOutdated();
+        },
 
-								componentConfig["localId"] = localId;
+        /**
+         * For bootstrapping only
+         *
+         * @private
+         */
+        fireLoadEvent : function(eventName) {
+            return priv.fireLoadEvent(eventName);
+        },
 
-								var root = $A.getRoot();
-								var c = $A.componentService.newComponent(
-										componentConfig, root);
+        /**
+         * Reset the token.
+         *
+         * @param {Object}
+         *            newToken Refresh the current token with a new one.
+         * @memberOf AuraClientService
+         * @private
+         */
+        resetToken : function(newToken) {
+            priv.token = newToken;
+        },
 
-								if (!errors) {
-									// Wire up event handlers
-									var actionEventHandlers = config["actionEventHandlers"];
-									if (actionEventHandlers) {
-										var containerValueProvider = {
-											getValue : function(functionName) {
-												return {
-													run : function(event) {
-														window[functionName]
-																(event);
-													}
-												};
-											}
-										};
+        /**
+         * Run the actions.
+         *
+         * @param {Object}
+         *            actions
+         * @param {function}
+         *            scope The scope in which the function is executed
+         * @param {function}
+         *            callback The callback function to run
+         * @memberOf AuraClientService
+         * @private
+         */
+        runActions : function(actions, scope, callback) {
+            priv.request(actions, scope, callback);
+        },
 
-										for ( var event in actionEventHandlers) {
-											c.addHandler(event,
-													containerValueProvider,
-													actionEventHandlers[event]);
-										}
-									}
-								}
+        /**
+         * Inject a component and set up its event handlers. For Integration
+         * Service.
+         *
+         * @param {Component}
+         *            parent
+         * @param {Object}
+         *            rawConfig
+         * @param {String}
+         *            placeholderId
+         * @param {String}
+         *            localId
+         * @memberOf AuraClientService
+         * @private
+         */
+        injectComponent : function(rawConfig, locatorDomId, localId) {
+            var config = $A.util.json.resolveRefs(rawConfig);
 
-								root.getValue("v.body").push(c);
+            // Save off any context global stuff like new labels
+            $A.getContext().join(config["context"]);
 
-								$A.render(c, element);
+            var actionResult = config["actions"][0];
+            var action = $A.get("c.aura://ComponentController.getComponent");
 
-								$A.afterRender(c);
-							});
+            action
+                    .setCallback(
+                            action,
+                            function(a) {
+                                var element = $A.util.getElement(locatorDomId);
 
-			action.complete(actionResult);
-		}
+                                // Check for bogus locatorDomId
+                                var errors;
+                                if (!element) {
+                                    // We have no other place to display this
+                                    // critical failure - fallback to the
+                                    // document.body
+                                    element = document.body;
+                                    errors = [ "Invalid locatorDomId specified - no element found in the DOM with id="
+                                            + locatorDomId ];
+                                } else {
+                                    errors = a.getState() === "SUCCESS" ? undefined
+                                            : action.getError();
+                                }
 
-		// #if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-		,
-		"priv" : priv
-	// #end
-	};
+                                var componentConfig;
+                                if (!errors) {
+                                    componentConfig = a.getReturnValue();
+                                } else {
+                                    // Display the errors in a ui:message
+                                    // instead
+                                    componentConfig = {
+                                        "componentDef" : {
+                                            "descriptor" : "markup://ui:message"
+                                        },
 
-	// #include aura.AuraClientService_export
+                                        "attributes" : {
+                                            "values" : {
+                                                "title" : "Aura Integration Service Error",
+                                                "severity" : "error",
+                                                "body" : [ {
+                                                    "componentDef" : {
+                                                        "descriptor" : "markup://ui:outputText"
+                                                    },
 
-	return clientService;
+                                                    "attributes" : {
+                                                        "values" : {
+                                                            "value" : $A.util.json
+                                                                    .encode(errors)
+                                                        }
+                                                    }
+                                                } ]
+                                            }
+                                        }
+                                    };
+                                }
+
+                                componentConfig["localId"] = localId;
+
+                                var root = $A.getRoot();
+                                var c = $A.componentService.newComponent(
+                                        componentConfig, root);
+
+                                if (!errors) {
+                                    // Wire up event handlers
+                                    var actionEventHandlers = config["actionEventHandlers"];
+                                    if (actionEventHandlers) {
+                                        var containerValueProvider = {
+                                            getValue : function(functionName) {
+                                                return {
+                                                    run : function(event) {
+                                                        window[functionName]
+                                                                (event);
+                                                    }
+                                                };
+                                            }
+                                        };
+
+                                        for ( var event in actionEventHandlers) {
+                                            c.addHandler(event,
+                                                    containerValueProvider,
+                                                    actionEventHandlers[event]);
+                                        }
+                                    }
+                                }
+
+                                root.getValue("v.body").push(c);
+
+                                $A.render(c, element);
+
+                                $A.afterRender(c);
+                            });
+
+            action.complete(actionResult);
+        },
+
+        /**
+         * Return whether Aura believes it is online. This is only an educated
+         * guess. Immediate and future communication with the server may fail.
+         *
+         * @return true if Aura believe it is online; false otherwise.
+         */
+        isConnected : function() {
+            return !priv.isDisconnected;
+        }
+
+
+        // #if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+        ,
+        "priv" : priv
+    // #end
+    };
+
+    // #include aura.AuraClientService_export
+
+    return clientService;
 };

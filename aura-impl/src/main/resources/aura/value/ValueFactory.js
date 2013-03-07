@@ -42,9 +42,10 @@ var valueFactory = {
 
     parsePropertyReference: function(str) {
         // TODO: add [] support
-        if (str[0] == "{") {
+        if (str.charAt(0) === "{") {
             str = str.slice(2, str.length - 1);
         }
+        
         var path = str.split('.');
         return new PropertyReferenceValue(path);
     }

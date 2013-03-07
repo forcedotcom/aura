@@ -725,6 +725,8 @@ var Test = function(){
 		/**
 	     * Given an HTML element and an eventName, fire the corresponding DOM event. Code adapted from a stack overflow
 	     * question's answer.
+	     * @param {Object} element The HTML element whose corresponding DOM event is to be fired
+	     * @param {String} eventName Initializes the given event that bubbles up through the event chain
 	     */
 	    fireDomEvent: function (element, eventName) {
 	    	var event;

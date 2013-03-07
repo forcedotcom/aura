@@ -82,6 +82,7 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
             assertFalse("unmodified group should be un-stale", test.isStale());
             // Update a js file which is part of the group
             writer = new FileWriter(newFile, false);
+            writer.append("New time: ");
             writer.append(new Long(System.currentTimeMillis()).toString());
             writer.close();
             assertTrue("An existing file in the group was modified and isStale() could not recognize the modification",

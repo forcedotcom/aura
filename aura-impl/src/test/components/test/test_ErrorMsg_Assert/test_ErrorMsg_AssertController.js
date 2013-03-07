@@ -16,5 +16,5 @@
 {
     clicked: function(cmp, event){
         aura.assert(false, "Assert failed in test_ErrorMsg_AssertController!");
-    },
+    }
 }

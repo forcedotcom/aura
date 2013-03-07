@@ -25,5 +25,5 @@
             $A.test.assertTrue(option2,"Option2 should be selected by default");
             $A.test.assertTrue(option3,"Option3 should be selected by default");
         }
-    },
+    }
 })

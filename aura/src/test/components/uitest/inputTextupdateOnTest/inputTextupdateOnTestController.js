@@ -23,5 +23,5 @@
     	var buttonValue =  event.getParam("button");
 		$A.log("Mouse Event Fired");
         cmp.find("outputValue").getAttributes().setValue("value", buttonValue);
-      },
+      }
 })

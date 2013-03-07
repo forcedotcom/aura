@@ -86,5 +86,5 @@
     getChildren : function(cmp, event, helper) {
         var ret = helper.getChildren(cmp);
         event.getParam('callback')(ret);
-    },
+    }
 })

@@ -24,5 +24,5 @@
         var tree = cmp.find('tree');
         searchTree.getAttributes().setValue('tree', tree);
         topicTree.getAttributes().setValue('tree', tree);
-    },
+    }
 }

@@ -219,5 +219,5 @@
             }
         }
         return new helper.CollapseVisitor();
-    },
+    }
 })

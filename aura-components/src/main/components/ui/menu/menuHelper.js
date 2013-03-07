@@ -158,5 +158,5 @@
         c.setValue("v.focusItemIndex", index);
         var menuVisible = c.get("v.visible");
         c.setValue("v.visible", !menuVisible);
-    },
+    }
 })

@@ -28,5 +28,5 @@
         $A.log('Paste Event Fired');
         cmp.getValue("v.pasteEventFired").setValue(true);
         cmp.find("outputStatus").getAttributes().setValue("value", "Paste Event Fired");
-    },
+    }
 })

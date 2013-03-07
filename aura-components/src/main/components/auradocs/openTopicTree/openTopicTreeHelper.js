@@ -168,5 +168,5 @@
         this.setActive(cmp);
         this.expandActiveAncestry(cmp);
         this.highlightActive(cmp);
-    },
+    }
 })

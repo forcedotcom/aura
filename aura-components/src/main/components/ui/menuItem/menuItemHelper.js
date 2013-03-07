@@ -269,5 +269,5 @@
                 this.setFocusToTypingChars(concreteCmp, event);
             }
         }
-    },
+    }
 })

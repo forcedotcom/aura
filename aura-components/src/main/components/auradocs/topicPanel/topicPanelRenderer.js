@@ -17,5 +17,5 @@
     afterRender : function(cmp, helper) {
         cmp.getSuper().getElement().scrollTop = 0;
         this.superAfterRender();
-    },
+    }
 })

@@ -49,5 +49,5 @@
             }
         }
         return this.superRerender(cmp);
-    },
+    }
 }

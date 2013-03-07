@@ -18,6 +18,7 @@ package org.auraframework.util.json;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.auraframework.util.AuraTextUtil;
 
@@ -32,14 +33,6 @@ import org.auraframework.util.AuraTextUtil;
  * functions, like: BAD: function foo(arg1, arg2){}
  */
 public class JsFunction implements JsonSerializable, Serializable {
-    private static final long serialVersionUID = 1186050562190474668L;
-    private String name;
-    private final List<String> arguments;
-    private final String body;
-    private final int line;
-    private final int col;
-    private String sanitized;
-
     public JsFunction(List<String> arguments, String body) {
         this(null, arguments, body, -1, -1);
     }
@@ -59,13 +52,14 @@ public class JsFunction implements JsonSerializable, Serializable {
             }
             func.append(arg);
         }
-        func.append(") {");
-        func.append(body);
-        func.append('}');
 
-        //
+        func.append(") {");
+        
+        func.append(trailingCommaPattern.matcher(body).replaceAll("$1"));
+        
+        func.append('}');
+        
         // Now make sure we escape the right sequences.
-        //
         return AuraTextUtil.escapeForJSONFunction(func.toString());
     }
 
@@ -161,4 +155,16 @@ public class JsFunction implements JsonSerializable, Serializable {
         return this.body.hashCode() * 31 + (this.name == null ? 0 : this.name.hashCode() * 31)
                 + (arguments == null ? 0 : arguments.hashCode()) + col + line;
     }
+    
+    
+    private String name;
+    private final List<String> arguments;
+    private final String body;
+    private final int line;
+    private final int col;
+    private String sanitized;
+
+    private static final Pattern trailingCommaPattern = Pattern.compile(",(\\s*})");
+    
+    private static final long serialVersionUID = 1186050562190474668L;
 }

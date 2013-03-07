@@ -54,10 +54,8 @@
 </aura:component>]]>
 </auradocs:codeblock>
 
-     <p>If you are reusing a renderer from another component and you already have an auto-wired renderer in your component bundle, the methods in your auto-wired renderer will not be accessible unless you explicitly declare it. Otherwise, only renderers in bundles that the component extends will be accessible.
-     </p>
-    <p>To add an external renderer not within your component bundle, append the renderer in a comma-separated list: <code> renderer="js://auradocs.sampleComponent, js://auradocs.anotherComponent"</code>.
-         We recommend that you use a renderer  within the component bundle for maintainability and use an external renderer  only if you must.</p>
+     <auradocs:warning>If you are reusing a renderer from another component and you already have an auto-wired renderer in your component bundle, the methods in your auto-wired renderer will not be accessible.
+         We recommend that you use a renderer  within the component bundle for maintainability and use an external renderer  only if you must.</auradocs:warning>
 
     <h2>Customizing Component Rendering</h2>
 

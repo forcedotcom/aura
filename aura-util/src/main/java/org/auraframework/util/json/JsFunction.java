@@ -38,11 +38,8 @@ public class JsFunction implements JsonSerializable, Serializable {
     }
 
     private String sanitize() {
-        StringBuilder func = new StringBuilder("function ");
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(name)) {
-            func.append(name);
-        }
-        func.append("(");
+        StringBuilder func = new StringBuilder("function(");
+
         boolean first = true;
         for (String arg : arguments) {
             if (!first) {
@@ -54,11 +51,11 @@ public class JsFunction implements JsonSerializable, Serializable {
         }
 
         func.append(") {");
-        
+
         func.append(trailingCommaPattern.matcher(body).replaceAll("$1"));
-        
+
         func.append('}');
-        
+
         // Now make sure we escape the right sequences.
         return AuraTextUtil.escapeForJSONFunction(func.toString());
     }
@@ -111,7 +108,8 @@ public class JsFunction implements JsonSerializable, Serializable {
      * @param name The name to set.
      */
     public void setName(String name) {
-        // Clear out the cache of the serialized form since the name is changing.
+        // Clear out the cache of the serialized form since the name is
+        // changing.
         this.sanitized = null;
         this.name = name;
     }
@@ -123,7 +121,7 @@ public class JsFunction implements JsonSerializable, Serializable {
     @Override
     public void serialize(Json json) throws IOException {
         json.writeBreak();
-        // json.writeIndent();
+
         json.writeLiteral(toString());
     }
 
@@ -132,6 +130,7 @@ public class JsFunction implements JsonSerializable, Serializable {
         if (sanitized == null) {
             sanitized = sanitize();
         }
+
         return sanitized;
     }
 
@@ -155,8 +154,7 @@ public class JsFunction implements JsonSerializable, Serializable {
         return this.body.hashCode() * 31 + (this.name == null ? 0 : this.name.hashCode() * 31)
                 + (arguments == null ? 0 : arguments.hashCode()) + col + line;
     }
-    
-    
+
     private String name;
     private final List<String> arguments;
     private final String body;
@@ -165,6 +163,6 @@ public class JsFunction implements JsonSerializable, Serializable {
     private String sanitized;
 
     private static final Pattern trailingCommaPattern = Pattern.compile(",(\\s*})");
-    
+
     private static final long serialVersionUID = 1186050562190474668L;
 }

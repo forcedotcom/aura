@@ -483,7 +483,8 @@ public class JsonStreamReaderTest extends UnitTestCase {
         } finally {
             jsonStreamReader.close();
         }
-        String func = "function (arg1, arg2) {   /*comment\n\n\n*/var str = \"\\\"\"; var str2 = '\\'vads\\nadf' var foo = {\n}; var func = function(){ var foo = {};var str = \"{\";};}";
+        
+        String func = "function(arg1, arg2) {   /*comment\n\n\n*/var str = \"\\\"\"; var str2 = '\\'vads\\nadf' var foo = {\n}; var func = function(){ var foo = {};var str = \"{\";};}";
         jsonStreamReader = new JsonStreamReader("  { " + "'foo' : 'bar', " + "'baz' : 'qux', "
                 + "\"quux\" : \"corge grault\\n\\\"\\\\\\tga\\u030A\\u031Frply\", "
                 + "'waldo' : [ 'fred','plu\\'gh' , 'xyzzy'], " + "'thud' : { 'wibble' : 'wobble'},"
@@ -519,8 +520,9 @@ public class JsonStreamReaderTest extends UnitTestCase {
             assertEquals(1.23456, ((BigDecimal) outerMap.get("otherNum")).doubleValue());
             assertEquals(12345.6, ((BigDecimal) outerMap.get("otherOtherNum")).doubleValue());
             assertTrue(outerMap.get("func") instanceof JsFunction);
-            assertEquals("\n" + AuraTextUtil.replaceSimple(func, "/*comment\n\n\n*/", "\n"),
-                    Json.serialize(outerMap.get("func"), true, false));
+            
+            assertEquals("\n" + AuraTextUtil.replaceSimple(func, "/*comment\n\n\n*/", "\n"), Json.serialize(outerMap.get("func"), true, false));
+            
             assertEquals("whose's son?", outerMap.get("jsean"));
             assertEquals("за", outerMap.get("Фокс"));
         } finally {

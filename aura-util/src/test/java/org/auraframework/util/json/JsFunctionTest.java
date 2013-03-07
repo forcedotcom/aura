@@ -26,12 +26,12 @@ public class JsFunctionTest extends UnitTestCase {
     public void testSerialize() throws Exception {
         String contents = "var thin = \"brown fox\";\njumps('over the moon');";
         JsFunction f = new JsFunction(ImmutableList.<String> of(), contents);
-        assertEquals("\nfunction () {" + contents + "}", Json.serialize(f, true, false));
+        assertEquals("\nfunction() {" + contents + "}", Json.serialize(f, true, false));
 
         JsFunction f2 = new JsFunction(ImmutableList.of("arg1"), "nothing");
-        assertEquals("\nfunction (arg1) {nothing}", Json.serialize(f2, true, false));
+        assertEquals("\nfunction(arg1) {nothing}", Json.serialize(f2, true, false));
         JsFunction f3 = new JsFunction(ImmutableList.of("arg1", "arg2"), "something");
-        assertEquals("\nfunction (arg1, arg2) {something}", Json.serialize(f3, true, false));
+        assertEquals("\nfunction(arg1, arg2) {something}", Json.serialize(f3, true, false));
     }
 
     public void testEquals() throws Exception {

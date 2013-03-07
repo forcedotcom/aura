@@ -16,7 +16,7 @@
                   "descriptor":"js://test.test_LocChng_CompositeComponent/ACTION$clientAction",
                   "name":"clientAction",
                   "code":
-function test$test_LocChng_CompositeComponent_clientAction(cmp, event) {
+function(cmp, event) {
         
         
         var locator = $A.historyService.get().locator;
@@ -36,7 +36,7 @@ function test$test_LocChng_CompositeComponent_clientAction(cmp, event) {
                   "descriptor":"js://test.test_LocChng_CompositeComponent/ACTION$innerClicked",
                   "name":"innerClicked",
                   "code":
-function test$test_LocChng_CompositeComponent_innerClicked(cmp, event) {
+function(cmp, event) {
         
         if(event.getParam('num')){ 
             
@@ -55,7 +55,7 @@ function test$test_LocChng_CompositeComponent_innerClicked(cmp, event) {
                   "descriptor":"js://test.test_LocChng_CompositeComponent/ACTION$clicked",
                   "name":"clicked",
                   "code":
-function test$test_LocChng_CompositeComponent_clicked(cmp, event) {
+function(cmp, event) {
         
         if(event.getParam('locator')){
             
@@ -177,7 +177,7 @@ function test$test_LocChng_CompositeComponent_clicked(cmp, event) {
                               "descriptor":"js://test.test_button/ACTION$press",
                               "name":"press",
                               "code":
-function test$test_button_press(cmp, event) {
+function(cmp, event) {
         cmp.getEvent("press").fire();
     },
                               "actionType":"CLIENT"

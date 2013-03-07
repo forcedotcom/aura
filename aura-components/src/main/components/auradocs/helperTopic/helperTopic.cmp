@@ -33,11 +33,8 @@
 </aura:component>]]>
 </auradocs:codeblock>
 
-     <p>If you are reusing a helper from another component and you already have an auto-wired helper in your component bundle, the methods in your auto-wired helper will not be accessible unless you explicitly declare it. Otherwise, only helpers in bundles that the component extends will be accessible.
-     </p>
-
-    <p>To use both your auto-wired helper and an external one in a component, specify both helper files on the component: <code>  helper="js://auradocs.sampleComponent, js://auradocs.anotherComponent"</code>.
-         We recommend that you use a helper  within the component bundle for maintainability and use an external helper only if you must. </p>
+     <auradocs:warning>If you are reusing a helper from another component and you already have an auto-wired helper in your component bundle, the methods in your auto-wired helper will not be accessible.
+     We recommend that you use a helper within the component bundle for maintainability and use an external helper only if you must.</auradocs:warning>
 
     <h2>Using a Helper in a Renderer</h2>
 

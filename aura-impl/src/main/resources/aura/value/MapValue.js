@@ -15,9 +15,10 @@
  */
 /*jslint sub: true */
 /**
- * @class A value object wrapper for a map. Each value in the map is a value object rather than a JavaScript literal value.
- * A value object is a thin wrapper around the actual data. The wrapper layer around the literal JavaScript objects enables you
- * to modify data in a transactional manner. The framework selectively rerenders and updates the UI in response to data changes.
+ * @class A value object wrapper for a map. Each value in the map is a value object rather than a JavaScript literal
+ * value. A value object is a thin wrapper around the actual data. The wrapper layer around the literal JavaScript
+ * objects enables you to modify data in a transactional manner. The framework selectively rerenders and updates the
+ * UI in response to data changes.
  *
  * @constructor
  * @protected
@@ -85,9 +86,6 @@ MapValue.prototype.getValue = function(k){
  * do as the constructor and create a map based on a model, you would need to first
  * construct a MapValue, then call this.
  *
- * Note also that this is a bit pricey, as it will unwrap and rewrap maps that are contained.
- * We have no way of knowing if this is safe otherwise...
- *
  * @param newMap The new map.
  */
 MapValue.prototype.setValue = function(newMap) {
@@ -107,9 +105,11 @@ MapValue.prototype.setValue = function(newMap) {
             //
             // Be very careful here. v could represent null
             // or undefined, which would fail if we use put.
+            // It can also be an expression, which cannot
+            // be unwrapped.
             //
-            config = {};
-            config[k] = v.unwrap();
+            var config = {};
+            config[k] = v;
             this.add(k, config);
         }, { scope: this });
     } else if (type === 'SimpleValue') {
@@ -136,7 +136,20 @@ MapValue.prototype.setValue = function(newMap) {
  * @param key The key for the value to return.
  */
 MapValue.prototype.get = function(key){
+    // FIXME: W-1563175
     return $A.expressionService.get(this, key);
+    //
+    // The code below does not work either, but it doesn't throw an error, it gives the wrong value..
+    // Not clear which is worse.
+    //
+    // var value = $A.expressionService.getValue(this, key);
+    // if ($A.util.isUndefinedOrNull(value)) {
+    //     return value;
+    // }
+    // if (value.toString && value.toString() === 'PropertyReferenceValue') {
+    //     return $A.expressionService.get(this.owner, key);
+    // }
+    // return value.unwrap();
 };
 
 /**
@@ -146,6 +159,9 @@ MapValue.prototype.get = function(key){
  * @param overwrite If set to true, entries from yourMap overwrite entries in the current map.
  */
 MapValue.prototype.merge = function(yourMap, overwrite) {
+    if (!$A.util.isObject(newMap) || !newMap.toString || newMap.toString() !== 'MapValue') {
+        $A.assert(false, "merge argument must be a MapValue");
+    }
     var my = this.value;
     var keys = yourMap.value;
     for (var key in keys) {

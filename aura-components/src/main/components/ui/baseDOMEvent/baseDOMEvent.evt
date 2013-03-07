@@ -15,4 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" extends="ui:baseDOMEvent" support="GA" description="Indicates that a component has been put out of focus."></aura:event>
+<aura:event type="COMPONENT" support="BETA">
+    <aura:attribute name="domEvent" type="Object" description="The associated DOM event."/>
+</aura:event>

@@ -19,7 +19,9 @@
             event.preventDefault();
             return false;
         }
-        cmp.getEvent("press").fire();
+        var e = cmp.getEvent("press");
+        e.setParams({"domEvent": event});
+        e.fire();
         return true;
     }
 }

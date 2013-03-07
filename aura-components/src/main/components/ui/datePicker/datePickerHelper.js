@@ -148,6 +148,13 @@
         return component._onClickStartFunc;
     },
     
+    handleESCKey: function(component, event) {
+        var keyCode = event.keyCode;
+        if (keyCode == 27) { // Esc key is pressed
+            component.setValue("{!v.visible}", false);
+        }
+    },
+    
     isElementInComponent : function(component, targetElem) {
         var componentElements = [];
 

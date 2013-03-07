@@ -32,7 +32,7 @@
 	   
 	 //Set the new date
 	   var newdate = new Date();
-	   d.setValue(newdate);
+	   d.setValue(newdate.getFullYear() + "-" + (newdate.getMonth() + 1) + "-" + newdate.getDate());
    },
    
    inspectKeyEvent: function(cmp,event) {

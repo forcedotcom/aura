@@ -21,6 +21,8 @@
     testConnection : {
         attributes : { __layout : "#" },
         test : [function(component) {
+                // we assume we start connected
+                $A.test.assertTrue($A.clientService.isConnected());
                 $A.test.addWaitFor(true, function() { return aura.util.trim(component.get("v.eventsFired")) == "layoutChange"; });
             }, function(component) {
                 component.find("button").get("e.press").fire();
@@ -28,6 +30,8 @@
             }, function(component) {
                 $A.test.assertEquals("SUCCESS", component.get("v.actionStatus"));
                 $A.test.assertEquals("layoutChange", component.get("v.eventsFired"));
+                // ensure we still think we're connected
+                $A.test.assertTrue($A.clientService.isConnected());
             }]
     },
 
@@ -47,11 +51,14 @@
             }, function(component) {
                 $A.test.assertEquals("INCOMPLETE", component.get("v.actionStatus"));
                 $A.test.assertEquals("layoutChange connectionLost", aura.util.trim(component.get("v.eventsFired")));
+                $A.test.assertFalse($A.clientService.isConnected());
                 component.find("button").get("e.press").fire();
                 $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") != ""; });
             }, function(component) {
                 // connectionLost event is not repeated
                 $A.test.assertEquals("layoutChange connectionLost", aura.util.trim(component.get("v.eventsFired")));
+                // still offline
+                $A.test.assertFalse($A.clientService.isConnected());
             }]
     },
 
@@ -71,16 +78,20 @@
             }, function(component) {
                 $A.test.assertEquals("INCOMPLETE", component.get("v.actionStatus"));
                 $A.test.assertEquals("layoutChange connectionLost", aura.util.trim(component.get("v.eventsFired")));
+                $A.test.assertFalse($A.clientService.isConnected());
                 component.getValue("v.host").setValue(undefined); // restore to default
                 component.find("button").get("e.press").fire();
                 $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") == "SUCCESS"; });
             }, function(component) {
                 $A.test.assertEquals("layoutChange connectionLost connectionResumed", aura.util.trim(component.get("v.eventsFired")));
+                $A.test.assertTrue($A.clientService.isConnected());
                 component.find("button").get("e.press").fire();
                 $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") == "SUCCESS"; });
             }, function(component) {
                 // connectionResumed event is not repeated
                 $A.test.assertEquals("layoutChange connectionLost connectionResumed", aura.util.trim(component.get("v.eventsFired")));
+                // still online
+                $A.test.assertTrue($A.clientService.isConnected());
             }]
     },
 
@@ -92,6 +103,8 @@
         attributes : { host : "http://invalid.salesforce.com", __layout : "#" },
         test : [function(component) {
                 $A.test.addWaitFor(true, function() { return aura.util.trim(component.get("v.eventsFired")) == "connectionLost layoutFailed layoutChange"; });
+            }, function(component) {
+                $A.test.assertFalse($A.clientService.isConnected());
             }]
     },
 
@@ -104,9 +117,12 @@
         test : [function(component) {
                 $A.test.addWaitFor(true, function() { return aura.util.trim(component.get("v.eventsFired")) == "connectionLost layoutFailed layoutChange"; });
             }, function(component) {
+                $A.test.assertFalse($A.clientService.isConnected());
                 component.getValue("v.host").setValue(undefined); // restore to default
                 $A.historyService.set("action");
                 $A.test.addWaitFor(true, function() { return aura.util.trim(component.get("v.eventsFired")) == "connectionLost layoutFailed layoutChange connectionResumed layoutChange"; });
+            }, function(component) {
+                $A.test.assertTrue($A.clientService.isConnected());
             }]
     }
 })

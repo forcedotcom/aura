@@ -56,12 +56,12 @@
             aura.test.assertTrue($A.test.isInstanceOfAnchorElement(linkElement), "Expected to see a anchor element.")
             aura.test.assertTrue(aura.test.contains(linkElement.href,'http://www.salesforce.com'), linkElement.href + " Expected a link with specified address.")
             aura.test.assertEquals('_top',linkElement.target, "Expected target to be _top.")
-            aura.test.assertTrue(linkElement.className.indexOf('logo')!==-1, "Expected link element to have specified class selector.");
+            aura.test.assertNotEquals(linkElement.className.indexOf('logo'), -1, "Expected link element to have specified class selector.");
 
             var imgElement = linkElement.children[0];
             aura.test.assertTrue(this.endsWith(imgElement.src, '/auraFW/resources/aura/images/bug.png'), "Failed to display specified image source.");
             aura.test.assertEquals('Company', imgElement.alt, "Expected to see alt text on image element.");
-            aura.test.assertTrue(imgElement.className.indexOf('logo') == -1);
+            aura.test.assertEquals(-1, imgElement.className.indexOf('logo'));
         }
     },
     //W-1014086

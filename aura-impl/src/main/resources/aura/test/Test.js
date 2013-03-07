@@ -318,8 +318,29 @@ var Test = function(){
                 if(typeof arg1 !== typeof arg2){
                     assertMessage += "\n. Type Mismatch.";
                 }
-                 throw new Error(assertMessage);
+                throw new Error(assertMessage);
             }
+        },
+
+        /**
+         * Complement of assertEquals, throws Error if arg1 and arg2 are
+         * "equal" in the sense of ===.
+         */
+        assertNotEquals: function(arg1, arg2, assertMessage) {
+            if (arg1 === arg2) {
+                if (!assertMessage) {
+                    assertMessage = "Values are equal (via ===)";
+                }
+                assertMessage += "\nValue is: {" + arg1 + "}";
+                throw new Error(assertMessage);
+            }
+        },
+
+        /**
+         * Asserts value is not undefined.
+         */
+        assertDefined: function(arg1, assertMessage) {
+            $A.test.assertNotEquals(undefined, arg1, "Value is undefined");
         },
 
         /**

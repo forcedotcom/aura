@@ -68,7 +68,8 @@
     testLabelClass:{
         attributes:{label:'Ok', labelClass: 'OkStyling'},
         test:function(component){
-            aura.test.assertTrue(component.find("span").getElement().className.toString().indexOf('OkStyling')!==-1, "Button not rendered with specified labelStyle class")
+            aura.test.assertNotEquals(component.find("span").getElement().className.toString().indexOf('OkStyling'), -1,
+                    "Button not rendered with specified labelStyle class")
         }
     },
     testLabelHidden: {
@@ -83,8 +84,10 @@
             for(var i in component.find('button').getElement().children){
                 var child = component.find('button').getElement().children[i];
                 if($A.test.isInstanceOfImageElement(child)){
-                    aura.test.assertTrue(child.className.toString().indexOf('Red')!== -1 , "Button not rendered with specified iconClass")
-                    aura.test.assertTrue(child.src.indexOf('/auraFW/resources/aura/images/bug.png')!==-1, "Button not rendered with specified icon img")
+                    aura.test.assertNotEquals(child.className.toString().indexOf('Red'), -1 ,
+                            "Button not rendered with specified iconClass")
+                    aura.test.assertNotEquals(child.src.indexOf('/auraFW/resources/aura/images/bug.png'), -1,
+                            "Button not rendered with specified icon img")
                     return;
                 }
             }

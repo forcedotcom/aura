@@ -38,7 +38,7 @@
         test:function(cmp){
             var li = cmp.find('li');
             aura.test.assertNotNull(li);
-            aura.test.assertTrue(li.getElement().className.indexOf('active')==-1, "Active css selector applied to tab when attribute was set to false.")
+            aura.test.assertEquals(-1, li.getElement().className.indexOf('active'), "Active css selector applied to tab when attribute was set to false.")
             //Verify that tab title is visible
             var a = cmp.find('a');
             aura.test.assertEquals('block', this.getComputedStyle(a.getElement())['display'], "Title of tab to be displayed even if tab is inactive");

@@ -14,32 +14,37 @@
  * limitations under the License.
  */
 ({
-
     getChildren : function(cmp, event) {
         var body = cmp.get("v.body") || [];
-        // Is there some way to guarantee this at component instantiation
-        // time?
-        body = body.filter(function(c) {
-            return c.isInstanceOf("ui:treeNode");
-        });
+
+        var treeNodes = [];
+        for (var n = 0; n < body.length; n++) {
+        	var child = body[n];
+        	
+        	if (child.isInstanceOf("ui:treeNode")) {
+        		treeNodes.push(child);
+        	}
+        }
+        
         // Grab the model nodes from the tree.
-        var modelNodes = cmp.find('modelNode');
+        var modelNodes = cmp.find("modelNode");
         if ($A.util.isUndefinedOrNull(modelNodes)) {
             modelNodes = [];
         } else if (!$A.util.isArray(modelNodes)) {
             modelNodes = [modelNodes];
         }
+        
         // Return them to the caller
-        event.getParam('callback')(modelNodes.concat(body));
+        event.getParam("callback")(modelNodes.concat(treeNodes));
     },
     
     onActiveNodeChange : function(cmp, event) {
-        var activeNode = cmp.get('v.activeNode');
+        var activeNode = cmp.get("v.activeNode");
         $A.assert(activeNode.isInstanceOf("ui:treeNode"));
         
         // Unset the old active node if we had one.
         if (cmp._activeNode) {
-            cmp._activeNode.getAttributes().setValue('active', false);
+            cmp._activeNode.getAttributes().setValue("active", false);
         }
         
         cmp._activeNode = activeNode;

@@ -59,6 +59,7 @@ MapValue.prototype.auraType = "Value";
 
 /**
  * Returns a SimpleValue for the specified key.
+ * @param {String} k The key for whose value is to be fetched.
  */
 MapValue.prototype.getValue = function(k){
     if ($A.util.isUndefined(this.value)) {
@@ -86,7 +87,7 @@ MapValue.prototype.getValue = function(k){
  * do as the constructor and create a map based on a model, you would need to first
  * construct a MapValue, then call this.
  *
- * @param newMap The new map.
+ * @param {Object} newMap The new map.
  */
 MapValue.prototype.setValue = function(newMap) {
     this.value = {};
@@ -131,7 +132,7 @@ MapValue.prototype.setValue = function(newMap) {
 /**
  * Returns the unwrapped value for the key. Shortcut for getValue(key).unwrap().
  *
- * @param key The key for the value to return.
+ * @param {String} key The key for the value to return.
  */
 MapValue.prototype.get = function(key){
     // FIXME: W-1563175
@@ -153,8 +154,8 @@ MapValue.prototype.get = function(key){
 /**
  * Merges the specified map into the current map.
  *
- * @param yourMap The map to merge into the current map.
- * @param overwrite If set to true, entries from yourMap overwrite entries in the current map.
+ * @param {Object} yourMap The map to merge into the current map.
+ * @param {Boolean} overwrite If set to true, entries from yourMap overwrite entries in the current map.
  */
 MapValue.prototype.merge = function(yourMap, overwrite) {
     var my = this.value;
@@ -222,14 +223,16 @@ MapValue.prototype.rollback = function(clean) {
 /**
  * Iterates through the map and calls the user-defined function on each entry.
  * For example, this function simply alerts the user for each key-value pair in the map.
- *
+ * <pre>
  * mapValue.each(function(key, val) {
  *      alert("Value " + val + " stored at key " + key);
  * });
+ * </pre>
  *
- * @param func The function that operates on each entry.
+ * @param {Function} func The function that operates on each entry.
+ * @param {Object} config A context value passed to func as the third parameter.
+ * @param {Object} config.scope A context value for 'this' when func is invoked.
  */
-// TODO config param could use some doc
 MapValue.prototype.each = function(func, config){
     // Defaults to global scope
     var scope = config && config.scope ? config.scope : window;
@@ -245,7 +248,7 @@ MapValue.prototype.each = function(func, config){
 /**
  * Convenience method for getting the current value (committed or not)
  * of a named property of this map.  Same as calling getValue(k).getValue().
- * @param k The key for the value to return.
+ * @param {String} k The key for the value to return.
  */
 MapValue.prototype.getRawValue = function(k){
     var ret = this.getValue(k);
@@ -333,14 +336,17 @@ MapValue.prototype.add = function(k, config) {
  * @public
  * Associates the specified value with the specified key.
  * If the map previously contained a mapping for the key, the old value is replaced by the specified value.
+ *
+ * @param {String} k The key.
+ * @param {Object} v The value.
  */
 MapValue.prototype.put = function(k, v){
     var key = k.toLowerCase();
     var value = this.value[key];
 
-    if(value){
+    if (value) {
         value.setValue(v);
-    }else{
+    } else {
         var config = {};
         config[k] = v;
         this.add(k, config);

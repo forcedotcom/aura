@@ -29,6 +29,10 @@ public abstract class AuraValidationException extends QuickFixException {
         super(message, l, quickFixes);
     }
 
+    public AuraValidationException(String message, Location l, Throwable cause, AuraQuickFix... quickFixes) {
+        super(message, l, cause, quickFixes);
+    }
+
     public AuraValidationException(String msg) {
         this(msg, null);
     }

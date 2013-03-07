@@ -27,6 +27,7 @@ import org.auraframework.def.TypeDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Json.Serialization;
@@ -64,9 +65,13 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
     }
 
     @Override
-    public void parseValue(TypeDef typeDef) {
+    public void parseValue(TypeDef typeDef) throws QuickFixException {
         if (!(this.value instanceof Expression)) {
-            this.parsedValue = typeDef.valueOf(this.value);
+            try {
+                this.parsedValue = typeDef.valueOf(this.value);
+            } catch (Throwable t) {
+                throw new InvalidExpressionException(t.getMessage(), getLocation(), t);
+            }
         }
     }
 

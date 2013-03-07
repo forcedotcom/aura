@@ -34,7 +34,6 @@ public class InvalidExpressionException extends AuraValidationException {
     }
 
     public InvalidExpressionException(String message, Location l, Throwable cause) {
-        super(message, l);
+        super(message, l, cause);
     }
-
 }

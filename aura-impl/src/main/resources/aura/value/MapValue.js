@@ -159,10 +159,6 @@ MapValue.prototype.get = function(key){
  * @param overwrite If set to true, entries from yourMap overwrite entries in the current map.
  */
 MapValue.prototype.merge = function(yourMap, overwrite) {
-    if (!$A.util.isObject(yourMap) || !yourMap.toString || yourMap.toString() !== "MapValue") {
-        $A.assert(false, "merge argument must be a MapValue");
-    }
-    
     var my = this.value;
     var keys = yourMap.value;
     for (var key in keys) {

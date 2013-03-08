@@ -818,6 +818,21 @@ var Test = function(){
 		}
 		return element.nodeType == 1 && element.tagName.toLowerCase() == tag;
 	},
+	
+	objectKeys:function(obj){
+    	if(Object.keys){
+    		return Object.keys(obj);
+    	}
+    	else{
+    		var result = [];  
+    		for(var name in obj) {  
+        		if (obj.hasOwnProperty(name)){  
+          			result.push(name);  
+          		}
+    		}			  
+    		return result;  
+    	}
+    },
 		
         // Used by tests to modify framework source to trigger JS last mod update
         /** @ignore */

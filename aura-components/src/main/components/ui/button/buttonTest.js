@@ -33,7 +33,7 @@
         test:function(component){
             var element = component.getElement();
             aura.test.assertEquals('button', component.getAttributes().getValue('buttonType').getValue(), "default value of buttonType attribute should be 'button'")
-            aura.test.assert('button',element.type, "By default ui:button should create a button element of type 'Button'");
+            aura.test.assert('button',element.getAttribute('type'), "By default ui:button should create a button element of type 'Button'");
 
             aura.test.assertTrue(!component.getAttributes().getValue('buttonTitle').getValue(), "Button should not have a default value for title");
 
@@ -55,7 +55,7 @@
     testButtonType:{
         attributes:{label : 'Ok', buttonType: 'reset'},
         test:function(component){
-            aura.test.assertEquals('reset', component.find("button").getElement().type, "Button not rendered with specified type");
+            aura.test.assertEquals('reset', component.find("button").getElement().getAttribute("type"), "Button not rendered with specified type");
         }
     },
     // FF 3.6 doesn't default the type as FF 4+ and Google Chrome do, but FF 3.6 is not our end-target platform

@@ -64,6 +64,7 @@ exp(p,
     "getPrototype", p.getPrototype,
     "overrideFunction", p.overrideFunction,
     "addFunctionHandler", p.addFunctionHandler,
+    "objectKeys", p.objectKeys,
     
     // actions
     "callServerAction", p.callServerAction,

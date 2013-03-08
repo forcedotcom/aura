@@ -263,7 +263,7 @@
             var setval = $A.expressionService.create(null,{"simpleValue":simval,"mapValue":mapval,"arrayValue":arrval});
             var val = setval.unwrap();
             $A.test.assertEquals(true, $A.util.isObject(val), "expected a map");
-            $A.test.assertEquals(3, Object.keys(val).length, "expected 3 values");
+            $A.test.assertEquals(3, $A.test.objectKeys(val).length, "expected 3 values");
             $A.test.assertEquals("string", typeof val["simpleValue"], "wrong first value type");
             $A.test.assertEquals("simplicity", val["simpleValue"], "wrong first value");
             $A.test.assertEquals("object", typeof val["mapValue"], "wrong second value type");

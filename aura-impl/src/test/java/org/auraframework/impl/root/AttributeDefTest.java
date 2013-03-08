@@ -15,14 +15,22 @@
  */
 package org.auraframework.impl.root;
 
+import java.util.Set;
+
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
+import com.google.common.collect.Sets;
 
 public class AttributeDefTest extends AuraImplTestCase {
 
@@ -292,4 +300,55 @@ public class AttributeDefTest extends AuraImplTestCase {
         }
     }
 
+    public void testAppendDependenciesWithNullDefault() throws Exception {
+        AttributeDefImpl attDef = vendor.makeAttributeDefWithNulls(testAttributeDescriptorName, null,
+                vendor.getTypeDefDescriptor(), null, false, null, null);
+        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+        attDef.appendDependencies(dependencies);
+        assertTrue(dependencies.isEmpty());
+    }
+
+    /**
+     * appendDependencies will include the default value's dependencies, if it was parsed already
+     */
+    public void testAppendDependenciesIncludesDefaultValue() throws Exception {
+        AttributeDefRefImpl defaultValue = Mockito.mock(AttributeDefRefImpl.class);
+        final DefDescriptor<?> depDesc = Mockito.mock(DefDescriptor.class);
+        Mockito.doAnswer(new Answer<Void>() {
+            @SuppressWarnings("unchecked")
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                ((Set<DefDescriptor<?>>) invocation.getArguments()[0]).add(depDesc);
+                return null;
+            }
+        }).when(defaultValue).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any());
+        AttributeDefImpl attDef = vendor.makeAttributeDefWithNulls(testAttributeDescriptorName, null,
+                vendor.getTypeDefDescriptor(), defaultValue, false, null, null);
+        Mockito.verify(defaultValue, Mockito.times(0)).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any());
+        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+        attDef.appendDependencies(dependencies);
+        assertEquals(1, dependencies.size());
+        assertTrue(dependencies.contains(depDesc));
+        Mockito.verify(defaultValue, Mockito.times(1)).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any());
+    }
+
+    public void testValidateReferencesWithNullDefault() throws Exception {
+        AttributeDefImpl attDef = vendor.makeAttributeDefWithNulls(testAttributeDescriptorName, null,
+                vendor.getTypeDefDescriptor(), null, false, null, null);
+        attDef.validateReferences();
+    }
+
+    /**
+     * validateReferences will parse the default value and validate its references
+     */
+    public void testValidateReferences() throws Exception {
+        AttributeDefRefImpl defaultValue = Mockito.mock(AttributeDefRefImpl.class);
+        AttributeDefImpl attDef = vendor.makeAttributeDefWithNulls(testAttributeDescriptorName, null,
+                vendor.getTypeDefDescriptor(), defaultValue, false, null, null);
+        Mockito.verify(defaultValue, Mockito.times(0)).parseValue(Mockito.<TypeDef> any());
+        Mockito.verify(defaultValue, Mockito.times(0)).validateReferences();
+        attDef.validateReferences();
+        Mockito.verify(defaultValue, Mockito.times(1)).parseValue(Mockito.<TypeDef> any());
+        Mockito.verify(defaultValue, Mockito.times(1)).validateReferences();
+    }
 }

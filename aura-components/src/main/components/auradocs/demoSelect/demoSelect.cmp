@@ -16,7 +16,7 @@
 
 -->
 <aura:component>
-<div>Single Selection</div>
+<div style="padding-bottom:10px;">Single Selection</div>
 <ui:inputSelect class="single" aura:id="InputSelectSingle">
         <ui:inputSelectOptionGroup label="Mammal">
             <ui:inputSelectOption text="Tiger"/>
@@ -30,7 +30,7 @@
         </ui:inputSelectOptionGroup>
     </ui:inputSelect>
     <br/>
-    <div>Multiple Selection</div>
+    <div style="padding:10px 0 10px 0;">Multiple Selection</div>
     <ui:inputSelect multiple="true" class="multiple" size="5" aura:id="InputSelectMultiple" updateOn="blur">
         <ui:inputSelectOptionGroup label="Mammal">
             <ui:inputSelectOption text="Tiger"/>

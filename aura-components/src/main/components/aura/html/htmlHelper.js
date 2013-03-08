@@ -192,16 +192,27 @@
 
     domEventHandler : function (event) {
         var eventName = "on" + event.type;
-        if (eventName === "ontouchend") {
-            // Map from touch event to onclick
-            eventName = "onclick";
-        }
-
         var element = event.currentTarget;
         var ownerComponent = $A.componentService.getRenderingComponentForElement(element);
         var attributes = ownerComponent.getAttributes();
         var valueProvider = attributes.getValueProvider();
-        var valueExpression = attributes.getValue("HTMLAttributes").getValue(eventName);
+        
+        var htmlAttributes = attributes.getValue("HTMLAttributes");
+        var valueExpression = htmlAttributes.getValue(eventName);
+        
+        if (eventName === "ontouchend") {
+        	// Validate that either onclick or ontouchend is wired up to an action never both simultaneously
+            var onclickExpression = htmlAttributes.getValue("onclick");
+            if (onclickExpression.isDefined()) {
+            	if (!valueExpression.isDefined()) {
+    	            // Map from touch event to onclick
+                	valueExpression = onclickExpression;
+    	            eventName = "onclick";
+            	} else {
+            		throw new Error("aura:html cannot use onclick and ontouchend events simultaneously");
+            	}
+            }
+        }
 
         $A.services.event.startFiring(eventName);
 

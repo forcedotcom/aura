@@ -49,7 +49,7 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
         URL testUrl = testClass.getResource("/" + relPath);
         if (!testUrl.getProtocol().equals("file")) {
             // write something to temp file at least
-            url = new URL(System.getProperty("java.io.tmpdir") + "/aura/test" + resourceName);
+            url = new URL("file://"+System.getProperty("java.io.tmpdir") + "/aura/test" + resourceName);
         } else {
             String fullPath = testUrl.getPath();
             String basePath = fullPath.substring(0, fullPath.indexOf(relPath));

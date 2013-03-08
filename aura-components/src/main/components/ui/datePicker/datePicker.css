@@ -62,28 +62,47 @@ div.THIS {
 .THIS .navLink:hover,
 .THIS .navLink:focus {
     background-color: #E1E1E1;
-    background-position-y: -23px;
     border-color: #AEAEAE;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 1), 0 2px 2px rgba(0, 0, 0, .25);
     outline:none;
 }
 
 .THIS .dateBar .prevYear {
-    background-position-x: 6px;
+    background-position: 6px 7px;
     margin-left: 5px;
 }
 
+.THIS .dateBar .navLink.prevYear:hover,
+.THIS .dateBar .navLink.prevYear:focus {
+    background-position: 6px -23px;
+}
+
 .THIS .dateBar .prevMonth {
-    background-position-x: -26px;
+    background-position: -26px 7px;
+}
+
+.THIS .dateBar .navLink.prevMonth:hover,
+.THIS .dateBar .navLink.prevMonth:focus {
+    background-position: -26px -23px;
 }
 
 .THIS .dateBar .nextMonth {
-    background-position-x: -66px;
+    background-position: -66px 7px;
+}
+
+.THIS .dateBar .navLink.nextMonth:hover,
+.THIS .dateBar .navLink.nextMonth:focus {
+    background-position: -66px -23px;
 }
 
 .THIS .dateBar .nextYear {
-    background-position-x: -98px;
+    background-position: -98px 7px;
     margin-right: 5px;
+}
+
+.THIS .dateBar .navLink.nextYear:hover,
+.THIS .dateBar .navLink.nextYear:focus {
+    background-position: -98px -23px;
 }
 
 .THIS .dateBar .monthYear {

@@ -47,7 +47,7 @@
             </tr>
             <tr>
                 <td><code>aura.test.assertTruthy(condition, assertMessage)</code></td>
-                <td>Checks that the condition is true, null, or defined. Throws an error if the condition is false or undefined.</td>
+                <td>Checks that the condition is true, null, or defined. Returns a message if the condition is false or undefined.</td>
             </tr>
             <tr>
                 <td><code>aura.test.assertFalse(condition, assertMessage)</code></td>
@@ -55,11 +55,11 @@
             </tr>
             <tr>
                 <td><code>aura.test.assertFalsy(condition, assertMessage)</code></td>
-                <td>Checks that the condition is false, null, or undefined. Throws an error if the condition is true or defined.</td>
+                <td>Checks that the condition is false, null, or undefined. Returns a message if the condition is true or defined.</td>
             </tr>
             <tr>
                 <td><code>aura.test.assertEquals(arg1, arg2, assertMessage)</code></td>
-                <td>Checks that <code>arg1 == arg2</code> is true.</td>
+                <td>Checks that <code>arg1 !== arg2</code> is true. Returns a message if the two values are not equal.</td>
             </tr>
             <tr>
                 <td><code>aura.test.fail(assertMessage)</code></td>

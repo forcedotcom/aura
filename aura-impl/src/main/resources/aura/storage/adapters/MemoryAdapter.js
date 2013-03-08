@@ -87,6 +87,11 @@ MemoryStorageAdapter.prototype.setItem = function(key, item) {
 	// For the size calculation, consider only the inputs to the storage layer: key and value
 	// Ignore all the extras added by the Storage layer.
 	var size = this.sizeEstimator.estimateSize(key) + this.sizeEstimator.estimateSize(item["value"]);
+	
+	if (size > this.maxSize) {
+		$A.error("MemoryStorageAdapter.setItem() cannot store an item over the maxSize");
+	}
+	
 	var spaceNeeded = (size + this.getSize()) - this.maxSize;
 	if (spaceNeeded > 0) {
 		this.evict(spaceNeeded);

@@ -208,8 +208,6 @@
     	            // Map from touch event to onclick
                 	valueExpression = onclickExpression;
     	            eventName = "onclick";
-            	} else {
-            		throw new Error("aura:html cannot use onclick and ontouchend events simultaneously");
             	}
             }
         }

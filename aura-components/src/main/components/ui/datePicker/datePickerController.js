@@ -98,7 +98,7 @@
     },
     
     selectToday: function(component, event, helper) {
-        var mDate = moment.utc();
+        var mDate = moment();
         var selectDateEvent = component.getEvent("selectDate");
         selectDateEvent.setParams({"value": mDate.format("YYYY-MM-DD")});
         selectDateEvent.fire();

@@ -93,7 +93,7 @@ public abstract class CommonJavascriptGroupImpl implements JavascriptGroup {
     /** ReadWriteLock for {@link #bundle}. */
     protected ReadWriteLock bundleLock;
 
-    public CommonJavascriptGroupImpl(String name, File root) throws FileNotFoundException {
+    public CommonJavascriptGroupImpl(String name, File root) {
         this.name = name;
         this.root = root;
         this.bundle = new StateBundle(); // TODO: should this initialize for new StateBundle(root)? Breaks tests today.
@@ -220,10 +220,30 @@ public abstract class CommonJavascriptGroupImpl implements JavascriptGroup {
     }
 
     /**
+     * Ensures the lastmod time is at least a given value. Note that change detection is increasingly using MD5 hashes,
+     * so if you need this method, you like likely be in trouble "soon".
+     * 
+     * @return the actual lastmod, which will be at least the input.
+     */
+    protected long setLastModFloor(long floor) {
+        long lastMod = getLastMod();
+        if (lastMod >= floor) {
+            return lastMod; // We're already higher
+        }
+        try {
+            bundleLock.writeLock().lock();
+            bundle.lastMod = Math.max(floor, bundle.lastMod);
+            return bundle.lastMod;
+        } finally {
+            bundleLock.writeLock().unlock();
+        }
+    }
+
+    /**
      * This is a semi-expensive operation, since it has to replace the entire bundle with mostly a copy of the old.
      * Prefer {@link #setContents(String)} or {@link #setContents(String, String)} where applicable.
      */
-    protected File addFile(File f) throws FileNotFoundException {
+    protected void addFile(File f) throws FileNotFoundException {
         if (!f.exists() || !f.isFile() || !f.getName().endsWith(".js")) {
             throw new FileNotFoundException("File did not exist or was not a .js file: " + f.getAbsolutePath());
         }
@@ -235,7 +255,6 @@ public abstract class CommonJavascriptGroupImpl implements JavascriptGroup {
             }
             newBundle.addFile(f);
             bundle = newBundle;
-            return f;
         } finally {
             bundleLock.writeLock().unlock();
         }
@@ -244,7 +263,8 @@ public abstract class CommonJavascriptGroupImpl implements JavascriptGroup {
     @Override
     public File addFile(String s) throws IOException {
         File f = new File(root, s);
-        return addFile(f);
+        addFile(f);
+        return f;
     }
 
     /**

@@ -18,7 +18,7 @@
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Aura Integration Service"/>
 
-<p>The Aura Integration Service enables plugging Aura components into non-Aura HTML containers without having to create an Aura application. Because Aura requires an app to start and to render components, the Aura Integration Service creates and manages an internal integration app and a security provider on your behalf for the components you're embedding. This makes it easy to use Aura components in an HTML-based application.</p>
+<p>The Aura Integration Service enables plugging Aura components into non-Aura HTML containers. Because Aura requires an app to start and to render components, the Aura Integration Service creates and manages an internal integration app and a security provider on your behalf for the components you're embedding. This makes it easy to use Aura components in an HTML-based application.</p>
 
 <p>Also, the Aura Integration Service allows partial page updates. You can add additional components to a page that has already been loaded and after an app has already been created.</p>
 

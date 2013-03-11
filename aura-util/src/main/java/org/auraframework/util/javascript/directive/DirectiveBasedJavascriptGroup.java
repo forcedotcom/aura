@@ -160,21 +160,18 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
     @Override
     public boolean isStale() {
+        // Short circuit the unknown-contents case; it's always stale.
+        if (groupHash == null) {
+            return true;
+        }
+
+        // Otherwise, we're stale IFF we have changed contents.
         try {
-            bundleLock.readLock().lock();
-            try {
-                if (!isGroupHashKnown()) {
-                    return true;
-                }
-                // Otherwise, we're stale IFF we have changed contents.
-                Hash currentTextHash = computeGroupHash();
-                return !currentTextHash.equals(getGroupHash());
-            } catch (IOException e) {
-                // presume we're stale; we'll probably try to regenerate and die from that.
-                return true;
-            }
-        } finally {
-            bundleLock.readLock().unlock();
+            Hash currentTextHash = computeGroupHash();
+            return !currentTextHash.equals(groupHash);
+        } catch (IOException e) {
+            // presume we're stale; we'll probably try to regenerate and die from that.
+            return true;
         }
     }
 
@@ -186,9 +183,9 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
     @Override
     public void regenerate(File destRoot) throws IOException {
-        setContents(this.root, this.startFile);
+        reset();
+        addFile(this.startFile);
         parse();
-        getGroupHash(); // Ensure the new bundle knows its hash once the directives are parsed.
         generate(destRoot, true);
         postProcess();
     }

@@ -96,21 +96,24 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
     }
 
     /**
-     * URL with hash with query will have buster appended as query (before the hash).
+     * URL with hash with query will have buster appended as query (before the
+     * hash).
      */
     public void testAddCacheBusterWithHashQuery() throws Exception {
         assertBustedUrl("/something?aura.cb=%s#layout?option=value", "/something#layout?option=value");
     }
 
     /**
-     * URL with query and hash will have buster appended to query (before the hash).
+     * URL with query and hash will have buster appended to query (before the
+     * hash).
      */
     public void testAddCacheBusterWithQueryAndHash() throws Exception {
         assertBustedUrl("/something?is=fishy&aura.cb=%s#inside", "/something?is=fishy#inside");
     }
 
     /**
-     * URL with query and hash with query will have buster appended to query (before the hash).
+     * URL with query and hash with query will have buster appended to query
+     * (before the hash).
      */
     public void testAddCacheBusterWithQueryAndHashQuery() throws Exception {
         assertBustedUrl("/something?is=fishy&aura.cb=%s#inside?where=fridge", "/something?is=fishy#inside?where=fridge");
@@ -144,9 +147,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
                     AuraPrivateAccessor.set(configAdapter, "buildTimestamp", newStamp);
                     Object jsGroup = AuraPrivateAccessor.get(configAdapter, "jsGroup");
                     if (jsGroup != null) {
-                        Object bundle = AuraPrivateAccessor.get(jsGroup, "bundle");
-                        assertNotNull(bundle);
-                        AuraPrivateAccessor.set(bundle, "lastMod", newStamp);
+                        AuraPrivateAccessor.set(jsGroup, "lastMod", newStamp);
                     }
                 } catch (Exception e) {
                     throw new Error("Failed to simulate framework update", e);

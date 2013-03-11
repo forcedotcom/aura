@@ -26,8 +26,9 @@ import org.auraframework.util.IOUtil;
 import org.auraframework.util.text.Hash;
 
 /**
- * Tests for CommonJavascriptGroupImpl class {@link CommonJavascriptGroupImpl}. This class has implementation of some
- * common functionality required for grouping javascript files in modules. The current class has some tests for
+ * Tests for CommonJavascriptGroupImpl class {@link CommonJavascriptGroupImpl}.
+ * This class has implementation of some common functionality required for
+ * grouping javascript files in modules. The current class has some tests for
  * verifying the implementation of javascript grouping functionality.
  */
 public class CommonJavascriptGroupImplTest extends UnitTestCase {
@@ -36,7 +37,8 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
     }
 
     /**
-     * Test basic initialization and other exposed public methods of CommonJavascriptGroupImpl.java.
+     * Test basic initialization and other exposed public methods of
+     * CommonJavascriptGroupImpl.java.
      * 
      * @throws Exception
      */
@@ -49,13 +51,8 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
         assertEquals("Javascript Group name not set on the group object", localCJG.getName(), "test");
         // Verify Initialization
         verifyCleanState(localCJG);
-        long floor = System.currentTimeMillis() - 200000; // arbitrary, but between -1 and "a while ago"
-        localCJG.setLastModFloor(floor);
-        assertEquals(floor, localCJG.getLastMod());
         localCJG.reset();
         verifyCleanState(localCJG);
-        floor = 200000; // "really long ago," but not -1
-        localCJG.setLastModFloor(floor);
         String validJSFile = "head.js";
         String validJSDirectory = "/dummyDir";
         String invalidJSFile = "JSfilterValidation.junk.js";
@@ -65,8 +62,6 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
         assertTrue("Directories should be accepted for Javascript Groups", localCJG.getFiles().size() == 1);
         // There should only be one js file and that should be innersibling.js
         assertTrue("", localCJG.getFiles().iterator().next().getName().equals(file.getName()));
-        // Files' date should be later, so it should "win"
-        assertEquals(file.lastModified(), localCJG.getLastMod());
         localCJG.reset();
         try {
             localCJG.addDirectory(validJSFile);
@@ -115,96 +110,103 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
         writer.close();
         localCJG.addFile(newFileName);
         try {
-            assertTrue("Last modified time of javascript group not set",
-                    localCJG.getLastMod() == newFile.lastModified());
+            assertTrue("Last modified time of javascript group not set", localCJG.lastMod == newFile.lastModified());
         } finally {
             newFile.delete();
         }
     }
 
-    /**
-     * Test that group hash is recalculated only during certain actions. We test with recorded hash values because the
-     * value should only depend on the file content which is defined in the test and shouldn't depend on file names or
-     * other external factors.
-     */
-    public void testGetGroupHash() throws Exception {
-        File newFile = getResourceFile("/testdata/javascript/testGetGroupHash.js");
-        newFile.getParentFile().mkdirs();
-        Writer writer = new FileWriter(newFile, false);
-        try {
-            writer.append("var simple='hi';");
-            writer.flush();
-        } finally {
-            writer.close();
-        }
+	/**
+	 * Test that group hash is recalculated only during certain actions. We test
+	 * with recorded hash values because the value should only depend on the
+	 * file content which is defined in the test and shouldn't depend on file
+	 * names or other external factors.
+	 */
+	public void testGetGroupHash() throws Exception {
+		File newFile = getResourceFile("/testdata/javascript/testGetGroupHash.js");
+		newFile.getParentFile().mkdirs();
+		Writer writer = new FileWriter(newFile, false);
+		try {
+			writer.append("var simple='hi';");
+			writer.flush();
+		} finally {
+			writer.close();
+		}
 
-        File nestedFile = new File(newFile.getParentFile(), "testDir/testGetGroupHashNested.js");
-        nestedFile.getParentFile().mkdir();
+		File nestedFile = new File(newFile.getParentFile(),
+				"testDir/testGetGroupHashNested.js");
+		nestedFile.getParentFile().mkdir();
 
-        File dest = File.createTempFile(getName(), "");
+		File dest = File.createTempFile(getName(), "");
 
-        try {
-            TestCommonJavascriptGroupImpl test = new TestCommonJavascriptGroupImpl("test", newFile.getParentFile());
-            Hash hash = test.getGroupHash();
-            assertEquals("Unexpected hash", "1B2M2Y8AsgTpgAmY7PhCfg", hash.toString());
+		try {
+			TestCommonJavascriptGroupImpl test = new TestCommonJavascriptGroupImpl(
+					"test", newFile.getParentFile());
+			Hash hash = test.getGroupHash();
+			assertEquals("Unexpected hash", "1B2M2Y8AsgTpgAmY7PhCfg",
+					hash.toString());
 
-            // Need this sleep so the last modified time changes, otherwise the
-            // test runs too fast and the test fails
-            // because the last modified time was not updated by the OS
-            Thread.sleep(2000);
-            // Update a js file which is part of the group
-            writer = new FileWriter(newFile, false);
-            writer.append("var simple='bye';");
-            writer.close();
+			// Need this sleep so the last modified time changes, otherwise the
+			// test runs too fast and the test fails
+			// because the last modified time was not updated by the OS
+			Thread.sleep(2000);
+			// Update a js file which is part of the group
+			writer = new FileWriter(newFile, false);
+			writer.append("var simple='bye';");
+			writer.close();
 
-            // hash value is retained after update, but recalculated when adding
-            // file to the group
-            hash = test.getGroupHash();
-            assertEquals("Hash shouldn't be updated without a manual reset", "1B2M2Y8AsgTpgAmY7PhCfg", hash.toString());
-            // just add same file to trigger
-            test.addFile("testGetGroupHash.js");
-            hash = test.getGroupHash();
-            assertEquals("Hash should have been updated after file added to group", "4EZCacmVcFMwWJRaluefgw",
-                    hash.toString());
+			// hash value is retained after update, but recalculated when adding
+			// file to the group
+			hash = test.getGroupHash();
+			assertEquals("Hash shouldn't be updated without a manual reset",
+					"1B2M2Y8AsgTpgAmY7PhCfg", hash.toString());
+			// just add same file to trigger
+			test.addFile("testGetGroupHash.js");
+			hash = test.getGroupHash();
+			assertEquals(
+					"Hash should have been updated after file added to group",
+					"4EZCacmVcFMwWJRaluefgw", hash.toString());
 
-            // hash value doesn't change when adding empty directory to group
-            test.addDirectory("testDir");
-            hash = test.getGroupHash();
-            assertEquals("Hash should not have changed after adding empty directory to group",
-                    "4EZCacmVcFMwWJRaluefgw", hash.toString());
+			// hash value doesn't change when adding empty directory to group
+			test.addDirectory("testDir");
+			hash = test.getGroupHash();
+			assertEquals(
+					"Hash should not have changed after adding empty directory to group",
+					"4EZCacmVcFMwWJRaluefgw", hash.toString());
 
-            // hash value should change when adding non-empty directory to group
-            writer = new FileWriter(nestedFile, false);
-            try {
-                writer.append("var simple='sayonara';");
-                writer.flush();
-            } finally {
-                writer.close();
-            }
+			// hash value should change when adding non-empty directory to group
+			writer = new FileWriter(nestedFile, false);
+			try {
+				writer.append("var simple='sayonara';");
+				writer.flush();
+			} finally {
+				writer.close();
+			}
 
-            test.addDirectory("testDir");
-            hash = test.getGroupHash();
-            assertEquals("Hash should have been updated after adding non-empty directory to group",
-                    "CUadD1uu9gF9HA_AFPb0Cg", hash.toString());
-        } finally {
-            IOUtil.delete(dest);
-            IOUtil.delete(nestedFile.getParentFile());
-            newFile.delete();
-        }
-    }
+			test.addDirectory("testDir");
+			hash = test.getGroupHash();
+			assertEquals(
+					"Hash should have been updated after adding non-empty directory to group",
+					"CUadD1uu9gF9HA_AFPb0Cg", hash.toString());
+		} finally {
+			IOUtil.delete(dest);
+			IOUtil.delete(nestedFile.getParentFile());
+			newFile.delete();
+		}
+	}
 
     /*
      * Helper Function, add more stuff as CommonJavascriptGroup gets Fleshed out
      */
     public void verifyCleanState(CommonJavascriptGroupImpl pCJG) throws IOException {
-        assertTrue("Last modified date not initialized to -1", pCJG.getLastMod() == -1);
+        assertTrue("Last modified date not initialized to -1", pCJG.lastMod == -1);
         assertTrue("javascript Group should not be initialized with a list of files", pCJG.getFiles().size() == 0);
         assertTrue("Hash should not be unset", pCJG.getGroupHash().isSet());
         assertTrue("Hash should not be empty", pCJG.getGroupHash().toString().length() > 0);
     }
 
     private static class TestCommonJavascriptGroupImpl extends CommonJavascriptGroupImpl {
-        public TestCommonJavascriptGroupImpl(String s, File f) throws FileNotFoundException {
+        public TestCommonJavascriptGroupImpl(String s, File f) {
             super(s, f);
         }
 

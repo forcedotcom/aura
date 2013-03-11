@@ -28,8 +28,8 @@ import java.util.TreeSet;
 import org.auraframework.util.text.Hash;
 
 /**
- * Implementation of the common stuff shared between the main javascript library in sfdc and the new directive based
- * javascript groups
+ * Implementation of the common stuff shared between the main javascript library
+ * in sfdc and the new directive based javascript groups
  */
 public abstract class CommonJavascriptGroupImpl implements JavascriptGroup {
 
@@ -67,25 +67,14 @@ public abstract class CommonJavascriptGroupImpl implements JavascriptGroup {
         return lastMod;
     }
 
-    /**
-     * Scan all group files to compute a new hash of current contents. This is used both to initially compute the hash
-     * for the group and also to test for changes from some known version.
-     * 
-     * @return a newly-computed Hash.
-     * @throws IOException
-     */
-    protected Hash computeGroupHash() throws IOException {
-        Set<URL> urls = new TreeSet<URL>(compareUrls);
-        for (File file : files) {
-            urls.add(file.toURI().toURL());
-        }
-        return new Hash(new MultiStreamReader(urls));
-    }
-
     @Override
     public Hash getGroupHash() throws IOException {
         if (groupHash == null) {
-            groupHash = computeGroupHash();
+            Set<URL> urls = new TreeSet<URL>(compareUrls);
+            for (File file : files) {
+                urls.add(file.toURI().toURL());
+            }
+            groupHash = new Hash(new MultiStreamReader(urls));
         }
         return groupHash;
     }

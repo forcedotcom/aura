@@ -159,6 +159,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
                         OutputStream os = new FileOutputStream(new File(resourceDest, f.getName()));
                         IOUtil.copyStream(is, os);
                         getResourceLoader().refreshCache("aura/javascript/" + f.getName());
+
                         is.close();
                         os.close();
                     }
@@ -167,6 +168,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             } catch (Exception x) {
                 lastGenerationHadCompilationErrors = true;
                 throw new AuraRuntimeException("Unable to regenerate aura javascript", x);
+
             }
         }
     }
@@ -288,8 +290,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     /**
-     * Creates a new Javascript group. This method exists to allow tests to override, so they can substitute e.g. an
-     * AuraJavascriptGroup that experiences synthetic errors.
+     * Creates a new Javascript group. This method exists to allow tests to
+     * override, so they can substitute e.g. an AuraJavascriptGroup that
+     * experiences synthetic errors.
      */
     protected AuraJavascriptGroup newAuraJavascriptGroup() throws IOException {
         return new AuraJavascriptGroup();

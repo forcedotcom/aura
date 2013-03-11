@@ -15,22 +15,7 @@
  */
 package org.auraframework.util.test;
 
-import java.net.URL;
-
-import junit.framework.AssertionFailedError;
-
-/**
- */
 public class GoldFileUtils {
-    public static class NewGoldFileException extends RuntimeException {
-        private static final long serialVersionUID = -5288394880186418728L;
-
-        private NewGoldFileException(URL url, Throwable t) {
-            super(String.format("Differences were found. Review new gold file before committing: %s%n%s%n", url,
-                    t.getMessage()), t);
-        }
-    }
-
     public void assertTextDiff(Class<?> testClass, String resultsBaseFilename, String testResults) throws Exception {
         TextDiffUtils diff = new TextDiffUtils(testClass, resultsBaseFilename);
         assertDiffInternal(testResults, diff);
@@ -46,12 +31,7 @@ public class GoldFileUtils {
             diff.assertDiff(testResults, null);
             return;
         } catch (Throwable t) {
-            try {
-                diff.writeGoldFile(testResults);
-            } catch (Throwable tw) {
-                throw new AssertionFailedError("Differences were found with " + diff.getUrl() + " - " + t.getMessage());
-            }
-            throw new NewGoldFileException(diff.getUrl(), t);
+            diff.writeGoldFile(testResults);
         }
     }
 }

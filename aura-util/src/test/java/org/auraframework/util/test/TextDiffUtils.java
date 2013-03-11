@@ -35,6 +35,14 @@ import org.xml.sax.SAXException;
 
 public class TextDiffUtils extends BaseDiffUtils<String> {
 
+    public static class NewGoldFileException extends RuntimeException {
+        private static final long serialVersionUID = -5288394880186418728L;
+
+        private NewGoldFileException(URL url) {
+            super(String.format("Differences were found. Review new gold file before committing: %s", url));
+        }
+    }
+
     public TextDiffUtils(Class<?> testClass, String goldName) throws Exception {
         super(testClass, goldName);
     }
@@ -60,36 +68,38 @@ public class TextDiffUtils extends BaseDiffUtils<String> {
     }
 
     @Override
-    public void writeGoldFile(String results) throws IOException {
-        URL url = getUrl();
+    public void writeGoldFile(String results) {
+        URL url = getDestUrl();
         SourceControlAdapter sca = AuraUtil.getSourceControlAdapter();
         if (!sca.canCheckout() || !url.getProtocol().equals("file")) {
             throw new RuntimeException("Unable to write to gold file: " + url.toString());
         }
-        File f = new File(url.getFile());
-        boolean existed = f.exists();
-        if (existed && !f.canWrite()) {
-            sca.checkout(f);
-        }
-        if (!f.getParentFile().exists()) {
-            f.getParentFile().mkdirs();
-        }
-        OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(f), "UTF-8");
-        fw.write(results);
-        fw.close();
+        try {
+            File f = new File(url.getFile());
+            boolean existed = f.exists();
+            if (existed && !f.canWrite()) {
+                sca.checkout(f);
+            }
+            if (!f.getParentFile().exists()) {
+                f.getParentFile().mkdirs();
+            }
+            OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(f), "UTF-8");
+            fw.write(results);
+            fw.close();
 
-        if (!existed) {
-            sca.add(f);
+            if (!existed) {
+                sca.add(f);
+            }
+        } catch (Throwable t) {
+            throw new RuntimeException("Failed to write gold file: " + url.toString(), t);
         }
+        throw new NewGoldFileException(url);
     }
 
     @Override
     public String readGoldFile() throws IOException {
         int READ_BUFFER = 4096;
 
-        // TK TODO: deal with brand new files separately at the outer level.
-        // Maybe that means catching FileNotFoundException and printing a
-        // different error. Should also p4 add
         Reader br = new BufferedReader(new InputStreamReader(getUrl().openStream(), "UTF-8"));
         char[] buff = new char[READ_BUFFER];
         int read = -1;

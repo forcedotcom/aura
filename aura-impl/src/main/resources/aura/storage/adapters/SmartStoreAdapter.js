@@ -499,9 +499,21 @@ SmartStoreAdapter.prototype.handleSmartStoreError = function(adapterOperationNam
 
 //#include aura.storage.adapters.SmartStoreAdapter_export
 
-$A.storageService.registerAdapter({ 
-	"name": SmartStoreAdapter.NAME, 
-	"adapterClass": SmartStoreAdapter,
-	"persistent": true,
-	"secure": true
-});
+var smartStoreAvailable = true;
+try {
+    cordova["require"]("salesforce/plugin/smartstore");
+} catch (registerErr) {
+    smartStoreAvailable = false;	
+}
+try {
+    if(smartStoreAvailable){
+	$A.storageService.registerAdapter({ 
+	    "name": SmartStoreAdapter.NAME, 
+	    "adapterClass": SmartStoreAdapter,
+	    "persistent": true,
+	    "secure": true
+	});
+    }
+} catch(auraErr) {
+}
+

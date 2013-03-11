@@ -36,8 +36,7 @@ import org.auraframework.util.json.Json.Serialization.ReferenceType;
 /**
  * A reference to an attribute.
  * 
- * FIXME: W-1328558 This should extend DefinitionImpl<AttributeDefRef> and
- * getAttributeDescriptor should be an override
+ * FIXME: W-1328558 This should extend DefinitionImpl<AttributeDefRef> and getAttributeDescriptor should be an override
  */
 @Serialization(referenceType = ReferenceType.NONE)
 public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements AttributeDefRef {
@@ -49,10 +48,8 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
     // the original value , which could be a string representation
     private final Object value;
     /*
-     * if the original value was a string representation of a non-string type,
-     * then this is the value parsed from that string this is set in the
-     * parseValue method which is called during the validateReferences stage of
-     * compilation
+     * if the original value was a string representation of a non-string type, then this is the value parsed from that
+     * string this is set in the parseValue method which is called during the validateReferences stage of compilation
      */
     private Object parsedValue;
     private final int hashCode;
@@ -124,7 +121,7 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
     public boolean equals(Object o) {
         if (o instanceof AttributeDefRefImpl) {
             AttributeDefRefImpl e = (AttributeDefRefImpl) o;
-            return getName().equals(e.getName()) && getValue().equals(e.getValue());
+            return getName().equals(e.getName()) && value.equals(e.value);
         }
 
         return false;

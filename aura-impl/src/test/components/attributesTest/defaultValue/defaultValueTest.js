@@ -101,7 +101,9 @@
 		test : function(cmp) {
 			$A.test.assertEquals(true, cmp.get("v.booleanDefault"));
 			$A.test.assertEquals(23, cmp.get("v.longDefault"));
-			$A.test.assertEquals("2013-03-06T08:00:00.000Z", cmp.get("v.dateDefault"));
+			// ignore time portion because it currently depends on the client/server timezone diff
+			var dateValue = cmp.get("v.dateDefault").split("T")[0];
+			$A.test.assertEquals("2013-03-06", dateValue);
 			$A.test.assertEquals("1970-01-02T10:17:36.789Z", cmp.get("v.dateTimeDefault"));
 			var cmpValue = cmp.get("v.componentDefault");
 			$A.test.assertTrue($A.util.isArray(cmpValue));

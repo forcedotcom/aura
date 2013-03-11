@@ -47,7 +47,7 @@
 
 <p>You can add as many parameters as you need. The parameters are numbered and are zero-based. For example, if you have three parameters, they will be named {0}, {1}, and {2}, and they will be substituted in the order they're specified.</p> 
 
-<p>This example shows the <code>Object.Title</code> label referenced in an <code>aura:label</code> component and with three parameter substitutions. Suppose the label value is defined as <code>"{0} Members, {1} New Members, and {2} Guests"</code> in the label file.</p>
+<p>This example shows the <code>Object.Title</code> label referenced in an <code>aura:label</code> component and with three parameter substitutions. The label value is defined as <code>"{0} Members, {1} New Members, and {2} Guests"</code> in the label file.</p>
 
 <auradocs:codeblock>
 &lt;aura:label value="<aura:text value="{!"/>$Label.Object.Title}">

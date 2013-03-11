@@ -73,7 +73,7 @@ MemoryStorageAdapter.prototype.getItem = function(key, resultCallback) {
 	var value = this.backingStore[key];
 	if (!$A.util.isUndefinedOrNull(value)) {
 		// Update the MRU
-		var index = this.mru.indexOf(key);
+		var index = $A.util.arrayIndexOf(this.mru, key);
 		this.mru.splice(index, 1);
 		this.mru.push(key);
 
@@ -110,7 +110,7 @@ MemoryStorageAdapter.prototype.removeItem = function(key) {
 	// Update the MRU
 	var value = this.backingStore[key];
 	
-	var index = this.mru.indexOf(key);
+	var index = $A.util.arrayIndexOf(this.mru, key);
 	if (index >= 0) {
 		this.mru.splice(index, 1);
 	}

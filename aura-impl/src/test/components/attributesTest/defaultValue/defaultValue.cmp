@@ -24,4 +24,12 @@
     {!v.objAttributeWithDefaultValue}
     <aura:attribute type="Boolean[]" name="listAttributeWithNoDefaultValue"/>
     <aura:attribute type="Boolean[]" name="listAttributeWithDefaultValue" default="true,false,true"/>
+    
+    <aura:attribute type="Boolean" name="booleanDefault" default="true"/>
+    <aura:attribute type="long" name="longDefault" default="23"/>
+    <aura:attribute type="Date" name="dateDefault" default="2013-03-06"/>
+    <aura:attribute type="DateTime" name="datetimeDefault" default="123456789"/>
+    <aura:attribute type="Aura.Component[]" name="componentDefault">
+    	node text
+    </aura:attribute>
 </aura:component>

@@ -17,6 +17,7 @@ package org.auraframework.util.resource;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -45,7 +46,8 @@ import com.google.common.cache.LoadingCache;
 public class ResourceLoader extends ClassLoader {
 
     /**
-     * We cache both the resource://... URL and the original using this glorified ImmutablePair.
+     * We cache both the resource://... URL and the original using this
+     * glorified ImmutablePair.
      */
     private static class CacheEntry {
         private final URL originalUrl;
@@ -134,12 +136,14 @@ public class ResourceLoader extends ClassLoader {
     }
 
     /**
-     * Gets the "original" URL for a resource. {@link #getResource(String)} is overridden to return a string like "
-     * {@code resource:foo/bar}", but this allows access to the actual underlying resource URL, typically for accessing
-     * location information.
+     * Gets the "original" URL for a resource. {@link #getResource(String)} is
+     * overridden to return a string like "{@code resource:foo/bar}", but this
+     * allows access to the actual underlying resource URL, typically for
+     * accessing location information.
      * 
      * @param name the relative name of the resource, e.g. "foo/bar"
-     * @return the URL used to load the resource, today either a file or jar protocol URL.
+     * @return the URL used to load the resource, today either a file or jar
+     *         protocol URL.
      */
     public URL getRawResourceUrl(String name) {
         try {
@@ -158,9 +162,11 @@ public class ResourceLoader extends ClassLoader {
     }
 
     /**
-     * Gets a "cached" URL for a resource. Like {@link #getRawResourceUrl(String)}, this is a real URL to a file or jar,
-     * rather than a {@code resource:...} URL from {@link #getResource(String)}. Unlike that, however, this returns a
-     * URL for the cached copy, not the the original source.
+     * Gets a "cached" URL for a resource. Like
+     * {@link #getRawResourceUrl(String)}, this is a real URL to a file or jar,
+     * rather than a {@code resource:...} URL from {@link #getResource(String)}.
+     * Unlike that, however, this returns a URL for the cached copy, not the the
+     * original source.
      * 
      * @param name
      * @return {@null}, or a file URL to the cache of the given name.
@@ -194,9 +200,11 @@ public class ResourceLoader extends ClassLoader {
     }
 
     /**
-     * For the given URL from the classpath, try to determine if the resource is a file. Each protocol may handle files
-     * and directories differently. If the nature of the resource cannot be determined, this method conservatively
-     * returns false. Currently, we only process jar: and file: URLs.
+     * For the given URL from the classpath, try to determine if the resource is
+     * a file. Each protocol may handle files and directories differently. If
+     * the nature of the resource cannot be determined, this method
+     * conservatively returns false. Currently, we only process jar: and file:
+     * URLs.
      */
     private boolean isFile(URL url) throws IOException {
         if (url.getProtocol().equalsIgnoreCase(JAR_PROTOCOL)) {
@@ -209,10 +217,12 @@ public class ResourceLoader extends ClassLoader {
             JarURLConnection jarConnection = (JarURLConnection) url.openConnection();
             JarFile jar = jarConnection.getJarFile();
             /**
-             * ZipEntry.isDirectory() is unreliable: the specification is simply that a name ending in a '/' is a
-             * directory. Therefore, we cannot use it to reliably test if a resource is a directory or a file. If there
-             * is a resource at this location ending in a '/', then it must be a directory. Conversely, if there is no
-             * resource at this location ending in a '/', then it must be a file.
+             * ZipEntry.isDirectory() is unreliable: the specification is simply
+             * that a name ending in a '/' is a directory. Therefore, we cannot
+             * use it to reliably test if a resource is a directory or a file.
+             * If there is a resource at this location ending in a '/', then it
+             * must be a directory. Conversely, if there is no resource at this
+             * location ending in a '/', then it must be a file.
              */
             ZipEntry ze = jarConnection.getJarEntry();
             if (!ze.getName().endsWith("/")) {
@@ -271,7 +281,7 @@ public class ResourceLoader extends ClassLoader {
     public synchronized void refreshCache(String resourcePath) throws IOException {
         URL url = parent.getResource(resourcePath);
         if (url == null || !isFile(url)) {
-            return; // We can't do anything real with this anyway.
+            throw new FileNotFoundException("Could not find resource " + resourcePath);
         }
         refreshCache(resourcePath, url);
     }

@@ -115,7 +115,9 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
 
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
-        defaultValue.appendDependencies(dependencies);
+        if (defaultValue != null) {
+            defaultValue.appendDependencies(dependencies);
+        }
     }
 
     @Override

@@ -29,11 +29,11 @@ import org.auraframework.util.javascript.CommonJavascriptGroupImpl;
 import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptValidator;
 import org.auraframework.util.javascript.JavascriptWriter.CompressionLevel;
-import org.auraframework.util.text.Hash;
 
 /**
- * Javascript group that contains directives for parsing instructions or metadata or other fun stuff. It starts from one
- * file which should include the others.
+ * Javascript group that contains directives for parsing instructions or
+ * metadata or other fun stuff. It starts from one file which should include the
+ * others.
  */
 public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
     // name for threads that compress and write the output
@@ -160,22 +160,12 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
     @Override
     public boolean isStale() {
-        try {
-            bundleLock.readLock().lock();
-            try {
-                if (!isGroupHashKnown()) {
-                    return true;
-                }
-                // Otherwise, we're stale IFF we have changed contents.
-                Hash currentTextHash = computeGroupHash();
-                return !currentTextHash.equals(getGroupHash());
-            } catch (IOException e) {
-                // presume we're stale; we'll probably try to regenerate and die from that.
+        for (File f : getFiles()) {
+            if (f.lastModified() > getLastMod()) {
                 return true;
             }
-        } finally {
-            bundleLock.readLock().unlock();
         }
+        return false;
     }
 
     @Override
@@ -186,9 +176,9 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
     @Override
     public void regenerate(File destRoot) throws IOException {
-        setContents(this.root, this.startFile);
+        reset();
+        addFile(this.startFile);
         parse();
-        getGroupHash(); // Ensure the new bundle knows its hash once the directives are parsed.
         generate(destRoot, true);
         postProcess();
     }

@@ -376,4 +376,18 @@ public interface AuraContext {
     List<Event> getClientEvents();
 
     boolean isDevMode();
+
+    /**
+     * Set the framework UID from the client (or server).
+     *
+     * @param the UID that we should set.
+     */
+    void setFrameworkUID(String uid);
+
+    /**
+     * Get the framework UID.
+     *
+     * @return the context's idea of the UID.
+     */
+    String getFrameworkUID();
 }

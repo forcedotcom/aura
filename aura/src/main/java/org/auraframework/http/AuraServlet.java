@@ -53,6 +53,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.SystemErrorException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -384,6 +385,12 @@ public class AuraServlet extends AuraBaseServlet {
             if (context.getFormat() != Format.JSON) {
                 throw new AuraRuntimeException("Invalid request, post must use JSON");
             }
+
+            String fwUID = Aura.getConfigAdapter().getAuraFrameworkNonce();
+            if (context.getFrameworkUID() != null && !fwUID.equals(context.getFrameworkUID())) {
+                throw new ClientOutOfSyncException("Framework has been updated");
+            }
+            context.setFrameworkUID(fwUID);
 
             Message<?> message;
             setNoCache(response);

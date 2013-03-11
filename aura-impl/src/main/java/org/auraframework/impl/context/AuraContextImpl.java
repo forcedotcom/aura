@@ -160,12 +160,15 @@ public class AuraContextImpl implements AuraContext {
                 }
             }
 
+            if (ctx.getFrameworkUID() != null) {
+                json.writeMapEntry("fwuid", ctx.getFrameworkUID());
+            }
+
             if (forClient) {
                 // client needs value providers, urls don't
                 boolean started = false;
 
-                for (GlobalValueProvider valueProvider : ctx
-                        .getGlobalProviders().values()) {
+                for (GlobalValueProvider valueProvider : ctx.getGlobalProviders().values()) {
                     if (!valueProvider.isEmpty()) {
                         if (!started) {
                             json.writeMapKey("globalValueProviders");
@@ -175,8 +178,7 @@ public class AuraContextImpl implements AuraContext {
                         json.writeComma();
                         json.writeIndent();
                         json.writeMapBegin();
-                        json.writeMapEntry("type", valueProvider
-                                .getValueProviderKey().getPrefix());
+                        json.writeMapEntry("type", valueProvider.getValueProviderKey().getPrefix());
                         json.writeMapEntry("values", valueProvider.getData());
                         json.writeMapEnd();
                     }
@@ -186,8 +188,7 @@ public class AuraContextImpl implements AuraContext {
                     json.writeArrayEnd();
                 }
 
-                Map<String, BaseComponent<?, ?>> components = ctx
-                        .getComponents();
+                Map<String, BaseComponent<?, ?>> components = ctx.getComponents();
                 if (!components.isEmpty()) {
                     List<BaseComponent<?, ?>> sorted = Lists.newArrayList(components.values());
                     Collections.sort(sorted, GID_SORTER);
@@ -196,8 +197,7 @@ public class AuraContextImpl implements AuraContext {
 
                     for (BaseComponent<?, ?> component : sorted) {
                         if (component.hasLocalDependencies()) {
-                            json.writeMapEntry(component.getGlobalId(),
-                                    component);
+                            json.writeMapEntry(component.getGlobalId(), component);
                         }
                     }
 
@@ -272,6 +272,8 @@ public class AuraContextImpl implements AuraContext {
     private String lastMod = "";
 
     private final List<Event> clientEvents = Lists.newArrayList();
+
+    private String fwUID;
 
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Access access, JsonSerializationContext jsonContext,
@@ -400,8 +402,7 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public String getLabel(String section, String name, Object... params) {
-        return ServiceLocator.get().get(LocalizationAdapter.class)
-                .getLabel(section, name, params);
+        return ServiceLocator.get().get(LocalizationAdapter.class).getLabel(section, name, params);
     }
 
     @Override
@@ -613,5 +614,15 @@ public class AuraContextImpl implements AuraContext {
             return null;
         }
         return val;
+    }
+
+    @Override
+    public void setFrameworkUID(String uid) {
+        this.fwUID = uid;
+    }
+
+    @Override
+    public String getFrameworkUID() {
+        return fwUID;
     }
 }

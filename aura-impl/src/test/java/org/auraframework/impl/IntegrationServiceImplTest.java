@@ -154,7 +154,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         }
         // Verify that the boot strap was written only once
         assertNotNull(out);
-        Pattern frameworkJS = Pattern.compile("<script src=\"/auraFW/javascript/[^/]+/aura_.{4}.js\" ></script>");
+        Pattern frameworkJS = Pattern.compile("<script src=\"/auraFW/javascript/[^/]+/aura_.{4}.js\\?aura.fwuid=[-0-9A-Za-z_]*\" ></script>");
         Matcher m = frameworkJS.matcher(out.toString());
         int counter = 0;
         while (m.find()) {

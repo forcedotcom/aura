@@ -11,7 +11,8 @@
 
     testSelectPersistentAndNotSecure: {
         test: function(cmp){
-            $A.test.assertEquals("smartstore", $A.storageService.selectAdapter(true, false));
+        	var expectedAdapter = $A.storageService.adapters["smartstore"] ? "smartstore" : $A.storageService.adapters["websql"] ? "websql" : "memory";
+            $A.test.assertEquals(expectedAdapter, $A.storageService.selectAdapter(true, false));
         }
     },
 	
@@ -23,7 +24,7 @@
 
     testSelectPersistentAndSecure: {
         test: function(cmp){
-            $A.test.assertEquals("smartstore", $A.storageService.selectAdapter(true, true));
+            $A.test.assertEquals("memory", $A.storageService.selectAdapter(true, true));
         }
     },
     testSelectDefault:{

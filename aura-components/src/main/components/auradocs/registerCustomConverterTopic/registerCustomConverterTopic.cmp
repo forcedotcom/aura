@@ -20,9 +20,9 @@
 
 <p>A custom converter enables the conversion of one Java type to another Java type for client data sent to the server or for server markup data.</p>
 
-<p>When a client calls a server-side controller action, data that the client sends, such as input parameters for a server action, is sent in JSON format. The JSON representation of data is converted to target Java types on the server. Similarly, values in Aura markup on the server, such as component attribute values, are evaluated as Java strings. These strings are converted to corresponding Java types. For primitive Java types, the type conversion is implicit and doesn't require the addition of any converters. For example, a JSON string is converted to a Java string, and a JSON list is converted to a Java ArrayList. For custom types, Aura calls the custom converter that you provide to create an instance of the custom Java type corresponding to the JSON representation on the client or the markup attribute value on the server.</p>
+<p>When a client calls a server-side controller action, data that the client sends, such as input parameters for a server action, is sent in JSON format. The JSON representation of data is converted to target Java types on the server. Similarly, values in Aura markup on the server, such as component attribute values, are evaluated as Java strings. These strings are converted to corresponding Java types. For primitive Java types, the type conversion is implicit and doesn't require the addition of any converters. For example, a JSON string is converted to a Java string, and a JSON list is converted to a Java ArrayList. For custom types, or when there is no one-to-one mapping between the source value and the target type, Aura calls the custom converter that you provide to create an instance of the custom Java type corresponding to the JSON representation on the client or the markup attribute value on the server.</p>
 
-<p>For example, a component attribute of type List can have a default value in markup of a comma-delimited string of values. Aura converts the attribute string value into a list by calling a String to ArrayList converter.</p>   
+<p>An example of a custom converter is a converter used to convert comma-delimited string values to an ArrayList. A component attribute of type List can have a default value in markup of a comma-delimited string of values. Aura converts this attribute string value into an ArrayList by calling the custom String to ArrayList converter.</p>   
 
 <p>To register a custom converter:</p>
 
@@ -75,7 +75,7 @@ public class MyTypeConverterConfig {
     <li>To specify additional conversions, repeat the previous steps. Each new conversion requires a converter implementation class and the addition of a corresponding method to the Aura configuration class.</li>       
 </ol>
 
-<auradocs:info>To marshall data from the server to the client, see <auradocs:topicLink topic="attrTypes​Java">Custom Java Class Types</auradocs:topicLink>.</auradocs:info>
+<auradocs:info>To marshall data from the server to the client, see <auradocs:topicLink topic="attrTypesJava">Custom Java Class Types</auradocs:topicLink>.</auradocs:info>
 
 <h3>Example 1: Custom Type Conversion for a Component Attribute</h3>
 
@@ -104,7 +104,7 @@ public class MyCustomType implements JsonSerializable {
 &lt;aura:attribute name="myObj" type="java://doc.sample.MyCustomType" default="x"/>
 </auradocs:codeblock><br/>
 
-<p>This is the converter implementation for converting a string (the attribute value) to an object of type <code>MyCustomType</code> (the target Java type.)</p> 
+<p>This is the converter implementation for converting a string (the attribute value) to an object of type <code>MyCustomType</code> (the target Java type).</p> 
 <auradocs:codeblock>
 public class StringToMyCustomTypeConverter implements Converter&lt;String, MyCustomType> {
 
@@ -160,7 +160,7 @@ custom : function(c) {
 },
 </auradocs:codeblock><br/>
 
-<p>This is how the <code>accept</code> method looks like in the server-side controller. Notice the parameter of the <code>accept</code> method is of type <code>List&lt;MyCustomType></code>. This is the target type of the conversion.</p>  
+<p>This is how the <code>accept</code> method looks in the server-side controller. Notice the parameter of the <code>accept</code> method is of type <code>List&lt;MyCustomType></code>. This is the target type of the conversion.</p>  
 <auradocs:codeblock>
 @AuraEnabled
 public static void accept(@Key("myObjs") List&lt;MyCustomType> myObjs) {

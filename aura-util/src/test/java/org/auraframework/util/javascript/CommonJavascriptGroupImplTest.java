@@ -49,13 +49,8 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
         assertEquals("Javascript Group name not set on the group object", localCJG.getName(), "test");
         // Verify Initialization
         verifyCleanState(localCJG);
-        long floor = System.currentTimeMillis() - 200000; // arbitrary, but between -1 and "a while ago"
-        localCJG.setLastModFloor(floor);
-        assertEquals(floor, localCJG.getLastMod());
         localCJG.reset();
         verifyCleanState(localCJG);
-        floor = 200000; // "really long ago," but not -1
-        localCJG.setLastModFloor(floor);
         String validJSFile = "head.js";
         String validJSDirectory = "/dummyDir";
         String invalidJSFile = "JSfilterValidation.junk.js";
@@ -65,8 +60,6 @@ public class CommonJavascriptGroupImplTest extends UnitTestCase {
         assertTrue("Directories should be accepted for Javascript Groups", localCJG.getFiles().size() == 1);
         // There should only be one js file and that should be innersibling.js
         assertTrue("", localCJG.getFiles().iterator().next().getName().equals(file.getName()));
-        // Files' date should be later, so it should "win"
-        assertEquals(file.lastModified(), localCJG.getLastMod());
         localCJG.reset();
         try {
             localCJG.addDirectory(validJSFile);

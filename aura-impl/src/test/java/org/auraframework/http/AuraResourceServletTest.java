@@ -15,6 +15,8 @@
  */
 package org.auraframework.http;
 
+import java.util.Map;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,17 +27,18 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.SourceListener;
 import org.auraframework.test.AuraTestCase;
 import org.auraframework.test.DummyHttpServletRequest;
 import org.auraframework.test.DummyHttpServletResponse;
+import org.auraframework.test.util.AuraPrivateAccessor;
 
 /**
- * Simple (non-integration) test case for {@link AuraResourceServlet}, most
- * useful for exercising hard-to-reach error conditions.
+ * Simple (non-integration) test case for {@link AuraResourceServlet}, most useful for exercising hard-to-reach error
+ * conditions.
  * 
- * I would like this test to be in the "aura" module (vice "aura-impl"), but the
- * configuration there isn't friendly to getting a context service, and I think
- * changing that may impact other tests, so I'm leaving it at least for now.
+ * I would like this test to be in the "aura" module (vice "aura-impl"), but the configuration there isn't friendly to
+ * getting a context service, and I think changing that may impact other tests, so I'm leaving it at least for now.
  */
 public class AuraResourceServletTest extends AuraTestCase {
 
@@ -87,7 +90,7 @@ public class AuraResourceServletTest extends AuraTestCase {
                 AuraContext.Access.PUBLIC);
 
         DefDescriptor<ApplicationDef> nopreload = DefDescriptorImpl.getInstance("appCache:nopreload",
-                                                                                ApplicationDef.class);
+                ApplicationDef.class);
         Aura.getContextService().getCurrentContext().setApplicationDescriptor(nopreload);
 
         DummyHttpServletRequest request = new DummyHttpServletRequest();
@@ -112,20 +115,76 @@ public class AuraResourceServletTest extends AuraTestCase {
         // Format of the cookie is now <n>:<time>
         //
         assertEquals(AuraBaseServlet.SHORT_EXPIRE_SECONDS, cookie.getMaxAge());
-        assertTrue("Cookie should contain : but was:"+cookie.getValue(), cookie.getValue().contains(":"));
+        assertTrue("Cookie should contain : but was:" + cookie.getValue(), cookie.getValue().contains(":"));
         String countStr = cookie.getValue().substring(0, cookie.getValue().indexOf(':'));
         String startTimeStr = cookie.getValue().substring(countStr.length() + 1);
         try {
             int count = Integer.parseInt(countStr);
-            assertTrue("count should be between 1 & 8 was "+count, (count >= 0 && count < 9));
+            assertTrue("count should be between 1 & 8 was " + count, (count >= 0 && count < 9));
         } catch (NumberFormatException nfe) {
-            fail("Invalid count of "+countStr);
+            fail("Invalid count of " + countStr);
         }
         try {
             long startTime = Long.parseLong(startTimeStr);
             assertTrue("Start time should be in the past", (startTime <= System.currentTimeMillis()));
         } catch (NumberFormatException nfe) {
-            fail("Invalid start time of "+startTimeStr);
+            fail("Invalid start time of " + startTimeStr);
         }
+    }
+
+    /**
+     * Verify the CSS cache is cleared in DEV mode after a source change. Usually this would be picked up by the file
+     * source monitor, but we'll just emulate a source change for the sake of speed and simplicity.
+     * 
+     * Original dev caching story: W-1450222
+     */
+    public void testCssCacheClearedOnSourceChange() throws Exception {
+        // DEV mode and Authenticated access so css is actually cached on servlet
+        Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.CSS,
+                AuraContext.Access.AUTHENTICATED);
+
+        doGetToPopulateCache();
+
+        // Verify something was actually added to cache
+        Object cssCache = AuraPrivateAccessor.get(AuraResourceServlet.class, "cssCache");
+        @SuppressWarnings("unchecked")
+        Map<String, String> cache = (Map<String, String>) cssCache;
+        assertTrue("Nothing added to CSS cache", cache.size() > 0);
+
+        // Now force a source change event and verify cache is emptied
+        Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.changed);
+        assertTrue("CSS cache not cleared after source change event", cache.isEmpty());
+    }
+
+    /**
+     * Verify cache of Javascript definitions is cleared on source change in DEV mode.
+     */
+    public void testJsCacheClearedOnSourceChange() throws Exception {
+        // DEV mode and Authenticated access so js is actually cached on servlet
+        Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.JS,
+                AuraContext.Access.AUTHENTICATED);
+
+        doGetToPopulateCache();
+
+        // Verify something was actually added to cache
+        Object jsCache = AuraPrivateAccessor.get(AuraResourceServlet.class, "definitionCache");
+        @SuppressWarnings("unchecked")
+        Map<String, String> cache = (Map<String, String>) jsCache;
+        assertTrue("Nothing added to JS cache", cache.size() > 0);
+
+        // Now force a source change event and verify cache is emptied
+        Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.changed);
+        assertTrue("JS cache not cleared after source change event", cache.isEmpty());
+    }
+
+    private void doGetToPopulateCache() throws Exception {
+        DefDescriptor<ApplicationDef> nopreload = DefDescriptorImpl.getInstance("appCache:withpreload",
+                ApplicationDef.class);
+        Aura.getContextService().getCurrentContext().setApplicationDescriptor(nopreload);
+
+        HttpServletRequest request = new DummyHttpServletRequest();
+        HttpServletResponse response = new DummyHttpServletResponse();
+        AuraResourceServlet servlet = new AuraResourceServlet();
+        servlet.doGet(request, response);
     }
 }

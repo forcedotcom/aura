@@ -443,7 +443,7 @@
 				},
 				function(cmp) {
 					// Create an offline event,
-					cmp.getValue("v.host").setValue("http://invalid.salesforce.com");
+					cmp.getValue("v.host").setValue("http://localhost:9999");
 					cmp.find("TestConnectionButton").get("e.press").fire();
 					$A.test.addWaitFor(true, function() {
 						return cmp.get("v.actionStatus") != "";

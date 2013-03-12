@@ -42,6 +42,7 @@ import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
+import org.auraframework.system.SourceListener.SourceMonitorEvent;
 import org.auraframework.system.SourceLoader;
 
 import com.google.common.base.Preconditions;
@@ -178,13 +179,25 @@ public class StringSourceLoader implements SourceLoader {
         String namespace = descriptor.getNamespace();
         Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
                 .get(namespace);
+
+        SourceMonitorEvent event = SourceMonitorEvent.created;
+
         if (sourceMap == null) {
             sourceMap = Maps.newHashMap();
             namespaces.put(namespace, sourceMap);
         } else {
-            Preconditions.checkState(overwrite || !sourceMap.containsKey(descriptor));
+            boolean containsKey = sourceMap.containsKey(descriptor);
+            Preconditions.checkState(overwrite || !containsKey);
+            if (containsKey) {
+                event = SourceMonitorEvent.changed;
+            }
+
         }
         sourceMap.put(descriptor, source);
+
+        // notify source listeners of change
+        Aura.getDefinitionService().onSourceChanged(null, event);
+
         return source;
     }
 
@@ -202,6 +215,10 @@ public class StringSourceLoader implements SourceLoader {
         if (!DEFAULT_NAMESPACE.equals(namespace) && sourceMap.isEmpty()) {
             namespaces.remove(sourceMap);
         }
+
+        // notify source listeners of change
+        Aura.getDefinitionService().onSourceChanged(null, SourceMonitorEvent.deleted);
+
     }
 
     /**

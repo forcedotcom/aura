@@ -17,6 +17,8 @@ package org.auraframework.throwable.quickfix;
 
 import java.io.File;
 
+import org.auraframework.system.SourceListener;
+
 import junit.framework.Assert;
 
 import org.auraframework.Aura;
@@ -117,5 +119,6 @@ public class QuickFixUITestUtil {
                 dir.delete();
             }
         }
+        Aura.getDefinitionService().onSourceChanged(defDescriptor, SourceListener.SourceMonitorEvent.deleted);
     }
 }

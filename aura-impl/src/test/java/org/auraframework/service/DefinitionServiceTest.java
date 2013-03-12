@@ -30,6 +30,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoContextException;
@@ -309,5 +310,17 @@ public class DefinitionServiceTest extends BaseServiceTest<DefinitionService, De
     @Override
     public void updateLoaded(DefDescriptor<?> loading, boolean preload) throws QuickFixException,
             ClientOutOfSyncException {
+    }
+
+    @Override
+    public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event) {
+    }
+
+    @Override
+    public void subscribeToChangeNotification(SourceListener listener) {
+    }
+
+    @Override
+    public void unsubscribeToChangeNotification(SourceListener listener) {
     }
 }

@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.system;
 
+import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -22,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
@@ -39,6 +42,7 @@ import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Location;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
+import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -67,6 +71,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private static final Set<String> unsecuredNamespaces = ImmutableSet.of("aura", "ui", "os", "auradev",
             "org.auraframework");
     private static final Set<String> unsecuredNonProductionNamespaces = ImmutableSet.of("auradev");
+
+    private static final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+    private static final Lock rLock = rwLock.readLock();
+    private static final Lock wLock = rwLock.writeLock();
 
     private final static int DEPENDENCY_CACHE_SIZE = 100;
     private final static int STRING_CACHE_SIZE = 100;
@@ -471,47 +479,52 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         CompileContext cc = new CompileContext(dependencies);
         D def;
 
-        cc.loggingService.startTimer(LoggingService.TIMER_DEFINITION_CREATION);
+        rLock.lock();
         try {
-            //
-            // FIXME: in the event of a compiled def, we should be done at the
-            // first fetch, though realistically,
-            // this should require that all defs be cached, or we _will_ break.
-            //
-            // First, walk all dependencies, compiling them with
-            // validateDefinition.
-            // and accumulating the set in a local map.
-            //
+            cc.loggingService.startTimer(LoggingService.TIMER_DEFINITION_CREATION);
             try {
-                def = getHelper(descriptor, cc, next);
-            } catch (DefinitionNotFoundException dnfe) {
                 //
-                // ignore a nonexistent def here.
-                // This fits the description of the routine, but it seems a bit
-                // silly.
+                // FIXME: in the event of a compiled def, we should be done at the
+                // first fetch, though realistically,
+                // this should require that all defs be cached, or we _will_ break.
                 //
-                defs.put(descriptor, null);
-                return null;
-            }
-            //
-            // This loop accumulates over a breadth first traversal of the
-            // dependency tree.
-            // All child definitions are added to the 'next' set, while walking
-            // the 'current'
-            // set.
-            //
-            while (next.size() > 0) {
-                Set<DefDescriptor<?>> current = next;
-                next = Sets.newHashSet();
-                for (DefDescriptor<?> cdesc : current) {
-                    getHelper(cdesc, cc, next);
+                // First, walk all dependencies, compiling them with
+                // validateDefinition.
+                // and accumulating the set in a local map.
+                //
+                try {
+                    def = getHelper(descriptor, cc, next);
+                } catch (DefinitionNotFoundException dnfe) {
+                    //
+                    // ignore a nonexistent def here.
+                    // This fits the description of the routine, but it seems a bit
+                    // silly.
+                    //
+                    defs.put(descriptor, null);
+                    return null;
                 }
-            }
+                //
+                // This loop accumulates over a breadth first traversal of the
+                // dependency tree.
+                // All child definitions are added to the 'next' set, while walking
+                // the 'current'
+                // set.
+                //
+                while (next.size() > 0) {
+                    Set<DefDescriptor<?>> current = next;
+                    next = Sets.newHashSet();
+                    for (DefDescriptor<?> cdesc : current) {
+                        getHelper(cdesc, cc, next);
+                    }
+                }
 
-            finishValidation(cc.context, cc.compiled.values());
-            return def;
+                finishValidation(cc.context, cc.compiled.values());
+                return def;
+            } finally {
+                cc.loggingService.stopTimer(LoggingService.TIMER_DEFINITION_CREATION);
+            }
         } finally {
-            cc.loggingService.stopTimer(LoggingService.TIMER_DEFINITION_CREATION);
+            rLock.unlock();
         }
     }
 
@@ -706,55 +719,61 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      */
     @Override
     public <D extends Definition> D getDef(DefDescriptor<D> descriptor) throws QuickFixException {
-        if (descriptor == null) {
-            return null;
-        }
-        if (defs.containsKey(descriptor)) {
-            @SuppressWarnings("unchecked")
-            D def = (D) defs.get(descriptor);
-            return def;
-        }
-        DependencyEntry de = getDE(null, descriptor);
-        if (de == null) {
-            for (DependencyEntry det : localDependencies.values()) {
-                if (det.dependencies != null && det.dependencies.contains(descriptor)) {
-                    de = det;
-                    break;
+        rLock.lock();
+        try {
+            if (descriptor == null) {
+                return null;
+            }
+            if (defs.containsKey(descriptor)) {
+                @SuppressWarnings("unchecked")
+                D def = (D) defs.get(descriptor);
+                return def;
+            }
+            DependencyEntry de = getDE(null, descriptor);
+            if (de == null) {
+                for (DependencyEntry det : localDependencies.values()) {
+                    if (det.dependencies != null && det.dependencies.contains(descriptor)) {
+                        de = det;
+                        break;
+                    }
                 }
             }
-        }
-        if (de == null) {
+            if (de == null) {
+                //
+                // Not in any dependecies.
+                // This is often a bug, and should be logged.
+                //
+                compileDE(descriptor);
+                @SuppressWarnings("unchecked")
+                D def = (D) defs.get(descriptor);
+                return def;
+            }
             //
-            // Not in any dependecies.
-            // This is often a bug, and should be logged.
+            // found an entry.
+            // In this case, throw a QFE if we have one.
             //
-            compileDE(descriptor);
+            if (de.qfe != null) {
+                throw de.qfe;
+            }
+            //
+            // Now we need to actually do the build..
+            //
+            List<CompilingDef<?>> compiled = Lists.newArrayList();
+            AuraContext context = Aura.getContextService().getCurrentContext();
+            for (DefDescriptor<?> dd : de.dependencies) {
+                CompilingDef<?> def = validateHelper(context, dd);
+                if (def != null) {
+                    compiled.add(def);
+                }
+            }
+            finishValidation(context, compiled);
             @SuppressWarnings("unchecked")
             D def = (D) defs.get(descriptor);
             return def;
+
+        } finally {
+            rLock.unlock();
         }
-        //
-        // found an entry.
-        // In this case, throw a QFE if we have one.
-        //
-        if (de.qfe != null) {
-            throw de.qfe;
-        }
-        //
-        // Now we need to actually do the build..
-        //
-        List<CompilingDef<?>> compiled = Lists.newArrayList();
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        for (DefDescriptor<?> dd : de.dependencies) {
-            CompilingDef<?> def = validateHelper(context, dd);
-            if (def != null) {
-                compiled.add(def);
-            }
-        }
-        finishValidation(context, compiled);
-        @SuppressWarnings("unchecked")
-        D def = (D) defs.get(descriptor);
-        return def;
     }
 
     @SuppressWarnings("unchecked")
@@ -1015,4 +1034,37 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private String makeGlobalKey(String uid, DefDescriptor<?> descriptor) {
         return uid + "/" + makeLocalKey(descriptor);
     }
+
+    /**
+     * The driver for cache-consistency management in response to source changes.
+     * MDR drives the process, will notify all registered listeners while write blocking,
+     * then invalidate it's own caches.
+     * 
+     * @param listeners - collections of listeners to notify of source changes
+     * @param source - DefDescriptor that changed - for granular cache clear
+     *            (currently not considered here, but other listeners may make use of it)
+     * @param event - what type of event triggered the change
+     */
+    public static void notifyDependentSourceChange(Collection<WeakReference<SourceListener>> listeners,
+            DefDescriptor<?> source,
+            SourceListener.SourceMonitorEvent event) {
+
+        wLock.lock();
+        try {
+
+            // notify provided listeners, presumably to clear caches
+            for (WeakReference<SourceListener> i : listeners) {
+                if (i.get() != null)
+                {
+                    i.get().onSourceChanged(source, event);
+                }
+            }
+
+            // lastly, clear MDR's static caches
+            dependencies.invalidateAll();
+        } finally {
+            wLock.unlock();
+        }
+    }
+
 }

@@ -34,6 +34,15 @@ public class InputCutCopyPasteUITest extends WebDriverTestCase {
 
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testCutCopyPasteEvents() throws Exception {
+        if (System.getProperty("os.name").startsWith("Mac")) {
+            // Selenium's key event injection are simulated for OSX, and not actually received by
+            // the real browser (see https://code.google.com/p/selenium/issues/detail?id=3101),
+            // which means that there's no way to generate cut/copy/paste events under Selenium.
+            // So, on Mac, skip this whole test. No, changing Keys.CONTROL to Keys.COMMAND below
+            // doesn't do it, they aren't "real keypresses" to the browser at all.
+            return;
+        }
+
         WebDriver d = getDriver();
         open("/uitest/inputCutCopyPasteEventTest.cmp");
         WebElement input = d.findElement(By.xpath("//input"));

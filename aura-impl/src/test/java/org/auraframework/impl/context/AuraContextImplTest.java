@@ -257,8 +257,9 @@ public class AuraContextImplTest extends AuraImplTestCase {
      * Expect a map that doesn't include dropped descriptors.
      */
     public void testGetLoaded() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
-                laxSecurityApp);
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        context.setApplicationDescriptor(laxSecurityApp);
+
         assertTrue("Nothing should be loaded", context.getLoaded().isEmpty());
 
         DefDescriptor<?> dropped = DefDescriptorImpl.getInstance("auratest:iwasdropped", EventDef.class);
@@ -282,25 +283,31 @@ public class AuraContextImplTest extends AuraImplTestCase {
      * Loaded map contains the loaded descriptor.
      */
     public void testSerializeWithLoaded() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
-                laxSecurityApp);
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        context.setApplicationDescriptor(laxSecurityApp);
+        context.setSerializeLastMod(false);
+        context.setSerializePreLoad(false);
+        context.getGlobalProviders().clear();
+
         DefDescriptor<?> added = DefDescriptorImpl.getInstance("auratest:iwasadded", EventDef.class);
         context.addLoaded(added, "somegenerateduid");
-        context.setSerializeLastMod(false);
         String res = Json.serialize(context, context.getJsonSerializationContext());
         goldFileJson(res);
     }
-
+    
     /**
-     * Loaded map contains the dropped descriptor.
+     * Loaded map contains deleted descriptors.
      */
     @Ignore("W-1560329")
     public void testSerializeWithDroppedLoaded() throws Exception {
-        AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Access.AUTHENTICATED,
-                laxSecurityApp);
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        context.setApplicationDescriptor(laxSecurityApp);
+        context.setSerializeLastMod(false);
+        context.setSerializePreLoad(false);
+        context.getGlobalProviders().clear();
+
         DefDescriptor<?> dropped = DefDescriptorImpl.getInstance("auratest:iwasdropped", EventDef.class);
         context.dropLoaded(dropped);
-        context.setSerializeLastMod(false);
         String res = Json.serialize(context, context.getJsonSerializationContext());
         goldFileJson(res);
     }

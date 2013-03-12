@@ -1,1 +1,8 @@
-{"mode":"PROD","app":"test:laxSecurity","preloads":["aura","ui"],"loaded":{"EVENT@markup://auratest:iwasadded":"somegenerateduid"},"test":"org.auraframework.impl.context.AuraContextImplTest.testSerializeWithLoaded","globalValueProviders":[{"type":"$Browser","values":{"formFactor":"DESKTOP","isPhone":false,"isIPad":false,"isAndroid":false,"isTablet":false,"isIPhone":false,"isIOS":false}},{"type":"$Locale"}]}
+{
+  "mode":"UTEST",
+  "app":"test:laxSecurity",
+  "loaded":{
+    "EVENT@markup://auratest:iwasadded":"somegenerateduid"
+  },
+  "test":"org.auraframework.impl.context.AuraContextImplTest.testSerializeWithLoaded"
+}

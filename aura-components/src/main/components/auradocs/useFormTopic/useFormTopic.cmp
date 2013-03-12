@@ -39,8 +39,8 @@
     </p>
     
     <h3>Getting Selections from a List</h3>
-    <p>Use <code>ui:inputSelect</code> to create a list of options, which is a wrapper for an HTML <code>select</code> element. Group options together using <code>ui:inputSelectOptionGroup</code>. Options are represented by <code>ui:inputSelectOption</code>.
-    You can allow multiple selections by setting the <code>multiple</code> attribute to true. 
+     <p>Use <code>ui:inputSelect</code> to create a list of options, which is a wrapper for an HTML <code>select</code> element. You can allow multiple selections by setting the <code>multiple</code> attribute to true.
+    Group options using <code>ui:inputSelectOptionGroup</code>. Each option is represented by <code>ui:inputSelectOption</code>.
     Alternatively, display a list of options from a model by using the format <code>&lt;ui:inputSelect options="<aura:text value="{!"/>m.selectOptions}" /&gt;</code> and creating the list of options in the model using <code>ArrayList&lt;InputOption&gt;</code>.
     <auradocs:info>See the <auradocs:defLink descriptor="ui:inputSelect">ui:inputSelect</auradocs:defLink> component reference.</auradocs:info>
     </p>

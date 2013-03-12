@@ -38,29 +38,31 @@ public interface AuraContext {
 
     public static enum Mode {
 
-        DEV(true, true, JavascriptGeneratorMode.DEVELOPMENT, true),
-        STATS(true, true, JavascriptGeneratorMode.STATS, true),
-        UTEST(true, true, JavascriptGeneratorMode.PRODUCTION, true),
-        FTEST(true, true, JavascriptGeneratorMode.TESTING, true),
-        JSTEST(true, false, JavascriptGeneratorMode.TESTING, false),
-        AUTOJSTEST(true, false, JavascriptGeneratorMode.AUTOTESTING, false),
-        JSTESTDEBUG(true, true, JavascriptGeneratorMode.TESTINGDEBUG, false),
-        AUTOJSTESTDEBUG(true, true, JavascriptGeneratorMode.AUTOTESTINGDEBUG, false),
-        PTEST(false, false, JavascriptGeneratorMode.PRODUCTION, true),
-        CADENCE(false, false, JavascriptGeneratorMode.PRODUCTION, true),
-        PRODDEBUG(false, false, JavascriptGeneratorMode.PRODUCTIONDEBUG, true),
-        PROD(false, false, JavascriptGeneratorMode.PRODUCTION, true),
-        SELENIUM(true, true, JavascriptGeneratorMode.AUTOTESTING, true),
-        SELENIUMDEBUG(true, true, JavascriptGeneratorMode.AUTOTESTINGDEBUG, true);
+        DEV(false, true, true, JavascriptGeneratorMode.DEVELOPMENT, true),
+        STATS(true, false, true, JavascriptGeneratorMode.STATS, true),
+        UTEST(true, false, true, JavascriptGeneratorMode.PRODUCTION, true),
+        FTEST(true, false, true, JavascriptGeneratorMode.TESTING, true),
+        JSTEST(true, false, false, JavascriptGeneratorMode.TESTING, false),
+        AUTOJSTEST(true, false, false, JavascriptGeneratorMode.AUTOTESTING, false),
+        JSTESTDEBUG(true, false, true, JavascriptGeneratorMode.TESTINGDEBUG, false),
+        AUTOJSTESTDEBUG(true, false, true, JavascriptGeneratorMode.AUTOTESTINGDEBUG, false),
+        PTEST(false, false, false, JavascriptGeneratorMode.PRODUCTION, true),
+        CADENCE(false, false, false, JavascriptGeneratorMode.PRODUCTION, true),
+        PRODDEBUG(false, false, false, JavascriptGeneratorMode.PRODUCTIONDEBUG, true),
+        PROD(false, false, false, JavascriptGeneratorMode.PRODUCTION, true),
+        SELENIUM(true, false, true, JavascriptGeneratorMode.AUTOTESTING, true),
+        SELENIUMDEBUG(true, false, true, JavascriptGeneratorMode.AUTOTESTINGDEBUG, true);
 
         private final JavascriptGeneratorMode javascriptMode;
         private final boolean isTestMode;
+        private final boolean isDevMode;
         private final boolean prettyPrint;
         private final boolean allowLocalRendering;
 
-        private Mode(boolean isTestMode, boolean prettyPrint, JavascriptGeneratorMode jsMode,
+        private Mode(boolean isTestMode, boolean isDevMode, boolean prettyPrint, JavascriptGeneratorMode jsMode,
                 boolean allowLocalRendering) {
             this.isTestMode = isTestMode;
+            this.isDevMode = isDevMode;
             this.javascriptMode = jsMode;
             this.prettyPrint = prettyPrint;
             this.allowLocalRendering = allowLocalRendering;
@@ -68,6 +70,10 @@ public interface AuraContext {
 
         public boolean isTestMode() {
             return isTestMode;
+        }
+
+        public boolean isDevMode() {
+            return isDevMode;
         }
 
         public boolean prettyPrint() {
@@ -130,7 +136,7 @@ public interface AuraContext {
     /**
      * Set the current component, so that the components controller can access
      * it.
-     *
+     * 
      * TODO: what is this for.
      * TODO: this is not handled as a stack, so it is almost certainly broken.
      * 
@@ -141,7 +147,7 @@ public interface AuraContext {
 
     /**
      * Get the currently processing action.
-     *
+     * 
      * @return the current action being processed (for use by controllers)
      */
     Action getCurrentAction();
@@ -186,8 +192,8 @@ public interface AuraContext {
     Mode getMode();
 
     /**
-     * Shortcut to check if we are running in one of several testing modes. Use
-     * {@link #getMode()} to get the specific mode.
+     * Shortcut to check if we are running in one of several testing modes. Use {@link #getMode()} to get the specific
+     * mode.
      */
     boolean isTestMode();
 
@@ -261,33 +267,33 @@ public interface AuraContext {
 
     /**
      * Set the current descriptor to send.
-     *
+     * 
      * This sets a descriptor that is intended to be 'preloaded'
      * on the client. This means that it, and all of the non-loaded
      * dependencies will be sent to the client. This is set by the
      * servlet to allow us to know what we should send without
      * changing the context sent to the client.
-     *
+     * 
      * TODO: move this W-1474844
      */
     void setPreloading(DefDescriptor<?> descriptor);
 
     /**
      * Get the currently preloading descriptor.
-     *
+     * 
      * TODO: move this W-1474844
      */
     DefDescriptor<?> getPreloading();
 
     /**
      * Add a loaded descriptor+UID pair.
-     *
+     * 
      * This routine will remember a descriptor in the set of loaded
      * descriptors along with a uid for validating the load (and
      * 'timestamping' it). This should be used with care, as it will
      * be serialized with every request, so size should be a
      * consideration.
-     *
+     * 
      * @param descriptor The loaded descriptor.
      * @param uid the UID that was loaded.
      */
@@ -295,18 +301,17 @@ public interface AuraContext {
 
     /**
      * Drop a component from the set of loaded components.
-     *
+     * 
      * Sober up our set. This can be used to remove a descriptor
      * that is already covered by the set of loaded components.
-     *
+     * 
      * @param descriptor the previously marked 'loaded' descriptor.
      */
     public void dropLoaded(DefDescriptor<?> descriptor);
 
-
     /**
      * Get the uid string for a descriptor.
-     *
+     * 
      * @param descriptor the descriptor that we need a UID for.
      * @return the uid from the request (null if none).
      */
@@ -314,14 +319,14 @@ public interface AuraContext {
 
     /**
      * Get the set of loaded descriptors with the uid.
-     *
+     * 
      * This set of descriptors should be the complete set of loaded
      * descriptors that we choose to remember. Things outside of the
      * dependency set will be resent.
-     *
+     * 
      * @return the map of descriptors to UIDs, UIDs are allowed to be null
      */
-    Map<DefDescriptor<?>,String> getLoaded();
+    Map<DefDescriptor<?>, String> getLoaded();
 
     /**
      * Check if a descriptor has been preloaded.
@@ -362,12 +367,13 @@ public interface AuraContext {
 
     /**
      * 
-     * @param event - Instance of the {@link org.auraframework.instance.Event}
-     *            to be fired at the client.
+     * @param event - Instance of the {@link org.auraframework.instance.Event} to be fired at the client.
      * @throws Exception - If the {@link org.auraframework.def.EventType} is not
      *             APPLICATION or Event object's definition cannot be found.
      */
     void addClientApplicationEvent(Event event) throws Exception;
 
     List<Event> getClientEvents();
+
+    boolean isDevMode();
 }

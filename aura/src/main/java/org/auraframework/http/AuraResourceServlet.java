@@ -47,6 +47,7 @@ import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
+import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.JavascriptProcessingError;
@@ -62,15 +63,16 @@ import com.google.common.collect.Sets;
  * This servlet serves up the application content for 'preloaded' definitions. It should be cacheable,
  * which means that the only context used should be the context sent as part of the URL. If any other
  * information is required, caching will cause bugs.
- *
+ * 
  * Note that this servlet should be very careful to not attempt to force the client to re-sync (except
  * for manifest fetches), since these calls may well be to re-populate a cache. In general, we should
- * send back at least the basics needed for the client to survive. All resets should be done from
- * {@link AuraServlet}, or when fetching the manifest here.
- *
+ * send back at least the basics needed for the client to survive. All resets should be done from {@link AuraServlet},
+ * or when fetching the manifest here.
+ * 
  * TODO: 'preload': use dependencies instead of namespaces here.
  */
-public class AuraResourceServlet extends AuraBaseServlet {
+public class AuraResourceServlet extends AuraBaseServlet
+{
 
     private static final String RESOURCE_URLS = "resourceURLs";
     private static final String LAST_MOD = "lastMod";
@@ -79,6 +81,11 @@ public class AuraResourceServlet extends AuraBaseServlet {
     public static final String ORIG_REQUEST_URI = "aura.origRequestURI";
 
     private static ServletContext servletContext;
+    private static SourceNotifier sourceNotifier = new SourceNotifier();
+
+    static {
+        Aura.getDefinitionService().subscribeToChangeNotification(sourceNotifier);
+    }
 
     /**
      * A very hackish internal filter.
@@ -438,19 +445,17 @@ public class AuraResourceServlet extends AuraBaseServlet {
         String key = null;
 
         context.setPreloading(true);
-        if (!mode.isTestMode()) {
-            StringBuilder keyBuilder = new StringBuilder();
+        StringBuilder keyBuilder = new StringBuilder();
 
-            for (DescriptorFilter dm : filters) {
-                keyBuilder.append(dm);
-                keyBuilder.append(",");
-            }
-            key = keyBuilder.toString();
+        for (DescriptorFilter dm : filters) {
+            keyBuilder.append(dm);
+            keyBuilder.append(",");
+        }
+        key = keyBuilder.toString();
 
-            ret = definitionCache.get(key);
-            if (ret != null) {
-                out.append(ret);
-            }
+        ret = definitionCache.get(key);
+        if (ret != null) {
+            out.append(ret);
         }
         StringBuilder sb = new StringBuilder();
 
@@ -489,7 +494,8 @@ public class AuraResourceServlet extends AuraBaseServlet {
         sb.append("});");
 
         ret = sb.toString();
-        if (!mode.isTestMode()) {
+        // only use closure compiler in prod mode, due to compile cost
+        if (!(mode.isTestMode() || mode.isDevMode())) {
             StringWriter sw = new StringWriter();
             List<JavascriptProcessingError> errors = JavascriptWriter.CompressionLevel.CLOSURE_SIMPLE.compress(
                     new StringReader(ret), sw, key);
@@ -502,6 +508,10 @@ public class AuraResourceServlet extends AuraBaseServlet {
             // Note that we just use put (last one wins), as we don't really
             // care what happens
             // when there is a race. Just that one of them gets in.
+            definitionCache.put(key, ret);
+        }
+        else {
+            // still store the return in cache in not prod
             definitionCache.put(key, ret);
         }
         out.append(ret);
@@ -626,4 +636,16 @@ public class AuraResourceServlet extends AuraBaseServlet {
     public void init(ServletConfig config) {
         servletContext = config.getServletContext();
     }
+
+    /**
+     * Singleton class to manage external calls to the parent class' static cache
+     */
+    private static class SourceNotifier implements SourceListener {
+        @Override
+        public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event) {
+            definitionCache.clear();
+            cssCache.clear();
+        }
+    }
+
 }

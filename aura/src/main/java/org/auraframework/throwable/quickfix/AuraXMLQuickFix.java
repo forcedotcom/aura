@@ -164,5 +164,6 @@ public abstract class AuraXMLQuickFix extends AuraQuickFix {
                 writer.close();
             }
         }
+        resetCache(source.getDescriptor());
     }
 }

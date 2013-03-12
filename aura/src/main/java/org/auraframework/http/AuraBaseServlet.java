@@ -17,13 +17,13 @@ package org.auraframework.http;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -38,7 +38,6 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-
 import org.auraframework.def.ThemeDef;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.service.DefinitionService;
@@ -46,13 +45,13 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
@@ -85,6 +84,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
     protected static MimetypesFileTypeMap mimeTypesMap;
     public static final String OUTDATED_MESSAGE = "OUTDATED";
     protected final static StringParam csrfToken = new StringParam(AURA_PREFIX + "token", 0, true);
+    private static SourceNotifier sourceNotifier = new SourceNotifier();
 
     static {
         mimeTypesMap = new MimetypesFileTypeMap();
@@ -95,6 +95,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
         mimeTypesMap.addMimeTypes("audio/mpeg mp3 mpeg3");
         mimeTypesMap.addMimeTypes("image/png png");
         mimeTypesMap.addMimeTypes("video/mpeg mpeg mpg mpe mpv vbs mpegv");
+        Aura.getDefinitionService().subscribeToChangeNotification(sourceNotifier);
     }
 
     protected static void addCookie(HttpServletResponse response, String name, String value, long expiry) {
@@ -183,8 +184,8 @@ public abstract class AuraBaseServlet extends HttpServlet {
      * @throws ServletException if send404 does (should not generally happen).
      */
     protected void handleServletException(Throwable t, boolean quickfix, AuraContext context,
-                                          HttpServletRequest request, HttpServletResponse response,
-                                          boolean written) throws IOException, ServletException {
+            HttpServletRequest request, HttpServletResponse response,
+            boolean written) throws IOException, ServletException {
         try {
             Throwable mappedEx = t;
             boolean map = !quickfix;
@@ -382,6 +383,8 @@ public abstract class AuraBaseServlet extends HttpServlet {
         DefDescriptor<? extends BaseComponentDef> app = context.getApplicationDescriptor();
         Mode mode = context.getMode();
         long appLastMod = -1;
+
+        // if there are conditions where cache must be disabled, set this boolean false
         boolean useCache = (Aura.getConfigAdapter().isProduction() || (mode == Mode.PROD || mode == Mode.PTEST || mode == Mode.CADENCE));
 
         if (app != null) {
@@ -547,6 +550,20 @@ public abstract class AuraBaseServlet extends HttpServlet {
             ret.add(defs.toString());
         }
         return ret;
+    }
+
+    @Override
+    public void init(ServletConfig config) {
+    }
+
+    /**
+     * Singleton class to manage external calls to the parent class' static cache
+     */
+    private static class SourceNotifier implements SourceListener {
+        @Override
+        public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event) {
+            lastModMap.clear();
+        }
     }
 
 }

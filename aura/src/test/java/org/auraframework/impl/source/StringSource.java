@@ -21,10 +21,13 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import org.auraframework.Aura;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
+import org.auraframework.system.SourceListener.SourceMonitorEvent;
 
 import org.auraframework.throwable.AuraRuntimeException;
 
@@ -99,8 +102,9 @@ public class StringSource<D extends Definition> extends Source<D> {
     @Override
     public boolean addOrUpdate(CharSequence newContents) {
         if (newContents != null) {
-            clearContents();
+            data.getBuffer().setLength(0);
             data.write(newContents.toString());
+            Aura.getDefinitionService().onSourceChanged(getDescriptor(), SourceMonitorEvent.changed);
         }
         return true;
     }
@@ -109,6 +113,7 @@ public class StringSource<D extends Definition> extends Source<D> {
     public void clearContents() {
         data.getBuffer().setLength(0);
         data.touch();
+        Aura.getDefinitionService().onSourceChanged(getDescriptor(), SourceMonitorEvent.changed);
     }
 
     public long setLastModified(long lastModified) {
@@ -152,6 +157,7 @@ public class StringSource<D extends Definition> extends Source<D> {
 
         private void touch() {
             lastModified = System.currentTimeMillis();
+
         }
     }
 }

@@ -24,6 +24,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.VFS;
+import org.apache.commons.vfs2.impl.DefaultFileMonitor;
+import org.apache.log4j.Logger;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
@@ -41,6 +47,7 @@ import com.google.common.collect.Maps;
 public class FileSourceLoader extends BaseSourceLoader {
 
     private static final EnumMap<DefType, FileFilter> filters = new EnumMap<DefType, FileFilter>(DefType.class);
+    private static final Logger logger = Logger.getLogger("FileSourceLoader");
     protected final File base;
     // Tests create loaders like crazy, which takes time to scan for namespaces,
     // so this caches that mapping.
@@ -53,7 +60,24 @@ public class FileSourceLoader extends BaseSourceLoader {
         }
     };
 
+    private static FileSystemManager fileMonitorManager;
+    private static DefaultFileMonitor fileMonitor;
+    private static Set<String> monitoredDirs = new HashSet<String>();
+
     static {
+        try {
+            // set up source file monitoring
+            fileMonitorManager = VFS.getManager();
+            fileMonitor = new DefaultFileMonitor(
+                    new FileSourceListener());
+
+            // monitor the base and all child directories
+            fileMonitor.start();
+        } catch (FileSystemException e) {
+            fileMonitorManager = null;
+            fileMonitor = null;
+        }
+
         filters.put(DefType.APPLICATION, new SourceFileFilter(DefType.APPLICATION));
         filters.put(DefType.COMPONENT, new SourceFileFilter(DefType.COMPONENT));
         filters.put(DefType.EVENT, new SourceFileFilter(DefType.EVENT));
@@ -70,6 +94,35 @@ public class FileSourceLoader extends BaseSourceLoader {
                     : base.getAbsolutePath()));
         }
         this.base = base;
+
+        // add the namespace root to the file monitor
+        registerDirMonitor(base.getAbsolutePath());
+
+    }
+
+    /**
+     * Add a root directory to monitor for changes
+     * Synchronized due to updating single static monitor.
+     * This should be called rarely (only on encountering a new namespace) and have no performance impact
+     * 
+     * @param dirName - name of a root directory to monitor
+     */
+    private static synchronized void registerDirMonitor(String dirName)
+    {
+        if (fileMonitorManager == null || fileMonitor == null)
+            return;
+        if (monitoredDirs.contains(dirName))
+            return;
+        try {
+            monitoredDirs.add(dirName);
+            FileObject listendir = fileMonitorManager.resolveFile(dirName);
+            logger.info("Added file monitor for directory " + dirName);
+            fileMonitor.setRecursive(true);
+            fileMonitor.addFile(listendir);
+        } catch (Exception ex) {
+            // eat error - monitoring simply won't happen for requested dir, but should never occur
+        }
+
     }
 
     private boolean isFilePresent(File file) {
@@ -117,6 +170,7 @@ public class FileSourceLoader extends BaseSourceLoader {
     @Override
     public Set<String> getNamespaces() {
         Set<String> namespaces = baseToNamepsaceCache.get(base);
+
         if (namespaces == null) {
             namespaces = new HashSet<String>();
             for (File dir : base.listFiles(directoryFilter)) {

@@ -15,9 +15,11 @@
  */
 package org.auraframework.impl;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
@@ -28,12 +30,14 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -44,12 +48,13 @@ import com.google.common.collect.Sets;
 
 /**
  * The public access to definitions inside Aura.
- *
+ * 
  * This class manages all of the permissions checking and fetching of implementations
  * for consumers of aura definitions.
  */
 public class DefinitionServiceImpl implements DefinitionService {
     private static final long serialVersionUID = -2488984746420077688L;
+    private static final ConcurrentLinkedQueue<WeakReference<SourceListener>> listeners = new ConcurrentLinkedQueue<WeakReference<SourceListener>>();
 
     @SuppressWarnings("unchecked")
     @Override
@@ -126,7 +131,7 @@ public class DefinitionServiceImpl implements DefinitionService {
 
     /**
      * Get the def registry currently in use.
-     *
+     * 
      * @return the master def registry.
      * @throws RuntimeException if the context has not been initialized.
      */
@@ -187,27 +192,27 @@ public class DefinitionServiceImpl implements DefinitionService {
 
     /**
      * Take in the information off the context and sanitize, populating dependencies.
-     *
+     * 
      * This routine takes in the current descriptor, and a boolean to tell us
      * if we are preloading. It then expands out dependencies and cleans up the
      * set of explicitly loaded descriptors by removing descriptors that are
      * implicitly loaded by others in the set. If there is a problem with the
      * descriptor, it cleans up, and possibly sets the context descriptor to
      * a quickfix, then lets the exception percolate up.
-     *
+     * 
      * Note that the client out of sync exception has higher 'precedence' than
      * the quick fix exception. This allows the servlet to correctly refresh a
      * client before presenting the quick fix (which would otherwise hide the
      * fact that the server side code changed). This is because quick fix exceptions
      * are thrown and swallowed during posts to avoid circular qfes, which cause
      * the server to not process the quick fix.
-     *
+     * 
      * Once this routine has completed, the master def registiry should have a
      * valid set of dependencies for the descriptor on the context.
-     *
+     * 
      * Note that removing things from the 'loaded' set should send them back to
      * the client, and allow our future requests to be smaller.
-     *
+     * 
      * @param loading The descriptor we think we are loading.
      * @param preload are we preloading?
      * @throws ClientOutOfSyncException if the uid on something is a mismatch
@@ -219,7 +224,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         ContextService contextService = Aura.getContextService();
         AuraContext context;
         MasterDefRegistry mdr;
-        List<Map.Entry<DefDescriptor<?>,String>> entries;
+        List<Map.Entry<DefDescriptor<?>, String>> entries;
         Set<DefDescriptor<?>> loaded = Sets.newHashSet();
 
         contextService.assertEstablished();
@@ -232,7 +237,7 @@ public class DefinitionServiceImpl implements DefinitionService {
         // exact (hard to test though).
         //
         try {
-            for (Map.Entry<DefDescriptor<?>,String> entry : entries) {
+            for (Map.Entry<DefDescriptor<?>, String> entry : entries) {
                 DefDescriptor<?> descriptor = entry.getKey();
                 String uid = entry.getValue();
                 if (uid == null) {
@@ -256,7 +261,7 @@ public class DefinitionServiceImpl implements DefinitionService {
                         qfe = broke;
                     }
                     if (!uid.equals(tuid)) {
-                        throw new ClientOutOfSyncException(descriptor+": mismatched UIDs "+uid+" != "+tuid);
+                        throw new ClientOutOfSyncException(descriptor + ": mismatched UIDs " + uid + " != " + tuid);
                     }
                     if (qfe != null) {
                         throw qfe;
@@ -281,11 +286,33 @@ public class DefinitionServiceImpl implements DefinitionService {
                 }
             }
         } finally {
-            // Future!
-            //if (!preload) {
-            //    context.setPreloadedDeps(loaded);
-            //}
+
         }
         return;
     }
+
+    @Override
+    public void onSourceChanged(DefDescriptor<?> source, SourceListener.SourceMonitorEvent event) {
+        for (WeakReference<SourceListener> i : listeners) {
+            if (i.get() == null) {
+                listeners.remove(i);
+            }
+        }
+        MasterDefRegistryImpl.notifyDependentSourceChange(listeners, source, event);
+    }
+
+    @Override
+    public void subscribeToChangeNotification(SourceListener listener) {
+        listeners.add(new WeakReference<SourceListener>(listener));
+    }
+
+    @Override
+    public void unsubscribeToChangeNotification(SourceListener listener) {
+        for (WeakReference<SourceListener> i : listeners) {
+            if (i.get() == null || i.get() == listener) {
+                listeners.remove(i);
+            }
+        }
+    }
+
 }

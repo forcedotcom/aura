@@ -19,8 +19,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.Aura;
+
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.system.SourceListener.SourceMonitorEvent;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
@@ -135,4 +138,8 @@ public abstract class AuraQuickFix implements JsonSerializable {
         json.writeMapEnd();
     }
 
+    protected void resetCache(DefDescriptor<?> descriptor) {
+        Aura.getContextService().getCurrentContext().getDefRegistry().invalidate(descriptor);
+        Aura.getDefinitionService().onSourceChanged(descriptor, SourceMonitorEvent.created);
+    }
 }

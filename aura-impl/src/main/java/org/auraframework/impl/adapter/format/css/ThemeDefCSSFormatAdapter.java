@@ -46,7 +46,7 @@ public class ThemeDefCSSFormatAdapter extends CSSFormatAdapter<ThemeDef> {
     public void writeCollection(Collection<? extends ThemeDef> values, Appendable out) throws IOException,
             QuickFixException {
         Mode mode = Aura.getContextService().getCurrentContext().getMode();
-        boolean compress = !mode.isTestMode();
+        boolean compress = !(mode.isDevMode() || mode.isTestMode());
         AuraContext context = Aura.getContextService().getCurrentContext();
         StringBuilder sb = new StringBuilder();
         Client.Type type = context.getClient().getType();

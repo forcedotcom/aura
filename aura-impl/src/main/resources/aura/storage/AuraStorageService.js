@@ -60,7 +60,11 @@ var AuraStorageService = function(){
         	
         	adapters[name] = config;
         },
-        
+
+        getAdapterConfig : function(adapter) {
+        	return adapters[adapter];
+        },
+
         createAdapter : function(adapter, name, maxSize, debugLoggingEnabled) {
         	var config = adapters[adapter];
         	if (!config) {

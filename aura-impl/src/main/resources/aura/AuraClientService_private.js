@@ -253,12 +253,14 @@ var priv = {
 
             var ctx = responseMessage["context"];
             $A.getContext().join(ctx);
+            
             var events = responseMessage["events"];
             if (events) {
                 for (var en = 0, len = events.length; en < len; en++) {
                     priv.parseAndFireEvent(events[en]);
                 }
             }
+            
             var actionResponses = responseMessage["actions"];
 
             for (var r = 0; r < actionResponses.length; r++) {

@@ -611,7 +611,7 @@ $A.ns.Util.prototype.on = (function() {
  * @param {Boolean} useCapture Whether to use event capturing.
  * @returns {void}
  */
-Util.prototype.removeOn = function(element, eventName, listener, useCapture) {
+$A.ns.Util.prototype.removeOn = function(element, eventName, listener, useCapture) {
     if (window["removeEventListener"]) {
         element.removeEventListener(eventName, listener, useCapture);
     } else if (window["detachEvent"]) {
@@ -1036,7 +1036,7 @@ $A.ns.Util.prototype.emptyComponentTrash = function() {
  * @param {HTMLElement} element The element you think is buried inside the container.
  * @returns {Boolean} Returns true if 'element' is indeed inside 'container', false otherwise.
  */
-Util.prototype.contains = function(container, element) {
+$A.ns.Util.prototype.contains = function(container, element) {
     if ($A.util.isElement(container) && $A.util.isElement(element)) {
         if (container === element) {
             return true;
@@ -1061,7 +1061,7 @@ Util.prototype.contains = function(container, element) {
  * @param {Boolean} preventDefault if preventDefault() should also be called
  * @return {void}
  */
-Util.prototype.squash = function(event, preventDefault) {
+$A.ns.Util.prototype.squash = function(event, preventDefault) {
     event = event || window.event;
     event.stopPropagation();
     event.cancelBubble = true;

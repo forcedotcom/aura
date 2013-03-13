@@ -24,7 +24,6 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHeaders;
-
 import org.auraframework.Aura;
 import org.auraframework.test.AuraHttpTestCase;
 
@@ -43,7 +42,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     public final String sampleJavascriptResourcePath = "/auraFW/javascript/aura_dev.js";
     public final String sampleBinaryResourcePathWithNonce = "/auraFW/resources/%s/aura/auraIdeLogo.png";
     public final String sampleTextResourcePathWithNonce = "/auraFW/resources/%s/aura/resetCSS.css";
-    private final long timeWindowExpiry = 60000; // one minute expiration test window
+    private final long timeWindowExpiry = 600000; // ten minute expiration test window
 
     public AuraFrameworkServletHttpTest(String name) {
         super(name);
@@ -53,9 +52,83 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         return (Math.abs(a - b) < delta);
     }
 
-    protected static GetMethod obtainNoncedGetMethod(String noncedPath) throws Exception {
-        String realPath = String.format(noncedPath, Aura.getConfigAdapter().getAuraFrameworkNonce());
+    private SimpleDateFormat getHttpDateFormat() {
+        return new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+    }
 
+    /**
+     * Execute a get method and check that we got a long cache response.
+     */
+    private int checkLongCache(GetMethod get, String mimeType) throws Exception {
+        int statusCode = getHttpClient().executeMethod(get);
+        assertEquals("AuraFrameworkServlet failed to fetch a valid resource request.", HttpStatus.SC_OK, statusCode);
+        assertNotNull(get.getResponseBodyAsString());
+
+        if (mimeType.startsWith("text/")) {
+            String responseMime = get.getResponseHeader(HttpHeaders.CONTENT_TYPE).getValue();
+
+            assertEquals("Framework servlet not responding with correct encoding type.", AuraBaseServlet.UTF_ENCODING,
+                    get.getResponseCharSet());
+            assertTrue("Framework servlet not responding with correct mime type expected " + mimeType
+                    + " got " + responseMime, responseMime.startsWith(mimeType + ";"));
+        } else {
+            assertEquals("Framework servlet not responding with correct mime type", mimeType,
+                    get.getResponseHeader(HttpHeaders.CONTENT_TYPE).getValue());
+        }
+
+        SimpleDateFormat df = getHttpDateFormat();
+        Date currentDate = new Date();
+        long expirationMillis = (df.parse(get.getResponseHeader(HttpHeaders.EXPIRES).getValue()).getTime()
+                - currentDate.getTime());
+        assertTrue("AuraFrameworkServlet is not setting the right value for expires header.",
+                ApproximatelyEqual(expirationMillis, AuraBaseServlet.LONG_EXPIRE, timeWindowExpiry));
+        return statusCode;
+    }
+
+    private int checkExpired(GetMethod get, String mimeType) throws Exception {
+        int statusCode = getHttpClient().executeMethod(get);
+        SimpleDateFormat df = getHttpDateFormat();
+        assertEquals("AuraFrameworkServlet failed to return ok.", HttpStatus.SC_OK, statusCode);
+
+        if (mimeType.startsWith("text/")) {
+            String responseMime = get.getResponseHeader(HttpHeaders.CONTENT_TYPE).getValue();
+
+            assertEquals("Framework servlet not responding with correct encoding type.", AuraBaseServlet.UTF_ENCODING,
+                    get.getResponseCharSet());
+            assertTrue("Framework servlet not responding with correct mime type expected " + mimeType
+                    + " got " + responseMime, responseMime.startsWith(mimeType + ";"));
+        } else {
+            assertEquals("Framework servlet not responding with correct mime type", mimeType,
+                    get.getResponseHeader(HttpHeaders.CONTENT_TYPE).getValue());
+        }
+        long expirationMillis = df.parse(get.getResponseHeader(HttpHeaders.EXPIRES).getValue()).getTime();
+        assertTrue("AuraFrameworkServlet is not setting the right value for expires header.",
+                expirationMillis < System.currentTimeMillis());
+        return statusCode;
+    }
+
+    protected static GetMethod obtainNoncedGetMethod(String noncedPath, boolean fake) throws Exception {
+        String nonce;
+
+        if (fake) {
+            nonce = "thisisnotanonce";
+        } else {
+            nonce = Aura.getConfigAdapter().getAuraFrameworkNonce();
+        }
+        String realPath = String.format(noncedPath, nonce);
+
+        return obtainGetMethod(realPath);
+    }
+
+    protected static GetMethod obtainUidedGetMethod(String path, boolean fake) throws Exception {
+        String nonce;
+
+        if (fake) {
+            nonce = "thisisnotanonce";
+        } else {
+            nonce = Aura.getConfigAdapter().getAuraFrameworkNonce();
+        }
+        String realPath = path + "?aura.fwuid=" + nonce;
         return obtainGetMethod(realPath);
     }
 
@@ -116,7 +189,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
      * that resource is not stale.
      */
     public void testResourceCaching() throws Exception {
-        GetMethod get = obtainGetMethod(sampleBinaryResourcePath);
+        GetMethod get = obtainUidedGetMethod(sampleBinaryResourcePath, false);
         Calendar stamp = Calendar.getInstance();
         stamp.add(Calendar.DAY_OF_YEAR, 45);
         get.setRequestHeader(HttpHeaders.IF_MODIFIED_SINCE,
@@ -131,24 +204,25 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
      * for a binary resource.
      */
     public void testRequestBinaryResourceWithNonce() throws Exception {
-        GetMethod get = obtainNoncedGetMethod(sampleBinaryResourcePathWithNonce);
-        int statusCode = getHttpClient().executeMethod(get);
-        assertEquals("AuraResourceServlet failed to fetch a valid resource request.", HttpStatus.SC_OK, statusCode);
-        assertNotNull(get.getResponseBodyAsString());
-        assertEquals("Framework servlet not responding with correct mime type", "image/png",
-                get.getResponseHeader(HttpHeaders.CONTENT_TYPE).getValue());
-        SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
-        Date currentDate = new Date();
-        long expirationMillis = (df.parse(get.getResponseHeader(HttpHeaders.EXPIRES).getValue()).getTime() - currentDate
-                .getTime());
-        assertTrue("AuraFrameworkServlet is not setting the right value for expires header.",
-                ApproximatelyEqual(expirationMillis, AuraBaseServlet.LONG_EXPIRE, timeWindowExpiry));
+        GetMethod get = obtainNoncedGetMethod(sampleBinaryResourcePathWithNonce, false);
+        SimpleDateFormat df = getHttpDateFormat();
+        int statusCode;
+        checkLongCache(get, "image/png");
 
-        get = obtainNoncedGetMethod(sampleBinaryResourcePathWithNonce);
+        get = obtainNoncedGetMethod(sampleBinaryResourcePathWithNonce, false);
         // set the if modified since to a long time ago.
         get.setRequestHeader("If-Modified-Since", df.format(new Date(1)));
         statusCode = getHttpClient().executeMethod(get);
-        assertEquals("AuraResourceServlet failed to return not modified.", HttpStatus.SC_NOT_MODIFIED, statusCode);
+        assertEquals("AuraFrameworkServlet failed to return not modified.", HttpStatus.SC_NOT_MODIFIED, statusCode);
+
+        get = obtainNoncedGetMethod(sampleBinaryResourcePathWithNonce, false);
+        // set the if modified since to the future.
+        get.setRequestHeader("If-Modified-Since", df.format(new Date(System.currentTimeMillis() + 24 * 3600 * 1000)));
+        statusCode = getHttpClient().executeMethod(get);
+        assertEquals("AuraFrameworkServlet failed to return not modified.", HttpStatus.SC_NOT_MODIFIED, statusCode);
+
+        get = obtainNoncedGetMethod(sampleBinaryResourcePathWithNonce, true);
+        checkExpired(get, "image/png");
     }
 
     /**
@@ -156,16 +230,16 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
      * for a binary resource.
      */
     public void testRequestBinaryResourceShortExpire() throws Exception {
-        GetMethod get = obtainGetMethod(sampleBinaryResourcePath);
+        GetMethod get = obtainGetMethod(sampleBinaryResourcePath, false);
         int statusCode = getHttpClient().executeMethod(get);
-        assertEquals("AuraResourceServlet failed to fetch a valid resource request.", HttpStatus.SC_OK, statusCode);
+        assertEquals("AuraFrameworkServlet failed to fetch a valid resource request.", HttpStatus.SC_OK, statusCode);
         assertNotNull(get.getResponseBodyAsString());
         assertEquals("Framework servlet not responding with correct mime type", "image/png",
                 get.getResponseHeader(HttpHeaders.CONTENT_TYPE).getValue());
-        SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+        SimpleDateFormat df = getHttpDateFormat();
         Date currentDate = new Date();
-        long expirationMillis = ((df.parse(get.getResponseHeader(HttpHeaders.EXPIRES).getValue()).getTime() + 5000) - currentDate
-                .getTime());
+        long expirationMillis = (df.parse(get.getResponseHeader(HttpHeaders.EXPIRES).getValue()).getTime()
+                - currentDate.getTime());
         assertTrue("AuraFrameworkServlet is not setting the right value for expires header.",
                 ApproximatelyEqual(expirationMillis, AuraBaseServlet.SHORT_EXPIRE, timeWindowExpiry));
     }
@@ -175,28 +249,18 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
      * for a text resource.
      */
     public void testRequestTextResourceWithNonce() throws Exception {
-        GetMethod get = obtainNoncedGetMethod(sampleTextResourcePathWithNonce);
-        int statusCode = getHttpClient().executeMethod(get);
-        assertEquals("AuraResourceServlet failed to fetch a valid resource request.", HttpStatus.SC_OK, statusCode);
-        assertNotNull(get.getResponseBodyAsString());
+        GetMethod get = obtainNoncedGetMethod(sampleTextResourcePathWithNonce, false);
+        SimpleDateFormat df = getHttpDateFormat();
+        checkLongCache(get, "text/css");
 
-        assertEquals("Framework servlet not responding with correct encoding type.", AuraBaseServlet.UTF_ENCODING,
-                get.getResponseCharSet());
-        assertTrue("Framework servlet not responding with correct mime type",
-                get.getResponseHeader(HttpHeaders.CONTENT_TYPE).getValue().startsWith("text/css;"));
-
-        SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
-        Date currentDate = new Date();
-        long expirationMillis = ((df.parse(get.getResponseHeader(HttpHeaders.EXPIRES).getValue()).getTime() + 5000) - currentDate
-                .getTime());
-        assertTrue("AuraFrameworkServlet is not setting the right value for expires header.",
-                ApproximatelyEqual(expirationMillis, AuraBaseServlet.LONG_EXPIRE, timeWindowExpiry));
-
-        get = obtainNoncedGetMethod(sampleTextResourcePathWithNonce);
+        get = obtainNoncedGetMethod(sampleTextResourcePathWithNonce, false);
         // set the if modified since to a long time ago.
         get.setRequestHeader("If-Modified-Since", df.format(new Date(1)));
-        statusCode = getHttpClient().executeMethod(get);
-        assertEquals("AuraResourceServlet failed to return not modified.", HttpStatus.SC_NOT_MODIFIED, statusCode);
+        int statusCode = getHttpClient().executeMethod(get);
+        assertEquals("AuraFrameworkServlet failed to return not modified.", HttpStatus.SC_NOT_MODIFIED, statusCode);
+
+        get = obtainNoncedGetMethod(sampleTextResourcePathWithNonce, true);
+        checkExpired(get, "text/css");
     }
 
     /**
@@ -206,7 +270,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     public void testRequestTextResourceShortExpire() throws Exception {
         GetMethod get = obtainGetMethod(sampleTextResourcePath);
         int statusCode = getHttpClient().executeMethod(get);
-        assertEquals("AuraResourceServlet failed to fetch a valid resource request.", HttpStatus.SC_OK, statusCode);
+        assertEquals("AuraFrameworkServlet failed to fetch a valid resource request.", HttpStatus.SC_OK, statusCode);
         assertNotNull(get.getResponseBodyAsString());
 
         assertEquals("Framework servlet not responding with correct encoding type.", AuraBaseServlet.UTF_ENCODING,
@@ -215,8 +279,8 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
                 get.getResponseHeader(HttpHeaders.CONTENT_TYPE).getValue().startsWith("text/css;"));
         SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
         Date currentDate = new Date();
-        long expirationMillis = ((df.parse(get.getResponseHeader(HttpHeaders.EXPIRES).getValue()).getTime() + 5000) - currentDate
-                .getTime());
+        long expirationMillis = (df.parse(get.getResponseHeader(HttpHeaders.EXPIRES).getValue()).getTime()
+                - currentDate.getTime());
         assertTrue("AuraFrameworkServlet is not setting the right value for expires header.",
                 ApproximatelyEqual(expirationMillis, AuraBaseServlet.SHORT_EXPIRE, timeWindowExpiry));
     }
@@ -225,22 +289,14 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
      * Verify that AuraFrameworkServlet responds successfully to valid request
      * for a javascript resource.
      */
-    // "W-1402893 - Until we predictable get the nonce (lastmod) in the path at auraFW, we will always return LONG_EXPIRES for javascript"
     public void testRequestJavascriptResourceLongExpire() throws Exception {
         GetMethod get = obtainGetMethod(sampleJavascriptResourcePath);
-        int statusCode = getHttpClient().executeMethod(get);
-        assertEquals("AuraResourceServlet failed to fetch a valid resource request.", HttpStatus.SC_OK, statusCode);
-        assertNotNull(get.getResponseBodyAsString());
+        checkExpired(get, "text/javascript");
 
-        assertEquals("Framework servlet not responding with correct encoding type.", AuraBaseServlet.UTF_ENCODING,
-                get.getResponseCharSet());
-        assertTrue("Framework servlet not responding with correct mime type",
-                get.getResponseHeader(HttpHeaders.CONTENT_TYPE).getValue().startsWith("text/javascript;"));
-        SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
-        Date currentDate = new Date();
-        long expirationMillis = ((df.parse(get.getResponseHeader(HttpHeaders.EXPIRES).getValue()).getTime() + 5000) - currentDate
-                .getTime());
-        assertTrue("AuraFrameworkServlet is not setting the right value for expires header.",
-                ApproximatelyEqual(expirationMillis, AuraBaseServlet.LONG_EXPIRE, timeWindowExpiry));
+        get = obtainUidedGetMethod(sampleJavascriptResourcePath, false);
+        checkLongCache(get, "text/javascript");
+
+        get = obtainUidedGetMethod(sampleJavascriptResourcePath, true);
+        checkExpired(get, "text/javascript");
     }
 }

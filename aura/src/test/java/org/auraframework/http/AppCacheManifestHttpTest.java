@@ -95,7 +95,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
 
     private List<String> getRequiredLinks() throws Exception {
         List<String> required = Lists.newArrayList();
-        required.add(".*/aura_prod\\.js");
+        required.add(".*/aura_prod\\.js\\?aura.fwuid=.*");
         return required;
     }
 

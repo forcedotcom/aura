@@ -32,7 +32,8 @@ public class InputCutCopyPasteUITest extends WebDriverTestCase {
 
     }
 
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
+            BrowserType.SAFARI })
     public void testCutCopyPasteEvents() throws Exception {
         if (System.getProperty("os.name").startsWith("Mac")) {
             // Selenium's key event injection are simulated for OSX, and not actually received by

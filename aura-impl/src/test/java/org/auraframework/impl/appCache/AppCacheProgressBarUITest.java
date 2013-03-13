@@ -21,6 +21,8 @@ import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.FreshBrowserInstance;
 import org.auraframework.test.annotation.ThreadHostileTest;
+
+import org.junit.Ignore;
 import org.openqa.selenium.By;
 
 /**
@@ -53,12 +55,14 @@ public class AppCacheProgressBarUITest extends WebDriverTestCase {
      *             TODO: this should pass in iBrowsers since no javascript
      *             called, but looks like the progress bar loads/disappears too
      *             fast for test to pick it up. Passes locally if you clear
-     *             cache in Safari first.
+     *             cache in Safari first. It will probably no longer pass even
+     *             locally if you have already loaded testApp.app.
      */
     @FreshBrowserInstance
+    @Ignore("W-1570969")
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testProgressBar() throws Exception {
-        open("/appCache/testApp.app", Mode.DEV, false);
+        open("/appCache/testApp.app", Mode.SELENIUM, false);
         assertTrue("Progress bar for appCache did not show up.", findDomElement(appCacheProgressDiv).isDisplayed());
         waitForAuraInit();
         waitForElementAbsent("Progress bar for appCache is visible even after aura is ready.",

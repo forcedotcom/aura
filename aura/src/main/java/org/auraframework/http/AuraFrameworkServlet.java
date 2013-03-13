@@ -56,7 +56,6 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
         String currentFwUid = Aura.getConfigAdapter().getAuraFrameworkNonce();
 
         long ifModifiedSince = request.getDateHeader("If-Modified-Since");
-        boolean forceShort = false;
         InputStream in = null;
         try {
             Aura.getConfigAdapter().regenerateAuraJS();
@@ -68,20 +67,19 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             // match entire path once, looking for root, optional nonce, and
             // rest-of-path
             Matcher matcher = RESOURCES_PATTERN.matcher(path);
-            String nonce = null;
-            String file = null;
-            boolean missingNonce = true;
-            boolean matchedNonce = false;
             if (!matcher.matches()) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
-            nonce = matcher.group(2);
-            file = matcher.group(3);
-            String nonceUid = null;
 
-            if (nonce != null) {
-                nonceUid = nonce.substring(1);
+            String nonceUid = matcher.group(2);
+            String file = null;
+            boolean haveUid = false;
+            boolean matchedUid = false;
+            file = matcher.group(3);
+
+            if (nonceUid != null) {
+                nonceUid = nonceUid.substring(1);
             }
             //
             // This is ugly. We can't really distinguish here between a nonce
@@ -89,19 +87,22 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             // match, we just use it as part of the path. In practice this will
             // do exactly the same thing.
             //
-            if (fwUid != null && !fwUid.equals(nonceUid)) {
-                //
-                // This is the case where there is an fwUid, and there is no real
-                // nonce. We reconnect the falsely matched nonce & file. Note that
-                // fwUid should never be null for new fetches of the framwork js.
-                //
-                if (nonce != null) {
-                    file = nonce+file;
+            if (fwUid != null) { 
+                if (!fwUid.equals(nonceUid) && nonceUid != null) {
+                    //
+                    // This is the case where there is an fwUid, and there is no real
+                    // nonce. We reconnect the falsely matched nonce & file. Note that
+                    // fwUid should never be null for new fetches of the framwork js.
+                    //
+                    file = "/"+nonceUid+file;
                 }
-                nonce = null;
+                //
+                // In any case, if we have an fwUid as a parameter, we can erase the
+                // nonceUid.
+                //
+                haveUid = true;
                 nonceUid = null;
-                missingNonce = false;
-            } 
+            }
             if (currentFwUid.equals(fwUid) || currentFwUid.equals(nonceUid)) {
                 //
                 // If we match the nonce and we have an if-modified-since, we
@@ -120,24 +121,16 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                     response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
                     return;
                 }
-                matchedNonce = true;
-                missingNonce = false;
+                matchedUid = true;
+                haveUid = true;
                 nonceUid = null;
-                nonce = null;
             } else if (fwUid != null) {
                 //
-                // Whoops, we have a mismatched nonce.
+                // Whoops, we have a mismatched nonce. Note that a mismatch of the nonce
+                // does _not_ mean we definitely mismatched.
                 //
-                forceShort = true;
+                matchedUid = false;
             }
-            if (nonceUid != null && nonceUid.equals(fwUid)) {
-                //
-                // we have a nonce & a parameter that match... erase the
-                // nonce, we have already set 'forceShort' above.
-                //
-                nonce = null;
-                missingNonce = false;
-            } 
             String root = matcher.group(1);
             if (root.equals("resources")) {
                 format = "/aura/resources%s";
@@ -159,7 +152,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             // if, and never have it exist out here.
             //
             in = resourceLoader.getResourceAsStream(resStr);
-            if (nonce != null) {
+            if (nonceUid != null) {
                 if (in == null) {
                     //
                     // In this case the nonce was actually part of the file path, so
@@ -167,13 +160,14 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                     // if there was a nonce, and it mismatched, we will give the wrong
                     // content for the nonce.
                     //
-                    resStr = String.format(format, nonce+file);
+                    resStr = String.format(format, "/"+nonceUid+file);
                     in = resourceLoader.getResourceAsStream(resStr);
                     if (in != null) {
-                        missingNonce = true;
+                        haveUid = false;
                     }
                 } else {
-                    forceShort = true;
+                    haveUid = true;
+                    matchedUid = false;
                 }
             }
 
@@ -204,19 +198,19 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
             response.setBufferSize(10240);// 10kb
 
             boolean js = JAVASCRIPT_CONTENT_TYPE.equals(mimeType);
-            if (forceShort || (missingNonce && js)) {
+            if ((haveUid && !matchedUid) || (!haveUid && js)) {
                 //
                 // If we had a mismatched UID or we had none, and are requesting js (legacy) we set a short
                 // cache response.
                 //
                 setNoCache(response);
-            } else if (matchedNonce || js) {
+            } else if (matchedUid || js) {
                 //
                 // If we have a known good state, we send a long expire. Warning, this means that resources other
                 // than js may have to impact the MD5, which could make it cycle more than we would like.
                 //
                 // TODO: if we want to have things not included in the fw uid use the fw-uid nonce,
-                // we need to adjust to drop the matchedNonce.
+                // we need to adjust to drop the matchedUid.
                 //
                 response.setDateHeader("Expires", System.currentTimeMillis() + AuraBaseServlet.LONG_EXPIRE);
             } else {

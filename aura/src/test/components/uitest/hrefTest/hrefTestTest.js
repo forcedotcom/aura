@@ -18,7 +18,7 @@
         test: function(component) {
             var link = component.find("testLink");
             var hrefValue = link.getElement().href;
-            $A.test.assertEquals("javascript:void(0);", hrefValue);
+            aura.test.assertEquals("javascript:void(0/*#*/);", hrefValue, "href not expected");
         }
     },
     

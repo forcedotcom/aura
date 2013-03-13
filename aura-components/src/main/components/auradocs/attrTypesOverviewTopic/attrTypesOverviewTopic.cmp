@@ -18,7 +18,7 @@
 <aura:component extends="auradocs:topicPanel">
 	<p>
 	<code>aura:attribute</code> describes an attribute available on a component. See <auradocs:topicLink topic="helloAttributes">Component Attributes</auradocs:topicLink> for an introduction to attributes.
-	An <code>aura:attribute</code> tag can contain these attributes.
+	An <code>aura:cmp</code> tag can contain these attributes.
 	</p>  
 	<table class="table table-bordered table-striped">
           <thead>

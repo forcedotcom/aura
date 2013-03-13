@@ -36,12 +36,12 @@
               </tr>
               <tr>
                      <td><code>type</code></td>
-                     <td>string</td>
+                     <td>String</td>
                      <td>Required. Determines the supported type of the attribute. See the rest of this document for supported types.</td>
               </tr>
               <tr>
                      <td><code>default</code></td>
-                     <td>string</td>
+                     <td>String</td>
                      <td>The default value to use for the attribute, which can be overwritten as needed. See <auradocs:topicLink topic="valueObjects">Value Objects</auradocs:topicLink> to learn how to access and set values.</td>
               </tr>
               <tr>

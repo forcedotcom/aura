@@ -21,12 +21,13 @@
     right:0;
     bottom:0;
     left:0;
-    background-color:#222;
-    background-color:rgba(0,0,0,0.9);
+    background:#222;
+    background:rgba(0,0,0,0.9);
     -webkit-transition:all 0.3s linear;
     -moz-transition:all 0.3s linear;
     transition:all 0.3s linear;
     opacity:0;
+    *opacity:1;
     z-index:99999;
 }
 .uiDialog.fadeIn{

@@ -42,8 +42,8 @@
 
     <!-- private attributes -->
     <aura:attribute name="_ariaId" type="String" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The id needed to identify the dialog window to assistive technologies."/>
-    <aura:attribute name="_handlerConfig" type="Object" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The map of event handlers that should be applied after rendering (keyup, click, blur, resize)."/>
-    <aura:attribute name="_maxHeight" type="Double" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The maximum height of the content &lt;div&gt;."/>
+    <aura:attribute name="_handlerConfig" type="Object" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. A JS config object containing event handlers used for component interactivity."/>
+    <aura:attribute name="_maxHeight" type="Integer" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The maximum height of the content &lt;div&gt;."/>
 
     <!-- events -->
     <aura:registerEvent name="close" type="ui:closeDialog" description="Event fired when the dialog window requests to close itself."/>
@@ -78,7 +78,7 @@
             </div>
         </aura:if>
 
-        <!-- close ("x") link - this DOM placement is intentional. DO NOT move, hide, or remove this element. see dialogManagerHelper.getFocusElement() for more info -->
+        <!-- close ("x") link - this DOM placement is intentional. DO NOT move, hide, or remove this element. see dialogManagerHelper#getFirstFocusableElement for more info -->
         <ui:button aura:id="closeButton" class="{!'close ' + v.closeButtonClass}" label="{!v.closeButtonLabel}" buttonTitle="{!v.closeButtonTitle}" press="{!c.cancel}"/>
 
     </div>

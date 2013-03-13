@@ -97,7 +97,11 @@
         var month = component.get("v.month");
         var year = component.get("v.year");
         var date = new Date(year, month, dayOfMonth);
-        var selectedDate = new Date(component.get("v.selectedDate"));
+        var selectedDate;
+        var mDate = moment(component.get("v.selectedDate"), "YYYY-MM-DD");
+        if (mDate.isValid()) {
+            selectedDate = mDate.toDate();
+        }
         var today = new Date();
         
         var d = new Date();
@@ -227,8 +231,10 @@
         } else if (keyCode == 32) { // space bar
             this.selectDate(component, event);
         } else if (keyCode == 36) { // Home key
+            domEvent.stopPropagation();
             this.goToFirstOfMonth(component, localId);
         } else if (keyCode == 35) { // End key
+            domEvent.stopPropagation();     
             this.goToLastOfMonth(component, localId);
         } else if (keyCode == 33 && shiftKey != true) { // Page Up
             this.changeCalendar(component, localId, -1, 0);

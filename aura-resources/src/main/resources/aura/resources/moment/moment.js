@@ -696,7 +696,7 @@
         // AM / PM
         case 'a' : // fall through to A
         case 'A' :
-            config._isPm = (parseAmpm(input) === 'pm'); // @SFDC
+            config._isPm = (parseAmpm(input, config._l) === 'pm'); // @SFDC
             break;
         // 24 HOUR
         case 'H' : // fall through to hh
@@ -754,9 +754,12 @@
      * function to parse localized am/pm
      * @SFDC
      */
-    function parseAmpm(input) {
+    function parseAmpm(input, lang) {
+        if (!lang) {
+            lang = moment.lang();
+        }
         var inp = (input + '').toLowerCase();
-        var localizedAmpm = moment.langData(moment.lang())._ampm;
+        var localizedAmpm = moment.langData(lang)._ampm;
         if (localizedAmpm && localizedAmpm.pm) {
             return inp === localizedAmpm.pm ? 'pm' : 'am';
         }

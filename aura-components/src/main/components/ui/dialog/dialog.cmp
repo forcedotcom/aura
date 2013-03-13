@@ -18,15 +18,14 @@
 <aura:component extensible="true" support="GA" description="A dialog window used for overlays or modals. To use this component, you must also include one (and only one) ui:dialogManager component in your app. Regardless of how many instances of ui:dialog you use, only one ui:dialogManager component is required. We recommend putting the ui:dialogManager component at the end of your .app file.">
 
     <!-- main attributes -->
-    <aura:attribute name="autoFocus" type="Boolean" default="{!true}" description="Automatically focus on the first focusable element when the dialog is displayed."/>
+    <aura:attribute name="autoFocus" type="Boolean" default="{!true}" description="Automatically focus on the first focusable element when the dialog is displayed. The default is 'true'."/>
     <aura:attribute name="buttons" type="Aura.Component[]" description="Buttons that should be displayed at the bottom of the dialog (e.g., 'Save', 'Cancel', etc.). If the dialog type is set to 'alert' and you are using the default 'cancel' and 'confirm' buttons, any custom buttons you provide here will be placed between the 'cancel' and 'confirm' buttons."/>
-    <aura:attribute name="clickOutToClose" type="Boolean" default="{!true}" description="Specifies if the dialog should be closed when any element outside the dialog is clicked."/>
-    <aura:attribute name="defaultAlertButtons" type="String" default="both" description="When the 'type' attribute is set to 'alert', determines which default buttons should appear at the bottom of the dialog. Valid values are 'confim', 'cancel', 'both', or 'none'."/>
-    <aura:attribute name="doubleConfirm" type="Boolean" default="{!false}" description="When the 'type' attribute is set to 'alert' and the 'defaultAlertButtons' attribute is set to 'confirm' or 'both', this setting will display a confirmation checkbox in addition to the confirmation button. The checkbox must be checked in order for the confirmation button to return true upon click."/>
+    <aura:attribute name="clickOutToClose" type="Boolean" default="{!true}" description="Specifies if the dialog should be closed when any element outside the dialog is clicked. The default is 'true'."/>
+    <aura:attribute name="defaultAlertButtons" type="String" default="both" description="When the 'type' attribute is set to 'alert', determines which default buttons should appear at the bottom of the dialog. Valid values are 'confim', 'cancel', 'both', or 'none'. The default is 'both'."/>
     <aura:attribute name="title" type="String" description="The title displayed in the dialog's header. Required for accessibility." required="true"/>
-    <aura:attribute name="titleDescription" type="String" description="Instructional information about the purpose of the dialog. This text will not be visible on-screen, but still readable by assistive technologies." required="true"/>
+    <aura:attribute name="titleDescription" type="String" description="Instructional information about the purpose of the dialog. This text will not be visible on-screen, but still readable by assistive technologies. Required for accessibility." required="true"/>
     <aura:attribute name="type" type="String" description="The type of dialog window. Possible choices are 'alert', 'modal', and 'nonmodal'. TODO: explain the difference between these." required="true"/>
-    <aura:attribute name="width" type="String" default="medium" description="The width of the dialog. Valid values are 'small', 'medium', 'large' (which equal 310px, 620px, and 940px, respectively), and 'auto', which sizes based on the contents of the dialog. Note that 'auto' will only work properly when the dialog type is set to 'nonmodal'."/>
+    <aura:attribute name="width" type="String" default="medium" description="The width of the dialog. Valid values are 'small', 'medium', 'large' (which equal 310px, 620px, and 940px, respectively), and 'auto', which sizes based on the contents of the dialog. Note that 'auto' will only work properly when the dialog type is set to 'nonmodal'. The default is 'medium'."/>
 
     <!-- css, label, and title hooks -->
     <aura:attribute name="cancelButtonClass" type="String" description="Additional CSS classes to apply to the default cancel button that is displayed when the 'type' attribute is set to 'alert'."/>
@@ -35,9 +34,6 @@
     <aura:attribute name="closeButtonClass" type="String" description="Additional CSS classes to apply to the dialog close button, located in the upper right corner of the dialog window."/>
     <aura:attribute name="closeButtonLabel" type="String" default="X" description="The label of the dialog close button, located in the upper right corner of the dialog window."/>
     <aura:attribute name="closeButtonTitle" type="String" default="Close this window" description="The title attribute of the dialog close button, located in the upper right corner of the dialog window."/>
-    <aura:attribute name="confirmCheckboxClass" type="String" description="Additional CSS classes to apply to the double-confirmation checkbox."/>
-    <aura:attribute name="confirmCheckboxLabel" type="String" default="Are you sure?" description="The label of the double-confirmation checkbox."/>
-    <aura:attribute name="confirmCheckboxLabelClass" type="String" description="Additional CSS classes to apply to the label of the double-confirmation checkbox."/>
     <aura:attribute name="confirmButtonClass" type="String" description="Additional CSS classes to apply to the default confirm button that is displayed when the 'type' attribute is set to 'alert'."/>
     <aura:attribute name="confirmButtonLabel" type="String" default="OK" description="The label of the default confirm button that is displayed when the 'type' attribute is set to 'alert'."/>
     <aura:attribute name="confirmButtonTitle" type="String" default="Click to confirm" description="The title attribute of the default confirm button that is displayed when the 'type' attribute is set to 'alert'."/>
@@ -46,7 +42,6 @@
 
     <!-- private attributes -->
     <aura:attribute name="_ariaId" type="String" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The id needed to identify the dialog window to assistive technologies."/>
-    <aura:attribute name="_checkboxId" type="String" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The id needed to tie the double-confirm checkbox to its label."/>
     <aura:attribute name="_handlerConfig" type="Object" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The map of event handlers that should be applied after rendering (keyup, click, blur, resize)."/>
     <aura:attribute name="_maxHeight" type="Double" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The maximum height of the content &lt;div&gt;."/>
 
@@ -66,39 +61,25 @@
         <h2 aura:id="title" id="{!v._ariaId}" class="title">{!v.title}<span class="assistiveText"> {!v.titleDescription}</span></h2>
 
         <!-- content -->
-        <div aura:id="content" class="content" style="{!'max-height:' + v._maxHeight + 'px;'}">
-            {!v.body}
-            <aura:if isTrue="{!v.type == 'alert' &amp;&amp; v.doubleConfirm}">
-                <div class="confirmWrapper">
-                    <ui:block class="confirm">
-                        <aura:set attribute="left">
-                            <input aura:id="confirmBox" id="{!v._checkboxId}" type="checkbox" class="{!v.confirmCheckboxClass}" onclick="{!c.setConfirmButtonState}"/>
-                        </aura:set>
-                        <aura:set attribute="body">
-                            <label aura:id="confirmBoxLabel" for="{!v._checkboxId}" class="{!'confirmBoxLabel ' + v.confirmCheckboxLabelClass}">{!v.confirmCheckboxLabel}</label>
-                        </aura:set>
-                    </ui:block>
-                </div>
-            </aura:if>
-        </div>
+        <div aura:id="content" class="content" style="{!'max-height:' + v._maxHeight + 'px;'}">{!v.body}</div>
 
         <!-- buttons -->
-        <aura:if isTrue="{!v.buttons.length > 0 || (v.type == 'alert' &amp;&amp; (v.defaultAlertButtons != 'none' || v.doubleConfirm))}">
+        <aura:if isTrue="{!v.buttons.length > 0 || (v.type == 'alert' &amp;&amp; v.defaultAlertButtons != 'none')}">
             <div class="buttons">
-                <aura:if isTrue="{!v.type == 'alert' &amp;&amp; (v.defaultAlertButtons == 'cancel' || v.defaultAlertButtons == 'both')}">
+                <aura:if isTrue="{!v.type == 'alert' &amp;&amp; v.defaultAlertButtons != 'confirm'}">
                     <ui:button aura:id="cancelButton" class="{!v.cancelButtonClass}" label="{!v.cancelButtonLabel}" buttonTitle="{!v.cancelButtonTitle}" press="{!c.cancel}"/>
                 </aura:if>
                 <!-- custom buttons go between 'cancel' and 'confirm', because 'cancel' buttons should always be on the far left
                      and 'confirm' buttons should always be on the far right. any other custom action should be in the middle. -->
                 {!v.buttons}
-                <aura:if isTrue="{!v.type == 'alert' &amp;&amp; (v.defaultAlertButtons == 'confirm' || v.defaultAlertButtons == 'both' || v.doubleConfirm)}">
-                    <ui:button aura:id="confirmButton" class="{!v.confirmButtonClass}" label="{!v.confirmButtonLabel}" buttonTitle="{!v.confirmButtonTitle}" disabled="{!v.doubleConfirm}" press="{!c.confirm}"/>
+                <aura:if isTrue="{!v.type == 'alert' &amp;&amp; v.defaultAlertButtons != 'cancel'}">
+                    <ui:button aura:id="confirmButton" class="{!v.confirmButtonClass}" label="{!v.confirmButtonLabel}" buttonTitle="{!v.confirmButtonTitle}" press="{!c.confirm}"/>
                 </aura:if>
             </div>
         </aura:if>
 
         <!-- close ("x") link - this DOM placement is intentional. DO NOT move, hide, or remove this element. see dialogManagerHelper.getFocusElement() for more info -->
-        <ui:button aura:id="close" class="{!'close ' + v.closeButtonClass}" label="{!v.closeButtonLabel}" buttonTitle="{!v.closeButtonTitle}" press="{!c.cancel}"/>
+        <ui:button aura:id="closeButton" class="{!'close ' + v.closeButtonClass}" label="{!v.closeButtonLabel}" buttonTitle="{!v.closeButtonTitle}" press="{!c.cancel}"/>
 
     </div>
 

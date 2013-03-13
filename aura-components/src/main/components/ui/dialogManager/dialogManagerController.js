@@ -22,27 +22,21 @@
      */
     openDialog : function(cmp, evt, hlp) {
 
-        var atts          = cmp.getAttributes(),
-            triggerEvent  = evt.getParam("triggerEvent"),
-            type          = evt.getParam("dialog").get("v.type"),
-            allowMultiple = atts.get("allowMultipleOpen"),
-            activeDialogs = atts.get("_activeDialogs"),
-            isModal       = type === "alert" || type === "modal",
-            length        = activeDialogs.length,
-            dialog        = evt.getParam("dialog");
+        var atts         = cmp.getAttributes(),
+            activeDialog = atts.get("_activeDialog"),
+            triggerEvent = evt.getParam("triggerEvent"),
+            dialog       = evt.getParam("dialog");
 
         // kill the "click" event generated from ui:press so it doesn't bubble
-        // up to the document and immediately close the dialog
+        // up to the document and immediately close the dialog.
         if (triggerEvent && triggerEvent.getName() === "press") {
             $A.util.squash(triggerEvent.getParam("domEvent"));
         }
 
-        // if we don't allow multiple active dialogs, or the dialog is modal,
-        // deactivate all the old ones first
-        if (!allowMultiple || isModal) {
-            for (var i=0; i<length; i++) {
-                hlp.deactivateDialog(activeDialogs[i], cmp);
-            }
+        // only one open dialog is allowed at a time ... if there's one
+        // already open, close that one first.
+        if (activeDialog) {
+            hlp.deactivateDialog(activeDialog, cmp);
         }
 
         hlp.activateDialog(dialog, cmp);
@@ -58,12 +52,6 @@
 
         var dialog       = evt.getParam("dialog"),
             triggerEvent = evt.getParam("triggerEvent");
-
-        // kill the "click" event generated from ui:press so it doesn't bubble
-        // up to the document and close other open dialogs
-        if (triggerEvent && triggerEvent.getName() === "press") {
-            $A.util.squash(triggerEvent.getParam("domEvent"));
-        }
 
         hlp.deactivateDialog(dialog, cmp);
 

@@ -20,6 +20,7 @@
      * Sets the 'confirmClicked' Boolean on the ui:closeDialog event.
      *
      * @param {Aura.Component} cmp the ui:dialogComponent
+     * @param {Aura.Event} evt the Aura event that triggered this (e.g., ui:press)
      * @param {Boolean} confirmClicked if the 'confirm' or 'cancel' button was clicked
      * @return {void}
      */
@@ -52,7 +53,7 @@
 
 
     /**
-     * Simple cross-browser function to get the height of the client viewport
+     * Simple cross-browser function to get the height of the client viewport.
      * 
      * @return {Integer} the height of the client viewport
      */

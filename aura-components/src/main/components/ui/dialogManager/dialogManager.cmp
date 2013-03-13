@@ -17,12 +17,8 @@
 -->
 <aura:component extensible="true" support="GA" description="Manages all instances of ui:dialog in an application, by handling visibility and all DOM events. One (and only one) instance of this component is required if you wish to use the ui:dialog component. We recommend putting the ui:dialogManager component at the end of your .app file.">
 
-    <!-- main attributes -->
-    <aura:attribute name="allowMultipleOpen" type="Boolean" default="{!false}" description="Determines whether multiple open (i.e., active) dialogs are allowed. There are virtually no use cases where this should be set to {!true}, but, it's an option anyway. Note that this setting only applies to non-modal dialogs. If a modal dialog is active, all other dialogs will be deactivated."/>
-
     <!-- private attributes -->
-    <aura:attribute name="_activeDialogs" type="Aura.Component[]" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The currently active (i.e. open) ui:dialog components."/>
-    <aura:attribute name="_nextZIndex" type="Integer" default="{!99999}" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The z-index value to apply to the next dialog activated."/>
+    <aura:attribute name="_activeDialog" type="Aura.Component" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The currently active (i.e., open) ui:dialog component."/>
 
     <!-- events -->
     <aura:registerEvent name="close" type="ui:closeDialog"/>

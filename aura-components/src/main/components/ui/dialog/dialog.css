@@ -110,16 +110,6 @@
     box-shadow:inset 0 0 6px #000;
     border:2px solid #FFF;
 }
-.uiDialog .confirmWrapper{
-    margin-top:10px;
-    text-align:center;
-}
-.uiDialog .confirm{
-    display:inline-block;
-}
-.uiDialog .confirmBoxLabel{
-    margin-left:5px;
-}
 .uiDialog .buttons{
     text-align:center;
 }

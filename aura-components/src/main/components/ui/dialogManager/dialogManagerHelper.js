@@ -17,12 +17,12 @@
 
 
     /**
-     * Activates a single ui:dialog component by setting its visibility
-     * to true, applies event handlers for proper interaction (and sets
-     * a reference to those handlers on a component attribute, for removal
-     * later)), manages the application of CSS classes, and updates the
-     * manager's _activeDialogs attribute.
-     * 
+     * Activates a single ui:dialog component by:
+     *     1. setting a reference to it on the dialogManager component.
+     *     2. applying event handlers for proper interaction.
+     *     3. setting a reference to those event handlers on the dialog component (for removal later).
+     *     4. managing application of CSS classes for display and animation.
+     *
      * @param {Aura.Component} dialogCmp the ui:dialog component to activate
      * @param {Aura.Component} managerCmp the ui:dialogManager component
      * @return {void}
@@ -37,13 +37,10 @@
             dialogInnerCmp  = dialogCmp.find("dialog"),
             maskCmp         = dialogCmp.find("mask"),
             managerAtts     = managerCmp.getAttributes(),
-            currentlyActive = managerAtts.get("_activeDialogs"),
             handlerConfig   = this.getHandlerConfig(dialogCmp, isModal, clickOutToClose, managerCmp);
 
+        managerAtts.setValue("_activeDialog", dialogCmp);
         dialogAtts.setValue("_handlerConfig", handlerConfig);
-        currentlyActive.push(dialogCmp);
-        managerAtts.setValue("_activeDialogs", currentlyActive);
-        this.bringToFront(dialogCmp, managerCmp);
         this.applyEventHandlers(handlerConfig);
         this.doAnimation(true, maskCmp, dialogInnerCmp, autoFocus, isModal, handlerConfig);
 
@@ -51,10 +48,10 @@
 
 
     /**
-     * Deactivates a single ui:dialog component by setting its visibility
-     * to false, removes the event handlers applied during dialog activation,
-     * manages the application of CSS classes, and updates the manager's
-     * _activeDialogs attribute.
+     * Deactivates a single ui:dialog component by:
+     *     1. removing the reference to it from the dialogManager component.
+     *     2. removing event handlers.
+     *     3. managing removal of CSS classes for display and animation.
      *
      * @param {Aura.Component} dialogCmp the ui:dialog component to deactivate
      * @param {Aura.Component} managerCmp the ui:dialogManager component
@@ -69,18 +66,9 @@
             isModal         = dialogType === "alert" || dialogType === "modal",
             maskCmp         = dialogCmp.find("mask"),
             dialogInnerCmp  = dialogCmp.find("dialog"),
-            managerAtts     = managerCmp.getAttributes(),
-            currentlyActive = managerAtts.get("_activeDialogs"),
-            length          = currentlyActive.length;
+            managerAtts     = managerCmp.getAttributes();
 
-        for (var i=0; i<length; i++) {
-            if (dialogCmp === currentlyActive[i]) {
-                // remove the dialog from the array and re-set the value of the manager's attribute'
-                currentlyActive.splice(i,1);
-                managerAtts.setValue("_activeDialogs", currentlyActive);
-                break;
-            }
-        }
+        managerAtts.setValue("_activeDialog", null);
         this.removeEventHandlers(handlerConfig);
         this.doAnimation(false, maskCmp, dialogInnerCmp, autoFocus, isModal, handlerConfig);
 
@@ -132,7 +120,6 @@
     getHandlerConfig : function(dialogCmp, isModal, clickOutToClose, managerCmp) {
 
         var self          = this,
-            allowMultiple = managerCmp.get("v.allowMultiple"),
             oldFocus      = document.activeElement,
             newFocus      = this.getFirstFocusableElement(dialogCmp),
             keydown       = function(event) { self.getKeydownHandler(dialogCmp, managerCmp, isModal, newFocus, event) },
@@ -165,7 +152,7 @@
 
         if (!event) { var event = window.event; }
 
-        var closeLink    = dialogCmp.find("close").getElement(),
+        var closeButton  = dialogCmp.find("closeButton").getElement(),
             shiftPressed = event.shiftKey,
             currentFocus = document.activeElement,
             closeEvent   = $A.get("e.ui:closeDialog");
@@ -179,16 +166,16 @@
                 break;
             case 9: // tab key - if modal, keep focus inside the dialog
                 if (isModal) {
-                    if (currentFocus === closeLink && !shiftPressed) {
+                    if (currentFocus === closeButton && !shiftPressed) {
                         $A.util.squash(event, true);
                         firstFocusable.focus();
                     } else if (currentFocus === firstFocusable && shiftPressed) {
                         $A.util.squash(event, true);
-                        closeLink.focus();
+                        closeButton.focus();
                     }
-                // if not modal, close the dialog when you tab out of it (unless you allow multiple active dialogs)
-                } else if (!managerCmp.get("v.allowMultipleOpen")) {
-                    if ((currentFocus === closeLink && !shiftPressed) ||
+                // if not modal, close the dialog when you tab out of it
+                } else {
+                    if ((currentFocus === closeButton && !shiftPressed) ||
                         (currentFocus === firstFocusable && shiftPressed)) {
                         $A.util.squash(event, true);
                         closeEvent.fire();
@@ -213,23 +200,15 @@
 
         if (!event) { var event = window.event; }
 
-        var target                 = event.target || event.srcElement,
-            container              = dialogCmp.find("dialog").getElement(),
-            allOpen                = managerCmp.get("v._activeDialogs"),
-            clickedInside          = $A.util.contains(container, target),
-            otherOpenDialogClicked = this.otherOpenDialogClicked(dialogCmp, allOpen, target),
+        var target        = event.target || event.srcElement,
+            container     = dialogCmp.find("dialog").getElement(),
+            clickedInside = $A.util.contains(container, target),
             closeEvent;
 
-        // don't let the click event bubble up, as it will close other open dialogs
-        $A.util.squash(event);
-
         if (clickedInside) {
-            this.bringToFront(dialogCmp, managerCmp);
             return;
         } else {
-            if (otherOpenDialogClicked) {
-                return;
-            } else if (clickOutToClose) {
+            if (clickOutToClose) {
                 closeEvent = $A.get("e.ui:closeDialog");
                 closeEvent.setParams({
                     dialog : dialogCmp,
@@ -264,25 +243,6 @@
 
 
     /**
-     * Brings the dialog visually to the front, then increments the z-index
-     * for the next dialog to be activated.
-     * 
-     * @param {Aura.Component} dialog the ui:dialog component
-     * @param {Aura.Component} manager the ui:dialogManager component
-     */
-    bringToFront : function(dialog, manager) {
-
-        var atts   = manager.getAttributes(),
-            zIndex = atts.get("_nextZIndex");
-
-        // set the z-index, then increment for the next dialog that gets focus
-        dialog.find("dialog").getElement().style.zIndex = zIndex;
-        atts.setValue("_nextZIndex", zIndex + 1);
-
-    },
-
-
-    /**
      * Retrieves the first focusable element inside the dialog component. Should
      * ALWAYS return a non-null value, as the "x" (i.e. dialog close) link should always
      * be visible and positioned as the very last element in the dialog window.
@@ -298,7 +258,7 @@
     getFirstFocusableElement : function(dialogCmp) {
 
         var container    = dialogCmp.find("dialog").getElement(),
-            close        = dialogCmp.find("close").getElement(),
+            close        = dialogCmp.find("closeButton").getElement(),
             formElements = [],
             length       = 0,
             element      = null;
@@ -385,33 +345,6 @@
                 config.oldFocus.focus();
             }
         }
-
-    },
-
-
-    /**
-     * Determines if an open dialog - other than the one currently being evaluated - was clicked.
-     *
-     * @param {Aura.Component} currentDialog the current ui:dialog component
-     * @param {Aura.Component[]} allOpenDialogs the array of active (i.e. open) dialogs currently registered w/ the ui:dialogManager
-     * @param {HTMLElement} clickTarget the DOM element that was the target of the click
-     * @return {Boolean}
-     */
-    otherOpenDialogClicked : function(currentDialog, allOpenDialogs, clickTarget) {
-
-        var length = allOpenDialogs.length,
-            dialog;
-
-        for (var i=0; i<length; i++) {
-            if (currentDialog === allOpenDialogs[i]) {
-                continue;
-            }
-            dialog = allOpenDialogs[i].getElement();
-            if ($A.util.contains(dialog, clickTarget)) {
-                return true;
-            }
-        }
-        return false;
 
     }
 

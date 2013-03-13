@@ -323,8 +323,13 @@ var Test = function(){
         },
 
         /**
-         * Complement of assertEquals, throws Error if arg1 and arg2 are
-         * "equal" in the sense of ===.
+         * Complement of assertEquals, throws Error if arg1===arg2.
+         * @param {Object} arg1
+         * 				The argument to evaluate against arg2
+         * @param {Object} arg2
+         * 				The argument to evaluate against arg1
+         * @param {String} assertMessage
+         * 				The message that is returned if the two values are equal
          */
         assertNotEquals: function(arg1, arg2, assertMessage) {
             if (arg1 === arg2) {
@@ -337,7 +342,11 @@ var Test = function(){
         },
 
         /**
-         * Asserts value is not undefined.
+         * Assert that the value is not undefined.
+         * @param {Object} arg1 
+         * 				The argument to evaluate
+         * @param {String} assertMessage
+         * 				The message that is returned if arg1 is undefined
          */
         assertDefined: function(arg1, assertMessage) {
             $A.test.assertNotEquals(undefined, arg1, "Value is undefined");

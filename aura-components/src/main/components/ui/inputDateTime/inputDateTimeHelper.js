@@ -19,13 +19,13 @@
         var value = component.get("v.value");
         var format = component.get("v.format");
         if (value) {
-            var mDate = moment.utc(value, format, this.getLangLocale(component));
+            var mDate = moment(value, format, this.getLangLocale(component));
             if (mDate.isValid()) {
-                currentDate = new Date(Date.UTC(mDate.year(), mDate.month(), mDate.date()));
+                currentDate = mDate.toDate();
             }
         }
         var datePicker = component.find("datePicker");
-        datePicker.setValue("v.value", this.getUTCDateString(currentDate));
+        datePicker.setValue("v.value", this.getDateString(currentDate));
         datePicker.setValue("v.visible", true);
     },
     
@@ -63,7 +63,7 @@
         return component._langLocale;
     },
     
-    getUTCDateString: function(date) {
-        return date.getUTCFullYear() + "-" + (date.getUTCMonth() + 1) + "-" + date.getUTCDate();
+    getDateString: function(date) {
+        return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
     }
 })

@@ -16,8 +16,7 @@
 package org.auraframework.impl.adapter.format.html;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.http.AuraServlet;
 import org.auraframework.system.AuraContext;
 import org.auraframework.test.annotation.ThreadHostileTest;
@@ -142,5 +141,43 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         if (!tag.contains(expectedAttribute)) {
             fail("Did not find expected manifest attribute <" + expectedAttribute + "> in:" + tag);
         }
+    }
+    /**
+     * Verify that comments in Template CSS are stripped out before sending it to client.
+     * 
+     * @throws Exception
+     */
+    public void testCommentsInTemplateCssNotInjectedToPage() throws Exception{
+        String css = "/*" +
+                "*Multi line comment"+
+                "*/\n"+
+                "body{" +
+                    "background-color: #ededed;" +
+                    "font-size: 13px;" +
+                    "/**Inline comment*/\n"+
+                    "line-height: 1.3;" +
+                "}";
+        DefDescriptor<ThemeDef> themeDesc = Aura.getDefinitionService().getDefDescriptor("templateCss://string.thing"+System.currentTimeMillis()+"template", 
+                ThemeDef.class);
+        auraTestingUtil.addSourceAutoCleanup(themeDesc, css);
+        String templateCss = String.format("%s://%s.%s",DefDescriptor.TEMPLATE_CSS_PREFIX,themeDesc.getNamespace(), themeDesc.getName());
+        String templateMarkup = String.format(baseComponentTag, 
+                "theme='"+templateCss+"'  isTemplate='false'  extends='aura:template' ", "");
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateMarkup);
+        
+        DefDescriptor<ApplicationDef> testApp = addSourceAutoCleanup(ApplicationDef.class, 
+                "<aura:application render='client' template='"+template.getQualifiedName()+"'></aura:application>");
+        
+        String body = doWrite(testApp.getDef());
+        assertNotNull(body);
+        assertFalse("Comments were not stripped out from template CSS", body.contains("Multi line comment"));
+        assertFalse("Inline comments were not stripped our from template CSS", body.contains("Inline comment"));
+        assertTrue("Expected template css not found in serialized response.", 
+                body.contains("<style>body {\n"+
+                                 "  background-color: #ededed;\n"+
+                                 "  font-size: 13px;\n"+
+                                 "  line-height: 1.3;\n"+
+                                 "}\n"+
+                                "</style>"));
     }
 }

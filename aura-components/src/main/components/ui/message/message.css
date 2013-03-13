@@ -24,8 +24,9 @@
     line-height: 18px;
     border-color: #ccc;
     background-color: #eee;
-    opacity:1;
+    opacity:1;        
     -webkit-transition: opacity .2s ease-out;
+    transition: opacity .2s ease-out;
 }
 .uiMessage.hide{
     opacity:0;

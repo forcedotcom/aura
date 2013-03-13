@@ -19,7 +19,7 @@
 <div style="margin:20px;">
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Your favorite soccer club</h2>
-        <ui:menu>
+        <ui:menu aura:id="uiMenu" class="uiMenu">
             <ui:menuTriggerLink class="trigger" aura:id="trigger" label="Please pick your favorite soccer club"/>
             <ui:menuList class="actionMenu" aura:id="actionMenu">
                 <ui:actionMenuItem class="actionItem1" aura:id="actionItem1" label="Bayern München" click="{!c.updateTriggerLabel}"/>

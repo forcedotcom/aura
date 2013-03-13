@@ -25,5 +25,5 @@
         test:function(component){
             aura.test.assertNull(component.getElement());
         }
-    },
+    }
 })

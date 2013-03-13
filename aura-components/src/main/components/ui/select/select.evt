@@ -15,4 +15,4 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" support="GA" description="Indicates that the user has made a selection."></aura:event>
+<aura:event type="COMPONENT" extends="ui:baseDOMEvent" support="GA" description="Indicates that the user has made a selection."></aura:event>

@@ -16,9 +16,10 @@
 /*jslint sub: true */
 var p = MemoryStorageAdapter.prototype;
 exp(p
-	//#if {"excludeModes" : ["PRODUCTION"]}
+	//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 		,
 		"getSize", p.getSize,
-		"getSizeEstimator", p.getSizeEstimator
+		"getSizeEstimator", p.getSizeEstimator,
+		"getMRU", p.getMRU
 	//#end
 );

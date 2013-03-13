@@ -42,50 +42,45 @@ public class JavascriptMockProviderHandler extends JavascriptMockHandler<Provide
 
     @Override
     protected ProviderDef createDefinition(Map<String, Object> map) throws QuickFixException {
-    	ProviderDef baseDef = getBaseDefinition((String)map.get("descriptor"), ProviderDef.class);
+        ProviderDef baseDef = getBaseDefinition((String) map.get("descriptor"), ProviderDef.class);
         List<Stub<?>> stubs = getStubs(map.get("stubs"));
-		return (ProviderDef) Proxy.newProxyInstance(this.getClass()
-				.getClassLoader(), new Class<?>[] { ProviderDef.class },
-				new DelegatingStubHandler(baseDef, stubs));
+        return (ProviderDef) Proxy.newProxyInstance(this.getClass()
+                .getClassLoader(), new Class<?>[] { ProviderDef.class },
+                new DelegatingStubHandler(baseDef, stubs));
     }
-    
-	@SuppressWarnings("unchecked")
-	@Override
-	protected <T> T getValue(Object object, Class<T> retClass)
-			throws QuickFixException {
-		if (object != null && ComponentConfig.class.equals(retClass)) {
-			if (!(object instanceof Map)) {
-				throw new InvalidDefinitionException(
-						"Mock Provider expects descriptor and/or attributes",
-						getLocation());
-			}
 
-			ComponentConfig config = new ComponentConfig();
-			DefDescriptor<ComponentDef> cdd = getDescriptor(
-					(String) ((Map<?, ?>) object).get("descriptor"),
-					ComponentDef.class);
-			if (cdd != null) {
-				config.setDescriptor(cdd);
-			}
-			Map<String, Object> attributes = (Map<String, Object>) ((Map<?, ?>) object)
-					.get("attributes");
-			if (attributes != null) {
-				config.setAttributes(attributes);
-			}
-			return (T) config;
-		} else {
-			return super.getValue(object, retClass);
-		}
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    protected <T> T getValue(Object object, Class<T> retClass) throws QuickFixException {
+        if (object != null && ComponentConfig.class.equals(retClass)) {
+            if (!(object instanceof Map)) {
+                throw new InvalidDefinitionException("Mock Provider expects descriptor and/or attributes", getLocation());
+            }
 
-	@Override
-	protected ProviderDef getDefaultBaseDefinition() throws QuickFixException {
-		return getTargetDescriptor().getDef().getLocalProviderDef();
-	}
+            ComponentConfig config = new ComponentConfig();
+            DefDescriptor<ComponentDef> cdd = getDescriptor((String) ((Map<?, ?>) object).get("descriptor"),
+                    ComponentDef.class);
+            if (cdd != null) {
+                config.setDescriptor(cdd);
+            }
+            Map<String, Object> attributes = (Map<String, Object>) ((Map<?, ?>) object).get("attributes");
+            if (attributes != null) {
+                config.setAttributes(attributes);
+            }
+            return (T) config;
+        } else {
+            return super.getValue(object, retClass);
+        }
+    }
 
-	@Override
-	protected Invocation getDefaultInvocation() throws QuickFixException {
-		return new Invocation("provide", null, ComponentConfig.class);
-	}
+    @Override
+    protected ProviderDef getDefaultBaseDefinition() throws QuickFixException {
+        return getTargetDescriptor().getDef().getLocalProviderDef();
+    }
+
+    @Override
+    protected Invocation getDefaultInvocation() throws QuickFixException {
+        return new Invocation("provide", null, ComponentConfig.class);
+    }
 
 }

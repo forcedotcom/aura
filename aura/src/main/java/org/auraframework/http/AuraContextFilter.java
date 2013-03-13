@@ -150,6 +150,7 @@ public class AuraContextFilter implements Filter {
                 }
             }
             getLoaded(context, configMap.get("loaded"));
+            context.setFrameworkUID((String)configMap.get("fwuid"));
         }
 
         if (!isProduction) {
@@ -270,11 +271,7 @@ public class AuraContextFilter implements Filter {
             Map<String, Object> configMap) {
         String appName = null;
         String cmpName = null;
-        //
-        // FIXME: W-1419841
-        // I'm not sure why we need to get this off the request. W-
-        // We generally set this from the initial get request with the 'tag'.
-        //
+
         appName = app.get(request, null);
         if (appName == null && configMap != null) {
             appName = (String) configMap.get("app");

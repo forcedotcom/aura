@@ -84,4 +84,8 @@
             </tr>
         </tbody>
        </table>
+       
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="oodWhatsInherited">What is Inherited?</auradocs:topicLink>
+    </p>       
 </aura:component>

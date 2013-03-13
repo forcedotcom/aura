@@ -66,4 +66,11 @@ public interface TestCaseDef extends Definition {
 	 * @return the Set of Definitions expected by this test case
 	 */
     Set<Definition> getLocalDefs();
+    
+	/**
+	 * The set of exceptions that are allowed during initialization. These exceptions will not cause the test to fail.
+	 * 
+	 * @return The Set of exceptions that are allowed during initialization
+	 */
+    Set<String> getExceptionsAllowedDuringInit();   
 }

@@ -16,6 +16,7 @@
 package org.auraframework.impl.context;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
@@ -24,6 +25,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Event;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
@@ -31,6 +33,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.json.Json;
+import org.junit.Ignore;
 
 /**
  * Unit tests for AuraContextImpl.
@@ -45,11 +48,9 @@ public class AuraContextImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify the basic configuration in place for preloading namespaces.
-     * AuraContextImpl keeps track of namespaces whose definitions should be
-     * preLoaded. This test would act like a gold file for namespaces selected
-     * to be pre-loaded. Be sure to consider what namespaces you are specifying
-     * for pre-loading.
+     * Verify the basic configuration in place for preloading namespaces. AuraContextImpl keeps track of namespaces
+     * whose definitions should be preLoaded. This test would act like a gold file for namespaces selected to be
+     * pre-loaded. Be sure to consider what namespaces you are specifying for pre-loading.
      * 
      * @userStory a07B0000000EYU4
      */
@@ -81,10 +82,9 @@ public class AuraContextImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify the serialized format of a ComponentDef when it belongs to a
-     * pre-load namespace. Components which belong to a pre-load namespace will
-     * only have the descriptor as part of their ComponentDef. This descriptor
-     * will be used on the client side to obtain the full blown componentDef.
+     * Verify the serialized format of a ComponentDef when it belongs to a pre-load namespace. Components which belong
+     * to a pre-load namespace will only have the descriptor as part of their ComponentDef. This descriptor will be used
+     * on the client side to obtain the full blown componentDef.
      */
     public void testComponentDefSerializedFormat() throws Exception {
         ApplicationDef cDef = Aura.getDefinitionService().getDefinition("preloadTest:test_Preload_Cmp_SameNameSpace",
@@ -119,8 +119,8 @@ public class AuraContextImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify clearing current preloads in AuraContext AuraContext.preloading
-     * indicates whether components defs are currently being preloaded.
+     * Verify clearing current preloads in AuraContext AuraContext.preloading indicates whether components defs are
+     * currently being preloaded.
      */
     public void testClearPreloads() throws Exception {
         AuraContext lc = Aura.getContextService().getCurrentContext();
@@ -202,8 +202,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Add events to context. Technique used by controllers to add events and
-     * send them down with action response.
+     * Add events to context. Technique used by controllers to add events and send them down with action response.
      * 
      * @throws Exception
      */
@@ -252,5 +251,64 @@ public class AuraContextImplTest extends AuraImplTestCase {
             assertEquals("markup://handleEventTest:event is not an Application event. "
                     + "Only Application events are allowed to be fired from server.", e.getMessage());
         }
+    }
+
+    /**
+     * Expect a map that doesn't include dropped descriptors.
+     */
+    public void testGetLoaded() throws Exception {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        context.setApplicationDescriptor(laxSecurityApp);
+
+        assertTrue("Nothing should be loaded", context.getLoaded().isEmpty());
+
+        DefDescriptor<?> dropped = DefDescriptorImpl.getInstance("auratest:iwasdropped", EventDef.class);
+        context.dropLoaded(dropped);
+        assertTrue("Deletions should not be loaded", context.getLoaded().isEmpty());
+        assertNull("Dropped descriptors should not return a uid", context.getUid(dropped));
+
+        DefDescriptor<?> added = DefDescriptorImpl.getInstance("auratest:iwasadded", EventDef.class);
+        context.addLoaded(added, "somegenerateduid");
+        Map<DefDescriptor<?>, String> loaded = context.getLoaded();
+        assertEquals("Unexpected load", 1, loaded.size());
+        assertEquals("Unexpected loaded uid", "somegenerateduid", loaded.get(added));
+        assertEquals("Unexpected loaded uid from getUid", "somegenerateduid", context.getUid(added));
+
+        context.dropLoaded(added);
+        assertTrue("Added descriptor was not dropped", context.getLoaded().isEmpty());
+        assertNull("Dropped descriptors should not return a uid", context.getUid(added));
+    }
+
+    /**
+     * Loaded map contains the loaded descriptor.
+     */
+    public void testSerializeWithLoaded() throws Exception {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        context.setApplicationDescriptor(laxSecurityApp);
+        context.setSerializeLastMod(false);
+        context.setSerializePreLoad(false);
+        context.getGlobalProviders().clear();
+
+        DefDescriptor<?> added = DefDescriptorImpl.getInstance("auratest:iwasadded", EventDef.class);
+        context.addLoaded(added, "somegenerateduid");
+        String res = Json.serialize(context, context.getJsonSerializationContext());
+        goldFileJson(res);
+    }
+    
+    /**
+     * Loaded map contains deleted descriptors.
+     */
+    @Ignore("W-1560329")
+    public void testSerializeWithDroppedLoaded() throws Exception {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        context.setApplicationDescriptor(laxSecurityApp);
+        context.setSerializeLastMod(false);
+        context.setSerializePreLoad(false);
+        context.getGlobalProviders().clear();
+
+        DefDescriptor<?> dropped = DefDescriptorImpl.getInstance("auratest:iwasdropped", EventDef.class);
+        context.dropLoaded(dropped);
+        String res = Json.serialize(context, context.getJsonSerializationContext());
+        goldFileJson(res);
     }
 }

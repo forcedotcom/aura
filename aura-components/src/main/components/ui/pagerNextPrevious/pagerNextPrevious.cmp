@@ -21,20 +21,32 @@
     <aura:attribute name="Labels_Next" type="String" default="Next"            description="The text to display in the label of the link used to jump to the next page."/>
     <aura:attribute name="Labels_Previous" type="String" default="Previous"    description="The text to display in the label of the link used to jump to the previous page."/>
 
-    <div class="{!v.class+' pagerContainer pagerNextPrevious'+(v.totalItems==0?' empty':'')}">
-        <a aura:id="pager:first" class="pagerControl first" onclick="{!c.firstPage}" href="javascript:void('First')">
+   <div class="{!v.class+' pagerContainer pagerNextPrevious'+(v.totalItems==0?' empty':'')}">
+        <a aura:id="pager:first" class="{!'pagerControl first' + ((v.currentPage le 1)?' off':'')}" onclick="{!c.firstPage}" href="javascript:void('First')" aria-disabled="{!v.currentPage le 1}">
+        	<aura:renderIf isTrue="{!v.currentPage le 1}">
+        	<span class="assistiveText">Disabled</span>
+        	</aura:renderIf>
             <span class="visualization"></span>
             <span class="label">{!v.Labels_First}</span>
         </a>
-        <a aura:id="pager:previous" class="pagerControl previous" onclick="{!c.previousPage}" href="javascript:void('Previous')">
+        <a aura:id="pager:previous" class="{!'pagerControl previous' + ((v.currentPage le 1)?' off':'')}" onclick="{!c.previousPage}" href="javascript:void('Previous')" aria-disabled="{!v.currentPage le 1}">
+        	<aura:renderIf isTrue="{!v.currentPage le 1}">
+        	<span class="assistiveText">Disabled</span>
+        	</aura:renderIf>
             <span class="visualization"></span>
             <span class="label">{!v.Labels_Previous}</span>
         </a>
-        <a aura:id="pager:next" class="pagerControl next" onclick="{!c.nextPage}" href="javascript:void('Next')">
+        <a aura:id="pager:next" class="{!'pagerControl next' + ((v.currentPage == v.pageCount)?' off':'')}" onclick="{!c.nextPage}" href="javascript:void('Next')" aria-disabled="{!v.currentPage == v.pageCount}">
+        	<aura:renderIf isTrue="{!v.currentPage == v.pageCount}">
+        	<span class="assistiveText">Disabled</span>
+        	</aura:renderIf>
             <span class="label">{!v.Labels_Next}</span>
             <span class="visualization"></span>
         </a>
-        <a aura:id="pager:last" class="pagerControl last" onclick="{!c.lastPage}" href="javascript:void('Last')">
+        <a aura:id="pager:last" class="{!'pagerControl last' + ((v.currentPage == v.pageCount)?' off':'')}" onclick="{!c.lastPage}" href="javascript:void('Last')" aria-disabled="{!v.currentPage == v.pageCount}">
+        	<aura:renderIf isTrue="{!v.currentPage == v.pageCount}">
+        	<span class="assistiveText">Disabled</span>
+        	</aura:renderIf>
             <span class="label">{!v.Labels_Last}</span>
             <span class="visualization"></span>
         </a>

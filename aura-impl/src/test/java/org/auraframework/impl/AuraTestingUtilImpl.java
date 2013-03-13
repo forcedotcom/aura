@@ -62,6 +62,11 @@ public class AuraTestingUtilImpl implements AuraTestingUtil {
     }
 
     @Override
+    public String getNonce(String prefix) {
+        return (prefix == null ? "" : prefix) + getNonce();
+    }
+
+    @Override
     public <T extends Definition> Source<T> getSource(DefDescriptor<T> descriptor) {
         // Look up in the registry if a context is available. Otherwise, we're
         // probably running a context-less unit test

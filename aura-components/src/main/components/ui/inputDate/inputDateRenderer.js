@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 ({
-    render: function(component, helper) {
-        if (helper.isHTML5Input("date")) {
-            // HTML5 date fields require this format
-            component.setValue("{!v.format}", "yyyy-MM-dd");
-        }
-        return this.superRender();
+    afterRender: function(component, helper) {
+        helper.displayValue(component);
+        return this.superAfterRender();
+	},
+	
+	rerender: function(component, helper) {
+        helper.displayValue(component);
+        return this.superRerender();
     }
 })

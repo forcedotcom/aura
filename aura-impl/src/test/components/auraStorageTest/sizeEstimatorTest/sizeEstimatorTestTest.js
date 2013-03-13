@@ -17,7 +17,7 @@
 ({
 	setUp:function(){
 		// TODO: I would really like to know a better way of doing this.
-		this.sizeEstimator = new $A.storageService.createAdapter("memory").getSizeEstimator();
+		this.sizeEstimator = new $A.storageService.createAdapter("memory", "test", 4096).getSizeEstimator();
 	},
 	
 	testSizeNumber:{

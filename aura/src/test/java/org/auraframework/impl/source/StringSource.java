@@ -21,15 +21,110 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import org.auraframework.Aura;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.Source;
+import org.auraframework.system.SourceListener.SourceMonitorEvent;
+
+import org.auraframework.throwable.AuraRuntimeException;
+
+import org.auraframework.util.IOUtil;
 
 public class StringSource<D extends Definition> extends Source<D> {
 
     private static final long serialVersionUID = 8822758262106180101L;
-    private final transient StringWriter writer = new StringWriter() {
+    private final transient StringData data;
+
+    public StringSource(DefDescriptor<D> descriptor, String contents, String id, Format format) {
+        super(descriptor, id, format);
+        data = new StringData();
+        if (contents != null) {
+            data.write(contents);
+        }
+    }
+
+    /**
+     * Copy an existing StringSource with shared backing data.
+     * 
+     * @param original
+     */
+    public StringSource(StringSource<D> original) {
+        super(original.getDescriptor(), original.getSystemId(), original.getFormat());
+        data = original.data;
+    }
+
+    @Override
+    public long getLastModified() {
+        return data.lastModified;
+    }
+
+    @Override
+    public Reader getReader() {
+        return new StringReader(data.getBuffer().toString());
+    }
+
+    @Override
+    public String getContents() {
+        //
+        // TODO: W-1562068 - do something different.
+        // This looks very strange, but it causes the hash to be calculated. 
+        // We could perhaps do this other ways, but for the moment, we will
+        // force it through a hashing reader.
+        //
+        try {
+            StringWriter sw = new StringWriter();
+            IOUtil.copyStream(getHashingReader(), sw);
+            return sw.toString();
+        } catch (IOException e) {
+            throw new AuraRuntimeException(e);
+        }
+    }
+
+    @Override
+    public Writer getWriter() {
+        return data;
+    }
+
+    /** StringSource returns a "URL" like "markup://string:foo". */
+    @Override
+    public String getUrl() {
+        return getSystemId(); // e.g. "markup://string:thing"
+    }
+
+    @Override
+    public boolean exists() {
+        return data.getBuffer().length() > 0;
+    }
+
+    @Override
+    public boolean addOrUpdate(CharSequence newContents) {
+        if (newContents != null) {
+            data.getBuffer().setLength(0);
+            data.write(newContents.toString());
+            Aura.getDefinitionService().onSourceChanged(getDescriptor(), SourceMonitorEvent.changed);
+        }
+        return true;
+    }
+
+    @Override
+    public void clearContents() {
+        data.getBuffer().setLength(0);
+        data.touch();
+        Aura.getDefinitionService().onSourceChanged(getDescriptor(), SourceMonitorEvent.changed);
+    }
+
+    public long setLastModified(long lastModified) {
+        long previous = data.lastModified;
+        data.lastModified = lastModified;
+        return previous;
+    }
+
+    private class StringData extends StringWriter {
+        long lastModified = System.currentTimeMillis();
+
         @Override
         public void write(int c) {
             super.write(c);
@@ -59,73 +154,10 @@ public class StringSource<D extends Definition> extends Source<D> {
             super.write(str, off, len);
             touch();
         }
-    };
 
-    private final StringBuffer sb = writer.getBuffer();
-    private long lastModified;
+        private void touch() {
+            lastModified = System.currentTimeMillis();
 
-    public StringSource(DefDescriptor<D> descriptor, String contents, String id, Format format) {
-        super(descriptor, id, format);
-        if (contents != null) {
-            this.sb.append(contents);
         }
-        touch();
-    }
-
-    @Override
-    public long getLastModified() {
-        return lastModified;
-    }
-
-    @Override
-    public Reader getReader() {
-        return new StringReader(getContents());
-    }
-
-    @Override
-    public String getContents() {
-        return sb.toString();
-    }
-
-    @Override
-    public Writer getWriter() {
-        return writer;
-    }
-
-    /** StringSource returns a "URL" like "markup://string:foo". */
-    @Override
-    public String getUrl() {
-        return getSystemId(); // e.g. "markup://string:thing"
-    }
-
-    @Override
-    public boolean exists() {
-        return sb.length() > 0;
-    }
-
-    @Override
-    public boolean addOrUpdate(CharSequence newContents) {
-        if (newContents != null) {
-            clearContents();
-            sb.append(newContents);
-        }
-        touch();
-        return true;
-    }
-
-    @Override
-    public void clearContents() {
-        sb.setLength(0);
-        touch();
-    }
-
-    public long setLastModified(long lastModified) {
-        long previous = this.lastModified;
-        this.lastModified = lastModified;
-        return previous;
-    }
-
-    private void touch() {
-        setLastModified(System.currentTimeMillis());
     }
 }

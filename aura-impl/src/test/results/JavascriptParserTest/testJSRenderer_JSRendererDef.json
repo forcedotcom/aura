@@ -3,7 +3,7 @@
   "value":{
     "descriptor":"js://test.testJSRenderer",
     "render":
-function render_test_testJSRenderer(component) {
+function(component) {
     
 
     
@@ -14,7 +14,7 @@ function render_test_testJSRenderer(component) {
         return [ret];
     },
     "rerender":
-function rerender_test_testJSRenderer(component) {
+function(component) {
         var div = component.getElements().element;
         div.innerHTML = component.getAttributes().getValue('label').getValue();
     }

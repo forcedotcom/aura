@@ -29,11 +29,11 @@
             $A.test.assertTrue(this.isWhitespace($A.test.getText(cmpElems[2])), "Third element in body of component should be whitespace.");
             $A.test.assertEquals("false", $A.test.getText(cmpElems[3]), "Fourth element in body of component should be 'false'.");
             $A.test.assertTrue(this.isWhitespace($A.test.getText(cmpElems[4])), "Fifth element in body of component should be whitespace.");
-            $A.test.assertTrue(cmpElems[5] instanceof HTMLDivElement, "Sixth element in body of component should be div.");
+            $A.test.assertTrue($A.test.isInstanceOfDivElement(cmpElems[5]), "Sixth element in body of component should be div.");
             $A.test.assertTrue(this.isWhitespace($A.test.getText(cmpElems[6]), "Newline should be present after div."));
 
             // check whitespace within div            
             aura.test.assertNotNull(divText.match(/\n?        true     false\n?    /), "Div text does not contain proper whitespace.");
-        },
+        }
     }
 })

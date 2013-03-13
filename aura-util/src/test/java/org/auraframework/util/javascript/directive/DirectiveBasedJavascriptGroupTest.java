@@ -87,6 +87,7 @@ public class DirectiveBasedJavascriptGroupTest extends UnitTestCase {
             Thread.sleep(2000);
             // Update a js file which is part of the group
             writer = new FileWriter(newFile, false);
+            writer.append("New time: ");
             writer.append(new Long(System.currentTimeMillis()).toString());
             writer.close();
             assertTrue("An existing file in the group was modified and isStale() could not recognize the modification",

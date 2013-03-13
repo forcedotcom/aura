@@ -90,5 +90,5 @@
 
                 cmp.find("index").getElement().innerHTML = (evt.getParam("index"));
                 cmp.find("value").getElement().innerHTML = val;
-    },
+    }
 })

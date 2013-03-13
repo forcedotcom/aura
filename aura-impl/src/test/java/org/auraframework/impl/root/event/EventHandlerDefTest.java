@@ -152,8 +152,7 @@ public class EventHandlerDefTest extends AuraImplTestCase {
     /**
      * An aura:handler for a component event with no action parameter declared.
      */
-    // TODO(W-1508416): NPE thrown when no action param in aura:handler
-    public void _testHandlerWithNoAction() throws Exception {
+    public void testHandlerWithNoAction() throws Exception {
         DefDescriptor<ComponentDef> componentDefDescriptor = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:registerevent name='somename' type='handleEventTest:event'/>"
                         + "<aura:handler name='somename' /></aura:component>");

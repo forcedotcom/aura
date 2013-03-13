@@ -16,7 +16,7 @@
                   "descriptor":"js://test.test_LocChng_SimpleComponent/ACTION$clientAction",
                   "name":"clientAction",
                   "code":
-function test$test_LocChng_SimpleComponent_clientAction(cmp, event) {
+function(cmp, event) {
         
         if(cmp===$A.getRoot()){
             
@@ -48,7 +48,7 @@ function test$test_LocChng_SimpleComponent_clientAction(cmp, event) {
                   "descriptor":"js://test.test_LocChng_SimpleComponent/ACTION$locationChange",
                   "name":"locationChange",
                   "code":
-function test$test_LocChng_SimpleComponent_locationChange(cmp, event) {
+function(cmp, event) {
         
         if(event.getParam('num')){
             
@@ -68,7 +68,7 @@ function test$test_LocChng_SimpleComponent_locationChange(cmp, event) {
                   "descriptor":"js://test.test_LocChng_SimpleComponent/ACTION$locationChangeComposite",
                   "name":"locationChangeComposite",
                   "code":
-function test$test_LocChng_SimpleComponent_locationChangeComposite(cmp, event) {
+function(cmp, event) {
     
         if(event.getParam('locator')){
             
@@ -87,7 +87,7 @@ function test$test_LocChng_SimpleComponent_locationChangeComposite(cmp, event) {
                   "descriptor":"js://test.test_LocChng_SimpleComponent/ACTION$locationChangeGeneric",
                   "name":"locationChangeGeneric",
                   "code":
-function test$test_LocChng_SimpleComponent_locationChangeGeneric(cmp, event) {
+function(cmp, event) {
     
         if(event.getParam('num')){
             var button = cmp.find("button");
@@ -265,7 +265,7 @@ function test$test_LocChng_SimpleComponent_locationChangeGeneric(cmp, event) {
                               "descriptor":"js://test.test_button/ACTION$press",
                               "name":"press",
                               "code":
-function test$test_button_press(cmp, event) {
+function(cmp, event) {
         cmp.getEvent("press").fire();
     },
                               "actionType":"CLIENT"

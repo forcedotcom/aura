@@ -17,7 +17,11 @@ package org.auraframework.builder;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+
+import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import org.auraframework.util.text.Hash;
 
 /**
  * @param <PrimaryIntf> The Primary Interface of a DefType, which should always
@@ -33,12 +37,35 @@ public interface DefBuilder<PrimaryIntf extends Definition, DefOrRefType extends
     DefBuilder<PrimaryIntf, DefOrRefType> setLocation(String fileName, int line, int column, long lastModified);
 
     DefBuilder<PrimaryIntf, DefOrRefType> setLocation(String fileName, long lastModified);
+    
+    /**
+     * Set the location to a location that you build.
+     */
+    DefBuilder<PrimaryIntf, DefOrRefType> setLocation(Location location);
 
     DefBuilder<PrimaryIntf, DefOrRefType> setDescriptor(String qualifiedName);
 
     DefBuilder<PrimaryIntf, DefOrRefType> setDescriptor(DefDescriptor<PrimaryIntf> desc);
 
     DefBuilder<PrimaryIntf, DefOrRefType> setDescription(String description);
+
+    /**
+     * Set the Hash object from which the definition should extract the string.
+     *
+     * @param hash the hash object to use, it does not need to be complete when set.
+     */
+    DefBuilder<PrimaryIntf, DefOrRefType> setOwnHash(Hash hash);
+
+    /**
+     * Set a string to use as the hash.
+     *
+     * Note that this overrides {@link #setOwnHash(Hash)} as it assumes that if you
+     * set the string version, you know what you are doing. This hash must change any
+     * time the definition changes.
+     *
+     * @param hash the string to use.
+     */
+    DefBuilder<PrimaryIntf, DefOrRefType> setOwnHash(String hash);
 
     DefDescriptor<PrimaryIntf> getDescriptor();
 }

@@ -268,8 +268,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      * Verify that we are able to build a component that declares dependencies and those dependencies are found and
      * built, or that the correct Exception is thrown.
      */
-    // TODO(W-1166679): Dependencies not attached to ComponentDef yet, add more
-    // tests to check what dependencies are actually found after this story.
     public void testGetDependencies() throws Exception {
         // No dependencies by default
         T baseComponentDef = define(baseTag, "", "");
@@ -666,26 +664,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                             parentDesc.getQualifiedName(), grandParentDesc.getQualifiedName()),
                     parentDesc.getQualifiedName());
         }
-        // Child with GA support
-        DefDescriptor<T> childDesc = addSourceAutoCleanup(
-                getDefClass(),
-                String.format(baseTag, "extensible='true' extends='" + parentDesc.getDescriptorName()
-                        + "' support='GA'", ""));
-        try {
-            childDesc.getDef().validateReferences();
-            fail("A child cannot widen the support level of its grand parent.");
-        } catch (Exception e) {
-            //
-            // FIXME: W-1539554
-            // Turns out that this test is fundamentally broken. The use of getDef means that it recursively
-            // compiles the definition, which causes the error to sometimes be the wrong one. Commenting out
-            // for now.
-            //
-            // checkExceptionFull(e, InvalidDefinitionException.class, childDesc.getQualifiedName()
-            // + " cannot widen the support level to GA from " + grandParentDesc.getQualifiedName()
-            // + "'s level of BETA", childDesc.getQualifiedName());
-            assertTrue(e instanceof InvalidDefinitionException);
-        }
+
         // Including a component, that violates support level restriction, as
         // facet
         DefDescriptor<ComponentDef> parentCmp = addSourceAutoCleanup(ComponentDef.class,

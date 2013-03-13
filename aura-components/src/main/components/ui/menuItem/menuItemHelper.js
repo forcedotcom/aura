@@ -75,7 +75,7 @@
     	var parent = this.getParentComponent(component);
         if (parent) {
             if (parent.get("v.visible") === true) {
-                parent.setValue("{!v.visible}", false);
+                parent.setValue("v.visible", false);
                 if (component.get("v.disabled") === true) {
                     // for disabled menu item, no Aura event gets fired, so we have to directly deal with DOM.
                     var devCmp = parent.find("menu");
@@ -110,7 +110,7 @@
         var parent = this.getParentComponent(component);
         if (parent) {
             if (parent.get("v.visible") === true) {
-                parent.setValue("{!v.visible}", false);
+                parent.setValue("v.visible", false);
                 if (component.get("v.disabled") === true) {
                     // for disabled menu item, no Aura event gets fired, so we have to directly deal with DOM.
                     var devCmp = parent.find("menu");
@@ -269,5 +269,5 @@
                 this.setFocusToTypingChars(concreteCmp, event);
             }
         }
-    },
+    }
 })

@@ -22,7 +22,6 @@ import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
-import org.auraframework.util.text.Hash;
 
 /**
  * Define something.
@@ -116,5 +115,5 @@ public interface Definition extends JsonSerializable, Serializable {
      * context-dependent (in that providers may give different users different
      * dependencies for the same parent definition).
      */
-    Hash getOwnHash();
+    String getOwnHash();
 }

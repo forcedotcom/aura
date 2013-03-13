@@ -34,6 +34,10 @@
                 <td>Checks that the condition is true.</td>
             </tr>
             <tr>
+                <td><code>aura.test.assertDefined(arg1, assertMessage)</code></td>
+                <td>Checks that the value is not undefined.</td>
+            </tr>
+            <tr>
                 <td><code>aura.test.assertNull(arg1, assertMessage)</code></td>
                 <td>Checks that <code>arg1</code> is null.</td>
             </tr>
@@ -59,7 +63,11 @@
             </tr>
             <tr>
                 <td><code>aura.test.assertEquals(arg1, arg2, assertMessage)</code></td>
-                <td>Checks that <code>arg1 == arg2</code> is true.</td>
+                <td>Checks that <code>arg1 === arg2</code> is true. Throws an error if the two values are not equal.</td>
+            </tr>
+            <tr>
+                <td><code>aura.test.assertNotEquals(arg1, arg2, assertMessage)</code></td>
+                <td>Checks that <code>arg1 === arg2</code> is not true. Throws an error if the two values are equal.</td>
             </tr>
             <tr>
                 <td><code>aura.test.fail(assertMessage)</code></td>

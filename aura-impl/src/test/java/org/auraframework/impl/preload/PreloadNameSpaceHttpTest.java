@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.preload;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.commons.httpclient.HttpStatus;
@@ -27,12 +28,7 @@ import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.util.json.JsonReader;
 
 /**
- * Basic HTTP retieve test for pre loading componentDefs from namespaces.
- * 
- * @hierarchy Aura.Basic
- * @priority high
- * @userStory a07B0000000DfxB
- * @since 138
+ * Basic HTTP retrieve test for checking preloaded namespaces and componentDefs.
  */
 @ThreadHostileTest
 public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
@@ -41,24 +37,18 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Verify that when a component is serialized down to the client, the
-     * component Def only has the descriptor and nothing else.
+     * Verify that when a component is serialized down to the client, the component Def only has the descriptor and
+     * nothing else.
      * <ol>
-     * <li>Obtain a valid CSRF token to be used on a get request for a component
-     * in JSON format.</li>
+     * <li>Obtain a valid CSRF token to be used on a get request for a component in JSON format.</li>
      * <li>Request a component in JSON format.</li>
      * </ol>
      */
     @SuppressWarnings("unchecked")
     @TestLabels("auraSanity")
     public void testComponentDef() throws Exception {
-        // Obtain CSRF token
-        String url = String
-                .format("/aura?aura.tag=preloadTest:test_Preload_Cmp_SameNameSpace&aura.format=JSON&aura.mode=FTEST&aura.lastmod=%s&aura.deftype=APPLICATION",
-                        getLastMod(Mode.FTEST, "preloadTest"));
-        GetMethod get = obtainGetMethod(url);
-        int statusCode = this.getHttpClient().executeMethod(get);
-        assertTrue("Failed to reach aura servlet", statusCode == HttpStatus.SC_OK);
+        GetMethod get = obtainGetMethodCheckStatus();
+
         // Obtain a component which uses preloading namespaces
         String componentInJson = get.getResponseBodyAsString().substring(AuraBaseServlet.CSRF_PROTECT.length());
         Map<String, Object> outerMap = (Map<String, Object>) new JsonReader().read(componentInJson);
@@ -66,10 +56,42 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
         Map<String, Object> value = (Map<String, Object>) component.get("value");
         Map<String, Object> componentDef = (Map<String, Object>) value.get("componentDef");
         componentDef = (Map<String, Object>) componentDef.get("value");
-        // Verify that Descriptor was the only value sent back as part of the
-        // componentDef
+
+        // Verify that Descriptor was the only value sent back as part of the componentDef
         assertTrue(componentDef.size() == 1);
         assertTrue(componentDef.containsKey("descriptor"));
         assertEquals(componentDef.get("descriptor"), "markup://preloadTest:test_Preload_Cmp_SameNameSpace");
+    }
+
+    /**
+     * Verify preload namespaces are properly attached to the Context, including the preloads explicitly declared on the
+     * component using the preload='<namespace>' tag.
+     */
+    @SuppressWarnings("unchecked")
+    public void testPreloadsOnContext() throws Exception {
+        GetMethod get = obtainGetMethodCheckStatus();
+
+        // Grab the preloads attached to the context
+        String componentInJson = get.getResponseBodyAsString().substring(AuraBaseServlet.CSRF_PROTECT.length());
+        Map<String, Object> outerMap = (Map<String, Object>) new JsonReader().read(componentInJson);
+        Map<String, Object> context = (Map<String, Object>) outerMap.get("context");
+        ArrayList<String> preloads = (ArrayList<String>) context.get("preloads");
+
+        assertNotNull("No preloads found in the Context", preloads);
+        assertTrue("Preloads array on Context is empty", !preloads.isEmpty());
+        assertTrue("'aura' preloaded namespace not found on Context", preloads.contains("aura"));
+        assertTrue("'ui' preloaded namespace not found on Context", preloads.contains("ui"));
+        assertTrue("Preloads explicitly declared on component using the preload='' tag should be present on Context",
+                preloads.contains("preloadTest"));
+    }
+
+    private GetMethod obtainGetMethodCheckStatus() throws Exception {
+        String url = String
+                .format("/aura?aura.tag=preloadTest:test_Preload_Cmp_SameNameSpace&aura.format=JSON&aura.mode=FTEST&aura.lastmod=%s&aura.deftype=APPLICATION",
+                        getLastMod(Mode.FTEST, "preloadTest"));
+        GetMethod get = obtainGetMethod(url);
+        int statusCode = this.getHttpClient().executeMethod(get);
+        assertTrue("Failed to reach aura servlet", statusCode == HttpStatus.SC_OK);
+        return get;
     }
 }

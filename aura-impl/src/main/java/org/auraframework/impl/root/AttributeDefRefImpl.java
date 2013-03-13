@@ -27,6 +27,7 @@ import org.auraframework.def.TypeDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.Json.Serialization;
@@ -35,8 +36,7 @@ import org.auraframework.util.json.Json.Serialization.ReferenceType;
 /**
  * A reference to an attribute.
  * 
- * FIXME: W-1328558 This should extend DefinitionImpl<AttributeDefRef> and
- * getAttributeDescriptor should be an override
+ * FIXME: W-1328558 This should extend DefinitionImpl<AttributeDefRef> and getAttributeDescriptor should be an override
  */
 @Serialization(referenceType = ReferenceType.NONE)
 public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements AttributeDefRef {
@@ -48,10 +48,8 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
     // the original value , which could be a string representation
     private final Object value;
     /*
-     * if the original value was a string representation of a non-string type,
-     * then this is the value parsed from that string this is set in the
-     * parseValue method which is called during the validateReferences stage of
-     * compilation
+     * if the original value was a string representation of a non-string type, then this is the value parsed from that
+     * string this is set in the parseValue method which is called during the validateReferences stage of compilation
      */
     private Object parsedValue;
     private final int hashCode;
@@ -64,9 +62,13 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
     }
 
     @Override
-    public void parseValue(TypeDef typeDef) {
+    public void parseValue(TypeDef typeDef) throws QuickFixException {
         if (!(this.value instanceof Expression)) {
-            this.parsedValue = typeDef.valueOf(this.value);
+            try {
+                this.parsedValue = typeDef.valueOf(this.value);
+            } catch (Throwable t) {
+                throw new InvalidExpressionException(t.getMessage(), getLocation(), t);
+            }
         }
     }
 
@@ -119,7 +121,7 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
     public boolean equals(Object o) {
         if (o instanceof AttributeDefRefImpl) {
             AttributeDefRefImpl e = (AttributeDefRefImpl) o;
-            return getName().equals(e.getName()) && getValue().equals(e.getValue());
+            return getName().equals(e.getName()) && value.equals(e.value);
         }
 
         return false;
@@ -128,7 +130,7 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
     @Override
     public String toString() {
         // output the original value
-        return value.toString();
+        return String.valueOf(value);
     }
 
     @Override
@@ -153,6 +155,9 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
          * Sets the value for this instance.
          */
         public Builder setValue(Object value) {
+            if (value == null) {
+                throw new NullPointerException("Value cannot be null");
+            }
             this.value = value;
             return this;
         }

@@ -24,7 +24,7 @@
                 children.push(c);
             }
             if (c.getDef().getAttributeDefs().getDef("parent")) {
-                c.setValue("{!v.parent}", [component]);
+                c.setValue("v.parent", [component]);
             }
         }
         // Set "parent" for menu items in iteration
@@ -36,10 +36,10 @@
                     children.push(item);
                 }
                 if (item.getDef().getAttributeDefs().getDef("parent")) {
-                    item.setValue("{!v.parent}", [component]);
+                    item.setValue("v.parent", [component]);
                 }
             }
         }
-        component.setValue("{!v.childMenuItems}", children);
+        component.setValue("v.childMenuItems", children);
     }
 })

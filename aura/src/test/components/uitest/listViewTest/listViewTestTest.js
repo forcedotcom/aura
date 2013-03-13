@@ -670,7 +670,7 @@
      */
     getCellComponentAt: function(listViewComponent, rowComponent, colNumber) {
         var cellComponents = rowComponent.get("v.body");
-        $A.assert(cellComponents.length !== undefined, cellComponents + " should be an array");
+        $A.test.assertDefined(cellComponents.length, cellComponents + " should be an array");
         $A.assert(cellComponents.length > colNumber, cellComponents + " does not contain a column numbered " + colNumber)
         return cellComponents[colNumber];
     },
@@ -720,7 +720,7 @@
      */
     getRowComponents: function(listViewComponent, parentContainerAuraId) {
         var rowComponents = listViewComponent.find(parentContainerAuraId).get("v.body");
-        $A.assert(rowComponents.length !== undefined, rowComponents + " should be an array");
+        $A.test.assertDefined(rowComponents.length, rowComponents + " should be an array");
         return rowComponents;
     },
 

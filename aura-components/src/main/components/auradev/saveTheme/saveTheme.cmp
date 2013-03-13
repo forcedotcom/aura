@@ -16,6 +16,6 @@
 
 -->
 <aura:component>
-    <aura:attribute name="def" type="java://org.auraframework.def.ThemeDef"/><![CDATA[.{!v.def.className}{
+    <aura:attribute name="def" type="java://org.auraframework.def.ThemeDef"/><![CDATA[.THIS{
 }]]>
 </aura:component>

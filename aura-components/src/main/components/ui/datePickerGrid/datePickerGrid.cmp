@@ -1,0 +1,106 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true">
+    <aura:attribute name="class" type="String" description="A CSS style to be attached to the component."/>
+    <aura:attribute name="date" type="Integer" description="The currently highlighted date."/>
+    <aura:attribute name="month" type="Integer" description="The currently rendered month."/>
+    <aura:attribute name="year" type="Integer" description="The currently rendered year."/>
+    <aura:attribute name="selectedDate" type="Date" description="The selected date."/>
+    <aura:attribute name="weekDays" type="Object" description="The localized weekday labels."/>
+    
+    <!-- private attributes -->
+    <aura:attribute name="_setFocus" type="Boolean" default="true" description="Control if we should focus any date when we render the month."/>
+    
+    <aura:registerevent name="hide" type="ui:change"/>
+    <aura:registerevent name="focus" type="ui:focus"/>
+    <aura:registerevent name="selectDate" type="ui:selectDate"/>
+    <aura:registerevent name="updateCalendar" type="ui:updateCalendar"/>
+    <aura:registerevent name="updateCalendarTitle" type="ui:updateCalendarTitle"/>
+    
+    <aura:handler name="focus" action="{!c.focus}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="updateCalendar" action="{!c.updateCalendar}"/>
+    
+    <div class="{!v.class}">
+    <table class="calGrid" aura:id="datePickerGrid">
+        <thead>
+            <tr>
+                <aura:iteration items="{!v.weekDays}" var="day">
+                    <th scope="col" class="dayOfWeek">{!day.shortName}</th>
+                </aura:iteration>
+            </tr>
+        </thead>
+        <tbody>
+            <tr aura:id="calRow1" class="calRow">
+                <td><ui:dayInMonthCell aura:id="0"/></td>
+                <td><ui:dayInMonthCell aura:id="1"/></td>
+                <td><ui:dayInMonthCell aura:id="2"/></td>
+                <td><ui:dayInMonthCell aura:id="3"/></td>
+                <td><ui:dayInMonthCell aura:id="4"/></td>
+                <td><ui:dayInMonthCell aura:id="5"/></td>
+                <td><ui:dayInMonthCell aura:id="6"/></td>
+            </tr>
+            <tr aura:id="calRow2" class="calRow">
+                <td><ui:dayInMonthCell aura:id="7"/></td>
+                <td><ui:dayInMonthCell aura:id="8"/></td>
+                <td><ui:dayInMonthCell aura:id="9"/></td>
+                <td><ui:dayInMonthCell aura:id="10"/></td>
+                <td><ui:dayInMonthCell aura:id="11"/></td>
+                <td><ui:dayInMonthCell aura:id="12"/></td>
+                <td><ui:dayInMonthCell aura:id="13"/></td>
+            </tr>
+            <tr aura:id="calRow3" class="calRow">
+                <td><ui:dayInMonthCell aura:id="14"/></td>
+                <td><ui:dayInMonthCell aura:id="15"/></td>
+                <td><ui:dayInMonthCell aura:id="16"/></td>
+                <td><ui:dayInMonthCell aura:id="17"/></td>
+                <td><ui:dayInMonthCell aura:id="18"/></td>
+                <td><ui:dayInMonthCell aura:id="19"/></td>
+                <td><ui:dayInMonthCell aura:id="20"/></td>
+            </tr>
+            <tr aura:id="calRow4" class="calRow">
+                <td><ui:dayInMonthCell aura:id="21"/></td>
+                <td><ui:dayInMonthCell aura:id="22"/></td>
+                <td><ui:dayInMonthCell aura:id="23"/></td>
+                <td><ui:dayInMonthCell aura:id="24"/></td>
+                <td><ui:dayInMonthCell aura:id="25"/></td>
+                <td><ui:dayInMonthCell aura:id="26"/></td>
+                <td><ui:dayInMonthCell aura:id="27"/></td>
+            </tr>
+            <tr aura:id="calRow5" class="calRow">
+                <td><ui:dayInMonthCell aura:id="28"/></td>
+                <td><ui:dayInMonthCell aura:id="29"/></td>
+                <td><ui:dayInMonthCell aura:id="30"/></td>
+                <td><ui:dayInMonthCell aura:id="31"/></td>
+                <td><ui:dayInMonthCell aura:id="32"/></td>
+                <td><ui:dayInMonthCell aura:id="33"/></td>
+                <td><ui:dayInMonthCell aura:id="34"/></td>
+            </tr>
+            <tr aura:id="calRow6" class="calRow">
+                <td><ui:dayInMonthCell aura:id="35"/></td>
+                <td><ui:dayInMonthCell aura:id="36"/></td>
+                <td><ui:dayInMonthCell aura:id="37"/></td>
+                <td><ui:dayInMonthCell aura:id="38"/></td>
+                <td><ui:dayInMonthCell aura:id="39"/></td>
+                <td><ui:dayInMonthCell aura:id="40"/></td>
+                <td><ui:dayInMonthCell aura:id="41"/></td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+</aura:component>

@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" support="GA">
+<aura:event type="COMPONENT" extends="ui:baseDOMEvent" support="GA">
     <aura:attribute name="button" type="Integer" description="The button number that was pressed when the mouse event was fired: Left button=0, middle button=1 (if present), right button=2."/>
 </aura:event>

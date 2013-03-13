@@ -42,8 +42,7 @@ public class AuraTextUtilTest extends UnitTestCase {
         /**
          * A constructor for unchanged values.
          * 
-         * @param input the input string to the method, this will be used as the
-         *            expected value.
+         * @param input the input string to the method, this will be used as the expected value.
          */
         public StringPair(String input) {
             this.input = input;
@@ -327,4 +326,32 @@ public class AuraTextUtilTest extends UnitTestCase {
             assertEquals(p.expected, AuraTextUtil.urlencode(p.input));
         }
     }
+
+    public void testvalidateAttributeName() {
+        assertTrue("Attribute name<name> should be valid ", AuraTextUtil.validateAttributeName("name"));
+        assertTrue("Attribute name<_name> should be valid", AuraTextUtil.validateAttributeName("_name"));
+        assertTrue("Attribute name<na-me> should be valid", AuraTextUtil.validateAttributeName("na-me"));
+        assertTrue("Attribute name<na_me> should be valid", AuraTextUtil.validateAttributeName("na_me"));
+        assertTrue("Attribute name<nam123e> should be valid", AuraTextUtil.validateAttributeName("nam123e"));
+        assertFalse("Attribute name <na$:me> should be invalid", AuraTextUtil.validateAttributeName("na$:me"));
+        assertFalse("Attribute name <123name> should be invalid", AuraTextUtil.validateAttributeName("123name"));
+        assertFalse("Attribute name <nam e> should be invalid", AuraTextUtil.validateAttributeName("nam e"));
+        assertFalse("Attribute name <nam'a'e> should be invalid", AuraTextUtil.validateAttributeName("nam'a'e"));
+    }
+
+
+    private final static StringPair[] JSON_FUNCTION_ENCODE_PAIRS = new StringPair[] {
+        new StringPair("", ""),
+        new StringPair("\u2029", "\\u2029"),
+        new StringPair("\u2028", "\n"),
+        new StringPair("\u0000", ""),
+        new StringPair("*/", "\\u002A/"),
+    };
+
+    public void testJSONFunction() {
+        for (StringPair p : JSON_FUNCTION_ENCODE_PAIRS) {
+            assertEquals(p.expected, AuraTextUtil.escapeForJSONFunction(p.input));
+        }
+    }
+
 }

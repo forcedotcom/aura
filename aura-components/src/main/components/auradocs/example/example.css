@@ -16,7 +16,7 @@
 .THIS{
     position: relative;
 }
-.THIS.uiTabset{
+.THIS.uiTabset.displayTab{
 	height:360px;
 }
 .THIS .frame{

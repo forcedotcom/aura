@@ -47,7 +47,6 @@ import org.auraframework.system.Client;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
-
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidEventTypeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -85,15 +84,15 @@ public class AuraContextImpl implements AuraContext {
         }
     }
 
-    private static class GlobalIdSorter implements Comparator<BaseComponent<?,?>> {
+    private static class GlobalIdSorter implements Comparator<BaseComponent<?, ?>> {
         @Override
         public int compare(BaseComponent<?, ?> arg0, BaseComponent<?, ?> arg1) {
             String gid0 = arg0.getGlobalId();
             String gid1 = arg1.getGlobalId();
             List<String> gid0split = AuraTextUtil.splitSimple(":", gid0, 2);
             List<String> gid1split = AuraTextUtil.splitSimple(":", gid1, 2);
-            return (Integer.parseInt(gid0split.get(gid0split.size()-1))
-                    -Integer.parseInt(gid1split.get(gid1split.size()-1)));
+            return (Integer.parseInt(gid0split.get(gid0split.size() - 1))
+            - Integer.parseInt(gid1split.get(gid1split.size() - 1)));
         }
     }
 
@@ -140,10 +139,10 @@ public class AuraContextImpl implements AuraContext {
             // as well. We could do this with a set of defs, and an overall UID,
             // but we don't have that set yet.
             //
-            Map<String,String> loadedStrings = Maps.newHashMap();
-            for (Map.Entry<DefDescriptor<?>,String> entry : ctx.getLoaded().entrySet()) {
+            Map<String, String> loadedStrings = Maps.newHashMap();
+            for (Map.Entry<DefDescriptor<?>, String> entry : ctx.getLoaded().entrySet()) {
                 loadedStrings.put(String.format("%s@%s", entry.getKey().getDefType().toString(),
-                                                entry.getKey().getQualifiedName()), entry.getValue());
+                        entry.getKey().getQualifiedName()), entry.getValue());
             }
             if (loadedStrings.size() > 0) {
                 json.writeMapKey("loaded");
@@ -161,12 +160,15 @@ public class AuraContextImpl implements AuraContext {
                 }
             }
 
+            if (ctx.getFrameworkUID() != null) {
+                json.writeMapEntry("fwuid", ctx.getFrameworkUID());
+            }
+
             if (forClient) {
                 // client needs value providers, urls don't
                 boolean started = false;
 
-                for (GlobalValueProvider valueProvider : ctx
-                        .getGlobalProviders().values()) {
+                for (GlobalValueProvider valueProvider : ctx.getGlobalProviders().values()) {
                     if (!valueProvider.isEmpty()) {
                         if (!started) {
                             json.writeMapKey("globalValueProviders");
@@ -176,8 +178,7 @@ public class AuraContextImpl implements AuraContext {
                         json.writeComma();
                         json.writeIndent();
                         json.writeMapBegin();
-                        json.writeMapEntry("type", valueProvider
-                                .getValueProviderKey().getPrefix());
+                        json.writeMapEntry("type", valueProvider.getValueProviderKey().getPrefix());
                         json.writeMapEntry("values", valueProvider.getData());
                         json.writeMapEnd();
                     }
@@ -187,18 +188,16 @@ public class AuraContextImpl implements AuraContext {
                     json.writeArrayEnd();
                 }
 
-                Map<String, BaseComponent<?, ?>> components = ctx
-                        .getComponents();
+                Map<String, BaseComponent<?, ?>> components = ctx.getComponents();
                 if (!components.isEmpty()) {
-                    List<BaseComponent<?,?>> sorted = Lists.newArrayList(components.values());
+                    List<BaseComponent<?, ?>> sorted = Lists.newArrayList(components.values());
                     Collections.sort(sorted, GID_SORTER);
                     json.writeMapKey("components");
                     json.writeMapBegin();
 
                     for (BaseComponent<?, ?> component : sorted) {
                         if (component.hasLocalDependencies()) {
-                            json.writeMapEntry(component.getGlobalId(),
-                                    component);
+                            json.writeMapEntry(component.getGlobalId(), component);
                         }
                     }
 
@@ -274,10 +273,12 @@ public class AuraContextImpl implements AuraContext {
 
     private final List<Event> clientEvents = Lists.newArrayList();
 
+    private String fwUID;
+
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
-                           Format format, Access access, JsonSerializationContext jsonContext,
-                           Map<ValueProviderType, GlobalValueProvider> globalProviders,
-                           DefDescriptor<? extends BaseComponentDef> appDesc) {
+            Format format, Access access, JsonSerializationContext jsonContext,
+            Map<ValueProviderType, GlobalValueProvider> globalProviders,
+            DefDescriptor<? extends BaseComponentDef> appDesc) {
         if (access == Access.AUTHENTICATED) {
             preloadedNamespaces.add("aura");
             preloadedNamespaces.add("ui");
@@ -401,8 +402,7 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public String getLabel(String section, String name, Object... params) {
-        return ServiceLocator.get().get(LocalizationAdapter.class)
-                .getLabel(section, name, params);
+        return ServiceLocator.get().get(LocalizationAdapter.class).getLabel(section, name, params);
     }
 
     @Override
@@ -458,6 +458,11 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public boolean isTestMode() {
         return getMode().isTestMode();
+    }
+
+    @Override
+    public boolean isDevMode() {
+        return getMode().isDevMode();
     }
 
     @Override
@@ -557,8 +562,8 @@ public class AuraContextImpl implements AuraContext {
             if (event.getDescriptor().getDef().getEventType() != EventType.APPLICATION) {
                 throw new InvalidEventTypeException(
                         String.format("%s is not an Application event. "
-                                       + "Only Application events are allowed to be fired from server.",
-                                       event.getDescriptor()), null);
+                                + "Only Application events are allowed to be fired from server.",
+                                event.getDescriptor()), null);
             }
             clientEvents.add(event);
         }
@@ -575,6 +580,7 @@ public class AuraContextImpl implements AuraContext {
     }
 
     public static final String DELETED = "deleted";
+
     @Override
     public void dropLoaded(DefDescriptor<?> descriptor) {
         loaded.put(descriptor, DELETED);
@@ -582,7 +588,7 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public Map<DefDescriptor<?>, String> getLoaded() {
-        Map<DefDescriptor<?>,String> safeLoaded = Maps.newHashMapWithExpectedSize(loaded.size());
+        Map<DefDescriptor<?>, String> safeLoaded = Maps.newHashMapWithExpectedSize(loaded.size());
         for (Map.Entry<DefDescriptor<?>, String> entry : loaded.entrySet()) {
             if (!DELETED.equals(entry.getValue())) {
                 safeLoaded.put(entry.getKey(), entry.getValue());
@@ -608,5 +614,15 @@ public class AuraContextImpl implements AuraContext {
             return null;
         }
         return val;
+    }
+
+    @Override
+    public void setFrameworkUID(String uid) {
+        this.fwUID = uid;
+    }
+
+    @Override
+    public String getFrameworkUID() {
+        return fwUID;
     }
 }

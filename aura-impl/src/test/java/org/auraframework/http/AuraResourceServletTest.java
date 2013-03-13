@@ -90,8 +90,8 @@ public class AuraResourceServletTest extends AuraTestCase {
                                                                                 ApplicationDef.class);
         Aura.getContextService().getCurrentContext().setApplicationDescriptor(nopreload);
 
+        DummyHttpServletRequest request = new DummyHttpServletRequest();
         DummyHttpServletResponse response = new DummyHttpServletResponse() {
-
             Cookie cookie;
 
             @Override
@@ -104,17 +104,28 @@ public class AuraResourceServletTest extends AuraTestCase {
                 return cookie != null && cookie.getName().equals(name) ? cookie : null;
             }
         };
-        AuraResourceServlet.addManifestCookie(response);
+        ManifestUtil.checkManifestCookie(request, response);
         String expectedName = Mode.UTEST + "_" + nopreload.getNamespace() + "_" + nopreload.getName() + "_lm";
         Cookie cookie = response.getCookie(expectedName);
         assertEquals(expectedName, cookie.getName());
+        //
+        // Format of the cookie is now <n>:<time>
+        //
         assertEquals(AuraBaseServlet.SHORT_EXPIRE_SECONDS, cookie.getMaxAge());
-        assertTrue("Cookie should contain :", cookie.getValue().contains(":"));
-        String uid = cookie.getValue().substring(0, cookie.getValue().indexOf(':'));
-        assertNotNull("App uid should not be null", uid);
-        assertTrue("App uid should be > 20 characters long", uid.length() > 20);
-        String fwUid = cookie.getValue().substring(uid.length() + 1);
-        assertNotNull("Framework uid should not be null", fwUid);
-        assertTrue("Framework uid should be > 20 characters long", fwUid.length() > 20);
+        assertTrue("Cookie should contain : but was:"+cookie.getValue(), cookie.getValue().contains(":"));
+        String countStr = cookie.getValue().substring(0, cookie.getValue().indexOf(':'));
+        String startTimeStr = cookie.getValue().substring(countStr.length() + 1);
+        try {
+            int count = Integer.parseInt(countStr);
+            assertTrue("count should be between 1 & 8 was "+count, (count >= 0 && count < 9));
+        } catch (NumberFormatException nfe) {
+            fail("Invalid count of "+countStr);
+        }
+        try {
+            long startTime = Long.parseLong(startTimeStr);
+            assertTrue("Start time should be in the past", (startTime <= System.currentTimeMillis()));
+        } catch (NumberFormatException nfe) {
+            fail("Invalid start time of "+startTimeStr);
+        }
     }
 }

@@ -27,6 +27,7 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Source;
+import org.auraframework.system.SourceListener.SourceMonitorEvent;
 import org.auraframework.test.IntegrationTestCase;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
@@ -127,6 +128,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
                         .getSource(toUpdate);
                 final String originalContent = source.getContents();
                 source.addOrUpdate(originalContent + " ");
+                Aura.getDefinitionService().onSourceChanged(source.getDescriptor(), SourceMonitorEvent.changed);
                 addTearDownStep(new Runnable() {
                     @Override
                     public void run() {
@@ -160,8 +162,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
             boolean shouldLastModUpdate) throws Exception {
         long lastModBeforeUpdate = AuraBaseServlet.getLastMod();
         assertTrue("failed to get valid lastmod: " + lastModBeforeUpdate, lastModBeforeUpdate > 0);
-        Thread.sleep(1002); // ensure lastMod changes despite system time
-                            // resolution
+        Thread.sleep(1002); // ensure lastMod changes despite system time resolution
         update.run();
 
         // restart context as prior context will have old lastMod
@@ -293,7 +294,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
                 "updateTest:updateWithPreload", ApplicationDef.class);
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, appDesc);
         ComponentDef depDef = Aura.getDefinitionService().getDefinition("updateTest:updateable", ComponentDef.class);
-        assertLastModAfterUpdate(Mode.PROD, appDesc, touchSource(depDef.getThemeDescriptor()), false);
+        assertLastModAfterUpdate(Mode.PROD, appDesc, touchSource(depDef.getThemeDescriptor()), true);
     }
 
     @UnAdaptableTest
@@ -303,7 +304,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, appDesc);
         ComponentDef depDef = Aura.getDefinitionService()
                 .getDefinition("updateTest:updateableAlso", ComponentDef.class);
-        assertLastModAfterUpdate(Mode.PROD, appDesc, touchSource(getClientController(depDef)), false);
+        assertLastModAfterUpdate(Mode.PROD, appDesc, touchSource(getClientController(depDef)), true);
     }
 
     @UnAdaptableTest
@@ -312,7 +313,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
                 "updateTest:updateWithPreload", ApplicationDef.class);
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, appDesc);
         ComponentDef depDef = Aura.getDefinitionService().getDefinition("updateTest:updateable", ComponentDef.class);
-        assertLastModAfterUpdate(Mode.PROD, appDesc, touchSource(depDef.getDescriptor()), false);
+        assertLastModAfterUpdate(Mode.PROD, appDesc, touchSource(depDef.getDescriptor()), true);
     }
 
     /**
@@ -323,8 +324,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
                 "appPreloadTest:appCacheNoPreload", ApplicationDef.class);
         AuraContext context = Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, desc);
         context.clearPreloads();
-        String url = AuraBaseServlet.getManifest();
-        assertEquals("", url);
+        assertEquals(false, ManifestUtil.isManifestEnabled());
     }
 
     /**
@@ -337,7 +337,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
         context.clearPreloads();
         context.addPreload("aura");
         context.addPreload("ui");
-        String url = AuraBaseServlet.getManifest();
+        String url = ManifestUtil.getManifestUrl();
         assertEquals(
                 "/l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22appPreloadTest%3AappCacheNoPreload%22%2C"
                         + "%22preloads%22%3A%5B%22aura%22%2C%22ui%22%5D%2C"

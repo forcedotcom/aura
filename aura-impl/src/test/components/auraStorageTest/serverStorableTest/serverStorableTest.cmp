@@ -17,8 +17,13 @@
 -->
 <aura:component controller="java://org.auraframework.java.controller.ServerStorableActionController" render="client">
     <aura:attribute type="String" name="responseOrder" default=""/>
+    <aura:attribute name="defaultExpiration" type="Integer" default="60"/>
+    <aura:attribute name="defaultAutoRefreshInterval" type="Integer" default="60"/>
     
-	<auraStorage:init name="actions" secure="true" debugLoggingEnabled="true"/>
+	<auraStorage:init name="actions" secure="true" debugLoggingEnabled="true" defaultExpiration="{!v.defaultExpiration}" 
+                      defaultAutoRefreshInterval="{!v.defaultAutoRefreshInterval}"/>
 	     
     <ui:button press="{!c.handleClick}" aura:id="button" label="Get a stored action from the server"/>
+    
+    <div aura:id="facet"></div>
 </aura:component>

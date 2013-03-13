@@ -48,7 +48,7 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
                         + "' abstract='true'>Child Text<aura:foo/></aura:application>", "myID", Format.XML);
         xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());
+        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
         xmlReader.next();
         cdHandler = new ApplicationDefHandler(vendor.getApplicationDefDescriptor(), source, xmlReader);
     }

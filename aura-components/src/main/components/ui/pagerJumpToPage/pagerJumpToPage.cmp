@@ -20,8 +20,8 @@
     <aura:attribute name="Labels_Of" type="String" default=" of "    description="The text to display in the label between the page input and pageCount."/>
 
     <div class="{!v.class+' pagerContainer pagerJumpToPage'+(v.totalItems==0?' empty':'')}">
-        <label for="{!'ui:pagerJumpToPage:'+globalId}">{!v.Labels_Page}</label>
-        <input aura:id="pager:pageInput" id="{!'ui:pagerJumpToPage:'+globalId}" class="pageInput" type="text" value="{!v.currentPage}" onchange="{!c.changePage}"/>
-        <label for="{!'ui:pagerJumpToPage:'+globalId}">{!v.Labels_Of}<span aura:id="pager:pageCount">{!v.pageCount}</span></label>
+        <label>{!v.Labels_Page}
+        <input aura:id="pager:pageInput" class="pageInput" type="text" value="{!v.currentPage}" onchange="{!c.changePage}"/>
+        {!v.Labels_Of}<span aura:id="pager:pageCount">{!v.pageCount}</span></label>
     </div>
 </aura:component>

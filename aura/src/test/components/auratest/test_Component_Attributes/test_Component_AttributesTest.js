@@ -114,8 +114,8 @@
             var attrValue = attributeSet.getValue('label');
             //attrValue.getValue() is the actual usage of a wrapped value object
             var newBlankValue = attrValue.getValue('blah');
-            aura.test.assertTrue(newBlankValue !== undefined, 'A Value was not created');
+            aura.test.assertDefined(newBlankValue, 'A Value was not created');
         }
-    },
+    }
 
 })

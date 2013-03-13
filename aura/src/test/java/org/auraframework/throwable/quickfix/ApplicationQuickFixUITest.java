@@ -16,14 +16,13 @@
 package org.auraframework.throwable.quickfix;
 
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
-import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.annotation.UnAdaptableTest;
 
 /**
  * Quick fix testing for Application.
  */
-// TODO(W-1510267): QuickFix buttons do not show up in IE9
-@ExcludeBrowsers({ BrowserType.IE9 })
+// Unadaptable since does not function properly when running from jars
+@UnAdaptableTest
 public class ApplicationQuickFixUITest extends BaseComponentQuickFixUITest {
     public ApplicationQuickFixUITest(String name) {
         super(name, DefType.APPLICATION, ".app");

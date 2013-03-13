@@ -47,7 +47,7 @@
 
 <p>You can add as many parameters as you need. The parameters are numbered and are zero-based. For example, if you have three parameters, they will be named {0}, {1}, and {2}, and they will be substituted in the order they're specified.</p> 
 
-<p>This example shows the <code>Object.Title</code> label referenced in an <code>aura:label</code> component and with three parameter substitutions. Suppose the label value is defined as <code>"{0} Members, {1} New Members, and {2} Guests"</code> in the label file.</p>
+<p>This example shows the <code>Object.Title</code> label referenced in an <code>aura:label</code> component and with three parameter substitutions. The label value is defined as <code>"{0} Members, {1} New Members, and {2} Guests"</code> in the label file.</p>
 
 <auradocs:codeblock>
 &lt;aura:label value="<aura:text value="{!"/>$Label.Object.Title}">
@@ -90,7 +90,7 @@
 
 <auradocs:codeblock>
 &lt;ui:button labelDisplay="false" label="Label for assistive text">
-    &lt;aura:label value="<aura:text value="{!"/>$Label.Object.Title}">
+    &lt;aura:label value="<aura:text value="{!"/>$Label.Object.LinkLabel}">
         &lt;ui:outputURL value="http://www.salesforce.com" label="Test Link"/>
     &lt;/aura:label>
 &lt;/ui:button>
@@ -103,7 +103,8 @@
 <p><b>See also:</b><br/>   
     <auradocs:defLink descriptor="aura:label">aura:label</auradocs:defLink><br/>
     <auradocs:topicLink topic="expressions">Expressions</auradocs:topicLink><br/>
-    <auradocs:topicLink topic="globalValueProviders">Global Value Providers</auradocs:topicLink>    
+    <auradocs:topicLink topic="globalValueProviders">Global Value Providers</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="labelAdapter">Label Adapters</auradocs:topicLink>    
  </p>
 
 </aura:component>

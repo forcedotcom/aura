@@ -51,118 +51,112 @@ import com.google.common.collect.Sets;
  * 
  * @since 0.0.194
  */
-public class JavascriptTestSuiteDefHandler extends
-		JavascriptHandler<DefDescriptor<TestSuiteDef>, JavascriptTestSuiteDef> {
+public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDef, TestSuiteDef> {
 
-	private final Builder builder = new Builder();
+    private final Builder builder = new Builder();
 
-	public JavascriptTestSuiteDefHandler(
-			DefDescriptor<TestSuiteDef> descriptor, Source<?> source) {
-		super(descriptor, source);
-		builder.code = source.getContents();
-	}
+    public JavascriptTestSuiteDefHandler(DefDescriptor<TestSuiteDef> descriptor, Source<?> source) {
+        super(descriptor, source);
+        builder.code = source.getContents();
+    }
 
-	private Definition parseMock(
-			DefDescriptor<? extends BaseComponentDef> compDesc,
-			Map<String, Object> map) throws QuickFixException {
-		DefType mockType = DefType.valueOf((String) map.get("type"));
-		switch (mockType) {
-		case MODEL:
-			return new JavascriptMockModelHandler(descriptor, source, compDesc,
-					map).getDefinition();
-		case ACTION:
-			return new JavascriptMockActionHandler(descriptor, source,
-					compDesc, map).getDefinition();
-		case PROVIDER:
-			return new JavascriptMockProviderHandler(descriptor, source,
-					compDesc, map).getDefinition();
-		default:
-			return null;
-		}
-	}
+    private Definition parseMock(DefDescriptor<? extends BaseComponentDef> compDesc,
+            Map<String, Object> map) throws QuickFixException {
+        DefType mockType = DefType.valueOf((String) map.get("type"));
+        switch (mockType) {
+        case MODEL:
+            return new JavascriptMockModelHandler(descriptor, source, compDesc, map).getDefinition();
+        case ACTION:
+            return new JavascriptMockActionHandler(descriptor, source, compDesc, map).getDefinition();
+        case PROVIDER:
+            return new JavascriptMockProviderHandler(descriptor, source, compDesc, map).getDefinition();
+        default:
+            return null;
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	protected JavascriptTestSuiteDef createDefinition(Map<String, Object> map)
-			throws QuickFixException {
-		builder.setDescriptor(descriptor);
-		builder.setLocation(getLocation());
-		builder.caseDefs = new ArrayList<TestCaseDef>();
+    @SuppressWarnings("unchecked")
+    @Override
+    protected JavascriptTestSuiteDef createDefinition(Map<String, Object> map) throws QuickFixException {
+        builder.setDescriptor(descriptor);
+        builder.setLocation(getLocation());
+        builder.caseDefs = new ArrayList<TestCaseDef>();
 
-		Map<String, Object> defaultAttributes = (Map<String, Object>) map
-				.get("attributes");
-		List<String> browserListForTestSet = (List<String>) (List<?>) map
-				.get("browsers");
-		for (Entry<String, Object> entry : map.entrySet()) {
-			String key = entry.getKey();
-			if (key.startsWith("test")) {
-				Map<String, Object> value = (Map<String, Object>) entry
-						.getValue();
-				Object t = value.get("test");
-				if (!(t instanceof JsFunction)) {
-					if (t instanceof List) {
-						List<Object> functions = (List<Object>) t;
-						for (Object i : functions) {
-							if (!(i instanceof JsFunction)) {
-								throw new AuraRuntimeException(
-										key
-												+ " 'test' must be a function or an array of functions");
-							}
-						}
-					} else {
-						throw new AuraRuntimeException(
-								key
-										+ " 'test' must be a function or an array of functions");
-					}
-				}
+        Map<String, Object> defaultAttributes = (Map<String, Object>) map.get("attributes");
+        List<String> browserListForTestSet = (List<String>) (List<?>) map.get("browsers");
+        for (Entry<String, Object> entry : map.entrySet()) {
+            String key = entry.getKey();
+            if (key.startsWith("test")) {
+                Map<String, Object> value = (Map<String, Object>) entry.getValue();
+                Object t = value.get("test");
+                if (!(t instanceof JsFunction)) {
+                    if (t instanceof List) {
+                        List<Object> functions = (List<Object>) t;
+                        for (Object i : functions) {
+                            if (!(i instanceof JsFunction)) {
+                                throw new AuraRuntimeException(
+                                        key + " 'test' must be a function or an array of functions");
+                            }
+                        }
+                    } else {
+                        throw new AuraRuntimeException(
+                                key + " 'test' must be a function or an array of functions");
+                    }
+                }
 
-				Map<String, Object> attributes = (Map<String, Object>) value
-						.get("attributes");
+                Map<String, Object> attributes = (Map<String, Object>) value
+                        .get("attributes");
 
-				List<String> labelsList = (List<String>) (List<?>) value
-						.get("testLabels");
-				Set<String> labels = labelsList == null ? Collections.EMPTY_SET
-						: Sets.newHashSet(labelsList);
+                List<String> labelsList = (List<String>) (List<?>) value
+                        .get("testLabels");
+                Set<String> labels = labelsList == null ? Collections.EMPTY_SET
+                        : Sets.newHashSet(labelsList);
 
-				List<String> browserListForTestCase = (List<String>) (List<?>) value
-						.get("browsers");
-				Set<String> browsers = browserListForTestCase == null ? (browserListForTestSet == null ? Collections.EMPTY_SET
-						: Sets.newHashSet(browserListForTestSet))
-						: Sets.newHashSet(browserListForTestCase);
-				DefDescriptor<? extends BaseComponentDef> compDesc = DefDescriptorImpl
-						.getAssociateDescriptor(descriptor, ComponentDef.class,
-								DefDescriptor.MARKUP_PREFIX);
-				if (compDesc == null || !compDesc.exists()) {
-					compDesc = DefDescriptorImpl.getAssociateDescriptor(
-							descriptor, ApplicationDef.class,
-							DefDescriptor.MARKUP_PREFIX);
-				}
-				DefType defType = compDesc.getDefType();
+                List<String> browserListForTestCase = (List<String>) (List<?>) value
+                        .get("browsers");
+                Set<String> browsers = browserListForTestCase == null ? (browserListForTestSet == null ? Collections.EMPTY_SET
+                        : Sets.newHashSet(browserListForTestSet))
+                        : Sets.newHashSet(browserListForTestCase);
+                
+                List<String> exceptionsAllowedDuringInitList = (List<String>) (List<?>) value
+						.get("exceptionsAllowedDuringInit");
+				Set<String> exceptionsAllowedDuringInit = exceptionsAllowedDuringInitList == null ? Collections.EMPTY_SET
+						: Sets.newHashSet(exceptionsAllowedDuringInitList);
+				
+                DefDescriptor<? extends BaseComponentDef> compDesc = DefDescriptorImpl
+                        .getAssociateDescriptor(descriptor, ComponentDef.class,
+                                DefDescriptor.MARKUP_PREFIX);
+                if (compDesc == null || !compDesc.exists()) {
+                    compDesc = DefDescriptorImpl.getAssociateDescriptor(
+                            descriptor, ApplicationDef.class,
+                            DefDescriptor.MARKUP_PREFIX);
+                }
+                DefType defType = compDesc.getDefType();
 
-				Set<Definition> mocks = Sets.newHashSet();
-				List<Object> jsList = (List<Object>) value.get("mocks");
-				if (jsList != null && !jsList.isEmpty()) {
-					for (Object jsItem : jsList) {
-						Definition mockDef = parseMock(compDesc,
-								(Map<String, Object>) jsItem);
-						if (mockDef != null) {
-							mocks.add(mockDef);
-						}
-					}
-				}
+                Set<Definition> mocks = Sets.newHashSet();
+                List<Object> jsList = (List<Object>) value.get("mocks");
+                if (jsList != null && !jsList.isEmpty()) {
+                    for (Object jsItem : jsList) {
+                        Definition mockDef = parseMock(compDesc,
+                                (Map<String, Object>) jsItem);
+                        if (mockDef != null) {
+                            mocks.add(mockDef);
+                        }
+                    }
+                }
 
-				builder.caseDefs.add(new JavascriptTestCaseDef(descriptor, key,
-						null, attributes != null ? attributes
-								: defaultAttributes, defType, labels, browsers,
-						mocks));
-			}
-		}
+                builder.caseDefs.add(new JavascriptTestCaseDef(descriptor, key,
+                        null, attributes != null ? attributes
+                                : defaultAttributes, defType, labels, browsers,
+                        mocks, exceptionsAllowedDuringInit));
+            }
+        }
 
-		return builder.build();
-	}
+        return builder.build();
+    }
 
-	@Override
-	public void addExpressionReferences(Set<PropertyReference> propRefs) {
-		// ignore these
-	}
+    @Override
+    public void addExpressionReferences(Set<PropertyReference> propRefs) {
+        // ignore these
+    }
 }

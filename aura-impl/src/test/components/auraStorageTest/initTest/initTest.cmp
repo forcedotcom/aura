@@ -3,14 +3,16 @@
     <aura:attribute name="defaultExpiration" type="Integer" default="50"/>
     <aura:attribute name="defaultAutoRefreshInterval" type="Integer" default="60"/>
     <aura:attribute name="requireUseStorageQueryParam" type="Boolean"/>
+    <aura:attribute name="persistent" type="Boolean" default="false"/>
         
     <!--Control the values per test case-->
     <auraStorage:init debugLoggingEnabled="true"
-    				  name="actions" secure="true" 
+    				  name="actions" secure="true" persistent="{!v.persistent}"
                       clearStorageOnInit="{!v.clearStorageOnInit}"
                       defaultExpiration="{!v.defaultExpiration}" 
                       defaultAutoRefreshInterval="{!v.defaultAutoRefreshInterval}" 
                       requireUseStorageQueryParam="{!v.requireUseStorageQueryParam}"/>
+                      
                       
     <ui:button label="Run action at Server Always" press="{!c.forceActionAtServer}" aura:id="ForceActionAtServer"/>
     <p/>
@@ -42,5 +44,13 @@
     
     <ui:inputText aura:id="inputHost" value="{!v.host}"/>
     <ui:button aura:id="TestConnectionButton" label="test connection" press="{!c.testConnection}"/><br/>
+    
+    <!-- Named storage test setup-->
+    <auraStorage:init name="defaultAdapter"/>
+    <aura:attribute name="dupNamedStorage" type="Boolean" default="false"/>
+    <auraStorage:init name="dupNamedStorage" maxSize="9999" aura:id="dupNamedStorage1"/>
+    <aura:if isTrue="{!v.dupNamedStorage}">
+        <auraStorage:init name="dupNamedStorage" maxSize="6666" aura:id="dupNamedStorage2"/>
+    </aura:if>                      
     
 </aura:component>

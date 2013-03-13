@@ -20,23 +20,23 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 public class DelegatingStubHandler implements InvocationHandler {
-	private final Object delegate;
-	private final List<Stub<?>> stubs;
+    private final Object delegate;
+    private final List<Stub<?>> stubs;
 
-	public DelegatingStubHandler(Object delegate, List<Stub<?>> stubs) {
-		this.delegate = delegate;
-		this.stubs = stubs;
-	}
+    public DelegatingStubHandler(Object delegate, List<Stub<?>> stubs) {
+        this.delegate = delegate;
+        this.stubs = stubs;
+    }
 
-	@Override
-	public Object invoke(Object object, Method method, Object[] args)
-			throws Throwable {
-		for (Stub<?> stub : stubs) {
-			Invocation invocation = stub.getInvocation();
-			if (invocation.matches(method, args)) {
-				return stub.getNextAnswer().answer();
-			}
-		}
-		return method.invoke(delegate, args);
-	}
+    @Override
+    public Object invoke(Object object, Method method, Object[] args)
+            throws Throwable {
+        for (Stub<?> stub : stubs) {
+            Invocation invocation = stub.getInvocation();
+            if (invocation.matches(method, args)) {
+                return stub.getNextAnswer().answer();
+            }
+        }
+        return method.invoke(delegate, args);
+    }
 }

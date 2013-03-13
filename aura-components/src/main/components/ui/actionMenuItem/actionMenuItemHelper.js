@@ -21,7 +21,7 @@
             var parent = component.getValue("v.parent");
             if (parent && !parent.isEmpty()) {
                 p = parent.getValue(0);
-                p.setValue("{!v.visible}", false);
+                p.setValue("v.visible", false);
             }
             // put the focus back to menu trigger
             this.setFocusToTrigger(component);

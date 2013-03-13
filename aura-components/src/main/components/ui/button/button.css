@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 .uiButton{
-    display: inline-block;
+	display: inline-block;
     cursor: pointer;
 }
 .uiButton .label{
-    display: block;
+	display: block;
 }
 .uiButton.default{
-    font-weight: bold;
+	font-weight: bold;
     font-size: .9em;
     margin: 2px 3px;
     padding: 4px 6px;
@@ -29,28 +29,28 @@
     text-align:center;
     border-radius:4px;
     border:0;
-    border-top:1px solid rgba(255,255,255,.45);
+    border-top:1px solid rgba(255,255,255,.45);     
     background:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#F8F8F9), to(#DDDFE1));
     background:-webkit-linear-gradient(#F8F8F9, #DDDFE1);
     background:linear-gradient(#F8F8F9, #DDDFE1);
     -webkit-box-shadow:rgba(0, 0, 0, 0.699219) 0px 1px 3px, rgba(0, 0, 0, 0.296875) 0px 1px 0px;
     box-shadow:rgba(0, 0, 0, 0.699219) 0px 1px 3px, rgba(0, 0, 0, 0.296875) 0px 1px 0px;
-    text-shadow: white 0px 1px 1px;
+	text-shadow: white 0px 1px 1px;	
 }
 .uiButton.default:hover,
 .uiButton.default:focus{
-    background: #757D8A -webkit-gradient(linear, 0% 0%, 0% 100%, from(#7F8792), to(#535B68));
+	background: #757D8A -webkit-gradient(linear, 0% 0%, 0% 100%, from(#7F8792), to(#535B68));
     background: #757D8A -webkit-linear-gradient(#7F8792,#535B68);
     background: #757D8A -moz-linear-gradient(#7F8792,#535B68);
     background: #757D8A linear-gradient(#7F8792,#535B68);
     border:0;
-    border-top:1px solid rgba(255,255,255,.45);
-    text-shadow: rgba(0, 0, 0, 0.5) 0px -1px 1px;
+    border-top:1px solid rgba(255,255,255,.45);     
+	text-shadow: rgba(0, 0, 0, 0.5) 0px -1px 1px;
 }
 .uiButton.default .label{
     white-space:nowrap;
-    color: #3A3D42;
-    padding:0 1px;
+	color: #3A3D42;
+	padding:0 1px;
 }
 .uiButton.default:hover .label,
 .uiButton.default:focus .label{

@@ -4,7 +4,7 @@
     "descriptor":"js://test.testJSController/ACTION$functionName2",
     "name":"functionName2",
     "code":
-function test$testJSController_functionName2(args1, args2, args3) {
+function(args1, args2, args3) {
         var str = 'Still do Nothing';
     },
     "actionType":"CLIENT"

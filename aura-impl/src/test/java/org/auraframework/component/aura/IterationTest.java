@@ -25,6 +25,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.AuraExecutionException;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
 import org.junit.Ignore;
@@ -215,8 +216,8 @@ public class IterationTest extends AuraImplTestCase {
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         try {
             getIterationComponent(source, attributes);
-            fail("Expected a NumberFormatException");
-        } catch (NumberFormatException e) {
+            fail("Expected a InvalidExpressionException");
+        } catch (InvalidExpressionException e) {
         }
     }
 
@@ -251,8 +252,8 @@ public class IterationTest extends AuraImplTestCase {
         attributes.put("items", Lists.newArrayList("q", "r", "s"));
         try {
             getIterationComponent(source, attributes);
-            fail("Expected a NumberFormatException");
-        } catch (NumberFormatException e) {
+            fail("Expected a InvalidExpressionException");
+        } catch (InvalidExpressionException e) {
         }
     }
 

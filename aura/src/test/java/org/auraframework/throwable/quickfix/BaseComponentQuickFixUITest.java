@@ -27,13 +27,10 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.UnAdaptableTest;
 
 /**
  * Tests for creating new markup bundles when you attempt to load a component that doesn't exist in the browser.
  */
-// Unadaptable since does not function properly when running from jars
-@UnAdaptableTest
 public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
     protected String typeSuffix;
     protected String capType;
@@ -126,8 +123,6 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
     /**
      * Verify that multiple component bundles can be created by entering the DefDescriptors in, comma separated.
      */
-    // TODO(tbliss): W-1510001 Why is this failing on touch's autobuild? Passes locally and testCreationQuickFix, which
-    // is very similar, seems to be passing fine.
     public void testMultipleDescriptors() throws Exception {
         String namespace = String.format("auratest", System.currentTimeMillis());
         String cmpName1 = String.format("nonExistent1%s%s", defType.name(), System.currentTimeMillis());

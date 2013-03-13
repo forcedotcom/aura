@@ -33,5 +33,5 @@
             //Verify that the rerender object is initialized on the RendererDef
             aura.test.assertNotNull(rendererDef.rerenderMethod, "ReRender object not found on the renderer def of this componentDef.");
         }
-    },
+    }
 })

@@ -42,5 +42,5 @@
 
     refreshEnd : function(cmp, event, helper){
         helper.hideRefreshing(cmp);
-    },
+    }
 }

@@ -176,7 +176,8 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     @Override
     public String getAuraJSURL() {
         String suffix = Aura.getContextService().getCurrentContext().getMode().getJavascriptMode().getSuffix();
-        return String.format("/auraFW/javascript/%s/aura_%s.js", getAuraFrameworkNonce(), suffix);
+        String nonce = getAuraFrameworkNonce();
+        return String.format("/auraFW/javascript/%s/aura_%s.js?aura.fwuid=%s", nonce, suffix, nonce);
     }
 
     @Override

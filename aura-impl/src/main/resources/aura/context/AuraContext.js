@@ -28,6 +28,7 @@ function AuraContext(config) {
         this.loaded = {};
     }
     this.lastmod = config["lastmod"];
+    this.fwuid = config["fwuid"];
     this.preloadLookup = {};
     for(var j=0;j<this.preloads.length;j++){
         this.preloadLookup[this.preloads[j]] = true;
@@ -103,6 +104,7 @@ AuraContext.prototype.encodeForServer = function(includePreloads) {
 		"app" : this.app,
 		"cmp" : this.cmp,
 		"lastmod" : this.lastmod,
+		"fwuid" : this.fwuid,
 		"test" : this.test
 	});
 };

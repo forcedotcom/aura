@@ -95,7 +95,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
 
     private List<String> getRequiredLinks() throws Exception {
         List<String> required = Lists.newArrayList();
-        required.add(".*/aura_prod\\.js");
+        required.add(".*/aura_prod\\.js\\?aura.fwuid=.*");
         return required;
     }
 
@@ -118,7 +118,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
 
     /**
      * Check for the 'last mod' line.
-     *
+     * 
      * Note that since the reformat of this line, there is no real
      * last mod date in the manifest.
      */
@@ -208,12 +208,12 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         GetMethod get = obtainGetMethod(manifest.url);
         getHttpClient().executeMethod(get);
         String response = get.getResponseBodyAsString();
-		String serializedContextFragment = AuraTextUtil.urlencode(String
-				.format("\"lastmod\":\"%s\"", manifest.lastmod));
-		assertManifest(response, Lists.newArrayList(
-				String.format(".*%s.*/app\\.css", serializedContextFragment),
-				String.format(".*%s.*/app\\.js", serializedContextFragment)),
-				manifest.lastmod);
+        String serializedContextFragment = AuraTextUtil.urlencode(String
+                .format("\"lastmod\":\"%s\"", manifest.lastmod));
+        assertManifest(response, Lists.newArrayList(
+                String.format(".*%s.*/app\\.css", serializedContextFragment),
+                String.format(".*%s.*/app\\.js", serializedContextFragment)),
+                manifest.lastmod);
     }
 
     /**
@@ -262,12 +262,12 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
 
         // Now, after one failed call a new manifest call should go thru.(Error
         // cookie cleared);
-		String serializedContextFragment = AuraTextUtil.urlencode(String
-				.format("\"lastmod\":\"%s\"", manifest.lastmod));
-		assertManifest(getClean.getResponseBodyAsString(), Lists.newArrayList(
-				String.format(".*%s.*/app\\.css", serializedContextFragment),
-				String.format(".*%s.*/app\\.js", serializedContextFragment)),
-				manifest.lastmod);
+        String serializedContextFragment = AuraTextUtil.urlencode(String
+                .format("\"lastmod\":\"%s\"", manifest.lastmod));
+        assertManifest(getClean.getResponseBodyAsString(), Lists.newArrayList(
+                String.format(".*%s.*/app\\.css", serializedContextFragment),
+                String.format(".*%s.*/app\\.js", serializedContextFragment)),
+                manifest.lastmod);
     }
 
     /**

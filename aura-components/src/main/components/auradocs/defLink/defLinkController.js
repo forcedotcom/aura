@@ -23,5 +23,5 @@
             defType : cmp.get("v.defType")
         });
         evt.fire();
-    },
+    }
 })

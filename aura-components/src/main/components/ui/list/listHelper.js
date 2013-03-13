@@ -25,7 +25,7 @@
 		if (dataProvider && dataProvider.length && dataProvider.length > 0) {
 			dataProvider = dataProvider[0];
 			dataProvider.addHandler("onchange", component, "c.handleDataChange");
-			dataProvider.get("e.provide").fire();
+			component._dataProvider = dataProvider;
 		}		
 	},
 	
@@ -42,15 +42,38 @@
 		        	if (facet.isInstanceOf("ui:pager")) {
 		        		pagers.push(facet);
 		        	} else {
-		        		pagers.concat(facet.find({instancesOf:"ui:pager"}));
+		        		pagers = pagers.concat(facet.find({instancesOf:"ui:pager"}));
 		        	}
 		        }	
 			});
         }
 		
-		// add handlers to each
-		for (var j=0, len=pagers.length; j<len; j++) {
-			pagers[j].addHandler("onPageChange", component, "c.handlePageChange");
+		// wireup handlers and values
+//		var chainedAttrs = ["currentPage", "pageSize", "totalItems"];
+		var j = pagers.length;
+		while (j--) {
+			var pager = pagers[j];
+			pager.addHandler("onPageChange", component, "c.handlePageChange");
+			
+//			TODO: want to wire this up so that the valueProvider for these attributes is always the parent list, not the component
+//				in which the paginators were referenced, but not sure we can do that today...
+//			var k = chainedAttrs.length;
+//			while (k--) {
+//				var exp = "v." + chainedAttrs[k];
+//				pager.getValue(exp).setValue(component.getValue(exp));	
+//			}
 		}
+		
+		// cache the pagers
+		component._pagers = pagers;
+	},
+	
+    showLoading:function (component, visible) {
+        $A.util[visible ? "addClass" : "removeClass"](component.getElement(), "loading");
+    },
+	
+	triggerDataProvider: function(component) {
+		this.showLoading(component, true);
+		component._dataProvider.get("e.provide").fire();
 	}
 })

@@ -24,6 +24,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.CacheableDefFactory;
+import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.base.Optional;
@@ -34,7 +35,9 @@ import com.google.common.cache.CacheBuilder;
  * base class for registries, adds some important methods that aren't exposed
  * through the top level interface
  */
-public class CachingDefRegistryImpl<T extends Definition> extends NonCachingDefRegistryImpl<T> {
+public class CachingDefRegistryImpl<T extends Definition>
+        extends NonCachingDefRegistryImpl<T>
+        implements SourceListener {
 
     private static final long serialVersionUID = -1052118918311747954L;
     protected static final int CACHE_SIZE_MIN = 128;
@@ -50,6 +53,7 @@ public class CachingDefRegistryImpl<T extends Definition> extends NonCachingDefR
     public CachingDefRegistryImpl(CacheableDefFactory<T> factory, Set<DefType> defTypes, Set<String> prefixes) {
         super(factory, defTypes, prefixes);
         this.cacheableFactory = factory;
+        Aura.getDefinitionService().subscribeToChangeNotification(this);
     }
 
     /**
@@ -173,5 +177,15 @@ public class CachingDefRegistryImpl<T extends Definition> extends NonCachingDefR
     @Override
     public void clear() {
         this.defs.invalidateAll();
+    }
+
+    /**
+     * clear's caches based on source and event provided
+     * (currently does brute force clear)
+     * 
+     */
+    @Override
+    public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event) {
+        clear();
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /*jslint sub: true */
-var p = Util.prototype;
+var p = $A.ns.Util.prototype;
 exp(p,
     "isIE", p.isIE,
     "isArray", p.isArray,

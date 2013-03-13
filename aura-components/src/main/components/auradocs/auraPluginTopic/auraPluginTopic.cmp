@@ -37,7 +37,7 @@
        </auradocs:info>
 
        <h2>Using Aura Assist</h2>
-
+	   <p>To use auto-complete, follow the usage guidelines below.</p>
        <p>
         <table class="table table-bordered table-striped">
               <thead>
@@ -53,17 +53,16 @@
                   </tr>
                   <tr>
                       <td>Components</td>
-                      <td>Triggered when you type <code>&lt;NAMESPACE:</code>, or Ctrl + Space</td>
+                      <td>Triggered when you type <code>&lt;NAMESPACE:</code>, or Ctrl + Space. Make sure you are within an <code>aura:application</code> or <code>aura:component</code> tag.</td>
                   </tr>
                   <tr>
                       <td>Attributes</td>
-                      <td>Triggered when you type <code>&lt;NAMESPACE:COMPONENT</code>, or Ctrl + Space</td>
+                      <td>Triggered when you type <code>&lt;NAMESPACE:COMPONENT</code>, or Ctrl + Space.</td>
                   </tr>
               </tbody>
         </table>
        </p>
-       <p>
-       </p>
+
 
         <!-- ML comment out as usage is not clear
        <h2>Override Aura Registry (Optional)</h2>

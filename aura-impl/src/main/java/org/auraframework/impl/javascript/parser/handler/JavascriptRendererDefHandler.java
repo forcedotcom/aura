@@ -30,7 +30,7 @@ import org.auraframework.util.json.JsFunction;
  * happy happy render render TODO: this class needs to validate stuff about the
  * renderer
  */
-public class JavascriptRendererDefHandler extends JavascriptHandler<DefDescriptor<RendererDef>, RendererDef> {
+public class JavascriptRendererDefHandler extends JavascriptHandler<RendererDef, RendererDef> {
 
     private final JavascriptRendererDef.Builder builder = new JavascriptRendererDef.Builder();
 
@@ -40,8 +40,7 @@ public class JavascriptRendererDefHandler extends JavascriptHandler<DefDescripto
 
     @Override
     protected RendererDef createDefinition(Map<String, Object> map) throws QuickFixException {
-        builder.setDescriptor(descriptor);
-        builder.setLocation(getLocation());
+        setDefBuilderFields(builder);
         builder.render = (JsFunction) map.get("render");
         if (builder.render != null) {
             builder.render.setName(String.format("render_%s_%s", descriptor.getNamespace(), descriptor.getName()));

@@ -16,6 +16,6 @@
 ({
     doUpdate: function(component) {
         var el = component.getElement();
-        component.setValue("{!v.value}", el.checked);
+        component.setValue("v.value", el.checked);
     }
 })

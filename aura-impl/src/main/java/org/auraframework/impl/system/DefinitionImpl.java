@@ -28,6 +28,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json.Serialization;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
+
 import org.auraframework.util.text.Hash;
 
 import com.google.common.collect.Maps;
@@ -43,13 +44,17 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     protected final Location location;
     protected final Map<SubDefDescriptor<?, T>, Definition> subDefs;
     protected final String description;
+    private final String ownHash;
     private boolean valid;
+    private final Hash sourceHash;
 
     protected DefinitionImpl(DefDescriptor<T> descriptor, Location location) {
         this.descriptor = descriptor;
         this.location = location;
         this.subDefs = null;
         this.description = null;
+        this.ownHash = null;
+        this.sourceHash = null;
     }
 
     protected DefinitionImpl(RefBuilderImpl<T, ?> builder) {
@@ -57,6 +62,26 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         this.location = builder.getLocation();
         this.subDefs = builder.subDefs;
         this.description = builder.description;
+
+        //
+        // Try to make sure that we have a hash string.
+        //
+        String hashVal = builder.ownHash;
+
+        if (hashVal == null && builder.hash != null) {
+            if (builder.hash.isSet()) {
+                hashVal = builder.hash.toString();
+            }
+        }
+        this.ownHash = hashVal;
+        //
+        // Only set the hash value if we don't have one.
+        //
+        if (hashVal == null) {
+            this.sourceHash = builder.hash;
+        } else {
+            this.sourceHash = null;
+        }
     }
 
     /**
@@ -84,11 +109,11 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     }
 
     @Override
-    public Hash getOwnHash() {
-        if (this.location == null) {
-            return null;
+    public String getOwnHash() {
+        if (sourceHash != null) {
+            return sourceHash.toString();
         }
-        return location.getHash();
+        return ownHash;
     }
 
     /**
@@ -162,9 +187,12 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         public Map<SubDefDescriptor<?, T>, Definition> subDefs;
         private final Class<T> defClass;
         public String description;
+        public Hash hash;
+        public String ownHash;
 
         protected RefBuilderImpl(Class<T> defClass) {
             this.defClass = defClass;
+            //this.ownHash = String.valueOf(System.currentTimeMillis());
         }
 
         @Override
@@ -179,6 +207,7 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
             return this;
         }
 
+        @Override
         public RefBuilderImpl<T, A> setLocation(Location location) {
             this.location = location;
             return this;
@@ -223,6 +252,21 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         @Override
         public RefBuilderImpl<T, A> setDescription(String description) {
             this.description = description;
+            return this;
+        }
+
+        @Override
+        public RefBuilderImpl<T,A> setOwnHash(Hash hash) {
+            if (hash != null) {
+                this.ownHash = null;
+            }
+            this.hash = hash;
+            return this;
+        }
+
+        @Override
+        public RefBuilderImpl<T,A> setOwnHash(String ownHash) {
+            this.ownHash = ownHash;
             return this;
         }
     }

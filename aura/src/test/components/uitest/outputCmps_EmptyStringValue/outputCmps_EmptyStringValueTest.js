@@ -47,5 +47,5 @@
         test: function(component){
             $A.test.assertEquals("", $A.test.getText(component.find('percent').getElement()), "Expected an empty span for outputPercent.");
         }
-    },
+    }
 })

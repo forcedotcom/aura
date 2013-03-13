@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
+{
     press : function(cmp, event){
-        var press = cmp.getEvent("press");
         if (cmp.getAttributes().getValue("disabled").getBooleanValue()) {
             event.preventDefault();
             return false;
         }
-        press.setParams({ domEvent : event });
-        press.fire();
+        var e = cmp.getEvent("press");
+        e.setParams({"domEvent": event});
+        e.fire();
         return true;
     }
-})
+}

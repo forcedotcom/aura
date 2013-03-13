@@ -63,6 +63,7 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
     protected EventDefImpl createDefinition() {
         builder.setDescriptor(getDefDescriptor());
         builder.setLocation(startLocation);
+        builder.setOwnHash(source.getHash());
         return builder.build();
     }
 

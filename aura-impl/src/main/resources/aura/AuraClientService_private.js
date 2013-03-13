@@ -262,7 +262,7 @@ var priv = {
             var actionResponses = responseMessage["actions"];
 
             for (var r = 0; r < actionResponses.length; r++) {
-                actionResponse = actionResponses[r];
+                var actionResponse = actionResponses[r];
 
                 var actionGroupNumber;
                 var action;
@@ -724,7 +724,7 @@ window.onbeforeunload = function(event) {
     }
 };
 
-Util.prototype.on(window, "load", function(event) {
+$A.ns.Util.prototype.on(window, "load", function(event) {
     // Lazy load data-src scripts
     var scripts = document.getElementsByTagName("script");
     if (scripts) {

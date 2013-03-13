@@ -28,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -42,14 +41,13 @@ import org.auraframework.def.DependencyDef;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.ThemeDef;
-import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
-
+import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.JavascriptProcessingError;
@@ -62,14 +60,19 @@ import com.google.common.collect.Sets;
 /**
  * The aura resource servlet.
  * 
- * This servlet serves up the application content for 'preloaded' definitions. It should
- * be cacheable, as there is no data present (or available to the defs). These 'preloaded'
- * definitions should never be ommitted, and should never be replaced by an exception response,
- * as there are no defs on the client with which to handle them.
+ * This servlet serves up the application content for 'preloaded' definitions. It should be cacheable,
+ * which means that the only context used should be the context sent as part of the URL. If any other
+ * information is required, caching will cause bugs.
+ * 
+ * Note that this servlet should be very careful to not attempt to force the client to re-sync (except
+ * for manifest fetches), since these calls may well be to re-populate a cache. In general, we should
+ * send back at least the basics needed for the client to survive. All resets should be done from {@link AuraServlet},
+ * or when fetching the manifest here.
  * 
  * TODO: 'preload': use dependencies instead of namespaces here.
  */
-public class AuraResourceServlet extends AuraBaseServlet {
+public class AuraResourceServlet extends AuraBaseServlet
+{
 
     private static final String RESOURCE_URLS = "resourceURLs";
     private static final String LAST_MOD = "lastMod";
@@ -78,8 +81,11 @@ public class AuraResourceServlet extends AuraBaseServlet {
     public static final String ORIG_REQUEST_URI = "aura.origRequestURI";
 
     private static ServletContext servletContext;
+    private static SourceNotifier sourceNotifier = new SourceNotifier();
 
-    private final static StringParam errorParam = new StringParam(AURA_PREFIX + "error", 128, false);
+    static {
+        Aura.getDefinitionService().subscribeToChangeNotification(sourceNotifier);
+    }
 
     /**
      * A very hackish internal filter.
@@ -162,7 +168,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
      * This routine checks to see that we have a valid top level component. If our top level component has some
      * problem (QFE/out of sync) we totally ignore it, and continue with the preloading as if everything was ok.
      * Otherwise, if we have no descriptor, we give back an empty response.
-     *
+     * 
      * Also note that this handles the 'if-modified-since' header, as we want to tell the browser that nothing
      * changed in that case.
      * 
@@ -221,7 +227,10 @@ public class AuraResourceServlet extends AuraBaseServlet {
      * This writes out the full manifest for an application so that we can use
      * the AppCache.
      * 
-     * TODO: W-1486764 we should document what goes in the manifest and why.
+     * The manifest contains CSS and JavaScript URLs. These specified resources are copied into the AppCache
+     * with the HTML template. When the page is reloaded, the existing manifest is compared to the new manifest.
+     * If they are identical, the resources are served from the AppCache. Otherwise, 
+     * the resources are requested from the server and the AppCache is updated.
      * 
      * @param request the request
      * @param response the response
@@ -233,23 +242,30 @@ public class AuraResourceServlet extends AuraBaseServlet {
         setNoCache(response);
 
         try {
-            if (errorParam.get(request) != null) {
-                addManifestErrorCookie(response);
-                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-                return;
-            }
-
-            if (!isManifestEnabled(request)) {
+            //
+            // First, we make sure that the manifest is enabled.
+            //
+            if (!ManifestUtil.isManifestEnabled(request)) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
+            //
+            // Now we validate the cookie, which includes loop detection.
+            // this routine sets the response code.
+            //
+            if (!ManifestUtil.checkManifestCookie(request, response)) {
+                return;
+            }
 
+            //
+            // TODO: why do we want this restriction? Does it actually help us in
+            // any way?
+            //
             String originalPath = (String) request.getAttribute(AuraResourceServlet.ORIG_REQUEST_URI);
             if (originalPath != null) {
-                String currentManifestUrl = AuraServlet.getManifest();
+                String currentManifestUrl = ManifestUtil.getManifestUrl();
                 if (!originalPath.equals(currentManifestUrl)) {
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    deleteManifestCookie(response);
                     return;
                 }
             }
@@ -288,17 +304,6 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 return;
             }
 
-            Map<String, Object> attribs = Maps.newHashMap();
-            Cookie cookie = getManifestCookie(request);
-            if (cookie != null) {
-                if (MANIFEST_ERROR.equals(cookie.getValue())) {
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    deleteManifestCookie(response);
-                    return;
-                }
-            }
-            addManifestCookie(response);
-
             //
             // This writes both the app and framework signatures into
             // the manifest, so that if either one changes, the
@@ -306,15 +311,16 @@ public class AuraResourceServlet extends AuraBaseServlet {
             // write these signatures in multiple places, but we just
             // need to make sure that they are in at least one place.
             //
+            Map<String, Object> attribs = Maps.newHashMap();
             attribs.put(LAST_MOD, String.format("app=%s, FW=%s", getContextAppUid(),
                     Aura.getConfigAdapter().getAuraFrameworkNonce()));
             attribs.put(UID, getContextAppUid());
             StringWriter sw = new StringWriter();
-            for (String s : AuraServlet.getStyles()) {
+            for (String s : getStyles()) {
                 sw.write(s);
                 sw.write('\n');
             }
-            for (String s : AuraServlet.getScripts()) {
+            for (String s : getScripts()) {
                 sw.write(s);
                 sw.write('\n');
             }
@@ -439,19 +445,17 @@ public class AuraResourceServlet extends AuraBaseServlet {
         String key = null;
 
         context.setPreloading(true);
-        if (!mode.isTestMode()) {
-            StringBuilder keyBuilder = new StringBuilder();
+        StringBuilder keyBuilder = new StringBuilder();
 
-            for (DescriptorFilter dm : filters) {
-                keyBuilder.append(dm);
-                keyBuilder.append(",");
-            }
-            key = keyBuilder.toString();
+        for (DescriptorFilter dm : filters) {
+            keyBuilder.append(dm);
+            keyBuilder.append(",");
+        }
+        key = keyBuilder.toString();
 
-            ret = definitionCache.get(key);
-            if (ret != null) {
-                out.append(ret);
-            }
+        ret = definitionCache.get(key);
+        if (ret != null) {
+            out.append(ret);
         }
         StringBuilder sb = new StringBuilder();
 
@@ -490,7 +494,8 @@ public class AuraResourceServlet extends AuraBaseServlet {
         sb.append("});");
 
         ret = sb.toString();
-        if (!mode.isTestMode()) {
+        // only use closure compiler in prod mode, due to compile cost
+        if (!(mode.isTestMode() || mode.isDevMode())) {
             StringWriter sw = new StringWriter();
             List<JavascriptProcessingError> errors = JavascriptWriter.CompressionLevel.CLOSURE_SIMPLE.compress(
                     new StringReader(ret), sw, key);
@@ -503,6 +508,10 @@ public class AuraResourceServlet extends AuraBaseServlet {
             // Note that we just use put (last one wins), as we don't really
             // care what happens
             // when there is a race. Just that one of them gets in.
+            definitionCache.put(key, ret);
+        }
+        else {
+            // still store the return in cache in not prod
             definitionCache.put(key, ret);
         }
         out.append(ret);
@@ -627,4 +636,16 @@ public class AuraResourceServlet extends AuraBaseServlet {
     public void init(ServletConfig config) {
         servletContext = config.getServletContext();
     }
+
+    /**
+     * Singleton class to manage external calls to the parent class' static cache
+     */
+    private static class SourceNotifier implements SourceListener {
+        @Override
+        public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event) {
+            definitionCache.clear();
+            cssCache.clear();
+        }
+    }
+
 }

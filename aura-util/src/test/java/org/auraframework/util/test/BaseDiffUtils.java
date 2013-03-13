@@ -26,51 +26,57 @@ import java.net.URL;
 
 public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
 
-    private URL url;
+    private URL srcUrl;
+    private URL destUrl;
 
     public BaseDiffUtils(Class<?> testClass, String goldName) throws Exception {
         String resourceName = "/results/" + testClass.getSimpleName() + (goldName.startsWith("/") ? "" : "/")
                 + goldName;
-        url = testClass.getResource(resourceName);
-        if (url != null) {
-            if ("file".equals(url.getProtocol())) {
-                // probably in dev so look for source rather than target
-                String devPath = url.getPath().replaceFirst("/target/test-classes/", "/src/test/");
-                File f = new File(devPath);
-                if (f.exists()) {
-                    url = f.toURI().toURL();
-                }
+        srcUrl = testClass.getResource(resourceName);
+        if (srcUrl == null) {
+            // gold file not found, but try to identify expected gold file location based on the test class location
+            String relPath = testClass.getName().replace('.', '/') + ".class";
+            URL testUrl = testClass.getResource("/" + relPath);
+            if ("file".equals(testUrl.getProtocol())) {
+                String fullPath = testUrl.getPath();
+                String basePath = fullPath.substring(0, fullPath.indexOf(relPath)).replaceFirst(
+                        "/target/test-classes/", "/src/test");
+                destUrl = new URL("file://" + basePath + resourceName);
             }
-            return;
+        } else if ("file".equals(srcUrl.getProtocol())) {
+            // probably in dev so look for source rather than target
+            String devPath = srcUrl.getPath().replaceFirst("/target/test-classes/", "/src/test/");
+            srcUrl = destUrl = new URL("file://" + devPath);
         }
 
-        // file not found, but check if we can write
-        String relPath = testClass.getName().replace('.', '/') + ".class";
-        URL testUrl = testClass.getResource("/" + relPath);
-        if (!testUrl.getProtocol().equals("file")) {
-            // write something to temp file at least
-            url = new URL(System.getProperty("java.io.tmpdir") + "/aura/test" + resourceName);
-        } else {
-            String fullPath = testUrl.getPath();
-            String basePath = fullPath.substring(0, fullPath.indexOf(relPath));
-            url = new URL(String.format("file://%s../../test%s", basePath, resourceName));
+        if (destUrl == null) {
+            // if we're reading from jars and can't identify filesystem source locations, write to a temp file at least
+            destUrl = new URL("file://" + System.getProperty("java.io.tmpdir") + "/aura/test" + resourceName);
+        }
+        if (srcUrl == null) {
+            // also if reading from jars and no gold included (shouldn't happen)
+            srcUrl = destUrl;
         }
     }
 
     @Override
     public URL getUrl() {
-        return this.url;
+        return srcUrl;
+    }
+
+    protected URL getDestUrl() {
+        return destUrl;
     }
 
     /**
-     * try to invoke "diff" to create a readable diff for the test failure
-     * results, otherwise append our crappy unreadable garbage
+     * try to invoke "diff" to create a readable diff for the test failure results, otherwise append our crappy
+     * unreadable garbage
      */
     protected void appendDiffs(String results, StringBuilder sb) {
         try {
             // create a temp file and write the results so that we're sure to
             // have something for diff to use
-            File file = File.createTempFile("sfdc-gold.", ".xml");
+            File file = File.createTempFile("aura-gold.", ".xml");
             try {
                 OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
                 try {
@@ -78,7 +84,7 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
                 } finally {
                     fw.close();
                 }
-                Process child = Runtime.getRuntime().exec("diff -du " + url.getPath() + " " + file.getPath());
+                Process child = Runtime.getRuntime().exec("diff -du " + srcUrl.getPath() + " " + file.getPath());
                 try {
                     printToBuffer(sb, child.getInputStream());
                     printToBuffer(sb, child.getErrorStream());

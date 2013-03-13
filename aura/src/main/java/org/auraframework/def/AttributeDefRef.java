@@ -15,6 +15,8 @@
  */
 package org.auraframework.def;
 
+import org.auraframework.throwable.quickfix.QuickFixException;
+
 /**
  */
 public interface AttributeDefRef extends Definition {
@@ -45,5 +47,5 @@ public interface AttributeDefRef extends Definition {
      * 
      * @param typeDef type of the attribute to try to parse to
      */
-    void parseValue(TypeDef typeDef);
+    void parseValue(TypeDef typeDef) throws QuickFixException;
 }

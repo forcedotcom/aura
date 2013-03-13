@@ -107,8 +107,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     protected BaseComponentDefImpl(Builder<T> builder) {
         super(builder);
         this.modelDefDescriptor = builder.modelDefDescriptor;
-        this.controllerDescriptors = AuraUtil
-                .immutableList(builder.controllerDescriptors);
+        this.controllerDescriptors = AuraUtil.immutableList(builder.controllerDescriptors);
         this.interfaces = AuraUtil.immutableSet(builder.interfaces);
 
         if (builder.extendsDescriptor != null) {
@@ -144,9 +143,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.whitespaceBehavior = builder.whitespaceBehavior;
 
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
-        this.compoundControllerDescriptor = DefDescriptorImpl
-                .getAssociateDescriptor(getDescriptor(), ControllerDef.class,
-                        DefDescriptor.COMPOUND_PREFIX);
+        this.compoundControllerDescriptor = DefDescriptorImpl.getAssociateDescriptor(getDescriptor(),
+                ControllerDef.class, DefDescriptor.COMPOUND_PREFIX);
         this.hashCode = AuraUtil.hashCode(super.hashCode(), attributeDefs,
                 events, controllerDescriptors, modelDefDescriptor,
                 extendsDescriptor);
@@ -394,15 +392,14 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
      * ComponentDef's children to the provided set. The set may then be used to
      * analyze freshness of all of those types to see if any of them should be
      * recompiled from source.
-     *
+     * 
      * @param dependencies
      *            A Set that this method will append RootDescriptors to for
      *            every RootDef that this ComponentDef requires
      * @throws QuickFixException
      */
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies)
-            throws QuickFixException {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
         for (AttributeDefRef facet : this.facets) {
             facet.appendDependencies(dependencies);
         }
@@ -450,6 +447,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         if (templateDefDescriptor != null) {
             dependencies.add(templateDefDescriptor);
         }
+
         for (DependencyDef dep : this.dependencies) {
             dep.appendDependencies(dependencies);
         }
@@ -457,7 +455,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     /**
      * This is used to validate by the compiler to validate EventDefRefs.
-     *
+     * 
      * @return all the events this component can fire, including those inherited
      * @throws QuickFixException
      */
@@ -678,14 +676,17 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 if (rendererDef != null && !rendererDef.isLocal()) {
                     json.writeMapEntry("rendererDef", rendererDef);
                 }
+
                 HelperDef helperDef = getHelperDef();
                 if (helperDef != null && !helperDef.isLocal()) {
                     json.writeMapEntry("helperDef", helperDef);
                 }
+
                 json.writeMapEntry("themeDef", getThemeDef());
                 json.writeMapEntry("controllerDef", getControllerDef());
                 json.writeMapEntry("modelDef", getModelDef());
                 json.writeMapEntry("superDef", getSuperDef());
+
                 Collection<AttributeDef> attrDefs = getAttributeDefs().values();
                 if (!attrDefs.isEmpty()) {
                     json.writeMapEntry("attributeDefs", attrDefs);
@@ -1063,9 +1064,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     /**
      * Helper routine for public call.
-     *
+     * 
      * DIE! please?
-     *
+     * 
      * @param already the set of processed descriptors.
      */
     private boolean isLocallyRenderable(Set<DefDescriptor<?>> already) throws QuickFixException {
@@ -1078,7 +1079,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         // FIXME: OMG W-1501702 really?!?!?!
         //
         // We desperately need to make this go away. It is heinousness
-        // incarnate, but the entirety of server side rendering is blocking this.
+        // incarnate, but the entirety of server side rendering is blocking
+        // this.
         //
         // Currently, the server side throws an UnsupportedOperationException,
         // so the themes (which is one part that currently breaks) never get

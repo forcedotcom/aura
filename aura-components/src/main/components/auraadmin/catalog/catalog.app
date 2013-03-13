@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application model="java://org.auraframework.components.auraadmin.CatalogModel">
+<aura:application model="java://org.auraframework.components.auraadmin.CatalogModel" preload="auraadmin">
 	<table>
 		<thead>
 			<tr>

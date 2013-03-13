@@ -37,6 +37,7 @@ import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
+import org.auraframework.system.DefFactory;
 import org.auraframework.system.Location;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -69,6 +70,7 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
             return null;
         }
         builder.setControllerClass(c);
+        // FIXME = "we need an md5";
         builder.setLocation(c.getCanonicalName(), -1);
         if (!c.isAnnotationPresent(Controller.class)) {
             throw new InvalidDefinitionException(String.format(
@@ -139,6 +141,7 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
                     String qn = "java://" + formatType(genParams[i]);
                     DefDescriptor<TypeDef> typeDefDesc = DefDescriptorImpl.getInstance(qn, TypeDef.class);
 
+                    // FIXME = "we need an md5";
                     ValueDef valueDef = new JavaValueDef(((Key) annotation).value(), typeDefDesc, new Location(
                             controllerClass.getName() + "." + name, 0));
                     params.add(valueDef);

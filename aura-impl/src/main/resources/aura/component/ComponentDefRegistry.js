@@ -27,6 +27,20 @@ ComponentDefRegistry.prototype.auraType = "ComponentDefRegistry";
 
 ComponentDefRegistry.prototype.cacheName = "componetDefRegistry.catalog";
 
+ComponentDefRegistry.prototype.isLocalStorageAvailable= (function() {
+	if (window.localStorage) {
+		// Now actually try a test write because private browsing and use of local when not authorized by the user will only fail on writes
+		try {
+			window.localStorage.setItem("test", "test");
+			window.localStorage.removeItem("test");
+			return true;
+		} catch(e) {
+		}
+	}
+	
+	return false;
+})();
+
 /**
  * Returns a ComponentDef instance from registry, or config after adding to the registry.
  * Throws an error if config is not provided.
@@ -73,7 +87,11 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
                 localStorage.clear();
                 $A.measure("Cleared localStorage (out of space) ", mark);
 
-                this.writeToCache(descriptor, config, mark);
+                try {
+                	this.writeToCache(descriptor, config, mark);
+                } catch(e2) {
+                	// Nothing we can do at this point - give up.
+                }
             }
         }
     }
@@ -85,8 +103,7 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
  * Use the local cache for the page session persistently when layouts are used.
  */
 ComponentDefRegistry.prototype.useLocalCache = function(descriptor) {
-    // DCHASMAN TODO Switch this to use a new ComponentDef cache: local attribute or something to that effect
-    return window.localStorage && descriptor.indexOf("layout://") === 0;
+    return this.isLocalStorageAvailable && descriptor.indexOf("layout://") === 0;
 };
 
 /**
@@ -94,7 +111,7 @@ ComponentDefRegistry.prototype.useLocalCache = function(descriptor) {
  * or returns null.
  */
 ComponentDefRegistry.prototype.getLocalCacheCatalog = function() {
-    if (aura.util.isUndefined(window.localStorage)) {
+    if (!this.isLocalStorageAvailable) {
         return null;
     }
 
@@ -107,7 +124,7 @@ ComponentDefRegistry.prototype.getLocalCacheCatalog = function() {
  * @param {Object} descriptor The key to look up on the localStorage.
  */
 ComponentDefRegistry.prototype.getConfigFromLocalCache = function(descriptor) {
-    if (aura.util.isUndefined(window.localStorage)) {
+    if (!this.isLocalStorageAvailable) {
         return null;
     }
 
@@ -122,15 +139,17 @@ ComponentDefRegistry.prototype.getConfigFromLocalCache = function(descriptor) {
  * @param {Object} mark
  */
 ComponentDefRegistry.prototype.writeToCache = function(descriptor, config, mark) {
-    // Update the catalog
-    var catalog = this.getLocalCacheCatalog();
-
-    catalog[descriptor] = true;
-    localStorage.setItem(this.cacheName, aura.util.json.encode(catalog));
-
-    // Write out the componentDef
-    localStorage.setItem(this.cacheName + "." + descriptor, aura.util.json.encode(config));
-
-    $A.measure("Wrote " + descriptor, mark);
+	if (this.isLocalStorageAvailable) {
+	    // Update the catalog
+	    var catalog = this.getLocalCacheCatalog();
+	
+	    catalog[descriptor] = true;
+	    localStorage.setItem(this.cacheName, aura.util.json.encode(catalog));
+	
+	    // Write out the componentDef
+	    localStorage.setItem(this.cacheName + "." + descriptor, aura.util.json.encode(config));
+	
+	    $A.measure("Wrote " + descriptor, mark);
+	}
 };
 

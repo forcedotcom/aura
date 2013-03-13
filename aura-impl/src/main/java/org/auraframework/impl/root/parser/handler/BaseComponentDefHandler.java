@@ -94,12 +94,14 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
         super();
     }
 
-    public BaseComponentDefHandler(DefDescriptor<T> componentDefDescriptor,
-            Source<?> source, XMLStreamReader xmlReader) {
+    public BaseComponentDefHandler(DefDescriptor<T> componentDefDescriptor, Source<?> source, XMLStreamReader xmlReader) {
         super(componentDefDescriptor, source, xmlReader);
         builder = createBuilder();
         builder.setLocation(getLocation());
         builder.setDescriptor(componentDefDescriptor);
+        if (source != null) {
+            builder.setOwnHash(source.getHash());
+        }
         builder.events = Maps.newHashMap();
         builder.interfaces = Sets.newLinkedHashSet();
         builder.eventHandlers = Lists.newArrayList();
@@ -114,8 +116,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
     }
 
     @Override
-    protected void handleChildTag() throws XMLStreamException,
-            QuickFixException {
+    protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
             AttributeDefImpl attributeDef = new AttributeDefHandler<T>(this,
@@ -159,8 +160,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
     }
 
     @Override
-    protected void handleChildText() throws XMLStreamException,
-            QuickFixException {
+    protected void handleChildText() throws XMLStreamException, QuickFixException {
         String text = xmlReader.getText();
         boolean skip = getWhitespaceBehavior() == WhitespaceBehavior.OPTIMIZE ? AuraTextUtil
                 .isNullEmptyOrWhitespace(text) : AuraTextUtil
@@ -388,10 +388,8 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
     protected T createDefinition() throws QuickFixException {
 
         if (!body.isEmpty()) {
-
             AttributeDefRefImpl.Builder atBuilder = new AttributeDefRefImpl.Builder();
-            atBuilder.setDescriptor(DefDescriptorImpl
-                    .getInstance(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME,
+            atBuilder.setDescriptor(DefDescriptorImpl.getInstance(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME,
                             AttributeDef.class));
             atBuilder.setLocation(getLocation());
             atBuilder.setValue(body);

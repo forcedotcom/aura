@@ -25,5 +25,6 @@ exp(clientService,
     "resetToken", clientService.resetToken,
     "hardRefresh", clientService.hardRefresh,
     "setOutdated", clientService.setOutdated,
-    "injectComponent", clientService.injectComponent
+    "injectComponent", clientService.injectComponent,
+    "isConnected", clientService.isConnected
 );

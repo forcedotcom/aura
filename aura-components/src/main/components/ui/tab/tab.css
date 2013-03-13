@@ -17,6 +17,7 @@
 	float: left;
 	list-style: none;
 	background: -webkit-linear-gradient(#fff,#eee);
+	background: -moz-linear-gradient(#fff,#eee);
 	border: 1px solid #cecece;
 	box-shadow: inset 0 1px 1px #fff;
 	border-radius: 5px 5px 0 0;
@@ -24,6 +25,7 @@
 }
 .THIS.active{
 	background: -webkit-linear-gradient(#eee,#fff);
+	background: -moz-linear-gradient(#eee,#fff);
 	border-bottom: 1px solid #fff;
 }
 

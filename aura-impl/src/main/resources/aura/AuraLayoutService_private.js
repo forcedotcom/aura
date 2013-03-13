@@ -62,7 +62,7 @@ var priv = {
         }
     },
 
-    fireLayoutChangeEvent : function(){
+    fireLayoutChangeEvent : function(pre){
         var curr = this.peek();
         var prev = this.peekLast();
         var title = this.getTitle(curr);
@@ -76,8 +76,7 @@ var priv = {
             params["prevTitle"] = this.getTitle(prev);
             params["prevLayoutName"] = prev.layout.getName();
         }
-
-        var evt = $A.get("e.aura:layoutChange");
+        var evt = pre?$A.get("e.aura:beforeLayoutChange"):$A.get("e.aura:layoutChange");
         evt.setParams(params);
         evt.fire();
 

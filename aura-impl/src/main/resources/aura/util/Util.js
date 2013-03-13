@@ -20,7 +20,7 @@
  * functions for retrieving, manipulating, or checking DOM elements.
  * @constructor
  */
-function Util(){
+$A.ns.Util = function() {
     this.trashcan = document.createDocumentFragment();
     this.trash = [];
     this.json = new Json();
@@ -33,17 +33,17 @@ function Util(){
     this["Bitset"] = Bitset;
     this.objToString = Object.prototype.toString;
     this.trashedComponentQueue = [];
-}
+};
 
 /**
  * Browser check, does the validation using the userAgent.
  */
-Util.prototype.isIE = navigator.userAgent.indexOf("MSIE") != -1;
+$A.ns.Util.prototype.isIE = navigator.userAgent.indexOf("MSIE") != -1;
 
 /**
  * evals code globally, without enclosing the current scope
  */
-Util.prototype.globalEval = Util.prototype.isIE ? function(src) {
+$A.ns.Util.prototype.globalEval = $A.ns.Util.prototype.isIE ? function(src) {
     // use assignment to variable so that the newlines in src are not actually treated as the end of the line
     return new Function("var a = " + src + "; return a;")();
 } : function(src) {
@@ -56,7 +56,7 @@ Util.prototype.globalEval = Util.prototype.isIE ? function(src) {
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is an array, or false otherwise.
  */
-Util.prototype.isArray = typeof Array.isArray === "function" ? Array.isArray : function(obj) {
+$A.ns.Util.prototype.isArray = typeof Array.isArray === "function" ? Array.isArray : function(obj) {
     return !!obj && this.objToString.apply(obj) === '[object Array]';
 };
 
@@ -67,7 +67,7 @@ Util.prototype.isArray = typeof Array.isArray === "function" ? Array.isArray : f
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is a valid object, or false otherwise.
  */
-Util.prototype.isObject = function(obj){
+$A.ns.Util.prototype.isObject = function(obj){
     return typeof obj === "object" && obj !== null && !this.isArray(obj);
 };
 
@@ -78,7 +78,7 @@ Util.prototype.isObject = function(obj){
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is a valid error, or false otherwise.
  */
-Util.prototype.isError = function(obj){
+$A.ns.Util.prototype.isError = function(obj){
     return !!obj && this.objToString.apply(obj) === '[object Error]';
 };
 
@@ -89,7 +89,7 @@ Util.prototype.isError = function(obj){
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is a valid function, or false otherwise.
  */
-Util.prototype.isFunction = function(obj){
+$A.ns.Util.prototype.isFunction = function(obj){
     return !!obj && this.objToString.apply(obj) === '[object Function]';
 };
 
@@ -98,7 +98,7 @@ Util.prototype.isFunction = function(obj){
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is of type string, or false otherwise.
  */
-Util.prototype.isString = function(obj){
+$A.ns.Util.prototype.isString = function(obj){
     return typeof obj === 'string';
 };
 
@@ -107,7 +107,7 @@ Util.prototype.isString = function(obj){
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is of type number, or false otherwise.
  */
-Util.prototype.isNumber = function(obj){
+$A.ns.Util.prototype.isNumber = function(obj){
     return typeof obj === 'number';
 };
 
@@ -116,7 +116,7 @@ Util.prototype.isNumber = function(obj){
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is of type boolean, or false otherwise.
  */
-Util.prototype.isBoolean = function(obj){
+$A.ns.Util.prototype.isBoolean = function(obj){
     return typeof obj === 'boolean';
 };
 
@@ -125,7 +125,7 @@ Util.prototype.isBoolean = function(obj){
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object type is undefined, or false otherwise.
  */
-Util.prototype.isUndefined = function(obj){
+$A.ns.Util.prototype.isUndefined = function(obj){
     return obj === undefined;
 };
 
@@ -134,7 +134,7 @@ Util.prototype.isUndefined = function(obj){
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object type is undefined or null, or return false otherwise.
  */
-Util.prototype.isUndefinedOrNull = function(obj){
+$A.ns.Util.prototype.isUndefinedOrNull = function(obj){
     return obj === undefined || obj === null;
 };
 
@@ -145,7 +145,7 @@ Util.prototype.isUndefinedOrNull = function(obj){
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is empty, or false otherwise.
  */
-Util.prototype.isEmpty = function(obj){
+$A.ns.Util.prototype.isEmpty = function(obj){
     return this.isUndefinedOrNull(obj) || (this.isArray(obj) && obj.length === 0) || obj === '';
 };
 
@@ -154,7 +154,7 @@ Util.prototype.isEmpty = function(obj){
  * @param {String} id The corresponding id of the DOM element.
  * @returns {Object} The element with the matching id, or null if none is found.
  */
-Util.prototype.getElement = function(id){
+$A.ns.Util.prototype.getElement = function(id){
     return document.getElementById(id);
 };
 
@@ -165,7 +165,7 @@ Util.prototype.getElement = function(id){
  * @param {String} clz The CSS class name to check for.
  * @returns {Boolean} True if the specified class is found for the element, or false otherwise.
  */
-Util.prototype.hasClass = function(element, clz){
+$A.ns.Util.prototype.hasClass = function(element, clz){
     if(element){
         var cn = element["className"] || '';
         var split = cn.split(' ');
@@ -184,7 +184,7 @@ Util.prototype.hasClass = function(element, clz){
  * @param {String} clz The CSS class to be applied on the element.
  *
  */
-Util.prototype.addClass = function(element, clz){
+$A.ns.Util.prototype.addClass = function(element, clz){
     if(element && element.tagName){
         if (clz) {
             clz = this.trim(clz);
@@ -208,7 +208,7 @@ Util.prototype.addClass = function(element, clz){
  * @param {Object} element The element to remove the class from.
  * @param {String} clz The CSS class to be removed from the element.
  */
-Util.prototype.removeClass = function(element, clz){
+$A.ns.Util.prototype.removeClass = function(element, clz){
     if(!element){
         return;
     }
@@ -234,7 +234,7 @@ Util.prototype.removeClass = function(element, clz){
  * @param {Object} element The element to add or remove the class from.
  * @param {String} clz The CSS class to be added or removed from the class.
  */
-Util.prototype.toggleClass = function(element, clz){
+$A.ns.Util.prototype.toggleClass = function(element, clz){
     if(this.hasClass(element, clz)){
         this.removeClass(element, clz);
         return false;
@@ -250,7 +250,7 @@ Util.prototype.toggleClass = function(element, clz){
  * @param {String} clz1 The class to remove from the element.
  * @param {String} clz2 The class to add to the element.
  */
-Util.prototype.swapClass = function(element, clz1, clz2){
+$A.ns.Util.prototype.swapClass = function(element, clz1, clz2){
     clz1 = this.isArray(clz1)?clz1:[clz1];
     clz2 = this.isArray(clz2)?clz2:[clz2];
     for(var i=0;i<clz1.length;i++){
@@ -266,7 +266,7 @@ Util.prototype.swapClass = function(element, clz1, clz2){
  * @param {Object} parent The parent element
  * @param {Array|Object} child The child element to insert as the first child in the parent element.
  */
-Util.prototype.insertFirst = function(parent, child){
+$A.ns.Util.prototype.insertFirst = function(parent, child){
     if (this.isArray(child)) {
         for (var i = child.length - 1; i >= 0; i--) {
             this.insertFirst(parent, child[i]);
@@ -289,7 +289,7 @@ Util.prototype.insertFirst = function(parent, child){
  * @param {Object} referenceE1 The reference element
  * @returns {Object} The element that was inserted.
  */
-Util.prototype.insertBefore = function(newEl, referenceEl) {
+$A.ns.Util.prototype.insertBefore = function(newEl, referenceEl) {
     if (this.isArray(newEl)) {
         var frag = document.createDocumentFragment();
         this.appendChild(newEl, frag);
@@ -310,7 +310,7 @@ Util.prototype.insertBefore = function(newEl, referenceEl) {
  * @param {Object} referenceE1 The reference element
  * @returns {Object} The element that was inserted.
  */
-Util.prototype.insertAfter = function(newEl, referenceEl) {
+$A.ns.Util.prototype.insertAfter = function(newEl, referenceEl) {
     if (this.isArray(newEl)) {
         var frag = document.createDocumentFragment();
         this.appendChild(newEl, frag);
@@ -337,7 +337,7 @@ Util.prototype.insertAfter = function(newEl, referenceEl) {
  * @param {Object} referenceE1 The existing element
  * @returns {Object} The new element that was added
  */
-Util.prototype.appendChild = function(newEl, referenceEl) {
+$A.ns.Util.prototype.appendChild = function(newEl, referenceEl) {
     if (referenceEl.canHaveChildren===false){
         return;
     }
@@ -367,7 +367,7 @@ Util.prototype.appendChild = function(newEl, referenceEl) {
  *
  * @param {Object} element The element to be removed.
  */
-Util.prototype.removeElement = function(element) {
+$A.ns.Util.prototype.removeElement = function(element) {
     if (element && !(element.parentNode === this.trashcan)) {
         if (element.parentNode) {
             //
@@ -385,11 +385,11 @@ Util.prototype.removeElement = function(element) {
             // the property should never live longer than the delay between this
             // reparenting and the gc below.
             //
-        	if (element.nodeType !== 3) {
-	            aura.assert(this.isUndefined(element["aura_deleted"]), "Element was reused after delete");
-	            element["aura_deleted"] = true;
-        	}
-        	
+            if (element.nodeType !== 3 && element.nodeType !== 8) {
+                $A.assert(this.isUndefined(element["aura_deleted"]), "Element was reused after delete");
+                element["aura_deleted"] = true;
+            }
+
             this.trashcan.appendChild(element);
         } else{
             this.trash.push(element);
@@ -399,13 +399,18 @@ Util.prototype.removeElement = function(element) {
             this.gcPending = true;
             var that = this;
             setTimeout(function() {
-            	$A.mark("Util.removeElement");
                 var trashcan = that.trashcan;
                 while (trashcan.hasChildNodes()) {
                     var node = trashcan.lastChild;
                     
-                    if (node.nodeType !== 3) {
-                    	delete node["aura_deleted"];
+                    if (node.nodeType !== 3 && node.nodeType !== 8) {
+                    	try{
+                    		delete node["aura_deleted"];
+                    	}
+                    	catch(e){
+                    		//IE7 having issue with delete
+                    		node.removeAttribute("aura_deleted");
+                    	}
                     }
                     
                     trashcan.removeChild(node);
@@ -416,7 +421,6 @@ Util.prototype.removeElement = function(element) {
                 }
                 
                 that.trash = [];
-                $A.measure("Finished emptying element trashcan.", "Util.removeElement");
                 that.gcPending = false;
             }, 1000);
         }
@@ -428,7 +432,7 @@ Util.prototype.removeElement = function(element) {
  * @param {String} url The URL string to be decoded.
  * @returns {Object} The decoded URL.
  */
-Util.prototype.urlDecode = function(url){
+$A.ns.Util.prototype.urlDecode = function(url){
     var ret = {};
     var pairs = url.split("&");
     for (var i = 0; i < pairs.length; i++) {
@@ -443,7 +447,7 @@ Util.prototype.urlDecode = function(url){
  * @param {String} st The string to be trimmed.
  * @returns {String}
  */
-Util.prototype.trim = function(st){
+$A.ns.Util.prototype.trim = function(st){
     return (st || "").replace(/^\s+|\s+$/g, '');
 };
 
@@ -455,7 +459,7 @@ Util.prototype.trim = function(st){
  * @param {Boolean} truncateByWord If set to true, checks that no truncation occurs in the middle of a word.
  * @returns {String} The truncated string.
  */
-Util.prototype.truncate = function(st, len, ellipsis, truncateByWord){
+$A.ns.Util.prototype.truncate = function(st, len, ellipsis, truncateByWord){
     ellipsis = !!ellipsis;
     truncateByWord = !!truncateByWord;
 
@@ -502,7 +506,7 @@ Util.prototype.truncate = function(st, len, ellipsis, truncateByWord){
  * @returns {Function} The function to invoke in order to trigger a start/reset
  *          of the tolerance period.
  */
-Util.prototype.createTimeoutCallback = function(callback, toleranceMillis) {
+$A.ns.Util.prototype.createTimeoutCallback = function(callback, toleranceMillis) {
     $A.assert(!$A.util.isUndefinedOrNull(callback) && $A.util.isFunction(callback), "Invalid callback");
     $A.assert(toleranceMillis > 0, "Must use a positive tolerance period.");
     
@@ -554,7 +558,7 @@ Util.prototype.createTimeoutCallback = function(callback, toleranceMillis) {
  * @param {Integer} timeout Optional timeout (in milliseconds) that will delay the handler execution.
  * @returns {Object} Either a function (success) or null (fail)
  */
-Util.prototype.on = (function() {
+$A.ns.Util.prototype.on = (function() {
     if (window["addEventListener"]) {
         return function(element, eventName, handler, useCapture, timeout) {
             if (timeout) {
@@ -623,7 +627,7 @@ Util.prototype.removeOn = function(element, eventName, listener, useCapture) {
  * @param {Object} form
  * @returns {Object} The map containing the values from the form input.
  */
-Util.prototype.formToMap = function(form) {
+$A.ns.Util.prototype.formToMap = function(form) {
     var map = {};
 
     for (var i=0; i<form.length; i++) {
@@ -667,7 +671,7 @@ Util.prototype.formToMap = function(form) {
  * @param {Object} select
  * @returns {Object} A list of selected options.
  */
-Util.prototype.getSelectValue = function(select) {
+$A.ns.Util.prototype.getSelectValue = function(select) {
 
     if (select.options.length === 0) {
         return null;
@@ -697,7 +701,7 @@ Util.prototype.getSelectValue = function(select) {
  * @param {String} key The data key whose value is to be added to the input map.
  * @param {Object} value The value of the data to add to the input map.
  */
-Util.prototype.addValueToMap = function(inputMap, key, value) {
+$A.ns.Util.prototype.addValueToMap = function(inputMap, key, value) {
 
     if (key.indexOf(".") > 0) {
         var inputName = key.substring(0, key.indexOf("."));
@@ -737,7 +741,7 @@ Util.prototype.addValueToMap = function(inputMap, key, value) {
  * @param {String} subMapKey
  */
 
-Util.prototype.addMapValueToMap = function(inputMap, key, value, subMapKey) {
+$A.ns.Util.prototype.addMapValueToMap = function(inputMap, key, value, subMapKey) {
     var subMap = inputMap[key];
     if (!subMap) {
         subMap = {};
@@ -746,7 +750,7 @@ Util.prototype.addMapValueToMap = function(inputMap, key, value, subMapKey) {
     subMap[subMapKey] = value;
 };
 
-Util.prototype.isSubDef = function(def, qname) {
+$A.ns.Util.prototype.isSubDef = function(def, qname) {
     while (def) {
         if (def.getDescriptor().getQualifiedName() === qname) {
             return true;
@@ -773,7 +777,7 @@ Util.prototype.isSubDef = function(def, qname) {
  * @param {Object|Function} members The methods and properties to assign to the baseObject.
  * @param {Boolean} [forceCopy] If the property already exists, should we still copy the member? false by default
  */
-Util.prototype.apply = function(/* Object|Function */ baseObject, /* Object|Function*/ members, /* bool */ forceCopy) {
+$A.ns.Util.prototype.apply = function(/* Object|Function */ baseObject, /* Object|Function*/ members, /* bool */ forceCopy) {
     // Probably cheaper to have two loops with only one getting run then doing the if check each time.
     var prop;
     if(forceCopy) {
@@ -796,9 +800,9 @@ Util.prototype.apply = function(/* Object|Function */ baseObject, /* Object|Func
  * @returns {String} The string containing hyphens that replaces the camelCase.
  */
 
-Util.prototype.CAMEL_CASE_TO_HYPHENS_REGEX = /([A-Z])/g;
+$A.ns.Util.prototype.CAMEL_CASE_TO_HYPHENS_REGEX = /([A-Z])/g;
 
-Util.prototype.camelCaseToHyphens = function(str) {
+$A.ns.Util.prototype.camelCaseToHyphens = function(str) {
     return str.replace(this.CAMEL_CASE_TO_HYPHENS_REGEX, "-$1").toLowerCase();
 };
 
@@ -807,7 +811,7 @@ Util.prototype.camelCaseToHyphens = function(str) {
  * @param {String} str The string to be converted.
  * @returns {String} The string in camelCase.
  */
-Util.prototype.hyphensToCamelCase = function(str) {
+$A.ns.Util.prototype.hyphensToCamelCase = function(str) {
     function hyphensToCamelCaseHelper(s, group) {
         return group.toUpperCase();
     }
@@ -820,7 +824,7 @@ Util.prototype.hyphensToCamelCase = function(str) {
  * @description
  * A map of nodeNames that cannot accept custom data attributes.
  */
-Util.prototype.noData = {
+$A.ns.Util.prototype.noData = {
     "embed": true,
     "object": "clsid:D27CDB6E-AE6D-11cf-96B8-444553540000", // flash
     "applet": true,
@@ -833,7 +837,7 @@ Util.prototype.noData = {
  * @param {HTMLElement} element The element to check for custom data attribute support.
  * @returns {Boolean} Whether element accepts custom data attributes.
  */
-Util.prototype.acceptsData = function(element) {
+$A.ns.Util.prototype.acceptsData = function(element) {
     if (!this.isElement(element)) {
         return false;
     }
@@ -856,7 +860,7 @@ Util.prototype.acceptsData = function(element) {
  * @param {HTMLElement} element The element from which to retrieve data.
  * @param {String} key The data key to look up on element.
  */
-Util.prototype.getDataAttribute = function(element, key) {
+$A.ns.Util.prototype.getDataAttribute = function(element, key) {
     if (!this.acceptsData(element) || this.isUndefined(key)) {
         return null;
     }
@@ -874,7 +878,7 @@ Util.prototype.getDataAttribute = function(element, key) {
  * @param {String} key The data key to add to element.
  * @param {String} value The value of the data to add to an element. If value is undefined, the key data attribute will be removed from element.
  */
-Util.prototype.setDataAttribute = function(element, key, value) {
+$A.ns.Util.prototype.setDataAttribute = function(element, key, value) {
     if (!this.acceptsData(element) || this.isUndefined(key)) {
         return null;
     }
@@ -883,9 +887,9 @@ Util.prototype.setDataAttribute = function(element, key, value) {
 
     if (!this.isUndefined(value)) {
         return element.setAttribute(key, value);
-    } else {
-        return element.removeAttribute(key);
     }
+    return element.removeAttribute(key);
+
 };
 
 /**
@@ -894,7 +898,7 @@ Util.prototype.setDataAttribute = function(element, key, value) {
  * @param {String} key The data key to look up on element.
  * @returns {Boolean}
  */
-Util.prototype.hasDataAttribute = function(element, key) {
+$A.ns.Util.prototype.hasDataAttribute = function(element, key) {
     return !this.isUndefinedOrNull(this.getDataAttribute(element, key));
 };
 
@@ -903,7 +907,7 @@ Util.prototype.hasDataAttribute = function(element, key) {
  * @param {Object} obj
  * @returns {Boolean} True if the object is an HTMLElement object, or false otherwise.
  */
-Util.prototype.isElement = function(obj) {
+$A.ns.Util.prototype.isElement = function(obj) {
     if (typeof HTMLElement === "object") {
         return obj instanceof HTMLElement;
     } else {
@@ -921,7 +925,7 @@ Util.prototype.isElement = function(obj) {
  */
 if (!!Array.prototype.indexOf) {
     // If we have a native indexOf, then use that.
-    Util.prototype.arrayIndexOf = function(array, searchElement /*, fromIndex */) {
+	$A.ns.Util.prototype.arrayIndexOf = function(array, searchElement /*, fromIndex */) {
         // Grab the relevant arguments.
         var args = Array.prototype.slice.apply(arguments, [1]);
         return Array.prototype.indexOf.apply(array, args);
@@ -938,7 +942,7 @@ if (!!Array.prototype.indexOf) {
      * @param {Object}
      *            searchElement The element to locate in the array.
      */
-    Util.prototype.arrayIndexOf = function(array, searchElement /*, fromIndex */) {
+	$A.ns.Util.prototype.arrayIndexOf = function(array, searchElement /*, fromIndex */) {
         /*jslint bitwise: false */
         "use strict";
         if (array === null) {
@@ -983,7 +987,7 @@ if (!!Array.prototype.indexOf) {
  * Schedules the specified component to be asynchronously destroyed.
  * @param {cmp} element The component to be destroyed.
  */
-Util.prototype.destroyAsync = function(cmp) {
+$A.ns.Util.prototype.destroyAsync = function(cmp) {
     this.trashedComponentQueue.push(cmp);
 
     if (!this.componentGCPending) {
@@ -1005,7 +1009,7 @@ Util.prototype.destroyAsync = function(cmp) {
  * Destroys any components currently in the trashcan.
  * @private
  */
-Util.prototype.emptyComponentTrash = function() {
+$A.ns.Util.prototype.emptyComponentTrash = function() {
     var length = this.trashedComponentQueue.length;
     if (length > 0) {
         var reaped = [];

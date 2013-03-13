@@ -46,218 +46,204 @@ import com.google.common.collect.ImmutableMap.Builder;
  * @param <D>
  *            the type of Definition being modified in the registry
  */
-public abstract class JavascriptMockHandler<D extends Definition> extends
-		JavascriptHandler<DefDescriptor<TestSuiteDef>, D> {
-	private final Map<String, Object> sourceMap;
-	private final DefDescriptor<? extends BaseComponentDef> compDesc;
+public abstract class JavascriptMockHandler<D extends Definition> extends JavascriptHandler<TestSuiteDef, D> {
+    private final Map<String, Object> sourceMap;
+    private final DefDescriptor<? extends BaseComponentDef> compDesc;
 
-	protected JavascriptMockHandler(DefDescriptor<TestSuiteDef> descriptor,
-			Source<?> source,
-			DefDescriptor<? extends BaseComponentDef> targetDescriptor,
-			Map<String, Object> map) {
-		super(descriptor, source);
-		this.sourceMap = map;
-		this.compDesc = targetDescriptor;
-	}
+    protected JavascriptMockHandler(DefDescriptor<TestSuiteDef> descriptor, Source<?> source,
+            DefDescriptor<? extends BaseComponentDef> targetDescriptor, Map<String, Object> map) {
+        super(descriptor, source);
+        this.sourceMap = map;
+        this.compDesc = targetDescriptor;
+    }
 
-	protected DefDescriptor<? extends BaseComponentDef> getTargetDescriptor() {
-		return compDesc;
-	}
+    protected DefDescriptor<? extends BaseComponentDef> getTargetDescriptor() {
+        return compDesc;
+    }
 
-	@Override
-	public D getDefinition() throws QuickFixException {
-		return createDefinition(sourceMap);
-	}
+    @Override
+    public D getDefinition() throws QuickFixException {
+        return createDefinition(sourceMap);
+    }
 
-	/**
-	 * Mocks will have handlers to parse their respective mock objects.
-	 */
-	@Override
-	protected abstract D createDefinition(Map<String, Object> map)
-			throws QuickFixException;
+    /**
+     * Mocks will have handlers to parse their respective mock objects.
+     */
+    @Override
+    protected abstract D createDefinition(Map<String, Object> map) throws QuickFixException;
 
-	/**
-	 * 
-	 * @param descStr
-	 * @param defClass
-	 * @return
-	 * @throws DefinitionNotFoundException
-	 * @throws QuickFixException
-	 */
-	protected D getBaseDefinition(String descStr, Class<D> defClass)
-			throws DefinitionNotFoundException, QuickFixException {
-		if (descStr != null) {
-			return Aura.getDefinitionService().getDefinition(descStr, defClass);
-		}
-		return getDefaultBaseDefinition();
-	}
+    /**
+     * 
+     * @param descStr
+     * @param defClass
+     * @return
+     * @throws DefinitionNotFoundException
+     * @throws QuickFixException
+     */
+    protected D getBaseDefinition(String descStr, Class<D> defClass)
+            throws DefinitionNotFoundException, QuickFixException {
+        if (descStr != null) {
+            return Aura.getDefinitionService().getDefinition(descStr, defClass);
+        }
+        return getDefaultBaseDefinition();
+    }
 
-	protected abstract D getDefaultBaseDefinition() throws QuickFixException;
+    protected abstract D getDefaultBaseDefinition() throws QuickFixException;
 
-	protected <T extends Definition> DefDescriptor<T> getDescriptor(
-			String descStr, Class<T> defClass) {
-		if (descStr != null) {
-			return Aura.getDefinitionService().getDefDescriptor(descStr,
-					defClass);
-		}
-		return null;
-	}
+    protected <T extends Definition> DefDescriptor<T> getDescriptor(String descStr, Class<T> defClass) {
+        if (descStr != null) {
+            return Aura.getDefinitionService().getDefDescriptor(descStr, defClass);
+        }
+        return null;
+    }
 
-	/**
-	 * Read a single or list of Stubs
-	 * 
-	 * @param object
-	 *            the parsed json representation
-	 * @return a list of Stubs
-	 * @throws QuickFixException
-	 */
-	protected List<Stub<?>> getStubs(Object object) throws QuickFixException {
-		List<Stub<?>> stubs = Lists.newLinkedList();
-		if (!(object instanceof List)) {
-			object = Lists.newArrayList(object);
-		}
-		for (Object item : (List<?>) object) {
-			Stub<?> answer = getStub(item);
-			if (answer != null) {
-				stubs.add(answer);
-			}
-		}
-		return stubs;
-	}
+    /**
+     * Read a single or list of Stubs
+     * 
+     * @param object
+     *            the parsed json representation
+     * @return a list of Stubs
+     * @throws QuickFixException
+     */
+    protected List<Stub<?>> getStubs(Object object) throws QuickFixException {
+        List<Stub<?>> stubs = Lists.newLinkedList();
+        if (!(object instanceof List)) {
+            object = Lists.newArrayList(object);
+        }
+        for (Object item : (List<?>) object) {
+            Stub<?> answer = getStub(item);
+            if (answer != null) {
+                stubs.add(answer);
+            }
+        }
+        return stubs;
+    }
 
-	/**
-	 * Read a Stub that has an optional Invocation definition, "method"; and a list
-	 * of Answers, "answers".
-	 * @param <T>
-	 * 
-	 * @param object
-	 *            the parsed json representation
-	 * @return a Stub object
-	 * @throws QuickFixException
-	 */
-	protected Stub<?> getStub(Object object) throws QuickFixException {
-		if (object instanceof Map) {
-			Invocation invocation = getInvocation(((Map<?, ?>) object)
-					.get("method"));
-			@SuppressWarnings("rawtypes")
-			Class retType = invocation.getReturnType();
-			@SuppressWarnings("unchecked")
-			List<Answer<Object>> answers = getAnswers(((Map<?, ?>) object)
-					.get("answers"), retType);
-			return new Stub<Object>(invocation, answers);
-		}
-		return null;
-	}
+    /**
+     * Read a Stub that has an optional Invocation definition, "method"; and a list
+     * of Answers, "answers".
+     * 
+     * @param <T>
+     * 
+     * @param object
+     *            the parsed json representation
+     * @return a Stub object
+     * @throws QuickFixException
+     */
+    protected Stub<?> getStub(Object object) throws QuickFixException {
+        if (object instanceof Map) {
+            Invocation invocation = getInvocation(((Map<?, ?>) object).get("method"));
+            @SuppressWarnings("rawtypes")
+            Class retType = invocation.getReturnType();
+            @SuppressWarnings("unchecked")
+            List<Answer<Object>> answers = getAnswers(((Map<?, ?>) object).get("answers"), retType);
+            return new Stub<Object>(invocation, answers);
+        }
+        return null;
+    }
 
-	protected abstract Invocation getDefaultInvocation()
-			throws QuickFixException;
+    protected abstract Invocation getDefaultInvocation() throws QuickFixException;
 
-	/**
-	 * Read an Invocation, which must have a "name" and, optionally,
-	 * a "params" list of the input parameters to the method.
-	 * 
-	 * @param object
-	 *            the parsed json representation
-	 * @return an Invocation object
-	 * @throws QuickFixException
-	 */
-	protected Invocation getInvocation(Object object) throws QuickFixException {
-		if (object == null) {
-			return getDefaultInvocation();
-		} else if (object instanceof Map) {
-			Map<?, ?> methodMap = (Map<?, ?>) object;
-			String name = (String) methodMap.get("name");
-			if (name == null) {
-				throw new InvalidDefinitionException(
-						"A mock's stubbed method must specify 'name'",
-						getLocation());
-			}
-			List<?> params = (List<?>) methodMap.get("params");
-			String typeStr = (String) methodMap.get("type");
-			Class<?> type = Object.class;
-			if (typeStr != null) {
-				try {
-					type = classForSimpleName(typeStr);
-				} catch (ClassNotFoundException e) {
-				}
-			}
-			return new Invocation(name, params, type);
-		}
-		return null;
-	}
+    /**
+     * Read an Invocation, which must have a "name" and, optionally,
+     * a "params" list of the input parameters to the method.
+     * 
+     * @param object
+     *            the parsed json representation
+     * @return an Invocation object
+     * @throws QuickFixException
+     */
+    protected Invocation getInvocation(Object object) throws QuickFixException {
+        if (object == null) {
+            return getDefaultInvocation();
+        } else if (object instanceof Map) {
+            Map<?, ?> methodMap = (Map<?, ?>) object;
+            String name = (String) methodMap.get("name");
+            if (name == null) {
+                throw new InvalidDefinitionException("A mock's stubbed method must specify 'name'", getLocation());
+            }
+            List<?> params = (List<?>) methodMap.get("params");
+            String typeStr = (String) methodMap.get("type");
+            Class<?> type = Object.class;
+            if (typeStr != null) {
+                try {
+                    type = classForSimpleName(typeStr);
+                } catch (ClassNotFoundException e) {
+                }
+            }
+            return new Invocation(name, params, type);
+        }
+        return null;
+    }
 
-	/**
-	 * Read a single or list of answers
-	 * 
-	 * @param object
-	 *            the parsed json representation
-	 * @param retClass
-	 * 			  the expected type from the Answers
-	 * @return a list of Answers
-	 * @throws QuickFixException
-	 */
-	protected <T> List<Answer<T>> getAnswers(Object object, Class<T> retClass)
-			throws QuickFixException {
-		List<Answer<T>> answers = Lists.newLinkedList();
-		if (!(object instanceof List)) {
-			object = Lists.newArrayList(object);
-		}
-		for (Object item : (List<?>) object) {
-			Answer<T> answer = getAnswer(item, retClass);
-			if (answer != null) {
-				answers.add(answer);
-			}
-		}
-		return answers;
-	}
+    /**
+     * Read a single or list of answers
+     * 
+     * @param object
+     *            the parsed json representation
+     * @param retClass
+     *            the expected type from the Answers
+     * @return a list of Answers
+     * @throws QuickFixException
+     */
+    protected <T> List<Answer<T>> getAnswers(Object object, Class<T> retClass) throws QuickFixException {
+        List<Answer<T>> answers = Lists.newLinkedList();
+        if (!(object instanceof List)) {
+            object = Lists.newArrayList(object);
+        }
+        for (Object item : (List<?>) object) {
+            Answer<T> answer = getAnswer(item, retClass);
+            if (answer != null) {
+                answers.add(answer);
+            }
+        }
+        return answers;
+    }
 
-	/**
-	 * Read an Answer, which must have either a 'value' or 'error',
-	 * corresponding to Returns or ThrowsExceptionClass instances.
-	 * 
-	 * @param object
-	 *            the parsed json representation
-	 * @param retClass
-	 * 			  the expected type from the Answer
-	 * @return an Answer object
-	 * @throws QuickFixException
-	 */
-	protected <T> Answer<T> getAnswer(Object object, Class<T> retClass) throws QuickFixException {
-		if (object instanceof Map) {
-			Map<?, ?> map = (Map<?, ?>) object;
-			T value = getValue(map.get("value"), retClass);
-			String error = (String) map.get("error");
-			if (value != null) {
-				if (error == null) {
-					return new Returns<T>(value);
-				}
-			} else {
-				if (error != null) {
-					return new ThrowsExceptionClass<T>(error);
-				}
-			}
-		}
-		throw new InvalidDefinitionException(
-				"Mock answer must specify either 'value' or 'error'",
-				getLocation());
-	}
+    /**
+     * Read an Answer, which must have either a 'value' or 'error',
+     * corresponding to Returns or ThrowsExceptionClass instances.
+     * 
+     * @param object
+     *            the parsed json representation
+     * @param retClass
+     *            the expected type from the Answer
+     * @return an Answer object
+     * @throws QuickFixException
+     */
+    protected <T> Answer<T> getAnswer(Object object, Class<T> retClass) throws QuickFixException {
+        if (object instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) object;
+            T value = getValue(map.get("value"), retClass);
+            String error = (String) map.get("error");
+            if (value != null) {
+                if (error == null) {
+                    return new Returns<T>(value);
+                }
+            } else {
+                if (error != null) {
+                    return new ThrowsExceptionClass<T>(error);
+                }
+            }
+        }
+        throw new InvalidDefinitionException("Mock answer must specify either 'value' or 'error'", getLocation());
+    }
 
-	
-	/**
-	 * Read a value. Usually, this will be returned by an Answer and/or may
-	 * contain nested Answers.
-	 * 
-	 * @param object
-	 *            the parsed json representation
-	 * @param retClass
-	 *            the expected type of the value
-	 * @return the value
-	 * @throws QuickFixException
-	 */
-	@SuppressWarnings("unchecked")
-	protected <T> T getValue(Object object, Class<T> retClass) throws QuickFixException {
-		return (T) object;
-	}
+    /**
+     * Read a value. Usually, this will be returned by an Answer and/or may
+     * contain nested Answers.
+     * 
+     * @param object
+     *            the parsed json representation
+     * @param retClass
+     *            the expected type of the value
+     * @return the value
+     * @throws QuickFixException
+     */
+    @SuppressWarnings("unchecked")
+    protected <T> T getValue(Object object, Class<T> retClass) throws QuickFixException {
+        return (T) object;
+    }
 
     /**
      * Gets the Class from a simple name representation. Classes from the java.lang package may omit the package name.
@@ -296,48 +282,48 @@ public abstract class JavascriptMockHandler<D extends Definition> extends
         }
         primitiveMap = builder.build();
     }
-	
-	/**
-	 * An Answer that just returns a value.
-	 */
-	public class Returns<T> implements Answer<T> {
-		private T value;
 
-		public Returns(T value) {
-			this.value = value;
-		}
+    /**
+     * An Answer that just returns a value.
+     */
+    public class Returns<T> implements Answer<T> {
+        private T value;
 
-		@Override
-		public T answer() throws Throwable {
-			return value;
-		}
-	}
+        public Returns(T value) {
+            this.value = value;
+        }
 
-	/**
-	 * An Answer that throws a Throwable.
-	 */
-	public class ThrowsExceptionClass<T> implements Answer<T> {
-		private Class<? extends Throwable> toThrow;
+        @Override
+        public T answer() throws Throwable {
+            return value;
+        }
+    }
 
-		public ThrowsExceptionClass(String className) {
-			try {
-				this.toThrow = Class.forName(className).asSubclass(
-						Throwable.class);
-			} catch (ClassNotFoundException e) {
-				throw new AuraRuntimeException(e);
-			}
-		}
+    /**
+     * An Answer that throws a Throwable.
+     */
+    public class ThrowsExceptionClass<T> implements Answer<T> {
+        private Class<? extends Throwable> toThrow;
 
-		@Override
-		public T answer() throws Throwable {
-			// try to instantiate the class with no args, or with a string
-			Throwable t;
-			try {
-				t = toThrow.newInstance();
-			} catch (Exception e) {
-				t = toThrow.getConstructor(String.class).newInstance("MOCKED");
-			}
-			throw t;
-		}
-	}
+        public ThrowsExceptionClass(String className) {
+            try {
+                this.toThrow = Class.forName(className).asSubclass(
+                        Throwable.class);
+            } catch (ClassNotFoundException e) {
+                throw new AuraRuntimeException(e);
+            }
+        }
+
+        @Override
+        public T answer() throws Throwable {
+            // try to instantiate the class with no args, or with a string
+            Throwable t;
+            try {
+                t = toThrow.newInstance();
+            } catch (Exception e) {
+                t = toThrow.getConstructor(String.class).newInstance("MOCKED");
+            }
+            throw t;
+        }
+    }
 }

@@ -19,10 +19,6 @@
 	},
 	
 	init : function(cmp) {
-		if (this.getStorage(cmp)) {
-			return;
-		}
-
 		var debugLoggingEnabled = cmp.getValue("v.debugLoggingEnabled")
 				.getBooleanValue();
 

@@ -192,16 +192,25 @@
 
     domEventHandler : function (event) {
         var eventName = "on" + event.type;
-        if (eventName === "ontouchend") {
-            // Map from touch event to onclick
-            eventName = "onclick";
-        }
-
         var element = event.currentTarget;
         var ownerComponent = $A.componentService.getRenderingComponentForElement(element);
         var attributes = ownerComponent.getAttributes();
         var valueProvider = attributes.getValueProvider();
-        var valueExpression = attributes.getValue("HTMLAttributes").getValue(eventName);
+        
+        var htmlAttributes = attributes.getValue("HTMLAttributes");
+        var valueExpression = htmlAttributes.getValue(eventName);
+        
+        if (eventName === "ontouchend") {
+        	// Validate that either onclick or ontouchend is wired up to an action never both simultaneously
+            var onclickExpression = htmlAttributes.getValue("onclick");
+            if (onclickExpression.isDefined()) {
+            	if (!valueExpression.isDefined()) {
+    	            // Map from touch event to onclick
+                	valueExpression = onclickExpression;
+    	            eventName = "onclick";
+            	}
+            }
+        }
 
         $A.services.event.startFiring(eventName);
 
@@ -289,12 +298,18 @@
             } else if (name.toLowerCase() === "role" || name.lastIndexOf("aria-", 0) === 0) {
                 // use setAttribute to render accessibility attributes to markup
                 ret.setAttribute(name, value);
-            } else if (aura.util.arrayIndexOf(this.SPECIAL_BOOLEANS,name.toLowerCase()) > -1) {
+            } else if (aura.util.arrayIndexOf(this.SPECIAL_BOOLEANS, name.toLowerCase()) > -1) {
                 // handle the boolean attributes for whom presence implies truth
+            	var casedName = this.caseAttribute(name);
                 if (value === false) {
-                    ret.removeAttribute(this.caseAttribute(name));
+                    ret.removeAttribute(casedName);
                 } else {
-                    ret.setAttribute(this.caseAttribute(name), name);
+                    ret.setAttribute(casedName, name);
+                    
+                    // Support for IE's weird handling of checked
+                    if (casedName === "checked"){
+                    	ret.setAttribute("defaultChecked", true);
+                	}
                 }
             } else {
                 // as long as we have a valid value at this point, set

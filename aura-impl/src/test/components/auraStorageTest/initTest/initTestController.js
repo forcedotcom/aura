@@ -63,5 +63,5 @@
             component.getValue("v.actionStatus").setValue(action.getState());
         });
         a.runAfter(a);
-    },
+    }
 })

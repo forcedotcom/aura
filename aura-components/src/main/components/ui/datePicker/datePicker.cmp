@@ -1,0 +1,47 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" implements="ui:visible" model="java://org.auraframework.component.ui.DatePickerModel" description="A date picker that is used within ui:inputDate.">
+    <aura:attribute name="value" type="Date" description="A date corresponding to a calendar day in the format yyyy-mm-dd."/>
+    <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if the date picker is displayed. Defaults to false, which hides the date picker."/>
+    <aura:registerevent name="selectDate" type="ui:selectDate"/>
+    <div aura:id="datePicker" class="{!v.class + (v.visible == true ? ' visible' : '')}">
+        <div class="dateBar">
+            <div class="prevLinks">
+                <a aura:id="prevYear" class="navLink prevYear" title="Go to previous year" onclick="{!c.goToPrevYear}" onkeydown="{!c.closeOnTab}">
+                    <span class="assistiveText">Go to previous year</span>
+                </a>
+                <a aura:id="prevMonth" class="navLink prevMonth" title="Go to previous month" onclick="{!c.goToPrevMonth}" onkeydown="{!c.handleKeydown}">
+                    <span class="assistiveText">Go to previous month</span>
+                </a>
+            </div>
+            <div class="nextLinks">
+                <a aura:id="nextMonth" class="navLink nextMonth" title="Go to next month" onclick="{!c.goToNextMonth}" onkeydown="{!c.handleKeydown}">
+                    <span class="assistiveText">Go to next month</span>
+                </a>
+                <a aura:id="nextYear" class="navLink nextYear" title="Go to next year" onclick="{!c.goToNextYear}" onkeydown="{!c.focusDateOnTab}">
+                    <span class="assistiveText">Go to next year</span>
+                </a>
+            </div>
+            <h4 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle"/>
+        </div>
+        <ui:datePickerGrid aura:id="grid" weekDays="{!m.weekdayLabels}" hide="{!c.hide}" selectDate="{!c.selectDate}" updateCalendarTitle="{!c.updateCalendarTitle}"/>
+        <div class="buttonBar">
+            <a aura:id="today" onclick="{!c.selectToday}" onkeydown="{!c.handleTabToday}" class="calToday" href="javascript:void(0);">Today</a>
+        </div>
+    </div>
+</aura:component>

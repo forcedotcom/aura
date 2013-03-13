@@ -74,13 +74,15 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
 
         builder.setDescription(getAttributeValue(RootTagHandler.ATTRIBUTE_DESCRIPTION));
 
-        Expression e = AuraImpl.getExpressionAdapter().buildExpression(
-                TextTokenizer.unwrap(getAttributeValue(ATTRIBUTE_ACTION)), getLocation());
-        if (!(e instanceof PropertyReference)) {
-            error("value of 'action' attribute must be a reference to an Action");
+        String action = getAttributeValue(ATTRIBUTE_ACTION);
+        if (action != null) {
+            Expression e = AuraImpl.getExpressionAdapter().buildExpression(
+                    TextTokenizer.unwrap(getAttributeValue(ATTRIBUTE_ACTION)), getLocation());
+            if (!(e instanceof PropertyReference)) {
+                error("value of 'action' attribute must be a reference to an Action");
+            }
+            builder.setAction((PropertyReference) e);
         }
-        builder.setAction((PropertyReference) e);
-
         String value = getAttributeValue(ATTRIBUTE_VALUE);
         if (value != null) {
             Expression valueExpression = AuraImpl.getExpressionAdapter().buildExpression(TextTokenizer.unwrap(value),
@@ -95,6 +97,7 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
         if (next != XMLStreamConstants.END_ELEMENT || !TAG.equalsIgnoreCase(getTagName())) {
             error("expected end of %s tag", TAG);
         }
+        builder.setOwnHash(source.getHash());
 
         return builder.build();
     }

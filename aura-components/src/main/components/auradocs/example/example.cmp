@@ -17,7 +17,7 @@
 -->
 <aura:component>
     <aura:attribute name="descriptor" type="String" required="true"/>
-    <ui:tabset>
+    <ui:tabset class="displayTab">
         <ui:tab title="Output">
             <form action="javascript:void(null);" onsubmit="{!c.updateLocation}">
                 <input type="hidden" aura:id="locationBar"/>

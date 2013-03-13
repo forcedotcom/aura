@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.RegistryAdapter;
@@ -35,15 +36,18 @@ import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttrib
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.system.Source;
+
+import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.junit.Ignore;
 import org.mockito.Mockito;
 import org.mockito.internal.util.MockUtil;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * @see org.auraframework.impl.registry.RootDefFactoryTest
@@ -110,6 +114,35 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Mockito.verify(def, Mockito.times(1)).validateReferences();
         Mockito.verify(def, Mockito.times(1)).markValid();
         assertEquals("definition not valid: " + def, true, def.isValid());
+    }
+
+    private void assertIdenticalDependencies(DefDescriptor<?> desc1, DefDescriptor<?> desc2) throws Exception {
+        MasterDefRegistryImpl registry = getDefRegistry(false);
+        Set<DefDescriptor<?>> deps1 = registry.getDependencies(registry.getUid(null, desc1));
+        Set<DefDescriptor<?>> deps2 = registry.getDependencies(registry.getUid(null, desc2));
+        assertNotNull(deps1);
+        assertNotNull(deps2);
+        assertEquals("Descriptors should have the same number of dependencies", deps1.size(), deps2.size());
+
+        // Loop through and check individual dependencies. Order doesn't matter.
+        for (DefDescriptor<?> dep : deps1) {
+            assertTrue("Descriptors do not have identical dependencies",
+                    checkDependenciesContains(deps2, dep.getQualifiedName()));
+        }
+    }
+
+    private boolean checkDependenciesContains(Set<DefDescriptor<?>> deps, String depSearch) {
+        for (DefDescriptor<?> dep : deps) {
+            if (dep.getQualifiedName().equals(depSearch)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void updateStringSource(DefDescriptor<?> desc, String content) {
+        Source<?> src = StringSourceLoader.getInstance().getSource(desc);
+        src.addOrUpdate(content);
     }
 
     public void testFindRegex() throws Exception {
@@ -193,20 +226,45 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify getUid() returns the correct value. If the component itself, any of it's dependencies, or the logic to
-     * calculate the UID are modified, then this hard-coded UID will need to be changed as well.
+     * Verify UID values and dependencies against a gold file.
+     * 
+     * This does a recursive set of dependencies checks to build a gold file with the resulting descriptors and UIDs to
+     * ensure that we get both a valid set and can tell what changed (and thus verify that it should have changed).
+     * 
+     * The format of the file is:
+     * <ul>
+     * <li>Top level descriptor ':' global UID.
+     * <li>
+     * <li>dependency ':' own hash
+     * <li>
+     * <li>...</li>
+     * </ul>
      */
-    @Ignore("W-1551219")
     public void testUidValue() throws Exception {
-        // Known UID, assuming no dependencies or the file itself have changed.
-        String knownUid = "3VBCHFMNOup__UlHicckgg";
+        StringBuilder buffer = new StringBuilder();
         String cmpName = "test:layoutNoLayout";
         DefDescriptor<ApplicationDef> desc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpName, ApplicationDef.class);
         MasterDefRegistryImpl masterDefReg = getDefRegistry(false);
+        Aura.getContextService().getCurrentContext().clearPreloads();
         String uid = masterDefReg.getUid(null, desc);
         assertNotNull("Could not retrieve UID for component " + cmpName, uid);
-        assertEquals("Unexpected UID value on component " + cmpName, knownUid, uid);
+        Set<DefDescriptor<?>> dependencies = masterDefReg.getDependencies(uid);
+        assertNotNull("Could not retrieve dependencies for component " + cmpName, dependencies);
+
+        buffer.append(desc.toString());
+        buffer.append(" : ");
+        buffer.append(uid);
+        buffer.append("\n");
+
+        SortedSet<DefDescriptor<?>> sorted = Sets.newTreeSet(dependencies);
+        for (DefDescriptor<?> dep : sorted) {
+            buffer.append(dep);
+            buffer.append(" : ");
+            buffer.append(masterDefReg.getDef(dep).getOwnHash());
+            buffer.append("\n");
+        }
+        goldFileText(buffer.toString());
     }
 
     public void testGetUidDescriptorNull() throws Exception {
@@ -259,10 +317,10 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         String uidNew = registry.getUid(null, cmpDesc);
         assertEquals("UID not cached", uid, uidNew);
 
-        // UID also cached for new registry
+        // UID not cached for new registry
         MasterDefRegistryImpl registryNext = getDefRegistry(false);
         String uidNext = registryNext.getUid(null, cmpDesc);
-        assertEquals("UID not cached in new registry", uid, uidNext);
+        assertFalse("UID not cached in new registry", uid.equals(uidNext));
     }
 
     public void testGetUidCachedForRemovedDefinition() throws Exception {
@@ -484,5 +542,173 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 StringSourceLoader.getInstance().removeSource(cmpDesc);
             }
         }
+    }
+
+    /**
+     * Circular dependencies case 1: A has inner component B, and B has an explicit dependency on A (via aura:dependency
+     * tag)
+     */
+    public void testCircularDependenciesInnerCmp() throws Exception {
+        DefDescriptor<ComponentDef> cmpDescA = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        DefDescriptor<ComponentDef> cmpDescB = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format("<aura:component><aura:dependency resource=\"%s\"/></aura:component>",
+                        cmpDescA.getQualifiedName()));
+        updateStringSource(cmpDescA,
+                String.format("<aura:component><%s/></aura:component>", cmpDescB.getDescriptorName()));
+        // Circular dependency cases should result in identical dependencies
+        assertIdenticalDependencies(cmpDescA, cmpDescB);
+    }
+
+    /**
+     * Circular dependencies case 2: D extends C, and C has explicit dependency on D (via aura:dependency tag)
+     */
+    public void testCircularDependenciesExtendsCmp() throws Exception {
+        DefDescriptor<ComponentDef> cmpDescC = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        DefDescriptor<ComponentDef> cmpDescD = addSourceAutoCleanup(ComponentDef.class,
+                String.format("<aura:component extends=\"%s\"/>", cmpDescC.getDescriptorName()));
+        updateStringSource(
+                cmpDescC,
+                String.format(
+                        "<aura:component extensible=\"true\"><aura:dependency resource=\"%s\"/></aura:component>",
+                        cmpDescD.getQualifiedName()));
+        // Circular dependency cases should result in identical dependencies
+        assertIdenticalDependencies(cmpDescC, cmpDescD);
+    }
+
+    /**
+     * Circular dependencies case 3: E has dependency on F, and F has dependency on E (both through aura:dependency tag)
+     */
+    public void testCircularDependenciesDepTag() throws Exception {
+        DefDescriptor<ComponentDef> cmpDescE = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        DefDescriptor<ComponentDef> cmpDescF = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format("<aura:component><aura:dependency resource=\"%s\"/></aura:component>",
+                        cmpDescE.getQualifiedName()));
+        updateStringSource(
+                cmpDescE,
+                String.format("<aura:component><aura:dependency resource=\"%s\"/></aura:component>",
+                        cmpDescF.getQualifiedName()));
+        // Circular dependency cases should result in identical dependencies
+        assertIdenticalDependencies(cmpDescE, cmpDescF);
+    }
+
+    /**
+     * Verify correct dependencies are attached to a component.
+     */
+    public void testGetDependencies() throws Exception {
+        DefDescriptor<ComponentDef> depCmpDesc1 = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        DefDescriptor<ComponentDef> depCmpDesc2 = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        DefDescriptor<ComponentDef> cmpDesc1 = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        // Manually add dependency to inner component
+        DefDescriptor<ComponentDef> cmpDesc2 = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component><aura:dependency resource=\"" + depCmpDesc1.getQualifiedName()
+                        + "\"/></aura:component>");
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(
+                        baseComponentTag,
+                        "",
+                        String.format("<aura:dependency resource=\"" + depCmpDesc2.getQualifiedName()
+                                + "\"/><%s/><%s/>",
+                                cmpDesc1.getDescriptorName(), cmpDesc2.getDescriptorName())));
+
+        MasterDefRegistryImpl registry = getDefRegistry(false);
+        String uid = registry.getUid(null, cmpDesc);
+        Set<DefDescriptor<?>> deps = registry.getDependencies(uid);
+        assertTrue("Component should have dependency on aura:component by default",
+                checkDependenciesContains(deps, "markup://aura:component"));
+        assertTrue("Component should have dependency on aura:rootComponent by default",
+                checkDependenciesContains(deps, "markup://aura:rootComponent"));
+        assertTrue("Component should not have a dependency on aura:application",
+                !checkDependenciesContains(deps, "markup://aura:application"));
+        assertTrue("No dependency on self found in Component",
+                checkDependenciesContains(deps, cmpDesc.getQualifiedName()));
+        assertTrue("Dependency on inner component not found",
+                checkDependenciesContains(deps, cmpDesc1.getQualifiedName()));
+        assertTrue("Dependency on inner component not found",
+                checkDependenciesContains(deps, cmpDesc2.getQualifiedName()));
+        assertTrue("Explicitly declared dependency on inner component not found",
+                checkDependenciesContains(deps, depCmpDesc1.getQualifiedName()));
+        assertTrue("Explicitly declared dependency on top level component not found",
+                checkDependenciesContains(deps, depCmpDesc2.getQualifiedName()));
+    }
+
+    /**
+     * Check access assertion on abstract applications.
+     */
+    public void testAssertAcessAbstractApp() throws Exception {
+        DefDescriptor<ApplicationDef> abApp = addSourceAutoCleanup(ApplicationDef.class,
+                "<aura:application abstract=\"true\"/>");
+        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class,
+                String.format("<aura:application extends=\"%s:%s\"/>", abApp.getNamespace(), abApp.getName()));
+        DefDescriptor<ApplicationDef> auraApp = Aura.getDefinitionService().getDefDescriptor("markup://aura:application",
+                 ApplicationDef.class);
+        MasterDefRegistryImpl mdr = getDefRegistry(false);
+        AuraContext context = Aura.getContextService().getCurrentContext();
+
+        //
+        // Check aura:application for failure first, as it will get put in the cache later.
+        //
+        context.setApplicationDescriptor(auraApp);
+        try {
+            mdr.assertAccess(auraApp);
+            fail("should fail to grant access to aura:application");
+        } catch (NoAccessException nae) {
+            assertTrue("exception should say something about abstract",
+                    nae.getMessage().contains("Abstract definition"));
+        }
+
+        //
+        // Check for failure when abstract app is top level.
+        //
+        context.setApplicationDescriptor(abApp);
+        try {
+            mdr.assertAccess(abApp);
+            fail("should fail to grant access to an abstract application");
+        } catch (NoAccessException nae) {
+            assertTrue("exception should say something about abstract",
+                    nae.getMessage().contains("Abstract definition"));
+        }
+        mdr.assertAccess(auraApp);
+
+        //
+        // Check for success when non-abstract app is top level.
+        //
+        context.setApplicationDescriptor(app);
+        mdr.assertAccess(app);
+        mdr.assertAccess(abApp);
+        mdr.assertAccess(auraApp);
+    }
+
+    /**
+     * Check access assertion on abstract components.
+     */
+    public void testAssertAcessAbstractComponent() throws Exception {
+        DefDescriptor<ComponentDef> abComp = addSourceAutoCleanup(ComponentDef.class,
+                "<aura:component abstract=\"true\"/>");
+        DefDescriptor<ComponentDef> comp = addSourceAutoCleanup(ComponentDef.class,
+                String.format("<aura:component extends=\"%s:%s\"/>", abComp.getNamespace(), abComp.getName()));
+        MasterDefRegistryImpl mdr = getDefRegistry(false);
+        AuraContext context = Aura.getContextService().getCurrentContext();
+
+        //
+        // Check for failure when abstract app is top level.
+        //
+        context.setApplicationDescriptor(abComp);
+        try {
+            mdr.assertAccess(abComp);
+            fail("should fail to grant access to an abstract component");
+        } catch (NoAccessException nae) {
+            assertTrue("exception should say something about abstract",
+                    nae.getMessage().contains("Abstract definition"));
+        }
+
+        //
+        // Check for success when non-abstract app is top level.
+        //
+        context.setApplicationDescriptor(comp);
+        mdr.assertAccess(comp);
+        mdr.assertAccess(abComp);
     }
 }

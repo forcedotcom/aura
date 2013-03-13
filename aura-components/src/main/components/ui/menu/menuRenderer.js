@@ -14,12 +14,18 @@
  * limitations under the License.
  */
  ({
-    unrender: function(cmp, helper) {
-        if (helper.cache.onClickStartEvent && helper.cache.onClickStartFunction) {
-            document.body.removeEventListener(helper.cache.onClickStartEvent, helper.cache.onClickStartFunction);
+    unrender: function(component, helper) {
+        if (helper.getOnClickEventProp.cache && 
+            helper.getOnClickEventProp.cache.onClickStartEvent && 
+            component._onClickStartFunc) {
+            document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickStartEvent, 
+                                              component._onClickStartFunc);
         }
-        if (helper.cache.onClickEndEvent && helper.cache.onClickEndFunction) {
-            document.body.removeEventListener(helper.cache.onClickEndEvent, helper.cache.onClickEndFunction);
+        if (helper.getOnClickEventProp.cache &&
+            helper.getOnClickEventProp.cache.onClickEndEvent && 
+            component._onClickEndFunc) {
+            document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickEndEvent, 
+                                              component._onClickEndFunc);
         }
         this.superUnrender();
     }

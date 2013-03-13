@@ -16,6 +16,6 @@
 ({
     doUpdate: function(component) {
         var el = component.find("radio").getElement();
-        component.setValue("{!v.value}", el.checked);
+        component.setValue("v.value", el.checked);
     }
 })

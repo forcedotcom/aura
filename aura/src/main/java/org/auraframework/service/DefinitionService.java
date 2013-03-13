@@ -23,7 +23,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.system.MasterDefRegistry;
-
+import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -36,15 +36,14 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * Instances of all AuraServices should be retrieved from {@link Aura}
  * </p>
  */
-public interface DefinitionService extends AuraService {
+public interface DefinitionService extends AuraService, SourceListener {
 
     /**
      * <p>
      * Create a {@link DefDescriptor} that describes a named {@link Definition}
      * </p>
      * <p>
-     * The class must be retrieved from
-     * DefDescriptor.DefType.getPrimaryInterface()
+     * The class must be retrieved from DefDescriptor.DefType.getPrimaryInterface()
      * </p>
      * 
      * @param qualifiedName the name of the Definition
@@ -56,12 +55,11 @@ public interface DefinitionService extends AuraService {
 
     /**
      * <p>
-     * Create a {@link DefDescriptor} that has the same namespace and name as
-     * the provided descriptor but a different DefType and prefix.
+     * Create a {@link DefDescriptor} that has the same namespace and name as the provided descriptor but a different
+     * DefType and prefix.
      * </p>
      * <p>
-     * The class must be retrieved from
-     * DefDescriptor.DefType.getPrimaryInterface()
+     * The class must be retrieved from DefDescriptor.DefType.getPrimaryInterface()
      * </p>
      * 
      * @param desc the descriptor of the Definition
@@ -123,7 +121,7 @@ public interface DefinitionService extends AuraService {
      * @param descriptor the descriptor to check.
      */
     <T extends Definition> long getLastMod(DefDescriptor<T> desc) throws QuickFixException;
-    
+
     /**
      * Get the latest timestamp for a given uid.
      * 
@@ -162,11 +160,25 @@ public interface DefinitionService extends AuraService {
 
     /**
      * update the set of loaded descriptors, and validate.
-     *
+     * 
      * @param loading the descriptor that we are loading if any.
      * @param preload are we in 'preload'?
      * @throws ClientOutOfSyncException if one of the defs is out of date.
      * @throws QuickFixException if a definition can't be compiled.
      */
     void updateLoaded(DefDescriptor<?> loading, boolean preload) throws QuickFixException, ClientOutOfSyncException;
+
+    /**
+     * Register interest in real-time changes to source, if available
+     * 
+     * @param listener - which listener to register
+     */
+    void subscribeToChangeNotification(SourceListener listener);
+
+    /**
+     * Unregister interest in real-time changes to source
+     * 
+     * @param listener - which listener to unregister
+     */
+    void unsubscribeToChangeNotification(SourceListener listener);
 }

@@ -616,6 +616,18 @@ Component.prototype.getValue = function(key){
 };
 
 /**
+ * Gets the wrapped value referenced using property syntax and sets the value object's value.
+ * @param {String} key The data key to look up on the Component. E.g. $A.get("root.v.mapAttring.key")
+ * @param {Object} value The value to set
+ *
+ * @public
+ */
+Component.prototype.setValue = function(key, value){
+    this.getValue(key).setValue(value);
+};
+
+
+/**
  * Returns the raw value referenced using property syntax.
  * get() calls getValue() and unwraps the value.
  * If you need the wrapper, which can be used for things like
@@ -641,13 +653,6 @@ Component.prototype.getConcreteComponent = function(){
  */
 Component.prototype.isConcrete = function() {
     return !this.priv.concreteComponentId;
-};
-
-/**
- * @deprecated.  Will be replaced with set()/put()
- */
-Component.prototype.setValue = function(expression, value){
-    expressionService.setValue(this, expression, value);
 };
 
 /**
@@ -717,11 +722,11 @@ Component.prototype.toString = function(){
 };
 
 /**
- * Returns JSON.stringify to serialize Components to JSON.
+ * Returns component serialized as Json string
  */
 Component.prototype.toJSON = function(){
 
-    return JSON.stringify(this.output());
+    return $A.util.json.encode(this.output());
 };
 
 /**
@@ -748,10 +753,10 @@ Component.prototype.addClass = function(clz) {
         oldClz = $A.util.trim(oldClz);
         if (oldClz) {
             if ((' ' + oldClz + ' ').indexOf(' ' + clz + ' ') == -1) {
-                this.setValue("{!v.class}", oldClz + ' ' + clz);
+                this.setValue("v.class", oldClz + ' ' + clz);
             }
         } else {
-            this.setValue("{!v.class}", clz);
+            this.setValue("v.class", clz);
         }
     }
 };
@@ -778,7 +783,7 @@ Component.prototype.removeClass = function(clz) {
         }
     }
     if (found) {
-        this.setValue("{!v.class}", newClass.join(' '));
+        this.setValue("v.class", newClass.join(' '));
     }
 };
 

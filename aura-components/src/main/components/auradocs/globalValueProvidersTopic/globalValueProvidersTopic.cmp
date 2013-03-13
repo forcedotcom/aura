@@ -31,24 +31,8 @@
 <p>Label files make it easier to translate and localize your applications by separating messages from source code. <code>$Label</code> makes it easy for you to use label files in your Aura application. Labels are hierarchical, and you access them using dot notation, <code>$Label.&lt;section&gt;.&lt;message_name&gt;</code>. For example, see the Like Button code sample previously shown, where messages are retrieved from labels:</p>
 
 <code><aura:text value="{!"/>$Label.SocialApp.YouAndOthersLike}</code>
-
-<!-- Commenting out because we don't document adapters yet. 
-<p>If your platform already provides an analogous service, you can write an adapter to use <code>$Label</code> with it. See Localizing Your Application with Labels for more details.</p>
--->
-
-<!-- <p>You can dynamically populate values in a label by using placeholders, such as {0} or {1}. For example, the following label uses a placeholder represented by {0}.</p> -->
-<!-- <code><param name="NMembers">{0} Members</param></code> --> 
-<!-- <p>This Aura label component provides the value for this label. The value can be a literal value or an expression. In this example, the Aura component provides the literal value of 5 and the value attribute of the label component specifies the label name.</p> -->  
-<!-- <code><aura:label value="$Label.MobileWebChatter.NMembers">5</aura:label></code> -->
-<!-- <p>The output is: 5 Members</p> -->
-<!-- <p>Multiple placeholders can be specified and are ordered by their index, starting from 0. This is an example with two placeholders.</p> -->
-<!-- <code><param name="NMembers">{0} Members and {1} Guests</param></code> --> 
-<!-- <p>In this second example, the first placeholder is replaced by the literal value of 5 and the second placeholder is replaced by the value of an expression.</p> -->  
-<!-- <code><aura:label value="$Label.MobileWebChatter.NMembers">5 {!m.guests}</aura:label></code> -->
-<!-- <p>The output can look like: 5 Members and 2 Guests</p> -->
-<!-- <p>The Aura label component can include multiple parameters. You can use multiple parameters using the following syntax.</p> -->
-<!-- <code><aura:label value="{!$Label.section.param}">{!param0}{!param1}...</aura:label></code> -->
-<!-- <p>Aura parses and replaces each expression in the body.</p> -->
+<br/>
+<p>A label has a two-part name: a section name and a label name. Each name must start with a letter or underscore so that the label can be accessed in an expression. For example, <code><aura:text value="{!"/>$Label.1SocialApp.2YouAndOthersLike}</code> is not valid because the section and label name each start with a number.</p>
 
 <h3><code>globalID</code></h3>
 
@@ -56,7 +40,7 @@
 
 <h3><code>$Browser</code></h3>
 
-<p>The <code>$Browser</code> global variable provides information about the hardware and operating system of the browser accessing the application. Here are the attributes for <code>$Browser</code>.</p>
+<p>The <code>$Browser</code> global value provider provides information about the hardware and operating system of the browser accessing the application. Here are the attributes for <code>$Browser</code>.</p>
 
 <table class="table table-bordered table-striped">
 <thead>
@@ -104,7 +88,7 @@
 </table>
  
 <p><b>Example</b></p>
-<p>This example shows how to get all <code>$Browser</code> attributes.</p>
+<p>This example shows how to get some <code>$Browser</code> attributes.</p>
 <auradocs:example descriptor="auradocs:sampleBrowser" />
 
 <p><b>See also:</b><br/>   

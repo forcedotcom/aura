@@ -54,7 +54,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
                 "myID", Format.XML);
         xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());
+        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader);
         cdrHandler = new ComponentDefRefHandler<ComponentDef>(cdh, xmlReader, source);

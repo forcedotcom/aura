@@ -65,7 +65,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         XMLStreamReader xmlReader = null;
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());
+        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
         xmlReader.next();
         AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<ComponentDef>(null, xmlReader,
                 source);
@@ -82,7 +82,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         XMLStreamReader xmlReader = null;
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());
+        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
         xmlReader.next();
         AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<ComponentDef>(null, xmlReader,
                 source);
@@ -98,7 +98,7 @@ public class AttributeDefRefHandlerTest extends AuraImplTestCase {
         XMLStreamReader xmlReader = null;
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getReader());
+        xmlReader = xmlInputFactory.createXMLStreamReader(source.getSystemId(), source.getHashingReader());
         xmlReader.next();
         AttributeDefRefHandler<ComponentDef> adrHandler = new AttributeDefRefHandler<ComponentDef>(null, xmlReader,
                 source);

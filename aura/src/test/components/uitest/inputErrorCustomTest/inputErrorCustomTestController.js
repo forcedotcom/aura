@@ -35,7 +35,7 @@
                 }
             });
             
-            inputCmp.setValue("{!v.errorComponent}", errorCmp);
+            inputCmp.setValue("v.errorComponent", errorCmp);
             $A.rerender(inputCmp);
             
             // test infrastructure expects error css set
@@ -53,7 +53,7 @@
         var inputCmp = component.find("inputCmp");
         // uncomment after bug: W-1412621
         /*
-        inputCmp.setValue("{!v.errorComponent}", "");
+        inputCmp.setValue("v.errorComponent", "");
         
         // test infrastructure expects error css cleared
         var element = inputCmp.getElement();

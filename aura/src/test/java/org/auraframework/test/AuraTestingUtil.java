@@ -34,12 +34,15 @@ public interface AuraTestingUtil {
     String getNonce();
 
     /**
-     * Retrieves the source of a component resource. Note: Works only for
-     * markup://string:XXXXX components and not for any other namespace. By
-     * default, test util is aware of StringSourceLoader only.
+     * Get a unique value and append it to a provided string
+     */
+    String getNonce(String prefix);
+
+    /**
+     * Retrieves the source of a component resource. Note: Works only for markup://string:XXXXX components and not for
+     * any other namespace. By default, test util is aware of StringSourceLoader only.
      * 
-     * @param descriptor Descriptor of the resource you want to see the source
-     *            of
+     * @param descriptor Descriptor of the resource you want to see the source of
      * @return
      */
     <T extends Definition> Source<T> getSource(DefDescriptor<T> descriptor);

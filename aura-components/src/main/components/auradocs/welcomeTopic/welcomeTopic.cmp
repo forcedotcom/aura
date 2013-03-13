@@ -17,7 +17,7 @@
 -->
 <aura:component extends="auradocs:topicPanel">
 <aura:set attribute="title" value="A Guide to Aura Development"/>
-	<p><auradocs:search /></p>
+
 	<ui:block>
         <aura:set attribute="left">
           <h4>What is Aura?</h4>
@@ -25,7 +25,7 @@
           <p>Aura supports partitioned multi-tier component development that bridges the client and server. It uses JavaScript on the client side and Java on the server side.</p>
         </aura:set>
          <span class="why">
-         <h4>Why use Aura?</h4>
+         <h4>Why Use Aura?</h4>
          <p>Aura comes with a rich and extensible component set to kick start building apps. You don't have to spend your time optimizing your apps for different devices as the components take care of that for you.</p>
          <p>The framework intelligently utilizes your server, browser, devices, and network so you can focus on the logic and interactions of your apps.</p>
          </span>

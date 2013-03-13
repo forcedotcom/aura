@@ -29,11 +29,10 @@ var AuraStorageService = function(){
         
         initStorage : function(name, persistent, secure, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit) {
         	if (storages[name]) {
-        		throw new Error("Storage named '" + name + "' already exists!");
+        		$A.error("Storage named '" + name + "' already exists!");
         	}
         	
-        	var implementation = this.selectAdapter(persistent, secure);
-            var adapter = this.createAdapter(implementation);
+        	var adapter = this.createAdapter(this.selectAdapter(persistent, secure), name, maxSize, debugLoggingEnabled);
         	
         	var config = {
         		"name": name,
@@ -56,20 +55,27 @@ var AuraStorageService = function(){
         	var adapterClass = config["adapterClass"];
         	
         	if (adapters[name]) {
-        		throw new Error("StorageService.registerAdapter() adapter '" + name + "' already registered!");
+        		$A.error("StorageService.registerAdapter() adapter '" + name + "' already registered!");
         	}
         	
         	adapters[name] = config;
         },
         
-        createAdapter : function(implementation) {
-        	var config = adapters[implementation];
+        createAdapter : function(adapter, name, maxSize, debugLoggingEnabled) {
+        	var config = adapters[adapter];
         	if (!config) {
-        		throw new Error("StorageService.getAdapter() unknown adapter '" + implementation + "'!");
-        	}        	
+        		$A.error("StorageService.createAdapter() unknown adapter '" + implementation + "'!");
+        	}        
         	
         	var AdapterClass = config["adapterClass"];
-        	return new AdapterClass(config);
+        	
+        	var adapterConfig = {
+        		"name": name,
+        		"maxSize": maxSize,
+        		"debugLoggingEnabled": debugLoggingEnabled
+        	};        	
+        	
+        	return new AdapterClass(adapterConfig);
         },
         
         fireModified : function() {
@@ -93,7 +99,7 @@ var AuraStorageService = function(){
         	}
 
         	if (candidates.length === 0) {
-        		throw new Error("StorageService.selectAdapter() unable to find a secure adapter implementation!");
+        		$A.error("StorageService.selectAdapter() unable to find a secure adapter implementation!");
         	}
         	
         	// Now take the set of candidates and weed out any non-persistent if persistence is requested (not required)

@@ -168,7 +168,7 @@
         var targetCellCmp = this.findDateComponent(component, date);
         if (targetCellCmp) {
             targetCellCmp.getElement().focus();
-            component.setValue("v.date", cellCmp.get("v.label"));
+            component.setValue("v.date", targetCellCmp.get("v.label"));
         }
     },
     

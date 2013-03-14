@@ -36,6 +36,7 @@
 
     <p>Note that the <code>name</code> attributes of <code>aura:registerEvent</code> and <code>aura:handler</code> must match. The <code>action</code> attribute of <code>aura:handler</code> sets the controller action to handle the event.</p>    
     
+    <auradocs:warning>You cannot use <code>onclick</code> and <code>ontouchend</code> events simultaneously. Aura translates touch-tap events into clicks and activate any <code>onclick</code> handlers that are present. </auradocs:warning>
     <p>A child component that extends another component can also handle events fired by the super component. The child component automatically inherits event handlers from its super component. For more information, see <auradocs:topicLink topic="oodWhatsInherited">What is Inherited?</auradocs:topicLink></p>
 
     <h2>Component Events Overview</h2>

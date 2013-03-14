@@ -75,4 +75,7 @@
             </tr>
         </tbody>
     </table>
+     <h3>Writing Asserts</h3>
+    <p>Include unique and specific error messages in your assert statements. For example, use <code>assertTrue(run, "Returns true if the action has run successfully.")</code>
+    instead of a generic message. Making each assert message unique also helps in narrowing down which assert statement has failed. </p>
 </aura:component>

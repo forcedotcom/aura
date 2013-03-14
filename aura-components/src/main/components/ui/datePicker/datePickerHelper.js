@@ -230,19 +230,18 @@
     },
     
     setGridInitialValue: function(component) {
+        var initialDate = new Date();
         var value = component.get("v.value");
-        if ($A.util.isUndefinedOrNull(value) || $A.util.isEmpty(value)) {
-            value = new Date();
-        } else {
+        if (!$A.util.isUndefinedOrNull(value) && !$A.util.isEmpty(value)) {
             var d = moment(value, "YYYY-MM-DD");
-            value = d.toDate();
+            initialDate = d.toDate();
         }
         var grid = component.find("grid");
         if (grid) {
-            grid.setValue("v.selectedDate", value.getFullYear() + "-" + (value.getMonth() + 1) + "-" + value.getDate());
-            grid.setValue("v.date", value.getDate());
-            grid.setValue("v.month", value.getMonth());
-            grid.setValue("v.year", value.getFullYear());
+            grid.setValue("v.selectedDate", initialDate.getFullYear() + "-" + (initialDate.getMonth() + 1) + "-" + initialDate.getDate());
+            grid.setValue("v.date", initialDate.getDate());
+            grid.setValue("v.month", initialDate.getMonth());
+            grid.setValue("v.year", initialDate.getFullYear());
         }
     },
     

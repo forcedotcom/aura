@@ -1,0 +1,76 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Aura Integration Service"/>
+<p>Aura client applications can benefit from caching data to reduce response times of pages by storing and accessing data locally rather than requesting data from the server. This enhances the user experience on the client. Caching is especially beneficial for high-performance, mostly connected applications operating over high latency connections, such as 3G networks. Aura Storage Service provides a powerful, simple- to-use caching infrastructure for Aura clients.</p>
+
+<p>The advantage of using Aura Storage Service instead of other caching infrastructures, such as Apple local storage for iOS devices, is that Aura Storage Service offers several types of storage through adapters. Storage can be persistent and secure. With persistent storage, cached data is preserved between user sessions in the browser. With secure storage, cached data is encrypted.</p>
+
+<h3>Available Storage Adapters</h3>
+<h4>SmartStore</h4>
+<p>(Persistent and secure) The SmartStore caching service is provided by the Salesforce Mobile SDK and is available only if you have installed the Salesforce Mobile SDK. The Salesforce Mobile SDK enables developing mobile applications that integrate with Salesforce. You can use SmartStore with these mobile applications for caching data. </p>
+
+<h4>MemoryAdapter</h4>
+<p>(Not persistent but secure) Provides access to the JavaScript main memory space for caching data. The stored cache persists only per browser page. Browsing to a new page resets the cache to a new state and clears the old cached data. Also, MemoryAdapter provides cache management capabilities. If the memory size limit has been reached, MemoryAdapter removes the least recently used data from the cache to shrink the cache size.</p>
+
+<h4>WebSQL</h4>
+<p>(Persistent but not secure) Provides access the Firefox's session storage and is available for Firefox browsers only.</p>
+
+<h4>IndexedDB</h4>
+<p>(Not yet implemented but will be available in the future. Persistent but not secure.) Provides access the Chrome's session storage and is available for Chrome browsers only.</p>
+
+<h3>Aura Storage Options</h3>
+<p>When you initialize the Aura Storage Service, you can set certain options, such as the name of your storage, the maximum cache size, and the default expiration time.</p>
+
+<auradocs:info>The name of Aura storage can be any name except for “actions”, which is the name of the storage that the Aura framework uses.</auradocs:info>
+
+<h3>Storage Adapter Selection</h3>
+<p>Aura Storage Service selects a storage adapter on your behalf that matches the  persistent and secure options you specify when initializing the service. For example, if you request a persistent and secure storage service, Aura Storage Service will return the SmartStore storage.</p>
+
+<h3>Examples</h3>
+
+<p>This example shows how to initialize Aura Storage Service in a JavaScript client-side controller. The example requests a persistent and secure storage named MyStorage with a maximum size of 512 KB. The default storage expiration is set to 600 seconds (10 minutes) as well as the auto refresh interval. Debug logging is enabled and storage is set to be cleared when initialized.</p>
+
+<auradocs:codeblock>
+$A.storageService.initStorage({ 
+    "name": "MyStorage", 
+    "persistent": true,
+    "secure": true,
+    "maxSize":512,
+    "defaultExpiration":600,
+    "defaultAutoRefreshInterval":600,
+    "debugLoggingEnabled":true,
+    "clearStorageOnInit":true
+});
+</auradocs:codeblock><br/>
+
+<p>After initializing storage, you can get the new storage by calling getStorage(). You can then call other functions on the Storage object. For example, you can get the current cache size or you can clear the storage.</p>
+
+<auradocs:codeblock>
+// Get cache size
+var size = $A.storageService.getStorage("MyStorage").getSize();
+// Clear the cache
+$A.storageService.getStorage("MyStorage").clear();
+</auradocs:codeblock><br/>
+
+Also, you can override default storage settings using <code>$Action.setStorable(config)</code>.
+
+<p>For a detailed description of the JavaScript API for <code>AuraStorageService</code> and <code>AuraStorage</code>, see 
+    <auradocs:topicLink topic="api:AuraStorageService">AuraStorageService</auradocs:topicLink> and 
+    <auradocs:topicLink topic="api:AuraStorage">AuraStorage</auradocs:topicLink>.</p>
+</aura:component>

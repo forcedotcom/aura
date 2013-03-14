@@ -23,10 +23,27 @@ var AuraStorageService = function(){
 	var adapters = {};
 	
     var storageService = {
+       /**
+        * Returns an existing storage using the specified name.
+	* @param {String} name The name of the requested storage. 
+	* @returns {AuraStorage} Returns an AuraStorage object corresponding to an existing storage.
+	*/
         getStorage : function(name) {
         	return storages[name];
         },
         
+        /**
+         * Initializes and returns new storage.
+         * @param {String} name The name of the storage to be initialized.
+         * @param {Boolean} persistent Indicates whether the requested storage is persistent.
+         * @param {Boolean} secure Indicates whether the requested storage is secure.
+         * @param {number} maxSize Specifies the maximum storage size.
+         * @param {number} defaultExpiration Specifies the default time in seconds after which the cache expires.
+         * @param {number} defaultAutoRefreshInterval (Will be moved to Action) Specifies the default interval in seconds after which cached data is to be refreshed.
+         * @param {Boolean} debugLoggingEnabled Indicates whether to enable debug logging in the JavaScript console for the Aura Storage Service.
+         * @param {Boolean} clearStorageOnInit Indicates whether to clear storage when storage is initialized.
+         * @returns {AuraStorage} Returns an AuraStorage object for the new storage.
+         */
         initStorage : function(name, persistent, secure, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit) {
         	if (storages[name]) {
         		$A.error("Storage named '" + name + "' already exists!");

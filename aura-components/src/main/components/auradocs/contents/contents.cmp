@@ -118,6 +118,7 @@
                 <auradocs:contentsNode text="Client-Side Providers" id="providersClientSide" />
                 <auradocs:contentsNode text="Services" id="services"/>
                 <auradocs:contentsNode text="Error Handling" id="error"/>
+                <auradocs:contentsNode text="Aura Storage Service" id="auraStorageService" />
                 <auradocs:contentsNode text="Component Tests" >
                     <auradocs:contentsNode text="Introduction" id="docTests" />
                     <auradocs:contentsNode text="Assertions" id="testsAssert" />

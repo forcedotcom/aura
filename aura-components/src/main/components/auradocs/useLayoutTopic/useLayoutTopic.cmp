@@ -22,7 +22,6 @@
     the <code>ui:vbox</code> component positions them vertically.  These components are wrappers around regular HTML elements and are rendered as <code>div</code> elements.
     You can use them together for fine control over placement and also customize them with CSS.
     </p>
-    <p>Additionally, tabs and scrollers are available as Aura components.</p>
 
     <h3><code>ui:block</code></h3>
     <p> <code>ui:block</code> creates a horizontal box area. This component contains the <code>left</code> and <code>right</code> attributes for your content,
@@ -47,11 +46,6 @@
     <auradocs:info>See the <auradocs:defLink descriptor ="ui:vbox">ui:vbox</auradocs:defLink> component reference.</auradocs:info>
     <auradocs:example descriptor="auradocs:demoVbox" />
     
-    <h2>Using Tabs and Scrollers</h2>
-    <h3><code>ui:tab</code></h3>
-    <p><code>ui:tab</code> represents a tab, and multiple tabs are nested in a <code>ui:tabset</code> component. You can set the default tab by using <code>active="true"</code>.</p>
-    <auradocs:info>See the <auradocs:defLink descriptor ="ui:tab">ui:tab</auradocs:defLink> component reference.</auradocs:info>
-    <auradocs:example descriptor="auradocs:demoTab" />
     <p>
     <b>See Also:</b><br/>
     <auradocs:topicLink topic="components">Components</auradocs:topicLink>

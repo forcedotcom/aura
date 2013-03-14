@@ -21,11 +21,11 @@
 
     <p>This section lists all the modes that Aura supports. The list of modes in Aura is defined in <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/system/AuraContext.html" target="_new">AuraContext</a>.</p>
 
-    <p>Every request in Aura is associated with a context. After initial loading of an application, each subsequent request is an XHR POST that contains your Aura context configuration. This includes the mode to run in, the name of the application, and the namespaces that already have preloaded metadata on the client.</p>
+    <p>Every request in Aura is associated with a context. After initial loading of an app, each subsequent request is an XHR POST that contains your Aura context configuration, which includes the mode to run in, the name of the app, and the namespaces that already have preloaded metadata on the client.</p>
 
     <p>We split the list of modes into two sections here to differentiate between runtime and test modes. This split is purely to cluster similar modes together in the documentation. All the runtime and core modes are defined in the <code>Mode</code> enum in <code>AuraContext</code>.</p>
 
-    <p>All modes are available by default in your application. For information on controlling which modes are available, see <auradocs:topicLink topic="modesAvailableSet">Controlling Available Modes</auradocs:topicLink>.</p>
+    <p>All modes are available by default in your app. For information on controlling which modes are available, see <auradocs:topicLink topic="modesAvailableSet">Controlling Available Modes</auradocs:topicLink>.</p>
 
     <h2>Google Closure Compiler</h2>
 
@@ -34,48 +34,59 @@
     <h2>Runtime Modes</h2>
 
     <p>Use these modes for running in development or production.</p>
-
+	
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
                 <th>Mode</th>
-                <th>Usage</th>
+                <th><code>PROD</code></th>
+                <th><code>DEV</code></th>
+                <th><code>PRODDEBUG</code></th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td><code>PROD</code></td>
-                <td>Use for applications in production. The framework is optimized for performance rather than ease of debugging in this mode. Behavior in this mode includes:
-                  <ul>
-                      <li>Disables access to a <code>.cmp</code> resource in a URL. You can only access a <code>.app</code> resource.</li>
-                      <li>Uses the Google Closure Compiler to optimize the JavaScript code. The method names and code are heavily obfuscated so it's impractical to debug in this mode.</li>
-                      <li>Requires an application to implement a security provider. The default security provider prevents access to any resources in this mode.</li>
-                      <li>Code is cached until the server is restarted and no up-to-date checks are done on application code. This makes it difficult to develop in this mode.</li>
-                  </ul>
-
-                  <p>Since <code>PROD</code> mode is intended for apps in production, test modes, such as <code>SELENIUM</code>, are preferable for running tests, especially concurrent tests.</p>
-                </td>
+                <td><b>Usage</b></td>
+                <td>Use for apps in production. The framework is optimized for performance rather than ease of debugging in this mode.</td>
+                <td>Use for apps in development. The framework is configured for ease of debugging in this mode.</td>
+                <td>Use temporarily to debug apps in production.</td>
             </tr>
-
             <tr>
-                <td><code>DEV</code></td>
-                <td>Use for applications in development. The framework is configured for ease of debugging in this mode. The primary differences compared to <code>PROD</code> mode are:
-                  <ul>
-                      <li>Enables a <code>.cmp</code> resource to be addressed in a URL</li>
-                      <li>Uses the Google Closure Compiler to lightly obfuscate the names of non-exported JavaScript methods. This is meant to avoid unintentional usage of non-exported methods. See <auradocs:topicLink topic="codeJavaScriptIntro">Publicly Accessible JavaScript Methods</auradocs:topicLink>.</li>
-                      <li>Enables you to access an application that doesn’t implement a security provider. The default security provider provides access to all resources in this mode.</li>
-                      <li>Doesn’t load any definitions from server-side cache. They are recompiled from source each time they are requested.</li>
-                        <li>Pretty prints JSON responses from the server</li>
-                        <li>Exposes private members in some framework JavaScript objects for ease of debugging</li>
-                  </ul>
-                </td>
+            	<td><b>Debugging</b></td>
+            	<td>Not recommended for debugging.<p>Since <code>PROD</code> mode is intended for apps in production, test modes, such as <code>SELENIUM</code>, are preferable for running tests, especially concurrent tests.</p></td>
+            	<td>Facilitates debugging. Pretty prints JSON responses from the server. Exposes private members in some framework JavaScript objects.</td> 
+            	<td>Similar to <code>PROD</code> mode</td>
             </tr>
-
             <tr>
-                <td><code>PRODDEBUG</code></td>
-                <td>Use temporarily to debug applications in production. Similar to <code>PROD</code> mode except that it doesn’t use the Google Closure Compiler.</td>
+            	<td><b>Access</b></td>
+            	<td>Disables access to a <code>.cmp</code> resource in a URL. You can only access a <code>.app</code> resource.</td>
+            	<td>Enables a <code>.cmp</code> resource to be addressed in a URL</td>
+            	<td>Similar to <code>PROD</code> mode</td>
             </tr>
-
+            <tr>
+            	<td><b>GA Component Access</b></td>
+            	<td>Allows GA components only</td>
+            	<td>Allows non-GA components</td>
+            	<td>Similar to <code>PROD</code> mode</td>
+            </tr>
+            <tr>
+            	<td><b>Google Closure Compiler</b></td>
+            	<td>Uses the Google Closure Compiler to optimize the JavaScript code. The method names and code are heavily obfuscated.</td>
+                <td>Uses the Google Closure Compiler to lightly obfuscate the names of non-exported JavaScript methods. This is meant to avoid unintentional usage of non-exported methods. See <auradocs:topicLink topic="codeJavaScriptIntro">Publicly Accessible JavaScript Methods</auradocs:topicLink>.</td>
+                <td>Does not use Google Closure Compiler</td>
+            </tr>
+            <tr>
+            	<td><b>Security Provider</b></td>
+            	<td>Requires an app to implement a security provider. The default security provider prevents access to any resources in this mode.</td>  
+                <td>Enables you to access an app that doesn’t implement a security provider. The default security provider provides access to all resources in this mode.</td>
+                <td>Similar to <code>PROD</code> mode</td>
+            </tr>
+            <tr>
+            	<td><b>Caching</b></td>
+            	<td>Caches code. When a file change is detected, this mode performs a full closure compile on all units.</td>   
+                <td>Caches code. When a file change is detected, this mode clears the cache and recompiles definitions.</td>  
+                <td>Similar to <code>PROD</code> mode</td>
+            </tr>         
         </tbody>
     </table>
 
@@ -95,7 +106,7 @@
         <tbody>
             <tr>
                 <td><code>JSTEST</code></td>
-                <td>Use for running component tests. If your component or application has a <code>&lt;componentName&gt;Test.js</code> file in its bundle, a browser page is displayed to run the tests. A tab is displayed for each test case in your test suite. Each tab contains an iframe that loads the component in <code>AUTOJSTEST</code> mode and runs the single test case.
+                <td>Use for running component tests. If your component or app has a <code>&lt;componentName&gt;Test.js</code> file in its bundle, a browser page is displayed to run the tests. A tab is displayed for each test case in your test suite. Each tab contains an iframe that loads the component in <code>AUTOJSTEST</code> mode and runs the single test case.
 
                     <p>The test results are displayed below the iframe. For a successful test run, the tab turns green; for a failure, it turns red.</p>
                 </td>
@@ -110,7 +121,7 @@
                 <td><code>AUTOJSTEST</code></td>
                 <td>Used by <code>JSTEST</code> mode when running inside the iframe for a test case. It enables extra JavaScript needed to execute the test case.
 
-                    <p>Use this mode by requesting the component or application containing the test in <code>JSTEST</code> mode.</p>
+                    <p>Use this mode by requesting the component or app containing the test in <code>JSTEST</code> mode.</p>
                 </td>
             </tr>
 
@@ -118,7 +129,7 @@
                 <td><code>AUTOJSTESTDEBUG</code></td>
                 <td>Used by <code>JSTESTDEBUG</code> mode when running inside the iframe for a test case. It enables extra JavaScript needed to execute the test case.
 
-                    <p>Use this mode by requesting the component or application containing the test in <code>JSTESTDEBUG</code> mode.</p>
+                    <p>Use this mode by requesting the component or app containing the test in <code>JSTESTDEBUG</code> mode.</p>
                 </td>
             </tr>
 
@@ -139,7 +150,7 @@
 
             <tr>
                 <td><code>SELENIUM</code></td>
-                <td>Use for tests with Selenium, a software testing framework for web applications. This mode uses the Google Closure Compiler.</td>
+                <td>Use for tests with Selenium, a software testing framework for web apps. This mode uses the Google Closure Compiler.</td>
             </tr>
 
             <tr>

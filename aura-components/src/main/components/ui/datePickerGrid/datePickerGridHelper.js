@@ -136,9 +136,9 @@
                 }
                 if (this.dateEquals(d, selectedDate)) {
                     clazz += " selectedDate"
-                    cellCmp.getElement().removeAttribute("tabindex");              
+                    cellCmp.setValue("v.tabIndex", 0);              
                 } else {
-                    cellCmp.getElement().setAttribute("tabindex", "-1");
+                    cellCmp.setValue("v.tabIndex", -1);
                 }
                 cellCmp.setValue("v.class", clazz);
                 cellCmp.setValue("v.label", d.getDate());

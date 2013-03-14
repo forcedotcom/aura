@@ -18,7 +18,7 @@
 	 * Tests to verify links on page 1
 	 */
 	testFirstPage: {
-        attributes : {currentPage : 1, pageSize : 10, totalItems: 55},
+        attributes : {currentPage : 1, pageSize : 10, totalItems: 50},
         test: function(cmp){
         	first = cmp.find("pager:first").getElement();
         	previous = cmp.find("pager:previous").getElement();
@@ -35,7 +35,7 @@
      * Tests to verify links on last page
      */
     testLastPage: {
-        attributes : {currentPage : 5, pageSize : 10, totalItems: 55},
+        attributes : {currentPage : 5, pageSize : 10, totalItems: 50},
         test: function(cmp){
         	first = cmp.find("pager:first").getElement();
         	previous = cmp.find("pager:previous").getElement();
@@ -52,7 +52,7 @@
      * Tests to verify links on middle page
      */
     testMiddlePage: {
-        attributes : {currentPage : 3, pageSize : 10, totalItems: 55},
+        attributes : {currentPage : 3, pageSize : 10, totalItems: 50},
         test: function(cmp){
         	first = cmp.find("pager:first").getElement();
         	previous = cmp.find("pager:previous").getElement();

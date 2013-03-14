@@ -18,6 +18,10 @@
         var value = component.get("v.value");
         if (!$A.util.isUndefinedOrNull(value)) {
             var date = new Date(value);
+            var mDate = moment(value, "YYYY-MM-DD");
+            if (mDate.isValid()) {
+                date = mDate.toDate();
+            }
             var elem = component.getElement();
             if (elem) {
                 elem.setAttribute("data-datevalue", date.toLocaleDateString());

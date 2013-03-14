@@ -33,10 +33,7 @@
     handleBlur: function(component, event, helper) {
         var source = event.getSource();
         if (source) {
-            var elem = source.getElement();
-            if (elem) {
-                elem.setAttribute("aria-selected", "false");
-            }
+            source.setValue("v.ariaSelected", false);            
         }
     },
     
@@ -47,10 +44,7 @@
     handleFocus: function(component, event, helper) {
         var source = event.getSource();
         if (source) {
-            var elem = source.getElement();
-            if (elem) {
-                elem.setAttribute("aria-selected", "true");
-            }
+            source.setValue("v.ariaSelected", true);            
         }
     },
     

@@ -43,7 +43,7 @@
     <!-- private attributes -->
     <aura:attribute name="_ariaId" type="String" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The id needed to identify the dialog window to assistive technologies."/>
     <aura:attribute name="_handlerConfig" type="Object" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. A JS config object containing event handlers used for component interactivity."/>
-    <aura:attribute name="_maxHeight" type="Integer" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The maximum height of the content &lt;div&gt;."/>
+    <aura:attribute name="_maxHeight" type="Integer" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The maximum height of the content &lt;div&gt;. Used for modal dialog positioning."/>
 
     <!-- events -->
     <aura:registerEvent name="close" type="ui:closeDialog" description="Event fired when the dialog window requests to close itself."/>

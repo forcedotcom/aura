@@ -18,11 +18,11 @@
     cursor: pointer;
     *display: inline;
     *zoom: 1;
-    *overflow: visible !important;
+    *overflow: visible !important; /* must override .uiBlock overflow:hidden declaration for IE7 */
 }
 .uiButton .label{
     display: block;
-    *overflow: visible !important;
+    *overflow: visible !important; /* must override .uiBlock .bLeft overflow:hidden declaration for IE7 */
 }
 .uiButton.default{
     font-weight: bold;

@@ -103,5 +103,46 @@
         test: function(cmp){
         	//Should throw error: TODO: W-1562449
         }
+    },
+    
+    /**
+     * Default Page size should be 25
+     */
+    testDefaultPageSize: {
+        test: function(cmp){
+        	pageSize = cmp.getAttributes().getValue('pageSize').getValue();
+        	aura.test.assertEquals(25, pageSize, "Default Page size should be 25");
+        }
+    },
+    
+    /**
+     * verify all calculated fields are correct
+     */
+    testCalculatedFieldsForFirstPage: {
+    	attributes : {currentPage : 1, pageSize : 10, totalItems: 55},
+        test: function(cmp){
+        	startIndex = cmp.getAttributes().getValue('startIndex').getValue();
+        	aura.test.assertEquals(1, startIndex + 1, "Index of the first item on the page should be 1");
+        	
+            endIndex = cmp.getAttributes().getValue('endIndex').getValue();
+            aura.test.assertEquals(10, endIndex + 1, "Index of the last item on the page should be 10");
+            
+            pageCount = cmp.getAttributes().getValue('pageCount').getValue();
+        	aura.test.assertEquals(6, pageCount, "Total Number of pages should be 6");
+        }
+    },
+    
+    testCalculatedFieldsForLastPage: {
+    	attributes : {currentPage : 6, pageSize : 10, totalItems: 55},
+        test: function(cmp){
+        	startIndex = cmp.getAttributes().getValue('startIndex').getValue();
+        	aura.test.assertEquals(51, startIndex + 1, "Index of the first item on the page should be 51");
+        	
+            endIndex = cmp.getAttributes().getValue('endIndex').getValue();
+            aura.test.assertEquals(55, endIndex + 1, "Index of the last item on the page should be 55");
+            
+            pageCount = cmp.getAttributes().getValue('pageCount').getValue();
+        	aura.test.assertEquals(6, pageCount, "Total Number of pages should be 6");
+        }
     }
 })

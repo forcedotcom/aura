@@ -35,8 +35,7 @@ import com.google.common.cache.CacheBuilder;
  * base class for registries, adds some important methods that aren't exposed
  * through the top level interface
  */
-public class CachingDefRegistryImpl<T extends Definition>
-        extends NonCachingDefRegistryImpl<T>
+public class CachingDefRegistryImpl<T extends Definition> extends NonCachingDefRegistryImpl<T>
         implements SourceListener {
 
     private static final long serialVersionUID = -1052118918311747954L;
@@ -56,11 +55,8 @@ public class CachingDefRegistryImpl<T extends Definition>
         Aura.getDefinitionService().subscribeToChangeNotification(this);
     }
 
-    /**
-     * FIXME: this should not be an explicit test mode for DB.
-     */
     protected boolean useCache() {
-        return !Aura.getContextService().getCurrentContext().isTestMode();
+        return true;
     }
 
     /**
@@ -177,6 +173,7 @@ public class CachingDefRegistryImpl<T extends Definition>
     @Override
     public void clear() {
         this.defs.invalidateAll();
+        this.existsCache.invalidateAll();
     }
 
     /**

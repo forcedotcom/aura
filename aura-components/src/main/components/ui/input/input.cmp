@@ -34,6 +34,7 @@
 
     <aura:registerEvent name="updateError" type="ui:updateError" description="The event fired to trigger the default error component and messages."/>
     <aura:handler name="updateError" action="{!c.updateDefaultError}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
 
     {!v.body}
     {!v.errorComponent}

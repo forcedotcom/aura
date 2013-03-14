@@ -249,11 +249,18 @@
         var concretCmp = component.getConcreteComponent();
         var visible = concretCmp.get("v.visible");
         if (visible === true) {
-            document.body.addEventListener(this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
-            document.body.addEventListener(this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));
+            $A.util.on(document.body, this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
+            $A.util.on(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));
         } else {
-            document.body.removeEventListener(this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
-            document.body.removeEventListener(this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));
+            if (document.body.removeEventListener) {
+                document.body.removeEventListener(this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component), false);
+                document.body.removeEventListener(this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component), false);
+            } else {
+                if (document.body.detachEvent) {
+                    document.body.detachEvent('on' + this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
+                    document.body.detachEvent('on' + this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));
+                }
+            }
         }
     },
     
@@ -269,7 +276,7 @@
                     //var title = this.MonthLabels[m].fullName + " " + y;
                     var monthLabels = component.get("m.monthLabels");
                     var title = monthLabels[m].fullName + " " + y;
-                    elem.textContent = title;
+                    elem.textContent = elem.innerText = title;
                 }
             }
         }

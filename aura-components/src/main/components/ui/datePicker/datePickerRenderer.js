@@ -15,34 +15,54 @@
  */
 ({
     afterRender: function(component, helper) {
-        helper.setGridInitialValue(component);
-        helper.updateMonthYear(component, component.get("v.value"));
-        helper.updateGlobalEventListeners(component);
+        var visible = component.get("v.visible");
+        if (visible === true) {
+            helper.setGridInitialValue(component);
+            helper.updateMonthYear(component, component.get("v.value"));
+            helper.updateGlobalEventListeners(component);
+        }
         var ret = this.superAfterRender();
-        helper.localizeToday(component);
+        if (visible === true) {
+            helper.localizeToday(component);
+        }
         return ret;
     },
 
     rerender: function(component, helper) {
-        helper.setGridInitialValue(component);
-        helper.updateMonthYear(component, component.get("v.value"));
-        helper.updateGlobalEventListeners(component);
+        var visible = component.get("v.visible");
+        if (visible === true) {
+            helper.setGridInitialValue(component);
+            helper.updateMonthYear(component, component.get("v.value"));
+            helper.updateGlobalEventListeners(component);
+        }
         this.superRerender();
-        helper.localizeToday(component);
+        if (visible === true) {
+            helper.localizeToday(component);
+        }
     },
     
     unrender: function(component, helper) {
         if (helper.getOnClickEventProp.cache && 
             helper.getOnClickEventProp.cache.onClickStartEvent && 
             component._onClickStartFunc) {
-            document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickStartEvent, 
-                                              component._onClickStartFunc, false);
+            if (document.body.removeEventListener) {
+                document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickStartEvent, component._onClickStartFunc, false);
+            } else {
+                if (document.body.detachEvent) {
+                    document.body.detachEvent('on' + helper.getOnClickEventProp.cache.onClickStartEvent, component._onClickStartFunc);
+                }
+            }
         }
         if (helper.getOnClickEventProp.cache &&
             helper.getOnClickEventProp.cache.onClickEndEvent && 
             component._onClickEndFunc) {
-            document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickEndEvent, 
-                                              component._onClickEndFunc, false);
+            if (document.body.removeEventListener) {
+                document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickEndEvent, component._onClickEndFunc, false);
+            } else {
+                if (document.body.detachEvent) {
+                    document.body.detachEvent('on' + helper.getOnClickEventProp.cache.onClickEndEvent, component._onClickEndFunc);
+                }
+            }
         }
         this.superUnrender();
     }

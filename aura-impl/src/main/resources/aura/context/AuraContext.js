@@ -42,6 +42,17 @@ function AuraContext(config) {
     this.cmp = config["cmp"];
     this.test = config["test"];
     
+    // If persistent storage is active then write through for disconnected support
+    var storage = this.getStorage("actions");
+    var that = this;
+    if (storage) {
+    	storage.get("globalValueProviders", function(item) {
+    		if (item) {
+    			that.joinGlobalValueProviders(item, true);
+    		}
+    	});    	
+    }
+
     var gvp = config["globalValueProviders"];
     if (gvp) {
         var l = gvp.length;
@@ -182,7 +193,7 @@ AuraContext.prototype.getApp = function(){
 /**
  * @private
  */
-AuraContext.prototype.joinGlobalValueProviders = function(gvps) {
+AuraContext.prototype.joinGlobalValueProviders = function(gvps, doNotPersist) {
     if (gvps) {
         for (var i = 0; i < gvps.length; i++) {
             var newGvp = gvps[i];
@@ -194,6 +205,22 @@ AuraContext.prototype.joinGlobalValueProviders = function(gvps) {
                 var mergeMap = new MapValue(newGvp["values"]);
                 gvp.merge(mergeMap, false);
             }
+        }
+        
+        if (!doNotPersist) {
+	        // If persistent storage is active then write through for disconnected support
+	        var storage = this.getStorage("actions");
+	        if (storage) {
+	        	storage.get("globalValueProviders", function(item) {
+	        		if (item) {
+	            		// DCHASMAN TODO W-1562121 Merge in current global values
+	        		} else {
+	        			item = gvps;
+	        		}
+	        		
+	            	storage.put("globalValueProviders", item);
+	        	});
+	        }
         }
     }
 };
@@ -255,6 +282,19 @@ AuraContext.prototype.setCurrentAction = function(action){
  */
 AuraContext.prototype.getCurrentAction = function(action){
     return this.currentAction;
+};
+
+/**
+ * @private
+ */
+AuraContext.prototype.getStorage = function() {
+	var storage = $A.storageService.getStorage("actions");
+	if (!storage) {
+		return undefined;
+	}
+	
+	var config = $A.storageService.getAdapterConfig(storage.getName());
+    return config["persistent"] ? storage : undefined;
 };
 
 //#include aura.context.AuraContext_export

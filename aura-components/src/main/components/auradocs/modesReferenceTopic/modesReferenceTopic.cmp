@@ -21,7 +21,7 @@
 
     <p>This section lists all the modes that Aura supports. The list of modes in Aura is defined in <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/system/AuraContext.html" target="_new">AuraContext</a>.</p>
 
-    <p>Every request in Aura is associated with a context. After initial loading of an app, each subsequent request is an XHR POST that contains your Aura context configuration. This includes the mode to run in, the name of the app, and the namespaces that already have preloaded metadata on the client.</p>
+    <p>Every request in Aura is associated with a context. After initial loading of an app, each subsequent request is an XHR POST that contains your Aura context configuration, which includes the mode to run in, the name of the app, and the namespaces that already have preloaded metadata on the client.</p>
 
     <p>We split the list of modes into two sections here to differentiate between runtime and test modes. This split is purely to cluster similar modes together in the documentation. All the runtime and core modes are defined in the <code>Mode</code> enum in <code>AuraContext</code>.</p>
 

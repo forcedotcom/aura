@@ -23,6 +23,8 @@ import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ThemeDefBuilder;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.http.AuraResourceServlet;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -54,6 +56,12 @@ public class ThemeDefImpl extends DefinitionImpl<ThemeDef> implements ThemeDef {
             this.imageURLs = builder.imageURLs;
         }
         this.validImageURLs = validateImageURLs(builder.imageURLs);
+    }
+
+    @Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        dependencies.add(Aura.getDefinitionService().getDefDescriptor(descriptor.getNamespace(),
+             NamespaceDef.class));
     }
 
     @Override

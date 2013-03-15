@@ -32,8 +32,8 @@ import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
@@ -241,8 +241,15 @@ public abstract class IntegrationTestCase extends AuraTestCase {
                 if (context != null) {
                     StringBuilder sb = new StringBuilder();
                     context.setSerializeLastMod(false);
+                    context.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
                     Aura.getSerializationService().write(context, null, AuraContext.class, sb, "HTML");
                     params.put("aura.context", sb.toString());
+                } else {
+                    //
+                    // We always need an fwuid or we'll reset.
+                    //
+                    params.put("aura.context", String.format("{'fwuid':'%s'}",
+                            Aura.getConfigAdapter().getAuraFrameworkNonce()));
                 }
                 post = obtainPostMethod("/aura", params);
             }

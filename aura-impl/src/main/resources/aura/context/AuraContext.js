@@ -144,6 +144,12 @@ AuraContext.prototype.join = function(otherContext) {
     if (otherContext["mode"] !== this.getMode()) {
         throw new Error("Mode mismatch");
     }
+    if ($A.util.isUndefinedOrNull(this.fwuid)) {
+        this.fwuid = otherContext["fwuid"];
+    }
+    if (otherContext["fwuid"] !== this.fwuid) {
+        throw new Error("framework mismatch");
+    }
     this.joinGlobalValueProviders(otherContext["globalValueProviders"]);
     this.joinComponentConfigs(otherContext["components"]);
     this.joinLoaded(otherContext["loaded"]);

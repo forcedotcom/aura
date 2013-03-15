@@ -15,6 +15,13 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT">
-    <aura:attribute name="value" type="Date" description="The event fired when the user selects a date."/>
-</aura:event>
+
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Using Tabs" />
+    
+    <h3><code>ui:tab</code></h3>
+    <p><code>ui:tab</code> represents a tab, and multiple tabs are nested in a <code>ui:tabset</code> component. You can set the default tab by using <code>active="true"</code>.</p>
+    <auradocs:info>See the <auradocs:defLink descriptor ="ui:tab">ui:tab</auradocs:defLink> component reference.</auradocs:info>
+    <auradocs:example descriptor="auradocs:demoTab" />
+
+</aura:component>

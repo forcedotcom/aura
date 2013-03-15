@@ -13,35 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-.THIS .uiInput  {
-    margin: 10px 10px 10px;
-    padding: 5px;
-    width: 200px;
-    font-size: 11px;
-}
-
-.THIS .label {
-   font-family: Courier;
-   width: 150px;
-   text-align: left;
-   padding-right: 20px;
-}
-
-.THIS .uiButton {
-	font-family:Arial;
-	width:100px;
-	margin-right:20px;
-}
-
-.THIS .uiOutput {
-	padding-left: 20px;
-}
-
-.THIS .outputValue {
-	color:blue;
-}
-
-.THIS .uiDatePicker {
-	width:250px;
-}
+({
+    replaceBodyContent : function(cmp, event){
+        var oldBody = cmp.getAttributes().getValue("body");
+        oldBody.destroy();
+        oldBody.setValue("new content");
+    }
+})

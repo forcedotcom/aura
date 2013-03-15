@@ -15,6 +15,11 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT">
-    <aura:attribute name="value" type="Date" description="The event fired when the user selects a date."/>
-</aura:event>
+<aura:component>
+     <ui:stamp>Default</ui:stamp><br/>
+     <ui:stamp severity="success">Success</ui:stamp><br/>
+     <ui:stamp severity="warning">Warning</ui:stamp><br/>
+     <ui:stamp severity="important">Important</ui:stamp><br/>
+     <ui:stamp severity="info">Info</ui:stamp><br/>
+     <ui:stamp severity="inverse">Inverse</ui:stamp><br/>
+</aura:component>

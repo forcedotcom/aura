@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" model="java://org.auraframework.component.ui.DatePickerModel" description="A date picker that is used within ui:inputDate.">
+<aura:component extensible="true" implements="ui:visible" model="java://org.auraframework.component.ui.DatePickerModel" description="A date picker that is used within ui:inputDate and ui:inputDateTime.">
     <aura:attribute name="value" type="Date" description="A date corresponding to a calendar day in the format yyyy-mm-dd."/>
     <aura:attribute name="visible" type="Boolean" default="false" description="Indicates if the date picker is displayed. Defaults to false, which hides the date picker."/>
     <aura:registerevent name="selectDate" type="ui:selectDate"/>

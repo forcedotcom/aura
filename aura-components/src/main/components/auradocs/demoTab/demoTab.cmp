@@ -15,6 +15,10 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT">
-    <aura:attribute name="value" type="Date" description="The event fired when the user selects a date."/>
-</aura:event>
+<aura:component>
+     <ui:tabset class="subtabs">
+         <ui:tab title="Tab 1">Tab 1 contents</ui:tab>
+         <ui:tab title="Tab 2" active="true">Tab 2 contents. This is the default tab.</ui:tab>
+         <ui:tab title="Tab 3">Tab 3 contents</ui:tab>
+     </ui:tabset>     
+</aura:component>

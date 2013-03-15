@@ -38,7 +38,7 @@ public class InputTextUITest extends WebDriverTestCase {
 
     @UnAdaptableTest
     // because it fails in FIREFOX in SFDC (may be dependent on FF version)
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET})
     public void testUpdateOnAttribute_UsingStringSource() throws Exception {
         String event = "blur";
         String baseTag = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> "
@@ -48,58 +48,48 @@ public class InputTextUITest extends WebDriverTestCase {
                 + "</aura:component>";
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, baseTag.replaceAll("%s", event));
         open(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
-
+        WebDriver d = getDriver();
         String value = getCurrentModelValue();
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(event);
+        WebElement outputDiv = d.findElement(By.id("output"));
         assertModelValue(value); // value shouldn't be updated yet
         input.click();
-        auraUITestingUtil.pressTab(input);
+        outputDiv.click();//to simulate tab behavior for touch browsers 
         value = assertModelValue(event); // value should have been updated
     }
 
     @UnAdaptableTest
     // because it fails in FIREFOX
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE })
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET})
     public void testUpdateOnAttribute() throws Exception {
 
         open(TEST_CMP);
         String value = getCurrentModelValue();
         WebDriver d = getDriver();
-        Actions a = new Actions(d);
-
+        WebElement outputDiv = d.findElement(By.id("output"));
         String eventName = "blur";
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value); // value shouldn't be updated yet
         input.click();
-        auraUITestingUtil.pressTab(input);
+        outputDiv.click();	//	to simulate tab behavior for touch browsers 
         value = assertModelValue(eventName); // value should have been updated
 
         eventName = "change";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        // assertModelValue(value); //commented out because clear() was firing
-        // change it seems
-        auraUITestingUtil.pressTab(input);
+        outputDiv.click();
         value = assertModelValue(eventName);
 
         eventName = "click";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
-        auraUITestingUtil.pressTab(input);
+        outputDiv.click();
         assertModelValue(value);
         input.click();
         value = assertModelValue(eventName);
 
-        eventName = "dblclick";
-        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        assertModelValue(value);
-        a.doubleClick(input).build().perform();
-        value = assertModelValue(eventName);
-
         eventName = "focus";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        auraUITestingUtil.pressTab(input);
-        // assertModelValue(value);//commented out because clear() was firing
-        // change it seems
+        outputDiv.click();
         input.click();
         value = assertModelValue(eventName);
 
@@ -134,6 +124,12 @@ public class InputTextUITest extends WebDriverTestCase {
         assertModelValue(value);
         input.click();
         value = assertModelValue(eventName);
+        
+        eventName = "dblclick";
+        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+        assertModelValue(value);
+        a.doubleClick(input).build().perform();
+        value = assertModelValue(eventName);
 
         eventName = "mousemove";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
@@ -166,8 +162,8 @@ public class InputTextUITest extends WebDriverTestCase {
         a.doubleClick(input).build().perform();
         value = assertModelValue(eventName);
     }
-
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE,
+    
+   @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE,
             BrowserType.SAFARI })
     // W-1551077: Issue with Webdriver API ignores maxlength HTML5 attribute
     public void testMaxLength() throws Exception {

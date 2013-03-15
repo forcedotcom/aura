@@ -23,8 +23,7 @@ import org.auraframework.system.AuraContext.Mode;
  * Service for constructing an instance of a {@link Integration}
  * </p>
  * <p>
- * An Integration defines the scope of creating a set of component injection
- * scripts
+ * An Integration defines the scope of creating a set of component injection scripts
  * </p>
  */
 public interface IntegrationService extends AuraService {
@@ -33,18 +32,19 @@ public interface IntegrationService extends AuraService {
      * will be injected into a non-Aura container.
      * 
      * @param contextPath
-     *              The portion of the request URI that is used to select the context of the request. 
-     *              This is the first part of a request URI. The path starts with a / character 
-     *              but does not end with a / character. 
-     *              For servlets in the default (root) context, the context path is an empty string.
+     *            The portion of the request URI that is used to select the context of the request.
+     *            This is the first part of a request URI. The path starts with a / character
+     *            but does not end with a / character.
+     *            For servlets in the default (root) context, the context path is an empty string.
      * @param mode
-     *              The Aura mode.
+     *            The Aura mode.
      * @param initializeAura
-     *              Indicates whether to create an internal integration app (true) or not (false). 
-     *              Passing a value of false allows for partial page updates, that is, adding additional 
-     *              components on subsequent trips to the server after an app has already been loaded.
+     *            Indicates whether to create an internal integration app (true) or not (false).
+     *            Passing a value of false allows for partial page updates, that is, adding additional
+     *            components on subsequent trips to the server after an app has already been loaded.
+     * @param userAgent
      * @return
-     *              A new integration.
+     *         A new integration.
      */
-    Integration createIntegration(String contextPath, Mode mode, boolean initializeAura);
+    Integration createIntegration(String contextPath, Mode mode, boolean initializeAura, String userAgent);
 }

@@ -35,7 +35,7 @@ public abstract class AbstractRendererForTestingIntegrationService implements Re
         contextService.endContext();
 
         Integration integration = Aura.getIntegrationService().createIntegration(
-                "", Mode.DEV, true);
+                "", Mode.DEV, true, null);
         integration.injectComponent(tag, attributes, localId, locatorDomId, out);
 
         // The only not-so-ideal part of this approach to testing

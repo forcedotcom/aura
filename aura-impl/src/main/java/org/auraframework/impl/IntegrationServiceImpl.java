@@ -23,8 +23,8 @@ import org.auraframework.system.AuraContext.Mode;
 public class IntegrationServiceImpl implements IntegrationService {
 
     @Override
-    public Integration createIntegration(String contextPath, Mode mode, boolean initializeAura) {
-        return new IntegrationImpl(contextPath, mode, initializeAura);
+    public Integration createIntegration(String contextPath, Mode mode, boolean initializeAura, String userAgent) {
+        return new IntegrationImpl(contextPath, mode, initializeAura, userAgent);
     }
 
     private static final long serialVersionUID = -2650728458106333787L;

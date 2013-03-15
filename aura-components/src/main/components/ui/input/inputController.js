@@ -18,5 +18,16 @@
         var concreteCmp = component.getConcreteComponent();
         var value = concreteCmp.getValue("v.value");
         helper.setErrorComponent(component, value);
-    }
+    },
+    
+    init: function(cmp) {    	
+    	var mode = $A.getContext().getMode();    	
+    	if (mode === "SELENIUM" || mode === "SELENIUMDEBUG") {    		 
+    		//change event does not fire in selenium mode, so default to blur event
+    		//W-1564254
+    		if (cmp.get('v.updateOn') === 'change') {    			
+    			cmp.getAttributes().setValue("updateOn", "blur");
+    		}
+    	}
+    } 
 })

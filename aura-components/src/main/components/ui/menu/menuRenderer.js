@@ -19,13 +19,13 @@
             helper.getOnClickEventProp.cache.onClickStartEvent && 
             component._onClickStartFunc) {
             document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickStartEvent, 
-                                              component._onClickStartFunc);
+                                              component._onClickStartFunc, false);
         }
         if (helper.getOnClickEventProp.cache &&
             helper.getOnClickEventProp.cache.onClickEndEvent && 
             component._onClickEndFunc) {
             document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickEndEvent, 
-                                              component._onClickEndFunc);
+                                              component._onClickEndFunc, false);
         }
         this.superUnrender();
     }

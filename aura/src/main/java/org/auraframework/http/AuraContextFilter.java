@@ -98,7 +98,7 @@ public class AuraContextFilter implements Filter {
                 if (loggingService != null) {
                     try {
                         loggingService.setValue(LoggingService.STATUS,
-                                                String.valueOf(((HttpServletResponse)res).getStatus()));
+                                String.valueOf(((HttpServletResponse) res).getStatus()));
                     } catch (Throwable t) {
                         // ignore.
                     }
@@ -150,16 +150,15 @@ public class AuraContextFilter implements Filter {
                 }
             }
             getLoaded(context, configMap.get("loaded"));
-            context.setFrameworkUID((String)configMap.get("fwuid"));
+            context.setFrameworkUID((String) configMap.get("fwuid"));
         }
 
         if (!isProduction) {
             TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
             if (testContextAdapter != null) {
                 String testName = null;
-                // config takes precedence over param because the value is not
-                // expected to change during a test and it is less likely
-                // to have been modified unintentionally when from the config
+                // config takes precedence over param because the value is not expected to change during a test and it
+                // is less likely to have been modified unintentionally when from the config
                 if (configMap != null) {
                     testName = (String) configMap.get("test");
                 }
@@ -177,6 +176,9 @@ public class AuraContextFilter implements Filter {
                             }
                         }
                     }
+                } else {
+                    // if this thread was recycled from a prior test (mostly dev mode), clear out the old context
+                    testContextAdapter.release();
                 }
             }
         }
@@ -195,17 +197,17 @@ public class AuraContextFilter implements Filter {
             return;
         }
         @SuppressWarnings("unchecked")
-        Map<String,String> loaded = (Map<String,String>)loadedEntry;
+        Map<String, String> loaded = (Map<String, String>) loadedEntry;
         DefinitionService definitionService = Aura.getDefinitionService();
 
-        for (Map.Entry<String,String> entry: loaded.entrySet()) {
+        for (Map.Entry<String, String> entry : loaded.entrySet()) {
             String uid = entry.getValue();
             if (uid != null && !uid.equals("null")) {
                 String key = entry.getKey();
                 int posn = key.indexOf("@");
                 if (posn > 0) {
                     String typeStr = key.substring(0, posn);
-                    String defStr = key.substring(posn+1);
+                    String defStr = key.substring(posn + 1);
                     DefType type = null;
                     try {
                         type = DefType.valueOf(typeStr);

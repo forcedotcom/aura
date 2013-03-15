@@ -25,7 +25,7 @@
 			
 			var hrefValue = tag.getAttribute("href");
 			$A.test.assertNotNull(hrefValue, "Did not find href on valid tag");
-			$A.test.assertEquals("www.salesforce.com", hrefValue, "Href value incorrect on valid tag");
+            $A.test.assertTrue(aura.test.contains(hrefValue, "www.salesforce.com"), "Href value incorrect on valid tag");
 		}
 	},
 	

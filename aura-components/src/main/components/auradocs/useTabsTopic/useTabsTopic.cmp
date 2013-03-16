@@ -17,11 +17,16 @@
 -->
 
 <aura:component extends="auradocs:topicPanel">
-    <aura:set attribute="title" value="Using Tabs" />
+    <aura:set attribute="title" value="Using Tabs and Scrollers" />
     
     <h3><code>ui:tab</code></h3>
     <p><code>ui:tab</code> represents a tab, and multiple tabs are nested in a <code>ui:tabset</code> component. You can set the default tab by using <code>active="true"</code>.</p>
     <auradocs:info>See the <auradocs:defLink descriptor ="ui:tab">ui:tab</auradocs:defLink> component reference.</auradocs:info>
     <auradocs:example descriptor="auradocs:demoTab" />
-
+    
+    <h3><code>ui:scroller</code></h3>
+	<p>Use <code>ui:scroller</code> for a scrollable view, which supports scroll bars and pull-to-refresh behaviors.  You can set the width, and enable or disable both vertical and horizontal scrolling.
+	Shorter content leads to elastic scrolling. The demo shows both the default scrolling and pull-to-refresh behavior, with an action method to handle the pull-to-refresh event.</p>
+	<auradocs:info>See the <auradocs:defLink descriptor ="ui:scroller">ui:scroller</auradocs:defLink> component reference.</auradocs:info>
+	<auradocs:example descriptor="auradocs:demoScroller" />  
 </aura:component>

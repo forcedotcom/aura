@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 ({
-    replaceBodyContent : function(cmp, event){
-        var oldBody = cmp.getAttributes().getValue("body");
-        oldBody.destroy();
-        oldBody.setValue("new content");
+    replaceBodyContent : function(component, event){
+      //Update the content
+        var value = component.find("content").setValue("v.value", "new content");
+        var scroller = component.find("pullToRefresh");
+        
+      //Call the refresh action on ui:scroller
+        scroller.get("c.refresh").run();
+        $A.services.event.finishFiring(event);
     }
 })

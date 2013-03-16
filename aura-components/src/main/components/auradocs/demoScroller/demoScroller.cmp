@@ -17,6 +17,11 @@
 -->
 <aura:component>
 	<div class="scrollArea">
+        <ui:scroller aura:id="pullToRefresh" onPullToRefresh="{!c.replaceBodyContent}">
+            <ui:outputText aura:id="content" value="This is pull-to-refresh enabled." />
+        </ui:scroller>
+    </div>
+	<div class="scrollArea">
 		<ui:scroller>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse eu diam tortor, sodales venenatis est. Sed blandit eros sed neque tincidunt pulvinar. 
 		Praesent egestas aliquam nisl nec hendrerit. Donec lacinia tempus enim, ac tincidunt dolor laoreet eget. Nulla facilisi. 
@@ -27,9 +32,4 @@
 		Aenean eget tellus vitae massa tincidunt elementum in ac augue.
 		</ui:scroller>
 	</div>
-	<div class="scrollArea">
-        <ui:scroller aura:id="pullToRefresh" onPullToRefresh="{!c.replaceBodyContent}">
-            This is pull-to-refresh enabled.
-        </ui:scroller>
-    </div>
 </aura:component>

@@ -23,6 +23,8 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+
+import org.auraframework.Aura;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.test.AuraHttpTestCase;
@@ -84,7 +86,8 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
         if (!causeException) {
             params.put("aura.token", getCsrfToken());
         }
-        params.put("aura.context", "{\"mode\":\"FTEST\"}");
+        params.put("aura.context", String.format("{\"mode\":\"FTEST\",\"fwuid\":\"%s\"}",
+            Aura.getConfigAdapter().getAuraFrameworkNonce()));
         params.put("aura.format", "JSON");
         PostMethod post = obtainPostMethod("/aura", params);
         requestAndAssertContentType(post,

@@ -201,6 +201,11 @@ public class AuraServlet extends AuraBaseServlet {
 
         BaseComponentDef def;
         try {
+            //
+            // Make sure we get the fw uid into the context.
+            //
+            context.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
+
             tagName = tag.get(request);
             defType = defTypeParam.get(request, DefType.COMPONENT);
 
@@ -387,6 +392,12 @@ public class AuraServlet extends AuraBaseServlet {
             }
 
             String fwUID = Aura.getConfigAdapter().getAuraFrameworkNonce();
+            //
+            // TODO: the integration service has an empty fwuid, which I haven't figured out
+            // how to set, so we allow the first one through, but we do set one on the response,
+            // so we'll then merge in the client and the next request will come in with the uid
+            // set. If this gets fixed, the null check can go away, which will make things safer.
+            //
             if (context.getFrameworkUID() != null && !fwUID.equals(context.getFrameworkUID())) {
                 throw new ClientOutOfSyncException("Framework has been updated");
             }

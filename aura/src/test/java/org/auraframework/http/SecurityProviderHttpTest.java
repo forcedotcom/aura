@@ -22,6 +22,8 @@ import java.util.Map;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+
+import org.auraframework.Aura;
 import org.auraframework.components.security.SecurityProviderAccessLogger;
 import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.def.ApplicationDef;
@@ -376,10 +378,10 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         params.put("message", jsonMessage);
         params.put("aura.lastmod", "" + getLastMod(mode));
         params.put("aura.token", getCsrfToken());
-        params.put(
-                "aura.context",
-                String.format("{'mode':'%s'%s}", mode.name(),
-                        appDescriptor == null ? "" : String.format(",'app':'%s'", appDescriptor)));
+        params.put("aura.context",
+                String.format("{'mode':'%s'%s,'fwuid':'%s'}", mode.name(),
+                        appDescriptor == null ? "" : String.format(",'app':'%s'", appDescriptor),
+                        Aura.getConfigAdapter().getAuraFrameworkNonce()));
         return obtainPostMethod("/aura", params);
     }
 
@@ -390,11 +392,12 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         assertEquals("Unexpected http status code", HttpStatus.SC_OK, statusCode);
         String response = post.getResponseBodyAsString();
         Map<String, Object> json = null;
-       
+
         try {
-            json = (Map<String, Object>) new JsonReader().read(response.substring(AuraBaseServlet.CSRF_PROTECT.length()));
+            json = (Map<String, Object>) new JsonReader()
+                    .read(response.substring(AuraBaseServlet.CSRF_PROTECT.length()));
         } catch (Exception e) {
-            fail("unable to parse "+response+" "+e.getMessage());
+            fail("unable to parse " + response + " " + e.getMessage());
         }
 
         assertEquals("Unexpected state", "SUCCESS",

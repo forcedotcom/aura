@@ -122,6 +122,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                                     Aura.getDefinitionService().getDefDescriptor("auratest:test_SimpleServerRenderedPage",
                                                                                  ApplicationDef.class));
         ctxt.addPreload("preloadTest");
+        ctxt.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
         ctxtString = getSerializedAuraContextWithModifiedUID(ctxt, modified);
         contextService.endContext();
         return ctxtString;

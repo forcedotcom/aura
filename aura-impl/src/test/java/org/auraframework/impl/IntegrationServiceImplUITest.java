@@ -81,8 +81,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
         WebElement button = findDomElement(By.cssSelector("button.uiButton"));
         button.click();
-        WebElement controllerValue = findDomElement(By.cssSelector("div.dataFromController"));
-        waitForElementTextPresent(controllerValue, "TestController");
+        auraUITestingUtil.waitForElementText(By.cssSelector("div.dataFromController"), "TestController", true);
 
         // Access injected component through ClientSide API
         assertTrue(auraUITestingUtil.getBooleanEval(String.format("return window.$A.getRoot().find('%s')!== undefined ;", defaultLocalId)));

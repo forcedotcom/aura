@@ -19,7 +19,9 @@
         var frame = document.createElement("iframe");
         frame.src = cmp.get("m.url");
         frame.scrolling = "auto";
-        frame.onload = function(){ cmp.getDef().getHelper().runTest(cmp); };
+        $A.util.on(frame, "load", function(){ 
+        	cmp.getDef().getHelper().runTest(cmp);
+        });
         var content = cmp.find("content");
         $A.util.insertFirst(content.getElement(), frame);
     },

@@ -443,15 +443,11 @@
 				},
 				function(cmp) {
 					// Create an offline event,
-					cmp.getValue("v.host").setValue("http://invalid.salesforce.com");
-					cmp.find("TestConnectionButton").get("e.press").fire();
-					$A.test.addWaitFor(true, function() {
-						return cmp.get("v.actionStatus") != "";
-					});
+				        var connectionLostEvent = $A.get("e.aura:connectionLost");
+					connectionLostEvent.fire();
 				},
 				function(cmp) {
 					// Run the action and verify that cached data is not purged
-					$A.test.assertEquals("INCOMPLETE", cmp.get("v.actionStatus"));
 					var a = cmp.get("c.fetchDataRecord");
 					a.setParams({
 						testName : "testCacheDataNotPurgedWhenOffline"
@@ -475,9 +471,8 @@
 	 */
 	testCacheDataUsedWhenConnectionResumed : {
 		attributes : {
-			defaultExpiration : 5,
+			defaultExpiration : 50,
 			defaultAutoRefreshInterval : 60
-		// Very high but doesn't matter
 		},
 		test : [ function(cmp) {
 			$A.test.setTestTimeout(30000);
@@ -496,26 +491,13 @@
 				$A.test.assertEquals(0, a.getReturnValue().Counter, "Wrong counter value seen in response");
 			});
 		}, function(cmp) {
-			// Wait for atleast 5 seconds after the response has been stored
-			$A.test.addWaitFor(true, function() {
-				var now = new Date().getTime();
-				var storageModified = $A.test.getText(cmp.find("storageModified").getElement());
-				return (now - parseInt(storageModified, 10)) > 5000;
-			});
-		}, function(cmp) {
 			// Create an offline event,
-			cmp.getValue("v.host").setValue("http://invalid.salesforce.com");
-			cmp.find("TestConnectionButton").get("e.press").fire();
-			$A.test.addWaitFor(true, function() {
-				return cmp.get("v.actionStatus") != "";
-			});
+		    	var connectionLostEvent = $A.get("e.aura:connectionLost");
+		    	connectionLostEvent.fire();
 		}, function(cmp) {
 			// go back online
-			cmp.getValue("v.host").setValue(undefined); // restore to default
-			cmp.find("TestConnectionButton").get("e.press").fire();
-			$A.test.addWaitFor(true, function() {
-				return cmp.get("v.actionStatus") == "SUCCESS";
-			});
+		    	var connectionResumed = $A.get("e.aura:connectionResumed");
+		    	connectionResumed.fire();
 
 			// Run the action and verify that cache data is still being used
 			var a = cmp.get("c.fetchDataRecord");

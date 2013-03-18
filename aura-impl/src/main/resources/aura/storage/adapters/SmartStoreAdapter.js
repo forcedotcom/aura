@@ -287,7 +287,7 @@ SmartStoreAdapter.prototype.getExpired = function(successCallback, errorCallback
                 cursorIterator.iterateAll(
                     function(item){
                         // on each iteration, add the key to the expired items
-                        expired.push(item[that.SOUP_KEY]);
+                        expired.push(that.unsanitizeKey(item[that.SOUP_KEY]));
                     },
                     function(){
                         // when done, return the expired items
@@ -449,6 +449,12 @@ SmartStoreAdapter.prototype.querySoupForItem = function(key, successCallback, er
 SmartStoreAdapter.prototype.sanitizeKey = function(key) {
     return escape(key).replace(/[\.]/g,"%2e");
 };
+
+//Unsanitize the key from sqllite.
+SmartStoreAdapter.prototype.unsanitizeKey = function(key) {
+  return unescape(key.replace(/%2e/g,"."));
+};
+
 
 /**
  * A suboptimal, asynchronous, test-only means of getting the number of items in the store.

@@ -16,5 +16,5 @@
 
 -->
 <aura:event type="COMPONENT">
-    <aura:attribute name="value" type="Date"/>
+    <aura:attribute name="value" type="Date" description="The event fired when the user selects a date."/>
 </aura:event>

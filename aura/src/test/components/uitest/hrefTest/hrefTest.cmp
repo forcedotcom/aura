@@ -16,7 +16,6 @@
 
 -->
 <aura:component>
-	<a aura:id="testLink">link</a>
-	<div id="anchor"/>
+	<a aura:id="testLink" href="#">link</a>
 	<a aura:id="testAnchor" href="#anchor">anchor</a>
 </aura:component>

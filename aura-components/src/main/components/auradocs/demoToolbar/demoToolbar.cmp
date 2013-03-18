@@ -15,14 +15,19 @@
     limitations under the License.
 
 -->
-<aura:component isTemplate="true" extends="aura:template" theme="templateCss://auradocs.template">
-    <aura:set attribute="extraScriptTags">
-        <script src="/auraFW/resources/codemirror/js/codemirror.js"></script>
-    </aura:set>
-    <aura:set attribute="title" value="Aura Documentation"/>
-    
-    <aura:set attribute="auraPreInitBlock">
-		<auraStorage:init name="actions" maxSize="4096" defaultExpiration="3600" secure="true" persistent="false" 
-			defaultAutoRefreshInterval="3600" debugLoggingEnabled="true" clearStorageOnInit="false"/>
-	</aura:set>    
+<aura:component>
+	<ui:toolbar>
+         <ui:button>
+             <aura:set attribute="label" value="Button 1" />
+             <aura:set attribute="buttonTitle" value="click me" />
+         </ui:button>
+         <ui:button>
+             <aura:set attribute="label" value="Button 2" />
+             <aura:set attribute="buttonTitle" value="click me" />
+         </ui:button>
+         <ui:button>
+             <aura:set attribute="label" value="Button 3" />
+             <aura:set attribute="buttonTitle" value="click me" />
+         </ui:button>
+     </ui:toolbar>
 </aura:component>

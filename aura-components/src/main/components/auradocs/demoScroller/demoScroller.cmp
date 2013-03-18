@@ -1,0 +1,35 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+	<div class="scrollArea">
+		<ui:scroller>
+		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse eu diam tortor, sodales venenatis est. Sed blandit eros sed neque tincidunt pulvinar. 
+		Praesent egestas aliquam nisl nec hendrerit. Donec lacinia tempus enim, ac tincidunt dolor laoreet eget. Nulla facilisi. 
+		Etiam dapibus leo feugiat risus pharetra eu gravida neque porttitor. Suspendisse aliquam dolor sit amet massa lobortis tristique posuere lorem feugiat. 
+		Duis porta, odio eget aliquam mattis, neque eros mollis risus, suscipit dapibus libero justo in nisi. Aliquam a turpis sit amet turpis interdum malesuada. 
+		Praesent placerat, est nec consequat placerat, tellus lacus dignissim nunc, non accumsan tortor augue at nulla. 
+		Pellentesque ultricies, felis nec scelerisque hendrerit, leo mi faucibus dui, vitae mattis nisi diam vitae orci. Nam ac lectus justo, eget molestie magna. 
+		Aenean eget tellus vitae massa tincidunt elementum in ac augue.
+		</ui:scroller>
+	</div>
+	<div class="scrollArea">
+        <ui:scroller aura:id="pullToRefresh" onPullToRefresh="{!c.replaceBodyContent}">
+            This is pull-to-refresh enabled.
+        </ui:scroller>
+    </div>
+</aura:component>

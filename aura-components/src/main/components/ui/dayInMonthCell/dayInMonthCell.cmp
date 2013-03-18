@@ -16,6 +16,8 @@
 
 -->
 <aura:component extends="ui:interactive" extensible="true">
+    <aura:attribute name="ariaSelected" type="Boolean" default="false" description="The date highlighted."/>
+    <aura:attribute name="tabIndex" type="Integer" default="-1" description="The tab index of the anchor element."/>
     <aura:attribute name="value" type="Date" description="The date this component renders."/>
-    <a class="{!v.class}" tabindex="-1">{!v.label}</a>
+    <a class="{!v.class}" aria-selected="{!v.ariaSelected}" tabindex="{!v.tabIndex}">{!v.label}</a>
 </aura:component>

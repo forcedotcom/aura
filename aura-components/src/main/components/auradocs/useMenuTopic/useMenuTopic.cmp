@@ -42,7 +42,7 @@
      <p>To access selected values using a controller action, pass in the event to your controller, as demonstrated in the <code>getMenuSelected</code> controller action. You can use
     <code>cmp.find("myMenu").getValue("v.childMenuItems")</code> to retrieve the values. <code>childMenuItems</code> is a read-only attribute on the <code>ui:menu</code> component that contains the child menu items.</p>
 
-    <h2>Keyboard Accessibility</h2>
+    <h4>Keyboard Accessibility</h4>
 
     <p>To access the menu items using your keyboard, you can press these keys.</p>
 
@@ -76,7 +76,13 @@
             </tr>
         </tbody>
     </table>
-
+    
+    <h2>Navigation Menu</h2>
+	To display a horizontal menu, use <code>ui:toolbar</code>. This component renders as an HTML <code>menu</code> element, and can contain input elements such as <code>ui:button</code>.
+	Note that the HTML <code>menu</code> tag is currently not supported for all browsers.
+	<auradocs:info>See the <auradocs:defLink descriptor ="ui:toolbar">ui:toolbar</auradocs:defLink> component reference.</auradocs:info>
+	<auradocs:example descriptor="auradocs:demoToolbar" />
+	 
       <p><b>See also:</b><br/>
       <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
       <auradocs:topicLink topic="models">Models</auradocs:topicLink>

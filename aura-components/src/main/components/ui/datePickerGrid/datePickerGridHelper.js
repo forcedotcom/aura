@@ -136,18 +136,19 @@
                 }
                 if (this.dateEquals(d, selectedDate)) {
                     clazz += " selectedDate"
-                    cellCmp.getElement().removeAttribute("tabindex");              
+                    cellCmp.setValue("v.tabIndex", 0);              
                 } else {
-                    cellCmp.getElement().setAttribute("tabindex", "-1");
+                    cellCmp.setValue("v.tabIndex", -1);
                 }
                 cellCmp.setValue("v.class", clazz);
                 cellCmp.setValue("v.label", d.getDate());
                 cellCmp.setValue("v.value", d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate());
                 
-                cellCmp.getElement().setAttribute("aria-selected", "false");
-                var setFocus = component.get("{!v._setFocus}");
+                var setFocus = component.get("v._setFocus");
                 if (this.dateEquals(d, date) && setFocus === true) {
                     cellCmp.getElement().focus();
+                } else {
+                    cellCmp.setValue("v.ariaSelected", false);
                 }
             }
             d.setDate(d.getDate() + 1);

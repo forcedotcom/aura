@@ -950,7 +950,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     public <T extends Definition> boolean invalidate(DefDescriptor<T> descriptor) {
         defs.clear();
         localDependencies.clear();
+        accessCache.clear();
         dependencies.invalidateAll();
+        securityProvider = null;
         return false;
     }
 
@@ -1054,9 +1056,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
             // notify provided listeners, presumably to clear caches
             for (WeakReference<SourceListener> i : listeners) {
-                if (i.get() != null)
-                {
-                    i.get().onSourceChanged(source, event);
+                SourceListener sl = i.get();
+                
+                if (sl != null) {
+                    sl.onSourceChanged(source, event);
                 }
             }
 

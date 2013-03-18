@@ -1,4 +1,4 @@
-markup://test:layoutNoLayout : QfTXqU0jfCd6P7Hy2hA55w
+markup://test:layoutNoLayout : r2y2c8EyRRoA-WN3fyLydA
 aura://ComponentController : null
 css://aura.placeholder : FOJqLhWeXd4r-vgf-c0XtQ
 java://org.auraframework.renderer.ComponentRenderer : null
@@ -12,6 +12,7 @@ js://aura.html : T26PuSe74ZeYNpGEG6H29g
 js://aura.html : 7lp7P-UosoVxe-OZIfzbtg
 js://aura.placeholder : 2XT9xQ9u4aoFm7bDHXhrpA
 js://aura.text : KldblTnXTBHS0To9pis_ig
+markup://aura : no-hash-value
 markup://aura:addIntegrationComponent : ZSRLsrsHycFNOUYHQJOzqA
 markup://aura:application : GJehGi9vSc2aG8qmbDyxKg
 markup://aura:applicationEvent : Scw4ve7rQ0sSjRgn-0AuvA

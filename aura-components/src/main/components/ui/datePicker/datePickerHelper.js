@@ -230,19 +230,18 @@
     },
     
     setGridInitialValue: function(component) {
+        var initialDate = new Date();
         var value = component.get("v.value");
-        if ($A.util.isUndefinedOrNull(value) || $A.util.isEmpty(value)) {
-            value = new Date();
-        } else {
+        if (!$A.util.isUndefinedOrNull(value) && !$A.util.isEmpty(value)) {
             var d = moment(value, "YYYY-MM-DD");
-            value = d.toDate();
+            initialDate = d.toDate();
         }
         var grid = component.find("grid");
         if (grid) {
-            grid.setValue("v.selectedDate", value.getFullYear() + "-" + (value.getMonth() + 1) + "-" + value.getDate());
-            grid.setValue("v.date", value.getDate());
-            grid.setValue("v.month", value.getMonth());
-            grid.setValue("v.year", value.getFullYear());
+            grid.setValue("v.selectedDate", initialDate.getFullYear() + "-" + (initialDate.getMonth() + 1) + "-" + initialDate.getDate());
+            grid.setValue("v.date", initialDate.getDate());
+            grid.setValue("v.month", initialDate.getMonth());
+            grid.setValue("v.year", initialDate.getFullYear());
         }
     },
     
@@ -250,11 +249,18 @@
         var concretCmp = component.getConcreteComponent();
         var visible = concretCmp.get("v.visible");
         if (visible === true) {
-            document.body.addEventListener(this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
-            document.body.addEventListener(this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));
+            $A.util.on(document.body, this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
+            $A.util.on(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));
         } else {
-            document.body.removeEventListener(this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
-            document.body.removeEventListener(this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));
+            if (document.body.removeEventListener) {
+                document.body.removeEventListener(this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component), false);
+                document.body.removeEventListener(this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component), false);
+            } else {
+                if (document.body.detachEvent) {
+                    document.body.detachEvent('on' + this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
+                    document.body.detachEvent('on' + this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));
+                }
+            }
         }
     },
     
@@ -270,7 +276,7 @@
                     //var title = this.MonthLabels[m].fullName + " " + y;
                     var monthLabels = component.get("m.monthLabels");
                     var title = monthLabels[m].fullName + " " + y;
-                    elem.textContent = title;
+                    elem.textContent = elem.innerText = title;
                 }
             }
         }

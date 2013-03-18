@@ -15,13 +15,21 @@
  */
 ({
     updateCell: function(component) {
-        var value = component.get("v.value");
-        if (!$A.util.isUndefinedOrNull(value)) {
-            var date = new Date(value);
-            var elem = component.getElement();
-            if (elem) {
+        var elem = component.getElement();
+        if (elem) {
+            var value = component.get("v.value");
+            if (!$A.util.isUndefinedOrNull(value)) {
+                var date = new Date(value);
+                var mDate = moment(value, "YYYY-MM-DD");
+                if (mDate.isValid()) {
+                    date = mDate.toDate();
+                }
                 elem.setAttribute("data-datevalue", date.toLocaleDateString());
             }
-        }
+            var tabIndex = component.get("v.tabIndex");
+            if (parseInt(tabIndex) > -1) {
+                elem.removeAttribute("tabindex");
+            }
+        } 
     }
 })

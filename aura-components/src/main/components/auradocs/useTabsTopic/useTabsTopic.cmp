@@ -15,14 +15,13 @@
     limitations under the License.
 
 -->
-<aura:component isTemplate="true" extends="aura:template" theme="templateCss://auradocs.template">
-    <aura:set attribute="extraScriptTags">
-        <script src="/auraFW/resources/codemirror/js/codemirror.js"></script>
-    </aura:set>
-    <aura:set attribute="title" value="Aura Documentation"/>
+
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Using Tabs" />
     
-    <aura:set attribute="auraPreInitBlock">
-		<auraStorage:init name="actions" maxSize="4096" defaultExpiration="3600" secure="true" persistent="false" 
-			defaultAutoRefreshInterval="3600" debugLoggingEnabled="true" clearStorageOnInit="false"/>
-	</aura:set>    
+    <h3><code>ui:tab</code></h3>
+    <p><code>ui:tab</code> represents a tab, and multiple tabs are nested in a <code>ui:tabset</code> component. You can set the default tab by using <code>active="true"</code>.</p>
+    <auradocs:info>See the <auradocs:defLink descriptor ="ui:tab">ui:tab</auradocs:defLink> component reference.</auradocs:info>
+    <auradocs:example descriptor="auradocs:demoTab" />
+
 </aura:component>

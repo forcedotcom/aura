@@ -15,14 +15,10 @@
     limitations under the License.
 
 -->
-<aura:component isTemplate="true" extends="aura:template" theme="templateCss://auradocs.template">
-    <aura:set attribute="extraScriptTags">
-        <script src="/auraFW/resources/codemirror/js/codemirror.js"></script>
-    </aura:set>
-    <aura:set attribute="title" value="Aura Documentation"/>
-    
-    <aura:set attribute="auraPreInitBlock">
-		<auraStorage:init name="actions" maxSize="4096" defaultExpiration="3600" secure="true" persistent="false" 
-			defaultAutoRefreshInterval="3600" debugLoggingEnabled="true" clearStorageOnInit="false"/>
-	</aura:set>    
+<aura:component>
+     <ui:tabset class="subtabs">
+         <ui:tab title="Tab 1">Tab 1 contents</ui:tab>
+         <ui:tab title="Tab 2" active="true">Tab 2 contents. This is the default tab.</ui:tab>
+         <ui:tab title="Tab 3">Tab 3 contents</ui:tab>
+     </ui:tabset>     
 </aura:component>

@@ -98,35 +98,33 @@ MapValue.prototype.setValue = function(newMap) {
     if (!$A.util.isObject(newMap)) {
         $A.assert(false, "newMap must be an object");
     }
-    var type = (newMap.toString?newMap.toString():'');
-    if (type === 'MapValue') {
-        // we have a map value, let's go and copy things.
-        newMap.each(function(k, v) {
-            //
-            // Be very careful here. v could represent null
-            // or undefined, which would fail if we use put.
-            // It can also be an expression, which cannot
-            // be unwrapped.
-            //
-            var config = {};
-            config[k] = v;
-            this.add(k, config);
-        }, { scope: this });
-    } else if (type === 'SimpleValue') {
-        if (newMap.unwrap() === null) {
+    var copyMap = newMap;
+    var copyKeys = null;
+    if (newMap.auraType === "Value") {
+        var type = (newMap.toString?newMap.toString():'');
+        if (type === 'MapValue') {
+            copyMap = newMap.value;
+            copyKeys = newMap.keys;
+        } else if (type === 'SimpleValue') {
+            if (newMap.unwrap() === null) {
+                return;
+            }
+            // bad.
+            $A.assert(false, "Defined simplevalue cannot be passed to MapValue.setValue");
+            return;
+        } else if (type === 'ArrayValue') {
+            // bad.
+            $A.assert(false, "Defined ArrayValue cannot be passed to MapValue.setValue");
             return;
         }
-        // bad.
-        $A.assert(false, "Defined simplevalue cannot be passed to MapValue.setValue");
-        return;
-    } else if (type === 'ArrayValue') {
-        // bad.
-        $A.assert(false, "Defined ArrayValue cannot be passed to MapValue.setValue");
-        return;
-    } else {
-        for (var k in newMap) {
-            this.add(k, newMap);
+    }
+    for (var k in copyMap) {
+        var key = k;
+
+        if (copyKeys && copyKeys[k]) {
+            key = copyKeys[k];
         }
+        this.add(key, copyMap);
     }
 };
 

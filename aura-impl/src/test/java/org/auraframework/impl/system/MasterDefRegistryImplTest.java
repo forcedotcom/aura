@@ -15,11 +15,13 @@
  */
 package org.auraframework.impl.system;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.concurrent.TimeUnit;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.RegistryAdapter;
@@ -34,10 +36,12 @@ import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
 import org.auraframework.impl.source.StringSourceLoader;
+import org.auraframework.service.BuilderService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.Source;
-
+import org.auraframework.test.util.AuraPrivateAccessor;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -46,6 +50,7 @@ import org.mockito.internal.util.MockUtil;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import com.google.common.cache.Cache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -642,8 +647,9 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 "<aura:application abstract=\"true\"/>");
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class,
                 String.format("<aura:application extends=\"%s:%s\"/>", abApp.getNamespace(), abApp.getName()));
-        DefDescriptor<ApplicationDef> auraApp = Aura.getDefinitionService().getDefDescriptor("markup://aura:application",
-                 ApplicationDef.class);
+        DefDescriptor<ApplicationDef> auraApp = Aura.getDefinitionService().getDefDescriptor(
+                "markup://aura:application",
+                ApplicationDef.class);
         MasterDefRegistryImpl mdr = getDefRegistry(false);
         AuraContext context = Aura.getContextService().getCurrentContext();
 
@@ -710,5 +716,86 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         context.setApplicationDescriptor(comp);
         mdr.assertAccess(comp);
         mdr.assertAccess(abComp);
+    }
+
+    /**
+     * Verify that the file source listener picks up a newly created file and sends out a notification to clear the
+     * proper caches.
+     */
+    public void testSourceChangeClearsCachesInDevMode() throws Exception {
+        AuraContext currContext = Aura.getContextService().getCurrentContext();
+        Aura.getContextService().startContext(Mode.DEV, currContext.getFormat(), currContext.getAccess());
+        DefDescriptor<ComponentDef> cmpDesc = Aura.getDefinitionService().getDefDescriptor("test:deleteMeAfterTest",
+                ComponentDef.class);
+
+        // Make sure we have something in the caches before we check that they're cleared
+        Aura.getDefinitionService().getDefDescriptor("test:text", ComponentDef.class).getDef();
+        assertTrue("MasterDefRegistry should not be empty after calling getDef() on a component", !isMdrCacheEmpty());
+        assertTrue("CachingDefRegistry should not be empty after calling getDef() on a component", !isCdrCacheEmpty());
+
+        // Delete added files at end of test
+        Source<?> source = Aura.getContextService().getCurrentContext().getDefRegistry().getSource(cmpDesc);
+        File f = new File(source.getUrl().replace("file:", ""));
+        deleteFileOnTeardown(f);
+        deleteFileOnTeardown(f.getParentFile());
+
+        // Save file to filesystem and wait for source change to clear caches
+        BuilderService builderService = Aura.getBuilderService();
+        ComponentDef def = builderService.getComponentDefBuilder().setDescriptor(cmpDesc).build();
+        Aura.getDefinitionService().save(def);
+        waitForCachesToClear();
+    }
+
+    /**
+     * Wait for MasterDefRegistry and CachingDefRegistry caches to be cleared after a source change.
+     */
+    private void waitForCachesToClear() throws Exception {
+        long startTime = System.nanoTime();
+        long timeoutInMilliseconds = 10000;
+        long intervalInMilliseconds = 100;
+        while (TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime) < timeoutInMilliseconds) {
+            if (isMdrCacheEmpty() && isCdrCacheEmpty()) {
+                return;
+            }
+            Thread.sleep(intervalInMilliseconds);
+        }
+        fail("Caches did not clear within " + (timeoutInMilliseconds / 1000) + " seconds after a source change");
+    }
+
+    /**
+     * Return true if the MasterDefRegistry static cache is empty. This does not take into account non-static
+     * localDependencies cache.
+     */
+    private boolean isMdrCacheEmpty() throws Exception {
+        Object dependencies = AuraPrivateAccessor.get(MasterDefRegistryImpl.class, "dependencies");
+        Cache c = (Cache) dependencies;
+        if (c.size() == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Return true if all CachingDefRegistry caches are empty, false otherwise.
+     */
+    private boolean isCdrCacheEmpty() throws Exception {
+        MasterDefRegistryImpl mdr = (MasterDefRegistryImpl) Aura.getContextService().getCurrentContext()
+                .getDefRegistry();
+        DefRegistry<?>[] regs = mdr.getAllRegistries();
+        for (DefRegistry<?> dr : regs) {
+            if (dr instanceof CachingDefRegistryImpl) {
+                CachingDefRegistryImpl<? extends Definition> cdr = (CachingDefRegistryImpl<? extends Definition>) dr;
+                Collection<?> defsCache = cdr.getCachedDefs();
+
+                Object existsCache = AuraPrivateAccessor.get(cdr, "existsCache");
+                @SuppressWarnings("unchecked")
+                Cache<DefDescriptor<?>, Boolean> eCache = (Cache<DefDescriptor<?>, Boolean>) existsCache;
+
+                if (!defsCache.isEmpty() && eCache.size() > 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

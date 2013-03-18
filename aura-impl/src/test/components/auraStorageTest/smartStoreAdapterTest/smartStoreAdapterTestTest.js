@@ -459,6 +459,22 @@
         ]
     },
     /**
+     * Test that getExpired returns an item that is expired.
+     */
+    testGetExpiredSpecialCharactersInKey:{
+        test:[
+            function(cmp){
+                   this.setAndWaitForItem("key1.{}$%()", {"expires": new Date().getTime() - 1000 });
+            },
+            function(cmp){
+                var expected = ["key1.{}$%()"];
+                debugger;
+                this.assertGetExpired(expected);
+            }
+        ]
+    },
+
+    /**
      * Test behaviour of getExpired with many expired and not-expired items.
      * The set of expired items is large enough to exercise the underlying iterator and its handling
      * of multiple pages.

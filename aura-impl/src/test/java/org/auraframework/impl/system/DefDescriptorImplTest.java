@@ -76,7 +76,6 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         assertEquals(testDescriptor.getDefType(), DefType.COMPONENT);
     }
 
-    @UnAdaptableTest //("W-1545666")
     public void testGetInstance() throws Exception {
         // test getInstance(tag, defClass)
         DefDescriptor<?> testDescriptor = DefDescriptorImpl.getInstance("aura:text", ComponentDef.class);

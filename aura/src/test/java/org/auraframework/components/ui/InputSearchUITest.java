@@ -36,14 +36,18 @@ public class InputSearchUITest extends WebDriverTestCase {
             BrowserType.SAFARI })
     public void testSearch() throws Exception {
         String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.searched");
+        String cmpValueExpression = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil.getValueFromRootExpr("v.value"));
         valueExpression = auraUITestingUtil.prepareReturnStatement(valueExpression);
         open("/uitest/inputSearchHandlingSearchEvent.cmp");
 
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt("search");
         assertFalse("Search event should not have been triggered yet",
                 auraUITestingUtil.getBooleanEval(valueExpression));
+        assertNull("Component value should not be updated yet",auraUITestingUtil.getEval(cmpValueExpression));
         auraUITestingUtil.pressEnter(input);
         assertTrue("Search event should have been triggered", auraUITestingUtil.getBooleanEval(valueExpression));
+        //test case for W-1545841
+        assertEquals("Component value should be updated","search",auraUITestingUtil.getEval(cmpValueExpression));
     }
 
     // W-1551076: Webdriver not firing search event in Safari

@@ -86,7 +86,7 @@
 	
 	testActionDefault : {
 		test : [function(cmp) {
-			this.saveDate = new Date();
+			this.saveDate = Date.parse(new Date());
 			cmp.find("trigger").get("e.press").fire();
 			$A.test.addWaitFor(true, function(){return "password" != $A.test.getText(cmp.find("output").getElement())});
 		}, function(cmp) {

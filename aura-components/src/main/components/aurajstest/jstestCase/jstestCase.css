@@ -15,26 +15,30 @@
  */
 @-webkit-keyframes jstestCaseThrob {
   from,to {
-  	box-shadow: inset 4px 4px 16px #B40404;
+  	box-shadow: inset 4px 4px 16px #FFFF0F;
   }
   50% {
-  	box-shadow: inset 4px 4px 8px #B40404;
+  	box-shadow: inset 4px 4px 4px #FF800F;
   }
 }
 
 .aurajstestJstestCase .rerun.fail{
-	box-shadow: inset 4px 4px 8px #B40404;
+	background-color: #FF0F0F;
+	box-shadow: inset 4px 4px 8px #FFFF0F;
 	-webkit-animation-iteration-count:infinite;
     -webkit-animation-name: jstestCaseThrob;
     -webkit-animation-duration:1s;
     -webkit-animation-timing-function:linear;
 }
 .aurajstestJstestCase .rerun.pass{
-	box-shadow: inset 4px 4px 4px #088A29;
+	background-color: #0FFF0F;
+	background-color: green;
+	box-shadow: inset 4px 4px 4px #10FF10;
 }
 
 .aurajstestJstestCase .rerun{
-	box-shadow: inset 1px 2px 2px #666;
+	background-color: #FFFF0F;
+	box-shadow: inset 1px 2px 2px #000000;
 	border-radius : 10px;
 	display:inline-block;
 	width:16px;

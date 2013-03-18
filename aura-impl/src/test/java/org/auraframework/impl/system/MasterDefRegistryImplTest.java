@@ -768,7 +768,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      */
     private boolean isMdrCacheEmpty() throws Exception {
         Object dependencies = AuraPrivateAccessor.get(MasterDefRegistryImpl.class, "dependencies");
-        Cache c = (Cache) dependencies;
+        Cache<?,?> c = (Cache<?,?>) dependencies;
         if (c.size() == 0) {
             return true;
         }

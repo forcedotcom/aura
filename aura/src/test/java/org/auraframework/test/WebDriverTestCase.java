@@ -629,8 +629,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     /**
      * Wait for a specified amount of time.
      */
-    public void waitFor(long timeout) {
-        WebDriverWait wait = new WebDriverWait(getDriver(), timeout);
+    public void waitFor(long timeoutInSeconds) {
+        WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSeconds);
         try {
             wait.until(new ExpectedCondition<Boolean>() {
                 @Override

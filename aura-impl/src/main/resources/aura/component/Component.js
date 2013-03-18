@@ -739,7 +739,7 @@ Component.prototype.output = function(){
 };
 
 /**
- * @deprecated Use $A.util.addClass instead to add a CSS class to an element.
+ * Deprecated. Use $A.util.addClass instead to add a CSS class to an element.
  * @param {Object} clz The new CSS class to add to the component's config.
  */
 Component.prototype.addClass = function(clz) {
@@ -762,7 +762,7 @@ Component.prototype.addClass = function(clz) {
 };
 
 /**
- * @deprecated Use $A.util.removeClass instead to remove a CSS class from an element.
+ * Deprecated. Use $A.util.removeClass instead to remove a CSS class from an element.
  * @param {Object} clz An existing class to be removed from the component.
  */
 Component.prototype.removeClass = function(clz) {

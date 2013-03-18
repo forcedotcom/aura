@@ -52,7 +52,7 @@
         // fire the equivalent Aura event
         helper.fireEvent(component, event, helper);
     },
-    
+
     /**
      * Fire the equivalent Aura event for DOM one.
      * This can be overridden by extended component
@@ -98,12 +98,12 @@
      */
     preEventFiring : function(component, event){
     },
-    
+
     /**
      * Set event's parameters with the value from DOM event.
      * The event's parameter name should be the same as the property name in DOM event.
      */
-    setEventParams: function(e, DOMEvent) {
+    setEventParams : function(e, DOMEvent) {
         // set parameters if there is any
         var attributeDefs = e.getDef().getAttributeDefs();
         var params = {};
@@ -115,5 +115,17 @@
             }
         };
         e.setParams(params);
+    },
+
+    /**
+     * Toggle a component's offline state.
+     * @param {Component} component The component being toggled.
+     * @param {Boolean} offline True to set offline state; false for online state.
+     */
+    setOffline: function(component, offline) {
+        component.setValue('v.disabled', offline);
+        var fn = offline ? component.addClass : component.removeClass;
+        fn.call(component, 'offline');
     }
+
 })

@@ -15,9 +15,16 @@
  */
  .THIS .why {
     width: 40%;
- 	margin-top: 20px;
  	}
 .THIS .bLeft{
     width: 50%;
     padding-right: 10px;
+}
+.THIS .why .uiImage{
+	margin:10px;
+	background-repeat: no-repeat;
+}
+.THIS .bLeft .uiImage{
+	margin:auto;
+	background-repeat: no-repeat;
 }

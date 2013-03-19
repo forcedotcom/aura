@@ -18,15 +18,20 @@ package org.auraframework.impl;
 import java.io.File;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
+import junit.framework.Assert;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.source.StringSourceLoader;
+import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Source;
 import org.auraframework.test.AuraTestingUtil;
+import org.auraframework.test.util.AuraPrivateAccessor;
 
 import com.google.common.collect.Sets;
 
@@ -44,12 +49,29 @@ public class AuraTestingUtilImpl implements AuraTestingUtil {
 
     @Override
     public void tearDown() {
-        StringSourceLoader loader = StringSourceLoader.getInstance();
-        for (DefDescriptor<?> dd : cleanUpDds) {
-            loader.removeSource(dd);
+        // wait for registry lock to avoid deadlocks
+        WriteLock lock = null;
+        try {
+            lock = AuraPrivateAccessor.get(MasterDefRegistryImpl.class, "wLock");
+            while (!lock.tryLock()) {
+                Thread.sleep(1000);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            Assert.fail("Failed cleaning up string sources");
         }
-        cleanUpDds.clear();
+
+        try {
+            StringSourceLoader loader = StringSourceLoader.getInstance();
+            for (DefDescriptor<?> dd : cleanUpDds) {
+                loader.removeSource(dd);
+            }
+            cleanUpDds.clear();
+        } finally {
+            lock.unlock();
+        }
     }
+
 
     @Override
     public File getAuraJavascriptSourceDirectory() {

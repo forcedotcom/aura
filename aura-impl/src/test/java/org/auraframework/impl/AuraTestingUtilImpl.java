@@ -17,6 +17,7 @@ package org.auraframework.impl;
 
 import java.io.File;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
@@ -49,16 +50,16 @@ public class AuraTestingUtilImpl implements AuraTestingUtil {
 
     @Override
     public void tearDown() {
-        // wait for registry lock to avoid deadlocks
+        // wait for registry lock to avoid deadlocks (max 5 secs)
         WriteLock lock = null;
         try {
             lock = AuraPrivateAccessor.get(MasterDefRegistryImpl.class, "wLock");
-            while (!lock.tryLock()) {
-                Thread.sleep(1000);
+            if(!lock.tryLock()){
+                lock.tryLock(5, TimeUnit.SECONDS);
             }
         } catch (Throwable t) {
             t.printStackTrace();
-            Assert.fail("Failed cleaning up string sources");
+            Assert.fail("Failed getting lock to clean up string sources");
         }
 
         try {

@@ -556,8 +556,10 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         if (!auraErrorMsg.isEmpty()) {
         	// Compare against any expected failures
         	Set<String> allowedExceptions = getExceptionsAllowedDuringInit();
-        	if (!allowedExceptions.contains(auraErrorMsg)) {
-	            fail("Initialization error: " + auraErrorMsg);
+        	for(String allowedException : allowedExceptions){
+        		if (!auraErrorMsg.contains(allowedException)) {
+        			fail("Initialization error: " + auraErrorMsg);
+            	}
         	}
         }
     }

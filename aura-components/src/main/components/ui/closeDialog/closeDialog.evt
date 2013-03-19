@@ -17,6 +17,8 @@
 -->
 <aura:event type="APPLICATION" description="Event fired to close a dialog window. Handled by ui:dialogManager.">
     <aura:attribute name="dialog" type="Aura.Component" description="The dialog that should be closed."/>
+    <!-- remove this -->
     <aura:attribute name="triggerEvent" type="Event" description="The aura event that triggered this one. If the trigger is a ui:press event, always pass it in here. Optional otherwise."/>
+    <!-- create a separate event for alerts only that extend this event. move confirmClicked to that new one -->
     <aura:attribute name="confirmClicked" type="Boolean" description="This property is 'true' if the confirmation button in an alert dialog was clicked, 'false' otherwise."/>
 </aura:event>

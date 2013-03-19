@@ -23,11 +23,13 @@
           <h4>What is Aura?</h4>
           <p>Aura is a UI framework for developing dynamic web apps for mobile and desktop devices. Aura provides a scalable long-lived lifecycle to support building apps engineered for growth.</p>
           <p>Aura supports partitioned multi-tier component development that bridges the client and server. It uses JavaScript on the client side and Java on the server side.</p>
+          <ui:image src="/auraFW/resources/aura/images/devices.png" alt="Aura is platform and device agnostic."/>
         </aura:set>
          <span class="why">
          <h4>Why Use Aura?</h4>
          <p>Aura comes with a rich and extensible component set to kick start building apps. You don't have to spend your time optimizing your apps for different devices as the components take care of that for you.</p>
          <p>The framework intelligently utilizes your server, browser, devices, and network so you can focus on the logic and interactions of your apps.</p>
+          <ui:image src="/auraFW/resources/aura/images/modules.png" alt="Aura components speed up app development." />
          </span>
     </ui:block>
     

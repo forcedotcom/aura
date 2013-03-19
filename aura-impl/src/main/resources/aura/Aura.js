@@ -448,7 +448,7 @@ $A.ns.Aura.prototype.finishInit = function() {
 };
 
 /**
- * Use $A.error in response to an error that prevents Aura from starting an application successfully.
+ * Use $A.error() in response to an error that prevents Aura from starting an application successfully.
  * To treat a test as successful where $A.error() is expected, use exceptionsAllowedDuringInit.
  * @description <p>Example:</p>
  * testDuplicate : {<br/>

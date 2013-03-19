@@ -21,9 +21,9 @@
     		id = cmp.getLocalId() || cmp.getGlobalId() || '';
     	
     	if (imageType === 'informational' && altText.length == 0) {    		
-    		throw new Error('component: ' + id + ' "alt" attribute should not be empty for informational image');
+    		$A.error('component: ' + id + ' "alt" attribute should not be empty for informational image');
     	} else if (imageType === 'decorative' && altText.length > 0) {
-    		throw new Error('component: ' + id + ': "alt" attribute should be empty for decorative image');
+    		$A.error('component: ' + id + ': "alt" attribute should be empty for decorative image');
     	}
     }
 }

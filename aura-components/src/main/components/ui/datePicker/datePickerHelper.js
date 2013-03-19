@@ -54,6 +54,9 @@
     
     TodayLabels: {
         ar: "اليوم",
+        cs: "Dnes",
+        de: "Heute",
+        es: "Hoy",
         fr: "aujourd'hui",
         ja: "今日",
         ko: "오늘",

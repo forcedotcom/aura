@@ -18,14 +18,24 @@
         if (helper.getOnClickEventProp.cache && 
             helper.getOnClickEventProp.cache.onClickStartEvent && 
             component._onClickStartFunc) {
-            document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickStartEvent, 
-                                              component._onClickStartFunc, false);
+            if (document.body.removeEventListener) {
+                document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickStartEvent, 
+                                                  component._onClickStartFunc, false);
+            } else if (document.body.detachEvent) {
+                document.body.detachEvent(helper.getOnClickEventProp.cache.onClickStartEvent, 
+                                          component._onClickStartFunc, false);    
+            }
         }
         if (helper.getOnClickEventProp.cache &&
             helper.getOnClickEventProp.cache.onClickEndEvent && 
             component._onClickEndFunc) {
-            document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickEndEvent, 
-                                              component._onClickEndFunc, false);
+            if (document.body.removeEventListener) {
+                document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickEndEvent, 
+                                                  component._onClickEndFunc, false);
+            } else if (document.body.detachEvent) {
+                document.body.detachEvent(helper.getOnClickEventProp.cache.onClickEndEvent, 
+                                          component._onClickEndFunc, false);
+            }
         }
         this.superUnrender();
     }

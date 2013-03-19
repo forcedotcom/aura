@@ -345,11 +345,16 @@
                 <artifactId>jetty-webapp</artifactId>
                 <version>8.1.4.v20120524</version>
             </dependency>
-			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-all</artifactId>
-				<version>1.9.5</version>
-			</dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>1.9.5</version>
+            </dependency>
+	        <dependency>
+	            <groupId>org.apache.commons</groupId>
+	            <artifactId>commons-vfs2</artifactId>
+	            <version>2.0</version>
+	        </dependency>
         </dependencies>
     </dependencyManagement>
     <build>

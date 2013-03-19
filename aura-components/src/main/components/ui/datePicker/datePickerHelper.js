@@ -191,7 +191,10 @@
     
     localizeToday: function(component) {
         var todayElem = component.find("today").getElement();
-        var todayLabel = this.TodayLabels[component.get("m.langLocale")];
+        var todayLabel = $A.get("{!$Label.Related_Lists.task_mode_today}");
+        if (!todayLabel) {
+            todayLabel = this.TodayLabels[component.get("m.langLocale")];
+        }
         if (!todayLabel) {
             todayLabel = "Today";
         }

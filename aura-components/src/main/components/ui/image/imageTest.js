@@ -74,7 +74,7 @@
         }
     },
     
-    _testInformationImageTypeWithoutAltText:{
+    testInformationImageTypeWithoutAltText:{
     	exceptionsAllowedDuringInit : ["\"alt\" attribute should not be empty for informational image"],
     	attributes : {imageType:'informational'},
         test: function(cmp){
@@ -84,7 +84,7 @@
         }
     },
     
-    _testDecorativeImageTypeWithAltText:{
+    testDecorativeImageTypeWithAltText:{
     	exceptionsAllowedDuringInit : ["\"alt\" attribute should be empty for decorative image"],
     	attributes : {imageType:'decorative', alt:'Company'},
         test: function(cmp){

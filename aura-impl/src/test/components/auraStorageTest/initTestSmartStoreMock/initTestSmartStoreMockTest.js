@@ -1,5 +1,16 @@
 ({
-    
+    /**
+     * Verify the smartstore adapter is selected for actions when auraStorage:init is used without
+     * any specification.
+     */
+    testAdapterSelection : {
+        test : function(cmp) {
+                        var storage = $A.storageService.getStorage("actions");
+                        $A.test.assertTruthy(storage, "Failed to fetch named storage.");
+                        $A.test.assertEquals("smartstore", storage.getName());
+                }
+        },
+
     /**
      * Verify Action.setStorable() and auto refresh
      * setStorage() accepts configuration. These configuration are helpful for follow up actions 

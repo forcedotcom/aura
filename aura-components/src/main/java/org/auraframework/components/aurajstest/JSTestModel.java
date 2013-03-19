@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.auraframework.components.aurajstest;
 
 import java.util.ArrayList;
@@ -46,23 +47,21 @@ public class JSTestModel {
         BaseComponent<?, ?> component = context.getCurrentComponent();
         DefinitionService defService = Aura.getDefinitionService();
 
-        String desc = (String) component.getAttributes().getValue("descriptor");
-        DefType defType = DefType.valueOf(((String) component.getAttributes().getValue("defType")).toUpperCase());
+        String desc = (String)component.getAttributes().getValue("descriptor");
+        DefType defType = DefType.valueOf(((String)component.getAttributes().getValue("defType")).toUpperCase());
 
         desc = "js://" + desc.replace(':', '.');
         descriptor = defService.getDefDescriptor(desc, TestSuiteDef.class);
         def = descriptor.getDef();
-        if (def == null) {
-            throw new DefinitionNotFoundException(descriptor);
-        }
+        if (def == null) { throw new DefinitionNotFoundException(descriptor); }
         long nonce = System.currentTimeMillis();
 
         url = String.format("/%s/%s.%s?aura.nonce=%s&aura.mode=AUTO%s", descriptor.getNamespace(),
                 descriptor.getName(), defType == DefType.COMPONENT ? "cmp" : "app", nonce, context.getMode().name());
 
-        String test = (String) component.getAttributes().getValue("test");
+        String test = (String)component.getAttributes().getValue("test");
         tcds = filterTestCases(test);
-        
+
         TestContextAdapter contextAdapter = Aura.get(TestContextAdapter.class);
         for (TestCaseDef tcd : tcds) {
             TestContext testContext = contextAdapter.getTestContext(tcd.getDescriptor().getQualifiedName());
@@ -98,5 +97,10 @@ public class JSTestModel {
     @AuraEnabled
     public String getUrl() {
         return url;
+    }
+
+    @AuraEnabled
+    public Boolean getIsHybrid() {
+        return url.contains("/hybridContainerTest/");
     }
 }

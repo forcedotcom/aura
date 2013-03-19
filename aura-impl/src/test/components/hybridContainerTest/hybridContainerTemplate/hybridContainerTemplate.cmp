@@ -1,10 +1,11 @@
 <aura:component isTemplate="true" extensible="true" extends="aura:template">
     <aura:set attribute="extraScriptTags">
-        <script src="/auraFW/resources/mocksmartstore/MockCordova.js"></script>
+        <!-- tests are always run in frames so use the parent window's cordova to get the callbacks from native code -->
+        <!-- the cordova definitions made in sfhybridapp and sfsmartstoreplugin don't seem to make it into the child browser (module not found) -->
+        <script>cordova = window.parent.cordova;</script>
         <script src="/auraFW/resources/hybridcontainer1.5/SFHybridApp.js"></script>
         <script src="/auraFW/resources/hybridcontainer1.5/SFSmartStorePlugin.js"></script>
-        <script src="/auraFW/resources/mocksmartstore/MockSDKInfo.js"></script>
-        <script src="/auraFW/resources/mocksmartstore/MockSmartStore.js"></script>
+        
     </aura:set>
     {!v.containerScripts}
 </aura:component>

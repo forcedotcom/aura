@@ -1,3 +1,0 @@
-<aura:component extends="AuraStorageTest:initTest" render="client" template="AuraStorageTest:smartStoreTemplate">
-    <aura:set attribute="persistent" value="true"/> 
-</aura:component>

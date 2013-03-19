@@ -25,7 +25,7 @@
 
     <h2>Setting Up Your Tests</h2>
 
-    <p>Add component tests to a JavaScript file in the component bundle. For example, a component <code>inputAddr.cmp</code> in the ui namespace is saved in the folder inputPhone, which
+    <p>Add component tests to a JavaScript file in the component bundle. For example, a component <code>inputAddr.cmp</code> in the ui namespace is saved in the folder inputAddr, which
     can contain a test file <code>inputAddrTest.js</code>. Add a test case as a new function in the component's test file. See <auradocs:topicLink topic="compBundle">Component Bundles</auradocs:topicLink> for more information.
     </p>
 

@@ -118,14 +118,17 @@
     },
 
     /**
-     * Toggle a component's offline state.
+     * Toggle a component's disabled state and an optional CSS class.
      * @param {Component} component The component being toggled.
-     * @param {Boolean} offline True to set offline state; false for online state.
+     * @param {Boolean} disabled True to set disabled; false for enabled.
+     * @param {String} disabledCss Optional css class to apply when disabled, and remove when enabled.
      */
-    setOffline: function(component, offline) {
-        component.setValue('v.disabled', offline);
-        var fn = offline ? component.addClass : component.removeClass;
-        fn.call(component, 'offline');
+    setDisabled: function(component, disabled, disabledCss) {
+        component.setValue('v.disabled', disabled);
+        if (disabledCss) {
+            var fn = disabled ? component.addClass : component.removeClass;
+            fn.call(component, disabledCss);
+        }
     }
 
 })

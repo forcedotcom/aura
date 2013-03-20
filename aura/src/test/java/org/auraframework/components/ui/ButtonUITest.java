@@ -16,7 +16,9 @@
 package org.auraframework.components.ui;
 
 import org.auraframework.test.WebDriverTestCase;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -38,5 +40,15 @@ public class ButtonUITest extends WebDriverTestCase {
                     	return (getQuickFixMessage().contains(errorMsg));
                     }
                 });
+    }
+    
+    public void testDomEventAttributeOnPressEvent() throws Exception {
+    	open("/uitest/buttonTest.cmp");
+    	WebElement btn = findDomElement(By.cssSelector(".testDomEventBtn"));
+    	btn.click();
+    	
+    	String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.isDomEventSet");
+        valueExpression = auraUITestingUtil.prepareReturnStatement(valueExpression);
+        assertTrue("domEvent attribute on event should have been set", auraUITestingUtil.getBooleanEval(valueExpression));
     }
 }

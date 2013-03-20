@@ -73,6 +73,7 @@ public class InputTextUITest extends WebDriverTestCase {
         input.click();
         outputDiv.click();	//	to simulate tab behavior for touch browsers 
         value = assertModelValue(eventName); // value should have been updated
+        assertDomEventSet();
 
         eventName = "change";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
@@ -86,24 +87,29 @@ public class InputTextUITest extends WebDriverTestCase {
         assertModelValue(value);
         input.click();
         value = assertModelValue(eventName);
+        assertDomEventSet();
 
         eventName = "focus";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         outputDiv.click();
         input.click();
         value = assertModelValue(eventName);
+        assertDomEventSet();
 
         eventName = "keydown";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         value = assertModelValue(eventName.substring(0, eventName.length() - 1));
+        assertDomEventSet();
 
         eventName = "keypress";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         value = assertModelValue(eventName.substring(0, eventName.length() - 1));
+        assertDomEventSet();
 
         eventName = "keyup";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         value = assertModelValue(eventName);
+        assertDomEventSet();
     }
 
     @UnAdaptableTest
@@ -124,24 +130,28 @@ public class InputTextUITest extends WebDriverTestCase {
         assertModelValue(value);
         input.click();
         value = assertModelValue(eventName);
-        
+        assertDomEventSet();
+
         eventName = "dblclick";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
         a.doubleClick(input).build().perform();
         value = assertModelValue(eventName);
+        assertDomEventSet();
 
         eventName = "mousemove";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
         a.moveToElement(input).moveByOffset(0, 100).build().perform();
         value = assertModelValue(eventName);
+        assertDomEventSet();
 
         eventName = "mouseout";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
         a.moveToElement(input).moveToElement(outputDiv).build().perform();
         value = assertModelValue(eventName);
+        assertDomEventSet();
 
         eventName = "mouseover";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
@@ -149,12 +159,14 @@ public class InputTextUITest extends WebDriverTestCase {
         outputDiv.click();
         a.moveToElement(input).build().perform();
         value = assertModelValue(eventName);
+        assertDomEventSet();
 
         eventName = "mouseup";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
         input.click();
         value = assertModelValue(eventName);
+        assertDomEventSet();
 
         eventName = "select";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
@@ -196,6 +208,13 @@ public class InputTextUITest extends WebDriverTestCase {
         return value;
     }
 
+    private void assertDomEventSet() {
+    	String valueExpression = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil
+                .getValueFromRootExpr("v.isDomEventSet"));
+    	boolean value = auraUITestingUtil.getBooleanEval(valueExpression);
+    	assertTrue("domEvent attribute on event should have been set.", value);
+    }
+    
     public void testNullValue() throws Exception {
         String cmpSource = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> "
                 + "<ui:inputText value=\"{!m.StringNull}\"/>" + "</aura:component>";

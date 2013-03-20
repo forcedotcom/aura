@@ -20,9 +20,11 @@
         helper.setErrorComponent(component, value);
     },
     
-    init: function(cmp) {    	
-    	var mode = $A.getContext().getMode();    	
-    	if (mode === "SELENIUM" || mode === "SELENIUMDEBUG") {    		 
+    init: function(cmp) {   	
+    	var mode = $A.getContext().getMode(),
+    		isIOS = $A.get("$Browser.isIOS");
+    		
+    	if ((mode === "SELENIUM" || mode === "SELENIUMDEBUG") && isIOS) {    		 
     		//change event does not fire in selenium mode, so default to blur event
     		//W-1564254
     		if (cmp.get('v.updateOn') === 'change') {    			

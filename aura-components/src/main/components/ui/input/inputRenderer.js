@@ -15,12 +15,13 @@
  */
 ({
     afterRender: function(component, helper) {
+        this.superAfterRender();
+
         helper.addInputDomEvents(component);
-        return this.superAfterRender();
     },
+    
     rerender: function(component, helper) {
-        helper.addInputDomEvents(component);
         helper.handleErrors(component);
-        return this.superRerender();
+        this.superRerender();
     }
 })

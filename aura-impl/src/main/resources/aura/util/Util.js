@@ -555,24 +555,42 @@ $A.ns.Util.prototype.on = (function() {
     if (window["addEventListener"]) {
         return function(element, eventName, handler, useCapture, timeout) {
             if (timeout) {
-                handler = $A.util.createTimeoutCallback(handler, timeout);
+                handler = this.createTimeoutCallback(handler, timeout);
             }
 
             if(element){
                 element["addEventListener"](eventName, handler, useCapture);
             }
         };
-    }
-    if(window["attachEvent"]) {
-        var preventDefault=function(){
-            this.returnValue=false;
+    } else {
+        var preventDefault = function(){
+            this.returnValue = false;
         };
-        var stopPropagation=function(){
-            this.cancelBubble=true;
+        
+        var stopPropagation = function(){
+            this.cancelBubble = true;
         };
+        
         return function(element, eventName, handler, useCapture, timeout) {
+            if (!element){
+            	return;
+            }
+
+            // Eliminate registration of duplicate handlers on older browsers
+        	var handlers = element["handlers"];
+        	if (handlers) {
+        		if (this.arrayIndexOf(handlers, handler) < 0) {
+        			handlers.push(handler);
+        		} else {
+        			// Do not wire up duplicate handlers
+        			return;
+        		}
+        	} else {
+        		element["handlers"] = [handler];
+        	}
+        	
             if (timeout) {
-                handler = $A.util.createTimeoutCallback(handler, timeout);
+                handler = this.createTimeoutCallback(handler, timeout);
             }
 
             // Correct the context of the events (this) pointer to the element its attached to.
@@ -587,12 +605,9 @@ $A.ns.Util.prototype.on = (function() {
                 event.currentTarget = event.target = event.which = event.preventDefault = event.stopPropagation = null;
             };
 
-            if(element){
-                element["attachEvent"]('on' + eventName, newHandler, false);
-            }
+            element["attachEvent"]('on' + eventName, newHandler, false);
         };
     }
-    return null;
 })();
 
 /**

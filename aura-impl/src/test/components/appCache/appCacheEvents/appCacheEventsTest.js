@@ -4,6 +4,8 @@
      * covers when we have not seen the page before and must download resources.
      */
     testAppCacheEvents: {
+        // AppCache not supported on IE < 10
+        browsers:["-IE7","-IE8","-IE9"],
         test: function(component){
             var appCacheEvents = $A.test.getAppCacheEvents();
             var lastEvent = appCacheEvents.length - 1;

@@ -44,6 +44,8 @@
     <p>The <code>&lt;li class="red"&gt;</code> element matches the <code>.THIS .red</code> selector and renders with a red background. Note that this is a descendant selector and it contains a space as the <code>&lt;li&gt;</code> element is not a top-level element.</p>
 
     <auradocs:example descriptor="auradocs:helloHTML" />
+    
+    <auradocs:info>See <auradocs:topicLink topic="addClass">Adding and Removing Styles</auradocs:topicLink> for more information.</auradocs:info>
 
     <h2>Unescaping HTML</h2>
 

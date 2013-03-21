@@ -18,7 +18,7 @@
 <aura:component extends="auradocs:topicPanel">
 	<p>
 	<code>aura:attribute</code> describes an attribute available on a component. See <auradocs:topicLink topic="helloAttributes">Component Attributes</auradocs:topicLink> for an introduction to attributes.
-	An <code>aura:cmp</code> tag can contain these attributes.
+	An <code>aura:attribute</code> tag can contain these attributes.
 	</p>  
 	<table class="table table-bordered table-striped">
           <thead>
@@ -32,7 +32,7 @@
               <tr>
                      <td><code>name</code></td>
                      <td>String</td>
-                     <td>Required. The name of the attribute. For example, if you set <code>name="isTrue"</code> on a component attribute, you can use this attribute by setting <code>&lt;aura:component isTrue="false" /&gt;</code>. </td>
+                     <td>Required. The name of the attribute. For example, if you set <code>&lt;aura:attribute name="isTrue" type="Boolean" /&gt;</code> to a component called <code>aura:newCmp</code>, you can use this attribute by setting <code>&lt;aura:newCmp isTrue="false" /&gt;</code>. </td>
               </tr>
               <tr>
                      <td><code>type</code></td>
@@ -57,7 +57,9 @@
               <tr>
                      <td><code>serializeTo</code></td>
                      <td>String</td>
-                     <td>Determines if the attribute will be in JSON encoded form while transported from server to client or from client to server. Valid values are SERVER, BOTH, or NONE. </td>
+                     <td>For optimization. Determines if the attribute is transported from server to client or from client to server. Attributes are transported in JSON format. Valid values are SERVER, BOTH, or NONE. The default is BOTH.
+                     Specify SERVER if you don't want to serialize the attribute to the client. Specify NONE if you don't need the attribute to be serialized at all. For example, use NONE if it is a client-side only attribute.
+                     Or if you have a JavaScript object array that must be accessible to markup but don't have a requirement on how the objects are constructed, you can use <code>&lt;aura:attribute name="myObj" type="List" serializeTo="NONE"&gt;</code>.</td>
               </tr>
           </tbody>
        </table>

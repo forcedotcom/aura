@@ -264,7 +264,10 @@
                     function(){
     					$A.test.assertTrue(action.isFromStorage(), "Should have cached the action response.");
                     });
-    		$A.test.addWaitFor("1",function(){return $A.test.getTextByComponent(cmp.get("facet"));});
+    		$A.test.addWaitFor("National League",function(){
+    		    				var facet = cmp.get("facet").get('v.body')[0];
+    		    				return $A.test.getTextByComponent(facet.find("Division"));
+    		    			});
     	}, 
     	//Verify that components can be created multiple times with the same action response
     	function(cmp){
@@ -282,7 +285,14 @@
                     function(){
     					$A.test.assertTrue(dupAction.isFromStorage(), "Failed to fetch action response from storage for second action instance.");
                     });
-    		$A.test.addWaitFor("11",function(){return $A.test.getTextByComponent(cmp.get("facet"));});
+    		$A.test.addWaitFor("National League",function(){
+    		    		var facet_new = cmp.get("facet").get('v.body')[0];
+    		    		return $A.test.getTextByComponent(facet_new.find("Division"));
+    		    	});
+    		$A.test.addWaitFor("National League",function(){
+	    		var facet_old = cmp.get("facet").get('v.body')[1];
+	    		return $A.test.getTextByComponent(facet_old.find("Division"));
+	    	});
     	}]
     },
     /**

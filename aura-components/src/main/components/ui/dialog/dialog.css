@@ -92,8 +92,7 @@
     transform:translate3d(0,0,0);
 }
 .uiDialog .title,
-.uiDialog .content,
-.uiDialog .buttons{
+.uiDialog .content{
     margin:10px;
 }
 .uiDialog .title{
@@ -110,9 +109,6 @@
     background-color:#FFF;
     box-shadow:inset 0 0 6px #000;
     border:2px solid #FFF;
-}
-.uiDialog .buttons{
-    text-align:center;
 }
 .uiDialog .close{
     position:absolute;

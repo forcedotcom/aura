@@ -17,11 +17,7 @@
 -->
 <aura:component extensible="true" support="GA" description="Manages all instances of ui:dialog in an application, by handling visibility and all DOM events. One (and only one) instance of this component is required if you wish to use the ui:dialog component. We recommend putting the ui:dialogManager component at the end of your .app file.">
 
-    <!-- private attributes -->
-    <aura:attribute name="_activeDialog" type="Aura.Component" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. The currently active (i.e., open) ui:dialog component."/>
-
     <!-- events -->
-    <aura:registerEvent name="close" type="ui:closeDialog"/>
     <aura:handler event="ui:openDialog" action="{!c.openDialog}"/>
     <aura:handler event="ui:closeDialog" action="{!c.closeDialog}"/>
 

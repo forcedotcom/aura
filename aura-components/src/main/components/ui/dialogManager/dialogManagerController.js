@@ -22,8 +22,7 @@
      */
     openDialog : function(cmp, evt, hlp) {
 
-        var atts         = cmp.getAttributes(),
-            activeDialog = atts.get("_activeDialog"),
+        var activeDialog = cmp.get("m.activeDialog"),
             triggerEvent = evt.getParam("triggerEvent"),
             dialog       = evt.getParam("dialog");
 
@@ -50,10 +49,7 @@
      */
     closeDialog : function(cmp, evt, hlp) {
 
-        var dialog       = evt.getParam("dialog"),
-            triggerEvent = evt.getParam("triggerEvent");
-
-        hlp.deactivateDialog(dialog, cmp);
+        hlp.deactivateDialog(evt.getParam("dialog"), cmp);
 
     }
 

@@ -51,5 +51,6 @@ exp(p,
     "createTimeoutCallback", p.createTimeoutCallback,
     "arrayIndexOf", p.arrayIndexOf,
     "contains", p.contains,
-    "squash", p.squash
+    "squash", p.squash,
+    "getWindowSize", p.getWindowSize
 );

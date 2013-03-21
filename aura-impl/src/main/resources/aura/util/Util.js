@@ -1071,4 +1071,30 @@ $A.ns.Util.prototype.squash = function(event, preventDefault) {
 };
 
 
+/**
+ * Simple function to get client viewport dimensions. If neither window.innerWidth
+ * nor document.body.clientWidth is supported by the client, returns "0" for
+ * both width and height.
+ * 
+ * @return {Object} JS object with the fields "width" and "height"
+ */
+$A.ns.Util.prototype.getWindowSize = function() {
+    if (window.innerWidth) {
+        return {
+            width : window.innerWidth,
+            height : window.innerHeight
+        };
+    } else if (document.body.clientWidth){
+        return {
+            width : document.body.clientWidth,
+            height : document.body.clientHeight
+        };
+    } else {
+        return {
+            width : 0,
+            height : 0
+        };
+    }
+};
+
 //#include aura.util.Util_export

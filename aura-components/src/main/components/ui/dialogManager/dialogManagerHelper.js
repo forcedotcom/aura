@@ -18,59 +18,58 @@
 
     /**
      * Activates a single ui:dialog component by:
-     *     1. setting a reference to it on the dialogManager component.
+     *     1. setting a reference to it on the dialogManager's model.
      *     2. applying event handlers for proper interaction.
-     *     3. setting a reference to those event handlers on the dialog component (for removal later).
-     *     4. managing application of CSS classes for display and animation.
+     *     3. setting a reference to those event handlers on the dialog's model (for removal later).
+     *     4. applying CSS classes to display the dialog.
      *
-     * @param {Aura.Component} dialogCmp the ui:dialog component to activate
-     * @param {Aura.Component} managerCmp the ui:dialogManager component
+     * @param {Aura.Component} dialog the ui:dialog component to activate
+     * @param {Aura.Component} manager the ui:dialogManager component
      * @return {void}
      */
-    activateDialog : function(dialogCmp, managerCmp) {
+    activateDialog : function(dialog, manager) {
 
-        var dialogAtts      = dialogCmp.getAttributes(),
-            dialogType      = dialogAtts.get("type"),
-            clickOutToClose = dialogAtts.get("clickOutToClose"),
-            autoFocus       = dialogAtts.get("autoFocus"),
-            isModal         = dialogType === "alert" || dialogType === "modal",
-            dialogInnerCmp  = dialogCmp.find("dialog"),
-            maskCmp         = dialogCmp.find("mask"),
-            managerAtts     = managerCmp.getAttributes(),
-            handlerConfig   = this.getHandlerConfig(dialogCmp, isModal, clickOutToClose, managerCmp);
+        var atts            = dialog.getAttributes(),
+            isModal         = atts.get("isModal"),
+            clickOutToClose = atts.get("clickOutToClose"),
+            autoFocus       = atts.get("autoFocus"),
+            content         = dialog.find("dialog"),
+            mask            = dialog.find("mask"),
+            handlerConfig   = this.getHandlerConfig(dialog, manager, isModal, clickOutToClose);
 
-        managerAtts.setValue("_activeDialog", dialogCmp);
-        dialogAtts.setValue("_handlerConfig", handlerConfig);
-        this.applyEventHandlers(handlerConfig);
-        this.doAnimation(true, maskCmp, dialogInnerCmp, autoFocus, isModal, handlerConfig);
+        this.applyHandlers(handlerConfig);
+        this.doAnimation(true, mask, content, autoFocus, isModal, handlerConfig);
+        manager.get("m.activeDialog").setValue(dialog);
+        dialog.get("m.handlerConfig").setValue(handlerConfig);
 
     },
 
 
     /**
      * Deactivates a single ui:dialog component by:
-     *     1. removing the reference to it from the dialogManager component.
+     *     1. removing the reference to it from the dialogManager's model.
      *     2. removing event handlers.
-     *     3. managing removal of CSS classes for display and animation.
+     *     3. removing the reference to those event handlers from the dialog's model.
+     *     4. removing CSS classes to hide the dialog.
      *
-     * @param {Aura.Component} dialogCmp the ui:dialog component to deactivate
-     * @param {Aura.Component} managerCmp the ui:dialogManager component
+     * @param {Aura.Component} dialog the ui:dialog component to deactivate
+     * @param {Aura.Component} manager the ui:dialogManager component
      * @return {void}
      */
-    deactivateDialog : function(dialogCmp, managerCmp) {
+    deactivateDialog : function(dialog, manager) {
 
-        var dialogAtts      = dialogCmp.getAttributes(),
-            dialogType      = dialogAtts.get("type"),
-            autoFocus       = dialogAtts.get("autoFocus"),
-            handlerConfig   = dialogAtts.get("_handlerConfig"),
-            isModal         = dialogType === "alert" || dialogType === "modal",
-            maskCmp         = dialogCmp.find("mask"),
-            dialogInnerCmp  = dialogCmp.find("dialog"),
-            managerAtts     = managerCmp.getAttributes();
+        var atts          = dialog.getAttributes(),
+            isModal       = atts.get("isModal"),
+            autoFocus     = atts.get("autoFocus"),
+            handlerConfig = dialog.get("m.handlerConfig"),
+            mask          = dialog.find("mask"),
+            content       = dialog.find("dialog");
 
-        managerAtts.setValue("_activeDialog", null);
-        this.removeEventHandlers(handlerConfig);
-        this.doAnimation(false, maskCmp, dialogInnerCmp, autoFocus, isModal, handlerConfig);
+        /* TODO: remove manager's activeDialog and dialog's handlerConfig from their respective models */
+        this.removeHandlers(handlerConfig);
+        this.doAnimation(false, mask, content, autoFocus, isModal, handlerConfig);
+        manager.get("m.activeDialog").setValue(null);
+        dialog.get("m.handlerConfig").setValue(null);
 
     },
 
@@ -81,7 +80,7 @@
      * @param {Object} config JS object that contains all the necessary event handlers
      * @return {void}
      */
-    applyEventHandlers : function(config) {
+    applyHandlers : function(config) {
 
         $A.util.on(document, "keydown", config.keydownHandler, false);
         $A.util.on(document, "click", config.clickHandler, false);
@@ -96,7 +95,7 @@
      * @param {Object} config JS object that contains all the necessary event handlers
      * @return {void}
      */
-    removeEventHandlers : function(config) {
+    removeHandlers : function(config) {
 
         $A.util.removeOn(document, "keydown", config.keydownHandler, false);
         $A.util.removeOn(document, "click", config.clickHandler, false);
@@ -111,20 +110,20 @@
      * focused element (before the dialog opens), and the first focusable element
      * inside the dialog.
      * 
-     * @param {Aura.Component} dialogCmp the active ui:dialog comonent
+     * @param {Aura.Component} dialog the active ui:dialog comonent
      * @param {Boolean} isModal specifies if the active dialog is modal
      * @param {Boolean} clickOutToClose specifies if clicking outside the dialog should close it
-     * @param {Aura.Component} managerCmp the ui:dialogManager component
+     * @param {Aura.Component} manager the ui:dialogManager component
      * @return {Object} references to event handlers, and elements to remove or apply focus
      */
-    getHandlerConfig : function(dialogCmp, isModal, clickOutToClose, managerCmp) {
+    getHandlerConfig : function(dialog, manager, isModal, clickOutToClose) {
 
         var self          = this,
             oldFocus      = document.activeElement,
-            newFocus      = this.getFirstFocusableElement(dialogCmp),
-            keydown       = function(event) { self.getKeydownHandler(dialogCmp, managerCmp, isModal, newFocus, event) },
-            click         = function(event) { self.getClickHandler(dialogCmp, managerCmp, clickOutToClose, event) },
-            resize        = function() { self.getResizeHandler(dialogCmp, isModal) };
+            newFocus      = this.getFirstFocusableElement(dialog),
+            keydown       = function(event) { self.getKeydownHandler(dialog, manager, isModal, newFocus, event) },
+            click         = function(event) { self.getClickHandler(dialog, manager, clickOutToClose, event) },
+            resize        = function() { self.getResizeHandler(dialog, isModal) };
 
         return {
             oldFocus       : oldFocus,
@@ -141,23 +140,23 @@
      * Constructs the handler for the DOM keydown event. Includes handlers for 1) escape key,
      * and 2) tab key (including shift+tab).
      * 
-     * @param {Aura.Component} dialogCmp the active ui:dialog component
-     * @param {Aura.Component} managerCmp the ui:dialogManager component
+     * @param {Aura.Component} dialog the active ui:dialog component
+     * @param {Aura.Component} manager the ui:dialogManager component
      * @param {Boolean} isModal specifies if the dialog is modal
      * @param {HTMLElement} firstFocusable the first focusable element inside the dialog
      * @param {UIEvent} event DOM keydown event
      * @return {void}
      */
-    getKeydownHandler : function(dialogCmp, managerCmp, isModal, firstFocusable, event) {
+    getKeydownHandler : function(dialog, manager, isModal, firstFocusable, event) {
 
         if (!event) { var event = window.event; }
 
-        var closeButton  = dialogCmp.find("closeButton").getElement(),
+        var closeButton  = dialog.find("closeButton").getElement(),
             shiftPressed = event.shiftKey,
             currentFocus = document.activeElement,
             closeEvent   = $A.get("e.ui:closeDialog");
 
-        closeEvent.setParams({ dialog : dialogCmp, confirmClicked : false });
+        closeEvent.setParams({ dialog : dialog, confirmClicked : false });
 
         switch (event.keyCode) {
             case 27: // escape key - always closes all dialogs
@@ -190,18 +189,18 @@
     /**
      * Constructs the handler for the DOM click event.
      * 
-     * @param {Aura.Component} dialogCmp the ui:dialog component
-     * @param {Aura.Component} managerCmp the ui:dialogManager component
+     * @param {Aura.Component} dialog the ui:dialog component
+     * @param {Aura.Component} manager the ui:dialogManager component
      * @param {Boolean} clickOutToClose whether the dialog should be closed on click outside the dialog
      * @param {UIEvent} event the DOM click event
      * @return {void}
      */
-    getClickHandler : function(dialogCmp, managerCmp, clickOutToClose, event) {
+    getClickHandler : function(dialog, manager, clickOutToClose, event) {
 
         if (!event) { var event = window.event; }
 
         var target        = event.target || event.srcElement,
-            container     = dialogCmp.find("dialog").getElement(),
+            container     = dialog.find("dialog").getElement(),
             clickedInside = $A.util.contains(container, target),
             closeEvent;
 
@@ -211,7 +210,7 @@
             if (clickOutToClose) {
                 closeEvent = $A.get("e.ui:closeDialog");
                 closeEvent.setParams({
-                    dialog : dialogCmp,
+                    dialog : dialog,
                     confirmClicked : false
                 });
                 closeEvent.fire();
@@ -255,10 +254,10 @@
      * @param {Aura.Component} cmp the ui:dialog component
      * @return {HTMLElement} the first focusable element inside the dialog, or the "x" link for IE7
      */
-    getFirstFocusableElement : function(dialogCmp) {
+    getFirstFocusableElement : function(dialog) {
 
-        var container    = dialogCmp.find("dialog").getElement(),
-            close        = dialogCmp.find("closeButton").getElement(),
+        var container    = dialog.find("dialog").getElement(),
+            close        = dialog.find("closeButton").getElement(),
             formElements = [],
             length       = 0,
             element      = null;
@@ -290,28 +289,28 @@
 
 
     /**
-     * Handles the application or removal of CSS classes that control the visibility of
+     * Handles the application and removal of CSS classes that control the visibility of
      * all dialog types, as well as the animation behaviour of modal dialogs. This method
      * also handles focusing on the proper element when a dialog is opened or closed.
      * 
-     * @param {Boolean} isVisible specifies if the dialog should be displayed or hidden
+     * @param {Boolean} show specifies if the dialog should be shown (true) or hidden (false)
      * @param {Aura.Component} maskCmp the ui:dialog's "mask" component
-     * @param {Aura.Component} dialogCmp the ui:dialog component
+     * @param {Aura.Component} dialog the ui:dialog component
      * @param {Boolean} autoFocus specifies if focus should automatically be applied to the first element in the dialog
      * @param {Boolean} isModal specifies if this dialog is modal
      * @param {Object} config JS object that contains references to the elements to focus
      * @return {void}
      */
-    doAnimation : function(isVisible, maskCmp, dialogCmp, autoFocus, isModal, config) {
+    doAnimation : function(show, maskCmp, dialog, autoFocus, isModal, config) {
 
         var maskElement   = maskCmp ? maskCmp.getElement() : null,
-            dialogElement = dialogCmp.getElement(),
+            dialogElement = dialog.getElement(),
             flickerDelay  = 50,
             focusDelay    = 300,
             hideDelay     = 500;
 
         // if the dialog should be opened, remove the 'hidden' classes and apply the animation classes
-        if (isVisible) {
+        if (show) {
             $A.util.removeClass(dialogElement, "hidden");
             if (isModal) {
                 $A.util.removeClass(maskElement, "hidden");

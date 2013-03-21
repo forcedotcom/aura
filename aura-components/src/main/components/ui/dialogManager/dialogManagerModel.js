@@ -1,0 +1,3 @@
+{
+    activeDialog : null
+}

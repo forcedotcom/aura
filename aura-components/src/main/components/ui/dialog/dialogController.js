@@ -17,21 +17,34 @@
 
 
     /**
-     * Ties the <h2> tag in the dialog header to the dialog container using
-     * aria-labelledby. also makes sure modal windows with tons of content
-     * don't extend outside the viewport by setting a max-height CSS property.
+     * Validates the "ariaRole", "buttons", and "width" attributes.
      */
-    initialize : function(cmp, evt, hlp) {
+    doInit : function(cmp, evt, hlp) {
 
-        var atts             = cmp.getAttributes(),
-            type             = atts.get("type"),
-            isModal          = type === "alert" || type === "modal",
-            title            = cmp.find("title");
+        var atts        = cmp.getAttributes(),
+            buttonFacet = atts.get("buttons"),
+            role        = atts.get("ariaRole"),
+            width       = atts.get("width"),
+            length      = 0;
 
-        atts.setValue("_ariaId", title.getGlobalId());
+        // validate the aria role is one of the allowed values
+        if (role !== "dialog" && role !== "alertdialog") {
+            $A.error("The 'ariaRole' attribute of a ui:dialog component must be one of the following case-sensitive values: dialog, alertdialog");
+        }
 
-        if (isModal) {
-            atts.setValue("_maxHeight", hlp.getContentMaxHeight());
+        // validate the button facet is of type ui:dialogButtons
+        if (buttonFacet) {
+            length = buttonFacet.length;
+            for (var i=0; i<length; i++) {
+                if (!buttonFacet[i].isInstanceOf("ui:dialogButtons")) {
+                    $A.error("The 'buttons' attribute of a ui:dialog component must be of type ui:dialogButtons");
+                }
+            }
+        }
+
+        // validate the width attribute is one of the allowed values
+        if (width !== "small" && width !== "medium" && width !== "large" && width !== "auto") {
+            $A.error("The 'width' attribute of a ui:dialog component must be one of the following case-sensitive values: small, medium, large, auto");
         }
 
     },
@@ -42,21 +55,15 @@
      * the dialog. Fires the application-level event ui:closeDialog, setting the
      * 'confirmClicked' attribute to false.
      */
-    cancel : function(cmp, evt, hlp) {
+    close : function(cmp, evt, hlp) {
 
-        hlp.confirmOrCancel(cmp, evt, false);
+        var closeEvent = $A.get("e.ui:closeDialog");
 
-    },
-
-
-    /*
-     * Handles the click of default confirm button of the dialog. Fires the
-     * application-level event ui:closeDialog, setting the 'confirmClicked'
-     * attribute to true.
-     */
-    confirm : function(cmp, evt, hlp) {
-
-        hlp.confirmOrCancel(cmp, evt, true);
+        closeEvent.setParams({
+            dialog : cmp,
+            confirmClicked : false
+        });
+        closeEvent.fire();
 
     }
 

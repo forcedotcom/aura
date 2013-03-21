@@ -16,20 +16,28 @@
 ({
 
 
-    /**
-     * Calculates the max-height of the content <div> in a modal window so
-     * it doesn't extend outside the viewport.
-     * 
-     * @param {Aura.Component} contentCmp the content box component
-     * @return {void}
+    /*
+     * Handles the click of the default cancel button of the dialog. Fires the
+     * application-level event ui:closeDialog, setting the 'confirmClicked'
+     * attribute to false.
      */
-    getContentMaxHeight : function() {
+    cancel : function(cmp, evt, hlp) {
 
-        return Math.min($A.util.getWindowSize().height, 1250) - 150;
+        hlp.confirmOrCancel(cmp, false);
 
     },
 
 
+    /*
+     * Handles the click of default confirm button of the dialog. Fires the
+     * application-level event ui:closeDialog, setting the 'confirmClicked'
+     * attribute to true.
+     */
+    confirm : function(cmp, evt, hlp) {
+
+        hlp.confirmOrCancel(cmp, true);
+
+    }
 
 
 })

@@ -58,7 +58,7 @@
                      <td><code>serializeTo</code></td>
                      <td>String</td>
                      <td>For optimization. Determines if the attribute is transported from server to client or from client to server. Attributes are transported in JSON format. Valid values are SERVER, BOTH, or NONE. The default is BOTH.
-                     Specify SERVER if you do not want to serialize the attribute to the client. Specify NONE if you don't need the attribute to be serialized at all. For example, use NONE if it is a client-side only attribute.
+                     Specify SERVER if you don't want to serialize the attribute to the client. Specify NONE if you don't need the attribute to be serialized at all. For example, use NONE if it is a client-side only attribute.
                      Or if you have a JavaScript object array that must be accessible to markup but don't have a requirement on how the objects are constructed, you can use <code>&lt;aura:attribute name="myObj" type="List" serializeTo="NONE"&gt;</code>.</td>
               </tr>
           </tbody>

@@ -28,7 +28,7 @@
     <h2>Discussion</h2>
     <p>The buttons in this demo are wired to controller actions that append or remove the CSS styles. To append a CSS style to an element, use <code>$A.util.addClass(element, 'class');</code>.
     Similarly, remove the class by using <code>$A.util.removeClass(element, 'class');</code> in your controller.
-    <code>cmp.find()</code> locates the element using the localid, denoted by <code>aura:id="changeIt"</code> in this demo.</p>
+    <code>cmp.find()</code> locates the element using the local ID, denoted by <code>aura:id="changeIt"</code> in this demo.</p>
     
     <auradocs:info>See the <a href="#reference?topic=api:Util">JavaScript API Reference</a> for more utility functions for working with DOM elements.</auradocs:info>
     

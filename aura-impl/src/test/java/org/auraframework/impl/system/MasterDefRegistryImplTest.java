@@ -37,9 +37,13 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.service.BuilderService;
+import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.test.util.AuraPrivateAccessor;
 import org.auraframework.throwable.NoAccessException;
@@ -50,6 +54,7 @@ import org.mockito.internal.util.MockUtil;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -723,18 +728,25 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      * proper caches.
      */
     public void testSourceChangeClearsCachesInDevMode() throws Exception {
-        AuraContext currContext = Aura.getContextService().getCurrentContext();
-        Aura.getContextService().startContext(Mode.DEV, currContext.getFormat(), currContext.getAccess());
+        // Make sure we're in Dev mode.
+        ContextService contextService = Aura.getContextService();
+        if (contextService.isEstablished()) {
+            contextService.endContext();
+        }
+        contextService.startContext(Mode.DEV, Format.JSON, Access.AUTHENTICATED);
+
+        MasterDefRegistry mdr = contextService.getCurrentContext().getDefRegistry();
         DefDescriptor<ComponentDef> cmpDesc = Aura.getDefinitionService().getDefDescriptor("test:deleteMeAfterTest",
                 ComponentDef.class);
 
-        // Make sure we have something in the caches before we check that they're cleared
-        Aura.getDefinitionService().getDefDescriptor("test:text", ComponentDef.class).getDef();
-        assertTrue("MasterDefRegistry should not be empty after calling getDef() on a component", !isMdrCacheEmpty());
-        assertTrue("CachingDefRegistry should not be empty after calling getDef() on a component", !isCdrCacheEmpty());
+        // Make sure it's actually in the CachingDefRegistry caches
+        mdr.exists(cmpDesc);
 
-        // Delete added files at end of test
-        Source<?> source = Aura.getContextService().getCurrentContext().getDefRegistry().getSource(cmpDesc);
+        // Get the UID before adding the file since getUid() messes with caches
+        String uid = mdr.getUid(null, cmpDesc);
+
+        // Tell test to delete added component and directory files at end of test
+        Source<?> source = mdr.getSource(cmpDesc);
         File f = new File(source.getUrl().replace("file:", ""));
         deleteFileOnTeardown(f);
         deleteFileOnTeardown(f.getParentFile());
@@ -743,18 +755,20 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         BuilderService builderService = Aura.getBuilderService();
         ComponentDef def = builderService.getComponentDefBuilder().setDescriptor(cmpDesc).build();
         Aura.getDefinitionService().save(def);
-        waitForCachesToClear();
+        assertNotCached(cmpDesc, mdr, uid);
     }
 
     /**
      * Wait for MasterDefRegistry and CachingDefRegistry caches to be cleared after a source change.
      */
-    private void waitForCachesToClear() throws Exception {
+    private void assertNotCached(DefDescriptor<ComponentDef> cmpDesc, MasterDefRegistry mdr, String uid)
+            throws Exception {
         long startTime = System.nanoTime();
         long timeoutInMilliseconds = 10000;
         long intervalInMilliseconds = 100;
+
         while (TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime) < timeoutInMilliseconds) {
-            if (isMdrCacheEmpty() && isCdrCacheEmpty()) {
+            if (isMdrCacheCleared(cmpDesc, mdr, uid) && isCdrCacheCleared(cmpDesc, mdr)) {
                 return;
             }
             Thread.sleep(intervalInMilliseconds);
@@ -763,36 +777,47 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Return true if the MasterDefRegistry static cache is empty. This does not take into account non-static
-     * localDependencies cache.
+     * Return true if DefDescriptor has been removed from MasterDefRegistry static cache. This does not take into
+     * account the non-static local cache.
      */
-    private boolean isMdrCacheEmpty() throws Exception {
+    private boolean isMdrCacheCleared(DefDescriptor<ComponentDef> cmpDesc, MasterDefRegistry mdr, String uid)
+            throws Exception {
         Object dependencies = AuraPrivateAccessor.get(MasterDefRegistryImpl.class, "dependencies");
-        Cache<?,?> c = (Cache<?,?>) dependencies;
-        if (c.size() == 0) {
+        String key = AuraPrivateAccessor.invoke(mdr, "makeGlobalKey", uid, cmpDesc);
+        Object cacheReturn = ((Cache<?, ?>) dependencies).getIfPresent(key);
+
+        if (cacheReturn == null) {
             return true;
         }
         return false;
     }
 
     /**
-     * Return true if all CachingDefRegistry caches are empty, false otherwise.
+     * Return true if all CachingDefRegistry caches have cleared the DefDescriptor, false otherwise.
      */
-    private boolean isCdrCacheEmpty() throws Exception {
-        MasterDefRegistryImpl mdr = (MasterDefRegistryImpl) Aura.getContextService().getCurrentContext()
-                .getDefRegistry();
-        DefRegistry<?>[] regs = mdr.getAllRegistries();
+    @SuppressWarnings("unchecked")
+    private boolean isCdrCacheCleared(DefDescriptor<ComponentDef> cmpDesc, MasterDefRegistry mdr) throws Exception {
+        DefRegistry<?>[] regs = ((MasterDefRegistryImpl) mdr).getAllRegistries();
         for (DefRegistry<?> dr : regs) {
             if (dr instanceof CachingDefRegistryImpl) {
+                // Grab caches off CDR
                 CachingDefRegistryImpl<? extends Definition> cdr = (CachingDefRegistryImpl<? extends Definition>) dr;
                 Collection<?> defsCache = cdr.getCachedDefs();
+                Object eCache = AuraPrivateAccessor.get(cdr, "existsCache");
+                Cache<DefDescriptor<?>, Boolean> existsCache = (Cache<DefDescriptor<?>, Boolean>) eCache;
 
-                Object existsCache = AuraPrivateAccessor.get(cdr, "existsCache");
-                @SuppressWarnings("unchecked")
-                Cache<DefDescriptor<?>, Boolean> eCache = (Cache<DefDescriptor<?>, Boolean>) existsCache;
-
-                if (!defsCache.isEmpty() && eCache.size() > 0) {
+                // Check exists cache
+                if (existsCache.getIfPresent(cmpDesc) != null) {
                     return false;
+                }
+
+                // Check definitions cache
+                for (Object def : defsCache) {
+                    Definition definition = ((Optional<? extends Definition>) def).orNull();
+                    if (definition != null
+                            && definition.getDescriptor().getQualifiedName().equals(cmpDesc.getQualifiedName())) {
+                        return false;
+                    }
                 }
             }
         }

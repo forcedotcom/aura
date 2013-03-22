@@ -19,13 +19,13 @@
     <aura:set attribute="title" value="Dynamically Adding Event Handlers"/>
 
     <h2>Goal</h2>
-	<p>You want to start handling events that a component fires. The component can be created dynamically on the client-side or fetched from the server at runtime. See <auradocs:topicLink topic="dynamicCmp">Dynamically Creating Components</auradocs:topicLink> for more information.</p>
+	<p>You want to dynamically add a handler for an event that a component fires. The component can be created dynamically on the client-side or fetched from the server at runtime. See <auradocs:topicLink topic="dynamicCmp">Dynamically Creating Components</auradocs:topicLink> for more information.</p>
 	
 	<h2>Code</h2>
-	<p>This sample code adds an event handler to instances of <code>auradocs:component</code>.</p>
+	<p>This sample code adds an event handler to instances of <code>auradocs:sampleComponent</code>.</p>
 	<auradocs:codeblock>
 	addNewHandler : function(cmp, event) {
-		var cmpArr = cmp.find({ instancesOf : "auradocs:component" });
+		var cmpArr = cmp.find({ instancesOf : "auradocs:sampleComponent" });
 		for (var i = 0; i &lt; cmpArr.length; i++){
 		  var outputCmpArr = cmpArr[i];
 		  outputCmpArr.addHandler("someAction", cmp, "c.someAction");
@@ -41,7 +41,8 @@
 	
 	<h2>Discussion</h2>
 	<p><code>component.addHandler()</code> adds an event handler to a component. Note that you cannot force a component to start firing events that it doesn't fire.
-	<code>c.someAction</code> can be an action in a controller, in a custom renderer, or in a helper in the component's hierarchy. <code>someAction</code> and <code>cmp</code> refers to the event name and value provider respectively.</p>
+	<code>c.someAction</code> can be an action in a controller in the component's hierarchy. <code>someAction</code> and <code>cmp</code> refers to the event name and value provider respectively.
+	<code>someAction</code> must match the <code>name</code> attribute value in the <code>aura:registerevent</code> or <code>aura:handler</code> tag.</p>
 	
 	<auradocs:info>See the <a href="#reference?topic=api:AuraComponentService">JavaScript API reference</a> for a full list of methods and arguments.</auradocs:info>
 	

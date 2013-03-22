@@ -553,7 +553,7 @@ $A.ns.Util.prototype.createTimeoutCallback = function(callback, toleranceMillis)
  *
  * @param {HTMLElement} element The DOM element to which to apply the listener.
  * @param {String} eventName The name of the DOM event, minus the "on" prefix (e.g. "click", "focus", "blur", etc.).
- * @param {Object} handler The JS listener function to add.
+ * @param {Object} handler The JS handler to add.
  * @param {Boolean} useCapture Whether to use event capturing.
  * @param {Integer} timeout Optional timeout (in milliseconds) that will delay the handler execution.
  * @returns {Object} Either a function (success) or null (fail)
@@ -1094,22 +1094,10 @@ $A.ns.Util.prototype.squash = function(event, preventDefault) {
  * @return {Object} JS object with the fields "width" and "height"
  */
 $A.ns.Util.prototype.getWindowSize = function() {
-    if (window.innerWidth) {
-        return {
-            width : window.innerWidth,
-            height : window.innerHeight
-        };
-    } else if (document.body.clientWidth){
-        return {
-            width : document.body.clientWidth,
-            height : document.body.clientHeight
-        };
-    } else {
-        return {
-            width : 0,
-            height : 0
-        };
-    }
+    return {
+        width : window.innerWidth || document.body.clientWidth || 0,
+        height : window.innerHeight || document.body.clientHeight || 0
+    };
 };
 
 //#include aura.util.Util_export

@@ -1,10 +1,10 @@
 <aura:component isTemplate="true" extensible="true" extends="aura:template">
     <aura:set attribute="extraScriptTags">
-        <script src="/auraFW/resources/smartstore/MockCordova.js"></script>
-        <script src="/auraFW/resources/smartstore/SFHybridApp.js"></script>
-        <script src="/auraFW/resources/smartstore/SFSmartStorePlugin.js"></script>
-        <script src="/auraFW/resources/smartstore/MockSDKInfo.js"></script>
-        <script src="/auraFW/resources/smartstore/MockSmartStore.js"></script>
+        <script src="/auraFW/resources/mocksmartstore/MockCordova.js"></script>
+        <script src="/auraFW/resources/hybridcontainer1.5/SFHybridApp.js"></script>
+        <script src="/auraFW/resources/hybridcontainer1.5/SFSmartStorePlugin.js"></script>
+        <script src="/auraFW/resources/mocksmartstore/MockSDKInfo.js"></script>
+        <script src="/auraFW/resources/mocksmartstore/MockSmartStore.js"></script>
     </aura:set>
     {!v.containerScripts}
 </aura:component>

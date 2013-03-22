@@ -23,7 +23,28 @@ var priv = {
         waits : [],
         complete : -1, // -1:uninitialized, 0:complete, 1:tearing down, 2:running, 3+:waiting
         errors : [],
-        timeoutTime : 0
+        timeoutTime : 0,
+        appCacheEvents : [], // AppCache events in order, as they are picked up
+
+        handleAppcacheChecking : function() {
+            priv.appCacheEvents.push("checking");
+        },
+
+        handleAppcacheProgress : function() {
+            priv.appCacheEvents.push("progress");
+        },
+
+        handleAppcacheDownloading: function() {
+            priv.appCacheEvents.push("downloading");
+        },
+
+        handleAppcacheCached: function() {
+            priv.appCacheEvents.push("cached");
+        },
+
+        handleAppcacheError: function() {
+            priv.appCacheEvents.push("error");
+        }
 };
 
 /**
@@ -210,4 +231,13 @@ function getDump() {
     return status;
 }
 
-
+/**
+ * Set up AppCache event listeners. Not a complete set of events, but all the ones we care about in our current tests.
+ */
+if (window.applicationCache && window.applicationCache.addEventListener) {
+    window.applicationCache.addEventListener("checking", priv.handleAppcacheChecking, false);
+    window.applicationCache.addEventListener("progress", priv.handleAppcacheProgress, false);
+    window.applicationCache.addEventListener("downloading", priv.handleAppcacheDownloading, false);
+    window.applicationCache.addEventListener("cached", priv.handleAppcacheCached, false);
+    window.applicationCache.addEventListener("error", priv.handleAppcacheError, false);
+}

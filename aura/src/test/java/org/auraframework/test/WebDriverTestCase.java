@@ -556,8 +556,10 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         if (!auraErrorMsg.isEmpty()) {
         	// Compare against any expected failures
         	Set<String> allowedExceptions = getExceptionsAllowedDuringInit();
-        	if (!allowedExceptions.contains(auraErrorMsg)) {
-	            fail("Initialization error: " + auraErrorMsg);
+        	for(String allowedException : allowedExceptions){
+        		if (!auraErrorMsg.contains(allowedException)) {
+        			fail("Initialization error: " + auraErrorMsg);
+            	}
         	}
         }
     }
@@ -629,8 +631,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     /**
      * Wait for a specified amount of time.
      */
-    public void waitFor(long timeout) {
-        WebDriverWait wait = new WebDriverWait(getDriver(), timeout);
+    public void waitFor(long timeoutInSeconds) {
+        WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSeconds);
         try {
             wait.until(new ExpectedCondition<Boolean>() {
                 @Override

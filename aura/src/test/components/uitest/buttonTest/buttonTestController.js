@@ -24,5 +24,14 @@
 
     handleIconOnly : function(cmp, event){
         cmp.getAttributes().setValue("iconOnlyButtonPressedMessage", "Icon only button was pressed!!!");
+    },
+    
+    checkDomEventSet : function(cmp, event){
+    	var domEvent = event.getParam("domEvent");
+    	if ($A.util.isUndefinedOrNull(domEvent)) {
+    		cmp.getAttributes().setValue("isDomEventSet", false);
+    	} else {
+    		cmp.getAttributes().setValue("isDomEventSet", true);
+    	}
     }
 }

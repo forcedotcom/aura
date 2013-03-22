@@ -18,14 +18,15 @@ package org.auraframework.http;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.auraframework.Aura;
 import org.auraframework.components.security.SecurityProviderAccessLogger;
 import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -39,6 +40,7 @@ import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 /**
  * Automation to verify Security Providers functionally.
@@ -125,8 +127,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Deny GET component in DEV mode, with app with security provider that
-     * denies access.
+     * Deny GET component in DEV mode, with app with security provider that denies access.
      */
     public void testGetDevCmpWithDenies() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
@@ -138,8 +139,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Deny GET application in DEV mode, with security provider that throws a
-     * Throwable.
+     * Deny GET application in DEV mode, with security provider that throws a Throwable.
      */
     public void testGetDevAppWithThrows() throws Exception {
         verifyGetAccessDenied(DefType.APPLICATION,
@@ -148,8 +148,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Deny GET component in DEV mode, with app with security provider that
-     * throws a Throwable.
+     * Deny GET component in DEV mode, with app with security provider that throws a Throwable.
      */
     public void testGetDevCmpWithThrows() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
@@ -161,8 +160,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Deny GET application in PROD mode, with default security provider. No
-     * error info in response.
+     * Deny GET application in PROD mode, with default security provider. No error info in response.
      */
     @TestLabels("auraSanity")
     public void testGetProdAppWithDefault() throws Exception {
@@ -170,8 +168,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Deny GET application in PROD config, with security provider that throws a
-     * Throwable.
+     * Deny GET application in PROD config, with security provider that throws a Throwable.
      */
     public void testGetProdConfigAppWithThrows() throws Exception {
         ServletConfigController.setProductionConfig(true);
@@ -187,8 +184,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Deny GET component in PROD mode, with app with security provider that
-     * throws a Throwable. No error info in response.
+     * Deny GET component in PROD mode, with app with security provider that throws a Throwable. No error info in
+     * response.
      */
     public void testGetProdConfigCmpWithThrows() throws Exception {
         ServletConfigController.setProductionConfig(true);
@@ -223,8 +220,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Allow GET application in PROD mode, with security provider that allows
-     * access.
+     * Allow GET application in PROD mode, with security provider that allows access.
      */
     @TestLabels("auraSanity")
     public void testGetProdAppWithAllows() throws Exception {
@@ -234,8 +230,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Deny GET application in PROD mode, with security provider that denies
-     * access.
+     * Deny GET application in PROD mode, with security provider that denies access.
      */
     public void testGetProdAppWithDenies() throws Exception {
         verifyGetAccessDenied(DefType.APPLICATION,
@@ -244,8 +239,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Deny GET application in PROD mode, with security provider that denies
-     * access, but trying other app.
+     * Deny GET application in PROD mode, with security provider that denies access, but trying other app.
      */
     public void testGetProdConfigAppWithDeniesAndOther() throws Exception {
         ServletConfigController.setProductionConfig(true);
@@ -258,8 +252,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Allow GET application in PROD mode, with security provider that allows
-     * access, but trying other app.
+     * Allow GET application in PROD mode, with security provider that allows access, but trying other app.
      */
     public void testGetProdConfigAppWithAllowsAndOther() throws Exception {
         ServletConfigController.setProductionConfig(true);
@@ -281,8 +274,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Allow GET component in PROD mode, with app with security provider that
-     * allows access.
+     * Allow GET component in PROD mode, with app with security provider that allows access.
      */
     @UnAdaptableTest
     // SFDCAuraServlet will not allow COMPONENTs at all
@@ -295,8 +287,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Deny GET component in PROD mode, with app with security provider that
-     * denies access.
+     * Deny GET component in PROD mode, with app with security provider that denies access.
      */
     public void testGetProdConfigCmpWithDenies() throws Exception {
         ServletConfigController.setProductionConfig(true);
@@ -331,13 +322,14 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
                         "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderAccessLogger'><%1$s:%2$s><%3$s:%4$s/></%1$s:%2$s><%3$s:%4$s/></aura:application>",
                         outerCmpDesc.getNamespace(), outerCmpDesc.getName(), innerCmpDesc.getNamespace(),
                         innerCmpDesc.getName()));
-        ImmutableSet<DefDescriptor<? extends BaseComponentDef>> expectedDescs = ImmutableSet.of(innerCmpDesc,
-                outerCmpDesc, appDesc);
+        ImmutableSet<DefDescriptor<?>> expectedDescs = ImmutableSet.<DefDescriptor<?>> of(innerCmpDesc, outerCmpDesc,
+                appDesc);
 
         // first request for app should have only 1 log for each desc
         SecurityProviderAccessLogger.clearLog();
-        String url = String.format("/string/%s.%s?aura.context=%s", appDesc.getName(), "app",
-                AuraTextUtil.urlencode("{'mode':'PROD'}"));
+        String url = String.format("/string/%s.%s?aura.context=%s", appDesc.getName(), "app", AuraTextUtil
+                .urlencode(String.format("{'mode':'PROD','fwuid':'%s','app':'%s'}", Aura.getConfigAdapter()
+                        .getAuraFrameworkNonce(), appDesc.getDescriptorName())));
         assertEquals("Unexpected http status code", HttpStatus.SC_OK,
                 getHttpClient().executeMethod(obtainGetMethod(url)));
         assertAccessLogContains(expectedDescs);
@@ -350,18 +342,18 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         assertAccessLogContains(expectedDescs);
     }
 
-    private void assertAccessLogContains(ImmutableSet<DefDescriptor<? extends BaseComponentDef>> expectedDescs)
-            throws Exception {
+    private void assertAccessLogContains(Set<DefDescriptor<?>> expectedDescs) throws Exception {
         List<DefDescriptor<?>> log = SecurityProviderAccessLogger.getLog();
-        if (log.size() > 3) {
-            fail("Security check should have been done only once per descriptor.  Instead, got: " + log);
-        }
 
         if (!log.containsAll(expectedDescs)) {
             fail("Security check not executed for all expected descriptors: " + expectedDescs + ". Instead, got: "
                     + log);
         }
-
+        // remove duplicates from log by creating a Set from it
+        Set<?> set = Sets.newHashSet(log);
+        if (set.size() != log.size()) {
+            fail("Security check should have been done only once per descriptor.  Instead, got extra: " + log);
+        }
     }
 
     private PostMethod buildPostRequest(Mode mode, String actionDescriptor, String appDescriptor) throws Exception {
@@ -376,10 +368,9 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         params.put("message", jsonMessage);
         params.put("aura.lastmod", "" + getLastMod(mode));
         params.put("aura.token", getCsrfToken());
-        params.put(
-                "aura.context",
-                String.format("{'mode':'%s'%s}", mode.name(),
-                        appDescriptor == null ? "" : String.format(",'app':'%s'", appDescriptor)));
+        params.put("aura.context", String.format("{'mode':'%s'%s,'fwuid':'%s'}", mode.name(),
+                appDescriptor == null ? "" : String.format(",'app':'%s'", appDescriptor), Aura.getConfigAdapter()
+                        .getAuraFrameworkNonce()));
         return obtainPostMethod("/aura", params);
     }
 
@@ -390,16 +381,17 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         assertEquals("Unexpected http status code", HttpStatus.SC_OK, statusCode);
         String response = post.getResponseBodyAsString();
         Map<String, Object> json = null;
-       
+
         try {
-            json = (Map<String, Object>) new JsonReader().read(response.substring(AuraBaseServlet.CSRF_PROTECT.length()));
+            json = (Map<String, Object>)new JsonReader()
+                    .read(response.substring(AuraBaseServlet.CSRF_PROTECT.length()));
         } catch (Exception e) {
-            fail("unable to parse "+response+" "+e.getMessage());
+            fail("unable to parse " + response + " " + e.getMessage());
         }
 
         assertEquals("Unexpected state", "SUCCESS",
-                ((Map<String, Object>) ((List<Object>) json.get("actions")).get(0)).get("state"));
-        Map<String, Object> context = (Map<String, Object>) json.get("context");
+                ((Map<String, Object>)((List<Object>)json.get("actions")).get(0)).get("state"));
+        Map<String, Object> context = (Map<String, Object>)json.get("context");
         assertEquals("Unexpected mode", mode.name(), context.get("mode"));
         if (appDescriptor != null) {
             assertEquals("Unexpected app", appDescriptor, context.get("app"));
@@ -413,8 +405,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         assertEquals("Unexpected http status code", HttpStatus.SC_OK, statusCode);
         String response = post.getResponseBodyAsString();
         assertTrue("Expected error string", response.endsWith("/*ERROR*/"));
-        Map<String, Object> json = (Map<String, Object>) new JsonReader().read("/*" + response);
-        String desc = ((Map<String, Object>) json.get("event")).get("descriptor").toString();
+        Map<String, Object> json = (Map<String, Object>)new JsonReader().read("/*" + response);
+        String desc = ((Map<String, Object>)json.get("event")).get("descriptor").toString();
         assertEquals("Unexpected event", "markup://aura:noAccess", desc);
     }
 
@@ -427,8 +419,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Deny POST action in DEV mode, with app with security provider that denies
-     * access.
+     * Deny POST action in DEV mode, with app with security provider that denies access.
      */
     public void testPostDevActionWithAppDenied() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
@@ -439,8 +430,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Allow POST action in DEV mode, with app with security provider that
-     * allows access.
+     * Allow POST action in DEV mode, with app with security provider that allows access.
      */
     public void testPostDevActionWithAppAllowed() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
@@ -458,8 +448,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Deny POST action in PROD mode, with app with security provider that
-     * denies access.
+     * Deny POST action in PROD mode, with app with security provider that denies access.
      */
     public void testPostProdActionWithAppDenied() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
@@ -470,8 +459,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Allow POST action in PROD mode, with app with security provider that
-     * allows access.
+     * Allow POST action in PROD mode, with app with security provider that allows access.
      */
     @TestLabels("auraSanity")
     public void testPostProdActionWithAppAllowed() throws Exception {
@@ -485,6 +473,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     /**
      * Allow POST action in PROD mode, with unsecured namespace prefix.
      */
+    // Cannot guarantee context will not have preloads other than unsecured ones.
+    @UnAdaptableTest
     public void testPostProdActionWithUnsecuredNamespace() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
                 ApplicationDef.class,
@@ -495,8 +485,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Deny POST action in PROD mode, with app with security provider that
-     * throws a Throwable.
+     * Deny POST action in PROD mode, with app with security provider that throws a Throwable.
      */
     @SuppressWarnings("unchecked")
     public void testPostProdConfigActionWithAppThrows() throws Exception {
@@ -510,8 +499,8 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         assertEquals("Unexpected http status code", HttpStatus.SC_OK, statusCode);
         String response = post.getResponseBodyAsString();
         assertTrue("Expected error string", response.endsWith("/*ERROR*/"));
-        Map<String, Object> json = (Map<String, Object>) new JsonReader().read("/*" + response);
-        String desc = ((Map<String, Object>) json.get("event")).get("descriptor").toString();
+        Map<String, Object> json = (Map<String, Object>)new JsonReader().read("/*" + response);
+        String desc = ((Map<String, Object>)json.get("event")).get("descriptor").toString();
         assertEquals("Unexpected event", "markup://aura:noAccess", desc);
     }
 

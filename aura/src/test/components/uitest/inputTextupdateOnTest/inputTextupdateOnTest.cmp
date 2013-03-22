@@ -16,9 +16,11 @@
 
 -->
 <aura:component  model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:attribute name="isDomEventSet" type="boolean" default="false"/>
+
 <div id="blur">
 blur:
-<ui:inputText aura:id="blur" value="{!m.String}" updateOn="blur"/>
+<ui:inputText aura:id="blur" value="{!m.String}" updateOn="blur" blur="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="change">
@@ -28,57 +30,57 @@ change:
 
 <div id="click">
 click:
-<ui:inputText aura:id="click" value="{!m.String}" updateOn="click"/>
+<ui:inputText aura:id="click" value="{!m.String}" updateOn="click" click="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="dblclick">
 dblclick:
-<ui:inputText aura:id="dblclick" value="{!m.String}" updateOn="dblclick"/>
+<ui:inputText aura:id="dblclick" value="{!m.String}" updateOn="dblclick" dblclick="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="focus">
 focus:
-<ui:inputText aura:id="focus" value="{!m.String}" updateOn="focus"/>
+<ui:inputText aura:id="focus" value="{!m.String}" updateOn="focus" focus="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="mousedown">
 mousedown:
-<ui:inputText aura:id="mousedown" value="{!m.String}" updateOn="mousedown"/>
+<ui:inputText aura:id="mousedown" value="{!m.String}" updateOn="mousedown" mousedown="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="mousemove">
 mousemove:
-<ui:inputText aura:id="mousemove" value="{!m.String}" updateOn="mousemove"/>
+<ui:inputText aura:id="mousemove" value="{!m.String}" updateOn="mousemove" mousemove="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="mouseout">
 mouseout:
-<ui:inputText aura:id="mouseout" value="{!m.String}" updateOn="mouseout"/>
+<ui:inputText aura:id="mouseout" value="{!m.String}" updateOn="mouseout" mouseout="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="mouseover">
 mouseover:
-<ui:inputText aura:id="mouseover" value="{!m.String}" updateOn="mouseover"/>
+<ui:inputText aura:id="mouseover" value="{!m.String}" updateOn="mouseover" mouseover="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="mouseup">
 mouseup:
-<ui:inputText aura:id="mouseup" value="{!m.String}" updateOn="mouseup"/>
+<ui:inputText aura:id="mouseup" value="{!m.String}" updateOn="mouseup" mouseup="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="keydown">
 keydown:
-<ui:inputText aura:id="keydown" value="{!m.String}" updateOn="keydown"/>
+<ui:inputText aura:id="keydown" value="{!m.String}" updateOn="keydown" keydown="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="keypress">
 keypress:
-<ui:inputText aura:id="keypress" value="{!m.String}" updateOn="keypress"/>
+<ui:inputText aura:id="keypress" value="{!m.String}" updateOn="keypress" keypress="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="keyup">
 keyup:
-<ui:inputText aura:id="keyup" value="{!m.String}" updateOn="keyup"/>
+<ui:inputText aura:id="keyup" value="{!m.String}" updateOn="keyup" keyup="{!c.checkDomEventSet}"/>
 </div>
 
 <div id="select">

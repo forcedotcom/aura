@@ -371,7 +371,7 @@ var AuraClientService = function() {
          * Return whether Aura believes it is online. This is only an educated
          * guess. Immediate and future communication with the server may fail.
          *
-         * @return true if Aura believe it is online; false otherwise.
+         * @return true if Aura believes it is online; false otherwise.
          */
         isConnected : function() {
             return !priv.isDisconnected;

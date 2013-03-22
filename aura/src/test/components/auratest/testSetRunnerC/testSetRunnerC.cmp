@@ -18,6 +18,8 @@
 <aura:component model="java://org.auraframework.test.testsetrunner.TestSetRunnerModel" controller="java://org.auraframework.test.testsetrunner.TestSetRunnerController">
     <aura:handler event="auratest:poll" action="{!c.poll}"/>
     <aura:handler event="aura:initialized" action="{!c.poll}"/>
+    <!-- Indicates what type of tests we want to run. Default is every type except 'hybrid_container' tests -->
+    <aura:attribute name="scope" type="String"/>
     <div>
     <div id="menu" class="testmenu">
         <span class="menuItem">

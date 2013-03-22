@@ -229,7 +229,7 @@ public class AuraResourceServlet extends AuraBaseServlet
      * 
      * The manifest contains CSS and JavaScript URLs. These specified resources are copied into the AppCache
      * with the HTML template. When the page is reloaded, the existing manifest is compared to the new manifest.
-     * If they are identical, the resources are served from the AppCache. Otherwise, 
+     * If they are identical, the resources are served from the AppCache. Otherwise,
      * the resources are requested from the server and the AppCache is updated.
      * 
      * @param request the request
@@ -456,7 +456,9 @@ public class AuraResourceServlet extends AuraBaseServlet
         ret = definitionCache.get(key);
         if (ret != null) {
             out.append(ret);
+            return;
         }
+
         StringBuilder sb = new StringBuilder();
 
         sb.append("$A.clientService.initDefs({");

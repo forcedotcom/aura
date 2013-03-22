@@ -43,7 +43,7 @@ function AuraContext(config) {
     this.test = config["test"];
     
     // If persistent storage is active then write through for disconnected support
-    var storage = this.getStorage("actions");
+    var storage = this.getStorage();
     var that = this;
     if (storage) {
     	storage.get("globalValueProviders", function(item) {
@@ -144,6 +144,12 @@ AuraContext.prototype.join = function(otherContext) {
     if (otherContext["mode"] !== this.getMode()) {
         throw new Error("Mode mismatch");
     }
+    if ($A.util.isUndefinedOrNull(this.fwuid)) {
+        this.fwuid = otherContext["fwuid"];
+    }
+    if (otherContext["fwuid"] !== this.fwuid) {
+        throw new Error("framework mismatch");
+    }
     this.joinGlobalValueProviders(otherContext["globalValueProviders"]);
     this.joinComponentConfigs(otherContext["components"]);
     this.joinLoaded(otherContext["loaded"]);
@@ -195,32 +201,36 @@ AuraContext.prototype.getApp = function(){
  */
 AuraContext.prototype.joinGlobalValueProviders = function(gvps, doNotPersist) {
     if (gvps) {
+    	var storage;
+    	var storedGvps;
+        if (!doNotPersist) {
+	        // If persistent storage is active then write through for disconnected support
+	        storage = this.getStorage();
+        	storedGvps = [];
+        }
+        
         for (var i = 0; i < gvps.length; i++) {
             var newGvp = gvps[i];
             var t = newGvp["type"];
             var gvp = this.globalValueProviders[t];
             if (!gvp) {
-                this.globalValueProviders[t] = new MapValue(newGvp["values"]);
+            	gvp = new MapValue(newGvp["values"]);
+                this.globalValueProviders[t] = gvp;
             } else {
                 var mergeMap = new MapValue(newGvp["values"]);
                 gvp.merge(mergeMap, false);
             }
+            
+            if (storage) {
+            	storedGvps.push({ 
+            		"type": t, 
+            		"values": gvp.unwrap() 
+        		});
+            }
         }
         
-        if (!doNotPersist) {
-	        // If persistent storage is active then write through for disconnected support
-	        var storage = this.getStorage("actions");
-	        if (storage) {
-	        	storage.get("globalValueProviders", function(item) {
-	        		if (item) {
-	            		// DCHASMAN TODO W-1562121 Merge in current global values
-	        		} else {
-	        			item = gvps;
-	        		}
-	        		
-	            	storage.put("globalValueProviders", item);
-	        	});
-	        }
+        if (storage) {
+        	storage.put("globalValueProviders", storedGvps);
         }
     }
 };

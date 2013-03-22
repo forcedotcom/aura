@@ -74,5 +74,8 @@ exp(p,
     // internal functions
     "run", run,
     "getDump", getDump,
-    "dummyFunction", p.dummyFunction
+    "dummyFunction", p.dummyFunction,
+    
+    // appcache
+    "getAppCacheEvents", p.getAppCacheEvents
 );

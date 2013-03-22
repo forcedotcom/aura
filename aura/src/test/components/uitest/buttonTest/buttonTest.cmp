@@ -19,7 +19,8 @@
     <aura:attribute name="iconAndLabelButtonPressedMessage" type="String" default="Icon and label button NOT yet pressed"/>
     <aura:attribute name="labelOnlyButtonPressedMessage" type="String" default="Label only button NOT yet pressed"/>
     <aura:attribute name="iconOnlyButtonPressedMessage" type="String" default="Icon only button NOT yet pressed"/>
-
+	<aura:attribute name="isDomEventSet" type="boolean" default="{!false}"/>
+	
     <ui:button class="Icon_and_label" label='Icon and label' disabled='false' press="{!c.handleIconAndLabel}" iconImgSrc="/auraFW/resources/aura/images/checkbox_checked.gif" accesskey="i"/>
     <br/>
     <ui:outputText class="Icon_and_label" value='{!v.iconAndLabelButtonPressedMessage}'/>
@@ -31,4 +32,6 @@
     <ui:button class='Icon_only' disabled='false' press="{!c.handleIconOnly}" iconImgSrc="/auraFW/resources/aura/images/checkbox_checked.gif" label="Icon_only" labelDisplay="false"/>
     <br/>
     <ui:outputText class='Icon_only' value='{!v.iconOnlyButtonPressedMessage}'/>
+    <br/>
+    <ui:button class="testDomEventBtn" label="testDomEvent" press="{!c.checkDomEventSet}"/>
 </aura:component>

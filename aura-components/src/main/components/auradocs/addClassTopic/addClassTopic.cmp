@@ -1,0 +1,40 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Adding and Removing Styles"/>
+    
+    <h2>Goal</h2>
+    <p>You want to add or remove a CSS style to an element during runtime.</p>
+    
+    <h2>Code</h2>
+    <p>The following demo shows how to append and remove a CSS style from an element.</p>
+    <auradocs:example descriptor="auradocs:demoCss" />
+    
+    <h2>Discussion</h2>
+    <p>The buttons in this demo are wired to controller actions that append or remove the CSS styles. To append a CSS style to an element, use <code>$A.util.addClass(element, 'class');</code>.
+    Similarly, remove the class by using <code>$A.util.removeClass(element, 'class');</code> in your controller.
+    <code>cmp.find()</code> locates the element using the local ID, denoted by <code>aura:id="changeIt"</code> in this demo.</p>
+    
+    <auradocs:info>See the <a href="#reference?topic=api:Util">JavaScript API Reference</a> for more utility functions for working with DOM elements.</auradocs:info>
+    
+    <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="helloHTML">Applying HTML and CSS</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="compBundle">Component Bundles</auradocs:topicLink>
+	</p>
+</aura:component>

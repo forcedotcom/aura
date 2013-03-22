@@ -20,8 +20,8 @@
     testAnchorNoFragment: {
         test: function(component){
             var tag = component.find("nohash").getElement();
-            aura.test.assertEquals("salesforce", $A.test.getText(tag), "textContent not expected");
-            aura.test.assertTrue(aura.test.contains(tag.href, "http://www.salesforce.com/"), "href not expected");
+            $A.test.assertEquals("salesforce", $A.test.getText(tag), "textContent not expected");
+            $A.test.assertTrue($A.test.contains(tag.href, "http://www.salesforce.com/"), "href not expected");
         }
     },
 
@@ -31,8 +31,8 @@
     testAnchorFragment: {
         test: function(component){
             var tag = component.find("hash").getElement();
-            aura.test.assertEquals("hash", $A.test.getText(tag), "textContent not expected");
-            aura.test.assertEquals("javascript:void(0/*#*/);", tag.href, "href not expected");
+            $A.test.assertEquals("hash", $A.test.getText(tag), "textContent not expected");
+            $A.test.assertEquals("javascript:void(0/*#*/);", tag.href, "href not expected");
         }
     },
 
@@ -42,8 +42,8 @@
     testAnchorFragmentString: {
         test: function(component){
             var tag = component.find("hashString").getElement();
-            aura.test.assertEquals("layout", $A.test.getText(tag), "textContent not expected");
-            aura.test.assertEquals("javascript:void(0/*#layout*/);", tag.href, "href not expected");
+            $A.test.assertEquals("layout", $A.test.getText(tag), "textContent not expected");
+            $A.test.assertEquals("javascript:void(0/*#layout*/);", tag.href, "href not expected");
         }
     },
 
@@ -53,7 +53,7 @@
     testAreaNoFragment:{
         test: function(component){
             var tag = component.find("noHashArea").getElement();
-            aura.test.assertEquals("http://www.salesforce.com/", tag.href, "Area href not expected");
+            $A.test.assertEquals("http://www.salesforce.com/", tag.href, "Area href not expected");
         }
     },
 
@@ -61,7 +61,7 @@
         test: function(component){
             var tag = component.find("hashStringArea").getElement();
             var expectedHrefValue = "#layout"
-            aura.test.assertTrue(tag.href.substr(tag.href.length-expectedHrefValue.length) === expectedHrefValue);
+            $A.test.assertTrue(tag.href.substr(tag.href.length-expectedHrefValue.length) === expectedHrefValue);
         }
     },
 
@@ -69,7 +69,7 @@
         test: function(component){
             var tag = component.find("hashArea").getElement();
             var expectedHrefValue = "#";
-            aura.test.assertTrue(tag.href.substr(tag.href.length-expectedHrefValue.length) === expectedHrefValue);
+            $A.test.assertTrue(tag.href.substr(tag.href.length-expectedHrefValue.length) === expectedHrefValue);
         }
     },
 
@@ -79,8 +79,8 @@
     testBreak: {
         test: function(component){
             var elems = component.find("hasBr").getElement().getElementsByTagName("br");
-            aura.test.assertEquals(1, elems.length, "should only be 1 br tag");
-            aura.test.assertEquals(0, elems[0].children.length, "br should not have any children");
+            $A.test.assertEquals(1, elems.length, "should only be 1 br tag");
+            $A.test.assertEquals(0, elems[0].children.length, "br should not have any children");
         }
     },
 
@@ -90,18 +90,18 @@
     testAttributeCasing: {
         test: function(component){
             var tag = component.find("case").getElement();
-            aura.test.assertTrue(typeof tag.ReadOnly === "undefined" && tag.readOnly === true, "readOnly was not cased properly");
-            aura.test.assertTrue(typeof tag.maxlength === "undefined" && tag.maxLength == 11, "maxLength was not cased properly");
-            aura.test.assertTrue(typeof tag.AccessKey === "undefined" && tag.accessKey === "x", "accessKey was not cased properly");
-            aura.test.assertTrue(typeof tag.TABINDEX === "undefined" && tag.tabIndex === 1, "tabIndex was not cased properly");
-            aura.test.assertTrue(typeof tag.ColSpaN === "undefined" && tag.colSpan === "2", "colSpan was not cased properly");
-            aura.test.assertTrue(typeof tag.rOWsPAN === "undefined" && tag.rowSpan === "2", "rowSpan was not cased properly");
-            aura.test.assertTrue(typeof tag.BGColor === "undefined" && tag.bgColor === "#FFFFFF", "bgColor was not cased properly");
-            aura.test.assertTrue(typeof tag.USEmap === "undefined" && tag.useMap === "true", "useMap was not cased properly");
-            aura.test.assertTrue(typeof tag.Class === "undefined" && tag.className === "low", "className was not converted properly");
-            aura.test.assertTrue(typeof tag.FOR === "undefined" && tag.htmlFor === "ground", "htmlFor was not converted properly");
-            aura.test.assertTrue(typeof tag.PLACEHOLDER === "undefined" && tag.placeholder === "Casper", "placeholder was not cased properly");
-            aura.test.assertTrue(typeof tag.ValuE === "undefined" && tag.value === "infamous ghost", "value was not cased properly");
+            $A.test.assertTrue(typeof tag.ReadOnly === "undefined" && tag.readOnly === true, "readOnly was not cased properly");
+            $A.test.assertTrue(typeof tag.maxlength === "undefined" && tag.maxLength == 11, "maxLength was not cased properly");
+            $A.test.assertTrue(typeof tag.AccessKey === "undefined" && tag.accessKey === "x", "accessKey was not cased properly");
+            $A.test.assertTrue(typeof tag.TABINDEX === "undefined" && tag.tabIndex === 1, "tabIndex was not cased properly");
+            $A.test.assertTrue(typeof tag.ColSpaN === "undefined" && tag.colSpan === "2", "colSpan was not cased properly");
+            $A.test.assertTrue(typeof tag.rOWsPAN === "undefined" && tag.rowSpan === "2", "rowSpan was not cased properly");
+            $A.test.assertTrue(typeof tag.BGColor === "undefined" && tag.bgColor === "#FFFFFF", "bgColor was not cased properly");
+            $A.test.assertTrue(typeof tag.USEmap === "undefined" && tag.useMap === "true", "useMap was not cased properly");
+            $A.test.assertTrue(typeof tag.Class === "undefined" && tag.className === "low", "className was not converted properly");
+            $A.test.assertTrue(typeof tag.FOR === "undefined" && tag.htmlFor === "ground", "htmlFor was not converted properly");
+            $A.test.assertTrue(typeof tag.PLACEHOLDER === "undefined" && tag.placeholder === "Casper", "placeholder was not cased properly");
+            $A.test.assertTrue(typeof tag.ValuE === "undefined" && tag.value === "infamous ghost", "value was not cased properly");
         }
     },
 
@@ -134,5 +134,35 @@
 	    	this.assertClassUpdate(component, "lower");
 	    	this.assertClassUpdate(component);
     	}
-    }
+    },
+    /**
+     * Verify rerender of special html attributes
+     * type, href, style and data attributes must be set by using setAttribute() on dom elements
+     */
+    testRerenderSpecialHtmlAttributes:{
+	test:function(component){
+	    var input = component.find("specialAttributes_input").getElement();
+	    $A.log(input.getAttribute("style"));
+	    $A.test.assertEquals("textElement" , input.dataset.name, "Failed to render data attribute");
+	    $A.test.assertEquals("color:blue;text-align:center" , input.getAttribute("style"), "Failed to render style attribute");
+	    $A.test.assertEquals("text" , input.getAttribute("type"), "Failed to render type attribute");
+	    
+	    var a = component.find("specialAttributes_a").getElement();
+	    $A.test.assertEquals("http://bazinga.com/" , a.getAttribute("href"), "Failed to render href attribute");
+	    
+	    component.getAttributes().setValue("type", "input");
+	    component.getAttributes().setValue("style", "color:green;");
+	    component.getAttributes().setValue("dataName", "inputElement");
+	    component.getAttributes().setValue("href", "http://bbt.com/");
+	    
+	    $A.rerender(component);
+	    input1 = component.find("specialAttributes_input").getElement();
+	    $A.test.assertEquals("inputElement" , input.dataset.name, "Failed to rerender data attribute");
+	    $A.test.assertEquals("color:green;" , input.getAttribute("style"), "Failed to rerender style attribute");
+	    $A.test.assertEquals("input" , input.getAttribute("type"), "Failed to rerender type attribute");
+	    
+	    a = component.find("specialAttributes_a").getElement();
+	    $A.test.assertEquals("http://bbt.com/" , a.getAttribute("href"), "Failed to rerender href attribute");
+	}
+    },
 })

@@ -397,7 +397,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         // FIXME: this code will go away with preloads.
         // This pulls in the context preloads. not pretty, but it works.
         //
-        if (!cc.addedPreloads && canonical.getDefType().equals(DefType.APPLICATION)) {
+        if (!cc.addedPreloads && (canonical.getDefType().equals(DefType.APPLICATION)
+                || canonical.equals(cc.context.getApplicationDescriptor()))) {
             cc.addedPreloads = true;
             Set<String> preloads = cc.context.getPreloads();
             for (String preload : preloads) {

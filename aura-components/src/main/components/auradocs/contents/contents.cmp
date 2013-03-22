@@ -67,7 +67,7 @@
                     <auradocs:contentsNode text="Getting User Input" id="useForm"/>
                     <auradocs:contentsNode text="Using Menus" id="useMenu"/>
                     <auradocs:contentsNode text="Displaying Messages" id="useMessage"/>
-                    <auradocs:contentsNode text="Using Tabs" id="useTabs"/>
+                    <auradocs:contentsNode text="Using Tabs and Scrollers" id="useTabs"/>
                 </auradocs:contentsNode>                
             </auradocs:contentsNode>
             <auradocs:contentsNode text="Expressions" >
@@ -135,6 +135,7 @@
                     <auradocs:contentsNode text="Finding Components by ID" id="findById" />
                     <auradocs:contentsNode text="Dynamically Showing or Hiding Markup" id="hideMarkup" />
                     <auradocs:contentsNode text="Invoking Actions on Component Initialization" id="initHandler" />
+                    <auradocs:contentsNode text="Adding and Removing Styles" id="addClass" />
                 </auradocs:contentsNode>
             </auradocs:contentsNode>
 

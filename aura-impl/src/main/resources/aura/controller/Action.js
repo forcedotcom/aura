@@ -133,7 +133,8 @@ Action.prototype.run = function(evt) {
         this.meth.call(this, this.cmp, evt, helper);
         finished = true;
     } catch (e) {
-        $A.log("Action "+this.getDef().toString()+"Failed", e);
+        $A.log("Action failed: " + this.cmp.getDef().getDescriptor().getQualifiedName() + " -> "
+			+ this.getDef().getName(), e);
     } finally {
         if (!finished){
             this.state = "FAILURE";

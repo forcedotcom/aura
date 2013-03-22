@@ -23,7 +23,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.throwable.AuraRuntimeException;
 
 public class DefDescriptorImplTest extends AuraImplTestCase {
@@ -76,7 +75,6 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
         assertEquals(testDescriptor.getDefType(), DefType.COMPONENT);
     }
 
-    @UnAdaptableTest //("W-1545666")
     public void testGetInstance() throws Exception {
         // test getInstance(tag, defClass)
         DefDescriptor<?> testDescriptor = DefDescriptorImpl.getInstance("aura:text", ComponentDef.class);

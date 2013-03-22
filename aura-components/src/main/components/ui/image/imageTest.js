@@ -64,6 +64,44 @@
             aura.test.assertEquals(-1, imgElement.className.indexOf('logo'));
         }
     },
+    
+    testInformationImageTypeWithAltText:{
+    	attributes : {imageType:'informational', alt:'Company'},
+        test: function(cmp){
+        	var imgElement = cmp.getElement();
+            aura.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element.")
+            aura.test.assertEquals('Company', imgElement.alt, "Expected to see alt text on image element.");
+        }
+    },
+    
+    testInformationImageTypeWithoutAltText:{
+    	exceptionsAllowedDuringInit : ["\"alt\" attribute should not be empty for informational image"],
+    	attributes : {imageType:'informational'},
+        test: function(cmp){
+        	var message = aura.util.getElement("auraErrorMessage");
+    		var errorMessage = "\"alt\" attribute should not be empty for informational image";
+        	aura.test.assertTrue(aura.test.contains(aura.test.getText(message),errorMessage), "Expected " + errorMessage);
+        }
+    },
+    
+    testDecorativeImageTypeWithAltText:{
+    	exceptionsAllowedDuringInit : ["\"alt\" attribute should be empty for decorative image"],
+    	attributes : {imageType:'decorative', alt:'Company'},
+        test: function(cmp){
+        	var message = aura.util.getElement("auraErrorMessage");
+    		var errorMessage = "\"alt\" attribute should be empty for decorative image";
+    		aura.test.assertTrue(aura.test.contains(aura.test.getText(message),errorMessage), "Expected " + errorMessage);
+        }
+    },
+    
+    testDecorativeImageTypeWithoutAltText:{
+    	attributes : {imageType:'decorative'},
+        test: function(cmp,action){
+        	var imgElement = cmp.getElement();
+            aura.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element.")
+        }
+    },
+    
     //W-1014086
     _testAccessibility:{
         test:function(cmp){

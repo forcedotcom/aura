@@ -20,6 +20,8 @@ import java.util.Map;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
+
+import org.auraframework.Aura;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.TestLabels;
@@ -69,6 +71,8 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
     @TestLabels("auraSanity")
     public void testVerifyPostWithoutToken() throws Exception {
         Map<String, String> params = makeBasePostParams();
+        params.put("aura.context", String.format("{\"mode\":\"FTEST\",\"fwuid\":\"%s\"}",
+                Aura.getConfigAdapter().getAuraFrameworkNonce()));
         PostMethod post = obtainPostMethod("/aura", params);
         int statusCode = this.getHttpClient().executeMethod(post);
         String response = post.getResponseBodyAsString();

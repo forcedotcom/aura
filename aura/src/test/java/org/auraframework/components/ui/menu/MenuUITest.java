@@ -314,7 +314,25 @@ public class MenuUITest extends WebDriverTestCase{
     	button.click();
     	assertEquals("Checkbox items selected are not correct", "Colorado", result.getText());
     }
-	
+	/**
+	 * Test case for W-1575100
+	 * @throws MalformedURLException
+	 * @throws URISyntaxException
+	 */
+	public void testMenuExpandCollapse() throws MalformedURLException, URISyntaxException{
+		open(MENUTEST_APP);
+		WebDriver driver = this.getDriver();
+		String label = "trigger";
+		String menuName = "actionMenu";
+		WebElement menuLabel = driver.findElement(By.className(label));
+		WebElement menu = driver.findElement(By.className(menuName));
+		WebElement button = driver.findElement(By.className("radioButton"));
+		assertFalse("Action Menu list should not be visible", menu.getAttribute("class").contains("visible"));
+		menuLabel.click();
+		assertTrue("Action Menu list should be expanded", menu.getAttribute("class").contains("visible"));
+		button.click();
+		assertFalse("Action Menu list should be collapsed", menu.getAttribute("class").contains("visible"));
+	}
 	/*
 	 * Test case for: W-1559070
 	 */

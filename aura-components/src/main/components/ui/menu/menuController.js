@@ -30,13 +30,17 @@
     },
     
     handleMenuExpand: function(component, event, helper) {
-        document.body.addEventListener(helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(component));
-        document.body.addEventListener(helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(component));
-        
+        $A.util.on(document.body, helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(component));
+        $A.util.on(document.body, helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(component));        
     },
     
     handleMenuCollapse: function(component, event, helper) {
-        document.body.removeEventListener(helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(component));
-        document.body.removeEventListener(helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(component));
+        if (document.body.removeEventListener) {
+            document.body.removeEventListener(helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(component));
+            document.body.removeEventListener(helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(component));
+        } else if (document.body.detachEvent) {
+            document.body.detachEvent(helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(component));
+            document.body.detachEvent(helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(component));
+        }
     }
 })

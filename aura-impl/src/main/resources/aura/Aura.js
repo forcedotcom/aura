@@ -448,9 +448,19 @@ $A.ns.Aura.prototype.finishInit = function() {
 };
 
 /**
- * This should be called in response to an error that prevents Aura from starting an application successfully.
+ * Use $A.error() in response to an error that prevents Aura from starting an application successfully.
+ * To treat a test as successful where $A.error() is expected, use exceptionsAllowedDuringInit. 
+ * For example, this is useful if you are testing for components with the same name with different config parameters.
+ * @description <p>Example:</p>
+ * testDuplicate : {<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;exceptionsAllowedDuringInit : ["Duplicate found!"],<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;attributes : {<br/> 
+ * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dupCmp : true<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;},<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;//more tests<br/>
+ * }
  * @public
- * @param {Error} e
+ * @param {Error} e The error message to be returned
  */
 $A.ns.Aura.prototype.error = function(e) {
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

@@ -34,6 +34,8 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.Client;
+import org.auraframework.system.Client.Type;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -44,10 +46,11 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class IntegrationImpl implements Integration {
-    public IntegrationImpl(String contextPath, Mode mode, boolean initializeAura) {
+    public IntegrationImpl(String contextPath, Mode mode, boolean initializeAura, String userAgent) {
         this.contextPath = contextPath;
         this.mode = mode;
         this.initializeAura = initializeAura;
+        this.userAgent = userAgent;
     }
 
     @Override
@@ -90,9 +93,7 @@ public class IntegrationImpl implements Integration {
                 } else {
                     RegisterEventDef eventDef = componentDef.getRegisterEventDefs().get(key);
                     if (eventDef != null) {
-                        // Emit component.addHandler() wired to special
-                        // global
-                        // scope value provider
+                        // Emit component.addHandler() wired to special global scope value provider
                         String name = eventDef.getAttributeName();
                         actionEventHandlers.put(name, (String) entry.getValue());
                     } else {
@@ -134,12 +135,23 @@ public class IntegrationImpl implements Integration {
                                 locatorDomId,
                                 localId));
 
-                out.append("<script>").append(init).append("</script>");
+                out.append("<script>");
+
+                // To avoid "HTML Parsing Error: Unable to modify the parent container element before the child element is closed" exceptions in IE7/8
+                Type clientType = context.getClient().getType();
+                if (clientType == Type.IE7 || clientType == Type.IE8) {
+                    StringBuilder onload = new StringBuilder("$A.util.on(window, 'load', function() {\n");
+                    onload.append(init);
+                    onload.append("\n});");
+
+                    init = onload;
+                }
+
+                out.append(init).append("</script>");
+
             } catch (Throwable t) {
-                // DCHASMAN TODO W-1498425 Refine this approach - we currently
-                // have 2
-                // conflicting exception handling mechanisms kicking in that
-                // need to be reconciled
+                // DCHASMAN TODO W-1498425 Refine this approach - we currently have 2 conflicting exception handling mechanisms kicking in that need to be
+                // reconciled
                 out.append("<script>").append("$A.log('failed to create component: " + t.toString() + "')")
                         .append("</script>");
             }
@@ -165,6 +177,10 @@ public class IntegrationImpl implements Integration {
 
         if (num != null) {
             context.setNum(num);
+        }
+
+        if (userAgent != null) {
+            context.setClient(new Client(userAgent));
         }
 
         // Always include ui: because we need ui:message etc for error handling
@@ -198,6 +214,7 @@ public class IntegrationImpl implements Integration {
     private final String contextPath;
     private final Mode mode;
     private final boolean initializeAura;
+    private final String userAgent;
     private final Set<String> preloads = Sets.newHashSet();
     private boolean hasApplicationBeenWritten;
 }

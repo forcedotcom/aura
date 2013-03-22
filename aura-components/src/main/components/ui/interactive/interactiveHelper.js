@@ -52,7 +52,7 @@
         // fire the equivalent Aura event
         helper.fireEvent(component, event, helper);
     },
-    
+
     /**
      * Fire the equivalent Aura event for DOM one.
      * This can be overridden by extended component
@@ -98,12 +98,12 @@
      */
     preEventFiring : function(component, event){
     },
-    
+
     /**
      * Set event's parameters with the value from DOM event.
      * The event's parameter name should be the same as the property name in DOM event.
      */
-    setEventParams: function(e, DOMEvent) {
+    setEventParams : function(e, DOMEvent) {
         // set parameters if there is any
         var attributeDefs = e.getDef().getAttributeDefs();
         var params = {};
@@ -115,5 +115,20 @@
             }
         };
         e.setParams(params);
+    },
+
+    /**
+     * Toggle a component's disabled state and an optional CSS class.
+     * @param {Component} component The component being toggled.
+     * @param {Boolean} disabled True to set disabled; false for enabled.
+     * @param {String} disabledCss Optional css class to apply when disabled, and remove when enabled.
+     */
+    setDisabled: function(component, disabled, disabledCss) {
+        component.setValue('v.disabled', disabled);
+        if (disabledCss) {
+            var fn = disabled ? component.addClass : component.removeClass;
+            fn.call(component, disabledCss);
+        }
     }
+
 })

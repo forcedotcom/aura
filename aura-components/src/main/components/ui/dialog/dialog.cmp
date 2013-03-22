@@ -34,9 +34,6 @@
     <aura:attribute name="dialogClass" type="String" description="Additional CSS classes to apply to the dialog's outermost &lt;div&gt; wrapper."/>
     <aura:attribute name="maskClass" type="String" description="Additional CSS classes to apply to the window mask located behind a modal dialog."/>
 
-    <!-- private attributes -->
-    <aura:attribute name="_handlerConfig" type="Object" description="PRIVATE ATTRIBUTE - DO NOT SET MANUALLY. A JS config object containing event handlers used for component interactivity."/>
-
     <!-- events -->
     <aura:registerEvent name="close" type="ui:closeDialog" description="Event fired when the dialog window requests to close itself."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>

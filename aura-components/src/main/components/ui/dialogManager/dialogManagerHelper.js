@@ -33,7 +33,7 @@
             isModal         = atts.get("isModal"),
             clickOutToClose = atts.get("clickOutToClose"),
             autoFocus       = atts.get("autoFocus"),
-            handlerConfig   = this.getHandlerConfig(dialog, manager, isModal, clickOutToClose);
+            handlerConfig   = this.getHandlerConfig(dialog, isModal, clickOutToClose);
 
         this.applyHandlers(handlerConfig);
         this.toggleDisplay(true, dialog, autoFocus, isModal, handlerConfig);
@@ -59,9 +59,8 @@
         var atts          = dialog.getAttributes(),
             isModal       = atts.get("isModal"),
             autoFocus     = atts.get("autoFocus"),
-            handlerConfig = dialog.getValue("m.handlerConfig");
+            handlerConfig = dialog.get("m.handlerConfig");
 
-        /* TODO: remove manager's activeDialog and dialog's handlerConfig from their respective models */
         this.removeHandlers(handlerConfig);
         this.toggleDisplay(false, dialog, autoFocus, isModal, handlerConfig);
         manager.getValue("m.activeDialog").setValue("");
@@ -109,16 +108,15 @@
      * @param {Aura.Component} dialog the active ui:dialog comonent
      * @param {Boolean} isModal specifies if the active dialog is modal
      * @param {Boolean} clickOutToClose specifies if clicking outside the dialog should close it
-     * @param {Aura.Component} manager the ui:dialogManager component
      * @return {Object} references to event handlers, and elements to remove or apply focus
      */
-    getHandlerConfig : function(dialog, manager, isModal, clickOutToClose) {
+    getHandlerConfig : function(dialog, isModal, clickOutToClose) {
 
         var self          = this,
             oldFocus      = document.activeElement,
             newFocus      = this.getFirstFocusableElement(dialog),
-            keydown       = function(event) { self.getKeydownHandler(dialog, manager, isModal, newFocus, event) },
-            click         = function(event) { self.getClickHandler(dialog, manager, clickOutToClose, event) },
+            keydown       = function(event) { self.getKeydownHandler(dialog, isModal, newFocus, event) },
+            click         = function(event) { self.getClickHandler(dialog, clickOutToClose, event) },
             resize        = function() { self.getResizeHandler(dialog, isModal) };
 
         return {
@@ -137,13 +135,12 @@
      * and 2) tab key (including shift+tab).
      * 
      * @param {Aura.Component} dialog the active ui:dialog component
-     * @param {Aura.Component} manager the ui:dialogManager component
      * @param {Boolean} isModal specifies if the dialog is modal
      * @param {HTMLElement} firstFocusable the first focusable element inside the dialog
      * @param {UIEvent} event DOM keydown event
      * @return {void}
      */
-    getKeydownHandler : function(dialog, manager, isModal, firstFocusable, event) {
+    getKeydownHandler : function(dialog, isModal, firstFocusable, event) {
 
         if (!event) { var event = window.event; }
 
@@ -186,12 +183,11 @@
      * Constructs the handler for the DOM click event.
      * 
      * @param {Aura.Component} dialog the ui:dialog component
-     * @param {Aura.Component} manager the ui:dialogManager component
      * @param {Boolean} clickOutToClose whether the dialog should be closed on click outside the dialog
      * @param {UIEvent} event the DOM click event
      * @return {void}
      */
-    getClickHandler : function(dialog, manager, clickOutToClose, event) {
+    getClickHandler : function(dialog, clickOutToClose, event) {
 
         if (!event) { var event = window.event; }
 
@@ -299,7 +295,7 @@
             inner        = dialog.find("content").getElement(),
             flickerDelay = 50,
             focusDelay   = 300,
-            hideDelay    = 500;
+            hideDelay    = 400;
 
         // if the dialog should be opened, remove the 'hidden' classes and apply the animation classes
         if (show) {
@@ -345,12 +341,11 @@
      * Calculates the max-height of the content <div> in a modal window so
      * it doesn't extend outside the viewport.
      * 
-     * @param {Aura.Component} contentCmp the content box component
      * @return {void}
      */
     getContentMaxHeight : function() {
 
-        return Math.min($A.util.getWindowSize().height, 1250) - 150;
+        return Math.min($A.util.getWindowSize().height, 2600) - 150;
 
     }
 

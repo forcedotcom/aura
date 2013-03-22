@@ -43,7 +43,7 @@ function AuraContext(config) {
     this.test = config["test"];
     
     // If persistent storage is active then write through for disconnected support
-    var storage = this.getStorage("actions");
+    var storage = this.getStorage();
     var that = this;
     if (storage) {
     	storage.get("globalValueProviders", function(item) {
@@ -205,7 +205,7 @@ AuraContext.prototype.joinGlobalValueProviders = function(gvps, doNotPersist) {
     	var storedGvps;
         if (!doNotPersist) {
 	        // If persistent storage is active then write through for disconnected support
-	        storage = this.getStorage("actions");
+	        storage = this.getStorage();
         	storedGvps = [];
         }
         

@@ -16,6 +16,22 @@
 ({
 
 
+    /**
+     * Validates the "defaultButtons" attribute.
+     */
+    doInit : function(cmp, evt, hlp) {
+
+        var choice = cmp.get("v.defaultButtons");
+
+        if (choice !== "cancel" && choice !== "confirm" && choice !== "none" && choice !== "both") {
+            $A.error("The 'defaultButtons' attribute of a ui:dialogButtons " +
+                     "component must be one of the following case-sensitive " +
+                     "values: cancel, confirm, both, none");
+        }
+
+    },
+
+
     /*
      * Handles the click of the default cancel button of the dialog. Fires the
      * application-level event ui:closeDialog, setting the 'confirmClicked'
@@ -23,7 +39,7 @@
      */
     cancel : function(cmp, evt, hlp) {
 
-        hlp.confirmOrCancel(cmp, false);
+        hlp.confirmOrCancel(cmp.get("m.parentDialog"), false);
 
     },
 
@@ -35,7 +51,7 @@
      */
     confirm : function(cmp, evt, hlp) {
 
-        hlp.confirmOrCancel(cmp, true);
+        hlp.confirmOrCancel(cmp.get("m.parentDialog"), true);
 
     }
 

@@ -34,7 +34,7 @@
 
         // only one open dialog is allowed at a time ... if there's one
         // already open, close that one first.
-        if (activeDialog) {
+        if (activeDialog && activeDialog.isInstanceOf && activeDialog.isInstanceOf("ui:dialog")) {
             hlp.deactivateDialog(activeDialog, cmp);
         }
 

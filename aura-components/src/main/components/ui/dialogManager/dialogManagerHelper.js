@@ -33,14 +33,12 @@
             isModal         = atts.get("isModal"),
             clickOutToClose = atts.get("clickOutToClose"),
             autoFocus       = atts.get("autoFocus"),
-            content         = dialog.find("dialog"),
-            mask            = dialog.find("mask"),
             handlerConfig   = this.getHandlerConfig(dialog, manager, isModal, clickOutToClose);
 
         this.applyHandlers(handlerConfig);
-        this.doAnimation(true, mask, content, autoFocus, isModal, handlerConfig);
-        manager.get("m.activeDialog").setValue(dialog);
-        dialog.get("m.handlerConfig").setValue(handlerConfig);
+        this.toggleDisplay(true, dialog, autoFocus, isModal, handlerConfig);
+        manager.getValue("m.activeDialog").setValue(dialog);
+        dialog.getValue("m.handlerConfig").setValue(handlerConfig);
 
     },
 
@@ -61,15 +59,13 @@
         var atts          = dialog.getAttributes(),
             isModal       = atts.get("isModal"),
             autoFocus     = atts.get("autoFocus"),
-            handlerConfig = dialog.get("m.handlerConfig"),
-            mask          = dialog.find("mask"),
-            content       = dialog.find("dialog");
+            handlerConfig = dialog.getValue("m.handlerConfig");
 
         /* TODO: remove manager's activeDialog and dialog's handlerConfig from their respective models */
         this.removeHandlers(handlerConfig);
-        this.doAnimation(false, mask, content, autoFocus, isModal, handlerConfig);
-        manager.get("m.activeDialog").setValue(null);
-        dialog.get("m.handlerConfig").setValue(null);
+        this.toggleDisplay(false, dialog, autoFocus, isModal, handlerConfig);
+        manager.getValue("m.activeDialog").setValue("");
+        dialog.getValue("m.handlerConfig").setValue("");
 
     },
 
@@ -229,13 +225,8 @@
      */
     getResizeHandler : function(dialog, isModal) {
 
-        var max,
-            element;
-
         if (isModal) {
-            max = dialog.getDef().getHelper().getContentMaxHeight(),
-            element = dialog.find("content").getElement();
-            element.style.maxHeight = max + "px";
+            dialog.find("content").getElement().style.maxHeight = this.getContentMaxHeight() + "px";
         }
 
     },
@@ -301,22 +292,24 @@
      * @param {Object} config JS object that contains references to the elements to focus
      * @return {void}
      */
-    doAnimation : function(show, maskCmp, dialog, autoFocus, isModal, config) {
+    toggleDisplay : function(show, dialog, autoFocus, isModal, config) {
 
-        var maskElement   = maskCmp ? maskCmp.getElement() : null,
-            dialogElement = dialog.getElement(),
-            flickerDelay  = 50,
-            focusDelay    = 300,
-            hideDelay     = 500;
+        var mask         = isModal ? dialog.find("mask").getElement() : null,
+            outer        = dialog.find("dialog").getElement(),
+            inner        = dialog.find("content").getElement(),
+            flickerDelay = 50,
+            focusDelay   = 300,
+            hideDelay    = 500;
 
         // if the dialog should be opened, remove the 'hidden' classes and apply the animation classes
         if (show) {
-            $A.util.removeClass(dialogElement, "hidden");
+            $A.util.removeClass(outer, "hidden");
             if (isModal) {
-                $A.util.removeClass(maskElement, "hidden");
-                // delay the application of animation classes by just a hair ... webkit + firefox rendering bug
-                window.setTimeout(function() { $A.util.addClass(maskElement, "fadeIn"); }, flickerDelay);
-                window.setTimeout(function() { $A.util.addClass(dialogElement, "dropIn"); }, flickerDelay);
+                inner.style.maxHeight = this.getContentMaxHeight() + "px";
+                $A.util.removeClass(mask, "hidden");
+                // delay the application of animation classes by just a hair ... webkit/ffx rendering bug
+                window.setTimeout(function() { $A.util.addClass(mask, "fadeIn"); }, flickerDelay);
+                window.setTimeout(function() { $A.util.addClass(outer, "dropIn"); }, flickerDelay);
             }
             // apply proper element focus if necessary
             if ((autoFocus || isModal) && config.newFocus) {
@@ -331,19 +324,33 @@
         } else {
             if (isModal) {
                 // remove the animation classes immediately, but delay adding 'hidden' back until animation completes
-                $A.util.removeClass(maskElement, "fadeIn");
-                $A.util.removeClass(dialogElement, "dropIn");
-                window.setTimeout(function() { $A.util.addClass(maskElement, "hidden"); }, hideDelay);
-                window.setTimeout(function() { $A.util.addClass(dialogElement, "hidden"); }, hideDelay);
+                $A.util.removeClass(mask, "fadeIn");
+                $A.util.removeClass(outer, "dropIn");
+                window.setTimeout(function() { $A.util.addClass(mask, "hidden"); }, hideDelay);
+                window.setTimeout(function() { $A.util.addClass(outer, "hidden"); }, hideDelay);
             } else {
                 // if not a modal, then just hide the dialog immediately
-                $A.util.addClass(dialogElement, "hidden");
+                $A.util.addClass(outer, "hidden");
             }
             // apply proper element focus if necessary
             if (config.oldFocus) {
                 config.oldFocus.focus();
             }
         }
+
+    },
+
+
+    /**
+     * Calculates the max-height of the content <div> in a modal window so
+     * it doesn't extend outside the viewport.
+     * 
+     * @param {Aura.Component} contentCmp the content box component
+     * @return {void}
+     */
+    getContentMaxHeight : function() {
+
+        return Math.min($A.util.getWindowSize().height, 1250) - 150;
 
     }
 

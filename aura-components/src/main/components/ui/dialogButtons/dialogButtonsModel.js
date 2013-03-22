@@ -13,23 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-
-
-    /**
-     * Calculates the max-height of the content <div> in a modal window so
-     * it doesn't extend outside the viewport.
-     * 
-     * @param {Aura.Component} contentCmp the content box component
-     * @return {void}
-     */
-    getContentMaxHeight : function() {
-
-        return Math.min($A.util.getWindowSize().height, 1250) - 150;
-
-    },
-
-
-
-
-})
+{
+    parentDialog : ""
+}

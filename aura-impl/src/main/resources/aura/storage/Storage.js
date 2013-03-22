@@ -38,6 +38,10 @@ var AuraStorage = function AuraStorage(config) {
     }
 };
 
+/**
+ * Gets the current storage implementation name.
+ * @returns {String}
+ */
 AuraStorage.prototype.getName = function() {
 	return this.adapter.getName();
 };
@@ -136,15 +140,6 @@ AuraStorage.prototype.resumeSweeping = function() {
 
 	this._sweepingSuspended = false;
 	this.sweep();
-};
-
-
-/**
- * Gets the current storage implementation name.
- * @returns {String}
- */
-AuraStorage.prototype.getName = function() {
-    return this.adapter.getName();
 };
 
 AuraStorage.prototype.log = function() {

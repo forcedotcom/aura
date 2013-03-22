@@ -201,32 +201,36 @@ AuraContext.prototype.getApp = function(){
  */
 AuraContext.prototype.joinGlobalValueProviders = function(gvps, doNotPersist) {
     if (gvps) {
+    	var storage;
+    	var storedGvps;
+        if (!doNotPersist) {
+	        // If persistent storage is active then write through for disconnected support
+	        storage = this.getStorage("actions");
+        	storedGvps = [];
+        }
+        
         for (var i = 0; i < gvps.length; i++) {
             var newGvp = gvps[i];
             var t = newGvp["type"];
             var gvp = this.globalValueProviders[t];
             if (!gvp) {
-                this.globalValueProviders[t] = new MapValue(newGvp["values"]);
+            	gvp = new MapValue(newGvp["values"]);
+                this.globalValueProviders[t] = gvp;
             } else {
                 var mergeMap = new MapValue(newGvp["values"]);
                 gvp.merge(mergeMap, false);
             }
+            
+            if (storage) {
+            	storedGvps.push({ 
+            		"type": t, 
+            		"values": gvp.unwrap() 
+        		});
+            }
         }
         
-        if (!doNotPersist) {
-	        // If persistent storage is active then write through for disconnected support
-	        var storage = this.getStorage("actions");
-	        if (storage) {
-	        	storage.get("globalValueProviders", function(item) {
-	        		if (item) {
-	            		// DCHASMAN TODO W-1562121 Merge in current global values
-	        		} else {
-	        			item = gvps;
-	        		}
-	        		
-	            	storage.put("globalValueProviders", item);
-	        	});
-	        }
+        if (storage) {
+        	storage.put("globalValueProviders", storedGvps);
         }
     }
 };

@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -69,8 +70,7 @@ public class ThemeDefImplTest extends AuraImplTestCase {
     }
 
     /**
-     * ThemeDef without valid urls. Valid urls are relative and are accessible
-     * by HEAD request.
+     * ThemeDef without valid urls. Valid urls are relative and are accessible by HEAD request.
      */
     @UnAdaptableTest
     // Errors for invalid URLs differ, so the unit test result varies from
@@ -89,8 +89,7 @@ public class ThemeDefImplTest extends AuraImplTestCase {
     }
 
     /**
-     * ThemeDef with valid urls. Valid urls are relative and are accessible by
-     * HEAD request.
+     * ThemeDef with valid urls. Valid urls are relative and are accessible by HEAD request.
      */
     // Cannot run this as a unit test since validating urls involves making a
     // http connection. See
@@ -114,5 +113,26 @@ public class ThemeDefImplTest extends AuraImplTestCase {
                 "\"/auraFW/resources/qa/images/auralogo.png?doublequotes\"",
                 "/auraFW/resources/qa/images/auralogo.png?myvar", "/auraFW/resources/qa/images/auralogo.png?myurl",
                 "/auraFW/resources/aura/bootstrap.css"), theme.getImageURLs());
+    }
+
+    /**
+     * ThemeDef must have a dependency on a NamespaceDef.
+     */
+    public void testAppendDependenciesHasNamespaceDef() throws Exception {
+        String name = String.format("%s.someTheme", auraTestingUtil.getNonce(getName()));
+        DefDescriptor<ThemeDef> themeDesc = Aura.getDefinitionService().getDefDescriptor(name, ThemeDef.class);
+        auraTestingUtil.addSourceAutoCleanup(themeDesc, ".THIS {}");
+
+        // need to restart context because old context will not have the new namespace registered
+        Aura.getContextService().endContext();
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+
+        ThemeDef themeDef = themeDesc.getDef();
+        Set<DefDescriptor<?>> deps = Sets.newHashSet();
+        themeDef.appendDependencies(deps);
+
+        DefDescriptor<NamespaceDef> nsDesc = Aura.getDefinitionService().getDefDescriptor(themeDesc.getNamespace(),
+                NamespaceDef.class);
+        assertTrue("NamespaceDef missing from ThemeDef dependencies", deps.contains(nsDesc));
     }
 }

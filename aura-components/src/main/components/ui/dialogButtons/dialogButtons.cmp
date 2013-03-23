@@ -21,7 +21,6 @@
     <aura:attribute name="defaultButtons" type="String" default="none" description="Which default buttons to include (if any). Valid values are 'confirm', 'cancel', 'both', or 'none'. Default is 'none'. If you choose to use default and custom buttons together, custom buttons will always appear between the default cancel and default confirm buttons."/>
 
     <!-- css, label, and title hooks -->
-    <aura:attribute name="class" type="String" description="Additional CSS classes to apply to the button container."/>
     <aura:attribute name="confirmClass" type="String" description="Additional CSS classes to apply to the default confirm button."/>
     <aura:attribute name="confirmLabel" type="String" default="OK" description="The label of the default confirm button."/>
     <aura:attribute name="confirmTitle" type="String" default="Click to confirm" description="The title attribute of the default confirm button."/>

@@ -103,12 +103,13 @@
      * Builds the appropriate DOM event handlers necessary to interact with the
      * active ui:dialog component, as well as references to the document's previously
      * focused element (before the dialog opens), and the first focusable element
-     * inside the dialog.
+     * inside the dialog. This config object is stored on the dialog component's
+     * model so we can remove the event handlers when the dialog is finally closed.
      * 
-     * @param {Aura.Component} dialog the active ui:dialog comonent
+     * @param {Aura.Component} dialog the active ui:dialog component
      * @param {Boolean} isModal specifies if the active dialog is modal
      * @param {Boolean} clickOutToClose specifies if clicking outside the dialog should close it
-     * @return {Object} references to event handlers, and elements to remove or apply focus
+     * @return {Object} JS config object w/ references to event handlers, as well as the elements to which we need to apply focus
      */
     getHandlerConfig : function(dialog, isModal, clickOutToClose) {
 
@@ -222,7 +223,7 @@
     getResizeHandler : function(dialog, isModal) {
 
         if (isModal) {
-            dialog.find("content").getElement().style.maxHeight = this.getContentMaxHeight() + "px";
+            dialog.find("content").getElement().style.maxHeight = this.getContentMaxHeight(dialog) + "px";
         }
 
     },
@@ -291,8 +292,8 @@
     toggleDisplay : function(show, dialog, autoFocus, isModal, config) {
 
         var mask         = isModal ? dialog.find("mask").getElement() : null,
-            outer        = dialog.find("dialog").getElement(),
-            inner        = dialog.find("content").getElement(),
+            outer        = dialog.find("dialog").getElement(), // outer dialog wrapper
+            inner        = dialog.find("content").getElement(), // inner content wrapper (i.e., the part that is scrollable)
             flickerDelay = 50,
             focusDelay   = 300,
             hideDelay    = 400;
@@ -301,11 +302,11 @@
         if (show) {
             $A.util.removeClass(outer, "hidden");
             if (isModal) {
-                inner.style.maxHeight = this.getContentMaxHeight() + "px";
+                inner.style.maxHeight = this.getContentMaxHeight(dialog) + "px";
                 $A.util.removeClass(mask, "hidden");
                 // delay the application of animation classes by just a hair ... webkit/ffx rendering bug
                 window.setTimeout(function() { $A.util.addClass(mask, "fadeIn"); }, flickerDelay);
-                window.setTimeout(function() { $A.util.addClass(outer, "dropIn"); }, flickerDelay);
+                window.setTimeout(function() { $A.util.addClass(outer, "slideUp"); }, flickerDelay);
             }
             // apply proper element focus if necessary
             if ((autoFocus || isModal) && config.newFocus) {
@@ -321,7 +322,7 @@
             if (isModal) {
                 // remove the animation classes immediately, but delay adding 'hidden' back until animation completes
                 $A.util.removeClass(mask, "fadeIn");
-                $A.util.removeClass(outer, "dropIn");
+                $A.util.removeClass(outer, "slideUp");
                 window.setTimeout(function() { $A.util.addClass(mask, "hidden"); }, hideDelay);
                 window.setTimeout(function() { $A.util.addClass(outer, "hidden"); }, hideDelay);
             } else {
@@ -343,9 +344,18 @@
      * 
      * @return {void}
      */
-    getContentMaxHeight : function() {
+    getContentMaxHeight : function(dialog) {
 
-        return Math.min($A.util.getWindowSize().height, 2600) - 150;
+        var hasButtons     = dialog.get("v.buttons"),
+            cssMargin      = 10, // applied to top-level "title", "content", and "button" elements
+            cssPadding     = 10, // applied to "content" <div> only
+            titleHeight    = dialog.find("title").getElement().offsetHeight + cssMargin * 2, // account for top & bottom
+            contentPadding = cssPadding * 2, // account for top & bottom
+            buttonHeight   = hasButtons ? dialog.find("buttons").getElement().offsetHeight + cssMargin * 2 : cssMargin,
+            extraMargin    = 20; // extra margin at the bottom of the viewport so you can fully see the css box-shadow effect
+
+        // 2600px is the same value as the CSS 3D transform rule applied to the dialog
+        return Math.min($A.util.getWindowSize().height, 2600) - (titleHeight + contentPadding + buttonHeight + extraMargin);
 
     }
 

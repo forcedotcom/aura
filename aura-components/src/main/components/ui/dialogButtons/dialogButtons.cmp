@@ -32,16 +32,14 @@
     <!-- events -->
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
-    <div class="{!v.class}">
-        <aura:if isTrue="{!v.defaultButtons == 'cancel' || v.defaultButtons == 'both'}">
-            <ui:button aura:id="cancelButton" class="{!v.cancelClass}" label="{!v.cancelLabel}" buttonTitle="{!v.cancelTitle}" press="{!c.cancel}"/>
-        </aura:if>
-        <!-- custom buttons go between 'cancel' and 'confirm', because 'cancel' buttons should always be on the far left
-             and 'confirm' buttons should always be on the far right. any other action should be in the middle. -->
-        {!v.body}
-        <aura:if isTrue="{!v.defaultButtons == 'confirm' || v.defaultButtons == 'both'}">
-            <ui:button aura:id="confirmButton" class="{!v.confirmClass}" label="{!v.confirmLabel}" buttonTitle="{!v.confirmTitle}" press="{!c.confirm}"/>
-        </aura:if>
-    </div>
+    <aura:if isTrue="{!v.defaultButtons == 'cancel' || v.defaultButtons == 'both'}">
+        <ui:button aura:id="cancelButton" class="{!v.cancelClass}" label="{!v.cancelLabel}" buttonTitle="{!v.cancelTitle}" press="{!c.cancel}"/>
+    </aura:if>
+    <!-- custom buttons go between 'cancel' and 'confirm', because 'cancel' buttons should always be on the far left
+         and 'confirm' buttons should always be on the far right. any other action should be in the middle. -->
+    {!v.body}
+    <aura:if isTrue="{!v.defaultButtons == 'confirm' || v.defaultButtons == 'both'}">
+        <ui:button aura:id="confirmButton" class="{!v.confirmClass}" label="{!v.confirmLabel}" buttonTitle="{!v.confirmTitle}" press="{!c.confirm}"/>
+    </aura:if>
 
 </aura:component>

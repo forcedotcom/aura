@@ -23,9 +23,9 @@
     left:0;
     background:#222;
     background:rgba(0,0,0,0.9);
-    -webkit-transition:all 0.3s linear;
-    -moz-transition:all 0.3s linear;
-    transition:all 0.3s linear;
+    -webkit-transition:all 0.3s ease-in-out;
+    -moz-transition:all 0.3s ease-in-out;
+    transition:all 0.3s ease-in-out;
     opacity:0;
     z-index:99999;
 }
@@ -86,13 +86,14 @@
 .THIS.modal.auto{
     left:0;
 }
-.THIS.modal.dropIn{
+.THIS.modal.slideUp{
     -webkit-transform:translate3d(0,0,0);
     -moz-transform:translate3d(0,0,0);
     transform:translate3d(0,0,0);
 }
 .THIS .title,
-.THIS .content{
+.THIS .content,
+.THIS .buttons{
     margin:10px;
 }
 .THIS .title{
@@ -109,6 +110,9 @@
     background-color:#FFF;
     box-shadow:inset 0 0 6px #000;
     border:2px solid #FFF;
+}
+.THIS .buttons{
+    text-align:center;
 }
 .THIS .close{
     position:absolute;

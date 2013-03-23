@@ -53,7 +53,9 @@
         <div aura:id="content" class="content">{!v.body}</div>
 
         <!-- buttons -->
-        <aura:if isTrue="{!v.buttons != null}">{!v.buttons}</aura:if>
+        <aura:if isTrue="{!v.buttons != null}">
+            <div aura:id="buttons" class="buttons">{!v.buttons}</div>
+        </aura:if>
 
         <!-- close ("x") link - this DOM placement is intentional. DO NOT move, hide, or remove this element. see dialogManagerHelper#getFirstFocusableElement for more info -->
         <ui:button aura:id="closeButton" class="{!'close ' + v.closeClass}" label="{!v.closeLabel}" buttonTitle="{!v.closeTitle}" press="{!c.close}"/>

@@ -77,6 +77,7 @@ Json.prototype.decodeString = function(value) {
  * @param {Object}
  *            obj The object to resolve
  */
+<<<<<<< HEAD
 Json.prototype.resolveRefs = function(obj) {
 	$A.mark("Json.resolveRefs", $A.logLevel["DEBUG"]);
 
@@ -86,6 +87,13 @@ Json.prototype.resolveRefs = function(obj) {
 	$A.measure("done", "Json.resolveRefs");
 
 	return obj;
+=======
+Json.prototype.resolveRefs = function(obj){
+    $A.mark("Json.resolveRefs");
+    var ret = this._resolveRefs(obj, {});
+    $A.endMark("Json.resolveRefs");
+    return ret;
+>>>>>>> 1525c91... Aura framework changes to support transactions using Jiffy Transaction API
 };
 
 Json.prototype._resolveRefs = function(config, cache, parent, property) {
@@ -147,6 +155,7 @@ Json.prototype._resolveRefs = function(config, cache, parent, property) {
  *            whiteSpace Adds spaces or tabs to the resulting string. E.g. '\t'
  *            for tab
  */
+<<<<<<< HEAD
 Json.prototype.encode = function(obj, replacer, whiteSpace) {
 	if (typeof (JSON) !== "undefined") {
 		// Protect ourselves from the evils of libraries like Prototype.js that decorate Array with extra methods such as .toJSON() and do the wrong thing!
@@ -210,6 +219,60 @@ Json.prototype.encode = function(obj, replacer, whiteSpace) {
 	default:
 		return obj.toString();
 	}
+=======
+Json.prototype.encode = function(obj, replacer, whiteSpace){
+    if (typeof(JSON) !== "undefined") {
+        if ($A.util.isUndefinedOrNull(replacer)) {
+            return JSON.stringify(obj, function(key, value) {
+                return aura.util.json.encodeFunction(value); // We have to do this as JSON.stringify removes the property from the resulted JSON string if its value is a function
+            }, whiteSpace);
+        } else {
+            return JSON.stringify(obj, replacer, whiteSpace);
+        }
+    }
+
+    if (typeof(JSON) !== "undefined") {
+        return JSON.stringify(obj, replacer, whiteSpace);
+    }
+
+    if (obj === undefined) {
+        return 'null';
+    }
+
+    if (obj === null){
+        return 'null';
+    }
+
+    // Support the JSON.stringify() Object.toJSON() standard
+    if (!$A.util.isUndefined(obj.toJSON)) {
+        return arguments.callee(obj.toJSON());
+    }
+
+    switch (obj.constructor) {
+        case String:
+            return '"' + obj.replace(/\"/g,'\\"').replace(/\r|\n|\f/g,"\\n")+ '"';
+
+        case Array:
+            var buf = [];
+            for (var i=0; i<obj.length; i++) {
+                buf.push(arguments.callee(obj[i]));
+            }
+            return '[' + buf.join(',') + ']';
+
+        case Object:
+            var buf2 = [];
+            for (var k in obj) {
+                if (obj.hasOwnProperty(k)) {
+                    // Recursively invoke encode() on both the property name and the value
+                    buf2.push(arguments.callee(k) + ':' + arguments.callee(obj[k]));
+                }
+            }
+            return '{' + buf2.join(',') + '}';
+
+        default:
+            return obj.toString();
+    }
+>>>>>>> 1525c91... Aura framework changes to support transactions using Jiffy Transaction API
 };
 
 /**
@@ -219,9 +282,18 @@ Json.prototype.encode = function(obj, replacer, whiteSpace) {
  *            value The function to be encoded.
  */
 Json.prototype.encodeFunction = function(value) {
+<<<<<<< HEAD
 	if (typeof value === 'function') {
 		return value + '';
 	}
 	return value;
 };
 // #include aura.util.Json_export
+=======
+    if (typeof value === 'function') {
+        return value + '';
+    }
+    return value;
+};
+//#include aura.util.Json_export
+>>>>>>> 1525c91... Aura framework changes to support transactions using Jiffy Transaction API

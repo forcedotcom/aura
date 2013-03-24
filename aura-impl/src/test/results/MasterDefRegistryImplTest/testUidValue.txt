@@ -7,7 +7,7 @@ java://org.auraframework.renderer.HtmlRenderer : null
 java://org.auraframework.renderer.TextRenderer : null
 js://aura.component : rJFsrXr4XU9CTW4t_VRG0g
 js://aura.expression : WOBdtoGe4e4ecIPHBs1N8g
-js://aura.expression : -8iXXGeM5b3IYIbYYr7I3w
+js://aura.expression : -8iXXGeM5b3IYIbYYr7I
 js://aura.html : 7HDsxCxGj5oGfxC9Tlj-9g
 js://aura.html : uOWBC48ltDRMXWwg0a4d-w
 js://aura.placeholder : 2XT9xQ9u4aoFm7bDHXhrpA

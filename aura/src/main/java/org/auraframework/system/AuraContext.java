@@ -46,8 +46,8 @@ public interface AuraContext {
         AUTOJSTEST(true, false, false, JavascriptGeneratorMode.AUTOTESTING, false),
         JSTESTDEBUG(true, false, true, JavascriptGeneratorMode.TESTINGDEBUG, false),
         AUTOJSTESTDEBUG(true, false, true, JavascriptGeneratorMode.AUTOTESTINGDEBUG, false),
-        PTEST(false, false, false, JavascriptGeneratorMode.PRODUCTION, true),
-        CADENCE(false, false, false, JavascriptGeneratorMode.PRODUCTION, true),
+        PTEST(false, false, false, JavascriptGeneratorMode.PTEST, true),
+        CADENCE(false, false, false, JavascriptGeneratorMode.PTEST, true),
         PRODDEBUG(false, false, false, JavascriptGeneratorMode.PRODUCTIONDEBUG, true),
         PROD(false, false, false, JavascriptGeneratorMode.PRODUCTION, true),
         SELENIUM(true, false, true, JavascriptGeneratorMode.AUTOTESTING, true),
@@ -108,7 +108,7 @@ public interface AuraContext {
     /**
      * TODO: should have serialization contexts for any format, this shouldn't
      * be tied to json
-     * 
+     *
      * @return the json serialization context to use
      */
     JsonSerializationContext getJsonSerializationContext();
@@ -122,7 +122,7 @@ public interface AuraContext {
     /**
      * Sets that the given descriptor was checked for freshness, and so
      * shouldn't be checked again
-     * 
+     *
      * @param d descriptor that was checked
      */
     void setStaleCheck(DefDescriptor<?> d);
@@ -136,10 +136,10 @@ public interface AuraContext {
     /**
      * Set the current component, so that the components controller can access
      * it.
-     * 
+     *
      * TODO: what is this for.
      * TODO: this is not handled as a stack, so it is almost certainly broken.
-     * 
+     *
      * @param nextComponent The component to set.
      * @return the previous component
      */
@@ -147,14 +147,14 @@ public interface AuraContext {
 
     /**
      * Get the currently processing action.
-     * 
+     *
      * @return the current action being processed (for use by controllers)
      */
     Action getCurrentAction();
 
     /**
      * Set the current action, so that the components controller can access it
-     * 
+     *
      * @param nextAction
      * @return the previous action
      */
@@ -162,7 +162,7 @@ public interface AuraContext {
 
     /**
      * Set the current namespace.
-     * 
+     *
      * FIXME: this is an anti-pattern. it is used inside calls to set the
      * current namespace, but is never reset, so it persists in strange and
      * interesting ways. Figure out another way to do this?
@@ -178,7 +178,7 @@ public interface AuraContext {
      * If a qualifiedName for a DefDescriptor of the given type does not include
      * a prefix (apex:// or java://, etc...), this method on the context will be
      * consulted to find out what the default prefix for the given DefType is.
-     * 
+     *
      * @param defType
      * @return The default prefix for the given DefType in this context
      */
@@ -186,7 +186,7 @@ public interface AuraContext {
 
     /**
      * Get the mode of execution.
-     * 
+     *
      * This should be consistent across the entire request.
      */
     Mode getMode();
@@ -199,11 +199,11 @@ public interface AuraContext {
 
     /**
      * Set the 'number' of this context.
-     * 
+     *
      * This is used in component ids to guarantee that each global id is unique.
      * This is passed in from the client, and should never be set outside of
      * Aura code during normal operation.
-     * 
+     *
      * @param num The 'number' to use as an ID for this context.
      */
     void setNum(String num);
@@ -217,14 +217,14 @@ public interface AuraContext {
 
     /**
      * Namespaces whose defs should be, or have been preloaded on the client.
-     * 
+     *
      * @param preload
      */
     void addPreload(String preload);
 
     /**
      * Clear the current set of preloads.
-     * 
+     *
      * This can be used to reset preloads in the case of error, preventing
      * recurrance of any quick fix error.
      */
@@ -232,7 +232,7 @@ public interface AuraContext {
 
     /**
      * get the current set of preloads.
-     * 
+     *
      * By default, the aura and os namespaces are included.
      */
     Set<String> getPreloads();
@@ -267,33 +267,33 @@ public interface AuraContext {
 
     /**
      * Set the current descriptor to send.
-     * 
+     *
      * This sets a descriptor that is intended to be 'preloaded'
      * on the client. This means that it, and all of the non-loaded
      * dependencies will be sent to the client. This is set by the
      * servlet to allow us to know what we should send without
      * changing the context sent to the client.
-     * 
+     *
      * TODO: move this W-1474844
      */
     void setPreloading(DefDescriptor<?> descriptor);
 
     /**
      * Get the currently preloading descriptor.
-     * 
+     *
      * TODO: move this W-1474844
      */
     DefDescriptor<?> getPreloading();
 
     /**
      * Add a loaded descriptor+UID pair.
-     * 
+     *
      * This routine will remember a descriptor in the set of loaded
      * descriptors along with a uid for validating the load (and
      * 'timestamping' it). This should be used with care, as it will
      * be serialized with every request, so size should be a
      * consideration.
-     * 
+     *
      * @param descriptor The loaded descriptor.
      * @param uid the UID that was loaded.
      */
@@ -301,17 +301,17 @@ public interface AuraContext {
 
     /**
      * Drop a component from the set of loaded components.
-     * 
+     *
      * Sober up our set. This can be used to remove a descriptor
      * that is already covered by the set of loaded components.
-     * 
+     *
      * @param descriptor the previously marked 'loaded' descriptor.
      */
     public void dropLoaded(DefDescriptor<?> descriptor);
 
     /**
      * Get the uid string for a descriptor.
-     * 
+     *
      * @param descriptor the descriptor that we need a UID for.
      * @return the uid from the request (null if none).
      */
@@ -319,11 +319,11 @@ public interface AuraContext {
 
     /**
      * Get the set of loaded descriptors with the uid.
-     * 
+     *
      * This set of descriptors should be the complete set of loaded
      * descriptors that we choose to remember. Things outside of the
      * dependency set will be resent.
-     * 
+     *
      * @return the map of descriptors to UIDs, UIDs are allowed to be null
      */
     Map<DefDescriptor<?>, String> getLoaded();
@@ -335,20 +335,20 @@ public interface AuraContext {
 
     /**
      * Get the application (or component) descriptor.
-     * 
+     *
      * This returns the currently loaded application/component for this context.
      * It can only be a component for non-production mode.
-     * 
+     *
      * @return the component or application (should rarely be null).
      */
     DefDescriptor<? extends BaseComponentDef> getApplicationDescriptor();
 
     /**
      * Set the application (or component) descriptor.
-     * 
+     *
      * This returns the currently loaded application/component for this context.
      * It can only be a component for non-production mode.
-     * 
+     *
      * @param appDesc the descriptor for the application/component.
      */
     void setApplicationDescriptor(DefDescriptor<? extends BaseComponentDef> appDesc);
@@ -366,7 +366,7 @@ public interface AuraContext {
     void setLastMod(String lastMod);
 
     /**
-     * 
+     *
      * @param event - Instance of the {@link org.auraframework.instance.Event} to be fired at the client.
      * @throws Exception - If the {@link org.auraframework.def.EventType} is not
      *             APPLICATION or Event object's definition cannot be found.

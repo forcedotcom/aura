@@ -22,13 +22,14 @@ var AuraSerializationService = function(){
 
     return {
         readComponent : function(config){
-            $A.mark("AuraSerializationService");
+            $A.mark("resolvedRefs");
+            $A.mark("constructedComponent");
             config = aura.util.json.resolveRefs(config);
 
 
-            $A.measure("resolvedRefs", "AuraSerializationService");
+            $A.endMark("resolvedRefs");
             var ret = $A.componentService.newComponent(config, null, false, true);
-            $A.measure("constructedComponent", "AuraSerializationService");
+            $A.endMark("constructedComponent");
             return ret;
         }
     };

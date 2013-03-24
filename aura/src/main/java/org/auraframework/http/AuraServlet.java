@@ -57,18 +57,26 @@ import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.SystemErrorException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonReader;
+import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 
 import com.google.common.collect.Maps;
 
 // DCHASMAN TODO Move this into its own aura-heroku module
-/*import javax.servlet.ServletException;
- import org.eclipse.jetty.webapp.*;*/
+/*
+ * import javax.servlet.ServletException; import org.eclipse.jetty.webapp.*;
+ */
 
 /**
+<<<<<<< HEAD
  * The servlet for initialization and actions in Aura.
  *
  * The sequence of requests is:
+=======
+ * The servlet for initialization and actions in Aura. The sequence of requests is:
+>>>>>>> 1525c91... Aura framework changes to support transactions using Jiffy Transaction API
  * <ol>
  * <li>GET(AuraServlet): initial fetch of an aura app/component + Resource Fetches:
  * <ul>
@@ -92,12 +100,18 @@ import com.google.common.collect.Maps;
  * </ul>
  * </li>
  * </ol>
+<<<<<<< HEAD
  *
  * Run from aura-jetty project. Pass in these vmargs: <code>
  * -Dconfig=${AURA_HOME}/config -Daura.home=${AURA_HOME} -DPORT=9090
  * </code>
  *
  * Exception handling is dealt with in {@link #handleServletException} which should almost always be called when
+=======
+ * Run from aura-jetty project. Pass in these vmargs: <code>
+ * -Dconfig=${AURA_HOME}/config -Daura.home=${AURA_HOME} -DPORT=9090
+ * </code> Exception handling is dealt with in {@link #handleServletException} which should almost always be called when
+>>>>>>> 1525c91... Aura framework changes to support transactions using Jiffy Transaction API
  * exceptions are caught. This routine will use {@link org.auraframework.adapter.ExceptionAdapter ExceptionAdapter} to
  * log and rewrite exceptions as necessary.
  */
@@ -109,6 +123,7 @@ public class AuraServlet extends AuraBaseServlet {
     private static final EnumParam<DefType> defTypeParam = new EnumParam<DefType>(AURA_PREFIX + "deftype", false,
             DefType.class);
     private final static StringParam messageParam = new StringParam("message", 0, false);
+    private final static StringParam beaconParam = new StringParam("beaconData", 0, false);
 
     // FIXME: is this really a good idea?
     private final static StringParam nocacheParam = new StringParam("nocache", 0, false);
@@ -119,6 +134,7 @@ public class AuraServlet extends AuraBaseServlet {
     }
 
     /**
+<<<<<<< HEAD
      * Check for the nocache parameter and redirect as necessary.
      *
      * Not entirely sure what this is used for (need doco). It is part of the appcache refresh, forcing a reload while
@@ -128,6 +144,16 @@ public class AuraServlet extends AuraBaseServlet {
      *
      * @param request The request to retrieve the parameter.
      * @param response the response (for setting the location header.
+=======
+     * Check for the nocache parameter and redirect as necessary. Not entirely sure what this is used for (need doco).
+     * It is part of the appcache refresh, forcing a reload while avoiding the appcache. It maybe should be done
+     * differently (e.g. a nonce).
+     *
+     * @param request
+     *            The request to retrieve the parameter.
+     * @param response
+     *            the response (for setting the location header.
+>>>>>>> 1525c91... Aura framework changes to support transactions using Jiffy Transaction API
      * @returns true if we are finished with the request.
      */
     private boolean handleNoCacheRedirect(HttpServletRequest request, HttpServletResponse response)
@@ -141,9 +167,7 @@ public class AuraServlet extends AuraBaseServlet {
         // before we do any checks at all.
         //
         String nocache = nocacheParam.get(request);
-        if (nocache == null || nocache.isEmpty()) {
-            return false;
-        }
+        if (nocache == null || nocache.isEmpty()) { return false; }
         response.setContentType("text/plain");
         response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
 
@@ -170,10 +194,15 @@ public class AuraServlet extends AuraBaseServlet {
     }
 
     /**
+<<<<<<< HEAD
      * Handle an HTTP GET operation.
      *
      * The HTTP GET operation is used to retrieve resources from the Aura servlet. It is only used for this purpose,
      * where POST is used for actions.
+=======
+     * Handle an HTTP GET operation. The HTTP GET operation is used to retrieve resources from the Aura servlet. It is
+     * only used for this purpose, where POST is used for actions.
+>>>>>>> 1525c91... Aura framework changes to support transactions using Jiffy Transaction API
      *
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
@@ -213,16 +242,12 @@ public class AuraServlet extends AuraBaseServlet {
             // TODO: this should disappear!!!!! -GPO
             // Verify why it is here.
             //
-            if (handle404(request, response, tagName, defType)) {
-                return;
-            }
+            if (handle404(request, response, tagName, defType)) { return; }
 
             //
             // TODO: evaluate this for security.
             //
-            if (handleNoCacheRedirect(request, response)) {
-                return;
-            }
+            if (handleNoCacheRedirect(request, response)) { return; }
 
             DefinitionService definitionService = Aura.getDefinitionService();
             DefDescriptor<? extends BaseComponentDef> defDescriptor = definitionService.getDefDescriptor(tagName,
@@ -271,9 +296,14 @@ public class AuraServlet extends AuraBaseServlet {
     }
 
     /**
+<<<<<<< HEAD
      * Allow the servlet to override page access.
      *
      * FIXME: this is totally bogus and should be handled by the security provider - GPO.
+=======
+     * Allow the servlet to override page access. FIXME: this is totally bogus and should be handled by the security
+     * provider - GPO.
+>>>>>>> 1525c91... Aura framework changes to support transactions using Jiffy Transaction API
      */
     private boolean handle404(HttpServletRequest request, HttpServletResponse response, String tagName, DefType defType)
             throws ServletException, IOException {
@@ -307,7 +337,7 @@ public class AuraServlet extends AuraBaseServlet {
                 Application app = instanceService.getInstance(tagName, ApplicationDef.class, attributes);
                 component = app;
             } else if (defType == DefType.COMPONENT) {
-                component = (Component) instanceService.getInstance(tagName, ComponentDef.class, attributes);
+                component = (Component)instanceService.getInstance(tagName, ComponentDef.class, attributes);
             }
             Map<String, Object> map = Maps.newHashMap();
             map.put("token", getToken());
@@ -387,14 +417,24 @@ public class AuraServlet extends AuraBaseServlet {
         boolean written = false;
 
         try {
-            if (context.getFormat() != Format.JSON) {
-                throw new AuraRuntimeException("Invalid request, post must use JSON");
-            }
+            if (context.getFormat() != Format.JSON) { throw new AuraRuntimeException(
+                    "Invalid request, post must use JSON"); }
 
             String fwUID = Aura.getConfigAdapter().getAuraFrameworkNonce();
+<<<<<<< HEAD
             if (!fwUID.equals(context.getFrameworkUID())) {
                 throw new ClientOutOfSyncException("Framework has been updated");
             }
+=======
+            //
+            // TODO: the integration service has an empty fwuid, which I haven't figured out
+            // how to set, so we allow the first one through, but we do set one on the response,
+            // so we'll then merge in the client and the next request will come in with the uid
+            // set. If this gets fixed, the null check can go away, which will make things safer.
+            //
+            if (context.getFrameworkUID() != null && !fwUID.equals(context.getFrameworkUID())) { throw new ClientOutOfSyncException(
+                    "Framework has been updated"); }
+>>>>>>> 1525c91... Aura framework changes to support transactions using Jiffy Transaction API
             context.setFrameworkUID(fwUID);
 
             Message<?> message;
@@ -403,9 +443,7 @@ public class AuraServlet extends AuraBaseServlet {
             response.setContentType(getContentType(context.getFormat()));
             String msg = messageParam.get(request);
 
-            if (msg == null) {
-                throw new AuraRuntimeException("Invalid request, no message");
-            }
+            if (msg == null) { throw new AuraRuntimeException("Invalid request, no message"); }
 
             loggingService.startTimer(LoggingService.TIMER_DESERIALIZATION);
             try {
@@ -421,8 +459,8 @@ public class AuraServlet extends AuraBaseServlet {
                 Action action = message.getActions().get(0);
                 String name = action.getDescriptor().getQualifiedName();
                 if (name.equals("aura://ComponentController/ACTION$getApplication")
-                        || (name.equals("aura://ComponentController/ACTION$getComponent")
-                        && !isProductionMode(context.getMode()))) {
+                        || (name.equals("aura://ComponentController/ACTION$getComponent") && !isProductionMode(context
+                                .getMode()))) {
                     isBootstrapAction = true;
                 }
             }
@@ -441,6 +479,12 @@ public class AuraServlet extends AuraBaseServlet {
                     // a client out of sync exception, since the UID will not match.
                     //
                 }
+            }
+
+            // handle transaction beacon JSON data
+            String beaconData = beaconParam.get(request);
+            if (!"undefined".equals(beaconData) && !AuraTextUtil.isNullEmptyOrWhitespace(beaconData)) {
+                loggingService.setValue(LoggingService.BEACON_DATA, new JsonReader().read(beaconData));
             }
 
             Message<?> result = serverService.run(message, context);
@@ -471,6 +515,8 @@ public class AuraServlet extends AuraBaseServlet {
         } catch (RequestParam.MissingParamException mpe) {
             handleServletException(new SystemErrorException(mpe), false, context, request, response, false);
             return;
+        } catch (JsonParseException jpe) {
+            handleServletException(new SystemErrorException(jpe), false, context, request, response, false);
         } catch (Exception e) {
             handleServletException(e, false, context, request, response, written);
         }

@@ -15,8 +15,8 @@
  */
 /*jslint sub: true*/
 /**
- * @namespace Represents a Aura client-side context, created during HTTP requests for component definitions.
- * A context can include a mode, such as "DEV" for development mode or "PROD" for production mode.
+ * @namespace Represents a Aura client-side context, created during HTTP requests for component definitions. A context
+ *            can include a mode, such as "DEV" for development mode or "PROD" for production mode.
  * @constructor
  * @protected
  */
@@ -30,10 +30,12 @@ function AuraContext(config) {
     this.lastmod = config["lastmod"];
     this.fwuid = config["fwuid"];
     this.preloadLookup = {};
-    for(var j=0;j<this.preloads.length;j++){
+    for ( var j = 0; j < this.preloads.length; j++) {
         this.preloadLookup[this.preloads[j]] = true;
     }
     this.num = 0;
+    this.transaction = 0;
+    this.transactionName = "";
     this.lastGlobalId = 0;
     this.componentConfigs = {};
     var globalValueProviders = {};
@@ -41,22 +43,22 @@ function AuraContext(config) {
     this.app = config["app"];
     this.cmp = config["cmp"];
     this.test = config["test"];
-    
+
     // If persistent storage is active then write through for disconnected support
     var storage = this.getStorage();
     var that = this;
     if (storage) {
-    	storage.get("globalValueProviders", function(item) {
-    		if (item) {
-    			that.joinGlobalValueProviders(item, true);
-    		}
-    	});    	
+        storage.get("globalValueProviders", function(item) {
+            if (item) {
+                that.joinGlobalValueProviders(item, true);
+            }
+        });
     }
 
     var gvp = config["globalValueProviders"];
     if (gvp) {
         var l = gvp.length;
-        for (var i = 0; i < l; i++) {
+        for ( var i = 0; i < l; i++) {
             // TODO: need GlobalValueProvider js object, more than a mapvalue
             var g = gvp[i];
             globalValueProviders[g["type"]] = new MapValue(g["values"]);
@@ -90,10 +92,10 @@ AuraContext.prototype.isPreloaded = function(ns) {
 };
 
 /**
- *  @private
+ * @private
  */
-AuraContext.prototype.getPreloads = function(){
-	return this.preloadLookup;
+AuraContext.prototype.getPreloads = function() {
+    return this.preloadLookup;
 };
 
 /**
@@ -109,15 +111,15 @@ AuraContext.prototype.encodeForServer = function(includePreloads) {
     }
 
     return aura.util.json.encode({
-		"mode" : this.mode,
-		"preloads" : preloads,
-		"loaded" : this.loaded,
-		"app" : this.app,
-		"cmp" : this.cmp,
-		"lastmod" : this.lastmod,
-		"fwuid" : this.fwuid,
-		"test" : this.test
-	});
+        "mode" : this.mode,
+        "preloads" : preloads,
+        "loaded" : this.loaded,
+        "app" : this.app,
+        "cmp" : this.cmp,
+        "lastmod" : this.lastmod,
+        "fwuid" : this.fwuid,
+        "test" : this.test
+    });
 };
 
 /**
@@ -127,7 +129,7 @@ AuraContext.prototype.getDynamicNamespaces = function() {
     var dynamicNamespaces = [];
 
     var descriptors = $A.services.component.getRegisteredComponentDescriptors();
-    for (var n = 0; n < descriptors.length; n++) {
+    for ( var n = 0; n < descriptors.length; n++) {
         var desc = descriptors[n];
         if (desc.indexOf("layout://") === 0) {
             dynamicNamespaces.push(new DefDescriptor(desc).getNamespace());
@@ -158,14 +160,14 @@ AuraContext.prototype.join = function(otherContext) {
 /**
  * @private
  */
-AuraContext.prototype.getNum = function(){
+AuraContext.prototype.getNum = function() {
     return this.num;
 };
 
 /**
  * @private
  */
-AuraContext.prototype.incrementNum = function(){
+AuraContext.prototype.incrementNum = function() {
     this.num = this.num + 1;
     this.lastGlobalId = 0;
     return this.num;
@@ -173,8 +175,49 @@ AuraContext.prototype.incrementNum = function(){
 
 /**
  * @private
+ * @return transaction number
  */
-AuraContext.prototype.getNextGlobalId = function(){
+AuraContext.prototype.incrementTransaction = function() {
+    this.transaction = this.transaction + 1;
+    return this.transaction;
+};
+
+/**
+ * @private
+ * @return gets the number of the current transaction
+ */
+AuraContext.prototype.getTransaction = function() {
+    return this.transaction;
+};
+
+/**
+ * @private
+ */
+AuraContext.prototype.updateTransactionName = function(_transactionName) {
+    if (_transactionName) {
+        this.transactionName =  (this.trasactionName !== "") ? (this.transactionName + "-" + _transactionName) : _transactionName;
+    }
+};
+
+/**
+ * @private
+ * @return gets the name of the transaction
+ */
+AuraContext.prototype.getTransactionName = function() {
+    return this.transactionName;
+};
+
+/**
+ * @private
+ */
+AuraContext.prototype.clearTransactionName = function() {
+    this.transactionName = "";
+};
+
+/**
+ * @private
+ */
+AuraContext.prototype.getNextGlobalId = function() {
     this.lastGlobalId = this.lastGlobalId + 1;
     return this.lastGlobalId;
 };
@@ -182,7 +225,7 @@ AuraContext.prototype.getNextGlobalId = function(){
 /**
  * @private
  */
-AuraContext.prototype.getComponentConfig = function(globalId){
+AuraContext.prototype.getComponentConfig = function(globalId) {
     var componentConfigs = this.componentConfigs;
     var ret = componentConfigs[globalId];
     delete componentConfigs[globalId];
@@ -192,7 +235,7 @@ AuraContext.prototype.getComponentConfig = function(globalId){
 /**
  * Returns the app associated with the request.
  */
-AuraContext.prototype.getApp = function(){
+AuraContext.prototype.getApp = function() {
     return this.app;
 };
 
@@ -201,36 +244,36 @@ AuraContext.prototype.getApp = function(){
  */
 AuraContext.prototype.joinGlobalValueProviders = function(gvps, doNotPersist) {
     if (gvps) {
-    	var storage;
-    	var storedGvps;
+        var storage;
+        var storedGvps;
         if (!doNotPersist) {
-	        // If persistent storage is active then write through for disconnected support
-	        storage = this.getStorage();
-        	storedGvps = [];
+            // If persistent storage is active then write through for disconnected support
+            storage = this.getStorage();
+            storedGvps = [];
         }
-        
-        for (var i = 0; i < gvps.length; i++) {
+
+        for ( var i = 0; i < gvps.length; i++) {
             var newGvp = gvps[i];
             var t = newGvp["type"];
             var gvp = this.globalValueProviders[t];
             if (!gvp) {
-            	gvp = new MapValue(newGvp["values"]);
+                gvp = new MapValue(newGvp["values"]);
                 this.globalValueProviders[t] = gvp;
             } else {
                 var mergeMap = new MapValue(newGvp["values"]);
                 gvp.merge(mergeMap, false);
             }
-            
+
             if (storage) {
-            	storedGvps.push({ 
-            		"type": t, 
-            		"values": gvp.unwrap() 
-        		});
+                storedGvps.push({
+                    "type" : t,
+                    "values" : gvp.unwrap()
+                });
             }
         }
-        
+
         if (storage) {
-        	storage.put("globalValueProviders", storedGvps);
+            storage.put("globalValueProviders", storedGvps);
         }
     }
 };
@@ -238,9 +281,9 @@ AuraContext.prototype.joinGlobalValueProviders = function(gvps, doNotPersist) {
 /**
  * @private
  */
-AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs){
+AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs) {
     if (otherComponentConfigs) {
-        for (var k in otherComponentConfigs) {
+        for ( var k in otherComponentConfigs) {
             var config = otherComponentConfigs[k];
             var def = config["componentDef"];
             if (def) {
@@ -259,7 +302,7 @@ AuraContext.prototype.joinLoaded = function(loaded) {
         this.loaded = {};
     }
     if (loaded) {
-        for (var i in loaded) {
+        for ( var i in loaded) {
             var newL = loaded[i];
             if (newL === 'deleted') {
                 delete this.loaded[i];
@@ -270,18 +313,17 @@ AuraContext.prototype.joinLoaded = function(loaded) {
     }
 };
 
-
 /**
  * This should be private but is needed for testing... ideas?
  */
-AuraContext.prototype.getLoaded = function(){
+AuraContext.prototype.getLoaded = function() {
     return this.loaded;
 };
 
 /**
  * DCHASMAN Will be private again soon as part of the second phase of W-1450251
  */
-AuraContext.prototype.setCurrentAction = function(action){
+AuraContext.prototype.setCurrentAction = function(action) {
     var previous = this.currentAction;
     this.currentAction = action;
     return previous;
@@ -290,7 +332,7 @@ AuraContext.prototype.setCurrentAction = function(action){
 /**
  * @private
  */
-AuraContext.prototype.getCurrentAction = function(action){
+AuraContext.prototype.getCurrentAction = function(action) {
     return this.currentAction;
 };
 
@@ -298,12 +340,12 @@ AuraContext.prototype.getCurrentAction = function(action){
  * @private
  */
 AuraContext.prototype.getStorage = function() {
-	var storage = $A.storageService.getStorage("actions");
-	if (!storage) {
-		return undefined;
-	}
-	
-	var config = $A.storageService.getAdapterConfig(storage.getName());
+    var storage = $A.storageService.getStorage("actions");
+    if (!storage) {
+        return undefined;
+    }
+
+    var config = $A.storageService.getAdapterConfig(storage.getName());
     return config["persistent"] ? storage : undefined;
 };
 

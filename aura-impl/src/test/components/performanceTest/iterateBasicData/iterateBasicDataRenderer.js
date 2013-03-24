@@ -1,19 +1,20 @@
 ({
     render: function(component){
-    	$A.mark("performanceTest:iterateBasicData Render Time");
-    	return this.superRender();
+        $A.mark("Rendering time for performanceTest:iterateBasicData");
+        $A.mark("Rerender time for performanceTest:iterateBasicData");
+        return this.superRender();
     },
 
     afterRender: function(component){
-    	var ret = this.superAfterRender();
-    	$A.measure("Rendering time for performanceTest:iterateBasicData", "performanceTest:iterateBasicData Render Time");
-    	return ret;
+        var ret = this.superAfterRender();
+        $A.endMark("Rendering time for performanceTest:iterateBasicData");
+        return ret;
     },
 
     rerender: function(component){
-    	$A.mark("performanceTest:iterateBasicData Rerender Time");
-    	var ret = this.superRerender();
-    	$A.measure("Rerender time for performanceTest:iterateBasicData", "performanceTest:iterateBasicData Rerender Time");
-    	return ret;
+        $A.mark("performanceTest:iterateBasicData Rerender Time");
+        var ret = this.superRerender();
+        $A.endMark("Rerender time for performanceTest:iterateBasicData");
+        return ret;
     }
 })

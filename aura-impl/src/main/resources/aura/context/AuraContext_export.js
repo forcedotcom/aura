@@ -17,12 +17,14 @@
 var p = AuraContext.prototype;
 exp(p,
     "getMode", p.getMode,
+    "incrementTransaction", p.incrementTransaction,
     "getApp", p.getApp,
     "setCurrentAction", p.setCurrentAction
     //#if {"excludeModes" : ["PRODUCTION"]}
-	    ,
-	    "getPreloads", p.getPreloads,
-	    "getNum", p.getNum,
-	    "getLoaded", p.getLoaded
+        ,
+        "getPreloads", p.getPreloads,
+        "getNum", p.getNum,
+        "getLoaded", p.getLoaded
+
     //#end
 );

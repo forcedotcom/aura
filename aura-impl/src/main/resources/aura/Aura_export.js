@@ -32,13 +32,26 @@ $A.ns.Aura.prototype["log"] = $A.ns.Aura.prototype.log;
 $A.ns.Aura.prototype["logf"] = $A.ns.Aura.prototype.logf;
 $A.ns.Aura.prototype["trace"] = $A.ns.Aura.prototype.trace;
 $A.ns.Aura.prototype["mark"] = $A.ns.Aura.prototype.mark;
+/**
+ * @deprecated Use endMark instead
+ */
 $A.ns.Aura.prototype["measure"] = $A.ns.Aura.prototype.measure;
+$A.ns.Aura.prototype["endMark"] = $A.ns.Aura.prototype.endMark;
+$A.ns.Aura.prototype["startTransaction"] = $A.ns.Aura.prototype.startTransaction;
+$A.ns.Aura.prototype["endTransaction"] = $A.ns.Aura.prototype.endTransaction;
+$A.ns.Aura.prototype["updateTransaction"] = $A.ns.Aura.prototype.updateTransaction;
+$A.ns.Aura.prototype["toJson"] = $A.ns.Aura.prototype.toJson;
+$A.ns.Aura.prototype["setBeaconData"] = $A.ns.Aura.prototype.setBeaconData;
+$A.ns.Aura.prototype["getBeaconData"] = $A.ns.Aura.prototype.getBeaconData;
+$A.ns.Aura.prototype["clearBeaconData"] = $A.ns.Aura.prototype.clearBeaconData;
+$A.ns.Aura.prototype["removeStats"] = $A.ns.Aura.prototype.removeStats;
+$A.ns.Aura.prototype["onLoadFired"] = $A.ns.Aura.prototype.onLoadFired;
 $A.ns.Aura.prototype["logLevel"] = $A.ns.Aura.prototype.logLevel;
 $A.ns.Aura.prototype["fitTo"] = $A.ns.Aura.prototype.fitTo;
 // //#end
 
 //#if {"excludeModes" : ["PRODUCTION"]}
-$A.ns.Aura.prototype["devToolService"] = $A.ns.Aura.prototype.devToolService; 
+$A.ns.Aura.prototype["devToolService"] = $A.ns.Aura.prototype.devToolService;
 $A.ns.Aura.prototype["getQueryStatement"] = $A.ns.Aura.prototype.getQueryStatement;
 $A.ns.Aura.prototype["qhelp"] = $A.ns.Aura.prototype.qhelp;
 //#end

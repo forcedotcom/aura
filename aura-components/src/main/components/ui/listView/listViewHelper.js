@@ -219,7 +219,7 @@
             listBody.getValue("v.body").setValue(rows);
 
             // DEBUG: Performance Marker
-            $A.measure("endBlockRender" + component, "startBlockRender" + component);
+            $A.endMark("BlockRender" + component);
 
             // If the final item/block has been drawn, reset container height to allow proper overflow and fire the items ready event
             if(index>=itemCount-1){
@@ -227,7 +227,7 @@
                 this.fireEvent(component, component, "onitemsready", "PopulatedList");
 
                 // DEBUG: Performance Marker
-                $A.measure("endFullRender" + component, "startRender" + component);
+                $A.endMark("FullRender" + component);
             }
         }
     },

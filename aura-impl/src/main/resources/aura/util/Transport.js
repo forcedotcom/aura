@@ -17,7 +17,7 @@
 /**
  * @namespace
  */
-var Transport = function(){
+var Transport = function() {
 
     function createHttpRequest() {
         if (window.XMLHttpRequest) {
@@ -35,11 +35,11 @@ var Transport = function(){
         return null;
     }
 
-    function buildParams(map){
+    function buildParams(map) {
         var arr = [];
         var first = true;
-        for (var key in map){
-            if (!first){
+        for ( var key in map) {
+            if (!first) {
                 arr.push("&");
             }
             first = false;
@@ -49,7 +49,7 @@ var Transport = function(){
                     arr.push(key);
                     arr.push("=");
                 } else {
-                    for (var i = 0; i < valueArray.length; i++) {
+                    for ( var i = 0; i < valueArray.length; i++) {
                         if (i > 0) {
                             arr.push("&");
                         }
@@ -69,39 +69,41 @@ var Transport = function(){
 
     return {
 
-        request : function(config){
-            /**config{url,method,callback,scope,params}*/
+        request : function(config) {
+            /** config{url,method,callback,scope,params} */
 
             var request = createHttpRequest();
             var method = config["method"] || "GET";
             var qs;
-            if(config["params"]){
+            if (config["params"]) {
                 qs = buildParams(config["params"]);
             }
 
             var url = config["url"];
-            if(qs && method !== "POST"){
+            if (qs && method !== "POST") {
                 url = url + "?" + qs;
             }
-
             request["open"](method, url, true);
             request["onreadystatechange"] = function() {
                 if (request["readyState"] == 4) {
-                    $A.measure("Received Response", "Sending XHR " + config["params"]["aura.num"]);
+                    var aura_num = config["params"]["aura.num"];
+                    $A.endMark("Received Response - XHR " + aura_num);
                     config["callback"].call(config["scope"] || window, request);
-                    $A.measure("Callback Complete", "Sending XHR " + config["params"]["aura.num"]);
+                    $A.endMark("Callback Complete - XHR " + aura_num);
                 }
             };
-
-            $A.mark("Sending XHR " + config["params"]["aura.num"]);
-            if(qs && method === "POST"){
-                request.setRequestHeader('Content-Type','application/x-www-form-urlencoded; charset=ISO-8859-13');
+            var aura_num = config["params"]["aura.num"];
+            $A.mark("XHR " + aura_num);
+            $A.mark("Received Response - XHR " + aura_num);
+            $A.mark("Callback Complete - XHR " + aura_num);
+            $A.mark("Completed Action Callback - XHR " + aura_num);
+            if (qs && method === "POST") {
+                request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=ISO-8859-13');
                 request.send(qs);
-            }else{
+            } else {
                 request.send();
             }
         }
-
 
     };
 };

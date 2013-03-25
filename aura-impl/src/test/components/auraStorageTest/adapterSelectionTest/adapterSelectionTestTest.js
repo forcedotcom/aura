@@ -24,7 +24,7 @@
 
     testSelectPersistentAndSecure: {
         test: function(cmp){
-            $A.test.assertEquals("memory", $A.storageService.selectAdapter(true, true));
+            $A.test.assertEquals("smartstore", $A.storageService.selectAdapter(true, true));
         }
     },
     testSelectDefault:{

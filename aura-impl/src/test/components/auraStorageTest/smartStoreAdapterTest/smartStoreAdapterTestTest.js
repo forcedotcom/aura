@@ -468,7 +468,6 @@
             },
             function(cmp){
                 var expected = ["key1.{}$%()"];
-                debugger;
                 this.assertGetExpired(expected);
             }
         ]
@@ -625,10 +624,12 @@
     testErrorOnSetup:{
         test:[
             function(cmp){
-                // because of lazy loading the very first call to the adapter performs the setup
                 // a failure in setup is considered a fatal error.
                 this.mockRegisterSoupError();
-                this.assertSetItemFailure("key", {"value": {"oh":"my"}}, "Error during SmartStoreAdapter initialization. Error on registerSoup: registerSoup Mock Error");
+                // load the adapter after registerSoup error mocked
+                this.adapter = new $A.storageService.createAdapter("smartstore", "test");
+                
+                this.assertSetItemFailure("key", {"value": {"oh":"my"}}, "SmartStoreAdapter was not properly initialized.");
 
                 // subsequent calls to SmartStoreAdapter operations should fail fast
                 this.assertSetItemFailure("key", {"value": {"oh":"my"}}, "SmartStoreAdapter was not properly initialized.");

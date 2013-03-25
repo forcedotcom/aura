@@ -15,11 +15,24 @@
  */
 package org.auraframework.test;
 
-import java.io.*;
-import java.lang.annotation.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Method;
-import java.net.*;
-import java.util.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import junit.framework.AssertionFailedError;
@@ -28,15 +41,22 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.FreshBrowserInstance;
 import org.auraframework.test.annotation.WebDriverTest;
 import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.AuraUtil;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.ScreenshotException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -557,10 +577,11 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         	// Compare against any expected failures
         	Set<String> allowedExceptions = getExceptionsAllowedDuringInit();
         	for(String allowedException : allowedExceptions){
-        		if (!auraErrorMsg.contains(allowedException)) {
-        			fail("Initialization error: " + auraErrorMsg);
+        		if (auraErrorMsg.contains(allowedException)) {
+        		    return;
             	}
         	}
+            fail("Initialization error: " + auraErrorMsg);
         }
     }
 

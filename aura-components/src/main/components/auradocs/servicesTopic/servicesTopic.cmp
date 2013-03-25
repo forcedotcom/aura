@@ -64,6 +64,10 @@
     <p>The rendering service render components by retrieving and calling their specific renderers. You can override the default rendering behavior in a client-side renderer.</p>
     <p>See Also: <a href="#reference?topic=api:AuraExpressionService">Methods</a> | <auradocs:topicLink topic="renderers">Using Renderers</auradocs:topicLink></p>
 
+    <h3>AuraStorageService</h3>
+    <h4><code>$A.storageService</code></h4>
+    <p>The storage service provides a caching infrastructure for data storage on the client.</p>
+    <p>See Also: <auradocs:topicLink topic="auraStorageService">Aura Storage Service</auradocs:topicLink> | <a href="#reference?topic=api:AuraStorageService">Methods</a></p>
 
     <!--TODO: W-1403508 AuraStorageService-->
 

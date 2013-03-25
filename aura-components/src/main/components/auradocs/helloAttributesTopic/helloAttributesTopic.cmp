@@ -28,7 +28,7 @@
 
     <p>Attributes on a component in Aura are like member variables on a class in Java: they are typed fields that are set on a specific instance of a component, and can be referenced from within the component's markup using an expression syntax (which we will see in a moment).</p>      
 
-    <p>All attributes have a name and a type. Attribute names start with a letter or an underscore. They can also contain numbers or hyphens after the first character. For a list of valid attribute types, see <auradocs:topicLink topic="attrTypesOverview">Supported aura:attribute types</auradocs:topicLink>.</p>
+    <p>All attributes have a name and a type. Attribute names must start with a letter or underscore. They can also contain numbers or hyphens after the first character. For a list of valid attribute types, see <auradocs:topicLink topic="attrTypesOverview">Supported aura:attribute types</auradocs:topicLink>.</p>
 
     <p>Attributes may be marked as required by specifying <code>required="true"</code>, and may also specify a default value.</p>
 

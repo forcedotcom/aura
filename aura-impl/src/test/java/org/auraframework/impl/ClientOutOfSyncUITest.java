@@ -32,7 +32,6 @@ import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.Source;
 import org.auraframework.test.WebDriverTestCase;
-import org.junit.Ignore;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -370,7 +369,6 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 				});
 	}
 
-	@Ignore("still not detected")
 	public void testPostAfterNamespaceChange() throws Exception {
 		DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent("",
 				"<div id='out'>hi</div>");

@@ -39,29 +39,49 @@ var AuraStorage = function AuraStorage(config) {
 };
 
 /**
- * Gets the current storage implementation name.
- * @returns {String}
+ * Returns the storage name. 
+ * @returns {String} The storage name.
  */
 AuraStorage.prototype.getName = function() {
 	return this.adapter.getName();
 };
 
+/**
+ * Returns the current storage size in KB. 
+ * @returns {number} The current storage size in KB.
+ */
 AuraStorage.prototype.getSize = function() {
 	return this.adapter.getSize() / 1024.0;
 };
 
+/**
+ * Returns the maximum storage size in KB. 
+ * @returns {number} The maximum storage size in KB.
+ */
 AuraStorage.prototype.getMaxSize = function() {
 	return this.maxSize / 1024.0;
 };
 
+/**
+ * Returns the default auto-refresh interval in seconds. 
+ * @returns {number} The default auto-refresh interval.
+ */
 AuraStorage.prototype.getDefaultAutoRefreshInterval = function() {
 	return this.defaultAutoRefreshInterval;
 };
 
+/**
+ * Clears the storage. 
+ */
 AuraStorage.prototype.clear = function() {
 	this.adapter.clear();
 };
 
+/**
+ * Gets an item from storage corresponding to the specified key.
+ * @param {String} key The item key. This is the key used when the item was added to storage using put(). 
+ * @returns {Object} An item from storage.
+ */
 AuraStorage.prototype.get = function(key, resultCallback) {
 	this.sweep();
 
@@ -79,6 +99,11 @@ AuraStorage.prototype.get = function(key, resultCallback) {
 	});
 };
 
+/**
+ * Stores the value in storage using the specified key.
+ * @param {String} key The key of the item to store. 
+ * @param {Object} value The value of the item to store.
+ */
 AuraStorage.prototype.put = function(key, value) {
 	this.sweep();
 

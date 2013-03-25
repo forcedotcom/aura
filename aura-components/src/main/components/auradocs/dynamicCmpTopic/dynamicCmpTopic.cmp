@@ -79,7 +79,7 @@
     <p> 
     If the component you are dynamically creating requires a server call such as to a model or provider, <code>newComponent()</code> returns an <code>aura:placeholder</code> component.
     The server then returns the component to the client and replaces the placeholder.
-    To add an event handler to the new component, use <code>component.addHandler()</code> in your client-side controller.
+    To add an event handler to the new component, use <code>component.addHandler()</code> in your client-side controller. See <auradocs:topicLink topic="dynamicHandler">Dynamically Adding Event Handlers</auradocs:topicLink> for more information.
     </p>
     <auradocs:info><code>newLocalComponent()</code> is deprecated and has been replaced by <code>newComponent()</code>. See the <a href="#reference?topic=api:AuraComponentService">JavaScript API reference</a> for a full list of methods.</auradocs:info>
 

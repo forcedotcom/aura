@@ -115,9 +115,12 @@
                 <auradocs:contentsNode text="Using JavaScript Libraries" id="jsLibs" />
                 <auradocs:contentsNode text="Helpers" id="helper"/>
                 <auradocs:contentsNode text="Renderers" id="renderers" />
-                <auradocs:contentsNode text="Client-Side Providers" id="providersClientSide" />
-                <auradocs:contentsNode text="Services" id="services"/>
+                <auradocs:contentsNode text="Client-Side Providers" id="providersClientSide" />                
                 <auradocs:contentsNode text="Error Handling" id="error"/>
+                <auradocs:contentsNode text="Services">
+                    <auradocs:contentsNode text="Services" id="services"/>
+                    <auradocs:contentsNode text="Aura Storage Service" id="auraStorageService" />
+                </auradocs:contentsNode>
                 <auradocs:contentsNode text="Component Tests" >
                     <auradocs:contentsNode text="Introduction" id="docTests" />
                     <auradocs:contentsNode text="Assertions" id="testsAssert" />

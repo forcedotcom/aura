@@ -17,5 +17,5 @@
 -->
 <aura:event type="APPLICATION" description="Event fired to open a dialog window. Handled by ui:dialogManager.">
     <aura:attribute name="dialog" type="Aura.Component" description="The dialog that should be opened."/>
-    <aura:attribute name="triggerEvent" type="Event" description="The aura event that triggered this event.  If the trigger is a ui:press event, always pass it in here. Optional otherwise."/>
+    <aura:attribute name="triggerEvent" type="Aura.Event" description="The aura event that triggered this event. If the trigger is a ui:press event, always pass it in here. Optional otherwise."/>
 </aura:event>

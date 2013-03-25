@@ -314,7 +314,7 @@ Component.prototype.addValueHandler = function(config){
  * @public
  */
 Component.prototype.destroy = function(async){
-    if (this.priv){
+    if (this.priv && !this._destroying){
         var key;
         if (async) {
             for (key in this.priv.elements){
@@ -329,8 +329,10 @@ Component.prototype.destroy = function(async){
             return;
         }
 
+        this._destroying = true;
+        
         var globalId = this.priv.globalId;
-
+        
         renderingService.unrender(this);
 
         delete this.priv.elements;

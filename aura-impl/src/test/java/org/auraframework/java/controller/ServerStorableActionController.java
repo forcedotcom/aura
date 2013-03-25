@@ -15,17 +15,13 @@
  */
 package org.auraframework.java.controller;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ComponentDef;
-import org.auraframework.instance.Action;
-import org.auraframework.instance.Component;
-import org.auraframework.instance.StorableAction;
+import org.auraframework.instance.*;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
@@ -136,11 +132,14 @@ public class ServerStorableActionController {
         return String.format("Message %s : Fresh response each time.", staticCounter.get(testName));
     }
     @AuraEnabled
+    /**
+     * Return a component instance with a simple model.
+     */
     public static Component getComponent(@Key("testName")String testName)throws Exception{
         incrementCounter(testName);
         Map<String, Object> attr = Maps.newHashMap();
         attr.put("value", ""+staticCounter.get(testName));
-        Component cmp = Aura.getInstanceService().getInstance("aura:text", ComponentDef.class, attr);
+        Component cmp = Aura.getInstanceService().getInstance("auraStorageTest:teamFacet", ComponentDef.class, attr);
         return cmp;
     }
     @AuraEnabled

@@ -62,6 +62,10 @@ AuraStorage.prototype.getMaxSize = function() {
 	return this.maxSize / 1024.0;
 };
 
+/**
+ * Returns the default auto-refresh interval in seconds. 
+ * @returns {number} The default auto-refresh interval.
+ */
 AuraStorage.prototype.getDefaultAutoRefreshInterval = function() {
 	return this.defaultAutoRefreshInterval;
 };
@@ -74,9 +78,9 @@ AuraStorage.prototype.clear = function() {
 };
 
 /**
- * Gets the specified storage configuration option. 
- * @param {String} key The option name. 
- * @returns {Object} The storage configuration option value.
+ * Gets an item from storage corresponding to the specified key.
+ * @param {String} key The item key. This is the key used when the item was added to storage using put(). 
+ * @returns {Object} An item from storage.
  */
 AuraStorage.prototype.get = function(key, resultCallback) {
 	this.sweep();
@@ -96,9 +100,9 @@ AuraStorage.prototype.get = function(key, resultCallback) {
 };
 
 /**
- * Sets the specified storage configuration option.
- * @param {String} key The option name. 
- * @param {Object} value The option value.
+ * Stores the value in storage using the specified key.
+ * @param {String} key The key of the item to store. 
+ * @param {Object} value The value of the item to store.
  */
 AuraStorage.prototype.put = function(key, value) {
 	this.sweep();

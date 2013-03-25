@@ -280,9 +280,9 @@ Action.prototype.isExclusive = function() {
 };
 
 /**
- * Marks the Action as storable.
+ * Marks the Action as storable and abortable.
  * For server-side Actions only.
- * @param {Object} config Checks that the Action is server-side and mark it as storable and abortable.
+ * @param {Object} config Optional. A set of key/value pairs that specify the storage options to set. You can set the following options: ignoreExisting and refresh. 
  */
 Action.prototype.setStorable = function(config) {
     $A.assert(this.def.isServerAction(), "setStorable() cannot be called on a client action.");

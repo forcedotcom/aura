@@ -360,7 +360,6 @@ var priv = {
      */
     request : function(actions, scope, callback, exclusive) {
         $A.mark("AuraClientService.request");
-        var queue = this.requestQueue;
         var actionGroup = this.actionGroupCounter++;
 
         var fireDoneWaiting = false;
@@ -393,7 +392,8 @@ var priv = {
                 }
 
                 if (actionsToSend.length > 0) {
-                    queue.push({
+                    // clientService.requestQueue reference is mutable
+                    clientService.requestQueue.push({
                         actions : actionsToSend,
                         scope : scope,
                         callback : callback,

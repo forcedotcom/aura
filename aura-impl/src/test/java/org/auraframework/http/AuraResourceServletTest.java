@@ -35,10 +35,9 @@ import org.auraframework.test.util.AuraPrivateAccessor;
 
 /**
  * Simple (non-integration) test case for {@link AuraResourceServlet}, most useful for exercising hard-to-reach error
- * conditions.
- * 
- * I would like this test to be in the "aura" module (vice "aura-impl"), but the configuration there isn't friendly to
- * getting a context service, and I think changing that may impact other tests, so I'm leaving it at least for now.
+ * conditions. I would like this test to be in the "aura" module (vice "aura-impl"), but the configuration there isn't
+ * friendly to getting a context service, and I think changing that may impact other tests, so I'm leaving it at least
+ * for now.
  */
 public class AuraResourceServletTest extends AuraTestCase {
 
@@ -134,9 +133,8 @@ public class AuraResourceServletTest extends AuraTestCase {
 
     /**
      * Verify the CSS cache is cleared in DEV mode after a source change. Usually this would be picked up by the file
-     * source monitor, but we'll just emulate a source change for the sake of speed and simplicity.
-     * 
-     * Original dev caching story: W-1450222
+     * source monitor, but we'll just emulate a source change for the sake of speed and simplicity. Original dev caching
+     * story: W-1450222
      */
     public void testCssCacheClearedOnSourceChange() throws Exception {
         // DEV mode and Authenticated access so css is actually cached on servlet
@@ -186,5 +184,30 @@ public class AuraResourceServletTest extends AuraTestCase {
         HttpServletResponse response = new DummyHttpServletResponse();
         AuraResourceServlet servlet = new AuraResourceServlet();
         servlet.doGet(request, response);
+    }
+
+    /**
+     * Sanity check to make sure that app.js doesn't blow up
+     */
+    public void testWriteDefinitionsWithoutDupes() throws Exception {
+        Aura.getContextService().startContext(AuraContext.Mode.DEV, AuraContext.Format.JS,
+                AuraContext.Access.AUTHENTICATED);
+
+        // prime def cache
+        StringBuilder output = new StringBuilder();
+        AuraResourceServlet.writeDefinitions(output);
+        String text = output.toString();
+        final String dupeCheck = "$A.clientService.initDefs(";
+        if (text.indexOf(dupeCheck) != text.lastIndexOf(dupeCheck)) {
+            fail("found duplicated code in: " + text);
+        }
+
+        // now check that defs not re-written with unempty cache
+        output = new StringBuilder();
+        AuraResourceServlet.writeDefinitions(output);
+        text = output.toString();
+        if (text.indexOf(dupeCheck) != text.lastIndexOf(dupeCheck)) {
+            fail("found duplicated code in: " + text);
+        }
     }
 }

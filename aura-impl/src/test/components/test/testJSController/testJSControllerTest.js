@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 ({
-    a : function(){
-        return "func A";
-    },
- 
-    b : function(){
-        return "func B";
-    },
-    methodWithArgs : function(arg1){
-        return "Argument passed="+arg1;
-    },
-    setFocus : function(){
-	return "Set Focus";
+    /**
+     * Assert that controller functions are not exposed globally.
+     */
+    testControllerNotExposedGlobally:{
+	test : function(component){
+	    var controller = component.get("c.functionName1");
+	    $A.test.assertNotNull(controller);
+	    $A.test.assertEquals("Action", controller.auraType);
+	    $A.test.assertFalse($A.util.isFunction(window.functionName1), "Controller method exposed on window");
+	    $A.test.assertFalse($A.util.isFunction(window.setFocus), "Controller methods exposed on window");
+	}
     }
 })

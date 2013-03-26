@@ -39,6 +39,7 @@ exp(p,
     "trim", p.trim,
     "truncate", p.truncate,
     "on", p.on,
+    "removeOn", p.removeOn,
     "formToMap", p.formToMap,
     "getSelectValue", p.getSelectValue,
     "addValueToMap", p.addValueToMap,
@@ -48,5 +49,8 @@ exp(p,
     "setDataAttribute", p.setDataAttribute,
     "hasDataAttribute", p.hasDataAttribute,
     "createTimeoutCallback", p.createTimeoutCallback,
-    "arrayIndexOf", p.arrayIndexOf
+    "arrayIndexOf", p.arrayIndexOf,
+    "contains", p.contains,
+    "squash", p.squash,
+    "getWindowSize", p.getWindowSize
 );

@@ -328,8 +328,8 @@ ComponentDef.prototype.toString = function(){
 };
 
 /**
- * Checks whether the Component is an instance of the given interface and returns true if it is, or false otherwise.
- * @param {String} name The name of the interface
+ * Checks whether the Component is an instance of the given component name (or interface name).
+ * @param {String} name The name of the component (or interface), with a format of <namespace>:<componentName> (e.g., ui:button).
  * @returns {Boolean} True if the Component is an instance, or false otherwise.
  */
 ComponentDef.prototype.isInstanceOf = function(name){

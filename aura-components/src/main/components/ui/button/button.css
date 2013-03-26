@@ -14,52 +14,75 @@
  * limitations under the License.
  */
 .uiButton{
-	display: inline-block;
-    cursor: pointer;
+    display:inline-block;
+    cursor:pointer;
+}
+@if (IE7){
+    .uiButton{
+        display:inline;
+        zoom:1;
+        overflow:visible !important; /* must override .uiBlock overflow:hidden declaration */
+    }
 }
 .uiButton .label{
-	display: block;
+    display:block;
+}
+@if (IE7){
+    .uiButton .label{
+        overflow:visible !important; /* must override .uiBlock .bLeft overflow:hidden declaration */
+    }
 }
 .uiButton.default{
-	font-weight: bold;
+    font-weight: bold;
     font-size: .9em;
-    margin: 2px;
+    margin: 2px 3px;
     padding: 4px 6px;
     text-decoration:none;
     text-align:center;
-    border-radius:4px;    
+    border-radius:4px;
     border:0;
-    border-top:1px solid rgba(255,255,255,.45);    
-	
-	background: -moz-linear-gradient(#F8F8F9, #DDDFE1);  
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #F8F8F9), color-stop(100%, #DDDFE1));  
-    background: -webkit-linear-gradient(#F8F8F9, #DDDFE1);
-    background: linear-gradient(#F8F8F9, #DDDFE1);
-    
-	text-shadow: white 0px 1px 1px;	
-	-webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.69922), 0px 1px 0px rgba(0, 0, 0, 0.29688);
-    -moz-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.69922), 0px 1px 0px rgba(0, 0, 0, 0.29688);
-    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.69922), 0px 1px 0px rgba(0, 0, 0, 0.29688); 
-	
+    border-top:1px solid rgba(255,255,255,.45);
+    background:#DDDFE1;
+    background:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#F8F8F9), to(#DDDFE1));
+    background:-webkit-linear-gradient(#F8F8F9,#DDDFE1);
+    background:-moz-linear-gradient(#F8F8F9,#DDDFE1);
+    background:linear-gradient(#F8F8F9,#DDDFE1);
+    -webkit-box-shadow:0 1px 3px rgba(0, 0, 0, 0.7),0 1px 0 rgba(0, 0, 0, 0.3);
+    box-shadow:0 1px 3px rgba(0, 0, 0, 0.7),0 1px 0 rgba(0, 0, 0, 0.3) ;
+    text-shadow:0 1px 1px #FFF;	
 }
-.uiButton.default:hover{
-	border-radius:4px;
-	background: #757D8A -webkit-gradient(linear, 0% 0%, 0% 100%, from(#7F8792), to(#535B68));
-	
-	background: #757D8A -moz-linear-gradient(#7F8792, #535B68);   
-    background: #757D8A -webkit-gradient(linear, left top, left bottom, color-stop(0%, #7F8792), color-stop(100%, #535B68));  
-    background: #757D8A -webkit-linear-gradient(#7F8792, #535B68);
-    background: #757D8A linear-gradient(#7F8792, #535B68);
-    
-	
-    border:0;
-    border-top:1px solid rgba(255,255,255,.45);     
-	text-shadow: rgba(0, 0, 0, 0.5) 0px -1px 1px;
+@if (IE7){
+    .uiButton.default{
+        border:1px solid #999;
+    }
+}
+.uiButton.default:hover,
+.uiButton.default:focus{
+    background:#757D8A;
+    background:#757D8A -webkit-gradient(linear, 0% 0%, 0% 100%, from(#7F8792), to(#535B68));
+    background:#757D8A -webkit-linear-gradient(#7F8792,#535B68);
+    background:#757D8A -moz-linear-gradient(#7F8792,#535B68);
+    background:#757D8A linear-gradient(#7F8792,#535B68);
+    text-shadow:0 -1px 1px rgba(0, 0, 0, 0.5);
 }
 .uiButton.default .label{
-	color: #3A3D42;
-	padding:0 1px;
+    white-space:nowrap;
+    color: #3A3D42;
 }
-.uiButton.default:hover .label{
-	color: #fff;
+.uiButton.default:hover .label,
+.uiButton.default:focus .label{
+    color: #FFF;
+}
+.uiButton.default:disabled{
+    cursor:default;
+    background:#B9B9B9;
+    -webkit-box-shadow:none;
+    box-shadow:none;
+    text-shadow:none;
+}
+.uiButton.default:disabled .label{
+    color:#888;
+}
+.uiButton.default:disabled .label:hover{
+    color:#888;
 }

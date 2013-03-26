@@ -37,8 +37,8 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.ImmutableMap.Builder;
+import com.google.common.collect.Lists;
 
 /**
  * Parse JSTEST mock definitions into mocks to be applied when running tests.
@@ -85,7 +85,12 @@ public abstract class JavascriptMockHandler<D extends Definition> extends Javasc
         if (descStr != null) {
             return Aura.getDefinitionService().getDefinition(descStr, defClass);
         }
-        return getDefaultBaseDefinition();
+        D ret = getDefaultBaseDefinition();
+        if (ret == null) {
+            throw new AuraRuntimeException("Descriptor not specified, and default definition not found for " +
+                getTargetDescriptor(), getLocation());
+        }
+        return ret;
     }
 
     protected abstract D getDefaultBaseDefinition() throws QuickFixException;

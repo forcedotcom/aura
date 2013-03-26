@@ -62,5 +62,5 @@ public interface ConfigAdapter extends AuraAdapter {
 
     boolean validateCss();
 
-    Set<JavascriptGroupProvider> getJavascriptGroupProviders();
+    JavascriptGroupProvider getJavascriptGroupProvider();
 }

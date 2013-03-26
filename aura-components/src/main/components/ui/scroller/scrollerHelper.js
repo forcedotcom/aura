@@ -713,6 +713,13 @@
 				},
 
 				_move : function(e) {
+				    var tagName = e.target.nodeName.toLowerCase();
+				    // ssun don't scroll if we are in a textarea since it is hard
+				    // to scroll the textarea and the page at the same time.
+                    if ("textarea" == tagName) {
+                        return;
+                    }
+                     
 					var that = this, point = hasTouch ? e.touches[0] : e, deltaX = point.pageX - that.pointX, deltaY = point.pageY - that.pointY, newX = that.x
 							+ deltaX, newY = that.y + deltaY, c1, c2, scale, timestamp = e.timeStamp || Date.now();
 

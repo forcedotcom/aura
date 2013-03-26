@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -51,6 +52,16 @@ public class DatePickerModel {
             monthList.add(new LocalizedLabel(months[i], shortMonths[i]));
         }
         return monthList;
+    }
+    
+    @AuraEnabled
+    public String getLabelForToday() throws QuickFixException {
+        LocalizationAdapter la = Aura.getLocalizationAdapter();
+        if (la.labelExists("Related_Lists", "task_mode_today")) {
+            return la.getLabel("Related_Lists", "task_mode_today");
+        } else {
+            return "";
+        }
     }
     
     @AuraEnabled

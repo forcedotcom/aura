@@ -316,7 +316,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     @Override
-    public JavascriptGroupProvider getJavascriptGroupProvider() {
+    public Set<JavascriptGroupProvider> getJavascriptGroupProviders() {
         return null;
     }
 }

@@ -168,12 +168,12 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     /**
      * Handle an exception in the servlet.
-     * 
+     *
      * This routine shold be called whenever an exception has surfaced to the
      * top level of the servlet. It should not be overridden unless Aura is
      * entirely subsumed. Most special cases can be handled by the Aura user by
      * implementing {@link ExceptionAdapter ExceptionAdapter}.
-     * 
+     *
      * @param t the throwable to write out.
      * @param quickfix is this exception a valid quick-fix
      * @param context the aura context.
@@ -465,12 +465,12 @@ public abstract class AuraBaseServlet extends HttpServlet {
             defs.append("/app.css");
             ret.add(defs.toString());
         }
-        switch (mode) {
-        case PTEST:
+
+
+        if (mode == Mode.PTEST) {
             ret.add(config.getJiffyCSSURL());
-            break;
-        default:
         }
+
         return ret;
     }
 
@@ -544,11 +544,14 @@ public abstract class AuraBaseServlet extends HttpServlet {
             } catch (IOException e) {
                 throw new AuraRuntimeException(e);
             }
+
             String contextJson = AuraTextUtil.urlencode(sb.toString());
             defs.append(contextJson);
             defs.append("/app.js");
+
             ret.add(defs.toString());
         }
+
         return ret;
     }
 

@@ -18,7 +18,6 @@ package org.auraframework.adapter;
 import java.util.Set;
 
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.util.javascript.module.JavascriptGroupProvider;
 import org.auraframework.util.resource.ResourceLoader;
 
 public interface ConfigAdapter extends AuraAdapter {
@@ -61,6 +60,4 @@ public interface ConfigAdapter extends AuraAdapter {
     boolean isAuraJSStatic();
 
     boolean validateCss();
-
-    JavascriptGroupProvider getJavascriptGroupProvider();
 }

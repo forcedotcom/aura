@@ -41,7 +41,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.javascript.JavascriptGroup;
-import org.auraframework.util.javascript.module.JavascriptGroupProvider;
 import org.auraframework.util.resource.ResourceLoader;
 
 public class ConfigAdapterImpl implements ConfigAdapter {
@@ -313,10 +312,5 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         } catch (IOException e) {
             throw new AuraRuntimeException("Can't read framework files", e);
         }
-    }
-
-    @Override
-    public JavascriptGroupProvider getJavascriptGroupProvider() {
-        return null;
     }
 }

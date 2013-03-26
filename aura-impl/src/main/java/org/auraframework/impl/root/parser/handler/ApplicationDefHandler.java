@@ -46,19 +46,6 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
     public static final String TAG = "aura:application";
 
-    private static final String ATTRIBUTE_PRELOAD = "preload";
-    private static final String ATTRIBUTE_LAYOUTS = "layouts";
-    private static final String ATTRIBUTE_LOCATION_CHANGE_EVENT = "locationChangeEvent";
-    private static final String ATTRIBUTE_ACCESS = "access";
-    private static final String ATTRIBUTE_SECURITY_PROVIDER = "securityProvider";
-    private static final String ATTRIBUTE_APPCACHE_ENABLED = "useAppcache";
-    private static final String ATTRIBUTE_IS_ONE_PAGE_APP = "isOnePageApp";
-
-    private final static Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
-            .add(ATTRIBUTE_PRELOAD, ATTRIBUTE_LAYOUTS, ATTRIBUTE_LOCATION_CHANGE_EVENT, ATTRIBUTE_PRELOAD,
-                    ATTRIBUTE_ACCESS, ATTRIBUTE_SECURITY_PROVIDER, ATTRIBUTE_APPCACHE_ENABLED,
-                    ATTRIBUTE_IS_ONE_PAGE_APP).addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
-
     public ApplicationDefImpl.Builder appBuilder;
 
     public ApplicationDefHandler() {
@@ -88,7 +75,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
     /**
      * Allows embedded script tags by default in applications
-     * 
+     *
      * @return - return true if your instance should allow embedded script tags in HTML
      */
     @Override
@@ -136,10 +123,17 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
                 appBuilder.addDependency(ddb.build());
             }
         }
+
         String isAppcacheEnabled = getAttributeValue(ATTRIBUTE_APPCACHE_ENABLED);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(isAppcacheEnabled)) {
             appBuilder.isAppcacheEnabled = Boolean.parseBoolean(isAppcacheEnabled);
         }
+
+        String additionalAppCacheURLs = getAttributeValue(ATTRIBUTE_ADDITIONAL_APPCACHE_URLS);
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(additionalAppCacheURLs)) {
+            appBuilder.additionalAppCacheURLs = additionalAppCacheURLs;
+        }
+
         String isOnePageApp = getAttributeValue(ATTRIBUTE_IS_ONE_PAGE_APP);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(isOnePageApp)) {
             appBuilder.isOnePageApp = Boolean.parseBoolean(isOnePageApp);
@@ -163,4 +157,19 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             throw new AuraError(x);
         }
     }
+
+
+    private static final String ATTRIBUTE_PRELOAD = "preload";
+    private static final String ATTRIBUTE_LAYOUTS = "layouts";
+    private static final String ATTRIBUTE_LOCATION_CHANGE_EVENT = "locationChangeEvent";
+    private static final String ATTRIBUTE_ACCESS = "access";
+    private static final String ATTRIBUTE_SECURITY_PROVIDER = "securityProvider";
+    private static final String ATTRIBUTE_APPCACHE_ENABLED = "useAppcache";
+    private static final String ATTRIBUTE_ADDITIONAL_APPCACHE_URLS = "additionalAppCacheURLs";
+    private static final String ATTRIBUTE_IS_ONE_PAGE_APP = "isOnePageApp";
+
+    private final static Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
+            .add(ATTRIBUTE_PRELOAD, ATTRIBUTE_LAYOUTS, ATTRIBUTE_LOCATION_CHANGE_EVENT, ATTRIBUTE_PRELOAD,
+                    ATTRIBUTE_ACCESS, ATTRIBUTE_SECURITY_PROVIDER, ATTRIBUTE_APPCACHE_ENABLED, ATTRIBUTE_ADDITIONAL_APPCACHE_URLS,
+                    ATTRIBUTE_IS_ONE_PAGE_APP).addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
 }

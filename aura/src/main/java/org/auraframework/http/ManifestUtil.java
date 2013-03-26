@@ -37,7 +37,7 @@ import org.auraframework.util.AuraTextUtil;
 
 /**
  * A set of static http servlet utilities.
- * 
+ *
  * No state is kept in this utility class, and it cannot be instantiated.
  */
 public abstract class ManifestUtil {
@@ -93,6 +93,7 @@ public abstract class ManifestUtil {
         if (!Aura.getConfigAdapter().isClientAppcacheEnabled()) {
             return false;
         }
+
         AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getApplicationDescriptor();
         Set<String> preloads = context.getPreloads();
@@ -100,6 +101,7 @@ public abstract class ManifestUtil {
         if (preloads == null || preloads.isEmpty()) {
             return false;
         }
+
         if (appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)) {
             try {
                 Boolean useAppcache = ((ApplicationDef) appDefDesc.getDef()).isAppcacheEnabled();
@@ -116,12 +118,12 @@ public abstract class ManifestUtil {
 
     /**
      * Check a manifest cookie and update.
-     * 
+     *
      * This routine will check and update a manifest cookie value to ensure
      * that we are not looping. If the incoming cookie is null, it simply
      * initializes, othewise, it parses the cookie and returns null if it
      * requires a reset.
-     * 
+     *
      * @param incoming the cookie from the client.
      * @return either an updated cookie, or null if it was invalid.
      */
@@ -170,7 +172,7 @@ public abstract class ManifestUtil {
 
     /**
      * Get the expected name for the manifest cookie.
-     * 
+     *
      * @return the name (null if none)
      */
     private static String getManifestCookieName() {
@@ -201,7 +203,7 @@ public abstract class ManifestUtil {
 
     /**
      * Sets the manifest cookie on response.
-     * 
+     *
      * @param response the response
      * @param value the value to set.
      * @param expiry the expiry time for the cookie.
@@ -242,7 +244,7 @@ public abstract class ManifestUtil {
      *
      * This routine checks the cookie and parameter on the request and sets the
      * response code appropriately if we should not send back a manifest.
-     * 
+     *
      * @param request the request (for the incoming cookie).
      * @param response the response (for the outgoing cookie and status)
      * @return false if the caller should bolt because we already set the status.

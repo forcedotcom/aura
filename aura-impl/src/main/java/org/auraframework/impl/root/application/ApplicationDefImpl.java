@@ -16,19 +16,29 @@
 package org.auraframework.impl.root.application;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ApplicationDefBuilder;
+import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.SecurityProviderDef;
+import org.auraframework.expression.Expression;
+import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.root.component.BaseComponentDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.util.TextTokenizer;
+import org.auraframework.instance.Action;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -42,18 +52,8 @@ import com.google.common.collect.Lists;
  */
 public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> implements ApplicationDef {
 
-    private static final long serialVersionUID = 9044177107921912717L;
-
     public static final DefDescriptor<ApplicationDef> PROTOTYPE_APPLICATION = DefDescriptorImpl.getInstance(
             "markup://aura:application", ApplicationDef.class);
-
-    private final DefDescriptor<EventDef> locationChangeEventDescriptor;
-    private final DefDescriptor<LayoutsDef> layoutsDefDescriptor;
-    private final Access access;
-    private final DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
-
-    private final Boolean isAppcacheEnabled;
-    private final Boolean isOnePageApp;
 
     protected ApplicationDefImpl(Builder builder) {
         super(builder);
@@ -67,8 +67,10 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         } else {
             this.access = Access.valueOf(accessName.toUpperCase());
         }
+
         this.securityProviderDescriptor = builder.securityProviderDescriptor;
         this.isAppcacheEnabled = builder.isAppcacheEnabled;
+        this.additionalAppCacheURLs = builder.additionalAppCacheURLs;
         this.isOnePageApp = builder.isOnePageApp;
     }
 
@@ -80,6 +82,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         public Boolean isAppcacheEnabled;
         public Boolean isOnePageApp;
         public DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
+        public String additionalAppCacheURLs;
 
         public Builder() {
             super(ApplicationDef.class);
@@ -180,15 +183,47 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
     @Override
     public Boolean isAppcacheEnabled() throws QuickFixException {
-        if (this.isAppcacheEnabled == null) {
-            return getSuperDef().isAppcacheEnabled();
+        return isAppcacheEnabled != null ? isAppcacheEnabled : getSuperDef().isAppcacheEnabled();
+    }
+
+    @Override
+    public List<String> getAdditionalAppCacheURLs() throws QuickFixException {
+        List<String> urls = Collections.emptyList();
+
+        if (additionalAppCacheURLs != null) {
+            Expression expression = AuraImpl.getExpressionAdapter().buildExpression(TextTokenizer.unwrap(additionalAppCacheURLs), null);
+            if (!(expression instanceof PropertyReference)) {
+                throw new AuraRuntimeException("Value of 'additionalAppCacheURLs' attribute must be a reference to a server Action");
+            }
+
+            PropertyReference ref = (PropertyReference)expression;
+            ref = ref.getStem();
+
+            ControllerDef controllerDef = getControllerDef();
+            ActionDef actionDef = controllerDef.getSubDefinition(ref.toString());
+            Action action = Aura.getInstanceService().getInstance(actionDef);
+
+            AuraContext context = Aura.getContextService().getCurrentContext();
+            Action previous = context.setCurrentAction(action);
+            try {
+                action.run();
+            } finally {
+                context.setCurrentAction(previous);
+            }
+
+            @SuppressWarnings("unchecked")
+            List<String> additionalURLs = (List<String>) action.getReturnValue();
+            if (additionalURLs != null) {
+                urls = additionalURLs;
+            }
         }
-        return this.isAppcacheEnabled;
+
+        return urls;
     }
 
     @Override
     public Boolean isOnePageApp() throws QuickFixException {
-        return this.isOnePageApp;
+        return isOnePageApp;
     }
 
     @Override
@@ -234,4 +269,16 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         return securityProviderDescriptor;
     }
 
+
+    private final DefDescriptor<EventDef> locationChangeEventDescriptor;
+    private final DefDescriptor<LayoutsDef> layoutsDefDescriptor;
+    private final Access access;
+    private final DefDescriptor<SecurityProviderDef> securityProviderDescriptor;
+
+    private final Boolean isAppcacheEnabled;
+    private final String additionalAppCacheURLs;
+
+    private final Boolean isOnePageApp;
+
+    private static final long serialVersionUID = 9044177107921912717L;
 }

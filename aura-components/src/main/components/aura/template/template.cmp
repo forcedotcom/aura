@@ -32,14 +32,14 @@
     <aura:attribute name="loadingText" type="String" default="Loading" description="The text displayed on the page when the template is loading. Default value is &#8220;Loading&#8221;."/>
     <aura:attribute name="errorMessage" type="String" default="CSS Error" description="The error message displayed when an error has occured while loading. Default value is &#8220;CSS Error&#8221;."/>
     <aura:attribute name="forceError" type="Boolean" default="false" description="Set this to true to force the display of an error that would otherwise be hidden because of nesting.."/>
-    <aura:attribute name="extraScriptTags" type="String" description="Additional &lt;script&gt; elements, such as JavaScript libraries. Use multiple &lt;script&gt; elements to include more than one JavaScript library. Set this attribute using aura:set if overriding the template."/>
-    <aura:attribute name="extraMetaTags" type="String" description="Additional &lt;meta&gt; elements such as description, keywords, author, etc. Set this attribute using aura:set if overriding the template."/>
+    <aura:attribute name="extraScriptTags" type="Aura.Component[]" description="Additional &lt;script&gt; elements, such as JavaScript libraries. Use multiple &lt;script&gt; elements to include more than one JavaScript library. Set this attribute using aura:set if overriding the template."/>
+    <aura:attribute name="extraMetaTags" type="Aura.Component[]" description="Additional &lt;meta&gt; elements such as description, keywords, author, etc. Set this attribute using aura:set if overriding the template."/>
     <aura:attribute name="defaultBodyClass" type="String" default="loading" description="The default CSS style used to display the body of the template. Default value is &#8220;loading&#8221;."/>
     <aura:attribute name="bodyClass" type="String" description="The CSS style used to display the body of the template. May be used with defaultBodyClass."/>
     <aura:attribute name="manifest" type="String" description="Specifies the location of the document's cache manifest. Works with HTML5 only."/>
     <aura:attribute name="lastMod" type="String" description="The last modified date."/>
     <aura:attribute name="doctype" type="String" default="&lt;!DOCTYPE html&gt;" description="The DOCTYPE declaration for the template. Default value is &lt;!DOCTYPE html&gt;."/>
-    <aura:attribute name="extraStyleTags" type="String" description="Additional &lt;link&gt; elements for external CSS. Use multiple &lt;link&gt; elements to include more than one external CSS file. Set this attribute using aura:set if overriding the template."/>
+    <aura:attribute name="extraStyleTags" type="Aura.Component[]" description="Additional &lt;link&gt; elements for external CSS. Use multiple &lt;link&gt; elements to include more than one external CSS file. Set this attribute using aura:set if overriding the template."/>
     <aura:attribute name="inlineStyle" type="Aura.Component[]" description="The CSS style used to display inline elements. We recommend using external CSS with extraStyleTags instead.">
         .auraMsgMask{
             position: absolute;

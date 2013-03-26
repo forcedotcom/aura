@@ -26,11 +26,11 @@
                      description="A config object used to retrieve and initialize components for this application."/>
     <aura:attribute name="auraInitBlock" type="String"
                      description="A string of inline script code to use in this template."/>
-    <aura:attribute name="extraStyleTags" type="String"
+    <aura:attribute name="extraStyleTags" type="Aura.Component[]"
                      description="A list of style tags necessary for this template"/>
-    <aura:attribute name="extraScriptTags" type="String"
+    <aura:attribute name="extraScriptTags" type="Aura.Component[]"
                      description="A list of script tags necessary for this template"/>
-    <aura:attribute name="extraMetaTags" type="String"
+    <aura:attribute name="extraMetaTags" type="Aura.Component[]"
                      description="A list of meta tags necessary for this template"/>
 
     <div id="auraErrorMessage"/>

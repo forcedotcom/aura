@@ -23,10 +23,10 @@
 
         test: function(component){
             var helper = component.getDef().getHelper();
-            aura.test.assertNotNull(helper);
-            aura.test.assertNotNull(helper.a);
-            aura.test.assertNotNull(helper.b);
-            aura.test.assertNotNull(!helper.c);
+            $A.test.assertNotNull(helper);
+            $A.test.assertNotNull(helper.a);
+            $A.test.assertNotNull(helper.b);
+            $A.test.assertNotNull(!helper.c);
         }
     },
 
@@ -35,10 +35,10 @@
 
         test: function(component){
             var helperDef = component.getDef().getHelperDef();
-            aura.test.assertNotNull(helperDef);
-            aura.test.assertNotNull(helperDef.getFunctions);
-            aura.test.assertNotNull(helperDef.getFunctions());
-            aura.test.assertEquals("HelperDef", helperDef.auraType);
+            $A.test.assertNotNull(helperDef);
+            $A.test.assertNotNull(helperDef.getFunctions);
+            $A.test.assertNotNull(helperDef.getFunctions());
+            $A.test.assertEquals("HelperDef", helperDef.auraType);
         }
     },
 
@@ -47,9 +47,9 @@
 
         test: function(component){
             var helper = component.getDef().getHelper();
-            aura.test.assertNotNull(helper);
-            aura.test.assertEquals("func A", helper.a());
-            aura.test.assertEquals("func B", helper.b());
+            $A.test.assertNotNull(helper);
+            $A.test.assertEquals("func A", helper.a());
+            $A.test.assertEquals("func B", helper.b());
         }
     },
     /**
@@ -60,9 +60,9 @@
 
         test: function(component){
             var helper = component.getDef().getHelper();
-            aura.test.assertNotNull(helper);
-            aura.test.assertEquals("func Z", helper.z());
-            aura.test.assertEquals("func superSuperZ on Super Super", helper.superSuperz());
+            $A.test.assertNotNull(helper);
+            $A.test.assertEquals("func Z", helper.z());
+            $A.test.assertEquals("func superSuperZ on Super Super", helper.superSuperz());
         }
     },
     /**
@@ -72,15 +72,15 @@
         test : function(component){
             //This property is set in a render method
             //Which proves that the helper made it into the method signature as expected
-            aura.test.assertNotNull(component.renderHelper, "Helper not passed into render()");
-            aura.test.assertNotNull(component.afterRenderHelper, "Helper not passed into afterRender()");
+            $A.test.assertNotNull(component.renderHelper, "Helper not passed into render()");
+            $A.test.assertNotNull(component.afterRenderHelper, "Helper not passed into afterRender()");
             //Components won't rerender unless they are actually dirty, so forcing it.
             component.getValue("v.dirty").setValue("1");
             $A.rerender(component);
-            aura.test.assertNotNull(component.rerenderHelper, "Helper not passed into rerender()");
-            aura.test.assertEquals("func A", component.rerenderHelper.a());
+            $A.test.assertNotNull(component.rerenderHelper, "Helper not passed into rerender()");
+            $A.test.assertEquals("func A", component.rerenderHelper.a());
             $A.unrender(component);
-            aura.test.assertNotNull(component.unrenderHelper, "Helper not passed into unrender()");
+            $A.test.assertNotNull(component.unrenderHelper, "Helper not passed into unrender()");
         }
     },
     /**
@@ -91,8 +91,8 @@
             //This property is set in an action
             //Which proves that the helper made it into the action signature as expected
             component.get("c.myAction").run();
-            aura.test.assertNotNull(component.myActionHelper);
-            aura.test.assertEquals("func A", component.myActionHelper.a());
+            $A.test.assertNotNull(component.myActionHelper);
+            $A.test.assertEquals("func A", component.myActionHelper.a());
         }
     },
     /**
@@ -101,10 +101,23 @@
     testPassingArguments: {
         test : function(component){
             var helper = component.getDef().getHelper();
-            aura.test.assertNotNull(helper);
+            $A.test.assertNotNull(helper);
             var argument = 'Aura';
-            aura.test.assertEquals("Argument passed="+argument, helper.methodWithArgs(argument), "Passing arguments to helpers failed.");
+            $A.test.assertEquals("Argument passed="+argument, helper.methodWithArgs(argument), "Passing arguments to helpers failed.");
         }
 
+    },
+    /** 
+     * Assert that helper are not exposed as global functions.
+     */
+    testHelpersAreNotExposedGlobally: {
+	test : function(component){
+	    var helper = component.getDef().getHelper();
+	    $A.test.assertTrue($A.util.isFunction(helper.methodWithArgs));
+	    $A.test.assertFalse($A.util.isFunction(window.methodWithArgs), "Helper methods exposed on window");
+	    $A.test.assertFalse($A.util.isFunction(window.setFocus), "Helper methods exposed on window");
+	    $A.test.assertTrue($A.util.isFunction(helper.setFocus));
+	    $A.test.assertEquals("Set Focus", helper.setFocus()); 
+	}
     }
 })

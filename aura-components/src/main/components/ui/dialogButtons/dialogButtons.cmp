@@ -1,0 +1,44 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extensible="true" support="GA" description="A facet of ui:dialog to hold any buttons displayed at the bottom of the dialog window. This component comes with two default buttons, 'OK' and 'Cancel'. You can use zero or more of the default buttons, and/or provide your own custom buttons in this component's body.">
+
+    <!-- main attributes -->
+    <aura:attribute name="defaultButtons" type="String" default="none" description="Which default buttons to include (if any). Valid values are 'confirm', 'cancel', 'both', or 'none'. Default is 'none'. If you choose to use default and custom buttons together, custom buttons will always appear between the default cancel and default confirm buttons."/>
+
+    <!-- css, label, and title hooks -->
+    <aura:attribute name="confirmClass" type="String" description="Additional CSS classes to apply to the default confirm button."/>
+    <aura:attribute name="confirmLabel" type="String" default="OK" description="The label of the default confirm button."/>
+    <aura:attribute name="confirmTitle" type="String" default="Click to confirm" description="The title attribute of the default confirm button."/>
+    <aura:attribute name="cancelClass" type="String" description="Additional CSS classes to apply to the default cancel button."/>
+    <aura:attribute name="cancelLabel" type="String" default="Cancel" description="The label of the default cancel button."/>
+    <aura:attribute name="cancelTitle" type="String" default="Click to cancel" description="The title attribute of the default cancel button."/>
+
+    <!-- events -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <aura:if isTrue="{!v.defaultButtons == 'cancel' || v.defaultButtons == 'both'}">
+        <ui:button aura:id="cancelButton" class="{!v.cancelClass}" label="{!v.cancelLabel}" buttonTitle="{!v.cancelTitle}" press="{!c.cancel}"/>
+    </aura:if>
+    <!-- custom buttons go between 'cancel' and 'confirm', because 'cancel' buttons should always be on the far left
+         and 'confirm' buttons should always be on the far right. any other action should be in the middle. -->
+    {!v.body}
+    <aura:if isTrue="{!v.defaultButtons == 'confirm' || v.defaultButtons == 'both'}">
+        <ui:button aura:id="confirmButton" class="{!v.confirmClass}" label="{!v.confirmLabel}" buttonTitle="{!v.confirmTitle}" press="{!c.confirm}"/>
+    </aura:if>
+
+</aura:component>

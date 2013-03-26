@@ -28,16 +28,15 @@
  * The constructor does not call setup (which is asynchronous) because it does not work on device
  */
 var SmartStoreAdapter = function SmartStoreAdapter(config) {
-	
-	
-	// DCHASMAN TODO Figure out how to wire up config["name"] to create instances of this adapter!
-	// Looks like we just need to append the config["name"] to the SOUP_NAME prefix in SmartStoreAdapter.prototype.registerSoup() 
-	
-	
+
+    // DCHASMAN TODO Figure out how to wire up config["name"] to create instances of this adapter!
+    // Looks like we just need to append the config["name"] to the SOUP_NAME prefix in SmartStoreAdapter.prototype.registerSoup() 
+
     this.setupStage = this.SETUP_STAGE_NOT_STARTED;
     this.clearRegisterSoupFailed = false;
     this._currentSize = 0;
     this.sizeEstimator = new SizeEstimator();
+    this.setup(function(){}, function(){});
 };
 
 //Used at the end of the file before the variable is initialized so the name must be statically available
@@ -54,7 +53,7 @@ SmartStoreAdapter.prototype.SOUP_EXPIRES = "expires";
 
 //Stages of setup
 SmartStoreAdapter.prototype.SETUP_STAGE_NOT_STARTED = "not_started";
-SmartStoreAdapter.prototype.SETUP_STAGE_IN_PROGRESS = "in_progress";
+SmartStoreAdapter.prototype.SETUP_STAGE_STARTED = "started";
 SmartStoreAdapter.prototype.SETUP_STAGE_COMPLETED = "complete";
 SmartStoreAdapter.prototype.SETUP_STAGE_ERROR = "error";
 SmartStoreAdapter.prototype.QUERY_PAGE_SIZE = 20;
@@ -338,8 +337,8 @@ SmartStoreAdapter.prototype.setup = function(successCallback, errorCallback) {
         // setup is in process.  reschedule this command for the future.
         // TODO: We have to determine a proper timeout value.
         setTimeout(function() {
-            that.setup(successCallback, errorCallback);
-        }, 0);
+            that.setup.call(that, successCallback, errorCallback);
+        }, 50);
         return;
     } else if(this.setupStage === this.SETUP_STAGE_ERROR){
         errorCallback("SmartStoreAdapter was not properly initialized.");
@@ -347,6 +346,26 @@ SmartStoreAdapter.prototype.setup = function(successCallback, errorCallback) {
     }
     // else we are this.setupStage === this.SETUP_STAGE_NOT_STARTED
     this.setupStage = this.SETUP_STAGE_STARTED;
+    
+    this.waitForCordovaThenSetup(successCallback, errorCallback);
+
+};
+
+ // This function waits for cordova then calls setup.  
+SmartStoreAdapter.prototype.waitForCordovaThenSetup = function (successCallback, errorCallback) {
+    var that = this;
+    if (typeof cordova == "undefined" || typeof cordova["require"]("salesforce/plugin/smartstore") == "undefined" || 
+            typeof cordova["require"]("salesforce/plugin/smartstore")["registerSoup"] == "undefined"){
+        setTimeout(function() {that.waitForCordovaThenSetup.call(that, successCallback, errorCallback);}, 50);
+    } else {
+        this.internalSetup(successCallback, errorCallback);
+    }
+};
+
+// This function assumes that cordova is available.  
+SmartStoreAdapter.prototype.internalSetup = function (successCallback, errorCallback) {
+
+    var that = this;
 
     /* Get a logger that we can reliably use.  
      * On device, the logger can go to the apps (xcode or eclipse) native console
@@ -505,20 +524,9 @@ SmartStoreAdapter.prototype.handleSmartStoreError = function(adapterOperationNam
 
 //#include aura.storage.adapters.SmartStoreAdapter_export
 
-var smartStoreAvailable = true;
-try {
-    cordova["require"]("salesforce/plugin/smartstore");
-} catch (cordovaRequireErr) {
-    smartStoreAvailable = false;
-}
-try {
-    if(smartStoreAvailable){
-	$A.storageService.registerAdapter({ 
-	    "name": SmartStoreAdapter.NAME, 
-	    "adapterClass": SmartStoreAdapter,
-	    "persistent": true,
-	    "secure": true
-	});
-    }
-} catch(auraErr) {
-}
+$A.storageService.registerAdapter({ 
+        "name": SmartStoreAdapter.NAME, 
+        "adapterClass": SmartStoreAdapter,
+        "persistent": true,
+        "secure": true
+    });

@@ -235,10 +235,12 @@ Component.prototype.findInstanceOf = function(type){
 };
 
 /**
- * @private
+ * Checks whether the Component is an instance of the given component name (or interface name).
+ * @param {String} name The name of the component (or interface), with a format of <namespace>:<componentName> (e.g., ui:button).
+ * @returns {Boolean} True if the Component is an instance, or false otherwise.
  */
-Component.prototype.isInstanceOf = function(type){
-    return this.getDef().isInstanceOf(type);
+Component.prototype.isInstanceOf = function(name){
+    return this.getDef().isInstanceOf(name);
 };
 
 /**

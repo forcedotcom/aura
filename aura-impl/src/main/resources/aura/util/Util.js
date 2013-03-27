@@ -586,18 +586,20 @@ $A.ns.Util.prototype.on = (function() {
             // Eliminate registration of duplicate handlers on older browsers
         	var handlers = element["handlers"];
         	if (handlers) {
-        		if (this.arrayIndexOf(handlers, handler) < 0) {
-        			handlers.push(handler);
-        		} else {
-        			// Do not wire up duplicate handlers
-        			return;
+        		for (var n = 0; n < handlers.length; n++) {
+        			if (handler[n] === handler) {
+            			// Do not wire up duplicate handlers
+            			return;
+        			}
         		}
+        		
+    			handlers.push(handler);
         	} else {
         		element["handlers"] = [handler];
         	}
         	
             if (timeout) {
-                handler = this.createTimeoutCallback(handler, timeout);
+                handler = $A.util.createTimeoutCallback(handler, timeout);
             }
 
             // Correct the context of the events (this) pointer to the element its attached to.

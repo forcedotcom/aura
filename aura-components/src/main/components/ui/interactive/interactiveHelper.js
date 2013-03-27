@@ -110,6 +110,8 @@
         for (var key in attributeDefs) {
             if (key === "domEvent") {
                 params[key] = DOMEvent;
+            } else if (key === "keyCode") { // we need to re-visit this keyCode madness soon
+                params[key] = DOMEvent.which || DOMEvent.keyCode;
             } else {
                 params[key] = DOMEvent[key];
             }

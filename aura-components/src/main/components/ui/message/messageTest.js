@@ -28,9 +28,23 @@
         warning : "rgb(255, 255, 220)",
         error : "rgb(253, 237, 234)"
     },
+    
+    hexToRGB : function(hex) {
+    	var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+            return r + r + g + g + b + b;
+        });
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        
+        return result ? ['rgb(', parseInt(result[1], 16),  ', ',
+                         parseInt(result[2], 16), ', ',
+                         parseInt(result[3], 16), ')'].join('')
+                      : hex;
+    },
 
     assertBasicChecks : function(component, expectedTitle){
         var rootDiv = component.getElement();
+      
 
         // verify aria attributes
         $A.test.assertEquals("alert", rootDiv.getAttribute("role"),
@@ -46,6 +60,7 @@
                 "ui:message rendered with wrong severity CSS class");
 
         // verify icon alt text
+        //TODO: $A.test.select doesn't work in IE 7        
         var icon = $A.test.select(this.selectors.icon)[0];
         $A.test.assertEquals(severity, icon["alt"],
                 "ui:message rendered with wrong icon alt text");
@@ -56,7 +71,12 @@
                 "ui:message closable attribute is not being respected");
 
         // verify background color is correct, based on severity attribute
-        var backgroundColor = this.getComputedStyle(rootDiv)['background-color'];
+        var cStyle = this.getComputedStyle(rootDiv);
+        var backgroundColor = cStyle ? cStyle['background-color'] || cStyle['backgroundColor'] : null;
+        if (backgroundColor && backgroundColor.indexOf("#") == 0) {
+        	backgroundColor = this.hexToRGB(backgroundColor);
+        }
+        
         if ($A.util.isUndefined(this.bgColors[severity])) {
             severity = "message";
         }

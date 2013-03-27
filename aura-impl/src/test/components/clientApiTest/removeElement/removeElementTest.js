@@ -52,31 +52,33 @@
     /**
      * Verify for an unparented element that removeElement will move it to the trashcan and then delete it on the next gc cycle.
      */
-    // TODO(tbliss): these fail in prod mode since can't access util.$trash$. Figure out way to check that trash is empty
-    _testRemoveUnparentedDiv: {
+    // TODO(W-1589587): these fail in prod mode since can't access util.$trash$. Figure out way to check that trash is empty
+    testRemoveUnparentedDiv: {
         test: function(component){
             $A.test.setTestTimeout(30000);
             var element = component.find("auraDiv").getElement();
             element.parentNode.removeChild(element);
             $A.util.removeElement(element);
-            $A.test.assertTrue($A.util.$trash$.length > 0, "element never placed in trash");
+            //$A.test.assertTrue($A.util.$trash$.length > 0, "element never placed in trash");
             $A.test.assertEquals("", $A.test.getText(component.find("container").getElement()), "element not removed");
-            $A.test.runAfterIf(function(){return $A.util.$trash$.length === 0;}); // check that element emptied from trash
+            //$A.test.runAfterIf(function(){return $A.util.$trash$.length === 0;}); // check that element emptied from trash
         }
     },
 
     /**
      * Verify for an unparented textnode that removeElement will do nothing to it.
      */
-    _testRemoveUnparentedText: {
+    // TODO(W-1589587): these fail in prod mode since can't access util.$trash$. Figure out way to check that trash is empty
+    testRemoveUnparentedText: {
         test: function(component){
+            $A.test.setTestTimeout(30000);
             var element = component.find("auraDiv").getElement().childNodes[0];
             element.parentNode.removeChild(element);
             $A.util.removeElement(element);
             if(document.implementation["createHTMLDocument"]){
-                $A.test.assertTrue($A.util.$trash$.length > 0, "element never placed in trash");
-            $A.test.assertEquals("", $A.test.getText(component.find("container").getElement()), "element not removed");
-            $A.test.runAfterIf(function(){return $A.util.$trash$.length === 0;}); // check that element emptied from trash
+                //$A.test.assertTrue($A.util.$trash$.length > 0, "element never placed in trash");
+                $A.test.assertEquals("", $A.test.getText(component.find("container").getElement()), "element not removed");
+                //$A.test.runAfterIf(function(){return $A.util.$trash$.length === 0;}); // check that element emptied from trash
             }else{
                 $A.test.assertNull(element.parentNode);
             }

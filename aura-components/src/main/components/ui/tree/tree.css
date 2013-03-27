@@ -71,6 +71,7 @@
 	cursor: pointer;
 	display: block;
 	padding-left: 37px;
+	height: 1em;
 }
 
 .THIS li input:checked+ol {

@@ -57,11 +57,7 @@ public class DatePickerModel {
     @AuraEnabled
     public String getLabelForToday() throws QuickFixException {
         LocalizationAdapter la = Aura.getLocalizationAdapter();
-        if (la.labelExists("Related_Lists", "task_mode_today")) {
-            return la.getLabel("Related_Lists", "task_mode_today");
-        } else {
-            return "";
-        }
+        return la.getLabel("Related_Lists", "task_mode_today");
     }
     
     @AuraEnabled

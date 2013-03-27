@@ -15,9 +15,7 @@
  */
 package org.auraframework.impl.context;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.LocalizationAdapter;
@@ -28,13 +26,36 @@ import org.auraframework.util.AuraLocale;
 /**
  */
 public class LocalizationAdapterImpl implements LocalizationAdapter {
-
+    
+    /**
+     * Temporary workaround for localized labels for Auara Standalone
+     */
+    private static Map<String, Map<String, String>> labels = new HashMap<String, Map<String, String>>();
+    static {
+        Map<String, String> todayLabels = new HashMap<String, String>();
+        todayLabels.put("ar", "اليوم");
+        todayLabels.put("cs", "Dnes");
+        todayLabels.put("de", "Heute");
+        todayLabels.put("en", "Today");
+        todayLabels.put("es", "Hoy");
+        todayLabels.put("fr", "aujourd'hui");
+        todayLabels.put("ja", "今日");
+        todayLabels.put("ko", "오늘");
+        todayLabels.put("zh_CN", "今天");
+        todayLabels.put("zh_TW", "今天");
+        labels.put("task_mode_today", todayLabels);
+    }
+    
     public LocalizationAdapterImpl() {
     }
 
     @Override
     public String getLabel(String section, String name, Object... params) {
-        return "FIXME - LocalizationAdapter.getLabel() needs implemenation!";
+        Map<String, String> label = labels.get(name);
+        if (label == null) {
+            return "FIXME - LocalizationAdapter.getLabel() needs implemenation!";
+        }
+        return label.get(this.getAuraLocale().getLanguageLocale().toString());
     }
 
     @Override

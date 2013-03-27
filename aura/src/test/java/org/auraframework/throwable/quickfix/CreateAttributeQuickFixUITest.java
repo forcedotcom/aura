@@ -32,7 +32,7 @@ import org.openqa.selenium.WebElement;
 /**
  * Tests to verify that users can add missing attributes to components via QuickFixes through the browser.
  */
-// Unadaptable since does not function properly when running from jars
+// TODO(W-1589052): Unadaptable since does not function properly when running from jars
 @UnAdaptableTest
 public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
     private final QuickFixUITestUtil util = new QuickFixUITestUtil(this);

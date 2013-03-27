@@ -29,8 +29,14 @@
     },
     layoutDone : function(cmp, event) {
         $A.util.addClass(cmp.find("ready").getElement(),"layoutDone");
+        cmp._layoutChanged = true ;
+        cmp._layoutChangeEvt = event;
     },
     removeLayoutDone : function(cmp) {
         $A.util.removeClass(cmp.find("ready").getElement(),"layoutDone");
+    },
+    layoutChanging : function(cmp, event) {
+	cmp._layoutChanging = true ;
+        cmp._beforeLayoutChangeEvt = event;
     }
 }

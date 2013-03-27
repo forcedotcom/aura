@@ -18,6 +18,7 @@
 <aura:application>
     <div aura:id="ready" class="layout_t"/>
     <aura:handler event="aura:layoutChange" action="{!c.layoutDone}"/>
+    <aura:handler event="aura:beforeLayoutChange" action="{!c.layoutChanging}"/>
 
     <p>
         <div onclick="{!c.forward}" class='Forward_Button' aura:id='Forward_Button'>Forward</div>

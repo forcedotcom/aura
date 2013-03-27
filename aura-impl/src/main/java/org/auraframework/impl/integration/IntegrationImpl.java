@@ -38,6 +38,7 @@ import org.auraframework.system.Client;
 import org.auraframework.system.Client.Type;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -168,12 +169,14 @@ public class IntegrationImpl implements Integration {
         }
     }
 
-    private AuraContext startContext(String num) {
+    private AuraContext startContext(String num) throws ClientOutOfSyncException, QuickFixException {
         ContextService contextService = Aura.getContextService();
 
         AuraContext context = contextService.startContext(mode, Format.JSON, Access.AUTHENTICATED);
-        context.setApplicationDescriptor(getApplicationDescriptor());
+        DefDescriptor<ApplicationDef> applicationDescriptor = getApplicationDescriptor();
+        context.setApplicationDescriptor(applicationDescriptor);
         context.setContextPath(contextPath);
+        context.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
 
         if (num != null) {
             context.setNum(num);
@@ -193,12 +196,16 @@ public class IntegrationImpl implements Integration {
         return context;
     }
 
-    private void writeApplication(Appendable out) throws IOException, AuraRuntimeException {
-        startContext(null);
+    private void writeApplication(Appendable out) throws IOException, AuraRuntimeException, QuickFixException {
+        AuraContext context = startContext(null);
         try {
             ApplicationDef appDef = getApplicationDescriptor().getDef();
+
+            DefDescriptor<ApplicationDef> descriptor = appDef.getDescriptor();
+            context.addLoaded(descriptor, context.getDefRegistry().getUid(null, descriptor));
+
             Aura.getSerializationService().write(appDef, null,
-                    appDef.getDescriptor().getDefType().getPrimaryInterface(), out, "EMBEDDED_HTML");
+                    descriptor.getDefType().getPrimaryInterface(), out, "EMBEDDED_HTML");
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
         } finally {

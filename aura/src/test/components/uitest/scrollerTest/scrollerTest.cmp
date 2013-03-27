@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component model="java://org.auraframework.impl.java.model.TestJavaModel">
     <div class="test">
         <ui:scroller aura:id="basic">
             <img aura:id="dynamicImage"/>
@@ -102,5 +102,11 @@
             than my scroller height, but don't call me an invalid.
         </ui:scroller>
     </div>
-
+    <!--Manual test Case for W-1482909-->
+     <div class="test">
+        <ui:scroller>
+            <ui:inputTextArea aura:id="inTextArea" value="{!m.textAreaText}">
+            </ui:inputTextArea>
+        </ui:scroller>
+    </div>
 </aura:component>

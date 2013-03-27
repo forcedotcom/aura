@@ -21,7 +21,7 @@ import org.auraframework.test.annotation.UnAdaptableTest;
 /**
  * Quick fix testing for Components.
  */
-// Unadaptable since does not function properly when running from jars
+// TODO(W-1589052): Unadaptable since does not function properly when running from jars
 @UnAdaptableTest
 public class ComponentQuickFixUITest extends BaseComponentQuickFixUITest {
     public ComponentQuickFixUITest(String name) {

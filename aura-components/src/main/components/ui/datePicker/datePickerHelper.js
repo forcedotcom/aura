@@ -52,18 +52,6 @@
         shortName: "Dec"
     }],
     
-    TodayLabels: {
-        ar: "اليوم",
-        cs: "Dnes",
-        de: "Heute",
-        es: "Hoy",
-        fr: "aujourd'hui",
-        ja: "今日",
-        ko: "오늘",
-        zh_CN: "今天",
-        zh_TW: "今天"
-    },
-    
     focusDate: function(component) {
         var grid = component.find("grid");
         var e = grid.get("e.focus");
@@ -195,9 +183,6 @@
     localizeToday: function(component) {
         var todayElem = component.find("today").getElement();
         var todayLabel = component.get("m.labelForToday");
-        if (!todayLabel) {
-            todayLabel = this.TodayLabels[component.get("m.langLocale")];
-        }
         if (!todayLabel) {
             todayLabel = "Today";
         }

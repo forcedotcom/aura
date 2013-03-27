@@ -645,11 +645,16 @@ $A.ns.Aura.prototype.log = function(value, error) {
                 console["groupEnd"]();
             }
             console["groupEnd"]();
-        }
-        else if(console && console["debug"]) {
-            console["debug"](value);
-        }else if(console && console["log"]) {
-            console["log"](value);
+        } else if (console){
+        	if (error) {
+        		value += "\n" + error.message;
+        	}
+        	
+        	if (console["debug"]) {
+        		console["debug"](value);
+        	} else if (console["log"]) {
+        		console["log"](value);	
+        	}
         }
     }
 };

@@ -53,7 +53,6 @@ import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.AuraUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -62,7 +61,6 @@ import org.openqa.selenium.remote.ScreenshotException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -527,105 +525,16 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
         openRaw(url);
         if (waitForInit) {
-            waitForAuraInit();
+            auraUITestingUtil.waitForAuraInit(getExceptionsAllowedDuringInit());
         }
     }
 
-    /**
-     * @return true if Aura framework has loaded
-     */
-    protected boolean isAuraFrameworkReady() {
-        return auraUITestingUtil.getBooleanEval("return window.$A ? window.$A.finishedInit === true : false;");
+    public void waitForAuraFrameworkReady() {
+        auraUITestingUtil.waitForAuraFrameworkReady(getExceptionsAllowedDuringInit());
     }
-
-    /**
-     * Wait until the provided Function returns true or non-null. Any uncaught javascript errors will trigger an
-     * AssertionFailedError.
-     */
-    public <V> V waitUntil(Function<? super WebDriver, V> function) {
-        return waitUntil(function, timeoutInSecs);
-    }
-
-    /**
-     * Wait the specified number of seconds until the provided Function returns true or non-null. Any uncaught
-     * javascript errors will trigger an AssertionFailedError.
-     */
-    public <V> V waitUntil(Function<? super WebDriver, V> function, int timeoutInSecs) {
-        WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSecs);
-        return wait.until(auraUITestingUtil.addErrorCheck(function));
-    }
-
-    /**
-     * Wait for the document to enter the complete readyState.
-     */
-    protected void waitForDocumentReady() {
-        waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                return (Boolean) auraUITestingUtil.getRawEval("return document.readyState === 'complete'");
-            }
-        });
-    }
-
-    /**
-     * Look for any quickfix exceptions. These can sometimes reflect a framework load failure but provide a better error
-     * message.
-     */
-    private void assertNoQuickFixMessage() {
-        String auraErrorMsg = getQuickFixMessage();
-        if (!auraErrorMsg.isEmpty()) {
-        	// Compare against any expected failures
-        	Set<String> allowedExceptions = getExceptionsAllowedDuringInit();
-        	for(String allowedException : allowedExceptions){
-        		if (auraErrorMsg.contains(allowedException)) {
-        		    return;
-            	}
-        	}
-            fail("Initialization error: " + auraErrorMsg);
-        }
-    }
-
+    
     protected Set<String> getExceptionsAllowedDuringInit() {
     	return Collections.emptySet();
-    }
-
-	protected String getQuickFixMessage() {
-        WebElement errorBox = getDriver().findElement(By.id("auraErrorMessage"));
-        if (errorBox == null) {
-            fail("Aura quick fix errorBox not found.");
-        }
-        return errorBox.getText();
-    }
-
-    /**
-     * Wait until Aura has finished initialization or encountered an error.
-     */
-    protected void waitForAuraInit() {
-        waitForDocumentReady();
-        waitForAuraFrameworkReady();
-        waitForAppCacheReady();
-    }
-
-    /**
-     * First, verify that window.$A has been installed. Then, wait until {@link #isAuraFrameworkReady()} returns true.
-     * We assume the document has finished loading at this point: callers should have previously called
-     * {@link #waitForDocumentReady()}.
-     */
-    protected void waitForAuraFrameworkReady() {
-        // Umbrella check for any framework load error.
-        if (!(Boolean) auraUITestingUtil.getRawEval("return !!window.$A")) {
-            fail("Initialization error: document loaded without $A. Perhaps the initial GET failed.");
-        }
-
-        WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSecs);
-        wait.ignoring(StaleElementReferenceException.class).until(
-                new Function<WebDriver, Boolean>() {
-                    @Override
-                    public Boolean apply(WebDriver input) {
-                        assertNoQuickFixMessage();
-                        return isAuraFrameworkReady();
-                    }
-                });
     }
 
     /**
@@ -634,7 +543,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @throws AssertionFailedError if the provided javascript does not return a boolean.
      */
     public void waitForCondition(final String javascript, int timeoutInSecs) {
-        waitUntil(new ExpectedCondition<Boolean>() {
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
                 return auraUITestingUtil.getBooleanEval(javascript);
@@ -684,7 +593,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * Wait for text on element to be either cleared or present.
      */
     protected void waitForElementText(final WebElement e, final String text, final boolean isPresent, long timeout) {
-        waitUntil(new ExpectedCondition<Boolean>() {
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
                 return isPresent == text.equals(e.getText());
@@ -726,7 +635,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * @param timeoutinSecs number of seconds to wait before erroring out
      */
     protected void waitForElement(String msg, final WebElement e, final boolean isDisplayed, int timeoutInSecs) {
-        waitUntil(new ExpectedCondition<Boolean>() {
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
                 return isDisplayed == e.isDisplayed();
@@ -739,7 +648,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      */
     protected WebElement findDomElement(By locator) {
         final WebElement element = getDriver().findElement(locator);
-        waitUntil(new ExpectedCondition<Boolean>() {
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
                 return auraUITestingUtil.getBooleanEval("return arguments[0].ownerDocument === document", element);
@@ -765,17 +674,5 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      */
     protected String getText(By locator) {
         return findDomElement(locator).getText();
-    }
-
-    protected void waitForAppCacheReady() {
-        waitUntil(new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(WebDriver d) {
-                return auraUITestingUtil
-                        .getBooleanEval("var cache=window.applicationCache;"
-                                + "return $A.util.isUndefinedOrNull(cache) || "
-                                + "(cache.status===cache.UNCACHED)||(cache.status===cache.IDLE)||(cache.status===cache.OBSOLETE);");
-            }
-        });
     }
 }

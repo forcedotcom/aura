@@ -378,7 +378,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         }
         openNoAura(url);
         // Wait for page to be ready
-        waitForDocumentReady();
+        auraUITestingUtil.waitForDocumentReady();
         // Wait for Aura framework(injected) to be ready
         waitForAuraFrameworkReady();
     }

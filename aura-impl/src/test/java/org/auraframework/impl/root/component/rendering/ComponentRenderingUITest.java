@@ -160,10 +160,10 @@ public class ComponentRenderingUITest extends WebDriverTestCase {
 
     private boolean isAuraClientEnginePresentOnPage() {
         try {
-            return waitUntil(new Function<WebDriver, Boolean>() {
+            return auraUITestingUtil.waitUntil(new Function<WebDriver, Boolean>() {
                 @Override
                 public Boolean apply(WebDriver input) {
-                    return isAuraFrameworkReady();
+                    return auraUITestingUtil.isAuraFrameworkReady();
                 }
             }, 10); // give it only 10sec for these tests or they'll take too
                     // long for the neg cases

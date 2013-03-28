@@ -227,6 +227,10 @@
 
     canHaveBody : function(component) {
         var tag = component.get("v.tag");
+        if ($A.util.isUndefinedOrNull(tag)) {
+            $A.error("Undefined tag for "+component.getGlobalId(), false);
+            return true;
+        }
         return !this.BODYLESS_TAGS[tag.toLowerCase()];
     },
 

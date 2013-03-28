@@ -461,11 +461,22 @@ $A.ns.Aura.prototype.finishInit = function() {
  * }
  * @public
  * @param {Error} e The error message to be returned
+ * @param {Boolean} stopTest   Defaults to true, but there are some test cases
+ *    where using $A.test.fail (which throws) will break initialization, and so
+ *    isn't desired.
+ *
+ * TODO: stopTest is a kludge, and should be supported by something like test's
+ *    expectedExceptionsDuringInit.  However, the case where it's useful is an
+ *    expected failure in the initial render of the page, before any particular
+ *    test is running, so no test annotation is going to work.
  */
-$A.ns.Aura.prototype.error = function(e) {
+$A.ns.Aura.prototype.error = function(e, stopTest) {
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     $A.log(e.stack || e);
     //#end
+    if (stopTest === undefined) {
+        stopTest = true;
+    }
     var str = "";
     if ($A.util.isString(e)) {
         str = e;
@@ -497,7 +508,7 @@ $A.ns.Aura.prototype.error = function(e) {
     $A.util.removeClass(document.body, "loading");
     $A.util.addClass(document.body, "auraError");
    
-    if ($A.test) {
+    if ($A.test && stopTest) {
         $A.test.fail(str);
     }
     if (!$A.initialized) {
@@ -646,15 +657,15 @@ $A.ns.Aura.prototype.log = function(value, error) {
             }
             console["groupEnd"]();
         } else if (console){
-        	if (error) {
-        		value += "\n" + error.message;
-        	}
-        	
-        	if (console["debug"]) {
-        		console["debug"](value);
-        	} else if (console["log"]) {
-        		console["log"](value);	
-        	}
+            if (error) {
+                value += "\n" + error.message;
+            }
+               
+            if (console["debug"]) {
+                console["debug"](value);
+            } else if (console["log"]) {
+                console["log"](value);  
+            }
         }
     }
 };

@@ -51,6 +51,8 @@ public class JavaModel implements Model {
             throw new AuraRuntimeException(e);
         } catch (IllegalAccessException e) {
             throw new AuraRuntimeException(e);
+        } catch(Exception e){
+        	throw makeException(e.getMessage(),e,this.modelDef);
         }
     }
 
@@ -166,7 +168,7 @@ public class JavaModel implements Model {
 
     private static AuraRuntimeException makeException(String message, Throwable cause, ModelDef def) {
         if (def != null) {
-            return new AuraExecutionException(message, def.getLocation(), cause);
+            return new AuraExecutionException(message,def.getLocation(),cause);
         } else {
             return new AuraRuntimeException(message, cause);
         }

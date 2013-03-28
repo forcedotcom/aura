@@ -27,6 +27,8 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.http.HttpHeaders;
 import org.auraframework.controller.java.ServletConfigController;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
@@ -284,5 +286,60 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         assertManifestHeaders(get);
         String response = get.getResponseBodyAsString();
         assertEquals("", response);
+    }
+    
+    /**
+     * GET app cache manifest for app with additional URLs specified using a controller action
+     * returns a full manifest containing the additional URLs returned by controller. 
+     */
+    public void testGetManifestForAppWithAdditionalAppCacheURLs() throws Exception {
+        System.setProperty(HttpMethodParams.USER_AGENT, APPCACHE_SUPPORTED_USERAGENT);
+        ManifestInfo manifest = getManifestInfo("/appCache/additionalUrls.app");
+        GetMethod get = obtainGetMethod(manifest.url);
+        getHttpClient().executeMethod(get);
+        String response = get.getResponseBodyAsString();
+        String serializedContextFragment = AuraTextUtil.urlencode(String
+                .format("\"lastmod\":\"%s\"", manifest.lastmod));
+        assertManifest(response, Lists.newArrayList(
+                String.format(".*%s.*/app\\.css", serializedContextFragment),
+                String.format(".*%s.*/app\\.js", serializedContextFragment),
+                "/auraFW/resources/aura/auraIdeLogo.png",
+                "/auraFW/resources/aura/resetCSS.css"),
+                manifest.lastmod);
+    }
+    /**
+     * Verify behavior when action which provides additional app cache urls returns bad results or throws exception.
+     * TODO: W-1590903 - What should the expected behavior be?
+     *  Currently, the behavior is not consistent across these scenarios,
+     *   it just continues and ignores the exception thrown by the action, in other cases it returns 404.
+     *  Should we do something to signal that something went wrong, you might not have resources that you asked for?
+     */
+    public void _testGetManifestWhenAdditionalAppCacheUrlsActionBarfs() throws Exception{
+        String values[] = {"{!c.throwException}", //Action throws exception 
+                            "{!c.getString}", //Action returns literal instead of List<String>
+                            "{!v.attr}", //A expression that refers to attribute instead of action
+                            "/auraFW/resources/aura/resetCSS.css"};
+        
+        String appMarkup = String.format(baseApplicationTag,"useAppcache=\"true\" render=\"client\"  preload=\"appCache\" "+ 
+                            "securityProvider=\"java://org.auraframework.java.securityProvider.LaxSecurityProvider\" "+ 
+                            " controller=\"java://org.auraframework.impl.java.controller.TestController\" "+
+                            "additionalAppCacheURLs=\"%s\"", "");
+        
+        for(String value: values){
+            DefDescriptor<ApplicationDef> desc= addSourceAutoCleanup(ApplicationDef.class, String.format(appMarkup,value));
+            System.setProperty(HttpMethodParams.USER_AGENT, APPCACHE_SUPPORTED_USERAGENT);
+            ManifestInfo manifest = getManifestInfo(getUrl(desc));
+            GetMethod get = obtainGetMethod(manifest.url);
+            getHttpClient().executeMethod(get);
+            assertEquals("Expected to fail manifest fetching. additionalAppCacheUrls:"+value, 
+                    HttpStatus.SC_NOT_FOUND,get.getStatusCode());
+            String response = get.getResponseBodyAsString();
+            String serializedContextFragment = AuraTextUtil.urlencode(String
+                    .format("\"lastmod\":\"%s\"", manifest.lastmod));
+            assertManifest(response, Lists.newArrayList(
+                    String.format(".*%s.*/app\\.css", serializedContextFragment),
+                    String.format(".*%s.*/app\\.js", serializedContextFragment)),
+                    manifest.lastmod);
+        }
     }
 }

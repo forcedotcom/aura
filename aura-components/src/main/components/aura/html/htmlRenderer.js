@@ -21,6 +21,10 @@
         var replacements = {};
 
         var tag = attributes.get("tag");
+        if ($A.util.isUndefinedOrNull(tag)) {
+            $A.error("Undefined tag "+component.getGlobalId(), false);
+            tag = "div";
+        }
         var HTMLAttributes = attributes.getValue("HTMLAttributes");
         var ret = document.createElement(tag);
 

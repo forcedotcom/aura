@@ -1,0 +1,4 @@
+<aura:component>
+    <!--Set v.parent on all components of my body -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+</aura:component>

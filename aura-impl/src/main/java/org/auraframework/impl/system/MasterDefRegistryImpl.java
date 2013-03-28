@@ -23,9 +23,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -78,6 +80,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     private final static int DEPENDENCY_CACHE_SIZE = 100;
     private final static int STRING_CACHE_SIZE = 100;
+    private static final Logger logger = Logger.getLogger("MasterDefRegistryImpl");
 
     /**
      * A dependency entry for a uid+descriptor.
@@ -884,7 +887,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                         || unsecuredPrefixes.contains(prefix)
                         || unsecuredNamespaces.contains(ns)
                         || (mode != Mode.PROD && (!Aura.getConfigAdapter().isProduction())
-                            && unsecuredNonProductionNamespaces .contains(ns))) {
+                        && unsecuredNonProductionNamespaces.contains(ns))) {
                     accessCache.add(desc);
                     return;
                 }
@@ -1041,7 +1044,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     /**
      * The driver for cache-consistency management in response to source changes.
      * MDR drives the process, will notify all registered listeners while write blocking,
-     * then invalidate it's own caches.
+     * then invalidate it's own caches. If this routine can't acquire the lock ,
+     * it will log it as an non-fatal error, as it only results in staleness.
      * 
      * @param listeners - collections of listeners to notify of source changes
      * @param source - DefDescriptor that changed - for granular cache clear
@@ -1052,13 +1056,23 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             DefDescriptor<?> source,
             SourceListener.SourceMonitorEvent event) {
 
-        wLock.lock();
-        try {
+        boolean haveLock = false;
 
+        try {
+            // We have now eliminated all known deadlocks, but for production safety, we never want to block forever
+            haveLock = wLock.tryLock(5, TimeUnit.SECONDS);
+
+            // If this occurs, we have a new deadlock. But it only means temporary cache staleness, so it is not fatal
+            if (!haveLock) {
+                logger.error("Couldn't acquire cache clear lock in a reasonable time.  Cache may be stale until next clear.");
+                return;
+            }
+
+            // successfully acquired the lock, start clearing caches
             // notify provided listeners, presumably to clear caches
             for (WeakReference<SourceListener> i : listeners) {
                 SourceListener sl = i.get();
-                
+
                 if (sl != null) {
                     sl.onSourceChanged(source, event);
                 }
@@ -1066,9 +1080,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
             // lastly, clear MDR's static caches
             dependencies.invalidateAll();
+
+        } catch (InterruptedException e) {
         } finally {
-            wLock.unlock();
+            if (haveLock) {
+                wLock.unlock();
+            }
         }
     }
-
 }

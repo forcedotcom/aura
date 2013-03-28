@@ -32,9 +32,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-
 import org.auraframework.system.AuraContext.Format;
-
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.client.UserAgent;
 import org.auraframework.util.AuraTextUtil;
@@ -341,5 +339,15 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         String scriptTag = String.format("<script src=\"%s\" ></script>", expectedFWUrl);
         assertTrue("Expected Aura FW Script tag not found. Expected to see: " + scriptTag,
                 get.getResponseBodyAsString().contains(scriptTag));
+    }
+
+    public void testGetUnhandledError() throws Exception {
+        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
+                "<aura:application><aura:text/></aura:application>");
+        GetMethod get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
+        getHttpClient().executeMethod(get);
+        assertEquals(HttpStatus.SC_NOT_FOUND, get.getStatusCode());
+        String response = get.getResponseBodyAsString();
+        assertEquals("Expected simple error page but got: " + response, "404 Not Found\ndescriptor is null\n", response);
     }
 }

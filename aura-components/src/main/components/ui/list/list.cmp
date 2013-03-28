@@ -15,23 +15,10 @@
     limitations under the License.
 
 -->
-<aura:component implements="ui:visible, ui:listInterface, ui:pagingInterface" extensible="true" support="proto">
-	<aura:handler name="init" action="{!c.init}" value="{!this}"/>
-	<div class="{!v.class}">
-		{!v.header}
+<aura:component extends="ui:abstractList" support="proto">
+	<ul>
+	<aura:iteration items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}">
 		
-		<div class="listContent">
-			<ul>
-			<aura:iteration items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}">
-				
-			</aura:iteration>
-			</ul>
-			<div class="loadingIndicator">
-                <div class="background"></div>
-                <span class="label">Loading...</span>
-            </div>
-		</div>
-		
-		{!v.footer}
-	</div>
+	</aura:iteration>
+	</ul>
 </aura:component>

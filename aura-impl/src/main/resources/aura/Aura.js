@@ -562,6 +562,19 @@ $A.ns.Aura.prototype.unwrap = function(val) {
     return val;
 };
 
+/**
+ * Run a function within the standard Aura lifecycle and insures that runAfters and rerendering is handled properly 
+ * from javascript outside of controllers, renderers, providers.
+ * @param {Function} func The function to run.
+ * @public
+ */
+$A.ns.Aura.prototype.run = function(func) {
+	$A.assert(func && $A.util.isFunction(func), "The parameter 'func' for $A.run() must be a function!");
+	
+    $A.services.event.startFiring("$A.run()");
+    func();
+    $A.services.event.finishFiring("$A.run()");
+};
 
 /**
  * Checks the condition and if the condition is false, displays an error message.

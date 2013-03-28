@@ -15,13 +15,12 @@
  */
 package org.auraframework.impl.source;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.GuardedBy;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
@@ -86,13 +85,11 @@ public class StringSourceLoader implements SourceLoader {
     /**
      * This map stores all of the sources owned by this loader, split into namespaces.
      */
-    @GuardedBy("this")
-    private final Map<String, Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>> namespaces = Maps
-            .newHashMap();
+    private final Map<String, Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>> namespaces = new ConcurrentHashMap<String, Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>>();
 
     private StringSourceLoader() {
         namespaces.put(DEFAULT_NAMESPACE,
-                new HashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>());
+                new ConcurrentHashMap<DefDescriptor<? extends Definition>, StringSource<? extends Definition>>());
     }
 
     /**
@@ -174,7 +171,7 @@ public class StringSourceLoader implements SourceLoader {
         return putSource(descriptor, source, overwrite);
     }
 
-    private synchronized final <D extends Definition> StringSource<D> putSource(DefDescriptor<D> descriptor,
+    private final <D extends Definition> StringSource<D> putSource(DefDescriptor<D> descriptor,
             StringSource<D> source, boolean overwrite) {
         String namespace = descriptor.getNamespace();
         Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
@@ -206,7 +203,7 @@ public class StringSourceLoader implements SourceLoader {
      * 
      * @param descriptor the descriptor identifying the loaded definition to remove.
      */
-    public synchronized final void removeSource(DefDescriptor<?> descriptor) {
+    public final void removeSource(DefDescriptor<?> descriptor) {
         String namespace = descriptor.getNamespace();
         Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
                 .get(namespace);
@@ -231,7 +228,7 @@ public class StringSourceLoader implements SourceLoader {
     }
 
     @Override
-    public synchronized Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
+    public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         Set<DefDescriptor<?>> ret = Sets.newHashSet();
         for (String namespace : namespaces.keySet()) {
             if (matcher.matchNamespace(namespace)) {
@@ -247,7 +244,7 @@ public class StringSourceLoader implements SourceLoader {
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized <D extends Definition> Set<DefDescriptor<D>> find(Class<D> primaryInterface, String prefix,
+    public <D extends Definition> Set<DefDescriptor<D>> find(Class<D> primaryInterface, String prefix,
             String namespace) {
         Set<DefDescriptor<D>> ret = Sets.newHashSet();
         Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
@@ -268,7 +265,7 @@ public class StringSourceLoader implements SourceLoader {
     }
 
     @Override
-    public synchronized Set<String> getNamespaces() {
+    public Set<String> getNamespaces() {
         return ImmutableSet.copyOf(namespaces.keySet());
     }
 
@@ -279,7 +276,7 @@ public class StringSourceLoader implements SourceLoader {
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
+    public <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
         Map<DefDescriptor<? extends Definition>, StringSource<? extends Definition>> sourceMap = namespaces
                 .get(descriptor.getNamespace());
         if (sourceMap != null) {

@@ -18,6 +18,7 @@ package org.auraframework.def;
 import org.auraframework.Aura;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
+import org.auraframework.instance.Component;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.junit.Ignore;
 
@@ -228,6 +229,30 @@ public class TemplateDefTest extends AuraImplTestCase {
                         String.format("<aura:set attribute='scriptTags'>%s</aura:set>", scriptInclude)));
         assertExceptionDueToScripts("Script tags should not be allowed as attribute value in components",
                 scriptTagInAuraSet, true);
+    }
+
+    // Automation for W-1584537
+    public void testExtraTagsCanAccessModel() throws Exception {
+        String extraScriptTags = "<aura:set attribute='extraScriptTags'><script type='text/javascript' src='{!m.firstThing}'/></aura:set>";
+        String extraStyleTags = "<aura:set attribute='extraStyleTags'><script type='text/javascript' src='{!m.readOnlyThing}'/></aura:set>";
+        String extraMetaTags = "<aura:set attribute='extraMetaTags'><meta content='testtest' name='{!m.firstThing}'/></aura:set>";
+        DefDescriptor<ComponentDef> scriptTagInBodyOfTemplate = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(
+                        baseComponentTag,
+                        "isTemplate='true' extends='aura:template' model='java://org.auraframework.impl.java.model.TestModel'",
+                        extraScriptTags + extraStyleTags + extraMetaTags));
+
+        StringBuffer sb = new StringBuffer();
+        Component template = Aura.getInstanceService().getInstance(scriptTagInBodyOfTemplate);
+        Aura.getRenderingService().render(template, sb);
+        String result = sb.toString();
+        assertTrue("extraScriptTags attribute on aura:template could not retrieve value off model",
+                result.contains("<script type=\"text/javascript\" src=\"firstThingDefault\""));
+        assertTrue("extraStyleTags attribute on aura:template could not retrieve value off model",
+                result.contains("<script type=\"text/javascript\" src=\"readonly\""));
+        assertTrue("extraMetaTags attribute on aura:template could not retrieve value off model",
+                result.contains("<meta content=\"testtest\" name=\"firstThingDefault\""));
     }
 
     private void assertExceptionDueToScripts(String msg, DefDescriptor<? extends BaseComponentDef> desc,

@@ -168,7 +168,7 @@ public class JavaModel implements Model {
 
     private static AuraRuntimeException makeException(String message, Throwable cause, ModelDef def) {
         if (def != null) {
-            return new AuraExecutionException(cause, def.getLocation());
+            return new AuraExecutionException(message,def.getLocation(),cause);
         } else {
             return new AuraRuntimeException(message, cause);
         }

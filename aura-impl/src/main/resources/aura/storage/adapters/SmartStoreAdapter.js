@@ -264,7 +264,6 @@ SmartStoreAdapter.prototype.clear = function(successCallback, errorCallback) {
 // Note that any caller that also wants to remove the items will have to get the smartstore internal id for each item in order to delete
 // Which is what removeItem does
 SmartStoreAdapter.prototype.getExpired = function(successCallback, errorCallback) {
-
 	if($A.util.isUndefinedOrNull(successCallback)) {
         throw new Error("No successCallback passed to getExpired");
     }
@@ -272,7 +271,12 @@ SmartStoreAdapter.prototype.getExpired = function(successCallback, errorCallback
     if($A.util.isUndefinedOrNull(errorCallback)) {
         errorCallback = function(){};
     }
+    
+    var expired = [];
+    successCallback(expired);
 
+    /* TODO: Uncomment and fix after getExpired is properly fixed. */
+    /*
     var that = this;
     this.setup(function(){
         that._logger("getExpired");
@@ -282,12 +286,9 @@ SmartStoreAdapter.prototype.getExpired = function(successCallback, errorCallback
             that.SOUP_NAME,
             querySpec,
             function(cursor) {
-                var expired = [];
-                successCallback(expired);
-                
-                /* TODO: Uncomment and fix after getExpired is properly fixed. */
-                /*
                 var cursorIterator = new SmartStoreCursorIterator(that._smartstore, cursor);
+                var expired = [];
+                
                 cursorIterator.iterateAll(
                     function(item){
                         // on each iteration, add the key to the expired items
@@ -301,13 +302,13 @@ SmartStoreAdapter.prototype.getExpired = function(successCallback, errorCallback
                         that.handleSmartStoreError("getExpired", "moveCursorToNextPage", err, errorCallback);
                     },
                     true);
-                */
             },
             function(err) {
                 that.handleSmartStoreError("getExpired", "querySoup", err, errorCallback);
             });
     },
     errorCallback);
+    */
 };
 
 //Internals

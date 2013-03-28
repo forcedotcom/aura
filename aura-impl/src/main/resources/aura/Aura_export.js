@@ -24,6 +24,7 @@ $A.ns.Aura.prototype["message"] = $A.ns.Aura.prototype.message;
 $A.ns.Aura.prototype["get"] = $A.ns.Aura.prototype.get;
 $A.ns.Aura.prototype["getRoot"] = $A.ns.Aura.prototype.getRoot;
 $A.ns.Aura.prototype["getContext"] = $A.ns.Aura.prototype.getContext;
+$A.ns.Aura.prototype["run"] = $A.ns.Aura.prototype.run;
 $A.ns.Aura.prototype["unwrap"] = $A.ns.Aura.prototype.unwrap;
 $A.ns.Aura.prototype["assert"] = $A.ns.Aura.prototype.assert;
 $A.ns.Aura.prototype["userAssert"] = $A.ns.Aura.prototype.userAssert;

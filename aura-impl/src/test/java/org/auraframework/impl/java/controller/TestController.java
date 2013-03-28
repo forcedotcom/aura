@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.java.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
@@ -56,5 +57,13 @@ public class TestController {
         Map<String, Object> m = Maps.newHashMap();
         m.put("string", Lists.newArrayList(s));
         return Aura.getInstanceService().getInstance("forEachDefTest:basicDataType", ComponentDef.class, m);
+    }
+    
+    @AuraEnabled
+    public static List<String> getAppCacheUrls() throws Exception{
+        List<String> urls = Lists.newArrayList();
+        urls.add("/auraFW/resources/aura/auraIdeLogo.png");
+        urls.add("/auraFW/resources/aura/resetCSS.css");
+        return urls;
     }
 }

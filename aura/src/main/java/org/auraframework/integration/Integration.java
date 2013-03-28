@@ -24,7 +24,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * An Integration defines the scope of creating a set of component injection
  * scripts
- * 
+ *
  * @author dchasman
  * @since 184
  */
@@ -33,7 +33,7 @@ public interface Integration {
      * Generates a &lt;script&gt; tag that will correctly embed an instance of an
      * Aura
      * component bound to the DOM element identified by localDomId.
-     * 
+     *
      * @param tag
      *            Fully qualified (namespace:name) name of the Aura component.
      * @param attributes
@@ -51,7 +51,7 @@ public interface Integration {
      * @throws QuickFixException
      */
     void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId, Appendable out)
-            throws AuraRuntimeException,
+            throws UnsupportedUserAgentException, AuraRuntimeException,
             IOException, QuickFixException;
 
     @Deprecated

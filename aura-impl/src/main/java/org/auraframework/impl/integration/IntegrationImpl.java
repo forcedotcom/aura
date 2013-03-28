@@ -28,6 +28,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.instance.Action;
 import org.auraframework.integration.Integration;
+import org.auraframework.integration.UnsupportedUserAgentException;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
@@ -48,16 +49,20 @@ import com.google.common.collect.Sets;
 
 public class IntegrationImpl implements Integration {
     public IntegrationImpl(String contextPath, Mode mode, boolean initializeAura, String userAgent) {
+        this.client = userAgent != null ? new Client(userAgent) : null;
         this.contextPath = contextPath;
         this.mode = mode;
         this.initializeAura = initializeAura;
-        this.userAgent = userAgent;
     }
 
     @Override
     public void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
-            Appendable out) throws IOException,
+            Appendable out) throws UnsupportedUserAgentException, IOException,
             QuickFixException {
+
+        if (!isSupportedClient(client)) {
+            throw new UnsupportedUserAgentException(client.getUserAgent());
+        }
 
         if (Aura.getContextService().isEstablished()) {
             throw new AuraRuntimeException(
@@ -98,7 +103,8 @@ public class IntegrationImpl implements Integration {
                         String name = eventDef.getAttributeName();
                         actionEventHandlers.put(name, (String) entry.getValue());
                     } else {
-                        throw new AuraRuntimeException(String.format("Unknown attribute or event %s - %s", tag, key));
+                        throw new AuraRuntimeException(
+                                String.format("Unknown attribute or event %s - %s", tag, key));
                     }
                 }
             }
@@ -182,8 +188,8 @@ public class IntegrationImpl implements Integration {
             context.setNum(num);
         }
 
-        if (userAgent != null) {
-            context.setClient(new Client(userAgent));
+        if (client != null) {
+            context.setClient(client);
         }
 
         // Always include ui: because we need ui:message etc for error handling
@@ -197,20 +203,26 @@ public class IntegrationImpl implements Integration {
     }
 
     private void writeApplication(Appendable out) throws IOException, AuraRuntimeException, QuickFixException {
-        AuraContext context = startContext(null);
-        try {
-            ApplicationDef appDef = getApplicationDescriptor().getDef();
+        if (isSupportedClient(client)) {
+            AuraContext context = startContext(null);
+            try {
+                ApplicationDef appDef = getApplicationDescriptor().getDef();
 
-            DefDescriptor<ApplicationDef> descriptor = appDef.getDescriptor();
-            context.addLoaded(descriptor, context.getDefRegistry().getUid(null, descriptor));
+                DefDescriptor<ApplicationDef> descriptor = appDef.getDescriptor();
+                context.addLoaded(descriptor, context.getDefRegistry().getUid(null, descriptor));
 
-            Aura.getSerializationService().write(appDef, null,
-                    descriptor.getDefType().getPrimaryInterface(), out, "EMBEDDED_HTML");
-        } catch (QuickFixException e) {
-            throw new AuraRuntimeException(e);
-        } finally {
-            Aura.getContextService().endContext();
+                Aura.getSerializationService().write(appDef, null,
+                        descriptor.getDefType().getPrimaryInterface(), out, "EMBEDDED_HTML");
+            } catch (QuickFixException e) {
+                throw new AuraRuntimeException(e);
+            } finally {
+                Aura.getContextService().endContext();
+            }
         }
+    }
+
+    private static boolean isSupportedClient(Client client) {
+        return client == null || client.getType() != Type.IE6;
     }
 
     private static DefDescriptor<ApplicationDef> getApplicationDescriptor() {
@@ -221,7 +233,7 @@ public class IntegrationImpl implements Integration {
     private final String contextPath;
     private final Mode mode;
     private final boolean initializeAura;
-    private final String userAgent;
+    private final Client client;
     private final Set<String> preloads = Sets.newHashSet();
     private boolean hasApplicationBeenWritten;
 }

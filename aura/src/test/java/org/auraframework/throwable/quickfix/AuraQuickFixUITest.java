@@ -36,7 +36,7 @@ public class AuraQuickFixUITest extends WebDriverTestCase {
      */
     public void testQuickFixDevMode() throws Exception {
         open("/foo/bar.cmp", Mode.DEV, false);
-        waitForAuraInit();
+        auraUITestingUtil.waitForAuraInit();
         Thread.sleep(1000);
         assertEquals("Create Component Definition", getText(CREATE_COMPONENT_BUTTON));
     }

@@ -430,7 +430,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 		triggerServerAction();
 		// wait for page to reload by checking that our tempVar is undefined
 		// again
-		waitUntil(new ExpectedCondition<Boolean>() {
+		auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
 			@Override
 			public Boolean apply(WebDriver input) {
 				return (Boolean) auraUITestingUtil
@@ -438,7 +438,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 			}
 		});
 		auraUITestingUtil.findDomElement(By.cssSelector("#click")).click();
-		waitUntil(new ExpectedCondition<Boolean>() {
+		auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
 			@Override
 			public Boolean apply(WebDriver input) {
 				return "meaningful".equals(auraUITestingUtil
@@ -491,7 +491,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 		updateStringSource(helperDesc,
 				"({getHelp:function(){return 'complicated';}})");
 		triggerServerAction();
-		waitUntil(new ExpectedCondition<Boolean>() {
+		auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
 			@Override
 			public Boolean apply(WebDriver input) {
 				return "complicated"
@@ -535,7 +535,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 				eventDesc,
 				"<aura:event type='APPLICATION'><aura:attribute name='explode' type='String' default='kaboom'/></aura:event>");
 		triggerServerAction();
-		waitUntil(new ExpectedCondition<Boolean>() {
+		auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
 			@Override
 			public Boolean apply(WebDriver input) {
 				return "kaboom"
@@ -610,7 +610,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 		updateStringSource(depDesc, String.format(baseComponentTag, "",
 				"<aura:attribute name='val' type='String' default='final'/>"));
 		triggerServerAction();
-		waitUntil(new ExpectedCondition<Boolean>() {
+		auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
 			@Override
 			public Boolean apply(WebDriver input) {
 				return "final"

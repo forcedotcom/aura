@@ -82,7 +82,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     private void assertNoStacktrace() throws Exception {
-        String actual = getQuickFixMessage().replaceAll("\\s+", " ");
+        String actual = auraUITestingUtil.getQuickFixMessage().replaceAll("\\s+", " ");
         assertEquals("Unable to process your request", actual);
     }
 
@@ -102,7 +102,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     private void assertStacktrace(String messageStartsWith, String... causeStartsWith) throws Exception {
-        String actual = getQuickFixMessage().replaceAll("\\s+", " ");
+        String actual = auraUITestingUtil.getQuickFixMessage().replaceAll("\\s+", " ");
         assertStacktraceCommon(actual, messageStartsWith, causeStartsWith);
     }
 
@@ -335,7 +335,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
             }
         });
         // Wait for page to reload and aura framework initialization
-        waitForAuraInit();
+        auraUITestingUtil.waitForAuraInit();
         waitForElementText(findDomElement(By.cssSelector(".uiOutputText")), "initial", true, 3000);
     }
 }

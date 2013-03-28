@@ -15,13 +15,21 @@
  */
 package org.auraframework.util;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import junit.framework.Assert;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.auraframework.util.json.JsonReader;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -274,6 +282,25 @@ public class AuraUITestingUtil {
     }
 
     /**
+     * Look for any quickfix exceptions. These can sometimes reflect a framework load failure but provide a better error
+     * message.
+     */
+    public void assertNoQuickFixMessage(Set<String> exceptForThese) {
+        String auraErrorMsg = getQuickFixMessage();
+        if (!auraErrorMsg.isEmpty()) {
+            if(exceptForThese != null){
+                // Compare against any expected failures
+                for (String allowedException : exceptForThese) {
+                    if (auraErrorMsg.contains(allowedException)) {
+                        return;
+                    }
+                }
+            }
+            Assert.fail("Initialization error: " + auraErrorMsg);
+        }
+    }
+
+    /**
      * Find first matching element in the DOM.
      * 
      * @param locator
@@ -297,6 +324,97 @@ public class AuraUITestingUtil {
                     element = null;
                 }
                 return null;
+            }
+        });
+    }
+
+    public String getQuickFixMessage() {
+        WebElement errorBox = driver.findElement(By.id("auraErrorMessage"));
+        if (errorBox == null) {
+            Assert.fail("Aura quick fix errorBox not found.");
+        }
+        return errorBox.getText();
+    }
+
+    /**
+     * @return true if Aura framework has loaded
+     */
+    public boolean isAuraFrameworkReady() {
+        return getBooleanEval("return window.$A ? window.$A.finishedInit === true : false;");
+    }
+
+
+    /**
+     * Wait until the provided Function returns true or non-null. Any uncaught javascript errors will trigger an
+     * AssertionFailedError.
+     */
+    public <V> V waitUntil(Function<? super WebDriver, V> function) {
+        return waitUntil(function, timeoutInSecs);
+    }
+
+    /**
+     * Wait the specified number of seconds until the provided Function returns true or non-null. Any uncaught
+     * javascript errors will trigger an AssertionFailedError.
+     */
+    public <V> V waitUntil(Function<? super WebDriver, V> function, long timeoutInSecs) {
+        WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
+        return wait.until(addErrorCheck(function));
+    }
+
+    public void waitForAuraInit(){
+        waitForAuraInit(null);
+    }
+    
+    /**
+     * Wait until Aura has finished initialization or encountered an error.
+     */
+    public void waitForAuraInit(final Set<String> expectedErrors) {
+        waitForDocumentReady();
+        waitForAuraFrameworkReady(expectedErrors);
+        waitForAppCacheReady();
+    }
+
+    /**
+     * Wait for the document to enter the complete readyState.
+     */
+    public void waitForDocumentReady() {
+        waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return (Boolean) getRawEval("return document.readyState === 'complete'");
+            }
+        });
+    }
+
+    /**
+     * First, verify that window.$A has been installed. Then, wait until {@link #isAuraFrameworkReady()} returns true.
+     * We assume the document has finished loading at this point: callers should have previously called
+     * {@link #waitForDocumentReady()}.
+     */
+    public void waitForAuraFrameworkReady(final Set<String> expectedErrors) {
+        // Umbrella check for any framework load error.
+        if (!(Boolean) getRawEval("return !!window.$A")) {
+            Assert.fail("Initialization error: document loaded without $A. Perhaps the initial GET failed.");
+        }
+
+        WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
+        wait.ignoring(StaleElementReferenceException.class).until(
+                new Function<WebDriver, Boolean>() {
+                    @Override
+                    public Boolean apply(WebDriver input) {
+                        assertNoQuickFixMessage(expectedErrors);
+                        return isAuraFrameworkReady();
+                    }
+                });
+    }
+
+    public void waitForAppCacheReady() {
+        waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return getBooleanEval("var cache=window.applicationCache;"
+                                + "return $A.util.isUndefinedOrNull(cache) || "
+                                + "(cache.status===cache.UNCACHED)||(cache.status===cache.IDLE)||(cache.status===cache.OBSOLETE);");
             }
         });
     }

@@ -40,7 +40,7 @@ public class AuraModelExceptionUITest extends WebDriverTestCase {
     @UnAdaptableTest
     public void testRendererException() throws Exception {
         openNoAura("/auratest/testModelThatThrowsInRenderer.cmp");
-        waitForDocumentReady();
+        auraUITestingUtil.waitForDocumentReady();
         List<WebElement> errorBoxes = getDriver().findElements(By.cssSelector(".auraForcedErrorBox"));
         assertEquals("Element not found", 1, errorBoxes.size());
         assertTrue("Error not displayed", errorBoxes.get(0).isDisplayed());
@@ -48,7 +48,7 @@ public class AuraModelExceptionUITest extends WebDriverTestCase {
 
     public void testModelSerializationException() throws Exception {
         openNoAura("/auratest/testModelThatThrows.cmp");
-        waitForDocumentReady();
+        auraUITestingUtil.waitForDocumentReady();
         List<WebElement> errorBoxes = getDriver().findElements(By.cssSelector(".auraForcedErrorBox"));
         assertEquals("Renderer element found", 0, errorBoxes.size());
         WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSecs);

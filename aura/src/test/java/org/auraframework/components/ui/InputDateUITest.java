@@ -476,7 +476,7 @@ public class InputDateUITest extends WebDriverTestCase {
         String fmt= dtFormat.format(cal.getTime());
 
         //Test Begins
-        waitForDocumentReady();
+        auraUITestingUtil.waitForDocumentReady();
         
         //Checking if date sent in as 2012-12-24 registers correctly after opening calendar
         WebElement element = driver.findElement(By.cssSelector(dateCSS));

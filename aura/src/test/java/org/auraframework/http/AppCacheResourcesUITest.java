@@ -490,8 +490,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
             String fwToken) throws Exception {
         TestLoggingAdapterController.beginCapture();
         open(String.format("/%s/%s.app", namespace, appName));
-        waitForAppCacheReady();
-        WebElement elem = waitUntil(new Function<WebDriver, WebElement>() {
+        auraUITestingUtil.waitForAppCacheReady();
+        WebElement elem = auraUITestingUtil.waitUntil(new Function<WebDriver, WebElement>() {
             @Override
             public WebElement apply(WebDriver input) {
                 WebElement find = findDomElement(By.cssSelector(".clickableme"));

@@ -343,7 +343,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     public void testGetUnhandledError() throws Exception {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
-                "<aura:application><aura:text/></aura:application>");
+                "<aura:application><aura:attribute type='bah'/></aura:application>");
         GetMethod get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
         getHttpClient().executeMethod(get);
         assertEquals(HttpStatus.SC_NOT_FOUND, get.getStatusCode());

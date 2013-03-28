@@ -191,42 +191,19 @@ Action.prototype.complete = function(response) {
     this.returnValue = response.returnValue;
     this.error = response.error;
     this.storage = response["storage"];
-    
-    var completeAction = true;
-    if (this.originalResponse) {
-		// Compare the refresh response with the original response and only complete the action if they differ
-		var originalValue = $A.util.json.encode(this.originalResponse["returnValue"]);
-		var refreshedValue = $A.util.json.encode(response["returnValue"]);
-		if (refreshedValue === originalValue) {
-			var originalComponents = $A.util.json.encode(this.originalResponse["components"]);
-			var refreshedComponents = $A.util.json.encode(response["components"]);
-			if (refreshedComponents === originalComponents) {
-				completeAction = false;
-				
-		        var storageService = this.getStorage();
-                storageService.log("Action.complete(): no change in refresh action response, skipping replay.", this);
-                
-                this.fireRefreshEvent(this, this.getComponent(), "refreshEnd");
-			}
-		}
-    }
 
     var context = $A.getContext();
     var previous = context.setCurrentAction(this);
     try {
+        // Add in any Action scoped components /or partial configs
         var components = response["components"];
-        
-        
-    	if (completeAction) {
-	        // Add in any Action scoped components /or partial configs
-	        if (components) {
-	            context.joinComponentConfigs(components);
-	        }
-	
-	        if (this.callback && (this.cmp === undefined || this.cmp.isValid())) {
-	            this.callback.call(this.callbackScope, this);
-	        }
-    	}
+        if (components) {
+            context.joinComponentConfigs(components);
+        }
+
+        if (this.callback && (this.cmp === undefined || this.cmp.isValid())) {
+            this.callback.call(this.callbackScope, this);
+        }
 
         var storage = this.getStorage();
         if (storage && this._isStorable() && this.getState() === "SUCCESS") {
@@ -254,8 +231,11 @@ Action.prototype.complete = function(response) {
 
                 storage.put(key, stored);
             } else {
+                // DCHASMAN TODO Just update the last accessed timestamp for the item
+                //storage.log("Updating last accessed timestamp for action in " + storageName + " storage adapter", key);
+
                 // Initiate auto refresh if configured to do so
-                this.refresh(response);
+                this.refresh();
             }
         }
     } finally {
@@ -376,7 +356,7 @@ Action.prototype.toJSON = function() {
  * Refreshes the Action. Used with storage.
  * @private
  */
-Action.prototype.refresh = function(originalResponse) {
+Action.prototype.refresh = function() {
     // If this action was served from storage let's automatically try to get the latest from the server too
     var storage = this.storage;
     if (storage) {
@@ -390,8 +370,16 @@ Action.prototype.refresh = function(originalResponse) {
             storageService.log("Action.refresh(): auto refresh begin", action);
 
             var cmp = action.getComponent();
-            this.fireRefreshEvent(action, cmp, "refreshBegin");
-            
+            if (cmp) {            
+            	var isRefreshObserver = cmp.isInstanceOf("auraStorage:refreshObserver");
+	            if (isRefreshObserver) {
+	                // If our component implements auraStorage:refreshObserver then let it know that refreshing has started
+	                cmp.getEvent("refreshBegin").setParams({
+	                    "action": action
+	                }).fire();
+	            }
+            }
+
             var refreshAction = action.getDef().newInstance(cmp);
             refreshAction.setCallback(action.callbackScope, action.callback);
             refreshAction.setParams(action.params);
@@ -399,19 +387,20 @@ Action.prototype.refresh = function(originalResponse) {
                 "ignoreExisting": true
             });
 
-            refreshAction.sanitizeStoredResponse(originalResponse);
-            refreshAction.originalResponse = originalResponse;
-            
             var originalCallbackScope = action.callbackScope;
             var originalCallback = action.callback;
-            
             refreshAction.setCallback(originalCallbackScope, function(a) {
                 if (originalCallback) {
                     // Chain to the original callback to let it do its thing
                     originalCallback.call(originalCallbackScope, a);
                 }
 
-                a.fireRefreshEvent(a, cmp, "refreshEnd");
+                if (isRefreshObserver) {
+                    // If our component implements auraStorage:refreshObserver then let it know that refreshing has finished
+                    a.getComponent().getEvent("refreshEnd").setParams({
+                        "action": a
+                    }).fire();
+                }
 
                 storageService.log("Action.refresh(): auto refresh end", a);
             });
@@ -426,30 +415,28 @@ Action.prototype.refresh = function(originalResponse) {
  * @private
  */
 Action.prototype.sanitizeStoredResponse = function(response) {
-	if (this.getStorage()) {
-		var santizedComponents = {};
+	var santizedComponents = {};
+	
+	var globalId;
+	var suffix = this.getId();
+	var components = response["components"];
+	for(globalId in components) {
+		var newGlobalId = globalId.substr(0, globalId.indexOf(":") + 1) + suffix;
 		
-		var globalId;
-		var suffix = this.getId();
-		var components = response["components"];
-		for(globalId in components) {
-			var newGlobalId = globalId.substr(0, globalId.indexOf(":") + 1) + suffix;
-			
-			// Rewrite the globalId
-			var c = components[globalId]; 
-			c["globalId"] = newGlobalId;
-			
-			santizedComponents[newGlobalId] = c; 
-		}
+		// Rewrite the globalId
+		var c = components[globalId]; 
+		c["globalId"] = newGlobalId;
 		
-		response["components"] = santizedComponents;
-		
-		var returnValue = response["returnValue"];
-		if(returnValue) {
-			globalId = returnValue["globalId"];
-			if(globalId) {
-				returnValue["globalId"] = globalId.substr(0, globalId.indexOf(":") + 1) + suffix;
-			}
+		santizedComponents[newGlobalId] = c; 
+	}
+	
+	response["components"] = santizedComponents;
+	
+	var returnValue = response["returnValue"];
+	if(returnValue) {
+		globalId = returnValue["globalId"];
+		if(globalId) {
+			returnValue["globalId"] = globalId.substr(0, globalId.indexOf(":") + 1) + suffix;
 		}
 	}
 };
@@ -462,21 +449,5 @@ Action.prototype.sanitizeStoredResponse = function(response) {
 Action.prototype.getStorage = function() {
     return $A.storageService.getStorage("actions");
 };
-
-/**
- * @private
- */
-Action.prototype.fireRefreshEvent = function(action, cmp, event) {
-	if (cmp) {            
-		var isRefreshObserver = cmp.isInstanceOf("auraStorage:refreshObserver");
-	    if (isRefreshObserver) {
-	        // If our component implements auraStorage:refreshObserver then let it know that refreshing has started
-	        cmp.getEvent(event).setParams({
-	            "action": action
-	        }).fire();
-	    }
-	}
-};
-
 
 //#include aura.controller.Action_export

@@ -23,9 +23,4 @@
 	<aura:html tag="object" aura:id="objecttag">unsupported tag</aura:html><br/>
 	<aura:html tag="abc" aura:id="invalidtag">invalid tag</aura:html><br/>
 	-->
-	
-	<!-- TODO : @auraframework - uncommment after bug W-1538541
-	<aura:html aura:id="blank">blank html component</aura:html><br/>
-	<aura:html aura:id="notag" href="www.salesforce.com">no tag</aura:html><br/>
-	-->
 </aura:component>

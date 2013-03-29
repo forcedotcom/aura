@@ -15,6 +15,7 @@
             cmp.getDef().getHelper().findAndSetText(cmp, "staticCounter", returnValue.Counter); 
             cmp.getDef().getHelper().findAndSetText(cmp, "responseData", returnValue.Data);
             cmp.getDef().getHelper().findAndSetText(cmp, "isFromStorage", a.isFromStorage());
+            cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter", parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
         });
         if(additionalProperties){
             additionalProperties(a);

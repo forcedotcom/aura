@@ -13,33 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.components.ui;
+package org.auraframework.components.ui.inputDate;
 
 
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
-import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.auraframework.util.json.JsonReader;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 
 public class InputDateUITest extends WebDriverTestCase {
 
@@ -47,6 +34,7 @@ public class InputDateUITest extends WebDriverTestCase {
     private final String URL = "/uitest/datePickerTest.cmp";
 
     private final String dateStr = "yyyy-MM-dd";
+    private final String inDate = "2012-12-24";
     private final String dateStrTogether = "yyyyMMdd";
     private final String mnthYr = "MMMMMMMMM yyyy";
 
@@ -61,68 +49,7 @@ public class InputDateUITest extends WebDriverTestCase {
     public InputDateUITest(String name) {
         super(name);
     }
-    @SuppressWarnings("unchecked")
-    private void getValueByLocale(String locale, String dayOfWeek, String month, Map<String, String> urlAuraParameters)
-            throws Exception {
-        String query = "";
-
-        List<NameValuePair> params = Lists.newArrayList();
-
-        for (Map.Entry<String, String> entry : urlAuraParameters.entrySet()) {
-            params.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
-        }
-        query = URLEncodedUtils.format(params, "UTF-8");
-
-        // final url Request to be send to server
-        String url = "aura?" + query;
-
-        GetMethod get = obtainGetMethod(url);
-        get.addRequestHeader("Accept-Language", locale);
-        getHttpClient().executeMethod(get);
-        String response = get.getResponseBodyAsString();
-        int statusCode = getHttpClient().executeMethod(get);
-        if (HttpStatus.SC_OK != statusCode) {
-            fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
-                    HttpStatus.SC_OK, response));
-        }
-        Map<String, Object> json = (Map<String, Object>) new JsonReader().read(response
-                .substring(AuraBaseServlet.CSRF_PROTECT.length()));
-
-        System.out.println(json.toString());
-
-        //Grab the object you are looking for from the json tree
-        Map<String, Object> context = (Map<String, Object>) json.get("context");
-        Map<String, Object> components = (Map<String, Object>) context.get("components");
-        Map<String, Object>  num10= (Map<String, Object>) components.get("10");
-        Map<String, Object>  valueMap = (Map<String, Object>) num10.get("value");
-        Map<String, Object> model = (Map<String, Object>) valueMap.get("model");
-        ArrayList<Map<String, Object>> monthLabels = (ArrayList<Map<String, Object>>) model.get("monthLabels");
-        ArrayList<Map<String, Object>> weekDayLabels = (ArrayList<Map<String, Object>>) model.get("weekdayLabels");
-        Map<String, Object> weekdayFromServer = weekDayLabels.get(1);
-        Map<String, Object> monthFromServer = monthLabels.get(0);
-
-        assertEquals("The week day in the new locale ("+locale+") matches",weekdayFromServer.get("fullName"),dayOfWeek);
-        assertEquals("The month in the new locale ("+locale+") matches",monthFromServer.get("fullName"),month);
-    }
-
-    // TODO W-1591951
-    @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
-    public void _testCheckLocale() throws Exception{
-        Map<String, String> urlAuraParameters = ImmutableMap.of("aura.tag", "uiTest:datePickerTest", "aura.context",
-                "{'mode':'DEV'}", "visible","true");
-
-        //Monday in Chinese
-        String dayOfWeek = "星期一";
-
-        //January in chinese
-        String month = "一月";
-
-        //Chinese locale symbol
-        String locale = "zh";
-
-        getValueByLocale(locale, dayOfWeek, month, urlAuraParameters);
-    }
-
+    
     private String homeEndButtonHelper(String initDate, Keys buttonToPress)
     {
         WebDriver driver = getDriver();
@@ -258,7 +185,8 @@ public class InputDateUITest extends WebDriverTestCase {
         //Making sure the textBox is empty so we always start at the same date
         WebElement element = driver.findElement(By.cssSelector(dateCSS));
         element.clear();
-
+        element.sendKeys(inDate);
+        
         //Grabbing the Date Icon and click on it to open the calendar
         element = driver.findElement(By.cssSelector(dateIcon));
         element.click();
@@ -286,14 +214,15 @@ public class InputDateUITest extends WebDriverTestCase {
     //Testing the functionality of page_down, page_up, shift+page_down, shift+page_up
     @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.IE10,BrowserType.IE9, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testPageUpDownYear() throws Exception {
-        open(URL);
-
+    	DateFormat formatter = new SimpleDateFormat (dateStr);
+    	open(URL);
         //Calendar used to get current date
         GregorianCalendar cal = new GregorianCalendar();
         //Running test, Increasing year
         String result = pageUpDownHelper( 10, Keys.SHIFT+""+Keys.PAGE_UP);
 
         //Moving calendar to match corresponding action of test and formatting date
+        cal.setTime(formatter.parse(inDate));
         cal.add(Calendar.YEAR, -10);
 
         //Formatting date to match out of test
@@ -309,6 +238,7 @@ public class InputDateUITest extends WebDriverTestCase {
         result = pageUpDownHelper( 15, Keys.SHIFT+""+Keys.PAGE_DOWN);
 
         //Moving calendar to match corresponding action of test and formatting date
+        cal.setTime(formatter.parse(inDate));
         cal.add(Calendar.YEAR, 15);
         fmt = new SimpleDateFormat (dateStr).format(cal.getTime());
 
@@ -320,8 +250,9 @@ public class InputDateUITest extends WebDriverTestCase {
     //Testing the functionality of page_down, page_up, shift+page_down, shift+page_up
     @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testPageUpDownMonth() throws Exception {
-        open(URL);
-
+        DateFormat formatter = new SimpleDateFormat (dateStr);
+    	open(URL);
+    	
         //Calendar used to get current date
         GregorianCalendar cal = new GregorianCalendar();
 
@@ -329,9 +260,9 @@ public class InputDateUITest extends WebDriverTestCase {
         String result = pageUpDownHelper(4, ""+Keys.PAGE_UP);
 
         //Moving calendar to match corresponding action of test and formatting date
+        cal.setTime(formatter.parse(inDate));
         cal.add(Calendar.MONTH, -4);
         String fmt = new SimpleDateFormat (dateStr).format(cal.getTime());
-
         assertEquals("Page up went to the correct date", fmt,result );
 
         //Resetting calendar
@@ -341,6 +272,7 @@ public class InputDateUITest extends WebDriverTestCase {
         result = pageUpDownHelper( 10, ""+Keys.PAGE_DOWN);
 
         //Moving calendar to match corresponding action of test and formatting date
+        cal.setTime(formatter.parse(inDate));
         cal.add(Calendar.MONTH, 10);
         fmt = new SimpleDateFormat (dateStr).format(cal.getTime());
 

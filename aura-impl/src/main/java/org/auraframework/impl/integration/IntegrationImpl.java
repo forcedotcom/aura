@@ -222,7 +222,7 @@ public class IntegrationImpl implements Integration {
     }
 
     private static boolean isSupportedClient(Client client) {
-        return client == null || client.getType() != Type.IE6;
+        return client == null || (client.getType() != Type.IE6 && client.getType() != Type.OTHER);
     }
 
     private static DefDescriptor<ApplicationDef> getApplicationDescriptor() {

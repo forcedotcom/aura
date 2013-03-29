@@ -53,6 +53,8 @@ public class Client {
             type = Type.IE8;
         } else if (ua.contains("msie 7")) {
             type = Type.IE7;
+        } else if (ua.contains("msie 6")) {
+            type = Type.IE6;
         } else {
             type = Type.OTHER;
         }

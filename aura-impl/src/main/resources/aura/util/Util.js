@@ -584,7 +584,12 @@ $A.ns.Util.prototype.on = (function() {
             }
 
             // Eliminate registration of duplicate handlers on older browsers
-        	var handlers = element["handlers"];
+            var handlerCache = element["handlerCache"];
+            if (!handlerCache) {
+            	element["handlerCache"] = handlerCache = {};
+            }
+            
+        	var handlers = handlerCache[eventName];
         	if (handlers) {
         		for (var n = 0; n < handlers.length; n++) {
         			if (handlers[n] === handler) {
@@ -595,7 +600,7 @@ $A.ns.Util.prototype.on = (function() {
         		
     			handlers.push(handler);
         	} else {
-        		element["handlers"] = [handler];
+        		handlerCache[eventName] = [handler];
         	}
         	
             if (timeout) {

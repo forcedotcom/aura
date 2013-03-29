@@ -19,13 +19,14 @@
 
     <aura:set attribute="title" value="Displaying Messages"/>
     <h3><code>ui:dialog</code></h3>
-    <p>Use <code>ui:dialog</code> for overlay and modal dialogs. You can use <code>ui:dialogButtons</code> for buttons in the dialog window, which comes with default 'OK' and 'Cancel' buttons, or provide your own.
-    <code>ui:dialog</code> must be used with a <code>ui:dialogManager</code> component, which handles the opening and closing of your dialogs. Only one instance of <code>ui:dialogManager</code> is required to support all your dialogs.  
+    <p>Use <code>ui:dialog</code> for overlay and modal dialogs. You can use <code>ui:dialogButtons</code> for buttons in the dialog window. Setting <code>&lt;ui:dialogButtons defaultButtons="both"&gt;</code> provides default 'OK' and 'Cancel' buttons, 
+    but you can provide your own buttons using <code>ui:button</code> components.</p>
+    <p><code>ui:dialog</code> requires a <code>ui:dialogManager</code> component, which handles the opening and closing of your dialogs. You only need one instance of <code>ui:dialogManager</code> in a component to support multiple dialogs.  
     </p>
     <auradocs:info>See the <auradocs:defLink descriptor="ui:dialog">ui:dialog</auradocs:defLink> component reference.</auradocs:info>
     
-    <p>This demo shows an overlay dialog. You can use the <code>clickOutToClose="false"</code> to prevent the dialog from being closed when you click outside of the dialog area.
-    Note that you can use the <code>ui:openDialog</code> and <code>ui:closeDialog</code> to handle the opening and closing of your dialogs. Take a look at the js://controller source tab to see how you can implement these events.</p>
+    <p>This demo shows an overlay dialog. Set <code>clickOutToClose="false"</code> to prevent the dialog from being closed when you click outside of the dialog area.
+    Note that you can use the <code>ui:openDialog</code> and <code>ui:closeDialog</code> application events to handle the opening and closing of your dialogs. Take a look at the js://controller source tab to see how you can implement these events.</p>
     <auradocs:info>See  <auradocs:defLink descriptor="ui:openDialog" defType="event">ui:openDialog</auradocs:defLink> and <auradocs:defLink descriptor="ui:closeDialog" defType="event">ui:closeDialog</auradocs:defLink> for supported parameters.</auradocs:info>
     <auradocs:example descriptor="auradocs:demoDialog" />
     

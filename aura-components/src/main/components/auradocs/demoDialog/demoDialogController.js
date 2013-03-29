@@ -29,8 +29,7 @@
 		var msg= cmp.find('overlay');
 		var close = $A.get("e.ui:closeDialog");
 		close.setParams({
-			dialog : msg,
-			confirmClicked : true
+			dialog : msg
 		});
 		close.fire();
 	}

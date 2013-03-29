@@ -36,4 +36,9 @@
     
     <aura:attribute name="href" default="http://bazinga.com/" type="String"/>
     <a aura:id="specialAttributes_a" href="{!v.href}"/>
+    
+    <div ontouchend="{!c.handleTouchEnd}" onclick="{!c.handleOnClick}" aura:id="bothTouchEndAndClickHandlers"/>
+    <div onclick="{!c.handleOnClick}" aura:id="onlyClickHandler"/>
+    <div ontouchend="{!c.handleTouchEnd}" aura:id="onlyTouchEndHandler"/>
+    
 </aura:component>

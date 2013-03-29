@@ -22,7 +22,7 @@
             // add a proxy function that logs which component is associating which element
             var log = [];
             var proto = $A.test.getPrototype(component);
-            var override = $A.test.addFunctionHandler(proto, proto["associateElement"],
+            var override = $A.test.addFunctionHandler(proto, "associateElement",
                 function(){
                     var config = arguments[0];
                     log.push(this.getDef().getDescriptor() + ":" + this.getGlobalId()

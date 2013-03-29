@@ -424,7 +424,7 @@
             var helper = component.getDef().getHelper();
 
             // Mock fireEvent to do something we can use to test logic in fireEvents (its caller)
-            $A.test.overrideFunction(helper, helper.fireEvent,
+            $A.test.overrideFunction(helper, "fireEvent",
                 function (component, target, eventType, listViewEventType, rawEvent, data) {
                     ++actual;
                 });
@@ -617,7 +617,7 @@
         var helper = component.getDef().getHelper();
         var fireEventsCalled = false;
 
-        $A.test.overrideFunction(helper, helper.fireEvents,
+        $A.test.overrideFunction(helper, "fireEvents",
                 function (component, target, eventType, listViewEventType, rawEvent, data) {
                     fireEventsCalled = true;
                 });
@@ -636,7 +636,7 @@
         var helper = component.getDef().getHelper();
 
         // Mock fireEvent to do something we can use to test logic in fireEvents (its caller)
-        $A.test.overrideFunction(helper, helper.fireEvent,
+        $A.test.overrideFunction(helper, "fireEvent",
             function (list, target, eventType, listViewEventType, rawEvent, data) {
                 actualComponents.push(target);
             });

@@ -39,6 +39,8 @@
     <p>The base component in Aura is <code>aura:component</code>. Every component extends this base component.</p>
 
     <p>The renderer for <code>aura:component</code> is in <code>componentRenderer.js</code>. This renderer has base implementations for the <code>render()</code>, <code>rerender()</code>, <code>afterRender()</code>, and <code>unrender()</code> functions. The framework calls these functions as part of the rendering lifecycle. We will learn more about them in this topic. You can override the base rendering functions in a custom renderer.</p>
+    
+    <auradocs:info>When you create a new component using the component service, Aura fires an <code>init</code> event to initialize the metadata for the component. The default renderer, <code>render()</code>, gets the component body and use the rendering service to render it.</auradocs:info>
 
     <h2>Creating a Renderer</h2>
 
@@ -53,7 +55,6 @@
     ...
 </aura:component>]]>
 </auradocs:codeblock>
-
      <auradocs:warning>If you are reusing a renderer from another component and you already have an auto-wired renderer in your component bundle, the methods in your auto-wired renderer will not be accessible.
          We recommend that you use a renderer  within the component bundle for maintainability and use an external renderer  only if you must.</auradocs:warning>
 

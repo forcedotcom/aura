@@ -76,12 +76,17 @@
     <p>In the last sample, the <code>localId</code> is set on the component after it is created and returned from the server using <code>action.getReturnValue()</code>. 
     Additionally, <code>newComponent()</code> can take in an optional argument for the value provider. The value provider, 
     <code>parentCmp</code>, refers to the container or parent component that you want to be able to reference the new component.</p>
+    <auradocs:info><code>newLocalComponent()</code> is deprecated and has been replaced by <code>newComponent()</code>. See the <a href="#reference?topic=api:AuraComponentService">JavaScript API reference</a> for a full list of methods.</auradocs:info>
+    
+    <h4>Server-Side Dependencies</h4>
     <p> 
     If the component you are dynamically creating requires a server call such as to a model or provider, <code>newComponent()</code> returns an <code>aura:placeholder</code> component.
-    The server then returns the component to the client and replaces the placeholder.
+    The server then returns the component to the client and replaces the placeholder.</p>
+    <auradocs:warning>If you have any server-side dependencies, create your components on the server and instantiate it on the client. This restriction also applies to components that contain other components with any server-side dependencies.</auradocs:warning>
+    <p>
+    <h4>Adding Event Handlers</h4>
     To add an event handler to the new component, use <code>component.addHandler()</code> in your client-side controller. See <auradocs:topicLink topic="dynamicHandler">Dynamically Adding Event Handlers</auradocs:topicLink> for more information.
     </p>
-    <auradocs:info><code>newLocalComponent()</code> is deprecated and has been replaced by <code>newComponent()</code>. See the <a href="#reference?topic=api:AuraComponentService">JavaScript API reference</a> for a full list of methods.</auradocs:info>
 
     <p><b>See also:</b><br/>
       <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>

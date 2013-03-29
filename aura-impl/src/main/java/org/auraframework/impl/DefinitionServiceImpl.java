@@ -246,14 +246,11 @@ public class DefinitionServiceImpl implements DefinitionService {
                     context.dropLoaded(descriptor);
                 } else {
                     // validate the uid.
-                    //
-                    // TODO: dev caching, don't pass null in, ever.
-                    //
                     String tuid = null;
                     QuickFixException qfe = null;
 
                     try {
-                        tuid = mdr.getUid(null, descriptor);
+                        tuid = mdr.getUid(uid, descriptor);
                     } catch (QuickFixException broke) {
                         //
                         // See note above. This is how we enforce precedence of ClientOutOfSyncException

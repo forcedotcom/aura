@@ -654,43 +654,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         }
     }
 
-    /**
-     * Get a definition from a registry, and build a compilingDef if needed.
-     * 
-     * This retrieves the definition, and if it is validated, simply puts it in the local cache, otherwise, it builds a
-     * CompilingDef for it, and returns that for further processing.
-     * 
-     * @param context The aura context for the compiling def.
-     * @param descriptor the descriptor for which we need a definition.
-     * @return A compilingDef for the definition, or null if not needed.
-     */
-    private <D extends Definition> CompilingDef<D> validateHelper(AuraContext context, DefDescriptor<D> descriptor)
-            throws QuickFixException {
-        DefRegistry<D> registry = null;
-        D def;
-
-        registry = getRegistryFor(descriptor);
-        def = registry.getDef(descriptor);
-        if (!def.isValid()) {
-            CompilingDef<D> cd = new CompilingDef<D>();
-            //
-            // If our def is not 'valid', we must have built it, which means we need
-            // to validate. There is a subtle race condition here where more than one
-            // thread can grab a def from a registry, and they may all validate.
-            //
-            context.setCurrentNamespace(def.getDescriptor().getNamespace());
-            def.validateDefinition();
-            cd.def = def;
-            cd.registry = registry;
-            cd.built = true;
-            cd.descriptor = descriptor;
-            return cd;
-        } else {
-            defs.put(descriptor, def);
-        }
-        return null;
-    }
-
     @Override
     public <T extends Definition> long getLastMod(String uid) {
         DependencyEntry de = localDependencies.get(uid);
@@ -728,53 +691,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             if (descriptor == null) {
                 return null;
             }
-            if (defs.containsKey(descriptor)) {
-                @SuppressWarnings("unchecked")
-                D def = (D) defs.get(descriptor);
-                return def;
-            }
-            DependencyEntry de = getDE(null, descriptor);
-            if (de == null) {
-                for (DependencyEntry det : localDependencies.values()) {
-                    if (det.dependencies != null && det.dependencies.contains(descriptor)) {
-                        de = det;
-                        break;
-                    }
-                }
-            }
-            if (de == null) {
-                //
-                // Not in any dependecies.
-                // This is often a bug, and should be logged.
-                //
+            if (!defs.containsKey(descriptor)) {
+                // We should use the compiled dependencies, but that makes this
+                // far to complicated for now.
                 compileDE(descriptor);
-                @SuppressWarnings("unchecked")
-                D def = (D) defs.get(descriptor);
-                return def;
             }
-            //
-            // found an entry.
-            // In this case, throw a QFE if we have one.
-            //
-            if (de.qfe != null) {
-                throw de.qfe;
-            }
-            //
-            // Now we need to actually do the build..
-            //
-            List<CompilingDef<?>> compiled = Lists.newArrayList();
-            AuraContext context = Aura.getContextService().getCurrentContext();
-            for (DefDescriptor<?> dd : de.dependencies) {
-                CompilingDef<?> def = validateHelper(context, dd);
-                if (def != null) {
-                    compiled.add(def);
-                }
-            }
-            finishValidation(context, compiled);
             @SuppressWarnings("unchecked")
             D def = (D) defs.get(descriptor);
             return def;
-
         } finally {
             rLock.unlock();
         }

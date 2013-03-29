@@ -587,7 +587,7 @@ $A.ns.Util.prototype.on = (function() {
         	var handlers = element["handlers"];
         	if (handlers) {
         		for (var n = 0; n < handlers.length; n++) {
-        			if (handler[n] === handler) {
+        			if (handlers[n] === handler) {
             			// Do not wire up duplicate handlers
             			return;
         			}

@@ -1050,11 +1050,11 @@
      * restored automatically after the current subtest, even if a fatal error happens
      * during the subtest.
      */
-    mockSmartStoreMethod:function(methodToMock, replacement){
+    mockSmartStoreMethod:function(methodNameToMock, replacement){
         // override the specified SmartStore method
         var override = $A.test.overrideFunction(
                 this.getSmartStore(), 
-                methodToMock,
+                methodNameToMock,
                 replacement);
         // keep as to-be-restored in case this test fails and we can't restore it ourselves
         this.overrides.push(override);
@@ -1077,7 +1077,7 @@
      */
     mockQuerySoupError:function(){
         this.mockSmartStoreMethod( 
-                this.getSmartStore().querySoup,
+                "querySoup",
                 function(soupName, querySpec, successCallback, errorCallback){
                     errorCallback("querySoup Mock Error");
                 });
@@ -1087,7 +1087,7 @@
      */
     mockUpsertSoupEntriesWithExternalIdError:function(){
         this.mockSmartStoreMethod( 
-                this.getSmartStore().upsertSoupEntriesWithExternalId,
+                "upsertSoupEntriesWithExternalId",
                 function(soupName, entriesToUpsert, externalId, successCallback, errorCallback){
                     errorCallback("upsertSoupEntriesWithExternalId Mock Error");
                 });
@@ -1097,7 +1097,7 @@
      */
     mockRemoveFromSoupError:function(){
         this.mockSmartStoreMethod(
-                this.getSmartStore().removeFromSoup,
+                "removeFromSoup",
                 function(soupName, id, successCallback, errorCallback){
                     errorCallback("removeFromSoup Mock Error");
                 });
@@ -1107,7 +1107,7 @@
      */
     mockRegisterSoupError:function(){
         this.mockSmartStoreMethod(
-                this.getSmartStore().registerSoup,
+                "registerSoup",
                 function(soupName, indeces, successCallback, errorCallback){
                     errorCallback("registerSoup Mock Error");
                 });
@@ -1117,7 +1117,7 @@
      */
     mockRemoveSoupError:function(){
         this.mockSmartStoreMethod(
-                this.getSmartStore().removeSoup,
+                "removeSoup",
                 function(soupName, successCallback, errorCallback){
                     errorCallback("removeSoup Mock Error");
                 });
@@ -1127,7 +1127,7 @@
      */
     mockMoveCursorToNextPageError:function(){
         this.mockSmartStoreMethod( 
-                this.getSmartStore().moveCursorToNextPage,
+                "moveCursorToNextPage",
                 function(cursor, successCallback, errorCallback){
                     errorCallback("moveCursorToNextPage Mock Error");
                 });

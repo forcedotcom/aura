@@ -452,8 +452,8 @@ var Test = function(){
          * Replace a function on an object with a restorable override.
          * @param {Object} instance
          * 				The instance of the object
-         * @param {function} originalFunction
-         * 				The function to be replaced
+         * @param {String} name
+         * 				The name of the function to be replaced
          * @param {function} newFunction
          * 				The new function that replaces originalFunction
          * @returns {function}
@@ -463,22 +463,19 @@ var Test = function(){
          * @throws {Error}
          *             Throws an error if instance does not have originalFunction as a property
          */
-        overrideFunction : function(instance, originalFunction, newFunction){
+        overrideFunction : function(instance, name, newFunction){
+            var originalFunction = instance[name];
+            if(!originalFunction) {
+                throw new Error("Did not find the specified function '" + name + "' on the given object!");
+            }
+            
+            instance[name] = newFunction;
+            
             var override = newFunction;
             override.originalInstance = instance;
             override.originalFunction = originalFunction;
             override["restore"] = function(){
-                var toRestore = override.originalInstance;
-                for(var q in toRestore){
-                    if(toRestore[q] === override){
-                        var original = override.originalFunction;
-                        // if we're restoring to an override, update it's pointer too
-                        if(original.originalInstance){
-                            original.originalInstance = override.originalInstance;
-                        }
-                        toRestore[q] = original;
-                    }
-                }
+            	override.originalInstance[name] = override.originalFunction;
             };
 
             // if we're overriding an override, update it's pointer to restore to us
@@ -486,16 +483,6 @@ var Test = function(){
                 originalFunction.originalInstance = override;
             }
 
-            var found = false;
-            for(var p in instance){
-                if(instance[p] === originalFunction){
-                    instance[p] = override;
-                    found = true;
-                }
-            }
-            if(!found) {
-                throw new Error("Did not find the specified function on the given object!");
-            }
             return override;
         },
 
@@ -508,8 +495,8 @@ var Test = function(){
          * the handler will be invoked with just the original arguments.
          * @param {Object} instance
          * 				The instance of the object
-         * @param {function} originalFunction
-         * 				The original function whose arguments are applied to the handler
+         * @param {String} name
+         * 				The name of the function whose arguments are applied to the handler
          * @param {function} newFunction
          * 				The target function to attach the handler to
          * @param {boolean} postProcess
@@ -520,9 +507,10 @@ var Test = function(){
          *             function that, when invoked, will restore originalFunction
          *             on instance
          */
-        addFunctionHandler : function(instance, originalFunction, newFunction, postProcess){
+        addFunctionHandler : function(instance, name, newFunction, postProcess){
             var handler = newFunction;
-            return $A.test.overrideFunction(instance, originalFunction, postProcess ?
+            var originalFunction = instance[name];
+            return $A.test.overrideFunction(instance, name, postProcess ?
                 function(){
                     handler.apply(this, originalFunction.apply(this, arguments), arguments);
                 } :

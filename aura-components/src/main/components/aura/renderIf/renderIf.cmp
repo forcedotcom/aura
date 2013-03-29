@@ -16,7 +16,7 @@
 
 -->
 <aura:component support="GA"
-    description="This component allows you to conditionally renders its contents. It will render its body only if isTrue evaluates to true. This has no effect on component creation, only on the actual rendering. The else attribute allows you to render an alternative when isTrue evaluates to false. The expression in isTrue is re-evaluated every time any value used in the expression changes. When the results of the expression change, it triggers a re-rendering of the component.">
+    description="This component allows you to conditionally render its contents. It renders its body only if isTrue evaluates to true. The else attribute allows you to render an alternative when isTrue evaluates to false. The expression in isTrue is re-evaluated every time any value used in the expression changes. When the results of the expression change, it triggers a re-rendering of the component. We recommend using aura:if instead of aura:renderIf to improve performance. aura:if instantiates the components in either its body or the else attribute, but not both. Only consider using aura:renderIf if you expect to show the components for both the true and false states, and it would require a server round trip to instantiate the components that aren't initially rendered.">
 
 <aura:attribute name="isTrue" type="Boolean" required="true" description="An expression that must evaluate to true to display the body of the component."/>
 <aura:attribute name="else" type="Aura.Component[]" description="The alternative content to render when isTrue evaluates to false, and the body is not rendered. Set using the &lt;aura:set&gt; tag."/>

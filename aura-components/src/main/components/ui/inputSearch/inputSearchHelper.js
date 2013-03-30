@@ -27,12 +27,8 @@
     preEventFiring: function(component, event) {
         if (!this.isEventSupported("search") && event.type === "keyup" && event.keyCode === 13) {
             // update component's value if updateOn is "search"
+        	this.handleUpdate(component, {type: "search"});
             var element = component.find("search").getElement();
-            var helper = component.getDef().getHelper();
-            var updateOn = helper.getUpdateOn(component);
-            if ("search" === updateOn) {
-                helper.doUpdate(component, helper.getDomElementValue(element));
-            }
             
             // fire Aura "search" event
             var e = component.getEvent("search");

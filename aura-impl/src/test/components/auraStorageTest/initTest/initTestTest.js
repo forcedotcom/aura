@@ -326,6 +326,7 @@
 								.getText(cmp.find("responseData").getElement()));
 						$A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
 						$A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
+						$A.test.assertEquals("1", $A.test.getText(cmp.find("callbackCounter").getElement()));
 					});
 				},
 				function(cmp) {
@@ -340,6 +341,7 @@
 						$A.test.assertEquals("1", $A.test.getText(cmp.find("staticCounter").getElement()),
 								"Failed to force a previously cached action to run at server.");
 						$A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
+						$A.test.assertEquals("2", $A.test.getText(cmp.find("callbackCounter").getElement()));
 					});
 				}, function(cmp) {
 					// Re-Run the action and mark it as storable. Expect to see
@@ -351,6 +353,7 @@
 						return $A.test.getText(cmp.find("staticCounter").getElement())
 					}, function() {
 						$A.test.assertEquals("true", $A.test.getText(cmp.find("isFromStorage").getElement()));
+						$A.test.assertEquals("3", $A.test.getText(cmp.find("callbackCounter").getElement()));
 					});
 				} ]
 	},
@@ -643,5 +646,126 @@
 	},
 	resetCounter : function(cmp, testName) {
 		cmp.getDef().getHelper().resetCounters(cmp, testName);
+	},
+
+	/**
+	 * If a refresh contains the same response as what is stored, then skip
+	 * replaying the callback. The callback for the stored response is still
+	 * executed.
+	 */
+	testRefreshResponseSameAsStored : {
+		attributes : {
+			defaultExpiration : 60,
+			defaultAutoRefreshInterval : 0 // refresh every action
+		},
+		test : [function(cmp) {
+				cmp._testName = "testSkipReplayOnIdenticalRefresh";
+				this.resetCounter(cmp, "testSkipReplayOnIdenticalRefresh");
+				$A.test.addWaitFor(false, $A.test.isActionPending);
+			}, function(cmp) {
+				var btn = cmp.find("RunActionAndStore");
+				var evt = btn.get("e.press");
+				evt.fire();
+				$A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())}, function() {
+					$A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
+					$A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
+				});
+			}, function(cmp) {
+				// reset so next response will be same as first
+				cmp._testName = "testSkipReplayOnIdenticalRefresh";
+				this.resetCounter(cmp, "testSkipReplayOnIdenticalRefresh");
+				$A.test.addWaitFor(false, $A.test.isActionPending);
+			}, function(cmp) {
+				var btn = cmp.find("RunActionAndStore");
+				var evt = btn.get("e.press");
+				evt.fire();
+				$A.test.addWaitFor("2", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())}, function() {
+					$A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
+					$A.test.assertEquals("true", $A.test.getText(cmp.find("isFromStorage").getElement()));
+				});
+			}
+		]
+	},
+
+	/**
+	 * If a refresh response differs from what is stored, process the callback.
+	 */
+	testRefreshResponseDiffersFromStore : {
+		attributes : {
+			defaultExpiration : 60,
+			defaultAutoRefreshInterval : 0 // refresh every action
+		},
+		test : [function(cmp) {
+				cmp._testName = "testSkipReplayOnIdenticalRefresh";
+				this.resetCounter(cmp, "testSkipReplayOnIdenticalRefresh");
+				$A.test.addWaitFor(false, $A.test.isActionPending);
+			}, function(cmp) {
+				var btn = cmp.find("RunActionAndStore");
+				var evt = btn.get("e.press");
+				evt.fire();
+				$A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())}, function() {
+					$A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
+					$A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
+				});
+			}, function(cmp) {
+				// this response will be different so callback count should be +2 (for get(), then refresh())
+				var btn = cmp.find("RunActionAndStore");
+				var evt = btn.get("e.press");
+				evt.fire();
+				$A.test.addWaitFor("3", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())}, function() {
+					$A.test.assertEquals("1", $A.test.getText(cmp.find("staticCounter").getElement()));
+					$A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
+				});
+			}
+		]
+	},
+
+	/**
+	 * Refresh error not stored, so subsequent refresh will still replay.
+	 */
+	testRefreshErrorResponseNotStored : {
+		mocks : [{
+		    type : "ACTION",
+			stubs : [{
+				method : { name : "fetchDataRecord" },
+				answers : [{
+					value : "anything really"
+				},{
+					error : "java.lang.IllegalStateException"
+				},{
+					value : "anything really"
+				}]
+			}]
+		}],
+		attributes : {
+			defaultExpiration : 60,
+			defaultAutoRefreshInterval : 0 // refresh every action
+		},
+		test : [function(cmp) {
+				var a = cmp.get("c.fetchDataRecord");
+				a.setStorable();
+				a.setCallback(cmp, function(action){
+		            cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter", parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
+				});
+				$A.run(function(){a.runAfter(a);});
+				$A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())});
+			}, function(cmp) {
+				var a = cmp.get("c.fetchDataRecord");
+				a.setStorable();
+				a.setCallback(cmp, function(action){
+		            cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter", parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
+				});
+				$A.run(function(){a.runAfter(a);});
+				$A.test.addWaitFor("3", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())});
+			}, function(cmp) {
+				var a = cmp.get("c.fetchDataRecord");
+				a.setStorable();
+				a.setCallback(cmp, function(action){
+		            cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter", parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
+				});
+				$A.run(function(){a.runAfter(a);});
+				$A.test.addWaitFor("4", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())});
+			}
+		]
 	}
 })

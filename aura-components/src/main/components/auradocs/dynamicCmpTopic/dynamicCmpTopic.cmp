@@ -19,7 +19,7 @@
     <aura:set attribute="title" value="Dynamically Creating Components"/>
 
     <h2>Goal</h2>
-    <p>You want to create a component dynamically from your client-side controller or helper. </p>
+    <p>You want to create a component dynamically from your client-side controller action or helper. </p>
 
     <h2>Code</h2>
     <p>This sample code adds a component to a <code>div</code> element.</p>

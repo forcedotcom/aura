@@ -17,7 +17,7 @@
 	changePage : function(component, targetPage, domEvent) {
 		targetPage = parseInt(targetPage, 10);
 		var pageCount = parseInt(component.get("v.pageCount"), 10);
-		if (isNaN(targetPage) || isNaN(pageCount) || targetPage > pageCount) {
+		if (isNaN(targetPage) || targetPage <= 0 || isNaN(pageCount) || targetPage > pageCount) {
 			return false;
 		}
 

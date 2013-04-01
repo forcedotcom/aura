@@ -19,6 +19,7 @@
 		var open = $A.get("e.ui:openDialog");
 		open.setParams({
 			dialog : msg,
+			//triggerEvent is optional, unless when the trigger is a ui:press event
 			triggerEvent : event
 		});
 		open.fire();

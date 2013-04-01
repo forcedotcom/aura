@@ -18,12 +18,12 @@
 <aura:component>
 	<ui:dialogManager />
 	<ui:button press="{!c.showDialog}" label="Open Dialog" />
-	<ui:dialog aura:id="modal" isModal="true" width="small" title="Modal Demo" description="This is a demo of the ui:dialog modal component.">
-	<p>This is a modal dialog. It disables interaction with other parts of the page when still opened.</p>
+	<ui:dialog aura:id="modal" close="{!c.hideDialog}" isModal="true" width="small" title="Modal Demo" description="This is a demo of the ui:dialog modal component.">
+	<p>This is a modal dialog. It disables interaction with other parts of the page when active.</p>
 	
-		<ui:dialogButtons aura:id="buttonsModal">
-			<ui:button label="OK" press="{!c.hideDialog}" />
-		</ui:dialogButtons>
+		<ui:dialogButtons aura:id="buttonsModal" defaultButtons="both" />
+			<!--<ui:button label="OK" press="{!c.hideDialog}" />-->
+		<!--</ui:dialogButtons>-->
 
 	</ui:dialog>
 </aura:component>

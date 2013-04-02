@@ -17,7 +17,7 @@
 -->
 <aura:component extends="auradocs:topicPanel">
 
-    <aura:set attribute="title" value="Displaying Messages"/>
+    <aura:set attribute="title" value="Displaying Dialogs and Messages"/>
     <h3><code>ui:dialog</code></h3>
     <p>Use <code>ui:dialog</code> for overlay and modal dialogs. You can use <code>ui:dialogButtons</code> for buttons in the dialog window. Setting <code>&lt;ui:dialogButtons defaultButtons="both"&gt;</code> provides default 'OK' and 'Cancel' buttons, 
     but you can provide your own buttons using <code>ui:button</code> components.</p>

@@ -24,7 +24,7 @@
                 + "auto-wired javascript model is present");
 
             var stringFromAutoWiredModel = cmp.get("m.str");
-            $A.test.assertTrue(stringFromAutoWiredModel === undefined, "Should not have access to auto-wired model "
+            $A.test.assertUndefinedOrNull(stringFromAutoWiredModel, "Should not have access to auto-wired model "
                 + "when explicitly declared model is present");
         }
     }

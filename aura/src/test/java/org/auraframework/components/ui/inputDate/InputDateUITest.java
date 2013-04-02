@@ -21,6 +21,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
@@ -50,10 +51,20 @@ public class InputDateUITest extends WebDriverTestCase {
         super(name);
     }
     
+    
+    private WebElement loopThroughKeys(WebElement element, WebDriver driver, String keyString, int iterCondition, String cssSel, String assertVal){
+        //Pressing one button iterCondition times
+        for(int i=0; i<iterCondition; i++){
+            element.sendKeys(keyString);
+            element = driver.findElement(By.cssSelector(cssSel));
+            assertTrue(assertVal+"combination could not find aria-selected='true'", element != null);
+        }
+        
+        return element;
+    }
     private String homeEndButtonHelper(String initDate, Keys buttonToPress)
     {
         WebDriver driver = getDriver();
-
 
         //Getting the input box, making sure it is clear, and sending in the the starting date
         WebElement element = driver.findElement(By.cssSelector(dateCSS));
@@ -102,7 +113,7 @@ public class InputDateUITest extends WebDriverTestCase {
         cal.set(Calendar.DAY_OF_MONTH, begMonth);
         fmt= dtFormat.format(cal.getTime());
 
-        assertEquals("The Home button took us to the beginning of the January", fmt, inputBoxResult);
+        assertEquals("The Home button did not go to the beginning of January", fmt, inputBoxResult);
 
         inputBoxResult = homeEndButtonHelper("2011-1-1", Keys.END);
 
@@ -112,7 +123,7 @@ public class InputDateUITest extends WebDriverTestCase {
         cal.set(Calendar.DAY_OF_MONTH, 31);
         fmt= dtFormat.format(cal.getTime());
 
-        assertEquals("The End button took us to the end of the January", fmt, inputBoxResult);
+        assertEquals("The End button did not go to the end of January", fmt, inputBoxResult);
 
         //Checking February (28 or 29 days), none Leap year
         inputBoxResult = homeEndButtonHelper("2011-2-28",  Keys.HOME);
@@ -123,7 +134,7 @@ public class InputDateUITest extends WebDriverTestCase {
         cal.set(Calendar.DAY_OF_MONTH, begMonth);
         fmt= dtFormat.format(cal.getTime());
 
-        assertEquals("The Home button took us to the beginning of the February", fmt, inputBoxResult);
+        assertEquals("The Home button did not go to the beginning of February", fmt, inputBoxResult);
 
         inputBoxResult = homeEndButtonHelper("2011-2-1", Keys.END);
 
@@ -133,7 +144,7 @@ public class InputDateUITest extends WebDriverTestCase {
         cal.set(Calendar.DAY_OF_MONTH, 28);
         fmt= dtFormat.format(cal.getTime());
 
-        assertEquals("The End button took us to the end of the February", fmt, inputBoxResult);
+        assertEquals("The End button did not go to the end of February", fmt, inputBoxResult);
 
         //Checking February (28 or 29 days), Leap year
         inputBoxResult = homeEndButtonHelper("2012-2-29", Keys.HOME);
@@ -144,7 +155,7 @@ public class InputDateUITest extends WebDriverTestCase {
         cal.set(Calendar.DAY_OF_MONTH, begMonth);
         fmt= dtFormat.format(cal.getTime());
 
-        assertEquals("The Home button took us to the beginning of the February", fmt, inputBoxResult);
+        assertEquals("The Home button did not go to the beginning of February", fmt, inputBoxResult);
 
         inputBoxResult = homeEndButtonHelper("2012-2-1", Keys.END);
 
@@ -154,7 +165,7 @@ public class InputDateUITest extends WebDriverTestCase {
         cal.set(Calendar.DAY_OF_MONTH, 29);
         fmt= dtFormat.format(cal.getTime());
 
-        assertEquals("The End button took us to the end of the February", fmt, inputBoxResult);
+        assertEquals("The End button did not go to the end of February", fmt, inputBoxResult);
 
         //Checking September (30 days)
         inputBoxResult = homeEndButtonHelper("2011-9-30", Keys.HOME);
@@ -165,7 +176,7 @@ public class InputDateUITest extends WebDriverTestCase {
         cal.set(Calendar.DAY_OF_MONTH, begMonth);
         fmt= dtFormat.format(cal.getTime());
 
-        assertEquals("The Home button took us to the beginning of the September", fmt, inputBoxResult);
+        assertEquals("The Home button did not go to the beginning of September", fmt, inputBoxResult);
 
         inputBoxResult = homeEndButtonHelper("2011-9-1", Keys.END);
 
@@ -175,7 +186,7 @@ public class InputDateUITest extends WebDriverTestCase {
         cal.set(Calendar.DAY_OF_MONTH, 30);
         fmt= dtFormat.format(cal.getTime());
 
-        assertEquals("The End button took us to the end of the September", fmt, inputBoxResult);
+        assertEquals("The End button did not go to thes end of September", fmt, inputBoxResult);
     }
 
     private final String pageUpDownHelper(int iterCondition, String keyString)
@@ -190,17 +201,12 @@ public class InputDateUITest extends WebDriverTestCase {
         //Grabbing the Date Icon and click on it to open the calendar
         element = driver.findElement(By.cssSelector(dateIcon));
         element.click();
-
-        //Getting the item that focus is on (should be selected Date)
+        
         String classOfActiveElem = ""+ auraUITestingUtil.getEval(className);
         element = driver.findElement(By.cssSelector("a[class*='"+classOfActiveElem+"']"));
-
-        //Pressing one button iterCondition times
-        for(int i=0; i<iterCondition; i++){
-            element.sendKeys(keyString);
-            element = driver.findElement(By.cssSelector(ariaTrue));
-        }
-
+        
+        element = loopThroughKeys(element, driver, keyString,iterCondition, ariaTrue, "Shift+Page Up/Down");
+         
         //Selecting the date that we are on to get the value and compare it to what it should be
         element.sendKeys(Keys.SPACE);
 
@@ -214,8 +220,8 @@ public class InputDateUITest extends WebDriverTestCase {
     //Testing the functionality of page_down, page_up, shift+page_down, shift+page_up
     @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.IE10,BrowserType.IE9, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testPageUpDownYear() throws Exception {
-    	DateFormat formatter = new SimpleDateFormat (dateStr);
-    	open(URL);
+        DateFormat formatter = new SimpleDateFormat (dateStr);
+        open(URL);
         //Calendar used to get current date
         GregorianCalendar cal = new GregorianCalendar();
         //Running test, Increasing year
@@ -229,7 +235,7 @@ public class InputDateUITest extends WebDriverTestCase {
         String fmt = new SimpleDateFormat (dateStr).format(cal.getTime());
 
         //Making sure test result and true calendar outcome match
-        assertEquals("Shift + Page up went to the correct date", fmt,result );
+        assertEquals("Shift + Page did not go to the correct date", fmt,result );
 
         //Resetting calendar
         cal = new GregorianCalendar();
@@ -243,7 +249,7 @@ public class InputDateUITest extends WebDriverTestCase {
         fmt = new SimpleDateFormat (dateStr).format(cal.getTime());
 
        //Making sure test result and true calendar outcome match
-        assertEquals("shift + Page Down went to the correct date", fmt,result );
+        assertEquals("shift + Page Down did not find the correct date", fmt,result );
     }
 
 
@@ -251,8 +257,8 @@ public class InputDateUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testPageUpDownMonth() throws Exception {
         DateFormat formatter = new SimpleDateFormat (dateStr);
-    	open(URL);
-    	
+        open(URL);
+        
         //Calendar used to get current date
         GregorianCalendar cal = new GregorianCalendar();
 
@@ -263,7 +269,7 @@ public class InputDateUITest extends WebDriverTestCase {
         cal.setTime(formatter.parse(inDate));
         cal.add(Calendar.MONTH, -4);
         String fmt = new SimpleDateFormat (dateStr).format(cal.getTime());
-        assertEquals("Page up went to the correct date", fmt,result );
+        assertEquals("Page up id not find the correct date", fmt,result );
 
         //Resetting calendar
         cal = new GregorianCalendar();
@@ -277,7 +283,7 @@ public class InputDateUITest extends WebDriverTestCase {
         fmt = new SimpleDateFormat (dateStr).format(cal.getTime());
 
         //Making sure test result and true calendar outcome match
-        assertEquals("Page down went to the correct date", fmt, result);
+        assertEquals("Page down id not find the correct date", fmt, result);
     }
 
     //Testing functionallity of tab, starting from the InputBox to the today button
@@ -318,7 +324,7 @@ public class InputDateUITest extends WebDriverTestCase {
         element = driver.findElement(By.cssSelector("a[class*='"+classOfActiveElem+"']"));
         element.click();
 
-        assertEquals("Value from pressing Today link is todays date", fmt, input.getAttribute("value"));
+        assertEquals("Value from pressing Today link is not todays date", fmt, input.getAttribute("value"));
     }
 
     //TODO:Should Fail until bug W-1570768 is fixed
@@ -366,7 +372,7 @@ public class InputDateUITest extends WebDriverTestCase {
          classOfActiveElem = "input[class*='"+ auraUITestingUtil.getEval(className)+"']";
          element = driver.findElement(By.cssSelector(classOfActiveElem));
 
-         assertEquals("Successfully went from Today, back to the input", "1111-11-11", element.getAttribute("value"));
+         assertEquals("Tabbing did not get us to the input textbox", "1111-11-11", element.getAttribute("value"));
     }
 
     //Testing functionality of the ESC key
@@ -393,7 +399,7 @@ public class InputDateUITest extends WebDriverTestCase {
 
         escButtonClosedCal = !element.getAttribute("class").contains("visible");
 
-        assertTrue("Escape button closed the calendar and set focus on the calendar Icon", escButtonClosedCal);
+        assertTrue("Escape button did not close the calendar", escButtonClosedCal);
     }
 
     // Testing adding date manually then opening the calendar clicking on the same date
@@ -453,7 +459,7 @@ public class InputDateUITest extends WebDriverTestCase {
         element.click();
 
         assertEquals("Value sent in does not match value taken out", fmt, element.getAttribute("value"));
-    }
+    }        
 
     //Testing Functionality of calendar in traversing through 1 year by the keys
     @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
@@ -477,15 +483,10 @@ public class InputDateUITest extends WebDriverTestCase {
         String classOfActiveElem = ""+ auraUITestingUtil.getEval(className);
 
         element = driver.findElement(By.cssSelector("a[class*='"+classOfActiveElem+"']"));
-        element.sendKeys(Keys.RIGHT);
-
-        assertTrue("Arrow key was recognized: ", "true".equals(auraUITestingUtil.getEval("return $A.test.getActiveElement().getAttribute('aria-selected')")));
-
-        for(int i=0; i<355; i++){
-            element.sendKeys(Keys.ARROW_RIGHT);
-            element = driver.findElement(By.cssSelector(ariaTrue));
-        }
-
+       
+        //Loop through 355 days
+        element = loopThroughKeys(element, driver,""+Keys.ARROW_RIGHT,355, ariaTrue, "Arrow-Right ");
+       
         element.sendKeys(Keys.SPACE);
 
         element = driver.findElement(By.cssSelector(dateCSS));
@@ -515,23 +516,17 @@ public class InputDateUITest extends WebDriverTestCase {
         element = driver.findElement(By.cssSelector("a[class*='"+classOfActiveElem+"']"));
 
         //Move from todays date, to the todays date +41
-        for(int i=0; i<41; i++){
-            element.sendKeys(Keys.ARROW_RIGHT);
-            element = driver.findElement(By.cssSelector(ariaTrue));
-        }
+        element = loopThroughKeys(element, driver, ""+Keys.ARROW_RIGHT,41, ariaTrue, "Arrow-Right key ");
 
-      //Move from todays date+41, to the todays date+1
-        for(int i=0; i<40; i++){
-            element.sendKeys(Keys.ARROW_LEFT);
-            element = driver.findElement(By.cssSelector(ariaTrue));
-        }
-
+        //Move from today (date+41), to the todays date+1
+        element = loopThroughKeys(element, driver,""+Keys.ARROW_LEFT,40, ariaTrue, "Arrow-Left key");
+        
         //Select element
         element.sendKeys(Keys.SPACE);
 
         //Focus on the input box and get its value
         element = driver.findElement(By.cssSelector(dateCSS));
-        assertEquals("Next day correctly found", fmt, element.getAttribute("value"));
+        assertEquals("Next day was not correctly found", fmt, element.getAttribute("value"));
     }
 
     //Testing functionality of arrows being used one after the other, while going through months
@@ -558,22 +553,17 @@ public class InputDateUITest extends WebDriverTestCase {
         element = driver.findElement(By.cssSelector("a[class*='"+classOfActiveElem+"']"));
 
         //Move 4 months up
-        for(int i=0; i<4; i++){
-            element.sendKeys(Keys.ARROW_UP);
-            element = driver.findElement(By.cssSelector(ariaTrue));
-        }
+        element = loopThroughKeys(element, driver,""+Keys.ARROW_UP,4, ariaTrue, "Arrow-Up key");
 
-        //Move four months down
-        for(int i=0; i<4; i++){
-            element.sendKeys(Keys.ARROW_DOWN);
-            element = driver.findElement(By.cssSelector(ariaTrue));
-        }
+        //Move 4 months down
+        element = loopThroughKeys(element, driver,""+Keys.ARROW_DOWN,4, ariaTrue, "Arrow-Down key");
+        
         //Focus should be back on todays date
         element.sendKeys(Keys.SPACE);
 
         //Select the input text box and get its value for comparison
         element = driver.findElement(By.cssSelector(dateCSS));
-        assertEquals("Date has not changed", fmt, element.getAttribute("value"));
+        assertEquals("Moving dates using arrows has not brought us to todays date", fmt, element.getAttribute("value"));
     }
 
 
@@ -588,10 +578,11 @@ public class InputDateUITest extends WebDriverTestCase {
         //Finding either the increasing or decreasing month arrow
         element = driver.findElement(By.cssSelector(monthSel));
 
-        //Increasing or decreasing the month
+        //Increasing or decreasing the month     
         for(int i=0; i<monthIter;i++){
             element.click();
             element = driver.findElement(By.cssSelector(monthSel));
+            assertTrue("Page up/down could not find aria-selected='true'", element != null);
         }
 
         //Finding either the increasing or decreasing year arrow
@@ -600,7 +591,8 @@ public class InputDateUITest extends WebDriverTestCase {
          //Increasing or decreasing the year
         for(int i=0; i<yearIter;i++){
             element.click();
-            element = driver.findElement(By.cssSelector(yearSel));
+            element = driver.findElement(By.cssSelector(yearSel));   
+            assertTrue("Shift + Page up/down could not find aria-selected='true'", element != null);
         }
 
         /* Returning a Boolean value, whether the label in the calendar
@@ -609,6 +601,21 @@ public class InputDateUITest extends WebDriverTestCase {
         return driver.findElement(By.cssSelector("h4[class*='monthYear']")).getText();
     }
 
+
+    //Method to modify calendar
+    private String modCal(int month, int year){
+
+        //Getting the current date so all tests start from the same area
+        GregorianCalendar cal = new GregorianCalendar();
+      //Formatting the calendar in the format that we expect
+        SimpleDateFormat dtFormat = new SimpleDateFormat (mnthYr);
+        
+        //Modifying calendar by either positive or negative months/years
+        cal.add(Calendar.MONTH, month);
+        cal.add(Calendar.YEAR, year);
+        return dtFormat.format(cal.getTime()); 
+    }
+    
     //Testing functionality of arrows button on calendar by intercombining them and making them go through months and year
     @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testMonthYearByArrowsButtons() throws Exception {
@@ -618,50 +625,37 @@ public class InputDateUITest extends WebDriverTestCase {
         String prevYear = "a[class*='navLink prevYear']";
 
         open(URL);
-
-        //Getting the current date so all tests start from the same area
-        GregorianCalendar cal = new GregorianCalendar();
-
-        //Formatting the calendar in the format that we expect
-        SimpleDateFormat dtFormat = new SimpleDateFormat (mnthYr);
+        
 
         //Increases month and year
         String result = iterateCal(7, 5, nextMonth, nextYear);
+        
+        //Get correct date
+        String fmt= modCal(7,5);
 
-        //Modifying calendar by either positive or negative months/years
-        cal.add(Calendar.MONTH, 7);
-        cal.add(Calendar.YEAR, 5);
-        String fmt= dtFormat.format(cal.getTime());
-
-        assertEquals("Date using Month and Year buttons both increasing found correctly", fmt, result);
+        assertEquals("Date using Month and Year buttons both increasing found incorrectly", fmt, result);
 
         //Increase month and Decrease year
         result = iterateCal(7, 10, nextMonth, prevYear);
 
-        cal = new GregorianCalendar();
-        cal.add(Calendar.MONTH, 7);
-        cal.add(Calendar.YEAR, -10);
-        fmt = dtFormat.format(cal.getTime());
-        assertEquals("Date using Month and Year buttons, with Month increasing and Year Decreasing, found correctly", fmt, result);
+        //Get correct date
+        fmt= modCal(7,-10);
+        assertEquals("Date using Month and Year buttons, with Month increasing and Year Decreasing, found  incorrectly", fmt, result);
 
         //Decrease month and Increases year
         result = iterateCal(12, 10, prevMonth, nextYear);
-
-        cal = new GregorianCalendar();
-        cal.add(Calendar.MONTH, -12);
-        cal.add(Calendar.YEAR,  10);
-        fmt = dtFormat.format(cal.getTime());
-
-        assertEquals("Date using Month and Year buttons, with Month Decreasing and Year increasing found correctly", fmt, result);
+        
+        //Get correct date
+        fmt= modCal(-12,10);
+        
+        assertEquals("Date using Month and Year buttons, with Month Decreasing and Year increasing found incorrectly", fmt, result);
 
         //Decrease month and year
         result = iterateCal(12, 10, prevMonth, prevYear);
-
-        cal = new GregorianCalendar();
-        cal.add(Calendar.MONTH, -12);
-        cal.add(Calendar.YEAR,  -10);
-        fmt = dtFormat.format(cal.getTime());
-
-        assertEquals("Date using Month and Year buttons both increasing found correctly", fmt, result);
+        
+        //Get correct date
+        fmt= modCal(-12,-10);
+        
+        assertEquals("Date using Month and Year buttons both increasing found incorrectly", fmt, result);
     }
 }

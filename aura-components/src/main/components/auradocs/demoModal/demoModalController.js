@@ -23,15 +23,5 @@
 			triggerEvent : event
 		});
 		open.fire();
-	},
-	
-	
-	hideDialog: function(cmp, event){
-		var msg= cmp.find('modal');
-		var close = $A.get("e.ui:closeDialog");
-		close.setParams({
-			dialog : msg
-		});
-		close.fire();
 	}
 }

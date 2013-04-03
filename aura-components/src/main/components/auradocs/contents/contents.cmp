@@ -200,6 +200,7 @@
             <auradocs:contentsNode text="Setting Label Parameters" id="labelParameters"/>
             <auradocs:contentsNode text="System Tags">
                 <auradocs:contentsNode text="aura:application" id="appOverview"/>
+                <auradocs:contentsNode text="aura:dependency" id="tagDependency"/>
                 <auradocs:contentsNode text="aura:set">
                     <auradocs:contentsNode text="Introduction" id="tagAuraSet" />
                     <auradocs:contentsNode text="Setting Attributes on a Super Component" id="tagAuraSetSuper" />

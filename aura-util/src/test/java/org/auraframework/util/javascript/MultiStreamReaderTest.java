@@ -37,24 +37,28 @@ public class MultiStreamReaderTest extends UnitTestCase {
         URL[] urls = null;
         MultiStreamReader reader = new MultiStreamReader(urls);
         assertEquals(-1, reader.read());
+        reader.close();
     }
 
     public void testConstructNullCollection() throws Exception {
         Collection<URL> urls = null;
         MultiStreamReader reader = new MultiStreamReader(urls);
         assertEquals(-1, reader.read());
+        reader.close();
     }
 
     public void testConstructEmptyArray() throws Exception {
         URL[] urls = new URL[0];
         MultiStreamReader reader = new MultiStreamReader(urls);
         assertEquals(-1, reader.read());
+        reader.close();
     }
 
     public void testConstructEmptyCollection() throws Exception {
         Collection<URL> urls = ImmutableSet.of();
         MultiStreamReader reader = new MultiStreamReader(urls);
         assertEquals(-1, reader.read());
+        reader.close();
     }
 
     public void testReadSingleStream() throws Exception {
@@ -81,8 +85,7 @@ public class MultiStreamReaderTest extends UnitTestCase {
         assertReadingMultipleStreams(1, StringUtils.repeat("a", 100), "b", "c");
     }
 
-    public void testReadMultipleStreamsInChunksWithFirstBeingLonger()
-            throws Exception {
+    public void testReadMultipleStreamsInChunksWithFirstBeingLonger() throws Exception {
         assertReadingMultipleStreams(3, StringUtils.repeat("a", 100), "b", "c");
     }
 
@@ -90,8 +93,7 @@ public class MultiStreamReaderTest extends UnitTestCase {
         assertReadingMultipleStreams(1, "a", StringUtils.repeat("b", 100), "c");
     }
 
-    public void testReadMultipleStreamsInChunksWithSecondBeingLonger()
-            throws Exception {
+    public void testReadMultipleStreamsInChunksWithSecondBeingLonger() throws Exception {
         assertReadingMultipleStreams(3, "a", StringUtils.repeat("b", 100), "c");
     }
 
@@ -99,13 +101,11 @@ public class MultiStreamReaderTest extends UnitTestCase {
         assertReadingMultipleStreams(1, "a", "b", StringUtils.repeat("c", 100));
     }
 
-    public void testReadMultipleStreamsInChunksWithThirdBeingLonger()
-            throws Exception {
+    public void testReadMultipleStreamsInChunksWithThirdBeingLonger() throws Exception {
         assertReadingMultipleStreams(3, "a", "b", StringUtils.repeat("c", 100));
     }
 
-    private void assertReadingMultipleStreams(int numChunks, String... content)
-            throws Exception {
+    private void assertReadingMultipleStreams(int numChunks, String... content) throws Exception {
         Collection<URL> urls = Lists.newLinkedList();
         StringBuffer result = new StringBuffer();
         for (String conString : content) {
@@ -123,36 +123,29 @@ public class MultiStreamReaderTest extends UnitTestCase {
                 expectedString = "";
             } else if (i < (numChunks - 1)) {
                 expectedReadCount = chunkLength;
-                expectedString = result.substring(i * chunkLength, i
-                        * chunkLength + expectedReadCount);
+                expectedString = result.substring(i * chunkLength, i * chunkLength + expectedReadCount);
             } else {
                 expectedReadCount = result.length() - i * chunkLength;
-                expectedString = result.substring(i * chunkLength, i
-                        * chunkLength + expectedReadCount);
+                expectedString = result.substring(i * chunkLength, i * chunkLength + expectedReadCount);
             }
             char[] array = new char[chunkLength];
-            assertEquals(
-                    "Unexpected number of characters read from streams for chunk "
-                            + i, expectedReadCount, reader.read(array));
+            assertEquals("Unexpected number of characters read from streams for chunk " + i, expectedReadCount,
+                    reader.read(array));
             if (expectedReadCount > 0) {
-                assertEquals(
-                        "Unexpected concatenated set of characters read from streams for chunk "
-                                + i, expectedString,
-                        new String(Arrays.copyOf(array, expectedReadCount)));
+                assertEquals("Unexpected concatenated set of characters read from streams for chunk " + i,
+                        expectedString, new String(Arrays.copyOf(array, expectedReadCount)));
             }
         }
+        reader.close();
     }
 
-    private URL getStringStreamURL(final String content)
-            throws MalformedURLException {
-        return new URL("string", null, 0, "" + System.nanoTime(),
-                new URLStreamHandler() {
-                    @Override
-                    protected URLConnection openConnection(URL u)
-                            throws IOException {
-                        return new StringStreamURLConnection(u, content);
-                    }
-                });
+    private URL getStringStreamURL(final String content) throws MalformedURLException {
+        return new URL("string", null, 0, "" + System.nanoTime(), new URLStreamHandler() {
+            @Override
+            protected URLConnection openConnection(URL u) throws IOException {
+                return new StringStreamURLConnection(u, content);
+            }
+        });
     }
 
     public class StringStreamURLConnection extends URLConnection {

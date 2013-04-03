@@ -29,11 +29,11 @@ import org.auraframework.util.javascript.CommonJavascriptGroupImpl;
 import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptValidator;
 import org.auraframework.util.javascript.JavascriptWriter.CompressionLevel;
+import org.auraframework.util.text.Hash;
 
 /**
- * Javascript group that contains directives for parsing instructions or
- * metadata or other fun stuff. It starts from one file which should include the
- * others.
+ * Javascript group that contains directives for parsing instructions or metadata or other fun stuff. It starts from one
+ * file which should include the others.
  */
 public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
     // name for threads that compress and write the output
@@ -160,12 +160,17 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
     @Override
     public boolean isStale() {
-        for (File f : getFiles()) {
-            if (f.lastModified() > getLastMod()) {
-                return true;
-            }
+        if (!isGroupHashKnown()) {
+            return true;
         }
-        return false;
+        // Otherwise, we're stale IFF we have changed contents.
+        try {
+            Hash currentTextHash = computeGroupHash(getFiles());
+            return !currentTextHash.equals(getGroupHash());
+        } catch (IOException e) {
+            // presume we're stale; we'll probably try to regenerate and die from that.
+            return true;
+        }
     }
 
     @Override
@@ -176,9 +181,9 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
 
     @Override
     public void regenerate(File destRoot) throws IOException {
-        reset();
-        addFile(this.startFile);
+        setContents(null, this.startFile);
         parse();
+        getGroupHash(); // Ensure the new bundle knows its hash once the directives are parsed.
         generate(destRoot, true);
         postProcess();
     }

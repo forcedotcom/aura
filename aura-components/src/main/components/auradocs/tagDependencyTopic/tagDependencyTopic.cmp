@@ -1,0 +1,61 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="aura:dependency"/>
+
+    <p>The Aura framework automatically tracks dependencies between definitions, such as components. This enables the framework to automatically reload when it detects that you've changed a definition during development.</p>
+    
+    <p>The <code>&lt;aura:dependency&gt;</code> tag enables you to declare dependencies that can't easily be discovered by Aura. For example, if a component uses a client- or server-side provider that instantiates components that are not directly referenced elsewhere, use <code>&lt;aura:dependency&gt;</code> in the component to explicitly tell the framework about the dependency. Adding the <code>&lt;aura:dependency&gt;</code> tag ensures that a component and its dependencies are sent to the client, when needed.</p>
+    
+    <p>Here is an example. Adding this tag to a component marks the <code>aura:placeholder</code> component as a dependency.</p>
+    
+<auradocs:codeblock><![CDATA[<aura:dependency resource="markup://aura:placeholder" />]]>
+</auradocs:codeblock>    
+
+    <p>The <code>&lt;aura:dependency&gt;</code> tag includes these system attributes.</p>
+    
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>System Attribute</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>resource</code></td>
+                <td>The resource that the component depends on. For example, <code>resource="markup://sampleNamespace:sampleComponent"</code> refers to the <code>sampleComponent</code> in the <code>sampleNamespace</code> namespace.
+                <p>Use (<code>*</code>) in the resource name for wildcard matching. For example, <code>resource="markup://sampleNamespace:*"</code> matches everything in the namespace; <code>resource="markup://sampleNamespace:input*"</code> matches everything in the namespace that starts with <code>input</code>.</p>
+                </td>
+            </tr>
+
+            <tr>
+                <td><code>type</code></td>
+                <td>The type of resource that the component depends on, such as <code>EVENT</code> or <code>CONTROLLER</code>. Use a comma-separated listed for multiple types. The default value is <code>COMPONENT,APPLICATION</code>.</td>
+            </tr>
+
+        </tbody>
+    </table>
+    
+    <p><b>See also:</b><br/>
+    <auradocs:topicLink topic="providersClientSide">Client-Side Providers</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="oodProviders">Server-Side Providers</auradocs:topicLink>
+    </p>
+        
+</aura:component>

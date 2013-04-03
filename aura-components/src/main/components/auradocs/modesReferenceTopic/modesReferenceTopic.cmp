@@ -63,12 +63,14 @@
             	<td>Enables a <code>.cmp</code> resource to be addressed in a URL</td>
             	<td>Similar to <code>PROD</code> mode</td>
             </tr>
+            <!-- Not enforced so comment out for now 
             <tr>
             	<td><b>GA Component Access</b></td>
             	<td>Allows GA components only</td>
             	<td>Allows non-GA components</td>
             	<td>Similar to <code>PROD</code> mode</td>
             </tr>
+            -->
             <tr>
             	<td><b>Google Closure Compiler</b></td>
             	<td>Uses the Google Closure Compiler to optimize the JavaScript code. The method names and code are heavily obfuscated.</td>

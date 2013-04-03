@@ -32,33 +32,35 @@
 
     <p>This is about as simple as a component can get.  It consists only of the enclosing <code>&lt;aura:component&gt;</code> tags, which appear at the beginning and end of every Aura component definition, wrapped around the "Hello world!" text.  Easy.</p>
 
-    <auradocs:info>If you are familiar with Visualforce component definitions, this should look somewhat familiar.  Many of the component authoring and composition concepts in Aura are built on ideas from Visualforce.</auradocs:info>
-
     <p>Everything in Aura markup is case insensitive except for references to JavaScript, CSS, or Java.</p>
 
     <h2>Introduction to Component Bundles</h2>
 
     <p>Note where this component file is stored in the filesystem: <code>aura-components/components/auradocs/helloWorld/helloWorld.cmp</code></p>
-    <p>All core Aura components are in the <code>aura-components/components</code> directory.  All folders within that directory map to a namespace, which is used to group related components together. For example, all the components related to this documentation live in the auradocs namespace.</p>
-    <p>Each folder within a namespace folder maps to a specific component and contains all the resources necessary for the component.  We refer to this folder as the component's "bundle".</p>
+    <p>All core Aura components are in the <code>aura-components/components</code> directory.  All folders within that directory map to a namespace, which is used to group related components together. For example, all the components related to this documentation live in the <code>auradocs</code> namespace.</p>
+    <p>Each folder within a namespace folder maps to a specific component and contains all the resources necessary for the component.  We refer to this folder as the component's bundle.</p>
     <p>In this case, the <code>helloWorld</code> bundle only contains a <code>helloWorld.cmp</code> file, which has the markup for this component. See <auradocs:topicLink topic="compBundle">Component Bundles</auradocs:topicLink> for more information on files you can include in the bundle. </p>
 
     <auradocs:warning>Note that the file names in the bundle MUST match the name of the component.</auradocs:warning>
 
     <h2>Viewing Components</h2>
 
-    <p>So we've got a component, but the point of Aura is to build web applications--how do we actually view this thing in a web browser?</p>
-    <p>In development mode, you can address any Aura component using the URL scheme <code>http://&lt;yourServer&gt;/&lt;namespace&gt;/&lt;component&gt;.cmp</code></p>
+    <p>So we've got a component, but the point of Aura is to build web applications&mdash;how do we actually view this thing in a web browser?</p>
+    <p>In <code>DEV</code> mode, you can address any Aura component using the URL scheme <code>http://&lt;yourServer&gt;/&lt;namespace&gt;/&lt;component&gt;.cmp</code></p>
 
-    <auradocs:info>Development mode is the default mode when you are developing. When Aura is running in production, you can't directly address an Aura component using a <code>.cmp</code> suffix. However, you can directly address an application with a <code>.app</code> suffix.</auradocs:info>
+    <auradocs:info><code>DEV</code> mode is the default mode when you are developing. When Aura is running in <code>PROD</code> mode, you can't directly address an Aura component using a <code>.cmp</code> suffix. However, you can directly address an application with a <code>.app</code> suffix. For more information, see <auradocs:topicLink topic="modesIntro">Modes</auradocs:topicLink>.</auradocs:info>
 
     <p>Open up a new tab in your browser and try it yourself.  Navigate to <code>/auradocs/helloWorld.cmp</code>.  Or better yet, create your own practice namespace in your filesystem and follow along, creating your own versions of the sample components.  Either way, at the end you should see a heart-warming "Hello world!" in your browser.</p>
 
+    <h2>Support Level</h2>
+    
+    <p>Each component has a support level indicating whether it is fully supported or not. For more information, see the <auradocs:navLink location="reference">Reference tab</auradocs:navLink>.</p>
+    
     <h2>Summary</h2>
     <ul>
-        <li>Component files (.cmp) contain markup for building UI.</li>
+        <li>Component files (<code>.cmp</code>) contain markup for building UI.</li>
         <li>Components and their resources live in <code>aura-components/components/&lt;namespace&gt;/&lt;componentBundle&gt;/</code>.</li>
-        <li>Components are addressible at <code>http://&lt;yourServer&gt;/&lt;namespace&gt;/&lt;component&gt;.cmp</code> in development mode.</li>
+        <li>Components are addressible at <code>http://&lt;yourServer&gt;/&lt;namespace&gt;/&lt;component&gt;.cmp</code> in <code>DEV</code> mode.</li>
     </ul>
 
 </aura:component>

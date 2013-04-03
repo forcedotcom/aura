@@ -36,6 +36,11 @@ var AuraStorage = function AuraStorage(config) {
     	this.log("AuraStorage.ctor(): clearing " + this.getName() + " storage on init");
     	this.adapter.clear();
     }
+    
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    	this.adapter["getItem"] = this.adapter.getItem;
+    	this["adapter"] = this.adapter;
+    //#end
 };
 
 /**

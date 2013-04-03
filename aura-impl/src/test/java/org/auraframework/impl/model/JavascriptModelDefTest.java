@@ -65,6 +65,20 @@ public class JavascriptModelDefTest extends AuraImplTestCase {
         }
     }
 
+    /**
+     * Verify null value in javascript model throws correct exception. We don't allow nulls in js models because we
+     * derive the types from the value since Json gives no other type data. See W-1594517.
+     */
+    // TODO(W-1594517): Add validation to block null values
+    public void _testNullValue() throws Exception {
+        try {
+            Aura.getDefinitionService().getDefinition("test:jsModelNullValueType", ComponentDef.class);
+            fail("Null value in javascript model should throw Exception");
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "Null value type in model definition.");
+        }
+    }
+
     private void validateProperty(JavascriptModelDef def, String name, Object expectedValue) throws Exception {
         // Validate the default from the def
         JavascriptValueDef valueDef = (JavascriptValueDef) def.getMemberByName(name);

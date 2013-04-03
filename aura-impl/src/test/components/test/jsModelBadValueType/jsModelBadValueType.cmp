@@ -16,7 +16,5 @@
 
 -->
 <aura:component>
-
 </aura:component>
-<!--This component is used in
-    JavascriptModelDefTest-->
+<!--This component is used in JavascriptModelDefTest-->

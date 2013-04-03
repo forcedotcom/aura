@@ -16,8 +16,8 @@
 
 -->
 <aura:component>
-<div style="padding-bottom:10px;">Single Selection</div>
-<ui:inputSelect class="single" aura:id="InputSelectSingle">
+<div style="padding-bottom:10px;"><b>Single Selection</b></div>
+<ui:inputSelect class="single" aura:id="InputSelectSingle" change="{!c.onSingleSelectChange}">
         <ui:inputSelectOptionGroup label="Mammal">
             <ui:inputSelectOption text="Tiger"/>
             <ui:inputSelectOption text="Lion" value="true"/>
@@ -29,13 +29,17 @@
             <ui:inputSelectOption text="Emmet" label="Ant"/>
         </ui:inputSelectOptionGroup>
     </ui:inputSelect>
+    <p>Selected Item:</p>
+      <p><ui:outputText class="result" aura:id="singleResult" value="" 
+/></p>
+    
     <br/>
-    <div style="padding:10px 0 10px 0;">Multiple Selection</div>
-    <ui:inputSelect multiple="true" class="multiple" size="5" aura:id="InputSelectMultiple" updateOn="blur">
+    <div style="padding:10px 0 10px 0;"><b>Multiple Selection</b></div>
+    <ui:inputSelect multiple="true" class="multiple" size="5" aura:id="InputSelectMultiple" change="{!c.onMultiSelectChange}">
         <ui:inputSelectOptionGroup label="Mammal">
             <ui:inputSelectOption text="Tiger"/>
-            <ui:inputSelectOption text="Lion" value="true"/>
-            <ui:inputSelectOption text="Bear" value="true"/>
+            <ui:inputSelectOption text="Lion"/>
+            <ui:inputSelectOption text="Bear"/>
         </ui:inputSelectOptionGroup>
         <ui:inputSelectOptionGroup label="Insect">
             <ui:inputSelectOption text="Butterfly"/>
@@ -43,4 +47,7 @@
             <ui:inputSelectOption text="Emmet" label="Ant"/>
         </ui:inputSelectOptionGroup>
     </ui:inputSelect>
+    <p>Selected Items:</p>
+     <p><ui:outputText class="result" aura:id="multiResult" value="" /></p>
+    
 </aura:component>

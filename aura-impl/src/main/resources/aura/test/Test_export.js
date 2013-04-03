@@ -67,9 +67,11 @@ exp(p,
     "objectKeys", p.objectKeys,
     
     // actions
+    
     "callServerAction", p.callServerAction,
     "isActionPending", p.isActionPending,
     "getAction", p.getAction,
+    "getExternalAction", p.getExternalAction,
 
     // internal functions
     "run", run,

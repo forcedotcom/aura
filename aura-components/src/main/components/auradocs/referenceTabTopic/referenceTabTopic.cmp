@@ -36,13 +36,13 @@
 
     <h3>Support Level for Definitions</h3>
 
-    <p>Each definition has a support level indicating whether it is fully supported or not. The support level is defined in the <code>support</code> system attribute in the root tag of the definition.</p>
+    <p>Each definition has a support level indicating whether it is fully supported or not. The support level is defined in the <code>support</code> system attribute in the root tag of the definition. The support level is shown in the top-right corner for each definition in the Reference tab.</p>
 
     <p>We will explain the support levels in terms of components, which are the most common definitions to have different support levels. The support levels in ascending order are:</p>
 
     <ol>
-        <li><code>PROTO</code>&mdash;The component is still in development and is unsupported.</li>
-        <li><code>BETA</code>&mdash;The component is ready for beta use but don't use it in a GA app.</li>
+        <li><code>PROTO</code>&mdash;The component is still in development and is unsupported. This is the default support level.</li>
+        <li><code>BETA</code>&mdash;The component is ready for beta use but we don't recommend using it in a GA app.</li>
         <li><code>GA</code>&mdash;The component is generally available for use in apps and is supported.</li>
     </ol>
 

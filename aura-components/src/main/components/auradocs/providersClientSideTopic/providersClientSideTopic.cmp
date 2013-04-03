@@ -69,10 +69,15 @@
 
     <p>You can omit the <code>componentDef</code> entry if the component is already concrete and you only want to provide attributes.</p>
 
+    <h2>Declaring Provider Dependencies</h2>
+    
+    <p>The Aura framework automatically tracks dependencies between definitions, such as components. However, if a component uses a provider that instantiates components that are not directly referenced elsewhere, use <code>&lt;aura:dependency&gt;</code> in the component to explicitly tell the framework about the dependency, which wouldn't otherwise be discovered by Aura.</p>
+    
     <p><b>See also:</b><br/>
         <auradocs:topicLink topic="oodCmpAbstract">Abstract Components</auradocs:topicLink><br/>
         <auradocs:topicLink topic="oodInterfaces">Interfaces</auradocs:topicLink><br/>
-        <auradocs:topicLink topic="compBundle">Component Bundles</auradocs:topicLink>
+        <auradocs:topicLink topic="compBundle">Component Bundles</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="tagDependency">aura:dependency</auradocs:topicLink>
     </p>
 
 </aura:component>

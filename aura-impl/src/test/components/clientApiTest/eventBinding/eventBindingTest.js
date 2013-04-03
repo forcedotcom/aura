@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 ({
+    /**
+     * Automation for W-1589512. Older browsers (specifically IE7 and 8) were not picking up multiple event listeners
+     * on HTML elements.
+     */
     testMultipleEventHandlersOnHtmlElement: {
         test: function(cmp) {
             var input = cmp.find("input").getElement();
 
             input.click();
             input.focus();
-            
+
             $A.test.addWaitForWithFailureMessage(true, function() {
                 return cmp.getAttributes().getValue("clickEvent").getBooleanValue();
             }, "Did not pick up click event on html element");
@@ -28,7 +32,6 @@
             $A.test.addWaitForWithFailureMessage(true, function() {
                 return cmp.getAttributes().getValue("focusEvent").getBooleanValue();
             }, "Did not pick up focus event on html element");
-             
         }
     }
 })

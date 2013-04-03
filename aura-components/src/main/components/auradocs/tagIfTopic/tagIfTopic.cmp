@@ -20,8 +20,11 @@
 
        <p><code>aura:if</code> renders the content within the tag if the <code>isTrue</code> attribute evaluates to true. Aura evaluates the <code>isTrue</code> expression on the server and instantiate components
        either in its <code>body</code> or <code>else</code> attribute. </p>
-        <p>See <auradocs:defLink descriptor="aura:if" defType="component">aura:if</auradocs:defLink> for source files.</p>
-       <p>
+       
+       <p>See <auradocs:defLink descriptor="aura:if" defType="component">aura:if</auradocs:defLink> for source files.</p>
+        
+        <auradocs:info><code>aura:if</code> instantiates the components in either its body or the <code>else</code> attribute, but not both. <code>aura:renderIf</code>  instantiate both the components in its body and the <code>else</code> attribute, but only renders one. If the state of <code>isTrue</code> changes, <code>aura:if</code> has to first instantiate the components for the other state and then render them. We recommend using <code>aura:if</code> instead of <code>aura:renderIf</code> to improve performance. Only consider using <auradocs:defLink descriptor="aura:renderIf" defType="component">aura:renderIf</auradocs:defLink> if you expect to show the components for both the <code>true</code> and <code>false</code> states, and it would require a server round trip to instantiate the components that aren't initially rendered.</auradocs:info>
+                
        <table class="table table-bordered table-striped">
           <thead>
               <tr>
@@ -43,7 +46,6 @@
               </tr>
           </tbody>
        </table>
-       </p>
 
        <h2>Usage</h2>
        <p>The following components in the auradocs namespace show how to use <code>aura:if</code> to conditionally render markup based on the result of evaluating an expression.</p>
@@ -62,5 +64,4 @@
         <p>The <code>aura:if</code> component displays the  elements in the body when the <code>isTrue</code> attribute evaluates to true. In this case, the body displays when the <code>show</code> attribute contains a value.
          The <code>show</code> attribute is set in <code>sampleIf.cmp</code>, which extends <code>sampleIfDemo.cmp</code>.</p>
 
-        <auradocs:info><code>aura:if</code> instantiates the components in either the <code>body</code> or <code>else</code> attribute, but not both. To instantiate the components for both <code>body</code> and <code>else</code> attributes, use <auradocs:defLink descriptor="aura:renderIf" defType="component">aura:renderIf</auradocs:defLink> instead.</auradocs:info>
 </aura:component>

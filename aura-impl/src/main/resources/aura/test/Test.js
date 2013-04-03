@@ -79,6 +79,44 @@ var Test = function(){
         },
 
         /**
+		 * Get an instance of a server action that is not available to the component.
+		 * e.g. $A.test.getExternalAction(cmp, "aura://ComponentController/ACTION$getComponent", 
+		 * 			{name:"aura:text", attributes:{value:"valuable"}},
+		 * 			function(action){alert(action.getReturnValue().attributes.values.value)})
+		 * 
+		 * @param {Component}
+		 *            The scope to run the action with, even if the action is not visible to it
+		 * @param {String}
+		 *            descriptor The descriptor for the action - e.g. java://my.own.Controller/ACTION$doIt
+		 * @param {Object}
+		 *            params The parameters to pass to the action
+		 * @param {function}
+		 *            callback An optional callback to execute with the component as the scope
+		 * @returns {Action} an instance of the action
+		 */
+        getExternalAction : function(component, descriptor, params, callback) {
+        	var paramDefs = [];
+        	for (var k in params) {
+        		if (k === 'length' || !params.hasOwnProperty(k)) {
+        			continue;
+        		}
+        		paramDefs.push({"name":k});
+        	}
+            var def = new ActionDef({
+            	"name" : descriptor,
+            	"descriptor" : descriptor,
+            	"actionType" : "SERVER",
+            	"params" : paramDefs
+            });
+        	var action = def.newInstance(component);
+        	action.setParams(params);
+        	if (callback) {
+        		action.setCallback(component, callback);
+        	}
+        	return action;
+        },
+        
+        /**
          * Peek if there are any pending server actions.
          * @returns {boolean} Returns true if there are pending server actions, or false otherwise.
          */

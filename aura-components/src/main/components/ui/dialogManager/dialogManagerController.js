@@ -24,12 +24,18 @@
 
         var activeDialog = cmp.get("m.activeDialog"),
             triggerEvent = evt.getParam("triggerEvent"),
-            dialog       = evt.getParam("dialog");
+            dialog       = evt.getParam("dialog"),
+            eventToKill  = triggerEvent;
 
-        // kill the "click" event generated from ui:press so it doesn't bubble
-        // up to the document and immediately close the dialog.
-        if (triggerEvent && triggerEvent.getName() === "press") {
-            $A.util.squash(triggerEvent.getParam("domEvent"));
+        // we need to kill all "click" events that open dialogs, so they don't
+        // bubble up to the document and immediately close the dialog.
+        // the triggerEvent could either be a raw DOM click, or a click generated
+        // from ui:press. figure out which one it is, then kill it.
+        if (triggerEvent) {
+            if (triggerEvent.getName && triggerEvent.getName() === "press") {
+                eventToKill = triggerEvent.getParam("domEvent");
+            }
+            $A.util.squash(eventToKill);
         }
 
         // only one open dialog is allowed at a time ... if there's one

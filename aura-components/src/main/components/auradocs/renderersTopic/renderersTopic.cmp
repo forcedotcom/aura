@@ -40,7 +40,7 @@
 
     <p>The renderer for <code>aura:component</code> is in <code>componentRenderer.js</code>. This renderer has base implementations for the <code>render()</code>, <code>rerender()</code>, <code>afterRender()</code>, and <code>unrender()</code> functions. The framework calls these functions as part of the rendering lifecycle. We will learn more about them in this topic. You can override the base rendering functions in a custom renderer.</p>
     
-    <auradocs:info>When you create a new component, Aura fires an <code>init</code> event, enabling you to update a component or fire an event after component construction but before rendering. The default renderer, <code>render()</code>, gets the component body and use the rendering service to render it.</auradocs:info>
+    <auradocs:info>When you create a new component, Aura fires an <code>init</code> event, enabling you to update a component or fire an event after component construction but before rendering. See <auradocs:topicLink topic="initHandler">Invoking Actions on Component Initialization</auradocs:topicLink> for an example. The default renderer, <code>render()</code>, gets the component body and use the rendering service to render it.</auradocs:info>
 
     <h2>Creating a Renderer</h2>
 

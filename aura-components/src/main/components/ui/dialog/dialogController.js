@@ -41,7 +41,7 @@
             length = buttonFacet.length;
             for (var i=0; i<length; i++) {
                 if (buttonFacet[i].isInstanceOf("ui:dialogButtons")) {
-                    buttonFacet[i].getValue("m.parentDialog").setValue(cmp);
+                    buttonFacet[i].getAttributes().setValue("_parentDialog", cmp);
                 } else {
                     $A.error("The 'buttons' attribute of a ui:dialog component" +
                              "must be of type ui:dialogButtons");

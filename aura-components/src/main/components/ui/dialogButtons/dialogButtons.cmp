@@ -28,6 +28,9 @@
     <aura:attribute name="cancelLabel" type="String" default="Cancel" description="The label of the default cancel button."/>
     <aura:attribute name="cancelTitle" type="String" default="Click to cancel" description="The title attribute of the default cancel button."/>
 
+    <!-- private attributes -->
+    <aura:attribute name="_parentDialog" type="Object" description="PRIVATE ATTRIBUTE - DO NOT SET | Reference to the parent ui:dialog component."/>
+
     <!-- events -->
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 

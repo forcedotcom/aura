@@ -39,7 +39,7 @@
      */
     cancel : function(cmp, evt, hlp) {
 
-        hlp.confirmOrCancel(cmp.get("m.parentDialog"), false);
+        hlp.confirmOrCancel(cmp.get("v._parentDialog"), false);
 
     },
 
@@ -51,7 +51,7 @@
      */
     confirm : function(cmp, evt, hlp) {
 
-        hlp.confirmOrCancel(cmp.get("m.parentDialog"), true);
+        hlp.confirmOrCancel(cmp.get("v._parentDialog"), true);
 
     }
 

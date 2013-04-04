@@ -88,12 +88,14 @@ var Test = function(){
 		 * @param {String}
 		 *            descriptor The descriptor for the action - e.g. java://my.own.Controller/ACTION$doIt
 		 * @param {Object}
-		 *            params The parameters to pass to the action
+		 *            params The parameters to pass to the action, as a Map (name:value)
+		 * @param {Object}
+		 *            returnType The return type descriptor for the action, e.g. java://java.lang.String
 		 * @param {function}
 		 *            callback An optional callback to execute with the component as the scope
 		 * @returns {Action} an instance of the action
 		 */
-        getExternalAction : function(component, descriptor, params, callback) {
+        getExternalAction : function(component, descriptor, params, returnType, callback) {
         	var paramDefs = [];
         	for (var k in params) {
         		if (k === 'length' || !params.hasOwnProperty(k)) {
@@ -105,7 +107,8 @@ var Test = function(){
             	"name" : descriptor,
             	"descriptor" : descriptor,
             	"actionType" : "SERVER",
-            	"params" : paramDefs
+            	"params" : paramDefs,
+            	"returnType" : returnType
             });
         	var action = def.newInstance(component);
         	action.setParams(params);

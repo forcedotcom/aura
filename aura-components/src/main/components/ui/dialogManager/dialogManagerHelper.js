@@ -357,7 +357,23 @@
         // 2600px is the same value as the CSS 3D transform rule applied to the dialog
         return Math.min($A.util.getWindowSize().height, 2600) - (titleHeight + contentPadding + buttonHeight + extraMargin);
 
-    }
+    },
 
+
+    /**
+     * Gets a root ui:dialog instance, even if the component to check is
+     * an extension of ui:dialog.
+     * 
+     * @param {Aura.Component} cmp The component to check
+     * @return {Aura.Component} cmp The root ui:dialog component
+     */
+    getDialogRoot : function(cmp) {
+        var type = cmp.getDef().getDescriptor().getQualifiedName();
+        while (type !== "markup://ui:dialog") {
+            cmp = cmp.getSuper();
+            type = cmp.getDef().getDescriptor().getQualifiedName();
+        }
+        return cmp;
+    }
 
 })

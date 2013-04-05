@@ -33,8 +33,8 @@
     <h3>AuraDevToolService</h3>
     <h4><code>$A.devToolService</code></h4>
    <p>The dev tool service helps you debug and test in non-production modes by enabling you to query the current state of objects and get statistics about a running app.
-      For example, you can query all components using <code>$A.getQueryStatement().query()</code>.</p>
-   <p>See Also: <auradocs:topicLink topic="queryLang">Querying State and Statistics</auradocs:topicLink></p>
+      For example, you can create a select statement using <code>$A.devToolService.select()</code> or query all components using <code>$A.getQueryStatement().query()</code>.</p>
+   <p>See Also: <auradocs:topicLink topic="modesReference">Modes</auradocs:topicLink> | <auradocs:topicLink topic="queryLang">Querying State and Statistics</auradocs:topicLink></p>
 
     <h3>AuraEventService</h3>
     <h4><code>$A.eventService</code></h4>
@@ -61,7 +61,7 @@
 
     <h3>AuraRenderingService</h3>
     <h4><code>$A.renderingService</code></h4>
-    <p>The rendering service render components by retrieving and calling their specific renderers. You can override the default rendering behavior in a client-side renderer.</p>
+    <p>The rendering service renders components by retrieving and calling their specific renderers. You can override the default rendering behavior in a client-side renderer.</p>
     <p>See Also: <a href="#reference?topic=api:AuraExpressionService">Methods</a> | <auradocs:topicLink topic="renderers">Using Renderers</auradocs:topicLink></p>
 
     <h3>AuraStorageService</h3>

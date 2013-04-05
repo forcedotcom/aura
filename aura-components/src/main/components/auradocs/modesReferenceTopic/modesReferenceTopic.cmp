@@ -60,7 +60,7 @@
             <tr>
             	<td><b>Access</b></td>
             	<td>Disables access to a <code>.cmp</code> resource in a URL. You can only access a <code>.app</code> resource.</td>
-            	<td>Enables a <code>.cmp</code> resource to be addressed in a URL</td>
+            	<td>Enables a <code>.cmp</code> resource to be addressed in a URL.</td>
             	<td>Similar to <code>PROD</code> mode</td>
             </tr>
             <!-- Not enforced so comment out for now 

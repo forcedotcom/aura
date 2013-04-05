@@ -18,11 +18,40 @@ package org.auraframework.system;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.auraframework.system.Client.Type;
 import org.auraframework.impl.AuraImplTestCase;
+
+import com.google.common.collect.Maps;
 
 public class ClientTest extends AuraImplTestCase {
     public ClientTest(String name) {
         super(name);
+    }
+
+    /**
+     * Verify that useragent string is parsed out to obtain right ClientType
+     */
+    public void testGetType(){
+         Map<String, Type>pairs = Maps.newHashMap();
+         pairs.put("Mozilla/4.0 (compatible; MSIE 6.1; Windows XP; .NET CLR 1.1.4322; .NET CLR 2.0.50727)", Type.IE6 ); 
+         pairs.put("Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)", Type.IE7);
+         pairs.put("Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; Media Center PC 4.0; SLCC1; .NET CLR 3.0.04320)",Type.IE8);
+         pairs.put("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 7.1; Trident/5.0)",Type.IE9);
+         pairs.put("Mozilla/4.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)",Type.IE10);
+         pairs.put("Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1",Type.FIREFOX);
+         pairs.put("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.162 Safari/535.19",Type.WEBKIT);
+         pairs.put("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2",Type.WEBKIT);
+         pairs.put("Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25",Type.WEBKIT);
+         pairs.put("",Type.OTHER);
+         pairs.put("Opera/12.0(Windows NT 5.2;U;en)Presto/22.9.168 Version/12.00",Type.OTHER);
+         
+         for(String userAgent : pairs.keySet()){
+             assertEquals("Unexpected ClientType from userAgent string:", 
+                     pairs.get(userAgent), new Client(userAgent).getType());
+         }
+         assertEquals("Unexpected ClientType from userAgent string:", Type.OTHER, new Client().getType());
+         assertEquals("Unexpected ClientType from userAgent string:", Type.OTHER, new Client(null).getType());
+        
     }
 
     public String[] userAgentsWEBKIT = {
@@ -52,13 +81,13 @@ public class ClientTest extends AuraImplTestCase {
             "Mozilla/5.0 (Windows; U; Win 9x 4.90; SG; rv:1.9.2.4) Gecko/20101104 Netscape/9.1.0285" };
 
     public void testClientTypes() throws Exception {
-        Map<Enum<Client.Type>, String[]> clientToUserAgent = new HashMap<Enum<Client.Type>, String[]>();
-        clientToUserAgent.put(Client.Type.FIREFOX, userAgentsFF);
-        clientToUserAgent.put(Client.Type.IE8, userAgentsIE8);
-        clientToUserAgent.put(Client.Type.WEBKIT, userAgentsWEBKIT);
-        clientToUserAgent.put(Client.Type.OTHER, userAgentsOTHER);
+        Map<Enum<Type>, String[]> clientToUserAgent = new HashMap<Enum<Type>, String[]>();
+        clientToUserAgent.put(Type.FIREFOX, userAgentsFF);
+        clientToUserAgent.put(Type.IE8, userAgentsIE8);
+        clientToUserAgent.put(Type.WEBKIT, userAgentsWEBKIT);
+        clientToUserAgent.put(Type.OTHER, userAgentsOTHER);
 
-        for (Enum<Client.Type> c : clientToUserAgent.keySet()) {
+        for (Enum<Type> c : clientToUserAgent.keySet()) {
 
             for (String userAgentString : clientToUserAgent.get(c)) {
                 assertEquals("Incorrect client type returned for user-agent string:" + userAgentString, new Client(

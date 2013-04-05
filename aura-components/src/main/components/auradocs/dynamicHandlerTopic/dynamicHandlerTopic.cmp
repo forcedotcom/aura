@@ -25,10 +25,10 @@
 	<p>This sample code adds an event handler to instances of <code>auradocs:sampleComponent</code>.</p>
 	<auradocs:codeblock>
 	addNewHandler : function(cmp, event) {
-		var cmpArr = cmp.find({ instancesOf : "auradocs:sampleComponent" });
-		for (var i = 0; i &lt; cmpArr.length; i++){
-		  var outputCmpArr = cmpArr[i];
-		  outputCmpArr.addHandler("someAction", cmp, "c.someAction");
+	  var cmpArr = cmp.find({ instancesOf : "auradocs:sampleComponent" });
+	  for (var i = 0; i &lt; cmpArr.length; i++){
+	    var outputCmpArr = cmpArr[i];
+	    outputCmpArr.addHandler("someAction", cmp, "c.someAction");
 		}
 	}
 	</auradocs:codeblock>

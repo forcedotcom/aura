@@ -109,9 +109,9 @@
         <module>aura-archetype</module>
     </modules>
     <scm>
-        <connection>scm:git:git@git.soma.salesforce.com:aura/aura.git</connection>
-        <url>scm:git:git@git.soma.salesforce.com:aura/aura.git</url>
-        <developerConnection>scm:git:git@git.soma.salesforce.com:aura/aura.git</developerConnection>
+        <connection>scm:git:git@github.com:forcedotcom/lumen-beta.git</connection>
+        <url>scm:git:git@github.com:forcedotcom/lumen-beta.git</url>
+        <developerConnection>scm:git:git@github.com:forcedotcom/lumen-beta.git</developerConnection>
     </scm>
     <dependencies>
         <dependency>

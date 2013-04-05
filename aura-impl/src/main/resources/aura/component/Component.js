@@ -72,17 +72,29 @@ Component.prototype.index = function(localId, globalId){
 /**
  * Removes data from the index. If both globalId and localId are provided, only the given pair is removed from the index.
  * If only localId is provided, every mapping for that localId is removed from the index.
+ *
+ * This might be called after component destroy in some corner cases, be careful to check for priv before
+ * accessing.
+ *
  * @param {String} localId The id set using the aura:id attribute.
  * @param {String} globalId The globally unique id which is generated on pageload.
  * @protected
  */
 Component.prototype.deIndex = function(localId, globalId){
     var priv = this.priv;
+
+    if (!priv) {
+//#if {"modes" : ["DEVELOPMENT"]}
+        $A.error("deIndex after destroy on "+globalId+" [ "+localId+" ]");
+//#end
+        return;
+    }
+
     if(priv.delegateValueProvider){
         return priv.delegateValueProvider.deIndex(localId, globalId);
     }
 
-    if (priv && priv.index) {
+    if (priv.index) {
         if(globalId){
             var index = priv.index[localId];
             if(index){

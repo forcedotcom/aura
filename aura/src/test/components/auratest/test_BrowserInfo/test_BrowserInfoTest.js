@@ -39,6 +39,7 @@
 	},
 	
 	testInvalidProperties : {
+		testLabels : ["UnAdaptableTest"],
         test : function(component) {
         	$A.test.assertEquals(undefined, $A.get("$Browser.isUnknown"), "Unexpected property 'isUnknown' found on $Browser");
         	$A.test.assertEquals(undefined, $A.get("$Browser.isAndroid.really", "Unexpected subproperty 'isAndroid.really' found on $Browser"));

@@ -28,4 +28,9 @@
             <aurajstest:jstestCase aura:id="test" case="{!case}" url="{!m.url}" suite="{!m.testSuite}" done="{!c.testDone}"/>
         </aura:forEach>
     </ui:tabset>
+
+    <section class="suiteCode">
+        <h1>JS Test Suite <span onclick="{!c.toggleCode}">Display</span></h1>
+        <pre aura:id="test-suite-code">{!m.testSuite.code}</pre>
+    </section>
 </aura:application>

@@ -43,8 +43,7 @@
 	display:inline-block;
 	width:16px;
 	height:16px;
-	margin-right:4px;
-	margin-left:-4px;
+	margin: 4px 4px 0 0;
 	float:left;
 }
 

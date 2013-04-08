@@ -24,12 +24,35 @@ import java.util.TimeZone;
 import org.auraframework.util.AuraLocale;
 
 /**
- * Provides access to AuraLocale instances.
+ * Provides access to AuraLocale instances and enables a custom label adapter implementation.
  */
 public interface LocalizationAdapter extends AuraAdapter {
 
+    /**
+     * Returns the specified label. 
+     * @param section 
+     *      The section in the label definition file where the label is defined. 
+     *      This assumes your label name has two parts (section.name). 
+     *      This parameter can be <code>null</code> depending on your label system implementation.
+     * @param name
+     *      The label name.
+     * @param params
+     *      A list of parameter values for substitution on the server. 
+     *      This parameter can be <code>null</code> if parameter substitution is done on the client.
+     * @return
+     */
     String getLabel(String section, String name, Object... params);
 
+    /**
+     * Indicates whether the specified label is defined or not.
+     * @param section
+     *      The section in the label definition file where the label is defined. 
+     *      This assumes your label name has two parts (section.name). 
+     *      This parameter can be <code>null</code> depending on your label system implementation.
+     * @param name
+     *      The label name.
+     * @return True if the specified label is defined; otherwise, false.
+     */
     boolean labelExists(String section, String name);
 
     /**

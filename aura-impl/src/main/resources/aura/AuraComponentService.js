@@ -87,7 +87,8 @@ var AuraComponentService = function(){
 
         /**
          * Create a new component, using the format: newComponent("ui:inputText") or
-         * newComponent({componentDef: {descriptor: "markup://namespace:name"}, attributes: { values: { key: value }} })
+         * newComponent({componentDef: {descriptor: "markup://namespace:name"}, attributes: { values: { key: value }} })<br />
+         * See <a href="#help?topic=dynamicCmp">Dynamically Creating Components</a> for more information.
          * @param {Object} config
          * 				Use config to pass in your component definition and attributes. Supports lazy or exclusive loading by passing in "load": "LAZY" or "load": "EXCLUSIVE"
          * @param {Object} attributeValueProvider

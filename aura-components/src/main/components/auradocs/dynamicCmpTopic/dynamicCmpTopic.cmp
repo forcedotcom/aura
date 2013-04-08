@@ -86,6 +86,8 @@
     
     <h4>Destroying Components</h4>
     <p>Destroy components when you don't need them again to clean up memory. In the demo, <code>body.destroy()</code> removes all components in the <code>body</code> element, unrenders and removes them from the DOM. It also removes all event handlers on the components.</p>
+    <p>When destroying components, destroy only components that you don't need. For example, don't destroy a component if you still have a dependency on its model.
+    Additionally, we don't recommend destroying components in cases where it may result in orphaned components or dangling value providers.</p>
 
     <auradocs:info><code>newLocalComponent()</code> is deprecated and has been replaced by <code>newComponent()</code>. See the <a href="#reference?topic=api:AuraComponentService">JavaScript API reference</a> for a full list of methods.</auradocs:info>
 	  

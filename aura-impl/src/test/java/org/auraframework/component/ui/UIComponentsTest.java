@@ -64,5 +64,5 @@ public class UIComponentsTest extends AuraImplTestCase {
         return ret;
     }
 
-    private static final Set<String> NON_EXTENSIBLE_COMPONENTS = Sets.newHashSet("vbox", "resizeObserver", "scroller");
+    private static final Set<String> NON_EXTENSIBLE_COMPONENTS = Sets.newHashSet("vbox", "resizeObserver", "scroller", "list");
 }

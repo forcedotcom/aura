@@ -22,7 +22,7 @@
 
         var tag = attributes.get("tag");
         if ($A.util.isUndefinedOrNull(tag)) {
-            $A.error("Undefined tag "+component.getGlobalId(), false);
+            $A.error("Undefined tag attribute for "+component.getGlobalId(), false);
             tag = "div";
         }
         var HTMLAttributes = attributes.getValue("HTMLAttributes");

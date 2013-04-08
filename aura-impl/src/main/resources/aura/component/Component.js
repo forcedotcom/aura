@@ -124,6 +124,7 @@ Component.prototype.deIndex = function(localId, globalId){
 /**
  * Locates a component using the localId.
  * Shorthand: get("asdf"), where "asdf" is the aura:id of the component to look for.
+ * See <a href="#help?topic=findById">Finding Components by ID</a> for more information.
  * @param {String|Object} name If name is an object, return instances of it. Otherwise, finds a component using its index.
  * @public
  */
@@ -264,7 +265,7 @@ Component.prototype.implementsDirectly = function(type){
 
 /**
  * Adds an event handler. Resolving the handler Action happens at Event-handling time, so the Action reference may be altered at runtime,
- * and that change is reflected in the handler.
+ * and that change is reflected in the handler. See <a href="#help?topic=dynamicHandler">Dynamically Adding Event Handlers</a> for more information.
  * @param {String} eventName The event name
  * @param {Object} valueProvider The value provider to use for resolving the actionExpression.
  * @param {Object} actionExpression The expression to use for resolving the handler Action against the given valueProvider.
@@ -593,6 +594,7 @@ Component.prototype.getElement = function(){
 
 /**
  * Returns the collection of attributes for this component.
+ * See <a href="#help?topic=hideMarkup">Dynamically Showing or Hiding Markup</a> for more information.
  * Shorthand : get("v")
  */
 Component.prototype.getAttributes = function() {

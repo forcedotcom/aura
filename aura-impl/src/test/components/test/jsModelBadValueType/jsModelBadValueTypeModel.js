@@ -1,3 +1,3 @@
 {
-    badType : function() {}
+    "badType" : function() {}
 }

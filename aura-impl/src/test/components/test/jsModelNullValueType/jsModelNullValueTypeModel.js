@@ -1,3 +1,3 @@
 {
-    nullType : null
+    "nullType" : null
 }

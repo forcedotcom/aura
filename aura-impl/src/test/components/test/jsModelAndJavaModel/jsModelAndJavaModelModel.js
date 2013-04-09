@@ -14,5 +14,5 @@
  * limitations under the License.
  */
 {
-    str : "js model string"
+    "str" : "js model string"
 }

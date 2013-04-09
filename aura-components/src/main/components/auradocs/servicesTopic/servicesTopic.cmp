@@ -33,7 +33,7 @@
     <h3>AuraDevToolService</h3>
     <h4><code>$A.devToolService</code></h4>
    <p>The dev tool service helps you debug and test in non-production modes by enabling you to query the current state of objects and get statistics about a running app.
-      For example, you can query all components using <code>$A.getQueryStatement().query()</code>.</p>
+      For example, you can get a list of available views using <code>$A.devToolService.views</code>.</p>
    <p>See Also: <auradocs:topicLink topic="modesReference">Modes</auradocs:topicLink> | <auradocs:topicLink topic="queryLang">Querying State and Statistics</auradocs:topicLink></p>
 
     <h3>AuraEventService</h3>

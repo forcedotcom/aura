@@ -16,7 +16,7 @@
 
 -->
 <aura:component extends="ui:abstractList" support="proto">
-	<ul>
+	<ul class="{!v.class}">
 	<aura:iteration items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}">
 		
 	</aura:iteration>

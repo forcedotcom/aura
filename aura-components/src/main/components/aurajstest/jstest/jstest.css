@@ -94,6 +94,18 @@
     box-shadow: inset 0px 1px 0px 0px #6ad2ef;
 }
 
+.aurajstestJstest ul li.uiTab.active > a.tabHeader {
+    color: #333;
+    background: #ffa84c; /* Old browsers */
+    background: -moz-linear-gradient(top, #ffa84c 0%, #ff7b0d 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffa84c), color-stop(100%,#ff7b0d)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #ffa84c 0%,#ff7b0d 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #ffa84c 0%,#ff7b0d 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #ffa84c 0%,#ff7b0d 100%); /* IE10+ */
+    background: linear-gradient(to bottom, #ffa84c 0%,#ff7b0d 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffa84c', endColorstr='#ff7b0d',GradientType=0 ); /* IE6-9 */
+}
+
 .aurajstestJstest ul li.uiTab > a.tabHeader:hover {
     overflow: visible;
     color: #333;

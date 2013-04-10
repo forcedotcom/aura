@@ -33,6 +33,7 @@ $A.ns.Util = function() {
     this["Bitset"] = Bitset;
     this.objToString = Object.prototype.toString;
     this.trashedComponentQueue = [];
+    this.dataAttributeCache = {};
 };
 
 /**
@@ -889,7 +890,7 @@ $A.ns.Util.prototype.getDataAttribute = function(element, key) {
         return null;
     }
 
-    key = "data-" + this.camelCaseToHyphens(key);
+    key = this.getDataAttributeName(key);
 
     return element.getAttribute(key);
 };
@@ -907,13 +908,23 @@ $A.ns.Util.prototype.setDataAttribute = function(element, key, value) {
         return null;
     }
 
-    key = "data-" + this.camelCaseToHyphens(key);
+    key = this.getDataAttributeName(key);
 
     if (!this.isUndefined(value)) {
         return element.setAttribute(key, value);
     }
     return element.removeAttribute(key);
 
+};
+
+$A.ns.Util.prototype.getDataAttributeName = function(key) {
+	var name = this.dataAttributeCache[key];
+	if (!name) {
+		name = "data-" + this.camelCaseToHyphens(key);
+		this.dataAttributeCache[key] = name;
+	}
+	
+	return name;
 };
 
 /**

@@ -34,7 +34,40 @@
         })
         return count;
     },
-
+    /**
+     * Verify getVaue of map values.
+     */
+    testGetValue:{
+	test: [function(component){
+            var mval = $A.expressionService.create(null, {"string":"something","integer":23,"boolean":true});
+            $A.test.assertEquals("MapValue", mval.toString(), "expected an MapValue");
+            $A.test.assertEquals(3, this.calculateSize(mval), "expected 3 wrapped values");
+            $A.test.assertEquals("SimpleValue", mval.getValue("string").toString(), "expected value object");
+            $A.test.assertEquals("something", mval.getValue("string").getValue(), "expected string value");
+            $A.test.assertEquals(23, mval.getValue("integer").getValue(), "expected integer value");
+            $A.test.assertEquals(true, mval.getValue("boolean").getValue(), "expected boolean value");
+        },function(component){
+            var mval = $A.expressionService.create(null, {});
+            $A.test.assertEquals("MapValue", mval.toString(), "expected an MapValue");
+            $A.test.assertEquals(0, this.calculateSize(mval), "expected 0 wrapped values");
+            //Non-existing key, will create a new key with an undefined value
+            var temp = mval.getValue("foo");
+            $A.test.assertDefined(temp);
+            $A.test.assertUndefinedOrNull(temp.getValue(), "expected undefined when a non-existing key is used");
+            //No Key
+            try{
+        	mval.getValue();
+        	$A.test.fail("getValue cannot be called without a key")
+            }catch(e){/*Expected*/}
+            //Non string key TODO: W-1611590
+            /*mval = $A.expressionService.create(null, {23:"bar"});
+            var key = 23;
+            $A.test.assertEquals("bar", mval.getValue(key).getValue(), "expected string value");*/
+            try{mval.getValue(undefined); $A.test.fail("getValue cannot be called with an undefined key");}catch(e){}
+            try{mval.getValue(""); $A.test.fail("getValue cannot be called with an empty key");}catch(e){}
+        }
+        ]
+    },
     /**
      * Test getting a property reference from a MapValue.
      */

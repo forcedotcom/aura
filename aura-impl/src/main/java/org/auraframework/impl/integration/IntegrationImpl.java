@@ -142,19 +142,7 @@ public class IntegrationImpl implements Integration {
                                 locatorDomId,
                                 localId));
 
-                out.append("<script>");
-
-                // To avoid "HTML Parsing Error: Unable to modify the parent container element before the child element is closed" exceptions in IE7/8
-                Type clientType = context.getClient().getType();
-                if (clientType == Type.IE7 || clientType == Type.IE8) {
-                    StringBuilder onload = new StringBuilder("$A.util.on(window, 'load', function() {\n");
-                    onload.append(init);
-                    onload.append("\n});");
-
-                    init = onload;
-                }
-
-                out.append(init).append("</script>");
+                out.append("<script>").append(init).append("</script>");
 
             } catch (Throwable t) {
                 // DCHASMAN TODO W-1498425 Refine this approach - we currently have 2 conflicting exception handling mechanisms kicking in that need to be

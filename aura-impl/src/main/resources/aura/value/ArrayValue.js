@@ -42,6 +42,8 @@ ArrayValue.prototype.auraType = "Value";
 
 /**
  * Returns the value object at the specified index.
+ * getValue('length') will return a value object representing the length of this array value.
+ * Any other argument for getValue() will flag an error.
  */
 ArrayValue.prototype.getValue = function(i) {
     if (aura.util.isString(i)) {

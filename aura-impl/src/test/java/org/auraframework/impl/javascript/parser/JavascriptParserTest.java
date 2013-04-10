@@ -94,8 +94,9 @@ public class JavascriptParserTest extends AuraImplTestCase {
         try {
             parser.parse(descriptor, source);
         } catch (Exception e) {// Expect a file not found Exception
-            checkExceptionFull(e, AuraRuntimeException.class,
-                    "Resource not found: components_aura_impl/test/testNoJSControllers/testNoJSControllersTest.js");
+            assertEquals("Exception must be " + AuraRuntimeException.class.getSimpleName(), AuraRuntimeException.class,
+                    e.getClass());
+            e.getMessage().contains("testNoJSControllersTest.js");
         }
         // Test case 2: Null source
         try {

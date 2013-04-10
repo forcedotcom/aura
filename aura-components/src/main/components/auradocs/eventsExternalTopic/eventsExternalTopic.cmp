@@ -34,6 +34,7 @@ var myExternalEvent;
 </auradocs:codeblock>
 <p><code>window.opener.$A.get()</code> references the master window where your Aura app is loaded.</p>
   <p><b>See also:</b><br/>
-      <auradocs:topicLink topic="eventsApp">Application Events</auradocs:topicLink>
+      <auradocs:topicLink topic="eventsApp">Application Events</auradocs:topicLink><br/>
+      <auradocs:topicLink topic="jsModCmpExternal">Modifying Components from External JavaScript</auradocs:topicLink>
     </p>
 </aura:component>

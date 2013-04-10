@@ -594,30 +594,31 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 				"second", true);
 	}
 
-	public void testPostAfterDependencyChange() throws Exception {
-		final DefDescriptor<?> depDesc = addSourceAutoCleanup(
-				ComponentDef.class,
-				String.format(baseComponentTag, "",
-						"<aura:attribute name='val' type='String' default='initial'/>"));
-		DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent(
-				"",
-				String.format("<aura:dependency resource='%s'/>",
-						depDesc.getQualifiedName()));
-		open(cmpDesc);
-		assertEquals("initial", auraUITestingUtil.getEval(String.format(
-				"return $A.componentService.newComponent('%s').get('v.val');",
-				depDesc.getDescriptorName())));
-		updateStringSource(depDesc, String.format(baseComponentTag, "",
-				"<aura:attribute name='val' type='String' default='final'/>"));
-		triggerServerAction();
-		auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
-			@Override
-			public Boolean apply(WebDriver input) {
-				return "final"
-						.equals(auraUITestingUtil.getEval(String
-								.format("return window.$A && $A.componentService.newComponent('%s').get('v.val');",
-										depDesc.getDescriptorName())));
-			}
-		});
-	}
+    public void testPostAfterDependencyChange() throws Exception {
+        final DefDescriptor<?> depDesc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(baseComponentTag, "",
+                        "<aura:attribute name='val' type='String' default='initial'/>"));
+        DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent(
+                "",
+                String.format("<aura:dependency resource='%s'/>",
+                        depDesc.getQualifiedName()));
+        open(cmpDesc);
+        assertEquals("initial", auraUITestingUtil.getEval(String.format(
+                "return $A.componentService.getDef('%s').getAttributeDefs().getDef('val').getDefault();",
+                depDesc.getDescriptorName())));
+        updateStringSource(depDesc, String.format(baseComponentTag, "",
+                "<aura:attribute name='val' type='String' default='final'/>"));
+        triggerServerAction();
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver input) {
+                auraUITestingUtil.waitForDocumentReady();
+                auraUITestingUtil.waitForAuraFrameworkReady(null);
+                return "final".equals(auraUITestingUtil.getEval(String.format(
+                    "return window.$A && $A.componentService.getDef('%s').getAttributeDefs().getDef('val').getDefault();",
+                    depDesc.getDescriptorName())));
+            }
+        });
+    }
 }

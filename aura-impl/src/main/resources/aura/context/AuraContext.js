@@ -68,8 +68,8 @@ function AuraContext(config) {
 
 /**
  * Returns the mode for the current request. Defaults to "PROD" for production mode and "DEV" for development mode.
- * The HTTP request format is http://<your server>/namespace/component?aura.mode=PROD. <br/>
- * For a full list of modes, see <a href="http://jenkins.auraframework.org/view/All/job/aura_doc/javadoc/aura/system/AuraContext.Mode.html" target="_blank">AuraContext</a>.
+ * The HTTP request format is <code>http://<your server>/namespace/component?aura.mode=PROD</code>.
+ * <p>See Also: <a href="#help?topic=modesReference">AuraContext</a></p>
  */
 AuraContext.prototype.getMode = function() {
     return this.mode;

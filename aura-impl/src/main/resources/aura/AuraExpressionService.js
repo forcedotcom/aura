@@ -34,8 +34,8 @@ var AuraExpressionService = function AuraExpressionService(){
         },
 
         /**
-         * Get the wrapped value of an expression. Use Component.getValue() if you are retrieving the value of a component.
-         * $A.expressionService.get(cmp, "v.attribute") is equivalent to cmp.getValue("v.attribute").
+         * Get the wrapped value of an expression. Use <code>Component.getValue()</code> if you are retrieving the value of a component.
+         * <code>$A.expressionService.get(cmp, "v.attribute")</code> is equivalent to <code>cmp.getValue("v.attribute")</code>.
          * @param {Object} valueProvider The value provider
          * @param {String} expression The expression to be evaluated
          * @public
@@ -68,7 +68,7 @@ var AuraExpressionService = function AuraExpressionService(){
         },
 
         /**
-         * Get the raw value referenced using property syntax. Use Component.get() if you are retrieving the value of a component.
+         * Get the raw value referenced using property syntax. Use <code>Component.get()</code> if you are retrieving the value of a component.
          * @param {Object} valueProvider The value provider
          * @param {String} expression The expression to be evaluated
          * @public

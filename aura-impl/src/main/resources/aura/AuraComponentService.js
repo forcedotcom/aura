@@ -25,7 +25,7 @@ var AuraComponentService = function(){
         renderedBy: "auraRenderedBy",
 
         /**
-         * Get an instance of a component.
+         * Gets an instance of a component.
          * @param {String} globalId
          * 				The generated globally unique Id of the component that changes across pageloads.
          * @memberOf AuraComponentService
@@ -37,7 +37,7 @@ var AuraComponentService = function(){
         },
 
         /**
-         * Get the rendering component for the provided element recursively.
+         * Gets the rendering component for the provided element recursively.
          * @param {Object} element
          * 				The element that is used to find the rendering component
          * @memberOf AuraComponentService
@@ -60,7 +60,7 @@ var AuraComponentService = function(){
         },
 
         /**
-         * Get the attribute provider for the provided element by calling getAttributes().getValueProvider().
+         * Gets the attribute provider for the provided element.
          * @param {Object} element
          * 				The element whose attribute provider is to be returned
          * @memberOf AuraComponentService
@@ -86,9 +86,9 @@ var AuraComponentService = function(){
         },
 
         /**
-         * Create a new component, using the format: newComponent("ui:inputText") or
-         * newComponent({componentDef: {descriptor: "markup://namespace:name"}, attributes: { values: { key: value }} })<br />
-         * See <a href="#help?topic=dynamicCmp">Dynamically Creating Components</a> for more information.
+         * Creates a new component on the client or server and initializes it. For example <code>$A.services.component.newComponent("ui:inputText")</code>
+         * creates a <code>ui:inputText</code> component.
+         * <p>See Also: <a href="#help?topic=dynamicCmp">Dynamically Creating Components</a></p>
          * @param {Object} config
          * 				Use config to pass in your component definition and attributes. Supports lazy or exclusive loading by passing in "load": "LAZY" or "load": "EXCLUSIVE"
          * @param {Object} attributeValueProvider
@@ -170,7 +170,7 @@ var AuraComponentService = function(){
         },
 
         /**
-         * Index the component using its global Id, which is uniquely generated across pageloads.
+         * Indexes the component using its global Id, which is uniquely generated across pageloads.
          * @private
          */
         index: function(component){
@@ -178,9 +178,9 @@ var AuraComponentService = function(){
         },
 
         /**
-         * Get the component definition from the registry.
+         * Gets the component definition from the registry.
          * @param {Object} config
-         * 	@param {Object} noInit
+         * @param {Object} noInit
          * @returns {ComponentDef}  The metadata of the component
          * @memberOf AuraComponentService
          * @public
@@ -190,7 +190,7 @@ var AuraComponentService = function(){
         },
 
         /**
-         * Get the component's controller definition from the registry.
+         * Gets the component's controller definition from the registry.
          * @private
          */
         getControllerDef : function(config){
@@ -198,7 +198,7 @@ var AuraComponentService = function(){
         },
 
         /**
-         * Get the action definition from the registry.
+         * Gets the action definition from the registry.
          * @private
          */
         getActionDef : function(config){
@@ -206,7 +206,7 @@ var AuraComponentService = function(){
         },
 
         /**
-         * Get the model definition from the registry.
+         * Gets the model definition from the registry.
          * @private
          */       
         getModelDef : function(config){
@@ -214,7 +214,7 @@ var AuraComponentService = function(){
         },
 
         /**
-         * Get the provider definition from the registry. A provider enables an abstract component definition to be used directly in markup.
+         * Gets the provider definition from the registry. A provider enables an abstract component definition to be used directly in markup.
          * @private
          */
         getProviderDef : function(providerDefDescriptor, config){
@@ -222,7 +222,7 @@ var AuraComponentService = function(){
         },
 
         /**
-         * Get the renderer definition from the registry.
+         * Gets the renderer definition from the registry.
          * @private
          */
         getRendererDef : function(componentDefDescriptor, config){
@@ -230,7 +230,7 @@ var AuraComponentService = function(){
         },
 
         /**
-         * Get the helper definition from the registry.
+         * Gets the helper definition from the registry.
          * @private
          */
         getHelperDef : function(componentDefDescriptor, config, componentDef){
@@ -238,7 +238,7 @@ var AuraComponentService = function(){
         },
 
         /**
-         * Destroy the components.
+         * Destroys the components.
          * @private
          */
         destroy: function(components){
@@ -255,7 +255,7 @@ var AuraComponentService = function(){
         },
 
         /**
-         * Remove the index of the component.
+         * Removes the index of the component.
          * @private
          */
         deIndex: function(component){
@@ -263,7 +263,7 @@ var AuraComponentService = function(){
         },
 
         /**
-         * Return the descriptors of all components known to the registry.
+         * Returns the descriptors of all components known to the registry.
          * @memberOf AuraComponentService
          * @private
          */

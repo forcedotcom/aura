@@ -28,7 +28,10 @@ var AuraLayoutService = function(){
     var layoutService = {
         // Call this method to make use of the layoutHandler override and pass in params that override the existing URL params
     		/**
-    		 * Change the location with new URL and parameters.
+    		 * Changes the location with new URL and parameters. <p>Example:</p>
+    		 * <code>$A.layoutService.changeLocation(location, {<br />
+    		 * &nbsp;&nbsp;renderAll : false<br />
+    		 * });</code>
     		 * @param {Object} newLocation The new location set to the hash of the URL
     		 * @param {Object} overrideParams The parameters that override the existing URL parameters
     		 * @memberOf AuraLayoutService
@@ -100,7 +103,7 @@ var AuraLayoutService = function(){
         },
         
        /**
-        * Refresh the current layout.
+        * Refreshes the current layout.
         * @memberOf AuraLayoutService
         * @public
         */
@@ -110,7 +113,7 @@ var AuraLayoutService = function(){
         },
 
         /**
-         * Load the previous layout and update the history, or the default layout
+         * Loads the previous layout and updates the history, or the default layout.
          * @memberOf AuraLayoutService
          * @public 
          */
@@ -129,7 +132,7 @@ var AuraLayoutService = function(){
         },
 
         /**
-         * Clear the history.
+         * Clears the history.
          * @memberOf AuraLayoutService
          * @public
          */
@@ -147,7 +150,7 @@ var AuraLayoutService = function(){
         },
 
         /**
-         * Get the requested layout.
+         * Gets the requested layout.
          * @param {String} name The name of the layout to be retrieved
          * @param {Object} params Set params only for actions specified in the layouts file
          * @param {Boolean} noTrack If set to true, the service does not track the layout
@@ -298,10 +301,8 @@ var AuraLayoutService = function(){
         },
 
         /**
-         * Set the current layout title.
+         * Sets the current layout title. For example, <code>$A.layoutService.setCurrentLayoutTitle(cmp.get("v.title"));</code> sets the title based on an attribute.
          * @param {Object} title The title of the layout
-         * @description Example: 
-         * $A.layoutService.setCurrentLayoutTitle(label.getValue())
          * @memberOf AuraLayoutService
          * @public
          */

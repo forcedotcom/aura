@@ -22,8 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.Aura;
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.def.ActionDef.ActionType;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -31,6 +35,7 @@ import org.auraframework.def.RendererDef;
 import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.javascript.controller.JavascriptActionDef;
 import org.auraframework.impl.javascript.controller.JavascriptControllerDef;
 import org.auraframework.impl.javascript.renderer.JavascriptRendererDef;
@@ -43,9 +48,13 @@ import org.auraframework.impl.source.resource.ResourceJavascriptSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraImplFiles;
+import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.instance.Component;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.ServiceLocator;
+import org.auraframework.util.json.Json;
+import org.openqa.selenium.By;
 
 /**
  * This class tests the usage of Javascript to specify Controllers, Renderers
@@ -118,14 +127,35 @@ public class JavascriptParserTest extends AuraImplTestCase {
             fail("Expected AuraAssertionException, not" + e.getClass().getName());
         }
     }
-
-    /**
-     * TODO:New test Case: Having duplicate controller methods What if there are
-     * two actions in the javascript controller with the same name.
-     */
-    public void testDuplicateJSController() throws Exception {
-
-    }
+    
+    
+	/**
+	 * Having duplicate controller methods What if there are two actions in the
+	 * javascript controller with the same name.
+	 */
+	public void testDuplicateJSController() throws Exception {
+		DefDescriptor<ControllerDef> descriptor = DefDescriptorImpl
+				.getInstance("js://test.testDuplicateJSController",
+						ControllerDef.class);
+		Source<?> source = getJavascriptSourceLoader().getSource(descriptor);
+		Definition controller = parser.parse(descriptor, source);
+		assertTrue(controller instanceof JavascriptControllerDef);
+		JavascriptControllerDef obj = (JavascriptControllerDef) controller;
+		Map<String, JavascriptActionDef> controllerActions = obj
+				.getActionDefs();
+		assertTrue(controllerActions.containsKey("functionName"));
+		// If we have more than one controller function with same name, the later one will replace the previous one
+		//assertTrue(controllerActions.size() == 1);
+		// Verify the only JavascriptAction Def we have
+		JavascriptActionDef jsActionDef = null;
+		jsActionDef = controllerActions.get("functionName");
+		assertEquals(ActionType.CLIENT, jsActionDef.getActionType());
+		String[] jsonres = (Json.serialize(jsActionDef)).split("\"");
+		// Verify the second function did replace the first one
+		assertEquals(
+				"testDuplicateJSController in JavascriptParserTest, second function didn't survive",
+				":function(component) {var v = 2;},", jsonres[10]);
+	}
 
     /**
      * Test method for {@link JavascriptParser#parse(DefDescriptor, Source)}.
@@ -147,13 +177,10 @@ public class JavascriptParserTest extends AuraImplTestCase {
         // Convert from a generic controller to a Javascript type controller
         JavascriptControllerDef obj = (JavascriptControllerDef) controller;
         // Step 4: Verify properties of JavascriptRenderDef Object
-        // OBject that is to be verified, The Def object name / Qualified name,
-        // Name of the Def / Descriptor, prefix of
-        // the Def object, Namespace of the descriptor, Resource represented in
-        // terms of Aura component namespace
-        verifyBasicDefinitionAttributes(obj, "js://test.testJSController", "testJSController", "js", "test",
-                "js://test.testJSController");
-
+        // OBject that is to be verified: Qualified name,
+        assertEquals("unexpected qualifiedName of controller in testJSController.",
+        		"js://test.testJSController", obj.getDescriptor().getQualifiedName());
+        
         serializeAndGoldFile(controller, "_JSControllerDef");
 
         // 2.2: Should not be able to create an instance of the client action on
@@ -186,12 +213,11 @@ public class JavascriptParserTest extends AuraImplTestCase {
         // Verify the Serialized form of the objects
         serializeAndGoldFile(controllerActions.get("functionName1"), "_actionDef_functionName1");
 
-        // OBject that is to be verified, The Def object name / Qualified name,
-        // Name of the Def / Descriptor, prefix of
-        // the Def object, Namespace of the descriptor, Resource represented in
-        // terms of Aura component namespace
-        verifyBasicDefinitionAttributes(jsActionDef, "js://test.testJSController/ACTION$functionName1",
-                "functionName1", "js", "test", "js://test.testJSController");
+        // OBject that is to be verified,  Qualified name
+		assertEquals(
+				"unexpected qualifiedName for functionName1 in testJSController",
+				"js://test.testJSController/ACTION$functionName1", jsActionDef
+						.getDescriptor().getQualifiedName());
 
         // 3.3.2 Action Def 2
         jsActionDef = controllerActions.get("functionName2");
@@ -201,13 +227,11 @@ public class JavascriptParserTest extends AuraImplTestCase {
         assertNull(jsActionDef.getReturnType());
         // Verify the Serialized form of the objects
         serializeAndGoldFile(controllerActions.get("functionName2"), "_actionDef_functionName2");
-
-        // OBject that is to be verified, The Def object name / Qualified name,
-        // Name of the Def / Descriptor, prefix of
-        // the Def object, Namespace of the descriptor, Resource represented in
-        // terms of Aura component namespace
-        verifyBasicDefinitionAttributes(jsActionDef, "js://test.testJSController/ACTION$functionName2",
-                "functionName2", "js", "test", "js://test.testJSController");
+        // OBject that is to be verified, Qualified name
+        assertEquals(
+				"unexpected qualifiedName for functionName2 in testJSController",
+				"js://test.testJSController/ACTION$functionName2", jsActionDef
+						.getDescriptor().getQualifiedName());
 
     }
 
@@ -246,12 +270,11 @@ public class JavascriptParserTest extends AuraImplTestCase {
         // 3.4.2: Verify the Serialized form of the objects
         serializeAndGoldFile(jsActionDef, "_actionDef_functionName1");
 
-        // OBject that is to be verified, The Def object name / Qualified name,
-        // Name of the Def / Descriptor, prefix of
-        // the Def object, Namespace of the descriptor, Resource represented in
-        // terms of Aura component namespace
-        verifyBasicDefinitionAttributes(jsActionDef, "js://test.testJSControllerParent/ACTION$functionName1",
-                "functionName1", "js", "test", "js://test.testJSControllerParent");
+        // OBject that is to be verified, Qualified name
+        assertEquals(
+				"unexpected qualifiedName of functionName1 in testNestedComponent",
+				"js://test.testJSControllerParent/ACTION$functionName1", jsActionDef
+						.getDescriptor().getQualifiedName());
     }
 
     /**
@@ -322,13 +345,10 @@ public class JavascriptParserTest extends AuraImplTestCase {
         // Step 3: Gold file the JAvascriptRenderDef
         serializeAndGoldFile(renderer, "_JSRendererDef");
         // Step 4: Verify properties of JavascriptRenderDef Object
-        // OBject that is to be verified, The Def object name / Qualified name,
-        // Name of the Def / Descriptor, prefix of
-        // the Def object, Namespace of the descriptor, Resource represented in
-        // terms of Aura component namespace
-        verifyBasicDefinitionAttributes(obj, "js://test.testJSRenderer", "testJSRenderer", "js", "test",
-                "js://test.testJSRenderer");
-
+        // OBject that is to be verified, Qualified name,
+        assertEquals(
+				"unexpected qualifiedName of renderer in testJSRenderer",
+				"js://test.testJSRenderer", obj.getDescriptor().getQualifiedName());
     }
 
     /**
@@ -344,9 +364,9 @@ public class JavascriptParserTest extends AuraImplTestCase {
         try {
             // Parse and create the RedererDef object for the component
             parser.parse(descriptor, source);
-            // TODO: Currently a feature request. Uncomment the test once this
-            // is fixed
-            // fail("Javascript renderer should have only two actions : render & rerender");
+            // TODO: W-689596 is a broad bug that would cover this case. 
+            //Uncommnet the test once validation is added in JavascriptRendererDefHandler.  
+            //fail("Javascript renderer should have only two actions : render & rerender");
         } catch (AuraRuntimeException expected) {
             // expected
         }
@@ -372,13 +392,10 @@ public class JavascriptParserTest extends AuraImplTestCase {
         serializeAndGoldFile(testSuite, "_JSTestSuite");
 
         // Step 3: Verify the properties of the JavascriptTestSuiteDef object
-        // OBject that is to be verified, The Def object name / Qualified name,
-        // Name of the Def / Descriptor, prefix of
-        // the Def object, Namespace of the descriptor, Resource represented in
-        // terms of Aura component namespace
-        verifyBasicDefinitionAttributes((JavascriptTestSuiteDef) testSuite, "js://test.testJSTestSuite",
-                "testJSTestSuite", "js", "test", "js://test.testJSTestSuite");
-
+        // OBject that is to be verified, Qualified name,
+        assertEquals(
+				"unexpected qualifiedName of testSuite in testJSTestSuite",
+				"js://test.testJSTestSuite", ((JavascriptTestSuiteDef)testSuite).getDescriptor().getQualifiedName());
         // Step 4: Verify each testCaseDef objects in the test suite object
         List<TestCaseDef> testCases = ((JavascriptTestSuiteDef) testSuite).getTestCaseDefs();
         assertEquals(3, testCases.size());
@@ -390,39 +407,32 @@ public class JavascriptParserTest extends AuraImplTestCase {
                 assertTrue(attributes.size() == 1);
                 assertTrue(attributes.containsKey("num"));
                 assertEquals("2", attributes.get("num"));
-                // OBject that is to be verified, The Def object name /
-                // Qualified name, Name of the Def / Descriptor,
-                // prefix of the Def object, Namespace of the descriptor,
-                // Resource represented in terms of Aura
-                // component namespace
-                // TODO:W-766231
-                // verifyBasicDefinitionAttributes((DefinitionImpl)o,"js://test.testJSTestSuite/testHelloWorld","testHelloWorld",null,null,"js://test.testJSTestSuite");
+                // OBject that is to be verified, Qualified name
+                assertEquals(
+         				"unexpected qualifiedName of testHelloWorld in testJSTestSuite",
+         				"js://test.testJSTestSuite/TESTCASE$testHelloWorld", 
+         				((DefinitionImpl)o).getDescriptor().getQualifiedName());
             } else if (testCaseDef.getName().equals("testHelloWorld2")) {
                 assertTrue(attributes.size() == 1);
                 assertTrue(attributes.containsKey("num"));
                 // Should get the default Attribute value
                 assertEquals("5", attributes.get("num"));
-                // OBject that is to be verified, The Def object name /
-                // Qualified name, Name of the Def / Descriptor,
-                // prefix of the Def object, Namespace of the descriptor,
-                // Resource represented in terms of Aura
-                // component namespace
-                // TODO:W-766231
-                // verifyBasicDefinitionAttributes((DefinitionImpl)o,"js://test.testJSTestSuite/testHelloWorld2","testHelloWorld2",null,null,"js://test.testJSTestSuite");
+                // OBject that is to be verified, Qualified name, 
+                assertEquals(
+         				"unexpected qualifiedName of testHelloWorld2 in testJSTestSuite",
+         				"js://test.testJSTestSuite/TESTCASE$testHelloWorld2", 
+         				((DefinitionImpl)o).getDescriptor().getQualifiedName());
             } else if (testCaseDef.getName().equals("testHelloWorld3")) {
                 assertTrue(attributes.size() == 2);
                 assertTrue(attributes.containsKey("num"));
                 assertEquals("4", attributes.get("num"));
                 assertTrue(attributes.containsKey("alpha"));
                 assertEquals("A", attributes.get("alpha"));
-                // OBject that is to be verified, The Def object name /
-                // Qualified name, Name of the Def / Descriptor,
-                // prefix of the Def object, Namespace of the descriptor,
-                // Resource represented in terms of Aura
-                // component namespace
-                // TODO:W-766231
-                // verifyBasicDefinitionAttributes((DefinitionImpl)o,"js://test.testJSTestSuite/testHelloWorld3","testHelloWorld3",null,null,"js://test.testJSTestSuite");
-
+                // OBject that is to be verified, Qualified name
+                assertEquals(
+         				"unexpected qualifiedName of testHelloWorld3 in testJSTestSuite",
+         				"js://test.testJSTestSuite/TESTCASE$testHelloWorld3", 
+         				((DefinitionImpl)o).getDescriptor().getQualifiedName());
             } else {
                 fail("There should be no other test cases created");
             }
@@ -448,14 +458,11 @@ public class JavascriptParserTest extends AuraImplTestCase {
         assertTrue(testSuite instanceof JavascriptTestSuiteDef);
 
         // Step 2: Verify the properties of the JavascriptTestSuiteDef object
-        // OBject that is to be verified, The Def object name / Qualified name,
-        // Name of the Def / Descriptor, prefix of
-        // the Def object, Namespace of the descriptor, Resource represented in
-        // terms of Aura component namespace
-        verifyBasicDefinitionAttributes((JavascriptTestSuiteDef) testSuite,
-                "js://test.testJSTestSuiteWithoutAttributes", "testJSTestSuiteWithoutAttributes", "js", "test",
-                "js://test.testJSTestSuiteWithoutAttributes");
-
+        // OBject that is to be verified, Qualified name,
+        assertEquals(
+ 				"unexpected qualifiedName of testSuite in testJSTestSuiteWithoutAttributes",
+ 				"js://test.testJSTestSuiteWithoutAttributes", 
+ 				((JavascriptTestSuiteDef) testSuite).getDescriptor().getQualifiedName());
         // Step 3: Verify each testCaseDef objects in the test suite object
         List<TestCaseDef> testCases = ((JavascriptTestSuiteDef) testSuite).getTestCaseDefs();
         assertEquals(2, testCases.size());
@@ -467,22 +474,18 @@ public class JavascriptParserTest extends AuraImplTestCase {
                 assertTrue(attributes.size() == 1);
                 assertTrue(attributes.containsKey("num"));
                 assertEquals("2", attributes.get("num"));
-                // OBject that is to be verified, The Def object name /
-                // Qualified name, Name of the Def / Descriptor,
-                // prefix of the Def object, Namespace of the descriptor,
-                // Resource represented in terms of Aura
-                // component namespace
-                // TODO:W-766231
-                // verifyBasicDefinitionAttributes((DefinitionImpl)o,"js://test.testJSTestSuiteWithoutAttributes/testHelloWorld","testHelloWorld",null,null,"js://test.testJSTestSuiteWithoutAttributes");
+                // OBject that is to be verified,  Qualified name
+                assertEquals(
+         				"unexpected qualifiedName of testHelloWorld in testJSTestSuiteWithoutAttributes",
+         				"js://test.testJSTestSuiteWithoutAttributes/TESTCASE$testHelloWorld", 
+         				((DefinitionImpl)o).getDescriptor().getQualifiedName());
             } else if (testCaseDef.getName().equals("testHelloWorld3")) {
                 assertTrue(attributes.size() == 0);
-                // OBject that is to be verified, The Def object name /
-                // Qualified name, Name of the Def / Descriptor,
-                // prefix of the Def object, Namespace of the descriptor,
-                // Resource represented in terms of Aura
-                // component namespace
-                // TODO:W-766231
-                // verifyBasicDefinitionAttributes((DefinitionImpl)o,"js://test.testJSTestSuiteWithoutAttributes/testHelloWorld3","testHelloWorld3",null,null,"js://test.testJSTestSuiteWithoutAttributes");
+                // OBject that is to be verified,  Qualified name
+                assertEquals(
+         				"unexpected qualifiedName of testHelloWorld3 in testJSTestSuiteWithoutAttributes",
+         				"js://test.testJSTestSuiteWithoutAttributes/TESTCASE$testHelloWorld3", 
+         				((DefinitionImpl)o).getDescriptor().getQualifiedName());
             } else {
                 fail("There should be no other test cases created");
             }
@@ -515,31 +518,6 @@ public class JavascriptParserTest extends AuraImplTestCase {
         } catch (AuraRuntimeException expected) {
             assertTrue(expected.getMessage().startsWith(expectedMessageStartsWith));
         }
-    }
-
-    /**
-     * @param defImplObj OBject that is to be verified
-     * @param descriptorName The Def object name / Qualified name
-     * @param objName Name of the Def / Descriptor
-     * @param prefix prefix of the Def object
-     * @param namespace Namespace of the descriptor
-     * @param fileName Resource represented in terms of Aura component namespace
-     * @throws Exception
-     */
-    private void verifyBasicDefinitionAttributes(DefinitionImpl<?> defImplObj, String descriptorName, String objName,
-            String prefix, String namespace, String fileName) throws Exception {
-        DefDescriptor<?> descriptorObj = null;
-
-        assertEquals(defImplObj.toString(), descriptorName);
-        assertEquals(defImplObj.getName(), objName);
-        descriptorObj = defImplObj.getDescriptor();
-        assertEquals(objName, descriptorObj.getName());
-        assertEquals(prefix, descriptorObj.getPrefix());
-        assertEquals(namespace, descriptorObj.getNamespace());
-        assertEquals(descriptorName, descriptorObj.getQualifiedName());
-        // TODO: have to address getFileName() when loaded as resource
-        // Location l = defImplObj.getLocation();
-        // assertEquals(fileName, l.getFileName());
     }
 
     private BaseSourceLoader getJavascriptSourceLoader() {

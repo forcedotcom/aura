@@ -17,15 +17,13 @@
 -->
 <aura:component extends="auradocs:topicPanel">
 
-  <aura:set attribute="title" value="Models"/>
+  <aura:set attribute="title" value="Java Models"/>
 
-  <p>A model is a component's main source for dynamic data. Use a model to read your initial component data in Aura. For example, the model could read the component's data from a database. The component generates an appropriate user interface from the model's data.</p>
+  <p>A model is a component's main source for dynamic data. Use a model to read your initial component data in Aura. For example, a Java model could read the component's data from a database. The component generates an appropriate user interface from the model's data. Use a <auradocs:topicLink topic="modelsJSON">JSON model</auradocs:topicLink> if you prefer to read your initial component data from a JSON file.</p>
 
   <p>The value provider for a model is denoted by <code>m</code>. For example, the label in this button component is retrieved from the model of the component containing the <code>&lt;ui:button&gt;</code> tag. The value for the label is evaluated when the component renders.</p>
 
-<auradocs:codeblock>
-  &lt;ui:button label="<aura:text value="{!"/>m.myLabel}"/&gt;
-</auradocs:codeblock>
+<auradocs:codeblock>&lt;ui:button label="<aura:text value="{!"/>m.myLabel}"/&gt;</auradocs:codeblock>
 
   <p>On the server side, Aura's model is more of a model initializer compared to the usage of models in other MVC frameworks. The model is instantiated when the component is first requested. Perform any necessary operations to gather state, such as making database queries or external API callouts, in the model's constructor.</p>
 
@@ -34,49 +32,35 @@
   <auradocs:info><b>Note</b>: You can't create a new component dynamically in a model class using <code>Aura.getInstanceService().getInstance()</code>. To do this, use a provider instead.
   </auradocs:info>
 
-  <h2>Client-Side Model Access</h2>
+  <h2>Wiring Up the Model</h2>
 
-  <p>Let's look at simple usage of a model in a component.</p>
+    <p>The <code>aura:component</code> tag must include a <code>model</code> system attribute that wires it to the Java model. For example:</p>
 
-<auradocs:codeblock>
-  &lt;aura:component model="java://org.auraframework.demo.notes.models.TrivialModel"&gt;
-      &lt;aura:attribute name="name" type="String" required="true" default="Michelle" /&gt;
-
-      &lt;!-- Use the "m." prefix to access any fields that are annotated with
-      @AuraEnabled in the model class --&gt;
-      &lt;h1&gt;Title : <aura:text value="{!"/>m.title}&lt;/h1&gt;
-
-      &lt;!-- Use v.name to directly access the component's name attribute.
-        Remember that you use v to access the component's attribute values --&gt;
-      &lt;h2&gt;Name : <aura:text value="{!"/>v.name}&lt;/h2&gt;
-  &lt;/aura:component&gt;
+<auradocs:codeblock><![CDATA[<aura:component model="java://org.auraframework.demo.notes.models.TrivialModel">]]>
 </auradocs:codeblock>
+    
+  <h2>Accessing the Model in Markup</h2>
 
-  <p>The model attribute in <code>&lt;aura:component&gt;</code> wires the component to its Java model class.</p>
+  <p>Let's look at simple usage of a model in the markup of a component.</p>
+
+<auradocs:codeblock>&lt;aura:component model="java://org.auraframework.demo.notes.models.TrivialModel"&gt;
+    &lt;aura:attribute name="name" type="String" required="true" default="Michelle" /&gt;
+
+    &lt;!-- Use the "m." prefix to access any fields that are annotated with
+    @AuraEnabled in the model class --&gt;
+    &lt;h1&gt;Title : <aura:text value="{!"/>m.title}&lt;/h1&gt;
+
+    &lt;!-- Use v.name to directly access the component's name attribute.
+        Remember that you use v to access the component's attribute values --&gt;
+    &lt;h2&gt;Name : <aura:text value="{!"/>v.name}&lt;/h2&gt;
+&lt;/aura:component&gt;
+</auradocs:codeblock>
 
   <p>The <code><aura:text value="{!"/>m.title}</code> expression returns the result of the <code>getTitle()</code> getter method in the component's model class. The <code>getTitle()</code> method must be prefixed with the the <code>@AuraEnabled</code> annotation.</p>
 
-  <h3>Accessing the Model in JavaScript</h3>
-
-  <p>You can also use the value provider, <code>m</code>, to access the model in JavaScript. For example:</p>
-
-<auradocs:codeblock>
-  var title = cmp.get("m.title");
-  alert("Title: " + title);
-</auradocs:codeblock>
-
-  <auradocs:info><b>Note</b>: You can update the model in client-side code by using <code>setValue()</code>. For example:<br/>
-  <code>cmp.getValue("m.myLabel").setValue("updated label");</code>
-  </auradocs:info>
-
   <h2>Java Model class</h2>
 
-  <p>You can create a model in Java.</p>
-
-  <auradocs:info><b>Note</b>: To implement the model in another programming language, write an adapter that enables Aura to communicate with the target language through Java. This will be documented in more detail at a later time.
-  </auradocs:info>
-
-  <p>This model in Java is trivial as it doesn’t read in data from a persistent data store but it demonstrates some basics, including accessing a component's attribute in the model.</p>
+  <p>This model is trivial as it doesn’t read in data from a persistent data store but it demonstrates some basics, including accessing a component's attribute in the model.</p>
 
 <auradocs:codeblock>
 <![CDATA[package org.auraframework.demo.models;
@@ -117,7 +101,7 @@ public class TrivialModel throws QuickFixException {
 
   <h3>Java Annotations</h3>
 
-  <p>These annotations are available in models.</p>
+  <p>These annotations are available in Java models.</p>
 
   <table class="table table-bordered table-striped">
     <thead>
@@ -146,6 +130,7 @@ public class TrivialModel throws QuickFixException {
   <p>The associated noteList.cmp component is <a href="https://github.com/forcedotcom/aura-note/blob/master/src/main/webapp/WEB-INF/components/auranote/noteList/noteList.cmp" target="_new">here</a>.</p>
 
   <p><b>See also:</b><br/>
+      <auradocs:topicLink topic="modelsAccessJavaScript">Accessing Models in JavaScript</auradocs:topicLink><br/>
       <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink><br/>
       <auradocs:topicLink topic="oodProviders">Server-Side Providers</auradocs:topicLink>
     </p>

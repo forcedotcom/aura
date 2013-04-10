@@ -1,0 +1,72 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+
+    <aura:set attribute="title" value="JSON Models"/>
+    
+    <p>Use a JSON model to read your initial component data in Aura from a JSON file. If you want to initialize your component from a more dynamic source, such as a database, use a Java model instead.</p>
+
+  <h2>Wiring Up the Model</h2>
+
+    <p>There are a few ways to wire up a JSON model. A JSON model is auto-wired if it’s in the component bundle and follows the naming convention, <code>&lt;componentName&gt;Model.js</code>.</p>
+    
+    <p>You can also explicitly declare a model in the <code>aura:component</code> tag by including a <code>model</code> system attribute with the format <code>model="js://&lt;namespace&gt;.&lt;componentName&gt;"</code>. This enables reuse of a model from another component. For example, this component uses the auto-wired model for <code>auradocs.sampleComponent</code> in <code>auradocs/sampleComponent/sampleComponentModel.js.</code></p>
+    
+<auradocs:codeblock><![CDATA[<aura:component model="js://auradocs.sampleComponent]]>
+</auradocs:codeblock>
+
+    If you explicitly declare a <code>model</code> system attribute, it takes precedence over an auto-wired model in the component bundle.
+    
+    <auradocs:info>A component can only have a JSON or Java model, but not both.</auradocs:info>
+
+  <h2>Sample JSON Model</h2>
+  
+  <p>Here is a sample JSON model.</p>
+  
+<auradocs:codeblock>{
+    "obj" : {},
+    "bool" : true,
+    "num" : 5,
+    "str" : "My name is JSON",
+    "list" : []
+}</auradocs:codeblock>
+
+<auradocs:info>Don't use <code>null</code> for model values. Use <code>[]</code> for an empty array, <code>{}</code> for an empty object, <code>""</code> for an empty string, or zero for a number. This enables the framework to determine which type of value wrapper to initialize.</auradocs:info>
+    
+  <h2>Accessing the Model in Markup</h2>
+
+  <p>Let's look at simple usage of a model in the markup of a component.</p>
+
+<auradocs:codeblock>&lt;-- This component uses an auto-wired model
+    as the aura:component tag has no model system attribute --&gt;
+&lt;aura:component&gt;<span>
+    object: <aura:text value="{!"/>m.obj}
+    boolean: <aura:text value="{!"/>m.bool}   
+    number: <aura:text value="{!"/>m.num}   
+    string: <aura:text value="{!"/>m.str}   
+    list length: <aura:text value="{!"/>m.list.length}</span>
+&lt;/aura:component&gt;
+</auradocs:codeblock>      
+        
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="models">Java Models</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="modelsAccessJavaScript">Accessing Models in JavaScript</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="compBundle">Component Bundles</auradocs:topicLink>
+    </p>
+    
+</aura:component>

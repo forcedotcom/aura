@@ -15,6 +15,7 @@
     limitations under the License.
 
 -->
+<!-- this component is for test in JavascriptParserTest.testDuplicateJSController() -->
 <aura:component>
 <aura:attribute name="name" type="String" default="empty"/>
 </aura:component>

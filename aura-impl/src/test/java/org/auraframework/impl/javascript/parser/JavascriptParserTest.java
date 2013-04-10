@@ -167,9 +167,13 @@ public class JavascriptParserTest extends AuraImplTestCase {
         try {
             obj.createAction("newAction", new HashMap<String, Object>());
             fail("Should not be able to create an instance of the client action on the server side");
-        } catch (UnsupportedOperationException expected) {
-            "cannot create an instance of a client action".equals(expected.getMessage());
+        } catch (Exception e) {// Expect a file not found Exception
+            checkExceptionFull(e, UnsupportedOperationException.class, "cannot create an instance of a client action");
+
         }
+        // catch (UnsupportedOperationException expected) {
+        // "cannot create an instance of a client action".equals(expected.getMessage());
+        // }
         // 2.3 Extract the action defs and verify each of them in Step 3
         // Get all the actions defined in the Javascript
         Map<String, JavascriptActionDef> controllerActions = obj.getActionDefs();

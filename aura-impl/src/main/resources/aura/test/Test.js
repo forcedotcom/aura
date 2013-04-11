@@ -509,11 +509,28 @@ var Test = function(){
             
             instance[name] = newFunction;
             
+            // Now lets see if there is a corresponding private (obfuscated) version that we also need to mock
+            var nonExportedFunctionName;
+            for (var key in instance) {
+            	var f = instance[key];
+            	if (key !== name && f === originalFunction) { 
+            		nonExportedFunctionName = key;
+                    instance[key] = newFunction;
+            		break; 
+            	} 
+        	}
+            
             var override = newFunction;
             override.originalInstance = instance;
             override.originalFunction = originalFunction;
+            override.nonExportedFunctionName = nonExportedFunctionName;
+            
             override["restore"] = function(){
             	override.originalInstance[name] = override.originalFunction;
+            	
+            	if (override.nonExportedFunctionName) {
+            		override.originalInstance[override.nonExportedFunctionName] = override.originalFunction;
+            	}
             };
 
             // if we're overriding an override, update it's pointer to restore to us

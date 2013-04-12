@@ -48,6 +48,13 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 		super(name);
 	}
 
+	@Override
+    public void perBrowserSetUp() {
+	    super.perBrowserSetUp();
+	    // these tests trigger server recompilation which can take a bit of time
+	    auraUITestingUtil.setTimeoutInSecs(60);
+	}
+	
 	private void updateStringSource(DefDescriptor<?> desc, String content) {
 		Source<?> src = StringSourceLoader.getInstance().getSource(desc);
 		src.addOrUpdate(content);

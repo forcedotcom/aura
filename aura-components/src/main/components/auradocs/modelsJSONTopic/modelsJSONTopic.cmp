@@ -39,14 +39,13 @@
   <p>Here is a sample JSON model.</p>
   
 <auradocs:codeblock>{
-    "obj" : {},
     "bool" : true,
     "num" : 5,
     "str" : "My name is JSON",
     "list" : []
 }</auradocs:codeblock>
 
-<auradocs:info>Don't use <code>null</code> for model values. Use <code>[]</code> for an empty array, <code>{}</code> for an empty object, <code>""</code> for an empty string, or zero for a number. This enables the framework to determine which type of value wrapper to initialize.</auradocs:info>
+<auradocs:warning>Don't use <code>null</code> for model values. Use <code>[]</code> for an empty array, <code>""</code> for an empty string, or zero for a number. This enables the framework to determine which type of value wrapper to initialize. Due to a current limitation, don't use <code>{}</code> for an empty object.</auradocs:warning>
     
   <h2>Accessing the Model in Markup</h2>
 
@@ -55,7 +54,6 @@
 <auradocs:codeblock>&lt;-- This component uses an auto-wired model
     as the aura:component tag has no model system attribute --&gt;
 &lt;aura:component&gt;<span>
-    object: <aura:text value="{!"/>m.obj}
     boolean: <aura:text value="{!"/>m.bool}   
     number: <aura:text value="{!"/>m.num}   
     string: <aura:text value="{!"/>m.str}   

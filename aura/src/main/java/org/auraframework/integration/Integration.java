@@ -56,9 +56,12 @@ public interface Integration {
 
     @Deprecated
     /**
-     * NOTE: This is about to die die die with @Gordon Oliver's pending changes to add dependencies and kill preloads!!!
-     * @deprecated
-     * @param namespace whose defs should be preloaded on the client.
+     * @deprecated This method will soon be replaced by a new dependencies framework.
+     * 
+     * Preloads the metadata definitions of all dependent components that should 
+     * be sent to the client for the specified namespace.    
+     * 
+     * @param namespace The namespace for which to preload metadata definitions on the client. 
      */
     void addPreload(String namespace);
 }

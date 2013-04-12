@@ -367,14 +367,16 @@
      * Only 1 field is supported with groupBy caluse
      */
     testGroupBy:{
-        test:[function(cmp){
-            var result = $A.getQueryStatement().from('componentDef').field('nameSpace','getDescriptor().getNamespace()').groupBy('nameSpace').query();
-            this.verifyQueryResultCount(result, $A.componentService.getRegisteredComponentDescriptors().length);
-            var preloadNamespaceCount = $A.test.objectKeys($A.getContext().getPreloads()).length;
-            //Number of namespaces = preloadNamespaces + the current test component namespace
-            $A.test.assertEquals(preloadNamespaceCount + 1, result.groupCount);
+        test:[function(cmp){      	
+			var preLoads = $A.test.objectKeys($A.getContext().getPreloads());
+			if (preLoads.length > 2) {				
+				var whereClause = "nameSpace == '" + preLoads[0] + "' || nameSpace == '" + preLoads[1] + "'";
+				var result = $A.getQueryStatement().from('componentDef').field('nameSpace','getDescriptor().getNamespace()').where(whereClause).groupBy('nameSpace').query()
+				
+	            $A.test.assertEquals(2, result.groupCount);				
+			}			
         },
-        function(cmp){
+        function(cmp){        	
         //1. null, undefined and blank as group by clause
             var result = $A.getQueryStatement().from("component").query();
             this.verifyIdenticalResultSet(result, $A.getQueryStatement().from('component').groupBy().query());

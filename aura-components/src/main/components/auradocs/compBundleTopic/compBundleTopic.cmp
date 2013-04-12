@@ -49,6 +49,12 @@
                 <td><auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink></td>
             </tr>
             <tr>
+                <td>Model</td>
+                <td><code>sampleModel.js</code></td>
+                <td>JSON model to initialize a component.</td>
+                <td><auradocs:topicLink topic="modelsJSON">JSON Models</auradocs:topicLink></td>
+            </tr>
+            <tr>
                 <td>Renderer</td>
                 <td><code>sampleRenderer.js</code></td>
                 <td>Client-side renderer to override default rendering for a component. </td>

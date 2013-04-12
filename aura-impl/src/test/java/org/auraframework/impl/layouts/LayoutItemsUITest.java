@@ -42,10 +42,14 @@ public class LayoutItemsUITest extends WebDriverTestCase {
         By removeLayoutDone = By.cssSelector(".Remove_Layout_Done");
 
         open("/layoutServiceTest/multipleLayoutItems.app");
-        getDriver().manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+        
+        // might take a while for initial layout to load
+        getDriver().manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
         findDomElement(layoutDone);
         verifyExpectedResultsForInitialLayout();
 
+        // subsequent layouts should NOT take that long to load
+        getDriver().manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         findDomElement(forwardButton).click();
         findDomElement(layoutDone);
         verifyExpectedResultsForLayout1();

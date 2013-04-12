@@ -83,7 +83,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 		assertEquals("hi", getText(By.cssSelector("body")));
 		updateStringSource(cmpDesc, String.format(baseComponentTag, "", "bye"));
 		openNoAura(url);
-		assertEquals("bye", getText(By.cssSelector("body")));
+		auraUITestingUtil.waitForElementText(By.cssSelector("body"), "bye", true);
 	}
 
 	public void testGetClientRenderingAfterThemeChange() throws Exception {
@@ -277,7 +277,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 				interfaceDesc,
 				"<aura:interface support='GA' description=''><aura:attribute name='entrance' type='String' default='secret'/></aura:interface>");
 		openNoAura(url);
-		assertEquals("secret", getText(By.cssSelector("body")));
+        auraUITestingUtil.waitForElementText(By.cssSelector("body"), "secret", true);
 	}
 
 	public void testGetClientRenderingAfterLayoutChange() throws Exception {

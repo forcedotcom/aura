@@ -33,6 +33,7 @@ $A.ns.Util = function() {
     this["Bitset"] = Bitset;
     this.objToString = Object.prototype.toString;
     this.trashedComponentQueue = [];
+    this.dataAttributeCache = {};
 };
 
 /**
@@ -180,6 +181,7 @@ $A.ns.Util.prototype.hasClass = function(element, clz){
 
 /**
  * Adds the specified class to the element, depending on whether it already existed on that element.
+ * See <a href="#help?topic=addClass">Adding and Removing Styles</a> for more information.
  * @param {Object} element The element to apply the class on.
  * @param {String} clz The CSS class to be applied on the element.
  *
@@ -205,6 +207,7 @@ $A.ns.Util.prototype.addClass = function(element, clz){
 
 /**
  * Removes the class from an element.
+ * See <a href="#help?topic=addClass">Adding and Removing Styles</a> for more information.
  * @param {Object} element The element to remove the class from.
  * @param {String} clz The CSS class to be removed from the element.
  */
@@ -887,7 +890,7 @@ $A.ns.Util.prototype.getDataAttribute = function(element, key) {
         return null;
     }
 
-    key = "data-" + this.camelCaseToHyphens(key);
+    key = this.getDataAttributeName(key);
 
     return element.getAttribute(key);
 };
@@ -905,13 +908,23 @@ $A.ns.Util.prototype.setDataAttribute = function(element, key, value) {
         return null;
     }
 
-    key = "data-" + this.camelCaseToHyphens(key);
+    key = this.getDataAttributeName(key);
 
     if (!this.isUndefined(value)) {
         return element.setAttribute(key, value);
     }
     return element.removeAttribute(key);
 
+};
+
+$A.ns.Util.prototype.getDataAttributeName = function(key) {
+	var name = this.dataAttributeCache[key];
+	if (!name) {
+		name = "data-" + this.camelCaseToHyphens(key);
+		this.dataAttributeCache[key] = name;
+	}
+	
+	return name;
 };
 
 /**

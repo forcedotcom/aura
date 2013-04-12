@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    activeDialog : ""
-})
+{//this controller is for test in JavascriptParserTest.testDuplicateJSController() 
+    functionName: function(component) {var v = 1;},
+    functionName: function(component) {var v = 2;}
+}

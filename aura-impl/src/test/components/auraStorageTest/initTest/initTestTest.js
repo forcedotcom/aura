@@ -663,12 +663,13 @@
 				this.resetCounter(cmp, "testSkipReplayOnIdenticalRefresh");
 				$A.test.addWaitFor(false, $A.test.isActionPending);
 			}, function(cmp) {
-				var btn = cmp.find("RunActionAndStore");
-				var evt = btn.get("e.press");
-				evt.fire();
+				var a = $A.run(function(){
+					return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecord", {testName:cmp._testName}, function(a){a.setStorable();})
+				});
 				$A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())}, function() {
 					$A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
 					$A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
+					$A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(), function(item){cmp._originalExpiration = item.expires});
 				});
 			}, function(cmp) {
 				// reset so next response will be same as first
@@ -676,12 +677,17 @@
 				this.resetCounter(cmp, "testSkipReplayOnIdenticalRefresh");
 				$A.test.addWaitFor(false, $A.test.isActionPending);
 			}, function(cmp) {
-				var btn = cmp.find("RunActionAndStore");
-				var evt = btn.get("e.press");
-				evt.fire();
+				var a = $A.run(function(){
+					return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecord", {testName:cmp._testName}, function(a){a.setStorable();})
+				});
 				$A.test.addWaitFor("2", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())}, function() {
 					$A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
 					$A.test.assertEquals("true", $A.test.getText(cmp.find("isFromStorage").getElement()));
+					$A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(), function(item){
+						if(item.expires <= cmp._originalExpiration){
+							$A.test.fail("storage expiration was not updated after refresh");
+						}
+					});
 				});
 			}
 		]
@@ -700,21 +706,27 @@
 				this.resetCounter(cmp, "testSkipReplayOnIdenticalRefresh");
 				$A.test.addWaitFor(false, $A.test.isActionPending);
 			}, function(cmp) {
-				var btn = cmp.find("RunActionAndStore");
-				var evt = btn.get("e.press");
-				evt.fire();
+				var a = $A.run(function(){
+					return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecord", {testName:cmp._testName}, function(a){a.setStorable();})
+				});
 				$A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())}, function() {
 					$A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
 					$A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
+					$A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(), function(item){cmp._originalExpiration = item.expires});
 				});
 			}, function(cmp) {
 				// this response will be different so callback count should be +2 (for get(), then refresh())
-				var btn = cmp.find("RunActionAndStore");
-				var evt = btn.get("e.press");
-				evt.fire();
+				var a = $A.run(function(){
+					return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecord", {testName:cmp._testName}, function(a){a.setStorable();})
+				});
 				$A.test.addWaitFor("3", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())}, function() {
 					$A.test.assertEquals("1", $A.test.getText(cmp.find("staticCounter").getElement()));
 					$A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
+					$A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(), function(item){
+						if(item.expires <= cmp._originalExpiration){
+							$A.test.fail("storage expiration was not updated after refresh");
+						}
+					});
 				});
 			}
 		]
@@ -748,7 +760,9 @@
 		            cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter", parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
 				});
 				$A.run(function(){a.runAfter(a);});
-				$A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())});
+				$A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())}, function(){
+					$A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(), function(item){cmp._originalExpiration = item.expires});
+				});
 			}, function(cmp) {
 				var a = cmp.get("c.fetchDataRecord");
 				a.setStorable();
@@ -756,7 +770,11 @@
 		            cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter", parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
 				});
 				$A.run(function(){a.runAfter(a);});
-				$A.test.addWaitFor("3", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())});
+				$A.test.addWaitFor("3", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())}, function(){
+					$A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(), function(item){
+						$A.test.assertEquals(cmp._originalExpiration, item.expires, "stored item should not have had expiration modified");
+					});
+				});
 			}, function(cmp) {
 				var a = cmp.get("c.fetchDataRecord");
 				a.setStorable();
@@ -764,7 +782,13 @@
 		            cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter", parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
 				});
 				$A.run(function(){a.runAfter(a);});
-				$A.test.addWaitFor("4", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())});
+				$A.test.addWaitFor("4", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())}, function(){
+					$A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(), function(item){
+						if(item.expires <= cmp._originalExpiration){
+							$A.test.fail("storage expiration was not updated after refresh");
+						}
+					});
+				});
 			}
 		]
 	}

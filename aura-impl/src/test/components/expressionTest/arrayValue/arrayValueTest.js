@@ -25,6 +25,76 @@
     assertNoChangeEvent: function(component){
         $A.test.assertEquals(undefined, component._log);
     },
+    
+    testGetValue:{
+	test:[function(component){
+	    var aval = $A.expressionService.create(null, ["aa","bb", 1, 2]);
+	    $A.test.assertEquals("ArrayValue", aval.toString());
+	    $A.test.assertEquals(4, aval.getLength(), "expected 4 wrapped values");
+	    //Special case for getValue()
+	    $A.test.assertEquals(4, aval.getValue("length").getValue(), 
+		    "getValue('length') failed to return value object representing length");
+	    $A.test.assertEquals("aa", aval.getValue(0).getValue());
+	    $A.test.assertEquals("bb", aval.getValue(1).getValue());
+	    $A.test.assertEquals(1, aval.getValue(2).getValue());
+	    $A.test.assertEquals(2, aval.getValue(3).getValue());
+	},function(component){
+	    var aval = $A.expressionService.create(null, []);
+	    $A.test.assertEquals(0, aval.getLength(), "expected 0 wrapped values");
+	    try{
+		aval.getValue("");
+		$A.test.fail("Array Value should not accept non integer argument in getValue()");
+	    }catch(e){/*Expected*/}
+	    try{
+		aval.getValue({});
+		$A.test.fail("Array Value should not accept non integer argument in getValue()");
+	    }catch(e){/*Expected*/}
+	    try{
+		aval.getValue(undefined);
+		$A.test.fail("Array Value should not accept non integer argument in getValue()");
+	    }catch(e){
+		$A.test.assertTrue(e.message.indexOf("A number is required for getValue on ArrayValue")!=-1)
+	    }
+	    //Index out of bounds
+	    $A.test.assertUndefinedOrNull(aval.getValue(99))
+	}]
+    },
+    testGetValueAcrossCommitAndRollback:{
+	test:[function(cmp){
+	    var aval = $A.expressionService.create(null, ["Banana"]);
+	    $A.test.assertEquals("Banana", aval.getValue(0).getValue());
+	    
+	    //insert push remove
+	    aval.insert(0,"Grapes")
+	    $A.test.assertTrue(aval.isDirty());
+	    $A.test.assertEquals("Grapes", aval.getValue(0).getValue());
+	    
+	    /*TODO: W-1611582 Insert changes to the actual array, instead it should markDirty() and then start adding the new stuff 
+	     * aval.rollback();
+	    $A.test.assertFalse(aval.isDirty());
+	    $A.test.assertEquals("Banana", aval.getValue(0).getValue());*/
+	}, function(cmp){
+	    var aval = $A.expressionService.create(null, ["Rock"]);
+	    aval.push("Jazz");
+	    $A.test.assertTrue(aval.isDirty());
+	    $A.test.assertEquals("Jazz", aval.getValue(1).getValue());
+	    
+	    aval.commit();
+	    $A.test.assertFalse(aval.isDirty());
+	    $A.test.assertEquals("Jazz", aval.getValue(1).getValue());
+	    
+	    aval.push("Blues");
+	    $A.test.assertTrue(aval.isDirty());
+	    $A.test.assertEquals("Blues", aval.getValue(2).getValue());
+	    
+/*	    TODO: W-1611582 Push to the actual array, instead it should markDirty() and then start adding the new stuff 
+ * 	    aval.rollback();
+	    $A.test.assertFalse(aval.isDirty());
+	    $A.test.assertUndefinedOrNull(aval.getValue(2));
+	    $A.test.assertEquals("Jazz", aval.getValue(1).getValue());
+*/	    
+	}]
+    },
 
     /**
      * Setting array value to ArrayValue should use the provided value.

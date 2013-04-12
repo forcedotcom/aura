@@ -50,8 +50,7 @@ import org.auraframework.util.json.JsonReader;
 import com.google.common.collect.Lists;
 
 /**
- * TODO(W-1386863): investigate why/fix the thread hostile nature of these
- * tests.
+ * TODO(W-1386863): investigate why/fix the thread hostile nature of these tests.
  */
 @UnAdaptableTest
 @WebDriverTest
@@ -84,7 +83,13 @@ public class ComponentJSTestSuiteTest extends TestSuite {
             super(namespace);
             ContextService contextService = Aura.getContextService();
             DefinitionService definitionService = Aura.getDefinitionService();
-            contextService.startContext(Mode.JSTEST, Format.JSON, Access.AUTHENTICATED);
+
+            boolean contextStarted = false;
+            if (!contextService.isEstablished()) {
+                contextStarted = true;
+                contextService.startContext(Mode.JSTEST, Format.JSON, Access.AUTHENTICATED);
+            }
+
             Map<String, TestSuite> subSuites = new HashMap<String, TestSuite>();
             try {
                 DefDescriptor<TestSuiteDef> matcher = definitionService.getDefDescriptor(
@@ -115,7 +120,9 @@ public class ComponentJSTestSuiteTest extends TestSuite {
                 System.err.println("Failed to load component tests for namespace: " + namespace);
                 t.printStackTrace();
             } finally {
-                contextService.endContext();
+                if (contextStarted) {
+                    contextService.endContext();
+                }
             }
         }
     }
@@ -223,30 +230,30 @@ public class ComponentJSTestSuiteTest extends TestSuite {
         public String getQualifiedName() {
             return caseDef.getDescriptor().getQualifiedName();
         }
-        
+
         public void testRun() throws Throwable {
             Set<Definition> mocks = caseDef.getLocalDefs();
-			if (mocks != null && !mocks.isEmpty()) {
-				Aura.get(TestContextAdapter.class).getTestContext()
-						.getLocalDefs().addAll(mocks);
-			}
-            
-			open(getUrl(), Mode.AUTOJSTEST);
-            
-			String ret = (String) auraUITestingUtil.getEval(String.format(
-					"return window.aura.test.run('%s', '%s')",
-					AuraTextUtil.escapeForJavascriptString(caseDef.getName()),
-					AuraTextUtil.escapeForJavascriptString(suite.getCode())));
-			
-			if (ret != null && !"null".equals(ret)) {
-				@SuppressWarnings("unchecked")
-				Map<String, Object> e = (Map<String, Object>) new JsonReader()
-						.read(ret);
-				fail((String) e.get("message"));
-			}
-			// Actions run on servers need special handling because their call
-			// back methods are called asynchronously.
-			// This check is to make sure all such calls were complete
+            if (mocks != null && !mocks.isEmpty()) {
+                Aura.get(TestContextAdapter.class).getTestContext()
+                        .getLocalDefs().addAll(mocks);
+            }
+
+            open(getUrl(), Mode.AUTOJSTEST);
+
+            String ret = (String) auraUITestingUtil.getEval(String.format(
+                    "return window.aura.test.run('%s', '%s')",
+                    AuraTextUtil.escapeForJavascriptString(caseDef.getName()),
+                    AuraTextUtil.escapeForJavascriptString(suite.getCode())));
+
+            if (ret != null && !"null".equals(ret)) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> e = (Map<String, Object>) new JsonReader()
+                        .read(ret);
+                fail((String) e.get("message"));
+            }
+            // Actions run on servers need special handling because their call
+            // back methods are called asynchronously.
+            // This check is to make sure all such calls were complete
             waitForCondition("return window.aura.test.isComplete()", 30);
         }
 
@@ -259,12 +266,12 @@ public class ComponentJSTestSuiteTest extends TestSuite {
         public Set<BrowserType> getExcludedBrowsers() {
             return excludedBrowsers;
         }
-        
+
         @Override
         protected Set<String> getExceptionsAllowedDuringInit() {
-        	return caseDef.getExceptionsAllowedDuringInit();
+            return caseDef.getExceptionsAllowedDuringInit();
         }
-        
+
         private final ComponentTestSuite suite;
         private final TestCaseDef caseDef;
         private final String name;

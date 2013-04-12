@@ -13,6 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    parentDialog : ""
-})
+table.THIS {
+    padding : 20px;
+}
+
+.THIS tbody tr:nth-child(odd) {
+    background-color: #eee;
+}
+
+.THIS tbody tr:nth-child(even) {
+    background-color: #fff;
+}
+
+.THIS td, .THIS th {
+    height: 1em;
+    padding: 2px;
+}
+
+.THIS .test_count {
+    padding-left: 40px;
+}
+
+.THIS thead tr th {
+    font-weight: bold;
+}
+
+.THIS .browser_name {
+    font-weight: bold;
+    font-size: 40px;
+}

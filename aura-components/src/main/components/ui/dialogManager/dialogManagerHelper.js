@@ -37,8 +37,8 @@
 
         this.applyHandlers(handlerConfig);
         this.toggleDisplay(true, dialog, autoFocus, isModal, handlerConfig);
-        manager.getValue("m.activeDialog").setValue(dialog);
-        dialog.getValue("m.handlerConfig").setValue(handlerConfig);
+        manager.getAttributes().setValue("_activeDialog", dialog);
+        atts.setValue("_handlerConfig", handlerConfig);
 
     },
 
@@ -59,12 +59,12 @@
         var atts          = dialog.getAttributes(),
             isModal       = atts.get("isModal"),
             autoFocus     = atts.get("autoFocus"),
-            handlerConfig = dialog.get("m.handlerConfig");
+            handlerConfig = atts.get("_handlerConfig");
 
         this.removeHandlers(handlerConfig);
         this.toggleDisplay(false, dialog, autoFocus, isModal, handlerConfig);
-        manager.getValue("m.activeDialog").setValue("");
-        dialog.getValue("m.handlerConfig").setValue("");
+        manager.getAttributes().setValue("_activeDialog", null);
+        atts.setValue("_handlerConfig", null);
 
     },
 
@@ -193,7 +193,7 @@
         if (!event) { var event = window.event; }
 
         var target        = event.target || event.srcElement,
-            container     = dialog.find("dialog").getElement(),
+            container     = dialog.find("outer").getElement(),
             clickedInside = $A.util.contains(container, target),
             closeEvent;
 
@@ -244,7 +244,7 @@
      */
     getFirstFocusableElement : function(dialog) {
 
-        var container    = dialog.find("dialog").getElement(),
+        var container    = dialog.find("outer").getElement(),
             close        = dialog.find("closeButton").getElement(),
             formElements = [],
             length       = 0,
@@ -292,7 +292,7 @@
     toggleDisplay : function(show, dialog, autoFocus, isModal, config) {
 
         var mask         = isModal ? dialog.find("mask").getElement() : null,
-            outer        = dialog.find("dialog").getElement(), // outer dialog wrapper
+            outer        = dialog.find("outer").getElement(), // outer dialog wrapper
             inner        = dialog.find("content").getElement(), // inner content wrapper (i.e., the part that is scrollable)
             flickerDelay = 50,
             focusDelay   = 300,
@@ -357,7 +357,23 @@
         // 2600px is the same value as the CSS 3D transform rule applied to the dialog
         return Math.min($A.util.getWindowSize().height, 2600) - (titleHeight + contentPadding + buttonHeight + extraMargin);
 
-    }
+    },
 
+
+    /**
+     * Gets a root ui:dialog instance, even if the component to check is
+     * an extension of ui:dialog.
+     * 
+     * @param {Aura.Component} cmp The component to check
+     * @return {Aura.Component} cmp The root ui:dialog component
+     */
+    getDialogRoot : function(cmp) {
+        var type = cmp.getDef().getDescriptor().getQualifiedName();
+        while (type !== "markup://ui:dialog") {
+            cmp = cmp.getSuper();
+            type = cmp.getDef().getDescriptor().getQualifiedName();
+        }
+        return cmp;
+    }
 
 })

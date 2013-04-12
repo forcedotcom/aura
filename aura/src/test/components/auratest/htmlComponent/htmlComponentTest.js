@@ -79,29 +79,31 @@
 		}
 	},
 	
-	/*
-	 * TODO : @auraframework - uncommment after bug W-1538541 
-	 */
 	/**
-	 * Do not set any attributes on html component. 
+	 * Do not set tag attributes on html component.
+	 * W-1538544
 	 */
-	_testHtmlNoAttributesSet: {
-		test: function(component){
-			var tag = component.find("blank").getElement();
-			$A.test.assertNull(tag, "Html component with no attributes set should NOT be present");
+	testTagNotSet: {
+	    exceptionsAllowedDuringInit:["Undefined tag attribute for"],
+	    attributes:{testNoTagAttr:true},
+	    	test: function(component){
+		    	$A.test.assertTrue($A.hasErrors, "HTMl component without a tag attribute should not be allowed");
+		    	$A.test.assertEquals("Undefined tag attribute for "+component.find("notag").getGlobalId(), 
+		    		$A.test.getText($A.util.getElement("auraErrorMessage")));
 		}
-	},
+	}, 
 	
-	/*
-	 * TODO : @auraframework - uncommment after bug W-1538541
-	 */
 	/**
-	 * Do not set tag attribute on html component. 
+	 * Set tag attribute on html component to an undefined value.
+	 * W-1538544 
 	 */
-	_testTagNotSet: {
+	testUndefinedTagAttr: {
+	    exceptionsAllowedDuringInit : ["Undefined tag attribute for"],
+	    attributes:{testUndefinedTagAttr:true},
 		test: function(component){
-			var tag = component.find("notag").getElement();
-			$A.test.assertNull(tag, "Html component with tag not set should NOT be present");
+		    	$A.test.assertTrue($A.hasErrors, "HTMl component with a undefined tag attribute should not be allowed");
+		    	$A.test.assertEquals("Undefined tag attribute for "+component.find("undefinedTag").getGlobalId(), 
+		    		$A.test.getText($A.util.getElement("auraErrorMessage")));
 		}
 	},
 	

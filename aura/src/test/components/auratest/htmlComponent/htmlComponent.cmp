@@ -15,12 +15,20 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component >
 	<aura:html tag="a" href="www.salesforce.com" aura:id="atag">valid link</aura:html><br/>
 	<aura:html tag="a" abc="www.salesforce.com" aura:id="atagInvalidAttr">invalid attributes</aura:html><br/>
 	<aura:html tag="a" aura:id="noAttr">link no attributes</aura:html><br/>
 	<!-- TODO : @auraframework - uncommment after bug W-1538537
 	<aura:html tag="object" aura:id="objecttag">unsupported tag</aura:html><br/>
-	<aura:html tag="abc" aura:id="invalidtag">invalid tag</aura:html><br/>
+	<aura:html tag="abc" aura:id="invalidtag">invalid tag</aura:html><br/> 
 	-->
+	<aura:attribute default="false" name="testUndefinedTagAttr" type="Boolean"/>
+	<aura:if isTrue="{!v.testUndefinedTagAttr}">
+		<aura:html aura:id="undefinedTag" tag="{!v.attr}">Reference to undefined attribute</aura:html>
+    </aura:if>
+    <aura:attribute default="false" name="testNoTagAttr" type="Boolean"/>
+    <aura:if isTrue="{!v.testNoTagAttr}">
+        <aura:html aura:id="notag" href="www.salesforce.com">No Tag attribute</aura:html>
+    </aura:if>
 </aura:component>

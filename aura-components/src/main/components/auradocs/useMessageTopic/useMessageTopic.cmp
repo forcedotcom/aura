@@ -21,7 +21,7 @@
     <h3><code>ui:dialog</code></h3>
     <p>Use <code>ui:dialog</code> for overlay and modal dialogs. You can use <code>ui:dialogButtons</code> for buttons in the dialog window. Setting <code>&lt;ui:dialogButtons defaultButtons="both"&gt;</code> provides default 'OK' and 'Cancel' buttons, 
     but you can provide your own buttons using <code>ui:button</code> components.</p>
-    <p><code>ui:dialog</code> requires a <code>ui:dialogManager</code> component, which handles the opening and closing of your dialogs. You only need one (and only one) instance of <code>ui:dialogManager</code> in a component to support multiple dialogs.  
+    <p><code>ui:dialog</code> requires a <code>ui:dialogManager</code> component, which handles the opening and closing of your dialogs. Use only one instance of <code>ui:dialogManager</code> in a component to support multiple dialogs.  
     </p>
     <auradocs:info>See the <auradocs:defLink descriptor="ui:dialog">ui:dialog</auradocs:defLink> and <auradocs:defLink descriptor="ui:dialogButtons">ui:dialogButtons</auradocs:defLink> component reference.</auradocs:info>
     

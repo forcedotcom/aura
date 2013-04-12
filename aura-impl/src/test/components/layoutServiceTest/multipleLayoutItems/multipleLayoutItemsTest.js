@@ -19,6 +19,7 @@
      */
     testEventsPreAndPostLayoutChange:{
 	browsers:["-IE7", "-IE8", "-IE9"],
+	testLabels : ["UnAdaptableTest"],
 	test:[
 	      function(cmp){
 		  $A.test.setTestTimeout(5000);

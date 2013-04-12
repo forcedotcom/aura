@@ -20,12 +20,17 @@
     <aura:attribute name="start" type="Integer"/>
     <aura:attribute name="end" type="Integer"/>
 
+	<aura:attribute name="slowFacet" type="boolean" default="false"/>
+	<aura:attribute name="fastFacet" type="boolean" default="false"/>
     <!--Iterate and push values along with a slow server component -->
-    <aura:iteration aura:id="iteration" items="{!m.innerData}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
-        <loadLevelTest:serverComponent aura:id="lazy" waitId="withLazyComponents" aura:load="lazy"/>
-    </aura:iteration>
-
-    <aura:iteration aura:id="iterationWithAttributes" items="{!m.innerData}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
-        <aura:expression value="{!var}" aura:id="lazyWithAttributes" aura:load="lazy"/>
-    </aura:iteration>
+    <aura:if isTrue="{!v.slowFacet}">
+	    <aura:iteration aura:id="iteration" items="{!m.innerData}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
+	        <loadLevelTest:serverComponent aura:id="lazy" waitId="withLazyComponents" aura:load="lazy"/>
+	    </aura:iteration>
+    </aura:if>
+	<aura:if isTrue="{!v.fastFacet}">
+	    <aura:iteration aura:id="iterationWithAttributes" items="{!m.innerData}" var="var" indexVar="idx" start="{!v.start}" end="{!v.end}">
+	        <aura:expression value="{!var}" aura:id="lazyWithAttributes" aura:load="lazy"/>
+	    </aura:iteration>
+    </aura:if>
 </aura:component>

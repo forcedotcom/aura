@@ -21,6 +21,7 @@ import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.system.DefFactoryImpl;
+import org.auraframework.system.CacheableDefFactory;
 import org.auraframework.system.DefFactory;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
@@ -32,7 +33,7 @@ import com.google.common.collect.Lists;
  * Base class for {@link DefFactory} implementations for the java://
  * pseudo-protocol.
  */
-public abstract class BaseJavaDefFactory<D extends Definition> extends DefFactoryImpl<D> {
+public abstract class BaseJavaDefFactory<D extends Definition> extends DefFactoryImpl<D> implements CacheableDefFactory<D> {
 
     final List<SourceLoader> loaders;
 
@@ -99,5 +100,10 @@ public abstract class BaseJavaDefFactory<D extends Definition> extends DefFactor
         // FIXME = "need md5 in builder";
         def = builder.build();
         return def;
+    }
+
+    @Override
+    public long getLastMod(DefDescriptor<D> descriptor) {
+        return 0;
     }
 }

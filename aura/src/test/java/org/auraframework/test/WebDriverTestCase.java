@@ -70,6 +70,14 @@ import com.google.common.collect.Sets;
 @WebDriverTest
 public abstract class WebDriverTestCase extends IntegrationTestCase {
     private static final Logger logger = Logger.getLogger("WebDriverTestCase");
+
+    /** Checks whether {@code oneClass} is mentioned as a class on {@code elem}. */
+    public boolean hasCssClass(WebElement elem, String oneClass) {
+        String allClasses = elem.getAttribute("class");
+        return allClasses.contains(" " + oneClass + " ") || allClasses.equals(oneClass)
+                || allClasses.startsWith(oneClass + " ") || allClasses.endsWith(" " + oneClass);
+    }
+
     protected int timeoutInSecs = 30;
     private WebDriver currentDriver = null;
     BrowserType currentBrowserType = null;
@@ -532,9 +540,9 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     public void waitForAuraFrameworkReady() {
         auraUITestingUtil.waitForAuraFrameworkReady(getExceptionsAllowedDuringInit());
     }
-    
+
     protected Set<String> getExceptionsAllowedDuringInit() {
-    	return Collections.emptySet();
+        return Collections.emptySet();
     }
 
     /**

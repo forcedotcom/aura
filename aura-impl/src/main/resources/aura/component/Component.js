@@ -72,17 +72,29 @@ Component.prototype.index = function(localId, globalId){
 /**
  * Removes data from the index. If both globalId and localId are provided, only the given pair is removed from the index.
  * If only localId is provided, every mapping for that localId is removed from the index.
+ *
+ * This might be called after component destroy in some corner cases, be careful to check for priv before
+ * accessing.
+ *
  * @param {String} localId The id set using the aura:id attribute.
  * @param {String} globalId The globally unique id which is generated on pageload.
  * @protected
  */
 Component.prototype.deIndex = function(localId, globalId){
     var priv = this.priv;
+
+    if (!priv) {
+//#if {"modes" : ["DEVELOPMENT"]}
+        $A.error("deIndex after destroy on "+globalId+" [ "+localId+" ]");
+//#end
+        return;
+    }
+
     if(priv.delegateValueProvider){
         return priv.delegateValueProvider.deIndex(localId, globalId);
     }
 
-    if (priv && priv.index) {
+    if (priv.index) {
         if(globalId){
             var index = priv.index[localId];
             if(index){
@@ -112,6 +124,7 @@ Component.prototype.deIndex = function(localId, globalId){
 /**
  * Locates a component using the localId.
  * Shorthand: get("asdf"), where "asdf" is the aura:id of the component to look for.
+ * See <a href="#help?topic=findById">Finding Components by ID</a> for more information.
  * @param {String|Object} name If name is an object, return instances of it. Otherwise, finds a component using its index.
  * @public
  */
@@ -252,7 +265,7 @@ Component.prototype.implementsDirectly = function(type){
 
 /**
  * Adds an event handler. Resolving the handler Action happens at Event-handling time, so the Action reference may be altered at runtime,
- * and that change is reflected in the handler.
+ * and that change is reflected in the handler. See <a href="#help?topic=dynamicHandler">Dynamically Adding Event Handlers</a> for more information.
  * @param {String} eventName The event name
  * @param {Object} valueProvider The value provider to use for resolving the actionExpression.
  * @param {Object} actionExpression The expression to use for resolving the handler Action against the given valueProvider.
@@ -581,6 +594,7 @@ Component.prototype.getElement = function(){
 
 /**
  * Returns the collection of attributes for this component.
+ * See <a href="#help?topic=hideMarkup">Dynamically Showing or Hiding Markup</a> for more information.
  * Shorthand : get("v")
  */
 Component.prototype.getAttributes = function() {

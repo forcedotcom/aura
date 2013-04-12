@@ -34,6 +34,9 @@
     <aura:attribute name="dialogClass" type="String" description="Additional CSS classes to apply to the dialog's outermost &lt;div&gt; wrapper."/>
     <aura:attribute name="maskClass" type="String" description="Additional CSS classes to apply to the window mask located behind a modal dialog."/>
 
+    <!-- private attributes -->
+    <aura:attribute name="_handlerConfig" type="Object" description="PRIVATE ATTRIBUTE - DO NOT SET | Reference to the event handlers necessary for interactivity."/>
+
     <!-- events -->
     <aura:registerEvent name="close" type="ui:closeDialog" description="Event fired when the dialog window requests to close itself."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
@@ -44,7 +47,7 @@
     </aura:if>
 
     <!-- dialog container -->
-    <div aura:id="dialog" class="{!'dialog hidden ' + v.dialogClass + (v.isModal ? ' modal ' : ' ') + v.width}" role="{!v.ariaRole}" aria-live="assertive" aria-atmoic="true" aria-labelledby="{!globalId + '-title'}">
+    <div aura:id="outer" class="{!'dialog hidden ' + v.dialogClass + (v.isModal ? ' modal ' : ' ') + v.width}" role="{!v.ariaRole}" aria-live="assertive" aria-atmoic="true" aria-labelledby="{!globalId + '-title'}">
 
         <!-- header -->
         <h2 aura:id="title" id="{!globalId + '-title'}" class="title">{!v.title}<span class="assistiveText"> {!v.description}</span></h2>
@@ -53,7 +56,7 @@
         <div aura:id="content" class="content">{!v.body}</div>
 
         <!-- buttons -->
-        <aura:if isTrue="{!v.buttons != null}">
+        <aura:if isTrue="{!v.buttons.length > 0}">
             <div aura:id="buttons" class="buttons">{!v.buttons}</div>
         </aura:if>
 

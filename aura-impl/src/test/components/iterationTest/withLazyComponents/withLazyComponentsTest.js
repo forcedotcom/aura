@@ -15,11 +15,12 @@
  */
 ({
     /**
-     * Verify simple lazy loading case.
+     * Verify simple lazy loading case. 
      */
     testSimpleLazyLoading:{
-        attributes:{start:0,end:2},
+        attributes:{start:0,end:2, slowFacet:true},
         test:function(cmp){
+        	$A.test.setTestTimeout(30000);
             var items = cmp.find("lazy");
             $A.test.assertEquals(2, items.length,
                     "Expected two items in iteration component.");
@@ -86,9 +87,8 @@
      * Verify that iteration component facilitates using the outer component as value provider.
      */
     testLazyLoadingWithAttributeValues:{
-        attributes:{start:0,end:4},
+        attributes:{start:0,end:4, fastFacet:true},
         test:function(cmp){
-            aura.test.setTestTimeout(30000);
             var iteration = cmp.find("iterationWithAttributes");
             var items = cmp.find("lazyWithAttributes");
             $A.test.assertEquals(4,items.length, "Expeted 4 items in iteration.");
@@ -97,8 +97,6 @@
                 var item = items[i];
                 $A.test.assertEquals("placeholder", item.getDef().getDescriptor().getName(),
                 "Expected a placeholder for lazy loading component.");
-                $A.test.addWaitFor(true, $A.test.isActionPending,
-                        function(){setTimeout(function(){$A.test.callServerAction(cmp.get("c.resumeAll"), true);},(i+1)*50);});
             }
 
             //Verify first item is replaced by expected value

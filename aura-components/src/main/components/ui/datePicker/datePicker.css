@@ -23,6 +23,19 @@ div.THIS {
     z-index: 100;
 }
 
+@if (IE7){
+    div.THIS {
+        background-color: #FFF;
+        border: 1px solid #CCC;
+        border-radius: 5px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+        display: none;
+        position: absolute;
+        z-index: 100;
+        width: 243px;
+    }
+}
+
 .THIS.visible {
     display: block;
 }

@@ -33,7 +33,7 @@
             HTMLAttributes.each(helper.createHtmlAttribute, { scope: helper, ret: ret, component: component });
         }
 
-        if (ret.tagName.toLowerCase() === "a" && $A.util.isUndefinedOrNull(ret.getAttribute("href"))) {
+        if (ret.tagName.toLowerCase() === "a" && !ret.getAttribute("href")) {
             ret.setAttribute("href", "javascript:void(0);");
         }
 
@@ -103,7 +103,7 @@
             }
         }
 
-        if (element.tagName.toLowerCase() === "a" && $A.util.isUndefinedOrNull(element.getAttribute("href"))) {
+        if (element.tagName.toLowerCase() === "a" && !element.getAttribute("href")) {
             element.setAttribute("href", "javascript:void(0);");
         }
 

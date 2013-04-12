@@ -64,17 +64,12 @@ public class IntegrationImpl implements Integration {
             throw new UnsupportedUserAgentException(client.getUserAgent());
         }
 
-        if (Aura.getContextService().isEstablished()) {
-            throw new AuraRuntimeException(
-                    "Integration.injectComponent() cannot be called with an established Aura context!");
-        }
-
         if (initializeAura && !hasApplicationBeenWritten) {
             hasApplicationBeenWritten = true;
             writeApplication(out);
         }
 
-        AuraContext context = startContext("is");
+        AuraContext context = getContext("is");
         try {
             DefDescriptor<ComponentDef> descriptor = Aura.getDefinitionService().getDefDescriptor(tag,
                     ComponentDef.class);
@@ -151,7 +146,7 @@ public class IntegrationImpl implements Integration {
                         .append("</script>");
             }
         } finally {
-            Aura.getContextService().endContext();
+            releaseContext();
         }
     }
 
@@ -163,10 +158,24 @@ public class IntegrationImpl implements Integration {
         }
     }
 
-    private AuraContext startContext(String num) throws ClientOutOfSyncException, QuickFixException {
+    private void releaseContext() {
+        if (integrationOwnsContext) {
+            Aura.getContextService().endContext();
+        }
+    }
+
+    private AuraContext getContext(String num) throws ClientOutOfSyncException, QuickFixException {
         ContextService contextService = Aura.getContextService();
 
-        AuraContext context = contextService.startContext(mode, Format.JSON, Access.AUTHENTICATED);
+        integrationOwnsContext = !contextService.isEstablished();
+
+        AuraContext context;
+        if (integrationOwnsContext) {
+            context = contextService.startContext(mode, Format.JSON, Access.AUTHENTICATED);
+        } else {
+            context = contextService.getCurrentContext();
+        }
+
         DefDescriptor<ApplicationDef> applicationDescriptor = getApplicationDescriptor();
         context.setApplicationDescriptor(applicationDescriptor);
         context.setContextPath(contextPath);
@@ -192,7 +201,7 @@ public class IntegrationImpl implements Integration {
 
     private void writeApplication(Appendable out) throws IOException, AuraRuntimeException, QuickFixException {
         if (isSupportedClient(client)) {
-            AuraContext context = startContext(null);
+            AuraContext context = getContext(null);
             try {
                 ApplicationDef appDef = getApplicationDescriptor().getDef();
 
@@ -204,7 +213,7 @@ public class IntegrationImpl implements Integration {
             } catch (QuickFixException e) {
                 throw new AuraRuntimeException(e);
             } finally {
-                Aura.getContextService().endContext();
+                releaseContext();
             }
         }
     }
@@ -224,4 +233,5 @@ public class IntegrationImpl implements Integration {
     private final Client client;
     private final Set<String> preloads = Sets.newHashSet();
     private boolean hasApplicationBeenWritten;
+    private boolean integrationOwnsContext;
 }

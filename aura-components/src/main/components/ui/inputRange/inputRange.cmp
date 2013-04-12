@@ -21,6 +21,5 @@
     <aura:attribute name="step" type="Integer" default="1" description="Specifies the allowed integer intervals. Default value is &#8220;1&#8221;."/>
     <aura:attribute name="value" type="Integer" default="0" description="The input value of the integer."/>
     <aura:set attribute="type" value="range"/>
-    <!--aura:registerevent name="change" type="osproto:valueChange"/-->
     <input type="range" class="{!v.class}" min="{!v.min}" max="{!v.max}" step="{!v.step}" value="{!v.value}" onchange="{!c.change}"/>
 </aura:component>

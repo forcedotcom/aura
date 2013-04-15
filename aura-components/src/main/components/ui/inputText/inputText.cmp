@@ -22,9 +22,18 @@
     <aura:attribute name="placeholder" type="String" default="" description="Text that is displayed when the field is empty, to prompt the user for a valid entry."/>
     <aura:attribute name="maxlength" type="Integer" description="The maximum number of characters that can be typed into the input field. Corresponds to the maxlength attribute of the rendered HTML input element."/>
     <aura:attribute name="size" type="Integer" description="The width of the input field, in characters. Corresponds to the size attribute of the rendered HTML input element."/>
-
+			
     <aura:renderif isTrue="{!v.body.length == 0}">
-       <input aura:id="txt" class="{!v.class}" type="{!v.type}" value="{!v.value}" placeholder="{!v.placeholder}" required="{!v.required}" disabled="{!v.disabled}" maxlength="{!v.maxlength}" size="{!v.size}"/>
+       <input aura:id="txt"
+       		  id="{!v.domId}"
+			  class="{!v.class}"
+			  type="{!v.type}"
+			  value="{!v.value}"
+			  placeholder="{!v.placeholder}"
+			  required="{!v.required}"
+			  disabled="{!v.disabled}"
+			  maxlength="{!v.maxlength}"
+			  size="{!v.size}"/>
        <aura:set attribute="else">
            {!v.body}
        </aura:set>

@@ -14,9 +14,30 @@
  * limitations under the License.
  */
 ({
-    afterRender: function(component, helper) {
+	 
+	render: function(component) {
+        var attrs = component.getAttributes(),
+			domId = attrs.getValue("domId").getValue(),
+			concreteCmp = component.getConcreteComponent(),
+			parentCmp = concreteCmp.getSuper(),
+			globalId = concreteCmp.getGlobalId();
+		
+		if (!domId) {
+			concreteCmp.getAttributes().setValue("domId", globalId);
+			//need to traverse up the hierarchy and set the attributes, since attribute lookup is not hierarchical once initialized
+			while(parentCmp) {
+				parentCmp.getAttributes().setValue("domId", globalId);
+				parentCmp = parentCmp.getSuper();
+			} 
+		}
+		
+		return this.superRender();
+	},
+	
+	
+	afterRender: function(component, helper) {
         this.superAfterRender();
-
+		
         helper.addInputDomEvents(component);
     },
     

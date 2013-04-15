@@ -70,13 +70,9 @@ import com.google.common.collect.Maps;
  */
 
 /**
-<<<<<<< HEAD
  * The servlet for initialization and actions in Aura.
  *
  * The sequence of requests is:
-=======
- * The servlet for initialization and actions in Aura. The sequence of requests is:
->>>>>>> 1525c91... Aura framework changes to support transactions using Jiffy Transaction API
  * <ol>
  * <li>GET(AuraServlet): initial fetch of an aura app/component + Resource Fetches:
  * <ul>
@@ -100,18 +96,12 @@ import com.google.common.collect.Maps;
  * </ul>
  * </li>
  * </ol>
-<<<<<<< HEAD
  *
  * Run from aura-jetty project. Pass in these vmargs: <code>
  * -Dconfig=${AURA_HOME}/config -Daura.home=${AURA_HOME} -DPORT=9090
  * </code>
  *
  * Exception handling is dealt with in {@link #handleServletException} which should almost always be called when
-=======
- * Run from aura-jetty project. Pass in these vmargs: <code>
- * -Dconfig=${AURA_HOME}/config -Daura.home=${AURA_HOME} -DPORT=9090
- * </code> Exception handling is dealt with in {@link #handleServletException} which should almost always be called when
->>>>>>> 1525c91... Aura framework changes to support transactions using Jiffy Transaction API
  * exceptions are caught. This routine will use {@link org.auraframework.adapter.ExceptionAdapter ExceptionAdapter} to
  * log and rewrite exceptions as necessary.
  */
@@ -134,7 +124,6 @@ public class AuraServlet extends AuraBaseServlet {
     }
 
     /**
-<<<<<<< HEAD
      * Check for the nocache parameter and redirect as necessary.
      *
      * Not entirely sure what this is used for (need doco). It is part of the appcache refresh, forcing a reload while
@@ -144,16 +133,6 @@ public class AuraServlet extends AuraBaseServlet {
      *
      * @param request The request to retrieve the parameter.
      * @param response the response (for setting the location header.
-=======
-     * Check for the nocache parameter and redirect as necessary. Not entirely sure what this is used for (need doco).
-     * It is part of the appcache refresh, forcing a reload while avoiding the appcache. It maybe should be done
-     * differently (e.g. a nonce).
-     *
-     * @param request
-     *            The request to retrieve the parameter.
-     * @param response
-     *            the response (for setting the location header.
->>>>>>> 1525c91... Aura framework changes to support transactions using Jiffy Transaction API
      * @returns true if we are finished with the request.
      */
     private boolean handleNoCacheRedirect(HttpServletRequest request, HttpServletResponse response)
@@ -194,15 +173,10 @@ public class AuraServlet extends AuraBaseServlet {
     }
 
     /**
-<<<<<<< HEAD
      * Handle an HTTP GET operation.
      *
      * The HTTP GET operation is used to retrieve resources from the Aura servlet. It is only used for this purpose,
      * where POST is used for actions.
-=======
-     * Handle an HTTP GET operation. The HTTP GET operation is used to retrieve resources from the Aura servlet. It is
-     * only used for this purpose, where POST is used for actions.
->>>>>>> 1525c91... Aura framework changes to support transactions using Jiffy Transaction API
      *
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
@@ -296,14 +270,9 @@ public class AuraServlet extends AuraBaseServlet {
     }
 
     /**
-<<<<<<< HEAD
      * Allow the servlet to override page access.
      *
      * FIXME: this is totally bogus and should be handled by the security provider - GPO.
-=======
-     * Allow the servlet to override page access. FIXME: this is totally bogus and should be handled by the security
-     * provider - GPO.
->>>>>>> 1525c91... Aura framework changes to support transactions using Jiffy Transaction API
      */
     private boolean handle404(HttpServletRequest request, HttpServletResponse response, String tagName, DefType defType)
             throws ServletException, IOException {
@@ -421,20 +390,9 @@ public class AuraServlet extends AuraBaseServlet {
                     "Invalid request, post must use JSON"); }
 
             String fwUID = Aura.getConfigAdapter().getAuraFrameworkNonce();
-<<<<<<< HEAD
             if (!fwUID.equals(context.getFrameworkUID())) {
                 throw new ClientOutOfSyncException("Framework has been updated");
             }
-=======
-            //
-            // TODO: the integration service has an empty fwuid, which I haven't figured out
-            // how to set, so we allow the first one through, but we do set one on the response,
-            // so we'll then merge in the client and the next request will come in with the uid
-            // set. If this gets fixed, the null check can go away, which will make things safer.
-            //
-            if (context.getFrameworkUID() != null && !fwUID.equals(context.getFrameworkUID())) { throw new ClientOutOfSyncException(
-                    "Framework has been updated"); }
->>>>>>> 1525c91... Aura framework changes to support transactions using Jiffy Transaction API
             context.setFrameworkUID(fwUID);
 
             Message<?> message;

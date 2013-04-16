@@ -37,12 +37,25 @@
     </p>
     <p>When a browser initially requests an app, the server-side rendered template is returned with your <code>.app</code> file and a link to the manifest file.
        The browser retrieves the resource files that are listed in the manifest file, such as the JavaScript and CSS files, and they are cached in the browser cache.
-       Finally, the browser fetches a copy of the manifest file and downloads all resources as listed in the manifest file and store them in the AppCache.
+       Finally, the browser fetches a copy of the manifest file and downloads all resources as listed in the manifest file and stores them in the AppCache.
     </p>
+    
+    <h3>Specifying Additional Resources for Caching</h3>
+    <p>You can use the <code>additionalAppCacheURLs</code> attribute to specify a list of resources to be cached in addition to the web resources that are automatically cached by Aura when the <code>useAppcache</code> attribute is set to <code>true</code>.  The <code>additionalAppCacheURLs</code> attribute is set on the <code>aura:application</code> tag in your <code>.app</code> file. The additional resources that you can specify for caching are any resources that can be referenced and cached, such as JavaScript (.js) files, CSS stylesheet (.css) files, and images.</p>
+    <p>This is an example of an <code>additionalAppCacheURLs</code> attribute that you can add to the <code>aura:application</code> tag.</p>
+    <auradocs:codeblock>
+    additionalAppCacheURLs="<aura:text value="{!"/>c.getAdditionalAppCacheURLs}" 
+    </auradocs:codeblock><br/> 
+    <p>In the previous example, the <code>additionalAppCacheURLs</code> attribute is set to a list of URLs representing the additional resources. These URLs are returned by the a server controller method, <code>getAdditionalAppCacheURLs</code>. This is an example implementation of the server controller method.</p>
+    <auradocs:codeblock>
+    @AuraEnabled
+    public static List&lt;String> getAdditionalAppCacheURLs() {
+        return Lists.newArrayList(JavascriptLibrary.getUrl("TouchContainer1.0"), JavascriptLibrary.getUrl("CordaPopChart"));
+    }
+    </auradocs:codeblock><br/>
 
-    <auradocs:info>You must set the <code>preload</code> attribute to specify the namespaces to be preloaded for the AppCache. The top-level namespace is typically specified, such as <code>preload="auradocs"</code>
-                    in the case of our Aura documentation app. To specify multiple preloads, separate the namespaces with a comma.
-    </auradocs:info>
+    <h3>Preloading Namespaces for the AppCache</h3>
+    <p>You must set the <code>preload</code> attribute to specify the namespaces to be preloaded for the AppCache. The top-level namespace is typically specified, such as <code>preload="auradocs"</code> in the case of our Aura documentation app. To specify multiple preloads, separate the namespaces with a comma.</p>    
 
     <p>The <code>preload</code> attribute in the <code>aura:application</code> tag specifies the namespaces to be preloaded. If it's not set, any metadata for components, app, interfaces,
     events, and so on are not preloaded. Instead, these metadata are served during every subsequent request. Set the <code>preload</code> attribute to improve performance by preloading all

@@ -290,7 +290,7 @@ Component.prototype.addHandler = function(eventName, valueProvider, actionExpres
 
 /**
  * Adds handlers to Values owned by the Component.
- * @param {Object} config Passes in the eventName (e.g. "change") and actionExpression (e.g. "c.myAction").
+ * @param {Object} config Passes in the value, event (e.g. "change"), and action (e.g. "c.myAction").
  * @public
  */
 Component.prototype.addValueHandler = function(config){

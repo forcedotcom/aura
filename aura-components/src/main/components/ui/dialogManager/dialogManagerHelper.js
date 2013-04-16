@@ -346,7 +346,7 @@
      */
     getContentMaxHeight : function(dialog) {
 
-        var hasButtons     = dialog.get("v.buttons"),
+        var hasButtons     = dialog.get("v.buttons").length > 0,
             cssMargin      = 10, // applied to top-level "title", "content", and "button" elements
             cssPadding     = 10, // applied to "content" <div> only
             titleHeight    = dialog.find("title").getElement().offsetHeight + cssMargin * 2, // account for top & bottom

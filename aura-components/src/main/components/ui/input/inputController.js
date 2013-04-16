@@ -20,8 +20,8 @@
         helper.setErrorComponent(component, value);
     },
     
-    init: function(cmp) {   	
-    	var mode = $A.getContext().getMode(),
+    init: function(cmp) {
+    	var	mode = $A.getContext().getMode(),
     		isIOS = $A.get("$Browser.isIOS");
     		
     	if ((mode === "SELENIUM" || mode === "SELENIUMDEBUG") && isIOS) {    		 
@@ -30,6 +30,6 @@
     		if (cmp.get('v.updateOn') === 'change') {    			
     			cmp.getAttributes().setValue("updateOn", "blur");
     		}
-    	}
+    	}     
     } 
 })

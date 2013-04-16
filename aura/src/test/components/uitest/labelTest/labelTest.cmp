@@ -1,0 +1,183 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<aura:component>
+
+<h1>label separete from input with raw string id association</h1>
+	<table>
+	<tr><td>
+		<ui:label for="myrawid" label="My Input Text" />
+		</td>
+	</tr>
+	<tr><td>
+		<ui:inputText domId="myrawid" value="I'm an inputText"/>	
+	</td>
+	</tr>
+	</table>
+
+<hr />
+<h1>input component contained in the label component</h1>
+<ui:label>
+<span>my label</span>
+<ui:inputText value="my input" />
+</ui:label>	
+	
+ <hr />
+<h1>label separete from input</h1>
+	<table>
+	<tr><td>
+		<ui:label for="myinputtext" label="My Input Text" />
+		</td>
+	</tr>
+	<tr><td>
+		<ui:inputText aura:id="myinputtext" value="I'm an inputText"/>	
+	</td>
+	</tr>
+	</table>
+	 
+<hr />
+<h1>hidden label separete from input</h1>
+	<table>
+	<tr><td>
+		<ui:label labelDisplay="false" for="myinputtext" label="My Input Text" />
+		</td>
+	</tr>
+	<tr><td>
+		<ui:inputText aura:id="myinputtext" value="I'm an inputText"/>	
+	</td>
+	</tr>
+	</table>
+	
+
+          
+<hr />
+<h1>label with default position</h1>
+
+	<ui:inputCheckbox label="inputCheckbox" value="false"/>
+	<ui:inputDate label="inputDate" value="I'm an inputDate"/>
+	<ui:inputDateTime label="inputDateTime" value="I'm an inputDateTime"/>
+	<ui:inputNumber label="inputNumber" value="42"/>
+	<ui:inputRadio label="inputRadio" value="42"/>
+	<ui:inputRange label="inputRange" value="6"/>
+	<ui:inputSearch label="inputSearch" value="6"/>
+	<ui:inputSelect label="inputSelect" value="I'm an inputSelect"/>       
+	<ui:inputText label="inputTest" value="I'm an inputText"/>
+	<ui:inputTextArea label="inputTextArea" value="I'm an inputTextArea"/>
+ 	   
+ 	   
+   <ui:inputPhone label="inputPhone" value="I'm an inputPhone"/>
+   <ui:inputEmail label="I'm a inputEmail" value="I'm an inputEmail"/>
+   <ui:inputSecret label="I'm an inputSecret" value="I'm an inputSecret"/>
+   <ui:inputURL label="I'm an inputURL" value="I'm an inputURL"/>
+   
+   <ui:inputTime label="I'm an inputTime" value="I'm an inputTime"/>
+   
+   
+   <ui:inputPercent label="inputPercent" value="42"/>
+   <ui:inputCurrency  label="inputCurrency" value="42"/>
+   
+   <ui:inputRichText value="I'm an inputRichText"/>
+      
+   <ui:inputFile value="I'm an inputFile"/>
+   
+<hr />   
+<h1>label with top position</h1>
+
+	<ui:inputCheckbox label="inputCheckbox" labelPosition="top" value="false"/>
+	<ui:inputDate label="inputDate" labelPosition="top" value="I'm an inputDate"/>
+	<ui:inputDateTime label="inputDateTime" labelPosition="top" value="I'm an inputDateTime"/>
+	<ui:inputNumber label="inputNumber" labelPosition="top" value="42"/>
+	<ui:inputRadio label="inputRadio" labelPosition="top" value="42"/>
+	<ui:inputRange label="inputRange" labelPosition="top" value="6"/>
+	<ui:inputSearch label="inputSearch" labelPosition="top" value="6"/>
+	<ui:inputSelect label="inputSelect" labelPosition="top" value="I'm an inputSelect"/>       
+	<ui:inputText label="inputTest" labelPosition="top" value="I'm an inputText"/>
+	<ui:inputTextArea label="inputTextArea" labelPosition="top" value="I'm an inputTextArea"/>
+ 	   
+   <ui:inputPhone label="inputPhone" labelPosition="top" value="I'm an inputPhone"/>
+   <ui:inputEmail label="I'm a inputEmail" labelPosition="top" value="I'm an inputEmail"/>
+   <ui:inputSecret label="I'm an inputSecret" labelPosition="top" value="I'm an inputSecret"/>
+   <ui:inputURL label="I'm an inputURL" labelPosition="top" value="I'm an inputURL"/>
+   
+   <ui:inputTime label="I'm an inputTime" labelPosition="top" value="I'm an inputTime"/>
+      
+   <ui:inputPercent label="inputPercent" labelPosition="top" value="42"/>
+   <ui:inputCurrency  label="inputCurrency" labelPosition="top" value="42"/>
+   
+   <ui:inputRichText value="I'm an inputRichText"/>
+   <ui:inputFile value="I'm an inputFile"/>   
+
+
+<hr />
+<h1>label with right position</h1>
+
+	<ui:inputCheckbox label="inputCheckbox" labelPosition="right" value="false"/>
+	<ui:inputDate label="inputDate" labelPosition="right" value="I'm an inputDate"/>
+	<ui:inputDateTime label="inputDateTime" labelPosition="right" value="I'm an inputDateTime"/>
+	<ui:inputNumber label="inputNumber" labelPosition="right" value="42"/>
+	<ui:inputRadio label="inputRadio" labelPosition="right" value="42"/>
+	<ui:inputRange label="inputRange" labelPosition="right" value="6"/>
+	<ui:inputSearch label="inputSearch" labelPosition="right" value="6"/>
+	<ui:inputSelect label="inputSelect" labelPosition="right" value="I'm an inputSelect"/>       
+	<ui:inputText label="inputTest" labelPosition="right" value="I'm an inputText"/>
+	<ui:inputTextArea label="inputTextArea" labelPosition="right" value="I'm an inputTextArea"/>
+ 	   
+ 	   
+   <ui:inputPhone label="inputPhone" labelPosition="right" value="I'm an inputPhone"/>
+   <ui:inputEmail label="I'm a inputEmail" labelPosition="right" value="I'm an inputEmail"/>
+   <ui:inputSecret label="I'm an inputSecret" labelPosition="right" value="I'm an inputSecret"/>
+   <ui:inputURL label="I'm an inputURL" labelPosition="right" value="I'm an inputURL"/>
+   
+   <ui:inputTime label="I'm an inputTime" labelPosition="right" value="I'm an inputTime"/>
+      
+   <ui:inputPercent label="inputPercent" labelPosition="right" value="42"/>
+   <ui:inputCurrency  label="inputCurrency" labelPosition="right" value="42"/>
+      
+   <ui:inputRichText value="I'm an inputRichText"/>
+   <ui:inputFile value="I'm an inputFile"/>     
+   
+<hr />
+<h1>label with bottom position</h1>
+
+	<ui:inputCheckbox label="inputCheckbox" labelPosition="bottom" value="false"/>
+	<ui:inputDate label="inputDate" labelPosition="bottom" value="I'm an inputDate"/>
+	<ui:inputDateTime label="inputDateTime" labelPosition="bottom" value="I'm an inputDateTime"/>
+	<ui:inputNumber label="inputNumber" labelPosition="bottom" value="42"/>
+	<ui:inputRadio label="inputRadio" labelPosition="bottom" value="42"/>
+	<ui:inputRange label="inputRange" labelPosition="bottom" value="6"/>
+	<ui:inputSearch label="inputSearch" labelPosition="bottom" value="6"/>
+	<ui:inputSelect label="inputSelect" labelPosition="bottom" value="I'm an inputSelect"/>       
+	<ui:inputText label="inputTest" labelPosition="bottom" value="I'm an inputText"/>
+	<ui:inputTextArea label="inputTextArea" labelPosition="bottom" value="I'm an inputTextArea"/>
+ 	   
+ 	   
+   <ui:inputPhone label="inputPhone" labelPosition="bottom" value="I'm an inputPhone"/>
+   <ui:inputEmail label="I'm a inputEmail" labelPosition="bottom" value="I'm an inputEmail"/>
+   <ui:inputSecret label="I'm an inputSecret" labelPosition="bottom" value="I'm an inputSecret"/>
+   <ui:inputURL label="I'm an inputURL" labelPosition="bottom" value="I'm an inputURL"/>
+   
+   <ui:inputTime label="I'm an inputTime" labelPosition="bottom" value="I'm an inputTime"/>
+      
+   <ui:inputPercent label="inputPercent" labelPosition="bottom" value="42"/>
+   <ui:inputCurrency  label="inputCurrency" labelPosition="bottom" value="42"/>
+      
+   <ui:inputRichText value="I'm an inputRichText"/>
+   <ui:inputFile value="I'm an inputFile"/>     
+      
+   
+</aura:component>

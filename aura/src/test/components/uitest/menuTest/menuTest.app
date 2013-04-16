@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application>
+<aura:application model="java://org.auraframework.component.ui.MenuTestModel">
 <div style="margin:20px;">
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Your favorite soccer club</h2>
@@ -139,6 +139,47 @@
         <ui:outputText value='&#60;ui:button aura:id="radioButton" press="{&#160;!c.getRadioMenuSelected}" label="Check the selected menu items"/&#62;'/>
         <br/>
         <ui:outputText value='&#60;ui:outputText aura:id="radioResult" value="Which items get selected"/&#62;'/>  
+    </div>
+</div>
+<hr/>
+<p/>
+<div style="margin:20px;">
+    <div style="display:inline-block;width:50%;vertical-align:top;">
+        <h2>Example: Menu Item using Iteration</h2>
+               		<ui:menu>
+					  <ui:menuTriggerLink aura:id="iterationTrigger" label="iterationTrigger"/>
+					  <ui:menuList aura:id="iterationRadioMenu">
+					    <aura:iteration items="{!m.iterationItems}" var="item">
+					        <ui:radioMenuItem label="{!item.label}" value="{!item.value}"/>
+					    </aura:iteration>
+					  </ui:menuList>
+					</ui:menu>
+        	<p/>
+        <ui:button class="radioIterationButton" aura:id="radioIterationButton" press="{!c.getRadioIterationMenuSelected}" label="Check the selected menu items"/>
+        <p/>
+        <ui:outputText class="radioIterationResult" aura:id="radioIterationResult" value="Which items get selected"/> 
+   	</div>
+   	<div style="display:inline-block;width:50%;">
+        <h2>Radio menu using Iteration source codes:</h2>
+        <ui:outputText value='&#60;ui:menu&#62;'/>
+        <br/>   
+        <ui:outputText value='&#160;&#160;&#60;ui:menuTriggerLink aura:id="iterationTrigger" label="iterationTrigger"/&#62;'/>
+        <br/>
+        <ui:outputText value='&#160;&#160;&#60;ui:menuList aura:id="iterationRadioMenu"&#62;'/>
+        <br/>
+        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;aura:iteration items="{&#160;!m.iterationItems}" var="item"&#62;'/>
+        <br/>
+        <ui:outputText value='&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#60;ui:radioMenuItem label="{&#160;!item.label}" value="{&#160;!item.type} aura:id="{&#160;!item.auraId}/&#62;'/>
+        <br/>
+        <ui:outputText value='&#160;&#160;&#160;&#160;&#60;/aura:iteration&#62;'/>
+        <br/>
+        <ui:outputText value='&#160;&#160;&#60;/ui:menuList&#62;'/>
+        <br/>
+        <ui:outputText value='&#60;/ui:menu&#62;'/>    
+        <br/>
+        <ui:outputText value='&#60;ui:button aura:id="radioIterationButton" press="{&#160;!c.getRadioIterationMenuSelected}" label="Check the selected menu items"/&#62;'/>
+        <br/>
+        <ui:outputText value='&#60;ui:outputText aura:id="radioIterationResult" value="Which items get selected"/&#62;'/>  
     </div>
 </div>
 <hr/>

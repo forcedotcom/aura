@@ -238,16 +238,6 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
     }
 
     @UnAdaptableTest
-    public void testGetLastModDevUpdateNotPreloadedCss() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
-                "updateTest:updateWithoutPreload", ApplicationDef.class);
-        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.AUTHENTICATED, appDesc);
-        ComponentDef depDef = Aura.getDefinitionService().getDefinition("updateTest:updateableOther",
-                ComponentDef.class);
-        assertLastModAfterUpdate(Mode.DEV, appDesc, touchSource(depDef.getThemeDescriptor()), false);
-    }
-
-    @UnAdaptableTest
     public void testGetLastModDevUpdateDependentEventMarkup() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "updateTest:updateWithoutPreload", ApplicationDef.class);

@@ -26,13 +26,13 @@
 <p>(Persistent and secure) The SmartStore caching service is provided by the Salesforce Mobile SDK and is available only if you have installed the Salesforce Mobile SDK. The Salesforce Mobile SDK enables developing mobile applications that integrate with Salesforce. You can use SmartStore with these mobile applications for caching data. </p>
 
 <h4>MemoryAdapter</h4>
-<p>(Not persistent but secure) Provides access to the JavaScript main memory space for caching data. The stored cache persists only per browser page. Browsing to a new page resets the cache to a new state and clears the old cached data. Also, MemoryAdapter provides cache management capabilities. If the memory size limit has been reached, MemoryAdapter removes the least recently used data from the cache to shrink the cache size.</p>
+<p>(Not persistent but secure) Provides access to the JavaScript main memory space for caching data. The stored cache persists only per browser page. Browsing to a new page resets the cache. Also, MemoryAdapter provides cache management capabilities. If the memory size limit has been reached, MemoryAdapter removes the least recently used data from the cache to shrink the cache size.</p>
 
 <h4>WebSQL</h4>
-<p>(Persistent but not secure) Provides access to the Firefox's session storage and is available for Firefox browsers only.</p>
+<p>(Persistent but not secure) Provides access to Firefox's session storage and is available for Firefox browsers only.</p>
 
 <h4>IndexedDB</h4>
-<p>(Not yet implemented but will be available in the future. Persistent but not secure.) Provides access to the Chrome's session storage and is available for Chrome browsers only.</p>
+<p>(Not yet implemented but will be available in the future. Persistent but not secure.) Provides access to Chrome's session storage and is available for Chrome browsers only.</p>
 
 <h3>Storage Adapter Selection</h3>
 <p>Aura Storage Service selects a storage adapter on your behalf that matches the  persistent and secure options you specify when initializing the service. For example, if you request a persistent and secure storage service, Aura Storage Service will return the SmartStore storage.</p>
@@ -73,8 +73,9 @@
 <p>Alternatively, you can add <code>auraStorage:init</code> tags directly in the body of your component definition. The following example shows component markup that initializes a storage named <code>savings</code>.</p>
 
 <auradocs:codeblock>
-&lt;aura:component render="client" extensible="true" controller="java://org.auraframework.impl.java.controller.AuraStorageTestController" 
-implements="auraStorage:refreshObserver">
+&lt;aura:component render="client" extensible="true" 
+ controller="java://org.auraframework.impl.java.controller.AuraStorageTestController" 
+ implements="auraStorage:refreshObserver">
             
     &lt;auraStorage:init debugLoggingEnabled="true"
                          name="savings" 
@@ -165,7 +166,9 @@ a.setStorable({
 
 <p>This is the component markup that initializes the actions storage and contains a button.</p>
 <auradocs:codeblock>
-&lt;aura:component render="client" extensible="true" controller="java://org.auraframework.impl.java.controller.AuraStorageTestController" implements="auraStorage:refreshObserver">
+&lt;aura:component render="client" extensible="true" 
+ controller="java://org.auraframework.impl.java.controller.AuraStorageTestController" 
+ implements="auraStorage:refreshObserver">
             
     &lt;auraStorage:init debugLoggingEnabled="true"
                          name="actions" 
@@ -175,7 +178,8 @@ a.setStorable({
                          defaultExpiration="50" 
                          defaultAutoRefreshInterval="60" />
 
-    &lt;ui:button label="Run action at Server and mark as storable" press="<aura:text value="{!"/>c.runActionAtServerAndStore}" aura:id="ForceActionAtServer"/>
+    &lt;ui:button label="Run action at Server and mark as storable" press="<aura:text value="{!"/>c.runActionAtServerAndStore}" 
+     aura:id="ForceActionAtServer"/>
 
 &lt;/aura:component>
 </auradocs:codeblock><br/>

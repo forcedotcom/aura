@@ -36,7 +36,7 @@
         var parent = component.getValue("v.parent");
         if (parent && !parent.isEmpty()) {
             p = parent.getValue(0);
-            var body = p.getValue("v.body");
+            var body = p.getValue("v.childMenuItems");
             for (var i = 0; i < body.getLength(); i++) {
                 var c = body.getValue(i);
                 if (c.isInstanceOf("ui:radioMenuItem") && 

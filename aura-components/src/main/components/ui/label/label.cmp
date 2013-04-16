@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true">
+<aura:component extensible="true" description="The label displayed on an input component.">
 	<aura:attribute name="label" type="String" description="The text of the label." />
 	<aura:attribute name="class" type="String" description="A CSS style to be attached to the label." />		
 	<aura:attribute name="labelDisplay" default="true" type="Boolean" description="Specifies whether the label is displayed. If not, we add a hidden text for accessibility purpose." />

@@ -16,7 +16,10 @@
 package org.auraframework.component.ui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.auraframework.components.ui.MenuItem;
 import org.auraframework.system.Annotations.AuraEnabled;
@@ -78,5 +81,17 @@ public class MenuTestModel {
         MenuItem m3 = new MenuItem("tiger4", "Tiger3", false, "action");
         a.add(m3);
         return a;
+    }
+    
+    @AuraEnabled
+    public List<Object> getIterationItems() {
+    	List<Object> menuItem = new LinkedList<Object>();
+    	for (int i = 0; i < 4; i++) {
+            Map<String, Object> theMap = new HashMap<String, Object>();
+            theMap.put("label","label" + i );
+            theMap.put("value", "label" + i);
+            menuItem.add(theMap);
+        }
+		return menuItem;
     }
 }

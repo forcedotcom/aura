@@ -140,6 +140,49 @@
     },
     
     /**
+	 * Test to verify radiobox menu created using iteration cmp works when interacting with the menu items
+	 * using AURA API 
+	 * Test Case for W-1617363, W-1617518 
+	 */
+    testRadioMenuCreatedByIteration:{
+		test: [function(cmp) {
+				menuLabel = cmp.find("iterationTrigger");
+				radioMenu = cmp.find("iterationRadioMenu");
+				ouptutButton = cmp.find("radioIterationButton");
+				menuItems = radioMenu.getValue("v.childMenuItems");
+				item1 = menuItems.getValue(1);
+				item2 = menuItems.getValue(2);
+				
+				menuLabel.get("e.click").fire();
+				//check if menu is visible
+				$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(radioMenu.getElement(),"visible")}, "Radio Menu created by Iteration should be visible");
+			},function(cmp){
+				//Select first item from the menu
+				item1.get('e.click').fire();
+				//check if first item is selected
+				$A.test.addWaitForWithFailureMessage(true, function(){return item1.get('v.selected')}, "Radio Menu created by iteration should have item 1 selected");
+			},function(cmp){
+				//Test case for W-1617363
+				$A.test.assertDefined(item1.get('v.value'),"value of item1 should be defined");
+				$A.test.assertEquals(item1.get('v.value'), item1.get('v.label'), "Value of Item1 is not correct");
+				//select 2nd item from the menu
+				item2.get('e.click').fire();
+				$A.test.addWaitForWithFailureMessage(true, function(){return item2.get('v.selected')}, "Radio Menu created by iteration should have item 2 selected");
+			},function(cmp){
+				//menu item 1 should be unchecked after selecting item2
+				$A.test.assertFalse(item1.get('v.selected'),"Radio Menu item 1 should be unchecked");
+				menuLabel.get("e.click").fire();
+				$A.test.addWaitForWithFailureMessage(false, function(){return $A.util.hasClass(radioMenu.getElement(),"visible")}, "Radio Menu created by Iteration should not be visible");
+	    	}, function(cmp){
+	    		ouptutButton.get('e.press').fire();
+				var expectedOutputText = item2.get('v.label');
+				$A.test.addWaitForWithFailureMessage(expectedOutputText, function(){return cmp.find("radioIterationResult").get('v.value')}, "Output text did not get updated for Menu created by iteration");
+		  }
+	    
+        ]
+    },
+    
+    /**
 	 * General Test to verify focus on menu item using AURA API  
 	 */
     testFocusOnMenuItem:{

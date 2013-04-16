@@ -24,10 +24,10 @@ var AuraEventService = function(){
     var eventService = {
 
 		/**
-	     * Create a new application event. Set the event parameters using Event.setParams() and fire it using Event.fire().
+	     * Creates a new application event. Set the event parameters using <code>event.setParams()</code> and fire it using <code>event.fire()</code>.
+	     * For example, <code>$A.eventService.newEvent("app:navError")</code> fires the <code>app:navError</code> event. Set parameters on the new event
+	     * by using <code>event.setParams()</code>.
 	     * @param {String} name The event object in the format namespace:component
-	     * @description Example:
-	     * $A.eventService.newEvent("app:navError")
 	     * @memberOf AuraEventService
 	     * @public
 	     */
@@ -50,7 +50,7 @@ var AuraEventService = function(){
         },
 
         /**
-         * Return the new event.
+         * Returns the new event.
          * @param {String} name The event object in the format namespace:component
          * @memberOf AuraEventService
          * @public
@@ -60,7 +60,7 @@ var AuraEventService = function(){
         },
 
         /**
-         * Add an event handler.
+         * Adds an event handler.
          * @param {Object} config The data for the event handler
          * @memberOf AuraEventService
          * @public
@@ -82,7 +82,7 @@ var AuraEventService = function(){
         },
 
         /**
-         * Remove an event handler.
+         * Removes an event handler.
          * @param {Object} config The data for the event
          * @memberOf AuraEventService
          * @public
@@ -97,7 +97,7 @@ var AuraEventService = function(){
         },
 
         /**
-         * Push an action to the action queue.
+         * Pushes an action to the action queue.
          * @param {Action} action The action to enqueue
          * @memberOf AuraEventService
          * @public
@@ -107,7 +107,7 @@ var AuraEventService = function(){
         },
 
         /**
-         * Push an event to the event stack.
+         * Pushes an event to the event stack.
          * @param {Event} event The event to start firing
          * @memberOf AuraEventService
          * @private
@@ -129,7 +129,7 @@ var AuraEventService = function(){
         },
 
         /**
-         * Return the event definition (EventDef).
+         * Returns the event definition (EventDef).
          * @param {Object} config The parameters for the event
          * @memberOf AuraEventService
          * @public
@@ -139,7 +139,7 @@ var AuraEventService = function(){
         },
 
         /**
-         * Return true if the event has handlers.
+         * Returns true if the event has handlers.
          * @param {String} name The event name
          * @memberOf AuraEventService
          * @public
@@ -152,7 +152,7 @@ var AuraEventService = function(){
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         ,
         /**
-         * Return the qualified name of all events known to the registry.
+         * Returns the qualified name of all events known to the registry.
          * Available in DEV mode only.
          * @memberOf AuraEventService
          * @public

@@ -16,5 +16,12 @@
 
 -->
 <aura:component extends="ui:input" implements="ui:inputBaseOption" extensible="true" support="BETA" description="The radio button used in the input.">
-    <input aura:id="radio" class="{!v.class}" name="{!v.name}" type="radio" value="{!v.text}" checked="{!v.value}"/>
+     
+    <input aura:id="radio" 
+    	   id="{!v.domId}"
+    	   class="{!v.class}"
+    	   name="{!v.name}"
+    	   type="radio"
+    	   value="{!v.text}"
+    	   checked="{!v.value}"/>
 </aura:component>

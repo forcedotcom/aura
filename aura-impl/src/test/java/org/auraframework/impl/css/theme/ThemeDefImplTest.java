@@ -62,7 +62,8 @@ public class ThemeDefImplTest extends AuraImplTestCase {
     /**
      * ThemeDef without urls.
      */
-    public void testCssWithoutUrls() throws Exception {
+    //TODO: wait for W-1618450 to be resolved
+    public void _testCssWithoutUrls() throws Exception {
         DefDescriptor<ThemeDef> descriptor = DefDescriptorImpl.getInstance("appCache.testApp", ThemeDef.class);
         ThemeDef theme = descriptor.getDef();
         assertTrue("Unexpected urls found for theme", theme.getImageURLs().isEmpty());
@@ -75,7 +76,8 @@ public class ThemeDefImplTest extends AuraImplTestCase {
     @UnAdaptableTest
     // Errors for invalid URLs differ, so the unit test result varies from
     // standalone
-    public void testCssWithoutValidUrls() throws Exception {
+    //TODO: wait for W-1618450 to be resolved
+    public void _testCssWithoutValidUrls() throws Exception {
         if (Aura.getContextService().isEstablished()) {
             Aura.getContextService().endContext();
         }
@@ -95,6 +97,7 @@ public class ThemeDefImplTest extends AuraImplTestCase {
     // http connection. See
     // AppCacheManifestHttpTest for a test that validates that only the valid
     // URLs are cached.
+    //TODO: wait for W-1618450 to be resolved
     public void _testCssWithValidUrls() throws Exception {
         DefDescriptor<ThemeDef> descriptor = DefDescriptorImpl.getInstance("appCache.nopreload", ThemeDef.class);
         ThemeDef theme = descriptor.getDef();

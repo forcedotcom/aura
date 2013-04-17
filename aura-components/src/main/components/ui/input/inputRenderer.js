@@ -15,22 +15,18 @@
  */
 ({
 	 
-	render: function(component) {
+	render: function(component, helper) {
         var attrs = component.getAttributes(),
 			domId = attrs.getValue("domId").getValue(),
 			concreteCmp = component.getConcreteComponent(),
 			parentCmp = concreteCmp.getSuper(),
-			globalId = concreteCmp.getGlobalId();
-		
+			globalId = concreteCmp.getGlobalId(),
+			labelPos = attrs.get("labelPosition");
+        
 		if (!domId) {
-			concreteCmp.getAttributes().setValue("domId", globalId);
-			//need to traverse up the hierarchy and set the attributes, since attribute lookup is not hierarchical once initialized
-			while(parentCmp) {
-				parentCmp.getAttributes().setValue("domId", globalId);
-				parentCmp = parentCmp.getSuper();
-			} 
+			helper.setAttribute(component, {key: 'domId', value: globalId});
 		}
-		
+						
 		return this.superRender();
 	},
 	

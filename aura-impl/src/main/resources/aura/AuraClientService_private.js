@@ -344,12 +344,10 @@ var priv = {
         this.requestQueue = queue;
         var that = this;
         $A.endMark("Completed Action Callback - XHR " + num);
-        $A.endMark("XHR " + num);
 
         //#if {"modes" : ["PTEST"]}
         // if there are no more actions for a particular transaction and if
         // onLoad has already been fired
-
         if (queueCopy.length == 1 && $A.getContext().getTransaction() !== 0) {
             // if the current action is a list, a subsequent action follows to
             // fetch
@@ -358,6 +356,7 @@ var priv = {
             if (queueCopy[0].actions[0].getDef().name.indexOf("Overview") == -1 && (queueCopy[0].actions[0].getDef().name.indexOf("List") == -1 || queueCopy[0].actions[0].getDef().name.indexOf("RelatedList") !== -1)) {
                 // end the previously started transaction
                 $A.endTransaction($A.getContext().getTransaction());
+                console.log("end tr");
                 // set the transaction using #hashtag from the URL and the
                 // concatenated action names as the unique ID
                 var tokenJson = $A.historyService.get();

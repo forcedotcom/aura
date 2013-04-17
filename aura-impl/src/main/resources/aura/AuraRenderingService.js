@@ -28,7 +28,8 @@ var AuraRenderingService = function AuraRenderingService(){
              */
         rerenderDirty : function(){
             if (priv.needsCleaning) {
-                $A.mark("Finished rerendering");
+                var num = aura.getContext().incrementNum();
+                $A.mark("Rerendering: " + num);
                 $A.mark("Fired aura:doneRendering event");
                 priv.needsCleaning = false;
 
@@ -56,7 +57,7 @@ var AuraRenderingService = function AuraRenderingService(){
                 }
                 this.rerender(cmps);
 
-                $A.endMark("Finished rerendering");
+                $A.endMark("Rerendering: " + num);
                 $A.get("e.aura:doneRendering").fire();
                 $A.endMark("Fired aura:doneRendering event");
             }

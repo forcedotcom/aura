@@ -34,6 +34,8 @@ function AuraContext(config) {
         this.preloadLookup[this.preloads[j]] = true;
     }
     this.num = 0;
+    // To keep track of re-rendering service call
+    this.renderNum = 0;
     this.transaction = 0;
     this.transactionName = "";
     this.lastGlobalId = 0;
@@ -171,6 +173,14 @@ AuraContext.prototype.incrementNum = function() {
     this.num = this.num + 1;
     this.lastGlobalId = 0;
     return this.num;
+};
+
+/**
+ * @private
+ */
+AuraContext.prototype.incrementRender = function() {
+    this.renderNum = this.renderNum + 1;
+    return this.renderNum;
 };
 
 /**

@@ -77,10 +77,13 @@ var AuraLayoutService = function(){
 
             // The presence of a semaphore in here makes me think a class-level markName might cause trouble, but...
             $A.mark("LayoutService.handleLocationChange (" + token + ")");
-            $A.mark("Container Action Callback Initiated: " + item.getContainer());
-            $A.mark("Giving control to aura:layoutHandler (" + layoutHandler.toString() + ")");
+            $A.mark("Container Action Callback Initiated");
+          //  $A.mark("Container Action Callback Initiated: " + item.getContainer());
+            //$A.mark("Giving control to aura:layoutHandler (" + layoutHandler.toString() + ")");
+            $A.mark("Giving control to aura:layoutHandler");
             $A.mark("Layout Actions Callback Complete");
-            $A.mark("Container Layout Complete: "+ layoutItem.getContainer());
+           // $A.mark("Container Layout Complete: "+ layoutItem.getContainer());
+            $A.mark("Container Layout Complete");
 
             var curr = priv.peek();
 
@@ -191,7 +194,8 @@ var AuraLayoutService = function(){
                             }
 
                             action.setCallback(this, function(a){
-                                $A.endMark("Container Action Callback Initiated: " + item.getContainer());
+                                //$A.endMark("Container Action Callback Initiated: " + item.getContainer());
+                                $A.endMark("Container Action Callback Initiated");
                                 if (a.getState() === "SUCCESS") {
                                     var ret = a.getReturnValue();
                                     layoutService.layoutCallback(ret ? componentService.newComponent(ret, null, false, true) : null, item, layout, params, noTrack);
@@ -224,7 +228,8 @@ var AuraLayoutService = function(){
                                 "defaultAction": defaultAction
                             });
 
-                            $A.endMark("Giving control to aura:layoutHandler (" + layoutHandler.toString() + ")");
+                            //$A.endMark("Giving control to aura:layoutHandler (" + layoutHandler.toString() + ")");
+                            $A.endMark("Giving control to aura:layoutHandler");
 
                             event.fire();
                         } else {
@@ -300,7 +305,8 @@ var AuraLayoutService = function(){
                 defaultAction();
             }
 
-            $A.endMark("Container Layout Complete: "+ layoutItem.getContainer());
+            //$A.endMark("Container Layout Complete: "+ layoutItem.getContainer());
+            $A.endMark("Container Layout Complete");
         },
 
         /**

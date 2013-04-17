@@ -93,7 +93,6 @@ var Transport = function() {
                 }
             };
             var aura_num = config["params"]["aura.num"];
-            $A.mark("XHR " + aura_num);
             $A.mark("Received Response - XHR " + aura_num);
             $A.mark("Callback Complete - XHR " + aura_num);
             $A.mark("Completed Action Callback - XHR " + aura_num);

@@ -1,0 +1,8 @@
+{
+  "serId":1,
+  "value":{
+    "descriptor":"css://test.testStyleNamespaceToken",
+    "code":".testTestStyleNamespaceToken {\n  color: green;\n}\n.testTestStyleNamespaceToken menu {\n  color: red;\n}\n.testTestStyleNamespaceToken otherMenu {\n  color: black;\n}\n@-webkit-keyframes something {\n  from {\n    -webkit-transform: rotate(0deg);\n  }\n  to {\n    -webkit-transform: rotate(720deg);\n  }\n}\n.testTestStyleNamespaceToken .mobilePanel button:active, .testTestStyleNamespaceToken .mobilePanel .actionMenu:active, .testTestStyleNamespaceToken .uiButton.default:active {\n  background-color: #39bbe4;\n  color: #fff;\n  text-shadow: none;\n  -webkit-box-shadow: none;\n}\n",
+    "className":"testTestStyleNamespaceToken"
+  }
+}

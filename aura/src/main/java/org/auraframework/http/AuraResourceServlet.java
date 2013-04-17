@@ -43,7 +43,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.service.InstanceService;
@@ -92,7 +92,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
     /**
      * A very hackish internal filter.
      * 
-     * This is used to apply the theme definition filter for 'templates', which appears to be quite bogus, but is
+     * This is used to apply the style definition filter for 'templates', which appears to be quite bogus, but is
      * getting rather further embedded in code.
      * 
      * TODO: W-1486762
@@ -397,14 +397,14 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 }
             }
             if (nsCss == null) {
-                Set<ThemeDef> nddefs = Sets.newHashSet();
+                Set<StyleDef> nddefs = Sets.newHashSet();
                 List<DescriptorFilter> shortlist = Lists.newArrayList();
 
                 shortlist.add(filter);
-                addDefinitions(ThemeDef.class, shortlist, NTF, nddefs);
+                addDefinitions(StyleDef.class, shortlist, NTF, nddefs);
                 sb.setLength(0);
                 Appendable tmp = mode.isTestMode() ? out : sb;
-                Aura.getSerializationService().writeCollection(nddefs, ThemeDef.class, tmp, "CSS");
+                Aura.getSerializationService().writeCollection(nddefs, StyleDef.class, tmp, "CSS");
                 if (!mode.isTestMode()) {
                     nsCss = sb.toString();
                     cssCache.put(key, new SoftReference<String>(nsCss));

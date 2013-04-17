@@ -36,10 +36,10 @@ public class VerifyConditions extends DefaultTreeVisitor implements CssCompilerP
     private final MutatingVisitController visitController;
     private final Set<String> allowedConditions;
     private final ErrorManager errorManager;
-    private final ThemeParserResultHolder resultHolder;
+    private final StyleParserResultHolder resultHolder;
 
     public VerifyConditions(MutatingVisitController visitController, Set<String> allowedConditions,
-            ThemeParserResultHolder resultHolder, ErrorManager errorManager) {
+            StyleParserResultHolder resultHolder, ErrorManager errorManager) {
         this.visitController = visitController;
         this.allowedConditions = allowedConditions;
         this.resultHolder = resultHolder;

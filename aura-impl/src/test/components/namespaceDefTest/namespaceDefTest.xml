@@ -1,8 +1,8 @@
 <aura:namespace>
-	<theme>
-		<tokens>
-			<FOO>red</FOO>
-			<BAR>baz</BAR>
-		</tokens>
-	</theme>
+    <style>
+        <tokens>
+            <FOO>red</FOO>
+            <BAR>baz</BAR>
+        </tokens>
+    </style>
 </aura:namespace>

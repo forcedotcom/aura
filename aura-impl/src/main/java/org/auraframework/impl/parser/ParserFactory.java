@@ -17,10 +17,10 @@ package org.auraframework.impl.parser;
 
 import java.util.EnumMap;
 
-import org.auraframework.impl.css.parser.ThemeParser;
+import org.auraframework.impl.css.parser.StyleParser;
 import org.auraframework.impl.java.writer.JavaScriptWriter;
 import org.auraframework.impl.java.writer.JavaWriter;
-import org.auraframework.impl.java.writer.ThemeWriter;
+import org.auraframework.impl.java.writer.StyleWriter;
 import org.auraframework.impl.javascript.parser.JavascriptParser;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.XMLWriter;
@@ -38,15 +38,15 @@ public class ParserFactory {
 
     static {
         parsers.put(Format.XML, XMLParser.getInstance());
-        parsers.put(Format.CSS, ThemeParser.getInstance());
-        parsers.put(Format.TEMPLATE_CSS, ThemeParser.getNonValidatingInstance());
+        parsers.put(Format.CSS, StyleParser.getInstance());
+        parsers.put(Format.TEMPLATE_CSS, StyleParser.getNonValidatingInstance());
         parsers.put(Format.JS, JavascriptParser.getInstance());
 
         writers.put(Format.XML, XMLWriter.getInstance());
         writers.put(Format.JAVA, JavaWriter.getInstance());
         writers.put(Format.JS, JavaScriptWriter.getInstance());
-        writers.put(Format.CSS, ThemeWriter.getInstance());
-        writers.put(Format.TEMPLATE_CSS, ThemeWriter.getInstance());
+        writers.put(Format.CSS, StyleWriter.getInstance());
+        writers.put(Format.TEMPLATE_CSS, StyleWriter.getInstance());
     }
 
     public static Parser getParser(Format format) {

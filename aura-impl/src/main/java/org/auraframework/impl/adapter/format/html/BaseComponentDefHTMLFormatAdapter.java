@@ -26,7 +26,7 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.http.AuraServlet;
 import org.auraframework.http.ManifestUtil;
@@ -69,10 +69,10 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
 
             attributes.put("lastMod", Long.toString(AuraBaseServlet.getLastMod()));
 
-            DefDescriptor<ThemeDef> themeDefDesc = templateDef.getThemeDescriptor();
-            if (themeDefDesc != null) {
+            DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
+            if (styleDefDesc != null) {
                 Client.Type type = context.getClient().getType();
-                attributes.put("auraInlineStyle", themeDefDesc.getDef().getCode(type));
+                attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode(type));
             }
 
             String contextPath = context.getContextPath();

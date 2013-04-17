@@ -41,7 +41,7 @@ import org.auraframework.impl.ServerServiceImpl;
 import org.auraframework.impl.adapter.ConfigAdapterImpl;
 import org.auraframework.impl.adapter.GlobalValueProviderAdapterImpl;
 import org.auraframework.impl.adapter.JsonSerializerAdapterImpl;
-import org.auraframework.impl.adapter.format.css.ThemeDefCSSFormatAdapter;
+import org.auraframework.impl.adapter.format.css.StyleDefCSSFormatAdapter;
 import org.auraframework.impl.adapter.format.css.ThrowableCSSFormatAdapter;
 import org.auraframework.impl.adapter.format.html.ApplicationDefHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.ApplicationHTMLFormatAdapter;
@@ -290,8 +290,8 @@ public class AuraImplConfig {
     }
 
     @Impl
-    public static FormatAdapter<?> themeDefCSSFormatAdapter() {
-        return new ThemeDefCSSFormatAdapter();
+    public static FormatAdapter<?> styleDefCSSFormatAdapter() {
+        return new StyleDefCSSFormatAdapter();
     }
 
     @Impl

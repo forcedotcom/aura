@@ -5,7 +5,7 @@
       "serId":2,
       "value":{
         "descriptor":"markup://test:parent",
-        "themeDef":{
+        "styleDef":{
           "serId":3,
           "value":{
             "descriptor":"css://test.parent",

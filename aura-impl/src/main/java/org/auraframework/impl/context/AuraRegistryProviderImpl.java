@@ -35,7 +35,7 @@ import org.auraframework.def.SecurityProviderDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.impl.compound.controller.CompoundControllerDefFactory;
 import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
-import org.auraframework.impl.css.theme.ThemeDefFactory;
+import org.auraframework.impl.css.style.StyleDefFactory;
 import org.auraframework.impl.java.controller.JavaControllerDefFactory;
 import org.auraframework.impl.java.model.JavaModelDefFactory;
 import org.auraframework.impl.java.provider.JavaProviderDefFactory;
@@ -46,10 +46,10 @@ import org.auraframework.impl.root.RootDefFactory;
 import org.auraframework.impl.source.SourceFactory;
 import org.auraframework.impl.source.file.FileJavascriptSourceLoader;
 import org.auraframework.impl.source.file.FileSourceLoader;
-import org.auraframework.impl.source.file.FileThemeSourceLoader;
+import org.auraframework.impl.source.file.FileStyleSourceLoader;
 import org.auraframework.impl.source.resource.ResourceJavascriptSourceLoader;
 import org.auraframework.impl.source.resource.ResourceSourceLoader;
-import org.auraframework.impl.source.resource.ResourceThemeSourceLoader;
+import org.auraframework.impl.source.resource.ResourceStyleSourceLoader;
 import org.auraframework.impl.system.CacheableDefFactoryImpl;
 import org.auraframework.impl.system.CachingDefRegistryImpl;
 import org.auraframework.impl.system.NonCachingDefRegistryImpl;
@@ -83,7 +83,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
 
             List<SourceLoader> markupLoaders = Lists.newArrayList();
             List<SourceLoader> jsLoaders = Lists.newArrayList();
-            List<SourceLoader> themeLoaders = Lists.newArrayList();
+            List<SourceLoader> styleLoaders = Lists.newArrayList();
             List<SourceLoader> javaLoaders = Lists.newArrayList();
 
             for (ComponentLocationAdapter location : markupLocations) {
@@ -91,13 +91,13 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                     String pkg = location.getComponentSourcePackage();
                     if (pkg != null) {
                         jsLoaders.add(new ResourceJavascriptSourceLoader(pkg));
-                        themeLoaders.add(new ResourceThemeSourceLoader(pkg));
+                        styleLoaders.add(new ResourceStyleSourceLoader(pkg));
                         ResourceSourceLoader rsl = new ResourceSourceLoader(pkg);
                         markupLoaders.add(rsl);
                         javaLoaders.add(rsl);
                     } else if (location.getComponentSourceDir() != null) {
                         jsLoaders.add(new FileJavascriptSourceLoader(location.getComponentSourceDir()));
-                        themeLoaders.add(new FileThemeSourceLoader(location.getComponentSourceDir()));
+                        styleLoaders.add(new FileStyleSourceLoader(location.getComponentSourceDir()));
                         markupLoaders.add(new FileSourceLoader(location.getComponentSourceDir()));
                         File javaBase = new File(location.getComponentSourceDir().getParent(), "java");
                         if (javaBase.exists()) {
@@ -113,7 +113,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                         Set<SourceLoader> loaders = location.getSourceLoaders();
                         if (!loaders.isEmpty()) {
                             markupLoaders.addAll(loaders);
-                            themeLoaders.addAll(loaders);
+                            styleLoaders.addAll(loaders);
                             jsLoaders.addAll(loaders);
                         }
                     }
@@ -122,7 +122,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
 
             if (extraLoaders != null) {
                 jsLoaders.addAll(extraLoaders);
-                themeLoaders.addAll(extraLoaders);
+                styleLoaders.addAll(extraLoaders);
                 markupLoaders.addAll(extraLoaders);
                 javaLoaders.addAll(extraLoaders);
             }
@@ -152,7 +152,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                     AuraRegistryProviderImpl.<ProviderDef> createJavascriptRegistry(jsSourceFactory, DefType.PROVIDER),
                     AuraRegistryProviderImpl.<ModelDef> createJavascriptRegistry(jsSourceFactory, DefType.MODEL),
 
-                    createDefRegistry(new ThemeDefFactory(new SourceFactory(themeLoaders)),
+                    createDefRegistry(new StyleDefFactory(new SourceFactory(styleLoaders)),
                             Sets.newHashSet(DefType.STYLE),
                             Sets.newHashSet(DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX)),
                     createDefRegistry(new JavaTypeDefFactory(javaLoaders), DefType.TYPE, DefDescriptor.JAVA_PREFIX),

@@ -219,7 +219,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef("testAttributeDescriptorName", "testValue",
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                                vendor.makeLocation("filename1", 5, 5, 0),null));
+                        vendor.makeLocation("filename1", 5, 5, 0), null));
         List<ComponentDefRef> testChildren = ImmutableList.of(vendor.makeComponentDefRefWithNulls(
                 vendor.makeComponentDefDescriptor("test:text"), null, vendor.makeLocation("filename2", 10, 10, 0)));
         serializeAndGoldFile(vendor.makeBaseComponentDefWithNulls(getDefClass(),
@@ -292,8 +292,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                         baseTag,
                         String.format("extends='%s' implements='%s' provider='%s'", parentDesc.getDescriptorName(),
                                 intfDesc.getDescriptorName(), providerDesc), String.format(
-                                        "<%s/><aura:registerevent name='evt' type='%s'/>", childDesc.getDescriptorName(),
-                                        eventDesc.getDescriptorName())));
+                                "<%s/><aura:registerevent name='evt' type='%s'/>", childDesc.getDescriptorName(),
+                                eventDesc.getDescriptorName())));
 
         DefDescriptor<ModelDef> modelDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, ModelDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
@@ -311,15 +311,15 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 DefDescriptor.JAVASCRIPT_PREFIX);
         auraTestingUtil.addSourceAutoCleanup(helperDesc, "({help:function(){}})");
 
-        DefDescriptor<ThemeDef> themeDesc = Aura.getDefinitionService()
+        DefDescriptor<StyleDef> styleDesc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpDesc, DefDescriptor.CSS_PREFIX,
-                        ThemeDef.class);
+                        StyleDef.class);
         String className = cmpDesc.getNamespace()
                 + StringUtils.capitalize(cmpDesc.getName());
-        auraTestingUtil.addSourceAutoCleanup(themeDesc,
+        auraTestingUtil.addSourceAutoCleanup(styleDesc,
                 String.format(".%s {font-style:italic;}", className));
         DefDescriptor<NamespaceDef> namespaceDesc = Aura.getDefinitionService().getDefDescriptor(
-                String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, themeDesc.getNamespace()), NamespaceDef.class);
+                String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace()), NamespaceDef.class);
         auraTestingUtil.addSourceAutoCleanup(namespaceDesc, "<aura:namespace/>");
 
         Set<DefDescriptor<?>> dependencies = new HashSet<DefDescriptor<?>>();
@@ -327,7 +327,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
         @SuppressWarnings("unchecked")
         Set<DefDescriptor<?>> expected = Sets.newHashSet(parentDesc, childDesc, intfDesc, providerDesc, modelDesc,
-                controllerDesc, eventDesc, themeDesc, renderDesc, helperDesc);
+                controllerDesc, eventDesc, styleDesc, renderDesc, helperDesc);
         if (!dependencies.containsAll(expected)) {
             fail(String.format("missing dependencies - EXPECTED: %s, ACTUAL: %s", expected, dependencies));
         }
@@ -857,23 +857,23 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Test method for {@link BaseComponentDef#getThemeDescriptor()}.
+     * Test method for {@link BaseComponentDef#getStyleDescriptor()}.
      */
-    public void testGetThemeDescriptorWithoutTheme() throws Exception {
+    public void testGetStyleDescriptorWithoutStyle() throws Exception {
         T def = define(baseTag, "", "");
-        DefDescriptor<ThemeDef> themeDef = def.getThemeDescriptor();
-        assertNull("ThemeDescriptor for component without theme should be null", themeDef);
+        DefDescriptor<StyleDef> styleDef = def.getStyleDescriptor();
+        assertNull("StyleDescriptor for component without style should be null", styleDef);
     }
 
     /**
-     * Test method for {@link BaseComponentDef#getThemeDescriptor()}.
+     * Test method for {@link BaseComponentDef#getStyleDescriptor()}.
      */
-    public void testGetThemeDescriptor() throws Exception {
-        T def = define(baseTag, "theme=\"templateCss://test.themeTestTemplate\"", "");
-        DefDescriptor<ThemeDef> themeDef = def.getThemeDescriptor();
-        assertNotNull("ThemeDescriptor not found on component", themeDef);
-        assertEquals("Wrong ThemeDescriptor found on component", "templateCss://test.themeTestTemplate",
-                themeDef.getQualifiedName());
+    public void testGetStyleDescriptor() throws Exception {
+        T def = define(baseTag, "style=\"templateCss://test.styleTestTemplate\"", "");
+        DefDescriptor<StyleDef> styleDef = def.getStyleDescriptor();
+        assertNotNull("StyleDescriptor not found on component", styleDef);
+        assertEquals("Wrong StyleDescriptor found on component", "templateCss://test.styleTestTemplate",
+                styleDef.getQualifiedName());
     }
 
     /**
@@ -1095,13 +1095,13 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * isLocallyRenderable is false when a component includes a Theme. Test method for
+     * isLocallyRenderable is false when a component includes a Style. Test method for
      * {@link BaseComponentDef#isLocallyRenderable()}.
      */
-    public void testIsLocallyRenderableWithTheme() throws Exception {
-        T baseComponentDef = define(baseTag, "theme='css://test.testValidCSS'", "");
+    public void testIsLocallyRenderableWithStyle() throws Exception {
+        T baseComponentDef = define(baseTag, "style='css://test.testValidCSS'", "");
         assertEquals("Rendering detection logic is not on.", RenderType.AUTO, baseComponentDef.getRender());
-        assertFalse("When a component has a theme, the rendering should be done clientside.",
+        assertFalse("When a component has a style, the rendering should be done clientside.",
                 baseComponentDef.isLocallyRenderable());
     }
 
@@ -1443,7 +1443,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             checkExceptionFull(e, InvalidDefinitionException.class,
                     String.format("%s cannot widen the support level to GA from %s's level of BETA",
                             parentDesc.getQualifiedName(), grandParentDesc.getQualifiedName()),
-                            parentDesc.getQualifiedName());
+                    parentDesc.getQualifiedName());
         }
     }
 
@@ -1516,7 +1516,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class,
                     "Component " + dd.getQualifiedName()
-                    + " cannot implement the rootComponent interface because it is not in the aura namespace",
+                            + " cannot implement the rootComponent interface because it is not in the aura namespace",
                     dd.getQualifiedName());
         }
     }

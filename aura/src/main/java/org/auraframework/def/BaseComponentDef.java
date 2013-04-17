@@ -71,7 +71,7 @@ public interface BaseComponentDef extends RootDefinition {
 
     DefDescriptor<RendererDef> getRendererDescriptor() throws QuickFixException;
 
-    DefDescriptor<ThemeDef> getThemeDescriptor();
+    DefDescriptor<StyleDef> getStyleDescriptor();
 
     List<AttributeDefRef> getFacets();
 

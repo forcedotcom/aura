@@ -28,7 +28,7 @@ import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RendererDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.Component;
@@ -103,7 +103,7 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
         DefDescriptor<RendererDef> rd = component.getRendererDescriptor();
         assertEquals("testComponent1", rd.getName());
 
-        DefDescriptor<ThemeDef> td = component.getThemeDescriptor();
+        DefDescriptor<StyleDef> td = component.getStyleDescriptor();
         assertEquals("testComponent1", td.getName());
     }
 
@@ -167,7 +167,7 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
         DefDescriptor<RendererDef> rd = application.getRendererDescriptor();
         assertEquals("testApplication1", rd.getName());
 
-        DefDescriptor<ThemeDef> td = application.getThemeDescriptor();
+        DefDescriptor<StyleDef> td = application.getStyleDescriptor();
         assertEquals("testApplication1", td.getName());
     }
 }

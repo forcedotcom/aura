@@ -52,7 +52,7 @@ var priv = {
      * @private
      */
     applyClasses : function(cmp, elements) {
-        var className = cmp.getDef().getThemeClassName();
+        var className = cmp.getDef().getStyleClassName();
         if (className) {
             var len = elements.length;
             for ( var i = 0; i < len; i++) {

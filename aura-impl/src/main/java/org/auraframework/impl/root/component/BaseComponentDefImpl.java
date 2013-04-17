@@ -47,8 +47,8 @@ import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.RootDefinition;
+import org.auraframework.def.StyleDef;
 import org.auraframework.def.TestSuiteDef;
-import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.RootDefinitionImpl;
@@ -71,8 +71,8 @@ import com.google.common.collect.Sets;
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
-    public static final DefDescriptor<InterfaceDef> ROOT_MARKER = DefDescriptorImpl
-            .getInstance("markup://aura:rootComponent", InterfaceDef.class);
+    public static final DefDescriptor<InterfaceDef> ROOT_MARKER = DefDescriptorImpl.getInstance(
+            "markup://aura:rootComponent", InterfaceDef.class);
 
     private static final long serialVersionUID = -2485193714215681494L;
     private final boolean isAbstract;
@@ -83,7 +83,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     private final DefDescriptor<T> extendsDescriptor;
     private final DefDescriptor<ComponentDef> templateDefDescriptor;
     private final DefDescriptor<TestSuiteDef> testSuiteDefDescriptor;
-    private final DefDescriptor<ThemeDef> themeDescriptor;
+    private final DefDescriptor<StyleDef> styleDescriptor;
     private final List<DefDescriptor<RendererDef>> rendererDescriptors;
     private final List<DefDescriptor<HelperDef>> helperDescriptors;
     private final DefDescriptor<ControllerDef> compoundControllerDescriptor;
@@ -124,7 +124,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         this.templateDefDescriptor = builder.templateDefDescriptor;
         this.events = AuraUtil.immutableMap(builder.events);
         this.eventHandlers = AuraUtil.immutableList(builder.eventHandlers);
-        this.themeDescriptor = builder.themeDescriptor;
+        this.styleDescriptor = builder.styleDescriptor;
         this.rendererDescriptors = builder.rendererDescriptors;
         this.helperDescriptors = builder.helperDescriptors;
         this.isAbstract = builder.isAbstract;
@@ -164,10 +164,9 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         for (AttributeDef att : this.attributeDefs.values()) {
             att.validateDefinition();
             if (events.containsKey(att.getName())) {
-                throw new InvalidDefinitionException(
-                        String.format(
-                                "Cannot define an attribute and register an event with the same name: %s",
-                                att.getName()), getLocation());
+                throw new InvalidDefinitionException(String.format(
+                        "Cannot define an attribute and register an event with the same name: %s", att.getName()),
+                        getLocation());
             }
         }
 
@@ -184,8 +183,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         // an abstract component that you can't extend is pretty useless
         if (this.isAbstract() && !this.isExtensible()) {
             throw new InvalidDefinitionException(String.format(
-                    "Abstract component %s must be extensible.",
-                    getDescriptor()), getLocation());
+                    "Abstract component %s must be extensible.", getDescriptor()), getLocation());
         }
 
         if (this.interfaces.contains(ROOT_MARKER)) {
@@ -199,9 +197,11 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             }
             // cannot be a root and extend something
             if (this.extendsDescriptor != null) {
-                throw new InvalidDefinitionException(String.format(
-                        "Component %s cannot be a rootComponent and extend %s",
-                        getDescriptor(), this.extendsDescriptor), getLocation());
+                throw new InvalidDefinitionException(
+                        String.format(
+                                "Component %s cannot be a rootComponent and extend %s", getDescriptor(),
+                                this.extendsDescriptor),
+                        getLocation());
             }
         }
     }
@@ -214,8 +214,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         return localDeps;
     }
 
-    private synchronized void computeLocalDependencies()
-            throws QuickFixException {
+    private synchronized void computeLocalDependencies() throws QuickFixException {
         if (localDeps != null) {
             return;
         }
@@ -282,20 +281,18 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             T parentDef = extendsDescriptor.getDef();
 
             if (parentDef == null) {
-                throw new DefinitionNotFoundException(extendsDescriptor,
-                        getLocation());
+                throw new DefinitionNotFoundException(extendsDescriptor, getLocation());
             }
 
             if (parentDef.getDescriptor().equals(descriptor)) {
                 throw new InvalidDefinitionException(String.format(
-                        "%s cannot extend itself", getDescriptor()),
-                        getLocation());
+                        "%s cannot extend itself", getDescriptor()), getLocation());
             }
 
             if (!parentDef.isExtensible()) {
                 throw new InvalidDefinitionException(String.format(
-                        "%s cannot extend non-extensible component %s",
-                        getDescriptor(), extendsDescriptor), getLocation());
+                        "%s cannot extend non-extensible component %s", getDescriptor(), extendsDescriptor),
+                        getLocation());
             }
 
             SupportLevel support = getSupport();
@@ -304,10 +301,9 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                 T extDef = extDesc.getDef();
                 if (support.ordinal() > extDef.getSupport().ordinal()) {
                     throw new InvalidDefinitionException(
-                            String.format(
-                                    "%s cannot widen the support level to %s from %s's level of %s",
-                                    getDescriptor(), support, extDesc,
-                                    extDef.getSupport()), getLocation());
+                            String.format("%s cannot widen the support level to %s from %s's level of %s",
+                                    getDescriptor(),
+                                    support, extDesc, extDef.getSupport()), getLocation());
                 }
                 extDesc = (DefDescriptor<T>) extDef.getExtendsDescriptor();
             }
@@ -367,8 +363,8 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
     @Override
     public void retrieveLabels() throws QuickFixException {
-        GlobalValueProvider labelProvider = Aura.getContextService()
-                .getCurrentContext().getGlobalProviders().get(LABEL);
+        GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders()
+                .get(LABEL);
         for (PropertyReference e : expressionRefs) {
             if (e.getRoot().equals(LABEL.getPrefix())) {
                 labelProvider.getValue(e.getStem());
@@ -450,8 +446,8 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             dependencies.addAll(helperDescriptors);
         }
 
-        if (themeDescriptor != null) {
-            dependencies.add(themeDescriptor);
+        if (styleDescriptor != null) {
+            dependencies.add(styleDescriptor);
         }
 
         if (templateDefDescriptor != null) {
@@ -470,8 +466,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
      * @throws QuickFixException
      */
     @Override
-    public Map<String, RegisterEventDef> getRegisterEventDefs()
-            throws QuickFixException {
+    public Map<String, RegisterEventDef> getRegisterEventDefs() throws QuickFixException {
         Map<String, RegisterEventDef> ret = new LinkedHashMap<String, RegisterEventDef>();
         if (extendsDescriptor != null) {
             ret.putAll(getSuperDef().getRegisterEventDefs());
@@ -495,8 +490,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
      * @throws QuickFixException
      */
     @Override
-    public Collection<EventHandlerDef> getHandlerDefs()
-            throws QuickFixException {
+    public Collection<EventHandlerDef> getHandlerDefs() throws QuickFixException {
         return eventHandlers;
     }
 
@@ -505,8 +499,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
      * @throws QuickFixException
      */
     @Override
-    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs()
-            throws QuickFixException {
+    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
         Map<DefDescriptor<AttributeDef>, AttributeDef> map = new LinkedHashMap<DefDescriptor<AttributeDef>, AttributeDef>();
         if (extendsDescriptor != null) {
             map.putAll(getSuperDef().getAttributeDefs());
@@ -514,8 +507,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
         for (DefDescriptor<InterfaceDef> intf : interfaces) {
             InterfaceDef intfDef = intf.getDef();
-            for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> entry : intfDef
-                    .getAttributeDefs().entrySet()) {
+            for (Map.Entry<DefDescriptor<AttributeDef>, AttributeDef> entry : intfDef.getAttributeDefs().entrySet()) {
                 DefDescriptor<AttributeDef> desc = entry.getKey();
                 if (map.containsKey(desc)) {
                     // FIXMEDLP - do some validation #W-690040
@@ -534,8 +526,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     }
 
     @Override
-    public List<DefDescriptor<ControllerDef>> getControllerDefDescriptors()
-            throws QuickFixException {
+    public List<DefDescriptor<ControllerDef>> getControllerDefDescriptors() throws QuickFixException {
         List<DefDescriptor<ControllerDef>> ret;
         if (extendsDescriptor != null) {
             ret = new ArrayList<DefDescriptor<ControllerDef>>();
@@ -560,8 +551,8 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         }
     }
 
-    public ThemeDef getThemeDef() throws QuickFixException {
-        return themeDescriptor == null ? null : themeDescriptor.getDef();
+    public StyleDef getStyleDef() throws QuickFixException {
+        return styleDescriptor == null ? null : styleDescriptor.getDef();
     }
 
     @Override
@@ -584,8 +575,8 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     }
 
     @Override
-    public DefDescriptor<ThemeDef> getThemeDescriptor() {
-        return themeDescriptor;
+    public DefDescriptor<StyleDef> getStyleDescriptor() {
+        return styleDescriptor;
     }
 
     @Override
@@ -608,8 +599,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         return interfaces;
     }
 
-    private Set<DefDescriptor<InterfaceDef>> getAllInterfaces()
-            throws QuickFixException {
+    private Set<DefDescriptor<InterfaceDef>> getAllInterfaces() throws QuickFixException {
         Set<DefDescriptor<InterfaceDef>> ret = Sets.newLinkedHashSet();
         for (DefDescriptor<InterfaceDef> intf : interfaces) {
             addAllInterfaces(intf, ret);
@@ -617,11 +607,10 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         return ret;
     }
 
-    private void addAllInterfaces(DefDescriptor<InterfaceDef> intf,
-            Set<DefDescriptor<InterfaceDef>> set) throws QuickFixException {
+    private void addAllInterfaces(DefDescriptor<InterfaceDef> intf, Set<DefDescriptor<InterfaceDef>> set)
+            throws QuickFixException {
         set.add(intf);
-        for (DefDescriptor<InterfaceDef> zuper : intf.getDef()
-                .getExtendsDescriptors()) {
+        for (DefDescriptor<InterfaceDef> zuper : intf.getDef().getExtendsDescriptors()) {
             set.add(zuper);
             addAllInterfaces(zuper, set);
         }
@@ -691,7 +680,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                     json.writeMapEntry("helperDef", helperDef);
                 }
 
-                json.writeMapEntry("themeDef", getThemeDef());
+                json.writeMapEntry("styleDef", getStyleDef());
                 json.writeMapEntry("controllerDef", getControllerDef());
                 json.writeMapEntry("modelDef", getModelDef());
                 json.writeMapEntry("superDef", getSuperDef());
@@ -704,8 +693,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                 if (allInterfaces != null && !allInterfaces.isEmpty()) {
                     json.writeMapEntry("interfaces", allInterfaces);
                 }
-                Collection<RegisterEventDef> regevents = getRegisterEventDefs()
-                        .values();
+                Collection<RegisterEventDef> regevents = getRegisterEventDefs().values();
                 if (!regevents.isEmpty()) {
                     json.writeMapEntry("registerEventDefs", regevents);
                 }
@@ -752,8 +740,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
      * @see ComponentDef#getRendererDescriptor()
      */
     @Override
-    public DefDescriptor<RendererDef> getRendererDescriptor()
-            throws QuickFixException {
+    public DefDescriptor<RendererDef> getRendererDescriptor() throws QuickFixException {
         if (rendererDescriptors != null && rendererDescriptors.size() == 1) {
             return rendererDescriptors.get(0);
         }
@@ -817,8 +804,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     }
 
     public TestSuiteDef getTestSuiteDef() throws QuickFixException {
-        return testSuiteDefDescriptor == null ? null : testSuiteDefDescriptor
-                .getDef();
+        return testSuiteDefDescriptor == null ? null : testSuiteDefDescriptor.getDef();
     }
 
     /**
@@ -843,8 +829,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
      * @see ComponentDef#getModelDefDescriptors()
      */
     @Override
-    public List<DefDescriptor<ModelDef>> getModelDefDescriptors()
-            throws QuickFixException {
+    public List<DefDescriptor<ModelDef>> getModelDefDescriptors() throws QuickFixException {
         List<DefDescriptor<ModelDef>> ret = new ArrayList<DefDescriptor<ModelDef>>();
 
         if (modelDefDescriptor != null) {
@@ -872,7 +857,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         public DefDescriptor<T> extendsDescriptor;
         public DefDescriptor<ComponentDef> templateDefDescriptor;
         public DefDescriptor<TestSuiteDef> testSuiteDefDescriptor;
-        public DefDescriptor<ThemeDef> themeDescriptor;
+        public DefDescriptor<StyleDef> styleDescriptor;
         public List<DefDescriptor<RendererDef>> rendererDescriptors;
         public List<DefDescriptor<HelperDef>> helperDescriptors;
         public List<AttributeDefRef> facets;
@@ -904,16 +889,14 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             if (this.rendererDescriptors == null) {
                 this.rendererDescriptors = Lists.newArrayList();
             }
-            this.rendererDescriptors.add(DefDescriptorImpl.getInstance(name,
-                    RendererDef.class));
+            this.rendererDescriptors.add(DefDescriptorImpl.getInstance(name, RendererDef.class));
         }
 
         public void addHelper(String name) {
             if (this.helperDescriptors == null) {
                 this.helperDescriptors = Lists.newArrayList();
             }
-            this.helperDescriptors.add(DefDescriptorImpl.getInstance(name,
-                    HelperDef.class));
+            this.helperDescriptors.add(DefDescriptorImpl.getInstance(name, HelperDef.class));
         }
 
         @Override
@@ -968,8 +951,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         }
 
         @Override
-        public Builder<T> setWhitespaceBehavior(
-                WhitespaceBehavior whitespaceBehavior) {
+        public Builder<T> setWhitespaceBehavior(WhitespaceBehavior whitespaceBehavior) {
             this.whitespaceBehavior = whitespaceBehavior;
             return this;
         }
@@ -982,8 +964,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
         @Override
         public Builder<T> setTemplate(String templateName) {
-            this.templateDefDescriptor = Aura.getDefinitionService()
-                    .getDefDescriptor(templateName, ComponentDef.class);
+            this.templateDefDescriptor = Aura.getDefinitionService().getDefDescriptor(templateName, ComponentDef.class);
             return this;
         }
 
@@ -996,8 +977,8 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         }
 
         @Override
-        public Builder<T> setThemeDef(ThemeDef themeDef) {
-            this.themeDescriptor = themeDef.getDescriptor();
+        public Builder<T> setStyleDef(StyleDef styleDef) {
+            this.styleDescriptor = styleDef.getDescriptor();
             return this;
         }
     }
@@ -1006,8 +987,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
      * @see RootDefinition#isInstanceOf(DefDescriptor)
      */
     @Override
-    public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other)
-            throws QuickFixException {
+    public boolean isInstanceOf(DefDescriptor<? extends RootDefinition> other) throws QuickFixException {
         switch (other.getDefType()) {
         case INTERFACE:
             for (DefDescriptor<InterfaceDef> intf : interfaces) {
@@ -1015,8 +995,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                     return true;
                 }
             }
-            return (extendsDescriptor != null && getSuperDef().isInstanceOf(
-                    other));
+            return (extendsDescriptor != null && getSuperDef().isInstanceOf(other));
         case COMPONENT:
         case APPLICATION:
             return descriptor.equals(other)
@@ -1051,8 +1030,8 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             ret.addAll(providerDescriptors);
         }
 
-        if (themeDescriptor != null) {
-            ret.add(themeDescriptor);
+        if (styleDescriptor != null) {
+            ret.add(styleDescriptor);
         }
 
         if (helperDescriptors != null) {
@@ -1070,9 +1049,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     }
 
     /**
-     * Helper routine for public call.
-     * 
-     * DIE! please?
+     * Helper routine for public call. DIE! please?
      * 
      * @param already the set of processed descriptors.
      */
@@ -1090,13 +1067,13 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         // this.
         //
         // Currently, the server side throws an UnsupportedOperationException,
-        // so the themes (which is one part that currently breaks) never get
+        // so the styles (which is one part that currently breaks) never get
         // rendered.
         //
         // also see W-922563
         //
         // This will probably stay here til we fix server side rendering (or at
-        // least the theme part). Also, we need to allow dual renderers.
+        // least the style part). Also, we need to allow dual renderers.
         //
         if (this.getDescriptor().getQualifiedName().equals("markup://aura:placeholder")) {
             return true;
@@ -1125,10 +1102,10 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             ret = ret && getControllerDefDescriptors().isEmpty();
         }
 
-        // If we've gotten this far, let's check for Themes (server rendering
-        // doesn't work with themes) W-922563
+        // If we've gotten this far, let's check for Styles (server rendering
+        // doesn't work with styles) W-922563
         if (ret) {
-            ret = ret && getThemeDescriptor() == null;
+            ret = ret && getStyleDescriptor() == null;
         }
 
         // If we've gotten this far, let's spider dependencies.
@@ -1139,10 +1116,8 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             for (DefDescriptor<?> dep : deps) {
                 if (!already.contains(dep)) {
                     already.add(dep);
-                    if (dep.getDefType() == DefType.COMPONENT
-                            || dep.getDefType() == DefType.APPLICATION) {
-                        BaseComponentDefImpl<?> depDef = (BaseComponentDefImpl<?>) dep
-                                .getDef();
+                    if (dep.getDefType() == DefType.COMPONENT || dep.getDefType() == DefType.APPLICATION) {
+                        BaseComponentDefImpl<?> depDef = (BaseComponentDefImpl<?>) dep.getDef();
                         if (depDef != this) {
                             ret = ret && depDef.isLocallyRenderable(already);
                             if (!ret) {
@@ -1150,8 +1125,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                             }
                         }
                     } else if (dep.getDefType() == DefType.INTERFACE) {
-                        InterfaceDefImpl depDef = (InterfaceDefImpl) dep
-                                .getDef();
+                        InterfaceDefImpl depDef = (InterfaceDefImpl) dep.getDef();
                         ret = ret && depDef.isInConcreteAndHasLocalProvider();
                     } else if (dep.getDefType() == DefType.LAYOUTS) {
                         return false;

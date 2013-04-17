@@ -23,7 +23,7 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.RendererDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.StyleDef;
 
 /**
  */
@@ -38,7 +38,7 @@ public interface BaseComponentDefBuilder<T extends BaseComponentDef> extends Roo
 
     BaseComponentDefBuilder<T> setTemplate(String templateName);
 
-    BaseComponentDefBuilder<T> setThemeDef(ThemeDef themeDef);
+    BaseComponentDefBuilder<T> setStyleDef(StyleDef styleDef);
 
     BaseComponentDefBuilder<T> addRendererDef(RendererDef rendererDef);
 

@@ -28,11 +28,10 @@ import com.google.common.css.compiler.ast.GssError;
 import com.google.common.css.compiler.ast.VisitController;
 
 /**
- * Ensure that all selectors in a component's theme file begin with a
- * camel-cased concatenation of the component's componentClass and name.
+ * Ensure that all selectors in a component's style file begin with a camel-cased concatenation of the component's
+ * componentClass and name.
  * 
- * E.g., all selectors in the theme file for aura:detailPage must begin with one
- * of the following:
+ * E.g., all selectors in the style file for aura:detailPage must begin with one of the following:
  * 
  * .auraDetailPage &lt;element&gt;.auraDetailPage #&lt;id&gt;.auraDetailPage
  * 

@@ -26,7 +26,7 @@ import org.openqa.selenium.WebElement;
 /**
  * Widget class for QuickFixes to create new component/application bundles. This class handles verificaiton of UI
  * differences between creating a component and application bundle.
- * 
+ *
  * Logic that is different between handling component and application bundles is passed to inner class
  * BaseComponentQuickFixUtil. Logic common to all Quickfixes, including adding/removing attribtues etc, is passed to
  * QuickFixUITestUtil.
@@ -145,12 +145,12 @@ public class BaseComponentQuickFixWidget {
 
             // No support for renderer yet
             By jsRenderer = By.cssSelector("input[name='client.renderer']");
-            
+
             Assert.assertTrue("Could not locate checkbox to create JS renderer file.",
                     testCase.isElementPresent(jsRenderer));
 
             By css = By.cssSelector("input[name='client.css']");
-            Assert.assertTrue("Could not locate checkbox to create css theme file.", testCase.isElementPresent(css));
+            Assert.assertTrue("Could not locate checkbox to create css style file.", testCase.isElementPresent(css));
 
             // No support for controller yet
             By javaController = By

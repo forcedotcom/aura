@@ -1,0 +1,39 @@
+.testTestStyleNamespaceTrueConditions .default {
+  border: 1px solid;
+}
+.testTestStyleNamespaceTrueConditions {
+  margin: 5px;
+}
+.testTestStyleNamespaceTrueConditions .color {
+  background-color: white;
+}
+.testTestStyleNamespaceTrueConditions .color {
+  background-color: red;
+}
+.testTestStyleNamespaceTrueConditions .stackOrder {
+  z-index: 400;
+}
+.testTestStyleNamespaceTrueConditions .stackOrder {
+  z-index: 500;
+}
+.testTestStyleNamespaceTrueConditions .displayStyle {
+  display: inline;
+}
+.testTestStyleNamespaceTrueConditions .pLeft {
+  padding-left: add(15px,1px);
+}
+.testTestStyleNamespaceTrueConditions h1+h2 {
+  font-weight: bold;
+}
+.testTestStyleNamespaceTrueConditions h1~p {
+  font-size: 2em;
+}
+.testTestStyleNamespaceTrueConditions #content {
+  margin: 0 auto;
+}
+.testTestStyleNamespaceTrueConditions a[href*=".com"] {
+  color: blue;
+}
+.testTestStyleNamespaceTrueConditions~foo1+foo2 -foo3 :foo4 #foo5 _foo6 {
+  margin: 0px;
+}

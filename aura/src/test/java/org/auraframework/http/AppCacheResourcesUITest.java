@@ -30,7 +30,7 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.NamespaceDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Access;
@@ -115,7 +115,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         createDef(NamespaceDef.class, String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, namespace),
                 "<aura:namespace></aura:namespace>");
 
-        createDef(ThemeDef.class, String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, namespace, cmpName),
+        createDef(StyleDef.class, String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, namespace, cmpName),
                 ".THIS {background-image: url(/auraFW/resources/qa/images/s.gif?@@@TOKEN@@@);}");
 
         DefDescriptor<ComponentDef> cmpDesc = createDef(ComponentDef.class, String.format("%s:%s", namespace, cmpName),
@@ -260,7 +260,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         // update a component's css file
         String replacement = getName() + System.currentTimeMillis();
-        replaceToken(getTargetComponent().getThemeDescriptor(), replacement);
+        replaceToken(getTargetComponent().getStyleDescriptor(), replacement);
 
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, replacement, TOKEN);
         assertRequests(getExpectedChangeRequests(), logs);

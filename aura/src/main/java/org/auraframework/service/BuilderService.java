@@ -18,7 +18,7 @@ package org.auraframework.service;
 import org.auraframework.builder.ApplicationDefBuilder;
 import org.auraframework.builder.ComponentDefBuilder;
 import org.auraframework.builder.ComponentDefRefBuilder;
-import org.auraframework.builder.ThemeDefBuilder;
+import org.auraframework.builder.StyleDefBuilder;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -46,11 +46,11 @@ public interface BuilderService extends AuraService {
     ComponentDefBuilder getComponentDefBuilder() throws QuickFixException;
 
     /**
-     * Retrieves a Builder for defining a {@link ThemeDef}
+     * Retrieves a Builder for defining a {@link StyleDef}
      * 
      * @throws QuickFixException
      */
-    ThemeDefBuilder getThemeDefBuilder() throws QuickFixException;
+    StyleDefBuilder getStyleDefBuilder() throws QuickFixException;
 
     /**
      * Retrieves a Builder suitable for defining a {@link ComponentDefRef}

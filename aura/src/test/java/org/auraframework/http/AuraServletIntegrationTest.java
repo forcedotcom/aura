@@ -190,7 +190,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
                 "updateTest:updateWithoutPreload", ApplicationDef.class);
         Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.AUTHENTICATED, appDesc);
-        assertLastModAfterUpdate(Mode.DEV, appDesc, touchSource(appDesc.getDef().getThemeDescriptor()), true);
+        assertLastModAfterUpdate(Mode.DEV, appDesc, touchSource(appDesc.getDef().getStyleDescriptor()), true);
     }
 
     @UnAdaptableTest
@@ -215,7 +215,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
                 "updateTest:updateWithoutPreload", ApplicationDef.class);
         Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.AUTHENTICATED, appDesc);
         ComponentDef depDef = Aura.getDefinitionService().getDefinition("updateTest:updateable", ComponentDef.class);
-        assertLastModAfterUpdate(Mode.DEV, appDesc, touchSource(depDef.getThemeDescriptor()), true);
+        assertLastModAfterUpdate(Mode.DEV, appDesc, touchSource(depDef.getStyleDescriptor()), true);
     }
 
     @UnAdaptableTest
@@ -265,7 +265,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
         context.addPreload("updateTest");
         ComponentDef depDef = Aura.getDefinitionService().getDefinition("updateTest:updateableOther",
                 ComponentDef.class);
-        assertLastModAfterUpdate(Mode.DEV, appDesc, touchSource(depDef.getThemeDescriptor()), true);
+        assertLastModAfterUpdate(Mode.DEV, appDesc, touchSource(depDef.getStyleDescriptor()), true);
     }
 
     @UnAdaptableTest
@@ -282,7 +282,7 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
                 "updateTest:updateWithPreload", ApplicationDef.class);
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Access.AUTHENTICATED, appDesc);
         ComponentDef depDef = Aura.getDefinitionService().getDefinition("updateTest:updateable", ComponentDef.class);
-        assertLastModAfterUpdate(Mode.PROD, appDesc, touchSource(depDef.getThemeDescriptor()), true);
+        assertLastModAfterUpdate(Mode.PROD, appDesc, touchSource(depDef.getStyleDescriptor()), true);
     }
 
     @UnAdaptableTest

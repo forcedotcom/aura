@@ -1120,4 +1120,14 @@ $A.ns.Util.prototype.getWindowSize = function() {
     };
 };
 
+/**
+ * Checks if the object is an aura component via auraType property.
+ *
+ * @param {Object} obj The object to check for.
+ * @returns {Boolean} True if the object type is a component, or return false otherwise.
+ */
+$A.ns.Util.prototype.isComponent = function(obj) {
+    return (!this.isUndefinedOrNull(obj) && !this.isUndefinedOrNull(obj.auraType) && obj.auraType === 'Component');
+};
+
 //#include aura.util.Util_export

@@ -41,17 +41,26 @@
     </p>
     
     <h3>Specifying Additional Resources for Caching</h3>
-    <p>You can use the <code>additionalAppCacheURLs</code> attribute to specify a list of resources to be cached in addition to the web resources that are automatically cached by Aura when the <code>useAppcache</code> attribute is set to <code>true</code>.  The <code>additionalAppCacheURLs</code> attribute is set on the <code>aura:application</code> tag in your <code>.app</code> file. The additional resources that you can specify for caching are any resources that can be referenced and cached, such as JavaScript (.js) files, CSS stylesheet (.css) files, and images.</p>
-    <p>This is an example of an <code>additionalAppCacheURLs</code> attribute that you can add to the <code>aura:application</code> tag.</p>
+    <p>You can specify web resources to be cached in addition to the resources that Aura caches by default when AppCache is enabled. These additional resources can be any resources that can be referenced and cached, such as JavaScript (.js) files, CSS stylesheet (.css) files, and images.</p>
+    <p>To specify additional resources for the AppCache, add the <code>additionalAppCacheURLs</code> system attribute to the <code>aura:application</code> tag in your <code>.app</code> file. The <code>useAppcache="true"</code> attribute must be also set to enable caching. The <code>additionalAppCacheURLs</code> attribute value holds the URLs of the additional resources. The URLs can be local, such as <code>"/resources/format.css"</code>, or absolute, such as <code>"http://example.com/resources/format.css"</code>. When specifying more than one resource, separate the resources with commas.</p>
+    
+    <p>This is an example of using the <code>additionalAppCacheURLs</code> attribute in the application tag. In this example, the URLs in the attribute value are obtained from a server controller action.</p>
     <auradocs:codeblock>
-    additionalAppCacheURLs="<aura:text value="{!"/>c.getAdditionalAppCacheURLs}" 
+    &lt;aura:application useAppcache="true" render="client"  preload="appCache" 
+      securityProvider="java://org.auraframework.java.securityProvider.LaxSecurityProvider" 
+      controller="java://org.auraframework.impl.java.controller.TestController"
+      additionalAppCacheURLs="<aura:text value="{!"></aura:text>c.getAppCacheUrls}">
+    &lt;/aura:application>     
     </auradocs:codeblock><br/> 
-    <p>In the previous example, the <code>additionalAppCacheURLs</code> attribute is set to a list of URLs representing the additional resources. These URLs are returned by the a server controller method, <code>getAdditionalAppCacheURLs</code>. This is an example implementation of the server controller method.</p>
+    <p>This is the implementation of the server controller action.</p>
     <auradocs:codeblock>
     @AuraEnabled
-    public static List&lt;String> getAdditionalAppCacheURLs() {
-        return Lists.newArrayList(JavascriptLibrary.getUrl("TouchContainer1.0"), JavascriptLibrary.getUrl("CordaPopChart"));
-    }
+    public static List&lt;String> getAppCacheUrls() throws Exception {
+        List&lt;String> urls = Lists.newArrayList();
+        urls.add("/auraFW/resources/aura/auraIdeLogo.png");
+        urls.add("/auraFW/resources/aura/resetCSS.css");
+        return urls;
+    } 
     </auradocs:codeblock><br/>
 
     <h3>Preloading Namespaces for the AppCache</h3>

@@ -48,19 +48,24 @@
     <p>
    
    <h3>Using Labels with Input Components</h3>
-   <p>Labels are descriptive texts that bind to the input components. With the <code>ui:label</code> component, Aura enables you to bind labels using the global ID of the input element. You can also use the <code>label</code> attribute on the input components.
-   Set <code>labelDisplay="false"</code> if you want to hide the label.</p>
-   <p>This code sample shows how to bind a label using the global ID of an input component.</p>
+   <p>A label describes the purpose of an input component. To set a label on an input component, use the <code>label</code> attribute.</p>
+   
+   <p>This code sample shows how to use labels using the <code>label</code> attribute on an input component.
+   The label position can be <code>hidden</code>, <code>top</code>, <code>right</code>, or <code>bottom</code>. The default position is left.</p>
+   <auradocs:codeblock>
+   &lt;ui:inputNumber label="Pick a Number:" labelPosition="top" value="54" /&gt;
+   </auradocs:codeblock>
+  
+   <p>Additionally, you can use the <code>ui:label</code> component to bind labels using the local ID, <code>aura:id</code>, of the input component. 
+   This code sample shows how to bind a label using the <code>aura:id</code> of an input component. Set <code>labelDisplay="false"</code> if you want to hide the label.
+   Set the <code>for</code> attribute in <code>ui:label</code> to the same value as the <code>aura:id</code> in the associated input component. </p>
    <auradocs:codeblock>
    &lt;ui:label labelDisplay="false" for="myInput" label="My Input Text" /&gt;
    &lt;ui:inputText aura:id="myInput" value="Put your input here." />
    </auradocs:codeblock>
    
-   <p>This code sample shows how to use labels using the <code>label</code> attribute on an input component.
-   The label position can be <code>top</code>, <code>right</code>, or <code>bottom</code>. The default position is left.</p>
-   <auradocs:codeblock>
-   &lt;ui:inputNumber label="Pick a Number:" labelPosition="top" value="54" /&gt;
-   </auradocs:codeblock>
+   <p>Note that setting <code>labelPosition="hidden"</code> or <code>labelDisplay="false"</code> hides the label from view but still exposes it to screen readers. 
+    Setting <code>labelPosition="hidden"</code> is equivalent to setting <code>labelDisplay="false"</code> on <code>ui:label</code>.</p>
    
     <auradocs:info>See the <auradocs:defLink descriptor ="ui:label">ui:label</auradocs:defLink> component reference.</auradocs:info>
    

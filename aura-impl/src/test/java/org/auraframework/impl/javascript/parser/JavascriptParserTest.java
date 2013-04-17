@@ -128,7 +128,7 @@ public class JavascriptParserTest extends AuraImplTestCase {
         Map<String, JavascriptActionDef> controllerActions = obj.getActionDefs();
         assertTrue(controllerActions.containsKey("functionName"));
         // If we have more than one controller function with same name, the later one will replace the previous one
-        // assertTrue(controllerActions.size() == 1);
+        assertTrue(controllerActions.size() == 1);
         // Verify the only JavascriptAction Def we have
         JavascriptActionDef jsActionDef = null;
         jsActionDef = controllerActions.get("functionName");
@@ -268,8 +268,11 @@ public class JavascriptParserTest extends AuraImplTestCase {
         try {
             parser.parse(descriptor, source);
             fail("Javascript controller must only contain functions");
-        } catch (AuraRuntimeException expected) {
-            // Expected
+        } catch (Exception e) {
+        	
+        	 assertEquals("Exception must be " + AuraRuntimeException.class.getSimpleName(), AuraRuntimeException.class,
+                     e.getClass());
+             e.getMessage().contains("Attempted to convert \"global=\" to BigDecimal");
         }
 
     }
@@ -339,7 +342,8 @@ public class JavascriptParserTest extends AuraImplTestCase {
             parser.parse(descriptor, source);
             fail("Javascript renderer should have only two actions : render & rerender");
         } catch (AuraRuntimeException expected) {
-            // expected
+        	//this test is disabled, update error msg when we enable the test  
+        	checkExceptionStart(expected, AuraRuntimeException.class,null);
         }
     }
 

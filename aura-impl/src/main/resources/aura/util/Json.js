@@ -165,7 +165,7 @@ Json.prototype.encode = function(obj, replacer, whiteSpace) {
 			}
 		} finally {
             if (oldArrayToJSON) {
-                // assign property back to Array only if it exists so it does add the addition toJSON property.
+                // assign property back to Array only if it exists so it doesn't add the addition toJSON property.
 			    Array.prototype.toJSON = oldArrayToJSON;
             }
 		}

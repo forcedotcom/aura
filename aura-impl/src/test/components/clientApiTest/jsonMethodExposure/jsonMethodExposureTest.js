@@ -30,15 +30,14 @@
     },
     testArrayWithToJSON : {
         test : function(cmp) {
-            Array.prototype.toJSON = function() {
-                var awesome = "awesome";
-            };
+            var tojson = function() {};
+            Array.prototype.toJSON = tojson;
 
             var map = {"1": "salesforce.com", "2": {"a": "AA"}},
                 encoded = $A.util.json.encode(map),
                 arr = [];
 
-            $A.test.assertTrue( ("toJSON" in arr), "toJSON on Array be a function" );
+            $A.test.assertTrue( (arr.toJSON === tojson), "toJSON on Array should exist" );
 
             delete Array.prototype.toJSON
         }
@@ -47,7 +46,7 @@
         test : function(cmp) {
             var map = {"1": "salesforce.com", "2": {"a": "AA"}},
                 encoded = $A.util.json.encode(map),
-                arr= [];
+                arr = [];
 
             $A.test.assertFalse( ("toJSON" in arr), "toJSON on Array should not exist" );
         }

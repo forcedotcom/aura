@@ -72,9 +72,10 @@
         
          if(body && body.length > 0){
         	for(var key in body){
-                if (!$A.util.isUndefinedOrNull(body[key].auraType)) {
-                    if(body[key].auraType === 'Component' && body[key].getDef().getDescriptor().getQualifiedName()===cmpName){
-                        ret= body[key];
+                var obj = body[key];
+                if ($A.util.isComponent(obj)) {
+                    if (obj.getDef().getDescriptor().getQualifiedName() === cmpName){
+                        ret = obj;
                     }
                 }
         	}         

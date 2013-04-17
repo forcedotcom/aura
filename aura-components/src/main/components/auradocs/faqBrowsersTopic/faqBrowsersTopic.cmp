@@ -34,18 +34,18 @@
               </tr>
               <tr>
                      <td>Safari 5+</td>
-                     <td>Mac OS X and iOS</td>
+                     <td>For Mac OS X and iOS</td>
               </tr>
               <tr>
                      <td>Firefox</td>
                      <td></td>
               </tr>
               <tr>
-                     <td>Internet Explorer 9 &amp; 10</td>
-                     <td>Windows only</td>
+                     <td>Internet Explorer</td>
+                     <td>We recommend using Internet Explorer 9 or 10. Older versions might not support the full functionality of Aura. </td>
               </tr>
           </tbody>
        </table>
 
-    <p>We recommend enabling JavaScript and cookies in your web browsers to use the full functionality of Aura. Modern browsers can take advantage of Aura's HTML5 features and older ones default to available alternatives.</p>
+    <auradocs:info>We recommend enabling JavaScript and cookies in your web browsers. Modern browsers can take advantage of Aura's HTML5 features and older ones default to available alternatives.</auradocs:info>
 </aura:component>

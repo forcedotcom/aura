@@ -37,7 +37,7 @@
     In the demo, we set <code>updateOn="keyup"</code> to handle the <code>keyup</code> event and provide the keycode value as its parameter.
     </p>
     <auradocs:info>See the list of attributes and events for <code>ui:input</code> in the <auradocs:defLink descriptor ="ui:input">ui:input</auradocs:defLink> component reference.</auradocs:info>
-    
+   
     <h3>Getting Selections from a List</h3>
      <p>Use <code>ui:inputSelect</code> to create a list of options, which is a wrapper for an HTML <code>select</code> element. You can allow multiple selections by setting the <code>multiple</code> attribute to true.
     Group options using <code>ui:inputSelectOptionGroup</code>. Each option is represented by <code>ui:inputSelectOption</code>.
@@ -46,11 +46,28 @@
     </p>
     <auradocs:example descriptor="auradocs:demoSelect" />
     <p>
+   
+   <h3>Using Labels with Input Components</h3>
+   <p>Labels are descriptive texts that bind to the input components. With the <code>ui:label</code> component, Aura enables you to bind labels using the global ID of the input element. You can also use the <code>label</code> attribute on the input components.
+   Set <code>labelDisplay="false"</code> if you want to hide the label.</p>
+   <p>This code sample shows how to bind a label using the global ID of an input component.</p>
+   <auradocs:codeblock>
+   &lt;ui:label labelDisplay="false" for="myInput" label="My Input Text" /&gt;
+   &lt;ui:inputText aura:id="myInput" value="Put your input here." />
+   </auradocs:codeblock>
+   
+   <p>This code sample shows how to use labels using the <code>label</code> attribute on an input component.
+   The label position can be <code>top</code>, <code>right</code>, or <code>bottom</code>. The default position is left.</p>
+   <auradocs:codeblock>
+   &lt;ui:inputNumber label="Pick a Number:" labelPosition="top" value="54" /&gt;
+   </auradocs:codeblock>
+   
+    <auradocs:info>See the <auradocs:defLink descriptor ="ui:label">ui:label</auradocs:defLink> component reference.</auradocs:info>
+   
     <b>See Also:</b><br/>
     <auradocs:topicLink topic="oodInheritedAttributes">Inherited Component Attributes</auradocs:topicLink><br/>
     <auradocs:topicLink topic="helloAttributes">Component Attributes</auradocs:topicLink><br/>
     <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>
     <auradocs:topicLink topic="valueObjects">Value Objects</auradocs:topicLink>
     </p>
-
  </aura:component>

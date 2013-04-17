@@ -22,7 +22,7 @@
     <aura:attribute name="value" type="String" description="The value currently in the input field."/>
     <aura:attribute name="type" type="String" description="Specifies the input type. Possible values: button, checkbox, file, hidden, image, password, radio, reset, submit, text, textarea. Corresponds to the type attribute of the rendered HTML input element. Override type in a component that extends this component to set it to a different HTML input type."/>
     <aura:attribute name="errorComponent" type="Aura.Component[]" description="A component that displays any error messages, such as validation errors, associated with the input field."/>
-	<aura:attribute name="label" type="String" description="The text of the label tag" />
+	<aura:attribute name="label" type="String" description="The text of the label component" />
 	<aura:attribute name="labelPosition" type="String" default="left" description="The position in which the label should be displayed. Possible values are &quot;left&quot;, &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;. Default value is &quot;left&quot;." />
 		
     <aura:registerEvent name="change" type="ui:change" description="The event fired when the user changes the content of the input."/>

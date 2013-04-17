@@ -199,5 +199,19 @@
         }
         $A.util.removeElement(el); 
         return (this.isEventSupported.cache[eventName] = isSupported);
+    },
+    
+    setAttribute: function(cmp, attr) {
+    	var attrs = cmp.getAttributes(),			
+			concreteCmp = cmp.getConcreteComponent(),
+			parentCmp = concreteCmp.getSuper();
+    	
+			concreteCmp.getAttributes().setValue(attr.key, attr.value);
+			//need to traverse up the hierarchy and set the attributes, since attribute lookup is not hierarchical once initialized
+			while(parentCmp) {
+				parentCmp.getAttributes().setValue(attr.key, attr.value);
+				parentCmp = parentCmp.getSuper();
+			} 
+		}
     }
 })

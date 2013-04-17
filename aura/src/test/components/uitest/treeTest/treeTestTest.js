@@ -41,8 +41,8 @@
 				"xflight"
 				];
 				
-			for (var index in treeNodeIds) {
-				var nodeId = treeNodeIds[index];
+			for (var i = 0, treeLength = treeNodeIds.length; i < treeLength; i++ ) {
+				var nodeId = treeNodeIds[i];
 				aura.test.assertFalse(aura.util.isUndefinedOrNull(cmp.find(nodeId)), "Could not find '" + nodeId + "' node");
 			}
 		}

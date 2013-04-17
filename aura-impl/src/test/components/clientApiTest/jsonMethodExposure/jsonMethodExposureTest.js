@@ -27,5 +27,29 @@
             var map = {"1": "salesforce.com", "2": {"a": "AA"}};
             $A.test.assertEquals("{\"1\":\"salesforce.com\",\"2\":{\"a\":\"AA\"}}", $A.util.json.encode(map), "Json encode methods failed to serialize a javascript object");
         }
+    },
+    testArrayWithToJSON : {
+        test : function(cmp) {
+            Array.prototype.toJSON = function() {
+                var awesome = "awesome";
+            };
+
+            var map = {"1": "salesforce.com", "2": {"a": "AA"}},
+                encoded = $A.util.json.encode(map),
+                arr = [];
+
+            $A.test.assertTrue( ("toJSON" in arr), "toJSON on Array be a function" );
+
+            delete Array.prototype.toJSON
+        }
+    },
+    testArrayWithoutToJSON : {
+        test : function(cmp) {
+            var map = {"1": "salesforce.com", "2": {"a": "AA"}},
+                encoded = $A.util.json.encode(map),
+                arr= [];
+
+            $A.test.assertFalse( ("toJSON" in arr), "toJSON on Array should not exist" );
+        }
     }
 })

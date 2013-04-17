@@ -336,9 +336,11 @@
         var ret;
         if(body && body.length > 0){
         	for(var key in body){
-        		if(body[key].auraType && body[key].auraType === 'Component' && body[key].getDef().getDescriptor().getQualifiedName()===cmpName){
-                    ret= body[key];
-            	}
+                if (!$A.util.isUndefinedOrNull(body[key].auraType)) {
+                    if(body[key].auraType === 'Component' && body[key].getDef().getDescriptor().getQualifiedName()===cmpName){
+                        ret= body[key];
+                    }
+                }
         	}         
         }
         return ret;

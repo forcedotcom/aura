@@ -152,7 +152,7 @@ Json.prototype.encode = function(obj, replacer, whiteSpace) {
 		// Protect ourselves from the evils of libraries like Prototype.js that decorate Array with extra methods such as .toJSON() and do the wrong thing!
 		var oldArrayToJSON = Array.prototype.toJSON;
 		try {
-			Array.prototype.toJSON = undefined;
+			delete Array.prototype.toJSON;
 			
 			if ($A.util.isUndefinedOrNull(replacer)) {
 				return JSON.stringify(obj, function(key, value) {
@@ -164,7 +164,10 @@ Json.prototype.encode = function(obj, replacer, whiteSpace) {
 				return JSON.stringify(obj, replacer, whiteSpace);
 			}
 		} finally {
-			Array.prototype.toJSON = oldArrayToJSON;
+            if (oldArrayToJSON) {
+                // assign property back to Array only if it exists so it does add the addition toJSON property.
+			    Array.prototype.toJSON = oldArrayToJSON;
+            }
 		}
 	}
 

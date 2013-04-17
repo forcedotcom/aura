@@ -1,0 +1,4 @@
+<aura:component render="client">
+    <aura:handler event="auraStorage:modified" action="{!c.storageModified}"/>
+    
+</aura:component>

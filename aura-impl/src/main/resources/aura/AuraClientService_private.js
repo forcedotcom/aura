@@ -356,7 +356,6 @@ var priv = {
             if (queueCopy[0].actions[0].getDef().name.indexOf("Overview") == -1 && (queueCopy[0].actions[0].getDef().name.indexOf("List") == -1 || queueCopy[0].actions[0].getDef().name.indexOf("RelatedList") !== -1)) {
                 // end the previously started transaction
                 $A.endTransaction($A.getContext().getTransaction());
-                console.log("end tr");
                 // set the transaction using #hashtag from the URL and the
                 // concatenated action names as the unique ID
                 var tokenJson = $A.historyService.get();

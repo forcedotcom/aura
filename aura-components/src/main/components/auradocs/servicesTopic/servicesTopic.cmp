@@ -52,11 +52,13 @@
     <h4><code>$A.historyService</code></h4>
     <p>The history service enables you to manage browser history and change the location. For example, use <code>$A.historyService.set(location)</code> to add the location to the history service, and use <code>$A.historyService.back()</code>
      or <code>$A.historyService.forward()</code> to load the previous or subsequent URL or layout on the list.</p>
+     <p>Internet Explorer 7 and 8 are not supported for this service.</p>
     <p>See Also: <a href="#reference?topic=api:AuraHistoryService">Methods</a></p>
 
     <h3>AuraLayoutService</h3>
     <h4><code>$A.layoutService</code></h4>
     <p>The layout service enables you to manage the layout and navigation of your app. For example, you can use the <code>changeLocation()</code> method to pass in a new location and extra parameters for the new URL.</p>
+    <p>Internet Explorer 7 and 8 are not supported for this service.</p>    
     <p>See Also: <a href="#reference?topic=api:AuraLayoutService">Methods</a> | <auradocs:topicLink topic="layouts">Using Layouts</auradocs:topicLink></p>
 
     <h3>AuraRenderingService</h3>

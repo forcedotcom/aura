@@ -19,7 +19,7 @@
     <aura:set attribute="title" value="Which browsers does Aura support?"/>
 
 
-    <p>Aura supports  the most recent stable version of the following web browsers across major platforms, with exceptions noted:</p>
+    <p>Aura supports  the most recent stable version of the following web browsers across major platforms, with exceptions noted.</p>
        <table class="table table-bordered table-striped">
           <thead>
               <tr>
@@ -42,7 +42,8 @@
               </tr>
               <tr>
                      <td>Internet Explorer</td>
-                     <td>We recommend using Internet Explorer 9 or 10. Older versions might not support the full functionality of Aura. </td>
+                     <td>We recommend using Internet Explorer 9 or 10. 
+                     <p>Internet Explorer 7 and 8 are supported with the exception of the history and layout services, and may provide a degraded performance.</p></td>
               </tr>
           </tbody>
        </table>

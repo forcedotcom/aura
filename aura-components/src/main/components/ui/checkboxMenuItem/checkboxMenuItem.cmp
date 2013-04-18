@@ -17,12 +17,12 @@
 -->
 <aura:component extends="ui:menuItem" extensible="true" support="GA" description="​A menu item with a checkbox that supports multiple selection and can be used to invoke an action. This component is nested in a ui:menu component.">
     <aura:handler name="click" action="{!c.handleClick}"/>
-    <aura:if isTrue="{!v.body.length == 0}">
+    <aura:renderIf isTrue="{!v.body.length == 0}">
         <li aura:id="listitem" class="{!v.class}" role="presentation">
             <a aura:id="link" role="menuitemcheckbox"><b></b>{!v.label}</a>
         </li>
         <aura:set attribute="else">
             {!v.body}
         </aura:set>
-    </aura:if>
+    </aura:renderIf>
 </aura:component>

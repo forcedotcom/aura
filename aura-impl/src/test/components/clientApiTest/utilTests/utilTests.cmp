@@ -17,4 +17,6 @@
 -->
 <aura:component>
     <p>JS tests to validate Util.js</p>
+
+    <div aura:id="aDiv" data-test-data='divtestdata'>In div</div>
 </aura:component>

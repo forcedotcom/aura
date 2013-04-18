@@ -17,7 +17,12 @@
 -->
 <aura:component extends="ui:menuItem" extensible="true" support="GA" description="​A menu item that triggers an action. This component is nested in a ui:menu component.">
     <aura:handler name="click" action="{!c.handleClick}"/>
-    <li aura:id="listitem" class="{!v.class}" role="presentation">
-        <a aura:id="link" role="menuitem">{!v.label}</a>
-    </li>
+    <aura:renderIf isTrue="{!v.body.length == 0}">
+        <li aura:id="listitem" class="{!v.class}" role="presentation">
+            <a aura:id="link" role="menuitem">{!v.label}</a>
+        </li>
+        <aura:set attribute="else">
+            {!v.body}
+        </aura:set>
+    </aura:renderIf>
 </aura:component>

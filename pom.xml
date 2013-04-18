@@ -409,7 +409,7 @@
                     <aggregate>true</aggregate>
                     <properties>
                         <owner>salesforce.com, inc.</owner>
-                        <year>2012</year>
+                        <year>2013</year>
                     </properties>
                     <includes>
                         <include>**/src/main/java/**</include>

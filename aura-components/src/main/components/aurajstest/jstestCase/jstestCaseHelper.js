@@ -64,7 +64,7 @@
                 error = errorsInCallbackFunc[i];
                 msg += error.message;
                 if(error["lastStage"]) {
-                    msg += "<br/>Failing Test:<br/>" + error["lastStage"];
+                    msg += "<br/>Failing Test:<br/><pre>" + error["lastStage"] + "</pre>";
                 }
             }
             cmp.find("results").getElement().innerHTML = "Failed.<br/>"+msg;

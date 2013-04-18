@@ -28,7 +28,7 @@ var AuraRenderingService = function AuraRenderingService(){
              */
         rerenderDirty : function(){
             if (priv.needsCleaning) {
-                var num = aura.getContext().incrementNum();
+                var num = aura.getContext().incrementRender();
                 $A.mark("Rerendering: " + num);
                 $A.mark("Fired aura:doneRendering event");
                 priv.needsCleaning = false;

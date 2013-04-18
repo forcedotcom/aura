@@ -145,10 +145,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
         this.compoundControllerDescriptor = DefDescriptorImpl.getAssociateDescriptor(getDescriptor(),
                 ControllerDef.class, DefDescriptor.COMPOUND_PREFIX);
-        this.hashCode = AuraUtil.hashCode(super.hashCode(), attributeDefs,
-                events, controllerDescriptors, modelDefDescriptor,
-                extendsDescriptor);
-
+        this.hashCode = AuraUtil.hashCode(super.hashCode(), events, controllerDescriptors, modelDefDescriptor,
+                extendsDescriptor, interfaces, rendererDescriptors, helperDescriptors);
     }
 
     /**
@@ -388,14 +386,12 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     /**
-     * Recursively adds the ComponentDescriptors of all components in this
-     * ComponentDef's children to the provided set. The set may then be used to
-     * analyze freshness of all of those types to see if any of them should be
-     * recompiled from source.
+     * Recursively adds the ComponentDescriptors of all components in this ComponentDef's children to the provided set.
+     * The set may then be used to analyze freshness of all of those types to see if any of them should be recompiled
+     * from source.
      * 
-     * @param dependencies
-     *            A Set that this method will append RootDescriptors to for
-     *            every RootDef that this ComponentDef requires
+     * @param dependencies A Set that this method will append RootDescriptors to for every RootDef that this
+     *            ComponentDef requires
      * @throws QuickFixException
      */
     @Override
@@ -491,8 +487,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     /**
-     * @return all the attributes for this component, including those inherited
-     *         from a super component
+     * @return all the attributes for this component, including those inherited from a super component
      * @throws QuickFixException
      */
     @Override
@@ -657,9 +652,8 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     /**
-     * Serialize this component to json. The output will include all of the
-     * attributes, events, and handlers inherited. It doesn't yet include
-     * inherited ComponentDefRefs, but maybe it should.
+     * Serialize this component to json. The output will include all of the attributes, events, and handlers inherited.
+     * It doesn't yet include inherited ComponentDefRefs, but maybe it should.
      */
     @Override
     public void serialize(Json json) throws IOException {
@@ -773,8 +767,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     /**
-     * @return The primary renderer def. If multiple exist, this will be the
-     *         remote one.
+     * @return The primary renderer def. If multiple exist, this will be the remote one.
      * @throws QuickFixException
      */
     public RendererDef getRendererDef() throws QuickFixException {
@@ -791,8 +784,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     /**
-     * @return The primary helper def. If multiple exist, this will be the
-     *         remote one.
+     * @return The primary helper def. If multiple exist, this will be the remote one.
      * @throws QuickFixException
      */
     @Override

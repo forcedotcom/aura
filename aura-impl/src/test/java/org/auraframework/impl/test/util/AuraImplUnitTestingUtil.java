@@ -27,6 +27,7 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDef.SerializeToType;
 import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ControllerDef;
@@ -36,6 +37,7 @@ import org.auraframework.def.DependencyDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.EventType;
+import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.RegisterEventDef;
@@ -49,6 +51,9 @@ import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.root.AttributeImpl;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.RootDefinitionImpl;
+import org.auraframework.impl.root.application.ApplicationDefImpl;
+import org.auraframework.impl.root.component.BaseComponentDefImpl;
+import org.auraframework.impl.root.component.BaseComponentDefImpl.Builder;
 import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.impl.root.component.ComponentImpl;
@@ -63,6 +68,8 @@ import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Utility to easily get aura objects.
@@ -93,7 +100,7 @@ public class AuraImplUnitTestingUtil {
     }
 
     public DefDescriptor<RendererDef> getRendererDescriptor() {
-        return DefDescriptorImpl.getInstance("javascript://client.controller", RendererDef.class);
+        return DefDescriptorImpl.getInstance("js://test.renderer", RendererDef.class);
     }
 
     public DefDescriptor<ThemeDef> getThemeDescriptor() {
@@ -275,9 +282,8 @@ public class AuraImplUnitTestingUtil {
     }
 
     /**
-     * A null parameter indicates you don't care what the value is, and thus it
-     * replaces the parameter with a default object. If you want null values for
-     * the parameter, you have to call the objects constructor directly.
+     * A null parameter indicates you don't care what the value is, and thus it replaces the parameter with a default
+     * object. If you want null values for the parameter, you have to call the objects constructor directly.
      */
     public AttributeDefImpl makeAttributeDef(String name, DefDescriptor<TypeDef> typeDefDescriptor,
             AttributeDefRefImpl defaultValue, boolean required, SerializeToType serializeTo, Location location) {
@@ -313,9 +319,8 @@ public class AuraImplUnitTestingUtil {
     }
 
     /**
-     * A null parameter indicates you don't care what the value is, and thus it
-     * replaces the parameter with a default object. If you want null values for
-     * the parameter, you have to call the objects constructor directly.
+     * A null parameter indicates you don't care what the value is, and thus it replaces the parameter with a default
+     * object. If you want null values for the parameter, you have to call the objects constructor directly.
      */
     public AttributeDefRefImpl makeAttributeDefRef(String name, Object value, Location location) {
 
@@ -400,9 +405,8 @@ public class AuraImplUnitTestingUtil {
     }
 
     /**
-     * A null parameter indicates you don't care what the value is, and thus it
-     * replaces the parameter with a default object. If you want null values for
-     * the parameter, you have to call the objects constructor directly.
+     * A null parameter indicates you don't care what the value is, and thus it replaces the parameter with a default
+     * object. If you want null values for the parameter, you have to call the objects constructor directly.
      */
     public ComponentDef makeComponentDef(DefDescriptor<ComponentDef> descriptor,
             Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs, Map<String, RegisterEventDef> eventDefs,
@@ -445,10 +449,45 @@ public class AuraImplUnitTestingUtil {
         return builder.build();
     }
 
+    public <T extends BaseComponentDef> T makeBaseComponentDefWithNulls(Class<T> defClass, String descriptor,
+            Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs, Map<String, RegisterEventDef> eventDefs,
+            List<ComponentDefRef> children, Location location, DefDescriptor<ControllerDef> controllerDescriptor,
+            DefDescriptor<ModelDef> modelDescriptor, DefDescriptor<T> extendsDescriptor,
+            Set<DefDescriptor<InterfaceDef>> interfaces, List<DefDescriptor<RendererDef>> renderers,
+            List<DefDescriptor<HelperDef>> helpers, List<EventHandlerDef> eventHandlers, boolean isAbstract,
+            boolean isExtensible) throws QuickFixException {
+
+        @SuppressWarnings("unchecked")
+        BaseComponentDefImpl.Builder<T> builder = (Builder<T>) (defClass.equals(ComponentDef.class) ? new ComponentDefImpl.Builder()
+                : new ApplicationDefImpl.Builder());
+
+        if (descriptor != null) {
+            builder.setDescriptor(descriptor);
+        }
+        if (location != null) {
+            builder.setLocation(location);
+        }
+        if (attributeDefs != null) {
+            addAttributes(builder, attributeDefs);
+        }
+        if (controllerDescriptor != null) {
+            builder.controllerDescriptors = ImmutableList.of(controllerDescriptor);
+        }
+        builder.isAbstract = isAbstract;
+        builder.isExtensible = isExtensible;
+        builder.extendsDescriptor = extendsDescriptor;
+        builder.modelDefDescriptor = modelDescriptor;
+        builder.eventHandlers = eventHandlers;
+        builder.events = eventDefs;
+        builder.interfaces = interfaces;
+        builder.rendererDescriptors = renderers;
+        builder.helperDescriptors = helpers;
+        return builder.build();
+    }
+
     /**
-     * A null parameter indicates you don't care what the value is, and thus it
-     * replaces the parameter with a default object. If you want null values for
-     * the parameter, you have to call the objects constructor directly.
+     * A null parameter indicates you don't care what the value is, and thus it replaces the parameter with a default
+     * object. If you want null values for the parameter, you have to call the objects constructor directly.
      */
     public ComponentDef makeComponentDef(DefDescriptor<ComponentDef> descriptor,
             Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs, Map<String, RegisterEventDef> eventDefs,
@@ -529,7 +568,6 @@ public class AuraImplUnitTestingUtil {
         builder.isAbstract = isAbstract;
         builder.isExtensible = isExtensible;
         return builder.build();
-
     }
 
     public ComponentDefRef makeComponentDefRef() {
@@ -537,9 +575,8 @@ public class AuraImplUnitTestingUtil {
     }
 
     /**
-     * A null parameter indicates you don't care what the value is, and thus it
-     * replaces the parameter with a default object. If you want null values for
-     * the parameter, you have to call the objects constructor directly.
+     * A null parameter indicates you don't care what the value is, and thus it replaces the parameter with a default
+     * object. If you want null values for the parameter, you have to call the objects constructor directly.
      */
     public ComponentDefRef makeComponentDefRef(DefDescriptor<ComponentDef> descriptor,
             Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeValues, Location location) {
@@ -573,9 +610,8 @@ public class AuraImplUnitTestingUtil {
     }
 
     /**
-     * A null parameter indicates you don't care what the value is, and thus it
-     * replaces the parameter with a default object. If you want null values for
-     * the parameter, you have to call the objects constructor directly.
+     * A null parameter indicates you don't care what the value is, and thus it replaces the parameter with a default
+     * object. If you want null values for the parameter, you have to call the objects constructor directly.
      */
     public EventDefImpl makeEventDef(DefDescriptor<EventDef> descriptor, EventType eventType,
             Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs, Location location,
@@ -620,9 +656,8 @@ public class AuraImplUnitTestingUtil {
     }
 
     /**
-     * A null parameter indicates you don't care what the value is, and thus it
-     * replaces the parameter with a default object. If you want null values for
-     * the parameter, you have to call the objects constructor directly.
+     * A null parameter indicates you don't care what the value is, and thus it replaces the parameter with a default
+     * object. If you want null values for the parameter, you have to call the objects constructor directly.
      */
     public EventHandlerDef makeEventHandlerDef(DefDescriptor<EventDef> handledEvent, PropertyReference action,
             Location location) {
@@ -655,9 +690,8 @@ public class AuraImplUnitTestingUtil {
     }
 
     /**
-     * A null parameter indicates you don't care what the value is, and thus it
-     * replaces the parameter with a default object. If you want null values for
-     * the parameter, you have to call the objects constructor directly.
+     * A null parameter indicates you don't care what the value is, and thus it replaces the parameter with a default
+     * object. If you want null values for the parameter, you have to call the objects constructor directly.
      */
     public InterfaceDefImpl makeInterfaceDef(DefDescriptor<InterfaceDef> descriptor,
             Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs, Map<String, RegisterEventDef> eventDefs,
@@ -720,9 +754,8 @@ public class AuraImplUnitTestingUtil {
     }
 
     /**
-     * A null parameter indicates you don't care what the value is, and thus it
-     * replaces the parameter with a default object. If you want null values for
-     * the parameter, you have to call the objects constructor directly.
+     * A null parameter indicates you don't care what the value is, and thus it replaces the parameter with a default
+     * object. If you want null values for the parameter, you have to call the objects constructor directly.
      */
     public RegisterEventDefImpl makeRegisterEventDef(DefDescriptor<EventDef> eventDescriptor, boolean isGlobal,
             Location location) {
@@ -743,6 +776,21 @@ public class AuraImplUnitTestingUtil {
         builder.setIsGlobal(isGlobal);
         builder.setLocation((location == null) ? getLocation() : location);
         return builder.build();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends BaseComponentDef> DefDescriptor<T> getBaseComponentPrototype(Class<T> defClass) {
+        if (ComponentDef.class.equals(defClass)) {
+            return (DefDescriptor<T>) ComponentDefImpl.PROTOTYPE_COMPONENT;
+        } else if (ApplicationDef.class.equals(defClass)) {
+            return (DefDescriptor<T>) ApplicationDefImpl.PROTOTYPE_APPLICATION;
+        } else {
+            return null;
+        }
+    }
+
+    public DefDescriptor<HelperDef> getHelperDescriptor() {
+        return DefDescriptorImpl.getInstance("js://aura.html", HelperDef.class);
     }
 
 }

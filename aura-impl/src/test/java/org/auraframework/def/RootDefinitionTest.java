@@ -113,8 +113,7 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
         T def = define(baseTag, "", att1 + att2);
         Map<DefDescriptor<AttributeDef>, AttributeDef> attMap = def.getAttributeDefs();
 
-        // should inherit aura:component body attribute as well as added
-        // attributes
+        // should inherit aura:component body attribute as well as added attributes
         assertEquals("Wrong number of AttributeDefs", 3, attMap.size());
     }
 
@@ -208,6 +207,5 @@ public abstract class RootDefinitionTest<T extends RootDefinition> extends Defin
 
         assertEquals("Description of parent def is wrong.", "Parent markup", parentDesc.getDef().getDescription());
         assertEquals("Description of child def is wrong.", "Child markup", childDesc.getDef().getDescription());
-
     }
 }

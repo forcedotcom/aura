@@ -16,16 +16,19 @@
 
 -->
 <aura:component>
-	<ui:dialogManager />
-	
-	<ui:button press="{!c.showDialog}" label="Open Dialog" />
-	<ui:dialog aura:id="overlay" clickOutToClose="false"  width="small" title="Overlay Demo" description="This is a demo of the ui:dialog component.">
-	<p>Delete this record?</p>
-		
-		<ui:dialogButtons aura:id="buttons">
-			<ui:button label="OK" press="{!c.hideDialog}" />
-			<ui:button label="Cancel" press="{!c.hideDialog}" />
-		</ui:dialogButtons>
-	
-	</ui:dialog>	
+
+    <ui:dialogManager />
+
+    <ui:button press="{!c.showDialog}" label="Open Dialog" />
+
+    <ui:dialog aura:id="overlay" clickOutToClose="false"  width="small" title="Overlay Demo" description="This is a demo of the ui:dialog component.">
+        <p>Delete this record?</p>
+        <aura:set attribute="buttons">
+            <ui:dialogButtons aura:id="buttons" defaultButtons="both">
+                <!-- this is a custom button that will appear along with the default "ok" and "cancel" buttons -->
+                <ui:button label="Maybe" press="{!c.hideDialog}" />
+            </ui:dialogButtons>
+        </aura:set>
+    </ui:dialog>	
+
 </aura:component>

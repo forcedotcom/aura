@@ -40,6 +40,7 @@ public class FileSource<D extends Definition> extends Source<D> {
     private static final long serialVersionUID = -5816647732422404876L;
     private final File file;
     private final long lastModified;
+    private final String url;
 
     public FileSource(DefDescriptor<D> descriptor, File file, Format format) {
         this(descriptor, getFilePath(file), file, format);
@@ -48,6 +49,7 @@ public class FileSource<D extends Definition> extends Source<D> {
     protected FileSource(DefDescriptor<D> descriptor, String systemId, File file, Format format) {
         super(descriptor, systemId, format);
         this.file = file;
+        this.url = "file://" + file.getAbsolutePath();
 
         // Ensure that lastModified doesn't change after construction of this
         // Source.
@@ -90,7 +92,7 @@ public class FileSource<D extends Definition> extends Source<D> {
      */
     @Override
     public String getUrl() {
-        return "file://" + file.getAbsolutePath();
+        return url;
     }
 
     public static String getFilePath(File file) {

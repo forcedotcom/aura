@@ -86,7 +86,7 @@
     testValueEmpty: {
         attributes : {label: 'link', value: ''},
         test: function(component){
-            aura.test.assertEquals('', component.find("link").getElement().getAttribute('href'), "href attribute not correct");
+            aura.test.assertEquals('javascript:void(0);', component.find("link").getElement().getAttribute('href'), "href attribute not correct");
         }
     },
 

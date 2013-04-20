@@ -119,22 +119,22 @@ var ComponentPriv = (function(){ // Scoping priv
 
     ComponentPriv.prototype.nextGlobalId = function(localCreation){
         if (!localCreation) {
-        	var context = $A.getContext();
+            var context = $A.getContext();
             var currentAction = context.getCurrentAction();
-            
+
             var id;
             var suffix;
             if (currentAction){
-            	id = currentAction.getNextGlobalId();
-            	suffix = currentAction.getId();
+                id = currentAction.getNextGlobalId();
+                suffix = currentAction.getId();
             } else {
-            	id = context.getNextGlobalId();
-            	var num = context.getNum();
+                id = context.getNextGlobalId();
+                var num = context.getNum();
                 if (num > 0) {
                     suffix = num;
                 }
-            }        
-            
+            }
+
             return suffix ? (id + ":" + suffix) : id;
         } else {
             return (nextClientCreatedComponentId++) + ":c";
@@ -353,13 +353,17 @@ var ComponentPriv = (function(){ // Scoping priv
     };
 
     ComponentPriv.prototype.getActionCaller = function(valueProvider, actionExpression){
-        if(aura.util.isString(actionExpression)){
+        if (aura.util.isString(actionExpression)){
             actionExpression = valueFactory.parsePropertyReference(actionExpression);
         }
 
         var actionRef = valueFactory.create(actionExpression);
 
         return function(event){
+            if (valueProvider.isValid && !valueProvider.isValid()) {
+                return;
+            }
+
             var clientAction = expressionService.getValue(valueProvider, actionRef);
             if (clientAction) {
                 if(clientAction.unwrap){
@@ -436,6 +440,10 @@ var ComponentPriv = (function(){ // Scoping priv
     function getHandler(cmp, actionExpression){
         var actionRef = valueFactory.create(actionExpression);
         return function(event){
+            if (cmp.isValid && !cmp.isValid()) {
+                return;
+            }
+
             var clientAction = expressionService.get(cmp, actionRef);
             if (clientAction) {
                 clientAction.run(event);

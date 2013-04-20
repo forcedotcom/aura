@@ -42,9 +42,14 @@ var BaseValue = {
          */
         var actionRef = valueFactory.create(actionExpression);
         return function(event){
-            if(index !== null){
+            if (valueProvider.isValid && !valueProvider.isValid()) {
+                return;
+            }
+
+            if (index !== null){
                 event.getParams()["index"] = index;
             }
+
             var clientAction = expressionService.getValue(valueProvider, actionRef);
             if (clientAction) {
                 if(clientAction.unwrap){

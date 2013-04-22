@@ -1106,5 +1106,71 @@ $A.ns.Util.prototype.getWindowSize = function() {
         height : window.innerHeight || document.body.clientHeight || 0
     };
 };
+/**
+ * Used by getElementsByClassNameCustom for IE7
+ * @private
+ */	
+$A.ns.Util.prototype.walkTheDOM = function (node, func) {
+  func(node);
+  node = node.firstChild;
+  while (node) {
+   this.walkTheDOM(node, func);
+    node = node.nextSibling;
+  }
+};
 
+/**
+ * custom util to get element by class name for IE7
+ * @private
+ */
+$A.ns.Util.prototype.getElementsByClassNameCustom = function (className) {
+    var results = [];
+    this.walkTheDOM(document.body, function(node) {
+        var a, c = node.className,
+            i;
+        if (c) {
+            a = c.split(' ');
+            for (i = 0; i < a.length; i++) {
+                if (a[i] === className) {
+                    results.push(node);
+                    break;
+                }
+            }
+        }
+    });
+    return results;
+};
+/**
+ * Gets the first element on the page that have the specified class name.
+ * @param {String} classname The CSS class name.
+ * @returns {Object} The element denoting the class, or null if none is found.
+ */
+$A.ns.Util.prototype.getElementByClass = function(classname){
+     var ret = $A.util.getElementsByClass(classname);
+     
+     if (ret && ret.length > 0) {
+         return ret[0];
+     }
+     
+     return null;
+};
+
+$A.ns.Util.prototype.getElementsByClass = function(classname){
+     var ret;
+
+     if(document.getElementsByClassName){
+         ret = document.getElementsByClassName(classname);
+     }
+
+     else if(document.querySelectorAll){
+         ret = document.querySelectorAll("." + classname);
+     } else {
+         ret = this.getElementsByClassNameCustom(classname);
+     }
+
+     if (ret && ret.length > 0) {
+         return ret;
+     }
+     return null;
+ };
 //#include aura.util.Util_export

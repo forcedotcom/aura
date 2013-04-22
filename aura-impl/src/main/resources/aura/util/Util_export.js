@@ -52,5 +52,7 @@ exp(p,
     "arrayIndexOf", p.arrayIndexOf,
     "contains", p.contains,
     "squash", p.squash,
-    "getWindowSize", p.getWindowSize
+    "getWindowSize", p.getWindowSize,
+    "getElementByClass", p.getElementByClass,
+    "getElementsByClass", p.getElementsByClass
 );

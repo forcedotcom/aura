@@ -34,7 +34,7 @@
 	setting <code>value="<aura:text value="{!"/>v.myDate}"</code>. You can also include a date picker with <code>ui:inputDate</code> and <code>ui:inputDateTime</code> by setting <code>displayDatePicker="true"</code>.</p>
     <auradocs:example descriptor="auradocs:demoForm" />
     <p>You can extend these input and output components easily to take advantage of built-in attributes and events. For example, you can update the component's value binding using the <code>updateOn</code> attribute. 
-    In the demo, we set <code>updateOn="keyup"</code> to handle the <code>keyup</code> event and provide the keycode value as its parameter.
+    In the demo, we set <code>updateOn="keyup"</code> to handle the <code>keyup</code> event and provide the keycode value as its parameter. The <code>mousedown</code> attribute captures button clicks using <code>event.getParam("button")</code>. If you're handling a DOM event, use <code>event.button</code> instead.
     </p>
     <p>To use labels with your input components, see <auradocs:topicLink topic="label">Using Labels</auradocs:topicLink>.</p>
     <auradocs:info>See the list of attributes and events for <code>ui:input</code> in the <auradocs:defLink descriptor ="ui:input">ui:input</auradocs:defLink> component reference.</auradocs:info>

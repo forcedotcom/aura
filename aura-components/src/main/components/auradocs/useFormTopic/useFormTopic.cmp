@@ -36,6 +36,7 @@
     <p>You can extend these input and output components easily to take advantage of built-in attributes and events. For example, you can update the component's value binding using the <code>updateOn</code> attribute. 
     In the demo, we set <code>updateOn="keyup"</code> to handle the <code>keyup</code> event and provide the keycode value as its parameter.
     </p>
+    <p>To use labels with your input components, see <auradocs:topicLink topic="label">Using Labels</auradocs:topicLink>.</p>
     <auradocs:info>See the list of attributes and events for <code>ui:input</code> in the <auradocs:defLink descriptor ="ui:input">ui:input</auradocs:defLink> component reference.</auradocs:info>
    
     <h3>Getting Selections from a List</h3>

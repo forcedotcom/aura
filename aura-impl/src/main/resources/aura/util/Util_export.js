@@ -55,5 +55,6 @@ exp(p,
     "getWindowSize", p.getWindowSize,
     "isComponent", p.isComponent,
     "getElementByClass", p.getElementByClass,
-    "getElementsByClass", p.getElementsByClass
+    "getElementsByClass", p.getElementsByClass,
+    "getElementAttributeValue", p.getElementAttributeValue
 );

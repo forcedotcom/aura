@@ -578,11 +578,9 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> cmpDescC = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
         DefDescriptor<ComponentDef> cmpDescD = addSourceAutoCleanup(ComponentDef.class,
                 String.format("<aura:component extends=\"%s\"/>", cmpDescC.getDescriptorName()));
-        updateStringSource(
-                cmpDescC,
-                String.format(
-                        "<aura:component extensible=\"true\"><aura:dependency resource=\"%s\"/></aura:component>",
-                        cmpDescD.getQualifiedName()));
+        updateStringSource(cmpDescC, String.format(
+                "<aura:component extensible=\"true\"><aura:dependency resource=\"%s\"/></aura:component>",
+                cmpDescD.getQualifiedName()));
         // Circular dependency cases should result in identical dependencies
         assertIdenticalDependencies(cmpDescC, cmpDescD);
     }
@@ -621,8 +619,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                         baseComponentTag,
                         "",
                         String.format("<aura:dependency resource=\"" + depCmpDesc2.getQualifiedName()
-                                + "\"/><%s/><%s/>",
-                                cmpDesc1.getDescriptorName(), cmpDesc2.getDescriptorName())));
+                                + "\"/><%s/><%s/>", cmpDesc1.getDescriptorName(), cmpDesc2.getDescriptorName())));
 
         MasterDefRegistryImpl registry = getDefRegistry(false);
         String uid = registry.getUid(null, cmpDesc);
@@ -654,8 +651,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class,
                 String.format("<aura:application extends=\"%s:%s\"/>", abApp.getNamespace(), abApp.getName()));
         DefDescriptor<ApplicationDef> auraApp = Aura.getDefinitionService().getDefDescriptor(
-                "markup://aura:application",
-                ApplicationDef.class);
+                "markup://aura:application", ApplicationDef.class);
         MasterDefRegistryImpl mdr = getDefRegistry(false);
         AuraContext context = Aura.getContextService().getCurrentContext();
 
@@ -667,8 +663,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             mdr.assertAccess(auraApp);
             fail("should fail to grant access to aura:application");
         } catch (NoAccessException nae) {
-            assertTrue("exception should say something about abstract",
-                    nae.getMessage().contains("Abstract definition"));
+            assertTrue("exception should say something about abstract", nae.getMessage()
+                    .contains("Abstract definition"));
         }
 
         //
@@ -679,8 +675,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             mdr.assertAccess(abApp);
             fail("should fail to grant access to an abstract application");
         } catch (NoAccessException nae) {
-            assertTrue("exception should say something about abstract",
-                    nae.getMessage().contains("Abstract definition"));
+            assertTrue("exception should say something about abstract", nae.getMessage()
+                    .contains("Abstract definition"));
         }
         mdr.assertAccess(auraApp);
 
@@ -712,8 +708,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             mdr.assertAccess(abComp);
             fail("should fail to grant access to an abstract component");
         } catch (NoAccessException nae) {
-            assertTrue("exception should say something about abstract",
-                    nae.getMessage().contains("Abstract definition"));
+            assertTrue("exception should say something about abstract", nae.getMessage()
+                    .contains("Abstract definition"));
         }
 
         //
@@ -806,13 +802,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 // Grab caches off CDR
                 CachingDefRegistryImpl<? extends Definition> cdr = (CachingDefRegistryImpl<? extends Definition>) dr;
                 Collection<?> defsCache = cdr.getCachedDefs();
-                Object eCache = AuraPrivateAccessor.get(cdr, "existsCache");
-                Cache<DefDescriptor<?>, Boolean> existsCache = (Cache<DefDescriptor<?>, Boolean>) eCache;
-
-                // Check exists cache
-                if (existsCache.getIfPresent(cmpDesc) != null) {
-                    return false;
-                }
 
                 // Check definitions cache
                 for (Object def : defsCache) {

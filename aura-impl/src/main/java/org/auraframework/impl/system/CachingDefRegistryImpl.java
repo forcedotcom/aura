@@ -31,11 +31,10 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 /**
- * base class for registries, adds some important methods that aren't exposed
- * through the top level interface
+ * base class for registries, adds some important methods that aren't exposed through the top level interface
  */
-public class CachingDefRegistryImpl<T extends Definition> extends NonCachingDefRegistryImpl<T>
-        implements SourceListener {
+public class CachingDefRegistryImpl<T extends Definition> extends NonCachingDefRegistryImpl<T> implements
+        SourceListener {
 
     private static final long serialVersionUID = -1052118918311747954L;
     protected static final int CACHE_SIZE_MIN = 128;
@@ -45,8 +44,6 @@ public class CachingDefRegistryImpl<T extends Definition> extends NonCachingDefR
             .initialCapacity(CACHE_SIZE_MIN).maximumSize(CACHE_SIZE_MAX).build();
 
     private final CacheableDefFactory<T> cacheableFactory;
-    private final Cache<DefDescriptor<T>, Boolean> existsCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE_MAX)
-            .build();
 
     public CachingDefRegistryImpl(CacheableDefFactory<T> factory, Set<DefType> defTypes, Set<String> prefixes) {
         super(factory, defTypes, prefixes);
@@ -103,35 +100,20 @@ public class CachingDefRegistryImpl<T extends Definition> extends NonCachingDefR
         Boolean exists = null;
         Optional<T> cached;
 
-        //
         // Only check the cache if we are not avoiding it.
-        //
         if (useCache()) {
-            exists = existsCache.getIfPresent(descriptor);
-            if (exists != null) {
-                //
-                // If we found our value in the exists cache,
-                // just go ahead and short circuit.
-                //
-                return exists.booleanValue();
-            }
-            //
-            // Now check our cached defs.
-            //
             cached = defs.getIfPresent(descriptor);
             if (cached != null) {
-                exists = Boolean.valueOf(cached.orNull() != null);
+                exists = Boolean.valueOf(cached.isPresent());
             }
         }
-        //
+
         // If we were not checking cache, we always drop through
         // to the super class. Careful, as this may be far more
         // expensive.
-        //
         if (exists == null) {
             exists = Boolean.valueOf(super.exists(descriptor));
         }
-        existsCache.put(descriptor, exists);
         return exists.booleanValue();
     }
 
@@ -145,12 +127,10 @@ public class CachingDefRegistryImpl<T extends Definition> extends NonCachingDefR
     @Override
     public void clear() {
         this.defs.invalidateAll();
-        this.existsCache.invalidateAll();
     }
 
     /**
-     * clear's caches based on source and event provided
-     * (currently does brute force clear)
+     * clear's caches based on source and event provided (currently does brute force clear)
      * 
      */
     @Override

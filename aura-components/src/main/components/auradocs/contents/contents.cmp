@@ -65,6 +65,7 @@
                 <auradocs:contentsNode text="Using UI Components">
                     <auradocs:contentsNode text="Positioning UI Components" id="useLayout"/>
                     <auradocs:contentsNode text="Getting User Input" id="useForm"/>
+                    <auradocs:contentsNode text="Using Labels" id="label"/>
                     <auradocs:contentsNode text="Using Menus" id="useMenu"/>
                     <auradocs:contentsNode text="Displaying Dialogs and Messages" id="useMessage"/>
                     <auradocs:contentsNode text="Using Tabs and Scrollers" id="useTabs"/>

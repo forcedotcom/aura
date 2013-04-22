@@ -1,0 +1,52 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Using Labels" />
+
+   <p>A label describes the purpose of an input component. To set a label on an input component, use the <code>label</code> attribute.</p>
+   
+   <p>This code sample shows how to use labels using the <code>label</code> attribute on an input component.
+   The label position can be <code>hidden</code>, <code>top</code>, <code>right</code>, or <code>bottom</code>. The default position is <code>left</code>.</p>
+   <auradocs:codeblock>
+   &lt;ui:inputNumber label="Pick a Number:" labelPosition="top" value="54" /&gt;
+   </auradocs:codeblock>
+  <p>To use a model on your labels, use the <code>label</code> and <code>value</code> attributes to retrieve the data from the model.</p>
+  
+  <auradocs:example descriptor="auradocs:demoLabel" />
+  
+  <h3><code>ui:label</code></h3>
+   <p>Additionally, you can use the <code>ui:label</code> component to bind labels using the local ID, <code>aura:id</code>, of the input component. 
+   This code sample shows how to bind a label using the <code>aura:id</code> of an input component. Set <code>labelDisplay="false"</code> if you want to hide the label.
+   Set the <code>for</code> attribute in <code>ui:label</code> to the same value as the <code>aura:id</code> in the associated input component. </p>
+   <auradocs:codeblock>
+   &lt;ui:label labelDisplay="false" for="myInput" label="My Input Text" /&gt;
+   &lt;ui:inputText aura:id="myInput" value="Put your input here." />
+   </auradocs:codeblock>
+   
+   <p>Note that setting <code>labelPosition="hidden"</code> or <code>labelDisplay="false"</code> hides the label from view but still exposes it to screen readers. 
+    Setting <code>labelPosition="hidden"</code> is equivalent to setting <code>labelDisplay="false"</code> on <code>ui:label</code>.</p>
+   <p>To use labels with different values, see <auradocs:topicLink topic="labelParameters">Setting Label Parameters</auradocs:topicLink>.</p>
+   
+    <auradocs:info>See the <auradocs:defLink descriptor ="ui:label">ui:label</auradocs:defLink> component reference.</auradocs:info>
+    
+    <p>
+    <b>See Also:</b><br/>
+    <auradocs:topicLink topic="useForm">Getting User Input</auradocs:topicLink><br />
+    <auradocs:topicLink topic="models">Java Models</auradocs:topicLink>
+    </p>
+</aura:component>

@@ -1171,7 +1171,7 @@ $A.ns.Util.prototype.getElementsByClassNameCustom = function (className) {
  * @returns {Object} The element denoting the class, or null if none is found.
  */
 $A.ns.Util.prototype.getElementByClass = function(classname){
-     var ret = $A.util.getElementsByClass(classname);
+     var ret = this.getElementsByClass(classname);
      
      if (ret && ret.length > 0) {
          return ret[0];
@@ -1203,6 +1203,20 @@ $A.ns.Util.prototype.getElementsByClass = function(classname){
      return null;
  };
  
+ /**
+  * Gets the first element on the page that have the specified class name.
+  * @param {String} classname The CSS class name.
+  * @returns {Object} The element denoting the class, or null if none is found.
+  */
+ $A.ns.Util.prototype.getElementByClass = function(classname){
+      var ret = this.getElementsByClass(classname);
+      
+      if (ret && ret.length > 0) {
+          return ret[0];
+      }
+      
+      return null;
+ };
 /**
  * Checks if the object is an aura component via auraType property.
  *

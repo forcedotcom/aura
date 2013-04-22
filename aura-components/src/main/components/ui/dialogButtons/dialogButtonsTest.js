@@ -44,6 +44,6 @@
     		aura.test.assertTrue($A.util.isUndefinedOrNull(conf), "defaultButtons attribute is set to None, but is showing confrimButton");
     		aura.test.assertTrue($A.util.isUndefinedOrNull(can), "defaultButtons attribute is set to None, but is showing cancelButton");
         }
-    },
+    }
 
 })

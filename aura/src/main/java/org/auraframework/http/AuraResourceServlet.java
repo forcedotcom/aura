@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.auraframework.http;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -61,20 +63,19 @@ import com.google.common.collect.Sets;
 
 /**
  * The aura resource servlet.
- *
- * This servlet serves up the application content for 'preloaded' definitions. It should be cacheable,
- * which means that the only context used should be the context sent as part of the URL. If any other
- * information is required, caching will cause bugs.
- *
- * Note that this servlet should be very careful to not attempt to force the client to re-sync (except
- * for manifest fetches), since these calls may well be to re-populate a cache. In general, we should
- * send back at least the basics needed for the client to survive. All resets should be done from {@link AuraServlet},
- * or when fetching the manifest here.
- *
+ * 
+ * This servlet serves up the application content for 'preloaded' definitions. It should be cacheable, which means that
+ * the only context used should be the context sent as part of the URL. If any other information is required, caching
+ * will cause bugs.
+ * 
+ * Note that this servlet should be very careful to not attempt to force the client to re-sync (except for manifest
+ * fetches), since these calls may well be to re-populate a cache. In general, we should send back at least the basics
+ * needed for the client to survive. All resets should be done from {@link AuraServlet}, or when fetching the manifest
+ * here.
+ * 
  * TODO: 'preload': use dependencies instead of namespaces here.
  */
-public class AuraResourceServlet extends AuraBaseServlet
-{
+public class AuraResourceServlet extends AuraBaseServlet {
 
     private static final String RESOURCE_URLS = "resourceURLs";
     private static final String LAST_MOD = "lastMod";
@@ -91,11 +92,10 @@ public class AuraResourceServlet extends AuraBaseServlet
 
     /**
      * A very hackish internal filter.
-     *
-     * This is used to apply the theme definition filter for 'templates', which
-     * appears to be quite bogus, but is getting rather further embedded in
-     * code.
-     *
+     * 
+     * This is used to apply the theme definition filter for 'templates', which appears to be quite bogus, but is
+     * getting rather further embedded in code.
+     * 
      * TODO: W-1486762
      */
     private static interface TempFilter {
@@ -104,7 +104,7 @@ public class AuraResourceServlet extends AuraBaseServlet
 
     /**
      * An internal routine to populate a set from a set of namespaces.
-     *
+     * 
      * This will go away when W-1166679 is fixed.
      */
     private static <P extends Definition, D extends P> void addDefinitions(Class<D> preloadType,
@@ -129,17 +129,13 @@ public class AuraResourceServlet extends AuraBaseServlet
     }
 
     /**
-     * Get the set of filters for the current context using a different base
-     * component.
-     *
-     * Note the special handling here for quick fixes, as we need to be able to
-     * get all of the appropriate definitions even when the app fails to
-     * compile. In that case we reset everything and get the
-     * auradev:quickFixException.
-     *
-     * TODO: Note that this means the quickfix handling is hard wired, but I'm
-     * not sure that this is an issue. We should maybe make it more obvious by
-     * moving things around and using static strings..
+     * Get the set of filters for the current context using a different base component.
+     * 
+     * Note the special handling here for quick fixes, as we need to be able to get all of the appropriate definitions
+     * even when the app fails to compile. In that case we reset everything and get the auradev:quickFixException.
+     * 
+     * TODO: Note that this means the quickfix handling is hard wired, but I'm not sure that this is an issue. We should
+     * maybe make it more obvious by moving things around and using static strings..
      */
     private static List<DescriptorFilter> getFilters() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
@@ -166,14 +162,14 @@ public class AuraResourceServlet extends AuraBaseServlet
 
     /**
      * check the top level component/app.
-     *
-     * This routine checks to see that we have a valid top level component. If our top level component has some
-     * problem (QFE/out of sync) we totally ignore it, and continue with the preloading as if everything was ok.
-     * Otherwise, if we have no descriptor, we give back an empty response.
-     *
-     * Also note that this handles the 'if-modified-since' header, as we want to tell the browser that nothing
-     * changed in that case.
-     *
+     * 
+     * This routine checks to see that we have a valid top level component. If our top level component has some problem
+     * (QFE/out of sync) we totally ignore it, and continue with the preloading as if everything was ok. Otherwise, if
+     * we have no descriptor, we give back an empty response.
+     * 
+     * Also note that this handles the 'if-modified-since' header, as we want to tell the browser that nothing changed
+     * in that case.
+     * 
      * @param request the request (for exception handling)
      * @param response the response (for exception handling)
      * @param context the context to get the definition.
@@ -225,15 +221,14 @@ public class AuraResourceServlet extends AuraBaseServlet
 
     /**
      * Write out the manifest.
-     *
-     * This writes out the full manifest for an application so that we can use
-     * the AppCache.
-     *
-     * The manifest contains CSS and JavaScript URLs. These specified resources are copied into the AppCache
-     * with the HTML template. When the page is reloaded, the existing manifest is compared to the new manifest.
-     * If they are identical, the resources are served from the AppCache. Otherwise,
-     * the resources are requested from the server and the AppCache is updated.
-     *
+     * 
+     * This writes out the full manifest for an application so that we can use the AppCache.
+     * 
+     * The manifest contains CSS and JavaScript URLs. These specified resources are copied into the AppCache with the
+     * HTML template. When the page is reloaded, the existing manifest is compared to the new manifest. If they are
+     * identical, the resources are served from the AppCache. Otherwise, the resources are requested from the server and
+     * the AppCache is updated.
+     * 
      * @param request the request
      * @param response the response
      * @throws IOException if unable to write out the response
@@ -316,8 +311,8 @@ public class AuraResourceServlet extends AuraBaseServlet
             // need to make sure that they are in at least one place.
             //
             Map<String, Object> attribs = Maps.newHashMap();
-            attribs.put(LAST_MOD, String.format("app=%s, FW=%s", getContextAppUid(),
-                    Aura.getConfigAdapter().getAuraFrameworkNonce()));
+            attribs.put(LAST_MOD,
+                    String.format("app=%s, FW=%s", getContextAppUid(), Aura.getConfigAdapter().getAuraFrameworkNonce()));
             attribs.put(UID, getContextAppUid());
             StringWriter sw = new StringWriter();
 
@@ -333,7 +328,7 @@ public class AuraResourceServlet extends AuraBaseServlet
 
             // Add in any application specific resources
             if (descr != null && descr.getDefType().equals(DefType.APPLICATION)) {
-                ApplicationDef def = (ApplicationDef)descr.getDef();
+                ApplicationDef def = (ApplicationDef) descr.getDef();
                 for (String s : def.getAdditionalAppCacheURLs()) {
                     sw.write(s);
                     sw.write('\n');
@@ -344,8 +339,8 @@ public class AuraResourceServlet extends AuraBaseServlet
 
             DefinitionService definitionService = Aura.getDefinitionService();
             InstanceService instanceService = Aura.getInstanceService();
-            DefDescriptor<ComponentDef> tmplDesc = definitionService.getDefDescriptor("ui:manifest",
-                    ComponentDef.class);
+            DefDescriptor<ComponentDef> tmplDesc = definitionService
+                    .getDefDescriptor("ui:manifest", ComponentDef.class);
             Component tmpl = instanceService.getInstance(tmplDesc, attribs);
             Aura.getRenderingService().render(tmpl, response.getWriter());
         } catch (Exception e) {
@@ -357,9 +352,8 @@ public class AuraResourceServlet extends AuraBaseServlet
 
     /**
      * A cache for compressed CSS output.
-     *
-     * This is currently done by namespace, but it will eventually be by app
-     * after W-1166679
+     * 
+     * This is currently done by namespace, but it will eventually be by app after W-1166679
      */
     private static final Map<String, String> cssCache = new ConcurrentHashMap<String, String>();
 
@@ -374,11 +368,10 @@ public class AuraResourceServlet extends AuraBaseServlet
 
     /**
      * write out CSS.
-     *
-     * This writes out CSS for the preloads + app to the response. Note that
-     * currently it only writes out the preloads because of the missing
-     * capability to do the apps will get fixed by W-1166679
-     *
+     * 
+     * This writes out CSS for the preloads + app to the response. Note that currently it only writes out the preloads
+     * because of the missing capability to do the apps will get fixed by W-1166679
+     * 
      * @param request the request
      * @param response the response
      * @throws IOException if unable to write to the response
@@ -387,7 +380,8 @@ public class AuraResourceServlet extends AuraBaseServlet
     public static void writeCss(Appendable out) throws IOException, QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
 
-        List<DescriptorFilter> filters = getFilters();
+        Set<DescriptorFilter> filters = Sets.newLinkedHashSet();
+        filters.addAll(getFilters());
         Client.Type type = Aura.getContextService().getCurrentContext().getClient().getType();
         Mode mode = context.getMode();
         StringBuffer sb = new StringBuffer();
@@ -420,10 +414,9 @@ public class AuraResourceServlet extends AuraBaseServlet
 
     /**
      * Write out a set of components in JSON.
-     *
-     * FIXME: I have no idea of why this is here when JS does effectively the
-     * same thing with extra stuff.
-     *
+     * 
+     * FIXME: I have no idea of why this is here when JS does effectively the same thing with extra stuff.
+     * 
      * This writes out the entire set of components from the namespaces in JSON.
      */
     private void writeComponents(Appendable out) throws ServletException, IOException, QuickFixException {
@@ -436,15 +429,16 @@ public class AuraResourceServlet extends AuraBaseServlet
         Aura.getSerializationService().writeCollection(defs, BaseComponentDef.class, out);
     }
 
-    private static final Map<String, String> definitionCache = new ConcurrentHashMap<String, String>();
+    /** Map by URL of soft references to an already-loaded resource. */
+    private static final Map<String, Reference<String>> definitionCache = new ConcurrentHashMap<String, Reference<String>>();
     private static final List<DescriptorFilter> aurafilter = Arrays
             .asList(new DescriptorFilter[] { new DescriptorFilter("aura://*:*", "CONTROLLER") });
 
     /**
      * write out the complete set of definitions in JS.
-     *
+     * 
      * This generates a complete set of definitions for an app in JS+JSON.
-     *
+     * 
      */
     public static void writeDefinitions(Appendable out) throws IOException, QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
@@ -470,7 +464,10 @@ public class AuraResourceServlet extends AuraBaseServlet
         }
         key = keyBuilder.toString();
 
-        ret = definitionCache.get(key);
+        Reference<String> reference = definitionCache.get(key);
+        if (reference != null) {
+            ret = reference.get();
+        }
         if (ret != null) {
             out.append(ret);
             return;
@@ -527,54 +524,52 @@ public class AuraResourceServlet extends AuraBaseServlet
             // Note that we just use put (last one wins), as we don't really
             // care what happens
             // when there is a race. Just that one of them gets in.
-            definitionCache.put(key, ret);
-        }
-        else {
+            definitionCache.put(key, new SoftReference<String>(ret));
+        } else {
             // still store the return in cache in not prod
-            definitionCache.put(key, ret);
+            definitionCache.put(key, new SoftReference<String>(ret));
         }
         out.append(ret);
     }
 
     /**
      * Serves up CSS or JS resources for a list of namespaces.
-     *
+     * 
      * URLs follow the format:
-     *
+     * 
      * <pre>
      * /auraResource?aura.namespaces=&lt;namespace1&gt;/&lt;namespace2&gt;/&lt;namespace3&gt;/...&aura.format=&lt;format&gt;
      * </pre>
-     *
-     * Access to this servlet may also follow a shortened URL form specified in
-     * aura.conf.
-     *
+     * 
+     * Access to this servlet may also follow a shortened URL form specified in aura.conf.
+     * 
      * <p>
      * Examples: -
-     *
+     * 
      * <pre>
      * /l/123123123/aura/os/mobile.css
      * </pre>
-     *
+     * 
      * (The number is the last mod timestamp) -
-     *
+     * 
      * <pre>
      * /l/213423423/aura/os.js
      * </pre>
-     *
+     * 
      * -
-     *
+     * 
      * <pre>
      * /l/aura/os/mobile.css
      * </pre>
-     *
+     * 
      * -
-     *
+     * 
      * <pre>
      * /l/aura/os.js
      * </pre>
-     *
+     * 
      * </p>
-     *
+     * 
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
      */

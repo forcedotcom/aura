@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@
             HTMLAttributes.each(helper.createHtmlAttribute, { scope: helper, ret: ret, component: component });
         }
 
-        if (ret.tagName.toLowerCase() === "a" && $A.util.isUndefinedOrNull(ret.getAttribute("href"))) {
+        if (ret.tagName.toLowerCase() === "a" && !ret.getAttribute("href")) {
             ret.setAttribute("href", "javascript:void(0);");
         }
 
@@ -103,7 +103,7 @@
             }
         }
 
-        if (element.tagName.toLowerCase() === "a" && $A.util.isUndefinedOrNull(element.getAttribute("href"))) {
+        if (element.tagName.toLowerCase() === "a" && !element.getAttribute("href")) {
             element.setAttribute("href", "javascript:void(0);");
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,19 +149,26 @@ Json.prototype._resolveRefs = function(config, cache, parent, property) {
  */
 Json.prototype.encode = function(obj, replacer, whiteSpace) {
 	if (typeof (JSON) !== "undefined") {
-		if ($A.util.isUndefinedOrNull(replacer)) {
-			return JSON.stringify(obj, function(key, value) {
-				// We have to do this as JSON.stringify removes the property from
-				// the resulted JSON string if its value is a function
-				return aura.util.json.encodeFunction(value);
-			}, whiteSpace);
-		} else {
-			return JSON.stringify(obj, replacer, whiteSpace);
+		// Protect ourselves from the evils of libraries like Prototype.js that decorate Array with extra methods such as .toJSON() and do the wrong thing!
+		var oldArrayToJSON = Array.prototype.toJSON;
+		try {
+			delete Array.prototype.toJSON;
+			
+			if ($A.util.isUndefinedOrNull(replacer)) {
+				return JSON.stringify(obj, function(key, value) {
+					// We have to do this as JSON.stringify removes the property from
+					// the resulted JSON string if its value is a function
+					return aura.util.json.encodeFunction(value);
+				}, whiteSpace);
+			} else {
+				return JSON.stringify(obj, replacer, whiteSpace);
+			}
+		} finally {
+            if (oldArrayToJSON) {
+                // assign property back to Array only if it exists so it doesn't add the addition toJSON property.
+			    Array.prototype.toJSON = oldArrayToJSON;
+            }
 		}
-	}
-
-	if (typeof (JSON) !== "undefined") {
-		return JSON.stringify(obj, replacer, whiteSpace);
 	}
 
 	if (obj === undefined) {

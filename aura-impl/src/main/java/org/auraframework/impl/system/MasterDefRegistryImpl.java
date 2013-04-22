@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,10 +127,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     private final static Cache<String, DependencyEntry> dependencies = CacheBuilder.newBuilder()
-            .initialCapacity(DEPENDENCY_CACHE_SIZE).maximumSize(DEPENDENCY_CACHE_SIZE).build();
+            .initialCapacity(DEPENDENCY_CACHE_SIZE).maximumSize(DEPENDENCY_CACHE_SIZE).softValues().build();
 
     private final static Cache<String, String> strings = CacheBuilder.newBuilder().initialCapacity(STRING_CACHE_SIZE)
-            .maximumSize(STRING_CACHE_SIZE).build();
+            .maximumSize(STRING_CACHE_SIZE).softValues().build();
 
     /**
      * A local dependencies cache.
@@ -398,8 +398,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         // FIXME: this code will go away with preloads.
         // This pulls in the context preloads. not pretty, but it works.
         //
-        if (!cc.addedPreloads && (canonical.getDefType().equals(DefType.APPLICATION)
-                || canonical.equals(cc.context.getApplicationDescriptor()))) {
+        if (!cc.addedPreloads
+                && (canonical.getDefType().equals(DefType.APPLICATION) || canonical.equals(cc.context
+                        .getApplicationDescriptor()))) {
             cc.addedPreloads = true;
             Set<String> preloads = cc.context.getPreloads();
             for (String preload : preloads) {
@@ -808,8 +809,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 if (!securedDefTypes.contains(defType)
                         || unsecuredPrefixes.contains(prefix)
                         || unsecuredNamespaces.contains(ns)
-                        || (mode != Mode.PROD && (!Aura.getConfigAdapter().isProduction())
-                        && unsecuredNonProductionNamespaces.contains(ns))) {
+                        || (mode != Mode.PROD && (!Aura.getConfigAdapter().isProduction()) && unsecuredNonProductionNamespaces
+                                .contains(ns))) {
                     accessCache.add(desc);
                     return;
                 }
@@ -964,19 +965,17 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     /**
-     * The driver for cache-consistency management in response to source changes.
-     * MDR drives the process, will notify all registered listeners while write blocking,
-     * then invalidate it's own caches. If this routine can't acquire the lock ,
-     * it will log it as an non-fatal error, as it only results in staleness.
+     * The driver for cache-consistency management in response to source changes. MDR drives the process, will notify
+     * all registered listeners while write blocking, then invalidate it's own caches. If this routine can't acquire the
+     * lock , it will log it as an non-fatal error, as it only results in staleness.
      * 
      * @param listeners - collections of listeners to notify of source changes
-     * @param source - DefDescriptor that changed - for granular cache clear
-     *            (currently not considered here, but other listeners may make use of it)
+     * @param source - DefDescriptor that changed - for granular cache clear (currently not considered here, but other
+     *            listeners may make use of it)
      * @param event - what type of event triggered the change
      */
     public static void notifyDependentSourceChange(Collection<WeakReference<SourceListener>> listeners,
-            DefDescriptor<?> source,
-            SourceListener.SourceMonitorEvent event) {
+            DefDescriptor<?> source, SourceListener.SourceMonitorEvent event) {
 
         boolean haveLock = false;
 

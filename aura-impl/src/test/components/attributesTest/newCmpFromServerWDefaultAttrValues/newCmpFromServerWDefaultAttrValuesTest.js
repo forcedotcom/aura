@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,9 +72,12 @@
         
          if(body && body.length > 0){
         	for(var key in body){
-        		if(body[key].auraType && body[key].auraType === 'Component' && body[key].getDef().getDescriptor().getQualifiedName()===cmpName){
-                    ret= body[key];
-            	}
+                var obj = body[key];
+                if ($A.util.isComponent(obj)) {
+                    if (obj.getDef().getDescriptor().getQualifiedName() === cmpName){
+                        ret = obj;
+                    }
+                }
         	}         
         }
         return ret;

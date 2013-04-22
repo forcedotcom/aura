@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,8 @@ var AuraHistoryService = function(){
 
     var historyService = {
 		/**
-	     * Set the new location.
+	     * Set the new location. For example, <code>$A.services.history.set(location)</code> or <code>$A.services.history.set("search")</code>
+	     * sets the location to <code>#location</code> and <code>#search</code>. Otherwise, use <code>$A.services.layout.changeLocation()</code> to override existing URL parameters.
 	     * @param {Object} token The provided token set to the current location hash
 	     * @memberOf AuraHistoryService
 	     * @public
@@ -35,7 +36,8 @@ var AuraHistoryService = function(){
         
         /**
          * Parse the location. A token can be used here.
-         * @description Example: token == "newLayout"; $A.historyService.get().token;
+         * <p>Example:</p> 
+         * <code>token == "newLayout";<br /> $A.historyService.get().token;</code>
          * @memberOf AuraHistoryService
          * @public
          */
@@ -44,7 +46,7 @@ var AuraHistoryService = function(){
         },
         
         /**
-         * Loads the previous URL in the history list. Standard JavaScript history.go() method.
+         * Loads the previous URL in the history list. Standard JavaScript <code>history.go()</code> method.
          * @memberOf AuraHistoryService
          * @public
          */
@@ -64,7 +66,7 @@ var AuraHistoryService = function(){
         },
         
         /**
-         * Loads the next URL in the history list. Standard JavaScript history.go() method.
+         * Loads the next URL in the history list. Standard JavaScript <code>history.go()</code> method.
          * @memberOf AuraHistoryService
          * @public
          */

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Aura Storage Service.
+ * @namespace The Aura Storage Service, accessible using $A.storageService. 
  * @constructor
  */
 var AuraStorageService = function(){
@@ -23,9 +23,11 @@ var AuraStorageService = function(){
 	var adapters = {};
 	
     var storageService = {
-       /**
-        * Returns an existing storage using the specified name.
+   /**
+    * Returns an existing storage using the specified name. For example, <code>$A.storageService.getStorage("MyStorage").getSize()</code> returns the cache size.
+    * <p>See Also: <a href="#reference?topic=api:AuraStorage">AuraStorage</a></p>
 	* @param {String} name The name of the requested storage. 
+	* @memberOf AuraStorageService
 	* @returns {AuraStorage} Returns an AuraStorage object corresponding to an existing storage.
 	*/
         getStorage : function(name) {
@@ -34,6 +36,7 @@ var AuraStorageService = function(){
         
         /**
          * Initializes and returns new storage.
+         * <p>See Also: <a href="#help?topic=auraStorageService">Aura Storage Service</a></p>
          * @param {String} name Required. The unique name of the storage to be initialized.
          * @param {Boolean} persistent Set to true if the requested storage is persistent. The default is false.
          * @param {Boolean} secure Set to true if the requested storage is secure. The default is false.
@@ -42,6 +45,7 @@ var AuraStorageService = function(){
          * @param {number} defaultAutoRefreshInterval Specifies the default interval in seconds after which cached data is to be refreshed. The default is 30 seconds.
          * @param {Boolean} debugLoggingEnabled Set to true to enable debug logging in the JavaScript console for the Aura Storage Service. The default is false.
          * @param {Boolean} clearStorageOnInit Set to true to clear storage when storage is initialized. The default is true.
+         * @memberOf AuraStorageService
          * @returns {AuraStorage} Returns an AuraStorage object for the new storage.
          */
         initStorage : function(name, persistent, secure, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit) {
@@ -81,7 +85,17 @@ var AuraStorageService = function(){
         getAdapterConfig : function(adapter) {
         	return adapters[adapter];
         },
-
+        
+        /**
+         * Creates a storage adapter. Used mostly in non-production modes.
+         * <p>Example:</p>
+         * <code>$A.storageService.createAdapter("memory", "test", 4096, true);</code>
+         * @param {String} adapter The new adapter to create 
+         * @param {String} name The name of the adapter
+         * @param {Integer} maxSize The maximum size to allocate to the storage adapter
+         * @param {Boolean} debugLoggingEnabled Set to true to enable logging, or false otherwise.
+         * @memberOf AuraStorageService
+         */
         createAdapter : function(adapter, name, maxSize, debugLoggingEnabled) {
         	var config = adapters[adapter];
         	if (!config) {
@@ -106,6 +120,13 @@ var AuraStorageService = function(){
         	}
         },
         
+        /**
+         * Selects an adapter based on the given configuration. Used mostly in non-production modes.
+         * <p>See Also: <a href="#help?topic=auraStorageService">Aura Storage Service</a></p>
+         * @param {Boolean} persistent Set to true if the adapter should be persistent, or false otherwise.
+         * @param {Boolean} secure Set to true if the adapter should be secure, or false otherwise.
+         * @memberOf AuraStorageService
+         */
         selectAdapter : function(persistent, secure) {
         	// Find the best match for the specific implementation based on the requested configuration 
 

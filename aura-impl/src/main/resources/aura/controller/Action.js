@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 /*jslint sub: true */
 /**
- * A base class for a Aura Action to be passed to an associated component. An
- * Action is created in a client-side or server-side controller. Invoke a
- * client-side Action in a controller by declaring cmp.get("c.actionName"). Call
- * a server-side controller from a client-side controller.
+ * A base class for an Aura Action to be passed to an associated component. An
+ * Action is created in a client-side or server-side controller. Invoke an
+ * Action in a controller by declaring cmp.get("c.actionName"). Call
+ * a server-side Action from a client-side controller.
  * 
  * @constructor
  * @param {Object}
@@ -33,6 +33,7 @@
  *            cmp The component associated with the Action.
  */
 var Action = function Action(def, method, paramDefs, cmp) {
+	
 	this.def = def;
 	this.meth = method;
 	this.paramDefs = paramDefs;
@@ -46,7 +47,6 @@ Action.prototype.auraType = "Action";
 
 /**
  * Gets the Action Id.
- * 
  * @private
  * @returns {String}
  */
@@ -73,8 +73,8 @@ Action.prototype.getNextGlobalId = function() {
 };
 
 /**
- * Gets the ActionDef object. Shorthand: get("def")
- * 
+ * Gets the <code>ActionDef</code> object. Shorthand: <code>get("def")</code>
+ * <p>See Also: <a href="#reference?topic=api:ActionDef">ActionDef</a></p>
  * @returns {ActionDef}
  */
 Action.prototype.getDef = function() {
@@ -83,7 +83,7 @@ Action.prototype.getDef = function() {
 
 /**
  * Sets parameters for the Action. Maps key in paramDefs to config.
- * 
+ * <p>For example, <code>serverAction.setParams({ "record": id });</code> sets a parameter on serverAction.</p>
  * @param {Object}
  *            config The parameters for the Action.
  */
@@ -125,8 +125,9 @@ Action.prototype.getComponent = function() {
 
 /**
  * Sets the callback function that is executed after the server-side Action
- * returns.<br/> Call a server-side controller from a client-side controller
- * using callback.<br/>
+ * returns. Call a server-side Action from a client-side controller
+ * using callback.
+ * <p>See Also: <a href="#help?topic=serverSideControllers">Server-Side Controllers</a></p>
  * 
  * @param {Object}
  *            scope The scope in which the function is executed.
@@ -139,9 +140,9 @@ Action.prototype.setCallback = function(scope, callback) {
 };
 
 /**
- * Runs the Action. Checks that the event is client-side before running.<br/>
- * For server-side Actions, use runAfter() instead.<br/>
- * 
+ * Runs the Action. Checks that the event is client-side before running.
+ * For server-side Actions, use <code>runAfter()</code> instead.
+ * <p>See Also: <a href="#help?topic=helloActions">Client-Side Controllers</a></p>
  * @param {Event}
  *            evt The event that calls the Action.
  */
@@ -182,8 +183,8 @@ Action.prototype.getReturnValue = function() {
 
 /**
  * Returns an error object with a message field, or in development modes, a
- * stack field. For server-side Action only.
- * 
+ * stack field. For server-side Actions only.
+ * <p>For example, <code>$A.message(action.getError().message);</code> logs the error message.</p>
  * @public
  */
 Action.prototype.getError = function() {
@@ -192,8 +193,9 @@ Action.prototype.getError = function() {
 
 /**
  * Adds the server-side action to the queue. Checks that the event is
- * server-side before enqueuing.<br/> For client-side Action, use run()
- * instead.<br/>
+ * server-side before enqueuing. For client-side Action, use <code>run()</code>
+ * instead. 
+ * <p>For example,  <code>this.runAfter(serverAction);</code> runs serverAction after a callback.</p>
  * 
  * @param {Action}
  *            action The action to run after the function.
@@ -205,7 +207,7 @@ Action.prototype.runAfter = function(action) {
 
 /**
  * Returns a response function if the Action is complete.
- * 
+ * <p>For example, <code>this.complete({ returnValue: cmp.get("c.getAction") });</code> runs getAction after the current Action is complete.</p>
  * @private
  * @param {Object}
  *            response
@@ -300,7 +302,7 @@ Action.prototype.setAbortable = function() {
 };
 
 /**
- * Checks if the function is abortable. For server-side Action only.
+ * Checks if the function is abortable. For server-side Actions only.
  * 
  * @returns {Boolean} The function is abortable (true), or false otherwise.
  */
@@ -310,12 +312,11 @@ Action.prototype.isAbortable = function() {
 
 /**
  * An exclusive Action is processed on an XMLHttpRequest of its own.
- * a.setExclusive(true) and a.setExclusive() are the same. <br/> For server-side
- * Action only.
+ * <code>a.setExclusive(true)</code> and <code>a.setExclusive()</code> are the same. For server-side Actions only.
  * 
  * @param {Object}
  *            val
- * @returns {Boolean} The value is exclusive (true), or false otherwise.
+ * @returns {Boolean} Set to true if the Action should be exclusive, or false otherwise.
  */
 Action.prototype.setExclusive = function(val) {
 	this.exclusive = val === undefined ? true : val;
@@ -332,11 +333,11 @@ Action.prototype.isExclusive = function() {
 
 /**
  * Marks the Action as storable and abortable. For server-side Actions only.
- * 
+ * <p>See Also: <a href="#help?topic=auraStorageService">Aura Storage Service</a></p>
  * @param {Object}
  *            config Optional. A set of key/value pairs that specify the storage
- *            options to set. You can set the following options: ignoreExisting
- *            and refresh.
+ *            options to set. You can set the following options: <code>ignoreExisting</code>
+ *            and <code>refresh</code>.
  */
 Action.prototype.setStorable = function(config) {
 	$A.assert(this.def.isServerAction(), "setStorable() cannot be called on a client action.");
@@ -349,9 +350,9 @@ Action.prototype.setStorable = function(config) {
 };
 
 /**
- * Checks if the function is storable. For server-side Action only.
+ * Checks if the function is storable. For server-side Actions only.
  * 
- * @returns {Boolean} The function is storable (true), or false otherwise.
+ * @returns {Boolean} Set to true if the function is storable, or false otherwise.
  */
 Action.prototype.isStorable = function() {
 	var ignoreExisting = this.storableConfig && this.storableConfig["ignoreExisting"];
@@ -379,7 +380,7 @@ Action.prototype.isFromStorage = function() {
 };
 
 /**
- * Chains a function to run after this Action. For server-side Action only.
+ * Chains a function to run after the current Action. For server-side Actions only.
  */
 Action.prototype.setChained = function() {
 	this.chained = true;
@@ -388,7 +389,7 @@ Action.prototype.setChained = function() {
 
 /**
  * Returns true if a given function is chained, or false otherwise. For
- * server-side Action only.
+ * server-side Actions only.
  * 
  * @private
  * @returns {Boolean}
@@ -399,7 +400,7 @@ Action.prototype.isChained = function() {
 
 /**
  * Returns the key/value pair of the Action id, descriptor, and parameters in
- * JSON format.<br/>
+ * JSON format.
  */
 Action.prototype.toJSON = function() {
 	return {

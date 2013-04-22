@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.auraframework</groupId>
     <artifactId>aura-framework</artifactId>
-    <version>0.0.459-SNAPSHOT</version>
+    <version>0.0.463-SNAPSHOT</version>
     <packaging>pom</packaging>
     <organization>
         <url>http://www.auraframework.org</url>
@@ -130,67 +130,67 @@
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura</artifactId>
-                <version>0.0.459-SNAPSHOT</version>
+                <version>0.0.463-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura</artifactId>
-                <version>0.0.459-SNAPSHOT</version>
+                <version>0.0.463-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-util</artifactId>
-                <version>0.0.459-SNAPSHOT</version>
+                <version>0.0.463-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-util</artifactId>
-                <version>0.0.459-SNAPSHOT</version>
+                <version>0.0.463-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl</artifactId>
-                <version>0.0.459-SNAPSHOT</version>
+                <version>0.0.463-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl</artifactId>
-                <version>0.0.459-SNAPSHOT</version>
+                <version>0.0.463-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl-expression</artifactId>
-                <version>0.0.459-SNAPSHOT</version>
+                <version>0.0.463-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl-expression</artifactId>
-                <version>0.0.459-SNAPSHOT</version>
+                <version>0.0.463-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-components</artifactId>
-                <version>0.0.459-SNAPSHOT</version>
+                <version>0.0.463-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-tools</artifactId>
-                <version>0.0.459-SNAPSHOT</version>
+                <version>0.0.463-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-resources</artifactId>
-                <version>0.0.459-SNAPSHOT</version>
+                <version>0.0.463-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-integration-test</artifactId>
                 <type>test-jar</type>
-                <version>0.0.459-SNAPSHOT</version>
+                <version>0.0.463-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -409,7 +409,7 @@
                     <aggregate>true</aggregate>
                     <properties>
                         <owner>salesforce.com, inc.</owner>
-                        <year>2012</year>
+                        <year>2013</year>
                     </properties>
                     <includes>
                         <include>**/src/main/java/**</include>

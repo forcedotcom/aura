@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2012 salesforce.com, inc.
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,20 @@
             var c = body.getValue(i);
             if (c.isInstanceOf("ui:menuItem")) {
                 children.push(c);
-            }
-            if (c.getDef().getAttributeDefs().getDef("parent")) {
-                c.setValue("v.parent", [component]);
+                if (c.getDef().getAttributeDefs().getDef("parent")) {
+                    c.setValue("v.parent", [component]);
+                }
+            } else if (c.isInstanceOf("aura:iteration")) { // support external iteration
+                var iters = c.getValue("v.realbody");
+                for (var k = 0; k < iters.getLength(); k++) {
+                    var iter = iters.getValue(k);
+                    if (iter.isInstanceOf("ui:menuItem")) {
+                        children.push(iter);
+                        if (iter.getDef().getAttributeDefs().getDef("parent")) {
+                            iter.setValue("v.parent", [component]);
+                        }
+                    }
+                }
             }
         }
         // Set "parent" for menu items in iteration

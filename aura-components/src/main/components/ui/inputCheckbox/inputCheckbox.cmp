@@ -1,6 +1,6 @@
 <!--
 
-    Copyright (C) 2012 salesforce.com, inc.
+    Copyright (C) 2013 salesforce.com, inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 
 -->
 <aura:component extends="ui:input" implements="ui:inputBaseOption" extensible="true" support="GA" description="An HTML input element of type checkbox.">
+        
     <aura:renderif isTrue="{!v.body.length == 0}">
-       <input aura:id="checkbox" class="{!v.class}" name="{!v.name}" type="checkbox" value="{!v.text}" checked="{!v.value == true}" disabled="{!v.disabled}"/>
+       <input aura:id="checkbox" id="{!v.domId}" class="{!v.class}" name="{!v.name}" type="checkbox" value="{!v.text}" checked="{!v.value == true}" disabled="{!v.disabled}"/>
        <aura:set attribute="else">
            {!v.body}
        </aura:set>

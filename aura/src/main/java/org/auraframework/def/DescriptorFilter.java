@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.auraframework.util.text.GlobMatcher;
 
 import com.google.common.collect.Lists;
 
-public class DescriptorFilter {
+public class DescriptorFilter implements Comparable<DescriptorFilter> {
     private static final List<DefType> componentType = Collections.unmodifiableList(Arrays
             .asList(new DefType[] { DefType.COMPONENT }));
     private final List<DefType> defTypes;
@@ -139,5 +139,31 @@ public class DescriptorFilter {
      */
     public GlobMatcher getNameMatch() {
         return this.nameMatch;
+    }
+
+    @Override
+    public int compareTo(DescriptorFilter o) {
+        if (this == o) {
+            return 0;
+        }
+
+        if (o == null)
+            return -1;
+
+        return this.toString().compareTo(o.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return this.toString().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object arg0) {
+        if (!(arg0 instanceof DescriptorFilter)) { // tests null also
+            return false;
+        }
+
+        return compareTo((DescriptorFilter) arg0) == 0;
     }
 }

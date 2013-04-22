@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,31 +23,14 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.Nullable;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.HelperDef;
-import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.LayoutsDef;
-import org.auraframework.def.NamespaceDef;
-import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RendererDef;
-import org.auraframework.def.TestSuiteDef;
-import org.auraframework.def.ThemeDef;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.Source;
+import org.auraframework.system.*;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
-import org.auraframework.system.SourceLoader;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 
 /**
  * This source loader allows tests to load and unload source from strings rather than from the file system or looking at
@@ -284,11 +267,6 @@ public class StringSourceLoader implements SourceLoader {
             if (ret != null) {
                 // return a copy of the StringSource to emulate other Sources (hash is reset)
                 return new StringSource<D>(ret);
-            } else if (descriptor.getDefType().equals(DefType.NAMESPACE)) {
-                // If we are looking for a NameSpaceDef for a namespace introduced using String Source and the test did
-                // not add one,
-                // We return a empty String Source just like RootDefFactory.getDef() does
-                return new StringSource<D>(descriptor, "", descriptor.getQualifiedName(), Format.XML);
             }
         }
         return null;

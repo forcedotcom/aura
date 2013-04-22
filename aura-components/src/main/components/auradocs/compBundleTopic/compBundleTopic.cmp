@@ -1,6 +1,6 @@
 <!--
 
-    Copyright (C) 2012 salesforce.com, inc.
+    Copyright (C) 2013 salesforce.com, inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -47,6 +47,12 @@
                 <td><code>sampleController.js</code></td>
                 <td>Client-side controller methods to handle events in the component.</td>
                 <td><auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink></td>
+            </tr>
+            <tr>
+                <td>Model</td>
+                <td><code>sampleModel.js</code></td>
+                <td>JSON model to initialize a component.</td>
+                <td><auradocs:topicLink topic="modelsJSON">JSON Models</auradocs:topicLink></td>
             </tr>
             <tr>
                 <td>Renderer</td>

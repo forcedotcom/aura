@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,19 @@
             }
         }
         var resultCmp = cmp.find("radioResult");
+        resultCmp.setValue("v.value", values.join(","));
+    },
+    getRadioIterationMenuSelected: function(cmp, event) {
+        var menuCmp = cmp.find("iterationRadioMenu");
+        var menuItems = menuCmp.getValue("v.childMenuItems");
+        var values = [];
+        for (var i = 0; i < menuItems.getLength(); i++) {
+            var c = menuItems.getValue(i);
+            if (c.get("v.selected") === true) {
+                values.push(c.get("v.label"));
+            }
+        }
+        var resultCmp = cmp.find("radioIterationResult");
         resultCmp.setValue("v.value", values.join(","));
     }
 })

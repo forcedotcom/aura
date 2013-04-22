@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,5 +52,8 @@ exp(p,
     "arrayIndexOf", p.arrayIndexOf,
     "contains", p.contains,
     "squash", p.squash,
-    "getWindowSize", p.getWindowSize
+    "getWindowSize", p.getWindowSize,
+    "isComponent", p.isComponent,
+    "getElementByClass", p.getElementByClass,
+    "getElementsByClass", p.getElementsByClass
 );

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ public class MenuItem implements JsonSerializable {
     private final String label;    
     private final boolean selected;
     private final String type;
+    private final String value;
     
     public MenuItem(String label, String type) {
         this(label, false, type);
@@ -42,15 +43,20 @@ public class MenuItem implements JsonSerializable {
     }
     
     public MenuItem(String className, String label, boolean selected, String type) {
-        this(className, false, label, selected, type);
+        this(className, false, label, selected, type, null);
     }
     
     public MenuItem(String className, boolean disabled, String label, boolean selected, String type) {
+        this(className, disabled, label, selected, type, null);
+    }
+    
+    public MenuItem(String className, boolean disabled, String label, boolean selected, String type, String value) {
         this.className = className;
         this.disabled = disabled;
         this.label = label;
         this.selected = selected;
         this.type = type;
+        this.value = value;
     }
 
     /**
@@ -86,11 +92,19 @@ public class MenuItem implements JsonSerializable {
     }
 
     /**
-     * Get the value.
-     * @return the value of this option
+     * Get the menu item type ("action", "checkbox", "radio", "separator" or user defined).
+     * @return the type of this menu item
      */
     public String getType() {
         return this.type;
+    }
+    
+    /**
+     * Get the value.
+     * @return the value of this menu item
+     */
+    public String getValue() {
+        return this.value;
     }
 
     @Override
@@ -101,13 +115,14 @@ public class MenuItem implements JsonSerializable {
         json.writeMapEntry("label", this.label);
         json.writeMapEntry("selected", this.selected);
         json.writeMapEntry("type", this.type);
+        json.writeMapEntry("value", this.value);
         json.writeMapEnd();
     }
 
     @Override
     public String toString() {
-        return String.format("MenuItem(className[%s] disabled[%s] label[%s] selected[%s] type[%s])", 
-                this.className, this.disabled, this.label, this.selected, this.type);
+        return String.format("MenuItem(className[%s] disabled[%s] label[%s] selected[%s] type[%s] value[%s])", 
+                this.className, this.disabled, this.label, this.selected, this.type, this.value);
     }
 
 }

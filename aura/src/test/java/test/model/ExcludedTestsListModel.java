@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,18 +71,23 @@ public class ExcludedTestsListModel {
 
     /**
      * Go down the nested TestSuites until we get down to the individual tests, then find out what browsers each test
-     * doesn't run on and incremenet our counters.
+     * doesn't run on and increment our counters.
      */
     private void processTestSuite(TestSuite suite) {
         for (int i = 0; i < suite.testCount(); i++) {
             TestSuite ts = (TestSuite) suite.testAt(i);
             if (!ts.getName().equals("JS component tests")) {
                 for (int j = 0; j < ts.testCount(); j++) {
-                    WebDriverTestCase test = (WebDriverTestCase) ts.testAt(j);
-                    Set<BrowserType> browserList = WebDriverUtil.getBrowserListForTestRun(test.getTargetBrowsers(),
-                            test.getExcludedBrowsers());
-                    Set<BrowserType> ignoredBrowsers = EnumSet.complementOf(EnumSet.copyOf(browserList));
-                    incrementCounters(test, ignoredBrowsers);
+                    try {
+                        WebDriverTestCase test = (WebDriverTestCase) ts.testAt(j);
+                        Set<BrowserType> browserList = WebDriverUtil.getBrowserListForTestRun(test.getTargetBrowsers(),
+                                test.getExcludedBrowsers());
+                        Set<BrowserType> ignoredBrowsers = EnumSet.complementOf(EnumSet.copyOf(browserList));
+                        incrementCounters(test, ignoredBrowsers);
+                    } catch (ClassCastException e) {
+                        // If we have a test class without any test methods we don't get an error until we try cast the
+                        // empty TestSuite to a WebDriverTestCase. Ignore and keep going.
+                    }
                 }
             } else {
                 // Javascript component test suites are handled differently.

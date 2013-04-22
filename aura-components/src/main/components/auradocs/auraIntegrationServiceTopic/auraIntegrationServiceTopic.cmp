@@ -1,6 +1,6 @@
 <!--
 
-    Copyright (C) 2012 salesforce.com, inc.
+    Copyright (C) 2013 salesforce.com, inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -67,6 +67,12 @@
     </auradocs:codeblock><br/>
     </li>
 </ol>
+
+<p>To preload the metadata definitions of all dependent components for a namespace on the client, call the <code>addPreload</code> method on the <code>Integration</code> object before injecting a component. For example:</p>
+
+<auradocs:codeblock>
+integration.addPreload("MyNamespace");
+</auradocs:codeblock><br/>
 
 <auradocs:warning>The Aura History Service and Aura Layout Service are not supported with the Aura Integration Service, and hence embedded components can't make use of these services.</auradocs:warning>
 

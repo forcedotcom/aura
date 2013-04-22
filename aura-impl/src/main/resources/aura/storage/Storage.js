@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,7 @@ AuraStorage.prototype.clear = function() {
 
 /**
  * Gets an item from storage corresponding to the specified key.
+ * <p>See Also: <a href="#help?topic=auraStorageService">Aura Storage Service</a></p>
  * @param {String} key The item key. This is the key used when the item was added to storage using put(). 
  * @returns {Object} An item from storage.
  */
@@ -127,6 +128,9 @@ AuraStorage.prototype.put = function(key, value) {
 	$A.storageService.fireModified();
 };
 
+/**
+ * @private
+ */
 AuraStorage.prototype.remove = function(key, doNotFireModified) {
 	this.adapter.removeItem(key);
 	
@@ -135,6 +139,9 @@ AuraStorage.prototype.remove = function(key, doNotFireModified) {
 	}
 };
 
+/**
+ * @private
+ */
 AuraStorage.prototype.sweep = function() {
 	// Do not sweep if we have lost our connection - we'll
 	// ignore expiration until sweeping resumes
@@ -159,12 +166,18 @@ AuraStorage.prototype.sweep = function() {
 	}
 };
 
+/**
+ * Suspends sweeping. The storage adapter is removed if it is expired but sweeping can be suspended if the connection is lost.
+ */
 AuraStorage.prototype.suspendSweeping = function() {
 	this.log("AuraStorage.suspendSweeping()");
 
 	this._sweepingSuspended = true;
 };
 
+/**
+ * Resumes sweeping to remove expired storage adapters.
+ */
 AuraStorage.prototype.resumeSweeping = function() {
 	this.log("AuraStorage.resumeSweeping()");
 
@@ -172,6 +185,9 @@ AuraStorage.prototype.resumeSweeping = function() {
 	this.sweep();
 };
 
+/**
+ * @private
+ */
 AuraStorage.prototype.log = function() {
 	if (this.debugLoggingEnabled) {
 		$A.log(arguments[0], arguments.length > 1 ? arguments[1] : undefined);

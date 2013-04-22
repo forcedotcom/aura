@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -235,16 +235,6 @@ public class AuraServletIntegrationTest extends IntegrationTestCase {
         Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.AUTHENTICATED, appDesc);
         ComponentDef depDef = Aura.getDefinitionService().getDefinition("updateTest:updateable", ComponentDef.class);
         assertLastModAfterUpdate(Mode.DEV, appDesc, touchSource(depDef.getDescriptor()), true);
-    }
-
-    @UnAdaptableTest
-    public void testGetLastModDevUpdateNotPreloadedCss() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
-                "updateTest:updateWithoutPreload", ApplicationDef.class);
-        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Access.AUTHENTICATED, appDesc);
-        ComponentDef depDef = Aura.getDefinitionService().getDefinition("updateTest:updateableOther",
-                ComponentDef.class);
-        assertLastModAfterUpdate(Mode.DEV, appDesc, touchSource(depDef.getThemeDescriptor()), false);
     }
 
     @UnAdaptableTest

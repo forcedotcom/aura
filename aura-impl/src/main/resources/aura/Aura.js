@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -235,6 +235,8 @@ $A.ns.Aura = function() {
     };
 
     /**
+     * Equivalent to <code>$A.renderingService.render()</code>.
+     * <p>See Also: <a href="#reference?topic=api:AuraRenderingService">AuraRenderingService</a></p>
      * @public
      * @function
      * @param {Component|Array} cmp
@@ -243,6 +245,8 @@ $A.ns.Aura = function() {
     this.render = this.renderingService.render;
 
     /**
+     * Equivalent to <code>$A.renderingService.rerender()</code>.
+     * <p>See Also: <a href="#reference?topic=api:AuraRenderingService">AuraRenderingService</a></p>
      * @public
      * @function
      * @param {Component|Array} cmp
@@ -251,6 +255,8 @@ $A.ns.Aura = function() {
     this.rerender = this.renderingService.rerender;
 
     /**
+     * Equivalent to <code>$A.renderingService.unrender()</code>.
+     * <p>See Also: <a href="#reference?topic=api:AuraRenderingService">AuraRenderingService</a></p>
      * @public
      * @function
      * @param {Component|Array} cmp
@@ -259,6 +265,8 @@ $A.ns.Aura = function() {
     this.unrender = this.renderingService.unrender;
 
     /**
+     * Equivalent to <code>$A.renderingService.afterRender()</code>.
+     * <p>See Also: <a href="#reference?topic=api:AuraRenderingService">AuraRenderingService</a>
      * @public
      * @function
      * @param {Component|Array} cmp
@@ -267,6 +275,8 @@ $A.ns.Aura = function() {
     this.afterRender = this.renderingService.afterRender;
 
     /**
+     * Equivalent to <code>$A.componentService.get()</code>.
+     * <p>See Also: <a href="#reference?topic="AuraComponentService">AuraComponentService</a></p>
      * @public
      * @function
      * @param {Component|Array} cmp
@@ -277,6 +287,8 @@ $A.ns.Aura = function() {
     this.newCmp = this.componentService.newComponent;
 
     /**
+     * Equivalent to <code>$A.eventService.newEvent()</code>.
+     * <p>See Also: <a href="#reference?topic="AuraEventService">AuraEventService</a></p>
      * @public
      * @function
      * @param {Component|Array} cmp
@@ -341,10 +353,10 @@ $A.ns.Aura = function() {
  * @param {Object} config
  *
  * {
- *      config.descriptor : The descriptor of the application or component that should be loaded as the root. e.g : "markup://foo:bar"
- *      config.attributes : The attributes that should be passed into the root component when it is constructed. e.g. : {at1 : 1, at2 : "asdf"}
- *      config.defType : The defType of the descriptor.  eg : "DEFINITION" OR "APPLICATION"
- *      config.lastmod : The timestamp, in millis of the latest changes to the preloaded metadata associated with this application.
+ *      <code>config.descriptor</code> : The descriptor of the application or component that should be loaded as the root. For example, <code>"markup://foo:bar"</code><br />
+ *      <code>config.attributes</code> : The attributes that should be passed into the root component when it is constructed. For example, <code>{at1 : 1, at2 : "asdf"}</code><br />
+ *      <code>config.defType</code> : The defType of the descriptor.  For example, <code>"DEFINITION"</code> or <code>"APPLICATION"</code><br />
+ *      <code>config.lastmod</code> : The timestamp, in millis of the latest changes to the preloaded metadata associated with this application.
  * }
  * @public
  */
@@ -365,7 +377,7 @@ $A.ns.Aura.prototype.initAsync = function (config) {
  * Used for synchronous initialization.
  * @param {Object} config The configuration attributes
  * @param {Boolean} useExisting
- * @param {Boolean} doNotInitializeServices True if Layout and History services should not be initialized, or false if they should. Defaults to true for Aura Integration Service.
+ * @param {Boolean} doNotInitializeServices Set to true if Layout and History services should not be initialized, or false if they should. Defaults to true for Aura Integration Service.
  */
 $A.ns.Aura.prototype.initConfig = function (config, useExisting, doNotInitializeServices) {
     config = $A.util.json.resolveRefs(config);
@@ -383,11 +395,11 @@ $A.ns.Aura.prototype.initConfig = function (config, useExisting, doNotInitialize
 
 /**
  * Initializes Aura in a specified mode.
- * @param {Object} config The descriptor ("markup://foo:bar"), attributes, defType ("APPLICATION" or "COMPONENT"), and timestamp of last modified change
+ * @param {Object} config The descriptor (<code>"markup://foo:bar"</code>), attributes, defType (<code>"APPLICATION"</code> or <code>"COMPONENT"</code>), and timestamp of last modified change
  * @param {String} token
  * @param {Object} context The mode of the application or component ("DEV", "PROD", "PTEST")
  * @param {Object} container Sets the container for the component.
- * @param {Boolean} doNotInitializeServices True if Layout and History services should not be initialized, or false if they should. Defaults to true for Aura Integration Service.
+ * @param {Boolean} doNotInitializeServices Set to true if Layout and History services should not be initialized, or false if they should. Defaults to true for Aura Integration Service.
  */
 $A.ns.Aura.prototype.init = function (config, token, context, container, doNotInitializeServices) {
     var component = $A.util.json.resolveRefs(config);
@@ -429,6 +441,7 @@ $A.ns.Aura.prototype.initPriv = function (config, token, container, doNotInitial
 
 /**
  * Signals that initialization has completed.
+ * @private
  */
 $A.ns.Aura.prototype.finishInit = function() {
     if (!this["finishedInit"]) {
@@ -448,10 +461,11 @@ $A.ns.Aura.prototype.finishInit = function() {
 };
 
 /**
- * Use $A.error() in response to an error that prevents Aura from starting an application successfully.
- * To treat a test as successful where $A.error() is expected, use exceptionsAllowedDuringInit. 
- * For example, this is useful if you are testing for components with the same name with different config parameters.
+ * Use <code>$A.error()</code> in response to an error that prevents Aura from starting an application successfully.
+ * To treat a test as successful where <code>$A.error()</code> is expected, use <code>exceptionsAllowedDuringInit</code>. 
+ * For example, this is useful if you are testing for components with the same name with different <code>config</code> parameters.
  * @description <p>Example:</p>
+ * <code>
  * testDuplicate : {<br/>
  * &nbsp;&nbsp;&nbsp;&nbsp;exceptionsAllowedDuringInit : ["Duplicate found!"],<br/>
  * &nbsp;&nbsp;&nbsp;&nbsp;attributes : {<br/> 
@@ -459,6 +473,7 @@ $A.ns.Aura.prototype.finishInit = function() {
  * &nbsp;&nbsp;&nbsp;&nbsp;},<br/>
  * &nbsp;&nbsp;&nbsp;&nbsp;//more tests<br/>
  * }
+ * </code>
  * @public
  * @param {Error} e The error message to be returned
  * @param {Boolean} stopTest   Defaults to true, but there are some test cases
@@ -527,16 +542,17 @@ $A.ns.Aura.prototype.message = function(msg) {
 
 /**
  * Returns the raw value referenced using property syntax. Gets the raw value from within the Value object.
- * Shorthand for getValue().unwrap().
+ * Shorthand for <code>getValue().unwrap()</code>.
  * @public
  * @function
- * @param {String} key The data key to look up on element. E.g. $A.get("root.v.mapAttring.key")
+ * @param {String} key The data key to look up on element, for example, <code>$A.get("root.v.mapAttring.key")</code>.
  */
 $A.ns.Aura.prototype.get = function(key) {
     return this.expressionService.get($A.services, key);
 };
 
 /**
+ * For example, <code>$A.getRoot().get("v.attrName");</code> returns the attribute from the root component.
  * @public
  * @function
  */
@@ -552,7 +568,8 @@ $A.ns.Aura.prototype.setRoot = function(root) {
 };
 
 /**
- * Gets the current AuraContext. The context consists of the mode, descriptor, and namespaces to be loaded.
+ * Gets the current <code>AuraContext</code>. The context consists of the mode, descriptor, and namespaces to be loaded.
+ * <p>See Also: <a href="#help?topic=modesReference">Modes Reference</a></p>
  * @public
  * @function
  */
@@ -574,8 +591,8 @@ $A.ns.Aura.prototype.unwrap = function(val) {
 };
 
 /**
- * Run a function within the standard Aura lifecycle and insures that runAfters and rerendering is handled properly 
- * from javascript outside of controllers, renderers, providers.
+ * Runs a function within the standard Aura lifecycle and insures that <code>runAfter</code> methods and rerendering are handled properly 
+ * from JavaScript outside of controllers, renderers, providers.
  * @param {Function} func The function to run.
  * @public
  */
@@ -593,6 +610,7 @@ $A.ns.Aura.prototype.run = function(func) {
  *
  * Displays an error message if condition is false, runs 'trace()' and stops JS execution. The
  * app will cease to function until reloaded if this is called, and errors are not caught.
+ * <p>For example, <code>$A.assert(cmp.get("v.name") , "The name attribute is required.");</code> checks for the name attribute.
  *
  * @param {Boolean} condition True prevents the error message from being displayed, or false otherwise.
  * @param {String} assertMessage A message to be displayed when condition is false.
@@ -646,8 +664,9 @@ $A.ns.Aura.prototype.userAssert = function(condition, msg) {
 
 /**
  *  Log something.  Currently, this logs to the JavaScript console if it is available, and does not throw errors otherwise.
- *  If both are passed in, value shows up in the console as a group with value logged within the group.
+ *  If both value and error are passed in, value shows up in the console as a group with value logged within the group.
  *  If only value is passed in, value is logged without grouping.
+ *  <p>For example, <code>$A.log(action.getError());</code> logs the error from an action.</p>
  * @public
  * @param {Object} value The first object to log.
  * @param {Object} error The error messages to be logged in the stack trace.
@@ -685,7 +704,7 @@ $A.ns.Aura.prototype.log = function(value, error) {
 };
 
 /**
- * Logs using console.log() if defined on the console implementation.
+ * Logs using <code>console.log()</code> if defined on the console implementation.
  */
 $A.ns.Aura.prototype.logf = function() {
     if (window["console"]) {
@@ -742,7 +761,7 @@ $A.ns.Aura.prototype.getStackTrace = function(e) {
 };
 
 /**
- * Logs a stack trace. Trace calls using console.trace() if defined on the console implementation.
+ * Logs a stack trace. Trace calls using <code>console.trace()</code> if defined on the console implementation.
  * @public
  */
 $A.ns.Aura.prototype.trace = function() {
@@ -767,7 +786,7 @@ $A.ns.Aura.prototype.mark = (function() {
 
 /**
  * Map through to Jiffy.measure if Jiffy is loaded, otherwise a no-op.
- * This will be the same no-op as $A.ns.Aura.prototype.mark, since both
+ * This will be the same no-op as <code>$A.ns.Aura.prototype.mark</code>, since both
  * are no-ops when Jiffy is missing; we only need one noop object.
  *
  * @public

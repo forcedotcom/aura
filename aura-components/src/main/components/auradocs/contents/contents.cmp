@@ -1,6 +1,6 @@
 <!--
 
-    Copyright (C) 2012 salesforce.com, inc.
+    Copyright (C) 2013 salesforce.com, inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -65,6 +65,7 @@
                 <auradocs:contentsNode text="Using UI Components">
                     <auradocs:contentsNode text="Positioning UI Components" id="useLayout"/>
                     <auradocs:contentsNode text="Getting User Input" id="useForm"/>
+                    <auradocs:contentsNode text="Using Labels" id="label"/>
                     <auradocs:contentsNode text="Using Menus" id="useMenu"/>
                     <auradocs:contentsNode text="Displaying Dialogs and Messages" id="useMessage"/>
                     <auradocs:contentsNode text="Using Tabs and Scrollers" id="useTabs"/>
@@ -140,12 +141,17 @@
                     <auradocs:contentsNode text="Invoking Actions on Component Initialization" id="initHandler" />
                     <auradocs:contentsNode text="Adding and Removing Styles" id="addClass" />
                     <auradocs:contentsNode text="Dynamically Adding Event Handlers" id="dynamicHandler" />
+                    <auradocs:contentsNode text="Modifying Components from External JavaScript" id="jsModCmpExternal" />
                 </auradocs:contentsNode>
             </auradocs:contentsNode>
 
             <auradocs:contentsNode text="Java" >
                 <auradocs:contentsNode text="Introduction" id="codeJavaIntro" />
-                <auradocs:contentsNode text="Models" id="models" />
+                <auradocs:contentsNode text="Models">
+                    <auradocs:contentsNode text="Java Models" id="models" />
+                    <auradocs:contentsNode text="JSON Models" id="modelsJSON" />
+                    <auradocs:contentsNode text="Accessing Models in JavaScript" id="modelsAccessJavaScript" />
+                </auradocs:contentsNode>
                 <auradocs:contentsNode text="Server-Side Controllers" id="serverSideControllers" />
                 <auradocs:contentsNode text="Server-Side Renderers" id="renderersServerSide" />
                  <auradocs:contentsNode text="Server-Side Providers" id="oodProviders" />

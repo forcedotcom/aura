@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,9 +42,14 @@ var BaseValue = {
          */
         var actionRef = valueFactory.create(actionExpression);
         return function(event){
-            if(index !== null){
+            if (valueProvider.isValid && !valueProvider.isValid()) {
+                return;
+            }
+
+            if (index !== null){
                 event.getParams()["index"] = index;
             }
+
             var clientAction = expressionService.getValue(valueProvider, actionRef);
             if (clientAction) {
                 if(clientAction.unwrap){

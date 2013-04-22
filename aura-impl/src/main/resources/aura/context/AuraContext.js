@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,8 +68,8 @@ function AuraContext(config) {
 
 /**
  * Returns the mode for the current request. Defaults to "PROD" for production mode and "DEV" for development mode.
- * The HTTP request format is http://<your server>/namespace/component?aura.mode=PROD. <br/>
- * For a full list of modes, see <a href="http://jenkins.auraframework.org/view/All/job/aura_doc/javadoc/aura/system/AuraContext.Mode.html" target="_blank">AuraContext</a>.
+ * The HTTP request format is <code>http://<your server>/namespace/component?aura.mode=PROD</code>.
+ * <p>See Also: <a href="#help?topic=modesReference">AuraContext</a></p>
  */
 AuraContext.prototype.getMode = function() {
     return this.mode;
@@ -218,7 +218,7 @@ AuraContext.prototype.joinGlobalValueProviders = function(gvps, doNotPersist) {
                 this.globalValueProviders[t] = gvp;
             } else {
                 var mergeMap = new MapValue(newGvp["values"]);
-                gvp.merge(mergeMap, false);
+                gvp.merge(mergeMap, true);
             }
             
             if (storage) {

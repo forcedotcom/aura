@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,25 @@
         helper.setErrorComponent(component, value);
     },
     
-    init: function(cmp) {   	
-    	var mode = $A.getContext().getMode(),
-    		isIOS = $A.get("$Browser.isIOS");
+    init: function(cmp) {
+    	var	mode = $A.getContext().getMode(),
+    		isIOS = $A.get("$Browser.isIOS"),
+    		attrs = cmp.getAttributes(),
+    		labelPos = attrs.get('labelPosition');
     		
     	if ((mode === "SELENIUM" || mode === "SELENIUMDEBUG") && isIOS) {    		 
     		//change event does not fire in selenium mode, so default to blur event
     		//W-1564254
     		if (cmp.get('v.updateOn') === 'change') {    			
-    			cmp.getAttributes().setValue("updateOn", "blur");
+    			attrs.setValue("updateOn", "blur");
     		}
-    	}
+    	}     
+    	
+    	if ($A.util.arrayIndexOf(['top', 'right', 'bottom', 'left', 'hidden'], labelPos) < 0) {
+    		//once W-1419175 is fixed, then we can set default labelPosition instead of throwing error    		
+    		$A.error("labelPosition must be one of the following values: 'top', 'right', 'bottom', 'left', 'hidden'");
+        	//default labelPosition to 'left'
+    		//cmp.getDef().getHelper().setAttribute(cmp, {key: 'labelPosition', value: 'left'});
+        }    
     } 
 })

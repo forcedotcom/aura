@@ -1,6 +1,6 @@
 <!--
 
-    Copyright (C) 2012 salesforce.com, inc.
+    Copyright (C) 2013 salesforce.com, inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,6 +15,13 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" implements="ui:inputBaseOption" extensible="true" support="GA" description="An HTML option element that is nested in a &lt;ui:inputSelect&gt; element. Denotes the available options in the list.">
-    <option aura:id="inputSelectOption" selected="{!v.value}" class="{!v.class}" value="{!v.text}"><aura:renderIf isTrue="{!v.label == '' || v.label == null || v.label == undefined}">{!v.text}<aura:set attribute="else">{!v.label}</aura:set></aura:renderIf></option>
+<aura:component extends="ui:interactive" implements="ui:inputBaseOption" extensible="true" support="GA" description="An HTML option element that is nested in a &lt;ui:inputSelect&gt; element. Denotes the available options in the list.">
+    <option aura:id="inputSelectOption" selected="{!v.value}" class="{!v.class}" value="{!v.text}">
+	    <aura:renderIf isTrue="{!v.label == '' || v.label == null || v.label == undefined}">
+	    	{!v.text}
+	    	<aura:set attribute="else">
+	    	{!v.label}
+	    	</aura:set>
+		</aura:renderIf>
+	</option>
 </aura:component>

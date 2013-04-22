@@ -1,6 +1,6 @@
 <!--
 
-    Copyright (C) 2012 salesforce.com, inc.
+    Copyright (C) 2013 salesforce.com, inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,8 +22,10 @@
     <aura:attribute name="placeholder" type="String" default="Search" description="Text that is displayed when the field is empty, to prompt the user for a valid search string. Default value is &quot;Search&quot;."/>
     <aura:attribute name="showClear" type="Boolean" default="false" description="Boolean value indicate if we should show the search clear button. Default value is &quot;false&quot;."/>
     <aura:registerevent name="search" type="ui:searchEvent" description="The event fired when the user runs a search."/>
+    
     <aura:renderif isTrue="{!v.body.length == 0}">
-       <input aura:id="search" 
+       <input aura:id="search"
+    		  id="{!v.domId}"	   	 
               class="{!v.class}" 
               type="{!v.type}" 
               value="{!v.value}" 

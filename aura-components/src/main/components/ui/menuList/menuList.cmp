@@ -1,6 +1,6 @@
 <!--
 
-    Copyright (C) 2012 salesforce.com, inc.
+    Copyright (C) 2013 salesforce.com, inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
     <div aura:id="menu" role="menu" class="{!v.class + (v.visible == true ? ' visible':'')}">
         <ul aura:id="datalist" role="presentation">
             <aura:iteration items="{!v.menuItems}" var="item">
-                <ui:menuItem aura:id="item" class="{!item.className}" disabled="{!item.disabled}" label="{!item.label}" selected="{!item.selected}" type="{!item.type}"/>
+                <ui:menuItem aura:id="item" class="{!item.className}" disabled="{!item.disabled}" label="{!item.label}" selected="{!item.selected}" type="{!item.type}" value="{!item.value}"/>
             </aura:iteration>
             {!v.body}
         </ul>

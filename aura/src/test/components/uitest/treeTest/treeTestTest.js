@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,8 +41,8 @@
 				"xflight"
 				];
 				
-			for (var index in treeNodeIds) {
-				var nodeId = treeNodeIds[index];
+			for (var i = 0, treeLength = treeNodeIds.length; i < treeLength; i++ ) {
+				var nodeId = treeNodeIds[i];
 				aura.test.assertFalse(aura.util.isUndefinedOrNull(cmp.find(nodeId)), "Could not find '" + nodeId + "' node");
 			}
 		}

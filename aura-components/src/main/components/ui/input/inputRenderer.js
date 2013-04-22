@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,26 @@
  * limitations under the License.
  */
 ({
-    afterRender: function(component, helper) {
+	 
+	render: function(component, helper) {
+        var attrs = component.getAttributes(),
+			domId = attrs.getValue("domId").getValue(),
+			concreteCmp = component.getConcreteComponent(),
+			parentCmp = concreteCmp.getSuper(),
+			globalId = concreteCmp.getGlobalId(),
+			labelPos = attrs.get("labelPosition");
+        
+		if (!domId) {
+			helper.setAttribute(component, {key: 'domId', value: globalId});
+		}
+						
+		return this.superRender();
+	},
+	
+	
+	afterRender: function(component, helper) {
         this.superAfterRender();
-
+		
         helper.addInputDomEvents(component);
     },
     

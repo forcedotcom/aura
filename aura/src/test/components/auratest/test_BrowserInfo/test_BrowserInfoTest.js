@@ -112,7 +112,6 @@
     },
     
     testBrowserInfoIPhone : {
-    	testLabels : ["UnAdaptableTest"],
     	browsers:["IPHONE"],
         test : function(component) {
         	this.assertBrowserProperties(component, {

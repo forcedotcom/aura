@@ -83,7 +83,7 @@ Json.prototype.resolveRefs = function(obj) {
     var config = aura.util.isArray(obj) ? obj : [obj];
     this._resolveRefs(config, {}, null, null);
 
-    $A.endMArk("Json.resolveRefs");
+    $A.endMark("Json.resolveRefs");
 
     return obj;
 };

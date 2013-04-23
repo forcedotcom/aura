@@ -18,9 +18,9 @@
 <aura:component>
     <ui:inputSelect class="single" aura:id="InputSelectSingle">
         <ui:inputSelectOptionGroup label="Mammal">
-            <ui:inputSelectOption text="Tiger"/>
-            <ui:inputSelectOption text="Lion" value="true"/>
-            <ui:inputSelectOption text="Bear"/>
+            <ui:inputSelectOption text="Tiger" label="Tiger"/>
+            <ui:inputSelectOption text="Lion"  label="Lion" value="true"/>
+            <ui:inputSelectOption text="Bear"  label="Bear"/>
         </ui:inputSelectOptionGroup>
         <ui:inputSelectOptionGroup label="Insect">
             <ui:inputSelectOption text="Butterfly"/>
@@ -31,9 +31,9 @@
     <br/>
     <ui:inputSelect multiple="true" class="multiple" size="5" aura:id="InputSelectMultiple" updateOn="blur">
         <ui:inputSelectOptionGroup label="Mammal">
-            <ui:inputSelectOption text="Tiger"/>
-            <ui:inputSelectOption text="Lion" value="true"/>
-            <ui:inputSelectOption text="Bear" value="true"/>
+            <ui:inputSelectOption text="Tiger" label="Tiger"/>
+            <ui:inputSelectOption text="Lion"  label="Lion" value="true"/>
+            <ui:inputSelectOption text="Bear"  label="Bear" value="true"/>
         </ui:inputSelectOptionGroup>
         <ui:inputSelectOptionGroup label="Insect">
             <ui:inputSelectOption text="Butterfly"/>

@@ -18,6 +18,7 @@
      * Verify labelPosition must be one of the following values: 'top', 'right', 'bottom', 'left', 'hidden'
      */
     testThrowLabelPositionError: {
+    	exceptionsAllowedDuringInit : ["labelPosition must be one of the following values: 'top', 'right', 'bottom', 'left', 'hidden'"],
     	test: function(component){
     		var message = aura.util.getElement("auraErrorMessage");
     		var errorMessage = "labelPosition must be one of the following values: 'top', 'right', 'bottom', 'left', 'hidden'";

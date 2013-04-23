@@ -105,6 +105,12 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 						ThemeDef.class);
 		addSourceAutoCleanup(themeDesc,
 				String.format(".%s {font-style:italic;}", className));
+        addSourceAutoCleanup(
+                Aura.getDefinitionService()
+                        .getDefDescriptor(
+                                String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, themeDesc.getNamespace(),
+                                        DefDescriptor.MARKUP_PREFIX, themeDesc.getNamespace()),
+                                NamespaceDef.class),"<aura:namespace/>");
 		open(cmpDesc);
 		assertEquals(
 				"italic",
@@ -358,6 +364,12 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 						ThemeDef.class);
 		addSourceAutoCleanup(themeDesc,
 				String.format(".%s {font-style:italic;}", className));
+        addSourceAutoCleanup(
+                Aura.getDefinitionService()
+                        .getDefDescriptor(
+                                String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, themeDesc.getNamespace(),
+                                        DefDescriptor.MARKUP_PREFIX, themeDesc.getNamespace()),
+                                NamespaceDef.class),"<aura:namespace/>");
 		open(cmpDesc);
 		assertEquals(
 				"italic",

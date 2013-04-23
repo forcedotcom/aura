@@ -28,6 +28,7 @@ exp(p,
     "assertUndefinedOrNull", p.assertUndefinedOrNull,
     "assertNull", p.assertNull,
     "assertNotNull", p.assertNotNull,
+    "assertStartsWith", p.assertStartsWith,
     
     // test flow/state
     "fail", p.fail,

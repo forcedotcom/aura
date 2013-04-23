@@ -34,6 +34,9 @@ Component.prototype.auraType = "Component";
  * @public
  */
 Component.prototype.getDef = function() {
+    if (!this.assertValid()) {
+        return null;
+    }
     return this.priv.componentDef;
 };
 
@@ -45,6 +48,10 @@ Component.prototype.getDef = function() {
  * @protected
  */
 Component.prototype.index = function(localId, globalId){
+    if (!this.assertValid()) {
+        return null;
+    }
+
     var priv = this.priv;
     if (priv.delegateValueProvider){
         return priv.delegateValueProvider.index(localId, globalId);
@@ -83,11 +90,8 @@ Component.prototype.index = function(localId, globalId){
 Component.prototype.deIndex = function(localId, globalId){
     var priv = this.priv;
 
-    if (!priv) {
-//#if {"modes" : ["DEVELOPMENT"]}
-        $A.error("deIndex after destroy on "+globalId+" [ "+localId+" ]");
-//#end
-        return;
+    if (!this.assertValid()) {
+        return null;
     }
 
     if(priv.delegateValueProvider){
@@ -129,6 +133,9 @@ Component.prototype.deIndex = function(localId, globalId){
  * @public
  */
 Component.prototype.find = function(name){
+    if (!this.assertValid()) {
+        return null;
+    }
     if($A.util.isObject(name)){
         var type = name["instancesOf"];
         var instances = [];
@@ -162,7 +169,7 @@ Component.prototype.find = function(name){
 /**
  * Finds attribute values given its component name. Returns the value.
  * @param {Object|String} name
- * @public
+ * @private
  */
 Component.prototype.findValue = function(name){
     var zuper = this;
@@ -194,6 +201,7 @@ Component.prototype.unwrap = function() {
  * @param {Object} type The object type.
  * @param {Array} ret The array of instances to add the located Components to.
  * @param {Object} cmp The component to search for.
+ * @private
  */
 Component.prototype.findInstancesOf = function(type, ret, cmp){
     cmp = cmp || this.getSuperest();
@@ -253,6 +261,9 @@ Component.prototype.findInstanceOf = function(type){
  * @returns {Boolean} true if the component is an instance, or false otherwise.
  */
 Component.prototype.isInstanceOf = function(name){
+    if (!this.assertValid()) {
+        return false;
+    }
     return this.getDef().isInstanceOf(name);
 };
 
@@ -260,6 +271,9 @@ Component.prototype.isInstanceOf = function(name){
  * @param {Object} type Applies the type to its definition.
  */
 Component.prototype.implementsDirectly = function(type){
+    if (!this.assertValid()) {
+        return false;
+    }
     return this.getDef().implementsDirectly(type);
 };
 
@@ -273,6 +287,9 @@ Component.prototype.implementsDirectly = function(type){
  * @public
  */
 Component.prototype.addHandler = function(eventName, valueProvider, actionExpression, insert){
+    if (!this.assertValid()) {
+        return;
+    }
     var dispatcher = this.priv.getEventDispatcher(this);
 
     var handlers = dispatcher[eventName];
@@ -294,6 +311,9 @@ Component.prototype.addHandler = function(eventName, valueProvider, actionExpres
  * @public
  */
 Component.prototype.addValueHandler = function(config){
+    if (!this.assertValid()) {
+        return;
+    }
 
     var value = config["value"];
     if($A.util.isString(value) || value.toString() === "PropertyReferenceValue"){
@@ -325,9 +345,27 @@ Component.prototype.addValueHandler = function(config){
 };
 
 /**
- * Destroys the component and cleans up memory. destroy() destroys the component immediately while destroy(true) destroys it asychronously.
+ * force the final destroy of a component (after async).
+ */
+Component.prototype.finishDestroy = function(){
+    this.destroy(false);
+};
+
+/**
+ * Destroys the component and cleans up memory.
+ *
+ * destroy() destroys the component immediately while destroy(true) destroys it asychronously.
  * See <a href="#help?topic=dynamicCmp"/>Dynamically Creating Components</a> for more information.
- * @param {Boolean} async Set to true if component should be destroyed asychronously. The default value is false.
+ *
+ * Note that when this is called with async = true, it makes a specific race
+ * condition (i.e. calling functions after destroy) harder to trigger. this
+ * means that we really would like to be able to for synchronous behaviour here,
+ * or do something to make the destroy function appear much more like it is
+ * doing a synchronous destroy (e.g. removing this.priv). Unfortunately, the
+ * act of doing an asynchronous destroy creates false 'races' because it leaves
+ * all of the events wired up.
+ *
+ * @param {Boolean} async Set to true if component should be destroyed asychronously. The default value is false
  * @public
  */
 Component.prototype.destroy = function(async){
@@ -340,20 +378,19 @@ Component.prototype.destroy = function(async){
                     element.style.display = "none";
                 }
             }
-
             $A.util.destroyAsync(this);
 
-            return;
+            return null;
         }
+        var priv = this.priv;
 
         this._destroying = true;
         
-        var globalId = this.priv.globalId;
+        var globalId = priv.globalId;
         
         renderingService.unrender(this);
 
         delete this.priv.elements;
-        var priv = this.priv;
 
         priv.deIndex();
         var vp = priv.valueProviders;
@@ -438,7 +475,9 @@ Component.prototype.destroy = function(async){
         delete priv.index;
         delete priv.componentDef;
         delete this.priv;
+        return globalId;
     }
+    return null;
 };
 
 /**
@@ -447,6 +486,9 @@ Component.prototype.destroy = function(async){
  * @protected
  */
 Component.prototype.isRendered = function() {
+    if (!this.assertValid()) {
+        return false;
+    }
     return this.priv.rendered;
 };
 
@@ -456,6 +498,9 @@ Component.prototype.isRendered = function() {
  * @private
  */
 Component.prototype.setUnrendering = function(unrendering) {
+    if (!this.assertValid()) {
+        return;
+    }
     this.priv.inUnrender = unrendering;
 };
 
@@ -466,6 +511,9 @@ Component.prototype.setUnrendering = function(unrendering) {
  * @private
  */
 Component.prototype.isUnrendering = function() {
+    if (!this.assertValid()) {
+        return false;
+    }
     return this.priv.inUnrender;
 };
 
@@ -492,6 +540,9 @@ Component.prototype.getRenderer = function() {
  * @public
  */
 Component.prototype.getGlobalId = function() {
+    if (!this.assertValid()) {
+        return null;
+    }
     return this.priv.globalId;
 };
 
@@ -501,6 +552,9 @@ Component.prototype.getGlobalId = function() {
  * @public
  */
 Component.prototype.getLocalId = function() {
+    if (!this.assertValid()) {
+        return null;
+    }
     return this.priv.localId;
 };
 
@@ -509,6 +563,9 @@ Component.prototype.getLocalId = function() {
  * @public
  */
 Component.prototype.getRendering = function(){
+    if (!this.assertValid()) {
+        return false;
+    }
     var concrete = this.getConcreteComponent();
 
     if(this !== concrete){
@@ -523,6 +580,9 @@ Component.prototype.getRendering = function(){
  * @protected
  */
 Component.prototype.getSuper = function(){
+    if (!this.assertValid()) {
+        return null;
+    }
     return this.priv.superComponent;
 };
 
@@ -535,6 +595,9 @@ Component.prototype.getSuper = function(){
  * @protected
  */
 Component.prototype.associateElement = function(config){
+    if (!this.assertValid()) {
+        return;
+    }
     if (!this.isConcrete()){
         var concrete = this.getConcreteComponent();
         concrete.associateElement(config);
@@ -555,6 +618,9 @@ Component.prototype.associateElement = function(config){
  * @public
  */
 Component.prototype.getElements = function(){
+    if (!this.assertValid()) {
+        return [];
+    }
     if (!this.isConcrete()){
         var concrete = this.getConcreteComponent();
         return concrete.getElements();
@@ -569,6 +635,9 @@ Component.prototype.getElements = function(){
  * @public
  */
 Component.prototype.getElement = function(){
+    if (!this.assertValid()) {
+        return null;
+    }
     var elements = this.getElements();
     if (elements) {
         var ret = elements["element"];
@@ -600,6 +669,9 @@ Component.prototype.getElement = function(){
  * Shorthand : get("v")
  */
 Component.prototype.getAttributes = function() {
+    if (!this.assertValid()) {
+        return null;
+    }
     return this.priv.attributes;
 };
 
@@ -611,6 +683,7 @@ Component.prototype.getAttributes = function() {
  * @public
  */
 Component.prototype.getValue = function(key){
+    // Should we deliberately break here?
     if (!this.isValid() || $A.util.isUndefinedOrNull(key)) {
         return undefined;
     }
@@ -643,7 +716,15 @@ Component.prototype.getValue = function(key){
  * @public
  */
 Component.prototype.setValue = function(key, value){
-    this.getValue(key).setValue(value);
+    if (!this.assertValid()) {
+        return;
+    }
+    var v = this.getValue(key);
+    if ($A.util.isUndefinedOrNull(v)) {
+        $A.error("Invalid key "+key);
+        return;
+    }
+    v.setValue(value);
 };
 
 
@@ -657,6 +738,9 @@ Component.prototype.setValue = function(key, value){
  * @public
  */
 Component.prototype.get = function(key){
+    if (!this.assertValid()) {
+        return;
+    }
     return $A.expressionService.get(this, key);
 };
 
@@ -672,6 +756,9 @@ Component.prototype.getConcreteComponent = function(){
  * @private
  */
 Component.prototype.isConcrete = function() {
+    if (!this.assertValid()) {
+        return false;
+    }
     return !this.priv.concreteComponentId;
 };
 
@@ -689,6 +776,9 @@ Component.prototype.getEventDispatcher = function(){
  * @public
  */
 Component.prototype.getModel = function(){
+    if (!this.assertValid()) {
+        return null;
+    }
     return this.priv.model;
 };
 
@@ -699,6 +789,9 @@ Component.prototype.getModel = function(){
  * @public
  */
 Component.prototype.getEvent = function(name) {
+    if (!this.assertValid()) {
+        return null;
+    }
     /*if (!this.isConcrete()) {
         return this.getConcreteComponent().getEvent(name);
     }*/
@@ -722,7 +815,23 @@ Component.prototype.getEvent = function(name) {
  * @private
  */
 Component.prototype.fire = function(name) {
+    if (!this.assertValid()) {
+        return;
+    }
     BaseValue.fire(name, this, this.getEventDispatcher());
+};
+
+/**
+ * Returns true if the component has not been destroyed.
+ * @private
+ */
+Component.prototype.assertValid = function(){
+    // Maybe this should include '!this._destroying'
+    var valid = !$A.util.isUndefined(this.priv);
+    if (!valid) {
+        $A.error("Invalid component");
+    }
+    return valid;
 };
 
 /**
@@ -842,30 +951,32 @@ Component.prototype.hasEventHandler = function(eventName) {
  * Returns an array of this component's facets, i.e., attributes of type aura://Aura.Component[]
  */
 Component.prototype.getFacets = function() {
-	if (!this.getFacets.cachedFacetNames) {
-		// grab the names of each of the facets from the ComponentDef
-		var facetNames = [];
-		var attributeDefs = this.getDef().getAttributeDefs();
-		
-		attributeDefs.each(function(attrDef) {
-			if (attrDef.getTypeDefDescriptor() === "aura://Aura.Component[]") {
-				facetNames.push(attrDef.getDescriptor().getName());
-			}
-		});
-		
-		// cache the names--they're not going to change
-		this.getFacets.cachedFacetNames = facetNames;
-	}
+    if (!this.assertValid()) {
+        return [];
+    }
+    if (!this.getFacets.cachedFacetNames) {
+        // grab the names of each of the facets from the ComponentDef
+        var facetNames = [];
+        var attributeDefs = this.getDef().getAttributeDefs();
+        
+        attributeDefs.each(function(attrDef) {
+            if (attrDef.getTypeDefDescriptor() === "aura://Aura.Component[]") {
+                facetNames.push(attrDef.getDescriptor().getName());
+            }
+        });
+        
+        // cache the names--they're not going to change
+        this.getFacets.cachedFacetNames = facetNames;
+    }
 
-	// then grab each of the facets themselves
-	var names = this.getFacets.cachedFacetNames;
-	var facets = [];
+    // then grab each of the facets themselves
+    var names = this.getFacets.cachedFacetNames;
+    var facets = [];
 
-	for (var i=0, len=names.length; i<len; i++) {
-		facets.push(this.getValue("v." + names[i]));
-	}
-	
-	return facets;
+    for (var i=0, len=names.length; i<len; i++) {
+        facets.push(this.getValue("v." + names[i]));
+    }
+    return facets;
 };
 
 //#include aura.component.Component_export

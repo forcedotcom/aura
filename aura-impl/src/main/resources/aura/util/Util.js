@@ -1049,9 +1049,11 @@ $A.ns.Util.prototype.emptyComponentTrash = function() {
 
         for (var i = 0, len = this.trashedComponentQueue.length; i < len; i++){
             var cmp = this.trashedComponentQueue[i];
-            if(cmp && cmp.destroy && cmp.isValid()){
-                reaped.push(cmp.getGlobalId());
-                cmp.destroy();
+            if(cmp && cmp.finishDestroy){
+                var gid = cmp.finishDestroy();
+                if (gid !== null) {
+                    reaped.push(gid);
+                }
             }
         }
 

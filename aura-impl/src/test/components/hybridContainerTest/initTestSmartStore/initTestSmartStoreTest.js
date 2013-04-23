@@ -1,5 +1,5 @@
 ({
-    browsers: ['IPADCONTAINER'],
+    browsers: ['IPADCONTAINER', '-FIREFOX', '-GOOGLECHROME', '-SAFARI', '-IE7', '-IE8', '-IE9', '-IE10'],
     
     /**
      * Verify the smartstore adapter is selected for actions when auraStorage:init is used without

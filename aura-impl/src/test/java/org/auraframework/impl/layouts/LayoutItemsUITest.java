@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.auraframework.impl.layouts;
 
 import java.util.concurrent.TimeUnit;
@@ -43,10 +42,14 @@ public class LayoutItemsUITest extends WebDriverTestCase {
         By removeLayoutDone = By.cssSelector(".Remove_Layout_Done");
 
         open("/layoutServiceTest/multipleLayoutItems.app");
-        getDriver().manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+        
+        // might take a while for initial layout to load
+        getDriver().manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
         findDomElement(layoutDone);
         verifyExpectedResultsForInitialLayout();
 
+        // subsequent layouts should NOT take that long to load
+        getDriver().manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         findDomElement(forwardButton).click();
         findDomElement(layoutDone);
         verifyExpectedResultsForLayout1();

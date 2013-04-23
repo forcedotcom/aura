@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,14 +47,11 @@ public class BrowserValueProvider implements GlobalValueProvider {
 
     private Map<String, Object> browserDetails;
 
-    private void parse() {
+    protected Map<String, Object> parse() {
         AuraContext context = Aura.getContextService().getCurrentContext();
         Map<String, Object> m = Maps.newHashMapWithExpectedSize(32);
-        if (context == null) {
-            this.browserDetails = AuraUtil.immutableMap(m);
-            return;
-        }
-        BrowserInfo b = new BrowserInfo(context.getClient().getUserAgent());
+        String ua = context != null ? context.getClient().getUserAgent() : null; 
+        BrowserInfo b = new BrowserInfo(ua);
         m.put(IS_TABLET, b.isTablet());
         m.put(IS_PHONE, b.isPhone());
         m.put(IS_ANDROID, b.isAndroid());
@@ -63,7 +60,7 @@ public class BrowserValueProvider implements GlobalValueProvider {
         m.put(IS_IPAD, b.isIPad());
         m.put(IS_IOS, b.isIOS());
 
-        this.browserDetails = AuraUtil.immutableMap(m);
+        return m;
     }
 
     public BrowserValueProvider() {
@@ -103,7 +100,7 @@ public class BrowserValueProvider implements GlobalValueProvider {
     @Override
     public Map<String, ?> getData() {
         if (browserDetails == null) {
-            parse();
+            browserDetails = AuraUtil.immutableMap(parse());
         }
 
         return browserDetails;

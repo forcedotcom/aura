@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@
    inspectMouseEvent: function(cmp,event) {
 	   
 	 //Get the button value of the pressed button: 0 (left), 1 (middle), or 2 (right)
+	 //To handle a DOM event, use event.button instead of event.getParam 
    	   var buttonValue =  event.getParam("button");
        cmp.find("outputValue").getValue("v.value").setValue(buttonValue);
      }

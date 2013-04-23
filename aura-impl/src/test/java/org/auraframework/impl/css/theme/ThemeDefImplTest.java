@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@ package org.auraframework.impl.css.theme;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.NamespaceDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.*;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext.Access;
@@ -151,7 +149,12 @@ public class ThemeDefImplTest extends AuraImplTestCase {
 		DefDescriptor<ThemeDef> themeDesc = Aura.getDefinitionService()
 				.getDefDescriptor(name, ThemeDef.class);
 		auraTestingUtil.addSourceAutoCleanup(themeDesc, ".THIS {}");
-
+		
+		DefDescriptor<NamespaceDef> namespaceDesc = Aura.getDefinitionService().getDefDescriptor(
+		        String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, themeDesc.getNamespace()), 
+		        NamespaceDef.class);
+		auraTestingUtil.addSourceAutoCleanup(namespaceDesc, "<aura:namespace></aura:namespace>");
+		
 		// need to restart context because old context will not have the new
 		// namespace registered
 		Aura.getContextService().endContext();

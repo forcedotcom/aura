@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,9 +122,9 @@ Component.prototype.deIndex = function(localId, globalId){
 };
 
 /**
- * Locates a component using the localId.
- * Shorthand: get("asdf"), where "asdf" is the aura:id of the component to look for.
+ * Locates a component using the localId. Shorthand: get("asdf"), where "asdf" is the aura:id of the component to look for.
  * See <a href="#help?topic=findById">Finding Components by ID</a> for more information.
+ * Return instances of a component using the format cmp.find({ instancesOf : "auradocs:sampleComponent" }).
  * @param {String|Object} name If name is an object, return instances of it. Otherwise, finds a component using its index.
  * @public
  */
@@ -183,7 +183,7 @@ Component.prototype.findValue = function(name){
 };
 
 /**
- * Returns the Component instance.
+ * Returns the Component instance. For example, component.getValue("v.metadata").unwrap().
  */
 Component.prototype.unwrap = function() {
     return this;
@@ -325,7 +325,9 @@ Component.prototype.addValueHandler = function(config){
 };
 
 /**
- * Destroys the component and cleans up memory.
+ * Destroys the component and cleans up memory. destroy() destroys the component immediately while destroy(true) destroys it asychronously.
+ * See <a href="#help?topic=dynamicCmp"/>Dynamically Creating Components</a> for more information.
+ * @param {Boolean} async Set to true if component should be destroyed asychronously. The default value is false.
  * @public
  */
 Component.prototype.destroy = function(async){
@@ -451,7 +453,7 @@ Component.prototype.isRendered = function() {
 /**
  * Returns true if this component has been rendered but not unrendered
  * (does not necessarily mean component is in the dom tree).
- * @protected
+ * @private
  */
 Component.prototype.setUnrendering = function(unrendering) {
     this.priv.inUnrender = unrendering;
@@ -461,7 +463,7 @@ Component.prototype.setUnrendering = function(unrendering) {
 /**
  * Returns true if this component has been rendered but not unrendered
  * (does not necessarily mean component is in the dom tree).
- * @protected
+ * @private
  */
 Component.prototype.isUnrendering = function() {
     return this.priv.inUnrender;
@@ -527,7 +529,7 @@ Component.prototype.getSuper = function(){
 /*jslint sub: true */
 /**
  * Associates a rendered element with the component that rendered it for later lookup.
- * Also adds the rendering component's global id as an attribute to the rendered element.
+ * Also adds the rendering component's global Id as an attribute to the rendered element.
  * Primarily called by RenderingService.
  * @param {Object} config
  * @protected
@@ -717,7 +719,7 @@ Component.prototype.getEvent = function(name) {
 };
 
 /**
- * @protected
+ * @private
  */
 Component.prototype.fire = function(name) {
     BaseValue.fire(name, this, this.getEventDispatcher());
@@ -741,6 +743,7 @@ Component.prototype.toString = function(){
 
 /**
  * Returns component serialized as Json string
+ * @private
  */
 Component.prototype.toJSON = function(){
 

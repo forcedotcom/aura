@@ -1,6 +1,6 @@
 <!--
 
-    Copyright (C) 2012 salesforce.com, inc.
+    Copyright (C) 2013 salesforce.com, inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -16,18 +16,20 @@
 
 -->
 
-<aura:component>
+<aura:component model="java://org.auraframework.component.ui.MenuTestModel">
 
 <h1>label separete from input with raw string id association</h1>
 	<table>
+	<tbody>
 	<tr><td>
-		<ui:label for="myrawid" label="My Input Text" />
+		<ui:label aura:id="rawStringLabel" for="myrawid" label="My Input Text" />
 		</td>
 	</tr>
 	<tr><td>
-		<ui:inputText domId="myrawid" value="I'm an inputText"/>	
+		<ui:inputText aura:id="rawStringinput" domId="myrawid" value="I'm an inputText"/>	
 	</td>
 	</tr>
+	</tbody>
 	</table>
 
 <hr />
@@ -37,38 +39,44 @@
 <ui:inputText value="my input" />
 </ui:label>	
 	
- <hr />
+<hr />
 <h1>label separete from input</h1>
 	<table>
+	<tbody>
 	<tr><td>
-		<ui:label for="myinputtext" label="My Input Text" />
+		<ui:label for="myinputtext" label="My Input Text" aura:id="myinputtextLabel"/>
 		</td>
 	</tr>
 	<tr><td>
 		<ui:inputText aura:id="myinputtext" value="I'm an inputText"/>	
 	</td>
 	</tr>
+	</tbody>
 	</table>
 	 
 <hr />
 <h1>hidden label separete from input</h1>
 	<table>
+	<tbody>
 	<tr><td>
-		<ui:label labelDisplay="false" for="myinputtext" label="My Input Text" />
+		<ui:label aura:id="myHiddenLabel" labelDisplay="false" for="myHiddeninputtext" label="My Input Text" />
 		</td>
 	</tr>
 	<tr><td>
-		<ui:inputText aura:id="myinputtext" value="I'm an inputText"/>	
+		<ui:inputText aura:id="myHiddeninputtext" value="I'm an inputText"/>	
 	</td>
 	</tr>
+	</tbody>
 	</table>
-	
-
-          
+<hr />
+<h1>Input's created by iteration</h1>
+	<aura:iteration items="{!m.iterationItems}" var="item">
+		<ui:inputText label="{!item.label}" value="{!item.value}" aura:id="iteration"/>
+	</aura:iteration>
 <hr />
 <h1>label with default position</h1>
 
-	<ui:inputCheckbox label="inputCheckbox" value="false"/>
+	<ui:inputCheckbox label="inputCheckbox" value="false" aura:id="defaultPosition"/>
 	<ui:inputDate label="inputDate" value="I'm an inputDate"/>
 	<ui:inputDateTime label="inputDateTime" value="I'm an inputDateTime"/>
 	<ui:inputNumber label="inputNumber" value="42"/>
@@ -89,16 +97,12 @@
    
    
    <ui:inputPercent label="inputPercent" value="42"/>
-   <ui:inputCurrency  label="inputCurrency" value="42"/>
-   
-   <ui:inputRichText value="I'm an inputRichText"/>
-      
-   <ui:inputFile value="I'm an inputFile"/>
+   <ui:inputCurrency  label="inputCurrency" value="42" labelPosition="left" aura:id="leftPosition"/>
    
 <hr />   
 <h1>label with top position</h1>
 
-	<ui:inputCheckbox label="inputCheckbox" labelPosition="top" value="false"/>
+	<ui:inputCheckbox label="inputCheckbox" labelPosition="top" value="false" aura:id="topPosition"/>
 	<ui:inputDate label="inputDate" labelPosition="top" value="I'm an inputDate"/>
 	<ui:inputDateTime label="inputDateTime" labelPosition="top" value="I'm an inputDateTime"/>
 	<ui:inputNumber label="inputNumber" labelPosition="top" value="42"/>
@@ -119,14 +123,10 @@
    <ui:inputPercent label="inputPercent" labelPosition="top" value="42"/>
    <ui:inputCurrency  label="inputCurrency" labelPosition="top" value="42"/>
    
-   <ui:inputRichText value="I'm an inputRichText"/>
-   <ui:inputFile value="I'm an inputFile"/>   
-
-
 <hr />
 <h1>label with right position</h1>
 
-	<ui:inputCheckbox label="inputCheckbox" labelPosition="right" value="false"/>
+	<ui:inputCheckbox label="inputCheckbox" labelPosition="right" value="false" aura:id="rightPosition"/>
 	<ui:inputDate label="inputDate" labelPosition="right" value="I'm an inputDate"/>
 	<ui:inputDateTime label="inputDateTime" labelPosition="right" value="I'm an inputDateTime"/>
 	<ui:inputNumber label="inputNumber" labelPosition="right" value="42"/>
@@ -148,13 +148,10 @@
    <ui:inputPercent label="inputPercent" labelPosition="right" value="42"/>
    <ui:inputCurrency  label="inputCurrency" labelPosition="right" value="42"/>
       
-   <ui:inputRichText value="I'm an inputRichText"/>
-   <ui:inputFile value="I'm an inputFile"/>     
-   
 <hr />
 <h1>label with bottom position</h1>
 
-	<ui:inputCheckbox label="inputCheckbox" labelPosition="bottom" value="false"/>
+	<ui:inputCheckbox label="inputCheckbox" labelPosition="bottom" value="false" aura:id="bottomPosition"/>
 	<ui:inputDate label="inputDate" labelPosition="bottom" value="I'm an inputDate"/>
 	<ui:inputDateTime label="inputDateTime" labelPosition="bottom" value="I'm an inputDateTime"/>
 	<ui:inputNumber label="inputNumber" labelPosition="bottom" value="42"/>
@@ -175,9 +172,4 @@
       
    <ui:inputPercent label="inputPercent" labelPosition="bottom" value="42"/>
    <ui:inputCurrency  label="inputCurrency" labelPosition="bottom" value="42"/>
-      
-   <ui:inputRichText value="I'm an inputRichText"/>
-   <ui:inputFile value="I'm an inputFile"/>     
-      
-   
 </aura:component>

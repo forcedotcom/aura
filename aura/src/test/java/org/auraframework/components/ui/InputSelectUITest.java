@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
 
 public class InputSelectUITest extends WebDriverTestCase {
@@ -40,7 +41,7 @@ public class InputSelectUITest extends WebDriverTestCase {
 
         open("/uitest/inputSelect_OptionsInBody.cmp");
         WebElement inputSelectElement = d.findElement(By.cssSelector(selectLocator));
-        Select inputSelect = new Select(inputSelectElement);
+        final Select inputSelect = new Select(inputSelectElement);
 
         // Assert element visible
         assertTrue("InputSelect not visible", inputSelectElement.isDisplayed());
@@ -54,14 +55,24 @@ public class InputSelectUITest extends WebDriverTestCase {
         // Change selection
         inputSelectElement.click();
         inputSelect.selectByValue("Bear");
-        assertFalse("Lion should not be selected any longer", inputSelect.getOptions().get(1).isSelected());
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>(){
+            @Override
+            public Boolean apply(WebDriver input) {
+                return !inputSelect.getOptions().get(1).isSelected();
+            }
+        });
         assertTrue("Bear should be selected", inputSelect.getOptions().get(2).isSelected());
         assertEquals("InputSelect Component is not returning the selected value correctly", "Bear", inputSelect
                 .getOptions().get(2).getText());
 
         inputSelectElement.click();
         inputSelect.selectByValue("Dragonfly");
-        assertFalse("Bear should not be selected any longer", inputSelect.getOptions().get(2).isSelected());
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>(){
+            @Override
+            public Boolean apply(WebDriver input) {
+                return !inputSelect.getOptions().get(2).isSelected();
+            }
+        });
         assertTrue("Dragonfly should be selected", inputSelect.getOptions().get(4).isSelected());
         assertEquals("InputSelect Component is not returning the selected value correctly", "Dragonfly", inputSelect
                 .getOptions().get(4).getText());

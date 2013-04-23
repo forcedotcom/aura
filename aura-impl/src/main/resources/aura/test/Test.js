@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /*jslint evil:true, sub:true */
 
 var Test = function(){
@@ -89,12 +88,14 @@ var Test = function(){
 		 * @param {String}
 		 *            descriptor The descriptor for the action - e.g. java://my.own.Controller/ACTION$doIt
 		 * @param {Object}
-		 *            params The parameters to pass to the action
+		 *            params The parameters to pass to the action, as a Map (name:value)
+		 * @param {Object}
+		 *            returnType The return type descriptor for the action, e.g. java://java.lang.String
 		 * @param {function}
 		 *            callback An optional callback to execute with the component as the scope
 		 * @returns {Action} an instance of the action
 		 */
-        getExternalAction : function(component, descriptor, params, callback) {
+        getExternalAction : function(component, descriptor, params, returnType, callback) {
         	var paramDefs = [];
         	for (var k in params) {
         		if (k === 'length' || !params.hasOwnProperty(k)) {
@@ -106,7 +107,8 @@ var Test = function(){
             	"name" : descriptor,
             	"descriptor" : descriptor,
             	"actionType" : "SERVER",
-            	"params" : paramDefs
+            	"params" : paramDefs,
+            	"returnType" : returnType
             });
         	var action = def.newInstance(component);
         	action.setParams(params);
@@ -755,22 +757,7 @@ var Test = function(){
         * @returns {Object} The element denoting the class, or null if none is found.
         */
         getElementByClass : function(classname){
-            var ret;
-
-            if(document.getElementsByClassName){
-                ret = document.getElementsByClassName(classname);
-            }
-
-            else if(document.querySelectorAll){
-                ret = document.querySelectorAll("." + classname);
-            } else {
-                ret = aura.test.getElementsByClassNameCustom(classname);
-            }
-
-            if (ret && ret.length > 0) {
-                return ret[0];
-            }
-            return null;
+            return $A.util.getElementByClass(classname);
         },
 
         /**
@@ -794,41 +781,6 @@ var Test = function(){
             } else {
                 element.fireEvent("on" + event.eventType, event);
             }
-        },
-
-        /**
-         * Used by getElementsByClassNameCustom for IE7
-         * @private
-         */	
-        walkTheDOM: function (node, func) {
-          func(node);
-          node = node.firstChild;
-          while (node) {
-            aura.test.walkTheDOM(node, func);
-            node = node.nextSibling;
-          }
-        },
-
-        /**
-         * custom util to get element by class name for IE7
-         * @private
-         */
-        getElementsByClassNameCustom: function (className) {
-            var results = [];
-            aura.test.walkTheDOM(document.body, function(node) {
-                var a, c = node.className,
-                    i;
-                if (c) {
-                    a = c.split(' ');
-                    for (i = 0; i < a.length; i++) {
-                        if (a[i] === className) {
-                            results.push(node);
-                            break;
-                        }
-                    }
-                }
-            });
-            return results;
         },
 
         isInstanceOfText: function(node){

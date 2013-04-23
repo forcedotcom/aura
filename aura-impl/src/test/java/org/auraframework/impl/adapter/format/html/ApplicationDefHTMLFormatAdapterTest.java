@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -160,6 +160,10 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         DefDescriptor<ThemeDef> themeDesc = Aura.getDefinitionService().getDefDescriptor("templateCss://string.thing"+System.currentTimeMillis()+"template", 
                 ThemeDef.class);
         auraTestingUtil.addSourceAutoCleanup(themeDesc, css);
+        DefDescriptor<NamespaceDef> namespaceDesc = Aura.getDefinitionService().getDefDescriptor(
+                String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, themeDesc.getNamespace()), 
+                NamespaceDef.class);
+        auraTestingUtil.addSourceAutoCleanup(namespaceDesc, "<aura:namespace></aura:namespace>");
         String templateCss = String.format("%s://%s.%s",DefDescriptor.TEMPLATE_CSS_PREFIX,themeDesc.getNamespace(), themeDesc.getName());
         String templateMarkup = String.format(baseComponentTag, 
                 "theme='"+templateCss+"'  isTemplate='false'  extends='aura:template' ", "");

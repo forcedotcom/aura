@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,13 @@ public class AuradocsExampleUITest extends WebDriverTestCase {
 
     public AuradocsExampleUITest(String name) {
         super(name);
+    }
+
+    public void testDoNothing() {
+        // This test exists to prevent JUnit from whining about an empty test,
+        // until the "real" methods below are re-enabled. Right now, they're
+        // stalled for browser compatibility issues and server OOM (due to
+        // auradocs app).
     }
 
     public void _testAddClassTopicExampleProd() throws Exception {

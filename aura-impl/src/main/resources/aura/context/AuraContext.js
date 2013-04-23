@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -271,7 +271,7 @@ AuraContext.prototype.joinGlobalValueProviders = function(gvps, doNotPersist) {
                 this.globalValueProviders[t] = gvp;
             } else {
                 var mergeMap = new MapValue(newGvp["values"]);
-                gvp.merge(mergeMap, false);
+                gvp.merge(mergeMap, true);
             }
 
             if (storage) {

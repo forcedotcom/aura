@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 salesforce.com, inc.
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,6 +159,19 @@ $A.ns.Util.prototype.getElement = function(id){
     return document.getElementById(id);
 };
 
+/**
+ * Return attributeValue of an element
+ * @param {HTMLElement} element The element from which to retrieve data.
+ * @param {String} attributeName The name of attribute to look up on element.
+ */
+$A.ns.Util.prototype.getElementAttributeValue = function(element,attributeName){
+	var attrValue = element.getAttribute(attributeName);
+	//For browser Compatibility - getAttribute doesn't always work in IE
+	if(this.isUndefinedOrNull(attrValue)){
+		attrValue = element.attributes[attributeName].nodeValue;
+	}
+	return attrValue;
+};
 
 /**
  * Checks whether the element has the specified class.
@@ -891,7 +904,6 @@ $A.ns.Util.prototype.getDataAttribute = function(element, key) {
     }
 
     key = this.getDataAttributeName(key);
-
     return element.getAttribute(key);
 };
 
@@ -1119,7 +1131,92 @@ $A.ns.Util.prototype.getWindowSize = function() {
         height : window.innerHeight || document.body.clientHeight || 0
     };
 };
+/**
+ * Used by getElementsByClassNameCustom for IE7
+ * @private
+ */	
+$A.ns.Util.prototype.walkTheDOM = function (node, func) {
+  func(node);
+  node = node.firstChild;
+  while (node) {
+   this.walkTheDOM(node, func);
+    node = node.nextSibling;
+  }
+};
 
+/**
+ * custom util to get element by class name for IE7
+ * @private
+ */
+$A.ns.Util.prototype.getElementsByClassNameCustom = function (className) {
+    var results = [];
+    this.walkTheDOM(document.body, function(node) {
+        var a, c = node.className,
+            i;
+        if (c) {
+            a = c.split(' ');
+            for (i = 0; i < a.length; i++) {
+                if (a[i] === className) {
+                    results.push(node);
+                    break;
+                }
+            }
+        }
+    });
+    return results;
+};
+/**
+ * Gets the first element on the page that have the specified class name.
+ * @param {String} classname The CSS class name.
+ * @returns {Object} The element denoting the class, or null if none is found.
+ */
+$A.ns.Util.prototype.getElementByClass = function(classname){
+     var ret = this.getElementsByClass(classname);
+     
+     if (ret && ret.length > 0) {
+         return ret[0];
+     }
+     
+     return null;
+};
+/**
+ * Gets all of the elements on the page that have the specified class name.
+ * @param {String} classname The CSS class name.
+ * @returns {Object} The element denoting the class, or null if none is found.
+ */
+$A.ns.Util.prototype.getElementsByClass = function(classname){
+     var ret;
+
+     if(document.getElementsByClassName){
+         ret = document.getElementsByClassName(classname);
+     }
+
+     else if(document.querySelectorAll){
+         ret = document.querySelectorAll("." + classname);
+     } else {
+         ret = this.getElementsByClassNameCustom(classname);
+     }
+     
+     if (ret && ret.length > 0) {
+         return ret;
+     }
+     return null;
+ };
+ 
+ /**
+  * Gets the first element on the page that have the specified class name.
+  * @param {String} classname The CSS class name.
+  * @returns {Object} The element denoting the class, or null if none is found.
+  */
+ $A.ns.Util.prototype.getElementByClass = function(classname){
+      var ret = this.getElementsByClass(classname);
+      
+      if (ret && ret.length > 0) {
+          return ret[0];
+      }
+      
+      return null;
+ };
 /**
  * Checks if the object is an aura component via auraType property.
  *
@@ -1129,5 +1226,5 @@ $A.ns.Util.prototype.getWindowSize = function() {
 $A.ns.Util.prototype.isComponent = function(obj) {
     return (!this.isUndefinedOrNull(obj) && !this.isUndefinedOrNull(obj.auraType) && obj.auraType === 'Component');
 };
-
+ 
 //#include aura.util.Util_export

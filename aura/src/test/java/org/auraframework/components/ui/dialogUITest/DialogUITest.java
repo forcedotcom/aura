@@ -98,7 +98,7 @@ public class DialogUITest  extends WebDriverTestCase {
     /***********************************************************************************************
      *******************************MODAL DIALOG BOX CHECK******************************************
      ***********************************************************************************************/
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.GOOGLECHROME, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testDialogModalEnterDefaultSubmit() throws MalformedURLException, URISyntaxException{
         open(URL_MODAL);
         
@@ -123,7 +123,7 @@ public class DialogUITest  extends WebDriverTestCase {
         assertEquals("The enter button did not act as default submit", SUBMITTED, element.getAttribute("value"));
     }
     //Test making sure that focus stays in the modal
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.GOOGLECHROME, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testDialogModalFocusOnDialogBox() throws MalformedURLException, URISyntaxException{
         open(URL_MODAL);  
         WebDriver driver = getDriver();
@@ -141,7 +141,7 @@ public class DialogUITest  extends WebDriverTestCase {
     }
      
     /*Check if focus is returned to the Button that called dialog box did not actually lose focus to begin with*/
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.GOOGLECHROME, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testDialogModalFocusOnExit() throws MalformedURLException, URISyntaxException{
         open(URL_MODAL);
         
@@ -161,7 +161,7 @@ public class DialogUITest  extends WebDriverTestCase {
     }
     
     //Check if escape button exits with submitting
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.GOOGLECHROME, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testDialogModalEscapeButton() throws MalformedURLException, URISyntaxException{
         open(URL_MODAL);
         
@@ -181,7 +181,7 @@ public class DialogUITest  extends WebDriverTestCase {
     }
     
     //Making sure that tabing through the dialog box does not exit out
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testDialogModalTab() throws MalformedURLException, URISyntaxException, InterruptedException{
         open(URL_MODAL);
         
@@ -205,7 +205,7 @@ public class DialogUITest  extends WebDriverTestCase {
        }
     
     //Checking if Shift-Tab will close the dialog box
-    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testDialogModalShiftTab() throws MalformedURLException, URISyntaxException{
         open(URL_MODAL);
         

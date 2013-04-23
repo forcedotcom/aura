@@ -54,6 +54,4 @@ exp(p,
     "squash", p.squash,
     "getWindowSize", p.getWindowSize,
     "isComponent", p.isComponent,
-    "getElementByClass", p.getElementByClass,
-    "getElementsByClass", p.getElementsByClass
 );

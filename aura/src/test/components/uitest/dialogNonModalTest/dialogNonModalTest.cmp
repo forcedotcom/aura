@@ -24,17 +24,17 @@
         <aura:set attribute="buttons">
            <ui:dialogButtons defaultButtons="both"/>
         </aura:set>
-        <span class="menuItem" aura:id="checkboxes">
-             <ui:inputCheckbox name ="Pudding" class="checkBox1" value="false"/>Pudding
-             <ui:inputCheckbox name ="Puppies" class="checkBox2" value="false"/>Puppies
-             <ui:inputCheckbox name ="Bananas" class="checkBox3" value="false"/>Bananas       
-             <ui:inputCheckbox name ="Owls" class="checkBox4" value="false"/>Owls       
-             <ui:inputCheckbox name ="Cheese" class="checkBox5" value="false"/>Cheese         
-             <ui:inputCheckbox name ="Koala" class="checkBox6" value="false"/>Koala      
-             <ui:inputCheckbox name ="Water Bottles" class="checkBox7" value="false"/>Water Bottles         
-             <ui:inputCheckbox name ="Coffee" class="checkBox8" value="false"/>Coffee       
-             <ui:inputCheckbox name ="Computers" class="checkBox9" value="false"/>Computers         
-             <ui:inputCheckbox name ="Nerds" class="checkBox10" value="false"/>Nerds
+        <span class="menuItem">
+             <ui:inputCheckbox aura:id="checkbox" name ="Pudding"        value="false"/>Pudding
+             <ui:inputCheckbox aura:id="checkbox" name ="Puppies"        value="false"/>Puppies
+             <ui:inputCheckbox aura:id="checkbox" name ="Bananas"        value="false"/>Bananas       
+             <ui:inputCheckbox aura:id="checkbox" name ="Owls"           value="false"/>Owls       
+             <ui:inputCheckbox aura:id="checkbox" name ="Cheese"         value="false"/>Cheese         
+             <ui:inputCheckbox aura:id="checkbox" name ="Koala"          value="false"/>Koala      
+             <ui:inputCheckbox aura:id="checkbox" name ="Water Bottles"  value="false"/>Water Bottles         
+             <ui:inputCheckbox aura:id="checkbox" name ="Coffee"         value="false"/>Coffee       
+             <ui:inputCheckbox aura:id="checkbox" name ="Computers"      value="false"/>Computers         
+             <ui:inputCheckbox aura:id="checkbox" name ="Nerds"          value="false"/>Nerds
         </span>
     </ui:dialog> 
 </aura:component>

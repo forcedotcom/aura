@@ -363,6 +363,29 @@ var Test = function(){
         },
 
         /**
+         * Assert that the a string starts with another.
+         * @param {Object} start 
+         * 				The start string.
+         * @param {Object} full
+         * 				The string that is expected to start with the start string
+         * @param {String} assertMessage
+         * 				The message that is returned if the two values are not equal
+         */
+        assertStartsWith : function(start, full, assertMessage){
+            if(full.indexOf(start) !== 0){
+                if(!assertMessage){
+                    assertMessage = "StartsWith: ";
+                }
+                var fullStart = full;
+                if (fullStart.length > start.length+20) {
+                    fullStart = fullStart.substring(0, start.length+20);
+                }
+                assertMessage += "\nExpected: {"+start +"} but Actual: {"+fullStart+"}";
+                throw new Error(assertMessage);
+            }
+        },
+
+        /**
          * Complement of assertEquals, throws Error if arg1===arg2.
          * @param {Object} arg1
          * 				The argument to evaluate against arg2

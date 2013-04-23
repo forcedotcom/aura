@@ -483,9 +483,18 @@ $A.ns.Aura.prototype.error = function(e, stopTest) {
     var str = "";
     if ($A.util.isString(e)) {
         str = e;
+        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+        try {
+            throw Error("stack")
+        } catch (getstack) {
+            str = e + "\n" + getstack.stack;
+            $A.log(getstack.stack);
+        }
+        //#end
         // we treat error objects differently from object object, isObject means is it a map
     } else if ($A.util.isObject(e) || $A.util.isError(e)) {
-        for ( var k in e) {
+        // we treat error objects differently from object object, isObject means is it a map
+        for(var k in e) {
             try {
                 var val = e[k];
 
@@ -503,13 +512,7 @@ $A.ns.Aura.prototype.error = function(e, stopTest) {
         $A.log("Unrecognized parameter to aura.error", e);
         return;
     }
-
-    var message = $A.util.getElement("auraErrorMessage");
-    message.innerHTML = "";
-    message.appendChild(document.createTextNode(str));
-
-    $A.util.removeClass(document.body, "loading");
-    $A.util.addClass(document.body, "auraError");
+    $A.message(str);
 
     if ($A.test && stopTest) {
         $A.test.fail(str);
@@ -527,7 +530,12 @@ $A.ns.Aura.prototype.error = function(e, stopTest) {
  * @param {String} msg The alert message to display.
  */
 $A.ns.Aura.prototype.message = function(msg) {
-    alert(msg);
+    var message = $A.util.getElement("auraErrorMessage");
+    message.innerHTML = "";
+    message.appendChild(document.createTextNode(msg));
+    
+    $A.util.removeClass(document.body, "loading");
+    $A.util.addClass(document.body, "auraError");
 };
 
 /**

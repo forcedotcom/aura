@@ -260,7 +260,7 @@
 				
 				$A.test.fail("Expected an exception when trying to store an item bigger than maxSize");
 			} catch (e) {
-				$A.test.assertEquals("MemoryStorageAdapter.setItem() cannot store an item over the maxSize", e.message);
+				$A.test.assertStartsWith("MemoryStorageAdapter.setItem() cannot store an item over the maxSize", e.message);
 			}
 			
 			$A.test.assertEquals(0, this.adapter.getSize());

@@ -28,7 +28,7 @@ import org.auraframework.util.AuraLocale;
 public class LocalizationAdapterImpl implements LocalizationAdapter {
     
     /**
-     * Temporary workaround for localized labels for Auara Standalone
+     * Temporary workaround for localized labels for Aura Standalone
      */
     private static Map<String, Map<String, String>> labels = new HashMap<String, Map<String, String>>();
     static {
@@ -37,6 +37,7 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
         todayLabels.put("cs", "Dnes");
         todayLabels.put("de", "Heute");
         todayLabels.put("en", "Today");
+        todayLabels.put("en_US", "Today");
         todayLabels.put("es", "Hoy");
         todayLabels.put("fr", "aujourd'hui");
         todayLabels.put("ja", "今日");

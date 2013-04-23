@@ -19,14 +19,14 @@
 	 * Return labelId for label
 	 */
 	getLabelIdValue: function(labelElement){
-		return $A.util.getElementAttributeValue(labelElement,"for");
+		return $A.test.getElementAttributeValue(labelElement,"for");
     },
     
     /**
      * Return Id for input
      */
     getInputIdValue: function(inputElement){
-        return $A.util.getElementAttributeValue(inputElement,"id");
+        return $A.test.getElementAttributeValue(inputElement,"id");
     },
     
     /**

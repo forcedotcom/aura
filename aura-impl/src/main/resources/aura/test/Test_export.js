@@ -59,6 +59,7 @@ exp(p,
     "isInstanceOfImageElement", p.isInstanceOfImageElement,
     "isInstanceOfDivElement", p.isInstanceOfDivElement,
     "isInstanceOf", p.isInstanceOf,
+    "getElementAttributeValue", p.getElementAttributeValue,
     
     // javascript
     "getPrototype", p.getPrototype,

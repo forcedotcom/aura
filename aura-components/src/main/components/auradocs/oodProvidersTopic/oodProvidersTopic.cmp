@@ -89,7 +89,8 @@ public class SampleConfigProvider implements ComponentConfigProvider {
         <auradocs:topicLink topic="oodCmpAbstract">Abstract Components</auradocs:topicLink><br/>
         <auradocs:topicLink topic="oodInterfaces">Interfaces</auradocs:topicLink><br/>
         <auradocs:topicLink topic="javaDefDesc">Getting a DefDescriptor</auradocs:topicLink><br/>
-        <auradocs:topicLink topic="tagDependency">aura:dependency</auradocs:topicLink>
+        <auradocs:topicLink topic="tagDependency">aura:dependency</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="testsMockProvider">Mocking Java Providers</auradocs:topicLink>
     </p>
 
 </aura:component>

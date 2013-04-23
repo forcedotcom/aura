@@ -127,6 +127,12 @@
                     <auradocs:contentsNode text="Assertions" id="testsAssert" />
                     <auradocs:contentsNode text="Utility Functions" id="testsUtility" />
                     <auradocs:contentsNode text="Sample Test Cases" id="testsCases" />
+	                <auradocs:contentsNode text="Mocking Java Classes in JavaScript Tests" >
+	                    <auradocs:contentsNode text="Introduction" id="testsMockJava" />
+	                    <auradocs:contentsNode text="Mocking Java Models" id="testsMockModel" />
+	                    <auradocs:contentsNode text="Mocking Java Providers" id="testsMockProvider" />
+	                    <auradocs:contentsNode text="Mocking Java Actions" id="testsMockAction" />
+	                </auradocs:contentsNode>
                 </auradocs:contentsNode>
                 <auradocs:contentsNode text="Value Objects" >
                     <auradocs:contentsNode text="Introduction" id="valueObjects" />

@@ -89,7 +89,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 		openNoAura(url);
 		assertEquals("hi", getText(By.cssSelector("body")));
 		updateStringSource(cmpDesc, String.format(baseComponentTag, "", "bye"));
-		openNoAura(url);
+        // Firefox caches the response so we need to manually include a nonce to effect a reload
+        openNoAura(url + "?nonce=" + System.nanoTime());
 		auraUITestingUtil.waitForElementText(By.cssSelector("body"), "bye", true);
 	}
 
@@ -283,7 +284,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 		updateStringSource(
 				interfaceDesc,
 				"<aura:interface support='GA' description=''><aura:attribute name='entrance' type='String' default='secret'/></aura:interface>");
-		openNoAura(url);
+        // Firefox caches the response so we need to manually include a nonce to effect a reload
+		openNoAura(url + "?nonce=" + System.nanoTime());
         auraUITestingUtil.waitForElementText(By.cssSelector("body"), "secret", true);
 	}
 

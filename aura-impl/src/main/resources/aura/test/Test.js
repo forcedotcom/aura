@@ -838,6 +838,21 @@ var Test = function(){
                 return result;
             }
         },
+        
+
+        /**
+         * Return attributeValue of an element
+         * @param {HTMLElement} element The element from which to retrieve data.
+         * @param {String} attributeName The name of attribute to look up on element.
+         */
+        getElementAttributeValue:function(element,attributeName){
+        	var attrValue = element.getAttribute(attributeName);
+        	//For browser Compatibility - getAttribute doesn't always work in IE
+        	if($A.util.isUndefinedOrNull(attrValue)){
+        		attrValue = element.attributes[attributeName].nodeValue;
+        	}
+        	return attrValue;
+        },
 
         // Used by tests to modify framework source to trigger JS last mod update
         /** @ignore */

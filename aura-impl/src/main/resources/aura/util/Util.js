@@ -160,20 +160,6 @@ $A.ns.Util.prototype.getElement = function(id){
 };
 
 /**
- * Return attributeValue of an element
- * @param {HTMLElement} element The element from which to retrieve data.
- * @param {String} attributeName The name of attribute to look up on element.
- */
-$A.ns.Util.prototype.getElementAttributeValue = function(element,attributeName){
-	var attrValue = element.getAttribute(attributeName);
-	//For browser Compatibility - getAttribute doesn't always work in IE
-	if(this.isUndefinedOrNull(attrValue)){
-		attrValue = element.attributes[attributeName].nodeValue;
-	}
-	return attrValue;
-};
-
-/**
  * Checks whether the element has the specified class.
  * @param {Object} element The element to check for.
  * @param {String} clz The CSS class name to check for.

@@ -423,15 +423,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     private void assertRequests(List<Request> expected, List<Request> actual) throws Exception {
-        System.out.println(">>> assertRequests: ");
-        System.out.println("EXPECTED:");
-        for (Request r : expected) {
-            System.out.println("E: " + r);
-        }
-        System.out.println("ACTUAL:");
-        for (Request r : actual) {
-            System.out.println("A: " + r);
-        }
+        boolean failed;
+
         List<Request> unexpectedRequests = Lists.newArrayList();
         List<Request> expectedRequests = Lists.newArrayList(expected);
         List<Request> missingRequests = Lists.newArrayList();
@@ -452,7 +445,20 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                 missingRequests.add(r);
             }
         }
-        if (unexpectedRequests.size() > 0 || missingRequests.size() > 0) {
+
+        failed = unexpectedRequests.size() > 0 || missingRequests.size() > 0;
+
+        System.out.println(">>> assertRequests: ");
+        System.out.println("EXPECTED:");
+        for (Request r : expected) {
+            System.out.println("E: " + r);
+        }
+        System.out.println("ACTUAL:");
+        for (Request r : actual) {
+            r.setShowExtras(failed);
+            System.out.println("A: " + r);
+        }
+        if (failed) {
             StringBuffer sb = new StringBuffer();
             String separator = "";
 
@@ -617,6 +623,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         private final int fudge;
         private int count = 0;
+        private Map<String,String> extras = null;
+        private boolean showExtras = false;
 
         Request(int fudge, String URI, String tag, String namespaces, String format, int status) {
             super();
@@ -646,6 +654,11 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         public String put(String k, String v) {
             if (validKeys.contains(k)) {
                 return super.put(k, v);
+            } else {
+                if (extras == null) {
+                    extras = new HashMap<String,String>();
+                }
+                extras.put(k,v);
             }
             return null;
         }
@@ -670,6 +683,19 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
             } else {
                 count += 1;
                 return count > fudge;
+            }
+        }
+
+        public void setShowExtras(boolean value) {
+            this.showExtras = value;
+        }
+
+        @Override
+        public String toString() {
+            if (extras == null || !showExtras) {
+                return super.toString();
+            } else {
+                return super.toString() + String.valueOf(extras);
             }
         }
     }

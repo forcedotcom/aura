@@ -51,19 +51,54 @@ var AuraExpressionService = function AuraExpressionService(){
             }
             var propRef = expression;
             var value = valueProvider;
+            var isLabel = false;
             while (!aura.util.isUndefinedOrNull(propRef)) {
                 var root = propRef.getRoot();
                 value = value.getValue(root);
                 if (!value) {
+                	if (root === "$Label") {
+                		isLabel = true;
+                	}
                     // check for globals
                     value = $A.getContext().getGlobalValueProvider(root);
                 }
+
                 if (!value) {
                     // still nothing, time to die
                     break;
-                }
+                } 
+                else if (isLabel && value.toString()==="SimpleValue" && !value.isDefined() ) {
+                	// undefined $Label when section exists
+            		break;
+            	}
+                
                 propRef = propRef.getStem();
             }
+
+            if (isLabel && (!value || ( value.toString()==="SimpleValue" && !value.isDefined() ) )) {
+            	var action = $A.get("c.aura://LabelController.getLabel");
+
+	            propRef = expression.getStem();
+	            var n = propRef.path[1];
+	            var s = propRef.path[0];
+	            action.setParams({
+	                "name": n,
+	                "section": s
+	            });
+
+	            action.setCallback(this, function(a){
+	                if(a.getState() == "SUCCESS") {
+	                    $A.log(a.getReturnValue);
+	                } else {
+	                    $A.log("Missing Value");
+	                }
+	            });
+            
+	            action.runAfter(action);
+	            $A.eventService.finishFiring();
+	            return "<deferred>";
+            }
+            
             return value;
         },
 

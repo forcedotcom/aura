@@ -22,6 +22,8 @@
 
 
     <p>Layouts are a metadata-driven description of navigation in an application. You can describe in an XML file how you want the application to respond to changes to everything after the <code>#</code> (hash) in the URL. You can use Aura without layouts, but they offer a centralized location for managing URL-centric navigation.</p>
+    
+    <auradocs:info>Internet Explorer 7 and 8 are not supported for the layout service.</auradocs:info>
 
   <h2>Layouts Metadata File</h2>
 
@@ -66,10 +68,10 @@
 <p>The <code>&lt;aura:layouts&gt;</code> system tag supports the following optional attributes:</p>
 
         <dl>
-            <dt>default</dt>
+            <dt><code>default</code></dt>
             <dd>This is the layout to use when the app is initially loaded and there is no <code>#</code> value in the URL.</dd>
 
-            <dt>catchall</dt>
+            <dt><code>catchall</code></dt>
             <dd>This is the layout to use when the <code>#</code> value doesn't match any <code>&lt;aura:layout&gt;</code>.</dd>
         </dl>
 

@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Aura Layout Service, accessible using $A.layoutService.  Manages Layouts.
+ * @namespace The Aura Layout Service, accessible using $A.layoutService.  Manages Layouts. Internet Explorer 7 and 8 are not supported for this service.
  * @constructor
  */
 var AuraLayoutService = function(){

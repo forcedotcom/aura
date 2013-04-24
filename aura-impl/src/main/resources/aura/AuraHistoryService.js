@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace The Aura History Service, accessible using $A.services.history.  Manages Browser History.
+ * @namespace The Aura History Service, accessible using $A.services.history.  Manages Browser History. Internet Explorer 7 and 8 are not supported for this service.
  * @constructor
  */
 var AuraHistoryService = function(){
@@ -24,8 +24,8 @@ var AuraHistoryService = function(){
 
     var historyService = {
 		/**
-	     * Set the new location. For example, <code>$A.services.history.set(location)</code> or <code>$A.services.history.set("search")</code>
-	     * sets the location to <code>#location</code> and <code>#search</code>. Otherwise, use <code>$A.services.layout.changeLocation()</code> to override existing URL parameters.
+	     * Sets the new location. For example, <code>$A.services.history.set("search")</code> sets the location to <code>#search</code>. 
+	     * Otherwise, use <code>$A.services.layout.changeLocation()</code> to override existing URL parameters.
 	     * @param {Object} token The provided token set to the current location hash
 	     * @memberOf AuraHistoryService
 	     * @public
@@ -35,7 +35,7 @@ var AuraHistoryService = function(){
         },
         
         /**
-         * Parse the location. A token can be used here.
+         * Parses the location. A token can be used here.
          * <p>Example:</p> 
          * <code>token == "newLayout";<br /> $A.historyService.get().token;</code>
          * @memberOf AuraHistoryService
@@ -56,7 +56,7 @@ var AuraHistoryService = function(){
         },
         
         /**
-         * Set the title of the document.
+         * Sets the title of the document.
          * @param {String} title The new title
          * @memberOf AuraHistoryService
          * @public

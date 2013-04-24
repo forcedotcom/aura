@@ -775,14 +775,63 @@ var Test = function(){
         },
 
         /**
-        * Gets the first element on the page that have the specified class name.
-        * @param {String} classname The CSS class name.
-        * @returns {Object} The element denoting the class, or null if none is found.
-        */
-        getElementByClass : function(classname){
-            return $A.util.getElementByClass(classname);
+         * Used by getElementsByClassNameCustom for IE7
+         * @private
+         */	
+        walkTheDOM: function (node, func) {
+          func(node);
+          node = node.firstChild;
+          while (node) {
+            aura.test.walkTheDOM(node, func);
+            node = node.nextSibling;
+          }
         },
 
+        /**
+         * custom util to get element by class name for IE7
+         * @private
+         */
+        getElementsByClassNameCustom: function (className) {
+            var results = [];
+            aura.test.walkTheDOM(document.body, function(node) {
+                var a, c = node.className,
+                    i;
+                if (c) {
+                    a = c.split(' ');
+                    for (i = 0; i < a.length; i++) {
+                        if (a[i] === className) {
+                            results.push(node);
+                            break;
+                        }
+                    }
+                }
+            });
+            return results;
+        },
+        /**
+         * Gets the first element on the page that have the specified class name.
+         * @param {String} classname The CSS class name.
+         * @returns {Object} The element denoting the class, or null if none is found.
+         */
+         getElementByClass : function(classname){
+             var ret;
+
+             if(document.getElementsByClassName){
+                 ret = document.getElementsByClassName(classname);
+             }
+
+             else if(document.querySelectorAll){
+                 ret = document.querySelectorAll("." + classname);
+             } else {
+                 ret = aura.test.getElementsByClassNameCustom(classname);
+             }
+             
+             if (ret && ret.length > 0) {
+                 return ret;
+             }
+             return null;
+         },
+         
         /**
          * Given an HTML element and an eventName, fire the corresponding DOM event. Code adapted from a stack overflow
          * question's answer.

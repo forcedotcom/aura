@@ -1,9 +1,3 @@
-#!/bin/bash
-
 cd `dirname $0`/../aura-jetty
-
-# If you need to specify a Java system property, do so in aura-jetty/pom.xml,
-# in the <systemProperties> section.  Non-property JVM flags, however, have to
-# be in the MAVEN_OPT environment variable:
-MAVEN_OPT="-Xmx256M" \
-    mvn org.mortbay.jetty:jetty-maven-plugin:run -Pdev $@ &
+# if you need to specify a Java system property, do so in aura-jetty/pom.xml, in the <systemProperties> section
+mvn org.mortbay.jetty:jetty-maven-plugin:run -Pdev $@ &

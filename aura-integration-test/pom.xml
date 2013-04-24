@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.1.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
@@ -185,7 +185,7 @@
                                 <failIfNoTests>false</failIfNoTests>
                                 <runOrder>random</runOrder>
                                 <trimStackTrace>false</trimStackTrace>
-                                <argLine>-Xmx512M -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${java.io.tmpdir}/jvm-int-tests.heap -Djava.io.tmpdir=${java.io.tmpdir}</argLine>
+                                <argLine>-Djava.io.tmpdir=${java.io.tmpdir}</argLine>
                                 <systemPropertyVariables>
                                     <config>${config}</config>
                                     <java.io.tmpdir>${java.io.tmpdir}</java.io.tmpdir>
@@ -508,7 +508,7 @@
                             <classpathDependencyExcludes>
                                 <classpathDependencyScopeExclude>compile</classpathDependencyScopeExclude>
                             </classpathDependencyExcludes>
-                            <argLine>-Xmx768M -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${java.io.tmpdir}/jvm-int-tests.heap -Djava.io.tmpdir=${java.io.tmpdir}</argLine>
+                            <argLine>-Djava.io.tmpdir=${java.io.tmpdir}</argLine>
                             <systemPropertyVariables>
                                 <config>${config}</config>
                                 <java.io.tmpdir>${java.io.tmpdir}</java.io.tmpdir>

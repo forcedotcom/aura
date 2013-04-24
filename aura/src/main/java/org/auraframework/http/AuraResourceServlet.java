@@ -355,7 +355,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
      * 
      * This is currently done by namespace, but it will eventually be by app after W-1166679
      */
-    private static final Map<String, String> cssCache = new ConcurrentHashMap<String, String>();
+    private static final Map<String, Reference<String>> cssCache = new ConcurrentHashMap<String, Reference<String>>();
 
     private static class NonTemplateFilter implements TempFilter {
         @Override
@@ -389,8 +389,14 @@ public class AuraResourceServlet extends AuraBaseServlet {
         context.setPreloading(true);
         for (DescriptorFilter filter : filters) {
             String key = type.name() + "$" + filter;
+            String nsCss = null;
 
-            String nsCss = !mode.isTestMode() ? cssCache.get(key) : null;
+            if (!mode.isTestMode()) {
+                Reference<String> ref = cssCache.get(key);
+                if (ref != null) {
+                    nsCss = ref.get();
+                }
+            }
             if (nsCss == null) {
                 Set<ThemeDef> nddefs = Sets.newHashSet();
                 List<DescriptorFilter> shortlist = Lists.newArrayList();
@@ -402,7 +408,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 Aura.getSerializationService().writeCollection(nddefs, ThemeDef.class, tmp, "CSS");
                 if (!mode.isTestMode()) {
                     nsCss = sb.toString();
-                    cssCache.put(key, nsCss);
+                    cssCache.put(key, new SoftReference<String>(nsCss));
                 }
             }
 

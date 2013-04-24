@@ -1,0 +1,116 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Introduction"/>
+
+    <p>Use mocking to isolate your JavaScript test from other resources, such as a Java model, provider, or server-side controller. This enables you to narrow the focus of the test and eliminate other modes of failure, such as network errors. You should test the external resources in separate tests.</p>
+
+    <h2>Mock syntax</h2>
+    
+    <p>Aura enables you to mock a Java model, provider, or server-side controller by using a <code>mocks</code> element in your test function. <code>mocks</code> is an array of objects representing the resource that you're mocking.</p>
+
+    <p>Let's look at the high-level structure of a test using a mocked object. <code>mocks</code> contains <code>type</code>, <code>stubs</code>, and <code>descriptor</code> elements.</p>
+
+<auradocs:codeblock>
+testSampleSyntax : {
+    mocks : [{
+        type : "MODEL|PROVIDER|ACTION",
+        // descriptor is optional
+        descriptor : ...,
+        stubs : [{
+            // method is optional for a model or provider
+            method : { ... },
+            answers : [{
+                // specify value or error but not both
+                value : ...
+                error : ...
+            }]
+        }]               
+    }],
+    test : function(cmp) {
+        // test code goes here
+    }
+},
+</auradocs:codeblock>
+    
+    <h3><code>type</code></h3>
+    
+    <p>The type of mock object. Valid values are: <code>MODEL</code>, <code>PROVIDER</code>, and <code>ACTION</code>.</p>
+    
+    <h3><code>stubs</code></h3>
+    
+    <p>An array of objects representing the Java methods of the class being mocked. A stub object has <code>method</code> and <code>answers</code> properties.</p>
+
+    <h4><code>method</code></h4>
+    
+    <p>The <code>method</code> property is optional, except for the <code>ACTION</code> type.  It defaults to <code>provide</code> for a provider, and <code>newInstance</code> for a model.</p>
+    
+    <p>A <code>method</code> has the following elements:</p>
+    
+    <ul>
+        <li><code>name</code> is the method name.</li>
+        <li><code>params</code> is an array of Strings representing the input parameter types, if there are parameters.</li>
+        <li><code>type</code> is the return type. The default value is <code>Object</code>.</li>
+    </ul>
+        
+    <p>For example, this <code>method</code> element mocks <code>String doSomeWork(Boolean immediate, MyCustomType toProcess)</code>.</p>
+
+<auradocs:codeblock>
+method : {
+    name : "doSomeWork",
+    type : "java.lang.String",
+    params : ["java.lang.Boolean","my.package.MyCustomType"]
+}
+</auradocs:codeblock>
+
+    <h4><code>answers</code></h4>
+
+    <p>The <code>answers</code> property is an array of answer objects returned by the stub when it is invoked.</p>
+    
+    <p>An answer object has either a <code>value</code> or an <code>error</code> property. This indicates whether the mock returns the given value or throws a Java exception.</p>
+    
+    <p>The format of the <code>value</code> object depends on the class being mocked. Provider values correspond to the <code>ComponentConfig</code> object returned by <code>provide()</code>, and can specify either <code>descriptor</code> or <code>attributes</code> or both.</p>
+
+    <auradocs:info>The framework doesn't support custom values, such as types that require a custom converter.</auradocs:info>
+    
+    <p>Multiple answers enable you to test sequencing or multiple invocations of an action.  For example, if a test simulates clicking a button twice, this would call a server action twice, and you may want the actions to return different responses.</p>
+    
+    <p>Alternatively, your component might load two or more input fields and you want the model to return different values for each field.  If the mock is invoked more times than you have answers for, the last answer is repeated.  For example, if the mock for an input field value returns the answers "anybody" and "there", but the component has four input fields, the mock returns "anybody", "there", "there", "there".</p>
+    
+    <p>The <code>error</code> property is a <code>String</code> containing the fully qualified class name of the exception thrown.  You can only use exceptions with no-argument constructors, or a constructor accepting a <code>String</code>.</p>
+    
+    <h3><code>descriptor</code></h3>
+    
+    <p>The <code>descriptor</code> element is optional and defaults to the descriptor for the resource being mocked. For example, this is the descriptor for a model class.</p>
+    
+<auradocs:codeblock>descriptor : "java://org.auraframework.docsample.SampleJavaModel",</auradocs:codeblock>
+     
+    <p>To mock the type of a super or child component, such as a child <code>ui:input</code> component, you need to specify a <code>descriptor</code>.</p>
+    
+    <auradocs:info>The descriptor for the <code>ACTION</code> type is the controller descriptor rather than the action descriptor. For example:
+    <auradocs:codeblock>descriptor : "java://org.auraframework.docsample.SampleJavaController",</auradocs:codeblock>
+    </auradocs:info>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="testsMockModel">Mocking Java Models</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="testsMockProvider">Mocking Java Providers</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="testsMockAction">Mocking Java Actions</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="registerCustomConverter">Custom Converters</auradocs:topicLink>
+    </p>
+    
+</aura:component>

@@ -153,7 +153,8 @@
   <p>For a more in-depth example of a server-side controller that interacts with a database, see the <a href="https://github.com/forcedotcom/aura-note/blob/master/src/main/java/org/auraframework/demo/notes/controllers/NoteViewController.java" target="_new">NoteViewController class</a> in the Aura Note sample app. (Log in to GitHub if you get a 404 error.)</p>
 
   <p><b>See also:</b><br/>
-      <auradocs:topicLink topic="models">Models</auradocs:topicLink>
+      <auradocs:topicLink topic="models">Models</auradocs:topicLink><br/>
+      <auradocs:topicLink topic="testsMockAction">Mocking Java Actions</auradocs:topicLink>
     </p>
 
 </aura:component>

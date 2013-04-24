@@ -18,7 +18,7 @@
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Assertions"/>
 
-    <p>Assertions evaluates an object or expression for expected results and are the foundation of Aura Component testing.
+    <p>Assertions evaluate an object or expression for expected results and are the foundation of component testing.
     Each JavaScript test can contain one or more assertions. The test passes only when all the assertions are successful.
     Assertions should be prefixed with <code>aura.test</code> or <code>$A.test</code>. Aura supports these assertions.</p>
     <table class="table table-bordered table-striped">
@@ -31,51 +31,63 @@
         <tbody>
             <tr>
                 <td><code>aura.test.assert(condition, assertMessage)</code></td>
-                <td>Checks that the condition is true.</td>
+                <td>Checks that the condition is <code>true</code>. If it's <code>false</code>, throws an error with the <code>assertMessage</code>.</td>
             </tr>
             <tr>
                 <td><code>aura.test.assertDefined(arg1, assertMessage)</code></td>
-                <td>Checks that the value is not undefined.</td>
+                <td>Checks that <code>arg1</code> is not undefined. If it's <code>undefined</code>, throws an error with the <code>assertMessage</code>.</td>
             </tr>
             <tr>
                 <td><code>aura.test.assertNull(arg1, assertMessage)</code></td>
-                <td>Checks that <code>arg1</code> is null.</td>
+                <td>Checks that <code>arg1</code> is <code>null</code>. If it's not <code>null</code>, throws an error with the <code>assertMessage</code>.</td>
             </tr>
             <tr>
                 <td><code>aura.test.assertNotNull(arg1, assertMessage)</code></td>
-                <td>Checks that <code>arg1</code> is not null.</td>
+                <td>Checks that <code>arg1</code> is not <code>null</code>. If it's <code>null</code>, throws an error with the <code>assertMessage</code>.</td>
             </tr>
             <tr>
                 <td><code>aura.test.assertTrue(condition, assertMessage)</code></td>
-                <td>Checks that the condition is true.</td>
+                <td>Checks that the condition is <code>true</code>. This is the same as <code>aura.test.assert(condition, assertMessage)</code>.</td>
             </tr>
             <tr>
                 <td><code>aura.test.assertTruthy(condition, assertMessage)</code></td>
-                <td>Checks that the condition is true, null, or defined. Throws an error if the condition is false or undefined.</td>
+                <td>Checks that the condition is <code>true</code>, <code>null</code>, or defined. If the condition is <code>false</code> or <code>undefined</code>, throws an error with the <code>assertMessage</code>.</td>
             </tr>
             <tr>
                 <td><code>aura.test.assertFalse(condition, assertMessage)</code></td>
-                <td>Checks that the condition is false.</td>
+                <td>Checks that the condition is <code>false</code>. If it's <code>true</code>, throws an error with the <code>assertMessage</code>.</td>
             </tr>
             <tr>
                 <td><code>aura.test.assertFalsy(condition, assertMessage)</code></td>
-                <td>Checks that the condition is false, null, or undefined. Throws an error if the condition is true or defined.</td>
+                <td>Checks that the condition is <code>false</code>, <code>null</code>, or <code>undefined</code>. If the condition is <code>true</code> or defined, throws an error with the <code>assertMessage</code>.</td>
             </tr>
             <tr>
                 <td><code>aura.test.assertEquals(arg1, arg2, assertMessage)</code></td>
-                <td>Checks that <code>arg1 === arg2</code> is true. Throws an error if the two values are not equal.</td>
+                <td>Checks that <code>arg1 === arg2</code> is <code>true</code>. If the two values are not equal, throws an error with the <code>assertMessage</code>.</td>
             </tr>
             <tr>
                 <td><code>aura.test.assertNotEquals(arg1, arg2, assertMessage)</code></td>
-                <td>Checks that <code>arg1 === arg2</code> is not true. Throws an error if the two values are equal.</td>
+                <td>Checks that <code>arg1 === arg2</code> is <code>false</code>.  If the two values are equal, throws an error with the <code>assertMessage</code>.</td>
             </tr>
             <tr>
                 <td><code>aura.test.fail(assertMessage)</code></td>
-                <td>Checks for failure. Usually used to mark an incomplete test.</td>
+                <td>Throws an error with the <code>assertMessage</code>. Use this to test error handling. For example:
+<auradocs:codeblock>
+try {
+    // do something where you expect an error
+    aura.test.fail("should have got an error");
+}
+catch(e){
+    // assert expected error 
+}
+</auradocs:codeblock>               
+                </td>
             </tr>
         </tbody>
     </table>
-     <h3>Writing Asserts</h3>
+    
+    <h3>Writing Asserts</h3>
+    
     <p>Include unique and specific error messages in your assert statements. For example, use <code>assertTrue(run, "Returns true if the action has run successfully.")</code>
-    instead of a generic message. Making each assert message unique also helps in narrowing down which assert statement has failed. </p>
+    instead of a generic message. Making each assert message unique also helps in narrowing down which assert statement has failed.</p>
 </aura:component>

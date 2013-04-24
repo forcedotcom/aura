@@ -1,0 +1,70 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Mocking Java Models"/>
+
+    <p>This test mocks a Java model. For more details on the syntax, see <auradocs:topicLink topic="testsMockJava">Mocking Java Classes</auradocs:topicLink>.</p>
+    
+    <p>The test function is a placeholder. You would add actual test code here.</p>
+
+<auradocs:codeblock>
+testModelProperties : {
+    mocks : [{
+        type : "MODEL",
+        stubs : [{
+            answers : [{
+                value : {
+                    secret : { value : "&lt;not available&gt;" } ,
+                    integer : { value : 1 },
+                    stringList : { value : [ "early", "on", "time", "late"] }
+                }
+            }]
+        }]                   
+    }],
+    test : function(cmp) {
+        // test code goes here
+    }
+},
+</auradocs:codeblock>
+
+    <br/>
+    <p>This test has a mock object that throws an exception.</p>
+
+<auradocs:codeblock>
+testModelThrowsException : {
+    mocks : [{
+        type : "MODEL",
+        stubs : [{
+            answers : [{
+                error : "org.auraframework.throwable.AuraRuntimeException"
+            }]
+        }]                   
+    }],
+    test : function(cmp) {
+        // test code goes here
+    }
+},
+</auradocs:codeblock>
+
+    <p><b>See also:</b><br/>
+        <auradocs:topicLink topic="models">Java Models</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="testsMockProvider">Mocking Java Providers</auradocs:topicLink><br/>
+        <auradocs:topicLink topic="testsMockAction">Mocking Java Actions</auradocs:topicLink>
+    </p>
+    
+</aura:component>

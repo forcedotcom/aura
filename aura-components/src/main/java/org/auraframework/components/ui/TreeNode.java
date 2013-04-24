@@ -16,10 +16,10 @@
 package org.auraframework.components.ui;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import org.auraframework.data.HasHref;
+import org.auraframework.data.HasTitle;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
@@ -30,7 +30,7 @@ import com.google.common.collect.Lists;
  * 
  * @since 0.0.304
  */
-public class TreeNode implements JsonSerializable, Comparable<TreeNode> {
+public class TreeNode implements HasHref, HasTitle, JsonSerializable, Comparable<TreeNode> {
     public TreeNode(String href, String title) {
         this(href, title, null);
     }
@@ -78,10 +78,12 @@ public class TreeNode implements JsonSerializable, Comparable<TreeNode> {
         return this.children;
     }
 
+    @Override
     public String getTitle() {
         return this.title;
     }
 
+    @Override
     public String getHref() {
         return this.href;
     }

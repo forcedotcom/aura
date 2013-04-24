@@ -17,6 +17,7 @@ package org.auraframework.components.ui;
 
 import java.io.IOException;
 
+import org.auraframework.data.*;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
@@ -27,7 +28,7 @@ import org.auraframework.util.json.JsonSerializable;
  * 
  * @since Touch.174.3
  */
-public class InputOption implements JsonSerializable {
+public class InputOption implements HasLabel, HasName, HasSelected, HasValue, JsonSerializable {
 
     private final String label;
     private final String name;
@@ -46,6 +47,7 @@ public class InputOption implements JsonSerializable {
      * 
      * @return the label of this option
      */
+    @Override
     public String getLabel() {
         return this.label;
     }
@@ -55,6 +57,7 @@ public class InputOption implements JsonSerializable {
      * 
      * @return the name of this option
      */
+    @Override
     public String getName() {
         return this.name;
     }
@@ -64,6 +67,7 @@ public class InputOption implements JsonSerializable {
      * 
      * @return the true if selected, otherwise false
      */
+    @Override
     public boolean isSelected() {
         return this.selected;
     }
@@ -73,6 +77,7 @@ public class InputOption implements JsonSerializable {
      * 
      * @return the value of this option
      */
+    @Override
     public String getValue() {
         return this.value;
     }

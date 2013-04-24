@@ -17,6 +17,7 @@ package org.auraframework.components.ui;
 
 import java.io.IOException;
 
+import org.auraframework.data.*;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
@@ -26,7 +27,7 @@ import org.auraframework.util.json.JsonSerializable;
  *
  * @since 184
  */
-public class MenuItem implements JsonSerializable {
+public class MenuItem implements HasClassName, HasDisabled, HasLabel, HasSelected, HasType, HasValue, JsonSerializable {
     private final String className;
     private final boolean disabled;
     private final String label;    
@@ -63,6 +64,7 @@ public class MenuItem implements JsonSerializable {
      * Get the class name.
      * @return the class name of this menu item
      */
+    @Override
     public String getClassName() {
         return this.className;
     }
@@ -71,6 +73,7 @@ public class MenuItem implements JsonSerializable {
      * Get the label.
      * @return the label of this menu item
      */
+    @Override
     public String getLabel() {
         return this.label;
     }
@@ -79,6 +82,7 @@ public class MenuItem implements JsonSerializable {
      * Is the component disabled.
      * @return the true if disabled, otherwise false
      */
+    @Override
     public boolean isDisabled() {
         return this.disabled;
     }
@@ -87,6 +91,7 @@ public class MenuItem implements JsonSerializable {
      * Is the component selected.
      * @return the true if selected, otherwise false
      */
+    @Override
     public boolean isSelected() {
         return this.selected;
     }
@@ -95,6 +100,7 @@ public class MenuItem implements JsonSerializable {
      * Get the menu item type ("action", "checkbox", "radio", "separator" or user defined).
      * @return the type of this menu item
      */
+    @Override
     public String getType() {
         return this.type;
     }
@@ -103,6 +109,7 @@ public class MenuItem implements JsonSerializable {
      * Get the value.
      * @return the value of this menu item
      */
+    @Override
     public String getValue() {
         return this.value;
     }

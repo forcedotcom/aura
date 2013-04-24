@@ -53,5 +53,5 @@ exp(p,
     "contains", p.contains,
     "squash", p.squash,
     "getWindowSize", p.getWindowSize,
-    "isComponent", p.isComponent,
+    "isComponent", p.isComponent
 );

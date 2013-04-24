@@ -832,11 +832,6 @@ var Test = function(){
              return null;
          },
          
-        getAppCacheEvents: function() {
-            return priv.appCacheEvents;
-        }
-    };
-
         /**
          * Given an HTML element and an eventName, fire the corresponding DOM event. Code adapted from a stack overflow
          * question's answer.

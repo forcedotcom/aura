@@ -185,7 +185,7 @@
                                 <failIfNoTests>false</failIfNoTests>
                                 <runOrder>random</runOrder>
                                 <trimStackTrace>false</trimStackTrace>
-                                <argLine>-Djava.io.tmpdir=${java.io.tmpdir}</argLine>
+                                <argLine>-Xmx512M -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${java.io.tmpdir}/jvm-int-tests.heap -Djava.io.tmpdir=${java.io.tmpdir}</argLine>
                                 <systemPropertyVariables>
                                     <config>${config}</config>
                                     <java.io.tmpdir>${java.io.tmpdir}</java.io.tmpdir>
@@ -508,7 +508,7 @@
                             <classpathDependencyExcludes>
                                 <classpathDependencyScopeExclude>compile</classpathDependencyScopeExclude>
                             </classpathDependencyExcludes>
-                            <argLine>-Djava.io.tmpdir=${java.io.tmpdir}</argLine>
+                            <argLine>-Xmx768M -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${java.io.tmpdir}/jvm-int-tests.heap -Djava.io.tmpdir=${java.io.tmpdir}</argLine>
                             <systemPropertyVariables>
                                 <config>${config}</config>
                                 <java.io.tmpdir>${java.io.tmpdir}</java.io.tmpdir>

@@ -26,11 +26,22 @@ function Component(config, localCreation){
     this.priv = new ComponentPriv(config, this, localCreation);
 }
 
+/**
+ * The Component type. 
+ * <p>Examples:</p>
+ * <p><code>//Checks if the component value is of this type<br />cmp.getValue("v.value").auraType === "Component"</code></p> 
+ * <p><code>//Checks if the elements in the body is of this type<br />
+ * var body = cmp.get("v.body");<br />
+ * var child = body[i];<br />
+ * if (child.auraType === "Component") { //do comething }
+ * </code></p>
+ * @public
+ */
 Component.prototype.auraType = "Component";
 
 /**
  * Gets the ComponentDef
- * Shorthand: get("def")
+ * Shorthand: <code>get("def")</code>
  * @public
  */
 Component.prototype.getDef = function() {
@@ -41,8 +52,8 @@ Component.prototype.getDef = function() {
 };
 
 /**
- * Indexes the given globalId based on the given localId.
- * Allows cmp.find(localId) to look up the given globalId, look up the component, and return it.
+ * Indexes the given <code>globalId</code> based on the given <code>localId</code>.
+ * Allows <code>cmp.find(localId)</code> to look up the given <code>globalId</code>, look up the component, and return it.
  * @param {String} localId The id set using the aura:id attribute.
  * @param {String} globalId The globally unique id which is generated on pageload.
  * @protected
@@ -77,8 +88,8 @@ Component.prototype.index = function(localId, globalId){
 };
 
 /**
- * Removes data from the index. If both globalId and localId are provided, only the given pair is removed from the index.
- * If only localId is provided, every mapping for that localId is removed from the index.
+ * Removes data from the index. If both <code>globalId</code> and <code>localId</code> are provided, only the given pair is removed from the index.
+ * If only <code>localId</code> is provided, every mapping for that <code>localId</code> is removed from the index.
  *
  * This might be called after component destroy in some corner cases, be careful to check for priv before
  * accessing.
@@ -126,9 +137,9 @@ Component.prototype.deIndex = function(localId, globalId){
 };
 
 /**
- * Locates a component using the localId. Shorthand: get("asdf"), where "asdf" is the aura:id of the component to look for.
+ * Locates a component using the localId. Shorthand: <code>get("asdf")</code>, where "asdf" is the <code>aura:id</code> of the component to look for.
  * See <a href="#help?topic=findById">Finding Components by ID</a> for more information.
- * Return instances of a component using the format cmp.find({ instancesOf : "auradocs:sampleComponent" }).
+ * Returns instances of a component using the format <code>cmp.find({ instancesOf : "auradocs:sampleComponent" })</code>.
  * @param {String|Object} name If name is an object, return instances of it. Otherwise, finds a component using its index.
  * @public
  */
@@ -190,7 +201,7 @@ Component.prototype.findValue = function(name){
 };
 
 /**
- * Returns the Component instance. For example, component.getValue("v.metadata").unwrap().
+ * Returns the Component instance. For example, <code>component.getValue("v.metadata").unwrap()</code>.
  */
 Component.prototype.unwrap = function() {
     return this;
@@ -257,7 +268,7 @@ Component.prototype.findInstanceOf = function(type){
 
 /**
  * Checks whether the component is an instance of the given component name (or interface name).
- * @param {String} name The name of the component (or interface), with a format of &lt;namespace&gt;:&lt;componentName&gt; (for example, ui:button).
+ * @param {String} name The name of the component (or interface), with a format of <code>namespace:componentName</code>.
  * @returns {Boolean} true if the component is an instance, or false otherwise.
  */
 Component.prototype.isInstanceOf = function(name){
@@ -268,6 +279,7 @@ Component.prototype.isInstanceOf = function(name){
 };
 
 /**
+ * @private
  * @param {Object} type Applies the type to its definition.
  */
 Component.prototype.implementsDirectly = function(type){
@@ -345,7 +357,7 @@ Component.prototype.addValueHandler = function(config){
 };
 
 /**
- * force the final destroy of a component (after async).
+ * Forces the final destroy of a component (after async).
  */
 Component.prototype.finishDestroy = function(){
     this.destroy(false);
@@ -354,18 +366,18 @@ Component.prototype.finishDestroy = function(){
 /**
  * Destroys the component and cleans up memory.
  *
- * destroy() destroys the component immediately while destroy(true) destroys it asychronously.
+ * <code>destroy()</code> destroys the component immediately while <code>destroy(true)</code> destroys it asychronously.
  * See <a href="#help?topic=dynamicCmp"/>Dynamically Creating Components</a> for more information.
- *
+ * <p>
  * Note that when this is called with async = true, it makes a specific race
  * condition (i.e. calling functions after destroy) harder to trigger. this
  * means that we really would like to be able to for synchronous behaviour here,
  * or do something to make the destroy function appear much more like it is
  * doing a synchronous destroy (e.g. removing this.priv). Unfortunately, the
  * act of doing an asynchronous destroy creates false 'races' because it leaves
- * all of the events wired up.
+ * all of the events wired up.</p>
  *
- * @param {Boolean} async Set to true if component should be destroyed asychronously. The default value is false
+ * @param {Boolean} async Set to true if component should be destroyed asychronously. The default value is false.
  * @public
  */
 Component.prototype.destroy = function(async){
@@ -547,7 +559,7 @@ Component.prototype.getGlobalId = function() {
 };
 
 /**
- * Get the id set using the aura:id attribute.  Can be passed into find() on the parent
+ * Get the id set using the <code>aura:id</code> attribute.  Can be passed into <code>find()</code> on the parent
  * to locate this child.
  * @public
  */
@@ -631,7 +643,7 @@ Component.prototype.getElements = function(){
 
 /**
  * If the component only rendered a single element, return it.
- * Otherwise, you should use getElements().
+ * Otherwise, you should use <code>getElements()</code>.
  * @public
  */
 Component.prototype.getElement = function(){
@@ -665,8 +677,8 @@ Component.prototype.getElement = function(){
 
 /**
  * Returns the collection of attributes for this component.
- * See <a href="#help?topic=hideMarkup">Dynamically Showing or Hiding Markup</a> for more information.
- * Shorthand : get("v")
+ * See <a href="#help?topic=hideMarkup">Dynamically Showing or Hiding Markup</a> for an example.
+ * Shorthand : <code>get("v")</code>
  */
 Component.prototype.getAttributes = function() {
     if (!this.assertValid()) {
@@ -677,8 +689,8 @@ Component.prototype.getAttributes = function() {
 
 /**
  * Returns the wrapped value referenced using property syntax.
- * If you do not need the wrapper, use get() instead.
- * @param {String} key The data key to look up on the Component. E.g. $A.get("root.v.mapAttring.key")
+ * If you do not need the wrapper, use <code>get()</code> instead.
+ * @param {String} key The data key to look up on the Component. E.g. <code>$A.get("root.v.mapAttring.key")</code>
  *
  * @public
  */
@@ -710,7 +722,7 @@ Component.prototype.getValue = function(key){
 
 /**
  * Gets the wrapped value referenced using property syntax and sets the value object's value.
- * @param {String} key The data key to look up on the Component. E.g. $A.get("root.v.mapAttring.key")
+ * @param {String} key The data key to look up on the Component. E.g. <code>$A.get("root.v.mapAttring.key")</code>
  * @param {Object} value The value to set
  *
  * @public
@@ -730,10 +742,10 @@ Component.prototype.setValue = function(key, value){
 
 /**
  * Returns the raw value referenced using property syntax.
- * get() calls getValue() and unwraps the value.
+ * <code>get()</code> calls <code>getValue()</code> and unwraps the value.
  * If you need the wrapper, which can be used for things like
- * isDirty(), getPreviousValue(), commit(), rollback(), getBooleanValue(),
- * use getWrapper() instead.
+ * <code>isDirty()</code>, <code>getPreviousValue()</code>, <code>commit()</code>, <code>rollback()</code>, <code>getBooleanValue()</code>,
+ * use <code>getWrapper()</code> instead.
  * @param {String} key The data key to look up on the Component.
  * @public
  */
@@ -745,7 +757,9 @@ Component.prototype.get = function(key){
 };
 
 /**
- * @private
+ * Gets the concrete implementation of a component. If the component is concrete, the method returns the component itself.
+ * For example, call this method to get the concrete component of a super component.
+ * @public
  */
 Component.prototype.getConcreteComponent = function(){
     var priv = this.priv;
@@ -753,7 +767,8 @@ Component.prototype.getConcreteComponent = function(){
 };
 
 /**
- * @private
+ * Returns true if the component is concrete, or false otherwise.
+ * @public
  */
 Component.prototype.isConcrete = function() {
     if (!this.assertValid()) {
@@ -764,7 +779,7 @@ Component.prototype.isConcrete = function() {
 
 /**
  * Gets the event dispatcher.
- * @private
+ * @public
  */
 Component.prototype.getEventDispatcher = function(){
     return this.priv.getEventDispatcher();
@@ -772,7 +787,7 @@ Component.prototype.getEventDispatcher = function(){
 
 /**
  * Returns the model for this instance, if one exists.
- * shorthand : get("m")
+ * Shorthand : <code>get("m")</code>
  * @public
  */
 Component.prototype.getModel = function(){
@@ -784,7 +799,7 @@ Component.prototype.getModel = function(){
 
 /**
  * Return a new Event instance of the named component event.
- * shorthand: get("e.foo"), where e is the name of the event.
+ * Shorthand: <code>get("e.foo")</code>, where e is the name of the event.
  * @param {String} name The name of the Event.
  * @public
  */
@@ -869,7 +884,7 @@ Component.prototype.output = function(){
 };
 
 /**
- * Deprecated. Use $A.util.addClass instead to add a CSS class to an element.
+ * Deprecated. Use <code>$A.util.addClass</code> instead to add a CSS class to an element.
  * @param {Object} clz The new CSS class to add to the component's config.
  */
 Component.prototype.addClass = function(clz) {
@@ -892,7 +907,7 @@ Component.prototype.addClass = function(clz) {
 };
 
 /**
- * Deprecated. Use $A.util.removeClass instead to remove a CSS class from an element.
+ * Deprecated. Use <code>$A.util.removeClass</code> instead to remove a CSS class from an element.
  * @param {Object} clz An existing class to be removed from the component.
  */
 Component.prototype.removeClass = function(clz) {
@@ -948,7 +963,7 @@ Component.prototype.hasEventHandler = function(eventName) {
 };
 
 /**
- * Returns an array of this component's facets, i.e., attributes of type aura://Aura.Component[]
+ * Returns an array of this component's facets, i.e., attributes of type <code>aura://Aura.Component[]</code>
  */
 Component.prototype.getFacets = function() {
     if (!this.assertValid()) {

@@ -27,19 +27,18 @@
 
    closeDialog : function(cmp, evt) {
        var lblAttrib = cmp.find("resultLabel").getAttributes();
-       var checkBoxArray = $A.util.getElementsByClass("uiInputCheckbox uiInput");
-              
+       var checkBoxArray = new Array();
        var str ="";
-       var tmpArray = new Array();
        
-       for(var i = 0; i < checkBoxArray.length; i++){
-           if(checkBoxArray[i].checked){
-               tmpArray.push(checkBoxArray[i].name);
-           }  
-       }
-    
-       if(tmpArray.length > 0){
-	   str = tmpArray.join(" ");
+       $A.getRoot().find("checkbox").forEach(
+	       function(cmp){
+		   if(cmp.get("v.value")){
+		       checkBoxArray.push(cmp.get("v.name"));
+	           };
+	       });
+       
+       if(checkBoxArray.length > 0){
+	   str = checkBoxArray.join(" ");
        }
        else {
            str = "Data Submited";

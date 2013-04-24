@@ -16,18 +16,25 @@
 package org.auraframework.impl.controller;
 
 import org.auraframework.Aura;
-import org.auraframework.system.Annotations.*;
-import org.auraframework.system.AuraContext;
+import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.expression.PropertyReferenceImpl;
+import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Controller;
+import org.auraframework.system.Annotations.Key;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import static org.auraframework.instance.ValueProviderType.LABEL;
 
 @Controller
 public class LabelController {
 
     @AuraEnabled
     public static String getLabel(@Key("section") String section, @Key("name") String name) throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        String result = context.getLabel(section, name, (Object[]) null);
-        return result;
+        GlobalValueProvider labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders()
+                .get(LABEL);
+        PropertyReference labelRef = new PropertyReferenceImpl(section + "." + name, null);
+        return (String) labelProvider.getValue(labelRef);
     }
 
 }

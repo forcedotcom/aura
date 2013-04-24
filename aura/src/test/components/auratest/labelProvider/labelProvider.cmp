@@ -16,4 +16,5 @@
 
 -->
 <aura:component render="client">
+    <aura:attribute name="text" type="String"/>
 </aura:component>

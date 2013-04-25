@@ -33,7 +33,7 @@ function Component(config, localCreation){
  * <p><code>//Checks if the elements in the body is of this type<br />
  * var body = cmp.get("v.body");<br />
  * var child = body[i];<br />
- * if (child.auraType === "Component") { //do comething }
+ * if (child.auraType === "Component") { //do something }
  * </code></p>
  * @public
  */

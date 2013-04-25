@@ -15,7 +15,11 @@
  */
 package org.auraframework.impl.context;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.LocalizationAdapter;
@@ -26,9 +30,9 @@ import org.auraframework.util.AuraLocale;
 /**
  */
 public class LocalizationAdapterImpl implements LocalizationAdapter {
-    
+
     /**
-     * Temporary workaround for localized labels for Auara Standalone
+     * Temporary workaround for localized labels for Aura Standalone
      */
     private static Map<String, Map<String, String>> labels = new HashMap<String, Map<String, String>>();
     static {
@@ -37,6 +41,7 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
         todayLabels.put("cs", "Dnes");
         todayLabels.put("de", "Heute");
         todayLabels.put("en", "Today");
+        todayLabels.put("en_US", "Today");
         todayLabels.put("es", "Hoy");
         todayLabels.put("fr", "aujourd'hui");
         todayLabels.put("ja", "今日");
@@ -44,8 +49,22 @@ public class LocalizationAdapterImpl implements LocalizationAdapter {
         todayLabels.put("zh_CN", "今天");
         todayLabels.put("zh_TW", "今天");
         labels.put("task_mode_today", todayLabels);
+
+        todayLabels = new HashMap<String, String>();
+        todayLabels.put("ar", "اليوم1");
+        todayLabels.put("cs", "Dnes1");
+        todayLabels.put("de", "Heute1");
+        todayLabels.put("en", "Today1");
+        todayLabels.put("en_US", "Today1");
+        todayLabels.put("es", "Hoy1");
+        todayLabels.put("fr", "aujourd'hui1");
+        todayLabels.put("ja", "今日1");
+        todayLabels.put("ko", "오늘1");
+        todayLabels.put("zh_CN", "今天1");
+        todayLabels.put("zh_TW", "今天1");
+        labels.put("task_mode_today1", todayLabels);
     }
-    
+
     public LocalizationAdapterImpl() {
     }
 

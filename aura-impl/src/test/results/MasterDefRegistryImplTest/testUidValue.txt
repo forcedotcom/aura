@@ -1,5 +1,6 @@
-markup://test:layoutNoLayout : aLTihqqatMK42D779lmtlg
+markup://test:layoutNoLayout : 4pyFkho7mFCkwGiTn53fnw
 aura://ComponentController : null
+aura://LabelController : null
 css://aura.placeholder : kvkyys3VNLeU066RaKQMbA
 java://org.auraframework.renderer.ComponentRenderer : null
 java://org.auraframework.renderer.ExpressionRenderer : null

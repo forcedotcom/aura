@@ -43,6 +43,9 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
 
     public static final String PREFIX = "aura";
 
+    public static final String COMPONENT_CONTROLLER = "aura://ComponentController";
+    public static final String LABEL_CONTROLLER = "aura://LabelController";
+
     private static final Set<String> prefixes = Sets.newHashSet(PREFIX);
     private static final Set<DefType> defTypes = Sets.immutableEnumSet(DefType.CONTROLLER);
 
@@ -55,8 +58,12 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
     private static Map<DefDescriptor<ControllerDef>, ControllerDef> getDefs() {
 
         DefinitionService defService = Aura.getDefinitionService();
+        Map<DefDescriptor<ControllerDef>, ControllerDef> ret = Maps.newHashMap();
+
+        // Add Component Controller
+
         DefDescriptor<ControllerDef> componentControllerDesc = defService.getDefDescriptor(
-                "aura://ComponentController", ControllerDef.class);
+                COMPONENT_CONTROLLER, ControllerDef.class);
 
         Builder builder = new Builder();
         try {
@@ -66,11 +73,29 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
             throw new AuraUnhandledException("Broken ComponentController", qfe);
         }
         builder.setControllerClass(ComponentController.class);
-        builder.setLocation("aura://ComponentController", -1);
+        builder.setLocation(COMPONENT_CONTROLLER, -1);
         builder.setDescriptor(componentControllerDesc);
-        Map<DefDescriptor<ControllerDef>, ControllerDef> ret = Maps.newHashMap();
+
+        ret.put(builder.getDescriptor(), builder.build());
+
+        // Add Label Controller
+
+        DefDescriptor<ControllerDef> labelControllerDesc = defService.getDefDescriptor(
+                LABEL_CONTROLLER, ControllerDef.class);
+
+        builder = new Builder();
+        try {
+            builder.setActionMap(JavaControllerDefFactory.createActions(LabelController.class, labelControllerDesc));
+        } catch (QuickFixException qfe) {
+            throw new AuraUnhandledException("Broken LabelController", qfe);
+        }
+        builder.setControllerClass(LabelController.class);
+        builder.setLocation(LABEL_CONTROLLER, -1);
+        builder.setDescriptor(labelControllerDesc);
+
         // FIXME="need an md5";
         ret.put(builder.getDescriptor(), builder.build());
+
         return ret;
     }
 }

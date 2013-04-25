@@ -15,32 +15,9 @@
  */
 package org.auraframework.def;
 
-import org.auraframework.impl.root.component.ComponentDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
-
 public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
 
     public ComponentDefTest(String name) {
         super(name, ComponentDef.class, "aura:component");
-    }
-
-    /**
-     * Test method for {@link ComponentDef#isAbstract()}.
-     */
-    public void testIsAbstract() throws Exception {
-        // This creates a StringSource to store the definition
-        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, "");
-        ComponentDefImpl.Builder builder = new ComponentDefImpl.Builder();
-        builder.setDescriptor(DefDescriptorImpl.getInstance(desc.getQualifiedName(), ComponentDef.class));
-        builder.isAbstract = true;
-        // And then you can save the definition
-        definitionService.save(builder.build());
-        ComponentDef def = definitionService.getDefinition(desc.getDescriptorName(), ComponentDef.class);
-
-        assertNotNull(def);
-        assertFalse(def.isAbstract());
-
-        assertFalse(define(baseTag, "", "").isAbstract());
-        checkBoolean(String.format(baseTag, "abstract='%s'", ""));
     }
 }

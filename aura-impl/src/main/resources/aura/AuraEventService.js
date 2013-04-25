@@ -24,9 +24,11 @@ var AuraEventService = function() {
     var eventService = {
 
         /**
-         * Creates a new application event. Set the event parameters using <code>event.setParams()</code> and fire it using <code>event.fire()</code>.
-         * For example, <code>$A.eventService.newEvent("app:navError")</code> fires the <code>app:navError</code> event. Set parameters on the new event
+         * Creates a new application event. Set the event parameters using <code>event.setParams()</code> and fire
+         * it using <code>event.fire()</code>. For example, <code>$A.eventService.newEvent("app:navError")</code>
+         * fires the <code>app:navError</code> event. Set parameters on the new event
          * by using <code>event.setParams()</code>.
+         *
          * @param {String} name The event object in the format namespace:component
          * @memberOf AuraEventService
          * @public
@@ -96,17 +98,6 @@ var AuraEventService = function() {
         },
 
         /**
-         * Pushes an action to the action queue.
-         * @param {Action} action The action to enqueue
-         * @memberOf AuraEventService
-         * @public
-         */
-        enqueueAction : function(action) {
-            priv.actionQueue.push(action);
-        },
-
-
-        /**
          * Pushes an event to the event stack.
          * @param {Event} event The event to start firing
          * @memberOf AuraEventService
@@ -127,17 +118,42 @@ var AuraEventService = function() {
         },
 
         /**
-         * Clears the action queue.
+         * pull an event off the stack, and clean up if we hit top of stack.
          *
+         * This internal routine pops something off of the event stack, and if
+         * needed runs the queued actions, making sure that rerenderDirty is called
+         * at the very end, after everything has completed.
          * @memberOf AuraEventService
          * @private
          */
         finishFiring : function() {
-            priv.eventStack.pop();
-            if (priv.eventStack.length === 0) {
-                priv.flushActionQueue();
-            }
+            var done;
+            var count = 0;
 
+            if (priv.eventStack.length <= 1) {
+                //
+                // FIXME: W-1652120
+                //
+                // Weird compatibility stuff. We are sometimes called with nothing on the stack,
+                // so, rather than work too hard on this, just push two things on the stack so
+                // that even under those conditions we will not do the wrong thing.
+                //
+                priv.eventStack.push("finishFiring");
+                priv.eventStack.push("finishFiring");
+                $A.clientService.processActions();
+                done = !$A["finishedInit"];
+                while (!done && count <= 15) {
+                    $A.renderingService.rerenderDirty();
+                    done = !$A.clientService.processActions();
+                    count += 1;
+                    if (count > 10) {
+                        $A.error("finishFiring has not completed after 10 loops");
+                    }
+                }
+                priv.eventStack.pop();
+                priv.eventStack.pop();
+            }
+            priv.eventStack.pop();
         },
 
         /**

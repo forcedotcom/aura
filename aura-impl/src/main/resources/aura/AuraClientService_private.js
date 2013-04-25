@@ -25,6 +25,7 @@ var priv = {
     isUnloading : false,
     initDefsObservers : [],
     isDisconnected : false,
+    actionQueue : [],
 
     /**
      * Take a json (hopefully) response and decode it. If the input is invalid JSON, we try to handle it gracefully.
@@ -81,20 +82,16 @@ var priv = {
         }
 
         //
-        // server-side explosion. The new message is one where there is an
-        // /*ERROR*/ appended.
-        // this allows us to deal with the fact that we can get errors after the
-        // send has started.
-        // Of course, we also have the problem that we might not have valid JSON
-        // at all, in which case
+        // server-side explosion. The new message is one where there is an /*ERROR*/ appended.
+        // this allows us to deal with the fact that we can get errors after the send has started.
+        // Of course, we also have the problem that we might not have valid JSON at all, in which case
         // we have further problems...
         //
         if ((response["status"] != 200)
                 || (text.length > 9 && text.charAt(text.length - 9) == "/" && text.charAt(text.length - 8) == "*" && text.charAt(text.length - 7) == "E" && text.charAt(text.length - 6) == "R" && text.charAt(text.length - 5) == "R"
                         && text.charAt(text.length - 4) == "O" && text.charAt(text.length - 3) == "R" && text.charAt(text.length - 2) == "*" && text.charAt(text.length - 1) == "/")) {
             if (response["status"] == 200) {
-                // if we encountered an exception once the response was
-                // committed
+                // if we encountered an exception once the response was committed
                 // ignore the malformed JSON
                 text = "/*" + text;
             } else if (!noStrip === true && text.charAt(0) == "w") {
@@ -120,16 +117,11 @@ var priv = {
                 return null;
             } else {
                 // !!!!!!!!!!HACK ALERT!!!!!!!!!!
-                // The server side actually returns a response with 'message'
-                // and 'stack' defined
-                // when there was a server side exception. Unfortunately, we
-                // don't really know what
-                // we have... the code in aura.error has checks for those, but
-                // if they are not
-                // there the error message will be meaningless. This code thus
-                // does much the same
-                // thing, but in a different way so that we get a real error
-                // message.
+                // The server side actually returns a response with 'message' and 'stack' defined
+                // when there was a server side exception. Unfortunately, we don't really know what
+                // we have... the code in aura.error has checks for those, but if they are not
+                // there the error message will be meaningless. This code thu does much the same
+                // thing, but in a different way so that we get a real error message.
                 // !!!!!!!!!!HACK ALERT!!!!!!!!!!
                 //#if {"excludeModes" : ["PRODUCTION"]}
                 if (resp["message"] && resp["stack"]) {
@@ -241,6 +233,7 @@ var priv = {
         var queue = this.requestQueue;
 
         var errors = [];
+        $A.eventService.startFiring("actionCallback");
         if (responseMessage) {
             var token = responseMessage["token"];
             if (token) {
@@ -328,6 +321,7 @@ var priv = {
                 actionGroup.status = "done";
             }
         }
+        $A.eventService.finishFiring("actionCallback");
 
         this.inRequest = false;
         priv.fireDoneWaiting();

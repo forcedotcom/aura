@@ -243,6 +243,16 @@ $A.ns.Aura = function() {
     };
 
     /**
+     * Equivalent to <code>$A.clientService.enqueueAction()</code>.
+     * <p>See Also: <a href="#reference?topic=api:AuraClientService">AuraClientService</a></p>
+     * @public
+     * @function
+     * @param {Action} action
+     * @borrows AuraClientService.enqueueAction
+     */
+    this.enqueueAction = this.clientService.enqueueAction;
+
+    /**
      * Equivalent to <code>$A.renderingService.render()</code>.
      * <p>See Also: <a href="#reference?topic=api:AuraRenderingService">AuraRenderingService</a></p>
      * @public

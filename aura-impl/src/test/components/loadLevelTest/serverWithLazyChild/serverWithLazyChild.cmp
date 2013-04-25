@@ -17,5 +17,5 @@
 -->
 <aura:component model="java://org.auraframework.impl.loadLevel.GatedModel">
     <aura:attribute type="String" name="waitId"/>
-    Lazy Kid:<loadLevelTest:serverComponent aura:load="lazy" waitId="lazykid" aura:id="kid"/>
+    Lazy Kid:<loadLevelTest:serverComponent aura:load="lazy" waitId="lazyKid" aura:id="kid"/>
 </aura:component>

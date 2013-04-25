@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" controller="java://org.auraframework.impl.loadLevel.GatedModelController">
+<aura:component extends="loadLevelTest:lazyLoadHelper" render="client">
     <aura:attribute name='flip' type='boolean' default='true'/>
 
     <aura:renderIf isTrue='{!v.flip}'>

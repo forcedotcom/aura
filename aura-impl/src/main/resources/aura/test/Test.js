@@ -53,6 +53,15 @@ var Test = function(){
             }
             priv.waits.push({ expected:expected, actual:testFunction, callback:callback , failureMessage:failureMessage});
         },
+
+        /**
+         * Add a cleanup function that is run on teardown.
+         *
+         * @param cleanupFunction the function to run on teardown.
+         */
+        addCleanup : function(cleanupFunction) {
+            priv.cleanups.push(cleanupFunction);
+        },
         
         /**
          * Get an instance of an action based on the specified parameters and callback function.
@@ -78,23 +87,23 @@ var Test = function(){
         },
 
         /**
-		 * Get an instance of a server action that is not available to the component.
-		 * e.g. $A.test.getExternalAction(cmp, "aura://ComponentController/ACTION$getComponent", 
-		 * 			{name:"aura:text", attributes:{value:"valuable"}},
-		 * 			function(action){alert(action.getReturnValue().attributes.values.value)})
-		 * 
-		 * @param {Component}
-		 *            The scope to run the action with, even if the action is not visible to it
-		 * @param {String}
-		 *            descriptor The descriptor for the action - e.g. java://my.own.Controller/ACTION$doIt
-		 * @param {Object}
-		 *            params The parameters to pass to the action, as a Map (name:value)
-		 * @param {Object}
-		 *            returnType The return type descriptor for the action, e.g. java://java.lang.String
-		 * @param {function}
-		 *            callback An optional callback to execute with the component as the scope
-		 * @returns {Action} an instance of the action
-		 */
+         * Get an instance of a server action that is not available to the component.
+         * e.g. $A.test.getExternalAction(cmp, "aura://ComponentController/ACTION$getComponent", 
+         * 			{name:"aura:text", attributes:{value:"valuable"}},
+         * 			function(action){alert(action.getReturnValue().attributes.values.value)})
+         * 
+         * @param {Component}
+         *            The scope to run the action with, even if the action is not visible to it
+         * @param {String}
+         *            descriptor The descriptor for the action - e.g. java://my.own.Controller/ACTION$doIt
+         * @param {Object}
+         *            params The parameters to pass to the action, as a Map (name:value)
+         * @param {Object}
+         *            returnType The return type descriptor for the action, e.g. java://java.lang.String
+         * @param {function}
+         *            callback An optional callback to execute with the component as the scope
+         * @returns {Action} an instance of the action
+         */
         getExternalAction : function(component, descriptor, params, returnType, callback) {
         	var paramDefs = [];
         	for (var k in params) {

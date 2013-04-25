@@ -38,6 +38,7 @@ exp(p,
     "runAfterIf", p.runAfterIf,
     "setTestTimeout", p.setTestTimeout,
     "getErrors", p.getErrors,
+    "addCleanup", p.addCleanup,
     
     // DOM
     "getOuterHtml", p.getOuterHtml,

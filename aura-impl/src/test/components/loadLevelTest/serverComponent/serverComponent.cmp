@@ -18,5 +18,5 @@
 <aura:component model="java://org.auraframework.impl.loadLevel.GatedModel">
     <aura:attribute type="String" name="waitId"/>
     <aura:attribute type="String" name="stringAttribute"/>
-    Server component {!globalId}<br/>{!m.string}
+    Server component {!globalId} '{!v.waitId}'<br/>{!m.string}<br/>
 </aura:component>

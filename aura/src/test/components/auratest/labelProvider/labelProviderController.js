@@ -1,5 +1,5 @@
 ({
-    updateLabel: function(cmp, helper) {
+    updateLabel: function (cmp, helper) {
         var action = $A.get("c.aura://LabelController.getLabel");
 
         action.setParams({
@@ -7,11 +7,11 @@
             section: "bob"
         });
 
-        action.setCallback(this, function(a){
+        action.setCallback(this, function (a) {
 
             var textAttr = cmp.getValue("v.text");
 
-            if(a.getState()  ) {
+            if (a.getState()) {
                 var value = a.getReturnValue();
                 textAttr.setValue(value);
             } else {
@@ -22,9 +22,4 @@
 
         action.runAfter(action);
     }
-,
-
-testLabel: function(cmp, helper) {
-	cmp.getValue("v.sv").setValue($A.expressionService.getValue(cmp,"$Label" + ".bob" + ".task_mode_today"));
-	}
 })

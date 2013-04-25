@@ -67,7 +67,7 @@ var AuraExpressionService = function AuraExpressionService(){
                     // still nothing, time to die
                     break;
                 } 
-                else if (isLabel && value.toString()==="SimpleValue" && !value.isDefined() ) {
+                else if (isLabel && this.isUndefinedSimpleValue(value) ) {
                 	// undefined $Label when section exists
             		break;
             	}
@@ -75,36 +75,68 @@ var AuraExpressionService = function AuraExpressionService(){
                 propRef = propRef.getStem();
             }
 
-            if (isLabel && (!value || ( value.toString()==="SimpleValue" && !value.isDefined() ) )) {
-            	var action = $A.get("c.aura://LabelController.getLabel");
+            if ( isLabel && this.isUndefinedSimpleValue(value) ) {
+                propRef = expression.getStem();
+                var n = propRef.path[1];
+                var s = propRef.path[0];
 
-	            propRef = expression.getStem();
-	            var n = propRef.path[1];
-	            var s = propRef.path[0];
-	            action.setParams({
-	                "name": n,
-	                "section": s
-	            });
-
-	            
-	            var resValue = valueFactory.create("<deferred>", null, aura.util.isComponent(valueProvider) ? valueProvider : null);
-	            action.setCallback(this, function(a){
-	                if(a.getState() == "SUCCESS") {
-	                	resValue.setValue(a.getReturnValue()); 
-	                    $A.log(resValue);
-	                } else {
-	                    $A.log("Missing Value");
-	                }
-	            });
-            
-            	action.runAfter(action); 
-            	if (!aura.util.isComponent(valueProvider)) {
-            		$A.eventService.finishFiring(); // forces immediate lookup if not data-bound to component 
-            	}
-	            return resValue;
+                value = this.requestServerLabel(s, n, valueProvider);
             }
-            
+
             return value;
+        },
+
+        /**
+         * Checks value is not undefined and SimpleValue is defined
+         *
+         * @param value
+         * @return {boolean}
+         * @private
+         */
+        isUndefinedSimpleValue: function(value) {
+            return (!value || (value.toString() === "SimpleValue" && !value.isDefined()));
+        },
+
+        /**
+         *
+         * Performs LabelController.getLabel action to get specified section and name
+         *
+         * @param section
+         * @param name
+         * @param valueProvider
+         * @return {SimpleValue}
+         * @private
+         */
+        requestServerLabel: function(section, name, valueProvider) {
+
+            if( $A.util.isUndefinedOrNull(section) || $A.util.isUndefinedOrNull(name) ) {
+                return valueFactory.create("", null, null);
+            }
+
+            var action = $A.get("c.aura://LabelController.getLabel");
+
+            action.setParams({
+                "name": name,
+                "section": section
+            });
+
+            // create SimpleValue with temporary value of section and name
+            var resValue = valueFactory.create("<" + section + ":" + name + ">", null, aura.util.isComponent(valueProvider) ? valueProvider : null);
+
+            action.setCallback(this, function(a) {
+                if(a.getState() == "SUCCESS") {
+                    resValue.setValue(a.getReturnValue());
+                }
+            });
+
+            action.runAfter(action);
+
+            if (!aura.util.isComponent(valueProvider)) {
+                $A.eventService.finishFiring(); // forces immediate lookup if not data-bound to component
+            }
+
+            return resValue;
+
         },
 
         /**

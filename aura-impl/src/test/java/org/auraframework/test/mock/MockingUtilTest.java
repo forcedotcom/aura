@@ -44,7 +44,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 @Controller
-@TargetBrowsers(BrowserType.GOOGLECHROME)
+@TargetBrowsers({ BrowserType.GOOGLECHROME })
+/*
+ * W-1625166: Excluding from BrowserType.SAFARI,FIREFOX,IE10,IE7,IE8 : failed at assertion: expected:<[not a list]> but
+ * was:<[Modelonetwothree]> . if run in eclipse, GOOGLECHROME has the same problem. GOOGLECHROME only work under command
+ * line :mvn verify -DskipUnitTests -DskipJsDoc -DrunIntTests -DtestNameContains="testMockModel" -Pdesktop
+ * -Dwebdriver.browser.type=GOOGLECHROME
+ */
 public class MockingUtilTest extends WebDriverTestCase {
     private MockingUtil mockingUtil;
 
@@ -57,7 +63,7 @@ public class MockingUtilTest extends WebDriverTestCase {
         super.setUp();
         mockingUtil = new MockingUtil();
     }
-    
+
     @Override
     public void tearDown() throws Exception {
         Aura.getContextService().endContext();

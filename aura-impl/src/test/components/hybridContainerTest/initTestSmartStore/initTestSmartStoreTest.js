@@ -1,6 +1,12 @@
 ({
     browsers: ['IPADCONTAINER', '-FIREFOX', '-GOOGLECHROME', '-SAFARI', '-IE7', '-IE8', '-IE9', '-IE10'],
-    
+	/*
+	 * Only IPADCONTAINER is targeted:
+	 * That browser value simulates the user agent used by Touch Container. 
+	 * We required that because of behavior dependent on capabilities of Touch Container, 
+	 * specifically use of SmartStore as an Aura StorageService. When not in container we use the in-memory version.
+	 * From: Kevin Venkiteswaran <kvenkiteswaran@salesforce.com>
+	 */  
     /**
      * Verify the smartstore adapter is selected for actions when auraStorage:init is used without
      * any specification.

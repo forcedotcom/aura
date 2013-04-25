@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 ({
+	//IE7 IE8 : excluded because 'textContent'. https://github.com/forcedotcom/lumen-beta/commit/25650a7343a41b5fd613c23ad0ec400098657f6f
     testEmptyItems:{
         browsers: ["-IE7", "-IE8"],
         test:function(cmp){

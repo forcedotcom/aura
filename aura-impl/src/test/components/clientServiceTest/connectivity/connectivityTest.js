@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 ({
+	/* IE & FIREFOX are excluded:The tests try to send out a request to other domains http://invalid.salesforce.com, IE and Firefox block it by default
+	 * W-1624480 : SAFARI is excluded
+	 */
     browsers:["GOOGLECHROME"],
     /**
      * Calling server action on default host succeeds.
@@ -110,6 +113,7 @@
 
     /**
      * Changing layout after a prior connection failure succeeds.
+     * Excluding IE: history service was not previously supported in IE
      */
     testConnectionResumedForLayout : {
         testLabels : ["UnAdaptableTest"],

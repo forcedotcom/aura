@@ -38,7 +38,7 @@ public class InputTextUITest extends WebDriverTestCase {
 
     @UnAdaptableTest
     // because it fails in FIREFOX in SFDC (may be dependent on FF version)
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET})
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testUpdateOnAttribute_UsingStringSource() throws Exception {
         String event = "blur";
         String baseTag = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> "
@@ -54,13 +54,13 @@ public class InputTextUITest extends WebDriverTestCase {
         WebElement outputDiv = d.findElement(By.id("output"));
         assertModelValue(value); // value shouldn't be updated yet
         input.click();
-        outputDiv.click();//to simulate tab behavior for touch browsers 
+        outputDiv.click();// to simulate tab behavior for touch browsers
         value = assertModelValue(event); // value should have been updated
     }
 
     @UnAdaptableTest
     // because it fails in FIREFOX
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET})
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testUpdateOnAttribute() throws Exception {
 
         open(TEST_CMP);
@@ -71,7 +71,7 @@ public class InputTextUITest extends WebDriverTestCase {
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value); // value shouldn't be updated yet
         input.click();
-        outputDiv.click();	//	to simulate tab behavior for touch browsers 
+        outputDiv.click(); // to simulate tab behavior for touch browsers
         value = assertModelValue(eventName); // value should have been updated
         assertDomEventSet();
 
@@ -114,7 +114,8 @@ public class InputTextUITest extends WebDriverTestCase {
 
     @UnAdaptableTest
     // because it fails in FIREFOX
-    @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.IPAD, BrowserType.ANDROID_PHONE,
+    // IE10 IE7 IE8 IE9: failed on event mousemove -- is this similar to mouseOver issue in IE?
+    @ExcludeBrowsers({ BrowserType.IE10, BrowserType.IE9, BrowserType.IPAD, BrowserType.ANDROID_PHONE,
             BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.FIREFOX, BrowserType.IE7 })
     public void testUpdateOnAttributeWithCertainEvents() throws Exception {
 
@@ -174,8 +175,8 @@ public class InputTextUITest extends WebDriverTestCase {
         a.doubleClick(input).build().perform();
         value = assertModelValue(eventName);
     }
-    
-   @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE,
+
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE,
             BrowserType.SAFARI })
     // W-1551077: Issue with Webdriver API ignores maxlength HTML5 attribute
     public void testMaxLength() throws Exception {
@@ -204,17 +205,17 @@ public class InputTextUITest extends WebDriverTestCase {
     private String getCurrentModelValue() {
         String valueExpression = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil
                 .getValueFromRootExpr("m.string"));
-        String value = (String) auraUITestingUtil.getEval(valueExpression);
+        String value = (String)auraUITestingUtil.getEval(valueExpression);
         return value;
     }
 
     private void assertDomEventSet() {
-    	String valueExpression = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil
+        String valueExpression = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil
                 .getValueFromRootExpr("v.isDomEventSet"));
-    	boolean value = auraUITestingUtil.getBooleanEval(valueExpression);
-    	assertTrue("domEvent attribute on event should have been set.", value);
+        boolean value = auraUITestingUtil.getBooleanEval(valueExpression);
+        assertTrue("domEvent attribute on event should have been set.", value);
     }
-    
+
     public void testNullValue() throws Exception {
         String cmpSource = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> "
                 + "<ui:inputText value=\"{!m.StringNull}\"/>" + "</aura:component>";
@@ -233,7 +234,7 @@ public class InputTextUITest extends WebDriverTestCase {
         input.click();
         input.sendKeys(inputText);
         try {
-            char outputText = (char) Integer.parseInt(outputValue.getText());
+            char outputText = (char)Integer.parseInt(outputValue.getText());
             assertEquals("InputChar and outputChar are different ", inputText.charAt(0), outputText);
         } catch (Exception e) {
             fail("ParseInt failed with following error" + e.getMessage());

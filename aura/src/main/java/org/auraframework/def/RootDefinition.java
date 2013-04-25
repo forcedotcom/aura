@@ -27,7 +27,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  */
 public interface RootDefinition extends Definition {
     public enum SupportLevel {
-        PROTO, BETA, GA
+        PROTO, DEPRECATED, BETA, GA
     }
 
     @Override

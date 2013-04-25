@@ -47,7 +47,7 @@
     </aura:set>
     <aura:set attribute="status">
         <aura:if isTrue="{!m.support != null}">
-            <ui:stamp severity="{!m.support=='PROTO'?'important':m.support=='BETA'?'warning':m.support=='GA'?'success':''}">{!m.support}</ui:stamp>
+            <ui:stamp severity="{!m.support=='PROTO'?'important':m.support=='DEPRECATED'?'inverse':m.support=='BETA'?'warning':m.support=='GA'?'success':''}">{!m.support}</ui:stamp>
         </aura:if>
     </aura:set>
     <ui:tabset class="subtabs">

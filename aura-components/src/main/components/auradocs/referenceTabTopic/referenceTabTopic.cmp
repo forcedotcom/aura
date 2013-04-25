@@ -38,12 +38,13 @@
 
     <p>Each definition has a support level indicating whether it is fully supported or not. The support level is defined in the <code>support</code> system attribute in the root tag of the definition. The support level is shown in the top-right corner for each definition in the Reference tab.</p>
 
-    <p>We will explain the support levels in terms of components, which are the most common definitions to have different support levels. The support levels in ascending order are:</p>
+    <p>We will explain the support levels in terms of components, which are the most common definitions to have different support levels. The support levels are:</p>
 
     <ol>
         <li><code>PROTO</code>&mdash;The component is still in development and is unsupported. This is the default support level.</li>
         <li><code>BETA</code>&mdash;The component is ready for beta use but we don't recommend using it in a GA app.</li>
         <li><code>GA</code>&mdash;The component is generally available for use in apps and is supported.</li>
+        <li><code>DEPRECATE</code>&mdash;The component is deprecated and is no longer supported.</li>
     </ol>
 
     <p>If you extend a component, you can't give the child component a higher support level than the parent component. For example, if cmpA is <code>BETA</code> and cmpB extends cmpA, cmpB can't have a support level of <code>GA</code>. It can have a support level of <code>BETA</code> or <code>PROTO</code>.</p>

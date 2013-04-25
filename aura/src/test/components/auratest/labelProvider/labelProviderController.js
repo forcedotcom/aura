@@ -22,4 +22,9 @@
 
         action.runAfter(action);
     }
+,
+
+testLabel: function(cmp, helper) {
+	cmp.getValue("v.sv").setValue($A.expressionService.getValue(cmp,"$Label" + ".bob" + ".task_mode_today"));
+	}
 })

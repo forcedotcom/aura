@@ -16,5 +16,7 @@
 
 -->
 <aura:component render="client">
+    <aura:attribute name="sv" type="Object"/>
     <aura:attribute name="text" type="String"/>
+    <div onclick="{!c.testLabel}">test: {!v.sv.value}</div>
 </aura:component>

@@ -86,17 +86,22 @@ var AuraExpressionService = function AuraExpressionService(){
 	                "section": s
 	            });
 
+	            
+	            var resValue = valueFactory.create("<deferred>", null, aura.util.isComponent(valueProvider) ? valueProvider : null);
 	            action.setCallback(this, function(a){
 	                if(a.getState() == "SUCCESS") {
-	                    $A.log(a.getReturnValue);
+	                	resValue.setValue(a.getReturnValue()); 
+	                    $A.log(resValue);
 	                } else {
 	                    $A.log("Missing Value");
 	                }
 	            });
             
-	            action.runAfter(action);
-	            $A.eventService.finishFiring();
-	            return "<deferred>";
+            	action.runAfter(action); 
+            	if (!aura.util.isComponent(valueProvider)) {
+            		$A.eventService.finishFiring(); // forces immediate lookup if not data-bound to component 
+            	}
+	            return resValue;
             }
             
             return value;

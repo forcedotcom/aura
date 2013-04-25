@@ -12,22 +12,43 @@
         }
     },
 
-    testNonExistingLabel: {
-        testLabels : ["UnAdaptableTest"],
+    testNonExistingSection: {
         test: function(cmp) {
-
-            var value = $A.expressionService.getValue(cmp, "$Label.DOESNT.EXIST");
-
             $A.test.addWaitFor(
                 false,
                 $A.test.isActionPending,
                 function(){
-                    $A.test.assertEquals("FIXME - LocalizationAdapter.getLabel() needs implemenation!",
-                        cmp.get("v.simplevalue2.value"),
+
+                    var sv2 = cmp.get("v.simplevalue2.value");
+
+                    $A.test.assertTrue(
+                        sv2 === "FIXME - LocalizationAdapter.getLabel() needs implemenation!" ||
+                        sv2 === "<DOESNT:EXIST>",
+                        "Failed to get expected error message");
+                }
+            );
+
+        }
+    },
+
+    testNonExistingLabel: {
+        test: function(cmp) {
+            $A.test.addWaitFor(
+                false,
+                $A.test.isActionPending,
+                function(){
+
+                    var sv3 = cmp.get("v.simplevalue3.value");
+
+                    $A.test.assertTrue(
+                        sv3 === "FIXME - LocalizationAdapter.getLabel() needs implemenation!" ||
+                        sv3 === "__MISSING LABEL__ PropertyFile - val DOESNTEXIST not found in section Related_Lists",
                         "Failed to get expected error message");
                 }
             );
 
         }
     }
+
+
 })

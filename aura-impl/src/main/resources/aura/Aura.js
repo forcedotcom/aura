@@ -491,7 +491,6 @@ $A.ns.Aura.prototype.error = function(e, stopTest) {
             $A.log(getstack.stack);
         }
         //#end
-        // we treat error objects differently from object object, isObject means is it a map
     } else if ($A.util.isObject(e) || $A.util.isError(e)) {
         // we treat error objects differently from object object, isObject means is it a map
         for(var k in e) {
@@ -523,11 +522,11 @@ $A.ns.Aura.prototype.error = function(e, stopTest) {
 };
 
 /**
- * Displays a message to the user. Currently used for displaying errors that do not cause the application to stop
- * completely.
+ * Displays an error message to the user. Currently used for displaying errors that do not cause the application to
+ * stop completely.
  *
  * @public
- * @param {String} msg The alert message to display.
+ * @param {String} msg The message to display.
  */
 $A.ns.Aura.prototype.message = function(msg) {
     var message = $A.util.getElement("auraErrorMessage");

@@ -42,6 +42,7 @@
 
     <ol>
         <li><code>PROTO</code>&mdash;The component is still in development and is unsupported. This is the default support level.</li>
+        <li><code>DEPRECATED</code>&mdash;The component is deprecated and is no longer supported.</li>
         <li><code>BETA</code>&mdash;The component is ready for beta use but we don't recommend using it in a GA app.</li>
         <li><code>GA</code>&mdash;The component is generally available for use in apps and is supported.</li>
     </ol>

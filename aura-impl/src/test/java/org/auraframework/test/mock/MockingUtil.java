@@ -26,8 +26,10 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.ValueDef;
-import org.auraframework.instance.ComponentConfig;
+import org.auraframework.impl.root.parser.XMLParser;
+import org.auraframework.impl.source.StringSource;
 import org.auraframework.instance.Action.State;
+import org.auraframework.instance.ComponentConfig;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -42,33 +44,66 @@ import org.mockito.Mockito;
  */
 public class MockingUtil {
     /**
-     * Mock a Definition in the MasterDefRegistry.  This takes effect on the next AuraContext establishment from this test.
-     * @param mockDefs
-     *            the Definitions to be mocked
+     * Mock a Definition in the MasterDefRegistry. This takes effect on the next AuraContext establishment from this
+     * test.
+     * 
+     * @param mockDefs the Definitions to be mocked
      * @throws QuickFixException
      */
     public <D extends Definition> void mockDef(D... mockDefs) throws QuickFixException {
-		if (mockDefs != null && mockDefs.length > 0) {
-			TestContextAdapter testContextAdapter = Aura
-					.get(TestContextAdapter.class);
-			TestContext testContext = testContextAdapter.getTestContext();
-			if (testContext == null) {
-				throw new IllegalStateException(
-						"TestContext not established; use TestContextAdapter.getTestContext(String).");
-			}
+        if (mockDefs != null && mockDefs.length > 0) {
+            TestContextAdapter testContextAdapter = Aura
+                    .get(TestContextAdapter.class);
+            TestContext testContext = testContextAdapter.getTestContext();
+            if (testContext == null) {
+                throw new IllegalStateException(
+                        "TestContext not established; use TestContextAdapter.getTestContext(String).");
+            }
             Set<Definition> mocks = testContext.getLocalDefs();
-            if(mocks !=null){
+            if (mocks != null) {
                 mocks.addAll(Arrays.asList(mockDefs));
             }
         }
     }
-    
+
     /**
-     * Mock a Model.  This will still rely on the current ModelDef to be valid.
+     * Mock a definition with the given markup.
+     * 
+     * @param defClass the type of Definition to generate
+     * @param descriptor the name of the descriptor to assign to the generated Definition
+     * @param markup content to parse
+     * @return the Definition created from the provided markup
+     * @throws QuickFixException
+     */
+    public <D extends Definition> D mockDefMarkup(Class<D> defClass, String descriptor, String markup)
+            throws QuickFixException {
+        DefDescriptor<D> desc = Aura.getDefinitionService().getDefDescriptor(descriptor, defClass);
+        return mockDefMarkup(desc, markup);
+    }
+
+    /**
+     * Mock a definition with the given markup.
+     * 
+     * @param descriptor the descriptor to assign to the generated Definition
+     * @param markup content to parse
+     * @return the Definition created from the provided markup
+     * @throws QuickFixException
+     */
+    @SuppressWarnings("unchecked")
+    public <D extends Definition> D mockDefMarkup(DefDescriptor<D> descriptor, String markup) throws QuickFixException {
+        D def = XMLParser.getInstance().parse(
+                descriptor,
+                new StringSource<D>(descriptor, markup, descriptor.getQualifiedName(),
+                        org.auraframework.system.Parser.Format.XML));
+        mockDef(def);
+        return def;
+    }
+
+    /**
+     * Mock a Model. This will still rely on the current ModelDef to be valid.
      * 
      * @param modelDefDescriptor
-     * @param properties
-     *            the complete set of properties to be mocked
+     * @param properties the complete set of properties to be mocked
      * @return the MockModel that will be provided when instantiating the requested ModelDef
      * @throws QuickFixException
      */
@@ -85,8 +120,7 @@ public class MockingUtil {
      * Mock a ModelDef.
      * 
      * @param modelDefDescriptor
-     * @param members
-     *            the ValueDef members of the ModelDef
+     * @param members the ValueDef members of the ModelDef
      * @return the MockModelDef that will be provided by the registry
      * @throws QuickFixException
      */
@@ -97,13 +131,11 @@ public class MockingUtil {
         return modelDef;
     }
 
-    
     /**
      * Mock a server ProviderDef.
      * 
      * @param providerDefDescriptor
-     * @param componentConfig
-     *            the ComponentConfig that the mock should provide
+     * @param componentConfig the ComponentConfig that the mock should provide
      * @return the MockProviderDef that will be provided by the registry
      * @throws QuickFixException
      */

@@ -25,7 +25,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.java.controller.JavaControllerDef.Builder;
 import org.auraframework.impl.java.controller.JavaControllerDefFactory;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -57,45 +56,35 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
 
     private static Map<DefDescriptor<ControllerDef>, ControllerDef> getDefs() {
 
-        DefinitionService defService = Aura.getDefinitionService();
         Map<DefDescriptor<ControllerDef>, ControllerDef> ret = Maps.newHashMap();
 
         // Add Component Controller
-
-        DefDescriptor<ControllerDef> componentControllerDesc = defService.getDefDescriptor(
-                COMPONENT_CONTROLLER, ControllerDef.class);
-
-        Builder builder = new Builder();
-        try {
-            builder.setActionMap(JavaControllerDefFactory.createActions(ComponentController.class,
-                    componentControllerDesc));
-        } catch (QuickFixException qfe) {
-            throw new AuraUnhandledException("Broken ComponentController", qfe);
-        }
-        builder.setControllerClass(ComponentController.class);
-        builder.setLocation(COMPONENT_CONTROLLER, -1);
-        builder.setDescriptor(componentControllerDesc);
-
+        Builder builder = getControllerBuilder(ComponentController.class, COMPONENT_CONTROLLER);
         ret.put(builder.getDescriptor(), builder.build());
 
         // Add Label Controller
-
-        DefDescriptor<ControllerDef> labelControllerDesc = defService.getDefDescriptor(
-                LABEL_CONTROLLER, ControllerDef.class);
-
-        builder = new Builder();
-        try {
-            builder.setActionMap(JavaControllerDefFactory.createActions(LabelController.class, labelControllerDesc));
-        } catch (QuickFixException qfe) {
-            throw new AuraUnhandledException("Broken LabelController", qfe);
-        }
-        builder.setControllerClass(LabelController.class);
-        builder.setLocation(LABEL_CONTROLLER, -1);
-        builder.setDescriptor(labelControllerDesc);
-
+        builder = getControllerBuilder(LabelController.class, LABEL_CONTROLLER);
         // FIXME="need an md5";
         ret.put(builder.getDescriptor(), builder.build());
 
         return ret;
+    }
+
+    private static Builder getControllerBuilder(Class controller, String qualifiedName) {
+
+        DefDescriptor<ControllerDef> controllerDesc = (DefDescriptor<ControllerDef>) Aura.getDefinitionService()
+                .getDefDescriptor(qualifiedName, ControllerDef.class);
+
+        Builder builder = new Builder();
+        try {
+            builder.setActionMap(JavaControllerDefFactory.createActions(controller, controllerDesc));
+        } catch (QuickFixException qfe) {
+            throw new AuraUnhandledException("Broken Controller: " + qualifiedName, qfe);
+        }
+        builder.setControllerClass(controller);
+        builder.setLocation(qualifiedName, -1);
+        builder.setDescriptor(controllerDesc);
+
+        return builder;
     }
 }

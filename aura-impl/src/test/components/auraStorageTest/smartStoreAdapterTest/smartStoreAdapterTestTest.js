@@ -13,15 +13,7 @@
      *   I believe it's safe to assume that these are large enough to hold our keys and objects. to be 100% sure we would need
      *   to have tests running on the devices
      */
-	//W-1624565 : FIREFOX being excluded 
-	/*From Yudi Nagata <ynagata@salesforce.com>:
-	why we have whitelist of browsers('GOOGLECHROME', 'SAFARI') in smart store adapter test :
-	The smart store is only accessible via our mobile sdk. 
-	the assumption is that we only will run smart store code when running in mobile app using this sdk, 
-	which consequently means aura will be loaded into webviews, not browsers. 
-	In order to avoid potential flappers/failures in browser that we do not support, 
-	we whitelisted webkit browser which are an approximation of what the ios/android webviews are
-	*/
+	//we have a white-list of browsers('GOOGLECHROME', 'SAFARI') in this test because we only support webkit browser for smart store adapter.the smart store is only accessible via our mobile SDK. 
 	browsers: ['GOOGLECHROME', 'SAFARI'],
     setUp:function(cmp){
         this.adapter = new $A.storageService.createAdapter("smartstore", "test");

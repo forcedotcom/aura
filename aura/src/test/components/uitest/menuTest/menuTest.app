@@ -16,6 +16,20 @@
 
 -->
 <aura:application model="java://org.auraframework.component.ui.MenuTestModel">
+<div style="display:inline-block;width:50%;vertical-align:top;">
+        <h2>Check Menu Position Test</h2>
+        <ui:menu aura:id="uiMenu" class="checkPositionMenu">
+            <ui:menuTriggerLink class="triggercheckPosition" aura:id="triggercheckPosition" label="Please pick your favorite soccer club"/>
+            <ui:menuList class="checkPosition" aura:id="checkPosition">
+                <ui:actionMenuItem class="checkPositionItem1" aura:id="checkPositionItem1" label="Bayern München" click="{!c.updateTriggerLabel}"/>
+                <ui:actionMenuItem class="checkPositionItem2" aura:id="checkPositionItem2" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
+                <ui:actionMenuItem class="checkPositionItem3" aura:id="checkPositionItem3" label="Inter Milan" click="{!c.updateTriggerLabel}"/>
+                <ui:actionMenuItem class="checkPositionItem4" aura:id="checkPositionItem4" label="Manchester United" click="{!c.updateTriggerLabel}"/>
+            </ui:menuList>
+        </ui:menu> 
+    </div>
+<hr/>
+<p/>
 <div style="margin:20px;">
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Your favorite soccer club</h2>

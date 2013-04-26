@@ -194,5 +194,37 @@
 				$A.test.addWaitForWithFailureMessage(menuItem3.get('v.label'), function(){return $A.test.getActiveElementText()}, "Focus should be on item 3");
 			}
 	    ]
-    }
+    },
+    
+    /**
+     * Test menu is positioned above if there is no space left at the bottom.
+     * Test Case: W-1622773
+     */
+    testPositionOfMenu:{
+    	test: [function(cmp) {
+    		trigger = cmp.find("triggercheckPosition");
+			menuList = cmp.find("checkPosition");
+			menuListElement = menuList.getElement();
+			item1 = cmp.find("checkPositionItem1").getElement();
+			trigger.get("e.click").fire();
+			$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(menuList.getElement(),"visible")}, "Menu Should be visible");
+		},function(cmp){
+			topPropertyValue = $A.util.style.getCSSProperty(menuListElement,'top');
+			//default value
+			$A.test.assertTrue(parseInt(topPropertyValue) >=0 || topPropertyValue=="auto", "CSS property of MenuList should be auto or a positive value");
+			viewPort = $A.util.getWindowSize();
+			//change the height for item1 such that not enough space below
+			item1.style.height = viewPort.height * 2 + "px";
+			trigger.get("e.click").fire();
+			$A.test.addWaitForWithFailureMessage(false, function(){return $A.util.hasClass(menuList.getElement(),"visible")}, "Menu Should not be visible");
+		}, function(cmp){
+			//open the menu
+			trigger.get("e.click").fire();
+			$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(menuList.getElement(),"visible")}, "Menu Should be visible after changing height of item1");
+		}, function(cmp){
+			topPropertyValue = $A.util.style.getCSSProperty(menuListElement,'top');
+			$A.test.assertTrue(parseInt(topPropertyValue) < 0, "Menu is not position properly");
+		}
+	]
+   }
 })

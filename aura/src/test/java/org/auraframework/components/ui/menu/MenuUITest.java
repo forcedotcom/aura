@@ -18,13 +18,10 @@ package org.auraframework.components.ui.menu;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
-import org.auraframework.test.WebDriverTestCase;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.auraframework.test.*;
 import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.openqa.selenium.*;
 
 /**
  * UI automation to verify Action, checkbox and radio Menu using mouse and keyboard interaction .
@@ -339,13 +336,14 @@ public class MenuUITest extends WebDriverTestCase{
 	public void testRemovingMenuDoesNotThrowJsError() throws MalformedURLException, URISyntaxException{
 		open(MENUTEST_APP);
 		WebDriver driver = this.getDriver();
-		String uiMenuClassName = "uiMenu";
+		String uiMenuClassName = "clubMenu";
+		String uiMenuLocalId = "uiMenu";
 		WebElement menuLabel = driver.findElement(By.className(uiMenuClassName));
 		assertTrue("UiMenu should be present on the page",menuLabel.isDisplayed());
 		
 		//For W-1540590
 		assertEquals("ui:menu's wrapper element should be div", "div", menuLabel.getTagName());
-		String uiMenu = auraUITestingUtil.getFindAtRootExpr(uiMenuClassName);
+		String uiMenu = auraUITestingUtil.getFindAtRootExpr(uiMenuLocalId);
 		auraUITestingUtil.getEval("$A.unrender(" + uiMenu + ")");
 		assertFalse("UiMenu should not be present after unrender", isElementPresent(By.className(uiMenuClassName)));
 	}

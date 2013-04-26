@@ -39,6 +39,41 @@
         }
     },
     
+    handleVisible : function(component, currentlyVisible) {
+        var concreteCmp = component.getConcreteComponent();
+        var visible = concreteCmp.get("v.visible");
+        if (visible === true) {
+            if (currentlyVisible !== true) { // If menu changes from invisible to visible, let's set the initial focus
+                var index = concreteCmp.get("v.focusItemIndex");
+                if (index < 0) {
+                    index = concreteCmp.getValue("v.childMenuItems").getLength() - 1;
+                }
+                this.setMenuItemFocus(concreteCmp, index);
+            }
+        } else {
+            concreteCmp.setValue("v.focusItemIndex", 0);
+        }
+        this.handleGlobalClick(concreteCmp, visible);
+    },
+    
+    position: function(component) {
+        var divCmp = component.find("menu");
+        var elem = divCmp ? divCmp.getElement() : null;
+        if (elem) {
+            elem.style.top = "auto";
+            var visible = component.get("v.visible");
+            if (visible) {
+                var elemRect = elem.getBoundingClientRect();
+                var viewPort = $A.util.getWindowSize();
+                if (elemRect.bottom > viewPort.height) { // no enough space below
+                    elem.style.top = 0 - elemRect.height + "px"; 
+                } else {
+                    elem.style.top = "auto";
+                }
+            }
+        }
+    },
+    
     setAriaAttributes: function(component) {
         var concrete = component.getConcreteComponent();
         var elem = concrete.getElement();
@@ -66,22 +101,5 @@
                 action.run();
             }
         }
-    },
-    
-    handleVisible : function(component, currentlyVisible) {
-        var concreteCmp = component.getConcreteComponent();
-        var visible = concreteCmp.get("v.visible");
-        if (visible === true) {
-            if (currentlyVisible !== true) { // If menu changes from invisible to visible, let's set the initial focus
-                var index = concreteCmp.get("v.focusItemIndex");
-                if (index < 0) {
-                    index = concreteCmp.getValue("v.childMenuItems").getLength() - 1;
-                }
-                this.setMenuItemFocus(concreteCmp, index);
-            }
-        } else {
-            concreteCmp.setValue("v.focusItemIndex", 0);
-        }
-        this.handleGlobalClick(concreteCmp, visible);
     }
 })

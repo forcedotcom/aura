@@ -115,6 +115,7 @@ public class InputTextUITest extends WebDriverTestCase {
     @UnAdaptableTest
     // because it fails in FIREFOX
     // IE10 IE7 IE8 IE9: failed on event mousemove -- is this similar to mouseOver issue in IE?
+    // IPHONE IPAD : test time out
     @ExcludeBrowsers({ BrowserType.IE10, BrowserType.IE9, BrowserType.IPAD, BrowserType.ANDROID_PHONE,
             BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.FIREFOX, BrowserType.IE7 })
     public void testUpdateOnAttributeWithCertainEvents() throws Exception {

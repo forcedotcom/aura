@@ -79,12 +79,11 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
         MasterDefRegistry mdf = Aura.getContextService().getCurrentContext().getDefRegistry();
         Set<DefDescriptor<?>> found = mdf.find(this.dependency);
-
-        dependencies.addAll(found);
         if (found.size() == 0) {
             // TODO: QuickFix for broken dependency.
             throw new InvalidDefinitionException("Invalid dependency " + this.dependency, getLocation());
         }
+        dependencies.addAll(found);
     }
 
     /**

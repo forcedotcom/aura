@@ -46,7 +46,13 @@ public class InputDateUITest extends WebDriverTestCase {
     private final String selectedDate = "a[class*='selectedDate']";
 
     private final String className = "return $A.test.getActiveElement().className";
-
+   
+    /*
+     * Excluded Browser Reasons:
+     *      IE7:                     this browser does not support WAI-ARIA and certain elements can not be found. Manually tested
+     *      Android and IOS devices: this feature will not be used on mobile devices. Instead the their native versions will be used
+     */
+    
     public InputDateUITest(String name) {
         super(name);
     }
@@ -93,100 +99,37 @@ public class InputDateUITest extends WebDriverTestCase {
     }
 
     //Home and End Button Test using January (31 days) , February (28 or 29 days), September (30 days)
-    @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testHomeEnd() throws Exception {
         open(URL);
 
-        int year = 2011;
-        int begMonth = 1;
-
-        GregorianCalendar cal = new GregorianCalendar();
-        SimpleDateFormat dtFormat = new SimpleDateFormat (dateStr);
-        String fmt= dtFormat.format(cal.getTime());
-
         //Checking January (31 days)
         String inputBoxResult = homeEndButtonHelper("2011-1-31", Keys.HOME);
-
-        //Setting the date to what we should be expecting
-        cal.set(GregorianCalendar.YEAR, 2011);
-        cal.set(Calendar.MONTH, Calendar.JANUARY);
-        cal.set(Calendar.DAY_OF_MONTH, begMonth);
-        fmt= dtFormat.format(cal.getTime());
-
-        assertEquals("The Home button did not go to the beginning of January", fmt, inputBoxResult);
+        assertEquals("The Home button did not go to the beginning of January", "2011-01-01", inputBoxResult);
 
         inputBoxResult = homeEndButtonHelper("2011-1-1", Keys.END);
-
-        //Setting the date to what we should be expecting
-        cal.set(GregorianCalendar.YEAR, year);
-        cal.set(Calendar.MONTH, Calendar.JANUARY);
-        cal.set(Calendar.DAY_OF_MONTH, 31);
-        fmt= dtFormat.format(cal.getTime());
-
-        assertEquals("The End button did not go to the end of January", fmt, inputBoxResult);
+        assertEquals("The End button did not go to the end of January", "2011-01-31", inputBoxResult);
 
         //Checking February (28 or 29 days), none Leap year
         inputBoxResult = homeEndButtonHelper("2011-2-28",  Keys.HOME);
-
-        //Setting the date to what we should be expecting
-        cal.set(GregorianCalendar.YEAR, year);
-        cal.set(Calendar.MONTH, Calendar.FEBRUARY);
-        cal.set(Calendar.DAY_OF_MONTH, begMonth);
-        fmt= dtFormat.format(cal.getTime());
-
-        assertEquals("The Home button did not go to the beginning of February", fmt, inputBoxResult);
+        assertEquals("The Home button did not go to the beginning of February", "2011-02-01", inputBoxResult);
 
         inputBoxResult = homeEndButtonHelper("2011-2-1", Keys.END);
-
-        //Setting the date to what we should be expecting
-        cal.set(GregorianCalendar.YEAR, year);
-        cal.set(Calendar.MONTH, Calendar.FEBRUARY);
-        cal.set(Calendar.DAY_OF_MONTH, 28);
-        fmt= dtFormat.format(cal.getTime());
-
-        assertEquals("The End button did not go to the end of February", fmt, inputBoxResult);
+        assertEquals("The End button did not go to the end of February", "2011-02-28", inputBoxResult);
 
         //Checking February (28 or 29 days), Leap year
         inputBoxResult = homeEndButtonHelper("2012-2-29", Keys.HOME);
-
-        //Setting the date to what we should be expecting
-        cal.set(GregorianCalendar.YEAR, 2012);
-        cal.set(Calendar.MONTH, Calendar.FEBRUARY);
-        cal.set(Calendar.DAY_OF_MONTH, begMonth);
-        fmt= dtFormat.format(cal.getTime());
-
-        assertEquals("The Home button did not go to the beginning of February", fmt, inputBoxResult);
+        assertEquals("The Home button did not go to the beginning of February", "2012-02-01", inputBoxResult);
 
         inputBoxResult = homeEndButtonHelper("2012-2-1", Keys.END);
-
-        //Setting the date to what we should be expecting
-        cal.set(GregorianCalendar.YEAR, 2012);
-        cal.set(Calendar.MONTH, Calendar.FEBRUARY);
-        cal.set(Calendar.DAY_OF_MONTH, 29);
-        fmt= dtFormat.format(cal.getTime());
-
-        assertEquals("The End button did not go to the end of February", fmt, inputBoxResult);
+        assertEquals("The End button did not go to the end of February", "2012-02-29", inputBoxResult);
 
         //Checking September (30 days)
         inputBoxResult = homeEndButtonHelper("2011-9-30", Keys.HOME);
-
-        //Setting the date to what we should be expecting
-        cal.set(GregorianCalendar.YEAR, year);
-        cal.set(Calendar.MONTH,  Calendar.SEPTEMBER);
-        cal.set(Calendar.DAY_OF_MONTH, begMonth);
-        fmt= dtFormat.format(cal.getTime());
-
-        assertEquals("The Home button did not go to the beginning of September", fmt, inputBoxResult);
+        assertEquals("The Home button did not go to the beginning of September", "2011-09-01", inputBoxResult);
 
         inputBoxResult = homeEndButtonHelper("2011-9-1", Keys.END);
-
-        //Setting the date to what we should be expecting
-        cal.set(GregorianCalendar.YEAR, year);
-        cal.set(Calendar.MONTH,  Calendar.SEPTEMBER);
-        cal.set(Calendar.DAY_OF_MONTH, 30);
-        fmt= dtFormat.format(cal.getTime());
-
-        assertEquals("The End button did not go to thes end of September", fmt, inputBoxResult);
+        assertEquals("The End button did not go to thes end of September", "2011-09-30", inputBoxResult);
     }
 
     private final String pageUpDownHelper(int iterCondition, String keyString)
@@ -218,7 +161,7 @@ public class InputDateUITest extends WebDriverTestCase {
     }
 
     //Testing the functionality of page_down, page_up, shift+page_down, shift+page_up
-    @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.IE10,BrowserType.IE9, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testPageUpDownYear() throws Exception {
         DateFormat formatter = new SimpleDateFormat (dateStr);
         open(URL);
@@ -254,7 +197,7 @@ public class InputDateUITest extends WebDriverTestCase {
 
 
     //Testing the functionality of page_down, page_up, shift+page_down, shift+page_up
-    @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testPageUpDownMonth() throws Exception {
         DateFormat formatter = new SimpleDateFormat (dateStr);
         open(URL);
@@ -288,7 +231,7 @@ public class InputDateUITest extends WebDriverTestCase {
 
     //Testing functionallity of tab, starting from the InputBox to the today button
     //Do Not run with Safari. Safari does not handle tabs normally
-    @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE,
         BrowserType.SAFARI })
     public void testTab() throws Exception {
         open(URL);
@@ -329,7 +272,7 @@ public class InputDateUITest extends WebDriverTestCase {
 
     //TODO:Should Fail until bug W-1570768 is fixed
     //Checking functionality of the shift tab button
-    @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void _testShiftTab() throws Exception {
          open(URL);
 
@@ -376,7 +319,7 @@ public class InputDateUITest extends WebDriverTestCase {
     }
 
     //Testing functionality of the ESC key
-    @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testEscape() throws Exception {
         open(URL);
 
@@ -403,7 +346,7 @@ public class InputDateUITest extends WebDriverTestCase {
     }
 
     // Testing adding date manually then opening the calendar clicking on the same date
-    @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testAddDateManually() throws Exception {
 
         open(URL);
@@ -462,7 +405,7 @@ public class InputDateUITest extends WebDriverTestCase {
     }        
 
     //Testing Functionality of calendar in traversing through 1 year by the keys
-    @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testDateWithOneArrow() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
@@ -494,7 +437,7 @@ public class InputDateUITest extends WebDriverTestCase {
     }
 
     //Testing functionality of arrows being used one after the other
-    @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testLeftAndRightArrows() throws Exception {
         // Increase day in month by 1
         open(URL);
@@ -530,7 +473,7 @@ public class InputDateUITest extends WebDriverTestCase {
     }
 
     //Testing functionality of arrows being used one after the other, while going through months
-    @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testUpAndDownArrows() throws Exception {
 
         open(URL);
@@ -617,7 +560,7 @@ public class InputDateUITest extends WebDriverTestCase {
     }
     
     //Testing functionality of arrows button on calendar by intercombining them and making them go through months and year
-    @ExcludeBrowsers({ BrowserType.IE7,BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
+    @ExcludeBrowsers({ BrowserType.IE7, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testMonthYearByArrowsButtons() throws Exception {
         String nextMonth = "a[class*='navLink nextMonth']";
         String nextYear = "a[class*='navLink nextYear']";

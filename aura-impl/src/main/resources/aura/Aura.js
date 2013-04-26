@@ -109,6 +109,7 @@ var clientService;
 // #include aura.model.Model
 // #include aura.storage.AuraStorageService
 // #include aura.storage.Storage
+// #include aura.provider.LabelValueProvider
 
 /**
  * @class The Aura framework. Default global instance name is $A.
@@ -132,6 +133,7 @@ $A.ns.Aura = function() {
     this.layoutService = new AuraLayoutService();
     this.localizationService = new AuraLocalizationService();
     this.storageService = new AuraStorageService();
+    this.labelValueProvider = new LabelValueProvider();
 
     //#if {"excludeModes" : ["PRODUCTION"]}
     this.devToolService = new AuraDevToolService();
@@ -301,25 +303,53 @@ $A.ns.Aura = function() {
     this.getEvt = this.eventService.newEvent;
 
     // TODO: convert to //#exportSymbols when available
-    exp(aura, "clientService", aura.clientService, "componentService", aura.componentService, "serializationService", aura.serializationService, "renderingService", aura.renderingService, "expressionService", aura.expressionService,
-            "historyService", aura.historyService, "localizationService", aura.localizationService, "eventService", aura.eventService, "layoutService", aura.layoutService, "storageService", aura.storageService, "services", aura.services, "render",
-            aura.render, "rerender", aura.rerender, "unrender", aura.unrender, "afterRender", aura.afterRender, "getCmp", aura.getCmp,
-            //#if {"excludeModes" : ["PRODUCTION"]}
-            "devToolService", aura.devToolService, "getQueryStatement", aura.devToolService.newStatement, "qhelp", function() {
-                return aura.devToolService.help()
-            },
-            //#end
-            "newCmp", aura.newCmp, "getEvt", aura.getEvt);
+    exp(aura,
+        "clientService", aura.clientService,
+        "componentService", aura.componentService,
+        "serializationService", aura.serializationService,
+        "renderingService", aura.renderingService,
+        "expressionService", aura.expressionService,
+        "historyService", aura.historyService,
+        "localizationService", aura.localizationService,
+        "eventService", aura.eventService,
+        "layoutService", aura.layoutService,
+        "storageService", aura.storageService,
+        "labelValueProvider", aura.labelValueProvider,
+        "services", aura.services,
+        "render", aura.render,
+        "rerender", aura.rerender,
+        "unrender", aura.unrender,
+        "afterRender", aura.afterRender,
+        "getCmp", aura.getCmp,
+        //#if {"excludeModes" : ["PRODUCTION"]}
+            "devToolService", aura.devToolService,
+            "getQueryStatement", aura.devToolService.newStatement,
+            "qhelp", function() { return aura.devToolService.help() },
+        //#end
+        "newCmp", aura.newCmp,
+        "getEvt", aura.getEvt);
     var services = aura.services;
+
     // TODO: convert to //#exportSymbols when available
-    exp(services, "rendering", services.rendering, "event", services.event, "component", services.component, "client", services.client, "history", services.history, "l10n", services.localization, "storage", services.storage, "cmp", services.cmp,
-            "e", services.e, "getValue", services.getValue, "c", {
+    exp(services,
+        "rendering", services.rendering,
+        "event", services.event,
+        "component", services.component,
+        "client", services.client,
+        "history", services.history,
+        "l10n", services.localization,
+        "storage", services.storage,
+        "cmp", services.cmp,
+        "e", services.e,
+        "getValue", services.getValue,
+        "c", {
                 getValue : function(name) {
                     return services.cmp.getControllerDef({
                         descriptor : name
                     });
                 }
-            });
+            }
+    );
 
     this.eventService.addHandler({
         event : 'aura:systemError',

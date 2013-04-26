@@ -29,7 +29,6 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -53,13 +52,6 @@ public class ComponentController {
         DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor(name, ApplicationDef.class);
         definitionService.updateLoaded(desc, false);
         return Aura.getInstanceService().getInstance(desc, attributes);
-    }
-
-    @AuraEnabled
-    public static String getLabel(@Key("section") String section, @Key("name") String name) throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        String result = context.getLabel(section, name, (Object[]) null);
-        return result;
     }
 
     @AuraEnabled

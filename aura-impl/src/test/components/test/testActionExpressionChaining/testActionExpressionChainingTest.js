@@ -31,6 +31,7 @@
 
     /*
      * Html action can be passed as component attribute.
+     * IPAD IPHONE excluded: no way to click on a div element through javascript. https://github.com/forcedotcom/lumen-beta/commit/8e96f59e46cc2d9266b79c346332e838a1c2b06f
      */
     testAfterRenderTopLevelHtmlElement: {
         browsers: ["-IPAD","-IPHONE"],
@@ -69,6 +70,7 @@
 
     /*
      * Html action can be passed as component attribute function.
+     * IPAD IPHONE excluded: no way to click on a div element through javascript. https://github.com/forcedotcom/lumen-beta/commit/8e96f59e46cc2d9266b79c346332e838a1c2b06f
      */
     testAfterRenderTopLevelHtmlElementFunctionEvaluation: {
         browsers: ["-IPAD","-IPHONE"],

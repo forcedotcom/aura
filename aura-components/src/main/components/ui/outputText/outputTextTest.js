@@ -81,6 +81,8 @@
     },
     /**
      * Output text with linefeed.
+     * IE7 IE8 Excluded: textContent doesn't work https://github.com/forcedotcom/lumen-beta/commit/25650a7343a41b5fd613c23ad0ec400098657f6f
+     * and $A.test.​getText() won't trim the space
      */
     testLineFeed:{
         browsers: ["-IE7", "-IE8"],
@@ -91,6 +93,8 @@
     },
     /**
      * Output text with linefeeds.
+     * IE7 IE8 Excluded: textContent doesn't work https://github.com/forcedotcom/lumen-beta/commit/25650a7343a41b5fd613c23ad0ec400098657f6f
+     * and $A.test.​getText() won't trim the space
      */
     testLineFeeds:{
         browsers: ["-IE7", "-IE8"],
@@ -101,6 +105,8 @@
     },
     /**
      * Output text with carriage returns & linefeeds.  Carriage returns are output as \n by browser.
+     * IE7 IE8 Excluded: textContent doesn't work https://github.com/forcedotcom/lumen-beta/commit/25650a7343a41b5fd613c23ad0ec400098657f6f
+     * and $A.test.​getText() won't trim the space
      */
     testCarriageReturnLineFeeds:{
         browsers: ["-IE7", "-IE8"],

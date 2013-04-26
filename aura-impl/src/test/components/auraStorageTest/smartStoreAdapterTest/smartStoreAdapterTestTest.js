@@ -13,6 +13,7 @@
      *   I believe it's safe to assume that these are large enough to hold our keys and objects. to be 100% sure we would need
      *   to have tests running on the devices
      */
+	//we have a white-list of browsers('GOOGLECHROME', 'SAFARI') in this test because we only support webkit browser for smart store adapter.the smart store is only accessible via our mobile SDK. 
 	browsers: ['GOOGLECHROME', 'SAFARI'],
     setUp:function(cmp){
         this.adapter = new $A.storageService.createAdapter("smartstore", "test");

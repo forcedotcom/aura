@@ -16,6 +16,7 @@
 ({
     /**
      * Verify that aura:beforeLayoutChange is fired before a layout change
+     * IE789 excluded: history service was not previously supported in IE
      */
     testEventsPreAndPostLayoutChange:{
 	browsers:["-IE7", "-IE8", "-IE9"],

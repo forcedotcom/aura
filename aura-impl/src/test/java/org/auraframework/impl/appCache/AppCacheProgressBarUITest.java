@@ -24,9 +24,9 @@ import org.auraframework.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
 
 /**
- * UI automation for AppCache implementation.
- * 
- * ThreadHostile because simultaneous loads of the testApp will interfere with progress bar loading.
+ * UI automation for AppCache implementation. ThreadHostile because simultaneous loads of the testApp will interfere
+ * with progress bar loading. #W-1624136 : these test are excluded from SAFARI, FIREFOX, IE10,7,8,9, Iphone, Ipad for js
+ * parser error
  */
 @ThreadHostileTest
 @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })

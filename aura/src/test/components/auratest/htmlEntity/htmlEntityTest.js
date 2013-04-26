@@ -55,6 +55,7 @@
     },
     
     // IE outputs nbsp as 32, rather than 160
+    // W-1625218: IE7 IE8 : passed but not included
     testHtmlEntitiesInIE: {
     	browsers: ["IE9", "IE10"],
     	test: function(component){

@@ -41,10 +41,10 @@
     <p>We will explain the support levels in terms of components, which are the most common definitions to have different support levels. The support levels in ascending order are:</p>
 
     <ol>
-        <li><code>PROTO</code>&mdash;The component is still in development and is unsupported. This is the default support level.</li>
-        <li><code>DEPRECATED</code>&mdash;The component is deprecated and is no longer supported.</li>
-        <li><code>BETA</code>&mdash;The component is ready for beta use but we don't recommend using it in a GA app.</li>
-        <li><code>GA</code>&mdash;The component is generally available for use in apps and is supported.</li>
+        <li><ui:stamp severity="important">PROTO</ui:stamp>&mdash;The component is still in development and is unsupported. This is the default support level.</li>
+        <li><ui:stamp severity="inverse">DEPRECATED</ui:stamp>&mdash;The component is deprecated and is no longer supported.</li>
+        <li><ui:stamp severity="warning">BETA</ui:stamp>&mdash;The component is ready for beta use but we don't recommend using it in a GA app.</li>
+        <li><ui:stamp severity="success">GA</ui:stamp>&mdash;The component is generally available for use in apps and is supported.</li>
     </ol>
 
     <p>If you extend a component, you can't give the child component a higher support level than the parent component. For example, if cmpA is <code>BETA</code> and cmpB extends cmpA, cmpB can't have a support level of <code>GA</code>. It can have a support level of <code>BETA</code> or <code>PROTO</code>.</p>

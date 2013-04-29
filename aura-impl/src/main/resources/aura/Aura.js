@@ -344,9 +344,7 @@ $A.ns.Aura = function() {
         "getValue", services.getValue,
         "c", {
                 getValue : function(name) {
-                    return services.cmp.getControllerDef({
-                        descriptor : name
-                    });
+                    return services.cmp.getControllerDef({descriptor : name});
                 }
             }
     );
@@ -390,16 +388,19 @@ $A.ns.Aura.prototype.initAsync = function(config) {
  *
  * @param {Object} config The configuration attributes
  * @param {Boolean} useExisting
- * @param {Boolean} doNotInitializeServices Set to true if Layout and History services should not be initialized, or false if they should. Defaults to true for Aura Integration Service.
+ * @param {Boolean=} doNotInitializeServices Set to true if Layout and History services should not be initialized, or false if 
+ * 	 they should. Defaults to true for Aura Integration Service.
+ * @param {Boolean=} doNotCallJiffyOnLoad True if Jiffy.onLoad() should not be called after initialization. In case of 
+ *       IntegrationService when aura components are embedded on the page, onLoad is called by the parent container.      
  */
-$A.ns.Aura.prototype.initConfig = function(config, useExisting, doNotInitializeServices) {
+$A.ns.Aura.prototype.initConfig = function(config, useExisting, doNotInitializeServices, doNotCallJiffyOnLoad) {
     config = $A.util.json.resolveRefs(config);
 
     if (!useExisting || $A.util.isUndefined($A.getContext())) {
         clientService.initHost(config["host"]);
 
         $A.context = new AuraContext(config["context"]);
-        this.init(config["instance"], config["token"], config["context"], null, doNotInitializeServices);
+        this.init(config["instance"], config["token"], config["context"], null, doNotInitializeServices, doNotCallJiffyOnLoad);
     } else {
         // Use the existing context and just join the new context into it
         $A.getContext().join(config["context"]);
@@ -412,11 +413,14 @@ $A.ns.Aura.prototype.initConfig = function(config, useExisting, doNotInitializeS
  * @param {String} token
  * @param {Object} context The mode of the application or component ("DEV", "PROD", "PTEST")
  * @param {Object} container Sets the container for the component.
- * @param {Boolean} doNotInitializeServices Set to true if Layout and History services should not be initialized, or false if they should. Defaults to true for Aura Integration Service.
+ * @param {Boolean=} doNotInitializeServices Set to true if Layout and History services should not be initialized, or false if 
+ * 	 they should. Defaults to true for Aura Integration Service.
+ * @param {Boolean=} doNotCallJiffyOnLoad True if Jiffy.onLoad() should not be called after initialization. In case of 
+ *       IntegrationService when aura components are embedded on the page, onLoad is called by the parent container.      
  */
-$A.ns.Aura.prototype.init = function(config, token, context, container, doNotInitializeServices) {
+$A.ns.Aura.prototype.init = function(config, token, context, container, doNotInitializeServices, doNotCallJiffyOnLoad) {
     var component = $A.util.json.resolveRefs(config);
-    $A.initPriv(component, token, container, doNotInitializeServices);
+    $A.initPriv(component, token, container, doNotInitializeServices, doNotCallJiffyOnLoad);
 };
 
 /**
@@ -426,11 +430,13 @@ $A.ns.Aura.prototype.init = function(config, token, context, container, doNotIni
  *        timestamp of last modified change
  * @param {String} token
  * @param {Object} container Sets the container for the component.
- * @param {Boolean} doNotInitializeServices True if Layout and History services should not be initialized, or false if
+ * @param {Boolean=} doNotInitializeServices True if Layout and History services should not be initialized, or false if
  *        they should. Defaults to true for Aura Integration Service.
+ * @param {Boolean=} doNotCallJiffyOnLoad True if Jiffy.onLoad() should not be called after initialization. In case of 
+ *       IntegrationService when aura components are embedded on the page, onLoad is called by the parent container.      
  * @private
  */
-$A.ns.Aura.prototype.initPriv = function(config, token, container, doNotInitializeServices) {
+$A.ns.Aura.prototype.initPriv = function(config, token, container, doNotInitializeServices, doNotCallJiffyOnLoad) {
     if (!$A["hasErrors"]) {
         $A.mark("ClientService.init");
         $A.mark("LayoutService.init");
@@ -452,26 +458,37 @@ $A.ns.Aura.prototype.initPriv = function(config, token, container, doNotInitiali
                 $A.initialized = true;
             }
 
-            $A.finishInit();
+            $A.finishInit(doNotCallJiffyOnLoad);
         }, container ? $A.util.getElement(container) : null);
     }
 };
 
 /**
  * Signals that initialization has completed.
+ * @param {Boolean=} doNotCallJiffyOnLoad True if Jiffy.onLoad() should not be called after initialization. In case of 
+ *       IntegrationService when aura components are embedded on the page, onLoad is called by the parent container.      
  * @private
  */
-$A.ns.Aura.prototype.finishInit = function() {
+$A.ns.Aura.prototype.finishInit = function(doNotCallJiffyOnLoad) {
     if (!this["finishedInit"]) {
         $A.mark("Aura.finishInit");
         $A.util.removeClass(document.body, "loading");
 
         $A.endMark("Aura.finishInit");
-        if (window["Jiffy"] && window["Jiffy"]["onLoad"]) {
-            window["Jiffy"]["onLoad"]();
-            if (window["Jiffy"]["ui"] && window["Jiffy"]["ui"]["onLoad"]) {
-                window["Jiffy"]["ui"]["onLoad"]();
+        if(window["Jiffy"]){
+          //Do not call Jiffy.onLoad()
+          if(doNotCallJiffyOnLoad){
+            if(window["Jiffy"]["setTimer"]){
+              window["Jiffy"]["setTimer"]("Aura Init");
             }
+        }else{ 
+          if (window["Jiffy"]["onLoad"]) {
+                window["Jiffy"]["onLoad"]();
+                if (window["Jiffy"]["ui"] && window["Jiffy"]["ui"]["onLoad"]) {
+                    window["Jiffy"]["ui"]["onLoad"]();
+                }
+            }
+          }
         }
         this["finishedInit"] = true;
         $A.clientService.fireLoadEvent("e.aura:initialized");

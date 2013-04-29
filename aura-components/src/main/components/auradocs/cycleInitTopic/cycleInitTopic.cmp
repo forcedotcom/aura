@@ -25,16 +25,16 @@
 
     <p>For a component request, the server:</p>
     <ol>
-        <li>Loads registries and locates component definitions</li>
-        <li>Builds or retrieves component definitions</li>
-        <li>Instantiates component definitions</li>
-        <li>Serializes component definitions and instances</li>
-        <li>Sends serialized component definitions and instances to the client</li>
+        <li>Load registries and locates component definitions.</li>
+        <li>Build or retrieves component definitions.</li>
+        <li>Instantiate component definitions.</li>
+        <li>Serialize component definitions and instances.</li>
+        <li>Send serialized component definitions and instances to the client.</li>
     </ol>
 
     <auradocs:info>See the <auradocs:topicLink topic="cycleRefs">Component Request Glossary</auradocs:topicLink> section for a glossary of component request terms.</auradocs:info>
 
-    <h4>1. Load registries and locate component definitions</h4>
+    <h4>1. Load registries and locate component definitions.</h4>
     <p>When the server receives an HTTP request, the Aura framework is loaded according to the specified mode. <code>AuraContextFilter</code> creates a <code>AuraContext</code>, which contains the mode denoted by the <code>aura.mode</code> parameter in the URL, such as in <code>http://&lt;yourServer&gt;/namespace/&lt;component&gt;.cmp?aura.mode=PROD</code>. Aura uses the default mode if the <code>aura.mode</code> parameter is not included in the query string. See <auradocs:topicLink topic="modesReference">Modes</auradocs:topicLink> for more information.</p>
 
    <p>The server receives and parses the request for an instance of a component definition (<code>ComponentDef</code>). If attributes are included, Aura converts them to strongly typed attributes for the component definition.</p>
@@ -43,7 +43,7 @@
 
     <p>A master definition registry (<code>MasterDefRegistry</code>) contains a list of registries (<code>DefRegistry</code>) that are used to load and cache definitions. A separate registry is used for each Aura object, such as actions, or controllers.</p>
 
-   <h4>2. Build or retrieve component definitions</h4>
+   <h4>2. Build or retrieve component definitions.</h4>
 
    <p>This stage of the process retrieves the component's metadata, known as the <code>ComponentDef</code>.</p>
 
@@ -60,7 +60,7 @@
    <p>Each component definition in the tree is parsed iteratively. The process is completed when the <code>ComponentDef</code> tree doesn't contain any unparsed <code>ComponentDef</code>s.</p>
 
 
-  <h4>3. Instantiate component definitions</h4>
+  <h4>3. Instantiate component definitions.</h4>
    <p>Once the server completes the component definition process, it can create a component instance. To start this instantiation, the <code>ComponentDef</code> (a root definition) is retrieved along with any attribute definitions and references to other components. The next steps are:
    </p>
    <ul>
@@ -77,7 +77,7 @@
 
    <p>The instantiation process terminates when the component and all its child nodes have been instantiated. Note that controllers are not instantiated since they are static and don't have any state.</p>
 
-<h4>4. Serialize component definition and instances</h4>
+<h4>4. Serialize component definition and instances.</h4>
    <p>Aura enables dynamic rendering on the client side through a JSON serialization process, which begins after instantiation completes. Aura serializes:</p>
    <ul>
         <li>The component instance tree</li>
@@ -87,7 +87,7 @@
 
    <p>When the current object has been serialized but it's not the root object corresponding to the requested component, its parent objects are serialized recursively.</p>
 
-  <h4>5. Send serialized component definitions and instances to client</h4>
+  <h4>5. Send serialized component definitions and instances to client.</h4>
 
    <p>The server sends the serialized component definitions and instances to the client. Definitions are cached but the instance data is not cached.</p>
 

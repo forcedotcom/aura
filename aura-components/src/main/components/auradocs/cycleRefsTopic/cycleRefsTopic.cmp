@@ -109,7 +109,7 @@
                 <tr>
                     <td>Definition Registry</td>
                     <td><code>DefRegistry</code></td>
-                    <td>A <code>DefRegistry</code> loads and caches a list of definitions, such as <code>ActionDef</code>, <code>ApplicationDef</code>, <code>ComponentDef</code>, or <code>ControllerDef</code>. A separate registry is used for all Aura objects. If the definition is not found, the request is passed to a factory, which builds the definition.</td>
+                    <td>A <code>DefRegistry</code> loads and caches a list of definitions, such as <code>ActionDef</code>, <code>ApplicationDef</code>, <code>ComponentDef</code>, or <code>ControllerDef</code>. A separate registry is used for all Aura objects. If the definition is not found, the request is passed to <code>DefFactory</code>, an interface that builds the definition.</td>
                 </tr>
                 <tr>
                     <td>Definition Descriptor</td>

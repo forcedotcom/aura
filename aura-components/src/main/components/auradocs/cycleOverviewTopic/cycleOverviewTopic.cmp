@@ -22,5 +22,5 @@
 
     <p>We saw in an earlier topic how Aura processes an <auradocs:topicLink topic="faqInit">initial request for an app</auradocs:topicLink>.</p>
 
-    <p>When a component is requested, Aura retrieves the relevant metadata and data to construct the component from the server. The framework uses the metadata and data to construct the component on the client, enabling the client to render the component.</p>
+    <p>When a component is requested, Aura retrieves the relevant metadata and data from the server to construct the component. The framework uses the metadata and data to construct the component on the client, enabling the client to render the component.</p>
 </aura:component>

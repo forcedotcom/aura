@@ -21,16 +21,16 @@
 
     <p>The client performs these tasks:</p>
     <ol>
-        <li>Deserializes the response to create a metadata tree</li>
-        <li>Traverses the metadata tree to create an instance tree</li>
-        <li>Traverses the instance tree to render the component</li>
-        <li>Renders the components</li>
+        <li>Deserialize the response to create a metadata tree.</li>
+        <li>Traverse the metadata tree to create an instance tree.</li>
+        <li>Traverse the instance tree to render the component.</li>
+        <li>Render the components.</li>
     </ol>
 
-    <h4>1. Deserialize the response to create a metadata tree</h4>
+    <h4>1. Deserialize the response to create a metadata tree.</h4>
     <p>The JSON representation of the component definition is deserialized to create a metadata structure (JavaScript objects or maps).</p>
 
-    <h4>2. Traverse the metadata tree to create an instance tree</h4>
+    <h4>2. Traverse the metadata tree to create an instance tree.</h4>
     <p>The client traverses the JavaScript tree to initialize objects from the deserialized tree.
     The tree may contain:
     <ul>
@@ -39,10 +39,10 @@
     </ul>
     </p>
 
-    <h4>3. Traverse the instance tree to render the component</h4>
+    <h4>3. Traverse the instance tree to render the component.</h4>
     <p>The client traverses the instance tree to render the component instance. The reference IDs are used to recreate the component references, which can point to a <code>ComponentDef</code>, a model, or a controller.</p>
 
-    <h4>4. Render the components</h4>
+    <h4>4. Render the components.</h4>
     <p>The client locates the renderer definition in the component bundle, or uses the default renderer method to render the component and any sub-components.</p>
 
     <p><b>See also:</b><br/>

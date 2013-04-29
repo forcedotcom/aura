@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 ({
-	 testEmptyItems:{
+    testEmptyItems:{
         test:function(cmp){
             var element = cmp.getElement();
-            aura.test.assertTrue(element.className.indexOf("uiMessage")!=-1, "Expected to see a message to indicate no data.");
-            aura.test.assertEquals("No data found.", $A.test.​getText(​element), "Message to indicate no data is absent or incorrect")
+            $A.test.assertTrue(element.className.indexOf("uiMessage")!=-1, "Expected to see a message to indicate no data.");
+            $A.test.assertEquals("No data found.", $A.test.getText(element).trim(), "Message to indicate no data is absent or incorrect");
         }
     }
 })

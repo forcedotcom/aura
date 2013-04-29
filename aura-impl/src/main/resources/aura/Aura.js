@@ -478,16 +478,16 @@ $A.ns.Aura.prototype.finishInit = function(doNotCallJiffyOnLoad) {
         if(window["Jiffy"]){
           //Do not call Jiffy.onLoad()
           if(doNotCallJiffyOnLoad){
-            if(window["Jiffy"]["setTimer"]){
-              window["Jiffy"]["setTimer"]("Aura Init");
-            }
-        }else{ 
-          if (window["Jiffy"]["onLoad"]) {
-                window["Jiffy"]["onLoad"]();
-                if (window["Jiffy"]["ui"] && window["Jiffy"]["ui"]["onLoad"]) {
-                    window["Jiffy"]["ui"]["onLoad"]();
-                }
-            }
+              if(window["Jiffy"]["setTimer"]){
+        	  window["Jiffy"]["setTimer"]("Aura Init");
+              }
+          }else{ 
+        	if (window["Jiffy"]["onLoad"]) {
+                    window["Jiffy"]["onLoad"]();
+                    if (window["Jiffy"]["ui"] && window["Jiffy"]["ui"]["onLoad"]) {
+                        window["Jiffy"]["ui"]["onLoad"]();
+                    }
+        	}
           }
         }
         this["finishedInit"] = true;

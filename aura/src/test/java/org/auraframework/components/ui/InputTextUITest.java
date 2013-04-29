@@ -19,7 +19,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -36,9 +35,8 @@ public class InputTextUITest extends WebDriverTestCase {
         super(name);
     }
 
-    @UnAdaptableTest
-    // because it fails in FIREFOX in SFDC (may be dependent on FF version)
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
+    // Firefox version conflict
+    @ExcludeBrowsers({ BrowserType.FIREFOX, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testUpdateOnAttribute_UsingStringSource() throws Exception {
         String event = "blur";
         String baseTag = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> "
@@ -58,11 +56,9 @@ public class InputTextUITest extends WebDriverTestCase {
         value = assertModelValue(event); // value should have been updated
     }
 
-    @UnAdaptableTest
-    // because it fails in FIREFOX
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
+    // Firefox version conflict
+    @ExcludeBrowsers({ BrowserType.FIREFOX, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testUpdateOnAttribute() throws Exception {
-
         open(TEST_CMP);
         String value = getCurrentModelValue();
         WebDriver d = getDriver();
@@ -75,10 +71,13 @@ public class InputTextUITest extends WebDriverTestCase {
         value = assertModelValue(eventName); // value should have been updated
         assertDomEventSet();
 
-        eventName = "change";
-        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        outputDiv.click();
-        value = assertModelValue(eventName);
+        // Change event not picked up on Safari
+        if (!checkBrowserType("SAFARI")) {
+            eventName = "change";
+            input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+            outputDiv.click();
+            value = assertModelValue(eventName);
+        }
 
         eventName = "click";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
@@ -112,17 +111,8 @@ public class InputTextUITest extends WebDriverTestCase {
         assertDomEventSet();
     }
 
-    @UnAdaptableTest
-    /**
-     * W-1625372 : we better break this test into smaller ones
-     * it fails in FIREFOX
-     * IE10 IE7 IE8 IE9: failed on event mousemove -- is this similar to mouseOver issue in IE?
-     * IPHONE IPAD : test time out
-     */
-    @ExcludeBrowsers({ BrowserType.IE10, BrowserType.IE9, BrowserType.IPAD, BrowserType.ANDROID_PHONE,
-            BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.FIREFOX, BrowserType.IE7 })
-    public void testUpdateOnAttributeWithCertainEvents() throws Exception {
-
+    @TargetBrowsers({ BrowserType.GOOGLECHROME })
+    public void testUpdateOnAttributeWithCertainEventsChrome() throws Exception {
         open(TEST_CMP);
         String value = getCurrentModelValue();
         WebDriver d = getDriver();
@@ -130,15 +120,8 @@ public class InputTextUITest extends WebDriverTestCase {
 
         WebElement outputDiv = d.findElement(By.id("output"));
 
-        String eventName = "mousedown";
+        String eventName = "dblclick";
         WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-        assertModelValue(value);
-        input.click();
-        value = assertModelValue(eventName);
-        assertDomEventSet();
-
-        eventName = "dblclick";
-        input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         assertModelValue(value);
         a.doubleClick(input).build().perform();
         value = assertModelValue(eventName);
@@ -180,9 +163,28 @@ public class InputTextUITest extends WebDriverTestCase {
         value = assertModelValue(eventName);
     }
 
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE,
+    /**
+     * Different browsers support different events, so this case tests an event supported by all browsers.
+     * testUpdateOnAttributeWithCertainEventsChrome() more extensively tests different event types, but only on Chrome
+     * where we know they are all supported.
+     */
+    // Firefox version conflict
+    @ExcludeBrowsers({ BrowserType.FIREFOX })
+    public void testUpdateOnAttributeWithCertainEventsAllBrowsers() throws Exception {
+        open(TEST_CMP);
+        String value = getCurrentModelValue();
+
+        String eventName = "mousedown";
+        WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+        assertModelValue(value);
+        input.click();
+        value = assertModelValue(eventName);
+        assertDomEventSet();
+    }
+
+    // W-1551077: Issue with Webdriver API ignores maxlength HTML5 attribute (iOS/Safari)
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.SAFARI })
-    // W-1551077: Issue with Webdriver API ignores maxlength HTML5 attribute
     public void testMaxLength() throws Exception {
         open("/uitest/inputTextMaxLength.cmp");
         WebElement input = findDomElement(By.cssSelector("input.uiInputText.uiInput"));
@@ -209,7 +211,7 @@ public class InputTextUITest extends WebDriverTestCase {
     private String getCurrentModelValue() {
         String valueExpression = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil
                 .getValueFromRootExpr("m.string"));
-        String value = (String)auraUITestingUtil.getEval(valueExpression);
+        String value = (String) auraUITestingUtil.getEval(valueExpression);
         return value;
     }
 
@@ -238,22 +240,25 @@ public class InputTextUITest extends WebDriverTestCase {
         input.click();
         input.sendKeys(inputText);
         try {
-            char outputText = (char)Integer.parseInt(outputValue.getText());
+            char outputText = (char) Integer.parseInt(outputValue.getText());
             assertEquals("InputChar and outputChar are different ", inputText.charAt(0), outputText);
         } catch (Exception e) {
             fail("ParseInt failed with following error" + e.getMessage());
         }
     }
 
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE })
-    public void testBaseMouseEventValue() throws Exception {
+    // W-1625895: Safari WebDriver bug- cannot right click because interactions API not implemented
+    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
+            BrowserType.ANDROID_TABLET })
+    public void testBaseMouseClickEventValue() throws Exception {
         open(TEST_CMP);
         WebElement input = findDomElement(By.cssSelector(".keyup"));
         WebElement outputValue = findDomElement(By.cssSelector(".outputValue"));
 
-        // left click behavior
+        // IE < 9 uses values 1, 2, 4 for left, right, middle click (respectively)
+        String expectedVal = (checkBrowserType("IE7") || checkBrowserType("IE8")) ? "1" : "0";
         input.click();
-        assertEquals("Left click not performed ", "0", outputValue.getText());
+        assertEquals("Left click not performed ", expectedVal, outputValue.getText());
 
         // right click behavior
         Actions actions = new Actions(getDriver());

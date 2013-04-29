@@ -77,5 +77,18 @@
                     "$A.error failed to display escaped html markup as error text");
             }
         }]
+    },
+    testAuraErrorStackTrace : {
+        test : function(cmp) {
+            try {
+                $A.error("Verifying stack trace present");
+                $A.test.fail("Test setup failure, $A.error failed to throw exception.");
+            } catch(e) {
+                var message = $A.util.getElement("auraErrorMessage");
+                $A.test.assertNotNull(message, "Aura error message box did is not present after $A.error()");
+                $A.test.assertStartsWith("Verifying stack trace present\nError: stack\n    at Error",
+                    $A.test.getText(message), "Unexpected stacktrace message");
+            }
+        }
     }
 })

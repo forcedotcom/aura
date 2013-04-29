@@ -43,6 +43,7 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsFunction;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
@@ -104,8 +105,15 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                     }
                 }
 
-                Map<String, Object> attributes = (Map<String, Object>) value
+                Map<String, Object> caseAttributes = (Map<String, Object>) value
                         .get("attributes");
+                Map<String, Object> attributes = Maps.newHashMap();
+                if (defaultAttributes != null) {
+                    attributes.putAll(defaultAttributes);
+                }
+                if (caseAttributes != null) {
+                    attributes.putAll(caseAttributes);
+                }
 
                 List<String> labelsList = (List<String>) (List<?>) value
                         .get("testLabels");
@@ -117,12 +125,12 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                 Set<String> browsers = browserListForTestCase == null ? (browserListForTestSet == null ? Collections.EMPTY_SET
                         : Sets.newHashSet(browserListForTestSet))
                         : Sets.newHashSet(browserListForTestCase);
-                
+
                 List<String> exceptionsAllowedDuringInitList = (List<String>) (List<?>) value
-						.get("exceptionsAllowedDuringInit");
-				Set<String> exceptionsAllowedDuringInit = exceptionsAllowedDuringInitList == null ? Collections.EMPTY_SET
-						: Sets.newHashSet(exceptionsAllowedDuringInitList);
-				
+                        .get("exceptionsAllowedDuringInit");
+                Set<String> exceptionsAllowedDuringInit = exceptionsAllowedDuringInitList == null ? Collections.EMPTY_SET
+                        : Sets.newHashSet(exceptionsAllowedDuringInitList);
+
                 DefDescriptor<? extends BaseComponentDef> compDesc = DefDescriptorImpl
                         .getAssociateDescriptor(descriptor, ComponentDef.class,
                                 DefDescriptor.MARKUP_PREFIX);
@@ -145,10 +153,8 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                     }
                 }
 
-                builder.caseDefs.add(new JavascriptTestCaseDef(descriptor, key,
-                        null, attributes != null ? attributes
-                                : defaultAttributes, defType, labels, browsers,
-                        mocks, exceptionsAllowedDuringInit));
+                builder.caseDefs.add(new JavascriptTestCaseDef(descriptor, key, null, attributes, defType, labels,
+                        browsers, mocks, exceptionsAllowedDuringInit));
             }
         }
 

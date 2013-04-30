@@ -21,6 +21,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.def.ControllerDef;
@@ -67,6 +69,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class AuraRegistryProviderImpl implements RegistryAdapter {
+    private static final Logger _log = Logger.getLogger(RegistryAdapter.class);
 
     private DefRegistry<?>[] registries;
 
@@ -96,6 +99,12 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
                         markupLoaders.add(rsl);
                         javaLoaders.add(rsl);
                     } else if (location.getComponentSourceDir() != null) {
+                        if (!location.getComponentSourceDir().canRead()
+                                || !location.getComponentSourceDir().canExecute()
+                                || !location.getComponentSourceDir().isDirectory()) {
+                            _log.error("Unable to find "+location.getComponentSourceDir()+", ignored.");
+                            continue;
+                        }
                         jsLoaders.add(new FileJavascriptSourceLoader(location.getComponentSourceDir()));
                         styleLoaders.add(new FileStyleSourceLoader(location.getComponentSourceDir()));
                         markupLoaders.add(new FileSourceLoader(location.getComponentSourceDir()));
@@ -168,7 +177,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
         return ret;
     }
 
-    private Collection<ComponentLocationAdapter> getAllComponentLocationAdapters() {
+    protected Collection<ComponentLocationAdapter> getAllComponentLocationAdapters() {
         Collection<ComponentLocationAdapter> ret = ServiceLocator.get().getAll(ComponentLocationAdapter.class);
         String prop = System.getProperty("aura.componentDir");
         if (prop != null) {

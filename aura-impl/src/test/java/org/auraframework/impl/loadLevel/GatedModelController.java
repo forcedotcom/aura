@@ -27,7 +27,7 @@ public class GatedModelController {
         if (waitId == null) {
             return;
         }
-        GatedModel.getLatch(waitId).countDown();
+        GateKeeper.releaseGate(waitId);
     }
 
     @AuraEnabled
@@ -35,6 +35,6 @@ public class GatedModelController {
         if (waitId == null) {
             return;
         }
-        GatedModel.clearLatch(waitId);
+        GateKeeper.clearGate(waitId);
     }
 }

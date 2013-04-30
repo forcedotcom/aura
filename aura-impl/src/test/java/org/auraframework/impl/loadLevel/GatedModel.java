@@ -17,18 +17,11 @@ package org.auraframework.impl.loadLevel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.auraframework.Aura;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
-
-import org.apache.log4j.Logger;
-
-import org.auraframework.throwable.AuraRuntimeException;
 
 /**
  * A model to allow the client to control server speed.
@@ -44,39 +37,6 @@ import org.auraframework.throwable.AuraRuntimeException;
  */
 @Model
 public class GatedModel {
-    private static final Logger logger = Logger.getLogger("GatedModel");
-
-    private static class LatchMemory {
-        private final CountDownLatch latch = new CountDownLatch(1);
-        private final long time = System.currentTimeMillis();
-    }
-
-    static private ConcurrentHashMap<String, LatchMemory> pending = new ConcurrentHashMap<String, LatchMemory>();
-
-    public static CountDownLatch getLatch(String id) {
-        LatchMemory latch = pending.get(id);
-        if (latch != null && latch.time < System.currentTimeMillis() - 60000) {
-            logger.error("Uncleared latch at "+id);
-            pending.remove(id);
-            latch = null;
-        }
-        if (latch == null) {
-            pending.putIfAbsent(id, new LatchMemory());
-            latch = pending.get(id);
-        }
-        return latch.latch;
-    }
-
-    public static void clearLatch(String id) {
-        if (!pending.containsKey(id)) {
-            logger.error("Unexpected key removal of "+id);
-        }
-        LatchMemory lm = pending.remove(id);
-        if (lm.latch.getCount() > 0) {
-            logger.error("Unreleased latch being removed at "+id);
-        }
-    }
-
     public GatedModel() throws Exception {
         Aura.getContextService().getCurrentContext().getComponents();
         Aura.getContextService().getCurrentContext().getGlobalProviders();
@@ -88,10 +48,7 @@ public class GatedModel {
             return;
         }
         if (id != null) {
-            CountDownLatch latch = getLatch(id);
-            if (!latch.await(60, TimeUnit.SECONDS)) {
-                throw new AuraRuntimeException("Latch "+id+" never released");
-            }
+            GateKeeper.waitForGate(id);
         }
     }
 

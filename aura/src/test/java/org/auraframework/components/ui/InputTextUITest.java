@@ -35,8 +35,7 @@ public class InputTextUITest extends WebDriverTestCase {
         super(name);
     }
 
-    // Firefox version conflict
-    @ExcludeBrowsers({ BrowserType.FIREFOX, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testUpdateOnAttribute_UsingStringSource() throws Exception {
         String event = "blur";
         String baseTag = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> "
@@ -56,8 +55,7 @@ public class InputTextUITest extends WebDriverTestCase {
         value = assertModelValue(event); // value should have been updated
     }
 
-    // Firefox version conflict
-    @ExcludeBrowsers({ BrowserType.FIREFOX, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testUpdateOnAttribute() throws Exception {
         open(TEST_CMP);
         String value = getCurrentModelValue();
@@ -168,8 +166,6 @@ public class InputTextUITest extends WebDriverTestCase {
      * testUpdateOnAttributeWithCertainEventsChrome() more extensively tests different event types, but only on Chrome
      * where we know they are all supported.
      */
-    // Firefox version conflict
-    @ExcludeBrowsers({ BrowserType.FIREFOX })
     public void testUpdateOnAttributeWithCertainEventsAllBrowsers() throws Exception {
         open(TEST_CMP);
         String value = getCurrentModelValue();

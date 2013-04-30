@@ -17,9 +17,9 @@
     testEmptyItems:{
         test:function(cmp){
             var element = cmp.getElement();
-            $A.test.assertTrue($A.util.hasClass(element, "uiMessage"), "Expected to see a message to indicate no data.");
-            var text = $A.test.getText(element);
-            $A.test.assertEquals("No data found.", $A.util.trim(text), "Message to indicate no data is absent or incorrect");
+            $A.test.assertTrue(element.className.indexOf("uiMessage")!=-1, "Expected to see a message to indicate no data.");
+            $A.test.assertEquals("No data found.", $A.util.trim($A.test.getText(element)), "Message to indicate no data is absent or incorrect");
+
         }
     }
 })

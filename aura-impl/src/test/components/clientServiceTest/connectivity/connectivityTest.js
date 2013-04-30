@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 ({
-	/* IE & FIREFOX are excluded:The tests try to send out a request to other domains http://invalid.salesforce.com, IE and Firefox block it by default
-	 * W-1624480 : SAFARI is excluded
+	/** IE & FIREFOX are excluded:The tests try to send out a request to other domains http://invalid.salesforce.com, 
+	 * IE and Firefox block it by default
 	 */
-    browsers:["GOOGLECHROME"],
+    browsers:["GOOGLECHROME","SAFARI"],
     /**
      * Calling server action on default host succeeds.
      */

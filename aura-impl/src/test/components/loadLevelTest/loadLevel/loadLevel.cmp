@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" controller="java://org.auraframework.impl.loadLevel.GatedModelController">
+<aura:component render="client" extends="loadLevelTest:lazyLoadHelper" >
     Load Level<br/>
     <aura:renderIf isTrue="{!v.testLazy}">
         <loadLevelTest:serverComponent aura:id="lazy" waitId="lazy" aura:load="lazy"/>
@@ -32,11 +32,11 @@
     <loadLevelTest:clientComponent aura:id="lazyClient" aura:load="lazy"/>
 
     <aura:renderIf isTrue="{!v.testMissingRequiredAttribute}">
-     <loadlevelTest:serverComponentWReqAttr aura:id="lazyWReqAttr" waitId="lazyWReqAttr" aura:load="lazy"/>
+        <loadlevelTest:serverComponentWReqAttr aura:id="lazyWReqAttr" waitId="lazyWReqAttr" aura:load="lazy"/>
     </aura:renderIf>
 
-      <aura:attribute name="testLazy" type="boolean" default="false"/>
-      <aura:attribute name="testExclusive" type="boolean" default="false"/>
-      <aura:attribute name="testNestedLazy" type="boolean" default="false"/>
-      <aura:attribute name="testMissingRequiredAttribute" type="boolean" default="false"/>
+    <aura:attribute name="testLazy" type="boolean" default="false"/>
+    <aura:attribute name="testExclusive" type="boolean" default="false"/>
+    <aura:attribute name="testNestedLazy" type="boolean" default="false"/>
+    <aura:attribute name="testMissingRequiredAttribute" type="boolean" default="false"/>
 </aura:component>

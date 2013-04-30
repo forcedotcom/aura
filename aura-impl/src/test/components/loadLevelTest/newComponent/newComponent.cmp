@@ -15,8 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" controller="java://org.auraframework.impl.loadLevel.GatedModelController">
-
+<aura:component render="client" extends="loadLevelTest:lazyLoadHelper">
     <ui:button press="{!c.createCmpWithComplexAttributes}" label="Push for component"/>
     <!--ui:button press="{!c.makeServer}" label="Push for server component"/>
     <ui:button press="{!c.makeExclusiveServer}" label="Push for exclusive server component"/><br/-->

@@ -16,15 +16,16 @@
 
 -->
 <aura:component render="client" extends="loadLevelTest:lazyLoadHelper"  model="java://org.auraframework.impl.java.model.TestJavaModel">
-    <!--This component is just to help the tests. Since basic components come back really fast, having this component here
-    slows down the server response and helps testing. Also this will only work when lazy loading requests are batched-->
-    <loadLevelTest:serverComponent aura:id="lazy" waitId="loadSimpleAttributes" aura:load="lazy"/>
-
     <aura:attribute name="stringAttribute" type="String"/>
     <aura:attribute name="integerAttribute" type="Integer"/>
     <aura:attribute name="booleanAttribute" type="Boolean"/>
+    <aura:attribute name="waitId" type="String"/>
 
     <aura:expression value="{!v.stringAttribute}" aura:id="stringAttribute" aura:load="lazy"/>
+
+    <!--This component is just to help the tests. Since basic components come back really fast, having this component here
+    slows down the server response and helps testing. Also this will only work when lazy loading requests are batched-->
+    <loadLevelTest:serverComponent aura:id="lazy" waitId="{!v.waitId}" aura:load="lazy"/>
     <loadLevelTest:displayNumber number="{!v.integerAttribute}" aura:id="integerAttribute" aura:load="lazy"/>
     <!--This verifies boolean values and passing dirty values to facets of lazy components.-->
     <div aura:id="booleanWrapper">

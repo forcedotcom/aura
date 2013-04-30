@@ -17,15 +17,16 @@
 -->
 <aura:component render="client" extends="loadLevelTest:lazyLoadHelper">
     <aura:attribute name="stringAttribute" type="String" default="lazyLoading"/>
+    <aura:attribute name="waitId" type="String" />
 
     <!--This component is just to help the tests. Since basic components come back really fast, having this component here
     slows down the server response and helps testing. Also this will only work when lazy loading requests are batched-->
-    <loadLevelTest:serverComponent aura:id="lazy" aura:load="lazy" waitId="lazyLoadBasicTypes"/>
+    <loadLevelTest:serverComponent aura:id="lazy" aura:load="lazy" waitId="{!v.waitId}"/>
 
     <!-- HTML-->
     <div aura:id="simpleHtml" aura:load="lazy" title="div element"/>
     <div aura:id="htmlWithFacet" aura:load="lazy" title="div element as facet">
-        <div aura:id="facetInsideDiv" dir="ltr" style="width:34px;background-color:#ffffff;" title="div element inside facet"/>
+    <div aura:id="facetInsideDiv" dir="ltr" style="width:34px;background-color:#ffffff;" title="div element inside facet"/>
     </div>
 
     <!-- aura:label -->

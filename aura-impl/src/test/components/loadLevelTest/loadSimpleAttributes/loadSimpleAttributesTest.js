@@ -15,28 +15,26 @@
  */
 ({
     testUndefinedValues:{
+        attributes:{'waitId':'loadSimpleAttributesUndefined'},
         test:[function(cmp){
-            try{
-                var helper= cmp.getDef().getHelper();
-                helper.verifyLazyLoading(cmp, {'stringAttribute':'markup://aura:expression',
-                                          'integerAttribute':'markup://loadLevelTest:displayNumber',
-                                          'booleanAttribute':'markup://loadLevelTest:displayBoolean'},
-                                          "loadSimpleAttributes",
-                                          function(){
-                                             $A.test.assertEquals("",$A.test.getTextByComponent(cmp.find("stringAttribute")), "Failed to render blank value when a string attribute was not set.");
-                                             $A.test.assertEquals("",$A.test.getTextByComponent(cmp.find("integerAttribute")), "Failed to render blank value when a integer attribute was not set.");
-                                             $A.test.assertEquals("False",$A.test.getTextByComponent(cmp.find("booleanAttribute")), "Failed to detect undefined boolean value.");
-                                          });
-            } finally {
-                window.setTimeout(function(){$A.test.callServerAction(cmp.get("c.resumeAll"), true)}, 100);
-            }
+            var helper= cmp.getDef().getHelper();
+            helper.verifyLazyLoading(cmp, {'stringAttribute':'markup://aura:expression',
+                                      'integerAttribute':'markup://loadLevelTest:displayNumber',
+                                      'booleanAttribute':'markup://loadLevelTest:displayBoolean'},
+                                      "loadSimpleAttributesUndefined",
+                                      function(){
+                                         $A.test.assertEquals("",$A.test.getTextByComponent(cmp.find("stringAttribute")), "Failed to render blank value when a string attribute was not set.");
+                                         $A.test.assertEquals("",$A.test.getTextByComponent(cmp.find("integerAttribute")), "Failed to render blank value when a integer attribute was not set.");
+                                         $A.test.assertEquals("False",$A.test.getTextByComponent(cmp.find("booleanAttribute")), "Failed to detect undefined boolean value.");
+                                      });
         }]
     },
     testInitialValues:{
-        attributes:{'stringAttribute':'lazyLoading',integerAttribute:'99',booleanAttribute:true},
+        attributes:{'stringAttribute':'lazyLoading',integerAttribute:'99',booleanAttribute:true,'waitId':'loadSimpleAttributesInitial'},
         test:[function(cmp){
-            $A.test.addWaitFor(true, $A.test.isActionPending,
-                    function(){$A.test.callServerAction(cmp.get("c.resumeAll"), true);});
+            var helper= cmp.getDef().getHelper();
+            helper.resumeGateId(cmp, "loadSimpleAttributesInitial");
+
             $A.test.addWaitFor('markup://aura:expression', function(){
                     return  cmp.find('stringAttribute').getDef().getDescriptor().getQualifiedName();
                 },
@@ -61,10 +59,11 @@
         }]
     },
     testRerenderDirtyValuesOnLazyComponents:{
-        attributes:{'stringAttribute':'lazyLoading',integerAttribute:'99',booleanAttribute:true},
+        attributes:{'stringAttribute':'lazyLoading',integerAttribute:'99',booleanAttribute:true,'waitId':'loadSimpleAttributesDirty'},
         test:[function(cmp){
-            $A.test.addWaitFor(true, $A.test.isActionPending,
-                    function(){$A.test.callServerAction(cmp.get("c.resumeAll"), true);});
+            var helper = cmp.getDef().getHelper();
+            helper.resumeGateId(cmp, "loadSimpleAttributesDirty");
+
             $A.test.addWaitFor('markup://aura:expression', function(){
                 return  cmp.find('stringAttribute').getDef().getDescriptor().getQualifiedName();
             });

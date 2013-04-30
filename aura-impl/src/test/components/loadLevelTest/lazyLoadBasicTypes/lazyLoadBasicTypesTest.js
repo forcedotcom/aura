@@ -25,49 +25,46 @@
      * ContainerTagHandler.getDefRefHandler()
      */
     testHtmlExpressionAreNotLazilyLoaded:{
+        attributes:{waitId:"lazyLoadBasicTypes-Expression"},
         test:[function(cmp){
             try{
-                $A.test.assertEquals("markup://aura:html", cmp.find("simpleHtml").getDef().getDescriptor().getQualifiedName());
+                $A.test.assertEquals("markup://aura:html",
+                                     cmp.find("simpleHtml").getDef().getDescriptor().getQualifiedName());
                 $A.test.assertEquals("div element", cmp.find("simpleHtml").getElement().title);
-
-                $A.test.assertEquals("markup://aura:html", cmp.find("htmlWithFacet").getDef().getDescriptor().getQualifiedName());
+                $A.test.assertEquals("markup://aura:html",
+                                     cmp.find("htmlWithFacet").getDef().getDescriptor().getQualifiedName());
                 $A.test.assertEquals("div element as facet", cmp.find("htmlWithFacet").getElement().title);
-
-                $A.test.assertEquals("markup://aura:html", cmp.find("facetInsideDiv").getDef().getDescriptor().getQualifiedName());
+                $A.test.assertEquals("markup://aura:html",
+                                     cmp.find("facetInsideDiv").getDef().getDescriptor().getQualifiedName());
                 $A.test.assertEquals("div element inside facet", cmp.find("facetInsideDiv").getElement().title);
             } finally {
-                $A.test.callServerAction(cmp.get("c.resumeAll"), true);
+                var helper = cmp.getDef().getHelper();
+                helper.resumeGateId(cmp, "lazyLoadBasicTypes-Expression");
             }
         }]
     },
     testLazyLoadingAuraLabel:{
+        attributes:{waitId:"lazyLoadBasicTypes-Label"},
         test:[function(cmp){
-            try {
-                var helper= cmp.getDef().getHelper();
-                helper.verifyLazyLoading(cmp, {//'label':'markup://aura:label',
-                                                'labelWithoutBody':'markup://aura:label'},
-                                          "lazyLoadBasicTypes",
-                                          function(){
-                                                //$A.test.assertEquals("one logout two", $A.test.getTextByComponent(cmp.find('label')));
-                                                $A.test.assertEquals("one {0} two", $A.test.getTextByComponent(cmp.find("labelWithoutBody")));
-                                          });
-            } finally {
-                $A.test.callServerAction(cmp.get("c.resumeAll"), true);
-            }
+            var helper= cmp.getDef().getHelper();
+            helper.verifyLazyLoading(cmp, {'labelWithoutBody':'markup://aura:label'},
+                                     "lazyLoadBasicTypes-Label",
+                                     function(){
+                                         $A.test.assertEquals("one {0} two",
+                                                              $A.test.getTextByComponent(cmp.find("labelWithoutBody")));
+                                     });
         }]
     },
     testLazyLoadingAuraText:{
+        attributes:{waitId:"lazyLoadBasicTypes-Text"},
         test:[function(cmp){
-            try {
-                var helper= cmp.getDef().getHelper();
-                helper.verifyLazyLoading(cmp, {'text':'markup://aura:text'},
-                                          "lazyLoadBasicTypes",
-                                          function(){
-                                            $A.test.assertEquals("lazyLoading",$A.test.getTextByComponent(cmp.find("text")));
-                                          });
-            } finally {
-                $A.test.callServerAction(cmp.get("c.resumeAll"), true);
-            }
+            var helper= cmp.getDef().getHelper();
+            helper.verifyLazyLoading(cmp, {'text':'markup://aura:text'},
+                                     "lazyLoadBasicTypes-Text",
+                                     function(){
+                                         $A.test.assertEquals("lazyLoading",
+                                                              $A.test.getTextByComponent(cmp.find("text")));
+                                     });
         }]
     }
 })

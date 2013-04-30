@@ -135,7 +135,14 @@ AttributeSet.prototype.getComponentValueProvider = function() {
  * and insert new ones if they don't already exist in the source map.
  */
 AttributeSet.prototype.merge = function(yourMap, overwrite) {
-    this.values.merge(yourMap, overwrite);
+    var my = this.values.value;
+    var keys = yourMap.value;
+    for (var key in keys) {
+        var yourvalue = yourMap.getValue(key);
+        if (overwrite || !(key in my)) {
+            my[key] = yourvalue;
+        }
+    }
 };
 
 AttributeSet.prototype.createDefault = function(name) {

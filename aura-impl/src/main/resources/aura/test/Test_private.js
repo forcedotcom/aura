@@ -20,6 +20,7 @@ var priv = {
          * two variables help in accounting for assertions in the call back functions.
          */
         waits : [],
+        cleanups : [],
         complete : -1, // -1:uninitialized, 0:complete, 1:tearing down, 2:running, 3+:waiting
         errors : [],
         timeoutTime : 0,
@@ -112,6 +113,14 @@ function run(name, code, count){
             priv.complete = 1;
         }else {
             return;
+        }
+        try {
+            var i;
+            for (i = 0; i < priv.cleanups.length; i++) {
+                priv.cleanups[i]();
+            }
+        } catch(ce){
+            logError("Error during cleanup", ce);
         }
         try{
             if(suite["tearDown"]){

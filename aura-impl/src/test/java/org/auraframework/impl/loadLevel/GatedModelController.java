@@ -23,28 +23,18 @@ import org.auraframework.system.Annotations.Key;
 public class GatedModelController {
 
     @AuraEnabled
-    public static void resumeById(@Key("waitId") String waitId) {
+    public static void resumeGateId(@Key("waitId") String waitId) {
         if (waitId == null) {
             return;
         }
-        String lock = GatedModel.pending.remove(waitId);
-        ;
-        if (lock != null) {
-            synchronized (lock) {
-                lock.notifyAll();
-            }
-        }
+        GatedModel.getLatch(waitId).countDown();
     }
 
     @AuraEnabled
-    public static void resumeAll() {
-        for (String key : GatedModel.pending.keySet()) {
-            String lock = GatedModel.pending.remove(key);
-            if (lock != null) {
-                synchronized (lock) {
-                    lock.notifyAll();
-                }
-            }
+    public static void clearGateId(@Key("waitId") String waitId) {
+        if (waitId == null) {
+            return;
         }
+        GatedModel.clearLatch(waitId);
     }
 }

@@ -29,9 +29,12 @@
             attributes.each(function(key, value){
                 if(value.isLiteral()){
                     atts[key] = value.unwrap();
+                } else {
+                    atts[key] = $A.expressionService.get(cmp.getAttributes().getValueProvider(), value);
                 }
             });
         }
+        console.log(atts)
 
         action.setCallback(this, function(a){
             var newBody;

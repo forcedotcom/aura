@@ -181,6 +181,7 @@
      */
     testConfig_ComponentWithLazyFacet:{
         test:[function(cmp){
+            var helper = cmp.getDef().getHelper();
             var action = cmp.get('c.createComponentWithLazyFacets');
             action.run();
             cmp.getEvent("press").fire();
@@ -189,18 +190,18 @@
             $A.test.assertEquals("markup://aura:placeholder", body[0].getDef().getDescriptor().getQualifiedName(),
                     "Expected component to be initially represented by a placeholder.");
             this.assertAfterLazyLoading(body[0],"markup://loadLevelTest:serverWithLazyChild",
-                    function(){
-                        var serverCmp = this.extractCmpFromPlaceholder(body[0],"markup://loadLevelTest:serverWithLazyChild");
-                        var kid = serverCmp.find("kid");
-                        $A.test.assertEquals("placeholder", kid.getDef().getDescriptor().getName());
-                        $A.test.addWaitFor(true, $A.test.isActionPending,
-                                function(){$A.test.callServerAction(cmp.get("c.resumeAll"), true);});
+                function(){
+                    var serverCmp = this.extractCmpFromPlaceholder(body[0],"markup://loadLevelTest:serverWithLazyChild");
+                    var kid = serverCmp.find("kid");
+                    $A.test.assertEquals("placeholder", kid.getDef().getDescriptor().getName());
 
-                        $A.test.addWaitFor("serverComponent", function(){
-                            kid = serverCmp.find("kid");
-                            return kid.getDef().getDescriptor().getName();
-                        });
+                    helper.resumeGateId(cmp, "lazyKid");
+
+                    $A.test.addWaitFor("serverComponent", function(){
+                        kid = serverCmp.find("kid");
+                        return kid.getDef().getDescriptor().getName();
                     });
+                });
         }]
     },
     /**

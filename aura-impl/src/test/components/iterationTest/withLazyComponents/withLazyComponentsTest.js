@@ -20,21 +20,21 @@
     testSimpleLazyLoading:{
         attributes:{start:0,end:2, slowFacet:true},
         test:function(cmp){
-        	$A.test.setTestTimeout(30000);
+            var helper = cmp.getDef().getHelper();
             var items = cmp.find("lazy");
             $A.test.assertEquals(2, items.length,
                     "Expected two items in iteration component.");
             $A.test.assertEquals("placeholder", items[0].getDef().getDescriptor().getName(),
-                    "Expected a placeholder for lazy loading component.");
+                    "Expected a placeholder for first lazy loading component.");
             $A.test.assertEquals("placeholder", items[1].getDef().getDescriptor().getName(),
-                    "Expected a placeholder for lazy loading component.");
+                    "Expected a placeholder for second lazy loading component.");
 
-            $A.test.addWaitFor(true, $A.test.isActionPending,
-                    function(){
-                        setTimeout(function(){$A.test.callServerAction(cmp.get("c.resumeAll"), true);},100);
-                        setTimeout(function(){$A.test.callServerAction(cmp.get("c.resumeAll"), true);},500);
-                    });
-
+            //
+            // Note that we have to free up the second component because they get
+            // put in a single request to the server.
+            //
+            helper.resumeGateId(cmp, "withLazyComponents0");
+            helper.resumeGateId(cmp, "withLazyComponents1");
             //First Item
             $A.test.addWaitFor("serverComponent", function(){
                 return cmp.find("lazy")[0].getDef().getDescriptor().getName();
@@ -73,7 +73,6 @@
                 $A.test.assertTrue(flag, "Placeholder elements were not associated with iteration component");
 
             });
-
             //Second Item
             $A.test.addWaitFor("serverComponent", function(){
                 return cmp.find("lazy")[1].getDef().getDescriptor().getName();
@@ -81,6 +80,7 @@
                 $A.test.assertTrue(cmp.find("lazy")[1].isRendered());
                 $A.test.assertTrue($A.test.getTextByComponent(cmp.find("lazy")[1]).indexOf("Server component")!=-1);
             });
+
         }
     },
     /**
@@ -89,6 +89,7 @@
     testLazyLoadingWithAttributeValues:{
         attributes:{start:0,end:4, fastFacet:true},
         test:function(cmp){
+            var helper = cmp.getDef().getHelper();
             var iteration = cmp.find("iterationWithAttributes");
             var items = cmp.find("lazyWithAttributes");
             $A.test.assertEquals(4,items.length, "Expeted 4 items in iteration.");
@@ -98,6 +99,7 @@
                 $A.test.assertEquals("placeholder", item.getDef().getDescriptor().getName(),
                 "Expected a placeholder for lazy loading component.");
             }
+            helper.resumeGateId(cmp, "withAttributes");
 
             //Verify first item is replaced by expected value
             $A.test.addWaitFor('markup://aura:expression', function(){
@@ -106,7 +108,7 @@
                 function(){
                     $A.test.assertEquals(cmp.get('m.innerData')[0],$A.test.getTextByComponent(cmp.find("lazyWithAttributes")[0]),
                         "Failed to provide value for lazy component in iteration block");
-            });
+                });
 
             //Verify last item is replaced by expected value
             $A.test.addWaitFor('markup://aura:expression', function(){
@@ -115,7 +117,7 @@
                 function(){
                     $A.test.assertEquals(cmp.get('m.innerData')[3],$A.test.getTextByComponent(cmp.find("lazyWithAttributes")[3]),
                         "Failed to provide value for lazy component in iteration block");
-            });
+                });
         }
     }
 })

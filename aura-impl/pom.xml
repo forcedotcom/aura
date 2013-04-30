@@ -72,9 +72,16 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-vfs2</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <properties>
         <aura.home>${basedir}/..</aura.home>
+        <xunit.js.engine>rhino</xunit.js.engine>
+        <xunit.js.console>${basedir}/src/test/tools/xUnit/xUnit.js.Console.js</xunit.js.console>
     </properties>
     <build>
         <resources>
@@ -148,13 +155,70 @@
                             <configuration>
                                 <includes>
                                     <include>**/*UnitTestSuite.java</include>
-                                    <include>aura/service/AuraTest.java</include>
                                 </includes>
                             </configuration>
                         </plugin>
                     </plugins>
                 </pluginManagement>
             </build>
+        </profile>
+        <profile>
+            <id>xunit.js</id>
+	        <activation>
+	            <property>
+	               <name>!skipUnitTests</name>
+	            </property>
+	        </activation>
+	        <build>
+	           <plugins>
+	               <plugin>
+	                   <artifactId>maven-antrun-plugin</artifactId>
+	                   <dependencies>
+	                       <dependency>
+	                           <groupId>ant-contrib</groupId>
+	                           <artifactId>ant-contrib</artifactId>
+	                           <version>1.0b3</version>
+	                           <exclusions>
+	                               <exclusion>
+	                                   <groupId>ant</groupId>
+	                                   <artifactId>ant</artifactId>
+	                               </exclusion>
+	                           </exclusions>
+	                       </dependency>
+	                   </dependencies>
+	                   <executions>
+	                       <execution>
+	                           <id>xunit.js</id>
+	                           <phase>test</phase>
+	                           <goals>
+                                    <goal>run</goal>
+                               </goals>
+	                           <configuration>
+	                               <tasks>
+	                                   <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath"/>
+	                                   <java classname="org.auraframework.test.javascript.GenerateXUnitJS" classpathref="maven.test.classpath" fork="true" failonerror="true">
+                                           <jvmarg value="-Daura.home=${basedir}/.." />
+                                       </java>
+		                               <switch value="${xunit.js.engine}">
+			                               <case value="rhino">
+				                               <java classname="org.mozilla.javascript.tools.shell.Main" classpathref="maven.test.classpath" fork="true" failonerror="true">
+					                               <jvmarg value="-Daura.home=${basedir}/.." />
+					                               <arg value="${xunit.js.console}"/>
+					                               <arg value="/dependency:${basedir}/src/test/tools/xUnit/dependencies/"/>
+					                               <arg value="${project.build.directory}/xunitjs/xunitTests"/>
+				                               </java>
+			                               </case>
+			                               <default>
+			                                 <fail>Unknown XUnit.js engine : ${xunit.js.engine}</fail>
+			                               </default>
+		                               </switch>
+	                               </tasks>
+	                           </configuration>
+	                       </execution>
+	                   </executions>
+	               </plugin>
+	           </plugins>
+	        </build>
         </profile>
     </profiles>
 </project>

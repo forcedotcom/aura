@@ -19,8 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.java.controller.JavaControllerDef.Builder;
 import org.auraframework.impl.java.controller.JavaControllerDefFactory;

@@ -18,120 +18,132 @@
  * @namespace Label Provider. Performs server action to retrieve label values
  * @constructor
  */
-var LabelValueProvider = function() {
+function LabelValueProvider() {
 
-    var labelValueProvider = {
+    this.values = null;
 
-        /**
-         * Wrapper that calls appropriate getter depending on whether component parameter is defined and a component
-         *
-         * @param expression
-         * @param component
-         * @return {*}
-         */
-        get: function(expression, component) {
+}
 
-            var result;
 
-            if(this.isLabelExpression(expression)) {
+/**
+ * Checks value is not defined or SimpleValue is not defined
+ *
+ * @param value
+ * @return {boolean}
+ * @private
+ */
+LabelValueProvider.prototype.isUndefinedSimpleValue = function(value) {
+    return (!value || (value.toString() === "SimpleValue" && !value.isDefined()));
+};
 
-                if($A.util.isComponent(component)) {
-                    result = $A.expressionService.get(component, expression);
-                } else {
-                    result = $A.get(expression);
-                }
-            }
+/**
+ * Performs LabelController.getLabel action to get specified section and name
+ *
+ * @param expression
+ * @param [component] component owner
+ * @param [callback]
+ * @return {SimpleValue}
+ * @private
+ */
+LabelValueProvider.prototype.requestServerLabel = function(expression, component, callback) {
 
-            return result;
-        },
+    var action = $A.get("c.aura://LabelController.getLabel"),
+        propRef = expression.getStem(),
+        name = propRef.path[1],
+        section = propRef.path[0],
+        isComponent = $A.util.isComponent(component);
 
-        /**
-         * Wrapper that returns SimpleValue object instead of String
-         *
-         * @param expression
-         * @param component
-         * @return {SimpleValue}
-         */
-        getValue: function(expression, component) {
+    action.setParams({
+        "name": name,
+        "section": section
+    });
 
-            var result;
+    var placeholder = $A.getContext().getMode() === "PROD" ? "" : "[" + section + "." + name + "]";
 
-            if(this.isLabelExpression(expression) && $A.util.isComponent(component)) {
-                result = $A.expressionService.getValue(component, expression);
-            }
+    // create SimpleValue with temporary value of section and name
+    var resValue = valueFactory.create(placeholder, null, isComponent ? component : null);
 
-            return result;
-        },
-
-        /**
-         * Checks value is not defined or SimpleValue is not defined
-         *
-         * @param value
-         * @return {boolean}
-         */
-        isUndefinedSimpleValue: function(value) {
-            return (!value || (value.toString() === "SimpleValue" && !value.isDefined()));
-        },
-
-        /**
-         * Performs LabelController.getLabel action to get specified section and name
-         *
-         * @param valueProvider
-         * @param expression
-         * @return {SimpleValue}
-         */
-        requestServerLabel: function(valueProvider, expression) {
-
-            var action = $A.get("c.aura://LabelController.getLabel"),
-                propRef = expression.getStem(),
-                name = propRef.path[1],
-                section = propRef.path[0];
-
-            action.setParams({
-                "name": name,
-                "section": section
-            });
-
-            var placeholder = $A.getContext().getMode() === "PROD" ? "" : "<" + section + "." + name + ">";
-
-            // create SimpleValue with temporary value of section and name
-            var resValue = valueFactory.create(placeholder, null, $A.util.isComponent(valueProvider) ? valueProvider : null);
-
-            action.setCallback(this, function(a) {
-                if(a.getState() == "SUCCESS") {
-                    resValue.setValue(a.getReturnValue());
-                } else {
-                    $A.log("Error getting label: " + expression.getValue());
-                }
-            });
-
-            action.runAfter(action);
-
-            if (!$A.util.isComponent(valueProvider)) {
-                // forces immediate lookup if not data-bound to component
-                $A.eventService.finishFiring();
-            }
-
-            return resValue;
-
-        },
-
-        /**
-         * Checks for $Label expression
-         *
-         * @param expression
-         * @return {boolean}
-         */
-        isLabelExpression: function(expression) {
-            if ($A.util.isString(expression)) {
-                expression = valueFactory.parsePropertyReference(expression);
-            }
-            return (expression.getRoot() === "$Label");
+    action.setCallback(this, function(a) {
+        if(a.getState() == "SUCCESS") {
+            resValue.setValue(a.getReturnValue());
+        } else {
+            $A.log("Error getting label: " + expression.getValue());
         }
 
-    };
+        if( $A.util.isFunction(callback)) {
+            callback.call(a, resValue);
+        }
+    });
 
-    //#include aura.provider.LabelValueProvider_export
+    action.runAfter(action);
 
-    return labelValueProvider;
+    if (!isComponent) {
+        // forces immediate lookup if not data-bound to component
+        $A.eventService.finishFiring();
+    }
+
+    return resValue;
+
+};
+
+/**
+ * Setter $Label values
+ * @param values
+ */
+LabelValueProvider.prototype.setValues = function(values) {
+    this.values = values;
+};
+
+/**
+ * Getter $Label values
+ * @return {Object} Label values
+ */
+LabelValueProvider.prototype.getValues = function() {
+    return this.values;
+};
+
+/**
+ * Loops through existing values to find value. If no value found, send request to server
+ *
+ * @param expression
+ * @param [component]
+ * @param [callback]
+ * @return {SimpleValue}
+ */
+LabelValueProvider.prototype.getValue = function(expression, component, callback) {
+
+    var value;
+
+    if( this.values ) {
+        value = this.values;
+        var propRef = expression.getStem();
+        while (!$A.util.isUndefinedOrNull(propRef)) {
+            var root = propRef.getRoot();
+            value = value.getValue(root);
+            if(!value) {
+                // the value should be a Value Object. if not, set as undefined and done.
+                value = undefined;
+                break;
+            }
+            propRef = propRef.getStem();
+        }
+    }
+
+    if(this.isUndefinedSimpleValue(value)) {
+        // request from server if no value found in existing gvps
+        value = this.requestServerLabel(expression, component, callback);
+    } else {
+
+        if ($A.util.isValue(value) && $A.util.isComponent(component)) {
+            // create new value object with reference to owner component
+            value = valueFactory.create(value.unwrap(), null, component);
+        }
+
+        if( $A.util.isFunction(callback) ) {
+            callback.call(null, value);
+        }
+
+    }
+
+    return value;
 };

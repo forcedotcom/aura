@@ -49,24 +49,23 @@ var AuraExpressionService = function AuraExpressionService(){
                 // TODO: bleh need better test here
                 return expression.getValue(valueProvider);
             }
+
+            var gvp = $A.getContext().getGlobalValueProviders();
+            // use gvp; supports existing usage of $A.get and $A.expressionService.get
+            if( gvp.isGlobalValueExp(expression) ){
+                return gvp.getValue(expression, valueProvider);
+            }
+
             var propRef = expression;
             var value = valueProvider;
             while (!aura.util.isUndefinedOrNull(propRef)) {
                 var root = propRef.getRoot();
                 value = value.getValue(root);
                 if (!value) {
-                    // check for globals
-                    value = $A.getContext().getGlobalValueProvider(root);
-                }
-                if (!value) {
                     // still nothing, time to die
                     break;
                 }
                 propRef = propRef.getStem();
-            }
-
-            if( $A.labelValueProvider.isLabelExpression(expression) && $A.labelValueProvider.isUndefinedSimpleValue(value) ) {
-                value = $A.labelValueProvider.requestServerLabel(valueProvider, expression);
             }
 
             return value;

@@ -1129,5 +1129,15 @@ $A.ns.Util.prototype.getWindowSize = function() {
 $A.ns.Util.prototype.isComponent = function(obj) {
     return (!this.isUndefinedOrNull(obj) && !this.isUndefinedOrNull(obj.auraType) && obj.auraType === 'Component');
 };
+
+/**
+ * Checks if the object is an aura value object via auraType property.
+ *
+ * @param {Object} obj The object to check for.
+ * @returns {Boolean} True if the object type is a component, or return false otherwise.
+ */
+$A.ns.Util.prototype.isValue = function(obj) {
+    return (!this.isUndefinedOrNull(obj) && !this.isUndefinedOrNull(obj.auraType) && obj.auraType === 'Value');
+};
  
 //#include aura.util.Util_export

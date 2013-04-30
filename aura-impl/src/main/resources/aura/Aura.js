@@ -109,7 +109,9 @@ var clientService;
 // #include aura.model.Model
 // #include aura.storage.AuraStorageService
 // #include aura.storage.Storage
+// #include aura.provider.GlobalValueProviders
 // #include aura.provider.LabelValueProvider
+// #include aura.provider.SimpleValueProvider
 
 /**
  * @class The Aura framework. Default global instance name is $A.
@@ -133,7 +135,6 @@ $A.ns.Aura = function() {
     this.layoutService = new AuraLayoutService();
     this.localizationService = new AuraLocalizationService();
     this.storageService = new AuraStorageService();
-    this.labelValueProvider = new LabelValueProvider();
 
     //#if {"excludeModes" : ["PRODUCTION"]}
     this.devToolService = new AuraDevToolService();
@@ -314,7 +315,6 @@ $A.ns.Aura = function() {
         "eventService", aura.eventService,
         "layoutService", aura.layoutService,
         "storageService", aura.storageService,
-        "labelValueProvider", aura.labelValueProvider,
         "services", aura.services,
         "render", aura.render,
         "rerender", aura.rerender,
@@ -627,10 +627,8 @@ $A.ns.Aura.prototype.getContext = function() {
  * @param {Object} val If the Aura type corresponds to "Value", returns the unwrapped value.
  */
 $A.ns.Aura.prototype.unwrap = function(val) {
-    if (val && val.auraType) {
-        if (val.auraType === "Value") {
-            return val.unwrap();
-        }
+    if ($A.util.isValue(val)) {
+        return val.unwrap();
     }
     return val;
 };
@@ -1007,6 +1005,14 @@ $A.ns.Aura.prototype.logLevel = (window["PerfLogLevel"] || {});
 $A.ns.Aura.prototype.setMode = function(mode) {
     this.mode = mode;
     this.enableAssertions = (mode != 'PROD' && mode != 'PTEST');
+};
+
+/**
+ * Get GVP directly
+ * @return {GlobalValueProviders}
+ */
+$A.ns.Aura.prototype.getGlobalValueProviders = function() {
+    return this.getContext().getGlobalValueProviders();
 };
 
 // #include aura.Aura_export

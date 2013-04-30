@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 /*jslint sub: true */
-exp(labelValueProvider,
-    "requestServerLabel", labelValueProvider.requestServerLabel,
-    "isUndefinedSimpleValue", labelValueProvider.isUndefinedSimpleValue,
-    "get", labelValueProvider.get,
-    "getValue", labelValueProvider.getValue,
-    "isLabelExpression", labelValueProvider.isLabelExpression
+var p = GlobalValueProviders.prototype;
+exp(p,
+    "get", p.get,
+    "getValue", p.getValue
 );

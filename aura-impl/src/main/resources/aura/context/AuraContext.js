@@ -40,34 +40,13 @@ function AuraContext(config) {
     this.transactionName = "";
     this.lastGlobalId = 0;
     this.componentConfigs = {};
-    var globalValueProviders = {};
-    this.globalValueProviders = globalValueProviders;
     this.app = config["app"];
     this.cmp = config["cmp"];
     this.test = config["test"];
 
-    // If persistent storage is active then write through for disconnected support
-    var storage = this.getStorage();
-    var that = this;
-    if (storage) {
-        storage.get("globalValueProviders", function(item) {
-            if (item) {
-                that.joinGlobalValueProviders(item, true);
-            }
-        });
-    }
-
-    var gvp = config["globalValueProviders"];
-    if (gvp) {
-        var l = gvp.length;
-        for ( var i = 0; i < l; i++) {
-            // TODO: need GlobalValueProvider js object, more than a mapvalue
-            var g = gvp[i];
-            globalValueProviders[g["type"]] = new MapValue(g["values"]);
-        }
-    }
-
     this.joinComponentConfigs(config["components"]);
+
+    this.globalValueProviders = new GlobalValueProviders(config["globalValueProviders"]);
 }
 
 /**
@@ -80,10 +59,12 @@ AuraContext.prototype.getMode = function() {
 };
 
 /**
- * @private
+ * Provides access to global value providers
+ *
+ * @return {GlobalValueProviders}
  */
-AuraContext.prototype.getGlobalValueProvider = function(key) {
-    return this.globalValueProviders[key];
+AuraContext.prototype.getGlobalValueProviders = function() {
+    return this.globalValueProviders;
 };
 
 /**
@@ -154,7 +135,7 @@ AuraContext.prototype.join = function(otherContext) {
     if (otherContext["fwuid"] !== this.fwuid) {
         throw new Error("framework mismatch");
     }
-    this.joinGlobalValueProviders(otherContext["globalValueProviders"]);
+    this.globalValueProviders.join(otherContext["globalValueProviders"]);
     this.joinComponentConfigs(otherContext["components"]);
     this.joinLoaded(otherContext["loaded"]);
 };
@@ -247,45 +228,6 @@ AuraContext.prototype.getComponentConfig = function(globalId) {
  */
 AuraContext.prototype.getApp = function() {
     return this.app;
-};
-
-/**
- * @private
- */
-AuraContext.prototype.joinGlobalValueProviders = function(gvps, doNotPersist) {
-    if (gvps) {
-        var storage;
-        var storedGvps;
-        if (!doNotPersist) {
-            // If persistent storage is active then write through for disconnected support
-            storage = this.getStorage();
-            storedGvps = [];
-        }
-
-        for ( var i = 0; i < gvps.length; i++) {
-            var newGvp = gvps[i];
-            var t = newGvp["type"];
-            var gvp = this.globalValueProviders[t];
-            if (!gvp) {
-                gvp = new MapValue(newGvp["values"]);
-                this.globalValueProviders[t] = gvp;
-            } else {
-                var mergeMap = new MapValue(newGvp["values"]);
-                gvp.merge(mergeMap, true);
-            }
-
-            if (storage) {
-                storedGvps.push({
-                    "type" : t,
-                    "values" : gvp.unwrap()
-                });
-            }
-        }
-
-        if (storage) {
-            storage.put("globalValueProviders", storedGvps);
-        }
-    }
 };
 
 /**

@@ -17,7 +17,8 @@
     testEmptyItems:{
         test:function(cmp){
             var element = cmp.getElement();
-            $A.test.assertTrue(element.className.indexOf("uiMessage")!=-1, "Expected to see a message to indicate no data.");
+            //element.className.indexOf does not work for IE10
+            $A.test.assertTrue($A.util.hasClass(element, "uiMessage"), "Expected to see a message to indicate no data.");
             $A.test.assertEquals("No data found.", $A.util.trim($A.test.getText(element)), "Message to indicate no data is absent or incorrect");
 
         }

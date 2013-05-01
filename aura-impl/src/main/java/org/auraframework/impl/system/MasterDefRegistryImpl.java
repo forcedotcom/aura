@@ -152,6 +152,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     private final Map<DefDescriptor<?>, Definition> defs = Maps.newLinkedHashMap();
 
+    private Set<DefDescriptor<? extends Definition>> localDescs = null;
+
     private final Set<DefDescriptor<?>> accessCache = Sets.newLinkedHashSet();
 
     private SecurityProviderDef securityProvider;
@@ -174,13 +176,22 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 matched.addAll(reg.find(matcher));
             }
         }
+        if (localDescs != null) {
+            for (DefDescriptor<? extends Definition> desc : localDescs) {
+                if (matcher.matchDescriptor(desc)) {
+                    matched.add(desc);
+                }
+            }
+        }
+
         return matched;
     }
 
     @Override
     public <D extends Definition> Set<DefDescriptor<D>> find(DefDescriptor<D> matcher) {
+        Set<DefDescriptor<D>> matched;
         if (matcher.getNamespace().equals("*")) {
-            Set<DefDescriptor<D>> matchingDesc = new LinkedHashSet<DefDescriptor<D>>();
+            matched = new LinkedHashSet<DefDescriptor<D>>();
             String qualifiedNamePattern = null;
             switch (matcher.getDefType()) {
             case CONTROLLER:
@@ -220,13 +231,23 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                         matcher.getDefType().getPrimaryInterface());
                 DefRegistry<D> registry = getRegistryFor(namespacedMatcher);
                 if (registry != null) {
-                    matchingDesc.addAll(registry.find(namespacedMatcher));
+                    matched.addAll(registry.find(namespacedMatcher));
                 }
             }
-            return matchingDesc;
         } else {
-            return getRegistryFor(matcher).find(matcher);
+            matched = getRegistryFor(matcher).find(matcher);
         }
+        if (localDescs != null) {
+            DescriptorFilter filter = new DescriptorFilter(matcher.getQualifiedName());
+            for (DefDescriptor<? extends Definition> desc : localDescs) {
+                if (filter.matchDescriptor(desc)) {
+                    @SuppressWarnings("unchecked")
+                    DefDescriptor<D> localDesc = (DefDescriptor<D>) desc;
+                    matched.add(localDesc);
+                }
+            }
+        }
+        return matched;
     }
 
     /**
@@ -730,7 +751,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @Override
     public <D extends Definition> void addLocalDef(D def) {
-        defs.put(def.getDescriptor(), def);
+        DefDescriptor<? extends Definition> desc = def.getDescriptor();
+        defs.put(desc, def);
+        if (localDescs == null) {
+            localDescs = Sets.newHashSet();
+        }
+        localDescs.add(desc);
     }
 
     @Override
@@ -876,6 +902,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     @Override
     public <T extends Definition> boolean invalidate(DefDescriptor<T> descriptor) {
         defs.clear();
+        if (localDescs != null) {
+            localDescs.clear();
+        }
         localDependencies.clear();
         accessCache.clear();
         dependencies.invalidateAll();

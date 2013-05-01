@@ -70,9 +70,9 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
         return ret;
     }
 
-    private static Builder getControllerBuilder(Class controller, String qualifiedName) {
+    private static Builder getControllerBuilder(Class<?> controller, String qualifiedName) {
 
-        DefDescriptor<ControllerDef> controllerDesc = (DefDescriptor<ControllerDef>) Aura.getDefinitionService()
+        DefDescriptor<ControllerDef> controllerDesc = Aura.getDefinitionService()
                 .getDefDescriptor(qualifiedName, ControllerDef.class);
 
         Builder builder = new Builder();

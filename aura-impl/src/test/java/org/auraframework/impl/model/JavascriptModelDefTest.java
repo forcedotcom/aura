@@ -20,11 +20,13 @@ import java.util.ArrayList;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ModelDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.javascript.model.JavascriptModelDef;
 import org.auraframework.impl.javascript.model.JavascriptValueDef;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Model;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
@@ -57,8 +59,12 @@ public class JavascriptModelDefTest extends AuraImplTestCase {
      * Verify bad value in javascript model throws correct exception.
      */
     public void testBadModelValue() throws Exception {
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        DefDescriptor<ModelDef> modelDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, ModelDef.class,
+                DefDescriptor.JAVASCRIPT_PREFIX);
+        auraTestingUtil.addSourceAutoCleanup(modelDesc, "{\"badType\":function(){}}");
         try {
-            Aura.getDefinitionService().getDefinition("test:jsModelBadValueType", ComponentDef.class);
+            cmpDesc.getDef();
             fail("Bad value in javascript model should throw Exception");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "Invalid value type in model definition.");
@@ -71,8 +77,12 @@ public class JavascriptModelDefTest extends AuraImplTestCase {
      */
     // TODO(W-1594517): Add validation to block null values
     public void _testNullValue() throws Exception {
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, "<aura:component/>");
+        DefDescriptor<ModelDef> modelDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, ModelDef.class,
+                DefDescriptor.JAVASCRIPT_PREFIX);
+        auraTestingUtil.addSourceAutoCleanup(modelDesc, "{\"nullType\":null}");
         try {
-            Aura.getDefinitionService().getDefinition("test:jsModelNullValueType", ComponentDef.class);
+            cmpDesc.getDef();
             fail("Null value in javascript model should throw Exception");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "Null value type in model definition.");

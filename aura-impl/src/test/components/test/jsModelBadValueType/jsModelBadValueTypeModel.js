@@ -1,3 +1,0 @@
-{
-    "badType" : function() {}
-}

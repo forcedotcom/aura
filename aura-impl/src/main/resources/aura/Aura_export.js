@@ -32,6 +32,7 @@ $A.ns.Aura.prototype["log"] = $A.ns.Aura.prototype.log;
 $A.ns.Aura.prototype["logf"] = $A.ns.Aura.prototype.logf;
 $A.ns.Aura.prototype["trace"] = $A.ns.Aura.prototype.trace;
 $A.ns.Aura.prototype["mark"] = $A.ns.Aura.prototype.mark;
+$A.ns.Aura.prototype["getGlobalValueProviders"] = $A.ns.Aura.prototype.getGlobalValueProviders;
 /**
  * @deprecated Use endMark instead
  */

@@ -19,7 +19,8 @@ exp(p,
     "getMode", p.getMode,
     "incrementTransaction", p.incrementTransaction,
     "getApp", p.getApp,
-    "setCurrentAction", p.setCurrentAction
+    "setCurrentAction", p.setCurrentAction,
+    "getGlobalValueProviders", p.getGlobalValueProviders
     //#if {"excludeModes" : ["PRODUCTION"]}
         ,
         "getPreloads", p.getPreloads,

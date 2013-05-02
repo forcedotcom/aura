@@ -24,7 +24,7 @@
     <expressionTest:test expression="{!v.undefined}" exprText="v.undefined" expected="undefined"/>
     <expressionTest:test expression="{!m.undefined}" exprText="m.undefined" expected="undefined"/>
     <expressionTest:test expression="{!c.undefined}" exprText="c.undefined" expected="undefined"/>
-    <expressionTest:test expression="{!$Labels.undefined}" exprText="$Labels.undefined" expected="undefined"/>
+    <expressionTest:test expression="{!$Labels.undefined.undefined}" exprText="$Labels.undefined.undefined" expected="undefined"/>
     <expressionTest:test expression="{!$whimsy}" exprText="$whimsy" expected="undefined"/>
 
     <expressionTest:test expression="{!!undefined}" exprText="!undefined" expected="true"/>

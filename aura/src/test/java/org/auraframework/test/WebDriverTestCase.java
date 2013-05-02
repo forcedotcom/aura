@@ -78,7 +78,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 || allClasses.startsWith(oneClass + " ") || allClasses.endsWith(" " + oneClass);
     }
 
-    protected int timeoutInSecs = 30;
+    protected int timeoutInSecs;
     private WebDriver currentDriver = null;
     BrowserType currentBrowserType = null;
     protected AuraUITestingUtil auraUITestingUtil;
@@ -124,6 +124,11 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         // after perBrowserTearDown
         currentDriver = null;
         // W-1475510: instantiating it inorder to expose certain Util methods.
+        timeoutInSecs = 30;
+        //For IE7 and IE8 increase the timeout to 90 for sauceLabs
+        if(checkBrowserType("IE7") || checkBrowserType("IE8")){
+        	timeoutInSecs = 90;
+        }
         auraUITestingUtil = new AuraUITestingUtil(this.getDriver());
     }
 
@@ -132,6 +137,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      */
 
     public void perBrowserTearDown() {
+    	timeoutInSecs = 30;
     }
 
     private void superRunTest() throws Throwable {

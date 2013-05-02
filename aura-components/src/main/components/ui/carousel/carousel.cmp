@@ -1,0 +1,75 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component  extends="ui:interactive" extensible="true" 
+	 description="A tabset component that allows swiping through groups of related content types in addition to standard keyboard, touch, and mouse interaction">
+
+		<aura:attribute name="title" type="String" description="Title of the carousel" />
+		<aura:attribute name="width" type="Integer" description="Width of the carousel" />
+		<aura:attribute name="height" type="Integer" description="Height of the carousel" />
+		<aura:attribute name="class" type="String" description="A CSS style to be attached to the carousel" />
+		<aura:attribute name="pageIndicatorPosition" type="String" default="top" description="Position of the page indicator. Acceptable values are 'top' and 'bottom'. " />
+		<aura:attribute name="defaultPage" type="Integer" description="Default page to display. Setting this will override the 'isDefault' attribute in the page" />
+		
+		<aura:attribute name="pageModels" type="Object[]" description="" />
+		<aura:attribute name="pageComponents" type="Aura.Component[]" description="Carousel page components that is rendered as carousel pages." />
+		
+		<aura:attribute name="priv_currentPage" type="Integer" description="PRIVATE the currently selected page index." />
+		<aura:attribute name="priv_carouselStyle" type="String" description="PRIVATE inline style of the carousel container." />
+		<aura:attribute name="priv_pageStyle" type="String" description="PRIVATE inline style of the carousel page. " />
+		<aura:attribute name="priv_scrollerWidth" type="String" description="PRIVATE" />
+		<aura:attribute name="priv_snap" type="String" description="PRIVATE"/>
+								
+		<aura:registerevent name="selectDefaultPage" type="ui:carouselPageEvent"/>
+    	<aura:registerevent name="pageSelected" type="ui:carouselPageEvent"/>
+    	<aura:registerevent name="loadPage" type="ui:carouselPageEvent" />    	
+		<aura:registerevent name="scrollEnd" type="ui:scrollEnd" />
+		
+    	<aura:handler name="selectDefaultPage" action="{!c.selectDefaultPage}" />
+    	<aura:handler name="pageSelected" action="{!c.pageSelected}" />    
+		<aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+				
+		<ui:resizeObserver onresize="{!c.refresh}"/>
+		
+		<article class="{!v.class}" style="{!v.priv_carouselStyle}" role="article">
+		 
+				<h2 class="visually-hidden">{!v.title}</h2>			
+							  
+				<nav aura:id="navContainer" class="{!'carousel-nav-container carousel-nav-position-' + v.pageIndicatorPosition}" role="tablist">
+            		<ui:carouselPageIndicator aura:id="pageIndicator" pagerClicked="{!c.pagerClicked}"
+                		 pagerKeyed="{!c.pagerKeyed}" />
+				</nav>
+				   	        
+		    	<div aura:id="carousel-pages" class="carousel-pages">
+			    	<ui:scroller aura:id="scroller"
+			    		width="{!v.priv_scrollerWidth}"
+			    	 	class="scroll-container"			    	 	
+			    	   	hScroll="true"
+			    	   	vScroll="false"
+			    	   	onScrollEnd= "{!c.onScrollEnd}"
+			    	   	refreshed="{!c.onScrollerRefreshed}"
+			    	   	snap="{!v.priv_snap}" >	    				    		    		 
+						 								 
+						<div aura:id="pageContainer"> 					 						 							
+						 	<!--page content will be rendered here-->
+						 </div>
+					</ui:scroller>
+				</div>            
+		</article>		
+				 
+</aura:component>
+

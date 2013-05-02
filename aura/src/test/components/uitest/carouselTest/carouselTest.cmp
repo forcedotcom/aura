@@ -1,0 +1,56 @@
+<!--
+
+    Copyright (C) 2012 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+	  
+		    	
+<aura:component>
+<div> 	
+ 	<ui:carousel width="450" height="450" class="myclass">
+ 		<aura:set attribute="pageComponents">
+	 		<ui:carouselPage>
+	 			<ui:carouselPageItem label="New Post 1" class="entity-post" />
+	 			<ui:carouselPageItem label="Task 1" class="entity-task" />
+	 			<ui:carouselPageItem label="New Opportunity 1" class="entity-opportunity" />	
+	 			<ui:carouselPageItem label="Thank Someone 1" class="entity-thanks" />
+	 			<ui:carouselPageItem label="File 1" class="entity-file" />
+	 			<ui:carouselPageItem label="Post a New Poll 1" class="entity-poll" />
+	 		</ui:carouselPage>
+	 		<ui:carouselPage>
+	 			<ui:carouselPageItem label="New Post 2" class="entity-post" />
+	 			<ui:carouselPageItem label="Task 2" class="entity-task" />
+	 			<ui:carouselPageItem label="New Opportunity 2" class="entity-opportunity" />	
+	 			<ui:carouselPageItem label="Thank Someone 2" class="entity-thanks" />
+	 			<ui:carouselPageItem label="File 2" class="entity-file" />
+	 			<ui:carouselPageItem label="Post a New Poll 2" class="entity-poll" />
+	 		</ui:carouselPage>
+	 		<ui:carouselPage>
+	 			<ui:carouselPageItem label="New Post 3" class="entity-post" />
+	 			<ui:carouselPageItem label="Task 3" class="entity-task" />
+	 			<ui:carouselPageItem label="New Opportunity 3" class="entity-opportunity" />	
+	 			<ui:carouselPageItem label="Thank Someone 3" class="entity-thanks" />
+	 			<ui:carouselPageItem label="File 3" class="entity-file" />
+	 			<ui:carouselPageItem label="Post a New Poll 3" class="entity-poll" />
+	 		</ui:carouselPage>
+	 		<ui:carouselPage>
+	 			<h1> Page 4 </h1>
+	 		</ui:carouselPage>
+ 		</aura:set>
+ 	</ui:carousel>
+</div> 	
+
+
+</aura:component>

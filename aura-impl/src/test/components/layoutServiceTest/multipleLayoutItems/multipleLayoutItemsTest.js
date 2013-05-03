@@ -18,7 +18,8 @@
      * Verify that aura:beforeLayoutChange is fired before a layout change
      * IE789 excluded: history service was not previously supported in IE
      */
-    testEventsPreAndPostLayoutChange:{
+    //TODO: W-1635821 - fix this flapper
+    _testEventsPreAndPostLayoutChange:{
 	browsers:["-IE7", "-IE8", "-IE9"],
 	testLabels : ["UnAdaptableTest"],
 	test:[

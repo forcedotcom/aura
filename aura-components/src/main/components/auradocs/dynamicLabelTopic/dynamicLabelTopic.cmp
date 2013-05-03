@@ -37,7 +37,9 @@
      </p>
      <p>The following demo dynamically constructs the label value.</p>
      <auradocs:example descriptor="auradocs:demoLabelDyn" />
-     <p><code>&lt;aura:attribute name="simplevalue1" type="Object"/&gt;</code> binds the label expressions to an Object-type attribute. This binding ensures that the component is automatically rerendered when the attribute's expression is updated with the new value.</p>
+     <p><code>&lt;aura:attribute name="simplevalue1" type="Object"/&gt;</code> binds the label expressions to an Object-type attribute. This binding ensures that the component is automatically rerendered when the attribute's expression is updated with the new value.
+     </p>
+     <auradocs:info>Binding the label value to an Object-type attribute may cause a resizing activity on components if the returned String size is much bigger than the initially allocated size.</auradocs:info>
      <p>To get the label value when you have used the label in markup or in a server-side model, use one of these methods.</p>
      <p>
      <code>var val = $A.getGlobalValueProviders().get("$Label.Related_Lists.task_mode_today");</code>

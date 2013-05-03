@@ -1,0 +1,52 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Dynamically Constructing Labels"/>
+    
+    <h2>Goal</h2>
+    <p>You want to dynamically construct the label on the client.</p>
+    
+    <h2>Code</h2>
+    <p>This sample code shows how you can bind the label value to a component such that the value dynamically updates after a render.</p>
+     
+    <auradocs:codeblock>
+    $A.getGlobalValueProviders().get("$Label.Related_Lists.task_mode_today", cmp, function(res) {
+        $A.test.assertEquals("Today", res, "Failed: Wrong label value in callback");
+    });
+    </auradocs:codeblock>
+     <p><code>$A.getGlobalValueProviders().get()</code> takes three parameters: <code>expression</code>, <code>component</code>, and <code>callback</code>. 
+     <code>expression</code> is required.</p>
+     <p>Use <code>$A.getGlobalValueProviders().get()</code> to retrieve label values from the server and bind the values to the component. You may want to use this method if your <code>$Label</code> values are unknown such as when they are not included in the markup or in a server-side model.
+     If the value is known, <code>$A.getGlobalValueProviders().get()</code> returns a String value. If the value is not known, <code>PROD</code> mode returns an empty String and all other modes return a placeholder with the expression. 
+     Aura retrieves the label value the first time it is evaluated.
+     </p>
+     <p>The following demo dynamically constructs the label value.</p>
+     <auradocs:example descriptor="auradocs:demoLabelDyn" />
+     <p><code>&lt;aura:attribute name="simplevalue1" type="Object"/&gt;</code> binds the label expressions to an Object-type attribute. This binding ensures that the component is automatically rerendered when the attribute's expression is updated with the new value.</p>
+     <p>To get the label value when you have used the label in markup or in a server-side model, use one of these methods.</p>
+     <p>
+     <code>var val = $A.getGlobalValueProviders().get("$Label.Related_Lists.task_mode_today");</code>
+     <code>$A.get("$Label.Related_Lists.task_mode_today");</code>
+     <code>$A.expressionService.get("$Label.Related_Lists.task_mode_today");</code>	   
+     </p>
+     <p><b>See also:</b><br/>
+     <auradocs:topicLink topic="labelParameters">Setting Label Parameters</auradocs:topicLink><br/>
+     <auradocs:topicLink topic="labelAdapter">Label Adapters</auradocs:topicLink><br/>
+     <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink>
+     </p>
+    </aura:component>

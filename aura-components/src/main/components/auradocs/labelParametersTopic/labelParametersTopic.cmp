@@ -100,6 +100,7 @@
 
 <auradocs:example descriptor="auradocs:sampleLabelEmbedded" />
 
+<auradocs:info>See <auradocs:topicLink topic="dynamicLabel">Dynamically Constructing Labels</auradocs:topicLink> if you want to construct labels with a global value provider.</auradocs:info>
 <p><b>See also:</b><br/>   
     <auradocs:defLink descriptor="aura:label">aura:label</auradocs:defLink><br/>
     <auradocs:topicLink topic="expressions">Expressions</auradocs:topicLink><br/>

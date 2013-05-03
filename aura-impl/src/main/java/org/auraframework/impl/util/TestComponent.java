@@ -272,4 +272,10 @@ public final class TestComponent implements ComponentDef {
     public String getOwnHash() {
         return null;
     }
+
+    @Override
+    public Visibility getVisibility() {
+
+        return Visibility.PUBLIC;
+    }
 }

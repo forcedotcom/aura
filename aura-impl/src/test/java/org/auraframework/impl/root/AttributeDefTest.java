@@ -20,6 +20,7 @@ import java.util.Set;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition.Visibility;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.Location;
@@ -51,7 +52,7 @@ public class AttributeDefTest extends AuraImplTestCase {
                     vendor.getTypeDef().getDescriptor(),
                     vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
                             vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                    vendor.makeLocation("filename1", 5, 5, 0));
+                            vendor.makeLocation("filename1", 5, 5, 0),null);
             testAttributeDef.validateDefinition();
             fail("Should have thrown AuraException for null name in AttributeDef's AttributeDefDescriptor");
         } catch (AuraRuntimeException expected) {
@@ -59,12 +60,12 @@ public class AttributeDefTest extends AuraImplTestCase {
 
         testAttributeDef = vendor.makeAttributeDefWithNulls(testAttributeDescriptorName, null, vendor.getTypeDef()
                 .getDescriptor(), vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
-                vendor.makeLocation("filename1", 5, 5, 0)), false, null, vendor.makeLocation("filename1", 5, 5, 0));
+                        vendor.makeLocation("filename1", 5, 5, 0)), false, null, vendor.makeLocation("filename1", 5, 5, 0),null);
         assertNotNull(testAttributeDef);
 
         testAttributeDef = vendor.makeAttributeDefWithNulls(testFakeAttributeDescriptorName, null, vendor.getTypeDef()
                 .getDescriptor(), vendor.makeAttributeDefRef(testAttributeDescriptorName, -1,
-                vendor.makeLocation("filename1", 5, 5, 0)), false, null, vendor.makeLocation("filename2", 10, 10, 0));
+                        vendor.makeLocation("filename1", 5, 5, 0)), false, null, vendor.makeLocation("filename2", 10, 10, 0),null);
         assertNotNull(testAttributeDef);
     }
 
@@ -77,7 +78,7 @@ public class AttributeDefTest extends AuraImplTestCase {
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                        vendor.makeLocation("filename1", 5, 5, 0)).getName());
+                                vendor.makeLocation("filename1", 5, 5, 0),null).getName());
         assertEquals(
                 testFakeAttributeDescriptorName,
                 vendor.makeAttributeDefWithNulls(
@@ -86,7 +87,7 @@ public class AttributeDefTest extends AuraImplTestCase {
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef(testAttributeDescriptorName, -1,
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                        vendor.makeLocation("filename2", 10, 10, 0)).getName());
+                                vendor.makeLocation("filename2", 10, 10, 0),null).getName());
     }
 
     public void testGetValueDef() throws Exception {
@@ -98,7 +99,7 @@ public class AttributeDefTest extends AuraImplTestCase {
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                        vendor.makeLocation("filename1", 5, 5, 0)).getTypeDef());
+                                vendor.makeLocation("filename1", 5, 5, 0),null).getTypeDef());
         assertEquals(
                 vendor.getTypeDef(),
                 vendor.makeAttributeDefWithNulls(
@@ -107,7 +108,7 @@ public class AttributeDefTest extends AuraImplTestCase {
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef(testAttributeDescriptorName, -1,
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                        vendor.makeLocation("filename2", 10, 10, 0)).getTypeDef());
+                                vendor.makeLocation("filename2", 10, 10, 0),null).getTypeDef());
 
         assertTrue(vendor.getTypeDef().equals(
                 vendor.makeAttributeDefWithNulls(
@@ -116,7 +117,7 @@ public class AttributeDefTest extends AuraImplTestCase {
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef(testAttributeDescriptorName, -1,
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                        vendor.makeLocation("filename2", 10, 10, 0)).getTypeDef()));
+                                vendor.makeLocation("filename2", 10, 10, 0),null).getTypeDef()));
         assertTrue(vendor.getTypeDef().equals(
                 vendor.makeAttributeDefWithNulls(
                         testAttributeDescriptorName,
@@ -124,20 +125,20 @@ public class AttributeDefTest extends AuraImplTestCase {
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                        vendor.makeLocation("filename1", 5, 5, 0)).getTypeDef()));
+                                vendor.makeLocation("filename1", 5, 5, 0),null).getTypeDef()));
     }
 
     public void testGetDefaultValueDefRef() {
         assertEquals(
                 vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
                         vendor.makeLocation("filename1", 5, 5, 0)),
-                vendor.makeAttributeDefWithNulls(
-                        testAttributeDescriptorName,
-                        null,
-                        vendor.getTypeDefDescriptor(),
-                        vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
-                                vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                        vendor.makeLocation("filename1", 5, 5, 0)).getDefaultValue());
+                        vendor.makeAttributeDefWithNulls(
+                                testAttributeDescriptorName,
+                                null,
+                                vendor.getTypeDefDescriptor(),
+                                vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
+                                        vendor.makeLocation("filename1", 5, 5, 0)), false, null,
+                                        vendor.makeLocation("filename1", 5, 5, 0),null).getDefaultValue());
         assertEquals(
                 vendor.makeAttributeDefRef(testAttributeDescriptorName, -1, vendor.makeLocation("filename1", 5, 5, 0)),
                 vendor.makeAttributeDefWithNulls(
@@ -146,17 +147,17 @@ public class AttributeDefTest extends AuraImplTestCase {
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef(testAttributeDescriptorName, -1,
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                        vendor.makeLocation("filename2", 10, 10, 0)).getDefaultValue());
+                                vendor.makeLocation("filename2", 10, 10, 0),null).getDefaultValue());
 
         assertFalse(vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
                 vendor.makeLocation("filename1", 5, 5, 0)).equals(
-                vendor.makeAttributeDefWithNulls(
-                        testFakeAttributeDescriptorName,
-                        null,
-                        vendor.getTypeDefDescriptor(),
-                        vendor.makeAttributeDefRef(testAttributeDescriptorName, -1,
-                                vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                        vendor.makeLocation("filename2", 10, 10, 0)).getDefaultValue()));
+                        vendor.makeAttributeDefWithNulls(
+                                testFakeAttributeDescriptorName,
+                                null,
+                                vendor.getTypeDefDescriptor(),
+                                vendor.makeAttributeDefRef(testAttributeDescriptorName, -1,
+                                        vendor.makeLocation("filename1", 5, 5, 0)), false, null,
+                                        vendor.makeLocation("filename2", 10, 10, 0),null).getDefaultValue()));
         assertFalse(vendor
                 .makeAttributeDefWithNulls(
                         testAttributeDescriptorName,
@@ -164,10 +165,10 @@ public class AttributeDefTest extends AuraImplTestCase {
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                        vendor.makeLocation("filename1", 5, 5, 0))
-                .getDefaultValue()
-                .equals(vendor.makeAttributeDefRef(testAttributeDescriptorName, -1,
-                        vendor.makeLocation("filename1", 5, 5, 0))));
+                                vendor.makeLocation("filename1", 5, 5, 0),null)
+                                .getDefaultValue()
+                                .equals(vendor.makeAttributeDefRef(testAttributeDescriptorName, -1,
+                                        vendor.makeLocation("filename1", 5, 5, 0))));
     }
 
     public void testGetLocation() {
@@ -179,7 +180,7 @@ public class AttributeDefTest extends AuraImplTestCase {
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                        vendor.makeLocation("filename1", 5, 5, 0)).getLocation());
+                                vendor.makeLocation("filename1", 5, 5, 0),null).getLocation());
         assertEquals(
                 vendor.makeLocation("filename2", 10, 10, 0),
                 vendor.makeAttributeDefWithNulls(
@@ -188,7 +189,7 @@ public class AttributeDefTest extends AuraImplTestCase {
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef(testAttributeDescriptorName, -1,
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                        vendor.makeLocation("filename2", 10, 10, 0)).getLocation());
+                                vendor.makeLocation("filename2", 10, 10, 0),null).getLocation());
 
         assertFalse(vendor.makeLocation("filename1", 5, 5, 0).equals(
                 vendor.makeAttributeDefWithNulls(
@@ -197,7 +198,7 @@ public class AttributeDefTest extends AuraImplTestCase {
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef(testAttributeDescriptorName, -1,
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                        vendor.makeLocation("filename2", 10, 10, 0)).getLocation()));
+                                vendor.makeLocation("filename2", 10, 10, 0),null).getLocation()));
         assertFalse(vendor.makeLocation("filename2", 10, 10, 0).equals(
                 vendor.makeAttributeDefWithNulls(
                         testAttributeDescriptorName,
@@ -205,12 +206,12 @@ public class AttributeDefTest extends AuraImplTestCase {
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                        vendor.makeLocation("filename1", 5, 5, 0)).getLocation()));
+                                vendor.makeLocation("filename1", 5, 5, 0),null).getLocation()));
     }
 
     public void testIsRequired() {
         assertFalse("The attribute isn't required", vendor.makeAttributeDef().isRequired());
-        assertTrue("The attribute is required", vendor.makeAttributeDef(null, null, null, true, null, null)
+        assertTrue("The attribute is required", vendor.makeAttributeDef(null, null, null, true, null, null,null)
                 .isRequired());
     }
 
@@ -239,6 +240,45 @@ public class AttributeDefTest extends AuraImplTestCase {
         }
     }
 
+    public void testVisibility() throws Exception {
+        assertEquals(
+                AttributeDef.Visibility.PUBLIC,
+                vendor.makeAttributeDefWithNulls(
+                        testAttributeDescriptorName,
+                        null,
+                        vendor.getTypeDefDescriptor(),
+                        vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
+                                vendor.makeLocation("filename1", 5, 5, 0)), false, null,
+                                vendor.makeLocation("filename1", 5, 5, 0),null).getVisibility()); //null should be defaulted to public
+        assertEquals(
+                AttributeDef.Visibility.PUBLIC,
+                vendor.makeAttributeDefWithNulls(
+                        testAttributeDescriptorName,
+                        null,
+                        vendor.getTypeDefDescriptor(),
+                        vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
+                                vendor.makeLocation("filename1", 5, 5, 0)), false, null,
+                                vendor.makeLocation("filename1", 5, 5, 0),AttributeDef.Visibility.PUBLIC).getVisibility());
+        assertEquals(
+                AttributeDef.Visibility.PRIVATE,
+                vendor.makeAttributeDefWithNulls(
+                        testAttributeDescriptorName,
+                        null,
+                        vendor.getTypeDefDescriptor(),
+                        vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
+                                vendor.makeLocation("filename1", 5, 5, 0)), false, null,
+                                vendor.makeLocation("filename1", 5, 5, 0),AttributeDef.Visibility.PRIVATE).getVisibility());
+        assertEquals(
+                AttributeDef.Visibility.INVALID,
+                vendor.makeAttributeDefWithNulls(
+                        testAttributeDescriptorName,
+                        null,
+                        vendor.getTypeDefDescriptor(),
+                        vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
+                                vendor.makeLocation("filename1", 5, 5, 0)), false, null,
+                                vendor.makeLocation("filename1", 5, 5, 0),AttributeDef.Visibility.INVALID).getVisibility());
+    }
+
     public void testSerializeTo() throws Exception {
         assertEquals(
                 AttributeDef.SerializeToType.BOTH,
@@ -248,7 +288,7 @@ public class AttributeDefTest extends AuraImplTestCase {
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                        vendor.makeLocation("filename1", 5, 5, 0)).getSerializeTo());
+                                vendor.makeLocation("filename1", 5, 5, 0),null).getSerializeTo());
         assertEquals(
                 AttributeDef.SerializeToType.BOTH,
                 vendor.makeAttributeDefWithNulls(
@@ -257,7 +297,7 @@ public class AttributeDefTest extends AuraImplTestCase {
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, AttributeDef.SerializeToType.BOTH,
-                        vendor.makeLocation("filename1", 5, 5, 0)).getSerializeTo());
+                                vendor.makeLocation("filename1", 5, 5, 0),null).getSerializeTo());
         assertEquals(
                 AttributeDef.SerializeToType.SERVER,
                 vendor.makeAttributeDefWithNulls(
@@ -266,7 +306,7 @@ public class AttributeDefTest extends AuraImplTestCase {
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, AttributeDef.SerializeToType.SERVER,
-                        vendor.makeLocation("filename1", 5, 5, 0)).getSerializeTo());
+                                vendor.makeLocation("filename1", 5, 5, 0),null).getSerializeTo());
         assertEquals(
                 AttributeDef.SerializeToType.NONE,
                 vendor.makeAttributeDefWithNulls(
@@ -275,7 +315,7 @@ public class AttributeDefTest extends AuraImplTestCase {
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, AttributeDef.SerializeToType.NONE,
-                        vendor.makeLocation("filename1", 5, 5, 0)).getSerializeTo());
+                                vendor.makeLocation("filename1", 5, 5, 0),null).getSerializeTo());
         assertEquals(
                 AttributeDef.SerializeToType.INVALID,
                 vendor.makeAttributeDefWithNulls(
@@ -284,8 +324,8 @@ public class AttributeDefTest extends AuraImplTestCase {
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue",
                                 vendor.makeLocation("filename1", 5, 5, 0)), false,
-                        AttributeDef.SerializeToType.INVALID, vendor.makeLocation("filename1", 5, 5, 0))
-                        .getSerializeTo());
+                                AttributeDef.SerializeToType.INVALID, vendor.makeLocation("filename1", 5, 5, 0),null)
+                                .getSerializeTo());
     }
 
     public void testValidateDefinition() throws Exception {
@@ -293,7 +333,7 @@ public class AttributeDefTest extends AuraImplTestCase {
         try {
             vendor.makeAttributeDefWithNulls(testAttributeDescriptorName, null, vendor.getTypeDefDescriptor(),
                     vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue", location), false,
-                    AttributeDef.SerializeToType.INVALID, location).validateDefinition();
+                    AttributeDef.SerializeToType.INVALID, location,Visibility.PUBLIC).validateDefinition();
             fail("Did not get InvalidDefinitionException for Serialize to type INVALID");
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "Invalid serializeTo value", location.getFileName());
@@ -302,7 +342,7 @@ public class AttributeDefTest extends AuraImplTestCase {
 
     public void testAppendDependenciesWithNullDefault() throws Exception {
         AttributeDefImpl attDef = vendor.makeAttributeDefWithNulls(testAttributeDescriptorName, null,
-                vendor.getTypeDefDescriptor(), null, false, null, null);
+                vendor.getTypeDefDescriptor(), null, false, null, null,null);
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
         attDef.appendDependencies(dependencies);
         assertTrue(dependencies.isEmpty());
@@ -323,7 +363,7 @@ public class AttributeDefTest extends AuraImplTestCase {
             }
         }).when(defaultValue).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any());
         AttributeDefImpl attDef = vendor.makeAttributeDefWithNulls(testAttributeDescriptorName, null,
-                vendor.getTypeDefDescriptor(), defaultValue, false, null, null);
+                vendor.getTypeDefDescriptor(), defaultValue, false, null, null,null);
         Mockito.verify(defaultValue, Mockito.times(0)).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any());
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
         attDef.appendDependencies(dependencies);
@@ -334,7 +374,7 @@ public class AttributeDefTest extends AuraImplTestCase {
 
     public void testValidateReferencesWithNullDefault() throws Exception {
         AttributeDefImpl attDef = vendor.makeAttributeDefWithNulls(testAttributeDescriptorName, null,
-                vendor.getTypeDefDescriptor(), null, false, null, null);
+                vendor.getTypeDefDescriptor(), null, false, null, null,null);
         attDef.validateReferences();
     }
 
@@ -344,7 +384,7 @@ public class AttributeDefTest extends AuraImplTestCase {
     public void testValidateReferences() throws Exception {
         AttributeDefRefImpl defaultValue = Mockito.mock(AttributeDefRefImpl.class);
         AttributeDefImpl attDef = vendor.makeAttributeDefWithNulls(testAttributeDescriptorName, null,
-                vendor.getTypeDefDescriptor(), defaultValue, false, null, null);
+                vendor.getTypeDefDescriptor(), defaultValue, false, null, null,null);
         Mockito.verify(defaultValue, Mockito.times(0)).parseValue(Mockito.<TypeDef> any());
         Mockito.verify(defaultValue, Mockito.times(0)).validateReferences();
         attDef.validateReferences();

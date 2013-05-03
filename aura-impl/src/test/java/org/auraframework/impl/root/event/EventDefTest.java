@@ -49,10 +49,10 @@ public class EventDefTest extends AuraImplTestCase {
         DefDescriptor<TypeDef> type2 = DefDescriptorImpl.getInstance("apex://Integer", TypeDef.class);
         atts.put(DefDescriptorImpl.getInstance("testString", AttributeDef.class), new AttributeDefImpl(
                 DefDescriptorImpl.getInstance("testString", AttributeDef.class), null, type, null, true,
-                AttributeDef.SerializeToType.BOTH, null));
+                AttributeDef.SerializeToType.BOTH, null,null));
         atts.put(DefDescriptorImpl.getInstance("testInt", AttributeDef.class),
                 new AttributeDefImpl(DefDescriptorImpl.getInstance("testInt", AttributeDef.class), null, type2, null,
-                        true, AttributeDef.SerializeToType.BOTH, null));
+                        true, AttributeDef.SerializeToType.BOTH, null,null));
         EventDefImpl def = vendor.makeEventDef(desc, EventType.COMPONENT, atts, null, null);
         def.validateDefinition();
         assertEquals(EventType.COMPONENT, def.getEventType());
@@ -128,10 +128,10 @@ public class EventDefTest extends AuraImplTestCase {
         DefDescriptor<TypeDef> type2 = DefDescriptorImpl.getInstance("Integer", TypeDef.class);
         atts.put(DefDescriptorImpl.getInstance("testString", AttributeDef.class), new AttributeDefImpl(
                 DefDescriptorImpl.getInstance("testString", AttributeDef.class), null, type, null, true,
-                AttributeDef.SerializeToType.BOTH, null));
+                AttributeDef.SerializeToType.BOTH, null,null));
         atts.put(DefDescriptorImpl.getInstance("testInt", AttributeDef.class),
                 new AttributeDefImpl(DefDescriptorImpl.getInstance("testInt", AttributeDef.class), null, type2, null,
-                        true, AttributeDef.SerializeToType.BOTH, null));
+                        true, AttributeDef.SerializeToType.BOTH, null,null));
         EventDefImpl def = vendor.makeEventDefWithNulls(desc, EventType.COMPONENT, atts, null, null);
         serializeAndGoldFile(def);
     }
@@ -142,9 +142,9 @@ public class EventDefTest extends AuraImplTestCase {
         DefDescriptor<TypeDef> type = DefDescriptorImpl.getInstance("apex://String", TypeDef.class);
         DefDescriptor<TypeDef> type2 = DefDescriptorImpl.getInstance("apex://Integer", TypeDef.class);
         AttributeDefImpl att1 = new AttributeDefImpl(DefDescriptorImpl.getInstance("testString", AttributeDef.class),
-                null, type, null, true, AttributeDef.SerializeToType.BOTH, null);
+                null, type, null, true, AttributeDef.SerializeToType.BOTH, null,null);
         AttributeDefImpl att2 = new AttributeDefImpl(DefDescriptorImpl.getInstance("testInt", AttributeDef.class),
-                null, type2, null, true, AttributeDef.SerializeToType.BOTH, null);
+                null, type2, null, true, AttributeDef.SerializeToType.BOTH, null,null);
         atts.put(att1.getDescriptor(), att1);
         atts.put(att2.getDescriptor(), att2);
         EventDefImpl def = vendor.makeEventDefWithNulls(desc, EventType.COMPONENT, atts, null, null);

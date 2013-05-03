@@ -33,6 +33,7 @@ import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.def.Definition.Visibility;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
@@ -248,6 +249,12 @@ public class AuraImplUnitTestingUtil {
             public String getOwnHash() {
                 return null;
             }
+
+            @Override
+            public Visibility getVisibility() {
+
+                return Visibility.PUBLIC;
+            }
         };
     }
 
@@ -278,7 +285,7 @@ public class AuraImplUnitTestingUtil {
     }
 
     public AttributeDefImpl makeAttributeDef() {
-        return makeAttributeDef(null, null, null, false, null, null);
+        return makeAttributeDef(null, null, null, false, null, null,null);
     }
 
     /**
@@ -286,20 +293,20 @@ public class AuraImplUnitTestingUtil {
      * object. If you want null values for the parameter, you have to call the objects constructor directly.
      */
     public AttributeDefImpl makeAttributeDef(String name, DefDescriptor<TypeDef> typeDefDescriptor,
-            AttributeDefRefImpl defaultValue, boolean required, SerializeToType serializeTo, Location location) {
+            AttributeDefRefImpl defaultValue, boolean required, SerializeToType serializeTo, Location location,Visibility visibility) {
         return new AttributeDefImpl(DefDescriptorImpl.getInstance(name == null ? defaultAttributeName : name,
                 AttributeDef.class), null,
                 typeDefDescriptor == null ? getTypeDef().getDescriptor() : typeDefDescriptor,
-                defaultValue == null ? makeAttributeDefRef(null, null, null) : defaultValue, required,
-                serializeTo == null ? AttributeDef.SerializeToType.BOTH : serializeTo, location == null ? getLocation()
-                        : location);
+                        defaultValue == null ? makeAttributeDefRef(null, null, null) : defaultValue, required,
+                                serializeTo == null ? AttributeDef.SerializeToType.BOTH : serializeTo, location == null ? getLocation()
+                                        : location,visibility==null?Visibility.PUBLIC : visibility);
     }
 
     public AttributeDefImpl makeAttributeDefWithNulls(String name,
             DefDescriptor<? extends RootDefinition> parentDescriptor, DefDescriptor<TypeDef> typeDefDescriptor,
-            AttributeDefRefImpl defaultValue, boolean required, SerializeToType serializeTo, Location location) {
+            AttributeDefRefImpl defaultValue, boolean required, SerializeToType serializeTo, Location location,Visibility visibility) {
         return new AttributeDefImpl(DefDescriptorImpl.getInstance(name, AttributeDef.class), parentDescriptor,
-                typeDefDescriptor, defaultValue, required, serializeTo, location);
+                typeDefDescriptor, defaultValue, required, serializeTo, location,visibility);
     }
 
     public DependencyDef makeDependencyDef(DefDescriptor<? extends RootDefinition> parentDescriptor, String resource,
@@ -363,7 +370,7 @@ public class AuraImplUnitTestingUtil {
 
         if (attributeDefs == null) {
             attributeDefs = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
-            attributeDefs.put(getAttributeDescriptor(), makeAttributeDef(null, null, null, false, null, null));
+            attributeDefs.put(getAttributeDescriptor(), makeAttributeDef(null, null, null, false, null, null,null));
         }
 
         if (eventDefs == null) {
@@ -378,10 +385,10 @@ public class AuraImplUnitTestingUtil {
 
         return makeComponentDef(descriptor == null ? getComponentDefDescriptor() : descriptor, attributeDefs,
                 eventDefs, children, location == null ? getLocation() : location,
-                controllerDescriptor == null ? getControllerDescriptor() : controllerDescriptor,
-                modelDescriptor == null ? getModelDescriptor() : modelDescriptor,
-                extendsDescriptor == null ? getParentComponentDefDescriptor() : extendsDescriptor, null, null, false,
-                false);
+                        controllerDescriptor == null ? getControllerDescriptor() : controllerDescriptor,
+                                modelDescriptor == null ? getModelDescriptor() : modelDescriptor,
+                                        extendsDescriptor == null ? getParentComponentDefDescriptor() : extendsDescriptor, null, null, false,
+                                                false);
     }
 
     private void addAttributes(RootDefinitionImpl.Builder<?> builder,
@@ -419,7 +426,7 @@ public class AuraImplUnitTestingUtil {
 
         if (attributeDefs == null) {
             attributeDefs = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
-            attributeDefs.put(getAttributeDescriptor(), makeAttributeDef(null, null, null, false, null, null));
+            attributeDefs.put(getAttributeDescriptor(), makeAttributeDef(null, null, null, false, null, null,null));
         }
         addAttributes(builder, attributeDefs);
 
@@ -459,7 +466,7 @@ public class AuraImplUnitTestingUtil {
 
         @SuppressWarnings("unchecked")
         BaseComponentDefImpl.Builder<T> builder = (Builder<T>) (defClass.equals(ComponentDef.class) ? new ComponentDefImpl.Builder()
-                : new ApplicationDefImpl.Builder());
+        : new ApplicationDefImpl.Builder());
 
         if (descriptor != null) {
             builder.setDescriptor(descriptor);
@@ -501,7 +508,7 @@ public class AuraImplUnitTestingUtil {
 
         if (attributeDefs == null) {
             attributeDefs = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
-            attributeDefs.put(getAttributeDescriptor(), makeAttributeDef(null, null, null, false, null, null));
+            attributeDefs.put(getAttributeDescriptor(), makeAttributeDef(null, null, null, false, null, null,null));
         }
 
         if (eventDefs == null) {
@@ -619,7 +626,7 @@ public class AuraImplUnitTestingUtil {
 
         if (attributeDefs == null) {
             attributeDefs = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
-            attributeDefs.put(getAttributeDescriptor(), makeAttributeDef(null, null, null, false, null, null));
+            attributeDefs.put(getAttributeDescriptor(), makeAttributeDef(null, null, null, false, null, null,null));
         }
 
         EventDefImpl.Builder builder = new EventDefImpl.Builder();
@@ -701,7 +708,7 @@ public class AuraImplUnitTestingUtil {
 
         if (attributeDefs == null) {
             attributeDefs = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
-            attributeDefs.put(getAttributeDescriptor(), makeAttributeDef(null, null, null, false, null, null));
+            attributeDefs.put(getAttributeDescriptor(), makeAttributeDef(null, null, null, false, null, null,null));
         }
         addAttributes(builder, attributeDefs);
 

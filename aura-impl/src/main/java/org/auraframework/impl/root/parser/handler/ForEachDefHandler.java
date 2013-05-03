@@ -28,6 +28,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ComponentDefRef.Load;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition.Visibility;
 import org.auraframework.def.ForEachDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
@@ -49,7 +50,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 public class ForEachDefHandler<P extends RootDefinition> extends ParentedTagHandler<ForEachDef, P> implements
-        ExpressionContainerHandler {
+ExpressionContainerHandler {
 
     public static final String TAG = "aura:foreach";
 
@@ -92,7 +93,7 @@ public class ForEachDefHandler<P extends RootDefinition> extends ParentedTagHand
                 AttributeDef.class);
         DefDescriptor<TypeDef> varTypeDescriptor = DefDescriptorImpl.getInstance("String", TypeDef.class); // FIXME
         AttributeDef varAttributeDef = new AttributeDefImpl(varAttributeDescriptor, componentBuilder.getDescriptor(),
-                varTypeDescriptor, null, true, AttributeDef.SerializeToType.BOTH, getLocation());
+                varTypeDescriptor, null, true, AttributeDef.SerializeToType.BOTH, getLocation(),Visibility.PUBLIC);
         componentBuilder.addAttributeDef(varAttributeDef.getDescriptor(), varAttributeDef);
 
         if (!children.isEmpty()) {

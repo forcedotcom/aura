@@ -28,7 +28,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json.Serialization;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
-
 import org.auraframework.util.text.Hash;
 
 import com.google.common.collect.Maps;
@@ -47,6 +46,7 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     private final String ownHash;
     private boolean valid;
     private final Hash sourceHash;
+    protected  Visibility visibility;
 
     protected DefinitionImpl(DefDescriptor<T> descriptor, Location location) {
         this.descriptor = descriptor;
@@ -55,6 +55,7 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         this.description = null;
         this.ownHash = null;
         this.sourceHash = null;
+        this.visibility = null;
     }
 
     protected DefinitionImpl(RefBuilderImpl<T, ?> builder) {
@@ -62,6 +63,8 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         this.location = builder.getLocation();
         this.subDefs = builder.subDefs;
         this.description = builder.description;
+        this.visibility = builder.getVisibility();
+
 
         //
         // Try to make sure that we have a hash string.
@@ -84,6 +87,8 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         }
     }
 
+
+
     /**
      * @see Definition#getDescriptor()
      */
@@ -98,6 +103,13 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     @Override
     public Location getLocation() {
         return location;
+    }
+
+
+
+    @Override
+    public Visibility getVisibility(){
+        return visibility;
     }
 
     /**
@@ -181,6 +193,7 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     };
 
     public abstract static class RefBuilderImpl<T extends Definition, A extends Definition> implements DefBuilder<T, A> {
+        public Visibility visibility;
         private boolean descriptorLocked;
         public DefDescriptor<T> descriptor;
         public Location location;
@@ -216,6 +229,17 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         public Location getLocation() {
             return this.location;
         }
+
+        public Visibility getVisibility(){
+            return (visibility == null ? Visibility.PUBLIC : visibility);
+        }
+
+
+        public RefBuilderImpl<T, A> setVisibility(Visibility visibility) {
+            this.visibility = visibility;
+            return this;
+        }
+
 
         public RefBuilderImpl<T, A> addSubDef(SubDefDescriptor<?, T> sddesc, Definition inner) {
             if (this.subDefs == null) {

@@ -22,7 +22,8 @@
             "value":{
               "descriptor":"att1",
               "typeDefDescriptor":"aura://String",
-              "required":false
+              "required":false,
+              "visibility":"PUBLIC"
             }
           },
           "att2":{
@@ -30,7 +31,8 @@
             "value":{
               "descriptor":"att2",
               "typeDefDescriptor":"aura://Boolean",
-              "required":true
+              "required":true,
+              "visibility":"PUBLIC"
             }
           }
         }

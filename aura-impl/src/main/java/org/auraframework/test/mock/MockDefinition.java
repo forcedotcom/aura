@@ -98,4 +98,9 @@ public abstract class MockDefinition<D extends Definition> implements Definition
     public String getOwnHash() {
         return null;
     }
+
+    @Override
+    public Visibility getVisibility() {
+        return Visibility.PUBLIC;
+    }
 }

@@ -219,7 +219,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                         vendor.getTypeDefDescriptor(),
                         vendor.makeAttributeDefRef("testAttributeDescriptorName", "testValue",
                                 vendor.makeLocation("filename1", 5, 5, 0)), false, null,
-                        vendor.makeLocation("filename1", 5, 5, 0)));
+                                vendor.makeLocation("filename1", 5, 5, 0),null));
         List<ComponentDefRef> testChildren = ImmutableList.of(vendor.makeComponentDefRefWithNulls(
                 vendor.makeComponentDefDescriptor("test:text"), null, vendor.makeLocation("filename2", 10, 10, 0)));
         serializeAndGoldFile(vendor.makeBaseComponentDefWithNulls(getDefClass(),
@@ -292,8 +292,8 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                         baseTag,
                         String.format("extends='%s' implements='%s' provider='%s'", parentDesc.getDescriptorName(),
                                 intfDesc.getDescriptorName(), providerDesc), String.format(
-                                "<%s/><aura:registerevent name='evt' type='%s'/>", childDesc.getDescriptorName(),
-                                eventDesc.getDescriptorName())));
+                                        "<%s/><aura:registerevent name='evt' type='%s'/>", childDesc.getDescriptorName(),
+                                        eventDesc.getDescriptorName())));
 
         DefDescriptor<ModelDef> modelDesc = DefDescriptorImpl.getAssociateDescriptor(cmpDesc, ModelDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
@@ -1443,7 +1443,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             checkExceptionFull(e, InvalidDefinitionException.class,
                     String.format("%s cannot widen the support level to GA from %s's level of BETA",
                             parentDesc.getQualifiedName(), grandParentDesc.getQualifiedName()),
-                    parentDesc.getQualifiedName());
+                            parentDesc.getQualifiedName());
         }
     }
 
@@ -1516,7 +1516,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         } catch (Exception e) {
             checkExceptionFull(e, InvalidDefinitionException.class,
                     "Component " + dd.getQualifiedName()
-                            + " cannot implement the rootComponent interface because it is not in the aura namespace",
+                    + " cannot implement the rootComponent interface because it is not in the aura namespace",
                     dd.getQualifiedName());
         }
     }

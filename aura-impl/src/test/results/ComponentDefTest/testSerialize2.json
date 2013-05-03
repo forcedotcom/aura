@@ -14,7 +14,8 @@
         "value":{
           "descriptor":"body",
           "typeDefDescriptor":"aura://Aura.Component[]",
-          "required":false
+          "required":false,
+          "visibility":"PUBLIC"
         }
       }
     ]

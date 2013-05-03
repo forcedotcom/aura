@@ -43,9 +43,38 @@ var Test = function(){
         addWaitFor : function(expected, testFunction, callback){
         	aura.test.addWaitForWithFailureMessage(expected, testFunction, null, callback);
         },
+
+        /**
+         * Asynchronously wait for an action to complete before continuing with the next
+         * stage of the test case.  The wait condition is checked after the
+         * current test stage is completed but before the next stage is started.
+         *
+         * @description <p>Example:</p>
+         * aura.test.addWaitForAction(true, "myActionName", function() {alert("My Action Completed");});
+         *
+         * @param {Object} success true if the action should succeed.
+         * @param {Object} actionName the name of the action from createAction or markForCompletion
+         * @param {function} callback Invoked after the action completes
+         */
+        addWaitForAction : function(success, actionName, callback) {
+            var theAction = actionName;
+
+            if ($A.util.isUndefinedOrNull(priv.completed[theAction])) {
+                aura.test.fail("Unregistered name "+theAction);
+            }
+            aura.test.addWaitForWithFailureMessage(true,  function() {
+                    if (aura.test.isActionComplete(theAction)) {
+                        if (aura.test.isActionSuccessfullyComplete(theAction) !== success) {
+                            aura.test.fail("Action "+theAction+" did not complete with success = "+success);
+                        }
+                        return true;
+                    }
+                    return false;
+                }, null, callback);
+        },
         
         addWaitForWithFailureMessage : function(expected, testFunction, failureMessage, callback){
-        	if (!$A.util.isFunction(testFunction)) {
+            if (!$A.util.isFunction(testFunction)) {
                 throw new Error("addWaitFor expects a function to evaluate for comparison, but got: " + testFunction);
             }
             if (callback && !$A.util.isFunction(callback)) {
@@ -72,7 +101,7 @@ var Test = function(){
          * @param {Object} params
          *            The parameters to pass to the action
          * @param {function} callback
-         *            The callback function to execute for the action
+         *            The callback function to execute for the action, or if not a function a name for the action
          * @returns {Action} an instance of the action
          */
         getAction:function(component, name, params, callback){
@@ -81,7 +110,11 @@ var Test = function(){
                 action.setParams(params);
             }
             if (callback) {
-                action.setCallback(component, callback);
+                if ($A.util.isFunction(callback)) {
+                    action.setCallback(component, callback);
+                } else {
+                    aura.test.markForCompletion(action, callback);
+                }
             }
             return action;
         },
@@ -105,13 +138,13 @@ var Test = function(){
          * @returns {Action} an instance of the action
          */
         getExternalAction : function(component, descriptor, params, returnType, callback) {
-        	var paramDefs = [];
-        	for (var k in params) {
-        		if (k === 'length' || !params.hasOwnProperty(k)) {
-        			continue;
-        		}
-        		paramDefs.push({"name":k});
-        	}
+            var paramDefs = [];
+            for (var k in params) {
+                if (k === 'length' || !params.hasOwnProperty(k)) {
+                    continue;
+                }
+                paramDefs.push({"name":k});
+            }
             var def = new ActionDef({
             	"name" : descriptor,
             	"descriptor" : descriptor,
@@ -119,22 +152,115 @@ var Test = function(){
             	"params" : paramDefs,
             	"returnType" : returnType
             });
-        	var action = def.newInstance(component);
-        	action.setParams(params);
-        	if (callback) {
-        		action.setCallback(component, callback);
-        	}
-        	return action;
+            var action = def.newInstance(component);
+            action.setParams(params);
+            if (callback) {
+                action.setCallback(component, callback);
+            }
+            return action;
         },
-        
+
         /**
          * Peek if there are any pending server actions.
+         *
+         * FIXME: deprecated: always has races, use allActionsComplete or the action completion mechanism
+         *
          * @returns {boolean} Returns true if there are pending server actions, or false otherwise.
          */
         isActionPending : function() {
             return $A.clientService["priv"].requestQueue.length > 0;
         },
 
+        /**
+         * Check to see if all the current actions have completed.
+         *
+         * This uses both 'inRequest' and 'requestQueue' to determine if all
+         * of the queued actions have completed. Note that this is different than
+         * the old 'isActionPending' since that was subject to numerous race
+         * conditions.
+         */
+        allActionsComplete : function() {
+            return $A.clientService["priv"].requestQueue.length === 0
+                    && $A.clientService["priv"].inRequest === false;
+        },
+
+        /**
+         * Mark an action so we can tell when it is complete.
+         *
+         * This sets the callback on the action to mark the action complete.
+         * The action passed in may have a callback set previously, if so, that
+         * callback will be called before the action is set as complete..
+         *
+         * @param a the action to modify
+         * @param name the name to use (must be unique.
+         */
+        markForCompletion : function(a, name) {
+            if (!$A.util.isUndefinedOrNull(priv.completed[name])) {
+                aura.test.fail("Duplicate name "+name);
+            }
+            var myName = name;
+            priv.completed[myName] = "INCOMPLETE";
+            //
+            // Cheate and directly access the action internals.
+            //
+            var origCallback = a.callbackScope;
+            var origScope = a.callback;
+            a.setCallback(priv, function(action) {
+                    if (origCallback) {
+                        origCallback.call(origScope, action);
+                    }
+                    if (action.getState() === "SUCCESS") {
+                        priv.completed[myName] = "SUCCESS";
+                    } else {
+                        priv.completed[myName] = "FAILURE";
+                    }
+                });
+        },
+
+        /**
+         * Check to see if an action is complete.
+         *
+         * If you have previously called 'markForCompletion' this
+         * will check that the callback has been called (and thus
+         * that the action is complete). It does not check for
+         * success/failure.
+         */
+        isActionComplete : function(name) {
+            if ($A.util.isUndefinedOrNull(priv.completed[name])) {
+                aura.test.fail("Unregistered name "+name);
+            }
+            return priv.completed[name] !== "INCOMPLETE";
+        },
+
+        /**
+         * Check to see if an action was successful
+         *
+         * If you have previously called 'markForCompletion' this
+         * will check that the callback has been called with a
+         * successful completion code.
+         */
+        isActionSuccessfullyComplete : function(name) {
+            if ($A.util.isUndefinedOrNull(priv.completed[name])) {
+                aura.test.fail("Unregistered name "+name);
+            }
+            return priv.completed[name] !== "INCOMPLETE";
+        },
+
+        /**
+         * Check to see if an action is complete.
+         *
+         * If you have previously called 'markForCompletion' this
+         * will check that the callback has been called (and thus
+         * that the action is complete). It does not check for
+         * success/failure.
+         */
+        clearComplete : function(name) {
+            if ($A.util.isUndefinedOrNull(priv.completed[name])) {
+                aura.test.fail("Unregistered name "+name);
+            }
+            delete priv.completed[name];
+        },
+        
         /**
          * Invoke a server action.  At the end of current test case stage, the
          * test will wait for any actions to complete before continuing to the

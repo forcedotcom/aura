@@ -34,16 +34,17 @@
     },
     testSetStorableAPIStage2:function(cmp){
         var mycmp = cmp;
-            //Run the action and mark it as storable.
+        //Run the action and mark it as storable.
         var a = cmp.get("c.fetchDataRecord");
         a.setParams({testName : "testSetStorableAPI"});
         a.setStorable();
         a.runAfter(a);
+        $A.test.markForCompletion(a, "testSetStorableAPIStage2");
         $A.eventService.finishFiring();
-        $A.test.addWaitFor(false, 
-            $A.test.isActionPending,
+        $A.test.addWaitForAction(true, 
+            "testSetStorableAPIStage2",
             function(){
-                    $A.test.assertFalse(a.isFromStorage(), "Failed to excute action at server");
+                $A.test.assertFalse(a.isFromStorage(), "Failed to excute action at server");
                 $A.test.assertEquals(0, a.getReturnValue().Counter, "Wrong counter value seen in response");
                 //Set response stored time
                 mycmp._requestStoredTime = new Date().getTime();

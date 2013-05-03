@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.auraframework.def;
 
 import java.io.Serializable;
@@ -71,6 +72,12 @@ public interface Definition extends JsonSerializable, Serializable {
      * @return the location where this definition was defined
      */
     Location getLocation();
+
+    public enum Visibility{
+        PRIVATE,PUBLIC,INVALID
+    };
+
+    Visibility getVisibility();
 
     /**
      * Get the descriptor. Note that this _should_ be non-null, but it is not,

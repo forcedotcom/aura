@@ -37,6 +37,7 @@ import org.auraframework.util.json.Json;
  * actual ValueDefRef. AttrbitueInfos are immutable. Once they are created, they can only be replaced, never changed.
  */
 public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> implements AttributeDef {
+
     /**
      * Construct an AttributeDef
      * 
@@ -50,13 +51,14 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
      */
     public AttributeDefImpl(DefDescriptor<AttributeDef> descriptor,
             DefDescriptor<? extends RootDefinition> parentDescriptor, DefDescriptor<TypeDef> typeDefDescriptor,
-            AttributeDefRef defaultValue, boolean required, SerializeToType serializeTo, Location location) {
+            AttributeDefRef defaultValue, boolean required, SerializeToType serializeTo, Location location , Visibility visibility) {
         super(descriptor, location);
         this.parentDescriptor = parentDescriptor;
         this.typeDefDescriptor = typeDefDescriptor;
         this.defaultValue = defaultValue;
         this.required = required;
         this.serializeTo = serializeTo;
+        this.visibility= visibility;
     }
 
     protected AttributeDefImpl(Builder builder) {
@@ -64,6 +66,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
         this.parentDescriptor = builder.parentDescriptor;
         this.typeDefDescriptor = builder.typeDefDescriptor;
         this.defaultValue = builder.defaultValue;
+        this.visibility= builder.visibility;
         this.required = builder.required;
         this.serializeTo = builder.serializeTo;
     }
@@ -83,6 +86,10 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     @Override
     public AttributeDefRef getDefaultValue() {
         return defaultValue;
+    }
+    @Override
+    public Visibility getVisibility(){
+        return visibility != null ? visibility : Visibility.PUBLIC;
     }
 
     /**
@@ -110,6 +117,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
         json.writeMapEntry("defaultValue", defaultValue);
         json.writeMapEntry("required", required);
         json.writeMapEntry("serializeTo", serializeTo);
+        json.writeMapEntry("visibility",visibility);
         json.writeMapEnd();
     }
 
@@ -123,6 +131,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
+
         String name = this.descriptor.getName();
         // Calls the validateAttributeName method in AuraTextUtil.java to check if its a valid attribute name
         if ((AuraTextUtil.validateAttributeName(name)) != true) {
@@ -133,6 +142,13 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
         if (this.serializeTo == SerializeToType.INVALID) {
             throw new InvalidDefinitionException("Invalid serializeTo value", getLocation());
         }
+
+        if(this.visibility == Visibility.INVALID){
+            throw new InvalidDefinitionException("Invalid value for Visibility", getLocation());
+        }
+        if (this.visibility == Visibility.PRIVATE && this.required == true){
+            throw new InvalidDefinitionException("cannot set an attribute as required and private",getLocation());
+        }
     }
 
     @Override
@@ -142,6 +158,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
             if (defaultValue != null) {
                 defaultValue.parseValue(typeDef);
                 defaultValue.validateReferences();
+
             }
         } catch (AuraRuntimeException e) {
             if (e.getCause() instanceof ClassNotFoundException) {
@@ -170,7 +187,9 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
         public DefDescriptor<TypeDef> typeDefDescriptor;
         public AttributeDefRef defaultValue;
         public SerializeToType serializeTo;
+
         private boolean required;
+        public Visibility visibility;
 
         /**
          * @see org.auraframework.impl.system.DefinitionImpl.BuilderImpl#build()
@@ -210,6 +229,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
             return this;
         }
 
+
         /**
          * Sets whether or not this instance is required.
          * 
@@ -227,6 +247,14 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
             this.serializeTo = serializeTo;
             return this;
         }
+
+        @Override
+        public Builder setVisibility(Visibility visibility){
+            this.visibility= visibility;
+            return this;
+        }
+
+
     }
 
     private static final long serialVersionUID = 2241357665688011566L;
@@ -235,4 +263,5 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     private final AttributeDefRef defaultValue;
     private final boolean required;
     private final SerializeToType serializeTo;
+
 }

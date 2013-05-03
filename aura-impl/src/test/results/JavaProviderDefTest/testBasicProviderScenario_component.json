@@ -17,7 +17,8 @@
             "value":{
               "descriptor":"body",
               "typeDefDescriptor":"aura://Aura.Component[]",
-              "required":false
+              "required":false,
+              "visibility":"PUBLIC"
             }
           }
         ],
@@ -40,7 +41,8 @@
                             "descriptor":"defaultAttr",
                             "value":"meh"
                           },
-                          "required":false
+                          "required":false,
+                          "visibility":"PUBLIC"
                         }
                       },
                       "implNumber":{
@@ -48,7 +50,8 @@
                         "value":{
                           "descriptor":"implNumber",
                           "typeDefDescriptor":"aura://String",
-                          "required":false
+                          "required":false,
+                          "visibility":"PUBLIC"
                         }
                       }
                     },

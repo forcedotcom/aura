@@ -84,7 +84,8 @@ function(cmp, event) {
             "value":{
               "descriptor":"body",
               "typeDefDescriptor":"aura://Aura.Component[]",
-              "required":false
+              "required":false,
+              "visibility":"PUBLIC"
             }
           }
         ],
@@ -118,7 +119,8 @@ function(cmp, event) {
                           "value":{
                             "descriptor":"token",
                             "typeDefDescriptor":"aura://String",
-                            "required":false
+                            "required":false,
+                            "visibility":"PUBLIC"
                           }
                         }
                       }
@@ -130,7 +132,8 @@ function(cmp, event) {
                       "value":{
                         "descriptor":"customAttribute",
                         "typeDefDescriptor":"aura://String",
-                        "required":false
+                        "required":false,
+                        "visibility":"PUBLIC"
                       }
                     },
                     "locator":{
@@ -138,7 +141,8 @@ function(cmp, event) {
                       "value":{
                         "descriptor":"locator",
                         "typeDefDescriptor":"aura://String",
-                        "required":false
+                        "required":false,
+                        "visibility":"PUBLIC"
                       }
                     },
                     "token":{
@@ -198,7 +202,8 @@ function(cmp, event) {
                         "value":{
                           "descriptor":"body",
                           "typeDefDescriptor":"aura://Aura.Component[]",
-                          "required":false
+                          "required":false,
+                          "visibility":"PUBLIC"
                         }
                       },
                       {
@@ -206,7 +211,8 @@ function(cmp, event) {
                         "value":{
                           "descriptor":"class",
                           "typeDefDescriptor":"aura://String",
-                          "required":false
+                          "required":false,
+                          "visibility":"PUBLIC"
                         }
                       },
                       {
@@ -214,7 +220,8 @@ function(cmp, event) {
                         "value":{
                           "descriptor":"label",
                           "typeDefDescriptor":"aura://String",
-                          "required":false
+                          "required":false,
+                          "visibility":"PUBLIC"
                         }
                       }
                     ],

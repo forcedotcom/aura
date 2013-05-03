@@ -17,7 +17,8 @@
             "value":{
               "descriptor":"body",
               "typeDefDescriptor":"aura://Aura.Component[]",
-              "required":false
+              "required":false,
+              "visibility":"PUBLIC"
             }
           },
           {
@@ -25,7 +26,8 @@
             "value":{
               "descriptor":"attr",
               "typeDefDescriptor":"aura://String",
-              "required":false
+              "required":false,
+              "visibility":"PUBLIC"
             }
           }
         ],

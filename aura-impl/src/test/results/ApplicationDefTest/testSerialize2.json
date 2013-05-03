@@ -14,7 +14,8 @@
         "value":{
           "descriptor":"body",
           "typeDefDescriptor":"aura://Aura.Component[]",
-          "required":false
+          "required":false,
+          "visibility":"PUBLIC"
         }
       }
     ],
@@ -39,7 +40,8 @@
             "value":{
               "descriptor":"token",
               "typeDefDescriptor":"aura://String",
-              "required":false
+              "required":false,
+              "visibility":"PUBLIC"
             }
           }
         }

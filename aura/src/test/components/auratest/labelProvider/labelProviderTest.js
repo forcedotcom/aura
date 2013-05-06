@@ -3,8 +3,8 @@
         test: function(cmp) {
 
             $A.test.addWaitFor(
-                false,
-                $A.test.isActionPending,
+                true,
+                $A.test.allActionsComplete,
                 function(){
                     $A.test.assertEquals("Today", cmp.get("v.simplevalue1.value"), "Failed to get Label");
                 }
@@ -15,8 +15,8 @@
     testNonExistingSection: {
         test: function(cmp) {
             $A.test.addWaitFor(
-                false,
-                $A.test.isActionPending,
+                true,
+                $A.test.allActionsComplete,
                 function(){
 
                     var sv2 = cmp.get("v.simplevalue2.value");
@@ -34,8 +34,8 @@
     testNonExistingLabel: {
         test: function(cmp) {
             $A.test.addWaitFor(
-                false,
-                $A.test.isActionPending,
+                true,
+                $A.test.allActionsComplete,
                 function(){
 
                     var sv3 = cmp.get("v.simplevalue3.value");

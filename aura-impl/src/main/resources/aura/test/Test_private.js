@@ -21,6 +21,7 @@ var priv = {
          */
         waits : [],
         cleanups : [],
+        completed : {}, // A map of action name to boolean for 'named' actions that have been queued
         complete : -1, // -1:uninitialized, 0:complete, 1:tearing down, 2:running, 3+:waiting
         errors : [],
         timeoutTime : 0,

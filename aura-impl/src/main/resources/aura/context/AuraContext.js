@@ -60,7 +60,7 @@ AuraContext.prototype.getMode = function() {
 
 /**
  * Provides access to global value providers.
- * For example, <code>$A.getGlobalValueProviders().get("Label.Related_Lists.task_mode_today");</code> gets the label value.
+ * For example, <code>$A.getGlobalValueProviders().get("$Label.Related_Lists.task_mode_today");</code> gets the label value.
  * <p>See Also: <a href="#help?topic=dynamicLabel">Dynamically Constructing Labels</a></p>
  * @return {GlobalValueProviders}
  */

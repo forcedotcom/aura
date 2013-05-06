@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 ({
-    render: function(cmp) {
+    getLabel: function(cmp, event) {
         var gvp = $A.getGlobalValueProviders();
         cmp.getValue("v.simplevalue1").setValue(gvp.getValue("$Label" + ".Related_Lists" + ".task_mode_today", cmp));
-        return this.superRender();
     }
 })

@@ -22,31 +22,35 @@
     <p>You want to dynamically construct the label on the client.</p>
     
     <h2>Code</h2>
-    <p>This sample code shows how you can bind the label value to a component such that the value dynamically updates after a render.</p>
+    <p>This sample code shows how you can bind the label value to a component such that the value dynamically updates.</p>
      
     <auradocs:codeblock>
-    $A.getGlobalValueProviders().get("$Label.Related_Lists.task_mode_today", cmp, function(res) {
-        $A.test.assertEquals("Today", res, "Failed: Wrong label value in callback");
-    });
+    $A.getGlobalValueProviders().get("$Label.Related_Lists.task_mode_today", cmp);
     </auradocs:codeblock>
      <p><code>$A.getGlobalValueProviders().get()</code> takes three parameters: <code>expression</code>, <code>component</code>, and <code>callback</code>. 
      <code>expression</code> is required.</p>
-     <p>Use <code>$A.getGlobalValueProviders().get()</code> to retrieve label values from the server and bind the values to the component. You may want to use this method if your <code>$Label</code> values are unknown such as when they are not included in the markup or in a server-side model.
+     
+     <h2>Discussion</h2>
+     <p>Use <code>$A.getGlobalValueProviders().get()</code> to retrieve a label from the server and bind the values to the component. You may want to use this method if your <code>$Label</code> values are unknown such as when they are not included in the markup or in a server-side model.
      If the value is known, <code>$A.getGlobalValueProviders().get()</code> returns a String value. If the value is not known, <code>PROD</code> mode returns an empty String and all other modes return a placeholder with the expression. 
      Aura retrieves the label value the first time it is evaluated.
      </p>
-     <p>The following demo dynamically constructs the label value.</p>
+     <p>The following demo dynamically constructs the label value by calling <code>$A.getGlobalValueProviders()</code>.</p>
      <auradocs:example descriptor="auradocs:demoLabelDyn" />
-     <p><code>&lt;aura:attribute name="simplevalue1" type="Object"/&gt;</code> binds the label expressions to an Object-type attribute. This binding ensures that the component is automatically rerendered when the attribute's expression is updated with the new value.
+     <p><code>&lt;aura:attribute name="simplevalue1" type="Object"/&gt;</code> is a placeholder for the label. This Object-type attribute is dynamically updated with the label value, which triggers rerendering of the component. This binding ensures that the component is automatically rerendered when the attribute's expression is updated with the new value.
      </p>
      <auradocs:info>Binding the label value to an Object-type attribute may cause a resizing activity on components if the returned String size is much bigger than the initially allocated size.</auradocs:info>
-     <p>To get the label value when you have used the label in markup or in a server-side model, use one of these methods.</p>
-     <p>
-     <code>var val = $A.getGlobalValueProviders().get("$Label.Related_Lists.task_mode_today");</code>
-     <code>$A.get("$Label.Related_Lists.task_mode_today");</code>
-     <code>$A.expressionService.get("$Label.Related_Lists.task_mode_today");</code>	   
+     <p>To get the label value when you have used the label in markup or in a server-side model, use <code>var val = $A.getGlobalValueProviders().get("$Label.Related_Lists.task_mode_today");</code> or
+     <code>$A.get("$Label.Related_Lists.task_mode_today");</code>. Note that <code>get()</code> calls <code>getValue()</code>, which returns a <a href="#reference?topic=api:SimpleValue">SimpleValue</a> object. You can also use <code>$A.expressionService.get("$Label.Related_Lists.task_mode_today");</code> to retrieve a known label.	   
      </p>
+     <p>To test if your label value is correct, use a callback function.</p>
+     <auradocs:codeblock>
+     $A.getGlobalValueProviders().get("$Label.Related_Lists.task_mode_today", cmp, function(res) {
+        $A.test.assertEquals("Today", res, "Failed: Wrong label value in callback");
+     });
+     </auradocs:codeblock>
      <p><b>See also:</b><br/>
+     <auradocs:topicLink topic="label">Using Labels</auradocs:topicLink><br/>
      <auradocs:topicLink topic="labelParameters">Setting Label Parameters</auradocs:topicLink><br/>
      <auradocs:topicLink topic="labelAdapter">Label Adapters</auradocs:topicLink><br/>
      <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink>

@@ -596,7 +596,7 @@ $A.ns.Aura.prototype.get = function(key) {
 };
 
 /**
- * For example, <code>$A.getRoot().get("v.attrName");</code> returns the attribute from the root component.
+ * Gets the component that is passed to a controller method. For example, <code>$A.getRoot().get("v.attrName");</code> returns the attribute from the root component.
  * @public
  * @function
  */

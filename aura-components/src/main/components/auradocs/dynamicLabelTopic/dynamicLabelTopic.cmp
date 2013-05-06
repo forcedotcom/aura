@@ -19,7 +19,7 @@
     <aura:set attribute="title" value="Dynamically Constructing Labels"/>
     
     <h2>Goal</h2>
-    <p>You want to dynamically construct the label on the client.</p>
+    <p>You want to dynamically construct labels on the client.</p>
     
     <h2>Code</h2>
     <p>This sample code shows how you can bind the label value to a component such that the value dynamically updates.</p>

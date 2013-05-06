@@ -147,6 +147,7 @@
                     <auradocs:contentsNode text="Invoking Actions on Component Initialization" id="initHandler" />
                     <auradocs:contentsNode text="Adding and Removing Styles" id="addClass" />
                     <auradocs:contentsNode text="Dynamically Adding Event Handlers" id="dynamicHandler" />
+                    <auradocs:contentsNode text="Dynamically Constructing Labels" id="dynamicLabel" />
                     <auradocs:contentsNode text="Modifying Components from External JavaScript" id="jsModCmpExternal" />
                 </auradocs:contentsNode>
             </auradocs:contentsNode>

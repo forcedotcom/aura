@@ -34,7 +34,7 @@
                 }
             });
         }
-        console.log(atts)
+        $A.log(atts)
 
         action.setCallback(this, function(a){
             var newBody;

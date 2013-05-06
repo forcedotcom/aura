@@ -100,29 +100,17 @@ var AuraComponentService = function(){
             aura.assert(config, "config is required in ComponentService.newComponent(config)");
 
             var that = $A.services.component;
-            if(config && $A.util.isString(config)){
-                config = {"componentDef": config};
-            }
-
             if ($A.util.isArray(config)){
                 return that.newComponentArray(config, attributeValueProvider, localCreation, doForce);
             }
 
-            if (attributeValueProvider) {
-                if(!config["attributes"]){
-                    config["attributes"] = {};
-                }
+            var configObj = that.getComponentConfigs(config, attributeValueProvider);
 
-                config["attributes"]["valueProvider"] = attributeValueProvider;
-            }
+            var def = configObj["definition"],
+                desc = configObj["descriptor"],
+                load;
 
-            var def;
-            var desc;
-            var load;
-
-
-            def = that.getDef(config["componentDef"], true);
-
+            config = configObj["configuration"];
 
             if(doForce !== true && !config["globalId"]){
                 if(def && !def.hasRemoteDependencies() ){
@@ -135,38 +123,146 @@ var AuraComponentService = function(){
                 }
             }
 
-            if(def){
-                desc = def.getDescriptor().toString();
-            }else{
-                desc = config["componentDef"]["descriptor"]?config["componentDef"]["descriptor"]:config["componentDef"];
-            }
-
             if(desc === "markup://aura:placeholder"){
                 load = null;
             }
 
-            if(load === "LAZY" || load === "EXCLUSIVE"){
+            if (load === "LAZY" || load === "EXCLUSIVE") {
                 localCreation = true;
                 var oldConfig = config;
                 config = {
-                         "componentDef": {
-                             "descriptor": "markup://aura:placeholder"
-                         },
-                         "localId" : oldConfig["localId"],
+                    "componentDef": {
+                        "descriptor": "markup://aura:placeholder"
+                    },
+                    "localId": oldConfig["localId"],
 
-                         "attributes": {
-                             "values": {
-                                 "refDescriptor" : desc,
-                                 "attributes" : oldConfig["attributes"]?oldConfig["attributes"]["values"]:null,
-                                 "exclusive" : (oldConfig["load"] === "EXCLUSIVE")
-                             }
-                         }
-                     };
+                    "attributes": {
+                        "values": {
+                            "refDescriptor": desc,
+                            "attributes": oldConfig["attributes"] ? oldConfig["attributes"]["values"] : null,
+                            "exclusive": (oldConfig["load"] === "EXCLUSIVE")
+                        }
+                    }
+                };
             }
 
             var ret = new Component(config, localCreation);
             ret.fire("init");
             return ret;
+        },
+
+        /**
+         * Async version of newComponent. Returns a component from newComponent if component def
+         * is already known. Otherwise, we request component from server and call provided callback.
+         *
+         * @param config
+         * @param [attributeValueProvider]
+         * @param [localCreation]
+         * @param [doForce]
+         * @param callback
+         * @return {*}
+         */
+        newAsyncComponent: function(config, attributeValueProvider, localCreation, doForce, callback){
+            aura.assert(config, "config is required in ComponentService.newComponent(config)");
+
+            var that = $A.services.component;
+            if ($A.util.isArray(config)){
+                return that.newComponentArray(config, attributeValueProvider, localCreation, doForce);
+            }
+
+            var configObj = that.getComponentConfigs(config, attributeValueProvider);
+
+            var def = configObj["definition"],
+                desc = configObj["descriptor"];
+
+            config = configObj["configuration"];
+
+            config["componentDef"] = {
+                "descriptor": desc
+            };
+
+            if ( !def || (def && def.hasRemoteDependencies()) ) {
+                this.requestComponent(config, callback);
+            } else {
+                return this.newComponent(config, attributeValueProvider, localCreation, doForce);
+            }
+
+        },
+
+        /**
+         * Request component from server.
+         *
+         * @param config
+         * @param callback
+         */
+        requestComponent: function(config, callback) {
+
+            var action = $A.get("c.aura://ComponentController.getComponent");
+
+            action.setParams({
+                "name" : config["componentDef"]["descriptor"],
+                "attributes" : config["attributes"]
+            });
+
+            action.setCallback(this, function(a){
+                var newComp;
+                if(a.getState() === "ERROR"){
+                    newComp = $A.newCmp("markup://aura:text");
+                    newComp.getValue("v.value").setValue(a.getError()[0].message);
+                }else{
+                    newComp = $A.newCmp(a.getReturnValue());
+                }
+
+                if ( $A.util.isFunction(callback) ) {
+                    callback.call(null, newComp);
+                }
+            });
+
+            if (config.load === "EXCLUSIVE") {
+                action.setExclusive();
+            }
+
+            action.runAfter(action);
+        },
+
+        /**
+         * Provides processed component config, definition, and descriptor.
+         *
+         * @param config
+         * @param attributeValueProvider
+         * @return {{configuration: {}, definition: ComponentDef, descriptor: String}}
+         */
+        getComponentConfigs: function(config, attributeValueProvider) {
+
+            var componentService = $A.services.component;
+            if(config && $A.util.isString(config)){
+                config = {"componentDef": config};
+            }
+
+            if (attributeValueProvider) {
+                if(!config["attributes"]){
+                    config["attributes"] = {};
+                }
+
+                config["attributes"]["valueProvider"] = attributeValueProvider;
+            }
+
+            var def;
+            var desc;
+
+            def = componentService.getDef(config["componentDef"], true);
+
+            if(def){
+                desc = def.getDescriptor().toString();
+            }else{
+                desc = config["componentDef"]["descriptor"]? config["componentDef"]["descriptor"] : config["componentDef"];
+            }
+
+            return {
+                "configuration": config,
+                "definition": def,
+                "descriptor": desc
+            };
         },
 
         /**

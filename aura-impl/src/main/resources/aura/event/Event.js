@@ -153,7 +153,49 @@ Event.prototype.fire = function() {
         }
     }
     $A.services.event.finishFiring();
-
+    
+	//#if {"excludeModes" : ["PRODUCTION"]}
+    // if we have a debug component send event info to the tool
+    var auraDebugCmp = $A.util.getDebugToolComponent();
+    if(!$A.util.isUndefinedOrNull(auraDebugCmp)) {
+    	// event name
+    	var outputName =  this.eventName ? this.eventName : this.eventDef.getDescriptor().getQualifiedName();
+    	
+    	// event params
+    	var outputParams = function(eventParams) {
+    		var outParams = "";
+	    	if (!$A.util.isUndefinedOrNull(eventParams)) {
+	    		for (var p in eventParams) {
+	    			if (!$A.util.isUndefinedOrNull(p)) {
+	    				outParams += p + ": " + eventParams[p] + ", ";
+	    			}
+	    		}
+	    	}
+    		return " Params={ " + outParams + "}";
+    	}
+    	
+    	// output to debug tool
+    	var output = "[" + this.eventDef.getEventType() + "] " + outputName + outputParams(this.getParams());
+    	var debugLogEvent = $A.util.getDebugToolsAuraInstance().get("e.aura:debugLog");
+    	debugLogEvent.setParams({"type" : "event", "message" : output});
+    	debugLogEvent.fire();
+    	
+    	// listening to aura:systemError and auraStorage:modified events on debug
+    	// tool in the child window. Need to fire those events in the window.
+    	if ($A.util.isUndefinedOrNull(window.opener)) { // this is the parent window
+    		 	if (outputName.indexOf("aura:systemError") != -1) {
+				    var debugWindowEvent = $A.util.getDebugToolsAuraInstance().get("e.aura:systemError");
+					debugWindowEvent.setParams(this.getParams());
+					debugWindowEvent.fire();
+			    }
+			    
+			    if (outputName.indexOf("auraStorage:modified") != -1) {
+				    var debugWindowEvent = $A.util.getDebugToolsAuraInstance().get("e.auraStorage:modified");
+					debugWindowEvent.fire();
+			    }
+    	}
+    }
+    //#end
 };
 
 //#include aura.event.Event_export

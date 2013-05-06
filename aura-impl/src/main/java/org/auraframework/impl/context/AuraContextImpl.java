@@ -16,35 +16,17 @@
 package org.auraframework.impl.context;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.xml.stream.XMLStreamException;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.LocalizationAdapter;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.DependencyDef;
-import org.auraframework.def.EventType;
 import org.auraframework.http.AuraBaseServlet;
-import org.auraframework.instance.Action;
-import org.auraframework.instance.BaseComponent;
-import org.auraframework.instance.Event;
-import org.auraframework.instance.GlobalValueProvider;
-import org.auraframework.instance.ValueProviderType;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.Client;
-import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.instance.*;
+import org.auraframework.system.*;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.AuraUnhandledException;
@@ -52,16 +34,10 @@ import org.auraframework.throwable.quickfix.InvalidEventTypeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.ServiceLocator;
-import org.auraframework.util.json.BaseJsonSerializationContext;
-import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonSerializationContext;
-import org.auraframework.util.json.JsonSerializer;
+import org.auraframework.util.json.*;
 import org.auraframework.util.json.JsonSerializer.NoneSerializer;
-import org.auraframework.util.json.JsonSerializers;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 
 public class AuraContextImpl implements AuraContext {
     public static class SerializationContext extends BaseJsonSerializationContext {
@@ -274,11 +250,13 @@ public class AuraContextImpl implements AuraContext {
     private final List<Event> clientEvents = Lists.newArrayList();
 
     private String fwUID;
+    
+    private final boolean isDebugToolEnabled;
 
     public AuraContextImpl(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
             Format format, Access access, JsonSerializationContext jsonContext,
             Map<ValueProviderType, GlobalValueProvider> globalProviders,
-            DefDescriptor<? extends BaseComponentDef> appDesc) {
+            DefDescriptor<? extends BaseComponentDef> appDesc, boolean isDebugToolEnabled) {
         if (access == Access.AUTHENTICATED) {
             preloadedNamespaces.add("aura");
             preloadedNamespaces.add("ui");
@@ -294,9 +272,10 @@ public class AuraContextImpl implements AuraContext {
         this.jsonContext = jsonContext;
         this.globalProviders = globalProviders;
         this.appDesc = appDesc;
+        this.isDebugToolEnabled = isDebugToolEnabled;
     }
 
-    @Override
+	@Override
     public void addPreload(String preload) {
         preloadedNamespaces.add(preload);
     }
@@ -625,4 +604,9 @@ public class AuraContextImpl implements AuraContext {
     public String getFrameworkUID() {
         return fwUID;
     }
+
+	@Override
+	public boolean getIsDebugToolEnabled() {
+		return isDebugToolEnabled;
+	}
 }

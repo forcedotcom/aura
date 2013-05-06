@@ -1,4 +1,4 @@
-markup://test:layoutNoLayout : zUfi3KBaKR-ttWl367dZaQ
+markup://test:layoutNoLayout : EYMWBAXyhhXqmtc2jxxpuQ
 aura://ComponentController : null
 aura://LabelController : null
 css://aura.placeholder : kvkyys3VNLeU066RaKQMbA
@@ -23,6 +23,7 @@ markup://aura:component : WO2NsySPtltNWhAlOMVoNg
 markup://aura:componentEvent : At5WgyY1xuD6z3qK4DTJyQ
 markup://aura:connectionLost : J6bzHYrwpIAhmWX6eW-_TA
 markup://aura:connectionResumed : y2vk2AqFQ-jdwN5JaCLabw
+markup://aura:debugLog : 4zk1dotroeBdvL9XU91IMw
 markup://aura:doneRendering : XYjop4hY_cCHxQvXIc3kDA
 markup://aura:doneWaiting : CJtU9x15owqhco_yJDzLSw
 markup://aura:expression : zKKC9CKkhSkXMi3keknAEA

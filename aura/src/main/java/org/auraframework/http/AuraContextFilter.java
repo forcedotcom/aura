@@ -37,6 +37,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.http.RequestParam.BooleanParam;
 import org.auraframework.http.RequestParam.EnumParam;
 import org.auraframework.http.RequestParam.InvalidParamException;
 import org.auraframework.http.RequestParam.StringParam;
@@ -60,7 +61,10 @@ public class AuraContextFilter implements Filter {
 
     public static final EnumParam<AuraContext.Mode> mode = new EnumParam<AuraContext.Mode>(AuraServlet.AURA_PREFIX
             + "mode", false, AuraContext.Mode.class);
-
+    
+    public static final BooleanParam isDebugToolEnabled = new BooleanParam(AuraServlet.AURA_PREFIX
+            + "debugtool", false);
+    
     private static final EnumParam<Format> format = new EnumParam<Format>(AuraServlet.AURA_PREFIX + "format", false,
             Format.class);
 
@@ -120,13 +124,14 @@ public class AuraContextFilter implements Filter {
 
         Map<String, Object> configMap = getConfigMap(request);
         Mode m = getMode(request, configMap);
-
+        boolean d = getDebugToolParam(request);
+        
         DefDescriptor<? extends BaseComponentDef> appDesc = getAppParam(request, configMap);
 
         if (componentDir != null) {
             System.setProperty("aura.componentDir", componentDir);
         }
-        AuraContext context = Aura.getContextService().startContext(m, f, a, appDesc);
+        AuraContext context = Aura.getContextService().startContext(m, f, a, appDesc, d);
 
         String contextPath = request.getContextPath();
         // some appservers (like tomcat) use "/" as the root path, others ""
@@ -298,6 +303,11 @@ public class AuraContextFilter implements Filter {
         Aura.getContextService().endContext();
     }
 
+    protected Boolean getDebugToolParam(HttpServletRequest request) {
+    	// Get Passed in aura.debugtool param
+    	return isDebugToolEnabled.get(request);
+    }
+    
     @Override
     public void destroy() {
     }

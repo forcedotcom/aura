@@ -55,4 +55,11 @@ exp(p,
     "getWindowSize", p.getWindowSize,
     "isComponent", p.isComponent,
     "isValue", p.isValue
+    //#if {"excludeModes" : ["PRODUCTION"]}
+    ,
+    "getDebugToolComponent", p.getDebugToolComponent,
+    "setDebugToolWindow", p.setDebugToolWindow,
+    "getDebugToolsAuraInstance",  p.getDebugToolsAuraInstance,
+    "getUrl", p.getUrl
+    //#end
 );

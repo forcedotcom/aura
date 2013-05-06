@@ -41,6 +41,12 @@ public interface ContextAdapter extends AuraAdapter {
             Map<ValueProviderType, GlobalValueProvider> globalProviders,
             DefDescriptor<? extends BaseComponentDef> appDesc);
 
+    AuraContext establish(Mode mode, MasterDefRegistry masterRegistry, Map<DefType, String> defaultPrefixes,
+            Format format, Access access, JsonSerializationContext jsonContext,
+            Map<ValueProviderType, GlobalValueProvider> globalProviders,
+            DefDescriptor<? extends BaseComponentDef> appDesc,
+            boolean isDebugToolEnabled);
+    
     boolean isEstablished();
 
     AuraContext getCurrentContext();

@@ -1,0 +1,42 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Throwing Errors"/>
+
+    <p>Aura gives you flexibility in handling unrecoverable and recoverable app errors in JavaScript code.</p>
+
+    <h2>Unrecoverable Errors</h2>
+        
+    <p>Use <code>$A.error("error message here")</code> for unrecoverable errors, such as an error that prevents your app from starting successfully. It shows a stack trace on the page.</p>
+    
+    <h2>Recoverable Errors</h2>
+        
+    <p>To handle recoverable errors, use a component, such as <code>ui:message</code> or <code>ui:dialog</code>, to tell the user about the problem.</p>
+    
+    <p>This sample shows you the basics of throwing and catching an error in a JavaScript controller.</p>
+    
+    <auradocs:example descriptor="auradocs:sampleThrowError" /> 
+    
+    <p>See the controller code for an example of throwing an error in a try-catch block. The message in the error is displayed to the user in a dynamically created <code>ui:message</code> component.</p>
+    
+	<p><b>See also:</b><br/>
+	    <auradocs:topicLink topic="error">Validating Fields</auradocs:topicLink><br/>
+	    <auradocs:topicLink topic="dynamicCmp">Dynamically Creating Components</auradocs:topicLink>
+	</p>    
+       
+    </aura:component>

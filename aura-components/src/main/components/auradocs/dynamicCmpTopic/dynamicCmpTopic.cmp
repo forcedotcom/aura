@@ -53,19 +53,33 @@
     <p>The next sample code sets the configuration attributes for the new component and creates the new component on the client.
     The configuration attributes are set on the client and Aura doesn't make a call to the server if you provide them.</p>
     <auradocs:codeblock>
-   var msgConfig = {
-         componentDef: {
-               descriptor: "markup://namespace:name"
-         },
-         attributes: {
-               values: {
-                    severity: 'info',
-                    strength: 1,
-                    }
-          }
-    },
+    var componentConfig = {
+            "componentDef" : {
+                "descriptor" : "markup://ui:message"
+            },
 
-    var message = $A.componentService.newComponent(msgConfig);
+            "attributes" : {
+                "values" : {
+                    "title" : "Sample Message",
+                    "severity" : "info",
+                    "body" : [
+                        {
+                            "componentDef" : {
+                                "descriptor" : "markup://ui:outputText"
+                            },
+
+                            "attributes" : {
+                                "values" : {
+                                    "value" : "I'm so dynamic"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        };
+    
+    var message = $A.componentService.newComponent(componentConfig);    
     </auradocs:codeblock>
          
     <p>The next sample code sets the <code>localId</code> of the new component, which corresponds to its <code>aura:id</code> attribute on the component.</p> 

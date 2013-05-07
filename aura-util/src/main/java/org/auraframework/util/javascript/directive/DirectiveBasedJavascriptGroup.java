@@ -15,19 +15,11 @@
  */
 package org.auraframework.util.javascript.directive;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.Writer;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
-import org.auraframework.util.javascript.CommonJavascriptGroupImpl;
-import org.auraframework.util.javascript.JavascriptProcessingError;
-import org.auraframework.util.javascript.JavascriptValidator;
+import org.auraframework.util.javascript.*;
 import org.auraframework.util.javascript.JavascriptWriter.CompressionLevel;
 import org.auraframework.util.text.Hash;
 
@@ -122,6 +114,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                 return;
             }
         }
+        dest.getParentFile().mkdirs();
         final String everything = buildContent(mode);
         String threadName = THREAD_NAME + mode;
         Thread t = new Thread(new Runnable() {

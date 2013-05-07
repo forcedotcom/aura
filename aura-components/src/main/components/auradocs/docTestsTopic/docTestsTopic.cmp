@@ -56,8 +56,11 @@
              Learn more about how to use  breakpoints at <a href="https://developers.google.com/chrome-developer-tools/docs/scripts-breakpoints" target="_blank">Chrome Developer Tools</a>.</p>
 
      <h3>Simulating User Interactions</h3>
-    <p>To simulate user interactions, fire the associated Aura event. For example, use <code>buttonComponent.get("e.press").fire()</code> to simulate a button click event.</p>
+    <p>To simulate a user interaction, fire the associated Aura event. For example, use <code>buttonComponent.get("e.press").fire()</code> to simulate a button click event.</p>
     
+    <h3>Handling Events</h3>
+    <p>To handle an event, use a handler to listen to the event. For example, <code>&lt;aura:handler event="ui:closeDialog" action="<aura:text value="{!" />c.closeDialog}"/&gt;</code> 
+    handles the <code>ui:closeDialog</code> event. The handler calls the <code>closeDialog</code> controller action, which defines the action to test. See <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink> for more information.</p>
     <p><b>See also:</b><br/>
         <auradocs:topicLink topic="modesReference">Modes Reference</auradocs:topicLink><br/>
         <auradocs:topicLink topic="queryLang">Querying State and Statistics</auradocs:topicLink>

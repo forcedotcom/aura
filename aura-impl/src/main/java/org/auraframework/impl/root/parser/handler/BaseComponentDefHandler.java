@@ -47,6 +47,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Source;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -187,7 +188,8 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
     protected void readAttributes() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         context.setCurrentNamespace(builder.getDescriptor().getNamespace());
-
+        Mode mode = context.getMode();
+        
         super.readAttributes();
         String controllerName = getAttributeValue(ATTRIBUTE_CONTROLLER);
         DefDescriptor<ControllerDef> controllerDescriptor = null;
@@ -290,14 +292,16 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
         if (cssDescriptor.exists()) {
             builder.themeDescriptor = cssDescriptor;
         }
-
-        // See if there is a test suite that has the same qname.
-        DefDescriptor<TestSuiteDef> jsTestSuiteDescriptor = DefDescriptorImpl
-                .getInstance(jsControllerName, TestSuiteDef.class);
-        if (jsTestSuiteDescriptor.exists()) {
-            builder.testSuiteDefDescriptor = jsTestSuiteDescriptor;
+        
+        //Do not consider Javascript Test suite defs in PROD and PRODDEBUG modes.
+        if(mode != Mode.PROD && mode != Mode.PRODDEBUG){
+            // See if there is a test suite that has the same qname.
+            DefDescriptor<TestSuiteDef> jsTestSuiteDescriptor = DefDescriptorImpl
+                    .getInstance(jsControllerName, TestSuiteDef.class);
+            if (jsTestSuiteDescriptor.exists()) {
+                builder.testSuiteDefDescriptor = jsTestSuiteDescriptor;
+            }
         }
-
         String extendsName = getAttributeValue(ATTRIBUTE_EXTENDS);
         if (extendsName != null) {
             builder.extendsDescriptor = DefDescriptorImpl.getInstance(

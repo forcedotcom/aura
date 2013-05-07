@@ -57,7 +57,6 @@ import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -659,7 +658,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     public void serialize(Json json) throws IOException {
         try {
             AuraContext context = Aura.getContextService().getCurrentContext();
-            Mode mode = context.getMode();
             boolean preloaded = context.isPreloaded(getDescriptor());
 
             json.writeMapBegin();
@@ -718,9 +716,6 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     json.writeMapEntry("subDefs", subDefs.values());
                 }
 
-                if (mode.equals(Mode.AUTOJSTEST)) {
-                    json.writeMapEntry("testSuiteDef", getTestSuiteDef());
-                }
                 serializeFields(json);
             }
 

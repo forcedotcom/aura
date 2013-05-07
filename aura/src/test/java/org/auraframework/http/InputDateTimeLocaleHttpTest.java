@@ -105,19 +105,4 @@ public class InputDateTimeLocaleHttpTest extends AuraHttpTestCase{
         
         getValueByLocale(locale, dayOfWeek, month, urlAuraParameters);
     }
-	
-	/**
-	 * Test to verify daysofweek and month changes for chinese locale
-	 * For DateTime Picker
-     * @throws Exception
-	 */
-	public void testCheckLocaleForDateTimePicker() throws Exception{
-		
-        //Test case for dateTimePicker
-        Map<String, String> urlAuraParameters = ImmutableMap.of("aura.tag", "uiTest:dateTimePickerTest", "aura.context",
-                "{'mode':'DEV'}", "visible","true");
-        
-        getValueByLocale(locale, dayOfWeek, month, urlAuraParameters);
-    }
-	
 }

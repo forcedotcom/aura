@@ -42,12 +42,23 @@ public class ContextAdapterImpl implements ContextAdapter {
             Format format, Access access, JsonSerializationContext jsonContext,
             Map<ValueProviderType, GlobalValueProvider> globalProviders,
             DefDescriptor<? extends BaseComponentDef> appDesc) {
-        AuraContext context = new AuraContextImpl(mode, masterRegistry, defaultPrefixes, format, access, jsonContext,
-                globalProviders, appDesc);
-        currentContext.set(context);
-        return context;
+    	return establish(mode, masterRegistry, defaultPrefixes, format, access, jsonContext,
+                globalProviders, appDesc, false);
     }
 
+    @Override
+	public AuraContext establish(Mode mode, MasterDefRegistry masterRegistry,
+			Map<DefType, String> defaultPrefixes, Format format, Access access,
+			JsonSerializationContext jsonContext,
+			Map<ValueProviderType, GlobalValueProvider> globalProviders,
+			DefDescriptor<? extends BaseComponentDef> appDesc,
+			boolean isDebugToolEnabled) {
+    	AuraContext context = new AuraContextImpl(mode, masterRegistry, defaultPrefixes, format, access, jsonContext,
+                globalProviders, appDesc, isDebugToolEnabled);
+        currentContext.set(context);
+        return context;
+	}
+    
     @Override
     public AuraContext getCurrentContext() {
         return currentContext.get();

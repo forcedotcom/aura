@@ -92,6 +92,8 @@ public interface AuraContext {
         }
     }
 
+    public static boolean isDebugToolEnabled = false;
+    
     public static enum Format {
         MANIFEST, CSS, JS, JSON, HTML;
     }
@@ -390,4 +392,6 @@ public interface AuraContext {
      * @return the context's idea of the UID.
      */
     String getFrameworkUID();
+
+	boolean getIsDebugToolEnabled();
 }

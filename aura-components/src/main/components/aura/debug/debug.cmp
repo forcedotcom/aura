@@ -1,0 +1,47 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component support="PROTO" extensible="true" description="Outputs useful debug information. To enable debug tool pass aura.debugtool=true in the url. &lt;br&#47;&gt;
+															   For component stats tab to see aditional stats use aura.mode=STATS. &lt;br&#47;&gt;
+															   NOTE: need to disable pop up blocker for debugtool to work.">
+	
+	<aura:attribute name="errorsData" type="String" default=""/>
+	<aura:attribute name="cmpData" type="String" default=""/> <!-- to see additional stats use aura.mode=STATS -->
+	<aura:attribute name="eventData" type="String" default=""/>
+	<aura:attribute name="storageData" type="String" default="0 K ()"/>
+	<aura:attribute name="consoleData" type="String" default=""/>
+	<aura:attribute name="storageName" type="String" default="actions"/>
+	
+	<aura:handler event="aura:debugLog" action="{!c.debugLogEventListener}"/>
+	<aura:handler event="aura:systemError" action="{!c.errorEventListener}"/>
+	<aura:handler event="auraStorage:modified" action="{!c.storageEventListener}"/>
+	
+	<div id="__aura_debug_tool" aura:id="auradebugtool" class="debugWindow">
+		
+		<ui:tabset>
+	    	<ui:tab aura:id="errorsTab" title="Errors"><pre>{!v.errorsData}</pre></ui:tab>
+        	<ui:tab aura:id="cmpTab" title="Components" activated="{!c.cmpStats}">
+        		<a onclick="{!c.cmpStats}"><ui:image src="/auraFW/resources/aura/images/refresh.png"/></a>
+        		<pre>{!v.cmpData}</pre>
+        	</ui:tab>
+        	<ui:tab aura:id="eventTab" title="Events"><pre>{!v.eventData}</pre></ui:tab>
+        	<ui:tab aura:id="storageTab" title="Storage"><div aura:id="storageInfo"><pre>{!v.storageData}</pre></div></ui:tab>
+        	<ui:tab aura:id="consoleTab" title="Console"><pre>{!v.consoleData}</pre></ui:tab>
+   		</ui:tabset>
+		
+	</div>
+</aura:component>

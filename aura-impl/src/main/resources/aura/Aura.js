@@ -741,6 +741,22 @@ $A.ns.Aura.prototype.log = function(value, error) {
             }
         }
     }
+    
+    //#if {"excludeModes" : ["PRODUCTION"]}
+    // sending logging info to debug tool if enabled
+    if(!$A.util.isUndefinedOrNull($A.util.getDebugToolComponent())) {
+    	var output = value;
+    	if (!$A.util.isUndefinedOrNull(error)) {
+    		output += "\nError: " + error;
+    		if (!$A.util.isUndefinedOrNull(trace)) {
+    			output += "\nStack: " + trace.join("\n");
+    		}
+    	}
+    	var debugLogEvent = $A.util.getDebugToolsAuraInstance().get("e.aura:debugLog");
+    	debugLogEvent.setParams({"type" : "console", "message" : output});
+    	debugLogEvent.fire();
+    }
+    //#end
 };
 
 /**

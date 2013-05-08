@@ -146,6 +146,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
     @Override
     public synchronized void regenerateAuraJS() {
+        // If we're missing source, jsGroup will be an AuraResourceGroup and isStale() is always
+        // false. If we're in production, we're using the resources too. But if we have source,
+        // regenerate from it if it's changed:
         if (!isProduction() && jsGroup != null && (jsGroup.isStale() || lastGenerationHadCompilationErrors)) {
             try {
                 File dest = AuraImplFiles.AuraResourceJavascriptDirectory.asFile();
@@ -153,7 +156,8 @@ public class ConfigAdapterImpl implements ConfigAdapter {
                 jsGroup.regenerate(dest);
                 // now we have to copy the new files to the resource directory
                 File[] destFiles = dest.listFiles(JS_ONLY);
-                if (destFiles != null) {
+                if (destFiles != null && destFiles.length > 0) {
+                    resourceDest.mkdirs(); // If we got this far without this directory, just create it.
                     for (File f : destFiles) {
                         InputStream is = new FileInputStream(f);
                         OutputStream os = new FileOutputStream(new File(resourceDest, f.getName()));
@@ -291,9 +295,8 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     /**
-     * Creates a new Javascript group. This method exists to allow tests to
-     * override, so they can substitute e.g. an AuraJavascriptGroup that
-     * experiences synthetic errors.
+     * Creates a new Javascript group. This method exists to allow tests to override, so they can substitute e.g. an
+     * AuraJavascriptGroup that experiences synthetic errors.
      */
     protected AuraJavascriptGroup newAuraJavascriptGroup() throws IOException {
         return new AuraJavascriptGroup();

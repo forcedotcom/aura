@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.10-SNAPSHOT</version>
+        <version>0.10</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
@@ -195,7 +195,7 @@
                                </goals>
 	                           <configuration>
 	                               <tasks>
-	                                   <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath"/>
+	                                   <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath" />
 	                                   <java classname="org.auraframework.test.javascript.GenerateXUnitJS" classpathref="maven.test.classpath" fork="true" failonerror="true">
                                            <jvmarg value="-Daura.home=${basedir}/.." />
                                        </java>
@@ -203,9 +203,9 @@
 			                               <case value="rhino">
 				                               <java classname="org.mozilla.javascript.tools.shell.Main" classpathref="maven.test.classpath" fork="true" failonerror="true">
 					                               <jvmarg value="-Daura.home=${basedir}/.." />
-					                               <arg value="${xunit.js.console}"/>
-					                               <arg value="/dependency:${basedir}/src/test/tools/xUnit/dependencies/"/>
-					                               <arg value="${project.build.directory}/xunitjs/xunitTests"/>
+					                               <arg value="${xunit.js.console}" />
+					                               <arg value="/dependency:${basedir}/src/test/tools/xUnit/dependencies/" />
+					                               <arg value="${project.build.directory}/xunitjs/xunitTests" />
 				                               </java>
 			                               </case>
 			                               <default>

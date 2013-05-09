@@ -54,7 +54,19 @@ public class InputTextUITest extends WebDriverTestCase {
         outputDiv.click();// to simulate tab behavior for touch browsers
         value = assertModelValue(event); // value should have been updated
     }
-
+    
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET ,BrowserType.IPAD, BrowserType.SAFARI})
+    // Change event not picked up on IOS devices
+    public void testUpdateOnAttributeForNonIosAndroidDevice() throws Exception {
+    	open(TEST_CMP);
+    	WebDriver d = getDriver();
+        WebElement outputDiv = d.findElement(By.id("output"));
+        String eventName = "change";
+        auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+        outputDiv.click();
+        assertModelValue(eventName);
+    }
+    
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testUpdateOnAttribute() throws Exception {
         open(TEST_CMP);
@@ -68,14 +80,6 @@ public class InputTextUITest extends WebDriverTestCase {
         outputDiv.click(); // to simulate tab behavior for touch browsers
         value = assertModelValue(eventName); // value should have been updated
         assertDomEventSet();
-
-        // Change event not picked up on Safari
-        if (!checkBrowserType("SAFARI")) {
-            eventName = "change";
-            input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
-            outputDiv.click();
-            value = assertModelValue(eventName);
-        }
 
         eventName = "click";
         input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);

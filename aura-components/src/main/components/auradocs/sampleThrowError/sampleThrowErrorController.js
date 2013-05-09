@@ -25,23 +25,17 @@
 		catch (e) {
 		    // config for a dynamic ui:message component
 			var componentConfig = {
-				    "componentDef" : {
-				        "descriptor" : "markup://ui:message"
-				    },
-
-				    "attributes" : {
-				        "values" : {
-				            "title" : "Sample Thrown Error",
-				            "severity" : "error",
-				            "body" : [
+				    componentDef : "markup://ui:message",
+				    attributes : {
+				        values : {
+				            title : "Sample Thrown Error",
+				            severity : "error",
+				            body : [
 				                {
-				                    "componentDef" : {
-				                        "descriptor" : "markup://ui:outputText"
-				                    },
-
-				                    "attributes" : {
-				                        "values" : {
-				                            "value" : e.message
+				                    componentDef : "markup://ui:outputText",
+				                    attributes : {
+				                        values : {
+				                            value : e.message
 				                        }
 				                    }
 				                }

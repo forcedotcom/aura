@@ -16,6 +16,7 @@
 
 -->
 <aura:component>
+    <aura:attribute name="createCheckBoxes" type='boolean' default="false" description="val"/>
     <ui:dialogManager/>
     <aura:handler event="ui:closeDialog" action="{!c.closeDialog}"/>
     <ui:inputText aura:id="resultLabel" class="resultLabel" value=""/>
@@ -24,17 +25,19 @@
         <aura:set attribute="buttons">
            <ui:dialogButtons defaultButtons="both"/>
         </aura:set>
-        <span class="menuItem">
-             <ui:inputCheckbox aura:id="checkbox" name ="Pudding"        value="false"/>Pudding
-             <ui:inputCheckbox aura:id="checkbox" name ="Puppies"        value="false"/>Puppies
-             <ui:inputCheckbox aura:id="checkbox" name ="Bananas"        value="false"/>Bananas       
-             <ui:inputCheckbox aura:id="checkbox" name ="Owls"           value="false"/>Owls       
-             <ui:inputCheckbox aura:id="checkbox" name ="Cheese"         value="false"/>Cheese         
-             <ui:inputCheckbox aura:id="checkbox" name ="Koala"          value="false"/>Koala      
-             <ui:inputCheckbox aura:id="checkbox" name ="Water Bottles"  value="false"/>Water Bottles         
-             <ui:inputCheckbox aura:id="checkbox" name ="Coffee"         value="false"/>Coffee       
-             <ui:inputCheckbox aura:id="checkbox" name ="Computers"      value="false"/>Computers         
-             <ui:inputCheckbox aura:id="checkbox" name ="Nerds"          value="false"/>Nerds
-        </span>
+        <aura:if isTrue="{!v.createCheckBoxes}">
+            <span class="menuItem">
+                 <ui:inputCheckbox aura:id="checkbox" name ="Pudding"        class="checkbox1"  value="false"/>Pudding
+                 <ui:inputCheckbox aura:id="checkbox" name ="Puppies"        class="checkbox2"  value="false"/>Puppies
+                 <ui:inputCheckbox aura:id="checkbox" name ="Bananas"        class="checkbox3"  value="false"/>Bananas       
+                 <ui:inputCheckbox aura:id="checkbox" name ="Owls"           class="checkbox4"  value="false"/>Owls       
+                 <ui:inputCheckbox aura:id="checkbox" name ="Cheese"         class="checkbox5"  value="false"/>Cheese         
+                 <ui:inputCheckbox aura:id="checkbox" name ="Koala"          class="checkbox6"  value="false"/>Koala      
+                 <ui:inputCheckbox aura:id="checkbox" name ="Water Bottles"  class="checkbox7"  value="false"/>Water Bottles         
+                 <ui:inputCheckbox aura:id="checkbox" name ="Coffee"         class="checkbox8"  value="false"/>Coffee       
+                 <ui:inputCheckbox aura:id="checkbox" name ="Computers"      class="checkbox9"  value="false"/>Computers         
+                 <ui:inputCheckbox aura:id="checkbox" name ="Nerds"          class="checkbox10" value="false"/>Nerds
+            </span>
+         </aura:if> 
     </ui:dialog> 
 </aura:component>

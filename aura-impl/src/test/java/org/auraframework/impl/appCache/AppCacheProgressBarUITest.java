@@ -25,8 +25,9 @@ import org.openqa.selenium.By;
 
 /**
  * UI automation for AppCache implementation. ThreadHostile because simultaneous loads of the testApp will interfere
- * with progress bar loading. #W-1624136 : these test are excluded from SAFARI, FIREFOX, IE10,7,8,9, Iphone, Ipad for js
- * parser error
+ * with progress bar loading. 
+ * these test are excluded from SAFARI5, FIREFOX, IE10,7,8,9, Iphone, Ipad for js
+ * parser error : Event ProgressEvent is not supported (SAFARI6 support event progressevent though)
  */
 @ThreadHostileTest
 @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })

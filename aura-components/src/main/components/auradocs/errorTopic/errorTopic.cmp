@@ -16,9 +16,9 @@
 
 -->
 <aura:component extends="auradocs:topicPanel">
-    <aura:set attribute="title" value="Error Handling"/>
+    <aura:set attribute="title" value="Validating Fields"/>
 
-    <p>This topic shows you how to handle client-side errors using JavaScript. Typically, you validate the user input, identify any errors, and display the error messages.
+    <p>You can validate fields using JavaScript. Typically, you validate the user input, identify any errors, and display the error messages.
     You can use Aura's default error handling or customize it with your own error handlers.
 
     <h2>Default Error Handling</h2>

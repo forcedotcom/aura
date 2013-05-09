@@ -20,9 +20,6 @@
     <ui:inputText aura:id="resultLabel" class="resultLabel" value=""/>
     <ui:button aura:id="1" class="launchDialogButton" label="Click for Modal!" press="{!c.openDialog}" />
     <ui:dialog clickOutToClose="false" aura:id="dialogBoxId" title="Bang!" description="Testing Modal Dialog Box" isModal="true">
-         <aura:set attribute="buttons">
-          <ui:dialogButtons defaultButtons="confirm"/>
-          </aura:set>
         This is a public service announcement. Have you heard the word? No? Birds the word mate. Click ok to exit
     </ui:dialog>
 </aura:component>

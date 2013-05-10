@@ -63,7 +63,7 @@ GlobalValueProviders.prototype.join = function(gvps, doNotPersist) {
             }
 
             // set values into its value provider
-            this.getValueProvider(t).setValues(gvp);
+            vp.setValues(gvp);
 
             if (storage) {
                 storedGvps.push({
@@ -170,9 +170,9 @@ GlobalValueProviders.prototype.createPropertyRef = function(expression) {
  */
 GlobalValueProviders.prototype.isGlobalValueExp = function(expression) {
     expression = this.createPropertyRef(expression);
-    var root = expression.getRoot();
+    var firstChar = expression.getRoot().charAt(0);
 
-    return (root === "$Label" || root === "$Browser" || root === "$Locale" );
+    return firstChar === '$';
 };
 
 /**

@@ -15,11 +15,14 @@
     limitations under the License.
 
 -->
+<!--GVP -> Global Value Providers related tests-->
 <aura:component render="client">
     <aura:attribute name="simplevalue1" type="Object"/>
     <aura:attribute name="simplevalue2" type="Object"/>
     <aura:attribute name="simplevalue3" type="Object"/>
+    <aura:attribute name="simplevalue4" type="Object"/>
     <div>simplevalue1: {!v.simplevalue1.value}</div>
     <div>simplevalue2: {!v.simplevalue2.value}</div>
     <div>simplevalue3: {!v.simplevalue3.value}</div>
+    <div>simplevalue4: {!v.simplevalue4.value}</div>
 </aura:component>

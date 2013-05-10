@@ -18,4 +18,7 @@ var p = $A.ns.GlobalValueProviders.prototype;
 exp(p,
     "get", p.get,
     "getValue", p.getValue
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    	,"loadFromStorage", p.loadFromStorage 
+    //#end
 );

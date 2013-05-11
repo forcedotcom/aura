@@ -16,6 +16,7 @@
 package org.auraframework.test;
 
 import java.io.File;
+import java.util.Collection;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -74,4 +75,15 @@ public interface AuraTestingUtil {
      * @return the {@link DefDescriptor} for the created definition
      */
     <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents);
+
+    /**
+     * Clear cached defs from the system. When mocking a def, if the def has already been cached, as itself, or as part
+     * of a preloaded set, the mock will not be effective, so it's safer to clear any cached defs after setting up mocks
+     * but before executing a test. This relies on source change notifications to get the servlets to clear their
+     * caches.
+     * 
+     * @param defs the Definitions to be cleared from any caches
+     * @throws InterruptedException
+     */
+    <T extends Definition> void clearCachedDefs(Collection<T> defs) throws Exception;
 }

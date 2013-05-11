@@ -19,11 +19,9 @@
  * @constructor
  */
 function LabelValueProvider() {
-
     this.values = null;
-
+    this.queue = {};
 }
-
 
 /**
  * Checks value is not defined or SimpleValue is not defined
@@ -47,43 +45,76 @@ LabelValueProvider.prototype.isUndefinedSimpleValue = function(value) {
  */
 LabelValueProvider.prototype.requestServerLabel = function(expression, component, callback) {
 
-    var action = $A.get("c.aura://LabelController.getLabel"),
+    var queue = this.getQueue(expression),
         propRef = expression.getStem(),
         name = propRef.path[1],
         section = propRef.path[0],
-        isComponent = $A.util.isComponent(component);
+        isComponent = $A.util.isComponent(component),
+        placeholder = $A.getContext().getMode() === "PROD" ? "" : "[" + section + "." + name + "]",
+        resValue = valueFactory.create(placeholder, null, isComponent ? component : null);
 
-    action.setParams({
-        "name": name,
-        "section": section
-    });
+    if (isComponent) {
+        queue.addComponent(component);
+    }
 
-    var placeholder = $A.getContext().getMode() === "PROD" ? "" : "[" + section + "." + name + "]";
+    if ($A.util.isFunction(callback)) {
+        queue.addCallback(callback);
+    }
 
-    // create SimpleValue with temporary value of section and name
-    var resValue = valueFactory.create(placeholder, null, isComponent ? component : null);
+    queue.addReturnValue(resValue);
 
-    action.setCallback(this, function(a) {
-        if(a.getState() == "SUCCESS") {
-            resValue.setValue(a.getReturnValue());
-        } else {
-            $A.log("Error getting label: " + expression.getValue());
+    if (!queue.isRequested()) {
+
+        var action = $A.get("c.aura://LabelController.getLabel");
+
+        action.setParams({
+            "name": name,
+            "section": section
+        });
+
+        action.setCallback(this, function(a) {
+
+            var i = 0;
+
+            if(a.getState() === "SUCCESS") {
+                var returnValues = queue.getReturnValues();
+                for (i = 0; i < returnValues.length; i++) {
+                    returnValues[i].setValue(a.getReturnValue());
+                }
+            } else {
+                $A.log("Error getting label: " + expression.getValue());
+            }
+
+            var callbacks = queue.getCallbacks();
+
+            for (i = 0; i < callbacks.length; i++) {
+                callbacks[i].call(null, resValue);
+            }
+
+            queue.reset();
+        });
+
+        action.runAfter(action);
+
+        if (!isComponent) {
+            // forces immediate lookup if not data-bound to component
+            $A.eventService.finishFiring();
         }
 
-        if( $A.util.isFunction(callback)) {
-            callback.call(a, resValue);
-        }
-    });
-
-    action.runAfter(action);
-
-    if (!isComponent) {
-        // forces immediate lookup if not data-bound to component
-        $A.eventService.finishFiring();
+        queue.setRequested();
     }
 
     return resValue;
 
+};
+
+
+LabelValueProvider.prototype.getQueue = function(expression) {
+    var exp = expression.getValue();
+    if (!this.queue[exp]) {
+        this.queue[exp] = new LabelQueue();
+    }
+    return this.queue[exp];
 };
 
 /**

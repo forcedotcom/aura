@@ -110,6 +110,7 @@ var clientService;
 // #include aura.storage.AuraStorageService
 // #include aura.storage.Storage
 // #include aura.provider.GlobalValueProviders
+// #include aura.provider.LabelQueue
 // #include aura.provider.LabelValueProvider
 // #include aura.provider.SimpleValueProvider
 

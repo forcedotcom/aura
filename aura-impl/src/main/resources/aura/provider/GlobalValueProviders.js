@@ -170,7 +170,11 @@ GlobalValueProviders.prototype.createPropertyRef = function(expression) {
  */
 GlobalValueProviders.prototype.isGlobalValueExp = function(expression) {
     expression = this.createPropertyRef(expression);
-    var firstChar = expression.getRoot().charAt(0);
+    var firstChar = '';
+
+    if ($A.util.isUndefinedOrNull(expression) && ("getRoot" in expression)) {
+        firstChar = expression.getRoot().charAt(0);
+    }
 
     return firstChar === '$';
 };

@@ -15,45 +15,81 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Label Queue. Holds the components and callbacks for a particular $Label
+ * @namespace Label Queue. Holds the components and callbacks for a particular $Label.
+ * Queues request for the same $Label to make server calls efficient
+ *
  * @constructor
  */
 function LabelQueue() {
     this.reset();
 }
 
+/**
+ * Getter components
+ * @return {Array}
+ */
 LabelQueue.prototype.getComponents = function() {
     return this.components;
 };
 
+/**
+ * Add component to component array
+ * @param component
+ */
 LabelQueue.prototype.addComponent = function(component) {
     this.components.push(component);
 };
 
+/**
+ * Getter SimpleValues
+ * @return {Array}
+ */
 LabelQueue.prototype.getReturnValues = function() {
     return this.returnValues;
 };
 
+/**
+ * Add SimpleValue to return values
+ * @param {SimpleValue} value
+ */
 LabelQueue.prototype.addReturnValue = function(value) {
     this.returnValues.push(value);
 };
 
+/**
+ * Getter callbacks
+ * @return {Array}
+ */
 LabelQueue.prototype.getCallbacks = function() {
     return this.callbacks;
 };
 
+/**
+ * Add callback
+ * @param {Function} callback
+ */
 LabelQueue.prototype.addCallback = function(callback) {
     this.components.push(callback);
 };
 
+/**
+ * Set requested flag
+ */
 LabelQueue.prototype.setRequested = function() {
     this.requested = true;
 };
 
+/**
+ * Checks whether requested
+ * @return {Boolean}
+ */
 LabelQueue.prototype.isRequested = function() {
     return this.requested;
 };
 
+/**
+ * Resets / Initializes queue variables
+ */
 LabelQueue.prototype.reset = function() {
     this.components = [];
     this.callbacks = [];

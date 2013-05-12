@@ -35,7 +35,8 @@ LabelValueProvider.prototype.isUndefinedSimpleValue = function(value) {
 };
 
 /**
- * Performs LabelController.getLabel action to get specified section and name
+ * Performs LabelController.getLabel action to get specified section and name.
+ * Sets up label queue so that server action for the same label is only requested once
  *
  * @param expression
  * @param [component] component owner
@@ -45,7 +46,8 @@ LabelValueProvider.prototype.isUndefinedSimpleValue = function(value) {
  */
 LabelValueProvider.prototype.requestServerLabel = function(expression, component, callback) {
 
-    var queue = this.getQueue(expression),
+    var lvp = this,
+        queue = this.getQueue(expression),
         propRef = expression.getStem(),
         name = propRef.path[1],
         section = propRef.path[0],
@@ -91,7 +93,7 @@ LabelValueProvider.prototype.requestServerLabel = function(expression, component
                 callbacks[i].call(null, resValue);
             }
 
-            queue.reset();
+            lvp.removeQueue(expression);
         });
 
         action.runAfter(action);
@@ -108,13 +110,27 @@ LabelValueProvider.prototype.requestServerLabel = function(expression, component
 
 };
 
-
+/**
+ * Gets queue for specified label
+ *
+ * @param expression
+ * @return {LabelQueue}
+ */
 LabelValueProvider.prototype.getQueue = function(expression) {
     var exp = expression.getValue();
     if (!this.queue[exp]) {
         this.queue[exp] = new LabelQueue();
     }
     return this.queue[exp];
+};
+
+/**
+ * Removes label queue
+ * @param expression
+ */
+LabelValueProvider.prototype.removeQueue = function(expression) {
+    var exp = expression.getValue();
+    delete this.queue[exp];
 };
 
 /**

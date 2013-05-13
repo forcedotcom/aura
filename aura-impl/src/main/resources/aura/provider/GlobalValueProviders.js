@@ -168,13 +168,14 @@ $A.ns.GlobalValueProviders.prototype.createPropertyRef = function(expression) {
  */
 $A.ns.GlobalValueProviders.prototype.isGlobalValueExp = function(expression) {
     expression = this.createPropertyRef(expression);
-    var firstChar = '';
 
     if (!$A.util.isUndefinedOrNull(expression) && ("getRoot" in expression)) {
-        firstChar = expression.getRoot().charAt(0);
+        if (expression.getRoot().charAt(0) === '$') {
+            return true;
+        }
     }
 
-    return firstChar === '$';
+    return false;
 };
 
 /**

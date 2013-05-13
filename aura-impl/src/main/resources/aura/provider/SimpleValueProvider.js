@@ -18,22 +18,22 @@
  * @namespace Simple Value Provider. Holds MapValue of stuff
  * @constructor
  */
-function SimpleValueProvider() {
+$A.ns.SimpleValueProvider = function() {
     this.values = null;
-}
+};
 
 /**
  * Setter values
  * @param values
  */
-SimpleValueProvider.prototype.setValues = function(values) {
+$A.ns.SimpleValueProvider.prototype.setValues = function(values) {
     this.values = values;
 };
 
 /**
  * Getter values
  */
-SimpleValueProvider.prototype.getValues = function() {
+$A.ns.SimpleValueProvider.prototype.getValues = function() {
     return this.values;
 };
 
@@ -45,7 +45,7 @@ SimpleValueProvider.prototype.getValues = function() {
  * @param [callback]
  * @return {SimpleValue}
  */
-SimpleValueProvider.prototype.getValue = function(expression, component, callback) {
+$A.ns.SimpleValueProvider.prototype.getValue = function(expression, component, callback) {
     var value;
 
     if( this.values ) {

@@ -110,6 +110,7 @@ var clientService;
 // #include aura.storage.AuraStorageService
 // #include aura.storage.Storage
 // #include aura.provider.GlobalValueProviders
+// #include aura.provider.LabelQueue
 // #include aura.provider.LabelValueProvider
 // #include aura.provider.SimpleValueProvider
 
@@ -1040,6 +1041,7 @@ $A.ns.Aura.prototype.getGlobalValueProviders = function() {
     var ns = $A.ns;
     window['$A'] = new ns.Aura();
     window['$A']['ns'] = ns;
+    window['$A'].ns = ns;
 })();
 
 // shortcuts for using throughout the framework code.

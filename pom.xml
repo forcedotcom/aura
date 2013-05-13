@@ -121,11 +121,11 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+            </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -213,7 +213,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>13.0.1</version>
+                <version>14.0.1</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -253,7 +253,7 @@
             <dependency>
                 <groupId>com.google.javascript</groupId>
                 <artifactId>closure-compiler</artifactId>
-                <version>r1918</version>
+                <version>v20130411</version>
             </dependency>
             <dependency>
                 <groupId>org.seleniumhq.selenium</groupId>
@@ -281,16 +281,16 @@
                 <version>2.29.0</version>
             </dependency>
             <dependency>
-	            <groupId>org.seleniumhq.selenium</groupId>
-	            <artifactId>selenium-firefox-driver</artifactId>
+                <groupId>org.seleniumhq.selenium</groupId>
+                <artifactId>selenium-firefox-driver</artifactId>
             	<version>2.29.0</version>
-        	</dependency>
-			<dependency>
-				<!-- needed by selenium -->
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>httpcore</artifactId>
-				<version>4.2.3</version>
-			</dependency>
+            </dependency>
+            <dependency>
+                <!-- needed by selenium -->
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>4.2.3</version>
+            </dependency>
             <dependency>
                 <groupId>net.sourceforge.pjl-comp-filter</groupId>
                 <artifactId>pjl-comp-filter</artifactId>
@@ -315,7 +315,7 @@
             <dependency>
                 <groupId>args4j</groupId>
                 <artifactId>args4j</artifactId>
-                <version>2.0.16</version>
+                <version>2.0.17</version>
             </dependency>
             <dependency>
                 <groupId>org.easymock</groupId>
@@ -331,7 +331,7 @@
             <dependency>
                 <groupId>org.auraframework.external</groupId>
                 <artifactId>closure-stylesheets</artifactId>
-                <version>20121026</version>
+                <version>20130429sfdc</version>
             </dependency>
             <dependency>
                 <groupId>joda-time</groupId>
@@ -358,16 +358,16 @@
                 <artifactId>mockito-all</artifactId>
                 <version>1.9.5</version>
             </dependency>
-	        <dependency>
-	            <groupId>org.apache.commons</groupId>
-	            <artifactId>commons-vfs2</artifactId>
-	            <version>2.0</version>
-	        </dependency>
-	        <dependency>
-	            <groupId>org.mozilla</groupId>
-	            <artifactId>rhino</artifactId>
-	            <version>1.7R4</version>
-	        </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-vfs2</artifactId>
+                <version>2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mozilla</groupId>
+                <artifactId>rhino</artifactId>
+                <version>1.7R4</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>

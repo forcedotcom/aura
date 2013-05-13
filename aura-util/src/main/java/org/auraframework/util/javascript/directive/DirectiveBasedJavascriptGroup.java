@@ -15,8 +15,16 @@
  */
 package org.auraframework.util.javascript.directive;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.Writer;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import org.auraframework.util.javascript.*;
@@ -28,6 +36,56 @@ import org.auraframework.util.text.Hash;
  * file which should include the others.
  */
 public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
+    /**
+     * We spawn multiple threads to go the per-mode generation, and throw this to indicate at least one failure. When
+     * printed, this exception will have a "caused by" stack trace for the first error, but its message will identify
+     * the cause (and failing thread, which hints at the compilation mode) for each error encountered.
+     */
+    public static class CompositeRuntimeException extends RuntimeException {
+        public Map<String, Throwable> errors;
+
+        public CompositeRuntimeException(String message, Map<String, Throwable> errors) {
+            super(message, errors == null || errors.isEmpty() ? null : errors.get(0));
+            this.errors = errors;
+        }
+
+        /** Prints an overall summary, and the message of each error. */
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append(getClass().getName());
+            String message = getMessage();
+            if (message != null && message.isEmpty()) {
+                message = null;
+            }
+            if (message != null || errors.size() > 0) {
+                builder.append(": ");
+            }
+            if (message != null) {
+                builder.append(message);
+                builder.append("\n");
+            }
+            if (errors.size() > 0) {
+                builder.append(errors.size());
+                builder.append(" threads failed with throwables\n");
+                for (Map.Entry<String, Throwable> ent : errors.entrySet()) {
+                    builder.append("[");
+                    builder.append(ent.getKey());
+                    builder.append("] ");
+                    Throwable thrown = ent.getValue();
+                    builder.append(thrown.getClass().getName());
+                    message = thrown.getMessage();
+                    if (message != null && !message.isEmpty()) {
+                        builder.append(": ");
+                        builder.append(message);
+                    }
+                    builder.append("\n");
+                }
+            }
+            return builder.toString();
+        }
+    }
+
     // name for threads that compress and write the output
     public static final String THREAD_NAME = "jsgen.";
 
@@ -35,6 +93,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
     private final Set<JavascriptGeneratorMode> modes;
     private final File startFile;
     private CountDownLatch counter;
+    private Map<String, Throwable> errors;
 
     // used during parsing, should be clear for storing in memory
     private DirectiveParser parser;
@@ -42,6 +101,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
     public DirectiveBasedJavascriptGroup(String name, File root, String start) throws IOException {
         this(name, root, start, DirectiveTypes.DEFAULT_TYPES, EnumSet.of(JavascriptGeneratorMode.DEVELOPMENT,
                 JavascriptGeneratorMode.PRODUCTION));
+        errors = null;
     }
 
     public DirectiveBasedJavascriptGroup(String name, File root, String start, List<DirectiveType<?>> directiveTypes,
@@ -80,6 +140,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         }
 
         counter = new CountDownLatch(modes.size());
+        errors = new HashMap<String, Throwable>();
         for (JavascriptGeneratorMode mode : modes) {
             generateForMode(destRoot, mode);
         }
@@ -88,6 +149,10 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        if (!errors.isEmpty()) {
+            throw new CompositeRuntimeException("Errors generating javascript for " + getName(), errors);
+        }
+        errors = null;
     }
 
     public void validate() throws IOException {
@@ -116,7 +181,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         }
         dest.getParentFile().mkdirs();
         final String everything = buildContent(mode);
-        String threadName = THREAD_NAME + mode;
+        final String threadName = THREAD_NAME + mode;
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -137,8 +202,10 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                         }
                         dest.setReadOnly();
                     }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                } catch (Throwable t) {
+                    // Store any problems, to be thrown in a composite runtime exception from the main thread.
+                    // Otherwise, they kill this worker thread but are basically ignored.
+                    errors.put(threadName, t);
                 } finally {
                     counter.countDown();
                 }

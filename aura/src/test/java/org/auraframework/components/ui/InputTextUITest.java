@@ -55,7 +55,7 @@ public class InputTextUITest extends WebDriverTestCase {
         value = assertModelValue(event); // value should have been updated
     }
     
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET ,BrowserType.IPAD, BrowserType.SAFARI})
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET ,BrowserType.IPAD, BrowserType.SAFARI,BrowserType.IPHONE})
     // Change event not picked up on IOS devices
     public void testUpdateOnAttributeForNonIosAndroidDevice() throws Exception {
     	open(TEST_CMP);

@@ -30,7 +30,7 @@
         <ui:inputDate label="ui:inputDate" value="{!v.myDate}" mouseup="{!c.getDate}" displayDatePicker="true" />
         <ui:inputTime label="ui:inputTime" value="10:00"/>
         <ui:inputNumber label="ui:inputNumber" value="42"/>
-        <ui:inputTextArea label="ui:inputTextArea" cols="10"></ui:inputTextArea>
+        <ui:inputTextArea label="ui:inputTextArea" cols="10" />
     </span>
     
 </aura:component>

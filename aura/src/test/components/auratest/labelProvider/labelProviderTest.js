@@ -67,7 +67,14 @@
                     $A.test.assertEquals("SimpleValue", res.toString(), "Failed: Return value not a SimpleValue");
                 });
 
-                $A.test.assertEquals("Today", tmt.getValue(), "Label should already be context so it should be the return value");
+                $A.test.addWaitFor(
+                    true,
+                    $A.test.allActionsComplete,
+                    function(){
+                        $A.test.assertEquals("Today", tmt.getValue(), "Label should already be context so it should be the return value");
+                    }
+                );
+
             }
         ]
     },

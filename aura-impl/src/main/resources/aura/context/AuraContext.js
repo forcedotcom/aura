@@ -46,7 +46,7 @@ function AuraContext(config) {
 
     this.joinComponentConfigs(config["components"]);
 
-    this.globalValueProviders = new GlobalValueProviders(config["globalValueProviders"]);
+    this.globalValueProviders = new $A.ns.GlobalValueProviders(config["globalValueProviders"]);
 }
 
 /**

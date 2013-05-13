@@ -18,10 +18,10 @@
  * @namespace Label Provider. Performs server action to retrieve label values
  * @constructor
  */
-function LabelValueProvider() {
+$A.ns.LabelValueProvider = function() {
     this.values = null;
     this.queue = {};
-}
+};
 
 /**
  * Checks value is not defined or SimpleValue is not defined
@@ -30,7 +30,7 @@ function LabelValueProvider() {
  * @return {boolean}
  * @private
  */
-LabelValueProvider.prototype.isUndefinedSimpleValue = function(value) {
+$A.ns.LabelValueProvider.prototype.isUndefinedSimpleValue = function(value) {
     return (!value || (value.toString() === "SimpleValue" && !value.isDefined()));
 };
 
@@ -45,7 +45,7 @@ LabelValueProvider.prototype.isUndefinedSimpleValue = function(value) {
  * @return {SimpleValue}
  * @private
  */
-LabelValueProvider.prototype.requestServerLabel = function(section, name, component, callback) {
+$A.ns.LabelValueProvider.prototype.requestServerLabel = function(section, name, component, callback) {
 
     var lvp = this,
         queue = this.getQueue(section, name),
@@ -115,10 +115,10 @@ LabelValueProvider.prototype.requestServerLabel = function(section, name, compon
  * @param name
  * @return {LabelQueue}
  */
-LabelValueProvider.prototype.getQueue = function(section, name) {
+$A.ns.LabelValueProvider.prototype.getQueue = function(section, name) {
     var exp = this.getQueueKey(section, name);
     if (!this.queue[exp]) {
-        this.queue[exp] = new LabelQueue();
+        this.queue[exp] = new $A.ns.LabelQueue();
     }
     return this.queue[exp];
 };
@@ -128,7 +128,7 @@ LabelValueProvider.prototype.getQueue = function(section, name) {
  * @param section
  * @param name
  */
-LabelValueProvider.prototype.removeQueue = function(section, name) {
+$A.ns.LabelValueProvider.prototype.removeQueue = function(section, name) {
     var exp = this.getQueueKey(section, name);
     delete this.queue[exp];
 };
@@ -138,7 +138,7 @@ LabelValueProvider.prototype.removeQueue = function(section, name) {
  * @param section
  * @param name
  */
-LabelValueProvider.prototype.getQueueKey = function(section, name) {
+$A.ns.LabelValueProvider.prototype.getQueueKey = function(section, name) {
     return section + "." + name;
 };
 
@@ -146,7 +146,7 @@ LabelValueProvider.prototype.getQueueKey = function(section, name) {
  * Setter $Label values
  * @param values
  */
-LabelValueProvider.prototype.setValues = function(values) {
+$A.ns.LabelValueProvider.prototype.setValues = function(values) {
     this.values = values;
 };
 
@@ -154,7 +154,7 @@ LabelValueProvider.prototype.setValues = function(values) {
  * Getter $Label values
  * @return {Object} Label values
  */
-LabelValueProvider.prototype.getValues = function() {
+$A.ns.LabelValueProvider.prototype.getValues = function() {
     return this.values;
 };
 
@@ -166,7 +166,7 @@ LabelValueProvider.prototype.getValues = function() {
  * @param [callback]
  * @return {SimpleValue}
  */
-LabelValueProvider.prototype.getValue = function(expression, component, callback) {
+$A.ns.LabelValueProvider.prototype.getValue = function(expression, component, callback) {
 
     var value,
         stem = expression.getStem(),

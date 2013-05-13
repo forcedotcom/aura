@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /*jslint sub: true */
-var p = GlobalValueProviders.prototype;
+var p = $A.ns.GlobalValueProviders.prototype;
 exp(p,
     "get", p.get,
     "getValue", p.getValue

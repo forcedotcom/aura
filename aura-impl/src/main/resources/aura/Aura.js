@@ -1041,6 +1041,7 @@ $A.ns.Aura.prototype.getGlobalValueProviders = function() {
     var ns = $A.ns;
     window['$A'] = new ns.Aura();
     window['$A']['ns'] = ns;
+    window['$A'].ns = ns;
 })();
 
 // shortcuts for using throughout the framework code.

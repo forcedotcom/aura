@@ -15,22 +15,20 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Global Value Provider. Holds global values: $Label, $Browser, $Locale
+ * @namespace Global Value Provider. Holds global values: $Label, $Browser, $Locale, etc
  * @constructor
  */
-function GlobalValueProviders(gvp) {
+$A.ns.GlobalValueProviders = function (gvp) {
 
     this.globalValueProviders = {};
     this.valueProviders = {
-        "$Label": new LabelValueProvider(),
-        "$Browser": new SimpleValueProvider(),
-        "$Locale": new SimpleValueProvider()
+        "$Label": new $A.ns.LabelValueProvider()
     };
 
     this.loadFromStorage();
     this.load(gvp);
 
-}
+};
 
 /**
  * Joins new GVPs with existing and saves to storage
@@ -39,7 +37,7 @@ function GlobalValueProviders(gvp) {
  * @param doNotPersist
  * @private
  */
-GlobalValueProviders.prototype.join = function(gvps, doNotPersist) {
+$A.ns.GlobalValueProviders.prototype.join = function(gvps, doNotPersist) {
     if (gvps) {
         var storage;
         var storedGvps;
@@ -85,7 +83,7 @@ GlobalValueProviders.prototype.join = function(gvps, doNotPersist) {
  * @return storage
  * @private
  */
-GlobalValueProviders.prototype.getStorage = function () {
+$A.ns.GlobalValueProviders.prototype.getStorage = function () {
 
     //$A.getContext() isn't ready at this point.
     //return $A.getContext().getStorage();
@@ -103,7 +101,7 @@ GlobalValueProviders.prototype.getStorage = function () {
  * load GVPs from storage if available
  * @private
  */
-GlobalValueProviders.prototype.loadFromStorage = function() {
+$A.ns.GlobalValueProviders.prototype.loadFromStorage = function() {
     // If persistent storage is active then write through for disconnected support
     var storage = this.getStorage();
     var that = this;
@@ -122,7 +120,7 @@ GlobalValueProviders.prototype.loadFromStorage = function() {
  * @param gvp Global Value Providers
  * @private
  */
-GlobalValueProviders.prototype.load = function(gvp) {
+$A.ns.GlobalValueProviders.prototype.load = function(gvp) {
     if (gvp) {
         var l = gvp.length;
         for ( var i = 0; i < l; i++) {
@@ -141,9 +139,9 @@ GlobalValueProviders.prototype.load = function(gvp) {
  * @return ValueProvider
  * @private
  */
-GlobalValueProviders.prototype.getValueProvider = function(type) {
+$A.ns.GlobalValueProviders.prototype.getValueProvider = function(type) {
     if ( !this.valueProviders[type] ) {
-        this.valueProviders[type] = new SimpleValueProvider();
+        this.valueProviders[type] = new $A.ns.SimpleValueProvider();
     }
     return this.valueProviders[type];
 };
@@ -155,7 +153,7 @@ GlobalValueProviders.prototype.getValueProvider = function(type) {
  * @return {PropertyReferenceValue}
  * @private
  */
-GlobalValueProviders.prototype.createPropertyRef = function(expression) {
+$A.ns.GlobalValueProviders.prototype.createPropertyRef = function(expression) {
     if ($A.util.isString(expression)) {
         expression = valueFactory.parsePropertyReference(expression);
     }
@@ -168,7 +166,7 @@ GlobalValueProviders.prototype.createPropertyRef = function(expression) {
  * @param expression
  * @return {Boolean}
  */
-GlobalValueProviders.prototype.isGlobalValueExp = function(expression) {
+$A.ns.GlobalValueProviders.prototype.isGlobalValueExp = function(expression) {
     expression = this.createPropertyRef(expression);
     var firstChar = '';
 
@@ -187,7 +185,7 @@ GlobalValueProviders.prototype.isGlobalValueExp = function(expression) {
  * @param [callback]
  * @return {String} value of expression
  */
-GlobalValueProviders.prototype.get = function(expression, component, callback) {
+$A.ns.GlobalValueProviders.prototype.get = function(expression, component, callback) {
     return $A.unwrap(this.getValue(expression, component, function(result) {
         if($A.util.isFunction(callback)) {
             callback.call(null, $A.unwrap(result));
@@ -203,7 +201,7 @@ GlobalValueProviders.prototype.get = function(expression, component, callback) {
  * @param [callback]
  * @return {SimpleValue}
  */
-GlobalValueProviders.prototype.getValue = function(expression, component, callback) {
+$A.ns.GlobalValueProviders.prototype.getValue = function(expression, component, callback) {
     // in case anything other than gvps are requested
     if( !this.isGlobalValueExp(expression) ) {
         return undefined;

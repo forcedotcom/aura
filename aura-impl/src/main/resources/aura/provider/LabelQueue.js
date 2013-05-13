@@ -20,15 +20,15 @@
  *
  * @constructor
  */
-function LabelQueue() {
+$A.ns.LabelQueue = function() {
     this.reset();
-}
+};
 
 /**
  * Getter components
  * @return {Array}
  */
-LabelQueue.prototype.getComponents = function() {
+$A.ns.LabelQueue.prototype.getComponents = function() {
     return this.components;
 };
 
@@ -36,7 +36,7 @@ LabelQueue.prototype.getComponents = function() {
  * Add component to component array
  * @param component
  */
-LabelQueue.prototype.addComponent = function(component) {
+$A.ns.LabelQueue.prototype.addComponent = function(component) {
     this.components.push(component);
 };
 
@@ -44,7 +44,7 @@ LabelQueue.prototype.addComponent = function(component) {
  * Getter SimpleValues
  * @return {Array}
  */
-LabelQueue.prototype.getReturnValues = function() {
+$A.ns.LabelQueue.prototype.getReturnValues = function() {
     return this.returnValues;
 };
 
@@ -52,7 +52,7 @@ LabelQueue.prototype.getReturnValues = function() {
  * Add SimpleValue to return values
  * @param {SimpleValue} value
  */
-LabelQueue.prototype.addReturnValue = function(value) {
+$A.ns.LabelQueue.prototype.addReturnValue = function(value) {
     this.returnValues.push(value);
 };
 
@@ -60,7 +60,7 @@ LabelQueue.prototype.addReturnValue = function(value) {
  * Getter callbacks
  * @return {Array}
  */
-LabelQueue.prototype.getCallbacks = function() {
+$A.ns.LabelQueue.prototype.getCallbacks = function() {
     return this.callbacks;
 };
 
@@ -68,14 +68,14 @@ LabelQueue.prototype.getCallbacks = function() {
  * Add callback
  * @param {Function} callback
  */
-LabelQueue.prototype.addCallback = function(callback) {
+$A.ns.LabelQueue.prototype.addCallback = function(callback) {
     this.components.push(callback);
 };
 
 /**
  * Set requested flag
  */
-LabelQueue.prototype.setRequested = function() {
+$A.ns.LabelQueue.prototype.setRequested = function() {
     this.requested = true;
 };
 
@@ -83,14 +83,14 @@ LabelQueue.prototype.setRequested = function() {
  * Checks whether requested
  * @return {Boolean}
  */
-LabelQueue.prototype.isRequested = function() {
+$A.ns.LabelQueue.prototype.isRequested = function() {
     return this.requested;
 };
 
 /**
  * Resets / Initializes queue variables
  */
-LabelQueue.prototype.reset = function() {
+$A.ns.LabelQueue.prototype.reset = function() {
     this.components = [];
     this.callbacks = [];
     this.returnValues = [];

@@ -19,19 +19,18 @@
 	<aura:attribute name="myDate" type="Date" default="2013-02-28"/>
     <span>
     <p>Click the <b>Read input</b> button below.</p>
-        <p><span class="label">ui:inputText</span>  <ui:inputText aura:id="textI" value="text input"/> <ui:button label="Read input" press="{!c.getInput}"></ui:button>  <ui:outputText aura:id="textO" value="ui:outputText"></ui:outputText></p>
-		<p><span class="label">ui:inputText with events</span> <ui:inputText aura:id="keyup" class="keyup" value="Click here with left or right mouse button" updateOn="keyup" keypress="{!c.inspectKeyEvent}" mousedown="{!c.inspectMouseEvent}"/>  <ui:outputText aura:id="outputValue" class="outputValue" value=""/></p>
+        <ui:inputText aura:id="textI" label="ui:inputText" value="text input"/> <ui:button label="Read input" press="{!c.getInput}"></ui:button>  <ui:outputText aura:id="textO" value="ui:outputText"></ui:outputText>
+		<ui:inputText aura:id="keyup" label="ui:inputText with events" class="keyup" value="Click here with left or right mouse button" updateOn="keyup" keypress="{!c.inspectKeyEvent}" mousedown="{!c.inspectMouseEvent}"/>  <ui:outputText aura:id="outputValue" class="outputValue" value=""/>
 
-        <p><span class="label">ui:inputPhone</span>    <ui:inputPhone placeholder="000-000-0000"/> </p>
-        <p><span class="label">ui:inputEmail</span>    <ui:inputEmail value="email field in disabled state" disabled="true"/></p>
-        <p><span class="label">ui:inputSecret</span>   <ui:inputSecret value="secret field"/></p>
-        <p><span class="label">ui:inputURL</span>      <ui:inputURL value="http://"/></p><br/>
-        <p>Click the field to get today's date or use the date picker to select a date.</p>
-        <p><span class="label">ui:inputDate</span>     <ui:inputDate value="{!v.myDate}" mouseup="{!c.getDate}" displayDatePicker="true" /></p>
-        <p><span class="label">ui:inputTime</span>     <ui:inputTime value="10:00"/></p>
-        <p><span class="label">ui:inputNumber</span>   <ui:inputNumber value="42"/></p>
-        
-        <p><span class="label">ui:inputTextArea</span> <ui:inputTextArea cols="10"></ui:inputTextArea></p>
+        <ui:inputPhone label="ui:inputPhone" placeholder="000-000-0000"/>
+        <ui:inputEmail label="ui:inputEmail" value="email field in disabled state" disabled="true"/>
+        <ui:inputSecret label="ui:inputSecret" value="secret field"/>
+        <ui:inputURL label="ui:inputURL" value="http://"/><br/>
+        Click the ui:inputDate field to get today's date or use the date picker to select a date.
+        <ui:inputDate label="ui:inputDate" value="{!v.myDate}" mouseup="{!c.getDate}" displayDatePicker="true" />
+        <ui:inputTime label="ui:inputTime" value="10:00"/>
+        <ui:inputNumber label="ui:inputNumber" value="42"/>
+        <ui:inputTextArea label="ui:inputTextArea" cols="10" />
     </span>
     
 </aura:component>

@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.12-SNAPSHOT</version>
+        <version>0.13-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
@@ -27,14 +27,6 @@
                 <exclusion>
                     <artifactId>ant-launcher</artifactId>
                     <groupId>org.apache.ant</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>json</artifactId>
-                    <groupId>org.json</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>protobuf-java</artifactId>
-                    <groupId>com.google.protobuf</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

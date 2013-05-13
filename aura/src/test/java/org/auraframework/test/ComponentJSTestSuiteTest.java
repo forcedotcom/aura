@@ -236,6 +236,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
             if (mocks != null && !mocks.isEmpty()) {
                 Aura.get(TestContextAdapter.class).getTestContext()
                         .getLocalDefs().addAll(mocks);
+                auraTestingUtil.clearCachedDefs(mocks);
             }
 
             open(getUrl(), Mode.AUTOJSTEST);

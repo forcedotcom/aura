@@ -16,7 +16,10 @@
 package org.auraframework.impl;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.auraframework.Aura;
@@ -24,8 +27,11 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.impl.util.AuraImplFiles;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Source;
+import org.auraframework.system.SourceListener;
+import org.auraframework.system.SourceListener.SourceMonitorEvent;
 import org.auraframework.test.AuraTestingUtil;
 
 import com.google.common.collect.Sets;
@@ -99,5 +105,41 @@ public class AuraTestingUtilImpl implements AuraTestingUtil {
         loader.putSource(descriptor, contents, false);
         cleanUpDds.add(descriptor);
         return descriptor;
+    }
+
+    @Override
+    public <T extends Definition> void clearCachedDefs(Collection<T> defs) throws Exception {
+        if (defs == null || defs.isEmpty()) {
+            return;
+        }
+
+        // Get the Descriptors for the provided Definitions
+        final DefinitionService definitionService = Aura.getDefinitionService();
+        final Set<DefDescriptor<?>> cached = Sets.newHashSet();
+        for (T def : defs) {
+            if (def != null) {
+                cached.add(def.getDescriptor());
+            }
+        }
+
+        // Wait for the change notifications to get processed. We expect listeners to get processed in the order in
+        // which they subscribe.
+        final CountDownLatch latch = new CountDownLatch(cached.size());
+        SourceListener listener = new SourceListener() {
+            @Override
+            public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event) {
+                if (cached.remove(source)) {
+                    latch.countDown();
+                }
+                if (cached.isEmpty()) {
+                    definitionService.unsubscribeToChangeNotification(this);
+                }
+            }
+        };
+        definitionService.subscribeToChangeNotification(listener);
+        for (DefDescriptor<?> desc : cached) {
+            definitionService.onSourceChanged(desc, SourceMonitorEvent.changed);
+        }
+        latch.await(30, TimeUnit.SECONDS);
     }
 }

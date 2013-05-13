@@ -30,10 +30,10 @@ import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.instance.Action.State;
 import org.auraframework.instance.ComponentConfig;
+import org.auraframework.test.AuraTestingUtil;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.mockito.Mockito;
 
 /**
@@ -48,9 +48,9 @@ public class MockingUtil {
      * test.
      * 
      * @param mockDefs the Definitions to be mocked
-     * @throws QuickFixException
+     * @throws Exception
      */
-    public <D extends Definition> void mockDef(D... mockDefs) throws QuickFixException {
+    public <D extends Definition> void mockDef(D... mockDefs) throws Exception {
         if (mockDefs != null && mockDefs.length > 0) {
             TestContextAdapter testContextAdapter = Aura
                     .get(TestContextAdapter.class);
@@ -62,6 +62,7 @@ public class MockingUtil {
             Set<Definition> mocks = testContext.getLocalDefs();
             if (mocks != null) {
                 mocks.addAll(Arrays.asList(mockDefs));
+                Aura.get(AuraTestingUtil.class).clearCachedDefs(mocks);
             }
         }
     }
@@ -73,10 +74,10 @@ public class MockingUtil {
      * @param descriptor the name of the descriptor to assign to the generated Definition
      * @param markup content to parse
      * @return the Definition created from the provided markup
-     * @throws QuickFixException
+     * @throws Exception
      */
     public <D extends Definition> D mockDefMarkup(Class<D> defClass, String descriptor, String markup)
-            throws QuickFixException {
+            throws Exception {
         DefDescriptor<D> desc = Aura.getDefinitionService().getDefDescriptor(descriptor, defClass);
         return mockDefMarkup(desc, markup);
     }
@@ -87,10 +88,10 @@ public class MockingUtil {
      * @param descriptor the descriptor to assign to the generated Definition
      * @param markup content to parse
      * @return the Definition created from the provided markup
-     * @throws QuickFixException
+     * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    public <D extends Definition> D mockDefMarkup(DefDescriptor<D> descriptor, String markup) throws QuickFixException {
+    public <D extends Definition> D mockDefMarkup(DefDescriptor<D> descriptor, String markup) throws Exception {
         D def = XMLParser.getInstance().parse(
                 descriptor,
                 new StringSource<D>(descriptor, markup, descriptor.getQualifiedName(),
@@ -105,10 +106,10 @@ public class MockingUtil {
      * @param modelDefDescriptor
      * @param properties the complete set of properties to be mocked
      * @return the MockModel that will be provided when instantiating the requested ModelDef
-     * @throws QuickFixException
+     * @throws Exception
      */
     public MockModel mockModel(DefDescriptor<ModelDef> modelDefDescriptor, Map<String, Object> properties)
-            throws QuickFixException {
+            throws Exception {
         final ModelDef modelDef = Mockito.spy(Aura.getDefinitionService().getDefinition(modelDefDescriptor));
         final MockModel model = Mockito.spy(new MockModel(modelDefDescriptor, properties));
         Mockito.doReturn(model).when(modelDef).newInstance();
@@ -122,10 +123,10 @@ public class MockingUtil {
      * @param modelDefDescriptor
      * @param members the ValueDef members of the ModelDef
      * @return the MockModelDef that will be provided by the registry
-     * @throws QuickFixException
+     * @throws Exception
      */
     public MockModelDef mockModelDef(DefDescriptor<ModelDef> modelDefDescriptor, Set<ValueDef> members)
-            throws QuickFixException {
+            throws Exception {
         final MockModelDef modelDef = Mockito.spy(new MockModelDef(modelDefDescriptor, members, null));
         mockDef(modelDef);
         return modelDef;
@@ -137,10 +138,10 @@ public class MockingUtil {
      * @param providerDefDescriptor
      * @param componentConfig the ComponentConfig that the mock should provide
      * @return the MockProviderDef that will be provided by the registry
-     * @throws QuickFixException
+     * @throws Exception
      */
     public MockProviderDef mockServerProviderDef(DefDescriptor<ProviderDef> providerDefDescriptor,
-            ComponentConfig componentConfig) throws QuickFixException {
+            ComponentConfig componentConfig) throws Exception {
         final MockProviderDef providerDef = Mockito.spy(new MockProviderDef(providerDefDescriptor, componentConfig));
         mockDef(providerDef);
         return providerDef;
@@ -154,10 +155,10 @@ public class MockingUtil {
      * @param returnValue
      * @return the MockAction that will be provided when instantiating the requested Action
      * @throws DefinitionNotFoundException
-     * @throws QuickFixException
+     * @throws Exception
      */
     public MockAction mockServerAction(DefDescriptor<ControllerDef> controllerDefDescriptor, String actionName,
-            Object returnValue) throws DefinitionNotFoundException, QuickFixException {
+            Object returnValue) throws Exception {
         final ControllerDef originalControllerDef = Aura.getDefinitionService().getDefinition(controllerDefDescriptor);
         final ControllerDef controllerDef = Mockito.spy(originalControllerDef);
         final MockAction mockAction = Mockito.spy(new MockAction(originalControllerDef.getSubDefinition(actionName)

@@ -94,6 +94,7 @@
             <li>Test your app in a browser.<br/>
             <code>http://localhost:8080/helloWorld/helloWorld.app</code><br/>
             You should see a simple greeting in your browser.</li>
+            <li>To stop the Jetty server and free up the port when you are finished, press CTRL+C on the command line.</li>
         </ol>
         
         <p>Note that the <code>helloWorld/pom.xml</code> file has a <code>&lt;dependencies&gt;</code> section, which lists the <code>&lt;version&gt;</code> of each Aura artifact in your project. They define the version of Aura that your project is using and each artifact <code>&lt;dependency&gt;</code> should use the same version.</p>

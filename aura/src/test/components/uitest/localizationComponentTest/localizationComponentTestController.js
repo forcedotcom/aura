@@ -68,7 +68,7 @@
             }
         });
 
-        this.runAfter(a);
+        $A.enqueueAction(a);
         helper.incermentSubmitCount(component);
 
         helper.goToServer(this, component, event, cmpName, inputCmpValue);

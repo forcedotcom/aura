@@ -36,7 +36,7 @@
 	        }
         });
         
-        this.runAfter(a);
+        $A.enqueueAction(a);
 	},
 	
 	doErrorNoEventFire : function(component) {

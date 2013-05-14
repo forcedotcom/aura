@@ -167,7 +167,7 @@ public class MockingUtilTest extends WebDriverTestCase {
         auraTestingUtil.addSourceAutoCleanup(clientControllerDefDescriptor, "{clicked:function(component){"
                 + "var a = component.get('c.lookInside');a.setCallback(component,"
                 + "function(action){component.find('result').getElement().innerHTML=action.getReturnValue();});"
-                + "this.runAfter(a);}}");
+                + "$A.enqueueAction(a);}}");
 
         // sanity without mocks
         open(cmpDefDescriptor);

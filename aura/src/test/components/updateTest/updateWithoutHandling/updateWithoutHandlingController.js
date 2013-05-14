@@ -58,6 +58,6 @@
         }
         c.getValue("v.text").setValue("i was updated");
         var a = c.get("c.noArgs");
-        a.runAfter(a);
+        $A.enqueueAction(a);
     }
 }

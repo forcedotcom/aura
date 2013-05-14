@@ -26,7 +26,7 @@
             button.getAttributes().setValue("label", 'clientAction'+apexActionReturnValue);
             $A.rerender(button);
         });
-        this.runAfter(a);;*/
+        $A.enqueueAction(a);;*/
     },
     dissimilarActionNames: function(cmp, event) {
         var button = event.getSource();
@@ -37,7 +37,7 @@
             button.getAttributes().setValue("label", 'clientAction2'+apexActionReturnValue);
             $A.rerender(button);
         });
-        this.runAfter(a);
+        $A.enqueueAction(a);
     },
     anotherActionName: function(cmp, event) {
         var button = event.getSource();
@@ -48,6 +48,6 @@
             button.getAttributes().setValue("label", 'clientAction3'+apexActionReturnValue);
             $A.rerender(button);
         });
-        this.runAfter(a);
+        $A.enqueueAction(a);
     }
 }

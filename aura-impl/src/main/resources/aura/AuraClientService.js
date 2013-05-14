@@ -184,7 +184,7 @@ var AuraClientService = function() {
 
                 $A.services.event.startFiring("loadComponent");
 
-                action.runAfter(action);
+                $A.enqueueAction(action);
 
                 $A.services.event.finishFiring("loadComponent");
             });
@@ -364,6 +364,65 @@ var AuraClientService = function() {
          */
         isConnected : function() {
             return !priv.isDisconnected;
+        },
+
+        /**
+         * Queue an action for execution after the current event loop has ended.
+         *
+         * This must be called from within an event loop!
+         *
+         * @param {Action} action the action to enqueue
+         * @param {Boolean} background background this action.
+         * @param {Boolean} exclusive run this action as an exclusive action.
+         */
+        enqueueAction : function(action, background, exclusive) {
+            //
+            // FIXME: W-1652115 We need to enable this.
+            //
+            //if (background !== undefined && action.isBackground() !== true) {
+            //    action.setBackground(background);
+            //}
+            if (exclusive !== undefined) {
+                action.setExclusive(exclusive);
+            }
+            //
+            // FIXME: W-1652118 This should not differentiate, both of these should get pushed.
+            //
+            if (action.getDef().isClientAction()) {
+                action.run();
+            } else {
+                priv.actionQueue.push(action);
+            }
+        },
+
+        /**
+         * process the current set of actions, looping if needed.
+         *
+         * This runs the current action set, then tries again as
+         * long as there are actions to be run.
+         *
+         * @private
+         */
+        processActions : function() {
+            var cb = function(msg) {
+                    var errors = msg["errors"];
+                    if (errors && errors.length > 0) {
+                        for(var i=0;i<errors.length;i++){
+                            aura.log(errors[i]);
+                        }
+                    }
+                };
+            var count = 0;
+            while (priv.actionQueue.length > 0) {
+                var actions = priv.actionQueue;
+                priv.actionQueue = [];
+                priv.request(actions, null, cb);
+                count += 1;
+                if (count > 20) {
+                    $A.error("Actions do not seem to be completing");
+                }
+            }
+            return (count > 0);
         }
 
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

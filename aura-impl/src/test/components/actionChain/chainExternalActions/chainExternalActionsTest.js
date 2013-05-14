@@ -35,7 +35,7 @@
                                         $A.test.assertEquals("SUCCESS", action.getState());
                                         $A.test.assertEquals(100, action.getReturnValue(), "Server Controller failed to return correct value.");
                                     });
-            add.runAfter(add);
+            $A.enqueueAction(add);
             cmp.getEvent("press").fire();
             $A.test.addWaitFor("SUCCESS",
                        function(){return getString.getState()},

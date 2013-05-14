@@ -25,7 +25,7 @@
             }
         });
 
-        this.runAfter(a);
+        $A.enqueueAction(a);
     },
 
     waiting : function(cmp, event, helper){

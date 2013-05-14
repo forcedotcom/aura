@@ -130,7 +130,7 @@
 					});
 					// Empty settings
 					a.setStorable({});
-					a.runAfter(a);
+					$A.enqueueAction(a);
 					$A.eventService.finishFiring();
 					$A.test.addWaitFor(false, $A.test.isActionPending);
 				},
@@ -142,7 +142,7 @@
 					// Empty settings
 					aSecond.setStorable({});
 					$A.test.assertTrue(aSecond.isStorable());
-					aSecond.runAfter(aSecond);
+					$A.enqueueAction(aSecond);
 					$A.eventService.finishFiring();
 					$A.test.addWaitFor("SUCCESS", function() {
 						return aSecond.getState()
@@ -173,7 +173,7 @@
 					// Undefined
 					aUndefined.setStorable(undefined);
 					$A.test.assertTrue(aUndefined.isStorable());
-					aUndefined.runAfter(aUndefined);
+					$A.enqueueAction(aUndefined);
 					$A.eventService.finishFiring();
 					$A.test.addWaitFor("SUCCESS", function() {
 						return aUndefined.getState()
@@ -192,7 +192,7 @@
 					});
 					aUndefinedSecond.setStorable(undefined);
 					$A.test.assertTrue(aUndefinedSecond.isStorable());
-					aUndefinedSecond.runAfter(aUndefinedSecond);
+					$A.enqueueAction(aUndefinedSecond);
 					$A.eventService.finishFiring();
 					$A.test.addWaitFor("SUCCESS", function() {
 						return aUndefinedSecond.getState()
@@ -208,7 +208,7 @@
 								testName : "testSetStorableAPI_Undefined"
 							});
 							aUndefinedThird.setStorable(undefined);
-							aUndefinedThird.runAfter(aUndefinedThird);
+							$A.enqueueAction(aUndefinedThird);
 							$A.eventService.finishFiring();
 							$A.test.addWaitFor("SUCCESS", function() {
 								return aUndefinedThird.getState()
@@ -244,7 +244,7 @@
 						"refresh" : undefined
 					});
 					$A.test.assertTrue(aUndefined.isStorable());
-					aUndefined.runAfter(aUndefined);
+					$A.enqueueAction(aUndefined);
 					$A.eventService.finishFiring();
 					$A.test.addWaitFor("SUCCESS", function() {
 						return aUndefined.getState()
@@ -266,7 +266,7 @@
 						"refresh" : undefined
 					});
 					$A.test.assertTrue(aUndefinedSecond.isStorable());
-					aUndefinedSecond.runAfter(aUndefinedSecond);
+					$A.enqueueAction(aUndefinedSecond);
 					$A.eventService.finishFiring();
 					$A.test.addWaitFor("SUCCESS", function() {
 						return aUndefinedSecond.getState()
@@ -285,7 +285,7 @@
 								"IgnoreExisting" : undefined,
 								"refresh" : undefined
 							});
-							aUndefinedThird.runAfter(aUndefinedThird);
+							$A.enqueueAction(aUndefinedThird);
 							$A.eventService.finishFiring();
 							$A.test.addWaitFor("SUCCESS", function() {
 								return aUndefinedThird.getState()
@@ -428,7 +428,7 @@
 						testName : "testCacheDataNotPurgedWhenOffline"
 					});
 					a.setStorable();
-					a.runAfter(a);
+					$A.enqueueAction(a);
 					$A.eventService.finishFiring();
 					$A.test.addWaitFor(false, $A.test.isActionPending, function() {
 						$A.test.assertFalse(a.isFromStorage(), "Should not be using cached data");
@@ -456,7 +456,7 @@
 						testName : "testCacheDataNotPurgedWhenOffline"
 					});
 					a.setStorable();
-					a.runAfter(a);
+					$A.enqueueAction(a);
 					$A.eventService.finishFiring();
 					$A.test.addWaitFor("SUCCESS", function() {
 						return a.getState()
@@ -487,7 +487,7 @@
 				testName : "testCacheDataUsedWhenConnectionResumed"
 			});
 			a.setStorable();
-			a.runAfter(a);
+			$A.enqueueAction(a);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor(false, $A.test.isActionPending, function() {
 				$A.test.assertFalse(a.isFromStorage(), "Should not be using cached data");
@@ -508,7 +508,7 @@
 				testName : "testCacheDataUsedWhenConnectionResumed"
 			});
 			a.setStorable();
-			a.runAfter(a);
+			$A.enqueueAction(a);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor("SUCCESS", function() {
 				return a.getState()
@@ -598,7 +598,7 @@
 							cmp._testCounter--;
 						});
 					})
-					a.runAfter(a);
+					$A.enqueueAction(a);
 					$A.eventService.finishFiring();
 
 					$A.test.runAfterIf(function() {
@@ -617,7 +617,7 @@
 						param1 : 999
 					});
 					abortedAction.setStorable();
-					abortedAction.runAfter(abortedAction);
+					$A.enqueueAction(abortedAction);
 					$A.eventService.finishFiring();
 					$A.test.addWaitFor("SUCCESS", function() {
 						return abortedAction.getState()
@@ -635,7 +635,7 @@
 						param1 : 666
 					});
 					successfulAction.setStorable();
-					successfulAction.runAfter(successfulAction);
+					$A.enqueueAction(successfulAction);
 					$A.eventService.finishFiring();
 					$A.test.addWaitFor("SUCCESS", function() {
 						return successfulAction.getState()
@@ -759,7 +759,7 @@
 				a.setCallback(cmp, function(action){
 		            cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter", parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
 				});
-				$A.run(function(){a.runAfter(a);});
+				$A.run(function(){$A.enqueueAction(a);});
 				$A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())}, function(){
 					$A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(), function(item){cmp._originalExpiration = item.expires});
 				});
@@ -769,7 +769,7 @@
 				a.setCallback(cmp, function(action){
 		            cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter", parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
 				});
-				$A.run(function(){a.runAfter(a);});
+				$A.run(function(){$A.enqueueAction(a);});
 				$A.test.addWaitFor("3", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())}, function(){
 					$A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(), function(item){
 						$A.test.assertEquals(cmp._originalExpiration, item.expires, "stored item should not have had expiration modified");
@@ -781,7 +781,7 @@
 				a.setCallback(cmp, function(action){
 		            cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter", parseInt(cmp.find("callbackCounter").getElement().innerHTML)+1);
 				});
-				$A.run(function(){a.runAfter(a);});
+				$A.run(function(){$A.enqueueAction(a);});
 				$A.test.addWaitFor("4", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())}, function(){
 					$A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(), function(item){
 						if(item.expires <= cmp._originalExpiration){

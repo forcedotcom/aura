@@ -65,7 +65,7 @@
     		var action = cmp.get("c.simpleValuesAsParams");
 			action.setParams({mvp: "Buster Posey", year: 2012, testName: "testStorageOfServerActionWithSimpleValues"});
     		action.setStorable();
-    		action.runAfter(action);
+    		$A.enqueueAction(action);
     		$A.eventService.finishFiring();
     		$A.test.addWaitFor("SUCCESS", function(){return action.getState()},
                     function(){
@@ -76,7 +76,7 @@
     	}, function(cmp){//Force the action to run at server
     		var action = cmp.get("c.simpleValuesAsParams");
 			action.setParams({mvp: "Buster Posey", year: 2012, testName: "testStorageOfServerActionWithSimpleValues"});
-    		action.runAfter(action);
+    		$A.enqueueAction(action);
     		$A.eventService.finishFiring();
     		$A.test.addWaitFor("SUCCESS", function(){return action.getState()},
                     function(){
@@ -149,7 +149,7 @@
     	},function(cmp){//Run the action and get the response, verify this is the second run
     		var action = cmp.get("c.throwsException");
 			action.setParams({testName: "testStorageOfFailedServerActions"});
-    		action.runAfter(action);
+    		$A.enqueueAction(action);
     		$A.eventService.finishFiring();
     		$A.test.addWaitFor(false, $A.test.isActionPending,
                     function(){
@@ -186,7 +186,7 @@
 	           				}
 	           			});
 	           			action.setStorable();
-	            		action.runAfter(action);
+	            		$A.enqueueAction(action);
 	            		$A.eventService.finishFiring();
 	            		$A.test.addWaitFor("SUCCESS", function(){return action.getState()},
 	                            function(){
@@ -258,7 +258,7 @@
                 //Insert newly fetched component
                 cmp.find("facet").getValue("v.body").push(newComponent);
     		});
-    		action.runAfter(action);
+    		$A.enqueueAction(action);
     		$A.eventService.finishFiring();
     		$A.test.addWaitFor("SUCCESS", function(){return action.getState()},
                     function(){
@@ -279,7 +279,7 @@
     			//push newly fetched component
                 cmp.find("facet").getValue("v.body").push(secondNewComponent);
     		});
-    		dupAction.runAfter(dupAction);
+    		$A.enqueueAction(dupAction);
     		$A.eventService.finishFiring();
     		$A.test.addWaitFor("SUCCESS", function(){return dupAction.getState()},
                     function(){
@@ -307,7 +307,7 @@
         	a.setCallback(cmp, function(a){
     			cmp._callBackMarker = a.getReturnValue();
     		});
-            a.runAfter(a);
+            $A.enqueueAction(a);
             $A.eventService.finishFiring();
             $A.test.addWaitFor(false, $A.test.isActionPending,
                     function(){
@@ -365,7 +365,7 @@
     	var a = cmp.get("c.setStorable");
         a.setParams({testName: _testName,
         	actionsToMark: actionNames});
-        a.runAfter(a);
+        $A.enqueueAction(a);
         $A.eventService.finishFiring();
     },
     resetCounter:function(cmp, testName){
@@ -374,6 +374,6 @@
 	        testName: testName
 	    }),
 	    a.setExclusive();
-	    a.runAfter(a);
+	    $A.enqueueAction(a);
     }
 })

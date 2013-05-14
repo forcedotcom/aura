@@ -198,7 +198,7 @@ runActionAtServerAndStore:function(cmp, evt, helper){
     });
     
     // Run server-side action
-    a.runAfter(a);
+    $A.enqueueAction(a);
 },
 </auradocs:codeblock><br/>
 

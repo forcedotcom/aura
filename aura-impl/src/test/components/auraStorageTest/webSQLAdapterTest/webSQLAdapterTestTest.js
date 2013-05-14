@@ -171,7 +171,7 @@
 		$A.test.assertEquals("markup://auraStorageTest:teamFacet", newCmp.getDef().getDescriptor().toString());
 		storage.put("actionResponse", a);
 	    });
-	    a.runAfter(a);
+	    $A.enqueueAction(a);
 	    $A.eventService.finishFiring();
 	    this.assertAfterGet(cmp, storage, "actionResponse", 
 	    		function(){

@@ -147,6 +147,10 @@ Action.prototype.setCallback = function(scope, callback) {
  *            evt The event that calls the Action.
  */
 Action.prototype.run = function(evt) {
+    this.runDeprecated(evt);
+};
+
+Action.prototype.runDeprecated = function(evt) {
     $A.assert(this.def.isClientAction(), "Run() cannot be called on a server action. Use runAfter() on a server action instead.");
     this.state = "RUNNING";
     var finished = false;
@@ -202,7 +206,7 @@ Action.prototype.getError = function() {
  */
 Action.prototype.runAfter = function(action) {
     $A.assert(action.def.isServerAction(), "RunAfter() cannot be called on a client action. Use run() on a client action instead.");
-    $A.services.event.enqueueAction(action);
+    $A.clientService.enqueueAction(action);
 };
 
 /**
@@ -384,7 +388,7 @@ Action.prototype.isFromStorage = function() {
  */
 Action.prototype.setChained = function() {
     this.chained = true;
-    this.runAfter(this);
+    $A.enqueueAction(this);
 };
 
 /**
@@ -457,7 +461,7 @@ Action.prototype.refresh = function(originalResponse) {
                 storageService.log("Action.refresh(): auto refresh end", a);
             });
 
-            action.runAfter(refreshAction);
+            $A.enqueueAction(refreshAction);
         }
     }
 };

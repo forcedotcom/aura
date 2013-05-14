@@ -34,7 +34,7 @@
 			$A.test.assertEquals("5." + $A.getContext().getNum(), b.getId(), "Action Numbering gone wild - Server Action(2)");
 			var c = cmp.get("c.resetCounter");
 			$A.test.assertEquals("6." + $A.getContext().getNum(), c.getId(), "Action Numbering gone wild - Server Action(3)");
-			c.runAfter(c);
+			$A.enqueueAction(c);
 			$A.eventService.finishFiring();
 			$A.test.addWaitFor(false, $A.test.isActionPending,
                     function(){
@@ -120,7 +120,7 @@
 				$A.clientService.runActions([action1], cmp, function(){cmp._testCounter--;});
 				$A.clientService.runActions([action2], cmp, function(){cmp._testCounter--;});
 			})
-			a.runAfter(a);
+			$A.enqueueAction(a);
 			$A.eventService.finishFiring();
 			cmp.test = this;
 			$A.test.runAfterIf(function() {
@@ -180,7 +180,7 @@
 				testName: cmp._testName
 			});
 			a.setStorable();
-			a.runAfter(a);
+			$A.enqueueAction(a);
 			$A.eventService.finishFiring();
 			cmp.test = this;
 			$A.test.addWaitFor("SUCCESS", function(){return a.getState()},

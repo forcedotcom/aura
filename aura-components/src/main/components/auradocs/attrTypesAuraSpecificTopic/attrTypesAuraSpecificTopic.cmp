@@ -63,7 +63,7 @@
 
     <h2>Using Aura.Action</h2>
 
-    <p>A <code>Aura.Action</code> is a reference to an action in Aura. You can pass a <code>Aura.Action</code> around so the receiving component can execute the action in its client-side controller. Use <code>run()</code> to execute client-side controller actions, and <code>runAfter()</code> to execute server-side controller actions.</p>
+    <p>A <code>Aura.Action</code> is a reference to an action in Aura. You can pass a <code>Aura.Action</code> around so the receiving component can execute the action in its client-side controller. Use <code>run()</code> to execute client-side controller actions, and <code>$A.enqueueAction()</code> to execute server-side controller actions.</p>
 
     <auradocs:info>Note: The underlying value object for an attribute of type <code>Aura.Action</code> is <code>ActionReferenceValue</code>.</auradocs:info>
 

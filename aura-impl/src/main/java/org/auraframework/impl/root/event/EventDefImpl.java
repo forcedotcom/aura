@@ -114,6 +114,9 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
         }
 
         for (AttributeDef att : this.attributeDefs.values()) {
+            if(att.getVisibility() == Visibility.PRIVATE){
+                throw new InvalidDefinitionException("Cannot Declare an Event Attribute as Private",getLocation());
+            }
             att.validateDefinition();
         }
     }
@@ -167,7 +170,7 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
             return getDescriptor().equals(other.getDescriptor())
                     && eventType == other.eventType
                     && (extendsDescriptor == null ? other.extendsDescriptor == null : extendsDescriptor
-                            .equals(other.extendsDescriptor)) && getLocation().equals(other.getLocation());
+                    .equals(other.extendsDescriptor)) && getLocation().equals(other.getLocation());
         }
 
         return false;

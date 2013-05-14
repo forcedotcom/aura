@@ -72,6 +72,9 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
                         "Cannot define an attribute and register an event with the same name: %s", att.getName()),
                         getLocation());
             }
+            if(att.getVisibility() == Visibility.PRIVATE){
+                throw new InvalidDefinitionException("Cannot Declare an attribute on the Interface as private",getLocation());
+            }
         }
 
         for (RegisterEventDef reg : this.events.values()) {

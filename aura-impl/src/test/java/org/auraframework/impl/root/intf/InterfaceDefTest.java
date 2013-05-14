@@ -84,6 +84,19 @@ public class InterfaceDefTest extends AuraImplTestCase {
 
         }
     }
+    public void testValidatePrivateAttributeInInterface() throws Exception{
+        Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        atts.put(DefDescriptorImpl.getInstance("testInt", AttributeDef.class),
+                new AttributeDefImpl(DefDescriptorImpl.getInstance("testInt", AttributeDef.class), null, null, null,
+                        false, null, null,Visibility.PRIVATE));
+        InterfaceDefImpl inter = vendor.makeInterfaceDef(null, atts, null, null, null);
+        try{
+            inter.validateDefinition();
+            fail("Should have thrown an error for Private Attributes");
+        }catch(InvalidDefinitionException ide){
+            checkExceptionFull(ide,InvalidDefinitionException.class,"Cannot Declare an attribute on the Interface as private");
+        }
+    }
 
     public void testValidateReferences() throws Exception {
         FakeRegistry fake = createFakeRegistry();

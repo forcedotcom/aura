@@ -84,6 +84,28 @@
 		}
 	},
 	
+	testProviderConfigProvider: {
+	    	attributes : { providedAttribute : "Hello, I am the Mock Java Provider!"},
+	    	mocks : [{
+	    	    	type : "PROVIDER",
+	    	    	//Descriptor not required in this case, but specifying it anyway
+	    	    	descriptor : "java://org.auraframework.impl.java.provider.EmptyConfigProvider",
+	    		stubs : [{
+	    		    answers : [{
+	    			value: {
+	    			    //Specify the mock java provider the test should use, class should be accessible 
+	    			    configProvider : "java://org.auraframework.impl.java.provider.MockConfigProvider"
+	    			}
+	    		    }]
+	    		}]
+	    	}],
+	    	test : function(cmp){
+        	    	$A.test.assertEquals("markup://ui:outputText", cmp.getDef().getDescriptor().getQualifiedName());
+        		$A.test.assertEquals("Hello, I am the Mock Java Provider!", $A.test.getText(cmp.getElement()));
+	    	}
+	    
+	},
+	
 	testActionDefault : {
 		test : [function(cmp) {
 			this.saveDate = Date.parse(new Date());

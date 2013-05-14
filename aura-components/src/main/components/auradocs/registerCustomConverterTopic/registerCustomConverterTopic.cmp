@@ -156,7 +156,7 @@ public class MyCustomTypeConverterConfig {
 custom : function(c) {
     var a = c.get("c.accept");
     a.setParams({myObjs:["x","y","z"]});
-    this.runAfter(a);
+    $A.enqueueAction(a);
 },
 </auradocs:codeblock><br/>
 

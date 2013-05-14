@@ -327,6 +327,7 @@ $A.ns.Aura = function() {
         "layoutService", aura.layoutService,
         "storageService", aura.storageService,
         "services", aura.services,
+        "enqueueAction", aura.enqueueAction,
         "render", aura.render,
         "rerender", aura.rerender,
         "unrender", aura.unrender,
@@ -645,7 +646,10 @@ $A.ns.Aura.prototype.unwrap = function(val) {
 };
 
 /**
- * Runs a function within the standard Aura lifecycle and insures that <code>runAfter</code> methods and rerendering are handled properly
+ * Runs a function within the standard Aura lifecycle.
+ *
+ * This insures that <code>enqueueAction</code> methods and rerendering are handled properly.
+ *
  * from JavaScript outside of controllers, renderers, providers.
  * @param {Function} func The function to run.
  * @public

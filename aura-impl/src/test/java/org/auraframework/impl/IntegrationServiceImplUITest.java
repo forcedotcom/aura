@@ -103,7 +103,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         auraTestingUtil.addSourceAutoCleanup(jsControllerdesc, "{" + "handleClick:function(cmp){" + "var a = cmp.get('c.getString');"
                 + "a.setCallback(cmp,function(a){" + "cmp.find('dataFromController').getValue('v.body').push("
                 + "$A.newCmp({componentDef: 'markup://aura:text'," + "attributes:{" + "values:{value:a.getReturnValue()}" + "}" + "}));" + "});"
-                + "a.runAfter(a);" + "}" + "}");
+                + "$A.enqueueAction(a);" + "}" + "}");
         return cmpDesc;
     }
 

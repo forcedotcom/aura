@@ -94,7 +94,7 @@ $A.ns.LabelValueProvider.prototype.requestServerLabel = function(section, name, 
             lvp.removeQueue(section, name);
         });
 
-        action.runAfter(action);
+        $A.enqueueAction(action);
 
         if (!isComponent) {
             // forces immediate lookup if not data-bound to component

@@ -5,6 +5,6 @@
 		a.setCallback(cmp, function(action){
 			cmp.getValue("m.secret").setValue(action.getReturnValue());
 		});
-		a.runAfter(a);
+                $A.enqueueAction(a);
 	}
 }

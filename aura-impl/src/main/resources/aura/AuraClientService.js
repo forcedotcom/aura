@@ -184,7 +184,7 @@ var AuraClientService = function() {
 
                 $A.services.event.startFiring("loadComponent");
 
-                action.runAfter(action);
+                $A.enqueueAction(action);
 
                 $A.services.event.finishFiring("loadComponent");
             });

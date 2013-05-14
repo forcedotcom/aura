@@ -26,7 +26,7 @@
 		a.setCallback(cmp, function(a){
 			cmp.find("response").getElement().innerHTML += a.getReturnValue();
 		});
-		this.runAfter(a);
+		$A.enqueueAction(a);
 	},
 	
 	/**
@@ -45,7 +45,7 @@
 		a.setCallback(cmp, function(a){
 			$A.renderingService.render(a.getReturnValue(), cmp.find("response").getElement());
 		});
-		this.runAfter(a);
+		$A.enqueueAction(a);
 	},
 	
 	/**
@@ -59,7 +59,7 @@
 	infiniteEventCycle:function(cmp){
 		$A.log("Call server action that attaches event.")
 		var a = cmp.get('c.getCyclicEvent');
-		this.runAfter(a);
+		$A.enqueueAction(a);
 	},
 	
 	/**
@@ -70,7 +70,7 @@
 		a.setCallback(cmp, function(a){
 			cmp.find("response").getElement().innerHTML += a.getReturnValue();
 		});
-		this.runAfter(a);
+		$A.enqueueAction(a);
 	},
 	handleDupEvent:function(cmp, evt){
 		var evtParam = evt.getParam('strAttr');
@@ -90,7 +90,7 @@
 		a.setCallback(cmp, function(a){
 			cmp.find("response").getElement().innerHTML += a.getReturnValue();
 		});
-		this.runAfter(a);
+		$A.enqueueAction(a);
 	},
 	handleChainEvent:function(cmp, evt){
 		var evtParam = evt.getParam('pandaAttr');
@@ -103,6 +103,6 @@
 		a.setCallback(cmp, function(a){
 			cmp.find("response").getElement().innerHTML += a.getReturnValue();
 		});
-		this.runAfter(a);
+		$A.enqueueAction(a);
 	}
 })

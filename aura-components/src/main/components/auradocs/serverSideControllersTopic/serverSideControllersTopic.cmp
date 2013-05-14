@@ -65,11 +65,11 @@
 
         // A client-side action could cause multiple events, which could trigger
         // other events and other server-side action calls.
-        // runAfter() adds the server-side action to the queue.
+        // $A.enqueueAction adds the server-side action to the queue.
         // Rather than send a separate request for each individual action,
         // Aura processes the event chain and
         // executes the action in the queue after batching up related requests.
-        a.runAfter(a);
+        $A.enqueueAction(a);
     }
 }
 </auradocs:codeblock>

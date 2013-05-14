@@ -27,6 +27,6 @@
     			alert("Oops something went wrong.");     
     		}       
         });
-        this.runAfter(a);
+        $A.enqueueAction(a);
     }
 })

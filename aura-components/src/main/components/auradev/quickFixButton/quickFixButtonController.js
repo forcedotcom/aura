@@ -44,7 +44,7 @@
             });
 
 
-            this.runAfter(a);
+            $A.enqueueAction(a);
         }
     }
 })

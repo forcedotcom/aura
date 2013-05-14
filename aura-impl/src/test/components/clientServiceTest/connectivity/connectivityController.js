@@ -27,7 +27,7 @@
             component.getValue("v.actionStatus").setValue(action.getState());
             component.getValue("v.actionValue").setValue(action.getReturnValue());
         });
-        a.runAfter(a);
+        $A.enqueueAction(a);
     },
 
     logEvent: function(component, event, helper) {

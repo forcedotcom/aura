@@ -23,6 +23,6 @@
         a.setCallback(cmp, function(action){
             cmp.getAttributes().setValue("response", action);
         });
-        this.runAfter(a);
+        $A.enqueueAction(a);
     }
 })

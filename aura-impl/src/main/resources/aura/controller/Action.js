@@ -388,7 +388,7 @@ Action.prototype.isFromStorage = function() {
  */
 Action.prototype.setChained = function() {
     this.chained = true;
-    this.runAfter(this);
+    $A.enqueueAction(this);
 };
 
 /**
@@ -461,7 +461,7 @@ Action.prototype.refresh = function(originalResponse) {
                 storageService.log("Action.refresh(): auto refresh end", a);
             });
 
-            action.runAfter(refreshAction);
+            $A.enqueueAction(refreshAction);
         }
     }
 };

@@ -20,6 +20,6 @@
 
         });
 
-        action.runAfter(action);
+        $A.enqueueAction(action);
     }
 })

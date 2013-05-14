@@ -83,5 +83,27 @@
             $A.test.assertNull($A.util.getDataAttribute(textNode, "monkey"), "Should not be able to set data " +
                 "attributes on text nodes");
         }
+    },
+    
+    /**
+     * Verify $A.util.isComponent() API
+     */
+    testIsComponent : {
+	test:[
+	      function(cmp){
+		  $A.test.assertTrue($A.util.isComponent(cmp));
+		  $A.test.assertTrue($A.util.isComponent(cmp.find("aDiv")));
+		  $A.test.assertFalse($A.util.isComponent(cmp.getDef()));
+		  $A.test.assertFalse($A.util.isComponent(cmp.getElement()));
+		  var valueObj = $A.expressionService.create(null, "literal");
+		  $A.test.assertFalse($A.util.isComponent(valueObj));
+	      },
+	      function(cmp){
+		  $A.test.assertFalse($A.util.isComponent(""));
+		  $A.test.assertFalse($A.util.isComponent(undefined));
+		  $A.test.assertFalse($A.util.isComponent(null));
+		  $A.test.assertFalse($A.util.isComponent());
+	      }
+	      ]
     }
 })

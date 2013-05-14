@@ -17,32 +17,7 @@
 var priv = {
     registry : new EventDefRegistry(),
     eventDispatcher : {},
-    actionQueue : [],
     eventStack : [],
-
-    flushActionQueue : function(){
-        var after = this.actionQueue;
-        this.actionQueue = [];
-        if (after.length > 0) {
-            $A.clientService.runActions(after, this.cmp, function(msg){
-                var errors = msg["errors"];
-                if (errors && errors.length > 0) {
-                    for(var i=0;i<errors.length;i++){
-                        aura.log(errors[i]);
-                    }
-                }
-
-                if($A["finishedInit"]){
-                    $A.services.rendering.rerenderDirty();
-                }
-            });
-
-        } else {
-            if($A["finishedInit"]){
-                $A.services.rendering.rerenderDirty();
-            }
-        }
-    },
 
     qualifyEventName : function(event) {
         if(event.indexOf("://") == -1){

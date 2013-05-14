@@ -32,6 +32,6 @@
             component.find("outputValue").getAttributes().setValue("value", retValue);
         });
 
-        this.runAfter(a);
+        $A.enqueueAction(a);
     }
 }

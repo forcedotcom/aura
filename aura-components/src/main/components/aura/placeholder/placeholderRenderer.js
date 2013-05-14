@@ -68,7 +68,7 @@
         });
         action.setExclusive(cmp.getValue("v.exclusive").getBooleanValue());
         cmp.getValue("v.loaded").setValue(true);
-        action.runAfter(action);
+        $A.enqueueAction(action);
 
         this.superAfterRender();
     }

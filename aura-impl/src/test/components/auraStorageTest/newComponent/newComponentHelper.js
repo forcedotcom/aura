@@ -20,7 +20,7 @@
 			testName: (!_testName?"baseBall":_testName)
 		}),
 		a.setExclusive();
-		a.runAfter(a);
+		$A.enqueueAction(a);
 	},
 	setCounter:function(cmp, newValue){
 		var _testName = cmp._testName;
@@ -30,7 +30,7 @@
 			value: newValue
 		}),
 		a.setExclusive();
-		a.runAfter(a);
+		$A.enqueueAction(a);
 	},
 	getTeamAndPlayers:function(cmp, storable){
 		var _testName = cmp._testName;
@@ -50,7 +50,7 @@
 		});
 		if(storable)
 			aTeam.setStorable();
-		aTeam.runAfter(aTeam);
+		$A.enqueueAction(aTeam);
 		
 		//Second Action
 		var aPlayers = cmp.get("c.getBaseball");
@@ -71,7 +71,7 @@
 		});
 		if(storable)
 			aPlayers.setStorable();
-		aPlayers.runAfter(aPlayers);
+		$A.enqueueAction(aPlayers);
 	},
 	getTeamOnly:function(cmp,storable){
 		this.setCounter(cmp,0);
@@ -91,7 +91,7 @@
 		});
 		if(storable)
 			a.setStorable();
-		a.runAfter(a);
+		$A.enqueueAction(a);
 		cmp.find("Actions").getElement().innerHTML = a.getId();
 	},
 	getPlayersOnly:function(cmp,storable){
@@ -115,7 +115,7 @@
 		});
 		if(storable)
 			a.setStorable();
-		a.runAfter(a);
+		$A.enqueueAction(a);
 		cmp.getDef().getHelper().findAndSetText(cmp, "Actions", a.getId());
 	},
 	findAndSetText:function(cmp, targetCmpId, msg){

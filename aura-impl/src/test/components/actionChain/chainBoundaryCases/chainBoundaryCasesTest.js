@@ -15,7 +15,7 @@
  */
 ({
     enqueueServerActionAndFireEvent:function(cmp, action){
-        action.runAfter(action);
+        $A.enqueueAction(action);
         cmp.getEvent("press").fire();
     },
 

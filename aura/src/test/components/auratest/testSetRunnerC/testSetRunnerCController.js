@@ -30,7 +30,7 @@
         a.setCallback(cmp, function(action){
             helper.raisePollEvent(cmp, 5000);
         });
-        this.runAfter(a);
+        $A.enqueueAction(a);
     },
 
      poll : function (cmp, evt, helper){
@@ -53,7 +53,7 @@
             helper.raisePollEvent(cmp, pollFreq);
 
         });
-        this.runAfter(a);
+        $A.enqueueAction(a);
      },
 
      toggleRunAllTests : function (cmp){

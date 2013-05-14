@@ -11,6 +11,6 @@
             $A.endMark("Fetch component");
         });
         $A.mark("Fetch component");
-        a.runAfter(a);
+        $A.enqueueAction(a);
     }
 })

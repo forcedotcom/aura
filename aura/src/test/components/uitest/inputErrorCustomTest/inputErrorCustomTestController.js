@@ -87,7 +87,7 @@
 	        }
         });
         
-        this.runAfter(a);
+        $A.enqueueAction(a);
 	},
 	
 	clearErrorFireOnClearErrorsEvent : function(component, event) {

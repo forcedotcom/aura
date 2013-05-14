@@ -74,7 +74,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 						ControllerDef.class);
 		addSourceAutoCleanup(
 				controllerDesc,
-				"{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});this.runAfter(a);}}");
+				"{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});$A.enqueueAction(a);}}");
 		return cmpDesc;
 	}
 
@@ -439,7 +439,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 						ControllerDef.class);
 		addSourceAutoCleanup(
 				controllerDesc,
-				"{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});this.runAfter(a);},clicked:function(){window.tempVar='inconsequential'}}");
+				"{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});$A.enqueueAction(a);},clicked:function(){window.tempVar='inconsequential'}}");
 		open(cmpDesc);
 		assertNull(auraUITestingUtil.getEval("return window.tempVar;"));
 		auraUITestingUtil.findDomElement(By.cssSelector("#click")).click();
@@ -447,7 +447,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 				auraUITestingUtil.getEval("return window.tempVar;"));
 		updateStringSource(
 				controllerDesc,
-				"{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});this.runAfter(a);},clicked:function(){window.tempVar='meaningful'}}");
+				"{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});$A.enqueueAction(a);},clicked:function(){window.tempVar='meaningful'}}");
 		triggerServerAction();
 		// wait for page to reload by checking that our tempVar is undefined
 		// again
@@ -487,7 +487,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 						ControllerDef.class);
 		addSourceAutoCleanup(
 				controllerDesc,
-				"{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});this.runAfter(a);}}");
+				"{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});$A.enqueueAction(a);}}");
 		addSourceAutoCleanup(providerDesc,
 				"({provide:function(){return {attributes:{'given':'silver spoon'}};}})");
 		open(cmpDesc);
@@ -597,7 +597,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 						ControllerDef.class);
 		addSourceAutoCleanup(
 				controllerDesc,
-				"{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});this.runAfter(a);}}");
+				"{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});$A.enqueueAction(a);}}");
 		DefDescriptor<?> layoutsDesc = Aura.getDefinitionService()
 				.getDefDescriptor(appDesc, DefDescriptor.MARKUP_PREFIX,
 						LayoutsDef.class);

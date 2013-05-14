@@ -20,6 +20,6 @@
             var actionReturnValue = action.getReturnValue();
             cmp.getAttributes().setValue("label", actionReturnValue);
         });
-        this.runAfter(a);
+        $A.enqueueAction(a);
     }
 }

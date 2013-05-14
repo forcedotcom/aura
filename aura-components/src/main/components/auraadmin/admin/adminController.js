@@ -20,7 +20,7 @@
             a.setCallback(cmp, function(action){
                 alert("done");
             });
-            this.runAfter(a);
+            $A.enqueueAction(a);
         }
     },
 

@@ -43,7 +43,7 @@
         add.setCallback(cmp, function(action){
             $A.log(action.getReturnValue());//Should be 100
         });
-        this.runAfter(add);
+        $A.enqueueAction(add);
     },
 
     callServerButPassNoChainedActions:function(cmp){
@@ -57,6 +57,6 @@
             "b" : 99,
             "action1" : null
         });
-        this.runAfter(a);
+        $A.enqueueAction(a);
     }
 }

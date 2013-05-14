@@ -46,6 +46,6 @@
             }
         });
 
-        controller.runAfter(a);
+        $A.enqueueAction(a);
     }
 })

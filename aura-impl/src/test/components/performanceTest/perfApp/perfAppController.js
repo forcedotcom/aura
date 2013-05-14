@@ -16,7 +16,7 @@
         a.setCallback(cmp,function(a){
             $A.endMark("XHR call time: Simple Server Controller");
         });
-        a.runAfter(a);
+        $A.enqueueAction(a);
     },
     getComponent:function(cmp){
         $A.mark("XHR call time: Server Controller, New Component & Resolve Refs");
@@ -31,7 +31,7 @@
             //cmp.find('new').getValue('v.body').push(c);
             $A.endMark("XHR call time: Server Controller, New Component & Resolve Refs");
         });
-        a.runAfter(a);
+        $A.enqueueAction(a);
     },
     changeLayout:function(cmp){
         //This can be done using $A.layoutService too, but that does not utilize built in Jiffy marks.
@@ -51,7 +51,7 @@
             var c = $A.newCmp(a.getReturnValue());
             cmp.find('placeHolder').getValue('v.body').push(c);
         });
-        a.runAfter(a);
+        $A.enqueueAction(a);
     },
     destroyComponent:function(cmp){
         $A.mark("Component.destroy");

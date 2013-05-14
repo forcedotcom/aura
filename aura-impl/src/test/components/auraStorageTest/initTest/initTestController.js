@@ -62,6 +62,6 @@
         a.setCallback(this, function(action){
             component.getValue("v.actionStatus").setValue(action.getState());
         });
-        a.runAfter(a);
+        $A.enqueueAction(a);
     }
 })

@@ -46,7 +46,7 @@
                                             $A.test.assertEquals("", cmp.getAttributes().getValue('responseOrder').getValue(), "Action chaining did not preserve order at client.");
                                             cmp.getAttributes().setValue('responseOrder', "1");
                                     });
-            add.runAfter(add);
+            $A.enqueueAction(add);
             cmp.getEvent("press").fire();
             $A.test.addWaitFor("SUCCESS",
                        function(){return subtract.getState();},

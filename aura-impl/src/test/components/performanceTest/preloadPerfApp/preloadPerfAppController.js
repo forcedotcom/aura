@@ -11,6 +11,6 @@
             $A.endMark("Fetch preloaded component");
         });
         $A.mark("Fetch preloaded component");
-        a.runAfter(a);
+        $A.enqueueAction(a);
     }
 })

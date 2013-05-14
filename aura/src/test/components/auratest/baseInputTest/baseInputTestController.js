@@ -48,6 +48,6 @@
         	$A.test.fail("Test fail! Unexpected error: " + e.message);       
         }
         
-        this.runAfter(a);
+        $A.enqueueAction(a);
 	}
 }

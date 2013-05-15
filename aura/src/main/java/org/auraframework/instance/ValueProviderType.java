@@ -22,8 +22,10 @@ import com.google.common.collect.Maps;
 
 // TODO: case insensitivity for provider keys
 public enum ValueProviderType {
-    MODEL("m"), VIEW("v"), CONTROLLER("c"), FOREACH(null), // key for foreach is
-                                                           // dynamic
+    MODEL("m"),
+    VIEW("v"),
+    CONTROLLER("c"),
+    FOREACH(null), // key for foreach is dynamic
     LABEL("$Label", true),
     BROWSER("$Browser", true),
     LOCALE("$Locale", true),

@@ -380,11 +380,6 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public String getLabel(String section, String name, Object... params) {
-        return ServiceLocator.get().get(LocalizationAdapter.class).getLabel(section, name, params);
-    }
-
-    @Override
     public String getLastMod() {
         return lastMod;
     }

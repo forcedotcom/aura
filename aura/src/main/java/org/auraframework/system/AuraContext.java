@@ -215,8 +215,6 @@ public interface AuraContext {
      */
     String getNum();
 
-    String getLabel(String section, String name, Object... params);
-
     /**
      * Namespaces whose defs should be, or have been preloaded on the client.
      *

@@ -192,7 +192,7 @@
                                 <forkedProcessTimeoutInSeconds>300</forkedProcessTimeoutInSeconds>
                                 <runOrder>random</runOrder>
                                 <trimStackTrace>false</trimStackTrace>
-                                <argLine>-Xmx512M -Djava.io.tmpdir=${java.io.tmpdir}</argLine>
+                                <argLine>-Xmx712M -Djava.io.tmpdir=${java.io.tmpdir}</argLine>
                                 <systemPropertyVariables>
                                     <config>${config}</config>
                                     <java.io.tmpdir>${java.io.tmpdir}</java.io.tmpdir>

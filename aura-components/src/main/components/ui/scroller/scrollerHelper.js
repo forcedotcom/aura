@@ -38,11 +38,14 @@
 				scroller.unbindTransientHandlers();
 				
 				scroller.refresh();
-
+								
+				var compEvents = component.getEvent("refreshed");						
+				compEvents.fire();
+				
 				// Goose the x position to insure that onScrollEnd() fires with the correct page fully revealed
-				if (component.get("v.snap")) {
-					scroller.scrollTo(scroller.maxScrollX, 0, 0);
-				}
+//				if (component.get("v.snap")) {
+//					scroller.scrollTo(scroller.maxScrollX, 0, 0);
+//				}
 			}
 
 			component._refreshing = false;

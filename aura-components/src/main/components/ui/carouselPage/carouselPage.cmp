@@ -1,0 +1,43 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="ui:interactive"  extensible="true" description="Carousel page">
+    
+    <aura:attribute name="title" type="String" description="Title of the page" />    
+    <aura:attribute name="isCacheable" default="true" type="Boolean" description="Indicates whether the page content is cacheable on client or not." />    
+    <aura:attribute name="isDefault" default="false" type="Boolean" description="Determines if this is the default page to display." />
+    
+    <aura:attribute name="pageModel" type="Object" description="Page model that is used to create components on the fly." />
+    <aura:attribute name="pageIndex" type="Integer" description="The index of this page it belongs to." />    
+    <aura:attribute name="parent" type="Aura.Component[]" description="Container of this page." />
+    <aura:attribute name="width" type="Integer" description="Width of the page. It is implicitly set after the page is rendered" />
+    <aura:attribute name="height" type="Integer" description="Height of the page. It is implicitly set after the page is rendered" />
+    <aura:attribute name="priv_ariaExpanded" default="false" type="Boolean" description="PRIVATE" />
+    <aura:attribute name="priv_pageStyle" type="String" description="PRIVATE" />
+    
+    <aura:registerevent name="pageSelected" type="ui:carouselPageEvent"/>
+    <aura:registerevent name="update" type="ui:carouselPageEvent"/>
+    
+    <aura:handler name="pageSelected" action="{!c.onPageSelected}" /> 
+    <aura:handler name="update" action="{!c.onPageUpdate}" /> 
+        
+    <!-- id attribute is linked to the aria-control attribute in page indicator -->
+    <section id="{!'carousel-page-' + v.pageIndex}" aura:id="pageContainer" style="{!v.priv_pageStyle}" class="carousel-page" aria-expanded="{!v.priv_ariaExpanded}" role="tabpanel">						 						 							
+		{!v.body}		
+	</section>	
+    
+</aura:component>    

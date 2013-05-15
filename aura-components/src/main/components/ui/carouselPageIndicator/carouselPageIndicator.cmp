@@ -1,0 +1,35 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component  extensible="true"  description=".">
+    
+    <!--TODO: need to pass in only pageCount once aura:iteration component supports integer iteration -->
+    <aura:attribute name="pageComponents" type="Aura.Component[]" description="The page components in the carousel"/>
+    <aura:attribute name="currentPage" type="Integer" description="Gets or sets the current page of the pager." />
+        
+    <aura:registerevent name="pagerClicked" type="ui:pagerClicked" />
+    <aura:registerevent name="pagerKeyed" type="ui:pagerKeyed" />
+             
+    <ul class="carousel-nav-items" role="presentation">		
+	    <aura:iteration items="{!v.pageComponents}" var="page" indexVar="index">
+	    	<li role="presentation">
+            	<ui:carouselPageIndicatorItem aura:id="indicatorItems" pageIndex="{!index}" pagerKeyed="{!c.keyHandler}" pagerClicked="{!c.clickHandler}" />    
+            </li>
+    	</aura:iteration>         
+    </ul>	 
+	
+</aura:component>

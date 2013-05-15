@@ -206,6 +206,8 @@ $A.ns.LabelValueProvider.prototype.getValue = function(expression, component, ca
             }
 
         }
+    } else {
+        $A.log("$Label requests must have both section and name");
     }
 
     return value;

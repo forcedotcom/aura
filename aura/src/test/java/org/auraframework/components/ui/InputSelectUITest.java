@@ -34,7 +34,7 @@ public class InputSelectUITest extends WebDriverTestCase {
     public InputSelectUITest(String name) {
         super(name);
     }
-
+    @ExcludeBrowsers({ BrowserType.FIREFOX})
     public void testSingleSelect() throws Exception {
         d = getDriver();
         String selectLocator = "select[class~='single']";

@@ -17,7 +17,6 @@
 */
 ({
     openDialog : function(cmp, evt) {
-	
 	var openEvent = $A.get("e.ui:openDialog");
         openEvent.setParams({
             dialog : cmp.find("dialogBoxId"),
@@ -28,29 +27,12 @@
 
    closeDialog : function(cmp, evt) {
        var lblAttrib = cmp.find("resultLabel").getAttributes();
-       var checkBoxArray = new Array();
-       var str = "Data Submited";
-
-       if(cmp.getAttributes().getValue('createCheckBoxes').getBooleanValue())
-	{
-           cmp.find("checkbox").forEach(
-    	       function(cmp){
-    		   if(cmp.get("v.value")){
-    		       checkBoxArray.push(cmp.get("v.name"));
-    	           };
-    	       });
-	}
        
-       if(checkBoxArray.length > 0){
-	   str = checkBoxArray.join(" ");
-       }
-       lblAttrib.setValue("value", cmp.getAttributes().getValue('createCheckBoxes').getBooleanValue());
        if(evt.getParam("confirmClicked")){
-	   lblAttrib.setValue("value", str);
+	   lblAttrib.setValue("value", "Data Submited");
        }
        else{
 	   lblAttrib.setValue("value", "Data Not Submitted");      
        }
-       
    }
 })

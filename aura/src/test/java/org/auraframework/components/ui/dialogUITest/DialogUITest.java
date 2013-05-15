@@ -39,8 +39,9 @@ import org.openqa.selenium.WebElement;
 
 public class DialogUITest  extends WebDriverTestCase {
     
-    private final String URL_MODAL= "uitest/dialogModalTest.cmp?";
-    private final String URL_NON_MODAL= "uitest/dialogNonModalTest.cmp?";
+    private final String URL_MODAL= "uitest/dialogModalTest.cmp";
+    private final String URL_NON_MODAL= "uitest/dialogNonModalTest.cmp";
+    private final String URL_NON_MODAL_WITH_CHECKBOXES= "uitest/dialogNonModalWCheckboxesTest.cmp";
     private final String CLASSNAME = "return $A.test.getActiveElement().className";
     private final String TITLE = "return $A.test.getActiveElement().title";
     private final String SHIFT_TAB = Keys.SHIFT+""+Keys.TAB;
@@ -155,10 +156,9 @@ public class DialogUITest  extends WebDriverTestCase {
     /***********************************************************************************************
      ***************************NON-MODAL DIALOG BOX CHECK******************************************
      ***********************************************************************************************/
-   //here
     @ExcludeBrowsers({ BrowserType.IE7,  BrowserType.IE8, BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testDialogNonModalCheckBoxes() throws MalformedURLException, URISyntaxException{
-        open(URL_NON_MODAL+"createCheckBoxes=true");
+        open(URL_NON_MODAL_WITH_CHECKBOXES);
        
         WebDriver driver = getDriver();
         getToFirstButton(driver, true);
@@ -178,7 +178,7 @@ public class DialogUITest  extends WebDriverTestCase {
         element = driver.findElement(By.cssSelector(RESULT_LABEL));
         assertEquals("Values that were selected don't match the output given","Pudding Bananas Cheese Water Bottles Computers",element.getAttribute("value"));
     }
-
+    
     //Checking if Dialog box will will close after having all elements tabbed through
     @ExcludeBrowsers({ BrowserType.IE7,  BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE})
     public void testDialogNonModalTab() throws MalformedURLException, URISyntaxException{

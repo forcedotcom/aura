@@ -168,13 +168,13 @@ $A.ns.LabelValueProvider.prototype.getValues = function() {
  */
 $A.ns.LabelValueProvider.prototype.getValue = function(expression, component, callback) {
 
-    var value,
-        stem = expression.getStem(),
-        section = stem.path[0],
-        name = stem.path[1];
+    var value;
 
-    // section and name must be provided
-    if(!$A.util.isUndefinedOrNull(section) && !$A.util.isUndefinedOrNull(name)) {
+    if(expression.path && expression.path.length == 3) {
+
+        var stem = expression.getStem(),
+            section = stem.path[0],
+            name = stem.path[1];
 
         if( this.values ) {
             value = this.values;

@@ -69,7 +69,7 @@ $A.ns.LabelQueue.prototype.getCallbacks = function() {
  * @param {Function} callback
  */
 $A.ns.LabelQueue.prototype.addCallback = function(callback) {
-    this.components.push(callback);
+    this.callbacks.push(callback);
 };
 
 /**

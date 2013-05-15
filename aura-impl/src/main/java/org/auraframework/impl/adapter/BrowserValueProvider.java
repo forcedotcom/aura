@@ -85,9 +85,6 @@ public class BrowserValueProvider implements GlobalValueProvider {
     @Override
     public void validate(PropertyReference expr) throws InvalidExpressionException {
         if (expr.size() != 1 || !getData().containsKey(expr.getRoot())) {
-            if (expr.getRoot().toString().equals("isContainer")) {
-                return;
-            }
             throw new InvalidExpressionException("No property on $Browser for key: " + expr, expr.getLocation());
         }
     }

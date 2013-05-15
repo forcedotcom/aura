@@ -41,6 +41,7 @@ import org.auraframework.instance.Component;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AttributeNotFoundException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
@@ -154,6 +155,9 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
                             getLocation());
                 }
             } else {
+                if(attributeDef.getVisibility() == Visibility.PRIVATE){
+                    throw new InvalidDefinitionException(String.format(" Attribute '%s' is specified as Private ",attributeDef.getDescriptor()),attributeDef.getLocation());
+                }
                 // so it was an attribute, make sure to parse it
                 entry.getValue().parseValue(attributeDef.getTypeDef());
             }
@@ -248,7 +252,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     }
 
     public static class Builder extends DefinitionImpl.RefBuilderImpl<ComponentDef, ComponentDefRef> implements
-            ComponentDefRefBuilder {
+    ComponentDefRefBuilder {
 
         private Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributeValues;
         private String localId;

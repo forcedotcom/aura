@@ -340,6 +340,19 @@ public class AttributeDefTest extends AuraImplTestCase {
         }
     }
 
+    public void testValidateDefinitionPrivateAndRequiredAttribute() throws Exception {
+        Location location = vendor.makeLocation("filename1", 5, 5, 0);
+        //checks if error is thrown when attribute is private and required
+        try {
+            vendor.makeAttributeDefWithNulls(testAttributeDescriptorName, null, vendor.getTypeDefDescriptor(),
+                    vendor.makeAttributeDefRef(testAttributeDescriptorName, "testValue", location), true,
+                    null, location,Visibility.PRIVATE).validateDefinition();
+            fail("Did not get InvalidDefinitionException forattribute set as required and private");
+        } catch (Exception e) {
+            checkExceptionFull(e, InvalidDefinitionException.class, "cannot set an attribute as required and private", location.getFileName());
+        }
+    }
+
     public void testAppendDependenciesWithNullDefault() throws Exception {
         AttributeDefImpl attDef = vendor.makeAttributeDefWithNulls(testAttributeDescriptorName, null,
                 vendor.getTypeDefDescriptor(), null, false, null, null,null);

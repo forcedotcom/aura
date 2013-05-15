@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition.Visibility;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
 import org.auraframework.def.TypeDef;
@@ -92,6 +93,22 @@ public class EventDefTest extends AuraImplTestCase {
             fail("validate should have caught null type");
         } catch (InvalidDefinitionException expected) {
 
+        }
+
+    }
+    public void testValidatePrivateAttributeInEvent() throws Exception{
+        //checks if error is thrown when an attribute is set as private
+        Map<DefDescriptor<AttributeDef>, AttributeDef> att = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        att.put(DefDescriptorImpl.getInstance("testInt", AttributeDef.class),
+                new AttributeDefImpl(DefDescriptorImpl.getInstance("testInt", AttributeDef.class), null, null, null,
+                        false, null, null,Visibility.PRIVATE));
+        EventDefImpl eve = vendor.makeEventDef(null, null, att, null, null);
+        try{
+            eve.validateDefinition();
+            fail("Validate should have caught private attributes");
+        }
+        catch (InvalidDefinitionException e) {
+            checkExceptionFull(e,InvalidDefinitionException.class,"Cannot Declare an Event Attribute as Private");
         }
     }
 

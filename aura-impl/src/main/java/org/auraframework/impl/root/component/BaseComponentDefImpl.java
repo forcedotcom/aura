@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.auraframework.impl.root.component;
 
 import static org.auraframework.instance.ValueProviderType.LABEL;
@@ -57,6 +58,7 @@ import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -67,7 +69,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
-        RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
+RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
     public static final DefDescriptor<InterfaceDef> ROOT_MARKER = DefDescriptorImpl
             .getInstance("markup://aura:rootComponent", InterfaceDef.class);
@@ -335,18 +337,31 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     private void validateExpressionRefs() throws QuickFixException {
         for (PropertyReference e : expressionRefs) {
             String root = e.getRoot();
+
             ValueProviderType vpt = ValueProviderType.getTypeByPrefix(root);
             if (vpt == null) {
-                // validate that its a foreach
+                // validate that its a foreachs
             } else if (vpt.isGlobal()) {
                 AuraContext lc = Aura.getContextService().getCurrentContext();
                 GlobalValueProvider gvp = lc.getGlobalProviders().get(vpt);
                 if (gvp != null) {
                     gvp.validate(e.getStem());
                 }
-            } else {
-                // validate against m v or c
+            } else if(vpt == ValueProviderType.VIEW){
+                if(e.getStem() != null){   // checks for private attributes used in expressions ..
+                    String stem = e.getStem().toString();
+                    AttributeDef attr = getAttributeDef(stem);
+                    if(attr != null){
+                        Collection<AttributeDef> edefs =  extendsDescriptor.getDef().getAttributeDefs().values();
+                        if(attr.getVisibility() == Visibility.PRIVATE && (edefs.contains(attr)) ){
+                            throw new InvalidDefinitionException(String.format("Expression %s refers to a private attribute '%s' ",e,attr),attr.getLocation());
+                        }
+                    }
+
+                }
             }
+
+
         }
     }
 
@@ -513,6 +528,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             return attributeDefs;
         } else {
             map.putAll(attributeDefs);
+
             return Collections.unmodifiableMap(map);
         }
     }
@@ -629,12 +645,12 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
             return getDescriptor().equals(other.getDescriptor())
                     && controllerDescriptors
-                            .equals(other.controllerDescriptors)
+                    .equals(other.controllerDescriptors)
                     && (modelDefDescriptor == null ? other.modelDefDescriptor == null
-                            : modelDefDescriptor
-                                    .equals(other.modelDefDescriptor))
+                    : modelDefDescriptor
+                    .equals(other.modelDefDescriptor))
                     && (extendsDescriptor == null ? other.extendsDescriptor == null
-                            : extendsDescriptor.equals(other.extendsDescriptor))
+                    : extendsDescriptor.equals(other.extendsDescriptor))
                     && events.equals(other.events)
                     && getLocation().equals(other.getLocation());
         }
@@ -658,6 +674,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     public void serialize(Json json) throws IOException {
         try {
             AuraContext context = Aura.getContextService().getCurrentContext();
+            Mode mode = context.getMode();
             boolean preloaded = context.isPreloaded(getDescriptor());
 
             json.writeMapBegin();
@@ -716,6 +733,9 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                     json.writeMapEntry("subDefs", subDefs.values());
                 }
 
+                if (mode.equals(Mode.AUTOJSTEST)) {
+                    json.writeMapEntry("testSuiteDef", getTestSuiteDef());
+                }
                 serializeFields(json);
             }
 
@@ -726,7 +746,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     protected abstract void serializeFields(Json json) throws IOException,
-            QuickFixException;
+    QuickFixException;
 
     /**
      * @see ComponentDef#getRendererDescriptor()
@@ -838,7 +858,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     public static abstract class Builder<T extends BaseComponentDef> extends
-            RootDefinitionImpl.Builder<T> implements BaseComponentDefBuilder<T> {
+    RootDefinitionImpl.Builder<T> implements BaseComponentDefBuilder<T> {
 
         public Builder(Class<T> defClass) {
             super(defClass);
@@ -1001,7 +1021,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         case APPLICATION:
             return descriptor.equals(other)
                     || (extendsDescriptor != null && getSuperDef()
-                            .isInstanceOf(other));
+                    .isInstanceOf(other));
         default:
             return false;
         }

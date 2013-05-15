@@ -15,10 +15,14 @@
  */
 package org.auraframework.throwable;
 
+import java.io.IOException;
+
 import org.auraframework.instance.Event;
 import org.auraframework.util.json.JsFunction;
+import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonSerializable;
 
-public abstract class ClientSideEventException extends AuraHandledException {
+public abstract class ClientSideEventException extends AuraHandledException implements JsonSerializable {
     private static final long serialVersionUID = 8972903096686059699L;
 
     /**
@@ -27,7 +31,7 @@ public abstract class ClientSideEventException extends AuraHandledException {
      * @see AuraHandledException#AuraHandledException(Throwable)
      * @param cause the cause (usually logged).
      */
-    public ClientSideEventException(Throwable cause) {
+    protected ClientSideEventException(Throwable cause) {
         super(cause);
     }
 
@@ -55,4 +59,19 @@ public abstract class ClientSideEventException extends AuraHandledException {
     public abstract JsFunction getDefaultHandler();
 
     public abstract int getStatusCode();
+
+    /**
+     * Serialize to JSON.
+     *
+     * FIXME: this is horrendously twisted. Our JSON serialization has problems.
+     *
+     */
+    @Override
+    public void serialize(Json json) throws IOException {
+        json.writeMapBegin();
+        json.writeMapEntry("exceptionEvent", Boolean.TRUE);
+        json.writeMapEntry("event", getEvent());
+        json.writeMapEntry("defaultHandler", getDefaultHandler() == null ? null : getDefaultHandler().toString());
+        json.writeMapEnd();
+    }
 }

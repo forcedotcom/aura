@@ -827,6 +827,24 @@ Component.prototype.getEvent = function(name) {
 };
 
 /**
+ * Get an event by descriptor qualified name.
+ *
+ * This is only used by action for firing of component events.
+ * It is a bit of a hack (reversing the map).
+ *
+ * @param {String} descriptor a descriptor qualified name.
+ * @return {String} null, or the component event.
+ * @protected
+ */
+Component.prototype.getEventByDescriptor = function(descriptor) {
+    var name = this.getDef().getEventNameByDescriptor(descriptor);
+    if (name === null) {
+        return null;
+    }
+    return this.getEvent(name);
+};
+
+/**
  * @private
  */
 Component.prototype.fire = function(name) {

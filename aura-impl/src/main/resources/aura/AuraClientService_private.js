@@ -160,25 +160,6 @@ var priv = {
         return responseMessage;
     },
 
-    parseAndFireEvent : function(evtObj) {
-        var descriptor = evtObj["descriptor"];
-
-        if (evtObj["eventDef"]) {
-            // register the event with the EventDefRegistry
-            eventService.getEventDef(evtObj["eventDef"]);
-        }
-
-        if (eventService.hasHandlers(descriptor)) {
-            var evt = $A.getEvt(descriptor);
-            if (evtObj["attributes"]) {
-                evt.setParams(evtObj["attributes"]["values"]);
-            }
-
-            evt.fire();
-        }
-
-    },
-
     throwExceptionEvent : function(resp) {
         var evtObj = resp["event"];
         var descriptor = evtObj["descriptor"];
@@ -246,7 +227,7 @@ var priv = {
             var events = responseMessage["events"];
             if (events) {
                 for ( var en = 0, len = events.length; en < len; en++) {
-                    priv.parseAndFireEvent(events[en]);
+                    $A.clientService.parseAndFireEvent(events[en]);
                 }
             }
 

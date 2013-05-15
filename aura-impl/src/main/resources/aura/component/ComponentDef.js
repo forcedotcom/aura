@@ -288,6 +288,27 @@ ComponentDef.prototype.getEventDef = function(name, includeValueEvents) {
 };
 
 /**
+ * Get an event name by descriptor qualified name.
+ *
+ * This is only used in the case of an action firing a component event.
+ * It is a bit of a hack, but will give back the name of the event that
+ * corresponds to the descriptor.
+ *
+ * @param {String} descriptor a descriptor qualified name.
+ * @return {String} null, or the component fired event name.
+ * @protected
+ */
+ComponentDef.prototype.getEventNameByDescriptor = function(descriptor) {
+    for (var name in this.registerEventDefs) {
+        if (this.registerEventDefs[name] && this.registerEventDefs[name].descriptor
+                && this.registerEventDefs[name].descriptor.qualifiedName === descriptor) {
+            return name;
+        }
+    }
+    return null;
+};
+
+/**
  * Gets all events associated with the Component.
  * @returns {Object}
  */

@@ -61,6 +61,10 @@
 	overflow:auto;
 }
 
+.THIS div.tabBody .frame{
+	min-height:400px;
+}
+
 .THIS div.tabBody.scrolling {
 	overflow: auto;
 }

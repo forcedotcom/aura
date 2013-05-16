@@ -15,10 +15,10 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:interactive"  extensible="true" support="BETA" description="...">
+<aura:component extends="ui:interactive"  extensible="true" support="BETA" description="A carousel item in a ui:carouselPage component.">
     
-    <aura:attribute name="label" type="String" />
-    <aura:attribute name="class" type="String" />
+    <aura:attribute name="label" type="String" description="The text displayed on the page item." />
+    <aura:attribute name="class" type="String" description="The CSS class used for the page item." />
    
 	    <li class="mdp-action">
 	    	<a class="action-icon-container">

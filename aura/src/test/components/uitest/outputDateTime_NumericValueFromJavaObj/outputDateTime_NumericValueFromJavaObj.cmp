@@ -16,5 +16,5 @@
 
 -->
 <aura:component model='java://org.auraframework.impl.java.model.TestJavaModel'>
-    <ui:outputDateTime value='{!m.date}'  aura:id='NonCalendarFromJava' />
+    <ui:outputDateTime value='{!m.timestamp}' timezone='America/Chicago' format='M/d/yy h:m' aura:id='NumericValueFromJava'/>
 </aura:component>

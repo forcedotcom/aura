@@ -16,7 +16,5 @@
 
 -->
 <aura:interface support="GA" description="Common interface across date components.">
-    <aura:attribute name="timezone" type="String" description="A string used to define the timezone of the value attribute. The string provided must match a java.util.Timezone-style timezone."/>
-    <aura:attribute name="dateStyle" type="String" default="short" description="Format the date using a localized date style. This is a shortcut to specifying a complete datetime format string, and adapts to the user's locale. Values can be &quot;short&quot;, &quot;medium&quot;, &quot;long&quot;, or &quot;full&quot;."/>
-    <aura:attribute name="format" type="String" description="A string used to format the date and time of the value attribute. The string provided must be a java.text.SimpleDateFormat-style format string that doesn't include time of day or timezone pattern letters."/>
+    <aura:attribute name="format" type="String" description="A string (pattern letters are defined in java.text.SimpleDateFormat) used to format the date and time of the value attribute."/>
 </aura:interface>

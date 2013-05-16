@@ -15,11 +15,13 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:output" implements="ui:outputDateComponent" extensible="true" model="java://org.auraframework.component.ui.OutputDateTimeModel" support="GA"
-    description="Displays a date, time, and timezone in the default or specified format based on the user's locale.">
-    <!-- If you bind the "value" attribute to an Apex model then the Apex DateTime's timezone will be used by default.
-         You can specify a literal value which must be long value representing milliseconds since Jan 1 1970. -->
-    <aura:attribute name="value" type="DateTime" required="true" description="The value of the date and time to be output. A literal value (long) can be used to represent milliseconds since Jan 1, 1970."/>
-    <aura:attribute name="timeStyle" type="String" default="short" description="Format the time using a localized time style. This is a shortcut to specifying a complete datetime format string, and adapts to the user's locale. Values can be &quot;short&quot;, &quot;medium&quot;, &quot;long&quot;, or &quot;full&quot;."/>
-    <span aura:id='span' class="{!v.class}">{!m.text}</span>
+<aura:component extends="ui:output" implements="ui:outputDateComponent" extensible="true" support="GA"
+    controller="java://org.auraframework.component.ui.TimeZoneInfoController"
+    description="Displays a date, time in a specified or default format based on the user's locale.">
+    <aura:attribute name="langLocale" type="String" default="en" description="The language locale used to format date value."/>
+    <aura:attribute name="timezone" type="String" default="GMT" description="The timezone ID, for example, America/Los_Angeles."/>
+    <aura:attribute name="value" type="String" required="true" 
+                    description="An ISO8601-formatted string representing a date time."/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <span aura:id="span" class="{!v.class}"></span>
 </aura:component>

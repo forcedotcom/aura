@@ -13,57 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({    
-    displayDatePicker: function(component) {
-        var now = new Date(); // local date
-        // Later on, we will use getUTC... methods to get year/month/date
-        var currentDate = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
-        var outputCmp = component.find("inputText");
-        var elem = outputCmp ? outputCmp.getElement() : null;
-        var value = elem ? elem.value : null;
-        var format = component.get("v.format");
-        if (value) {
-            var mDate = moment.utc(value, format, this.getLangLocale(component));
-            if (mDate.isValid()) {
-                currentDate = mDate.toDate();
-            }
-        }
-        this.popUpDatePicker(component, currentDate);
-    },
-    
+({
     displayDateTime: function(component, displayValue) {
-        var outputCmp = component.find("inputText");
+        var outputCmp = component.find("span");
         var elem = outputCmp ? outputCmp.getElement() : null;
         if (elem) {
-            elem.value = displayValue;
+            elem.textContent = elem.innerText = displayValue;
         }
-    },
-    
-    /**
-     * Override ui:input.
-     *
-     */
-    doUpdate : function(component, value) {
-        var ret = value;
-        if (value) {
-            var format = component.get("v.format");
-            var mDate = moment.utc(value, format, this.getLangLocale(component));
-            if (mDate.isValid()) {
-                var d = mDate.toDate();
-                var timezone = component.get("v.timezone");
-                if (timezone == "GMT") {
-                    ret = d.toISOString();
-                } else {
-                    try {
-                        var utcDate = WallTime.WallTimeToUTC(timezone, d); // timezone info should already be loaded
-                        ret = utcDate.toISOString();
-                    } catch (e) {
-                        // The timezone id is invalid or for some reason, we can't get timezone info.
-                    }
-                }
-            }
-        }
-        component.setValue("v.value", ret);
     },
     
     formatDateTime: function(component) {
@@ -93,14 +49,6 @@
                 this.updateDisplay(component, d, format, timezone, value);
             }
         }
-    },
-    
-    getDateString: function(date) {
-        return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
-    },
-    
-    getUTCDateString: function(date) {
-        return date.getUTCFullYear() + "-" + (date.getUTCMonth() + 1) + "-" + date.getUTCDate();
     },
     
     /**
@@ -159,7 +107,8 @@
         $A.enqueueAction(a);
     },
     
-    getWallDateTime: function(d, timezone) {
+    updateDisplay: function(component, d, format, timezone, defaultDisplayValue) {
+        var displayValue = defaultDisplayValue;
         var tzOffset = 0;
         try {
             var tzDate = WallTime.UTCToWallTime(d, timezone);
@@ -168,19 +117,6 @@
             // The timezone id is invalid or for some reason, we can't get timezone info.
         }
         var mDate = moment.utc(d.getTime() - tzOffset * 60000);
-        return mDate.toDate();
-    },
-    
-    popUpDatePicker: function(component, date) {
-        var datePicker = component.find("datePicker");
-        datePicker.setValue("v.value", this.getUTCDateString(date));
-        datePicker.setValue("v.visible", true);
-    },
-    
-    updateDisplay: function(component, d, format, timezone, defaultDisplayValue) {
-        var displayValue = defaultDisplayValue;
-        var wallDate = this.getWallDateTime(d, timezone); 
-        var mDate = moment.utc(wallDate);
         if (mDate.isValid()) {
             displayValue = mDate.lang(this.getLangLocale(component)).format(format);
         } else {

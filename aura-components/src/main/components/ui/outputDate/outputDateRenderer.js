@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 ({
-    testNonDateTimeJavaObj:{
-        test:function(cmp){
-            var testCmp = cmp.find('NonCalendarFromJava');
-            aura.test.assertEquals("Value must be bound to a model value that resolves to a java.util.Calendar", $A.test.getText(testCmp.find('span').getElement()), "Expected an error message");
-        }
+    afterRender: function(component, helper) {
+        helper.formatDate(component);
+        return this.superAfterRender();
+    },
+    
+    rerender: function(component, helper) {
+        helper.formatDate(component);
+        return this.superRerender();
     }
 })

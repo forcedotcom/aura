@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 ({
-    testNonDateJavaObj:{
+    testNonDateTimeJavaObj:{
         test:function(cmp){
-            var testCmp = cmp.find('NonDateFromJava');
-            aura.test.assertEquals("Model", $A.test.getText(testCmp.find('span').getElement()), "Expected the original value");
+            var testCmp = cmp.find('NumericValueFromJava');
+            aura.test.assertEquals("9/23/04 11:30", $A.test.getText(testCmp.find('span').getElement()), "Value should be able to work with a numeric value");
         }
     }
 })

@@ -15,30 +15,27 @@
  */
 ({
     /**
-     * Verify behavior by assigning a long value representing a date value in milliseconds since Epoch.
-     * value of '0' is 01/01/1970 in Epoch calendar
+     * Verify default format.
      */
-    testLongValueAndDefaultFormat: {
+    testDefaultFormat: {
         attributes: {value : '2004-09-23'},
         test: function(component){
-            aura.test.assertEquals("9/23/04", $A.test.getText(component.find('span').getElement()), "Incorrect date");
+            aura.test.assertEquals("2004-09-23", $A.test.getText(component.find('span').getElement()), "Incorrect date");
         }
     },
     /**
-     * Verify behavior by assigning a negative long value representing a date value in milliseconds since Epoch.
-     * value of '0' is 01/01/1970 in Epoch calendar
+     * Verify default format with a date before 1970.
      */
-    testNegativeLongValue: {
+    testDefaultFormatWithBefore1970: {
         attributes: {value : '1935-04-10'},
         test: function(component){
-            aura.test.assertEquals("4/10/35", $A.test.getText(component.find('span').getElement()), "Incorrect date");
+            aura.test.assertEquals("1935-04-10", $A.test.getText(component.find('span').getElement()), "Incorrect date");
         }
     },
     /**
      * Verify behavior when 'Value' attribute is assigned an empty string.
      */
-    //TODO W-984924 value must be set in markup. moved to js://uitest.outputCmps_EmptyStringValue for now.
-    _testEmptyStringValue: {
+    testEmptyStringValue: {
         attributes: {value : ''},
         test: function(component){
             aura.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Expected an empty span.");
@@ -47,11 +44,10 @@
     /**
      * Verify behavior when 'Value' attribute is assigned a Garbage value.
      */
-    //TODO: W-967009
-    _testInvalidValue: {
+    testInvalidValue: {
         attributes: {value : 'cornholio'},
         test: function(component){
-            aura.test.assertEquals("Value must be a value in milliseconds or bound to a java.util.Date model value", $A.test.getText(component.find('span').getElement()), "Expected an error message.");
+            aura.test.assertEquals("cornholio", $A.test.getText(component.find('span').getElement()), "Display the original value if it is not a valid date value.");
         }
     },
 
@@ -61,7 +57,7 @@
     testEmptyStringForFormat:{
         attributes: {value : '2004-09-23', format: ''},
         test:function(component){
-            aura.test.assertEquals("", $A.test.getText(component.find('span').getElement()), "Incorrect date format, should not have displayed anything.");
+            aura.test.assertEquals("2004-09-23", $A.test.getText(component.find('span').getElement()), "Incorrect date format, should display as it is.");
         }
     },
 
@@ -76,14 +72,13 @@
     },
     /**
      * Verify behavior when 'format' is given a valid date format.
-     * G-(era)
-     * MMMMMMMMMMMM-(Full month)
-     * w-(week in year)
-     * D-(day in year)
-     * E-(day in week)
+     * MMMM-(Full month)
+     * ww-(week of year)
+     * DDD-(day of year)
+     * EEEE-(day in week)
      */
     testAllPossibleFormats: {
-        attributes: {value : '2004-09-23', format: 'yyyy MMMMMMMMMM EEEEEEEEE DDD ww'},
+        attributes: {value : '2004-09-23', format: 'yyyy MMMM EEEE DDD ww'},
         test: function(component){
             aura.test.assertEquals("2004 September Thursday 267 39", $A.test.getText(component.find('span').getElement()), "Incorrect date format in display.");
       }
@@ -95,23 +90,7 @@
     testInvalidFormat: {
         attributes: {value : '2004-09-23', format: 'bb'},
         test: function(component){
-            aura.test.assertEquals("You must provide a valid format: Illegal pattern component: bb", $A.test.getText(component.find('span').getElement()), "Expected an error message.");
+            aura.test.assertEquals("bb", $A.test.getText(component.find('span').getElement()), "Expected the garbage format value.");
       }
-    },
-
-    testTimezone: {
-        attributes: {value: '2012-06-07', timezone: 'CST', dateStyle: 'full', format: 'EEE, d MMM yyyy HH:mm:ss'},
-        test: function(component){
-       $A.test.assertEquals("CST", component.get("v.timezone"), "Incorrect value set for attribute timezone");
-    }
-
-    },
-
-    testDefaultDateStyle: {
-        attributes: {value: '2012-06-07'},
-    test: function(component){
-       $A.test.assertEquals("6/7/12", $A.test.getText(component.find('span').getElement()), "Date value does not match with dateStyle 'medium'");
-           $A.test.assertEquals("short", component.get("v.dateStyle"), "Incorrect default value set for attribute dateStyle");
-    }
     }
 })

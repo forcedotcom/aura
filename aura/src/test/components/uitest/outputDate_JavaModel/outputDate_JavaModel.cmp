@@ -16,5 +16,5 @@
 
 -->
 <aura:component model='java://org.auraframework.impl.java.model.TestJavaModel'>
-    <ui:outputDate value='{!m.date}' aura:id='dateFromJava'/>
+    <ui:outputDate value='{!m.date}' format='M/dd/yy' aura:id='dateFromJava'/>
 </aura:component>

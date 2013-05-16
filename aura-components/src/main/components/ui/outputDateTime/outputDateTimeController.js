@@ -17,26 +17,19 @@
     doInit: function(component, event, helper) {
         var format = component.get("v.format");
         if (format) {
-            format = format.replace(/y/g, "Y").replace(/d/g, "D").replace(/E/g, "d").replace(/a/g, "A");
+            format = format.replace(/y/g, "Y").replace(/d/g, "D").replace(/E/g, "d").replace(/a/g, "A"); // translate Java patterns to moment.js pattern
             component.setValue("v.format", format);
+        } else {
+            // TODO: grab the default value of format from locale global value provider
+            format = "YYYY-MM-DD HH:mm";
         }
-        var value = component.get("v.value");
-        if (value) {
-            var mDate = moment.utc(value, "YYYY-MM-DD");
-            if (mDate.isValid()) {
-                component.setValue("v.value", mDate.format("YYYY-MM-DD"));
-            }
+        component.setValue("v.format", format);
+        
+        var timezone = component.get("v.timezone");
+        if (!timezone) {
+            // TODO: grab the default value of timezone from locale global value provider
+            timezone = "GMT";
         }
-    },
-    
-    openDatePicker: function(cmp, event, helper) {
-        helper.displayDatePicker(cmp);
-    },
-    
-    setValue: function(component, event, helper) {
-        var dateValue = event.getParam("value");
-        if (dateValue) {
-            component.setValue("v.value", dateValue);
-        }
+        component.setValue("v.timezone", timezone);
     }
 })

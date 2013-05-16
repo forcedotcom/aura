@@ -271,6 +271,8 @@
             </script>
             
             <script src="/auraFW/resources/moment/moment.js"></script>
+            <script src="/auraFW/resources/walltime-js/olson/walltime-data_America-Los_Angeles.js"></script>
+            <script src="/auraFW/resources/walltime-js/walltime.js"></script>
             
             {!v.auraInitBlock}
 

@@ -16,7 +16,7 @@
 
 -->
 <aura:component extends="ui:input" implements="ui:inputDateComponent" extensible="true" support="BETA" description="An input field for entering a date as specified by the format attribute.">
-    <aura:attribute name="format" type="String" default="YYYY-MM-DD" description="The date format in user's locale."/>
+    <aura:attribute name="format" type="String" default="YYYY-MM-DD" description="The date format (pattern letters are defined in java.text.SimpleDateFormat) in user's locale."/>
     <aura:attribute name="placeholder" type="String" default="YYYY-MM-DD" description="The hint for the date input format."/>
     <aura:set attribute="updateOn" value="blur"/>
         

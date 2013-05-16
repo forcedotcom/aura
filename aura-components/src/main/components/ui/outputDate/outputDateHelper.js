@@ -14,29 +14,21 @@
  * limitations under the License.
  */
 ({
-    doInit: function(component, event, helper) {
-        var format = component.get("v.format");
-        if (format) {
-            format = format.replace(/y/g, "Y").replace(/d/g, "D").replace(/E/g, "d").replace(/a/g, "A");
-            component.setValue("v.format", format);
-        }
+    formatDate: function(component) {
         var value = component.get("v.value");
+        var format = component.get("v.format");
+        var displayValue = value;
         if (value) {
             var mDate = moment.utc(value, "YYYY-MM-DD");
             if (mDate.isValid()) {
-                component.setValue("v.value", mDate.format("YYYY-MM-DD"));
+                displayValue = mDate.format(format);
             }
         }
-    },
-    
-    openDatePicker: function(cmp, event, helper) {
-        helper.displayDatePicker(cmp);
-    },
-    
-    setValue: function(component, event, helper) {
-        var dateValue = event.getParam("value");
-        if (dateValue) {
-            component.setValue("v.value", dateValue);
+        
+        var outputCmp = component.find("span");
+        var elem = outputCmp ? outputCmp.getElement() : null;
+        if (elem) {
+            elem.textContent = elem.innerText = displayValue;
         }
     }
 })

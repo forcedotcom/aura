@@ -26,12 +26,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.auraframework.util.IOUtil;
 
 /**
@@ -230,23 +236,33 @@ public class PTestGoogleChart {
      * @return Whether the file was successfully created.
      */
     public boolean writeToFile(File file) throws IOException {
-        HttpClient http = new HttpClient();
-        http.getParams().setSoTimeout(24000); // don't wait forever
 
-        PostMethod method = new PostMethod(BASE_URL);
-        method.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        HttpParams httpParams = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(httpParams, 24000);
+        HttpConnectionParams.setSoTimeout(httpParams, 24000);
+
+        DefaultHttpClient http = new DefaultHttpClient(httpParams);
+
+        HttpPost post = new HttpPost(BASE_URL);
+
+        List <NameValuePair> nvps = new ArrayList<NameValuePair>();
 
         Map<String, String> params = buildRequestParams();
-        for (Entry<String, String> param : params.entrySet()) {
-            method.addParameter(new NameValuePair(param.getKey(), param.getValue()));
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            nvps.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
         }
+        post.setEntity(new UrlEncodedFormEntity(nvps));
+
+        post.setHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded; charset=UTF-8");
+
+        HttpResponse response = http.execute(post);
 
         InputStream in = null;
         FileOutputStream fw = null;
         ByteArrayOutputStream baos = null;
 
         boolean successful = false;
-        int responseCode = http.executeMethod(method);
+        int responseCode = response.getStatusLine().getStatusCode();
         try {
             if (responseCode == 200) {
                 if (file.exists()) {
@@ -254,7 +270,7 @@ public class PTestGoogleChart {
                 }
                 file.createNewFile();
 
-                in = new BufferedInputStream(method.getResponseBodyAsStream());
+                in = new BufferedInputStream(response.getEntity().getContent());
                 baos = new ByteArrayOutputStream();
                 fw = new FileOutputStream(file);
 
@@ -263,11 +279,11 @@ public class PTestGoogleChart {
                 fw.write(bytes);
                 successful = true;
             } else {
-                System.out.println(method.getResponseBodyAsString());
+                System.out.println(response.getEntity().getContent());
                 throw new RuntimeException("Callout to Google Charts API failed.");
             }
         } finally {
-            method.releaseConnection();
+            post.releaseConnection();
             if (in != null) {
                 in.close();
             }

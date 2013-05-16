@@ -18,11 +18,17 @@ package org.auraframework.test;
 import java.io.IOException;
 
 import java.net.URI;
+import java.util.List;
 
-import org.apache.commons.httpclient.Cookie;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
-
+import org.apache.http.HttpResponse;
+import org.apache.http.client.CookieStore;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.BasicClientCookie;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
 import org.auraframework.Aura;
 
 import org.auraframework.def.ApplicationDef;
@@ -51,15 +57,15 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        originalUserAgent = System.getProperty(HttpMethodParams.USER_AGENT);
+        originalUserAgent = System.getProperty(CoreProtocolPNames.USER_AGENT);
     }
 
     @Override
     public void tearDown() throws Exception {
         if (originalUserAgent == null) {
-            System.clearProperty(HttpMethodParams.USER_AGENT);
+            System.clearProperty(CoreProtocolPNames.USER_AGENT);
         } else {
-            System.setProperty(HttpMethodParams.USER_AGENT, originalUserAgent);
+            System.setProperty(CoreProtocolPNames.USER_AGENT, originalUserAgent);
         }
         super.tearDown();
     }
@@ -75,8 +81,8 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * @throws Exception
      */
     protected void assertUrlResponse(String msg, String url, int statusCode) throws Exception {
-        GetMethod get = obtainGetMethod(new URI(null, url, null).toString());
-        int status = this.getHttpClient().executeMethod(get);
+        HttpResponse httpResponse = performGet(new URI(null, url, null).toString());
+        int status = getStatusCode(httpResponse);
         assertEquals(msg, statusCode, status);
     }
 
@@ -84,32 +90,117 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         return servletConfig.getBaseUrl().getHost();
     }
 
+    /**
+     * Clear cookies from httpclient cookie store
+     * @throws Exception
+     */
     protected void clearCookies() throws Exception {
-        getHttpClient().getState().clearCookies();
+        getCookieStore().clear();
     }
 
+    /**
+     * Adds cookie
+     *
+     * @param name
+     * @param value
+     * @throws Exception
+     */
+    protected void addCookie(String name, String value) throws Exception {
+        BasicClientCookie cookie = makeCookie(getHost(), name, value, "/");
+        getCookieStore().addCookie(cookie);
+    }
+
+    /**
+     * Adds cookie to httpclient cookie store
+     * @param domain
+     * @param name
+     * @param value
+     * @param path
+     * @throws Exception
+     */
     protected void addCookie(String domain, String name, String value, String path) throws Exception {
-        getHttpClient().getState().addCookie(new Cookie(domain, name, value, path, null, false));
+        BasicClientCookie cookie = makeCookie(domain, name, value, path);
+        getCookieStore().addCookie(cookie);
     }
 
+    /**
+     * Creates HttpContext with httpclient cookie store. Allows cookies to be part of specific request method.
+     * @return
+     * @throws Exception
+     */
+    protected HttpContext getHttpCookieContext() throws Exception {
+        CookieStore cookieStore = getCookieStore();
+        HttpContext localContext = new BasicHttpContext();
+        localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
+        return localContext;
+    }
+
+    /**
+     * Checks there is no cookie in httpclient cookie store
+     * @param domain
+     * @param name
+     * @param path
+     * @throws Exception
+     */
     protected void assertNoCookie(String domain, String name, String path) throws Exception {
-        Cookie expected = new Cookie(domain, name, null, path, 0, false);
-        for (Cookie cookie : getHttpClient().getState().getCookies()) {
+        Cookie expected = makeCookie(domain, name, null, path);
+        for (Cookie cookie : getCookies()) {
             if (expected.equals(cookie)) {
                 fail("Cookie was not deleted: " + cookie);
             }
         }
     }
 
+    /**
+     * Checks for cookie
+     * @param domain
+     * @param name
+     * @param path
+     * @param value
+     * @throws Exception
+     */
     protected void assertCookie(String domain, String name, String path, String value) throws Exception {
-        Cookie expected = new Cookie(domain, name, value, path, 0, false);
-        for (Cookie cookie : getHttpClient().getState().getCookies()) {
+        Cookie expected = makeCookie(domain, name, value, path);
+        for (Cookie cookie :getCookies()) {
             if (expected.equals(cookie)) {
                 assertEquals("Wrong cookie value!", expected.getValue(), cookie.getValue());
                 return;
             }
         }
         fail("Missing cookie, expected " + expected);
+    }
+
+    /**
+     * Creates cookie
+     * @param domain
+     * @param name
+     * @param value
+     * @param path
+     * @return
+     */
+    private BasicClientCookie makeCookie(String domain, String name, String value, String path) {
+        BasicClientCookie cookie = new BasicClientCookie(name, value);
+        cookie.setDomain(domain);
+        cookie.setPath(path);
+        return cookie;
+    }
+
+    /**
+     * Gets all cookies in httpclient cookie store
+     * @return cookies
+     * @throws Exception
+     */
+    protected List<Cookie> getCookies() throws Exception {
+        return getCookieStore().getCookies();
+    }
+
+    /**
+     * Gets httpclient cookie store
+     * @return
+     * @throws Exception
+     */
+    protected CookieStore getCookieStore() throws Exception {
+        return ((DefaultHttpClient) getHttpClient()).getCookieStore();
     }
 
     /**

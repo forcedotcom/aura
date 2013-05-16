@@ -18,12 +18,12 @@ package org.auraframework.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
-
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.params.CoreProtocolPNames;
 import org.auraframework.Aura;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext.Format;
@@ -55,21 +55,20 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
         super(name);
     }
 
-    private void requestAndAssertContentType(HttpMethod method, String url, Format format) throws Exception {
-        getHttpClient().executeMethod(method);
-        Header contentTypeHeader = method.getResponseHeader("Content-Type");
-        String contentType = contentTypeHeader != null ? contentTypeHeader.toString()
-                .substring("Content-Type: ".length()).trim() : "";
+    private void requestAndAssertContentType(HttpRequestBase method, String url, Format format) throws Exception {
+
+        HttpResponse response = perform(method);
+        String contentType = response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue();
         // Eliminate the spaces separating the content Type specification
         contentType = AuraTextUtil.arrayToString(contentType.split(";\\s+"), ";", -1, false);
         assertEquals(String.format(
                 "Received wrong Content-Type header%nURL(or Action): %s%nContent:%s%nRequest type:%s", url,
-                method.getResponseBodyAsString(), method.getName()), FORMAT_CONTENTTYPE.get(format), contentType);
+                getResponseBody(response), method.getMethod()), FORMAT_CONTENTTYPE.get(format), contentType);
     }
 
     private void getOnAuraServlet(Format f, String tag) throws Exception {
         String url = String.format("/aura?%s&aura.mode=FTEST&aura.format=%s", tag, f.toString());
-        GetMethod get = obtainGetMethod(url);
+        HttpGet get = obtainGetMethod(url);
         requestAndAssertContentType(get, url, f);
     }
 
@@ -89,7 +88,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
         params.put("aura.context", String.format("{\"mode\":\"FTEST\",\"fwuid\":\"%s\"}",
             Aura.getConfigAdapter().getAuraFrameworkNonce()));
         params.put("aura.format", "JSON");
-        PostMethod post = obtainPostMethod("/aura", params);
+        HttpPost post = obtainPostMethod("/aura", params);
         requestAndAssertContentType(post,
                 "java://org.auraframework.impl.java.controller.JavaTestController/ACTION$getString", f);
     }
@@ -137,7 +136,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
     }
 
     private void getOnAuraResourceServlet(Format f, String url) throws Exception {
-        GetMethod get = obtainGetMethod(url);
+        HttpGet get = obtainGetMethod(url);
         requestAndAssertContentType(get, url, f);
     }
 
@@ -196,7 +195,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
             case MANIFEST:
                 String appManifestUrl = "{'mode':'DEV','app':'appCache:testApp'}";
                 url = "/l/" + AuraTextUtil.urlencode(appManifestUrl) + "/app.manifest";
-                System.setProperty(HttpMethodParams.USER_AGENT, UserAgent.GOOGLE_CHROME.getUserAgentString());
+                System.setProperty(CoreProtocolPNames.USER_AGENT, UserAgent.GOOGLE_CHROME.getUserAgentString());
                 getOnAuraResourceServlet(format, url);
                 break;
             default:

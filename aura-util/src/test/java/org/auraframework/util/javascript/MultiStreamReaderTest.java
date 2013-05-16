@@ -25,7 +25,7 @@ import java.net.URLStreamHandler;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.auraframework.test.UnitTestCase;
 
 import com.google.common.collect.ImmutableSet;

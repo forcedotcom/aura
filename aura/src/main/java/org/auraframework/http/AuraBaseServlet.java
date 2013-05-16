@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
@@ -116,17 +117,17 @@ public abstract class AuraBaseServlet extends HttpServlet {
     }
 
     public static void setNoCache(HttpServletResponse response) {
-        response.setHeader("Cache-Control", "no-cache, no-store");
-        response.setHeader("Pragma", "no-cache");
-        response.setDateHeader("Expires", System.currentTimeMillis() - LONG_EXPIRE);
-        response.setDateHeader("Last-Modified", System.currentTimeMillis() - LONG_EXPIRE);
+        response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store");
+        response.setHeader(HttpHeaders.PRAGMA, "no-cache");
+        response.setDateHeader(HttpHeaders.EXPIRES, System.currentTimeMillis() - LONG_EXPIRE);
+        response.setDateHeader(HttpHeaders.LAST_MODIFIED, System.currentTimeMillis() - LONG_EXPIRE);
     }
 
     public static void setLongCache(HttpServletResponse response) {
-        response.setHeader("Vary", "Accept-Encoding");
-        response.setHeader("Cache-Control", String.format("max-age=%s, public", LONG_EXPIRE / 1000));
-        response.setDateHeader("Expires", System.currentTimeMillis() + LONG_EXPIRE);
-        response.setDateHeader("Last-Modified", System.currentTimeMillis() + LONG_EXPIRE);
+        response.setHeader(HttpHeaders.VARY, "Accept-Encoding");
+        response.setHeader(HttpHeaders.CACHE_CONTROL, String.format("max-age=%s, public", LONG_EXPIRE / 1000));
+        response.setDateHeader(HttpHeaders.EXPIRES, System.currentTimeMillis() + LONG_EXPIRE);
+        response.setDateHeader(HttpHeaders.LAST_MODIFIED, System.currentTimeMillis() + LONG_EXPIRE);
     }
 
     public static String addCacheBuster(String url) {

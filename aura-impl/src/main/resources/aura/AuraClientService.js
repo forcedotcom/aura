@@ -211,6 +211,27 @@ var AuraClientService = function() {
         },
 
         /**
+         * A utility to handle events passed back from the server.
+         */
+        parseAndFireEvent : function(evtObj) {
+            var descriptor = evtObj["descriptor"];
+
+            if (evtObj["eventDef"]) {
+                // register the event with the EventDefRegistry
+                eventService.getEventDef(evtObj["eventDef"]);
+            }
+
+            if (eventService.hasHandlers(descriptor)) {
+                var evt = $A.getEvt(descriptor);
+                if (evtObj["attributes"]) {
+                    evt.setParams(evtObj["attributes"]["values"]);
+                }
+
+                evt.fire();
+            }
+        },
+
+        /**
          * For bootstrapping only
          *
          * @private

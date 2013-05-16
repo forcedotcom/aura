@@ -40,6 +40,7 @@ var Action = function Action(def, method, paramDefs, cmp) {
     this.cmp = cmp;
     this.params = {};
     this.state = "NEW";
+    this.callbacks = {};
 };
 
 Action.prototype.nextActionId = 1;
@@ -134,9 +135,44 @@ Action.prototype.getComponent = function() {
  * @param {Function}
  *            callback The callback function to run for each controller.
  */
-Action.prototype.setCallback = function(scope, callback) {
-    this.callbackScope = scope;
-    this.callback = callback;
+Action.prototype.setCallback = function(scope, callback, name) {
+    if (name === undefined || name === "ALL") {
+        this.callbacks["SUCCESS"] = {fn:callback, s:scope};
+        this.callbacks["ERROR"] = {fn:callback, s:scope};
+        this.callbacks["ABORTED"] = {fn:callback, s:scope};
+        this.callbacks["INCOMPLETE"] = {fn:callback, s:scope};
+    } else {
+        if (name !== "SUCCESS" && name !== "ERROR" && name !== "ABORTED" && name !== "INCOMPLETE") {
+            $A.error("Illegal name "+name);
+            return;
+        }
+        this.callbacks[name] = {fn:callback, s:scope};
+    }
+};
+
+/**
+ * Wrap the current action callbacks to ensure that they get called before a given function.
+ *
+ * This can be used to add additional functionality to the already existing callbacks, allowing
+ * the user to effectively 'append' a function to the current one.
+ *
+ * @param {Object} scope the scope in which the new function should be called.
+ * @param {Function} callback the callback to call after the current callback is executed.
+ */
+Action.prototype.wrapCallback = function(scope, callback) {
+    var nestedCallbacks = this.callbacks;
+    var outerCallback = callback;
+    var outerScope = scope;
+    this.callbacks = {};
+
+    this.setCallback(this, function(action) {
+        var cb = nestedCallbacks[this.getState()];
+        if (cb && cb.fn) {
+            cb.fn.call(cb.s, this);
+        }
+        outerCallback.call(outerScope, this);
+        this.callbacks = nestedCallbacks;
+    });
 };
 
 /**
@@ -255,8 +291,42 @@ Action.prototype.complete = function(response) {
                 context.joinComponentConfigs(components);
             }
 
-            if (this.callback && (this.cmp === undefined || this.cmp.isValid())) {
-                this.callback.call(this.callbackScope, this);
+            if (this.getState() === "ERROR") {
+                //
+                // Careful now. If we get back an event from the server as part of the error,
+                // we want to fire off the event. Note that this will also remove it from the
+                // list of errors, and this may leave us with an empty error list. In that case
+                // we toss in a message of 'event fired' to prevent confusion from having an
+                // error state, but no error.
+                //
+                // This code is perhaps a bit tenuous, as it attempts to reverse the mapping from
+                // event descriptor to event name in the component, giving back the first one that
+                // it finds (deep down in code). This almost violates encapsulation, but, well,
+                // not badly enough to remove it.
+                //
+                var i;
+                var newErrors = [];
+                var fired = false;
+                for (i = 0; i < response["error"].length; i++) {
+                    var err = response["error"][i];
+                    if (err["exceptionEvent"]) {
+                        fired = true;
+                        this.parseAndFireEvent(err["event"], this.getComponent());
+                    } else {
+                        newErrors.push(err);
+                    }
+                }
+                if (fired === true && newErrors.length === 0) {
+                    newErrors.push({"message":"Event fired"});
+                }
+                response["error"] = newErrors;
+            }
+            if (this.cmp === undefined || this.cmp.isValid()) {
+                var cb = this.callbacks[this.getState()];
+
+                if (cb) {
+                    cb.fn.call(cb.s, this);
+                }
             }
         }
 
@@ -438,7 +508,7 @@ Action.prototype.refresh = function(originalResponse) {
             this.fireRefreshEvent(action, cmp, "refreshBegin");
 
             var refreshAction = action.getDef().newInstance(cmp);
-            refreshAction.setCallback(action.callbackScope, action.callback);
+            refreshAction.callbacks = action.callbacks;
             refreshAction.setParams(action.params);
             refreshAction.setStorable({
                 "ignoreExisting" : true
@@ -446,21 +516,10 @@ Action.prototype.refresh = function(originalResponse) {
 
             refreshAction.sanitizeStoredResponse(originalResponse);
             refreshAction.originalResponse = originalResponse;
-
-            var originalCallbackScope = action.callbackScope;
-            var originalCallback = action.callback;
-
-            refreshAction.setCallback(originalCallbackScope, function(a) {
-                if (originalCallback) {
-                    // Chain to the original callback to let it do its thing
-                    originalCallback.call(originalCallbackScope, a);
-                }
-
+            refreshAction.wrapCallback(this, function(a) {
                 a.fireRefreshEvent(a, cmp, "refreshEnd");
-
                 storageService.log("Action.refresh(): auto refresh end", a);
             });
-
             $A.enqueueAction(refreshAction);
         }
     }
@@ -507,6 +566,20 @@ Action.prototype.sanitizeStoredResponse = function(response) {
  */
 Action.prototype.getStorage = function() {
     return $A.storageService.getStorage("actions");
+};
+
+Action.prototype.parseAndFireEvent = function(evtObj) {
+    var descriptor = evtObj["descriptor"];
+
+    var evt = this.getComponent().getEventByDescriptor(descriptor);
+    if (evt !== null) {
+        if (evtObj["attributes"]) {
+            evt.setParams(evtObj["attributes"]["values"]);
+        }
+        evt.fire();
+    } else {
+        $A.clientService.parseAndFireEvent(evtObj);
+    }
 };
 
 /**

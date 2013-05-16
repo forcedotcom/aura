@@ -75,6 +75,7 @@ var Transport = function() {
             var request = createHttpRequest();
             var method = config["method"] || "GET";
             var qs;
+            var processed = false;
             if (config["params"]) {
                 qs = buildParams(config["params"]);
             }
@@ -85,7 +86,8 @@ var Transport = function() {
             }
             request["open"](method, url, true);
             request["onreadystatechange"] = function() {
-                if (request["readyState"] == 4) {
+                if (request["readyState"] == 4 && processed === false) {
+                    processed = true;
                     var aura_num = config["params"]["aura.num"];
                     $A.endMark("Received Response - XHR " + aura_num);
                     config["callback"].call(config["scope"] || window, request);

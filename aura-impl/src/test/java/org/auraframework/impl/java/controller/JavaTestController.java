@@ -32,6 +32,7 @@ import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.GenericEventException;
 import org.auraframework.util.date.DateOnly;
 
 import com.google.common.collect.ImmutableMap;
@@ -104,6 +105,16 @@ public class JavaTestController {
         } else {
             throw new RuntimeException();
         }
+    }
+    
+    @AuraEnabled
+    public static void throwsCSE(@Key("event") String event, @Key("paramName") String paramName,
+            @Key("paramValue") String paramValue) throws Throwable {
+        GenericEventException gee = new GenericEventException(event);
+        if (paramName != null) {
+            gee.addParam(paramName, paramValue);
+        }
+        throw gee;
     }
 
     @AuraEnabled

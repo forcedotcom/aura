@@ -203,18 +203,13 @@ var Test = function(){
             //
             // Cheate and directly access the action internals.
             //
-            var origCallback = a.callbackScope;
-            var origScope = a.callback;
-            a.setCallback(priv, function(action) {
-                    if (origCallback) {
-                        origCallback.call(origScope, action);
-                    }
-                    if (action.getState() === "SUCCESS") {
-                        priv.completed[myName] = "SUCCESS";
-                    } else {
-                        priv.completed[myName] = "FAILURE";
-                    }
-                });
+            a.wrapCallback(priv, function(action) {
+                if (action.getState() === "SUCCESS") {
+                    priv.completed[myName] = "SUCCESS";
+                } else {
+                    priv.completed[myName] = "FAILURE";
+                }
+            });
         },
 
         /**

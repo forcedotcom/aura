@@ -23,6 +23,7 @@ import java.util.Set;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.java.type.JavaValueProvider;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -81,6 +82,9 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
 
     @Override
     public Object initialize(Object config, BaseComponent<?, ?> valueProvider) throws QuickFixException {
+        if (config instanceof PropertyReference) {
+            return config;
+        }
 
         List<BaseComponent<?, ?>> components = new ArrayList<BaseComponent<?, ?>>();
         List<?> list = (List<?>) config;

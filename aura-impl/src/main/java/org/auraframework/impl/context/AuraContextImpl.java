@@ -21,7 +21,6 @@ import java.util.*;
 import javax.xml.stream.XMLStreamException;
 
 import org.auraframework.Aura;
-import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.AuraBaseServlet;
@@ -33,7 +32,6 @@ import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.InvalidEventTypeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.json.*;
 import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 

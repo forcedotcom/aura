@@ -16,22 +16,22 @@
 
 -->
 <aura:component  extends="ui:interactive" extensible="true" 
-	 description="A tabset component that allows swiping through groups of related content types in addition to standard keyboard, touch, and mouse interactions.">
+	 description="A tabset component that enables swiping through groups of related content types in addition to standard keyboard, touch, and mouse interactions.">
 
 		<aura:attribute name="title" type="String" description="Title of the carousel" />
-		<aura:attribute name="width" type="Integer" description="Width of the carousel" />
-		<aura:attribute name="height" type="Integer" description="Height of the carousel" />
+		<aura:attribute name="width" type="Integer" description="Width of the carousel in pixels" />
+		<aura:attribute name="height" type="Integer" description="Height of the carousel in pixels" />
 		<aura:attribute name="class" type="String" description="A CSS style to be attached to the carousel" />
-		<aura:attribute name="pageIndicatorPosition" type="String" default="top" description="Position of the page indicator. Acceptable values are 'top' and 'bottom'. " />
-		<aura:attribute name="defaultPage" type="Integer" description="Default page to display. Setting this will override the 'isDefault' attribute in the page" />
+		<aura:attribute name="pageIndicatorPosition" type="String" default="top" description="Position of the page indicator. Acceptable values are 'top' and 'bottom'." />
+		<aura:attribute name="defaultPage" type="Integer" description="Default page to display. Setting this will override the 'isDefault' attribute in the ui:carouselPage component." />
 		
-		<aura:attribute name="pageModels" type="Object[]" description="The page model used to create the carousel pages." />
+		<aura:attribute name="pageModels" type="Object[]" description="The model used to create a carousel page." />
 		<aura:attribute name="pageComponents" type="Aura.Component[]" description="Carousel page components that is rendered as carousel pages." />
 		
-		<aura:attribute name="priv_currentPage" type="Integer" description="PRIVATE the currently selected page index." />
-		<aura:attribute name="priv_carouselStyle" type="String" description="PRIVATE inline style of the carousel container." />
-		<aura:attribute name="priv_pageStyle" type="String" description="PRIVATE inline style of the carousel page. " />
-		<aura:attribute name="priv_scrollerWidth" type="String" description="PRIVATE" />
+		<aura:attribute name="priv_currentPage" type="Integer" description="PRIVATE - the currently selected page index." />
+		<aura:attribute name="priv_carouselStyle" type="String" description="PRIVATE - inline style of the carousel container." />
+		<aura:attribute name="priv_pageStyle" type="String" description="PRIVATE - inline style of the carousel page. " />
+		<aura:attribute name="priv_scrollerWidth" type="String" description="PRIVATE -  the scroller width in pixels." />
 		<aura:attribute name="priv_snap" type="String" description="PRIVATE"/>
 								
 		<aura:registerevent name="selectDefaultPage" type="ui:carouselPageEvent" description="The event fired when the default page is selected."/>

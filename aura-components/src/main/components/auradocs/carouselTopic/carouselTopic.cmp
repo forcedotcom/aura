@@ -16,15 +16,11 @@
 
 -->
 <aura:component extends="auradocs:topicPanel">
-    <aura:set attribute="title" value="Carousels" />
+    <aura:set attribute="title" value="Carousel" />
     <h3><code>ui:carousel</code></h3>
     <p><code>ui:carousel</code> is a carousel component that displays a list of items horizontally, enabling you to swipe through the list one item at a time. It provides page indicators as an alternate method for navigating through the items.
-    <code>ui:carousel</code> can contain the following components:</p>
-    <ul>
-    	<li><code>ui:carouselPage</code> - a page that contains <code>ui:carouselPageItem</code> components</li>
-    	<li><code>ui:carouselPageItem</code> - an item in a <code>ui:carouselPage</code> component</li>
-    </ul>
-    <p>You can add carousel pages using <code>&lt;aura:set attribute="pageComponents"&gt;</code>.</p>
+    You can use <code>ui:carouselPage</code> and <code>ui:carouselPageItem</code> components in a <code>ui:carousel</code> to create carousel pages and group items on a page.
+    To add carousel pages, use <code>&lt;aura:set attribute="pageComponents"&gt;</code> in the <code>ui:carousel</code> component.</p>
       <auradocs:info>See the <auradocs:defLink descriptor ="ui:carousel">ui:carousel</auradocs:defLink> component reference.</auradocs:info>
     <auradocs:example descriptor="auradocs:demoCarousel" />
 </aura:component>

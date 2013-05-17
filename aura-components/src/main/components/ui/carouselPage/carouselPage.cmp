@@ -21,11 +21,11 @@
     <aura:attribute name="isCacheable" default="true" type="Boolean" description="Indicates whether the page content is cacheable on client or not." />    
     <aura:attribute name="isDefault" default="false" type="Boolean" description="Determines if this is the default page to display." />
     
-    <aura:attribute name="pageModel" type="Object" description="Page model that is used to create components dynamically." />
-    <aura:attribute name="pageIndex" type="Integer" description="The index of this page it belongs to." />    
-    <aura:attribute name="parent" type="Aura.Component[]" description="Container of this page." />
-    <aura:attribute name="width" type="Integer" description="Width of the page. It is implicitly set after the page is rendered." />
-    <aura:attribute name="height" type="Integer" description="Height of the page. It is implicitly set after the page is rendered." />
+    <aura:attribute name="pageModel" type="Object" description="The model that is used to create components dynamically." />
+    <aura:attribute name="pageIndex" type="Integer" description="The index of this page." />    
+    <aura:attribute name="parent" type="Aura.Component[]" description="The page container." />
+    <aura:attribute name="width" type="Integer" description="Width of the page in pixels. This value is inherited from the ui:carousel 'width' attribute." />
+    <aura:attribute name="height" type="Integer" description="Height of the page in pixels. This value is inherited from the ui:carousel 'height' attribute." />
     <aura:attribute name="priv_ariaExpanded" default="false" type="Boolean" description="PRIVATE" />
     <aura:attribute name="priv_pageStyle" type="String" description="PRIVATE" />
     

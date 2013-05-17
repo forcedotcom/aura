@@ -21,10 +21,10 @@
     <ui:carousel width="250" height="300">
     <aura:set attribute="pageComponents">
         <ui:carouselPage>
-            <ui:carouselPageItem label="New Post 1" class="entity-post" />
-			<ui:carouselPageItem label="Task 1" class="entity-task" />
-			<ui:carouselPageItem label="New Opportunity 1" class="entity-opportunity" />	
-			<ui:carouselPageItem label="Thank Someone 1" class="entity-thanks" />
+            <ui:carouselPageItem label="New Post" class="entity-post" />
+			<ui:carouselPageItem label="New Task" class="entity-task" />
+			<ui:carouselPageItem label="New Opportunity " class="entity-opportunity" />	
+			<ui:carouselPageItem label="Thank Someone" class="entity-thanks" />
         </ui:carouselPage>
         <ui:carouselPage isDefault="true">
 			<ui:carouselPageItem label="New Post 2" class="entity-post" />

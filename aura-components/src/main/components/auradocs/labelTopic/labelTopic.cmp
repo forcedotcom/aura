@@ -16,7 +16,7 @@
 
 -->
 <aura:component extends="auradocs:topicPanel">
-    <aura:set attribute="title" value="Using Labels" />
+    <aura:set attribute="title" value="Label" />
 
    <p>A label describes the purpose of an input component. To set a label on an input component, use the <code>label</code> attribute.</p>
    

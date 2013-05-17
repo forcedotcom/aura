@@ -27,8 +27,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
-import org.auraframework.util.javascript.*;
-import org.auraframework.util.javascript.JavascriptWriter.CompressionLevel;
+import org.auraframework.util.javascript.CommonJavascriptGroupImpl;
+import org.auraframework.util.javascript.JavascriptProcessingError;
+import org.auraframework.util.javascript.JavascriptValidator;
 import org.auraframework.util.text.Hash;
 
 /**
@@ -189,12 +190,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
                     Writer writer = null;
                     try {
                         writer = new FileWriter(dest);
-                        CompressionLevel level = mode.getCompressionLevel();
-                        if (level != null) {
-                            level.compress(new StringReader(everything), writer, dest.getName());
-                        } else {
-                            writer.write(everything);
-                        }
+                        mode.getJavascriptWriter().compress(everything, writer, dest.getName());
                         writer.write('\n');
                     } finally {
                         if (writer != null) {

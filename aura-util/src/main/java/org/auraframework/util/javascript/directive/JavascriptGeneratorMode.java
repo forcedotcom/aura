@@ -15,50 +15,47 @@
  */
 package org.auraframework.util.javascript.directive;
 
-import org.auraframework.util.javascript.JavascriptWriter.CompressionLevel;
+import org.auraframework.util.javascript.JavascriptWriter;
 
 /**
- * Modes are for generating copies of javascript files suited for specific
- * purposes, the most basic being for development and production. TODO: need a
- * way to only allow production mode in production
+ * Modes are for generating copies of javascript files suited for specific purposes, the most basic being for
+ * development and production. TODO: need a way to only allow production mode in production
  */
 public enum JavascriptGeneratorMode {
 
     /**
-     * the mode thats usually used in your local build. leaves comments intact
-     * so you can read your code
+     * the mode thats usually used in your local build. leaves comments intact so you can read your code
      */
-    DEVELOPMENT("dev", true, CompressionLevel.CLOSURE_AURA_DEBUG),
+    DEVELOPMENT("dev", true, JavascriptWriter.CLOSURE_AURA_DEBUG),
 
     /**
      * enable the tracking of additional runtime statistics
      */
-    STATS("stats", true, CompressionLevel.CLOSURE_AURA_DEBUG),
+    STATS("stats", true, JavascriptWriter.CLOSURE_AURA_DEBUG),
 
     /**
-     * testing mode is for running ftests so you can expose private data or
-     * methods that need to be tested but are not normally exposed by the code
+     * testing mode is for running ftests so you can expose private data or methods that need to be tested but are not
+     * normally exposed by the code
      */
-    TESTING("test", true, CompressionLevel.CLOSURE_AURA_DEBUG),
+    TESTING("test", true, JavascriptWriter.CLOSURE_AURA_DEBUG),
 
+    TESTINGDEBUG("testdebug", true, JavascriptWriter.CLOSURE_AURA_DEBUG),
 
-    TESTINGDEBUG("testdebug", true, CompressionLevel.CLOSURE_AURA_DEBUG),
+    AUTOTESTING("auto", false, JavascriptWriter.CLOSURE_AURA_PROD),
 
-    AUTOTESTING("auto", false, CompressionLevel.CLOSURE_AURA_PROD),
-
-    AUTOTESTINGDEBUG("autodebug", true, CompressionLevel.CLOSURE_AURA_DEBUG),
+    AUTOTESTINGDEBUG("autodebug", true, JavascriptWriter.CLOSURE_AURA_DEBUG),
 
     /**
      * in production everything is compressed to reduce file size
      */
-    PRODUCTION("prod", false, CompressionLevel.CLOSURE_AURA_PROD, true),
+    PRODUCTION("prod", false, JavascriptWriter.CLOSURE_AURA_PROD, true),
     /**
-     * in ptest everything is compressed to reduce file size.
-     * This mode is used to conditionally include performance testing code.
+     * in ptest everything is compressed to reduce file size. This mode is used to conditionally include performance
+     * testing code.
      */
-    PTEST("ptest", false, CompressionLevel.CLOSURE_AURA_PROD, true),
+    PTEST("ptest", false, JavascriptWriter.CLOSURE_AURA_PROD, true),
 
-    PRODUCTIONDEBUG("proddebug", false, CompressionLevel.CLOSURE_AURA_PROD, true),
+    PRODUCTIONDEBUG("proddebug", false, JavascriptWriter.CLOSURE_AURA_PROD, true),
 
     /**
      * mode used for documentation (jsdoc), but never served in any context
@@ -72,17 +69,17 @@ public enum JavascriptGeneratorMode {
 
     private final String suffix;
     private final boolean comments;
-    private final CompressionLevel compressionLevel;
+    private final JavascriptWriter jsWriter;
     private final boolean prod;
 
-    private JavascriptGeneratorMode(String suffix, boolean comments, CompressionLevel compressionLevel) {
+    private JavascriptGeneratorMode(String suffix, boolean comments, JavascriptWriter compressionLevel) {
         this(suffix, comments, compressionLevel, false);
     }
 
-    private JavascriptGeneratorMode(String suffix, boolean comments, CompressionLevel compressionLevel, boolean prod) {
+    private JavascriptGeneratorMode(String suffix, boolean comments, JavascriptWriter compressionLevel, boolean prod) {
         this.suffix = suffix;
         this.comments = comments;
-        this.compressionLevel = compressionLevel;
+        this.jsWriter = compressionLevel;
         this.prod = prod;
     }
 
@@ -96,8 +93,8 @@ public enum JavascriptGeneratorMode {
     /**
      * @return true if the output should be compressed
      */
-    public CompressionLevel getCompressionLevel() {
-        return compressionLevel;
+    public JavascriptWriter getJavascriptWriter() {
+        return jsWriter == null ? JavascriptWriter.WITHOUT_CLOSURE : jsWriter;
     }
 
     /**
@@ -108,10 +105,9 @@ public enum JavascriptGeneratorMode {
     }
 
     /**
-     * There may be more than 1 mode used in production, this value should
-     * control whether the file is even generated in production environment (but
-     * it doesn't yet)
-     *
+     * There may be more than 1 mode used in production, this value should control whether the file is even generated in
+     * production environment (but it doesn't yet)
+     * 
      * @return true if the mode is used in production
      */
     public boolean allowedInProduction() {

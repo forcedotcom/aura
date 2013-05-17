@@ -16,7 +16,6 @@
 package org.auraframework.http;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -519,8 +518,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
         // only use closure compiler in prod mode, due to compile cost
         if (!(mode.isTestMode() || mode.isDevMode())) {
             StringWriter sw = new StringWriter();
-            List<JavascriptProcessingError> errors = JavascriptWriter.CompressionLevel.CLOSURE_SIMPLE.compress(
-                    new StringReader(ret), sw, key);
+            List<JavascriptProcessingError> errors = JavascriptWriter.CLOSURE_SIMPLE.compress(ret, sw, key);
             if (errors == null || errors.isEmpty()) {
                 // For now, just use the non-compressed version if we can't get
                 // the compression to work.

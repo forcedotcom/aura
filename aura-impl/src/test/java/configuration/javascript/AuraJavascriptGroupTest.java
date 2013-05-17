@@ -15,7 +15,6 @@
  */
 package configuration.javascript;
 
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Set;
@@ -78,10 +77,10 @@ public class AuraJavascriptGroupTest extends AuraImplTestCase {
         // Have to do it for All modes because each mode has specific settings
         // for comments and such
         for (JavascriptGeneratorMode mode : jsModes) {
-            if (mode.getCompressionLevel() != null) {
+            if (mode.getJavascriptWriter() != null) {
                 String jsContents = parser.generate(mode);
-                List<JavascriptProcessingError> errors = mode.getCompressionLevel().compress(
-                        new StringReader(jsContents), new StringWriter(), js.getStartFile().getName());
+                List<JavascriptProcessingError> errors = mode.getJavascriptWriter().compress(jsContents,
+                        new StringWriter(), js.getStartFile().getName());
                 for (JavascriptProcessingError e : errors) {
                     errorTxt.append(e.toString());
                 }

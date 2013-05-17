@@ -15,11 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component  extensible="true"  description=".">
+<aura:component  extensible="true"  description="A page indicator in a ui:carousel component.">
     
     <!--TODO: need to pass in only pageCount once aura:iteration component supports integer iteration -->
     <aura:attribute name="pageComponents" type="Aura.Component[]" description="The page components in the carousel"/>
-    <aura:attribute name="currentPage" type="Integer" description="Gets or sets the current page of the pager." />
+    <aura:attribute name="currentPage" type="Integer" description="The current page of the pager." />
         
     <aura:registerevent name="pagerClicked" type="ui:pagerClicked" />
     <aura:registerevent name="pagerKeyed" type="ui:pagerKeyed" />

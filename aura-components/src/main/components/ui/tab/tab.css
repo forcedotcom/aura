@@ -61,6 +61,10 @@
 	overflow:auto;
 }
 
+.THIS div.tabBody iframe{
+	min-height:300px;
+}
+
 .THIS div.tabBody.scrolling {
 	overflow: auto;
 }

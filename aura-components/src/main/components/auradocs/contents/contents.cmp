@@ -62,13 +62,14 @@
                 <auradocs:contentsNode text="Component Composition" id="nestedComponents"/>
                 <auradocs:contentsNode text="Component Body and Facets" id="helloFacets"/>
                 <auradocs:contentsNode text="Lazy Loading a Component" id="lazyload"/>
-                <auradocs:contentsNode text="Using UI Components">
-                    <auradocs:contentsNode text="Positioning UI Components" id="useLayout"/>
+                <auradocs:contentsNode text="Aura UI Components">
+                    <auradocs:contentsNode text="Positioning" id="useLayout"/>
                     <auradocs:contentsNode text="Getting User Input" id="useForm"/>
-                    <auradocs:contentsNode text="Using Labels" id="label"/>
-                    <auradocs:contentsNode text="Using Menus" id="useMenu"/>
-                    <auradocs:contentsNode text="Displaying Dialogs and Messages" id="useMessage"/>
-                    <auradocs:contentsNode text="Using Tabs and Scrollers" id="useTabs"/>
+                    <auradocs:contentsNode text="Label" id="label"/>
+                    <auradocs:contentsNode text="Carousel" id="carousel"/>
+                    <auradocs:contentsNode text="Menu" id="useMenu"/>
+                    <auradocs:contentsNode text="Dialog and Message" id="useMessage"/>
+                    <auradocs:contentsNode text="Tabs and Scroller" id="useTabs"/>
                 </auradocs:contentsNode>                
             </auradocs:contentsNode>
             <auradocs:contentsNode text="Expressions" >

@@ -15,16 +15,16 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:interactive"  extensible="true"  description="...">
+<aura:component extends="ui:interactive"  extensible="true"  description="A page indicator item in a ui:carouselPageIndicator component.">
       
    <aura:attribute name="pageIndex" type="Integer" description="The index of the page this component belongs to." />
    
    <aura:attribute name="priv_ariaSelected" type="Boolean" default="false" description="" />
    <aura:attribute name="priv_tabIndex" type="Integer" default="-1" description="" />
    
-   <aura:registerevent name="pagerClicked" type="ui:pagerClicked" />
-   <aura:registerevent name="pagerKeyed" type="ui:pagerKeyed" />
-   <aura:registerevent name="pageSelected" type="ui:carouselPageEvent" />
+   <aura:registerevent name="pagerClicked" type="ui:pagerClicked" description="The event fired when the pager is clicked." />
+   <aura:registerevent name="pagerKeyed" type="ui:pagerKeyed" description="The event fired when the pager is keyed." />
+   <aura:registerevent name="pageSelected" type="ui:carouselPageEvent" description="The event fired when the page is selected." />
     
    <aura:handler name="pageSelected"  action="{!c.onPageSelected}" />    
    <aura:handler name="click" action="{!c.clickHandler}" />

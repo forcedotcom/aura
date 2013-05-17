@@ -15,7 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:abstractList" support="proto">
+<aura:component extends="ui:abstractList" support="proto"
+    provider="java://org.auraframework.component.ui.ListProvider, js://ui.list">
 	<ul class="{!v.class}">
 	<aura:iteration items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}">
 		

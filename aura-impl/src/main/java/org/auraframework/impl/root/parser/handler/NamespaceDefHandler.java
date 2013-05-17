@@ -58,26 +58,26 @@ public class NamespaceDefHandler extends RootTagHandler<NamespaceDef> {
 
         String tag = getTagName();
 
-        if ("theme".equalsIgnoreCase(tag)) {
-            readThemeConfig();
+        if ("style".equalsIgnoreCase(tag)) {
+            readStyleConfig();
         } else {
             error("Found unexpected tag %s", tag);
         }
     }
 
-    private void readThemeConfig() throws XMLStreamException, QuickFixException {
+    private void readStyleConfig() throws XMLStreamException, QuickFixException {
 
         loop: while (xmlReader.hasNext()) {
             int next = xmlReader.next();
             switch (next) {
             case XMLStreamConstants.START_ELEMENT:
                 if ("tokens".equalsIgnoreCase(getTagName())) {
-                    builder.setThemeTokens(readConfigMap());
+                    builder.setStyleTokens(readConfigMap());
                 }
                 break;
             case XMLStreamConstants.END_ELEMENT:
-                if (!"theme".equalsIgnoreCase(getTagName())) {
-                    error("Expected end tag <%s> but found %s", "theme", getTagName());
+                if (!"style".equalsIgnoreCase(getTagName())) {
+                    error("Expected end tag <%s> but found %s", "style", getTagName());
                 }
                 // we hit our own end tag, so stop handling
                 break loop;

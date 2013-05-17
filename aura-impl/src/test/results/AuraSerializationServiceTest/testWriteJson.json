@@ -11,11 +11,11 @@
             "descriptor":"js://auratest.testComponent1",
             "render":
 function render_auratest_testComponent1(component) {
-        
+
     }
           }
         },
-        "themeDef":{
+        "styleDef":{
           "serId":4,
           "value":{
             "descriptor":"css://auratest.testComponent1",

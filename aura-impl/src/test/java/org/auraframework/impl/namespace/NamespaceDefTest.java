@@ -18,7 +18,7 @@ package org.auraframework.impl.namespace;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.NamespaceDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.service.DefinitionService;
@@ -63,14 +63,14 @@ public class NamespaceDefTest extends AuraImplTestCase {
         descriptor = defService.getDefDescriptor("namespaceDefTest", NamespaceDef.class);
         def = descriptor.getDef();
         assertNotNull(def);
-        assertEquals("red", def.getThemeTokens().get("FOO"));
+        assertEquals("red", def.getStyleTokens().get("FOO"));
     }
 
-    public void testThemeTokens() throws Exception {
+    public void testStyleTokens() throws Exception {
         DefinitionService defService = Aura.getDefinitionService();
-        ThemeDef themeDef = defService.getDefinition("namespaceDefTest.testThemeTokens", ThemeDef.class);
+        StyleDef styleDef = defService.getDefinition("namespaceDefTest.testStyleTokens", StyleDef.class);
         assertEquals(
-                ".namespaceDefTestTestThemeTokens {\n  background-color: red;\n  color: FOOL;\n  border-color: black;\n}\n",
-                themeDef.getCode(Type.WEBKIT));
+                ".namespaceDefTestTestStyleTokens {\n  background-color: red;\n  color: FOOL;\n  border-color: black;\n}\n",
+                styleDef.getCode(Type.WEBKIT));
     }
 }

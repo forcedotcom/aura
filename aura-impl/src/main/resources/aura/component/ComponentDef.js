@@ -26,7 +26,7 @@ function ComponentDef(config){
         this.hasRemoteDeps = true;
     }
     this.superDef = this.initSuperDef(config["superDef"]);
-    this.themeDef = config["themeDef"] ? new ThemeDef(config["themeDef"]) : undefined;
+    this.styleDef = config["styleDef"] ? new StyleDef(config["styleDef"]) : undefined;
 
     this.controllerDef = config["controllerDef"] ? componentService.getControllerDef(config["controllerDef"]) : undefined;
     this.modelDef = config["modelDef"] ? componentService.getModelDef(config["modelDef"]) : undefined;
@@ -201,45 +201,45 @@ ComponentDef.prototype.getProviderDef = function(){
 };
 
 /**
- * Gets all the ThemeDef objects, including inherited ones, for this ComponentDef.
- * @returns {ThemeDef}
+ * Gets all the StyleDef objects, including inherited ones, for this ComponentDef.
+ * @returns {StyleDef}
  */
-ComponentDef.prototype.getAllThemeDefs = function() {
-    return this.allThemeDefs;
+ComponentDef.prototype.getAllStyleDefs = function() {
+    return this.allStyleDefs;
 };
 
 /**
  * Gets the CSS class name to use for Components of this type.
- * Includes the class names from all ThemeDefs, including inherited ones, associated with this ComponentDef.
+ * Includes the class names from all StyleDefs, including inherited ones, associated with this ComponentDef.
  * If multiple class names are found, the return value is a space-separated list of class names.
  * This string can be applied directly to DOM elements rendered by Components of this type.
- * @returns {String} The theme class name
+ * @returns {String} The style class name
  */
-ComponentDef.prototype.getThemeClassName = function(){
-    var className = this.themeClassName;
+ComponentDef.prototype.getStyleClassName = function(){
+    var className = this.styleClassName;
     if(className === undefined){
         className = "";
-        var themeDefs = this.getAllThemeDefs();
-        if(themeDefs){
-            var themeDefLen = themeDefs.length;
-            for ( var t = 0; t < themeDefLen; t++) {
-                var themeDef = themeDefs[t];
-                className = className + themeDef.getClassName() + " ";
-                themeDef.apply();
+        var styleDefs = this.getAllStyleDefs();
+        if(styleDefs){
+            var styleDefLen = styleDefs.length;
+            for ( var t = 0; t < styleDefLen; t++) {
+                var styleDef = styleDefs[t];
+                className = className + styleDef.getClassName() + " ";
+                styleDef.apply();
             }
 
         }
-        this.themeClassName = className;
+        this.styleClassName = className;
     }
     return className;
 };
 
 /**
- * Gets the theme definition. Returns a ThemeDef object.
- * @returns {ThemeDef}
+ * Gets the style definition. Returns a StyleDef object.
+ * @returns {StyleDef}
  */
-ComponentDef.prototype.getThemeDef = function(){
-    return this.themeDef;
+ComponentDef.prototype.getStyleDef = function(){
+    return this.styleDef;
 };
 
 /**
@@ -394,7 +394,7 @@ ComponentDef.prototype.initSuperDef = function(config){
 };
 
 /**
- * Setup the theme defs and renderer details.
+ * Setup the style defs and renderer details.
  * @private
  */
 ComponentDef.prototype.initRenderer = function() {
@@ -402,8 +402,8 @@ ComponentDef.prototype.initRenderer = function() {
         distance: 0,
         rendererDef: this.rendererDef
     };
-    if (this.themeDef) {
-        this.allThemeDefs = [this.themeDef];
+    if (this.styleDef) {
+        this.allStyleDefs = [this.styleDef];
     }
     var s = this.superDef;
     if (s) {
@@ -413,12 +413,12 @@ ComponentDef.prototype.initRenderer = function() {
             rd.rendererDef = superStuff.rendererDef;
             rd.distance = superStuff.distance + 1;
         }
-        var superThemes = s.getAllThemeDefs();
-        if (superThemes) {
-            if (this.allThemeDefs) {
-                this.allThemeDefs = this.allThemeDefs.concat(superThemes);
+        var superStyles = s.getAllStyleDefs();
+        if (superStyles) {
+            if (this.allStyleDefs) {
+                this.allStyleDefs = this.allStyleDefs.concat(superStyles);
             } else {
-                this.allThemeDefs = superThemes;
+                this.allStyleDefs = superStyles;
             }
         }
     }

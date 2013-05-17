@@ -96,8 +96,8 @@ public class CSSParser {
      * 
      * @throws GssParserException
      */
-    public ThemeParserResultHolder parse() throws GssParserException, QuickFixException {
-        ThemeParserResultHolder resultHolder = new ThemeParserResultHolder();
+    public StyleParserResultHolder parse() throws GssParserException, QuickFixException {
+        StyleParserResultHolder resultHolder = new StyleParserResultHolder();
         SourceCode sc = new SourceCode(cssNamespace, contents);
         // parse the css tree
         GssParser parser = new GssParser(ImmutableList.of(sc));
@@ -115,7 +115,7 @@ public class CSSParser {
 
         try {
             NamespaceDef namespaceDef = Aura.getDefinitionService().getDefinition(namespace, NamespaceDef.class);
-            Map<String, String> nsDefs = namespaceDef.getThemeTokens();
+            Map<String, String> nsDefs = namespaceDef.getStyleTokens();
             if (nsDefs != null && !nsDefs.isEmpty()) {
                 for (Entry<String, String> entry : nsDefs.entrySet()) {
                     CssDefinitionNode def = new CssDefinitionNode(new CssLiteralNode(entry.getKey()));

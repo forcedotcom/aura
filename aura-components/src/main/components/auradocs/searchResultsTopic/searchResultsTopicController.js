@@ -15,7 +15,7 @@
  */
 {
 	displaySearch : function(cmp,event){
-		var searchURL = window.location; 
+		var searchURL = window.location;
 		var searchTerm = searchURL.hash.substr(37);
 		//Highlight search term in results
 		var bold = 1;
@@ -37,7 +37,7 @@
 		s[8] = "Positioning UI Components^useLayout^You can position your components easily using several Aura ui components. The ui:block component positions page elements horizontally, while the ui:vbox component positions them vertically...^left, right, body, north, south, div, aura:set";
 		s[9] = "Getting User Input^useForm^Aura provides out-of-the-box input components that enable you to easily retrieve and process user input with built-in features such as value binding and event handling...^attributes, controller, updateOn, error handling, events, ui:input, ui:inputText, ui:inputPhone, ui:inputEmail, ui:inputSecret, ui:inputURL, ui:inputDate, ui:inputTime, ui:inputNumber, ui:inputTextArea";
 		s[10]= "Using Menus^useMenu^ui:menu is a menu component that can contain a link which triggers the menu, ui:menuTriggerLink, and list items. You can wire up list items to actions in a client-side controller, so that selection of the item triggers an action. List items in the menu can be initialized from the menu's mode...^ui:menuItem, ui:actionMenuItem, ui:checkboxMenuItem, ui:radioMenuItem, ui:menuItemSeparator, dropdown, trigger, ui:menuTriggerLink";
-		
+
 		//Expressions
 		s[11]= "Expressions^expressions^Aura expressions allow you to make calculations and access property values and other data within Aura markup. Use expressions for dynamic output or passing values into components by assigning them to attributes...^variables, operators, primitive, integer, string, boolean, object, collection, controller, syntax";
 		s[12]= "Example Expressions^expressionsExamples^Here are a few examples of expressions used in Aura code that illustrate various interesting aspects of Aura expressions. Don't worry if you understand them completely yet, later sections will explain...^dynamic output, values, attributes, view, property values, model, passing values, conditional, true, false, aura:renderif";
@@ -53,7 +53,7 @@
 		s[22]= "Application Events^eventsApp^Application events follow a traditional publish-subscribe model. An application event is fired from an instance of a component...^handle events, register events, event notifier, aura:handler";
 		s[23]= "Events Demo^eventsDemo^Events Handling Lifecycle gives an overview of how events are handled in Aura. This topic leads you through an events demo. Before we see a component wired up to events, let's look at the individual files involved...^notifier, handler, container, fire event, application event, component event";
 		s[24]= "Firing Aura Events from Non-Aura Code^eventsExternal^You can fire an Aura event from JavaScript code outside an Aura app. For example, your Aura app might need to call out to some non-Aura code, and then have that code communicate back to the Aura code once it's done...^window.opener, master window, external js, fire externally";
-		
+
 		//Creating Apps
 		s[25]= "Designing App UI^designAppLayout^An Aura app is a special top-level component whose markup is in a .app file. The markup looks similar to HTML and can contain components as well as a set of supported HTML tags. Design your app's UI by including markup in the .app file, which starts with the <aura:application> tag...^sample app, notes.app, aura demo, aura:template, layout";
 		s[26]= "Creating App Templates^createAppTemplate^An app template bootstraps the loading of the Aura framework and the app. The default template is aura:template. Customize the default template by creating your own component that extends the default template...^sample app, aura:template, aura:application, js libraries, external CSS, extraStyleTags, aura:set, inlineStyle";
@@ -63,7 +63,7 @@
 		s[30]= "Using Layouts for Metadata-Driven Navigation^layouts^Layouts are a metadata-driven description of navigation in an application. You can describe in an XML file how you want the application to respond to changes to everything after the # (hash) in the URL. You can use Aura without layouts, but they offer a centralized location for managing URL-centric navigation...^container, aside, article, aura:layout, aura:layoutItem, sidebar, content, regex, regular expression, aura:layouts, custom events, override layout, layout handling, handle layout, layout service, AuraLayoutService, changeLocation, aura:layoutHandler";
 		s[31]= "Using Appcache^appcache^Application cache (AppCache) speeds up app response time and reduces server load by only downloading resources that have changed. It improves page loads affected by limited browser cache persistence on some devices. You can take advantage of application cache capabilities in Aura...^useAppcache, aura:application, cache, browser, load resources, load js, load css, manifest, preload";
 		s[32]= "Controlling Access with Security Providers^securityProviders^A security provider centralizes the security logic to control access to your app, including components and actions. The default security provider is aura/components/DefaultSecurityProvider.java... It doesn't allow access to any resources when the app is in PROD (production) mode...^securityprovider, security provider, interface, DefDescriptor, metadata";
-		
+
 		//Code
 		s[33]= "Code^code^The quick start introduces you to the structure of apps and components but there is no code beyond markup. This section helps you to start writing code...^JavaScript, Java, sample app, sample code";
 		s[34]= "JavaScript^codeJavaScriptIntro^Use JavaScript for client-side Aura code. The Aura object is the top-level object in the JavaScript framework code. For all the methods available in the Aura class, see Aura in the JavaScript API in the Reference tab. You can use $A in JavaScript code to denote the Aura object...^controller, helper, renderer, testing, DOM, API, mode";
@@ -95,7 +95,7 @@
 		s[50]= "Getting an Instance of a Component^javaInstanceCmp^An instance represents the data for a component. You want to get an instance of a component in Java code...^instanceservice, instance service, get instance, componentdef, map, attribute map";
 		s[51]= "Setting a Component ID^setIDdefref^You want to create a component with a local ID and attributes in Java code. If you want to create a component and set its local Id on the client, see Dynamically Creating Components...^componentdefrefbuilder, component definition reference, set id, set facet, set body, instance";
 		s[52]= "Aura Integration Service^auraIntegrationService^The Aura Integration Service enables plugging Aura components into non-Aura HTML containers without having to create an Aura app. Because Aura requires an app to start and to render components, the Aura Integration Service creates and manages an internal integration app and a security provider on your behalf for the components you're embedding. This makes it easy to use Aura components in an HTML-based application...^IntegrationService, createIntegration, injectComponent";
-		
+
 		//Beyond the Basics
 		s[53]= "What is inherited?^oodWhatsInherited^This topic lists what is inherited in Aura. All component attributes are inherited.  You can override an attribute in a sub-component using <aura:attribute>. However, you should only do this if you want to change the attribute's default value in the sub-component...^inheritance, object-oriented, controllers, events, helpers";
 		s[54]= "Inheritance Rules^oodInheritanceRules^This table descibes the inheritance rules for various elemnts in Aura...^interfaces, component inheritance";
@@ -111,9 +111,9 @@
 		s[64]= "Component Request Overview^cycleComp^Aura performs initial construction of a component on the server. The client completes the initialization process and manages any rendering or rerendering. Before we explore the component request process, it is important to understand these terms...^definition, defdescriptor, instance, registry, rendering, metadata, init";
 		s[65]= "Server-Side Process^cycleInit^A component lifecycle starts when the client sends an HTTP request to the server, which can be in the form http://<yourServer>/<namespace>/<component>.cmp. Attributes can be included in the query string, such as http://<yourServer>/<namespace>/<component>.cmp?title=Component1. If attributes are not specified, the defaults that are defined in the attribute definition are used...^registry, component definitions, init, instantiate, serialize";
 		s[66]= "Client-Side Process^clientInit^In Server-Side Process, we looked at what happens on the server when the client sends a request for a component. After the server processes the request, it returns the component definitions (metadata for the all required components) and instance tree (data) in JSON format...^deserialize, metadata, instance tree, rendering";
-		s[67]= "Component Request Glossary^cycleRefs^This glossary explains terms related to Aura definitions and registries...^definition, aura:component, root definition, componentdef, interfacedef, eventdef, controllerdef, modeldef, providerdef, rendererdef, themedef, testsuitedef, attributedef, registereventdef, actiondef, provider, defref, componentdefref, attributedefref, registry, defdescriptor";
+		s[67]= "Component Request Glossary^cycleRefs^This glossary explains terms related to Aura definitions and registries...^definition, aura:component, root definition, componentdef, interfacedef, eventdef, controllerdef, modeldef, providerdef, rendererdef, styledef, testsuitedef, attributedef, registereventdef, actiondef, provider, defref, componentdefref, attributedefref, registry, defdescriptor";
 		s[68]= "Querying State and Statistics^queryLang^To aid debugging and testing, you can use Aura's query language to see the current state of certain objects in a running app. The query language is available in your browser's console for all modes, except for PROD mode...^qhelp, console, view, query value objects, grouping, groupby, diffing, diff";
-		
+
 		//Reference
 		s[69]= "Javadoc^javadoc^Browse the Aura Javadoc by clicking Java API in the Reference tab.^JavaScript API";
 		s[70]= "aura:if^tagIf^aura:if renders the content within the tag if the isTrue attribute evaluates to true. Aura evaluates the isTrue expression on the server and instantiate components either in its body or else attribute...^aura:renderIf";
@@ -128,7 +128,7 @@
 		s[79]= "Custom Java Class Types^attrTypesJava^A aura:attribute can have a type corresponding to a Java class...^list, Java type, JsonSerializable, JSON";
 		s[80]= "Aura-Specific Types^attrTypesAuraSpecific^This table lists the supported type values for types that are specific to Aura...^Aura.Component, Aura.Action, action type, component type";
 		s[94]= "Setting Label Parameters^labelParameters^The aura:label component accepts parameters, allowing you to provide different values for the labels. This can be useful for localizing your labels...^$Label, label provider"
-		
+
 		//Quick Start
 		s[81]= "Create an Aura App from the Command Line^qsCmdLine^You can generate a basic Aura app quickly using the command line...^maven, archetype, aura template, jetty";
 		s[82]= "Create an Aura App in Eclipse^eclipseCreateApp^This section shows you how to create an Aura app in Eclipse using a Maven remote archetype...^archetype, maven, eclipse plugin";
@@ -136,7 +136,7 @@
 		s[84]= "Add a Component^eclipseCreateCmp^An Aura app is represented by a .app file composed of a series of Aura components and HTML tags. In Eclipse, we'll add a component to the simple app that we just created...^create component";
 		s[85]= "Build Aura from Source^buildFromSource^You don't have to build Aura from source to use it. However, if you want to customize the source code or submit a pull request with enhancements to the framework, here's how to do it...^download aura, git, run aura";
 		s[86]= "Aura Demo^buildApp^We built a simple app on the Aura framework to demonstrate its capabilities. Aura Note is a note-taking app showcasing the simplicity of building apps on Aura...^aura source";
-			
+
 		//FAQs
 		s[87]= "What are the benefits of using Aura?^faqBenefits^Performance, flexible integration, event-driven architecture, MVC architecture, parallel design and development^inheritance, encapsulation, object-oriented, cross browser, HTML5, CSS3, FAQ";
 		s[88]= "What is an Aura Component?^faqComp^Components are the self-contained and reusable units of an Aura app. They represent a reusable section of the UI, and can range in granularity from a single line of text to an entire app. Components are rendered to produce HTML DOM elements within the browser. The framework includes a rich set of prebuilt components. You can assemble and configure components to form new components in an app...^FAQ";
@@ -145,13 +145,13 @@
 		s[91]= "What happens when I make an initial request?^faqInit^When you make a request to load an application on a browser, Aura returns an HTTP response with a default template, denoted by the template attribute in the .app file. The template contains JavaScript tags that make requests to get your application data.^preload namespace, rendering, DOM, HTML";
 		s[92]= "Which browsers does Aura support?^faqBrowsers^Aura supports the most recent stable version of the following web browsers across major platforms, with exceptions noted...^Chrome, Safari, Firefox, IE, Internet Explorer, HTML, browser support";
 		s[93]= "What do Aura version numbers mean?^faqVersions^Aura uses version numbers that are consistent with other Maven projects. This makes it easy for projects built with Maven to express their dependency on Aura...^maven, build, snapshot, release build, getauraversion";
-			
-		
+
+
 		searchTerm = unescape(searchTerm);
-		
+
 		/**
 		 * Open-source JavaScript Search Kit 1.0
-		 * Supports double-quote exact matches 
+		 * Supports double-quote exact matches
 		 * and omitting of keywords with hyphens
 		 */
 		var od = searchTerm;
@@ -220,15 +220,15 @@
 			}
 			co = a;
 		}
-		
+
 		//Return search term
 		var searchTerm = cmp.getValue("v.searchTerm");
-		searchTerm.setValue(od);	
-		
+		searchTerm.setValue(od);
+
 		//Return number of results found
 		var queryCount = cmp.getValue("v.queryNum");
 		queryCount.setValue(co);
-		
+
 		//Return help text
 		var help = cmp.getValue("v.helpText");
 		if (co==0) {
@@ -243,22 +243,22 @@
 			var helpStr = "Narrow your search by using double quotes \"\" for exact keyword matches or omitting terms with a hyphen -. For example, instead of searching for \"component\", try searching for \"component attribute\" with double quotes or \"component -value\".";
 			help.setValue(helpStr);
 		}
-		
+
 		var myQuery = cmp.getValue("v.myQuery");
-		
+
 		//Create an array to store search results
 		var result = [];
-		
+
 		//Display results
 			for (var a=0; a < r.length; a++){
 				var os = r[a].split("^");
 				var br="<b>" + od + "</b>";
 				os[2] = os[2].replace(pat, br);
-			
+
 				//Set the format of the search result
-				result[a] = "<a href=\"#help?topic=" + os[1] + "\" />" + os[0] + "</a><br/>" + os[2];	
+				result[a] = "<a href=\"#help?topic=" + os[1] + "\" />" + os[0] + "</a><br/>" + os[2];
 			}
 			myQuery.setValue(result);
 	}
-			
+
 }

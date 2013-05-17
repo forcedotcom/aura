@@ -54,7 +54,7 @@
                 "serId":6,
                 "value":{
                   "descriptor":"markup://test:parent",
-                  "themeDef":{
+                  "styleDef":{
                     "serId":7,
                     "value":{
                       "descriptor":"css://test.parent",

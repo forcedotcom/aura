@@ -44,7 +44,7 @@ import org.auraframework.def.ModelDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefImpl;
@@ -104,8 +104,8 @@ public class AuraImplUnitTestingUtil {
         return DefDescriptorImpl.getInstance("js://test.renderer", RendererDef.class);
     }
 
-    public DefDescriptor<ThemeDef> getThemeDescriptor() {
-        return DefDescriptorImpl.getInstance("css://test.fakeComponent", ThemeDef.class);
+    public DefDescriptor<StyleDef> getStyleDescriptor() {
+        return DefDescriptorImpl.getInstance("css://test.fakeComponent", StyleDef.class);
     }
 
     public DefDescriptor<ApplicationDef> getApplicationDefDescriptor() {
@@ -501,7 +501,7 @@ public class AuraImplUnitTestingUtil {
             List<ComponentDefRef> children, Location location, DefDescriptor<ControllerDef> controllerDescriptor,
             DefDescriptor<ModelDef> modelDescriptor, DefDescriptor<ComponentDef> extendsDescriptor,
             Set<DefDescriptor<InterfaceDef>> interfaces, List<EventHandlerDef> eventHandlers,
-            DefDescriptor<ThemeDef> themeDescriptor, DefDescriptor<RendererDef> rendererDescriptor, boolean isAbstract,
+            DefDescriptor<StyleDef> styleDescriptor, DefDescriptor<RendererDef> rendererDescriptor, boolean isAbstract,
             boolean isExtensible) {
 
         ComponentDefImpl.Builder builder = new ComponentDefImpl.Builder();
@@ -540,7 +540,7 @@ public class AuraImplUnitTestingUtil {
         builder.extendsDescriptor = extendsDescriptor == null ? getParentComponentDefDescriptor() : extendsDescriptor;
         builder.interfaces = interfaces;
         builder.eventHandlers = eventHandlers;
-        builder.themeDescriptor = themeDescriptor == null ? getThemeDescriptor() : themeDescriptor;
+        builder.styleDescriptor = styleDescriptor == null ? getStyleDescriptor() : styleDescriptor;
         builder.addRenderer(rendererDescriptor == null ? getRendererDescriptor().getQualifiedName()
                 : rendererDescriptor.getQualifiedName());
         builder.isAbstract = isAbstract;

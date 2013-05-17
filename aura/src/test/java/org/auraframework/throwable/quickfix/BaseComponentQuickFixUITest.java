@@ -22,7 +22,7 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -62,7 +62,7 @@ public abstract class BaseComponentQuickFixUITest extends WebDriverTestCase {
         String cmpName = String.format("nonExistent%s%s", defType.name(), System.currentTimeMillis());
         DefDescriptor<?> defDescriptor = createComponentDefDescriptor(namespace, cmpName);
         DefDescriptor<?> defDescriptorCss = Aura.getDefinitionService().getDefDescriptor(namespace + "." + cmpName,
-                ThemeDef.class);
+                StyleDef.class);
         BaseComponentQuickFixWidget quickFixUIWidget;
         quickFixUIWidget = new BaseComponentQuickFixWidget(defType, this);
         try {

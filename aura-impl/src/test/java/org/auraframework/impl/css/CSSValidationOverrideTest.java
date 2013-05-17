@@ -18,72 +18,76 @@ package org.auraframework.impl.css;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.css.parser.ThemeParser;
+import org.auraframework.impl.css.parser.StyleParser;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.throwable.quickfix.ThemeParserException;
+import org.auraframework.throwable.quickfix.StyleParserException;
+
 /**
- * Automation to verify that CSS validation override.
- * Aura enforces validation of CSS in component bundles. This css validation can be
- * configured in a aura.conf file. The aura.conf file should be at one of the Java classpath roots of the aura projects.
- * For example aura-integration-test/src/test/java/aura.conf
- *  >aura.css.validate=true
+ * Automation to verify that CSS validation override. Aura enforces validation of CSS in component bundles. This css
+ * validation can be configured in a aura.conf file. The aura.conf file should be at one of the Java classpath roots of
+ * the aura projects. For example aura-integration-test/src/test/java/aura.conf >aura.css.validate=true
  */
 
 public class CSSValidationOverrideTest extends AuraImplTestCase {
-    DefDescriptor<ThemeDef> themeDefDesc;
-    public CSSValidationOverrideTest(String name){
+    DefDescriptor<StyleDef> styleDefDesc;
+
+    public CSSValidationOverrideTest(String name) {
         super(name);
     }
+
     @Override
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         super.setUp();
         DefDescriptor<ComponentDef> cmp = auraTestingUtil.addSourceAutoCleanup(ComponentDef.class,
-                String.format(baseComponentTag, "",""));
+                String.format(baseComponentTag, "", ""));
         assertNotNull(cmp.getDef());
-        themeDefDesc = Aura.getDefinitionService().getDefDescriptor(
+        styleDefDesc = Aura.getDefinitionService().getDefDescriptor(
                 String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, cmp.getNamespace(), cmp.getName()),
-                ThemeDef.class);
-        auraTestingUtil.addSourceAutoCleanup(themeDefDesc,
-                ".xyErrorText {"+
-                "color: #808080;"+
-                "padding-bottom: 5px;"+
-                "}"+
-                ".xyLabel {"+
-                "padding-right: 5px;"+
-        "}");
+                StyleDef.class);
+        auraTestingUtil.addSourceAutoCleanup(styleDefDesc,
+                ".xyErrorText {" +
+                        "color: #808080;" +
+                        "padding-bottom: 5px;" +
+                        "}" +
+                        ".xyLabel {" +
+                        "padding-right: 5px;" +
+                        "}");
     }
+
     /**
-     * By default all component CSS is validated by ThemeParser.
+     * By default all component CSS is validated by StyleParser.
      */
-    public void testDefaultProps(){
+    public void testDefaultProps() {
         assertTrue("By default all component CSS should be validated", Aura.getConfigAdapter().validateCss());
-        getInvalidThemeDef(true);
+        getInvalidStyleDef(true);
     }
 
     /**
      * Override the validateCss flag on configAdapter and make sure validations are skipped
      */
-    public void testOverrideCSSValidation(){
+    public void testOverrideCSSValidation() {
         getMockConfigAdapter().setValidateCss(false);
         assertFalse("Expected CSS validation to be overriden.", Aura.getConfigAdapter().validateCss());
-        getInvalidThemeDef(false);
+        getInvalidStyleDef(false);
     }
 
-    private void getInvalidThemeDef(boolean expectException){
+    private void getInvalidStyleDef(boolean expectException) {
         try {
-            ThemeParser.getInstance().parse(themeDefDesc,auraTestingUtil.getSource(themeDefDesc) );
-            if(expectException)
+            StyleParser.getInstance().parse(styleDefDesc, auraTestingUtil.getSource(styleDefDesc));
+            if (expectException)
                 fail("Expected CSS validation to be turned on and catch the invalid CSS");
-        } catch (ThemeParserException expected) {
-            if(!expectException){
+        } catch (StyleParserException expected) {
+            if (!expectException) {
                 fail("Did not expect to encounter CSS validation exception.");
-            }else{
-                assertTrue("Unexpected error message in ThemeParserException",
-                        expected.getMessage().contains("Issue(s) found by Parser:CSS selectors must include component class:"));
+            } else {
+                assertTrue(
+                        "Unexpected error message in StyleParserException",
+                        expected.getMessage().contains(
+                                "Issue(s) found by Parser:CSS selectors must include component class:"));
             }
-        } catch (QuickFixException e){
+        } catch (QuickFixException e) {
             fail("Test setup failed. Looking for component test.testInValidCSS with invalid CSS");
         }
     }

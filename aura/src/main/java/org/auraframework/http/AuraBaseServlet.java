@@ -38,7 +38,7 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
@@ -482,13 +482,13 @@ public abstract class AuraBaseServlet extends HttpServlet {
         try {
             DefinitionService definitionService = Aura.getDefinitionService();
             for (String namespace : namespaces) {
-                DefDescriptor<ThemeDef> matcher = definitionService.getDefDescriptor(
-                        String.format("css://%s.*", namespace), ThemeDef.class);
-                Set<DefDescriptor<ThemeDef>> descriptors = definitionService.find(matcher);
+                DefDescriptor<StyleDef> matcher = definitionService.getDefDescriptor(
+                        String.format("css://%s.*", namespace), StyleDef.class);
+                Set<DefDescriptor<StyleDef>> descriptors = definitionService.find(matcher);
 
-                for (DefDescriptor<ThemeDef> descriptor : descriptors) {
+                for (DefDescriptor<StyleDef> descriptor : descriptors) {
                     if (!descriptor.getName().toLowerCase().endsWith("template")) {
-                        ThemeDef def = descriptor.getDef();
+                        StyleDef def = descriptor.getDef();
                         if (def != null) {
                             Set<String> imgs = def.getValidImageURLs();
                             if (imgs != null && imgs.size() > 0) {

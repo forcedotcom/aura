@@ -53,7 +53,7 @@
                         <code>ModelDef</code><br/>
                         <code>ProviderDef</code><br/>
                         <code>RendererDef</code><br/>
-                        <code>ThemeDef</code><br/>
+                        <code>StyleDef</code><br/>
                         <code>TestSuiteDef</code>
                     </td>
                     <td>Associate definitions represent objects that are associated with a root definition.

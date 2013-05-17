@@ -21,7 +21,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.service.BuilderService;
 import org.auraframework.service.DefinitionService;
 
@@ -50,9 +50,9 @@ public class CreateApplicationDefQuickFix extends CreateBaseComponentDefQuickFix
             definitionService.save(def);
 
             if (getBooleanAttribute("client.css")) {
-                DefDescriptor<ThemeDef> themeDescriptor = definitionService.getDefDescriptor(def.getDescriptor(),
-                        "css", ThemeDef.class);
-                new CreateThemeDefQuickFix(themeDescriptor).fix();
+                DefDescriptor<StyleDef> styleDescriptor = definitionService.getDefDescriptor(def.getDescriptor(),
+                        "css", StyleDef.class);
+                new CreateStyleDefQuickFix(styleDescriptor).fix();
             }
             resetCache(def.getDescriptor());
         }

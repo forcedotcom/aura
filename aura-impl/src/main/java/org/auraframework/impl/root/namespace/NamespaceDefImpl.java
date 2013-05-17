@@ -32,12 +32,12 @@ import org.auraframework.util.json.Json;
 
 public class NamespaceDefImpl extends RootDefinitionImpl<NamespaceDef> implements NamespaceDef {
 
-	private static final long serialVersionUID = 7336912248343144688L;
-	private final Map<String, String> themeTokens;
+    private static final long serialVersionUID = 7336912248343144688L;
+    private final Map<String, String> styleTokens;
 
     protected NamespaceDefImpl(Builder builder) {
         super(builder);
-        this.themeTokens = AuraUtil.immutableMap(builder.themeTokens);
+        this.styleTokens = AuraUtil.immutableMap(builder.styleTokens);
     }
 
     @Override
@@ -53,17 +53,17 @@ public class NamespaceDefImpl extends RootDefinitionImpl<NamespaceDef> implement
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
-        for (String key : themeTokens.keySet()) {
+        for (String key : styleTokens.keySet()) {
             if (!key.equals(key.toUpperCase())) {
                 throw new InvalidDefinitionException(String.format(
-                        "All keys in theme tokens must be all caps.  %s is not.", key), getLocation());
+                        "All keys in style tokens must be all caps.  %s is not.", key), getLocation());
             }
         }
     }
 
     @Override
-    public Map<String, String> getThemeTokens() {
-        return this.themeTokens;
+    public Map<String, String> getStyleTokens() {
+        return this.styleTokens;
     }
 
     @Override
@@ -82,7 +82,7 @@ public class NamespaceDefImpl extends RootDefinitionImpl<NamespaceDef> implement
 
     public static class Builder extends RootDefinitionImpl.Builder<NamespaceDef> {
 
-        private Map<String, String> themeTokens;
+        private Map<String, String> styleTokens;
 
         public Builder() {
             super(NamespaceDef.class);
@@ -93,8 +93,8 @@ public class NamespaceDefImpl extends RootDefinitionImpl<NamespaceDef> implement
             return new NamespaceDefImpl(this);
         }
 
-        public Builder setThemeTokens(Map<String, String> themeTokens) {
-            this.themeTokens = themeTokens;
+        public Builder setStyleTokens(Map<String, String> styleTokens) {
+            this.styleTokens = styleTokens;
             return this;
         }
 

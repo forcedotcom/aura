@@ -16,5 +16,5 @@
 
 -->
 <aura:component isTemplate="true">
-    <!-- Used in test: ThemeParserTest.testTemplateCssValid() -->
+    <!-- Used in test: StyleParserTest.testTemplateCssValid() -->
 </aura:component>

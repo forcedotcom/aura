@@ -36,9 +36,9 @@ public class GetComponentImageURLs extends DefaultTreeVisitor implements CssComp
     private static final Function URL = Function.byName("url");
 
     private final MutatingVisitController visitController;
-    private final ThemeParserResultHolder resultHolder;
+    private final StyleParserResultHolder resultHolder;
 
-    public GetComponentImageURLs(MutatingVisitController visitController, ThemeParserResultHolder resultHolder) {
+    public GetComponentImageURLs(MutatingVisitController visitController, StyleParserResultHolder resultHolder) {
         this.visitController = visitController;
         this.resultHolder = resultHolder;
     }

@@ -22,6 +22,6 @@ public interface NamespaceDef extends RootDefinition {
     @Override
     public DefDescriptor<NamespaceDef> getDescriptor();
 
-    Map<String, String> getThemeTokens();
+    Map<String, String> getStyleTokens();
 
 }

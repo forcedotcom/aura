@@ -146,10 +146,10 @@ public class ApplicationDefOfflineHTMLFormatAdapter extends OfflineHTMLFormatAda
 
             attributes.put("auraScriptTags", sb.toString());
 
-            DefDescriptor<ThemeDef> themeDefDesc = templateDef.getThemeDescriptor();
-            if (themeDefDesc != null) {
+            DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
+            if (styleDefDesc != null) {
                 Client.Type type = context.getClient().getType();
-                attributes.put("auraInlineStyle", themeDefDesc.getDef().getCode(type));
+                attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode(type));
             }
 
             attributes.put("autoInitialize", false);

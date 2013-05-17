@@ -38,7 +38,7 @@ import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.TestSuiteDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Access;
@@ -57,7 +57,7 @@ public class RegistrySerializer {
     private final String[] namespaces;
     private final String outputFile;
 
-    private final List<String> templateThemes = Lists.newArrayList();
+    private final List<String> templateStyles = Lists.newArrayList();
 
     public RegistrySerializer(String outputFile, String[] namespaces) {
         this.outputFile = outputFile;
@@ -103,9 +103,9 @@ public class RegistrySerializer {
                         createRegistry(defService.getDefDescriptor(String.format("js://%s.*", namespace),
                                 RendererDef.class)), createRegistry(defService.getDefDescriptor(
                                 String.format("js://%s.*", namespace), TestSuiteDef.class)), createRegistry(defService
-                                .getDefDescriptor(String.format("css://%s.*", namespace), ThemeDef.class)),
+                                .getDefDescriptor(String.format("css://%s.*", namespace), StyleDef.class)),
                         createRegistry(defService.getDefDescriptor(String.format("templateCss://%s.*", namespace),
-                                ThemeDef.class)));
+                                StyleDef.class)));
     }
 
     @SuppressWarnings("unchecked")
@@ -120,21 +120,21 @@ public class RegistrySerializer {
                 def = desc.getDef();
                 Object componentDef = def;
                 ComponentDef cd = (ComponentDef) componentDef;
-                DefDescriptor<ThemeDef> themeDesc = cd.getThemeDescriptor();
-                if (themeDesc != null && "templateCss".equalsIgnoreCase(themeDesc.getPrefix())) {
-                    templateThemes.add(String.format("%s:%s", themeDesc.getNamespace(), themeDesc.getName()));
+                DefDescriptor<StyleDef> styleDesc = cd.getStyleDescriptor();
+                if (styleDesc != null && "templateCss".equalsIgnoreCase(styleDesc.getPrefix())) {
+                    templateStyles.add(String.format("%s:%s", styleDesc.getNamespace(), styleDesc.getName()));
                 }
                 break;
             case STYLE:
                 if (matcher.getPrefix().equalsIgnoreCase("css")) {
-                    if (templateThemes.contains(String.format("%s:%s", desc.getNamespace(), desc.getName()))) {
+                    if (templateStyles.contains(String.format("%s:%s", desc.getNamespace(), desc.getName()))) {
                         break;
                     }
                 } else if (matcher.getPrefix().equalsIgnoreCase("templateCss")) {
-                    if (!templateThemes.contains(String.format("%s:%s", desc.getNamespace(), desc.getName()))) {
+                    if (!templateStyles.contains(String.format("%s:%s", desc.getNamespace(), desc.getName()))) {
                         break;
                     } else {
-                        Object o = defService.getDefDescriptor(desc, "templateCSS", ThemeDef.class);
+                        Object o = defService.getDefDescriptor(desc, "templateCSS", StyleDef.class);
                         desc = (DefDescriptor<T>) o;
                     }
                 }

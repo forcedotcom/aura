@@ -36,8 +36,8 @@ import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.def.TestSuiteDef;
-import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -71,7 +71,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
     private static final String ATTRIBUTE_ISTEMPLATE = "isTemplate";
     private static final String ATTRIBUTE_IMPLEMENTS = "implements";
     private static final String ATTRIBUTE_EXTENDS = "extends";
-    private static final String ATTRIBUTE_THEME = "theme";
+    private static final String ATTRIBUTE_STYLE = "style";
     private static final String ATTRIBUTE_HELPER = "helper";
     private static final String ATTRIBUTE_RENDERER = "renderer";
     private static final String ATTRIBUTE_MODEL = "model";
@@ -82,7 +82,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
             .add(ATTRIBUTE_RENDER, ATTRIBUTE_TEMPLATE, ATTRIBUTE_PROVIDER,
                     ATTRIBUTE_EXTENSIBLE, ATTRIBUTE_ABSTRACT,
                     ATTRIBUTE_ISTEMPLATE, ATTRIBUTE_IMPLEMENTS,
-                    ATTRIBUTE_EXTENDS, ATTRIBUTE_THEME, ATTRIBUTE_HELPER,
+                    ATTRIBUTE_EXTENDS, ATTRIBUTE_STYLE, ATTRIBUTE_HELPER,
                     ATTRIBUTE_RENDERER, ATTRIBUTE_MODEL, ATTRIBUTE_CONTROLLER,
                     ATTRIBUTE_WHITESPACE)
             .addAll(RootTagHandler.ALLOWED_ATTRIBUTES).build();
@@ -189,7 +189,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
         AuraContext context = Aura.getContextService().getCurrentContext();
         context.setCurrentNamespace(builder.getDescriptor().getNamespace());
         Mode mode = context.getMode();
-        
+
         super.readAttributes();
         String controllerName = getAttributeValue(ATTRIBUTE_CONTROLLER);
         DefDescriptor<ControllerDef> controllerDescriptor = null;
@@ -244,7 +244,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
         }
 
         //
-        // TODO: W-1501702 
+        // TODO: W-1501702
         // Need to handle dual renderers for aura:placeholder
         //
         String rendererName = getAttributeValue(ATTRIBUTE_RENDERER);
@@ -281,20 +281,20 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
             }
         }
 
-        // See if there is a theme that has the same qname.
-        String themeName = getAttributeValue(ATTRIBUTE_THEME);
-        if (AuraTextUtil.isNullEmptyOrWhitespace(themeName)) {
-            themeName = String.format("css://%s.%s",
+        // See if there is a style that has the same qname.
+        String styleName = getAttributeValue(ATTRIBUTE_STYLE);
+        if (AuraTextUtil.isNullEmptyOrWhitespace(styleName)) {
+            styleName = String.format("css://%s.%s",
                     defDescriptor.getNamespace(), defDescriptor.getName());
         }
-        DefDescriptor<ThemeDef> cssDescriptor = DefDescriptorImpl.getInstance(
-                themeName, ThemeDef.class);
+        DefDescriptor<StyleDef> cssDescriptor = DefDescriptorImpl.getInstance(
+                styleName, StyleDef.class);
         if (cssDescriptor.exists()) {
-            builder.themeDescriptor = cssDescriptor;
+            builder.styleDescriptor = cssDescriptor;
         }
-        
-        //Do not consider Javascript Test suite defs in PROD and PRODDEBUG modes.
-        if(mode != Mode.PROD && mode != Mode.PRODDEBUG){
+
+        // Do not consider Javascript Test suite defs in PROD and PRODDEBUG modes.
+        if (mode != Mode.PROD && mode != Mode.PRODDEBUG) {
             // See if there is a test suite that has the same qname.
             DefDescriptor<TestSuiteDef> jsTestSuiteDescriptor = DefDescriptorImpl
                     .getInstance(jsControllerName, TestSuiteDef.class);
@@ -394,7 +394,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef>
         if (!body.isEmpty()) {
             AttributeDefRefImpl.Builder atBuilder = new AttributeDefRefImpl.Builder();
             atBuilder.setDescriptor(DefDescriptorImpl.getInstance(AttributeDefRefImpl.BODY_ATTRIBUTE_NAME,
-                            AttributeDef.class));
+                    AttributeDef.class));
             atBuilder.setLocation(getLocation());
             atBuilder.setValue(body);
             AttributeDefRef adr = atBuilder.build();

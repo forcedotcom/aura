@@ -36,7 +36,7 @@ import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -102,7 +102,7 @@ public final class TestComponent implements ComponentDef {
     }
 
     @Override
-    public DefDescriptor<ThemeDef> getThemeDescriptor() {
+    public DefDescriptor<StyleDef> getStyleDescriptor() {
         return null;
     }
 

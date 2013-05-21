@@ -550,25 +550,35 @@ $A.ns.Aura.prototype.error = function(e, stopTest) {
         try {
             throw Error("stack")
         } catch (getstack) {
-            str = e + "\n" + getstack.stack;
-            $A.log(getstack.stack);
+            var stacktrace = this.getStackTrace(getstack);
+            if (stacktrace) {
+                str = str + "\n" + stacktrace.join("\n");
+            }
+            $A.log(str);
         }
         //#end
-    } else if ($A.util.isObject(e) || $A.util.isError(e)) {
+    } else if ($A.util.isError(e)) {
+        str = e.message;
+        var stacktrace = this.getStackTrace(e);
+        if (stacktrace) {
+            str = str + "\n" + stacktrace.join("\n");
+        }
+    } else if ($A.util.isObject(e)) {
         // we treat error objects differently from object object, isObject means is it a map
         for(var k in e) {
             try {
                 var val = e[k];
 
                 if ($A.util.isString(val)) {
-                    str = str + '\n' + val;
+                    if (!str) {
+                        str = val;
+                    } else {
+                        str = str + '\n' + val;
+                    }
                 }
             } catch (e2) {
                 // Ignore serialization errors
             }
-        }
-        if (!str) {
-            str = e.message + e.stack;
         }
     } else {
         $A.log("Unrecognized parameter to aura.error", e);
@@ -822,19 +832,29 @@ $A.ns.Aura.prototype.rpad = function(str, padString, length) {
 };
 
 /**
- * Returns the stack trace, including the functions on the stack. Values are not logged.
+ * Returns the stack trace, including the functions on the stack if available (Error object varies across browsers).
+ * Values are not logged.
  *
  * @private
  */
 $A.ns.Aura.prototype.getStackTrace = function(e) {
+    var ret = null;
     if (e.stack) {
-        var ret = e.stack.replace(/(?:\n@:0)?\s+$/m, '');
+        ret = e.stack.replace(/(?:\n@:0)?\s+$/m, '');
         ret = ret.replace(new RegExp('^\\(', 'gm'), '{anonymous}(');
         ret = ret.split("\n");
-
-        return ret;
+    } else if (!$A.util.isIE && !$Browser.isIPhone && !$Browser.isIPad
+                    && !$A.util.isUndefinedOrNull(arguments)
+                    && !$A.util.isUndefinedOrNull(arguments.callee)
+                    && !$A.util.isUndefinedOrNull(arguments.callee.caller)) {
+        // Add two levels to our call stack if we can.
+        ret = e + "\n" + arguments.callee.caller;
+        if (!$A.util.isUndefinedOrNull(arguments.callee.caller.caller)) {
+            ret = ret + "\n" + arguments.callee.caller.caller;
+        }
+        ret = ret.split("\n");
     }
-    return null;
+    return ret;
 };
 
 /**

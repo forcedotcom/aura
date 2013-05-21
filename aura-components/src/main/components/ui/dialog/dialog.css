@@ -29,6 +29,8 @@
     opacity:0;
     z-index:99999;
 }
+.THIS.mask.default{
+}
 .THIS.fadeIn{
     opacity:1;
 }
@@ -40,7 +42,7 @@
 .THIS.modal{
     position:fixed;
 }
-.THIS.dialog{
+.THIS.dialog.default{
     background:#666;
     background:-webkit-gradient(linear,0% 0%,0% 100%,from(#888),to(#2A2A2A));
     background:-webkit-linear-gradient(#888,#444 1.4em,#444 75%,#111);
@@ -65,14 +67,16 @@
 .THIS.modal{
     top:-1px;
     left:50%;
-    border-radius:0 0 4px 4px;
-    box-shadow:0 0 25px rgba(255,255,255,.8);
     -webkit-transition:all 0.3s ease-in-out;
     -moz-transition:all 0.3s ease-in-out;
     transition:all 0.3s ease-in-out;
     -webkit-transform:translate3d(0,2600px,0);
     -moz-transform:translate3d(0,2600px,0);
     transform:translate3d(0,2600px,0);
+}
+.THIS.modal.default{
+	border-radius:0 0 4px 4px;
+    box-shadow:0 0 25px rgba(255,255,255,.8);
 }
 .THIS.modal.small{
     margin-left:-155px;
@@ -91,18 +95,18 @@
     -moz-transform:translate3d(0,0,0);
     transform:translate3d(0,0,0);
 }
-.THIS .title,
-.THIS .content,
-.THIS .buttons{
+.THIS.default .title,
+.THIS.default .content,
+.THIS.default .buttons{
     margin:10px;
 }
-.THIS .title{
+.THIS.default .title{
     color:#FFF;
     font-weight:bold;
     font-size:1.1em;
     text-shadow:0 -1px #000;
 }
-.THIS .content{
+.THIS.default .content{
     overflow:auto;
     -webkit-overflow-scrolling:touch;
     padding:10px;

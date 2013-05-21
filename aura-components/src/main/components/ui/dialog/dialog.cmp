@@ -29,9 +29,10 @@
 
     <!-- css, label, and title hooks -->
     <aura:attribute name="closeClass" type="String" description="Additional CSS classes to apply to the dialog close button, located in the upper right corner of the dialog window."/>
-    <aura:attribute name="closeLabel" type="String" default="X" description="The label of the dialog close button, located in the upper right corner of the dialog window."/>
+    <aura:attribute name="closeLabel" type="String" default="&times;" description="The label of the dialog close button, located in the upper right corner of the dialog window."/>
     <aura:attribute name="closeTitle" type="String" default="Close this window" description="The title attribute of the dialog close button, located in the upper right corner of the dialog window."/>
     <aura:attribute name="dialogClass" type="String" description="Additional CSS classes to apply to the dialog's outermost &lt;div&gt; wrapper."/>
+    <aura:attribute name="theme" type="String" default="default" description="Theme to apply to the dialog."/>
     <aura:attribute name="maskClass" type="String" description="Additional CSS classes to apply to the window mask located behind a modal dialog."/>
 
     <!-- private attributes -->
@@ -47,7 +48,7 @@
     </aura:if>
 
     <!-- dialog container -->
-    <div aura:id="outer" class="{!'dialog hidden ' + v.dialogClass + (v.isModal ? ' modal ' : ' ') + v.width}" role="{!v.ariaRole}" aria-live="assertive" aria-atmoic="true" aria-labelledby="{!globalId + '-title'}">
+    <div aura:id="outer" class="{!'dialog hidden ' + v.dialogClass + (v.isModal ? ' modal ' : ' ') + v.width +' '+ v.theme}" role="{!v.ariaRole}" aria-live="assertive" aria-atmoic="true" aria-labelledby="{!globalId + '-title'}">
 
         <!-- header -->
         <h2 aura:id="title" id="{!globalId + '-title'}" class="title">{!v.title}<span class="assistiveText"> {!v.description}</span></h2>
@@ -61,7 +62,7 @@
         </aura:if>
 
         <!-- close ("x") link - this DOM placement is intentional. DO NOT move, hide, or remove this element. see dialogManagerHelper#getFirstFocusableElement for more info -->
-        <ui:button aura:id="closeButton" class="{!'close ' + v.closeClass}" label="{!v.closeLabel}" buttonTitle="{!v.closeTitle}" press="{!c.close}"/>
+        <ui:button aura:id="closeButton" class="{!'close ' + v.closeClass}" label="{!v.closeLabel}" buttonTitle="{!v.closeTitle}" press="{!c.close}" theme="{!v.theme}"/>
 
     </div>
 

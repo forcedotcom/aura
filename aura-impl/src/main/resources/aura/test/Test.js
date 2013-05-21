@@ -428,6 +428,46 @@ var Test = function(){
         },
 
         /**
+         * internally used error function to log an error for a given test.
+         *
+         * @param {Object or String} e the error object or message.
+         */
+        auraError : function(e) {
+            if (!priv.putMessage(priv.preErrors, priv.expectedErrors, e)) {
+                $A.test.fail(e);
+            }
+        },
+
+        /**
+         * Tell the test that we expect an error.
+         *
+         * @param {String} e the error message that we expect.
+         */
+        expectAuraError : function(e) {
+            priv.expectMessage(priv.preErrors, priv.expectedErrors, e);
+        },
+
+        /**
+         * internally used error function to log an error for a given test.
+         *
+         * @param {String} w the warning message.
+         */
+        auraWarning : function(w) {
+            if (!priv.putMessage(priv.preWarnings, priv.expectedWarnings, w)) {
+                $A.log("Unexpected warning: "+w);
+            }
+        },
+
+        /**
+         * Tell the test that we expect a warning.
+         *
+         * @param {String} w the warning message that we expect.
+         */
+        expectAuraWarning : function(w) {
+            priv.expectMessage(priv.preWarnings, priv.expectedWarnings, w);
+        },
+
+        /**
          * Assert that if(condition) check evaluates to true.
          * @param {Object} condition
          * 				The condition to evaluate
@@ -786,20 +826,21 @@ var Test = function(){
          * 				The text content of the specified DOM node
          */
         getText : function(node) {
-        	var t;            
+            var t;
             //text nodes
             if(node.nodeType === 3){
             	t = node.nodeValue;
-            }            
-            else{
+            } else {
             	// chrome, safari, IE have this
-            	t = node.innerText;
-            
-            	// FF
-            	if($A.util.isUndefinedOrNull(t)){
-                	t = node.textContent;
-            	}
-            }         
+                t = node.innerText;
+
+		// FF & chrome with visibility set to false
+                if (node.textContent !== undefined) {
+                    if($A.util.isUndefinedOrNull(t) || t === ""){
+                        t = node.textContent;
+                    }
+                }
+            }
             return t;
         },
 
@@ -1086,37 +1127,37 @@ var Test = function(){
         },
 
         /**
-		 * Add an event handler. If component is specified, the handler will be applied to component events. If
-		 * component is not specified, the handler will be applied to application events.
-		 * 
-		 * @param {String}
-		 *            eventName The registered name, for component events; the descriptor name for application events.
-		 * @param {function}
-		 *            handler The function handler, which should expect the event as input.
-		 * @param {Object}
-		 *            component The component to add the handler on.
-		 */
-		addEventHandler : function(eventName, handler, component) {
-			if ($A.util.isUndefinedOrNull(component)) {
-				// application event handler
-				$A.eventService.addHandler({
-					'event' : eventName,
-					'globalId' : 'TESTHANDLER' + eventName,
-					'handler' : handler
-				});
+         * Add an event handler. If component is specified, the handler will be applied to component events. If
+         * component is not specified, the handler will be applied to application events.
+         *
+         * @param {String}
+         *            eventName The registered name, for component events; the descriptor name for application events.
+         * @param {function}
+         *            handler The function handler, which should expect the event as input.
+         * @param {Object}
+         *            component The component to add the handler on.
+         */
+        addEventHandler : function(eventName, handler, component) {
+            if ($A.util.isUndefinedOrNull(component)) {
+                // application event handler
+                $A.eventService.addHandler({
+                    'event' : eventName,
+                    'globalId' : 'TESTHANDLER' + eventName,
+                    'handler' : handler
+                });
 
-			} else {
-				// component event handler
-				// mock a ValueProvider that returns a synthetic action
-				component.addHandler(eventName, {
-					getValue : function() {
-						return {
-							run : handler
-						};
-					}
-				}, 'TESTHANDLER'); // expression is irrelevant
-			}
-		},
+            } else {
+                // component event handler
+                // mock a ValueProvider that returns a synthetic action
+                component.addHandler(eventName, {
+                    getValue : function() {
+                        return {
+                            run : handler
+                        };
+                    }
+                }, 'TESTHANDLER'); // expression is irrelevant
+            }
+        },
         
         // Used by tests to modify framework source to trigger JS last mod update
         /** @ignore */
@@ -1128,20 +1169,6 @@ var Test = function(){
             return priv.appCacheEvents;
         },
         
-        /**
-         * true if the test expecting to see a aura error message on the page.
-         */
-        isExpectingAuraError: function(){
-            return priv.expectAuraError;
-        },
-        /**
-         * Inform the aura framework that the test is expecting an aura error($A.error)
-         */
-        expectAuraError: function(flag){
-            if(!$A.util.isUndefined(flag)){
-        	priv.expectAuraError = !!flag;
-            }
-        },
         /**
          * Extract the error message from aura error div(the grey error message on the page)
          */

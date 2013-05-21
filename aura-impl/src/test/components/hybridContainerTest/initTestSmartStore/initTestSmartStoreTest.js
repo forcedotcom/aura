@@ -1,5 +1,5 @@
 ({
-    browsers: ['IPADCONTAINER'],
+    browsers: ['IPADCONTAINER', '-FIREFOX', '-GOOGLECHROME', '-SAFARI', '-IE7', '-IE8', '-IE9', '-IE10'],
 	/**
 	 * Only IPADCONTAINER is targeted because smartstore only runs inside a mobile container application, 
 	 * in-memory version of storageservice is used when running outside of the container. 

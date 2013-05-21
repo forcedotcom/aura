@@ -16,6 +16,7 @@
 package org.auraframework.component.aura;
 
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.controller.TestLoggingAdapterController;
 
 import java.util.Map;
@@ -40,6 +41,7 @@ public class LabelValueProviderUITest extends WebDriverTestCase {
      *
      * @throws Exception
      */
+    @UnAdaptableTest
     public void testEfficientActionRequests() throws Exception {
         TestLoggingAdapterController.beginCapture();
         open(URL);

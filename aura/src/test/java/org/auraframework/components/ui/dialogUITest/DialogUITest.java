@@ -31,7 +31,7 @@ import org.openqa.selenium.WebElement;
  *              IE7:    Does not work friendly with web-driver tabbing functionality or with $A.foreach
  *                      Test that use that do not test on IE. Manual testing has been done.
  *              IE8:    Does not work with $A.foreach. Manual testing has been done however
- *              Safari: Does not support tabbing when done through web driver. So the tests that require it 
+ *              Safari: Does not support tabbing/pressing enter when done through web driver. So the tests that require it 
  *                      have been removed.
  *                      
  * @author mkohanfars
@@ -39,9 +39,9 @@ import org.openqa.selenium.WebElement;
 
 public class DialogUITest  extends WebDriverTestCase {
     
-    private final String URL_MODAL= "uitest/dialogModalTest.cmp";
-    private final String URL_NON_MODAL= "uitest/dialogNonModalTest.cmp";
-    private final String URL_NON_MODAL_WITH_CHECKBOXES= "uitest/dialogNonModalWCheckboxesTest.cmp";
+    private final String URL_MODAL= "/uitest/dialogModalTest.cmp";
+    private final String URL_NON_MODAL= "/uitest/dialogNonModalTest.cmp";
+    private final String URL_NON_MODAL_WITH_CHECKBOXES= "/uitest/dialogNonModalWCheckboxesTest.cmp";
     private final String CLASSNAME = "return $A.test.getActiveElement().className";
     private final String TITLE = "return $A.test.getActiveElement().title";
     private final String SHIFT_TAB = Keys.SHIFT+""+Keys.TAB;
@@ -81,30 +81,6 @@ public class DialogUITest  extends WebDriverTestCase {
         String dialogDivClass = driver.findElement(By.cssSelector("div[class*='medium uiDialog']")).getAttribute("className");
         assertTrue("DialogBox did not appear on the screen",!dialogDivClass.contains("hidden"));
     }
-    /*
-     * Method opening up dialog box and getting to the first non CheckBox item
-     */
-    private void getToFirstButton(WebDriver driver, boolean clickOnInput){ 
-        String classOfActiveElem;
-        WebElement element;
-        
-        openDialogBox(driver);
-        
-        //Going through checkBoxes
-        for(int i=0;i<10;i++)
-        {
-            classOfActiveElem = "input[class*='"+ auraUITestingUtil.getEval(CLASSNAME)+"']";
-            element = driver.findElement(By.cssSelector(classOfActiveElem)); 
-            assertEquals("Did not move to next checkbox", element.getAttribute("class"), "checkbox"+(i+1)+" uiInputCheckbox uiInput");
-            
-            //Click on every other checkbox
-            if(clickOnInput && (i%2==0)){
-                element.click();
-            }
-            
-            auraUITestingUtil.pressTab(element);
-        }
-    }
     
     /*
      * Function that will check that the modal dialog box does not close when clicked outside the box 
@@ -124,7 +100,6 @@ public class DialogUITest  extends WebDriverTestCase {
     
     public WebElement moveToNextActiveElement(WebDriver driver){
         String classOfActiveElem = "button[title^='"+ auraUITestingUtil.getEval(TITLE)+"']";
-        //classOfActiveElem = "button[title^='"+ auraUITestingUtil.getEval(CLASSNAME)+"']";
         return driver.findElement(By.cssSelector(classOfActiveElem)); 
     }
     /***********************************************************************************************
@@ -161,22 +136,20 @@ public class DialogUITest  extends WebDriverTestCase {
         open(URL_NON_MODAL_WITH_CHECKBOXES);
        
         WebDriver driver = getDriver();
-        getToFirstButton(driver, true);
+        openDialogBox(driver);
         
-        //getting Cancel Button
-        WebElement element =  moveToNextActiveElement(driver);
-        assertEquals("Went through all check boxes but did not get to the cancel button", CANCEL_STR, element.getAttribute("title"));
-        auraUITestingUtil.pressTab(element);
+        String classOfActiveElem = "input[class*='"+ auraUITestingUtil.getEval(CLASSNAME)+"']";
+        WebElement element = driver.findElement(By.cssSelector(classOfActiveElem)); 
+        assertEquals("Did not move to next checkbox", element.getAttribute("class"), "checkbox1 uiInputCheckbox uiInput");
+        element.click();
         
-        //Getting Ok button
-        element =  moveToNextActiveElement(driver);
-        assertEquals("Got to the cancel button but did not tab to confirm button", CONFIRM_STR, element.getAttribute("title"));
-        
+        classOfActiveElem = "button[title*='"+CONFIRM_STR+"']";
+        element = driver.findElement(By.cssSelector(classOfActiveElem)); 
         auraUITestingUtil.pressEnter(element);
         
         //Getting the input text box to grab the value that was put in it
         element = driver.findElement(By.cssSelector(RESULT_LABEL));
-        assertEquals("Values that were selected don't match the output given","Pudding Bananas Cheese Water Bottles Computers",element.getAttribute("value"));
+        assertEquals("Values that were selected don't match the output given","Pudding",element.getAttribute("value"));
     }
     
     //Checking if Dialog box will will close after having all elements tabbed through

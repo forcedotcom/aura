@@ -15,21 +15,10 @@
  */
 ({
     /**
-     * Verify behavior by assigning a long value representing a date value in milliseconds since Epoch.
-     */
-    // W-1075522 https://gus.soma.salesforce.com/a07B0000000GCLaIAO
-    _testLongValueAndDefaultTimezoneAndDefaultFormat: {
-        attributes: {value : '1095957000000'},
-        test: function(component){
-            aura.test.assertEquals("09/23/2004 16:30:00 GMT", $A.test.getText(component.find('span').getElement()), "Incorrect date/time");
-        }
-    },
-    /**
      * Verify behavior when 'Value' attribute is assigned an empty string.
      */
-    //TODO W-984924 value must be set in markup. moved to js://uitest.outputCmps_EmptyStringValue for now.
-    _testEmptyStringValue: {
-        attributes: {value : ''},
+    testEmptyStringValue: {
+        attributes: {value: ''},
         test: function(component){
             aura.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Expected an empty span.");
         }
@@ -38,107 +27,87 @@
     /**
      * Verify behavior when 'Value' attribute is assigned a Garbage value.
      */
-    //TODO: W-967009
-    _testInvalidValue: {
-        attributes: {value : 'cornholio'},
+    testInvalidValue: {
+        attributes: {value: 'cornholio'},
         test: function(component){
-            aura.test.assertEquals("Value must be a value in milliseconds or bound to a java.util.Calendar model value", $A.test.getText(component.find('span').getElement()), "Expected an error message.");
+            aura.test.assertEquals("Invalid date time value", $A.test.getText(component.find('span').getElement()), "Value must be an ISO8601-formatted string or a number of milliseconds from Epoch.");
         }
     },
-
 
     /**
      * Verify behavior when 'timezone' attribute is assigned an empty string.
      */
     testEmptyStringForTimeZone:{
-        attributes: {value : '1095957000000', timezone: ''},
+        attributes: {value: '2004-09-23T16:30:00.000Z', timezone: '', format: 'M/dd/yy h:mm A'},
         test: function(component){
             aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used GMT as default timezone.");
         }
     },
+    
     /**
      * Verify behavior when 'timezone' is assigned a valid time zone.
      */
     testTimezoneByCity: {
-        attributes: {value : '1095957000000', timezone: 'America/Phoenix'},
+        attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'America/Phoenix', format: 'M/dd/yy h:mm A'},
         test: function(component){
             aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time, failed to use specified timezone");
       }
     },
-    testTimezoneByCode: {
-        attributes: {value : '1095957000000', timezone: 'MST'},
-        test: function(component){
-            aura.test.assertEquals("9/23/04 10:30 AM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time, failed to use specified timezone code");
-      }
-    },
+    
     testTimezoneObeysDayLightSaving: {
-        attributes: {value : '1095957000000', timezone: 'America/Los_Angeles'},
+        attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'America/Los_Angeles', format: 'M/dd/yy h:mm A'},
         test: function(component){
             aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time, failed to recognize that timezone has Daylight saving in effect.");
       }
     },
+    
     /**
      * Verify behavior when 'timezone' attribute is assigned a garbage value.
      */
     testInvalidTimezoneIsIgnored: {
-        attributes: {value : '1095957000000', timezone: 'sasquatch'},
+        attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'sasquatch', format: 'M/dd/yy h:mm A'},
         test: function(component){
             aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used GMT timezone by default.");
         }
     },
 
-
     /**
      * Verify behavior when 'format' attribute is assigned an empty string.
      */
-    testEmptyStringForFormat:{
-        attributes: {value : '1095957000000', format: ''},
+    testEmptyFormat:{
+        attributes: {value : '2004-09-23T16:30:00.000Z', format: ''},
         test:function(component){
-            aura.test.assertEquals("", $A.test.getText(component.find('span').getElement()), "Incorrect date/time format, should not have displaed anything.");
+            aura.test.assertEquals("2004-09-23 16:30", $A.test.getText(component.find('span').getElement()), "Incorrect date/time format.");
         }
     },
+    
     /**
      * Verify behavior when 'format' is given a valid time format.
      */
-    // W-1075522 https://gus.soma.salesforce.com/a07B0000000GCLaIAO
-    _testFormat: {
-        attributes: {value : '1095957000000', format: 'z ss:mm:HH MM dd yyyy'},
+    testFormat: {
+        attributes: {value : '2004-09-23T16:30:00.000Z', format: 'Z ss:mm:HH MM dd yyyy'},
         test: function(component){
-            aura.test.assertEquals("GMT 00:30:16 09 23 2004", $A.test.getText(component.find('span').getElement()), "Incorrect date/time format in display.");
+            aura.test.assertEquals("+00:00 00:30:16 09 23 2004", $A.test.getText(component.find('span').getElement()), "Incorrect date/time format in display.");
       }
     },
+    
     /**
      * Verify behavior when 'format' attribute is assigned a garbage value.
      */
     testInvalidFormat: {
-        attributes: {value : '1095957000000', format: 'cornholio'},
+        attributes: {value : '2004-09-23T16:30:00.000Z', format: 'cornoio'},
         test: function(component){
-            aura.test.assertEquals("You must provide a valid format: Illegal pattern component: c", $A.test.getText(component.find('span').getElement()), "Expected an error message.");
+            aura.test.assertEquals("cornoio", $A.test.getText(component.find('span').getElement()), "Invalid pattern character is output as it is.");
       }
     },
-
-    testDefaultDateStyle: {
-        attributes: {value: '1339121817481', timezone: 'GMT'},
-    test: function(component){
-       $A.test.assertEquals("6/8/12 2:16 AM", $A.test.getText(component.find('span').getElement()), "Date value does not match with default dateStyle 'short'");
-           $A.test.assertEquals("short", component.get("v.dateStyle"), "Incorrect default value set for attribute dateStyle");
-    }
-    },
-
-    testDefaultTimeStyle: {
-        attributes: {value: '1339121817481', timezone: 'GMT'},
-    test: function(component){
-       $A.test.assertEquals("6/8/12 2:16 AM", $A.test.getText(component.find('span').getElement()), "Date value does not match with default timeStyle 'short'");
-           $A.test.assertEquals("short", component.get("v.timeStyle"), "Incorrect default value set for attribute timeStyle");
-    }
-    },
-
-    testValueWithDateAndTimeStyle: {
-        attributes: {value: '1339121817481', timezone: 'GMT', dateStyle: 'full', timeStyle: 'full', format: 'EEE, d MMM yyyy HH:mm:ss'},
-    test: function(component){
-       $A.test.assertEquals("Fri, 8 Jun 2012 02:16:57", $A.test.getText(component.find('span').getElement()), "Date value does not match with dateStyle 'full'");
-           $A.test.assertEquals("full", component.get("v.dateStyle"), "Incorrect value set for attribute dateStyle");
-       $A.test.assertEquals("full", component.get("v.timeStyle"), "Incorrect value set for attribute timeStyle");
-    }
+    
+    /**
+     * Verify AM/PM in a non-English language.
+     */
+    testLanguage: {
+        attributes: {value : '2004-09-23T16:30:00.000Z', format: 'M/dd/yy h:mm A', langLocale: 'zh_CN', timezone: 'Asia/Shanghai'},
+        test: function(component){
+            aura.test.assertEquals("9/24/04 12:30 上午", $A.test.getText(component.find('span').getElement()), "Incorrect formatted datetime string.");
+        }
     }
 })

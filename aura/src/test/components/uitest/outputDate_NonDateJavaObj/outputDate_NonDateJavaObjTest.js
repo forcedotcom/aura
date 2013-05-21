@@ -17,7 +17,7 @@
     testNonDateJavaObj:{
         test:function(cmp){
             var testCmp = cmp.find('NonDateFromJava');
-            aura.test.assertEquals("Value must be bound to a model value that resolves to a java.util.Date", $A.test.getText(testCmp.find('span').getElement()), "Expected an error message");
+            aura.test.assertEquals("Model", $A.test.getText(testCmp.find('span').getElement()), "Expected the original value");
         }
     }
 })

@@ -22,9 +22,10 @@
         // normalize format
         var format = component.get("v.format");
         if (format) {
-            format = format.replace(/y/g, "Y").replace(/d/g, "D");
+            format = format.replace(/y/g, "Y").replace(/d/g, "D").replace(/E/g, "d").replace(/a/g, "A");
             component.setValue("v.format", format);
         }
+        // TODOL get default format and timezone from LocaleValueProvider
     },
     
     openDatePicker: function(cmp, event, helper) {
@@ -32,7 +33,9 @@
     },
     
     setValue: function(component, event, helper) {
-        var value = component.get("v.value");
+        var outputCmp = component.find("inputText");
+        var elem = outputCmp ? outputCmp.getElement() : null;
+        var value = elem ? elem.value : null;
         var format = component.get("v.format");
         var hours = 0
         var mins = 0;
@@ -56,7 +59,17 @@
                                   mins,
                                   secs,
                                   ms);
-        var m = moment.utc(targetTime).lang(helper.getLangLocale(component));
-        component.setValue("v.value", m.format(format));
+        var d = new Date(targetTime);
+        var ret = d.toISOString();
+        var timezone = component.get("v.timezone");
+        if (timezone != "GMT") {
+            try {
+                var utcDate = WallTime.WallTimeToUTC(timezone, d); // timezone info should already be loaded
+                ret = utcDate.toISOString();
+            } catch (e) {
+                // The timezone id is invalid or for some reason, we can't get timezone info.
+            }
+        }
+        component.setValue("v.value", ret);
     }
 })

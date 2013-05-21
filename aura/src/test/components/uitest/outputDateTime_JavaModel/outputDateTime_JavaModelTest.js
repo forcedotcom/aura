@@ -15,14 +15,13 @@
  */
 ({
     /**
-     * Verify that outputDateTime can accept Calendar object from java model and display it.
+     * Verify that outputDateTime can accept ISO8601 format from java model and display it.
      */
-    // W-1075522 https://gus.soma.salesforce.com/a07B0000000GCLaIAO
-    _testCalendarValueFromJavaModel:{
+    testDateTimeISOValueFromJavaModel:{
         test:function(cmp){
-            var testCmp = cmp.find('calendarFromJava');
+            var testCmp = cmp.find('ISOStringFromJava');
             aura.test.assertNotNull(testCmp);
-            aura.test.assertEquals('10/23/2004 16:30:00 GMT', $A.test.getText(testCmp.find('span').getElement()), "Failed to display DateTime from Java model");
+            aura.test.assertEquals('10/23/2004 16:30:00 +00:00', $A.test.getText(testCmp.find('span').getElement()), "Failed to display DateTime from Java model");
         }
     },
     /**
@@ -30,9 +29,9 @@
      */
     testCalendarValueWithTimeZoneOverride:{
         test:function(cmp){
-        var testCmp = cmp.find('calendarFromJavaWithTZOverride');
+        var testCmp = cmp.find('ISOStringFromJavaWithTZOverride');
         aura.test.assertNotNull(testCmp);
-        aura.test.assertEquals('2005-07-04 09:30:00 MST', $A.test.getText(testCmp.find('span').getElement()), "Failed to display DateTime from Java model");
+        aura.test.assertEquals('2004-10-23 09:30:00', $A.test.getText(testCmp.find('span').getElement()), "Failed to display DateTime from Java model");
         }
     }
 })

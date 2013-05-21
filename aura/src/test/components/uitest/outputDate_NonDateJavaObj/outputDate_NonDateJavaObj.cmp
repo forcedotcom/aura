@@ -16,5 +16,5 @@
 
 -->
 <aura:component model='java://org.auraframework.impl.java.model.TestJavaModel'>
-    <ui:outputDate value='{!m.calendar}'  aura:id='NonDateFromJava' />
+    <ui:outputDate value='{!m.string}'  aura:id='NonDateFromJava' />
 </aura:component>

@@ -22,7 +22,7 @@ import java.util.*;
 import org.auraframework.components.ui.InputOption;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
-import org.auraframework.util.date.DateOnly;
+import org.auraframework.util.date.*;
 
 import com.google.common.collect.Maps;
 
@@ -63,6 +63,21 @@ public class TestJavaModel {
             categoryOption.add(new InputOption("", "", false, "opt3-sub2"));
         }
         return categoryOption;
+    }
+    
+    @AuraEnabled
+    public String getDateTimeISOString() {
+        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"), Locale.US);
+        c.set(2004, 9, 23, 16, 30, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        DateService dateService = DateServiceImpl.get();
+        return dateService.getDateTimeISO8601Converter().format(c.getTime());
+    }
+    
+    @AuraEnabled
+    public Long getTimestamp() {
+        Date d = new Date(1095957000000L);
+        return d.getTime();
     }
 
     @AuraEnabled

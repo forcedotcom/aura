@@ -17,7 +17,7 @@
     doInit: function(component, event, helper) {
         var format = component.get("v.format");
         if (format) {
-            format = format.toUpperCase();
+            format = format.replace(/y/g, "Y").replace(/d/g, "D").replace(/E/g, "d").replace(/a/g, "A");
             component.setValue("v.format", format);
         }
         var value = component.get("v.value");

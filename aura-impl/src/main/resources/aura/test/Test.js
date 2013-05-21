@@ -1056,6 +1056,39 @@ var Test = function(){
         	return attrValue;
         },
 
+        /**
+		 * Add an event handler. If component is specified, the handler will be applied to component events. If
+		 * component is not specified, the handler will be applied to application events.
+		 * 
+		 * @param {String}
+		 *            eventName The registered name, for component events; the descriptor name for application events.
+		 * @param {function}
+		 *            handler The function handler, which should expect the event as input.
+		 * @param {Object}
+		 *            component The component to add the handler on.
+		 */
+		addEventHandler : function(eventName, handler, component) {
+			if ($A.util.isUndefinedOrNull(component)) {
+				// application event handler
+				$A.eventService.addHandler({
+					event : eventName,
+					globalId : 'TESTHANDLER' + eventName,
+					handler : handler
+				});
+
+			} else {
+				// component event handler
+				// mock a ValueProvider that returns a synthetic action
+				component.addHandler(eventName, {
+					getValue : function() {
+						return {
+							run : handler
+						};
+					}
+				}, 'TESTHANDLER'); // expression is irrelevant
+			}
+		},
+        
         // Used by tests to modify framework source to trigger JS last mod update
         /** @ignore */
         dummyFunction : function(){

@@ -71,7 +71,6 @@ exp(p,
     "objectKeys", p.objectKeys,
     
     // actions
-    
     "callServerAction", p.callServerAction,
     "isActionPending", p.isActionPending,
     "allActionsComplete", p.allActionsComplete,
@@ -82,6 +81,9 @@ exp(p,
     "getAction", p.getAction,
     "getExternalAction", p.getExternalAction,
 
+    // events
+    "addEventHandler", p.addEventHandler,
+    
     // internal functions
     "run", run,
     "getDump", getDump,

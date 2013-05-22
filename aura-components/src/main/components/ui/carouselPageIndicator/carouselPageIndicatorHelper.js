@@ -15,31 +15,38 @@
  */
 
 {
-	handleScrollChange: function (cmp, event) {		
+	onPageSelected: function (cmp, evt) {
 		
         var currentPage = cmp.get("v.currentPage"),
         	pages = cmp.get("v.pageComponents"),
-        	targetPage =  event.getParam("currentPageX");
-        
-        if (targetPage < pages.length && targetPage >= 0) {
-        	var pageItems = cmp.find('indicatorItems'),        	
-        		e;
-        	
+        	//page index starts at 1
+        	targetPage =  evt.getParam("pageIndex") - 1,
+        	e,
+        	pageItems = cmp.find('indicatorItems');
+
+        if (pages && pages.length == 1) {
+        	//fire event to target indicator item
+        	e = pageItems.get("e.pageSelected");
+			e.setParams(evt.getParams())
+			e.fire();
+			cmp.getValue('v.currentPage').setValue(targetPage); 
+        }
+        else if (pages && pages.length > 1 && targetPage < pages.length && targetPage >= 0) {        	        	
     		if (typeof currentPage != 'undefined') {
+    			//fire event to previous selected indicator item
     			e = pageItems[currentPage].get("e.pageSelected");
-    			e.setParams({pageIndex: targetPage})
+    			e.setParams(evt.getParams())
     			e.fire();
     		}
     		        	   	
         	pageItems[targetPage].getElement().focus();
         	         	
+        	//fire event to target indicator item
         	e = pageItems[targetPage].get("e.pageSelected");
-			e.setParams({pageIndex: targetPage})
+			e.setParams(evt.getParams())
 			e.fire();
              
         	cmp.getValue('v.currentPage').setValue(targetPage);        	
-        }
-        
-        return true;        
+        }       
     } 
 }

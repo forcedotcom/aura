@@ -15,23 +15,30 @@
     limitations under the License.
 
 -->
+ 
 <aura:component extends="ui:interactive"  extensible="true"  description="A page indicator item in a ui:carouselPageIndicator component.">
-      
+ 
    <aura:attribute name="pageIndex" type="Integer" description="The index of the page this component belongs to." />
+   <aura:attribute name="title" type="String" description="The title of the page." />
+   <aura:attribute name="ariaControlId" type="String" default="{!'carousel-page-' + pageIndex}"
+   		description="The id that reference the dom id of the top level page element."  />
    
-   <aura:attribute name="priv_ariaSelected" type="Boolean" default="false" description="" />
-   <aura:attribute name="priv_tabIndex" type="Integer" default="-1" description="" />
+   <aura:attribute name="priv_ariaSelected" type="Boolean" default="false" description="PRIVATE - aria-selected boolean" />
+   <aura:attribute name="priv_ariaControlId" type="String" description="PRIVATE - Aria control ID." />
+   <aura:attribute name="priv_tabIndex" type="Integer" default="-1" description="PRIVATE - tab index" />
+   <aura:attribute name="priv_pageComponent" type="Object" description="PRIVATE - Carousel page component." />
    
    <aura:registerevent name="pagerClicked" type="ui:pagerClicked" description="The event fired when the pager is clicked." />
    <aura:registerevent name="pagerKeyed" type="ui:pagerKeyed" description="The event fired when the pager is keyed." />
    <aura:registerevent name="pageSelected" type="ui:carouselPageEvent" description="The event fired when the page is selected." />
     
+   <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
    <aura:handler name="pageSelected"  action="{!c.onPageSelected}" />    
    <aura:handler name="click" action="{!c.clickHandler}" />
     <!-- aria-controls attribute is linked to the section id attribute in the page -->  
-    <a aura:id="pageItem" class="carousel-nav-item" tabindex="{!v.priv_tabIndex}" role="tab" 
-    	aria-controls="{!'carousel-page-' + v.pageIndex}" aria-selected="{!v.priv_ariaSelected}"
+    <a aura:id="pageItem" class="{!v.class + ' carousel-nav-item'}" tabindex="{!v.priv_tabIndex}" role="tab" 
+    	aria-controls="{!v.priv_ariaControlId}" aria-selected="{!v.priv_ariaSelected}"
     	onkeydown="{!c.keyHandler}" >
-		<span class="visually-hidden">Page {!v.pageIndex}</span>
+		<span class="visually-hidden">{!v.title}</span>
   	</a>
 </aura:component>    

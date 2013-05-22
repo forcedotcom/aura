@@ -18,7 +18,7 @@
 .THIS   {
  	position: relative;
 	background: #2e4153;
-	display: block;
+	display: block;		
  }
  
  .THIS .carousel-nav-container {
@@ -34,7 +34,7 @@
  	position: relative;
  	clear: both;	
 	overflow: hidden;
-	white-space: nowrap;
+	white-space: nowrap;	 	
  }
  
  .THIS .carousel-pages .page-list { 
@@ -64,5 +64,8 @@
  	vertical-align: top;    
  }
  
+ .THIS .full-height {
+ 	height: 100%;
+ }
  
  

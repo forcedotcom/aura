@@ -15,6 +15,19 @@
  */
 
 {
+	onInit: function(cmp, evt, helper) {
+		var pageCmp = cmp.get('v.priv_pageComponent'),
+			title;
+		
+		if (pageCmp && pageCmp.get('v.title')) {			
+			title = pageCmp.get('v.title');			
+		} else {				
+			title = 'Page ' + cmp.get('v.pageIndex');			
+		}
+		
+		cmp.getValue('v.title').setValue(title);
+	},
+	
 	clickHandler: function (cmp, evt, helper) {
         var compEvent = cmp.getEvent("pagerClicked"),        	
         	pageIndex = cmp.get("v.pageIndex");
@@ -31,14 +44,22 @@
         compEvent.fire();
     },
     
-    onPageSelected: function(cmp, evt, helper) {  
+    onPageSelected: function(cmp, evt, helper) {
 		var selectedPage = evt.getParam('pageIndex'),
+			pageId = evt.getParam('pageId'),
 			curPage = cmp.get('v.pageIndex'),
-			selectedItemCss = 'carousel-nav-item-selected',		
-			method = selectedPage == curPage ? 'addClass' : 'removeClass';
-
-		$A.util[method](cmp.getElement(), selectedItemCss);		
-    	cmp.getValue("v.priv_ariaSelected").setValue(selectedPage == curPage);    	
-    	cmp.getValue("v.priv_tabIndex").setValue(selectedPage == curPage ? 0 : -1);
+			selectedItemCss = 'carousel-nav-item-selected';
+		
+    	if (selectedPage == curPage) {
+    		cmp.getValue("v.priv_ariaControlId").setValue(pageId);
+    		cmp.getValue("v.priv_ariaSelected").setValue(true);
+    		cmp.getValue("v.priv_tabIndex").setValue(0);
+    		$A.util.addClass(cmp.getElement(), selectedItemCss);
+    	} else {
+    		cmp.getValue("v.priv_ariaControlId").setValue('');
+    		cmp.getValue("v.priv_ariaSelected").setValue(false);
+    		cmp.getValue("v.priv_tabIndex").setValue(-1);
+    		$A.util.removeClass(cmp.getElement(), selectedItemCss);
+    	}
     }
 }

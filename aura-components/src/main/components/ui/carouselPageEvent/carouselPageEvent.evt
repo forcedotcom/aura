@@ -19,4 +19,6 @@
 	<aura:attribute name="pageModel" type="Object" />
 	<aura:attribute name="pageComponent" type="Object" />
 	<aura:attribute name="pageIndex" type="Integer" />
+	<aura:attribute name="pageId" type="String" />
+	<aura:attribute name="pageSize" type="Object" />
 </aura:event>

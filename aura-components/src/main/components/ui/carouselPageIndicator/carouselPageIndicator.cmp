@@ -19,15 +19,20 @@
     
     <!--TODO: need to pass in only pageCount once aura:iteration component supports integer iteration -->
     <aura:attribute name="pageComponents" type="Aura.Component[]" description="The page components in the carousel"/>
+
     <aura:attribute name="currentPage" type="Integer" description="The current page of the pager." />
-        
+
     <aura:registerevent name="pagerClicked" type="ui:pagerClicked" />
     <aura:registerevent name="pagerKeyed" type="ui:pagerKeyed" />
+    <aura:registerevent name="pageSelected" type="ui:carouselPageEvent" />
              
+    <aura:handler name="pageSelected" action="{!c.onPageSelected}" />
+    
     <ul class="carousel-nav-items" role="presentation">		
 	    <aura:iteration items="{!v.pageComponents}" var="page" indexVar="index">
 	    	<li role="presentation">
-            	<ui:carouselPageIndicatorItem aura:id="indicatorItems" pageIndex="{!index}" pagerKeyed="{!c.keyHandler}" pagerClicked="{!c.clickHandler}" />    
+	    		<!-- pageIndex starts with 1 -->	    		
+            	<ui:carouselPageIndicatorItem aura:id="indicatorItems" priv_pageComponent="{!page}" pageIndex="{!index + 1}" pagerKeyed="{!c.keyHandler}" pagerClicked="{!c.clickHandler}" />    
             </li>
     	</aura:iteration>         
     </ul>	 

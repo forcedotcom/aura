@@ -14,9 +14,16 @@
  * limitations under the License.
  */
 ({
-    onInit: function(cmp, event, helper) {    	 
+    onInit: function(cmp, event, helper) {
     	helper.init(cmp);
     },       
+    
+    /**
+     * Handle scrollStart event coming from scroller
+     */
+    onScrollMove : function(cmp, evt, helper){
+    	helper.handleScrollMove(cmp, evt);
+    },
     
     /**
      * Handle scrollEnd event coming from scroller
@@ -29,13 +36,15 @@
      * Handle scroller refreshed event
      */
     onScrollerRefreshed: function(cmp, evt, helper) {
-    	if (!cmp._isSelectDefaultPageFired) {    		
+    	if (!cmp._isSelectDefaultPageFired) {
+    		//fire selectDefaultPage only after the the scroller has initialized and ready
     		var e = cmp.getEvent("selectDefaultPage");
     		cmp._isSelectDefaultPageFired = true;
     		
     		e.fire();
     	}
     },
+      
     
     /**
      * Handle window resize event
@@ -50,7 +59,8 @@
     pagerClicked: function (cmp, evt, helper) {    	
         var pageIndex = evt.getParam("pageIndex");
         
-        helper.selectPage(cmp, pageIndex);        
+        helper.handlePagerClicked(cmp, pageIndex);
+        
         if (evt.preventDefault) evt.preventDefault();
     },
 
@@ -69,19 +79,6 @@
     },
     
     selectDefaultPage: function (cmp, evt, helper) {    	
-        var pageCmps = helper.getPageComponents(cmp),
-        	defaultPage = cmp.get('v.defaultPage'),
-        	pageToSelect = 0;
-     
-        if (defaultPage) {
-        	pageToSelect = defaultPage;
-        } else {        
-	        for (var i = 0; i < pageCmps.length; i++) {
-	            if (pageCmps[i].isDefault) {
-	            	pageToSelect = i;
-	            }
-	        }
-        }
-        helper.selectPage(cmp, pageToSelect, 0);        
+        helper.selectDefaultPage(cmp, evt);      
     }
 })

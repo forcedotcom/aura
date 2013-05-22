@@ -16,10 +16,10 @@
 
 { 
 	/**
-	 * Handle scroll event from carousel
+	 * Handle pageSelected event from carousel
 	 */
-	handleScrollChange: function(cmp, evt, helper) {
-        helper.handleScrollChange(cmp, evt);        
+	onPageSelected: function(cmp, evt, helper) {	
+        helper.onPageSelected(cmp, evt);        
     },
         
     /**

@@ -22,17 +22,20 @@
 		<aura:attribute name="width" type="Integer" description="Width of the carousel in pixels" />
 		<aura:attribute name="height" type="Integer" description="Height of the carousel in pixels" />
 		<aura:attribute name="class" type="String" description="A CSS style to be attached to the carousel" />
-		<aura:attribute name="pageIndicatorPosition" type="String" default="top" description="Position of the page indicator. Acceptable values are 'top' and 'bottom'." />
+
+		<aura:attribute name="pageIndicatorPosition" type="String" default="top" description="Position of the page indicator. Acceptable values are 'top' and 'bottom'. " />
+		<aura:attribute name="continuousFlow" type="Boolean" default="false" description="Determines whether to flow continuously between pages or not." />		
 		<aura:attribute name="defaultPage" type="Integer" description="Default page to display. Setting this will override the 'isDefault' attribute in the ui:carouselPage component." />
 		
 		<aura:attribute name="pageModels" type="Object[]" description="The model used to create a carousel page." />
 		<aura:attribute name="pageComponents" type="Aura.Component[]" description="Carousel page components that is rendered as carousel pages." />
 		
+
 		<aura:attribute name="priv_currentPage" type="Integer" description="PRIVATE - the currently selected page index." />
-		<aura:attribute name="priv_carouselStyle" type="String" description="PRIVATE - inline style of the carousel container." />
-		<aura:attribute name="priv_pageStyle" type="String" description="PRIVATE - inline style of the carousel page. " />
-		<aura:attribute name="priv_scrollerWidth" type="String" description="PRIVATE -  the scroller width in pixels." />
-		<aura:attribute name="priv_snap" type="String" description="PRIVATE"/>
+		<aura:attribute name="priv_carouselStyle" type="String" description="PRIVATE - inline style of the carousel container." />		
+		<aura:attribute name="priv_scrollerWidth" type="String" description="PRIVATE - the scroller width in pixels." />
+		<aura:attribute name="priv_snap" type="String" description="PRIVATE - Scroller snap option."/>
+		<aura:attribute name="priv_scrollContentClass" type="String" description="PRIVATE - Scroller content css class." />
 								
 		<aura:registerevent name="selectDefaultPage" type="ui:carouselPageEvent" description="The event fired when the default page is selected."/>
     	<aura:registerevent name="pageSelected" type="ui:carouselPageEvent" description="The event fired when the page is selected."/>
@@ -42,29 +45,33 @@
     	<aura:handler name="selectDefaultPage" action="{!c.selectDefaultPage}" />
     	<aura:handler name="pageSelected" action="{!c.pageSelected}" />    
 		<aura:handler name="init" value="{!this}" action="{!c.onInit}" />
-				
+						
 		<ui:resizeObserver onresize="{!c.refresh}"/>
 		
 		<article class="{!v.class}" style="{!v.priv_carouselStyle}" role="article">
 		 
 				<h2 class="visually-hidden">{!v.title}</h2>			
 							  
-				<nav aura:id="navContainer" class="{!'carousel-nav-container carousel-nav-position-' + v.pageIndicatorPosition}" role="tablist">
-            		<ui:carouselPageIndicator aura:id="pageIndicator" pagerClicked="{!c.pagerClicked}"
-                		 pagerKeyed="{!c.pagerKeyed}" />
-				</nav>
+				<aura:If isTrue="{!!v.continuousFlow}">
+					<nav aura:id="navContainer" class="{!'carousel-nav-container carousel-nav-position-' + v.pageIndicatorPosition}" role="tablist">
+	            		<ui:carouselPageIndicator aura:id="pageIndicator" pagerClicked="{!c.pagerClicked}"
+	                		 pagerKeyed="{!c.pagerKeyed}" />
+					</nav>
+				</aura:If>
 				   	        
-		    	<div aura:id="carousel-pages" class="carousel-pages">
+		    	<div aura:id="carousel-pages" class="carousel-pages" style="{!v.priv_carouselStyle}">
 			    	<ui:scroller aura:id="scroller"
 			    		width="{!v.priv_scrollerWidth}"
 			    	 	class="scroll-container"			    	 	
 			    	   	hScroll="true"
 			    	   	vScroll="false"
-			    	   	onScrollEnd= "{!c.onScrollEnd}"
+			    	   	onScrollMove="{!c.onScrollMove}"
+			    	   	onScrollEnd="{!c.onScrollEnd}"
 			    	   	refreshed="{!c.onScrollerRefreshed}"
-			    	   	snap="{!v.priv_snap}" >	    				    		    		 
+			    	   	snap="{!v.priv_snap}"
+			    	   	scrollContentClass="{!v.priv_scrollContentClass}" >	    				    		    		 
 						 								 
-						<div aura:id="pageContainer"> 					 						 							
+						<div aura:id="pageContainer" class="page-container" style="{!v.priv_carouselStyle}"> 					 						 							
 						 	<!--page content will be rendered here-->
 						 </div>
 					</ui:scroller>

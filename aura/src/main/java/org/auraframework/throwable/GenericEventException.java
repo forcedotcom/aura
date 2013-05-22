@@ -17,8 +17,7 @@ package org.auraframework.throwable;
 
 import java.util.Map;
 
-import org.apache.commons.httpclient.HttpStatus;
-
+import org.apache.http.HttpStatus;
 import org.auraframework.Aura;
 
 import org.auraframework.def.EventDef;

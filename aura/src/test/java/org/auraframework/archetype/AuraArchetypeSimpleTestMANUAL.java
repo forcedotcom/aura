@@ -15,6 +15,13 @@
  */
 package org.auraframework.archetype;
 
+import com.google.common.collect.ImmutableList;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.auraframework.test.IntegrationTestCase;
+import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.util.IOUtil;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.InputStream;
@@ -22,16 +29,6 @@ import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.util.List;
-
-import org.apache.commons.httpclient.HostConfiguration;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.auraframework.test.UnitTestCase;
-import org.auraframework.test.annotation.UnAdaptableTest;
-import org.auraframework.util.IOUtil;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * Tests for using simple archetype. Note: These won't pass in Eclipse JUnit
@@ -44,7 +41,7 @@ import com.google.common.collect.ImmutableList;
  * @since 0.0.178
  */
 @UnAdaptableTest
-public class AuraArchetypeSimpleTestMANUAL extends UnitTestCase {
+public class AuraArchetypeSimpleTestMANUAL extends IntegrationTestCase {
     private static class MavenArtifact {
         private final String artifactId;
         private final String groupId;
@@ -112,18 +109,11 @@ public class AuraArchetypeSimpleTestMANUAL extends UnitTestCase {
             // start up jetty
             jettyProcess = startProcess(projectDir, ImmutableList.of("mvn", "jetty:run", "-Djetty.port=" + jettyPort));
 
-            // request default until request not refused
-            HostConfiguration hostConfig = new HostConfiguration();
-            hostConfig.setHost("localhost", jettyPort);
-            HttpClient http = new HttpClient();
-            http.setHostConfiguration(hostConfig);
-            http.getHttpConnectionManager().getParams().setConnectionTimeout(2000);
-            http.getParams().setSoTimeout(2000);
-            GetMethod get = new GetMethod("/");
             int status = 0;
             for (int i = 0; i < 30; i++) {
                 try {
-                    status = http.executeMethod(get);
+                    HttpResponse response = performGet("/");
+                    status = getStatusCode(response);
                     break;
                 } catch (ConnectException ce) {
                     // expected, before server is listening
@@ -132,8 +122,8 @@ public class AuraArchetypeSimpleTestMANUAL extends UnitTestCase {
             }
             assertEquals("Failed to connect to server", HttpStatus.SC_OK, status);
 
-            verifyDefaultDocument(http);
-            verifySampleComponents(http);
+            verifyDefaultDocument();
+            verifySampleComponents();
         } catch (Throwable t) {
             // if any errors in Jetty requests, let's print out the Jetty
             // console output for diag before killing the
@@ -168,18 +158,18 @@ public class AuraArchetypeSimpleTestMANUAL extends UnitTestCase {
                 "src/main/webapp/WEB-INF/components/%1$s/%1$s/%1$s.app", project.artifactId)))), "-sample.app");
     }
 
-    private void verifyDefaultDocument(HttpClient http) throws Exception {
-        GetMethod get = new GetMethod("/");
-        assertEquals("Failed requesting default doc", HttpStatus.SC_OK, http.executeMethod(get));
-        String response = get.getResponseBodyAsString().replaceAll("\\s", "");
+    private void verifyDefaultDocument() throws Exception {
+        HttpResponse httpResponse = performGet("/");
+        assertEquals("Failed requesting default doc", HttpStatus.SC_OK, getStatusCode(httpResponse));
+        String response = getResponseBody(httpResponse).replaceAll("\\s", "");
         assertEquals("Unexpected default doc content",
                 String.format("<script>window.location=\"/%s/%1$s.app\";</script>", project.artifactId), response);
     }
 
-    private void verifySampleComponents(HttpClient http) throws Exception {
-        GetMethod get = new GetMethod(String.format("/%1$s/%1$s.app", project.artifactId));
-        assertEquals("Failed requesting sample app", HttpStatus.SC_OK, http.executeMethod(get));
-        String body = get.getResponseBodyAsString();
+    private void verifySampleComponents() throws Exception {
+        HttpResponse httpResponse = performGet(String.format("/%1$s/%1$s.app", project.artifactId));
+        assertEquals("Failed requesting sample app", HttpStatus.SC_OK, getStatusCode(httpResponse));
+        String body = getResponseBody(httpResponse);
 
         // strip lastmod values
         body = body.replaceFirst(" data-lm=\"[^\"]+\"", "");

@@ -19,10 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.UnAdaptableTest;
@@ -65,11 +68,12 @@ public class InputDateTimeLocaleHttpTest extends AuraHttpTestCase{
         // final url Request to be send to server
         String url = "aura?" + query;
 
-        GetMethod get = obtainGetMethod(url);
-        get.addRequestHeader("Accept-Language", locale);
-        getHttpClient().executeMethod(get);
-        String response = get.getResponseBodyAsString();
-        int statusCode = getHttpClient().executeMethod(get);
+        Header[] headers = new Header[]{ new BasicHeader(HttpHeaders.ACCEPT_LANGUAGE, locale) };
+
+        HttpResponse httpResponse = performGet(url, headers);
+
+        String response = getResponseBody(httpResponse);
+        int statusCode = getStatusCode(httpResponse);
         if (HttpStatus.SC_OK != statusCode) {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
                     HttpStatus.SC_OK, response));

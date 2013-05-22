@@ -15,10 +15,12 @@
  */
 package org.auraframework.test.configuration;
 
+
+import org.apache.http.client.HttpClient;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.commons.httpclient.HttpClient;
 
 /**
  * @since 0.0.59

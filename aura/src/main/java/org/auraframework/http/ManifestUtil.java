@@ -23,6 +23,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -80,7 +81,8 @@ public abstract class ManifestUtil {
         //
         // TODO: this is rather bogus.
         //
-        if (!request.getHeader("user-agent").contains("AppleWebKit")) {
+        final String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
+        if (userAgent != null && !userAgent.contains("AppleWebKit")) {
             return false;
         }
         return isManifestEnabled();

@@ -19,10 +19,12 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.message.BasicHeader;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.TestLabels;
@@ -54,10 +56,12 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     public void testSpecialCharactersInCSSAreSerialized() throws Exception {
         String modeAndContext = getSimpleContext(Format.CSS, false);
         String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.css";
-        GetMethod get = obtainGetMethod(url);
-        int statusCode = getHttpClient().executeMethod(get);
+
+        HttpResponse httpResponse = performGet(url);
+
+        int statusCode = getStatusCode(httpResponse);
         assertEquals(HttpStatus.SC_OK, statusCode);
-        String response = get.getResponseBodyAsString();
+        String response = getResponseBody(httpResponse);
         char expected = '•';
         String token = "content: '";
         int start = response.indexOf(token) + token.length();
@@ -80,10 +84,12 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     public void testSpecialCharactersInMarkupAreSerialized() throws Exception {
         String modeAndContext = getSimpleContext(Format.JS, false);
         String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.js";
-        GetMethod get = obtainGetMethod(url);
-        int statusCode = getHttpClient().executeMethod(get);
+
+        HttpResponse httpResponse = performGet(url);
+        int statusCode = getStatusCode(httpResponse);
         assertEquals(HttpStatus.SC_OK, statusCode);
-        String response = get.getResponseBodyAsString();
+        String response = getResponseBody(httpResponse);
+
         String expected = Arrays.toString("공유".getBytes("UTF8"));
         String token = "Test whether the special character shows up: ";
         int start = response.indexOf(token) + token.length();
@@ -99,14 +105,17 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     public void testGetWithIfModifiedSinceOld() throws Exception {
         String requestContext = getSimpleContext(Format.JS, false);
         String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/app.js";
-        GetMethod get = obtainGetMethod(url);
+
         Calendar stamp = Calendar.getInstance();
         stamp.add(Calendar.HOUR, -1);
-        get.setRequestHeader(HttpHeaders.IF_MODIFIED_SINCE,
-                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime()));
-        int statusCode = getHttpClient().executeMethod(get);
+
+        Header[] headers = new Header[]{ new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE,
+                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime())) };
+
+        HttpResponse httpResponse = performGet(url, headers);
+        int statusCode = getStatusCode(httpResponse);
         assertEquals(HttpStatus.SC_NOT_MODIFIED, statusCode);
-        assertNull(get.getResponseBodyAsString());
+        assertNull(getResponseBody(httpResponse));
     }
 
     /**
@@ -116,14 +125,18 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     public void testGetWithIfModifiedSinceOldModified() throws Exception {
         String requestContext = getSimpleContext(Format.JS, true);
         String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/app.js";
-        GetMethod get = obtainGetMethod(url);
+
         Calendar stamp = Calendar.getInstance();
         stamp.add(Calendar.HOUR, -1);
-        get.setRequestHeader(HttpHeaders.IF_MODIFIED_SINCE,
-                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime()));
-        int statusCode = getHttpClient().executeMethod(get);
+
+        Header[] headers = new Header[]{ new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE,
+                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime())) };
+
+        HttpResponse httpResponse = performGet(url, headers);
+        int statusCode = getStatusCode(httpResponse);
+
         assertEquals(HttpStatus.SC_OK, statusCode);
-        assertNotNull(get.getResponseBodyAsString());
+        assertNotNull(getResponseBody(httpResponse));
     }
 
     /**
@@ -133,14 +146,17 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     @TestLabels("auraSanity")
     public void testGetWithIfModifiedSinceNew() throws Exception {
         String url = "/l/" + AuraTextUtil.urlencode(getSimpleContext(Format.JS, false)) + "/app.js";
-        GetMethod get = obtainGetMethod(url);
         Calendar stamp = Calendar.getInstance();
         stamp.add(Calendar.DAY_OF_YEAR, 45);
-        get.setRequestHeader(HttpHeaders.IF_MODIFIED_SINCE,
-                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime()));
-        int statusCode = getHttpClient().executeMethod(get);
+
+        Header[] headers = new Header[]{ new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE,
+                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime())) };
+
+        HttpResponse httpResponse = performGet(url, headers);
+        int statusCode = getStatusCode(httpResponse);
+
         assertEquals(HttpStatus.SC_NOT_MODIFIED, statusCode);
-        assertNull(get.getResponseBodyAsString());
+        assertNull(getResponseBody(httpResponse));
     }
 
     /**
@@ -151,10 +167,11 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     public void testGetWithoutIfModifiedSince() throws Exception {
         String requestContext = getSimpleContext(Format.JS, false);
         String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/app.js";
-        GetMethod get = obtainGetMethod(url);
-        get.removeRequestHeader(HttpHeaders.IF_MODIFIED_SINCE);
-        int statusCode = getHttpClient().executeMethod(get);
+
+        HttpResponse httpResponse = performGet(url);
+        int statusCode = getStatusCode(httpResponse);
+
         assertEquals(HttpStatus.SC_OK, statusCode);
-        assertNotNull(get.getResponseBodyAsString());
+        assertNotNull(getResponseBody(httpResponse));
     }
 }

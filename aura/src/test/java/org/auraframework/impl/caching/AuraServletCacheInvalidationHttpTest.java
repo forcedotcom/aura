@@ -19,9 +19,8 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -62,11 +61,12 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
         // When last mod time stamp is older than a year (400 days).
         AuraContext ctx = startContext("auratest:test_TokenValidation", ComponentDef.class);
         String uri = getGetURIWithModifiedUID(ctx, true);
-        GetMethod get = obtainGetMethod(uri);
-        int statusCode = getHttpClient().executeMethod(get);
-        assertTrue("Aura servlet should return 200.", statusCode == HttpStatus.SC_OK);
-        String response = get.getResponseBodyAsString();
 
+        HttpResponse httpResponse = performGet(uri);
+        int statusCode = getStatusCode(httpResponse);
+        String response = getResponseBody(httpResponse);
+
+        assertTrue("Aura servlet should return 200.", statusCode == HttpStatus.SC_OK);
         assertOutdated(response);
     }
 
@@ -81,10 +81,11 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
         // When last mod time stamp is older than a year.
         AuraContext ctx = startContext("auratest:test_TokenValidation", ComponentDef.class);
         String uri = getGetURIWithModifiedUID(ctx, false);
-        GetMethod get = obtainGetMethod(uri);
-        int statusCode = getHttpClient().executeMethod(get);
+        HttpResponse httpResponse = performGet(uri);
+        int statusCode = getStatusCode(httpResponse);
+        String response = getResponseBody(httpResponse);
+
         assertTrue("Failed to reach aura servlet.", statusCode == HttpStatus.SC_OK);
-        String response = get.getResponseBodyAsString();
         assertTrue("AuraServlet failed to notify the client about invalid cache.",
                 response.startsWith(AuraBaseServlet.CSRF_PROTECT));
     }
@@ -97,11 +98,11 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
      */
     public void testPostRequestWithDifferentUID() throws Exception {
         AuraContext ctx = startContext("auratest:test_TokenValidation", ComponentDef.class);
-        PostMethod post = getPostObject(ctx, true);
+        HttpResponse httpResponse = getPostResponse(ctx, true);
                                                                                                              // days
-        int statusCode = this.getHttpClient().executeMethod(post);
+        int statusCode = getStatusCode(httpResponse);
         assertTrue("Aura servlet should return 200.", statusCode == HttpStatus.SC_OK);
-        String response = post.getResponseBodyAsString();
+        String response = getResponseBody(httpResponse);
         assertOutdated(response);
     }
 
@@ -114,9 +115,9 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
     @TestLabels("auraSanity")
     public void testPostRequestWithValidUID() throws Exception {
         AuraContext ctx = startContext("auratest:test_TokenValidation", ComponentDef.class);
-        PostMethod post = getPostObject(ctx, false);
-        int statusCode = this.getHttpClient().executeMethod(post);
-        String response = post.getResponseBodyAsString();
+        HttpResponse httpResponse = getPostResponse(ctx, false);
+        int statusCode = getStatusCode(httpResponse);
+        String response = getResponseBody(httpResponse);
         if (HttpStatus.SC_OK != statusCode) {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
                     HttpStatus.SC_OK, response));
@@ -125,15 +126,16 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Conveniece method to create a POST object to invoke a server side action.
+     * Convenience method to create a POST object to invoke a server side action.
      * This method is very specific to this test, please do not use it for any
      * other purpose.
-     * 
-     * @param lastModToken
-     * @return
+     *
+     * @param ctx
+     * @param modified
+     * @return response
      * @throws Exception
      */
-    private PostMethod getPostObject(AuraContext ctx, boolean modified) throws Exception {
+    private HttpResponse getPostResponse(AuraContext ctx, boolean modified) throws Exception {
         Map<String, Object> message = new HashMap<String, Object>();
         Map<String, Object> actionInstance = new HashMap<String, Object>();
         actionInstance.put("descriptor",
@@ -149,14 +151,13 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("message", jsonMessage);
-        PostMethod post = null;
         params.put("aura.token", getCsrfToken());
 
         String serContext = getSerializedAuraContextWithModifiedUID(ctx, modified);
 
         params.put("aura.context", serContext);
-        post = obtainPostMethod("/aura", params);
-        return post;
+
+        return performPost("/aura", params);
     }
 
     private AuraContext startContext(String qualifiedName, Class<? extends BaseComponentDef> clazz) {

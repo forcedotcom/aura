@@ -19,7 +19,17 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
 
-import org.apache.commons.httpclient.HttpClient;
+import org.apache.http.client.CookieStore;
+import org.apache.http.client.HttpClient;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.auraframework.Aura;
 import org.auraframework.test.AuraJettyServer;
 import org.eclipse.jetty.server.Connector;
@@ -76,9 +86,21 @@ public class JettyTestServletConfig implements TestServletConfig {
         // This prevents tests from hanging in the http code, which in turn can
         // prevent the server from exiting.
         int timeout = 10 * 60 * 1000;
-        HttpClient http = new HttpClient();
-        http.getHttpConnectionManager().getParams().setConnectionTimeout(timeout);
-        http.getParams().setSoTimeout(timeout);
+
+        SchemeRegistry registry = new SchemeRegistry();
+        registry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
+
+        PoolingClientConnectionManager ccm = new PoolingClientConnectionManager(registry);
+
+        CookieStore cookieStore = new BasicCookieStore();
+
+        HttpParams params = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(params, timeout);
+        HttpConnectionParams.setSoTimeout(params, timeout);
+
+        DefaultHttpClient http = new DefaultHttpClient(ccm, params);
+        http.setCookieStore(cookieStore);
+
         return http;
     }
 

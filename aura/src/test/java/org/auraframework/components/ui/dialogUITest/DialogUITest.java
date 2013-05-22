@@ -78,7 +78,7 @@ public class DialogUITest  extends WebDriverTestCase {
         clickOnElementOrPressEnter(element);
         waitForComponentToChangeStatus("div[class*='dialog']","className","hidden", true);
         
-        String dialogDivClass = driver.findElement(By.cssSelector("div[class*='medium uiDialog']")).getAttribute("className");
+        String dialogDivClass = driver.findElement(By.cssSelector("div[class*='medium default uiDialog']")).getAttribute("className");
         assertTrue("DialogBox did not appear on the screen",!dialogDivClass.contains("hidden"));
     }
     

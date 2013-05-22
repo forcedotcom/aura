@@ -40,6 +40,8 @@ exp(p,
     "setTestTimeout", p.setTestTimeout,
     "getErrors", p.getErrors,
     "addCleanup", p.addCleanup,
+    "expectAuraError", p.expectAuraError,
+    "getAuraErrorMessage", p.getAuraErrorMessage,
     
     // DOM
     "getOuterHtml", p.getOuterHtml,

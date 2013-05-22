@@ -200,9 +200,6 @@ var Test = function(){
             }
             var myName = name;
             priv.completed[myName] = "INCOMPLETE";
-            //
-            // Cheate and directly access the action internals.
-            //
             a.wrapCallback(priv, function(action) {
                 if (action.getState() === "SUCCESS") {
                     priv.completed[myName] = "SUCCESS";
@@ -1097,7 +1094,29 @@ var Test = function(){
 
         getAppCacheEvents: function() {
             return priv.appCacheEvents;
+        },
+        
+        /**
+         * true if the test expecting to see a aura error message on the page.
+         */
+        isExpectingAuraError: function(){
+            return priv.expectAuraError;
+        },
+        /**
+         * Inform the aura framework that the test is expecting an aura error($A.error)
+         */
+        expectAuraError: function(flag){
+            if(!$A.util.isUndefined(flag)){
+        	priv.expectAuraError = flag;
+            }
+        },
+        /**
+         * Extract the error message from aura error div(the grey error message on the page)
+         */
+        getAuraErrorMessage: function(){
+            return aura.test.getText($A.util.getElement("auraErrorMessage"));
         }
+        
     };
 
     //#include aura.test.Test_export

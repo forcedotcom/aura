@@ -18,6 +18,7 @@ package org.auraframework.http;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +28,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.URI;
+import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -153,12 +154,15 @@ public class AuraServlet extends AuraBaseServlet {
         String newLocation = "/";
 
         try {
-            URI uri = new URI(nocache, true);
-            String fragment = uri.getEscapedFragment();
-            StringBuilder sb = new StringBuilder(uri.getEscapedPathQuery());
+            final URI uri = new URI(nocache);
+            final String fragment = uri.getFragment();
+            final String query = uri.getQuery();
+            final StringBuilder sb = new StringBuilder(uri.getPath());
+            if(query != null && !query.isEmpty()) {
+                sb.append("?").append(query);
+            }
             if (fragment != null && !fragment.isEmpty()) {
-                sb.append("#");
-                sb.append(fragment);
+                sb.append("#").append(fragment);
             }
             newLocation = sb.toString();
         } catch (Exception e) {
@@ -168,7 +172,7 @@ public class AuraServlet extends AuraBaseServlet {
         }
 
         setNoCache(response);
-        response.setHeader("Location", newLocation);
+        response.setHeader(HttpHeaders.LOCATION, newLocation);
         return true;
     }
 

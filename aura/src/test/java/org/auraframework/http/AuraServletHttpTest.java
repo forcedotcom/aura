@@ -23,11 +23,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.params.CoreProtocolPNames;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
@@ -58,9 +57,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     public void testGetContextHasPreloads() throws Exception {
         String url = "/aura?aura.tag=test%3Atext&aura.context="
                 + AuraTextUtil.urlencode(getSimpleContext(Format.JSON, false));
-        GetMethod get = obtainGetMethod(url);
-        int statusCode = getHttpClient().executeMethod(get);
-        String response = get.getResponseBodyAsString();
+        HttpResponse httpResponse = performGet(url);
+        int statusCode = getStatusCode(httpResponse);
+        String response = getResponseBody(httpResponse);
         if (HttpStatus.SC_OK != statusCode) {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
                     HttpStatus.SC_OK, response));
@@ -95,10 +94,10 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         params.put("message", jsonMessage);
         params.put("aura.token", getCsrfToken());
         params.put("aura.context", getSimpleContext(Format.JSON, false));
-        PostMethod post = obtainPostMethod("/aura", params);
 
-        int statusCode = getHttpClient().executeMethod(post);
-        String response = post.getResponseBodyAsString();
+        HttpResponse httpResponse = performPost("/aura", params);
+        int statusCode = getStatusCode(httpResponse);
+        String response = getResponseBody(httpResponse);
         if (HttpStatus.SC_OK != statusCode) {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
                     HttpStatus.SC_OK, response));
@@ -133,10 +132,11 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         params.put("message", jsonMessage);
         params.put("aura.token", getCsrfToken());
         params.put("aura.context", getSimpleContext(Format.JSON, true));
-        PostMethod post = obtainPostMethod("/aura", params);
 
-        int statusCode = getHttpClient().executeMethod(post);
-        String response = post.getResponseBodyAsString();
+        HttpResponse httpResponse = performPost("/aura", params);
+        int statusCode = getStatusCode(httpResponse);
+        String response = getResponseBody(httpResponse);
+
         if (HttpStatus.SC_OK != statusCode) {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
                     HttpStatus.SC_OK, response));
@@ -159,13 +159,12 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     }
 
     private void assertNoCacheRequest(String inputUrl, String expectedRedirect) throws Exception {
-        GetMethod get = obtainGetMethod(inputUrl);
-        get.setFollowRedirects(false);
-        getHttpClient().executeMethod(get);
-        assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, get.getStatusCode());
-        assertEquals(expectedRedirect, get.getResponseHeader("Location").getValue());
-        assertEquals("no-cache, no-store", get.getResponseHeader("Cache-Control").getValue());
-        assertEquals("no-cache", get.getResponseHeader("Pragma").getValue());
+
+        HttpResponse response = performGet(inputUrl, false);
+        assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, getStatusCode(response));
+        assertEquals(expectedRedirect, response.getFirstHeader(HttpHeaders.LOCATION).getValue());
+        assertEquals("no-cache, no-store", response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue());
+        assertEquals("no-cache", response.getFirstHeader(HttpHeaders.PRAGMA).getValue());
     }
 
     /**
@@ -191,11 +190,10 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     }
 
     public void testNoCacheNoValue() throws Exception {
-        GetMethod get = obtainGetMethod("/aura?aura.tag&nocache");
-        get.setFollowRedirects(false);
-        getHttpClient().executeMethod(get);
-        assertEquals(HttpStatus.SC_OK, get.getStatusCode());
-        assertTrue(get.getResponseBodyAsString().startsWith(
+        HttpResponse response = performGet("/aura?aura.tag&nocache");
+
+        assertEquals(HttpStatus.SC_OK, getStatusCode(response));
+        assertTrue(getResponseBody(response).startsWith(
                 String.format("%s*/{\n  \"message\":\"QualifiedName is required for descriptors\"",
                         AuraBaseServlet.CSRF_PROTECT)));
     }
@@ -204,57 +202,51 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         // An application with isOnePageApp set to true
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application isOnePageApp='true'></aura:application>");
-        GetMethod get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
+
         // Expect the get request to be set for long cache
-        assertResponseSetToLongCache(get);
+        assertResponseSetToLongCache(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
 
         // An application with isOnePageApp set to false
         desc = addSourceAutoCleanup(ApplicationDef.class, "<aura:application isOnePageApp='false'></aura:application>");
-        get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
         // Expect the get request to be set for no caching
-        assertResponseSetToNoCache(get);
+        assertResponseSetToNoCache(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
 
         // An application with no specification
         desc = addSourceAutoCleanup(ApplicationDef.class, "<aura:application isOnePageApp='false'></aura:application>");
-        get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
         // Expect the get request to be set for no caching
-        assertResponseSetToNoCache(get);
+        assertResponseSetToNoCache(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
 
         // A component and AuraBaseServlet.isManifestEnabled() is false because
         // UserAgent is not "AppleWebKit" based
-        System.setProperty(HttpMethodParams.USER_AGENT, UserAgent.EMPTY.getUserAgentString());
+        System.setProperty(CoreProtocolPNames.USER_AGENT, UserAgent.EMPTY.getUserAgentString());
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component ></aura:component>");
-        get = obtainGetMethod(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
         // Expect the get request to be set for long cache
-        assertResponseSetToLongCache(get);
+        assertResponseSetToLongCache(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
     }
 
     public void testHTMLTemplateCachingWhenAppCacheIsEnable() throws Exception {
-        System.setProperty(HttpMethodParams.USER_AGENT, UserAgent.GOOGLE_CHROME.getUserAgentString());
+        System.setProperty(CoreProtocolPNames.USER_AGENT, UserAgent.GOOGLE_CHROME.getUserAgentString());
 
         // An application with isOnePageApp set to true and useAppcache set to
         // true
         // isOnePageApp overrides useAppCache specification
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application isOnePageApp='true' useAppcache='true'></aura:application>");
-        GetMethod get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
         // Expect the get request to be set for long cache
-        assertResponseSetToLongCache(get);
+        assertResponseSetToLongCache(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
 
         // An application with useAppcache set to true and no specification for
         // isOnePageApp
         desc = addSourceAutoCleanup(ApplicationDef.class, "<aura:application useAppcache='true'></aura:application>");
-        get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
         // Expect the get request to be set for no caching
-        assertResponseSetToNoCache(get);
+        assertResponseSetToNoCache(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
 
         // A component and AuraBaseServlet.isManifestEnabled() is false
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component ></aura:component>");
-        get = obtainGetMethod(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
         // Expect the get request to be set for long cache
-        assertResponseSetToLongCache(get);
+        assertResponseSetToLongCache(String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName()));
     }
 
     /**
@@ -271,18 +263,20 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      * 
      * See documentation for {@link #WIGGLE_FACTOR}.
      * 
-     * @param request the request to execute.
+     * @param url the url
      */
-    private void assertResponseSetToLongCache(HttpMethod request) throws Exception {
+    private void assertResponseSetToLongCache(String url) throws Exception {
         Date expected = new Date(System.currentTimeMillis() + AuraBaseServlet.LONG_EXPIRE - WIGGLE_FACTOR);
-        getHttpClient().executeMethod(request);
-        assertEquals("Failed to execute request successfully.", HttpStatus.SC_OK, request.getStatusCode());
+
+        HttpResponse response = performGet(url);
+
+        assertEquals("Failed to execute request successfully.", HttpStatus.SC_OK, getStatusCode(response));
 
         assertEquals("Expected response to be marked for long cache",
                 String.format("max-age=%s, public", AuraBaseServlet.LONG_EXPIRE / 1000),
-                request.getResponseHeader("Cache-Control").getValue());
+                response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue());
 
-        String expiresHdr = request.getResponseHeader("Expires").getValue();
+        String expiresHdr = response.getFirstHeader(HttpHeaders.EXPIRES).getValue();
         Date expires = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH).parse(expiresHdr);
         //
         // We show all of the related dates/strings to help with debugging.
@@ -297,18 +291,18 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      * We are very generous with the expires time here, as we really don't care other than to have it
      * well in the past.
      * 
-     * @param request the request to execute.
+     * @param url the url path.
      */
-    private void assertResponseSetToNoCache(HttpMethod request) throws Exception {
+    private void assertResponseSetToNoCache(String url) throws Exception {
         Date expected = new Date(System.currentTimeMillis());
-        getHttpClient().executeMethod(request);
-        assertEquals("Failed to execute request successfully.", HttpStatus.SC_OK, request.getStatusCode());
+        HttpResponse response = performGet(url);
+        assertEquals("Failed to execute request successfully.", HttpStatus.SC_OK, getStatusCode(response));
 
         assertEquals("Expected response to be marked for no-cache", "no-cache, no-store",
-                request.getResponseHeader("Cache-Control").getValue());
-        assertEquals("no-cache", request.getResponseHeader("Pragma").getValue());
+                response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue());
+        assertEquals("no-cache", response.getFirstHeader(HttpHeaders.PRAGMA).getValue());
 
-        String expiresHdr = request.getResponseHeader("Expires").getValue();
+        String expiresHdr = response.getFirstHeader(HttpHeaders.EXPIRES).getValue();
         Date expires = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH).parse(expiresHdr);
         //
         // We show all of the related dates/strings to help with debugging.
@@ -329,25 +323,23 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     public void testJSFrameworkUrlHasNonce() throws Exception {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application render='client'></aura:application>");
-        GetMethod get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
-        getHttpClient().executeMethod(get);
-        assertEquals(HttpStatus.SC_OK, get.getStatusCode());
+        HttpResponse response = performGet(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
+        assertEquals(HttpStatus.SC_OK, getStatusCode(response));
         // Fetch the latest timestamp of the JS group and construct URL for DEV mode.
         String expectedFWUrl = String.format("/auraFW/javascript/%s/aura_dev.js?aura.fwuid=%s",
                 Aura.getConfigAdapter().getAuraFrameworkNonce(),
                 Aura.getConfigAdapter().getAuraFrameworkNonce());
         String scriptTag = String.format("<script src=\"%s\" ></script>", expectedFWUrl);
         assertTrue("Expected Aura FW Script tag not found. Expected to see: " + scriptTag,
-                get.getResponseBodyAsString().contains(scriptTag));
+                getResponseBody(response).contains(scriptTag));
     }
 
     public void testGetUnhandledError() throws Exception {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application><aura:attribute type='bah'/></aura:application>");
-        GetMethod get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
-        getHttpClient().executeMethod(get);
-        assertEquals(HttpStatus.SC_NOT_FOUND, get.getStatusCode());
-        String response = get.getResponseBodyAsString();
+        HttpResponse httpResponse = performGet(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
+        assertEquals(HttpStatus.SC_NOT_FOUND, getStatusCode(httpResponse));
+        String response = getResponseBody(httpResponse);
         assertEquals("Expected simple error page but got: " + response, "404 Not Found\ndescriptor is null\n", response);
     }
 }

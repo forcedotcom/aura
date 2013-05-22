@@ -16,18 +16,34 @@
 package org.auraframework.test;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.lang3.CharEncoding;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.params.HttpClientParams;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.BaseComponentDef;
@@ -79,6 +95,9 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 
     @Override
     public void tearDown() throws Exception {
+        if (httpClient != null) {
+            httpClient.getConnectionManager().shutdown();
+        }
         httpClient = null;
         auraTestingUtil.tearDown();
         super.tearDown();
@@ -131,52 +150,178 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     }
 
     /**
-     * Given a path on the api server, return a {@link GetMethod} that has the appropriate headers and server name.
+     * Given a path on the api server, return a {@link HttpGet} that has the appropriate headers and server name.
      * 
      * @param path the relative path to the server, such as <tt>/services/Soap</tt> or
      *            <tt>/servlet/servlet.SForceMailMerge</tt> Follows redirects by default.
-     * @return a {@link GetMethod}
+     * @return a {@link HttpGet}
      * @throws MalformedURLException if the path is invalid.
      * @throws URISyntaxException
      */
-    protected static GetMethod obtainGetMethod(String path) throws MalformedURLException, URISyntaxException {
-        return obtainGetMethod(path, true);
+    protected static HttpGet obtainGetMethod(String path) throws MalformedURLException, URISyntaxException {
+        return obtainGetMethod(path, true, null);
     }
 
-    protected static GetMethod obtainGetMethod(String path, boolean followRedirects) throws MalformedURLException,
+    protected static HttpGet obtainGetMethod(String path, boolean followRedirects) throws MalformedURLException, URISyntaxException {
+        return obtainGetMethod(path, followRedirects, null);
+    }
+
+    /**
+     * Sets up get request method for httpclient. Includes ability to follow redirects and set request headers
+     *
+     * @param path
+     * @param followRedirects
+     * @param headers
+     * @return
+     * @throws MalformedURLException
+     * @throws URISyntaxException
+     */
+    protected static HttpGet obtainGetMethod(String path, boolean followRedirects, Header[] headers) throws MalformedURLException,
             URISyntaxException {
         String url = servletConfig.getBaseUrl().toURI().resolve(path).toString();
-        GetMethod get = new GetMethod(url);
-        if (System.getProperty(HttpMethodParams.USER_AGENT) != null) {
-            get.getParams().setParameter(HttpMethodParams.USER_AGENT, System.getProperty(HttpMethodParams.USER_AGENT));
+        HttpParams params = new BasicHttpParams();
+        HttpClientParams.setRedirecting(params, followRedirects);
+
+        if (System.getProperty(CoreProtocolPNames.USER_AGENT) != null) {
+            HttpProtocolParams.setUserAgent(params, System.getProperty(CoreProtocolPNames.USER_AGENT));
         }
-        get.setFollowRedirects(followRedirects);
+
+        HttpGet get = new HttpGet(url);
+        get.setParams(params);
+
+        if( headers != null ) {
+            get.setHeaders(headers);
+        }
+
         return get;
     }
 
     /**
-     * Given the a path on the api server, return a {@link PostMethod} that has the appropriate headers and server name.
+     * Given the a path on the api server, return a {@link HttpPost} that has the appropriate headers and server name.
      * 
      * @param path the relative path to the server, such as <tt>/services/Soap</tt> or
      *            <tt>/servlet/servlet.SForceMailMerge</tt>.
      * @param params a set of name value string pairs to use as parameters to the post call.
-     * @return a {@link PostMethod}
+     * @return a {@link HttpPost}
      * @throws MalformedURLException if the path is invalid.
      * @throws URISyntaxException
      */
-    protected static PostMethod obtainPostMethod(String path, Map<String, String> params) throws MalformedURLException,
-            URISyntaxException {
-        PostMethod post = new PostMethod(servletConfig.getBaseUrl().toURI().resolve(path).toString());
-        if (System.getProperty(HttpMethodParams.USER_AGENT) != null) {
-            post.getParams().setParameter(HttpMethodParams.USER_AGENT, System.getProperty(HttpMethodParams.USER_AGENT));
-        }
+    protected static HttpPost obtainPostMethod(String path, Map<String, String> params) throws MalformedURLException,
+            URISyntaxException, UnsupportedEncodingException {
+        HttpPost post = new HttpPost(servletConfig.getBaseUrl().toURI().resolve(path).toString());
+
+        List <NameValuePair> nvps = new ArrayList<NameValuePair>();
 
         if (params != null) {
             for (Map.Entry<String, String> entry : params.entrySet()) {
-                post.addParameter(entry.getKey(), entry.getValue());
+                nvps.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
             }
+            post.setEntity(new UrlEncodedFormEntity(nvps, CharEncoding.UTF_8));
+
         }
         return post;
+    }
+
+    /**
+     * Performs get request with path
+     * @param path
+     * @return
+     * @throws Exception
+     */
+    protected static HttpResponse performGet(String path) throws Exception {
+        return performGet(path, true);
+    }
+
+    /**
+     * Performs get request with path and follow redirects
+     * @param path
+     * @param followRedirects
+     * @return
+     * @throws Exception
+     */
+    protected static HttpResponse performGet(String path, boolean followRedirects) throws Exception {
+        HttpGet get = obtainGetMethod(path, followRedirects, null);
+        return perform(get);
+    }
+
+    /**
+     * Performs get request with path and request headers
+     * @param path
+     * @param headers
+     * @return
+     * @throws Exception
+     */
+    protected static HttpResponse performGet(String path, Header[] headers) throws Exception {
+        HttpGet get = obtainGetMethod(path, true, headers);
+        return perform(get);
+    }
+
+    /**
+     * Performs get request with path, follow redirects, and request headers
+     * @param path
+     * @param followRedirects
+     * @param headers
+     * @return
+     * @throws Exception
+     */
+    protected static HttpResponse performGet(String path, boolean followRedirects, Header[] headers) throws Exception {
+        HttpGet get = obtainGetMethod(path, followRedirects, headers);
+        return perform(get);
+    }
+
+    /**
+     * Performs post request with path and post parameters
+     * @param path
+     * @param params
+     * @return
+     * @throws Exception
+     */
+    protected static HttpResponse performPost(String path, Map<String, String> params) throws Exception {
+        HttpPost post = obtainPostMethod(path, params);
+        return perform(post);
+    }
+
+    /**
+     * Performs request method
+     * @param method
+     * @return
+     * @throws Exception
+     */
+    protected static HttpResponse perform(HttpRequestBase method) throws Exception {
+        return perform(method, null);
+    }
+
+    /**
+     * Performs request method with HttpContext. HttpContext typically contains cookie store with all cookies
+     * to include with request
+     *
+     * @param method
+     * @param context
+     * @return
+     * @throws Exception
+     */
+    protected static HttpResponse perform(HttpRequestBase method, HttpContext context) throws Exception {
+        return servletConfig.getHttpClient().execute(method, context);
+    }
+
+    /**
+     * Gets status code of response
+     * @param response
+     * @return
+     */
+    protected static int getStatusCode(HttpResponse response) {
+        return response.getStatusLine().getStatusCode();
+    }
+
+    /**
+     * Gets string body of response
+     * @param response
+     * @return
+     * @throws IOException
+     */
+    protected static String getResponseBody(HttpResponse response) throws IOException {
+        HttpEntity entity = response.getEntity();
+        return entity == null ? null : EntityUtils.toString(entity);
     }
 
     protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents) {
@@ -204,6 +349,17 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     }
 
     public static class ServerAction implements Action {
+
+        private final String qualifiedName;
+        private Map<String, Object> actionParams;
+        private State state = State.NEW;
+        private Object returnValue;
+        private List<Object> errors;
+        private HttpPost post;
+        private String rawResponse;
+        private final Map<String, BaseComponent<?, ?>> componentRegistry = Maps.newLinkedHashMap();
+        private int nextId = 1;
+
         public ServerAction(String qualifiedName, Map<String, Object> actionParams) {
             this.qualifiedName = qualifiedName;
             this.actionParams = actionParams;
@@ -223,7 +379,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
             return action;
         }
 
-        public PostMethod getPostMethod() throws Exception {
+        public HttpPost getPostMethod() throws Exception {
             if (post == null) {
                 Map<String, Object> message = new HashMap<String, Object>();
                 Map<String, Object> actionInstance = new HashMap<String, Object>();
@@ -279,13 +435,14 @@ public abstract class IntegrationTestCase extends AuraTestCase {
         @Override
         public void run() throws AuraExecutionException {
             try {
-                PostMethod post = getPostMethod();
-                servletConfig.getHttpClient().executeMethod(post);
-                assertEquals(HttpStatus.SC_OK, post.getStatusCode());
-                rawResponse = post.getResponseBodyAsString();
+                HttpPost post = getPostMethod();
+                HttpResponse response = servletConfig.getHttpClient().execute(post);
+
+                assertEquals(HttpStatus.SC_OK, getStatusCode(response));
+                rawResponse = getResponseBody(response);
                 assertEquals(AuraBaseServlet.CSRF_PROTECT,
                         rawResponse.substring(0, AuraBaseServlet.CSRF_PROTECT.length()));
-                Map<String, Object> json = (Map<String, Object>) new JsonReader().read(post.getResponseBodyAsString()
+                Map<String, Object> json = (Map<String, Object>) new JsonReader().read(rawResponse
                         .substring(AuraBaseServlet.CSRF_PROTECT.length()));
                 Map<String, Object> action = (Map<String, Object>) ((List<Object>) json.get("actions")).get(0);
                 this.state = State.valueOf(action.get("state").toString());
@@ -336,14 +493,6 @@ public abstract class IntegrationTestCase extends AuraTestCase {
             return nextId++;
         }
 
-        private final String qualifiedName;
-        private Map<String, Object> actionParams;
-        private State state = State.NEW;
-        private Object returnValue;
-        private List<Object> errors;
-        private PostMethod post;
-        private String rawResponse;
-        private final Map<String, BaseComponent<?, ?>> componentRegistry = Maps.newLinkedHashMap();
-        private int nextId = 1;
+
     }
 }

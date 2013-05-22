@@ -24,6 +24,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.util.IOUtil;
@@ -55,7 +56,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
         String fwUid = fwUIDParam.get(request);
         String currentFwUid = Aura.getConfigAdapter().getAuraFrameworkNonce();
 
-        long ifModifiedSince = request.getDateHeader("If-Modified-Since");
+        long ifModifiedSince = request.getDateHeader(HttpHeaders.IF_MODIFIED_SINCE);
         InputStream in = null;
         try {
             Aura.getConfigAdapter().regenerateAuraJS();
@@ -92,7 +93,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                     //
                     // This is the case where there is an fwUid, and there is no real
                     // nonce. We reconnect the falsely matched nonce & file. Note that
-                    // fwUid should never be null for new fetches of the framwork js.
+                    // fwUid should never be null for new fetches of the framework js.
                     //
                     file = "/"+nonceUid+file;
                 }

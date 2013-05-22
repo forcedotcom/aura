@@ -30,6 +30,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -141,7 +142,7 @@ public class AuraContextFilter implements Filter {
         context.setContextPath(contextPath);
         context.setNum(num.get(request));
         context.setRequestedLocales(Collections.list(request.getLocales()));
-        context.setClient(new Client(request.getHeader("User-Agent")));
+        context.setClient(new Client(request.getHeader(HttpHeaders.USER_AGENT)));
 
         if (configMap != null) {
             String lastMod = (String) configMap.get("lastmod");

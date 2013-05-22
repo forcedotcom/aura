@@ -22,7 +22,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.auraframework.util.json.JsonReader;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -171,7 +171,7 @@ public class AuraUITestingUtil {
          * errors back to the WebDriver. We must return as an array because
          * {@link JavascriptExecutor#executeScript(String, Object...) cannot handle Objects as return values."
          */
-        String escapedJavascript = StringEscapeUtils.escapeJavaScript(javascript);
+        String escapedJavascript = StringEscapeUtils.escapeEcmaScript(javascript);
         String wrapper = "var ret,scriptExecException;"
                 + String.format("var func = new Function('arguments', \"%s\");\n", escapedJavascript) + "try\n{"
                 + " ret = func.call(this, arguments);\n" + "}\n" + "catch(e){\n"
@@ -243,7 +243,7 @@ public class AuraUITestingUtil {
     /**
      * use to do mouse over the element
      * 
-     * @param element
+     * @param elem
      */
     public void setHoverOverElement(String elem) {
         Actions builder = new Actions(driver);

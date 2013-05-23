@@ -16,7 +16,7 @@
 
 -->
 <aura:component extends="auradocs:topicPanel">
-    <aura:set attribute="title" value="Registering a Custom Converter"/>
+    <aura:set attribute="title" value="Custom Converters"/>
 
 <p>A custom converter enables the conversion of one Java type to another Java type for client data sent to the server or for server markup data.</p>
 

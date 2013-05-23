@@ -103,9 +103,10 @@
             try{
                 $A.componentService.newComponent(config, null, true, false);
             } catch (e){
-                $A.test.assertEquals("Assertion Failed!: DefDescriptor config undefined : undefined", e.message);
+                $A.test.assertEquals("Assertion Failed!: Unknown component markup://arrested:development : undefined", e.message);
                 return;
             }
+
             throw new Error("Expected an error");
         }
     },

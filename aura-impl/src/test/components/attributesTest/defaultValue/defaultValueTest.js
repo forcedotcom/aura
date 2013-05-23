@@ -82,12 +82,19 @@
 	 */
 	testDefaultValueOfNewLocalComponentWithDefAtClient : {
 		test : function(cmp) {
-			var newCmp = $A.newCmp("markup://attributesTest:defaultValue");
-			this.verifyDefaultValuesOfBasicDataType(newCmp);
-			this.verifyDefaultValuesOfObjectDataType(newCmp);
-			// W-1324216
-			// this.verifyDefaultValuesOfListDataType(newCmp);
-			this.verifyChangingAttributeValues(newCmp);
+			$A.newCmpAsync(
+					function (newComp) {
+        				this.verifyDefaultValuesOfBasicDataType(newComp);
+        				this.verifyDefaultValuesOfObjectDataType(newComp);
+        				// W-1324216
+        				// this.verifyDefaultValuesOfListDataType(newComp);
+        				this.verifyChangingAttributeValues(newComp);
+					},
+					this,
+					"markup://attributesTest:defaultValue",
+					null, null, null
+			);
+			
 		}
 	},
 

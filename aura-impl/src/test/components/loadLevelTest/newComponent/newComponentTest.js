@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
-     * Tests to verify AuraComponentService.newComponent() or $A.newCmp()
+     * Tests to verify AuraComponentService.newComponent() or $A.newCmpDeprecated()
      */
 
 ({
@@ -267,7 +267,7 @@
                 $A.componentService.newComponent(config);
                 $A.test.fail('Should have failed to create component without a descriptor.');
             }catch(e){
-                $A.test.assertEquals("Assertion Failed!: ComponentDef Config required for registration : undefined",e.message);
+                $A.test.assertEquals("Assertion Failed!: ComponentDefRegistry.getDef() name is required : undefined",e.message);
             }
         },function(cmp){
             aura.test.setTestTimeout(15000);

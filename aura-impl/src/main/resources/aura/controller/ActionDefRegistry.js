@@ -18,6 +18,7 @@
  * @constructor
  * @protected
  */
+/*jslint sub: true */
 function ActionDefRegistry(){
     this.actionDefs = {};
 }
@@ -36,12 +37,18 @@ ActionDefRegistry.prototype.getDef = function(config){
     var descriptor = config.descriptor;
     var ret = this.actionDefs[descriptor];
     if (!ret) {
-        ret = new ActionDef(config);
-        
-        // Only track server actions to save space
-        if (ret.isServerAction()) {
-        	this.actionDefs[ret.getDescriptor().toString()] = ret;
-        }
+    	if (config["actionType"]) {
+	        ret = new ActionDef(config);
+	        
+	        // Only track server actions to save space
+	        if (ret.isServerAction()) {
+	        	this.actionDefs[ret.getDescriptor().toString()] = ret;
+	        }
+    	} else {
+         	// Make sure that all actions are registered and try again
+        	aura.componentService.registerPending();
+            ret = this.actionDefs[descriptor];
+    	}
     }
     
     return ret;

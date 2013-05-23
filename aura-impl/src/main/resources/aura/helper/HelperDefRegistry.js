@@ -41,10 +41,12 @@ HelperDefRegistry.prototype.getDef = function(componentDefDescriptor, config, co
         if(zuper){
             superHelper = zuper.getHelper();
         }
+        
         if (config || superHelper) {
             ret = new HelperDef(config || {}, superHelper);
             this.helperDefs[componentDefDescriptor] = ret;
         }
     }
+    
     return ret;
 };

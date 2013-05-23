@@ -33,9 +33,9 @@
 	}
 	</auradocs:codeblock>
 	
-	<p>This sample code adds an event handler to a component that is created using <code>$A.services.component.newComponent()</code>.</p>
+	<p>This sample code adds an event handler to a component that is created using <code>$A.services.component.newComponentDeprecated()</code>.</p>
 	<auradocs:codeblock>
-	var newCmp = $A.services.component.newComponent(event.getParam("newcmp"));
+	var newCmp = $A.services.component.newComponentDeprecated(event.getParam("newcmp"));
 	newCmp.addHandler("someAction", cmp, "c.someAction");
 	</auradocs:codeblock>
 	

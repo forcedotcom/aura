@@ -16,17 +16,17 @@
 ({
     makeClient : function(cmp){
         cmp.find("status").getElement().innerHTML = "";
-        cmp.getValue("v.body").push($A.newCmp("markup://loadLevelTest:clientComponent"));
+        cmp.getValue("v.body").push($A.newCmpDeprecated("markup://loadLevelTest:clientComponent"));
     },
 
     makeServer : function(cmp){
         cmp.find("status").getElement().innerHTML = "";
-        cmp.getValue("v.body").push($A.newCmp("markup://loadLevelTest:serverComponent"));
+        cmp.getValue("v.body").push($A.newCmpDeprecated("markup://loadLevelTest:serverComponent"));
     },
 
     makeExclusiveServer : function(cmp){
         cmp.find("status").getElement().innerHTML = "";
-        cmp.getValue("v.body").push($A.newCmp({componentDef : "markup://loadLevelTest:serverComponent", load : "EXCLUSIVE"}));
+        cmp.getValue("v.body").push($A.newCmpDeprecated({componentDef : "markup://loadLevelTest:serverComponent", load : "EXCLUSIVE"}));
     },
 
     waiting : function(cmp){

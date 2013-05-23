@@ -85,8 +85,14 @@ var AuraComponentService = function(){
             return ret;
         },
 
+        newComponent: function(config, attributeValueProvider, localCreation, doForce){
+        	var that = $A.services.component;
+        	return that.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
+        },
+
+        
         /**
-         * Creates a new component on the client or server and initializes it. For example <code>$A.services.component.newComponent("ui:inputText")</code>
+         * Creates a new component on the client or server and initializes it. For example <code>$A.services.component.newComponentDeprecated("ui:inputText")</code>
          * creates a <code>ui:inputText</code> component.
          * <p>See Also: <a href="#help?topic=dynamicCmp">Dynamically Creating Components</a></p>
          * @param {Object} config
@@ -96,7 +102,7 @@ var AuraComponentService = function(){
          * @memberOf AuraComponentService
          * @public
          */
-        newComponent: function(config, attributeValueProvider, localCreation, doForce){
+        newComponentDeprecated: function(config, attributeValueProvider, localCreation, doForce){
             aura.assert(config, "config is required in ComponentService.newComponent(config)");
 
             var that = $A.services.component;
@@ -151,18 +157,20 @@ var AuraComponentService = function(){
             return ret;
         },
 
+        
         /**
-         * Async version of newComponent. Returns a component from newComponent if component def
-         * is already known. Otherwise, we request component from server and call provided callback.
+         * Asynchronous version of newComponent. Calls your provided callback with the completed component
+         * regardless of whether we must make a round trip to server, or can create locally.
          *
+         * @param callback - the callback to use once the component is successfully created
+         * @param callbackThis - the "this" context for the callback (null for global)
          * @param config
          * @param [attributeValueProvider]
          * @param [localCreation]
          * @param [doForce]
-         * @param callback
          * @return {*}
          */
-        newAsyncComponent: function(config, attributeValueProvider, localCreation, doForce, callback){
+        newComponentAsync: function(callback, callbackThis, config, attributeValueProvider, localCreation, doForce){
             aura.assert(config, "config is required in ComponentService.newComponent(config)");
 
             var that = $A.services.component;
@@ -182,9 +190,10 @@ var AuraComponentService = function(){
             };
 
             if ( !def || (def && def.hasRemoteDependencies()) ) {
-                this.requestComponent(config, callback);
-            } else {
-                return this.newComponent(config, attributeValueProvider, localCreation, doForce);
+                that.requestComponent(config, callback, callbackThis);
+            } else if ( $A.util.isFunction(callback) ) {
+            	var newComp = that.newComponent(config, attributeValueProvider, localCreation, doForce);
+                callback.call(callbackThis, newComp);
             }
 
         },
@@ -195,7 +204,7 @@ var AuraComponentService = function(){
          * @param config
          * @param callback
          */
-        requestComponent: function(config, callback) {
+        requestComponent: function(config, callback, callbackThis) {
 
             var action = $A.get("c.aura://ComponentController.getComponent");
 
@@ -214,7 +223,7 @@ var AuraComponentService = function(){
                 }
 
                 if ( $A.util.isFunction(callback) ) {
-                    callback.call(null, newComp);
+                    callback.call(callbackThis, newComp);
                 }
             });
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
-     * Tests to verify AuraComponentService.newComponent() or $A.newCmp()
+     * Tests to verify AuraComponentService.newComponent() or $A.newCmpDeprecated()
      */
 
 ({

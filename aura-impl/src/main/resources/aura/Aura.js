@@ -303,6 +303,8 @@ $A.ns.Aura = function() {
     this.getCmp = this.componentService.get;
 
     this.newCmp = this.componentService.newComponent;
+    this.newCmpDeprecated = this.componentService.newComponentDeprecated;
+    this.newCmpAsync = this.componentService.newComponentAsync;
 
     /**
      * Equivalent to <code>$A.eventService.newEvent()</code>.
@@ -339,6 +341,8 @@ $A.ns.Aura = function() {
             "qhelp", function() { return aura.devToolService.help() },
         //#end
         "newCmp", aura.newCmp,
+        "newCmpDeprecated", aura.newCmpDeprecated,
+        "newCmpAsync", aura.newCmpAsync,
         "getEvt", aura.getEvt);
     var services = aura.services;
 

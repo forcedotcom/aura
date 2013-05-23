@@ -21,6 +21,7 @@
  */
 function ComponentDefRegistry(){
     this.componentDefs = {};
+    this.pendingComponentDefs = {};
 }
 
 ComponentDefRegistry.prototype.auraType = "ComponentDefRegistry";
@@ -49,54 +50,75 @@ ComponentDefRegistry.prototype.isLocalStorageAvailable= (function() {
  * trying to write through of local storage cacheable componentDefs.
  * @returns a ComponentDef instance from registry, or config after adding to registry.
  */
-ComponentDefRegistry.prototype.getDef = function(config, noInit) {
+ComponentDefRegistry.prototype.getDef = function(config, allowUnknownComponentDef) {
     aura.assert(config, "ComponentDef Config required for registration");
-
-    // We don't re-register (or modify in any way) once we've registered
-    var descriptor = config["descriptor"] || config;
-    if ($A.util.isString(descriptor) && (descriptor.indexOf("://") < 0)) {
-        descriptor = "markup://" + descriptor; // support shorthand
+    
+    var name = config["descriptor"] || config;
+    if ($A.util.isString(name) && (name.indexOf("://") < 0)) {
+        name = "markup://" + name; // support shorthand
     }
-    var ret = this.componentDefs[descriptor];
-    if ((!noInit) && !ret) {
-        var useLocalStorage = this.useLocalCache(descriptor);
-        if (useLocalStorage) {
-            $A.mark("ComponentDefRegistry.localStorageCache");
-            $A.mark("Cleared localStorage (out of space) ");
-            $A.mark("Wrote " + descriptor);
-
+    
+    // We don't re-register (or modify in any way) once we've registered
+    var ret = this.componentDefs[name];
+    if (!ret) {
+        if (this.useLocalCache(name)) {
             // Try to load from cache
-            var cachedConfig = this.getConfigFromLocalCache(descriptor);
+            var cachedConfig = this.getConfigFromLocalCache(name);
             if (cachedConfig) {
-                config = cachedConfig;
-                useLocalStorage = false;
+                this.addDef(cachedConfig);
             }
-
-            $A.endMark("ComponentDefRegistry.localStorageCache");
         }
-
-        ret = new ComponentDef(config);
-        this.componentDefs[ret.getDescriptor().toString()] = ret;
-
-        if (useLocalStorage) {
-            // Write through of local storage cacheable componentDefs
-            try {
-                this.writeToCache(descriptor, config, mark);
-            } catch (e) {
-                // Clear localStorage and try one more time to write through
-                localStorage.clear();
-                $A.endMark("Cleared localStorage (out of space) ");
-
+        
+    	// See if we have this in pending adds
+    	config = this.pendingComponentDefs[name];
+    	if (config) {
+    		delete this.pendingComponentDefs[name];
+    		        		
+            ret = new ComponentDef(config);
+            this.componentDefs[name] = ret;
+            
+            if (this.useLocalCache(name)) {
+                // Write through of local storage cacheable componentDefs
                 try {
-                    this.writeToCache(descriptor, config, mark);
-                } catch(e2) {
-                    // Nothing we can do at this point - give up.
+                    this.writeToCache(name, config);
+                } catch (e) {
+                    // Clear localStorage and try one more time to write through
+                    localStorage.clear();
+
+                    try {
+                    	this.writeToCache(name, config);
+                    } catch(e2) {
+                    	// Nothing we can do at this point - give up.
+                    }
                 }
             }
         }
     }
 
+    aura.assert(allowUnknownComponentDef || ret, "Unknown component " + name);
+
     return ret;
+};
+
+/**
+ * Registers a ComponentDef instance with the registry.
+ * Throws an error if config is not provided.
+ * @param {Object} config Passes in a config, a ComponentDef, or the name of a ComponentDef.
+ * @private
+ */
+ComponentDefRegistry.prototype.addDef = function(config) {
+    aura.assert(config, "ComponentDef Config required for registration");
+
+    // We don't re-register (or modify in any way) once we've registered
+    var name = config["descriptor"] || config;
+    if ($A.util.isString(name) && (name.indexOf("://") < 0)) {
+        name = "markup://" + name; // support shorthand
+    }
+    
+    if (!this.componentDefs[name] && !this.pendingComponentDefs[name]) {
+        var descriptor = new DefDescriptor(name);
+    	this.pendingComponentDefs[descriptor.toString()] = config;
+    }
 };
 
 /**
@@ -136,19 +158,31 @@ ComponentDefRegistry.prototype.getConfigFromLocalCache = function(descriptor) {
  * Updates the local cache catalog and writes out the componentDef.
  * @param {Object} descriptor
  * @param {Object} config
- * @param {Object} mark
  */
-ComponentDefRegistry.prototype.writeToCache = function(descriptor, config, mark) {
-    if (this.isLocalStorageAvailable) {
-        // Update the catalog
-        var catalog = this.getLocalCacheCatalog();
+ComponentDefRegistry.prototype.writeToCache = function(descriptor, config) {
+	if (this.isLocalStorageAvailable) {
+	    // Update the catalog
+	    var catalog = this.getLocalCacheCatalog();
+	
+	    catalog[descriptor] = true;
+	    localStorage.setItem(this.cacheName, aura.util.json.encode(catalog));
+	
+	    // Write out the componentDef
+	    localStorage.setItem(this.cacheName + "." + descriptor, aura.util.json.encode(config));
+	}
+};
 
-        catalog[descriptor] = true;
-        localStorage.setItem(this.cacheName, aura.util.json.encode(catalog));
-
-        // Write out the componentDef
-        localStorage.setItem(this.cacheName + "." + descriptor, aura.util.json.encode(config));
-
-        $A.endMark("Wrote " + descriptor);
+/**
+ * Registers all pending component defs
+ * @protected
+ */
+ComponentDefRegistry.prototype.registerPending = function() {
+	var pending = [];
+    for (var name in this.pendingComponentDefs) {
+    	pending.push(name);
+    }	
+	
+    for (var n = 0; n < pending.length; n++) {
+        this.getDef(pending[n]);
     }
 };

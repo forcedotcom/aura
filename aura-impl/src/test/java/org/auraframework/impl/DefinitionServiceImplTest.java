@@ -359,7 +359,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             private static final long serialVersionUID = 1L;
 
             public TestTypeDef(DefDescriptor<TypeDef> descriptor, Object object) {
-                super(descriptor, null);
+                super(descriptor, null, null);
             }
 
             @Override

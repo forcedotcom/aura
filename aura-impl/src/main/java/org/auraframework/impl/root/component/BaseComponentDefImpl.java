@@ -69,7 +69,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
-RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
+        RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
     public static final DefDescriptor<InterfaceDef> ROOT_MARKER = DefDescriptorImpl.getInstance(
             "markup://aura:rootComponent", InterfaceDef.class);
@@ -328,7 +328,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     }
 
     /**
-     * does all the validation of the expressions defined in this component
+     * Does all the validation of the expressions defined in this component
      */
     private void validateExpressionRefs() throws QuickFixException {
         for (PropertyReference e : expressionRefs) {
@@ -343,21 +343,17 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                 if (gvp != null) {
                     gvp.validate(e.getStem());
                 }
-            } else if(vpt == ValueProviderType.VIEW){
-                if(e.getStem() != null){   // checks for private attributes used in expressions ..
+            } else if (vpt == ValueProviderType.VIEW) {
+                if (e.getStem() != null) { // checks for private attributes used in expressions ..
                     String stem = e.getStem().toString();
                     AttributeDef attr = getAttributeDef(stem);
-                    if(attr != null){
-                        Collection<AttributeDef> edefs =  extendsDescriptor.getDef().getAttributeDefs().values();
-                        if(attr.getVisibility() == Visibility.PRIVATE && (edefs.contains(attr)) ){
-                            throw new InvalidDefinitionException(String.format("Expression %s refers to a private attribute '%s' ",e,attr),attr.getLocation());
-                        }
+                    if ((attr != null) && (attr.getVisibility() == Visibility.PRIVATE)
+                            && (!this.attributeDefs.values().contains(attr))) {
+                        throw new InvalidDefinitionException(String.format(
+                                "Expression %s refers to a private attribute '%s' ", e, attr), e.getLocation());
                     }
-
                 }
             }
-
-
         }
     }
 
@@ -634,12 +630,12 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
             return getDescriptor().equals(other.getDescriptor())
                     && controllerDescriptors
-                    .equals(other.controllerDescriptors)
+                            .equals(other.controllerDescriptors)
                     && (modelDefDescriptor == null ? other.modelDefDescriptor == null
-                    : modelDefDescriptor
-                    .equals(other.modelDefDescriptor))
+                            : modelDefDescriptor
+                                    .equals(other.modelDefDescriptor))
                     && (extendsDescriptor == null ? other.extendsDescriptor == null
-                    : extendsDescriptor.equals(other.extendsDescriptor))
+                            : extendsDescriptor.equals(other.extendsDescriptor))
                     && events.equals(other.events)
                     && getLocation().equals(other.getLocation());
         }
@@ -734,7 +730,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     }
 
     protected abstract void serializeFields(Json json) throws IOException,
-    QuickFixException;
+            QuickFixException;
 
     /**
      * @see ComponentDef#getRendererDescriptor()
@@ -843,7 +839,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     }
 
     public static abstract class Builder<T extends BaseComponentDef> extends
-    RootDefinitionImpl.Builder<T> implements BaseComponentDefBuilder<T> {
+            RootDefinitionImpl.Builder<T> implements BaseComponentDefBuilder<T> {
 
         public Builder(Class<T> defClass) {
             super(defClass);
@@ -869,7 +865,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         public Set<PropertyReference> expressionRefs;
         public String render;
         public WhitespaceBehavior whitespaceBehavior;
-        private List<DependencyDef> dependencies;
+        List<DependencyDef> dependencies;
 
         @Override
         public Builder<T> setFacet(String key, Object value) {
@@ -1000,7 +996,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         case APPLICATION:
             return descriptor.equals(other)
                     || (extendsDescriptor != null && getSuperDef()
-                    .isInstanceOf(other));
+                            .isInstanceOf(other));
         default:
             return false;
         }

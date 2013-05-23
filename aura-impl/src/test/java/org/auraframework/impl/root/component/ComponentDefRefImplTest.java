@@ -32,7 +32,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
 
 import com.google.common.collect.ImmutableMap;
@@ -72,34 +72,6 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         assertNotNull(testComponentDefRef);
     }
 
-    public void testGetDescriptor() throws Exception {
-        assertEquals(vendor.makeComponentDefDescriptor("test:text"), testComponentDefRef.getDescriptor());
-        assertEquals(
-                vendor.makeComponentDefDescriptor("fake:component"),
-                vendor.makeComponentDefRef(vendor.makeComponentDefDescriptor("fake:component"),
-                        new HashMap<DefDescriptor<AttributeDef>, AttributeDefRef>(),
-                        vendor.makeLocation("fakefilename", 10, 10, 0)).getDescriptor());
-        assertFalse(vendor.makeComponentDefDescriptor("aura:test").equals(
-                vendor.makeComponentDefRef(vendor.makeComponentDefDescriptor("fake:component2"),
-                        new HashMap<DefDescriptor<AttributeDef>, AttributeDefRef>(),
-                        vendor.makeLocation("fakefilename", 10, 10, 0)).getDescriptor()));
-        assertFalse(vendor.makeComponentDefDescriptor("fake:component").equals(testComponentDefRef.getDescriptor()));
-    }
-
-    public void testGetLocation() throws Exception {
-        assertEquals(vendor.makeLocation("filename", 5, 5, 0), testComponentDefRef.getLocation());
-        assertEquals(
-                vendor.makeLocation("fakefilename", 10, 10, 0),
-                vendor.makeComponentDefRef(vendor.makeComponentDefDescriptor("fake:component2"),
-                        new HashMap<DefDescriptor<AttributeDef>, AttributeDefRef>(),
-                        vendor.makeLocation("fakefilename", 10, 10, 0)).getLocation());
-        assertFalse(vendor.makeLocation("filename", 5, 5, 0).equals(
-                vendor.makeComponentDefRef(vendor.makeComponentDefDescriptor("fake:component2"),
-                        new HashMap<DefDescriptor<AttributeDef>, AttributeDefRef>(),
-                        vendor.makeLocation("fakefilename", 10, 10, 0)).getLocation()));
-        assertFalse(vendor.makeLocation("fakefilename", 10, 10, 0).equals(testComponentDefRef.getLocation()));
-    }
-
     public void testAppendDependencies() throws Exception {
         Set<DefDescriptor<?>> dependencies = new HashSet<DefDescriptor<?>>();
         testComponentDefRef.appendDependencies(dependencies);
@@ -137,8 +109,8 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         ComponentDefRef cdr = vendor.makeComponentDefRefWithNulls(null, null, null);
         try {
             cdr.validateDefinition();
-            fail("Should have thrown AuraException because descriptor is null.");
-        } catch (AuraRuntimeException e) {
+            fail("Should have thrown InvalidDefinitionException because descriptor is null.");
+        } catch (InvalidDefinitionException e) {
 
         }
     }

@@ -52,13 +52,12 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     public AttributeDefImpl(DefDescriptor<AttributeDef> descriptor,
             DefDescriptor<? extends RootDefinition> parentDescriptor, DefDescriptor<TypeDef> typeDefDescriptor,
             AttributeDefRef defaultValue, boolean required, SerializeToType serializeTo, Location location , Visibility visibility) {
-        super(descriptor, location);
+        super(descriptor, location, visibility);
         this.parentDescriptor = parentDescriptor;
         this.typeDefDescriptor = typeDefDescriptor;
         this.defaultValue = defaultValue;
         this.required = required;
         this.serializeTo = serializeTo;
-        this.visibility= visibility;
     }
 
     protected AttributeDefImpl(Builder builder) {
@@ -66,7 +65,6 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
         this.parentDescriptor = builder.parentDescriptor;
         this.typeDefDescriptor = builder.typeDefDescriptor;
         this.defaultValue = builder.defaultValue;
-        this.visibility= builder.visibility;
         this.required = builder.required;
         this.serializeTo = builder.serializeTo;
     }
@@ -87,11 +85,7 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     public AttributeDefRef getDefaultValue() {
         return defaultValue;
     }
-    @Override
-    public Visibility getVisibility(){
-        return visibility != null ? visibility : Visibility.PUBLIC;
-    }
-
+    
     /**
      * @return True if instances must require a value to be explicitly set
      */
@@ -132,22 +126,23 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
 
+        if (this.typeDefDescriptor == null) {
+            throw new InvalidDefinitionException("Invalid typeDefDescriptor: null", getLocation());
+        }
+        
         String name = this.descriptor.getName();
         // Calls the validateAttributeName method in AuraTextUtil.java to check if its a valid attribute name
         if ((AuraTextUtil.validateAttributeName(name)) != true) {
-            throw new InvalidDefinitionException("Invalid Attribute Name :'" + name
-                    + "',Refer AuraDocs for valid attribute names", getLocation());
+            throw new InvalidDefinitionException("Invalid attribute name: '" + name
+                    + "', Refer to AuraDocs for valid attribute names", getLocation());
         }
 
         if (this.serializeTo == SerializeToType.INVALID) {
             throw new InvalidDefinitionException("Invalid serializeTo value", getLocation());
         }
 
-        if(this.visibility == Visibility.INVALID){
-            throw new InvalidDefinitionException("Invalid value for Visibility", getLocation());
-        }
-        if (this.visibility == Visibility.PRIVATE && this.required == true){
-            throw new InvalidDefinitionException("cannot set an attribute as required and private",getLocation());
+        if (this.visibility == Visibility.PRIVATE && this.required == true) {
+            throw new InvalidDefinitionException("Cannot set an attribute as required and private", getLocation());
         }
     }
 
@@ -183,13 +178,12 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
             super(AttributeDef.class);
         }
 
-        private DefDescriptor<? extends RootDefinition> parentDescriptor;
         public DefDescriptor<TypeDef> typeDefDescriptor;
         public AttributeDefRef defaultValue;
         public SerializeToType serializeTo;
 
+        private DefDescriptor<? extends RootDefinition> parentDescriptor;
         private boolean required;
-        public Visibility visibility;
 
         /**
          * @see org.auraframework.impl.system.DefinitionImpl.BuilderImpl#build()
@@ -247,14 +241,6 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
             this.serializeTo = serializeTo;
             return this;
         }
-
-        @Override
-        public Builder setVisibility(Visibility visibility){
-            this.visibility= visibility;
-            return this;
-        }
-
-
     }
 
     private static final long serialVersionUID = 2241357665688011566L;

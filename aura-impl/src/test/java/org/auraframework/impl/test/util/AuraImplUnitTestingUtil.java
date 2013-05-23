@@ -252,7 +252,6 @@ public class AuraImplUnitTestingUtil {
 
             @Override
             public Visibility getVisibility() {
-
                 return Visibility.PUBLIC;
             }
         };

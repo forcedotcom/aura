@@ -58,6 +58,28 @@ public class TypeUtilTest extends UnitTestCase {
         assertEquals("Custom array type converter failed to convert.", new CustomPairType("long", 5467),
                 arrayOfValues[1]);
     }
+    
+    /**
+     * Verify conversion of custom converters that handle multiple output types.
+     */
+    public void testRegisteringMulticonverters() {
+
+        // 1. Try to convert from String to subclasses of CustomAbstractType.
+        assertTrue("Failed to register custom multi converter",
+                TypeUtil.hasConverter(String.class, CustomConcreteType1.class, null));
+        assertTrue("Failed to register custom multi converter",
+                TypeUtil.hasConverter(String.class, CustomConcreteType2.class, null));
+        
+        CustomAbstractType result = TypeUtil.convert("blah:52", CustomConcreteType1.class);
+        assertNotNull(result);
+        assertEquals("Custom multi converter failed to convert string value.", "blah", result.getStrValue());
+        assertEquals("Custom multi converter failed to convert string value.", 52, result.getIntValue());
+
+        result = TypeUtil.convert("zebra zebra:73", CustomConcreteType2.class);
+        assertNotNull(result);
+        assertEquals("Custom multi converter failed to convert string value.", "zebra zebra", result.getStrValue());
+        assertEquals("Custom multi converter failed to convert string value.", -146, result.getIntValue());
+    }
 
     /**
      * W-1295660 This is a big hole. Anybody can override the converters we have

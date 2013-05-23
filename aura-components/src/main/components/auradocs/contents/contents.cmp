@@ -168,10 +168,7 @@
                  <auradocs:contentsNode text="Server-Side Providers" id="oodProviders" />
                 <auradocs:contentsNode text="Aura Integration Service" id="auraIntegrationService"/>
                 <auradocs:contentsNode text="Label Adapters" id="labelAdapter"/>
-                <auradocs:contentsNode text="Custom Converters">
-                    <auradocs:contentsNode text="Registering a Custom Converter" id="registerCustomConverter"/>
-                    <auradocs:contentsNode text="Converter Interface" id="converterInterface"/>
-                </auradocs:contentsNode>
+                <auradocs:contentsNode text="Custom Converters" id="registerCustomConverter" />
                 <auradocs:contentsNode text="Java Cookbook">
                     <auradocs:contentsNode text="Introduction" id="javaCookbook" />
                     <auradocs:contentsNode text="Getting a DefDescriptor" id="javaDefDesc" />

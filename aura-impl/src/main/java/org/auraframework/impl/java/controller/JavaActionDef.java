@@ -36,6 +36,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
     private final List<ValueDef> params;
     private final Class<?>[] javaParams;
     private final Method method;
+    private final boolean background;
 
     protected JavaActionDef(Builder builder) {
         super(builder);
@@ -43,6 +44,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         this.params = AuraUtil.immutableList(builder.params);
         this.javaParams = builder.javaParams;
         this.method = builder.method;
+        this.background = builder.background;
     }
 
     @Override
@@ -72,6 +74,10 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
     public DefDescriptor<TypeDef> getReturnType() {
         return returnTypeDescriptor;
     }
+    
+    public boolean isBackground() {
+    	return background;
+    }
 
     @Override
     public void serialize(Json json) throws IOException {
@@ -80,6 +86,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         json.writeMapEntry("descriptor", getDescriptor());
         json.writeMapEntry("actionType", getActionType());
         json.writeMapEntry("returnType", getReturnType());
+        json.writeMapEntry("background", isBackground());
         json.writeMapEntry("params", params);
         json.writeMapEnd();
     }
@@ -94,6 +101,7 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         private List<ValueDef> params;
         private Class<?>[] javaParams;
         private Method method;
+        private boolean background = false;
 
         @Override
         public JavaActionDef build() {
@@ -130,5 +138,9 @@ public class JavaActionDef extends DefinitionImpl<ActionDef> implements ActionDe
         public void setMethod(Method method) {
             this.method = method;
         }
+
+		public void setBackground(boolean background) {
+			this.background = background;
+		}
     }
 }

@@ -15,7 +15,7 @@
  */
 ({
     newComponent : function(cmp, evt, helper){
-        var newcmp = $A.services.component.newComponent({
+        var newcmp = $A.services.component.newComponentDeprecated({
                 "componentDef" : "markup://attributesTest:serializeTo",
                 "attributes" : {
                     "values" : {

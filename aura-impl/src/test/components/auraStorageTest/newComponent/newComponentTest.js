@@ -103,7 +103,7 @@
 			action2.setParams({testName : "testActionScopedGlobalID"});
 			action2.setAbortable();
 			action2.setCallback(cmp, function(action) {
-				var teamFacet = $A.newCmp(action.getReturnValue()[0]);
+				var teamFacet = $A.newCmpDeprecated(action.getReturnValue()[0]);
 				//Clear the old facet in team div
 				cmp.find("Team").getValue("v.body").clear();
 				 //Insert newly fetched components
@@ -169,7 +169,7 @@
 				//Clear the old facet in players div
 				cmp.find("Players").getValue("v.body").clear();
 	            for(var i=0;i<ret.length;i++){
-	                var playerFacet = $A.newCmp(ret[i]);
+	                var playerFacet = $A.newCmpDeprecated(ret[i]);
 	                //Insert newly fetched components
 	                cmp.find("Players").getValue("v.body").push(playerFacet);
 	            }

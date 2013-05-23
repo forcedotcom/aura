@@ -52,7 +52,7 @@
                 var bodyValue = currentCmp.getAttributes().getValue("body");
                 bodyValue.destroy();
 
-                var is = $A.services.component.newComponent(action.getReturnValue());
+                var is = $A.services.component.newComponentDeprecated(action.getReturnValue());
 
                 var outputNumberCmp = is.getAttributes().getValue("value");
 

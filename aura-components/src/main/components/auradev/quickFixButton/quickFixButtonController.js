@@ -19,7 +19,7 @@
         var quickFix = cmp.getAttributes().getValue("quickFix");
         var ui = quickFix.getValue("ui");
         if (ui) {
-            ui = $A.services.component.newComponent({
+            ui = $A.services.component.newComponentDeprecated({
                 componentDef: ui.unwrap(),
                 attributes: {
                     values: {

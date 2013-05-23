@@ -253,7 +253,7 @@
 			action.setParams({testName: "testComponentsFromStoredServerAction"});
     		action.setStorable();
     		action.setCallback(cmp, function(a){
-    			var newComponent = $A.newCmp(a.getReturnValue());
+    			var newComponent = $A.newCmpDeprecated(a.getReturnValue());
                 cmp.find("facet").getValue("v.body").clear();
                 //Insert newly fetched component
                 cmp.find("facet").getValue("v.body").push(newComponent);
@@ -275,7 +275,7 @@
     		dupAction.setParams({testName: "testComponentsFromStoredServerAction"});
     		dupAction.setStorable();
     		dupAction.setCallback(cmp, function(a){
-    			var secondNewComponent = $A.newCmp(a.getReturnValue());
+    			var secondNewComponent = $A.newCmpDeprecated(a.getReturnValue());
     			//push newly fetched component
                 cmp.find("facet").getValue("v.body").push(secondNewComponent);
     		});

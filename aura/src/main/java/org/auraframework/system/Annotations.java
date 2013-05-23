@@ -23,6 +23,14 @@ import java.lang.annotation.Target;
 /**
  */
 public interface Annotations {
+	
+	/**
+	 * This action will be queued and run as a lower priority background task.
+	 */
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.METHOD)
+	public @interface BackgroundAction {
+	}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)

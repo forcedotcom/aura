@@ -37,6 +37,7 @@ function ActionDef(config){
             var param = new ValueDef(paramConfig);
             this.paramDefs[param.getName()] = param;
         }
+        this.background = config["background"];
     }
 
     if (this.actionType === "CLIENT") {
@@ -100,7 +101,7 @@ ActionDef.prototype.isServerAction = function(){
  * @returns {Action}
  */
 ActionDef.prototype.newInstance = function(cmp){
-    return new Action(this, this.meth, this.paramDefs, cmp);
+    return new Action(this, this.meth, this.paramDefs, this.background, cmp);
 };
 
 //#include aura.controller.ActionDef_export

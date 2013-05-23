@@ -32,8 +32,7 @@
  * @param {Object}
  *            cmp The component associated with the Action.
  */
-var Action = function Action(def, method, paramDefs, cmp) {
-
+var Action = function Action(def, method, paramDefs, background, cmp) {
     this.def = def;
     this.meth = method;
     this.paramDefs = paramDefs;
@@ -41,6 +40,7 @@ var Action = function Action(def, method, paramDefs, cmp) {
     this.params = {};
     this.state = "NEW";
     this.callbacks = {};
+    this.background = background;
 };
 
 Action.prototype.nextActionId = 1;
@@ -229,6 +229,23 @@ Action.prototype.getReturnValue = function() {
  */
 Action.prototype.getError = function() {
     return this.error;
+};
+
+/**
+ * Returns true if the actions should be enqueued in the background, false if it should be run 
+ * in the foreground.
+ * @public
+ */
+Action.prototype.isBackground = function() {
+    return this.background === true;
+};
+
+/**
+ * Set to true of the action should be enqueued when run instead of running in the foreground.
+ * @param {boolean} background
+ */
+Action.prototype.setBackground = function(background) {
+    this.background = background;
 };
 
 /**

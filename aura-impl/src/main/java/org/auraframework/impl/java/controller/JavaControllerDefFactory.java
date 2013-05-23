@@ -35,6 +35,7 @@ import org.auraframework.impl.java.type.JavaTypeDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.BackgroundAction;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.DefFactory;
@@ -117,7 +118,7 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
         String name = method.getName();
         Class<?>[] paramTypes = method.getParameterTypes();
         List<ValueDef> params = Lists.newArrayList();
-        Annotation[][] annotations = method.getParameterAnnotations();
+        Annotation[][] paramAnnotations = method.getParameterAnnotations();
 
         if (!Modifier.isPublic(modifiers) || !Modifier.isStatic(modifiers)) {
             // We used to just ignore this, but it is really bad, as someone
@@ -135,7 +136,7 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
 
         for (int i = 0; i < paramTypes.length; i++) {
             boolean found = false;
-            for (Annotation annotation : annotations[i]) {
+            for (Annotation annotation : paramAnnotations[i]) {
                 if (annotation instanceof Key) {
                     found = true;
                     String qn = "java://" + formatType(genParams[i]);
@@ -153,6 +154,9 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
             }
         }
         actionBuilder.setParams(params);
+        
+    	actionBuilder.setBackground(method.isAnnotationPresent(BackgroundAction.class));
+        
         return actionBuilder.build();
     }
 

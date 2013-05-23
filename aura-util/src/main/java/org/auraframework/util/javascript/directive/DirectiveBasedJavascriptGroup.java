@@ -18,7 +18,6 @@ package org.auraframework.util.javascript.directive;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.Writer;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -43,6 +42,8 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
      * the cause (and failing thread, which hints at the compilation mode) for each error encountered.
      */
     public static class CompositeRuntimeException extends RuntimeException {
+        private static final long serialVersionUID = 7863307967596024441L;
+
         public Map<String, Throwable> errors;
 
         public CompositeRuntimeException(String message, Map<String, Throwable> errors) {

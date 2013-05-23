@@ -247,11 +247,11 @@ var ComponentPriv = (function(){ // Scoping priv
         if(this.partialConfig){
             var fromServer = this.partialConfig["componentDef"];
             if(fromServer){
-            	componentService.addDef(fromServer);
-                componentDef = componentService.getDef(fromServer);
+        		componentService.addDef(fromServer);
+                componentDef = componentService.getDef(fromServer["descriptor"]);
             }
         }else {
-            componentDef = componentService.getDef(config);
+            componentDef = componentService.getDef(config["descriptor"] || config);
         }
         
         aura.assert(componentDef, "componentDef is required");

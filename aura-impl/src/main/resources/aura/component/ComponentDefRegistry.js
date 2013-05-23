@@ -45,40 +45,44 @@ ComponentDefRegistry.prototype.isLocalStorageAvailable= (function() {
 /**
  * Returns a ComponentDef instance from registry, or config after adding to the registry.
  * Throws an error if config is not provided.
- * @param {Object} config Passes in a config, a ComponentDef, or the name of a ComponentDef.
+ * @param {Object} name the name or DefDescriptor of a ComponentDef.
  * @param {Object} noInit If set to false, try loading from cache first before
  * trying to write through of local storage cacheable componentDefs.
  * @returns a ComponentDef instance from registry, or config after adding to registry.
  */
-ComponentDefRegistry.prototype.getDef = function(config, allowUnknownComponentDef) {
-    aura.assert(config, "ComponentDef Config required for registration");
+ComponentDefRegistry.prototype.getDef = function(name, allowUnknownComponentDef) {
+    aura.assert(name, "ComponentDefRegistry.getDef() name is required");
     
-    var name = config["descriptor"] || config;
-    if ($A.util.isString(name) && (name.indexOf("://") < 0)) {
+    if (name instanceof DefDescriptor) {
+    	name = name.getQualifiedName();
+    }
+    
+    aura.assert($A.util.isString(name), "ComponentDefRegistry.getDef() name must be a string " + aura.util.json.encode(name));
+    
+    if (name.indexOf("://") < 0) {
         name = "markup://" + name; // support shorthand
     }
     
-    // We don't re-register (or modify in any way) once we've registered
     var ret = this.componentDefs[name];
     if (!ret) {
-        if (this.useLocalCache(name)) {
-            // Try to load from cache
-            var cachedConfig = this.getConfigFromLocalCache(name);
-            if (cachedConfig) {
-                this.addDef(cachedConfig);
-            }
-        }
-        
     	// See if we have this in pending adds
     	config = this.pendingComponentDefs[name];
-    	if (config) {
+    	
+    	var useLocalCache = this.useLocalCache(name);
+    	if (!config) {
+    		if (useLocalCache) {
+	            // Try to load from local storage cache
+	            var cachedConfig = this.getConfigFromLocalCache(name);
+	            if (cachedConfig) {
+	                this.addDef(cachedConfig);
+	            	config = cachedConfig;
+	            }
+    		}
+    	} else {
     		delete this.pendingComponentDefs[name];
-    		        		
-            ret = new ComponentDef(config);
-            this.componentDefs[name] = ret;
-            
-            if (this.useLocalCache(name)) {
-                // Write through of local storage cacheable componentDefs
+    		
+    		if (useLocalCache) {
+    			// Write through of local storage cacheable componentDefs
                 try {
                     this.writeToCache(name, config);
                 } catch (e) {
@@ -90,8 +94,13 @@ ComponentDefRegistry.prototype.getDef = function(config, allowUnknownComponentDe
                     } catch(e2) {
                     	// Nothing we can do at this point - give up.
                     }
-                }
-            }
+                }    			
+    		}
+    	}
+    
+    	if (config) {
+            ret = new ComponentDef(config);
+            this.componentDefs[name] = ret;
         }
     }
 
@@ -103,19 +112,18 @@ ComponentDefRegistry.prototype.getDef = function(config, allowUnknownComponentDe
 /**
  * Registers a ComponentDef instance with the registry.
  * Throws an error if config is not provided.
- * @param {Object} config Passes in a config, a ComponentDef, or the name of a ComponentDef.
+ * @param {Object} config a ComponentDef config.
  * @private
  */
 ComponentDefRegistry.prototype.addDef = function(config) {
     aura.assert(config, "ComponentDef Config required for registration");
 
-    // We don't re-register (or modify in any way) once we've registered
-    var name = config["descriptor"] || config;
-    if ($A.util.isString(name) && (name.indexOf("://") < 0)) {
-        name = "markup://" + name; // support shorthand
-    }
+    var name = config["descriptor"];
+    aura.assert(name, "ComponentDef descriptor required for registration: " + config);
     
-    if (!this.componentDefs[name] && !this.pendingComponentDefs[name]) {
+    // Make sure that the config meets at least the basic requirements of a component config
+    var isComponentConfig = config["attributeDefs"];
+    if (isComponentConfig && !this.componentDefs[name] && !this.pendingComponentDefs[name]) {
         var descriptor = new DefDescriptor(name);
     	this.pendingComponentDefs[descriptor.toString()] = config;
     }

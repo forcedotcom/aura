@@ -106,12 +106,12 @@ var AuraComponentService = function(){
 
             var configObj = that.getComponentConfigs(config, attributeValueProvider);
 
-            var def = configObj["definition"],
-                desc = configObj["descriptor"],
-                load;
+            var def = configObj["definition"];
+            var desc = configObj["descriptor"];
 
             config = configObj["configuration"];
 
+            var load;
             if(doForce !== true && !config["globalId"]){
                 if(def && !def.hasRemoteDependencies() ){
                     localCreation = true;
@@ -236,7 +236,7 @@ var AuraComponentService = function(){
 
             var componentService = $A.services.component;
             if(config && $A.util.isString(config)){
-                config = {"componentDef": config};
+                config = { "componentDef": config };
             }
 
             if (attributeValueProvider) {
@@ -247,15 +247,12 @@ var AuraComponentService = function(){
                 config["attributes"]["valueProvider"] = attributeValueProvider;
             }
 
-            var def;
-            var desc;
-
-            def = componentService.getDef(config["componentDef"], true);
+            var rawDef = config["componentDef"];
+            var desc = rawDef && rawDef["descriptor"] ? rawDef["descriptor"] : rawDef;
+            var def = componentService.getDef(desc, true);
 
             if(def){
                 desc = def.getDescriptor().toString();
-            }else{
-                desc = config["componentDef"]["descriptor"]? config["componentDef"]["descriptor"] : config["componentDef"];
             }
 
             return {
@@ -295,6 +292,15 @@ var AuraComponentService = function(){
             return priv.registry.addDef(config);
         },
         
+        /**
+         * Ask the component registry to complete any pending registrations.
+         * @memberOf AuraComponentService
+         * @private
+         */
+        registerPending: function(config){
+            return priv.registry.registerPending();
+        },
+
         /**
          * Get the component's controller definition from the registry.
          * @private

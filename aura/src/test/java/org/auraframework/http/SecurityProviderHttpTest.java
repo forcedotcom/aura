@@ -22,6 +22,8 @@ import java.util.Set;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.auraframework.Aura;
 import org.auraframework.components.security.SecurityProviderAccessLogger;
 import org.auraframework.controller.java.ServletConfigController;
@@ -52,20 +54,23 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         super(name);
     }
 
-    private HttpResponse doGetRequest(DefType defType, String attrs, String body, String contextStr) throws Exception {
+    private HttpGet buildGetRequest(DefType defType, String attrs, String body, String contextStr) throws Exception {
         String tag = "aura:" + defType.name().toLowerCase();
         String source = String.format("<%s %s>%s</%1$s>", tag, attrs, body);
         DefDescriptor<?> desc = addSourceAutoCleanup(defType.getPrimaryInterface(), source);
         String url = String.format("/string/%s.%s?aura.context=%s", desc.getName(),
                 DefType.APPLICATION.equals(defType) ? "app" : "cmp", AuraTextUtil.urlencode(contextStr));
-        return performGet(url);
+        return obtainGetMethod(url);
     }
 
     private void verifyGetAccessAllowed(DefType defType, String attrs, String contextStr) throws Exception {
         String myId = getName() + System.currentTimeMillis();
-        HttpResponse httpResponse = doGetRequest(defType, attrs, myId, contextStr);
+        HttpGet get = buildGetRequest(defType, attrs, myId, contextStr);
+        HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);
         String response = getResponseBody(httpResponse);
+        get.releaseConnection();
+
         if (HttpStatus.SC_OK != statusCode) {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
                     HttpStatus.SC_OK, response));
@@ -77,10 +82,13 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
 
     private void verifyGetAccessDenied(DefType defType, String attrs, String contextStr, String expectedReason)
             throws Exception {
-        HttpResponse httpResponse = doGetRequest(defType, attrs, "", contextStr);
+        HttpGet get = buildGetRequest(defType, attrs, "", contextStr);
+        HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);
-        assertEquals("Unexpected http status code", HttpStatus.SC_NOT_FOUND, statusCode);
         String response = getResponseBody(httpResponse);
+        get.releaseConnection();
+
+        assertEquals("Unexpected http status code", HttpStatus.SC_NOT_FOUND, statusCode);
         if (response.startsWith("404 Not Found\n")) {
             // standalone aura case
             if ((expectedReason != null) && (!response.contains(expectedReason))) {
@@ -95,11 +103,15 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
 
     private void verifyGetError(DefType defType, String attrs, String contextStr, String expectedReason)
             throws Exception {
-        HttpResponse httpResponse = doGetRequest(defType, attrs, "", contextStr);
+        HttpGet get = buildGetRequest(defType, attrs, "", contextStr);
+        HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);
+        String response = getResponseBody(httpResponse);
+        get.releaseConnection();
+
         if (HttpStatus.SC_NOT_FOUND != statusCode) {
             fail(String.format("Unexpected http status code.  Expected %s, but got %s, response:\n%s",
-                    HttpStatus.SC_NOT_FOUND, statusCode, getResponseBody(httpResponse)));
+                    HttpStatus.SC_NOT_FOUND, statusCode, response));
         }
     }
 
@@ -171,13 +183,15 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
      */
     public void testGetProdConfigAppWithThrows() throws Exception {
         ServletConfigController.setProductionConfig(true);
-        HttpResponse httpResponse = doGetRequest(DefType.APPLICATION,
+        HttpGet get = buildGetRequest(DefType.APPLICATION,
                 "securityProvider='org.auraframework.components.security.SecurityProviderThrowsThrowable'", "",
                 "{'mode':'PROD'}");
+        HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);
+        String response = getResponseBody(httpResponse);
+        get.releaseConnection();
 
         assertEquals("Unexpected http status code", HttpStatus.SC_NOT_FOUND, statusCode);
-        String response = getResponseBody(httpResponse);
         assertTrue("Unexpected response body",
                 response.equals("404 Not Found\n") || response.contains("URL No Longer Exists"));
     }
@@ -191,11 +205,14 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
                 ApplicationDef.class,
                 "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderThrowsThrowable'>%s</aura:application>");
-        HttpResponse httpResponse = doGetRequest(DefType.COMPONENT, "", "",
+        HttpGet get = buildGetRequest(DefType.COMPONENT, "", "",
                 String.format("{'mode':'PROD','app':'%s'}", appDesc.getQualifiedName()));
+        HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);
-        assertEquals("Unexpected http status code", HttpStatus.SC_NOT_FOUND, statusCode);
         String response = getResponseBody(httpResponse);
+        get.releaseConnection();
+
+        assertEquals("Unexpected http status code", HttpStatus.SC_NOT_FOUND, statusCode);
         assertTrue("Unexpected response body",
                 response.equals("404 Not Found\n") || response.contains("URL No Longer Exists"));
     }
@@ -329,16 +346,23 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         String url = String.format("/string/%s.%s?aura.context=%s", appDesc.getName(), "app", AuraTextUtil
                 .urlencode(String.format("{'mode':'PROD','fwuid':'%s','app':'%s'}", Aura.getConfigAdapter()
                         .getAuraFrameworkNonce(), appDesc.getDescriptorName())));
+
+        HttpGet get = obtainGetMethod(url);
+        HttpResponse response = perform(get);
         assertEquals("Unexpected http status code", HttpStatus.SC_OK,
-                getStatusCode(performGet(url)));
+                getStatusCode(response));
         assertAccessLogContains(expectedDescs);
+        get.releaseConnection();
 
         // second request for app should also have only 1 log for each desc, not
         // using prior request's cache
         SecurityProviderAccessLogger.clearLog();
+        get = obtainGetMethod(url);
+        response = perform(get);
         assertEquals("Unexpected http status code", HttpStatus.SC_OK,
-                getStatusCode(performGet(url)));
+                getStatusCode(response));
         assertAccessLogContains(expectedDescs);
+        get.releaseConnection();
     }
 
     private void assertAccessLogContains(Set<DefDescriptor<?>> expectedDescs) throws Exception {
@@ -355,7 +379,7 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         }
     }
 
-    private HttpResponse doPostRequest(Mode mode, String actionDescriptor, String appDescriptor) throws Exception {
+    private HttpPost buildPostRequest(Mode mode, String actionDescriptor, String appDescriptor) throws Exception {
         Map<String, Object> message = new HashMap<String, Object>();
         Map<String, Object> actionInstance = new HashMap<String, Object>();
         actionInstance.put("descriptor", actionDescriptor);
@@ -370,15 +394,18 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         params.put("aura.context", String.format("{'mode':'%s'%s,'fwuid':'%s'}", mode.name(),
                 appDescriptor == null ? "" : String.format(",'app':'%s'", appDescriptor), Aura.getConfigAdapter()
                         .getAuraFrameworkNonce()));
-        return performPost("/aura", params);
+        return obtainPostMethod("/aura", params);
     }
 
     @SuppressWarnings("unchecked")
     private void verifyPostAccessAllowed(Mode mode, String actionDescriptor, String appDescriptor) throws Exception {
-        HttpResponse httpResponse = doPostRequest(mode, actionDescriptor, appDescriptor);
+        HttpPost post = buildPostRequest(mode, actionDescriptor, appDescriptor);
+        HttpResponse httpResponse = perform(post);
         int statusCode = getStatusCode(httpResponse);
-        assertEquals("Unexpected http status code", HttpStatus.SC_OK, statusCode);
         String response = getResponseBody(httpResponse);
+        post.releaseConnection();
+
+        assertEquals("Unexpected http status code", HttpStatus.SC_OK, statusCode);
         Map<String, Object> json = null;
 
         try {
@@ -399,10 +426,13 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
 
     @SuppressWarnings("unchecked")
     private void verifyPostAccessDenied(Mode mode, String actionDescriptor, String appDescriptor) throws Exception {
-        HttpResponse httpResponse = doPostRequest(mode, actionDescriptor, appDescriptor);
+        HttpPost post = buildPostRequest(mode, actionDescriptor, appDescriptor);
+        HttpResponse httpResponse = perform(post);
         int statusCode = getStatusCode(httpResponse);
-        assertEquals("Unexpected http status code", HttpStatus.SC_OK, statusCode);
         String response = getResponseBody(httpResponse);
+        post.releaseConnection();
+
+        assertEquals("Unexpected http status code", HttpStatus.SC_OK, statusCode);
         assertTrue("Expected error string", response.endsWith("/*ERROR*/"));
         Map<String, Object> json = (Map<String, Object>)new JsonReader().read("/*" + response);
         String desc = ((Map<String, Object>)json.get("event")).get("descriptor").toString();
@@ -492,11 +522,14 @@ public class SecurityProviderHttpTest extends AuraHttpTestCase {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(
                 ApplicationDef.class,
                 "<aura:application securityProvider='org.auraframework.components.security.SecurityProviderThrowsThrowable'>%s</aura:application>");
-        HttpResponse httpResponse = doPostRequest(Mode.PROD, "java://test.controller.JavaController/ACTION$noArgs",
+        HttpPost post = buildPostRequest(Mode.PROD, "java://test.controller.JavaController/ACTION$noArgs",
                 appDesc.getNamespace() + ":" + appDesc.getName());
+        HttpResponse httpResponse = perform(post);
         int statusCode = getStatusCode(httpResponse);
-        assertEquals("Unexpected http status code", HttpStatus.SC_OK, statusCode);
         String response = getResponseBody(httpResponse);
+        post.releaseConnection();
+
+        assertEquals("Unexpected http status code", HttpStatus.SC_OK, statusCode);
         assertTrue("Expected error string", response.endsWith("/*ERROR*/"));
         Map<String, Object> json = (Map<String, Object>)new JsonReader().read("/*" + response);
         String desc = ((Map<String, Object>)json.get("event")).get("descriptor").toString();

@@ -24,6 +24,7 @@ import org.apache.http.HttpHeaders;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.message.BasicHeader;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.test.AuraHttpTestCase;
@@ -57,11 +58,14 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         String modeAndContext = getSimpleContext(Format.CSS, false);
         String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.css";
 
-        HttpResponse httpResponse = performGet(url);
-
+        HttpGet get = obtainGetMethod(url);
+        HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);
-        assertEquals(HttpStatus.SC_OK, statusCode);
         String response = getResponseBody(httpResponse);
+        get.releaseConnection();
+
+        assertEquals(HttpStatus.SC_OK, statusCode);
+
         char expected = '•';
         String token = "content: '";
         int start = response.indexOf(token) + token.length();
@@ -85,10 +89,13 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         String modeAndContext = getSimpleContext(Format.JS, false);
         String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.js";
 
-        HttpResponse httpResponse = performGet(url);
+        HttpGet get = obtainGetMethod(url);
+        HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);
-        assertEquals(HttpStatus.SC_OK, statusCode);
         String response = getResponseBody(httpResponse);
+        get.releaseConnection();
+
+        assertEquals(HttpStatus.SC_OK, statusCode);
 
         String expected = Arrays.toString("공유".getBytes("UTF8"));
         String token = "Test whether the special character shows up: ";
@@ -112,10 +119,14 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         Header[] headers = new Header[]{ new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE,
                 new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime())) };
 
-        HttpResponse httpResponse = performGet(url, headers);
+        HttpGet get = obtainGetMethod(url, headers);
+        HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);
+        String response = getResponseBody(httpResponse);
+        get.releaseConnection();
+
         assertEquals(HttpStatus.SC_NOT_MODIFIED, statusCode);
-        assertNull(getResponseBody(httpResponse));
+        assertNull(response);
     }
 
     /**
@@ -132,11 +143,14 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         Header[] headers = new Header[]{ new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE,
                 new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime())) };
 
-        HttpResponse httpResponse = performGet(url, headers);
+        HttpGet get = obtainGetMethod(url, headers);
+        HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);
+        String response = getResponseBody(httpResponse);
+        get.releaseConnection();
 
         assertEquals(HttpStatus.SC_OK, statusCode);
-        assertNotNull(getResponseBody(httpResponse));
+        assertNotNull(response);
     }
 
     /**
@@ -152,11 +166,14 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         Header[] headers = new Header[]{ new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE,
                 new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime())) };
 
-        HttpResponse httpResponse = performGet(url, headers);
+        HttpGet get = obtainGetMethod(url, headers);
+        HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);
+        String response = getResponseBody(httpResponse);
+        get.releaseConnection();
 
         assertEquals(HttpStatus.SC_NOT_MODIFIED, statusCode);
-        assertNull(getResponseBody(httpResponse));
+        assertNull(response);
     }
 
     /**
@@ -168,10 +185,13 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         String requestContext = getSimpleContext(Format.JS, false);
         String url = "/l/" + AuraTextUtil.urlencode(requestContext) + "/app.js";
 
-        HttpResponse httpResponse = performGet(url);
+        HttpGet get = obtainGetMethod(url);
+        HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);
+        String response = getResponseBody(httpResponse);
+        get.releaseConnection();
 
         assertEquals(HttpStatus.SC_OK, statusCode);
-        assertNotNull(getResponseBody(httpResponse));
+        assertNotNull(response);
     }
 }

@@ -109,10 +109,10 @@ public class AttributeDefRefTest extends AuraImplTestCase {
      */
     public void testParseValueWithConversionException() throws Exception {
         // values without a converter from String
-        assertParseException("1", "byte", ConversionException.class, "No Converter found for ");
-        assertParseException("1", "short", ConversionException.class, "No Converter found for ");
-        assertParseException("1", "float", ConversionException.class, "No Converter found for ");
-        assertParseException("1", "char", ConversionException.class, "No Converter found for ");
+        assertParseException("1", "byte", ConversionException.class, "No Converter or MultiConverter found for ");
+        assertParseException("1", "short", ConversionException.class, "No Converter or MultiConverter found for ");
+        assertParseException("1", "float", ConversionException.class, "No Converter or MultiConverter found for ");
+        assertParseException("1", "char", ConversionException.class, "No Converter or MultiConverter found for ");
 
         // number format
         assertParseException("xxx", "long", NumberFormatException.class, "For input string: \"xxx\"");

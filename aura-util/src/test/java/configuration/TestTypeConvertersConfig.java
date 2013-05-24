@@ -19,11 +19,14 @@ import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.type.BadConverter;
 import org.auraframework.util.type.Converter;
+import org.auraframework.util.type.CustomAbstractType;
+import org.auraframework.util.type.CustomAbstractTypeConverter;
 import org.auraframework.util.type.CustomDupConverter1;
 import org.auraframework.util.type.CustomDupConverter2;
 import org.auraframework.util.type.CustomDupType;
 import org.auraframework.util.type.CustomPairType;
 import org.auraframework.util.type.CustomPairTypeParameterizedConverter;
+import org.auraframework.util.type.MultiConverter;
 import org.auraframework.util.type.StringToCustomPairArrayConverter;
 import org.auraframework.util.type.StringToCustomPairConverter;
 
@@ -57,5 +60,10 @@ public class TestTypeConvertersConfig {
     @Impl
     public static Converter<String, CustomPairType> testUtilStringToCustomPairParameterized() {
         return new CustomPairTypeParameterizedConverter();
+    }
+    
+    @Impl
+    public static MultiConverter<CustomAbstractType> testUtilStringToCustomAbstract() {
+    	return new CustomAbstractTypeConverter();
     }
 }

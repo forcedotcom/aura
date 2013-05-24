@@ -39,7 +39,7 @@
                 $A.test.assertTrue(value.componentDef !== undefined);
                 $A.test.assertEquals("markup://ui:button", value.componentDef.descriptor);
                 //construct it.
-                value = $A.newCmp(value);
+                value = $A.newCmpDeprecated(value);
                 $A.test.assertEquals("Component", value.auraType);
                 $A.test.assertEquals("markup://ui:button", value.getDef().getDescriptor().toString());
                 $A.test.assertEquals("hi", value.get("v.label"));

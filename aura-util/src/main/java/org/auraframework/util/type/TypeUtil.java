@@ -16,6 +16,7 @@
 package org.auraframework.util.type;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.util.ServiceLocator;
 
@@ -29,6 +30,7 @@ public class TypeUtil {
     // cached converters
     private final Map<String, Map<String, Converter<?, ?>>> converters = Maps.newHashMap();
     private final Map<String, Map<String, Map<String, Converter<?, ?>>>> parameterizedConverters = Maps.newHashMap();
+    private final Map<String, Map<String, MultiConverter<?>>> multiConverters = Maps.newHashMap();
 
     private static final TypeUtil instance = new TypeUtil();
 
@@ -88,6 +90,32 @@ public class TypeUtil {
                 }
             }
         }
+        
+        for (MultiConverter<?> multiConverter : ServiceLocator.get().getAll(MultiConverter.class)) {
+            Class<?> fromClass = multiConverter.getFrom();
+            Set<Class<?>> toClasses = multiConverter.getTo();
+            
+            if (fromClass == null || toClasses == null) {
+                System.err.println("Invalid multiconverter not registered : " + multiConverter);
+            } else {
+                String from = fromClass.getName();
+
+                Map<String, MultiConverter<?>> toMap = multiConverters.get(from);
+                if (toMap == null) {
+                    toMap = Maps.newHashMap();
+                    multiConverters.put(from, toMap);
+                }
+               
+                for (Class<?> toClass : toClasses) {
+                	final String to = toClass.getName();
+                    if (toMap.containsKey(to)) {
+                        multiConverter = new MultiConverterInitError(String.format(
+                                "More than one multiconverter registered for %s to %s.", from, to));
+                    }
+                    toMap.put(to, multiConverter);
+                }
+            }
+        }
     }
 
     public static <F, T> T convertNoTrim(F value, Class<T> to) {
@@ -134,10 +162,20 @@ public class TypeUtil {
         }
 
         Converter<F, T> converter = getConverter(from, to, of);
-        if (converter == null) {
-            throw new ConversionException(String.format("No Converter found for %s to %s<%s>", from, to, of));
+        if (converter != null) {
+        	return converter.convert(value);	
         }
-        return converter.convert(value);
+        
+        MultiConverter<T> multiConverter = null;
+        if (of == null) {
+	        multiConverter = getMultiConverter(from, to);
+        }
+        
+        if (multiConverter == null) {
+            throw new ConversionException(String.format("No Converter or MultiConverter found for %s to %s<%s>", from, to, of));
+        }
+        
+	    return multiConverter.convert(to, value);
     }
 
     @SuppressWarnings("unchecked")
@@ -160,8 +198,19 @@ public class TypeUtil {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
+	private static <T> MultiConverter<T> getMultiConverter(Class<?> from, Class<T> to) {
+    	TypeUtil typeUtil = get();
+        Map<String, MultiConverter<?>> map = typeUtil.multiConverters.get(from.getName());
+        if (map != null) {
+            return (MultiConverter<T>)map.get(to.getName());
+        }
+
+        return null;
+    }
+    
     public static boolean hasConverter(Class<?> from, Class<?> to, String of) {
-        return getConverter(from, to, of) != null;
+        return getConverter(from, to, of) != null || (of == null && getMultiConverter(from, to) != null);
     }
 
     public static class ConversionException extends RuntimeException {
@@ -201,7 +250,28 @@ public class TypeUtil {
         public Class<?>[] getToParameters() {
             throw new ConversionException(error);
         }
-
     }
 
+    private static class MultiConverterInitError implements MultiConverter<Object> {
+    	 private final String error;
+
+         private MultiConverterInitError(String error) {
+             this.error = error;
+         }
+
+		@Override
+		public Object convert(Class<? extends Object> toClass, Object fromValue) {
+			throw new ConversionException(error);
+		}
+
+		@Override
+		public Class<?> getFrom() {
+			throw new ConversionException(error);
+		}
+
+		@Override
+		public Set<Class<?>> getTo() {
+			throw new ConversionException(error);
+		}
+    }
 }

@@ -13,34 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-.THIS {	 
-	margin: 0;
-	padding: 0;
-}
+package org.auraframework.util.type;
 
-.THIS li {
-	display: inline-block;
-	margin: 0 3px;
-}
+public class CustomConcreteType2 extends CustomAbstractType {
 
-.THIS li a {
-	width: 8px;
-	height: 8px;
-	border-radius: 8px;
-	background: #1e2b37;
-	display: inline-block;
-}
-
-.THIS li a.carousel-nav-item-selected {
-	background: #2d95d6;
-}
-
-.THIS .visually-hidden {
-	position: absolute !important;
-	height: 1px;
-	width: 1px;
-	overflow: hidden;
-	clip: rect(1px 1px 1px 1px);
-	clip: rect(1px, 1px, 1px, 1px);
+	protected CustomConcreteType2(String strValue, int intValue) {
+		super(strValue, -2 * intValue);
+	}
 }

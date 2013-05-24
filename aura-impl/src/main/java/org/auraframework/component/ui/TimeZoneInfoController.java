@@ -35,7 +35,6 @@ import org.auraframework.util.resource.ResourceLoader;
 public class TimeZoneInfoController {
     private static Map<String, String> cache = Collections.synchronizedMap(new HashMap<String, String>(1));
 
-    @SuppressWarnings("unchecked")
     @AuraEnabled
     public static TimeZoneInfo getTimeZoneInfo(@Key("timezoneId") String timezoneId) throws Exception {
         if (timezoneId == null) {
@@ -51,7 +50,6 @@ public class TimeZoneInfoController {
         return new TimeZoneInfo(info);
     }
     
-    @SuppressWarnings("unchecked")
     private static String readTZInfoFromFile(String timezoneId) {
         ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
         String suffix = timezoneId.replace("/", "-");
@@ -64,7 +62,6 @@ public class TimeZoneInfoController {
         }
     }
     
-    @SuppressWarnings("unchecked")
     private static String formatTZInfo(String info) {
         StringBuffer result = new StringBuffer(info);
         int dataIndex = result.indexOf("window.WallTime.data");

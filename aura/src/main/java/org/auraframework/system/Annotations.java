@@ -23,6 +23,15 @@ import java.lang.annotation.Target;
 /**
  */
 public interface Annotations {
+	
+    /**
+     * Marks a method as that will be queued and run as a lower priority background action.
+     * The AuraEnabled annotation is still required to use this method as a server action.
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    public @interface BackgroundAction {
+    }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)

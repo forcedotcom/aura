@@ -276,27 +276,17 @@ var AuraComponentService = function(){
         /**
          * Gets the component definition from the registry.
          * @param {Object} config
+         * @param {Object} noInit
          * @returns {ComponentDef}  The metadata of the component
          * @memberOf AuraComponentService
          * @public
          */
-        getDef: function(config, allowUnknownComponentDef){
-            return priv.registry.getDef(config, allowUnknownComponentDef);
+        getDef: function(config, noInit){
+            return priv.registry.getDef(config, noInit);
         },
 
         /**
-         * Add the component definition to the registry.
-         * @param {Object} config
-         * @returns {ComponentDef}  The metadata of the component
-         * @memberOf AuraComponentService
-         * @private
-         */
-        addDef: function(config){
-            return priv.registry.addDef(config);
-        },
-        
-        /**
-         * Get the component's controller definition from the registry.
+         * Gets the component's controller definition from the registry.
          * @private
          */
         getControllerDef : function(config){
@@ -379,10 +369,6 @@ var AuraComponentService = function(){
             var componentDefs = priv.registry.componentDefs;
             for (var name in componentDefs) {
                 ret.push(name);
-            }
-
-            for (var pending in priv.registry.pendingComponentDefs) {
-                ret.push(pending);
             }
 
             // Union in any locally cached component defs

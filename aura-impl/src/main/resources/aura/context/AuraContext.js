@@ -240,7 +240,7 @@ AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs) {
             var config = otherComponentConfigs[k];
             var def = config["componentDef"];
             if (def) {
-                componentService.addDef(def);
+                componentService.getDef(def);
             }
             this.componentConfigs[k] = config;
         }

@@ -84,7 +84,7 @@ var AuraClientService = function() {
             var comConfigs = aura.util.json.resolveRefs(config["componentDefs"]);
             $A.mark("Registered Components [" + comConfigs.length + "]");
             for ( var i = 0; i < comConfigs.length; i++) {
-                componentService.addDef(comConfigs[i]);
+                componentService.getDef(comConfigs[i]);
             }
             $A.endMark("Registered Components [" + comConfigs.length + "]");
 

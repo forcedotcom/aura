@@ -17,11 +17,8 @@
     testRenderIf: {
         attributes:{flip:true},
         test: [function(cmp){
-			$A.test.setTestTimeout(30000);
-
-			var helper = cmp.getDef().getHelper();
-
-			// Verify that both renderIf and else sections are
+            var helper = cmp.getDef().getHelper();
+            // Verify that both renderIf and else sections are
             $A.test.assertEquals("placeholder", cmp.find("lazyrenderIf").getDef().getDescriptor().getName(), "Placeholder missing for lazy component.");
             $A.test.assertEquals("placeholder", cmp.find("lazyelse").getDef().getDescriptor().getName(), "Placeholder missing for lazy component.");
             $A.test.assertTrue(cmp.find('nonLazyRenderIfDiv').isRendered(), "renderIf section is not rendered");
@@ -39,7 +36,6 @@
                 $A.test.assertFalse(cmp.find('nonLazyElseDiv').isRendered(), "else section is rendered");
             });
         }, function(cmp){
-			$A.test.setTestTimeout(30000);
             var helper = cmp.getDef().getHelper();
 
             // Flip the renderIf flag to lazy load components in else section

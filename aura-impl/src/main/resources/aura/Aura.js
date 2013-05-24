@@ -576,7 +576,7 @@ $A.ns.Aura.prototype.error = function(e, stopTest) {
     }
     $A.message(str);
 
-    if ($A.test && stopTest) {
+    if ($A.test && stopTest && !$A.test.expectAuraError) {
         $A.test.fail(str);
     }
     if (!$A.initialized) {

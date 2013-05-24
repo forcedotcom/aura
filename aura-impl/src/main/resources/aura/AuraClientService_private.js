@@ -88,8 +88,15 @@ var priv = {
         // we have further problems...
         //
         if ((response["status"] != 200)
-                || (text.length > 9 && text.charAt(text.length - 9) == "/" && text.charAt(text.length - 8) == "*" && text.charAt(text.length - 7) == "E" && text.charAt(text.length - 6) == "R" && text.charAt(text.length - 5) == "R"
-                        && text.charAt(text.length - 4) == "O" && text.charAt(text.length - 3) == "R" && text.charAt(text.length - 2) == "*" && text.charAt(text.length - 1) == "/")) {
+                || (text.length > 9 && text.charAt(text.length - 9) == "/" && 
+            				text.charAt(text.length - 8) == "*" && 
+            				text.charAt(text.length - 7) == "E" && 
+            				text.charAt(text.length - 6) == "R" && 
+            				text.charAt(text.length - 5) == "R" && 
+            				text.charAt(text.length - 4) == "O" && 
+            				text.charAt(text.length - 3) == "R" && 
+            				text.charAt(text.length - 2) == "*" && 
+            				text.charAt(text.length - 1) == "/")) {
             if (response["status"] == 200) {
                 // if we encountered an exception once the response was committed
                 // ignore the malformed JSON
@@ -224,6 +231,7 @@ var priv = {
             var ctx = responseMessage["context"];
             $A.getContext().join(ctx);
 
+            //Look for any Client side event exceptions
             var events = responseMessage["events"];
             if (events) {
                 for ( var en = 0, len = events.length; en < len; en++) {
@@ -232,7 +240,7 @@ var priv = {
             }
 
             var actionResponses = responseMessage["actions"];
-
+            //Process each action and its response
             for ( var r = 0; r < actionResponses.length; r++) {
                 var actionResponse = actionResponses[r];
 

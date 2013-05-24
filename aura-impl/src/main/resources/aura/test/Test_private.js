@@ -26,6 +26,7 @@ var priv = {
         errors : [],
         timeoutTime : 0,
         appCacheEvents : [], // AppCache events in order, as they are picked up
+        expectAuraError : false, //Expect error message in auraError div, these messages are created when $A.error() is called
 
         handleAppcacheChecking : function() {
             priv.appCacheEvents.push("checking");

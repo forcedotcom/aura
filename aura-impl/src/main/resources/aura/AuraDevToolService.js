@@ -114,7 +114,7 @@ var AuraDevToolService = function() {
                 return flattenRegistry($A.services.component.priv.indexes.globalId);
             },
             "componentDef" : function(){
-            	$A.componentService.registerPending();
+            	$A.services.component.priv.registry.registerPending();
             	
                 return flattenRegistry($A.services.component.priv.registry.componentDefs);
             },

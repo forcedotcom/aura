@@ -56,14 +56,15 @@ public class AuraJavascriptResourceGroup implements JavascriptGroup {
                     return false;
                 }
                 path = path.toLowerCase();
-                return path.startsWith("/aura/javascript/") || path.startsWith("/aura/resources/");
+                return path.startsWith("aura.javascript.") || path.startsWith("aura.resources.")
+                    || path.startsWith("/aura/javascript/") || path.startsWith("/aura/resources/");
             }
         }).setUrls(ClasspathHelper.forPackage("aura")).setScanners(new ResourcesScanner()));
         long latestModTime = 0;
         Set<URL> urls = new HashSet<URL>();
         try {
             for (String resource : reflection.getResources(TRUE)) {
-                URL url = getClass().getResource(resource);
+                URL url = getClass().getClassLoader().getResource(resource);
                 urls.add(url);
                 long thisLastMod = url.openConnection().getDate();
                 if (thisLastMod > latestModTime) {

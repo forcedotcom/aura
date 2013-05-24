@@ -1068,9 +1068,9 @@ var Test = function(){
 			if ($A.util.isUndefinedOrNull(component)) {
 				// application event handler
 				$A.eventService.addHandler({
-					event : eventName,
-					globalId : 'TESTHANDLER' + eventName,
-					handler : handler
+					'event' : eventName,
+					'globalId' : 'TESTHANDLER' + eventName,
+					'handler' : handler
 				});
 
 			} else {

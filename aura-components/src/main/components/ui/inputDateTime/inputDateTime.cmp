@@ -21,8 +21,8 @@
     <aura:attribute name="value" type="String" description="The input value of the date/time."/>
     <aura:attribute name="format" type="String" default="YYYY-MM-dd HH:mm" description="The java.text.SimpleDateFormat style format string. Default value is &#8220;yyyy-MM-dd HH:mm&#8221;."/>
     <aura:attribute name="placeholder" type="String" default="YYYY-MM-dd HH:mm" description="The text that is displayed by default."/>
-    <aura:attribute name="langLocale" type="String" default="en" description="The language locale used to format date value."/>
-    <aura:attribute name="timezone" type="String" default="GMT" description="The timezone ID, for example, America/Los_Angeles."/>
+    <aura:attribute name="langLocale" type="String" default="{!$Locale.language + ($Locale.country ? ('_' + $Locale.country) : '')}" description="The language locale used to format date value."/>
+    <aura:attribute name="timezone" type="String" default="{!$Locale.timezone}" description="The timezone ID, for example, America/Los_Angeles."/>
     <aura:set attribute="updateOn" value="blur"/>
         
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>

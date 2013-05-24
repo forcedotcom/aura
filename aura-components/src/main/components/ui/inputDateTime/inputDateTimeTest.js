@@ -19,7 +19,7 @@
      * is just a stub for future functionality
      */
     testInputDateTimeToday:{
-	attributes : {displayDatePicker:'true'},
+	attributes : {displayDatePicker:'true', langLocale: 'en', timezone: 'GMT'},
 	test: function(cmp){
 	        cmp.find("datePicker").get('c.selectToday').run()
 	        var inputDateStr  = cmp.find("inputText").getElement().value;

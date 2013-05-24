@@ -20,16 +20,9 @@
             format = format.replace(/y/g, "Y").replace(/d/g, "D").replace(/E/g, "d").replace(/a/g, "A"); // translate Java patterns to moment.js pattern
             component.setValue("v.format", format);
         } else {
-            // TODO: grab the default value of format from locale global value provider
+            // TODO: grab the default value of format from $Locale
             format = "YYYY-MM-DD HH:mm";
         }
         component.setValue("v.format", format);
-        
-        var timezone = component.get("v.timezone");
-        if (!timezone) {
-            // TODO: grab the default value of timezone from locale global value provider
-            timezone = "GMT";
-        }
-        component.setValue("v.timezone", timezone);
     }
 })

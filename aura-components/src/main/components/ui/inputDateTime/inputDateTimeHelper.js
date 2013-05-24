@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({    
+({  
     displayDatePicker: function(component) {
         var now = new Date(); // local date
         // Later on, we will use getUTC... methods to get year/month/date
@@ -31,6 +31,9 @@
         this.popUpDatePicker(component, currentDate);
     },
     
+    /**
+     * This can be overridden by extended component.
+     */
     displayDateTime: function(component, displayValue) {
         var outputCmp = component.find("inputText");
         var elem = outputCmp ? outputCmp.getElement() : null;
@@ -67,9 +70,11 @@
     },
     
     formatDateTime: function(component) {
+        var concreteCmp = component.getConcreteComponent();
+        var _helper = concreteCmp.getDef().getHelper();
         var value = component.get("v.value");
         if (!value) { // Setting an empty value probably means clear out existing value
-            this.displayDateTime(component, "");
+            _helper.displayDateTime(component, "");
             return;
         }
         var d = new Date(value);
@@ -78,19 +83,18 @@
         if (timezone == "GMT") {
             var mDate = moment.utc(d.getTime());
             if (mDate.isValid()) {
-                this.displayDateTime(component, mDate.lang(this.getLangLocale(component)).format(format));
+                _helper.displayDateTime(component, mDate.lang(this.getLangLocale(component)).format(format));
             } else {
-                this.displayDateTime(component, "Invalid date time value");
+                _helper.displayDateTime(component, "Invalid date time value");
             }
         } else {
             if (!WallTime.zones[timezone]) {
                 // retrieve timezone data from server
-                var _helper = this;
                 this.getTimeZoneInfo(component, timezone, function() {
                     _helper.updateDisplay(component, d, format, timezone, value);
                 });
             } else {
-                this.updateDisplay(component, d, format, timezone, value);
+                _helper.updateDisplay(component, d, format, timezone, value);
             }
         }
     },
@@ -177,6 +181,9 @@
         datePicker.setValue("v.visible", true);
     },
     
+    /**
+     * This can be overridden by extended component.
+     */
     updateDisplay: function(component, d, format, timezone, defaultDisplayValue) {
         var displayValue = defaultDisplayValue;
         var wallDate = this.getWallDateTime(d, timezone); 
@@ -186,6 +193,8 @@
         } else {
             displayValue = "Invalid date time value";
         }
-        this.displayDateTime(component, displayValue);
+        var concreteCmp = component.getConcreteComponent();
+        var _helper = concreteCmp.getDef().getHelper();
+        _helper.displayDateTime(component, displayValue);
     }
 })

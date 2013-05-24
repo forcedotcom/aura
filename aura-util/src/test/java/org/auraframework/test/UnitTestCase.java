@@ -36,6 +36,8 @@ import org.auraframework.util.IOUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.util.test.GoldFileUtils;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.Sets;
 
@@ -60,6 +62,7 @@ public abstract class UnitTestCase extends TestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        MockitoAnnotations.initMocks(this);
     }
 
     @Override
@@ -78,6 +81,7 @@ public abstract class UnitTestCase extends TestCase {
                 }
             }
         }
+        Mockito.validateMockitoUsage();
         super.tearDown();
     }
 

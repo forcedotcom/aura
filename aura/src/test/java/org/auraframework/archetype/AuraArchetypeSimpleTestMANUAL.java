@@ -18,6 +18,7 @@ package org.auraframework.archetype;
 import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpGet;
 import org.auraframework.test.IntegrationTestCase;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.IOUtil;
@@ -112,8 +113,10 @@ public class AuraArchetypeSimpleTestMANUAL extends IntegrationTestCase {
             int status = 0;
             for (int i = 0; i < 30; i++) {
                 try {
-                    HttpResponse response = performGet("/");
+                    HttpGet get = obtainGetMethod("/");
+                    HttpResponse response = perform(get);
                     status = getStatusCode(response);
+                    get.releaseConnection();
                     break;
                 } catch (ConnectException ce) {
                     // expected, before server is listening
@@ -159,17 +162,21 @@ public class AuraArchetypeSimpleTestMANUAL extends IntegrationTestCase {
     }
 
     private void verifyDefaultDocument() throws Exception {
-        HttpResponse httpResponse = performGet("/");
+        HttpGet get = obtainGetMethod("/");
+        HttpResponse httpResponse = perform(get);
         assertEquals("Failed requesting default doc", HttpStatus.SC_OK, getStatusCode(httpResponse));
         String response = getResponseBody(httpResponse).replaceAll("\\s", "");
+        get.releaseConnection();
         assertEquals("Unexpected default doc content",
                 String.format("<script>window.location=\"/%s/%1$s.app\";</script>", project.artifactId), response);
     }
 
     private void verifySampleComponents() throws Exception {
-        HttpResponse httpResponse = performGet(String.format("/%1$s/%1$s.app", project.artifactId));
+        HttpGet get = obtainGetMethod(String.format("/%1$s/%1$s.app", project.artifactId));
+        HttpResponse httpResponse = perform(get);
         assertEquals("Failed requesting sample app", HttpStatus.SC_OK, getStatusCode(httpResponse));
         String body = getResponseBody(httpResponse);
+        get.releaseConnection();
 
         // strip lastmod values
         body = body.replaceFirst(" data-lm=\"[^\"]+\"", "");

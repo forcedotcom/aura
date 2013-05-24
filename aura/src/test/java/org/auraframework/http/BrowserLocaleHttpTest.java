@@ -23,6 +23,7 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
@@ -57,10 +58,13 @@ public class BrowserLocaleHttpTest extends AuraHttpTestCase {
         String url = "aura?" + query;
         Header[] headers = new Header[]{ new BasicHeader(HttpHeaders.ACCEPT_LANGUAGE, locale) };
 
-        HttpResponse httpResponse = performGet(url, headers);
+        HttpGet get = obtainGetMethod(url, headers);
+        HttpResponse httpResponse = perform(get);
 
         String response = getResponseBody(httpResponse);
         int statusCode = getStatusCode(httpResponse);
+        get.releaseConnection();
+
         if (HttpStatus.SC_OK != statusCode) {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
                     HttpStatus.SC_OK, response));

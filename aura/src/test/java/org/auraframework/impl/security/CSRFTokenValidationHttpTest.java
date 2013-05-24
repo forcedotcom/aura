@@ -20,6 +20,8 @@ import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.util.EntityUtils;
 import org.auraframework.Aura;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.test.AuraHttpTestCase;
@@ -72,9 +74,11 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
         Map<String, String> params = makeBasePostParams();
         params.put("aura.context", String.format("{\"mode\":\"FTEST\",\"fwuid\":\"%s\"}",
                 Aura.getConfigAdapter().getAuraFrameworkNonce()));
-        HttpResponse httpResponse = performPost("/aura", params);
+        HttpPost post = obtainPostMethod("/aura", params);
+        HttpResponse httpResponse = perform(post);
         int statusCode = getStatusCode(httpResponse);
         String response = getResponseBody(httpResponse);
+        post.releaseConnection();
         assertNotNull(response);
         if (statusCode != HttpStatus.SC_OK || !response.endsWith("/*ERROR*/")) {
             fail("Should not be able to post to aura servlet without a valid CSRF token");
@@ -106,8 +110,11 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
         // Invalid token
         params.put("aura.token", "invalid");
         params.put("aura.context", "{\"mode\":\"FTEST\"}");
-        HttpResponse httpResponse = performPost("/aura", params);
+        HttpPost post = obtainPostMethod("/aura", params);
+        HttpResponse httpResponse = perform(post);
         int statusCode = getStatusCode(httpResponse);
+        EntityUtils.consume(httpResponse.getEntity());
+        post.releaseConnection();
         if (statusCode != HttpStatus.SC_NOT_FOUND) {
             fail("Should not be able to post to aura servlet with an invalid CSRF token");
         }
@@ -123,8 +130,11 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
         // Valid token
         params.put("aura.token", getCsrfToken());
         params.put("aura.context", "{\"mode\":\"FTEST\"}");
-        HttpResponse httpResponse = performPost("/aura", params);
+        HttpPost post = obtainPostMethod("/aura", params);
+        HttpResponse httpResponse = perform(post);
         int statusCode = getStatusCode(httpResponse);
+        EntityUtils.consume(httpResponse.getEntity());
+        post.releaseConnection();
         assertEquals("Failed to post to aura servlet", HttpStatus.SC_OK, statusCode);
     }
 }

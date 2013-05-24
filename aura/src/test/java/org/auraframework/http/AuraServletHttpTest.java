@@ -26,7 +26,10 @@ import java.util.Map;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.EntityUtils;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
@@ -57,9 +60,12 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     public void testGetContextHasPreloads() throws Exception {
         String url = "/aura?aura.tag=test%3Atext&aura.context="
                 + AuraTextUtil.urlencode(getSimpleContext(Format.JSON, false));
-        HttpResponse httpResponse = performGet(url);
+        HttpGet get = obtainGetMethod(url);
+        HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);
         String response = getResponseBody(httpResponse);
+        get.releaseConnection();
+
         if (HttpStatus.SC_OK != statusCode) {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
                     HttpStatus.SC_OK, response));
@@ -95,9 +101,12 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         params.put("aura.token", getCsrfToken());
         params.put("aura.context", getSimpleContext(Format.JSON, false));
 
-        HttpResponse httpResponse = performPost("/aura", params);
+        HttpPost post = obtainPostMethod("/aura", params);
+        HttpResponse httpResponse = perform(post);
         int statusCode = getStatusCode(httpResponse);
         String response = getResponseBody(httpResponse);
+        post.releaseConnection();
+
         if (HttpStatus.SC_OK != statusCode) {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
                     HttpStatus.SC_OK, response));
@@ -133,9 +142,11 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         params.put("aura.token", getCsrfToken());
         params.put("aura.context", getSimpleContext(Format.JSON, true));
 
-        HttpResponse httpResponse = performPost("/aura", params);
+        HttpPost post = obtainPostMethod("/aura", params);
+        HttpResponse httpResponse = perform(post);
         int statusCode = getStatusCode(httpResponse);
         String response = getResponseBody(httpResponse);
+        post.releaseConnection();
 
         if (HttpStatus.SC_OK != statusCode) {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
@@ -159,8 +170,11 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     }
 
     private void assertNoCacheRequest(String inputUrl, String expectedRedirect) throws Exception {
+        HttpGet get = obtainGetMethod(inputUrl, false);
+        HttpResponse response = perform(get);
+        EntityUtils.consume(response.getEntity());
+        get.releaseConnection();
 
-        HttpResponse response = performGet(inputUrl, false);
         assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, getStatusCode(response));
         assertEquals(expectedRedirect, response.getFirstHeader(HttpHeaders.LOCATION).getValue());
         assertEquals("no-cache, no-store", response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue());
@@ -190,12 +204,15 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     }
 
     public void testNoCacheNoValue() throws Exception {
-        HttpResponse response = performGet("/aura?aura.tag&nocache");
+        HttpGet get = obtainGetMethod("/aura?aura.tag&nocache");
+        HttpResponse response = perform(get);
 
         assertEquals(HttpStatus.SC_OK, getStatusCode(response));
         assertTrue(getResponseBody(response).startsWith(
                 String.format("%s*/{\n  \"message\":\"QualifiedName is required for descriptors\"",
                         AuraBaseServlet.CSRF_PROTECT)));
+
+        get.releaseConnection();
     }
 
     public void testHTMLTemplateCaching() throws Exception {
@@ -268,7 +285,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     private void assertResponseSetToLongCache(String url) throws Exception {
         Date expected = new Date(System.currentTimeMillis() + AuraBaseServlet.LONG_EXPIRE - WIGGLE_FACTOR);
 
-        HttpResponse response = performGet(url);
+        HttpGet get = obtainGetMethod(url);
+        HttpResponse response = perform(get);
 
         assertEquals("Failed to execute request successfully.", HttpStatus.SC_OK, getStatusCode(response));
 
@@ -283,6 +301,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         //
         assertTrue(String.format("Expires header is earlier than expected. Expected !before %s, got %s (%s).",
                 expected, expires, expiresHdr), !expires.before(expected));
+
+        get.releaseConnection();
     }
 
     /**
@@ -295,7 +315,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      */
     private void assertResponseSetToNoCache(String url) throws Exception {
         Date expected = new Date(System.currentTimeMillis());
-        HttpResponse response = performGet(url);
+        HttpGet get = obtainGetMethod(url);
+        HttpResponse response = perform(get);
         assertEquals("Failed to execute request successfully.", HttpStatus.SC_OK, getStatusCode(response));
 
         assertEquals("Expected response to be marked for no-cache", "no-cache, no-store",
@@ -309,6 +330,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         //
         assertTrue(String.format("Expires header should be in the past. Expected before %s, got %s (%s).",
                 expected, expires, expiresHdr), expires.before(expected));
+
+        EntityUtils.consume(response.getEntity());
+        get.releaseConnection();
     }
 
     /**
@@ -323,7 +347,8 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     public void testJSFrameworkUrlHasNonce() throws Exception {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application render='client'></aura:application>");
-        HttpResponse response = performGet(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
+        HttpGet get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
+        HttpResponse response = perform(get);
         assertEquals(HttpStatus.SC_OK, getStatusCode(response));
         // Fetch the latest timestamp of the JS group and construct URL for DEV mode.
         String expectedFWUrl = String.format("/auraFW/javascript/%s/aura_dev.js?aura.fwuid=%s",
@@ -332,14 +357,18 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         String scriptTag = String.format("<script src=\"%s\" ></script>", expectedFWUrl);
         assertTrue("Expected Aura FW Script tag not found. Expected to see: " + scriptTag,
                 getResponseBody(response).contains(scriptTag));
+
+        get.releaseConnection();
     }
 
     public void testGetUnhandledError() throws Exception {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class,
                 "<aura:application><aura:attribute type='bah'/></aura:application>");
-        HttpResponse httpResponse = performGet(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
+        HttpGet get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
+        HttpResponse httpResponse = perform(get);
         assertEquals(HttpStatus.SC_NOT_FOUND, getStatusCode(httpResponse));
         String response = getResponseBody(httpResponse);
         assertEquals("Expected simple error page but got: " + response, "404 Not Found\ndescriptor is null\n", response);
+        get.releaseConnection();
     }
 }

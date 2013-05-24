@@ -21,6 +21,8 @@ import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -62,9 +64,11 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
         AuraContext ctx = startContext("auratest:test_TokenValidation", ComponentDef.class);
         String uri = getGetURIWithModifiedUID(ctx, true);
 
-        HttpResponse httpResponse = performGet(uri);
+        HttpGet get = obtainGetMethod(uri);
+        HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);
         String response = getResponseBody(httpResponse);
+        get.releaseConnection();
 
         assertTrue("Aura servlet should return 200.", statusCode == HttpStatus.SC_OK);
         assertOutdated(response);
@@ -81,9 +85,12 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
         // When last mod time stamp is older than a year.
         AuraContext ctx = startContext("auratest:test_TokenValidation", ComponentDef.class);
         String uri = getGetURIWithModifiedUID(ctx, false);
-        HttpResponse httpResponse = performGet(uri);
+
+        HttpGet get = obtainGetMethod(uri);
+        HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);
         String response = getResponseBody(httpResponse);
+        get.releaseConnection();
 
         assertTrue("Failed to reach aura servlet.", statusCode == HttpStatus.SC_OK);
         assertTrue("AuraServlet failed to notify the client about invalid cache.",
@@ -98,11 +105,13 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
      */
     public void testPostRequestWithDifferentUID() throws Exception {
         AuraContext ctx = startContext("auratest:test_TokenValidation", ComponentDef.class);
-        HttpResponse httpResponse = getPostResponse(ctx, true);
-                                                                                                             // days
+
+        HttpPost post = getPostMethod(ctx, true);
+        HttpResponse httpResponse = perform(post);                                                        // days
         int statusCode = getStatusCode(httpResponse);
-        assertTrue("Aura servlet should return 200.", statusCode == HttpStatus.SC_OK);
         String response = getResponseBody(httpResponse);
+        post.releaseConnection();
+        assertTrue("Aura servlet should return 200.", statusCode == HttpStatus.SC_OK);
         assertOutdated(response);
     }
 
@@ -115,9 +124,12 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
     @TestLabels("auraSanity")
     public void testPostRequestWithValidUID() throws Exception {
         AuraContext ctx = startContext("auratest:test_TokenValidation", ComponentDef.class);
-        HttpResponse httpResponse = getPostResponse(ctx, false);
+        HttpPost post = getPostMethod(ctx, false);
+        HttpResponse httpResponse = perform(post);
         int statusCode = getStatusCode(httpResponse);
         String response = getResponseBody(httpResponse);
+        post.releaseConnection();
+
         if (HttpStatus.SC_OK != statusCode) {
             fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
                     HttpStatus.SC_OK, response));
@@ -135,7 +147,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
      * @return response
      * @throws Exception
      */
-    private HttpResponse getPostResponse(AuraContext ctx, boolean modified) throws Exception {
+    private HttpPost getPostMethod(AuraContext ctx, boolean modified) throws Exception {
         Map<String, Object> message = new HashMap<String, Object>();
         Map<String, Object> actionInstance = new HashMap<String, Object>();
         actionInstance.put("descriptor",
@@ -157,7 +169,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
 
         params.put("aura.context", serContext);
 
-        return performPost("/aura", params);
+        return obtainPostMethod("/aura", params);
     }
 
     private AuraContext startContext(String qualifiedName, Class<? extends BaseComponentDef> clazz) {

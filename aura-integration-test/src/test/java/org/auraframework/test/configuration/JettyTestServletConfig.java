@@ -21,12 +21,8 @@ import java.net.UnknownHostException;
 
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -87,18 +83,13 @@ public class JettyTestServletConfig implements TestServletConfig {
         // prevent the server from exiting.
         int timeout = 10 * 60 * 1000;
 
-        SchemeRegistry registry = new SchemeRegistry();
-        registry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
-
-        PoolingClientConnectionManager ccm = new PoolingClientConnectionManager(registry);
-
         CookieStore cookieStore = new BasicCookieStore();
 
         HttpParams params = new BasicHttpParams();
         HttpConnectionParams.setConnectionTimeout(params, timeout);
         HttpConnectionParams.setSoTimeout(params, timeout);
 
-        DefaultHttpClient http = new DefaultHttpClient(ccm, params);
+        DefaultHttpClient http = new DefaultHttpClient(params);
         http.setCookieStore(cookieStore);
 
         return http;

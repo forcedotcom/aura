@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,6 +38,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.params.HttpClientParams;
+import org.apache.http.entity.ContentType;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreProtocolPNames;
@@ -166,6 +168,10 @@ public abstract class IntegrationTestCase extends AuraTestCase {
         return obtainGetMethod(path, followRedirects, null);
     }
 
+    protected static HttpGet obtainGetMethod(String path, Header[] headers) throws MalformedURLException, URISyntaxException {
+        return obtainGetMethod(path, true, headers);
+    }
+
     /**
      * Sets up get request method for httpclient. Includes ability to follow redirects and set request headers
      *
@@ -223,71 +229,12 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     }
 
     /**
-     * Performs get request with path
-     * @param path
-     * @return
-     * @throws Exception
-     */
-    protected static HttpResponse performGet(String path) throws Exception {
-        return performGet(path, true);
-    }
-
-    /**
-     * Performs get request with path and follow redirects
-     * @param path
-     * @param followRedirects
-     * @return
-     * @throws Exception
-     */
-    protected static HttpResponse performGet(String path, boolean followRedirects) throws Exception {
-        HttpGet get = obtainGetMethod(path, followRedirects, null);
-        return perform(get);
-    }
-
-    /**
-     * Performs get request with path and request headers
-     * @param path
-     * @param headers
-     * @return
-     * @throws Exception
-     */
-    protected static HttpResponse performGet(String path, Header[] headers) throws Exception {
-        HttpGet get = obtainGetMethod(path, true, headers);
-        return perform(get);
-    }
-
-    /**
-     * Performs get request with path, follow redirects, and request headers
-     * @param path
-     * @param followRedirects
-     * @param headers
-     * @return
-     * @throws Exception
-     */
-    protected static HttpResponse performGet(String path, boolean followRedirects, Header[] headers) throws Exception {
-        HttpGet get = obtainGetMethod(path, followRedirects, headers);
-        return perform(get);
-    }
-
-    /**
-     * Performs post request with path and post parameters
-     * @param path
-     * @param params
-     * @return
-     * @throws Exception
-     */
-    protected static HttpResponse performPost(String path, Map<String, String> params) throws Exception {
-        HttpPost post = obtainPostMethod(path, params);
-        return perform(post);
-    }
-
-    /**
      * Performs request method
-     * @param method
-     * @return
+     * @param method request method
+     * @return request response
      * @throws Exception
      */
-    protected static HttpResponse perform(HttpRequestBase method) throws Exception {
+    protected HttpResponse perform(HttpRequestBase method) throws Exception {
         return perform(method, null);
     }
 
@@ -295,19 +242,19 @@ public abstract class IntegrationTestCase extends AuraTestCase {
      * Performs request method with HttpContext. HttpContext typically contains cookie store with all cookies
      * to include with request
      *
-     * @param method
-     * @param context
-     * @return
+     * @param method request method
+     * @param context httpcontext
+     * @return request response
      * @throws Exception
      */
-    protected static HttpResponse perform(HttpRequestBase method, HttpContext context) throws Exception {
-        return servletConfig.getHttpClient().execute(method, context);
+    protected HttpResponse perform(HttpRequestBase method, HttpContext context) throws Exception {
+        return getHttpClient().execute(method, context);
     }
 
     /**
      * Gets status code of response
-     * @param response
-     * @return
+     * @param response request response
+     * @return status code
      */
     protected static int getStatusCode(HttpResponse response) {
         return response.getStatusLine().getStatusCode();
@@ -315,13 +262,42 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 
     /**
      * Gets string body of response
-     * @param response
-     * @return
+     * @param response request response
+     * @return response body
      * @throws IOException
      */
     protected static String getResponseBody(HttpResponse response) throws IOException {
         HttpEntity entity = response.getEntity();
         return entity == null ? null : EntityUtils.toString(entity);
+    }
+
+    /**
+     * Gets content type of response
+     *
+     * @param response request response
+     * @return content type
+     */
+    protected static ContentType getContentType(HttpResponse response) {
+        return ContentType.getOrDefault(response.getEntity());
+    }
+
+    /**
+     * Gets charset of response
+     * @param response request response
+     * @return charset
+     */
+    protected static String getCharset(HttpResponse response) {
+        Charset charset = getContentType(response).getCharset();
+        return charset == null ? null : charset.displayName();
+    }
+
+    /**
+     * Gets mime type of response
+     * @param response request response
+     * @return mime type
+     */
+    protected static String getMimeType(HttpResponse response) {
+        return getContentType(response).getMimeType();
     }
 
     protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents) {

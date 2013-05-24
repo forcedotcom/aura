@@ -75,8 +75,13 @@
 			cmp.getValue('v.class').setValue(strClass + ' hidden');
 		}
 		
-		if (cmp.get('v.priv_continuousFlow')) {
-			cmp.getValue('v.priv_ariaExpanded').setValue(true);
+		if (cmp.get('v.priv_continuousFlow')) {								
+			cmp.getValue('v.priv_ariaExpanded').setValue(true);		 
+		} else {
+			var snap = cmp.get('v.priv_snap');			
+			if (snap && snap.indexOf('.') != -1) {
+				cmp.getValue('v.priv_snap').setValue(snap.substring(snap.indexOf('.') + 1));
+			}
 		}
 	},
 	

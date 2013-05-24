@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({	
-	INDICATOR_HEIGHT: 55,
+({		
 	//number of milliseconds to wait before navigating to the next page with arrow key
 	KEY_PAGE_SELECTION_TIMEOUT_DURATION: 200,
 	//number of pixels the scroller has moved before handling the scrollMove event
@@ -23,8 +22,6 @@
     SHOW_SELECTED_PAGE_ONLY : true,
    	
 	init : function(cmp) {		
-		var pageContainer = cmp.find('pageContainer');
-		
 		this.initSize(cmp);
 		this.initPages(cmp);
 		this.initScroller(cmp);		
@@ -34,29 +31,32 @@
 	initSize : function(cmp) {
 		var width = cmp.get('v.width'),
 			height = cmp.get('v.height'),
-			style = width ? ('width:' + width + 'px;') : '';
+			carouselStyle = width ? ('width:' + width + 'px;') : '';
+			
 		
 		cmp._width = width;
 		cmp._height = height;
 				
-		if (height) {
-			height += this.INDICATOR_HEIGHT;
-			style += 'height:' + height + 'px;';
+		if (height) {			
+			carouselStyle += 'height:' + height + 'px;';
 		} else {
-			style += 'height:100%';
+			carouselStyle += 'height:100%';			
 			cmp.getValue('v.priv_scrollContentClass').setValue('full-height');
 		}
 		
-		cmp.getAttributes().setValue('priv_carouselStyle', style);		
+		cmp.getAttributes().setValue('priv_carouselStyle', carouselStyle);
 	},
 	
 	initScroller: function(cmp) {
 		var pageCmps = this.getPageComponents(cmp);			
  		 
 		if (pageCmps && pageCmps.length > 0) {				
-			if (!cmp.get('v.continuousFlow')) {
-				cmp.getAttributes().setValue('priv_snap', 'section.carousel-page');
-			}
+			 
+			var snap = this.getSnap(cmp);
+			
+			if (snap) {					
+				cmp.getValue('v.priv_snap').setValue(snap);
+			}		 
 
 			if (cmp._width) {
 				//set scroller width
@@ -72,9 +72,9 @@
 			pageContainer = cmp.find('pageContainer'),
 			isContinuousFlow = cmp.get('v.continuousFlow'), 
 			isVisible = isContinuousFlow || !this.SHOW_SELECTED_PAGE_ONLY,
-			page,			
-			pages = [];
-
+			page, snap = this.getSnap(cmp),			
+			pages = [];			  
+		
 		if (pageCmps && pageCmps.length > 0) {
 			for ( var i = 0; i < pageCmps.length; i++) {
 				page = pageCmps[i];
@@ -85,7 +85,8 @@
 					page.getValue('v.parent').setValue([cmp]);
 					page.getValue('v.priv_width').setValue(cmp._width);
 					page.getValue('v.priv_visible').setValue(isVisible);
-					page.getValue('v.priv_height').setValue(cmp._height);
+					page.getValue('v.priv_snap').setValue(snap);
+					//page.getValue('v.priv_height').setValue(cmp._height);
 					page.getValue('v.priv_continuousFlow').setValue(isContinuousFlow);
 					pages.push(page);
 				}
@@ -104,13 +105,14 @@
 			            	'priv_visible' : isVisible, 
 			            	'pageModel' : page, 
 			            	'pageIndex' : i + 1,
-			            	'parent' : [cmp]},
+			            	'parent' : [cmp],
+			            	'priv_snap' : snap,
 			            	'priv_width' : cmp._width,
-			            	'priv_height' : cmp._height,
-			            	'priv_continuousFlow' : isContinuousFlow}
+			            	//'priv_height' : cmp._height,
+			            	'priv_continuousFlow' : isContinuousFlow}}
 			        },null,true);
 				 pages.push(component);
-			}
+			}			
 			var body = pageContainer.getValue('v.body');
 			body.destroy();
 			body.setValue(pages);			 
@@ -118,13 +120,15 @@
 		}		
 	},	
 	
-	initPageIndicator : function(cmp) {
-		if (cmp.find('navContainer')) {
-			var pager = cmp.find('pageIndicator');
-			pager.getValue('v.pageComponents').setValue(cmp.getValue('v.pageComponents'));
-		}
+	initPageIndicator : function(cmp) {		
+		var indCmp = this.getPageIndicatorsComponent(cmp);
+		if (indCmp) {		
+			indCmp.getValue('v.pageComponents').setValue(cmp.getValue('v.pageComponents'));
+			indCmp.addHandler('pagerClicked', cmp, 'c.pagerClicked');
+			indCmp.addHandler('pagerKeyed', cmp, 'c.pagerKeyed');			 
+		}		 
 	},
-	
+		
 	/**
 	 * Handle window resize event
 	 * This event is always fired after the carousel is rendered
@@ -159,6 +163,7 @@
 		}
 	},
 	
+	
 	_getParentSize: function(el) {		 		
 		var width, height,
 			parent = el.parentNode;
@@ -183,8 +188,8 @@
 	
 	handlePagerClicked : function(cmp, pageIndex) {
 		var curPage = cmp.get('v.priv_currentPage');
-		if (curPage != pageIndex) {
-			cmp._pageToHide = curPage;
+		if (curPage != pageIndex) {			
+			cmp._pageToHide = curPage;				
 		}
 		
 		this.showPage(cmp, pageIndex);
@@ -267,7 +272,7 @@
 			prevSelectedPage = cmp.get('v.priv_currentPage');
 		
 		cmp._isScrollStartProcessed = false;
-				
+
 		if (prevSelectedPage == currentPageX) {
 			//scrolled back to the same page
 			if (cmp._pageLastShown != currentPageX) {
@@ -327,7 +332,6 @@
 	pageSelected: function(cmp, pageIndex) {
 	
 		var prevSelectedPage = cmp.get('v.priv_currentPage');
-			//pageContainer = this.getPageContainerFromIndex(cmp, pageIndex);
 			
 		if (prevSelectedPage == pageIndex) {			
 			return;
@@ -340,7 +344,7 @@
 			cmp.getAttributes().setValue('priv_currentPage', pageIndex);
 			
 			this.firePageSelectedEventToPage(prePageCmp, pageIndex);
-			this.firePageSelectedEventToPage(curPageCmp, pageIndex, pageIndex);
+			this.firePageSelectedEventToPage(curPageCmp, pageIndex);			
 			this.firePageSelectedEventToPageIndicator(cmp, curPageCmp, pageIndex);			
 		}
 	},
@@ -357,9 +361,9 @@
 	},
 		 
 	firePageSelectedEventToPageIndicator: function(carouselCmp, pageCmp, selectedPage) {
-		var pageIndicator = carouselCmp.find('pageIndicator');
-		
-		if (pageIndicator && pageCmp.isRendered()) {			 
+		var pageIndicator = this.getPageIndicatorsComponent(carouselCmp);
+
+		if (pageIndicator && pageIndicator.isRendered()) {			 
 			var pageId = pageCmp.getElement().id,
 				e = pageIndicator.get('e.pageSelected');
 		
@@ -426,9 +430,19 @@
 		
 		return null;
 	},
+	
+	getPageIndicatorsComponent : function(cmp) {
+		var indicators = cmp.get('v.indicators');
+		return cmp.get('v.continuousFlow') != true && indicators ? indicators[0].find({ instancesOf : "ui:carouselPageIndicator" })[0] : null;
+	},
 	 
 	getScroller : function(cmp) {		
 		return cmp.find('scroller')._scroller;		
+	},
+	
+	getSnap : function(cmp) {
+		var id = cmp.getGlobalId().replace('.', '_').replace(':', '-');
+		return cmp.get('v.continuousFlow') != true ? 'section.snap-class-' + id + '' : null;
 	}
 	
 })

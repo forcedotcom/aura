@@ -78,7 +78,18 @@
     	helper.selectPage(cmp, evt.getParam("pageIndex"));
     },
     
-    selectDefaultPage: function (cmp, evt, helper) {    	
-        helper.selectDefaultPage(cmp, evt);      
+    selectDefaultPage: function (cmp, evt, helper) {
+    	if (cmp.isRendered()) {
+    		helper.selectDefaultPage(cmp, evt);
+    	} else {
+    		if (cmp._selectDefaultPageTimer) {
+    			clearTimeout(cmp._selectDefaultPageTimer);
+    			cmp._selectDefaultPageTimer = null;
+    		}    		
+    		cmp._selectDefaultPageTimer = setTimeout(function(){
+    			cmp._selectDefaultPageTimer = null;
+				helper.selectDefaultPage(cmp, evt);
+			}, 0);
+    	}
     }
 })

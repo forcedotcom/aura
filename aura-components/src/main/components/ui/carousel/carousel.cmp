@@ -15,14 +15,13 @@
     limitations under the License.
 
 -->
-<aura:component  extends="ui:interactive" extensible="true" 
+<aura:component  extends="ui:interactive"  extensible="true" 
 	 description="A tabset component that enables swiping through groups of related content types in addition to standard keyboard, touch, and mouse interactions.">
 
 		<aura:attribute name="title" type="String" description="Title of the carousel" />
 		<aura:attribute name="width" type="Integer" description="Width of the carousel in pixels" />
 		<aura:attribute name="height" type="Integer" description="Height of the carousel in pixels" />
-		<aura:attribute name="class" type="String" description="A CSS style to be attached to the carousel" />
-
+		
 		<aura:attribute name="pageIndicatorPosition" type="String" default="top" description="Position of the page indicator. Acceptable values are 'top' and 'bottom'. " />
 		<aura:attribute name="continuousFlow" type="Boolean" default="false" description="Determines whether to flow continuously between pages or not." />		
 		<aura:attribute name="defaultPage" type="Integer" description="Default page to display. Setting this will override the 'isDefault' attribute in the ui:carouselPage component." />
@@ -32,9 +31,10 @@
 		
 
 		<aura:attribute name="priv_currentPage" type="Integer" description="PRIVATE - the currently selected page index." />
-		<aura:attribute name="priv_carouselStyle" type="String" description="PRIVATE - inline style of the carousel container." />		
+		<aura:attribute name="priv_carouselStyle" type="String" description="PRIVATE - inline style of the carousel container." />
 		<aura:attribute name="priv_scrollerWidth" type="String" description="PRIVATE - the scroller width in pixels." />
 		<aura:attribute name="priv_snap" type="String" description="PRIVATE - Scroller snap option."/>
+		
 		<aura:attribute name="priv_scrollContentClass" type="String" description="PRIVATE - Scroller content css class." />
 								
 		<aura:registerevent name="selectDefaultPage" type="ui:carouselPageEvent" description="The event fired when the default page is selected."/>
@@ -47,20 +47,24 @@
 		<aura:handler name="init" value="{!this}" action="{!c.onInit}" />
 						
 		<ui:resizeObserver onresize="{!c.refresh}"/>
-		
+						
+		<aura:attribute name="indicators" type="Aura.Component[]">						 
+			<nav aura:id="navContainer" class="{!'carousel-nav-container carousel-nav-position-' + v.pageIndicatorPosition}" role="tablist">        		 
+        			<ui:carouselPageIndicator aura:id="pageIndicator" />        		 
+			</nav>
+		</aura:attribute>		
+				
 		<article class="{!v.class}" style="{!v.priv_carouselStyle}" role="article">
 		 
-				<h2 class="visually-hidden">{!v.title}</h2>			
-							  
-				<aura:If isTrue="{!!v.continuousFlow}">
-					<nav aura:id="navContainer" class="{!'carousel-nav-container carousel-nav-position-' + v.pageIndicatorPosition}" role="tablist">
-	            		<ui:carouselPageIndicator aura:id="pageIndicator" pagerClicked="{!c.pagerClicked}"
-	                		 pagerKeyed="{!c.pagerKeyed}" />
-					</nav>
-				</aura:If>
-				   	        
-		    	<div aura:id="carousel-pages" class="carousel-pages" style="{!v.priv_carouselStyle}">
-			    	<ui:scroller aura:id="scroller"
+				<h2 class="visually-hidden">{!v.title}</h2>
+				
+				<aura:if isTrue="{!v.continuousFlow != true &amp;&amp; v.pageIndicatorPosition == 'top'}" >
+					{!v.indicators}
+				</aura:if>			
+								   	        
+		    	<div aura:id="carousel-pages" class="carousel-pages">
+			    	<ui:scroller aura:id="scroller"			    		 
+			    		stopEventPropagation="true"
 			    		width="{!v.priv_scrollerWidth}"
 			    	 	class="scroll-container"			    	 	
 			    	   	hScroll="true"
@@ -71,11 +75,15 @@
 			    	   	snap="{!v.priv_snap}"
 			    	   	scrollContentClass="{!v.priv_scrollContentClass}" >	    				    		    		 
 						 								 
-						<div aura:id="pageContainer" class="page-container" style="{!v.priv_carouselStyle}"> 					 						 							
+						<div aura:id="pageContainer" class="page-container"> 					 						 							
 						 	<!--page content will be rendered here-->
-						 </div>
+						</div>
 					</ui:scroller>
-				</div>            
+				</div>
+				
+				<aura:if isTrue="{!v.continuousFlow != true &amp;&amp; v.pageIndicatorPosition == 'bottom'}" >
+					{!v.indicators}
+				</aura:if>					          
 		</article>		
 				 
 </aura:component>

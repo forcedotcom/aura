@@ -20,8 +20,6 @@
  
    <aura:attribute name="pageIndex" type="Integer" description="The index of the page this component belongs to." />
    <aura:attribute name="title" type="String" description="The title of the page." />
-   <aura:attribute name="ariaControlId" type="String" default="{!'carousel-page-' + pageIndex}"
-   		description="The id that reference the dom id of the top level page element."  />
    
    <aura:attribute name="priv_ariaSelected" type="Boolean" default="false" description="PRIVATE - aria-selected boolean" />
    <aura:attribute name="priv_ariaControlId" type="String" description="PRIVATE - Aria control ID." />

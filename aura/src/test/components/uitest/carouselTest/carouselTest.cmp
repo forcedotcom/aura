@@ -35,23 +35,6 @@
 	 			<ui:carouselPageItem label="File 2" class="entity-file" />
 	 			<ui:carouselPageItem label="Post a New Poll 2" class="entity-poll" />
 	 		</ui:carouselPage>
-	 		<!--
-	 		<ui:carouselPage aura:id="c1-carouselInCarousel">
-		 		<ui:carousel aura:id="insideCarousel" width="450" height="450">
-					<aura:set attribute="pageComponents">
-				 		<ui:carouselPage>
-				 			<p>Page #1</p>
-				 		</ui:carouselPage>
-				 		<ui:carouselPage>
-				 			<p>Page #2</p>
-				 		</ui:carouselPage>
-				 		<ui:carouselPage>
-				 			<p>Page #3</p>
-				 		</ui:carouselPage>
-					</aura:set>
-				</ui:carousel>
-	 		</ui:carouselPage>
-	 		-->
 	 		<ui:carouselPage aura:id="c1-pageWithLongString" title="PAGE 3">
 	 			{!m.longStr}
 	 		</ui:carouselPage>
@@ -93,7 +76,7 @@
 	 		</ui:carouselPage>
 	 		<ui:carouselPage aura:id="c1-updateOutput">
 	 			<ui:button aura:id="btnUpdateOutput" press="{!c.updateOutput}" label="update output"/>
-	 			<div><ui:outputText aura:id="output" value="i have somehting to say..."/></div>
+	 			<div><ui:outputText aura:id="output" value="i have something to say..."/></div>
 	 		</ui:carouselPage>
  		</aura:set>
  	</ui:carousel>
@@ -101,7 +84,7 @@
 
 
 <br/><br/>Carousel2<br/><br/>
-<ui:carousel aura:id="carousel2" width="450" height="450" pageIndicatorPosition="bottom">
+<ui:carousel aura:id="carousel2" width="450" height="450">
 	<aura:set attribute="pageComponents">
  		<ui:carouselPage>
  			<p>Press button to rerender this carousel with a new carousel that has 100 pages.<br/>
@@ -117,6 +100,20 @@
 	</aura:set>
 </ui:carousel>
 
+<br/><br/>Navigation on Bottom<br/><br/>
+<ui:carousel aura:id="carouselNavBottom" width="450" height="450" pageIndicatorPosition="bottom">
+	<aura:set attribute="pageComponents">
+ 		<ui:carouselPage aura:id="cnb-p1">
+ 			page 1
+ 		</ui:carouselPage>
+ 		<ui:carouselPage aura:id="cnb-p2">
+ 			page 2
+ 		</ui:carouselPage>
+ 		<ui:carouselPage aura:id="cnb-p3">
+ 			page 3
+ 		</ui:carouselPage>
+	</aura:set>
+</ui:carousel>
 
 <br/><br/>Carousel That Overrides isDefalut<br/><br/>
 <ui:carousel aura:id="carouselDefaultOverride" width="450" height="450" title="Im A Carousel" defaultPage="3">
@@ -152,13 +149,13 @@
 		<ui:carouselPage aura:id="cinc-p1">
  			<ui:carousel aura:id="childCarousel-smaller" width="100" height="100">
 				<aura:set attribute="pageComponents">
-			 		<ui:carouselPage>
+			 		<ui:carouselPage aura:id="childCarousel-smaller-p1">
 			 			<p>Child carousel #1 which is smaller <br/> Page #1</p>
 			 		</ui:carouselPage>
-			 		<ui:carouselPage>
+			 		<ui:carouselPage aura:id="childCarousel-smaller-p2">
 			 			<p>Child carousel #1 which is smaller <br/> Page #2</p>
 			 		</ui:carouselPage>
-			 		<ui:carouselPage>
+			 		<ui:carouselPage aura:id="childCarousel-smaller-p3">
 			 			<p>Child carousel #1 which is smaller <br/> Page #3</p>
 			 		</ui:carouselPage>
 				</aura:set>
@@ -167,13 +164,13 @@
 	 	<ui:carouselPage aura:id="cinc-p2">
  			<ui:carousel aura:id="childCarousel-sameDim" width="450" height="450">
 				<aura:set attribute="pageComponents">
-			 		<ui:carouselPage>
+			 		<ui:carouselPage aura:id="childCarousel-sameDim-p1">
 			 			<p>Child carousel #2 which has same dimentions <br/> Page #1</p>
 			 		</ui:carouselPage>
-			 		<ui:carouselPage>
+			 		<ui:carouselPage aura:id="childCarousel-sameDim-p2">
 			 			<p>Child carousel #2 which has same dimentions <br/> Page #2</p>
 			 		</ui:carouselPage>
-			 		<ui:carouselPage>
+			 		<ui:carouselPage aura:id="childCarousel-sameDim-p3">
 			 			<p>Child carousel #2 which has same dimentions <br/> Page #3</p>
 			 		</ui:carouselPage>
 				</aura:set>
@@ -182,13 +179,13 @@
 	 	<ui:carouselPage aura:id="cinc-p3">
  			<ui:carousel aura:id="childCarousel-larger" width="600" height="600">
 				<aura:set attribute="pageComponents">
-			 		<ui:carouselPage>
+			 		<ui:carouselPage aura:id="childCarousel-larger-p1">
 			 			<p>Child carousel #3 which is larger <br/> Page #1</p>
 			 		</ui:carouselPage>
-			 		<ui:carouselPage>
+			 		<ui:carouselPage aura:id="childCarousel-larger-p2">
 			 			<p>Child carousel #3 which is larger <br/> Page #2</p>
 			 		</ui:carouselPage>
-			 		<ui:carouselPage>
+			 		<ui:carouselPage aura:id="childCarousel-larger-p3">
 			 			<p>Child carousel #3 which is larger <br/> Page #3</p>
 			 		</ui:carouselPage>
 				</aura:set>

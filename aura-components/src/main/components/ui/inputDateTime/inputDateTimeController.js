@@ -25,7 +25,7 @@
             format = format.replace(/y/g, "Y").replace(/d/g, "D").replace(/E/g, "d").replace(/a/g, "A");
             component.setValue("v.format", format);
         }
-        // TODOL get default format and timezone from LocaleValueProvider
+        // TODO get default datetime format from $Locale
     },
     
     openDatePicker: function(cmp, event, helper) {

@@ -16,7 +16,8 @@
 package org.auraframework.impl.adapter;
 
 import java.text.*;
-import java.util.*;
+import java.util.Locale;
+import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
@@ -42,6 +43,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
 // TODO: add date format
 //    public static String DATE_FORMAT = "dateformat";
     public static String TIME_ZONE = "timezone";
+    public static String TIME_ZONE_FILE_NAME = "timezoneFileName";
     public static String CURRENCY_CODE = "currency_code";
 
     // symbols
@@ -60,6 +62,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
         builder.put(COUNTRY, lang.getCountry());
         builder.put(VARIANT, lang.getVariant());
         builder.put(TIME_ZONE, al.getTimeZone().getID());
+        builder.put(TIME_ZONE_FILE_NAME, al.getTimeZone().getID().replace("/", "-"));
         
         NumberFormat nf = NumberFormat.getNumberInstance(al.getNumberLocale());
         if (!(nf instanceof DecimalFormat)) {

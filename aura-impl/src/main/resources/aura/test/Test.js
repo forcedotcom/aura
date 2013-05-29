@@ -1126,7 +1126,7 @@ var Test = function(){
          */
         expectAuraError: function(flag){
             if(!$A.util.isUndefined(flag)){
-        	priv.expectAuraError = flag;
+        	priv.expectAuraError = !!flag;
             }
         },
         /**

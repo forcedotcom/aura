@@ -39,7 +39,6 @@
             $A.test.assertEquals(returned, aura.util.getElement("auraErrorMessage").innerHTML);
         }
     },
-
     testAuraError : {
         test : [function(cmp) {
             try {
@@ -79,13 +78,7 @@
             }
         }]
     },
-
-    /**
-     * Stacktraces are not available on all browsers. When we can extract useful stack info, it is not dispalyed
-     * consistently across different browsers. Check that it's at least there for Chrome.
-     */
     testAuraErrorStackTrace : {
-        browsers: ["GOOGLECHROME"],
         test : function(cmp) {
             try {
                 $A.error("Verifying stack trace present");
@@ -93,35 +86,8 @@
             } catch(e) {
                 var message = $A.util.getElement("auraErrorMessage");
                 $A.test.assertNotNull(message, "Aura error message box did is not present after $A.error()");
-                $A.test.assertStartsWith("Verifying stack trace present\nError: stack",
+                $A.test.assertStartsWith("Verifying stack trace present\nError: stack\n    at Error",
                     $A.test.getText(message), "Unexpected stacktrace message");
-            }
-        }
-    },
-
-    testAuraErrorWithErrorObject : {
-        test : function(cmp) {
-            try {
-                $A.error(new Error("Error message here"));
-                $A.test.fail("Test setup failure, $A.error failed to throw exception.");
-            } catch(e) {
-                var message = $A.util.getElement("auraErrorMessage");
-                $A.test.assertNotNull(message, "Aura error message box did is not present after $A.error()");
-                $A.test.assertStartsWith("Error message here", $A.test.getText(message), "Unexpected error message displayed");
-            }
-        }
-    },
-
-    testAuraErrorWithMap : {
-        test : function(cmp) {
-            try {
-                $A.error({ error1: "First Error", error2: "Second Error"});
-                $A.test.fail("Test setup failure, $A.error failed to throw exception.");
-            } catch(e) {
-                var message = $A.util.getElement("auraErrorMessage");
-                $A.test.assertNotNull(message, "Aura error message box did is not present after $A.error()");
-                var expected = $A.util.isIE ? "First Error\r\nSecond Error" : "First Error\nSecond Error";
-                $A.test.assertEquals(expected, $A.test.getText(message), "Unexpected error message displayed");
             }
         }
     }

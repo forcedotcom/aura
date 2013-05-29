@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" extensible="true" controller="java://org.auraframework.impl.java.controller.ParallelActionTestController">
+<aura:component controller="java://org.auraframework.impl.java.controller.ParallelActionTestController">
     <ui:button label="Run server action in foreground" press="{!c.cExecuteInForeground}" aura:id="executeInForeground"/>
     <p/>
     <ui:button label="Run server action in foreground with return" press="{!c.cExecuteInForegroundWithReturn}" aura:id="executeInForegroundWithReturn"/>

@@ -16,6 +16,6 @@
 
 -->
 <aura:component controller="java://org.auraframework.impl.java.controller.TestController">
-    <actionChain:chainLocalActions aura:id='facet'/>
+    <actionsTest:chainLocalActions aura:id='facet'/>
     <aura:registerevent name="press" type="ui:press"/>
 </aura:component>

@@ -1,0 +1,71 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Accessibility Considerations" />
+    <p>Accessible software can be used with assistive technology such as screen readers that announce textual elements in the software. 
+    Aura components support accessibility and we recommend that you use them in preference to HTML tags when possible. Using the components are also recommended
+    for their robust event handling.
+    Aura's accessibility guidelines are as follows.
+    </p>
+    <table class="table table-bordered table-striped">
+	<thead>
+	    <tr>
+	        <th>Element</th>  
+	        <th>Recommendation</th>      
+	    </tr>
+	</thead>
+	<tbody>
+	<tr>
+            <td>Buttons</td>
+            <td>Use the <code>ui:button</code> component in preference to the <code>&lt;button&gt;</code> tag. 
+            Example: <auradocs:codeblock>&lt;ui:button label="Attach a File" iconImgSrc="clip.png" labelDisplay="false" /&gt;</auradocs:codeblock></td>
+        </tr>
+        <tr>
+            <td>Drop-down lists</td>
+            <td>Use the <code>ui:inputSelect</code> component in preference to the <code>&lt;select&gt;</code> tag. 
+                See <auradocs:topicLink topic="useForm">Getting User Input</auradocs:topicLink> for more information.</td>           
+        </tr>
+	    <tr>
+	       <td>Images</td>
+	       <td>Use the <code>ui:image</code> component and include alternative text with informational images. 
+	           See <auradocs:topicLink topic="img">Images</auradocs:topicLink> for more information.</td>
+	    </tr>
+	    <tr>
+	       <td>Forms and fields</td>
+	       <td>Use the <code>ui:input</code> and <code>ui:output</code> components, which provide extensive <auradocs:topicLink topic="label">label</auradocs:topicLink> support.
+	       For example, use <code>ui:inputTextarea</code> in preference to the <code>select</code> tag for multi-line text input. 
+	       See <auradocs:topicLink topic="useForm">Getting User Input</auradocs:topicLink> for more information.</td> 
+        </tr>
+        <tr>
+            <td>Help and error messages</td>
+            <td>Use the <code>aria-describedby</code> attribute to associate the help text or error mmessage with a particular field. Example: 
+            <auradocs:codeblock>
+            &lt;ui:inputText label="Contact Name" labelPosition="top" aria-describedby="contact" /&gt;
+            &lt;ui:outputText aura:id="contact" value="This is an example of a help text" /&gt;
+            </auradocs:codeblock> 
+            For information on field-level errors, see <auradocs:topicLink topic="error">Validating Fields</auradocs:topicLink>.</td>
+        </tr>
+        <tr>
+            <td>Links</td>
+            <td>Use the <code>ui:outputURL</code> component in preference to the <code>&lt;a&gt;</code> tag.
+            Example: <auradocs:codeblock>&lt;ui:outputURL value="www.google.com" label=”search” /&gt;</auradocs:codeblock></td>
+        </tr>
+        
+    </tbody>
+    </table>
+</aura:component>

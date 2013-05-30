@@ -21,12 +21,26 @@
     <p>To display images, use the <code>ui:image</code> component. <code>ui:image</code> provides built-in functionalities that automates common usages of the HTML <code>&lt;img&gt;</code> tag, such as <code>href</code> linking and other attributes.
      For an example on how you can use component attributes in images to switch between CSS classes, take a look at the <auradocs:defLink descriptor="ui:outputCheckbox">ui:outputCheckbox</auradocs:defLink> component.</p> 
     <p>Additionally, include the <code>imageType</code> attribute to denote if the image is informational or decorative.</p>
-    <p><h4>Informational Image</h4>
-    Informational images can provide information that may not be available in the text, such as a Like or Follow image.
+    <h4>Informational Image</h4>
+    <p>Informational images can provide information that may not be available in the text, such as a Like or Follow image. 
+    They are actionable and can stand alone in a button or hyperlink. 
+    Include the <code>alt</code> tag to specify an alternate text for the image, which is helpful if the user has no access to the image.</p>
     <auradocs:codeblock>&lt;ui:image src="follow.png" imageType="informational" alt="follow" /&gt;</auradocs:codeblock>
-    </p>
+    <p>If you use CSS to display an informational image, you must provide assistive text that will be put into the DOM, by using the 
+    <code>assistiveText</code> class.</p>
+    <auradocs:codeblock>
+    &lt;div class="Following"&gt;
+        &lt;span class="assistiveText"&gt;Following&lt;/span&gt;
+    &lt;/div&gt;
+    </auradocs:codeblock>
+    <p>If you use an icon font to display an informational image, provide assistive text that will be put into the DOM.</p>
+    <auradocs:codeblock>
+    &lt;a class="icon-like"&gt;
+        &lt;span class="assistiveText"&gt;Like&lt;span&gt;
+    &lt;/a&gt;
+    </auradocs:codeblock>
     <p><h4>Decorative Image</h4>
-    Decorative Images are images that can be removed without affecting the logic or content of the page.
+    Decorative Images are images that can be removed without affecting the logic or content of the page. You don't need to specify assistive text for decorative images.
     <auradocs:codeblock>&lt;ui:image src="decoration.png" imageType="decorative" /&gt;</auradocs:codeblock>
     </p>
      <auradocs:info>See the <auradocs:defLink descriptor="ui:image">ui:image</auradocs:defLink> component reference.</auradocs:info>

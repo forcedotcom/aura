@@ -397,6 +397,8 @@ var AuraClientService = function() {
          * @param {Boolean} exclusive run this action as an exclusive action.
          */
         enqueueAction : function(action, background, exclusive) {
+            $A.assert(!$A.util.isUndefinedOrNull(action), "EnqueueAction() cannot be called on an undefined or null action.");
+            $A.assert(!$A.util.isUndefined(action.auraType)&& action.auraType==="Action", "Cannot call EnqueueAction() with a non Action parameter.");
             //
             // FIXME: W-1652115 We need to enable this.
             //

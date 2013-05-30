@@ -763,6 +763,39 @@ Test.Aura.Action.ActionTest = function(){
             // Assert
             Assert.Equal(action, actual);
         }
+        
+        [Fact]
+        function ThrowsIfActionIsNotServerAction(){
+            // Arrange
+            var expected = "RunAfter() cannot be called on a client action. Use run() on a client action instead.";
+            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
+        	assert : function(condition, message){
+        	    if(!condition){
+        		var error = new Error(message);
+			throw error;
+		    }
+		}
+            });
+            var target = new Action();
+            var action = { 
+                def: { 
+                    isServerAction: function() {
+                        return false;
+                    }
+                }
+            };
+            var actual = null;
+
+            // Act
+            mockAssert(function(){
+                actual = Record.Exception(function(){
+                    target.runAfter(action);
+                })
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
     }
 
     [Fixture]

@@ -20,4 +20,5 @@
     <aura:attribute type="String" name="dup"/>
     <aura:attribute type="String" name="dup"/>
 </aura:component>
-<!--This component is used in PreloadNameSpaceUITest.testPreloadNameSpaceWithBadComponent() -->
+<!--This component is used in PreloadNameSpaceUITest.testPreloadNameSpaceWithBadComponent()
+    and loadLevelTest.newComponentTest.js -->

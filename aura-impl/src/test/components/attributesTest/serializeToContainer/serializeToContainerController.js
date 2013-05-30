@@ -16,11 +16,11 @@
 ({
     newComponent : function(cmp, evt, helper){
         var newcmp = $A.newCmpAsync(
-        		this,
-        		function(newcmp) {
+                this,
+                function(newcmp) {
                     cmp.find("target").getValue("v.body").setValue(newcmp);
                 },
-        		{
+                {
                 "componentDef" : "markup://attributesTest:serializeTo",
                 "attributes" : {
                     "values" : {
@@ -32,7 +32,6 @@
                         noneDefault : "silk"
                     }
                 }
-            });
-        
+        });
     }
 })

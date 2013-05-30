@@ -31,7 +31,10 @@
             $A.test.assertEquals("silk", newcmp.get("v.noneDefault"));
 
             // try to create another new component which doesn't need a server trip now
-            cmp.find("newComponent").get("e.press").fire();
+            $A.run(function(){
+                cmp.get("c.newComponent").run()
+            });
+            $A.test.addWaitFor(true, $A.test.allActionsComplete);
             var newercmp = cmp.find("target").get("v.body")[0];
             $A.test.assertFalse(newcmp.getGlobalId() === newercmp.getGlobalId());
             $A.test.assertEquals("bulk", newercmp.get("v.both"));

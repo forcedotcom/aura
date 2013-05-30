@@ -19,10 +19,10 @@ Mocks.GetMock(Object.Global(), "exp", function(){})(function(){
     //#import aura.controller.Action
 });
 
-Function.RegisterNamespace("Test.Aura.Action");
+Function.RegisterNamespace("Test.Aura.Controller");
 
 [Fixture]
-Test.Aura.Action.ActionTest = function(){
+Test.Aura.Controller.ActionTest = function(){
     [Fixture]
     function Constructor(){
         [Fact]

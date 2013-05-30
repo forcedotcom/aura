@@ -114,7 +114,7 @@ var AuraComponentService = function(){
          * @public
          */
         newComponentDeprecated: function(config, attributeValueProvider, localCreation, doForce){
-            aura.assert(config, "config is required in ComponentService.newComponentDeprecated(config)");
+            $A.assert(config, "config is required in ComponentService.newComponentDeprecated(config)");
 
             var that = $A.services.component;
             if ($A.util.isArray(config)){
@@ -183,9 +183,9 @@ var AuraComponentService = function(){
          * @public
          */
         newComponentAsync: function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce){
-            aura.assert(config, "config is required in ComponentService.newComponentDeprecated(config)");
-            aura.assert($A.util.isFunction(callback),"newComponentAsync requires a function as the callback parameter");
-            
+            $A.assert(config, "config is required in ComponentService.newComponentAsync(config)");
+            $A.assert($A.util.isFunction(callback),"newComponentAsync requires a function as the callback parameter");
+
             var that = $A.services.component;
             if ($A.util.isArray(config)){
                 return that.newComponentArray(config, attributeValueProvider, localCreation, doForce);
@@ -208,7 +208,6 @@ var AuraComponentService = function(){
             	var newComp = that.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
                 callback.call(callbackScope, newComp);
             }
-
         },
 
         /**
@@ -217,7 +216,6 @@ var AuraComponentService = function(){
          * @param config
          * @param callback
          * @private
-
          */
         requestComponent: function(callbackScope, callback, config) {
 

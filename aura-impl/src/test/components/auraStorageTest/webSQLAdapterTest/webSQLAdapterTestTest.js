@@ -162,15 +162,20 @@
 	    var storage = $A.storageService.getStorage("browserdb");
 	    var a = $A.get("c.aura://ComponentController.getComponent");
 	    a.setParams({
-		"name" : 'auraStorageTest:teamFacet'
+            "name" : 'auraStorageTest:teamFacet'
 	    });
 	    a.setCallback(cmp,function(a){
-		//Verify that original action is usable
-		$A.test.assertEquals("SUCCESS", a.getState())
-		$A.test.assertDefined(a.getReturnValue);
-		var newCmp = $A.newCmpDeprecated(a.getReturnValue());
-		$A.test.assertEquals("markup://auraStorageTest:teamFacet", newCmp.getDef().getDescriptor().toString());
-		storage.put("actionResponse", a);
+    		//Verify that original action is usable
+    		$A.test.assertEquals("SUCCESS", a.getState())
+    		$A.test.assertDefined(a.getReturnValue);
+            $A.newCmpAsync(
+                    this,
+                    function(newCmp){
+                        $A.test.assertEquals("markup://auraStorageTest:teamFacet", newCmp.getDef().getDescriptor().toString());
+                        storage.put("actionResponse", a);
+                    },
+                    a.getReturnValue()
+            );
 	    });
 	    $A.enqueueAction(a);
 	    $A.eventService.finishFiring();
@@ -181,8 +186,13 @@
 				var item = cmp["actionResponse"];
 				$A.test.assertEquals("SUCCESS", item.getState());
 				$A.test.assertDefined(item.getReturnValue);
-				var newCmp = $A.newCmpDeprecated(item.getReturnValue());
-				$A.test.assertEquals("markup://auraStorageTest:teamFacet", newCmp.getDef().getDescriptor().toString());*/
+				$A.newCmpAsync(
+                    this,
+                    function(newCmp){
+                        $A.test.assertEquals("markup://auraStorageTest:teamFacet", newCmp.getDef().getDescriptor().toString());
+                    },
+                    a.getReturnValue()
+                );*/
 			});
 	}
 	]

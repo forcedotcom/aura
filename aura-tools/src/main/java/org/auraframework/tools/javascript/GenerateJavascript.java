@@ -16,9 +16,12 @@
 package org.auraframework.tools.javascript;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Properties;
 
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
+import org.auraframework.impl.javascript.AuraJavascriptResourceGroup;
 import org.auraframework.impl.util.AuraImplFiles;
 
 /**
@@ -36,6 +39,14 @@ public class GenerateJavascript {
         }
         js.parse();
         js.generate(dest, false);
+
+        // Store the precomputed hash into a file.
+        Properties props = new Properties();
+        props.setProperty(AuraJavascriptResourceGroup.UUID_PROPERTY, js.getGroupHash().toString());
+        props.setProperty(AuraJavascriptResourceGroup.LASTMOD_PROPERTY, Long.toString(js.getLastMod()));
+
+        File propertyFile = new File(dest, AuraJavascriptResourceGroup.VERSION_FILE);
+        props.store(new FileWriter(propertyFile), "Aura framework version information by GenerateJavascript");
     }
 
 }

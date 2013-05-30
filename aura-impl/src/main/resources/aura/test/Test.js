@@ -79,8 +79,8 @@ var Test = function(){
          * current test stage is completed but before the next stage is started.
          *
          * @description <p>Example:</p>
-         * aura.test.addWaitFor("i was updated", function(){
-         *   return element.textContent;}, function(){alert("the wait is over"});
+         * aura.test.addWaitForWithFailureMessage("i was updated", function(){
+         *   return element.textContent;},"Failure Message", function(){alert("the wait is over"});
          *
          * @param {Object} expected
          *             The value to compare against. If expected is a function,

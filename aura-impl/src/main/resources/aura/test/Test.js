@@ -73,6 +73,25 @@ var Test = function(){
                 }, null, callback);
         },
         
+        /**
+         * Asynchronously wait for a condition before continuing with the next
+         * stage of the test case.  The wait condition is checked after the
+         * current test stage is completed but before the next stage is started.
+         *
+         * @description <p>Example:</p>
+         * aura.test.addWaitFor("i was updated", function(){
+         *   return element.textContent;}, function(){alert("the wait is over"});
+         *
+         * @param {Object} expected
+         *             The value to compare against. If expected is a function,
+         *             it will evaluate it before comparison.
+         * @param {Object} testFunction
+         *             A function to evaluate and compare against expected.
+         * @param {String} failureMessage
+         *			The message that is returned if the condition is not true
+         * @param {function} callback
+         *             Invoked after the comparison evaluates to true
+         */
         addWaitForWithFailureMessage : function(expected, testFunction, failureMessage, callback){
             if (!$A.util.isFunction(testFunction)) {
                 throw new Error("addWaitFor expects a function to evaluate for comparison, but got: " + testFunction);

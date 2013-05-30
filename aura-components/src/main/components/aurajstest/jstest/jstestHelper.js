@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 ({
-    runNextTest : function(cmp){
+    startTests : function(cmp){
         var tests = cmp.find("test");
         tests = $A.util.isArray(tests) ? tests : [tests];
-        var index = parseInt(cmp.get("v.index"));
-        if(index >= tests.length){
-            return;
+        for(var i in tests){
+            tests[i].getDef().getHelper().loadTest(tests[i]);
         }
-        var test = tests[index];
-        test.getDef().getHelper().loadTest(test);
-        cmp.getValue("v.index").setValue(index + 1);
     }
 })

@@ -72,7 +72,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
 
     private static final Set<String> rootPrefixes = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
     private static final Set<DefType> rootDefTypes = EnumSet.of(DefType.APPLICATION, DefType.COMPONENT,
-            DefType.INTERFACE, DefType.EVENT, DefType.LAYOUTS, DefType.NAMESPACE);
+            DefType.INTERFACE, DefType.EVENT, DefType.LAYOUTS, DefType.NAMESPACE, DefType.THEME);
 
     @Override
     public DefRegistry<?>[] getRegistries(Mode mode, Access access, Set<SourceLoader> extraLoaders) {
@@ -197,6 +197,6 @@ public class AuraRegistryProviderImpl implements RegistryAdapter {
             return new CachingDefRegistryImpl<T>((CacheableDefFactory<T>) factory, defTypes, prefixes);
         } else {
             return new NonCachingDefRegistryImpl<T>(factory, defTypes, prefixes);
-        }
-    }
+		}
+	}
 }

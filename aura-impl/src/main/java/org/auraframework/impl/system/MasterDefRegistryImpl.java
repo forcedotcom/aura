@@ -216,6 +216,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case DOCUMENTATION:
             case LAYOUTS:
             case NAMESPACE:
+            case THEME:
                 qualifiedNamePattern = "%s://%s:%s";
                 break;
             case ACTION:

@@ -622,6 +622,7 @@
                                             <include name="**/*.evt" />
                                             <include name="**/*.app" />
                                             <include name="**/*.css" />
+                                            <include name="**/*.theme" />
                                             <include name="**/*Test.js" />
                                         </fileset>
                                     </path>
@@ -647,6 +648,7 @@
                                             <include name="**/*.evt" />
                                             <include name="**/*.app" />
                                             <include name="**/*.css" />
+                                            <include name="**/*.theme" />
                                             <include name="**/*Test.js" />
                                         </fileset>
                                     </path>

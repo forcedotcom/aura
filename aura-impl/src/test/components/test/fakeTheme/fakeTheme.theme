@@ -1,0 +1,4 @@
+<aura:theme>
+    <aura:attribute name="color" default="#ffcc00" type="String" />
+    <aura:attribute name="margin" default="10px" type="String" />
+</aura:theme>

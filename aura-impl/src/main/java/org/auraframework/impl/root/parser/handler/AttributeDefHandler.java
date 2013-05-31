@@ -32,6 +32,7 @@ import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
@@ -44,14 +45,13 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
      */
     public static final String TAG = "aura:attribute";
 
-    private static final String ATTRIBUTE_DEFAULT = "default";
-    private static final String ATTRIBUTE_REQUIRED = "required";
-    private static final String ATTRIBUTE_TYPE = "type";
-    private static final String ATTRIBUTE_NAME = "name";
-    private static final String ATTRIBUTE_DESCRIPTION = "description";
-    private static final String ATTRIBUTE_SERIALIZE_TO = "serializeTo";
-    private static final String ATTRIBUTE_VISIBILITY = "visibility";
-
+    protected static final String ATTRIBUTE_DEFAULT = "default";
+    protected static final String ATTRIBUTE_REQUIRED = "required";
+    protected static final String ATTRIBUTE_TYPE = "type";
+    protected static final String ATTRIBUTE_NAME = "name";
+    protected static final String ATTRIBUTE_DESCRIPTION = "description";
+    protected static final String ATTRIBUTE_SERIALIZE_TO = "serializeTo";
+    protected static final String ATTRIBUTE_VISIBILITY = "visibility";
 
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_DEFAULT, ATTRIBUTE_REQUIRED,
             ATTRIBUTE_TYPE, ATTRIBUTE_NAME, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_SERIALIZE_TO, ATTRIBUTE_VISIBILITY);
@@ -60,7 +60,6 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     private final List<ComponentDefRef> body = Lists.newArrayList();
     private String defaultValue = null;
 
-
     /**
      * For writing
      */
@@ -68,9 +67,8 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     }
 
     /**
-     * @param xmlReader The XMLStreamReader that the handler should read from.
-     *            It expected to be queued up the appropriate position before
-     *            getElement() is invoked.
+     * @param xmlReader The XMLStreamReader that the handler should read from. It expected to be queued up the
+     *            appropriate position before getElement() is invoked.
      */
     public AttributeDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
@@ -88,9 +86,14 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         builder.setParentDescriptor(getParentHandler().getDefDescriptor());
         builder.setDescriptor(DefDescriptorImpl.getInstance(name, AttributeDef.class));
         builder.setLocation(getLocation());
-        builder.setTypeDefDescriptor(DefDescriptorImpl.getInstance(getAttributeValue(ATTRIBUTE_TYPE), TypeDef.class));
         builder.setRequired(getBooleanAttributeValue(ATTRIBUTE_REQUIRED));
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
+
+        String type = getAttributeValue(ATTRIBUTE_TYPE);
+        if (type == null && getDefaultType().isPresent()) {
+            type = getDefaultType().get();
+        }
+        builder.setTypeDefDescriptor(DefDescriptorImpl.getInstance(type, TypeDef.class));
 
         String serializeTo = getAttributeValue(ATTRIBUTE_SERIALIZE_TO);
         if (serializeTo != null) {
@@ -102,14 +105,14 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         }
         defaultValue = getAttributeValue(ATTRIBUTE_DEFAULT);
         String visibility = getAttributeValue(ATTRIBUTE_VISIBILITY);
-        if(visibility != null){
-            try{
+        if (visibility != null) {
+            try {
                 builder.setVisibility(AttributeDef.Visibility.valueOf(visibility.toUpperCase()));
-            }catch(IllegalArgumentException iae){
+            } catch (IllegalArgumentException iae) {
                 builder.setVisibility(AttributeDef.Visibility.INVALID);
             }
         }
-        else{
+        else {
             builder.setVisibility(AttributeDef.Visibility.PUBLIC);
         }
 
@@ -147,7 +150,6 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
 
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
-
         body.add(getDefRefHandler(getParentHandler()).getElement());
     }
 
@@ -158,7 +160,10 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
 
     @Override
     public void writeElement(AttributeDefImpl def, Appendable out) {
+    }
 
+    public Optional<String> getDefaultType() {
+        return Optional.absent();
     }
 
 }

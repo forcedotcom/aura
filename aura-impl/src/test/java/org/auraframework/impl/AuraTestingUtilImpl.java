@@ -126,12 +126,13 @@ public class AuraTestingUtilImpl implements AuraTestingUtil {
         // which they subscribe.
         final CountDownLatch latch = new CountDownLatch(cached.size());
         SourceListener listener = new SourceListener() {
+            private Set<DefDescriptor<?>> descriptors = Sets.newHashSet(cached);
             @Override
             public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event) {
-                if (cached.remove(source)) {
+                if (descriptors.remove(source)) {
                     latch.countDown();
                 }
-                if (cached.isEmpty()) {
+                if (descriptors.isEmpty()) {
                     definitionService.unsubscribeToChangeNotification(this);
                 }
             }

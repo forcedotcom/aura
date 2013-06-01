@@ -30,24 +30,26 @@
 		var selectedPage = evt.getParam('pageIndex'),
 			curPage = cmp.get('v.pageIndex'),
 			selectedItemCss = 'carousel-page-selected',
-			hiddenCssClass = 'hidden',
-			method = selectedPage == curPage ? 'addClass' : 'removeClass';
-
-		$A.util[method](cmp.getElement(), selectedItemCss);
-		
-		cmp.getValue("v.priv_ariaExpanded").setValue(selectedPage == curPage);    	
-	    
+			hiddenCssClass = 'hidden';
+				    
 		if (selectedPage == curPage) {
 			var isCacheable = cmp.get('v.isCacheable');
 				parent = cmp.get('v.parent'),
 				pageModel = cmp.get('v.pageModel');
 				
+			cmp.getValue('v.isSelected').setValue(true);
+			cmp.getValue("v.priv_ariaExpanded").setValue(true);
+			$A.util.addClass(cmp.getElement(), selectedItemCss);
 			$A.util.removeClass(cmp.getElement(), hiddenCssClass);
 							
 			var e = parent[0].get('e.loadPage');    			
 			e.setParams({pageModel: pageModel, pageIndex: curPage});    			
 			e.fire();			
-		} 
+		} else {
+			cmp.getValue('v.isSelected').setValue(false);
+			cmp.getValue("v.priv_ariaExpanded").setValue(false);
+			$A.util.removeClass(cmp.getElement(), selectedItemCss);
+		}
 	},
 	
 	/**
@@ -95,6 +97,7 @@
 	},
 	
 	hidePage: function(cmp, pageIndex) {
+		
 		var curPage = cmp.get('v.pageIndex'),			
 			hiddenClass = 'hidden';
 		

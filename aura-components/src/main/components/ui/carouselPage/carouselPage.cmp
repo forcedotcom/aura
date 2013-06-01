@@ -24,6 +24,8 @@
     <aura:attribute name="pageModel" type="Object" description="The model that is used to create components dynamically." />
     <aura:attribute name="pageIndex" type="Integer" description="The index of this page." />
     
+    <aura:attribute name="isSelected" type="Boolean" default="false" description="Indicates whether the page is selected or not." />
+    
     <aura:attribute name="parent" type="Aura.Component[]" description="The page container." />
     <aura:attribute name="priv_width" type="Integer" description="PRIVATE - Width of the page in pixels. This value is inherited from the ui:carousel 'width' attribute." />
     <aura:attribute name="priv_height" type="Integer" description="PRIVATE - Height of the page in pixels. This value is inherited from the ui:carousel 'height' attribute." />

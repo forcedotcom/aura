@@ -29,6 +29,7 @@ exp(p,
     "assertNull", p.assertNull,
     "assertNotNull", p.assertNotNull,
     "assertStartsWith", p.assertStartsWith,
+    "assertAccessible", p.assertAccessible,
     
     // test flow/state
     "fail", p.fail,

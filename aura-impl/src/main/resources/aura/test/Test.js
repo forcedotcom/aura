@@ -448,7 +448,20 @@ var Test = function(){
                 throw new Error(assertMessage);
             }
         },
-
+        /**
+         * Assert that the current component HTML is Accessibility compliant.
+         * @param {String} errorMessage
+         * 				The message that is returned if the condition is not false
+         * @description Calls the checkAccessibilty method to verify certain tags are accessible
+         * 
+         *Returns      If call to checkAccessibility returns the empty string, no error, otherwise errors were found
+         */
+        assertAccessible : function() {
+            var res = aura.devToolService.checkAccessibility();
+            if (res !== "") {
+                throw new Error(res);
+            }
+        },
          /**
          * Assert that the if(condition) check evaluates to false.
          * @param {Object} condition

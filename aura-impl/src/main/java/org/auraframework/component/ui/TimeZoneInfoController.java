@@ -93,6 +93,10 @@ public class TimeZoneInfoController {
             this.info = info;
         }
         
+        public String getInfo(){
+        	return this.info;
+        }
+        
         @Override
         public void serialize(Json json) throws IOException {
             if (this.info == null) {

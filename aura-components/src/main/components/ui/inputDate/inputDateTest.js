@@ -45,6 +45,57 @@
             var inputDateStr = cmp.find("inputText").getElement().value;
             var dt           = moment().format('YYYY-MM-DD');
             aura.test.assertTrue(aura.test.contains(dt, inputDateStr), "Dates are not the same and they should be");
+    },
+
+	/**
+     * Verify behavior when 'format' is given a valid date format.
+     */
+	testTodayInEuropeFormat:{
+	attributes : {displayDatePicker:'true', format: 'DD-MM-YYYY'},
+	test: function(cmp){
+	        cmp.find("datePicker").get('c.selectToday').run()
+	        var inputDateStr = cmp.find("inputText").getElement().value;
+	        var dt           = moment().format('DD-MM-YYYY');
+    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
+        }
+    },
+
+	/**
+     * Verify behavior when 'format' is given a valid date format.
+     */
+	testMonthNameInFormat:{
+	attributes : {displayDatePicker:'true', format: 'MMMM DD,YYYY'},
+	test: function(cmp){
+	        cmp.find("datePicker").get('c.selectToday').run()
+	        var inputDateStr = cmp.find("inputText").getElement().value;
+	        var dt           = moment().format('MMMM DD,YYYY');
+    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
+        }
+    },
+
+	/**
+     * Verify behavior when 'format' attribute is assigned an empty string.
+     */
+	testEmptyStringForFormat:{
+	attributes : {displayDatePicker:'true', format: ''},
+	test: function(cmp){
+	        cmp.find("datePicker").get('c.selectToday').run()
+	        var inputDateStr = cmp.find("inputText").getElement().value;
+	        var dt           = moment().format('YYYY-MM-DD');
+    		aura.test.assertTrue(aura.test.contains(inputDateStr, dt), "Dates are not the same and they should be");
+        }
+    },
+
+	/**
+     * Verify behavior when 'format' attribute is assigned a garbage value.
+     */
+	testInvalidFormat:{
+	attributes : {displayDatePicker:'true', format: 'KKKKKK'},
+	test: function(cmp){			
+	        cmp.find("datePicker").get('c.selectToday').run()
+	        var inputDateStr = cmp.find("inputText").getElement().value;
+	        var dt           = moment().format('KKKKKK');
+    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
         }
     }
 })

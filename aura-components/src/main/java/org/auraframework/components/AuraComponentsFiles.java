@@ -17,6 +17,7 @@ package org.auraframework.components;
 
 import java.io.File;
 
+import org.auraframework.util.AuraFiles;
 import org.auraframework.util.AuraTextUtil;
 
 /**
@@ -26,7 +27,7 @@ public enum AuraComponentsFiles {
     /**
      * Aura Components Module Root dir
      */
-    AuraComponentsModuleDirectory(System.getProperty("aura.home"), "aura-components"),
+    AuraComponentsModuleDirectory(AuraFiles.Core.getPath(), "aura-components"),
 
     /**
      * File-based component root dir

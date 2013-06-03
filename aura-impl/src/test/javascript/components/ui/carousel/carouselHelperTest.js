@@ -30,7 +30,9 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 		function InitPagesUsingPageComponents(){
 			// Arrange
 			var expected = [{
-				isInstanceOf : function(expression) {return true;},
+				isInstanceOf : function(expression) {
+					return expression !== "aura:iteration";
+				},
 				getValue : function() {
 					return {
 						setValue : function(label, value) {}
@@ -42,22 +44,17 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 				height : 4
 			}];
 			
-			var targetComponent = {
-				find : function(expression) {
-					if (expression === "pageContainer") {
+			var targetComponent = {			 
+				get : function(expression) {return false;},
+				getValue : function(expression) {
+					if (expression === "v.pageComponents") {
 						return {
-							getValue : function(expression) {
-								return {
-									destroy : function() {},
-									setValue : function(pages) {
-										actual = pages;
-									}
-								}
+							setValue : function(value, boolean) {
+								actual = value;
 							}
-						}
+						};
 					}
 				},
-				get : function(expression) {return false;},
 				_width : 450
 			}
 			
@@ -70,7 +67,9 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 				SHOW_SELECTED_PAGE_ONLY : true,
 				getPageModels : function(value){},
 				getPageComponents : function(value){return expected;},
-				getSnap : function(value){}
+				getSnap : function(value){},
+				initPageIndicator : function(value){},
+				initScroller : function(value){}
 			});
 			
 			var actual = null;
@@ -91,28 +90,14 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 			// Arrange
 			var expected = ["page from model"];
 			
-			var targetComponent = {
-				find : function(expression) {
-					if (expression === "pageContainer") {
-						return {
-							getValue : function(expression) {
-								if (expression === "v.body") {
-									return {
-										destroy : function() {},
-										setValue : function(pages) {
-											actual = pages;
-										}
-									};
-								}
-							}
-						}
-					}
-				},
+			var targetComponent = {				 
 				get : function(expression) {return false;},
 				getValue : function(expression) {
 					if (expression === "v.pageComponents") {
 						return {
-							setValue : function(value) {}
+							setValue : function(value, boolean) {
+								actual = value;
+							}
 						};
 					}
 				},
@@ -128,7 +113,9 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 				SHOW_SELECTED_PAGE_ONLY : true,
 				getPageModels : function(value) {return [{dummy : "dummy"}];},
 				getPageComponents : function(value) {return [];},
-				getSnap : function(value){}
+				getSnap : function(value){},
+				initPageIndicator : function(value){},
+				initScroller : function(value){}
 			});
 			
 			var acutal = null;
@@ -136,7 +123,7 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 			// Act
 			mockAura(function(){
 				mockHelperMethods(function(){
-					targetHelper.initPages(targetComponent, 3, 4);
+					targetHelper.initPages(targetComponent);
 				})
 			});
 			

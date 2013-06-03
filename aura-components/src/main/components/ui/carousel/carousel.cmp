@@ -45,26 +45,26 @@
     	<aura:handler name="selectDefaultPage" action="{!c.selectDefaultPage}" />
     	<aura:handler name="pageSelected" action="{!c.pageSelected}" />    
 		<aura:handler name="init" value="{!this}" action="{!c.onInit}" />
-						
+		<aura:handler name="change" value="{!v.pageComponents}" action="{!c.onPageComponentsChanged}" />
+		 			
 		<ui:resizeObserver onresize="{!c.refresh}"/>
-						
+
 		<aura:attribute name="indicators" type="Aura.Component[]">						 
-			<nav aura:id="navContainer" class="{!'carousel-nav-container carousel-nav-position-' + v.pageIndicatorPosition}" role="tablist">        		 
-        			<ui:carouselPageIndicator aura:id="pageIndicator" />        		 
-			</nav>
+			<ui:carouselPageIndicator />
 		</aura:attribute>		
 				
 		<article class="{!v.class}" style="{!v.priv_carouselStyle}" role="article">
 		 
-				<h2 class="visually-hidden">{!v.title}</h2>
+				<h2 class="assistiveText">{!v.title}</h2>
 				
 				<aura:if isTrue="{!v.continuousFlow != true &amp;&amp; v.pageIndicatorPosition == 'top'}" >
-					{!v.indicators}
+					<nav aura:id="navContainer" class="{!'carousel-nav-container carousel-nav-position-' + v.pageIndicatorPosition}" role="tablist">        		 
+	        			{!v.indicators}	        		 
+					</nav>					
 				</aura:if>			
 								   	        
 		    	<div aura:id="carousel-pages" class="carousel-pages">
-			    	<ui:scroller aura:id="scroller"			    		 
-			    		stopEventPropagation="true"
+			    	<ui:scroller aura:id="scroller"			    		
 			    		width="{!v.priv_scrollerWidth}"
 			    	 	class="scroll-container"			    	 	
 			    	   	hScroll="true"
@@ -73,16 +73,17 @@
 			    	   	onScrollEnd="{!c.onScrollEnd}"
 			    	   	refreshed="{!c.onScrollerRefreshed}"
 			    	   	snap="{!v.priv_snap}"
-			    	   	scrollContentClass="{!v.priv_scrollContentClass}" >	    				    		    		 
-						 								 
-						<div aura:id="pageContainer" class="page-container"> 					 						 							
-						 	<!--page content will be rendered here-->
-						</div>
+			    	   	scrollContentClass="{!v.priv_scrollContentClass}" >
+						 
+						{!v.pageComponents}
+						
 					</ui:scroller>
 				</div>
 				
 				<aura:if isTrue="{!v.continuousFlow != true &amp;&amp; v.pageIndicatorPosition == 'bottom'}" >
-					{!v.indicators}
+					<nav aura:id="navContainer" class="{!'carousel-nav-container carousel-nav-position-' + v.pageIndicatorPosition}" role="tablist">        		 
+	        			{!v.indicators}	        		 
+					</nav>	
 				</aura:if>					          
 		</article>		
 				 

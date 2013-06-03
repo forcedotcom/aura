@@ -18,9 +18,9 @@
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="Accessibility Considerations" />
     <p>Accessible software can be used with assistive technology such as screen readers that announce textual elements in the software. 
-    Aura components support accessibility and we recommend that you use them in preference to HTML tags when possible. Using the components are also recommended
-    for their robust event handling.
-    Aura's accessibility guidelines are as follows.
+    Aura components support accessibility and we recommend that you use them in preference to HTML tags when possible. Using the components is also recommended
+    because they offer robust event handling.
+    Aura's accessibility guidelines are as follows:
     </p>
     <table class="table table-bordered table-striped">
 	<thead>
@@ -53,19 +53,24 @@
         </tr>
         <tr>
             <td>Help and error messages</td>
-            <td>Use the <code>aria-describedby</code> attribute to associate the help text or error mmessage with a particular field. Example: 
-            <auradocs:codeblock>
-            &lt;ui:inputText label="Contact Name" labelPosition="top" aria-describedby="contact" /&gt;
-            &lt;ui:outputText aura:id="contact" value="This is an example of a help text" /&gt;
-            </auradocs:codeblock> 
+            <td>Use the <code>aria-describedby</code> attribute to associate the help text or error message with a particular field. Example: 
+<auradocs:codeblock>
+&lt;ui:inputText label="Contact Name" labelPosition="top" aria-describedby="contact" /&gt;
+&lt;ui:outputText aura:id="contact" value="This is an example of a help text" /&gt;
+</auradocs:codeblock> 
             For information on field-level errors, see <auradocs:topicLink topic="error">Validating Fields</auradocs:topicLink>.</td>
         </tr>
         <tr>
             <td>Links</td>
             <td>Use the <code>ui:outputURL</code> component in preference to the <code>&lt;a&gt;</code> tag.
-            Example: <auradocs:codeblock>&lt;ui:outputURL value="www.google.com" label=”search” /&gt;</auradocs:codeblock></td>
+            Example: <auradocs:codeblock>&lt;ui:outputURL value="www.google.com" label="search" /&gt;</auradocs:codeblock></td>
         </tr>
         
     </tbody>
     </table>
+    <p>
+    <b>See Also:</b><br/>
+    <auradocs:topicLink topic="helloWorld">Components Overview</auradocs:topicLink><br />
+    <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink>
+    </p>
 </aura:component>

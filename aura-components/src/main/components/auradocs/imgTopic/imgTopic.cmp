@@ -44,6 +44,9 @@
     <auradocs:codeblock>&lt;ui:image src="decoration.png" imageType="decorative" /&gt;</auradocs:codeblock>
     </p>
      <auradocs:info>See the <auradocs:defLink descriptor="ui:image">ui:image</auradocs:defLink> component reference.</auradocs:info>
-     
+     <p>
+    <b>See Also:</b><br/>
+    <auradocs:topicLink topic="access">Accessibility Considerations</auradocs:topicLink>
+    </p>
     
 </aura:component>

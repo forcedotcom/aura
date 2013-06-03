@@ -34,21 +34,11 @@ public interface DefRegistry<T extends Definition> extends Serializable {
     /**
      * Return the definition for this descriptor, or null if it does not exist.
      * 
-     * This will only load the definition, it will not fully compile it. Until
-     * it has been put back into the registry with a call to 'validated', it
-     * will not be cached.
+     * This will only load the definition, it will not fully compile it.
      * 
      * @throws QuickFixException
      */
     T getDef(DefDescriptor<T> descriptor) throws QuickFixException;
-
-    /**
-     * Mark this definition as validated.
-     * 
-     * It is an error to call this function with a definition that was not
-     * retrieved from this same registry.
-     */
-    void markValid(DefDescriptor<T> descriptor, T def);
 
     /**
      * Return true if the find methods work.
@@ -108,4 +98,9 @@ public interface DefRegistry<T extends Definition> extends Serializable {
      * Clear this registry of all defs it might be storing
      */
     void clear();
+
+    /**
+     * return true if the caller can cache the value.
+     */
+    boolean isCacheable();
 }

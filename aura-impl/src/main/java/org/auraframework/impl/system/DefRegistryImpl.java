@@ -18,7 +18,6 @@ package org.auraframework.impl.system;
 import java.io.Serializable;
 import java.util.Set;
 
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.system.DefRegistry;
@@ -54,11 +53,6 @@ public abstract class DefRegistryImpl<T extends Definition> implements DefRegist
     @Override
     public Set<String> getNamespaces() {
         return namespaces;
-    }
-
-    @Override
-    public void markValid(DefDescriptor<T> descriptor, T def) {
-        def.markValid();
     }
 
     @Override

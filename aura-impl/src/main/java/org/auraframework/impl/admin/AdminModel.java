@@ -29,7 +29,6 @@ import javax.management.ObjectName;
 
 import org.auraframework.def.Definition;
 import org.auraframework.impl.AuraImpl;
-import org.auraframework.impl.system.CachingDefRegistryImpl;
 import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
@@ -38,6 +37,8 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 
 import com.google.common.base.Optional;
+
+import com.google.common.cache.CacheStats;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -50,10 +51,23 @@ public class AdminModel {
     private final Mode m;
     private final List<Map<String, Object>> beanData;
     private final List<Map<String, Object>> registryData;
-    private final List<Map<String, Object>> cachingRegistryData;
+    private final Map<String,Object> defsData;
+    private final Map<String,Object> existsData;
+    private final Map<String,Object> stringsData;
 
-    private <T extends Definition> void addCDR(CachingDefRegistryImpl<T> cdr, Map<String, Object> data) {
-        Collection<Optional<T>> defs = cdr.getCachedDefs();
+    private Map<String,Object> getStats(CacheStats stats) {
+        Map<String, Object> data = Maps.newHashMap();
+
+        data.put("evictionCount", String.valueOf(stats.evictionCount()));
+        data.put("hitCount", String.valueOf(stats.hitCount()));
+        data.put("hitRate", String.valueOf(stats.hitRate()));
+        data.put("missCount", String.valueOf(stats.missCount()));
+        data.put("missRate", String.valueOf(stats.missRate()));
+        data.put("requestCount", String.valueOf(stats.requestCount()));
+        return data;
+    }
+
+    private void addDefsStats(Map<String, Object> data, Collection<Optional<? extends Definition>> defs) {
         List<Map<String, Object>> defsData = Lists.newArrayListWithCapacity(defs.size());
         int nulls = 0;
 
@@ -79,22 +93,20 @@ public class AdminModel {
         m = c.getMode();
         MasterDefRegistryImpl mdr = (MasterDefRegistryImpl) c.getDefRegistry();
         DefRegistry<?>[] regs = mdr.getAllRegistries();
+
+        defsData = getStats(MasterDefRegistryImpl.getDefsCacheStats());
+        addDefsStats(defsData, MasterDefRegistryImpl.getCachedDefs());
+        existsData = getStats(MasterDefRegistryImpl.getExistsCacheStats());
+        stringsData = getStats(MasterDefRegistryImpl.getStringsCacheStats());
+
         registryData = Lists.newArrayListWithCapacity(regs.length);
-        cachingRegistryData = Lists.newArrayListWithCapacity(regs.length);
         for (DefRegistry<?> dr : regs) {
             Map<String, Object> data = Maps.newHashMap();
             data.put("class", dr.getClass().getName());
             data.put("deftypes", dr.getDefTypes().toString());
             data.put("prefixes", dr.getPrefixes().toString());
             data.put("namespaces", dr.getNamespaces().toString());
-            if (dr instanceof CachingDefRegistryImpl) {
-                // add the contents
-                CachingDefRegistryImpl<? extends Definition> cdr = (CachingDefRegistryImpl<? extends Definition>) dr;
-                addCDR(cdr, data);
-                cachingRegistryData.add(data);
-            } else {
-                registryData.add(data);
-            }
+            registryData.add(data);
         }
 
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
@@ -119,13 +131,23 @@ public class AdminModel {
     }
 
     @AuraEnabled
-    public List<Map<String, Object>> getRegistryData() {
-        return registryData;
+    public Map<String, Object> getDefsData() {
+        return defsData;
+    }
+    
+    @AuraEnabled
+    public Map<String, Object> getExistsData() {
+        return existsData;
     }
 
     @AuraEnabled
-    public List<Map<String, Object>> getCachingRegistryData() {
-        return cachingRegistryData;
+    public Map<String, Object> getStringsData() {
+        return stringsData;
+    }
+
+    @AuraEnabled
+    public List<Map<String, Object>> getRegistryData() {
+        return registryData;
     }
 
     @AuraEnabled

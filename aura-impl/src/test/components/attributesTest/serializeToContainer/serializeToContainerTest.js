@@ -17,17 +17,12 @@
     testSerializeTo : {
         test : [function(cmp) {
             // try to create a new component needing server trip
-            cmp.find("newComponent").get("e.press").fire();
-            $A.test.addWaitFor(true, function(){
-                var target = cmp.find("target").get("v.body");
-                if (target.length > 0){
-                    var placeholder = target[0].get("v.body");
-                    return ((placeholder.length > 0) && (placeholder[0].getDef().getDescriptor() == "markup://attributesTest:serializeTo"));
-                }
-                return false;
+            $A.run(function(){
+                cmp.get("c.newComponent").run()
             });
+            $A.test.addWaitFor(true, $A.test.allActionsComplete);
         }, function(cmp) {
-            var newcmp = cmp.find("target").get("v.body")[0].get("v.body")[0];
+            var newcmp = cmp.find("target").get("v.body")[0];
             $A.test.assertEquals("bulk", newcmp.get("v.both"));
             $A.test.assertEquals("hulk", newcmp.get("v.server"));
             $A.test.assertEquals("sulk", newcmp.get("v.none"));

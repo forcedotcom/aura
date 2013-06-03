@@ -83,6 +83,7 @@
 	testDefaultValueOfNewLocalComponentWithDefAtClient : {
 		test : function(cmp) {
 			$A.newCmpAsync(
+					this,
 					function (newComp) {
         				this.verifyDefaultValuesOfBasicDataType(newComp);
         				this.verifyDefaultValuesOfObjectDataType(newComp);
@@ -90,7 +91,6 @@
         				// this.verifyDefaultValuesOfListDataType(newComp);
         				this.verifyChangingAttributeValues(newComp);
 					},
-					this,
 					"markup://attributesTest:defaultValue",
 					null, null, null
 			);

@@ -39,10 +39,10 @@
         action.setCallback(this, function(a){
             var newBody;
             if(a.getState() === "ERROR"){
-                newBody = $A.newCmp("markup://aura:text");
+                newBody = $A.newCmpDeprecated("markup://aura:text");
                 newBody.getValue("v.value").setValue(a.getError()[0].message);
             }else{
-                newBody = $A.newCmp(a.getReturnValue(), cmp.getAttributes().getValueProvider());
+                newBody = $A.newCmpDeprecated(a.getReturnValue(), cmp.getAttributes().getValueProvider());
                 newBody.getAttributes().merge(attributes, true);
             }
             var body = cmp.getValue("v.body");

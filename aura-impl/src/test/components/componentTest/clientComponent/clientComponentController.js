@@ -1,11 +1,10 @@
 ({
     showOutputCmp: function(cmp) {
-
         $A.componentService.newComponentAsync(
+        	this,
 	        function(newCmp) {
 	            cmp.getValue("v.outputValue").setValue(newCmp.getValue("v.value").value);
 	        },
-	        this,
 	        {
             componentDef: {
                 descriptor: "ui:outputNumber"
@@ -18,10 +17,10 @@
 
     addOutputCurrency: function(cmp) {
         $A.componentService.newComponentAsync(
+        	this,
             function(newCmp) {
                 cmp.getValue("v.body").push(newCmp);
             },
-            this,
             {
             componentDef: {
                 descriptor: "ui:outputCurrency"

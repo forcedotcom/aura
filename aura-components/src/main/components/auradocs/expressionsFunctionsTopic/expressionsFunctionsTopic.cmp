@@ -108,6 +108,28 @@
 </tbody>
 </table>
 
+<h2>Array Functions</h2>
+<table class="table table-bordered table-striped">
+<thead>
+    <tr>
+        <th>Function</th>
+        <th>Alternative</th>
+        <th>Usage</th>
+        <th>Description</th>
+        <th>Corresponding Operator</th>
+    </tr>
+</thead>
+<tbody>
+   <tr>
+        <td><code>length</code></td>
+        <td></td>        
+        <td><code>myArray.length</code><br/></td>
+        <td>Returns the length of the array.</td>
+        <td></td>
+    </tr>
+</tbody>
+</table>
+
 <h2>Comparison Functions</h2>
 <p>Comparison functions take two number arguments and return <code>true</code> or <code>false</code> depending on the comparison result. The <code>eq</code> and <code>ne</code> functions can also take other data types for their arguments, such as strings.</p> 
 <table class="table table-bordered table-striped">

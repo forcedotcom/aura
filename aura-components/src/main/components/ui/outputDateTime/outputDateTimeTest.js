@@ -33,16 +33,6 @@
             aura.test.assertEquals("Invalid date time value", $A.test.getText(component.find('span').getElement()), "Value must be an ISO8601-formatted string or a number of milliseconds from Epoch.");
         }
     },
-
-    /**
-     * Verify behavior when 'timezone' attribute is assigned an empty string.
-     */
-    testEmptyStringForTimeZone:{
-        attributes: {value: '2004-09-23T16:30:00.000Z', timezone: 'America/Los_Angeles', format: 'M/dd/yy h:mm A', langLocale: 'en'},
-        test: function(component){
-            aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Should have used GMT as default timezone.");
-        }
-    },
     
     /**
      * Verify behavior when 'timezone' is assigned a valid time zone.
@@ -50,15 +40,19 @@
     testTimezoneByCity: {
         attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'America/Phoenix', format: 'M/dd/yy h:mm A', langLocale: 'en'},
         test: function(component){
-            aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time, failed to use specified timezone");
-      }
+            aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+                aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time, failed to use specified timezone");
+            });
+        }
     },
     
     testTimezoneObeysDayLightSaving: {
         attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'America/Los_Angeles', format: 'M/dd/yy h:mm A', langLocale: 'en'},
         test: function(component){
-            aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time, failed to recognize that timezone has Daylight saving in effect.");
-      }
+            aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+                aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time, failed to recognize that timezone has Daylight saving in effect.");
+            });
+        }
     },
     
     /**
@@ -67,7 +61,9 @@
     testInvalidTimezoneIsIgnored: {
         attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'sasquatch', format: 'M/dd/yy h:mm A', langLocale: 'en'},
         test: function(component){
-            aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used GMT timezone.");
+            aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+                aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used GMT timezone.");
+            });
         }
     },
 
@@ -107,7 +103,9 @@
     testLanguage: {
         attributes: {value : '2004-09-23T16:30:00.000Z', format: 'M/dd/yy h:mm A', langLocale: 'zh_CN', timezone: 'Asia/Shanghai'},
         test: function(component){
-            aura.test.assertEquals("9/24/04 12:30 上午", $A.test.getText(component.find('span').getElement()), "Incorrect formatted datetime string.");
+            aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+                aura.test.assertEquals("9/24/04 12:30 上午", $A.test.getText(component.find('span').getElement()), "Incorrect formatted datetime string.");
+            });
         }
     }
 })

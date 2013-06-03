@@ -63,6 +63,7 @@
                 <auradocs:contentsNode text="Component Body and Facets" id="helloFacets"/>
                 <auradocs:contentsNode text="Lazy Loading a Component" id="lazyload"/>
                 <auradocs:contentsNode text="Aura UI Components">
+                    <auradocs:contentsNode text="Accessibility Considerations" id="access"/>
                     <auradocs:contentsNode text="Positioning" id="useLayout"/>
                     <auradocs:contentsNode text="Getting User Input" id="useForm"/>
                     <auradocs:contentsNode text="Label" id="label"/>
@@ -70,6 +71,7 @@
                     <auradocs:contentsNode text="Menu" id="useMenu"/>
                     <auradocs:contentsNode text="Dialog and Message" id="useMessage"/>
                     <auradocs:contentsNode text="Tabs and Scroller" id="useTabs"/>
+                    <auradocs:contentsNode text="Images" id="img"/>
                 </auradocs:contentsNode>                
             </auradocs:contentsNode>
             <auradocs:contentsNode text="Expressions" >

@@ -88,7 +88,7 @@
                 _helper.displayDateTime(component, "Invalid date time value");
             }
         } else {
-            if (!WallTime.zones[timezone]) {
+            if (!WallTime.zones || !WallTime.zones[timezone]) {
                 // retrieve timezone data from server
                 this.getTimeZoneInfo(component, timezone, function() {
                     _helper.updateDisplay(component, d, format, timezone, value);
@@ -154,8 +154,13 @@
             if(state === "SUCCESS"){
                 var ret = action.returnValue;
                 if (ret) {
-                    WallTime.data = ret; 
-                    WallTime.addRulesZones(WallTime.data.rules, WallTime.data.zones);
+                    WallTime.data = ret;
+                    if (WallTime.zones) {
+                        WallTime.addRulesZones(WallTime.data.rules, WallTime.data.zones);
+                    } else { // initialize walltime-js if it doesn't yet 
+                        WallTime.autoinit = true;
+                        WallTime.init(WallTime.data.rules, WallTime.data.zones);
+                    }
                 }
             }
             callback();

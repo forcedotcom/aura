@@ -48,7 +48,7 @@
     <auradocs:example descriptor="auradocs:demoSelect" />
     
     <h3>Localization</h3>
-    <p>Aura provides client-side localization support on components such as <code>ui:inputDateTime</code> and <code>ui:outputDateTime</code>.
+    <p>Aura provides client-side localization support on components such as <code>ui:outputDate</code> and <code>ui:outputDateTime</code>.
     The components retrieve the browser's locale information and display the date and time accordingly. The following demo shows how you can override the default <code>langLocale</code> and <code>timezone</code> attributes. The output displays the time in the format <code>hh:mm</code> by default.</p>
     <auradocs:example descriptor="auradocs:demoLangLocale" />
     <p>Additionally, you can use the global value provider, <code>$Locale</code>, to obtain a browser's locale information. By default, Aura uses the browser's locale, but it can be configured to use others through the global value provider.

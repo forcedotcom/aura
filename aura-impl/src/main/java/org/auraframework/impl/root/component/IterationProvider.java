@@ -17,18 +17,11 @@
  */
 package org.auraframework.impl.root.component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentConfigProvider;
-import org.auraframework.def.ComponentDefRef;
-import org.auraframework.instance.AttributeSet;
-import org.auraframework.instance.BaseComponent;
-import org.auraframework.instance.Component;
-import org.auraframework.instance.ComponentConfig;
+import org.auraframework.instance.*;
 import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -60,7 +53,7 @@ public class IterationProvider implements ComponentConfigProvider {
         if (items != null && !items.isEmpty()) {
             int realstart = 0;
             int realend = items.size();
-            List<ComponentDefRef> body = (List<ComponentDefRef>) atts.getValue("body");
+            ComponentDefRefArray body = (ComponentDefRefArray) atts.getValue("body");
             Integer start = getIntValue(atts.getValue("start"));
             Integer end = getIntValue(atts.getValue("end"));
             if (start == null && end == null) {
@@ -75,7 +68,6 @@ public class IterationProvider implements ComponentConfigProvider {
                 }
             }
             // boolean reverse = (Boolean)atts.getValue("reverse");
-            BaseComponent<?, ?> vp = atts.getValueProvider();
             for (int i = realstart; i < realend; i++) {
                 Map<String, Object> providers = new HashMap<String, Object>();
                 providers.put(var, items.get(i));
@@ -83,12 +75,7 @@ public class IterationProvider implements ComponentConfigProvider {
                     providers.put(indexVar, i);
                 }
                 // realbody ends up dirty, don't need it to be
-                @SuppressWarnings("rawtypes")
-                IterationValueProvider ivp = new IterationValueProvider(vp, providers);
-                for (ComponentDefRef cdr : body) {
-                    Component c = cdr.newInstance(ivp).get(0);
-                    components.add(c);
-                }
+                components.addAll(body.newInstance(providers));
             }
         }
         return cc;

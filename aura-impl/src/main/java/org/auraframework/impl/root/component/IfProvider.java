@@ -13,21 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.components.aura;
+package org.auraframework.impl.root.component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentConfigProvider;
-import org.auraframework.def.ComponentDefRef;
-import org.auraframework.instance.AttributeSet;
-import org.auraframework.instance.BaseComponent;
-import org.auraframework.instance.Component;
-import org.auraframework.instance.ComponentConfig;
+import org.auraframework.instance.*;
 import org.auraframework.system.Annotations.Provider;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Maps;
@@ -38,7 +31,6 @@ import com.google.common.collect.Maps;
 @Provider
 public class IfProvider implements ComponentConfigProvider {
 
-    @SuppressWarnings("unchecked")
     @Override
     public ComponentConfig provide() throws QuickFixException {
         BaseComponent<?, ?> component = Aura.getContextService().getCurrentContext().getCurrentComponent();
@@ -51,25 +43,17 @@ public class IfProvider implements ComponentConfigProvider {
         AttributeSet atts = component.getAttributes();
         Object o = atts.getValue("isTrue");
         Boolean isTrue = (Boolean) o;
-        List<ComponentDefRef> facet;
+        ComponentDefRefArray facet;
         // get body facet if true, else facet if false
         if (isTrue != null && isTrue.booleanValue()) {
-            facet = (List<ComponentDefRef>) atts.getValue("body");
+            facet = (ComponentDefRefArray) atts.getValue("body");
             // System.err.println("truth " + component.getGlobalId());
         } else {
-            facet = (List<ComponentDefRef>) atts.getValue("else");
+            facet = (ComponentDefRefArray) atts.getValue("else");
             // System.err.println("fiction " + component.getGlobalId());
         }
         if (facet != null) {
-            BaseComponent<?, ?> vp = atts.getValueProvider();
-            for (ComponentDefRef cdr : facet) {
-                List<Component> ls = cdr.newInstance(vp);
-                if (ls.size() > 1) {
-                    throw new AuraRuntimeException("foreach inside of an if doesn't work yet", cdr.getLocation(),
-                            String.format("globalId=%s", component.getGlobalId()));
-                }
-                components.addAll(ls);
-            }
+            components.addAll(facet.newInstance());
         }
         return cc;
     }

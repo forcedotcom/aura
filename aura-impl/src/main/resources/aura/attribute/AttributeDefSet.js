@@ -158,6 +158,7 @@ AttributeDefSet.prototype.createAttribute = function(config, def, component, val
                     }
                 } else {
                     if (noInstantiate && !forceInstantiate) {
+                        v["valueProvider"] = valueProvider;
                         valueConfig.push(new SimpleValue(v, def, component));
                     } else {
                         valueConfig.push(componentService.newComponentDeprecated(v, valueProvider, localCreation, true));

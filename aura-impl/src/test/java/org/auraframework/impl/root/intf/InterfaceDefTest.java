@@ -27,6 +27,7 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.FakeRegistry;
 import org.auraframework.impl.root.AttributeDefImpl;
@@ -35,7 +36,6 @@ import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttrib
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
@@ -75,26 +75,28 @@ public class InterfaceDefTest extends AuraImplTestCase {
         assertEquals("dependencies are incorrect", expected, dependencies);
     }
 
-    public void testValidate() throws Exception {
+    public void testValidateDefinitionNullDescriptor() throws Exception {
         InterfaceDefImpl def = vendor.makeInterfaceDefWithNulls(null, null, null, null, null, null);
         try {
             def.validateDefinition();
-            fail("Should have thrown AuraException for AuraDescriptor<InterfaceDef> being null");
-        } catch (AuraRuntimeException expected) {
-
+            fail("Should have thrown InvalidDefinitionException for AuraDescriptor<InterfaceDef> being null");
+        } catch (InvalidDefinitionException expected) {
         }
     }
-    public void testValidatePrivateAttributeInInterface() throws Exception{
+
+    public void testValidateDefinitionPrivateAttribute() throws Exception {
         Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
         atts.put(DefDescriptorImpl.getInstance("testInt", AttributeDef.class),
-                new AttributeDefImpl(DefDescriptorImpl.getInstance("testInt", AttributeDef.class), null, null, null,
-                        false, null, null,Visibility.PRIVATE));
+                new AttributeDefImpl(DefDescriptorImpl.getInstance("testInt", AttributeDef.class), null,
+                        DefDescriptorImpl.getInstance("Integer", TypeDef.class), null,
+                        false, null, null, Visibility.PRIVATE));
         InterfaceDefImpl inter = vendor.makeInterfaceDef(null, atts, null, null, null);
-        try{
+        try {
             inter.validateDefinition();
             fail("Should have thrown an error for Private Attributes");
-        }catch(InvalidDefinitionException ide){
-            checkExceptionFull(ide,InvalidDefinitionException.class,"Cannot Declare an attribute on the Interface as private");
+        } catch (InvalidDefinitionException ide) {
+            checkExceptionFull(ide, InvalidDefinitionException.class,
+                    "Cannot declare an Interface attribute as private");
         }
     }
 
@@ -114,7 +116,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
         eventDefs.put("buckfutter", red);
         AttributeDefImpl testAttributeDef = new AttributeDefImpl(DefDescriptorImpl.getInstance("testattribute",
                 AttributeDef.class), null, vendor.getTypeDef().getDescriptor(), null, false,
-                AttributeDef.SerializeToType.BOTH, null,Visibility.PUBLIC);
+                AttributeDef.SerializeToType.BOTH, null, Visibility.PUBLIC);
         Map<DefDescriptor<AttributeDef>, AttributeDef> attDefs = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
         attDefs.put(DefDescriptorImpl.getInstance("nullAttribute", AttributeDef.class), testAttributeDef);
         InterfaceDefImpl def = vendor.makeInterfaceDefWithNulls(
@@ -156,7 +158,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
     public void testGetAttributeDefsWithoutExtensions() throws Exception {
         Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
         AttributeDef attDef = new AttributeDefImpl(DefDescriptorImpl.getInstance("Fake Attribute", AttributeDef.class),
-                null, null, null, false, AttributeDef.SerializeToType.BOTH, null,Visibility.PUBLIC);
+                null, null, null, false, AttributeDef.SerializeToType.BOTH, null, Visibility.PUBLIC);
         attributes.put(attDef.getDescriptor(), attDef);
         InterfaceDefImpl intDef2 = vendor.makeInterfaceDefWithNulls(
                 vendor.makeInterfaceDefDescriptor("aura:testinterfacechild"), attributes, null, null, null, null);
@@ -210,7 +212,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
     public void testEqualsWithDifferentLocations() {
         InterfaceDefImpl intDef2 = vendor.makeInterfaceDefWithNulls(vendor
                 .makeInterfaceDefDescriptor("aura:testinterfacechild"), null, null, new Location("filename1", 4, 4,
-                        1000), null, null);
+                1000), null, null);
         assertFalse(
                 "InterfacesDefs with different locations shouldn't have been equal",
                 vendor.makeInterfaceDef(vendor.makeInterfaceDefDescriptor("aura:testinterfacechild"), null, null,
@@ -222,7 +224,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
         extensions.add(vendor.makeInterfaceDefDescriptor("aura:testinterfaceparent"));
         Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
         AttributeDef attDef = new AttributeDefImpl(DefDescriptorImpl.getInstance("Fake Attribute", AttributeDef.class),
-                null, null, null, false, AttributeDef.SerializeToType.BOTH, null,null);
+                null, null, null, false, AttributeDef.SerializeToType.BOTH, null, null);
         attributes.put(attDef.getDescriptor(), attDef);
         DefDescriptor<EventDef> eventTestDescriptor = DefDescriptorImpl.getInstance("aura:testevent", EventDef.class);
         RegisterEventDef regEventDef = vendor.makeRegisterEventDefWithNulls(eventTestDescriptor, true, null);

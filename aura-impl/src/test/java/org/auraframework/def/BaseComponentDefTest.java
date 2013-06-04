@@ -55,14 +55,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         super(name, defClass, tag);
     }
 
-    public void testGetDescriptor() throws Exception {
-        DefDescriptor<T> desc = DefDescriptorImpl.getInstance(auraTestingUtil.getNonce("test:cmp"), getDefClass());
-        BaseComponentDef bcd = vendor.makeBaseComponentDefWithNulls(getDefClass(),
-                desc.getDescriptorName(), null, null, null, null, null, null, null, null, null, null, null, false,
-                false);
-        assertEquals(desc, bcd.getDescriptor());
-    }
-
     public void testHashCode() throws Exception {
         Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
         attributeDefs.put(DefDescriptorImpl.getInstance(vendor.getAttributeName(), AttributeDef.class),

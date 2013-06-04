@@ -73,7 +73,7 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
                         getLocation());
             }
             if(att.getVisibility() == Visibility.PRIVATE){
-                throw new InvalidDefinitionException("Cannot Declare an attribute on the Interface as private",getLocation());
+                throw new InvalidDefinitionException("Cannot declare an Interface attribute as private",getLocation());
             }
         }
 

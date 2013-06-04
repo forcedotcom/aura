@@ -24,7 +24,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
-import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json.Serialization;
 import org.auraframework.util.json.Json.Serialization.ReferenceType;
@@ -39,55 +39,36 @@ import com.google.common.collect.Maps;
 public abstract class DefinitionImpl<T extends Definition> implements Definition, Serializable {
 
     private static final long serialVersionUID = 5836732915093913670L;
+    
     protected final DefDescriptor<T> descriptor;
     protected final Location location;
     protected final Map<SubDefDescriptor<?, T>, Definition> subDefs;
     protected final String description;
-    private final String ownHash;
-    private boolean valid;
-    private final Hash sourceHash;
-    protected  Visibility visibility;
+    protected final Visibility visibility;
 
-    protected DefinitionImpl(DefDescriptor<T> descriptor, Location location) {
-        this.descriptor = descriptor;
-        this.location = location;
-        this.subDefs = null;
-        this.description = null;
-        this.ownHash = null;
-        this.sourceHash = null;
-        this.visibility = null;
+    private final String ownHash;
+    private final Hash sourceHash;
+    private boolean valid;
+
+    protected DefinitionImpl(DefDescriptor<T> descriptor, Location location, Visibility visibility) {
+        this(descriptor, location, null, null, visibility, null, null);
     }
 
     protected DefinitionImpl(RefBuilderImpl<T, ?> builder) {
-        this.descriptor = builder.getDescriptor();
-        this.location = builder.getLocation();
-        this.subDefs = builder.subDefs;
-        this.description = builder.description;
-        this.visibility = builder.getVisibility();
-
-
-        //
-        // Try to make sure that we have a hash string.
-        //
-        String hashVal = builder.ownHash;
-
-        if (hashVal == null && builder.hash != null) {
-            if (builder.hash.isSet()) {
-                hashVal = builder.hash.toString();
-            }
-        }
-        this.ownHash = hashVal;
-        //
-        // Only set the hash value if we don't have one.
-        //
-        if (hashVal == null) {
-            this.sourceHash = builder.hash;
-        } else {
-            this.sourceHash = null;
-        }
+        this(builder.getDescriptor(), builder.getLocation(), builder.subDefs, builder.description, builder
+                .visibility, builder.getOwnHash(), builder.getSourceHash());
     }
 
-
+    DefinitionImpl(DefDescriptor<T> descriptor, Location location, Map<SubDefDescriptor<?, T>, Definition> subDefs,
+            String description, Visibility visibility, String ownHash, Hash sourceHash) {
+        this.descriptor = descriptor;
+        this.location = location;
+        this.subDefs = subDefs;
+        this.description = description;
+        this.visibility = visibility;
+        this.ownHash = ownHash;
+        this.sourceHash = sourceHash;
+    }
 
     /**
      * @see Definition#getDescriptor()
@@ -105,11 +86,9 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         return location;
     }
 
-
-
     @Override
     public Visibility getVisibility(){
-        return visibility;
+        return visibility == null ? Visibility.PUBLIC : visibility;
     }
 
     /**
@@ -143,7 +122,11 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     @Override
     public void validateDefinition() throws QuickFixException {
         if (descriptor == null) {
-            throw new AuraRuntimeException("No descriptor", location);
+            throw new InvalidDefinitionException("No descriptor", location);
+        }
+
+        if (this.visibility == Visibility.INVALID) {
+            throw new InvalidDefinitionException("Invalid visibility value", getLocation());
         }
     }
 
@@ -230,16 +213,14 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
             return this.location;
         }
 
-        public Visibility getVisibility(){
-            return (visibility == null ? Visibility.PUBLIC : visibility);
-        }
-
-
         public RefBuilderImpl<T, A> setVisibility(Visibility visibility) {
             this.visibility = visibility;
             return this;
         }
 
+        public Visibility getVisibility(){
+            return this.visibility;
+        }
 
         public RefBuilderImpl<T, A> addSubDef(SubDefDescriptor<?, T> sddesc, Definition inner) {
             if (this.subDefs == null) {
@@ -292,6 +273,27 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
         public RefBuilderImpl<T,A> setOwnHash(String ownHash) {
             this.ownHash = ownHash;
             return this;
+        }
+
+        private String getOwnHash() {
+            //
+            // Try to make sure that we have a hash string.
+            //
+            if (ownHash == null && hash != null && hash.isSet()) {
+                ownHash = hash.toString();
+            }
+            return ownHash;
+        }
+
+        private Hash getSourceHash() {
+            //
+            // Only set the hash value if we don't have one.
+            //
+            if (getOwnHash() == null) {
+                return hash;
+            } else {
+                return null;
+            }
         }
     }
 

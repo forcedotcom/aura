@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpGet;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
@@ -47,10 +48,10 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
     @SuppressWarnings("unchecked")
     @TestLabels("auraSanity")
     public void testComponentDef() throws Exception {
-        HttpResponse httpResponse = obtainResponseCheckStatus();
+        String response = obtainResponseCheckStatus();
 
         // Obtain a component which uses preloading namespaces
-        String componentInJson = getResponseBody(httpResponse).substring(AuraBaseServlet.CSRF_PROTECT.length());
+        String componentInJson = response.substring(AuraBaseServlet.CSRF_PROTECT.length());
         Map<String, Object> outerMap = (Map<String, Object>) new JsonReader().read(componentInJson);
         Map<String, Object> component = (Map<String, Object>) outerMap.get("component");
         Map<String, Object> value = (Map<String, Object>) component.get("value");
@@ -69,10 +70,10 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
      */
     @SuppressWarnings("unchecked")
     public void testPreloadsOnContext() throws Exception {
-        HttpResponse httpResponse = obtainResponseCheckStatus();
+        String response = obtainResponseCheckStatus();
 
         // Grab the preloads attached to the context
-        String componentInJson = getResponseBody(httpResponse).substring(AuraBaseServlet.CSRF_PROTECT.length());
+        String componentInJson = response.substring(AuraBaseServlet.CSRF_PROTECT.length());
         Map<String, Object> outerMap = (Map<String, Object>) new JsonReader().read(componentInJson);
         Map<String, Object> context = (Map<String, Object>) outerMap.get("context");
         ArrayList<String> preloads = (ArrayList<String>) context.get("preloads");
@@ -85,13 +86,17 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
                 preloads.contains("preloadTest"));
     }
 
-    private HttpResponse obtainResponseCheckStatus() throws Exception {
+    private String obtainResponseCheckStatus() throws Exception {
         String url = String
                 .format("/aura?aura.tag=preloadTest:test_Preload_Cmp_SameNameSpace&aura.format=JSON&aura.mode=FTEST&aura.lastmod=%s&aura.deftype=APPLICATION",
                         getLastMod(Mode.FTEST, "preloadTest"));
-        HttpResponse httpResponse = performGet(url);
+        HttpGet get = obtainGetMethod(url);
+        HttpResponse httpResponse = perform(get);
         int statusCode = getStatusCode(httpResponse);
+        String response = getResponseBody(httpResponse);
+        get.releaseConnection();
         assertTrue("Failed to reach aura servlet", statusCode == HttpStatus.SC_OK);
-        return httpResponse;
+
+        return response;
     }
 }

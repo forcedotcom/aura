@@ -19,11 +19,8 @@ import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.auraframework.Aura;
-
 import org.auraframework.def.EventDef;
-
 import org.auraframework.instance.Event;
-
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsFunction;
 
@@ -32,7 +29,10 @@ import com.google.common.collect.Maps;
 
 /**
  * An exception to fire an arbitrary event on the client side.
- *
+ * A generic event class to fire events on the client side to indicate an error state 
+ * while executing a server action. This object will encapsulate all the information 
+ * required to create and fire the event client side.
+ * Note: This event should not be used by the Aura framework itself, it should only be used inside of a server action.
  */
 public class GenericEventException extends ClientSideEventException {
     private static final long serialVersionUID = 8972903096686059699L;
@@ -47,7 +47,7 @@ public class GenericEventException extends ClientSideEventException {
      * @param cause the cause (usually logged).
      */
     public GenericEventException(String eventName, Throwable cause) {
-        super(cause);
+        super(eventName, cause);
         this.eventName = eventName;
         this.params = Maps.newHashMap();
     }

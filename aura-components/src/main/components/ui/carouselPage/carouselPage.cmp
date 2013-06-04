@@ -20,23 +20,40 @@
     <aura:attribute name="title" type="String" description="Title of the page" />    
     <aura:attribute name="isCacheable" default="true" type="Boolean" description="Indicates whether the page content is cacheable on client or not." />    
     <aura:attribute name="isDefault" default="false" type="Boolean" description="Determines if this is the default page to display." />
-    
+        
     <aura:attribute name="pageModel" type="Object" description="The model that is used to create components dynamically." />
-    <aura:attribute name="pageIndex" type="Integer" description="The index of this page." />    
+    <aura:attribute name="pageIndex" type="Integer" description="The index of this page." />
+    
+    <aura:attribute name="isSelected" type="Boolean" default="false" description="Indicates whether the page is selected or not." />
+    
     <aura:attribute name="parent" type="Aura.Component[]" description="The page container." />
-    <aura:attribute name="width" type="Integer" description="Width of the page in pixels. This value is inherited from the ui:carousel 'width' attribute." />
-    <aura:attribute name="height" type="Integer" description="Height of the page in pixels. This value is inherited from the ui:carousel 'height' attribute." />
+    <aura:attribute name="priv_width" type="Integer" description="PRIVATE - Width of the page in pixels. This value is inherited from the ui:carousel 'width' attribute." />
+    <aura:attribute name="priv_height" type="Integer" description="PRIVATE - Height of the page in pixels. This value is inherited from the ui:carousel 'height' attribute." />
+
     <aura:attribute name="priv_ariaExpanded" default="false" type="Boolean" description="PRIVATE" />
     <aura:attribute name="priv_pageStyle" type="String" description="PRIVATE" />
-    
+    <aura:attribute name="priv_pageId" type="String" description="PRIVATE" />
+    <aura:attribute name="priv_visible" type="Boolean" description="Indicates page is visible or not." />
+    <aura:attribute name="priv_continuousFlow" type="Boolean" description="Indicates carousel can flow continuously or not." />
+    <aura:attribute name="priv_snap" type="String" description="PRIVATE - Scroller snap option."/>
+        
     <aura:registerevent name="pageSelected" type="ui:carouselPageEvent"/>
     <aura:registerevent name="update" type="ui:carouselPageEvent"/>
+    <aura:registerevent name="show" type="ui:carouselPageEvent"/>
+    <aura:registerevent name="hide" type="ui:carouselPageEvent"/>
+    <aura:registerevent name="updateSize" type="ui:carouselPageEvent"/>
     
     <aura:handler name="pageSelected" action="{!c.onPageSelected}" /> 
     <aura:handler name="update" action="{!c.onPageUpdate}" /> 
-        
+    <aura:handler name="show" action="{!c.onPageShow}" />
+    <aura:handler name="hide" action="{!c.onPageHide}" />
+    <aura:handler name="updateSize" action="{!c.onUpdateSize}" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+    
+    <aura:attribute name="showPage" type="Aura.Action" />    
     <!-- id attribute is linked to the aria-control attribute in page indicator -->
-    <section id="{!'carousel-page-' + v.pageIndex}" aura:id="pageContainer" style="{!v.priv_pageStyle}" class="carousel-page" aria-expanded="{!v.priv_ariaExpanded}" role="tabpanel">						 						 							
+    <section class="{!v.class + ' carousel-page ' + v.priv_snap}" id="{!v.priv_pageId}" aura:id="pageContainer" style="{!v.priv_pageStyle}"  aria-expanded="{!v.priv_ariaExpanded}" role="tabpanel">						 						 							
 		{!v.body}		
 	</section>	
     

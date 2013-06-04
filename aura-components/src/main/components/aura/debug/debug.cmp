@@ -25,6 +25,7 @@
 	<aura:attribute name="storageData" type="String" default="0 K ()"/>
 	<aura:attribute name="consoleData" type="String" default=""/>
 	<aura:attribute name="storageName" type="String" default="actions"/>
+	<aura:attribute name="accessibilityData" type="String" default=""/>
 	
 	<aura:handler event="aura:debugLog" action="{!c.debugLogEventListener}"/>
 	<aura:handler event="aura:systemError" action="{!c.errorEventListener}"/>
@@ -41,6 +42,9 @@
         	<ui:tab aura:id="eventTab" title="Events"><pre>{!v.eventData}</pre></ui:tab>
         	<ui:tab aura:id="storageTab" title="Storage"><div aura:id="storageInfo"><pre>{!v.storageData}</pre></div></ui:tab>
         	<ui:tab aura:id="consoleTab" title="Console"><pre>{!v.consoleData}</pre></ui:tab>
+        	<ui:tab aura:id="CheckAccessibility" title="Accessibility" activated="{!c.checkAccessibility}">
+                <pre>{!v.accessibilityData}</pre>
+            </ui:tab>
    		</ui:tabset>
 		
 	</div>

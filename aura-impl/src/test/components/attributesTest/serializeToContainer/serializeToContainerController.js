@@ -15,7 +15,12 @@
  */
 ({
     newComponent : function(cmp, evt, helper){
-        var newcmp = $A.services.component.newComponent({
+        var newcmp = $A.newCmpAsync(
+        		this,
+        		function(newcmp) {
+                    cmp.find("target").getValue("v.body").setValue(newcmp);
+                },
+        		{
                 "componentDef" : "markup://attributesTest:serializeTo",
                 "attributes" : {
                     "values" : {
@@ -28,6 +33,6 @@
                     }
                 }
             });
-        cmp.find("target").getValue("v.body").setValue(newcmp);
+        
     }
 })

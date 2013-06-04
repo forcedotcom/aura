@@ -462,4 +462,9 @@ public class AuraUITestingUtil {
             }
         });
     }
+
+    public void assertAccessible() {
+        getEval("$A.test.assertAccessible()");
+       
+    }
 }

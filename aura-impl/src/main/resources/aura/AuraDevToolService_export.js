@@ -28,5 +28,6 @@ exp(statement,
         "groupBy", statement.groupBy
 );
 exp(s,
-        "output", s.output
+        "output", s.output,
+        "checkAccessibility", s.checkAccessibility
 );

@@ -27,7 +27,7 @@
         a.setExclusive(); //So that it does not get batches with other requests
         a.setCallback(cmp,function(a){
             //If you want to explore adding new components on the page
-            //var c = $A.newCmp(a.getReturnValue());
+            //var c = $A.newCmpDeprecated(a.getReturnValue());
             //cmp.find('new').getValue('v.body').push(c);
             $A.endMark("XHR call time: Server Controller, New Component & Resolve Refs");
         });
@@ -48,7 +48,7 @@
             "attributes" : {'start': 5 }
         });
         a.setCallback(cmp,function(a){
-            var c = $A.newCmp(a.getReturnValue());
+            var c = $A.newCmpDeprecated(a.getReturnValue());
             cmp.find('placeHolder').getValue('v.body').push(c);
         });
         $A.enqueueAction(a);

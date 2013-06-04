@@ -15,37 +15,31 @@
  */
 
 {	
+	onInit: function(cmp, evt, helper) {
+		//populate pageId with component's globalId
+		cmp.getValue('v.priv_pageId').setValue(cmp.getGlobalId());		
+	},
+	
 	onPageSelected : function (cmp, evt, helper) {		
-		var selectedPage = evt.getParam('pageIndex'),
-			curPage = cmp.get('v.pageIndex'),
-			selectedItemCss = 'carousel-page-selected',		
-			method = selectedPage == curPage ? 'addClass' : 'removeClass';
-
-		$A.util[method](cmp.getElement(), selectedItemCss);
-		
-    	cmp.getValue("v.priv_ariaExpanded").setValue(selectedPage == curPage);    	
-	    
-    	if (selectedPage == curPage) {
-    		var isCacheable = cmp.get('v.isCacheable');
-				parent = cmp.get('v.parent'),
-				pageModel = cmp.get('v.pageModel');
-				
-    		if (true) {
-    			var e = parent[0].get('e.loadPage');    			
-    			e.setParams({pageModel: pageModel, pageIndex: curPage});    			
-    			e.fire();
-    		}
-    	}	
+		helper.selectPage(cmp, evt);
 	},
 	
 	onPageUpdate: function(cmp, evt, helper) {		
-		var pageCmp = evt.getParam("pageComponent");
-		if (pageCmp) {
-			var pageContainer = cmp.find('pageContainer').getValue('v.body');
-			if (!pageContainer.isEmpty()) {
-				pageContainer.destroy();
-	        }
-			pageContainer.setValue(pageCmp);
+		helper.updatePage(cmp, evt);
+	},
+	
+	onPageShow: function(cmp, evt, helper) {
+		helper.showPage(cmp, evt.getParam('pageIndex'));
+	},
+	
+	onPageHide: function(cmp, evt, helper) {
+		helper.hidePage(cmp, evt.getParam('pageIndex'));
+	},
+	
+	onUpdateSize: function(cmp, evt, helper) {
+		var size = evt.getParam('pageSize');
+		if (size) {
+			helper.updateSize(cmp, size.width, size.height);
 		}
 	}
 }

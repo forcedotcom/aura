@@ -15,20 +15,20 @@
     limitations under the License.
 
 -->
-<aura:application model="java://org.auraframework.impl.admin.AdminModel" controller="java://org.auraframework.impl.admin.AdminController" securityProvider="java://org.auraframework.impl.admin.AdminSecurityProvider">
+<aura:application preload="auradev" model="java://org.auraframework.impl.admin.AdminModel" controller="java://org.auraframework.impl.admin.AdminController" securityProvider="java://org.auraframework.impl.admin.AdminSecurityProvider">
 <aura:attribute name="mbeans" type="boolean"/>
 <div>
 <h2>Aura Administration console</h2>
 Running in <em>{!m.mode}</em> mode
 <p>
-<button class="clearButton" onclick="{!c.clearAll}">Clear all registry caches</button>
+<button class="clearButton" onclick="{!c.clearAll}">Clear all caches</button>
 # of registries: {!m.registryData.length}
 <br/><br/>
-Caching Registries
+Caches
 <br class="clear"/>
-<aura:foreach var="reg" items="{!m.cachingRegistryData}">
-<auraadmin:cachingRegistryView registry="{!reg}"/>
-</aura:foreach>
+<auraadmin:cacheView data="{!m.defsData}" name="Definitions" showDefs="true" />
+<auraadmin:cacheView data="{!m.existsData}" name="Existence" />
+<auraadmin:cacheView data="{!m.stringsData}" name="Strings" />
 </p>
 <p>
 Non-caching Registries

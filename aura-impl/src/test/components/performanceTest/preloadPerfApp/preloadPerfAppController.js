@@ -6,7 +6,7 @@
             "attributes" : {'start': 5 }
         });
         a.setCallback(cmp,function(a){
-            var c = $A.newCmp(a.getReturnValue());
+            var c = $A.newCmpDeprecated(a.getReturnValue());
             cmp.find('placeHolder').getValue('v.body').push(c);
             $A.endMark("Fetch preloaded component");
         });

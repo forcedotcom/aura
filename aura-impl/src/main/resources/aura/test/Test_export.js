@@ -29,6 +29,7 @@ exp(p,
     "assertNull", p.assertNull,
     "assertNotNull", p.assertNotNull,
     "assertStartsWith", p.assertStartsWith,
+    "assertAccessible", p.assertAccessible,
     
     // test flow/state
     "fail", p.fail,
@@ -40,6 +41,9 @@ exp(p,
     "setTestTimeout", p.setTestTimeout,
     "getErrors", p.getErrors,
     "addCleanup", p.addCleanup,
+    "expectAuraError", p.expectAuraError,
+    "expectAuraWarning", p.expectAuraWarning,
+    "getAuraErrorMessage", p.getAuraErrorMessage,
     
     // DOM
     "getOuterHtml", p.getOuterHtml,

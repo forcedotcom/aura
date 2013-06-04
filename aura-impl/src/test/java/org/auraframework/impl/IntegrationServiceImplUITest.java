@@ -43,7 +43,7 @@ import com.google.common.collect.Maps;
  * UI test for usage of Integration Service.
  * 
  */
-@ExcludeBrowsers({BrowserType.IPAD, BrowserType.IPHONE})
+@ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
 public class IntegrationServiceImplUITest extends WebDriverTestCase {
     private static final AuraTestingUtil auraTestingUtil = AuraUtil.get(AuraTestingUtil.class);
 
@@ -58,8 +58,11 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        defaultStubCmp = addSourceAutoCleanup(ComponentDef.class,
-                getIntegrationStubMarkup("java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForTestingIntegrationService", true, true, true));
+        defaultStubCmp = addSourceAutoCleanup(
+                ComponentDef.class,
+                getIntegrationStubMarkup(
+                        "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererForTestingIntegrationService",
+                        true, true, true));
     }
 
     /**
@@ -73,36 +76,46 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         openIntegrationStub(cmpToInject, attributes);
 
         String selectorForPlaceholder = String.format("div#%s", defaultPlaceholderID);
-        assertTrue("Injected component not found inside placeholder", isElementPresent(By.cssSelector(selectorForPlaceholder + ">" + "div.wrapper")));
+        assertTrue("Injected component not found inside placeholder",
+                isElementPresent(By.cssSelector(selectorForPlaceholder + ">" + "div.wrapper")));
         WebElement attrValue = findDomElement(By.cssSelector("div.dataFromAttribute"));
         assertEquals("Failed to see data from model of injected component", "Oranges", attrValue.getText());
         WebElement modelValue = findDomElement(By.cssSelector("div.dataFromModel"));
-        assertEquals("Failed to initilize attribute value of injected component", "firstThingDefault", modelValue.getText());
+        assertEquals("Failed to initilize attribute value of injected component", "firstThingDefault",
+                modelValue.getText());
 
         WebElement button = findDomElement(By.cssSelector("button.uiButton"));
         button.click();
         auraUITestingUtil.waitForElementText(By.cssSelector("div.dataFromController"), "TestController", true);
 
         // Access injected component through ClientSide API
-        assertTrue(auraUITestingUtil.getBooleanEval(String.format("return window.$A.getRoot().find('%s')!== undefined ;", defaultLocalId)));
+        assertTrue(auraUITestingUtil.getBooleanEval(String.format(
+                "return window.$A.getRoot().find('%s')!== undefined ;", defaultLocalId)));
         assertEquals(cmpToInject.toString(),
-                (String) auraUITestingUtil.getEval(String.format("return window.$A.getRoot().find('%s').getDef().getDescriptor().toString()", defaultLocalId)));
+                (String) auraUITestingUtil.getEval(String.format(
+                        "return window.$A.getRoot().find('%s').getDef().getDescriptor().toString()", defaultLocalId)));
     }
 
     private DefDescriptor<ComponentDef> setupSimpleComponentWithModelAndController() {
         String systemAttributes = "model='java://org.auraframework.impl.java.model.TestModel' "
-            + "controller='java://org.auraframework.impl.java.controller.TestController'";
-        String bodyMarkup = "<aura:attribute name='strAttribute' type='String' default='Apple'/> " + "<ui:button label='clickMe' press='{!c.handleClick}'/>"
-        + "<div class='wrapper'>" + "<div class='dataFromAttribute' aura:id='dataFromAttribute'>{!v.strAttribute}</div> "
-        + "<div class='dataFromModel' aura:id='dataFromModel'>{!m.firstThing}</div> "
-        + "<div class='dataFromController' aura:id='dataFromController'></div>" + "</div>";
+                + "controller='java://org.auraframework.impl.java.controller.TestController'";
+        String bodyMarkup = "<aura:attribute name='strAttribute' type='String' default='Apple'/> "
+                + "<ui:button label='clickMe' press='{!c.handleClick}'/>"
+                + "<div class='wrapper'>"
+                + "<div class='dataFromAttribute' aura:id='dataFromAttribute'>{!v.strAttribute}</div> "
+                + "<div class='dataFromModel' aura:id='dataFromModel'>{!m.firstThing}</div> "
+                + "<div class='dataFromController' aura:id='dataFromController'></div>" + "</div>";
         DefDescriptor<ComponentDef> cmpDesc = auraTestingUtil.addSourceAutoCleanup(ComponentDef.class,
                 String.format(AuraImplTestCase.baseComponentTag, systemAttributes, bodyMarkup));
-        DefDescriptor<ControllerDef> jsControllerdesc = Aura.getDefinitionService().getDefDescriptor(
-                String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, cmpDesc.getNamespace(), cmpDesc.getName()), ControllerDef.class);
-        auraTestingUtil.addSourceAutoCleanup(jsControllerdesc, "{" + "handleClick:function(cmp){" + "var a = cmp.get('c.getString');"
+        DefDescriptor<ControllerDef> jsControllerdesc = Aura.getDefinitionService()
+                .getDefDescriptor(
+                        String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, cmpDesc.getNamespace(),
+                                cmpDesc.getName()), ControllerDef.class);
+        auraTestingUtil.addSourceAutoCleanup(jsControllerdesc, "{" + "handleClick:function(cmp){"
+                + "var a = cmp.get('c.getString');"
                 + "a.setCallback(cmp,function(a){" + "cmp.find('dataFromController').getValue('v.body').push("
-                + "$A.newCmp({componentDef: 'markup://aura:text'," + "attributes:{" + "values:{value:a.getReturnValue()}" + "}" + "}));" + "});"
+                + "$A.newCmpDeprecated({componentDef: 'markup://aura:text'," + "attributes:{"
+                + "values:{value:a.getReturnValue()}" + "}" + "}));" + "});"
                 + "$A.enqueueAction(a);" + "}" + "}");
         return cmpDesc;
     }
@@ -112,14 +125,16 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * various types of attributes.
      */
     public void testAttributesInitialization() throws Exception {
-        String attributeMarkup = "<aura:attribute name='strAttr' type='String'/>" + "<aura:attribute name='booleanAttr' type='Boolean'/>"
-        + "<aura:attribute name='strList' type='List'/>" + "<aura:attribute name='stringArray' type='String[]'/>"
-        + "<aura:attribute name='obj' type='Object'/>";
+        String attributeMarkup = "<aura:attribute name='strAttr' type='String'/>"
+                + "<aura:attribute name='booleanAttr' type='Boolean'/>"
+                + "<aura:attribute name='strList' type='List'/>"
+                + "<aura:attribute name='stringArray' type='String[]'/>"
+                + "<aura:attribute name='obj' type='Object'/>";
         String attributeWithDefaultsMarkup = "<aura:attribute name='strAttrDefault' type='String' default='Apple'/>"
-            + "<aura:attribute name='booleanAttrDefault' type='Boolean' default='true'/>"
-            + "<aura:attribute name='strListDefault' type='List' default='Apple,Orange'/>"
-            + "<aura:attribute name='stringArrayDefault' type='String[]' default='Melon,Berry,Grapes'/>"
-            + "<aura:attribute name='objDefault' type='Object' default='Banana'/>";
+                + "<aura:attribute name='booleanAttrDefault' type='Boolean' default='true'/>"
+                + "<aura:attribute name='strListDefault' type='List' default='Apple,Orange'/>"
+                + "<aura:attribute name='stringArrayDefault' type='String[]' default='Melon,Berry,Grapes'/>"
+                + "<aura:attribute name='objDefault' type='Object' default='Banana'/>";
         DefDescriptor<ComponentDef> cmpToInject = auraTestingUtil.addSourceAutoCleanup(ComponentDef.class,
                 String.format(AuraImplTestCase.baseComponentTag, "", attributeMarkup + attributeWithDefaultsMarkup));
 
@@ -134,21 +149,28 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
         openIntegrationStub(cmpToInject, attributes);
         // Access injected component through ClientSide API
-        assertTrue(auraUITestingUtil.getBooleanEval(String.format("return window.$A.getRoot().find('%s')!== undefined ;", defaultLocalId)));
+        assertTrue(auraUITestingUtil.getBooleanEval(String.format(
+                "return window.$A.getRoot().find('%s')!== undefined ;", defaultLocalId)));
 
         String attributeEvalScript = "return window.$A.getRoot().find('%s').get('v.%s');";
         // Provided attributes
-        assertEquals("Oranges", auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "strAttr")));
+        assertEquals("Oranges",
+                auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "strAttr")));
         assertFalse(auraUITestingUtil.getBooleanEval(String.format(attributeEvalScript, defaultLocalId, "booleanAttr")));
         assertEquals("Object", auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "obj")));
         assertEquals(strList, auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "strList")));
-        assertEquals(stringList, auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "stringArray")));
+        assertEquals(stringList,
+                auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "stringArray")));
 
         // Attributes with Default values
-        assertEquals("Apple", auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "strAttrDefault")));
-        assertTrue(auraUITestingUtil.getBooleanEval(String.format(attributeEvalScript, defaultLocalId, "booleanAttrDefault")));
-        assertEquals("Banana", auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "objDefault")));
-        assertEquals(Lists.newArrayList("Apple", "Orange"), auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "strListDefault")));
+        assertEquals("Apple",
+                auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "strAttrDefault")));
+        assertTrue(auraUITestingUtil.getBooleanEval(String.format(attributeEvalScript, defaultLocalId,
+                "booleanAttrDefault")));
+        assertEquals("Banana",
+                auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "objDefault")));
+        assertEquals(Lists.newArrayList("Apple", "Orange"),
+                auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "strListDefault")));
         assertEquals(Lists.newArrayList("Melon", "Berry", "Grapes"),
                 auraUITestingUtil.getEval(String.format(attributeEvalScript, defaultLocalId, "stringArrayDefault")));
     }
@@ -162,27 +184,33 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     @Ignore("W-1498384")
     public void testComponentArrayAsAttribute() throws Exception {
         String attributeMarkup = "<aura:attribute name='cmps' type='Aura.Component[]'/>{!v.cmps}";
-        String attributeWithDefaultsMarkup = "<aura:attribute name='cmpsDefault' type='Aura.Component[]'>" + "<div class='divDefault'>Div as default</div>"
-        + "<span class='spanDefault'>Span component as default</span>" + "</aura:attribute>{!v.cmpsDefault}";
+        String attributeWithDefaultsMarkup = "<aura:attribute name='cmpsDefault' type='Aura.Component[]'>"
+                + "<div class='divDefault'>Div as default</div>"
+                + "<span class='spanDefault'>Span component as default</span>" + "</aura:attribute>{!v.cmpsDefault}";
         DefDescriptor<ComponentDef> cmpToInject = auraTestingUtil.addSourceAutoCleanup(ComponentDef.class,
                 String.format(AuraImplTestCase.baseComponentTag, "", attributeMarkup + attributeWithDefaultsMarkup));
 
         DefDescriptor<ComponentDef> customStub = addSourceAutoCleanup(
                 ComponentDef.class,
-                getIntegrationStubMarkup("java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererToInjectComponentAsAttributes", false, false,
+                getIntegrationStubMarkup(
+                        "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererToInjectComponentAsAttributes",
+                        false, false,
                         false));
 
         openIntegrationStub(customStub, cmpToInject, null);
 
         // Access injected component through ClientSide API
         assertTrue("Failed to locate injected component on page.",
-                auraUITestingUtil.getBooleanEval(String.format("return window.$A.getRoot().find('%s')!== undefined ;", "localId")));
+                auraUITestingUtil.getBooleanEval(String.format("return window.$A.getRoot().find('%s')!== undefined ;",
+                        "localId")));
 
         // Default values for attributes of type Aura.Component[]
         WebElement devDefault = findDomElement(By.cssSelector("div.divDefault"));
-        assertEquals("Failed to initializing attribute of type Aura.Component[]", "Div as default", devDefault.getText());
+        assertEquals("Failed to initializing attribute of type Aura.Component[]", "Div as default",
+                devDefault.getText());
         WebElement spanDefault = findDomElement(By.cssSelector("span.spanDefault"));
-        assertEquals("Failed to initializing attribute of type Aura.Component[]", "Span component as default", spanDefault.getText());
+        assertEquals("Failed to initializing attribute of type Aura.Component[]", "Span component as default",
+                spanDefault.getText());
 
         // Attribute value passing for Aura.Component[] type attributes
         assertTrue("Failed passing value to Aura.Component[] type attributes",
@@ -199,13 +227,17 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 String.format(AuraImplTestCase.baseComponentTag, "", ""));
         DefDescriptor<ComponentDef> customStubCmp = addSourceAutoCleanup(
                 ComponentDef.class,
-                getIntegrationStubMarkup("java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererToInjectCmpInNonExistingPlaceholder", true, true,
+                getIntegrationStubMarkup(
+                        "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererToInjectCmpInNonExistingPlaceholder",
+                        true, true,
                         true));
 
         openIntegrationStub(customStubCmp, cmpToInject, null, "fooBared");
         String expectedErrorMessage = "Invalid locatorDomId specified - no element found in the DOM with id=fooBared";
-        boolean isErrorPresent = findDomElement(By.cssSelector("span[class='uiOutputText']")).getText().contains(expectedErrorMessage);
-        assertTrue("IntegrationService failed to display error message when no locatorDomId was specified",isErrorPresent);
+        boolean isErrorPresent = findDomElement(By.cssSelector("span[class='uiOutputText']")).getText().contains(
+                expectedErrorMessage);
+        assertTrue("IntegrationService failed to display error message when no locatorDomId was specified",
+                isErrorPresent);
     }
 
     /**
@@ -213,9 +245,13 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * allowed.
      */
     public void testMissingLocalId() throws Exception {
-        DefDescriptor<ComponentDef> cmpToInject = Aura.getDefinitionService().getDefDescriptor("aura:text", ComponentDef.class);
-        DefDescriptor<ComponentDef> customStubCmp = addSourceAutoCleanup(ComponentDef.class,
-                getIntegrationStubMarkup("java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererToInjectCmpWithNullLocalId", true, true, false));
+        DefDescriptor<ComponentDef> cmpToInject = Aura.getDefinitionService().getDefDescriptor("aura:text",
+                ComponentDef.class);
+        DefDescriptor<ComponentDef> customStubCmp = addSourceAutoCleanup(
+                ComponentDef.class,
+                getIntegrationStubMarkup(
+                        "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererToInjectCmpWithNullLocalId",
+                        true, true, false));
         Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("value", "No Local Id");
         openIntegrationStub(customStubCmp, cmpToInject, attributes, null);
@@ -229,13 +265,15 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      */
     public void testExceptionDuringComponentInitialization() throws Exception {
         DefDescriptor<ComponentDef> cmpWithReqAttr = addSourceAutoCleanup(ComponentDef.class,
-                String.format(AuraImplTestCase.baseComponentTag, "", "<aura:attribute name='reqAttr' required='true' type='String'/>"));
+                String.format(AuraImplTestCase.baseComponentTag, "",
+                        "<aura:attribute name='reqAttr' required='true' type='String'/>"));
         Map<String, Object> attributes = Maps.newHashMap();
         openIntegrationStub(cmpWithReqAttr, attributes);
-        
+
         String expectedErrorMessage = "is missing required attribute 'reqAttr'";
-        boolean isErrorPresent = findDomElement(By.cssSelector("span[class='uiOutputText']")).getText().contains(expectedErrorMessage);
-        assertTrue("IntegrationService failed to display error message",isErrorPresent);
+        boolean isErrorPresent = findDomElement(By.cssSelector("span[class='uiOutputText']")).getText().contains(
+                expectedErrorMessage);
+        assertTrue("IntegrationService failed to display error message", isErrorPresent);
     }
 
     /**
@@ -251,8 +289,10 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         for (String facet : facets) {
             attributes.put("strAttribute", facet);
             facetMarkup = facetMarkup
-            + String.format("<%s:%s desc='%s:%s' attrMap='%s' placeholder='%s' localId='%s'/>", defaultStubCmp.getNamespace(),
-                    defaultStubCmp.getName(), cmpToInject.getNamespace(), cmpToInject.getName(), Json.serialize(attributes), "Animal" + facet, facet);
+                    + String.format("<%s:%s desc='%s:%s' attrMap='%s' placeholder='%s' localId='%s'/>",
+                            defaultStubCmp.getNamespace(),
+                            defaultStubCmp.getName(), cmpToInject.getNamespace(), cmpToInject.getName(),
+                            Json.serialize(attributes), "Animal" + facet, facet);
 
         }
 
@@ -261,7 +301,8 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
 
         openIntegrationStub(customStubCmp, cmpToInject, null, null);
         assertTrue(isElementPresent(By.xpath("//div//script[contains(@src,'aura_dev.js')]")));
-        assertEquals("Framework loaded multiple times", 1, getDriver().findElements(By.xpath("//div//script[contains(@src,'aura_dev.js')]")).size());
+        assertEquals("Framework loaded multiple times", 1,
+                getDriver().findElements(By.xpath("//div//script[contains(@src,'aura_dev.js')]")).size());
 
         WebElement attrValue = findDomElement(By.cssSelector("#AnimalPanda div.dataFromAttribute"));
         assertEquals("Failed to locate first component injected.", "Panda", attrValue.getText());
@@ -281,7 +322,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * This test verifies that calling LayoutService APIs don't cause Javascript Errors on the page.
      */
     @Ignore("W-1506261")
-    public void testLayoutServiceAPIs()throws Exception{
+    public void testLayoutServiceAPIs() throws Exception {
         DefDescriptor<ComponentDef> cmpToInject = auraTestingUtil.addSourceAutoCleanup(ComponentDef.class,
                 String.format(AuraImplTestCase.baseComponentTag, "", "Injected Component"));
 
@@ -290,7 +331,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         assertTrue("Failed to change window location using set()",
                 getDriver().getCurrentUrl().endsWith("#forward"));
 
-        //Execute all the public APIs of layoutService and make sure there are no Javascript errors
+        // Execute all the public APIs of layoutService and make sure there are no Javascript errors
         auraUITestingUtil.getEval("$A.layoutService.refreshLayout()");
 
         auraUITestingUtil.getEval("$A.layoutService.pop()");
@@ -311,37 +352,40 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * In case of integration service, this initialization is skipped. So changing url #
      * should not fire aura:locationChange event
      */
-    public void testHistoryServiceAPIs()throws Exception{
+    public void testHistoryServiceAPIs() throws Exception {
         String expectedTxt = "";
-        openIntegrationStub(Aura.getDefinitionService().getDefDescriptor("integrationService:noHistoryService", ComponentDef.class), null);
+        openIntegrationStub(
+                Aura.getDefinitionService().getDefDescriptor("integrationService:noHistoryService", ComponentDef.class),
+                null);
         String initialUrl = getDriver().getCurrentUrl();
-        //open("/integrationService/noHistoryService.cmp");
-        assertEquals("At page initialization, aura:locationChange event should not be fired.", expectedTxt, getText(By.cssSelector("div.testDiv")));
+        // open("/integrationService/noHistoryService.cmp");
+        assertEquals("At page initialization, aura:locationChange event should not be fired.", expectedTxt,
+                getText(By.cssSelector("div.testDiv")));
 
-        //historyService.set() to a new location - W-1506261
+        // historyService.set() to a new location - W-1506261
         auraUITestingUtil.getEval("$A.historyService.set('forward')");
         assertTrue("Failed to change window location using set()",
                 getDriver().getCurrentUrl().endsWith("#forward"));
         assertEquals("aura:locationChange should not have been fired on set()",
                 expectedTxt, getText(By.cssSelector("div.testDiv")));
 
-        //historyService.get()
+        // historyService.get()
         assertEquals("get() failed to retrieve expected token",
                 "forward", auraUITestingUtil.getEval("return $A.historyService.get().token"));
 
-        //historyService.back()
+        // historyService.back()
         auraUITestingUtil.getEval("$A.historyService.back()");
         assertEquals("Failed to revert back to previous URL", initialUrl, getDriver().getCurrentUrl());
         assertEquals("History service failed to go back",
                 "", auraUITestingUtil.getEval("return $A.historyService.get().token"));
 
-        //historyService.forward()
+        // historyService.forward()
         auraUITestingUtil.getEval("$A.historyService.forward()");
         assertEquals("History service does provided unexpected # token",
                 "forward", auraUITestingUtil.getEval("return $A.historyService.get().token"));
         assertTrue("Window location does not end with expected #", getDriver().getCurrentUrl().endsWith("#forward"));
 
-        //Manually firing locationChange event
+        // Manually firing locationChange event
         expectedTxt = "Location Change fired:0";
         auraUITestingUtil.getEval("$A.eventService.newEvent('aura:locationChange').fire()");
         assertEquals("Manully firing locationChange event failed",
@@ -352,11 +396,18 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * Utility method to obtain the required markup of the integration stub
      * component.
      */
-    private String getIntegrationStubMarkup(String javaRenderer, Boolean attributeMap, Boolean placeHolder, Boolean localId) {
-        String stubMarkup = String.format("<aura:component render='server' renderer='%s'>" + "<aura:attribute name='desc' type='String'/>" + "%s %s %s"
-                + "</aura:component>", javaRenderer, attributeMap ? "<aura:attribute name='attrMap' type='Map'/>" : "",
-                        placeHolder ? String.format("<aura:attribute name='placeholder' type='String' default='%s'/>", defaultPlaceholderID) : "",
-                                localId ? String.format("<aura:attribute name='localId' type='String' default='%s'/>", defaultLocalId) : "");
+    private String getIntegrationStubMarkup(String javaRenderer, Boolean attributeMap, Boolean placeHolder,
+            Boolean localId) {
+        String stubMarkup = String.format(
+                "<aura:component render='server' renderer='%s'>" + "<aura:attribute name='desc' type='String'/>"
+                        + "%s %s %s"
+                        + "</aura:component>",
+                javaRenderer,
+                attributeMap ? "<aura:attribute name='attrMap' type='Map'/>" : "",
+                placeHolder ? String.format("<aura:attribute name='placeholder' type='String' default='%s'/>",
+                        defaultPlaceholderID) : "",
+                localId ? String.format("<aura:attribute name='localId' type='String' default='%s'/>", defaultLocalId)
+                        : "");
         return stubMarkup;
     }
 
@@ -364,7 +415,8 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * Pass the descriptor and attributes map of the component to be injected to
      * a Stub component. Open the stub component using webdriver.
      */
-    private void openIntegrationStub(DefDescriptor<ComponentDef> stub, DefDescriptor<ComponentDef> toInject, Map<String, Object> attributeMap,
+    private void openIntegrationStub(DefDescriptor<ComponentDef> stub, DefDescriptor<ComponentDef> toInject,
+            Map<String, Object> attributeMap,
             String placeholder) throws MalformedURLException, URISyntaxException {
         String url = String.format("/%s/%s.cmp", stub.getNamespace(), stub.getName());
         url = url + "?desc=" + String.format("%s:%s", toInject.getNamespace(), toInject.getName());
@@ -383,12 +435,14 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         waitForAuraFrameworkReady();
     }
 
-    private void openIntegrationStub(DefDescriptor<ComponentDef> stub, DefDescriptor<ComponentDef> toInject, Map<String, Object> attributeMap)
-    throws MalformedURLException, URISyntaxException {
+    private void openIntegrationStub(DefDescriptor<ComponentDef> stub, DefDescriptor<ComponentDef> toInject,
+            Map<String, Object> attributeMap)
+            throws MalformedURLException, URISyntaxException {
         openIntegrationStub(stub, toInject, attributeMap, null);
     }
 
-    private void openIntegrationStub(DefDescriptor<ComponentDef> toInject, Map<String, Object> attributeMap) throws MalformedURLException, URISyntaxException {
+    private void openIntegrationStub(DefDescriptor<ComponentDef> toInject, Map<String, Object> attributeMap)
+            throws MalformedURLException, URISyntaxException {
         openIntegrationStub(defaultStubCmp, toInject, attributeMap, null);
     }
 

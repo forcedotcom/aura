@@ -23,6 +23,7 @@
     <li><code>$Label</code></li>
     <li><code>globalID</code></li>
     <li><code>$Browser</code></li>
+    <li><code>$Locale</code></li>
 </ul>
 </p>
 
@@ -91,6 +92,83 @@
 <p>This example shows how to get some <code>$Browser</code> attributes.</p>
 <auradocs:example descriptor="auradocs:sampleBrowser" />
 
+<h3><code>$Locale</code></h3>
+<p>Use the <code>$Locale</code> global value provider for information about the browser's locale. Here are the attributes for <code>$Locale</code>.
+ 
+ <table class="table table-bordered table-striped">
+<thead>
+    <tr>
+        <th>Attribute</th>  
+        <th>Description</th>
+        <th>Sample Value</th>      
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>language</td>
+        <td>Returns the language code. 
+        </td>
+        <td>"en", "de", "zh"</td>
+    </tr> 
+    <tr>
+        <td>country</td>
+        <td>Returns the ISO 3166 representation of the country code.</td>
+        <td>"US", "DE", "GB"</td>
+    </tr> 
+    <tr>
+        <td>variant</td>
+        <td>Returns the vendor and browser specific code.</td>
+        <td>"WIN", "MAC", "POSIX"</td>
+    </tr> 
+    <tr>
+        <td>timezone</td>
+        <td>Returns the time zone ID based on Java's <code>java.util.TimeZone</code> package.</td>
+        <td>"EST", "PST", "GMT", "America/New_York"</td>
+    </tr> 
+    <tr>
+        <td>numberformat</td>
+        <td>Returns the number formatting based on Java's <code>DecimalFormat</code> class.</td>
+        <td> "#,##0.###"<p># represents a digit, the comma is a placeholder for the grouping seperator,
+         and the period is a placeholder for the decimal separator. Zero (0) replace # to represent trailing zeros.</p></td>
+    </tr>
+    <tr>
+        <td>decimal</td>
+        <td>Returns the decimal seperator.</td>
+        <td>"."</td>
+    </tr>
+    <tr>
+        <td>grouping</td>
+        <td>Returns the grouping separator.</td>
+        <td>","</td>
+    </tr>
+    <tr>
+        <td>percentformat</td>
+        <td>Returns the percent formatting.</td>
+        <td>"#,##0%"</td>
+    </tr>
+    <tr>
+        <td>currencyformat</td>
+        <td>Returns the currency formatting.</td>
+        <td>"¤#,##0.00;(¤#,##0.00)"<p>¤ represents the currency sign, which is replaced by the currency symbol.</p></td>
+    </tr>
+    <tr>
+        <td>currency_code</td>
+        <td>Returns the ISO 4217 representation of the currency code.</td>
+        <td>"USD"</td>
+    </tr>
+    <tr>
+        <td>currency</td>
+        <td>Returns the currency symbol.</td>
+        <td>"$"</td>
+    </tr>
+</tbody>
+</table>
+<auradocs:info>See <ui:outputURL value="http://docs.oracle.com/javase/tutorial/i18n/format/decimalFormat.html" label="Customizing Formats" /> for more information on how to use the <code>DecimalFormat</code> class.</auradocs:info>
+</p>
+<p><b>Example</b></p>
+<p>This example shows how to get some <code>$Locale</code> attributes.</p>
+<auradocs:example descriptor="auradocs:demoLocale" />
+<p>Aura also provides localization support for input and output components. See <auradocs:topicLink topic="useForm">Getting User Input</auradocs:topicLink> for more information.</p> 
 <p><b>See also:</b><br/>   
     <auradocs:topicLink topic="labelParametersTopic">Setting Label Parameters</auradocs:topicLink><br/>
     <auradocs:topicLink topic="dynamicLabel">Dynamically Constructing Labels</auradocs:topicLink>   

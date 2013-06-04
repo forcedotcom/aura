@@ -75,5 +75,10 @@
 			output += helper.getAuraStats(cmp, views[i]);
 		}
 		helper.output(cmp, "cmpData", output);
+	},
+	checkAccessibility : function(cmp, event, helper){	
+	    debugger;
+	        var array = opener.$A.devToolService.checkAccessibility();
+		helper.output(cmp, "accessibilityData", array, true);
 	}
 })

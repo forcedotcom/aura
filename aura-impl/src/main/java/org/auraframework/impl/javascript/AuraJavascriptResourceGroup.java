@@ -17,64 +17,55 @@ package org.auraframework.impl.javascript;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
-
-import javax.annotation.Nullable;
 
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.javascript.JavascriptGroup;
-import org.auraframework.util.javascript.MultiStreamReader;
 import org.auraframework.util.text.Hash;
-import org.reflections.Reflections;
-import org.reflections.scanners.ResourcesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-
-import com.google.common.base.Predicate;
 
 public class AuraJavascriptResourceGroup implements JavascriptGroup {
 
-    private static final Predicate<String> TRUE = new Predicate<String>() {
-        @Override
-        public boolean apply(@Nullable String arg0) {
-            return true;
-        }
-    };
+    /** Base name of the file containing the framework UID, when precompiled in jars. */
+    public static final String VERSION_FILE = "aurafwuid.properties";
+
+    /**
+     * Resource path for the precompiled framework UID. We support this not being available.
+     */
+    public static final String VERSION_URI = "/aura/javascript/" + VERSION_FILE;
+
+    /** Charset for the version file. */
+    public static final String VERSION_CHARSET = "US-ASCII";
+
+    /** Property name for the UUID hash */
+    public static final String UUID_PROPERTY = "fwuid";
+
+    /** Property name for the lastmod time, which is merely advisory now. */
+    public static final String LASTMOD_PROPERTY = "lastmod";
 
     private final long lastMod;
     private final Hash hash;
 
     public AuraJavascriptResourceGroup() {
-        // We're going to scan the classpath for resources /aura/javascript/...
-        // and /aura/resources/..., and hash those.
-        Reflections reflection = new Reflections(new ConfigurationBuilder().filterInputsBy(new Predicate<String>() {
-            @Override
-            public boolean apply(@Nullable String path) {
-                if (path == null) {
-                    return false;
+        InputStream versionStream = getPropertyStream();
+        if (versionStream != null) {
+            try {
+                Properties props = new Properties();
+                props.load(versionStream);
+                String hashText = props.getProperty(UUID_PROPERTY);
+                if (hashText == null || hashText.isEmpty()) {
+                    throw new AuraRuntimeException("Can't parse precomputed hash from " + VERSION_URI);
                 }
-                path = path.toLowerCase();
-                return path.startsWith("/aura/javascript/") || path.startsWith("/aura/resources/");
+                hash = new Hash(hashText.getBytes(VERSION_CHARSET));
+                lastMod = Long.parseLong(props.getProperty(LASTMOD_PROPERTY));
+                return;
+            } catch (IOException e) {
+                throw new AuraRuntimeException("Can't parse precomputed info from " + VERSION_URI, e);
             }
-        }).setUrls(ClasspathHelper.forPackage("aura")).setScanners(new ResourcesScanner()));
-        long latestModTime = 0;
-        Set<URL> urls = new HashSet<URL>();
-        try {
-            for (String resource : reflection.getResources(TRUE)) {
-                URL url = getClass().getResource(resource);
-                urls.add(url);
-                long thisLastMod = url.openConnection().getDate();
-                if (thisLastMod > latestModTime) {
-                    latestModTime = thisLastMod;
-                }
-            }
-            lastMod = latestModTime;
-            hash = new Hash(new MultiStreamReader(urls));
-        } catch (IOException e) {
-            throw new AuraRuntimeException("Can't read classpath resources");
         }
+        throw new AuraRuntimeException("Can't find " + VERSION_URI + " to get precomputed uuid");
     }
 
     @Override
@@ -135,5 +126,10 @@ public class AuraJavascriptResourceGroup implements JavascriptGroup {
     @Override
     public void regenerate(File destRoot) throws IOException {
         throw new UnsupportedOperationException();
+    }
+
+    /** Accessor to provide for testability */
+    protected InputStream getPropertyStream() {
+        return this.getClass().getResourceAsStream(VERSION_URI);
     }
 }

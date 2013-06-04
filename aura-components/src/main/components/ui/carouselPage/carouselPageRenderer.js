@@ -17,6 +17,7 @@
 {
 	render: function(cmp, helper) {
 		helper.updateSize(cmp);
+		helper.setVisibility(cmp);
 		return this.superRender();
 	}
 }

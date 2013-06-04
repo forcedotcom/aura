@@ -99,7 +99,7 @@ public class JavascriptMockProviderHandler extends JavascriptMockHandler<Provide
                             mockProvider = configProvider.substring("java://".length());
                         }
                         try{
-                            Class providerClass = Class.forName(mockProvider);
+                            Class<?> providerClass = Class.forName(mockProvider);
                             if(!ComponentConfigProvider.class.isAssignableFrom(providerClass)){
                                 throw new InvalidDefinitionException("Class specified as configProvider should implement ComponentConfigProvider", getLocation()); 
                             }

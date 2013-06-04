@@ -16,8 +16,5 @@
 
 -->
 <aura:component>
-  <aura:attribute name="who" type="String" default="duh"/>
-  Hello {!v.who}.
-  <br/>
-  Hey, btw, this thing is freaking sweet.
+    <ui:outputDateTime value="2013-05-07T00:17:08.997Z"  timezone="Europe/Berlin" langLocale="de"/>
 </aura:component>

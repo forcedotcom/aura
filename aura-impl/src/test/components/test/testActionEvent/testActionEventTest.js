@@ -16,10 +16,11 @@
 ({
     checkResponse : function(cmp, expectedState, eventName, expectedMessage){
         cmp.find("trigger").get("e.press").fire();
+        //Wait till action's call back is invoked
         $A.test.runAfterIf(
-            function(){ return cmp.get("v.response"); },
+            function(){ return cmp.get("v.response"); }, //v.response is set only if action's call back is invoked
             function(){
-                var action = cmp.get("v.response");
+        	var action = cmp.get("v.response");
                 $A.log(action);
                 $A.log(action.error);
                 $A.test.assertEquals(expectedState, action.state, "Unexpected state: ");
@@ -51,7 +52,7 @@
         );
     },
 
-    testSystemError: {
+    testApplicationEvent_SystemError: {
         attributes : { eventName:"aura:systemError",
                        eventParamName:"message",
                        eventParamValue:"bah!" },
@@ -61,7 +62,7 @@
         }
     },
 
-    testLocalEvent: {
+    testComponentEvent: {
         attributes : { eventName:"test:testActionEventEvent",
                        eventParamName:"msg",
                        eventParamValue:"foo!" },
@@ -69,16 +70,52 @@
             this.checkResponse(cmp, "ERROR", "markup://test:testActionEventEvent", "foo!");
         }
     },
-
-    //
-    // This would work, but it dies in $A.error.
-    //
-    _testBadEvent: {
+    
+    
+    checkResponseForEventsWithoutHandler : function(cmp, expectedState, eventName){
+	$A.test.assertUndefinedOrNull($A.eventService.getEventDef(eventName),
+		"Test setup failure, eventdef known before hand.");
+        cmp.find("trigger").get("e.press").fire();
+        //Wait till action's call back is invoked
+        $A.test.runAfterIf(
+            function(){ return cmp.get("v.response"); }, //v.response is set only if action's call back is invoked
+            function(){
+        	var action = cmp.get("v.response");
+                $A.test.assertEquals(expectedState, action.state, "Unexpected state: ");
+                $A.test.assertDefined($A.eventService.getEventDef(eventName), 
+                	"Failed to add new event def from action response.");
+            }
+        );
+    },
+    testApplicationEventWithNoHandler: {
+	attributes : { eventName:"test:applicationEvent"},
+        test: function(cmp){
+            this.checkResponseForEventsWithoutHandler(cmp, "ERROR", "markup://test:applicationEvent");
+        }    
+    },
+    testComponentEventWithNoHandler: {
+	attributes : { eventName:"test:anevent"},
+        test: function(cmp){
+            this.checkResponseForEventsWithoutHandler(cmp, "ERROR", "markup://test:anevent");
+        } 
+    },
+    testBadEvent: {
         attributes : { eventName:"test:testActionEventEventNonExistant",
                        eventParamName:"msg",
                        eventParamValue:"foo!" },
         test: function(cmp){
-            this.checkFailure(cmp, "ERROR", "org.auraframework.throwable.quickfix.DefinitionNotFoundException: No EVENT named markup://test:testActionEventEventNonExistant found");
+            $A.test.expectAuraError("org.auraframework.throwable.quickfix.DefinitionNotFoundException");
+            cmp.find("trigger").get("e.press").fire();
+            $A.test.addWaitFor(
+                    true,
+                    $A.test.allActionsComplete,
+                    function () {
+                	$A.test.assertTrue(
+                		$A.test.getAuraErrorMessage().
+                		indexOf("org.auraframework.throwable.quickfix.DefinitionNotFoundException: " +
+                				"No EVENT named markup://test:testActionEventEventNonExistant found")==0, "Failed to see quick fix exception message");
+                    }
+                );
         }
     }
 })

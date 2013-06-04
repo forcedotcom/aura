@@ -1,11 +1,25 @@
 ({
-	testModelDefault : {
+	mocks : [{
+		type : "MODEL",
+		stubs : [{
+			answers : [{
+				value : {
+					secret : { value : "<suite-level>" } ,
+					integer : { value : 0 },
+					integerString : { value : "2" },
+					stringList : { value : [ "super", "mock", "def"] }
+				}
+			}]
+		}]                   
+	}],
+
+	testModelSuiteMocks : {
 		test : function(cmp) {
-			$A.test.assertEquals("password", $A.test.getText(cmp.find("output").getElement()));
+			$A.test.assertEquals("<suite-level>supermock", $A.test.getText(cmp.find("output").getElement()));
 		}
 	},
 
-	testModelProperties : {
+	testModelPropertiesCaseMocks : {
 		mocks : [{
     		type : "MODEL",
 			stubs : [{
@@ -62,7 +76,7 @@
 			}]                   
 		}],
 		test : function(cmp) {
-			$A.test.assertEquals("freshpassword", $A.test.getText(cmp.find("output").getElement()));
+			$A.test.assertEquals("fresh<suite-level>supermock", $A.test.getText(cmp.find("output").getElement()));
 		}
 	},
 	
@@ -84,35 +98,14 @@
 		}
 	},
 	
-	testProviderConfigProvider: {
-	    	attributes : { providedAttribute : "Hello, I am the Mock Java Provider!"},
-	    	mocks : [{
-	    	    	type : "PROVIDER",
-	    	    	//Descriptor not required in this case, but specifying it anyway
-	    	    	descriptor : "java://org.auraframework.impl.java.provider.EmptyConfigProvider",
-	    		stubs : [{
-	    		    answers : [{
-	    			value: {
-	    			    //Specify the mock java provider the test should use, class should be accessible 
-	    			    configProvider : "java://org.auraframework.impl.java.provider.MockConfigProvider"
-	    			}
-	    		    }]
-	    		}]
-	    	}],
-	    	test : function(cmp){
-        	    	$A.test.assertEquals("markup://ui:outputText", cmp.getDef().getDescriptor().getQualifiedName());
-        		$A.test.assertEquals("Hello, I am the Mock Java Provider!", $A.test.getText(cmp.getElement()));
-	    	}
-	    
-	},
-	
 	testActionDefault : {
 		test : [function(cmp) {
 			this.saveDate = Date.parse(new Date());
 			cmp.find("trigger").get("e.press").fire();
-			$A.test.addWaitFor(true, function(){return "password" != $A.test.getText(cmp.find("output").getElement())});
+			$A.test.addWaitFor(true, function(){return "<suite-level>supermock" != $A.test.getText(cmp.find("output").getElement())});
 		}, function(cmp) {
-			var newDate = Date.parse($A.test.getText(cmp.find("output").getElement()));
+			var rawText = $A.test.getText(cmp.find("output").getElement());
+			var newDate = Date.parse(rawText.substring(0, rawText.indexOf("supermock")));
 			$A.test.assertTrue(newDate >= this.saveDate);
 		}]
 	},
@@ -129,9 +122,9 @@
 		}],
 		test : [function(cmp) {
 			cmp.find("trigger").get("e.press").fire();
-			$A.test.addWaitFor(true, function(){return "password" != $A.test.getText(cmp.find("output").getElement())});
+			$A.test.addWaitFor(true, function(){return "<suite-level>supermock" != $A.test.getText(cmp.find("output").getElement())});
 		}, function(cmp) {
-			$A.test.assertEquals("what I expected", $A.test.getText(cmp.find("output").getElement()));
+			$A.test.assertEquals("what I expectedsupermock", $A.test.getText(cmp.find("output").getElement()));
 		}]
 	},
 	

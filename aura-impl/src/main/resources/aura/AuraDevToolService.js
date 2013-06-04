@@ -348,7 +348,231 @@ var AuraDevToolService = function() {
         output : function(cmp) {
             return cmp.output();
         },
+        accessbilityAide:{
+            /**
+             * Goes up the tree (until it reaches the body tag) and finds whether the initial tag param is in another sent up tag
+             * @param  tag       - The starting tag that we are going to use to go up the tree
+             * @param  nameOfTag - Name of the tag that we should find should the the starting tags parent
+             * @returns boolean   - Signifies whether or not the tag we want was found or not (found: true, else: false)
+             */
+            checkForParentMatchesTag : function(tag, parentTag){
+        	while(tag.tagName !== null && tag.tagName !== "BODY"){
+	        	 if(tag.tagName.toUpperCase() === parentTag){
+	        	       return true;
+	        	 }	
+	        	 tag = tag.parentNode;  
+	        }
+	        return false;
+            },
+            /**
+             * Function that goes through all labels and looks for a matching tag, returning true when found
+             * @param labels    - All the labels that we want to go through
+             * @param attribute - The attribute that is being sought (for, id, title, etc)
+             * @param val       - the val that the attribute should be set to
+             * @returns boolen   - Signifies whether or not the tag we want was found or not (found: true, else: false)
+             */
+            checkLabelForAttrb : function(labels, attribute, val){
+        	var atrib = null;
+        	
+                for(var j =0; j<labels.length; j++){
+                    atrib = labels[j].getAttribute(attribute);
+            	    if(!aura.util.isUndefinedOrNull(atrib) && atrib === val){
+            	       return true;
+            	    }
+                 }
+                 return false;
+            },
+            
+            inputLabelAid : function(lbls, inputTags){
+        	var errorArray = [];
+	        var lblIsPres = true;
+  	        var accessAideFuncs = aura.devToolService.accessbilityAide;
+  	        
+  	        for (var index = 0; index < inputTags.length; index++){
+  	            lblIsPres = (accessAideFuncs.checkLabelForAttrb(lbls, "for" ,inputTags[index].id)) || (accessAideFuncs.checkForParentMatchesTag(inputTags[index], "LABEL"));
+  	            if(!lblIsPres){
+  	        	errorArray.push(inputTags[index]);
+  	            }
+  	        }
+  	        return errorArray;
+            },
+            /**
+             * Function that goes finds all given tags and makes sure that they all have an attribute set
+             * Note: This and the above function are very similar. The main difference is that this function is making sure that if a specific value 
+             *       shows up, it is counted as an error
+             * @param  tagName   - Name of the tag to find all instances of 
+             * @param  attribute - The attribute that is being sought (for, id, title, etc)
+             * @param  errorVal  - Value that this attribute should not be set to
+             * @returns array     - All errornous tags
+             */
+            checkForAttrib : function(tagName, attribute, errorVal){
+        	var tags = document.getElementsByTagName(tagName);
+	        var errorArray = [];
+	        var atrib ="";
+	        
+	        for(var i=0; i<tags.length; i++){
+	                atrib = tags[i].getAttribute(attribute);
+	        	if(aura.util.isUndefinedOrNull(atrib) || (atrib === errorVal && taName.toLowerCase() !== "IMG")){
+	        	    errorArray.push(tags[i]);
+	        	}
+	        }
+	        return errorArray;
+            },
+            
+            /**
+             * This method grabs all attributes of a tag and turns them into strings 
+             * @param  attribs - All of the attributes in a tag
+             * @returns string  - String value of all of the tag attributes
+             */
+            attribStringVal : function(attribs){
+        	var strAttrib ="";
+        	var attrib=null;
+        	
+        	for(var i = 0; i<attribs.length; i++){
+        	    attrib = attribs.item(i);
+        	    strAttrib = strAttrib + " " +attrib.nodeName+ "=\""+attrib.nodeValue+"\""; 
+        	}
+        	return strAttrib;
+            },
+            
+            /**
+             * Method grabs everything from the given array and prints out the error and the tag(s) that are the issue
+             * @param tagError - The error message for the given tag
+             * @param errArray - The array of errors
+             * @returns String  - Either the empty string or a string representation of the error
+             */
+            formatOutput : function(tagError, errArray){
+        	if(errArray.length === 0){
+        	    return "";
+        	}
+        	
+        	var len = errArray.length;
+        	var data_aura_rendered_by = "";
+        	var errStr = "\nTotal Errors: "+len+"\nIssue: "+tagError+"\n";
+        	var nodeName = "";
+        	var cmp = "";
+        	var accessAideFuncs = aura.devToolService.accessbilityAide;
+        	
+        	for(var i = 0; i<len; i++){
+        	    nodeName = errArray[i].nodeName.toLowerCase();
+        	    data_aura_rendered_by = errArray[i].getAttribute("data-aura-rendered-by");
+        	    
+        	    //Make sure it has a rendered by value
+        	    if(data_aura_rendered_by === null || data_aura_rendered_by === "" ){
+        		cmp = "No component information Available, did you forget to use an Aura based component?";
+        	    }
+        	    else{
+        		//Making sure that the cmp is rendered by Aura and a normal HTML tag
+        		//Making sure to grab the correct $A. Depending if you are using the debuggertool or not, $A will be different
+        		var cmpDesc = $A.getCmp(data_aura_rendered_by);
+        		
+        		if(!aura.util.isUndefinedOrNull(cmpDesc)){
+        		    //If he component exists grab it descriptor
+        		    cmpDesc = cmpDesc.getAttributes().getValueProvider().getDef().getDescriptor();
+        		    //Grab the namespace and name so that it is not viewed as a hyperlink
+        		    cmp = cmpDesc.getNamespace()+":"+cmpDesc.getName();
+        		}
+        		else{
+        		    cmp = "There was an error finding this component. Please rerender or fix the issue";
+        		}
+        	    }
+        	    
+        	    errStr = errStr+"Component markup: //"+cmp+"\nRendered Tag:   <"+nodeName+""+accessAideFuncs.attribStringVal(errArray[i].attributes)+">...</"+nodeName+">\n";     	    
+        	}
+                return errStr;
+            }
+        },
+        verifyAccessibility : {
+                     /**
+                      * Function that will find all IFrames and make sure that they have titles in them
+                      * @returns Sring - Returns a string representation of the errors
+                      */
+        	     checkIFrameHasTitle : function(){
+        		var iFrameTitleMsg = "Each frame and iframe element must have non-empty title attribute. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/ensure-compat.html.";
+        		var accessAideFuncs = aura.devToolService.accessbilityAide;
+        		
+        		return accessAideFuncs.formatOutput(iFrameTitleMsg,accessAideFuncs.checkForAttrib("iframe","title", ""));
+        	    },
+        	    /**
+                     * Grabs all images tags and makes sure they have titles
+                     * @returns Sring - Returns a string representation of the errors
+                     */
+        	    checkImageTagForAlt : function(){
+        		var imgAltMsg = "IMG tag must have alt attribute. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/text-equiv.html.";
+        		var accessAideFuncs = aura.devToolService.accessbilityAide;
+        		
+       		        return accessAideFuncs.formatOutput(imgAltMsg, accessAideFuncs.checkForAttrib("img","alt",""));
+        	    },
+        	    /**
+                     * Goes through all of the fieldsets tags and makes sure that each on has a legend
+                     * @returns Sring - Returns a string representation of the errors
+                     */
+        	    checkFieldSetForLegend : function(){
+        		var fieldsetLegnedMsg = "Fieldset element must include legend element. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/minimize-error.html.";
+        		var accessAideFuncs = aura.devToolService.accessbilityAide;
+        		var fieldSets = document.getElementsByTagName('fieldset');
+        		var legends = "";
+        		var errorArray = [];
+        		
+        		for(var i=0; i<fieldSets.length; i++){
+        		        legends = fieldSets[i].getElementsByTagName('legend');
+        	        	if(legends.length === 0){
+        	        	    errorArray.push(fieldSets[i]);
+        	        	}
+        	         }
+        		return accessAideFuncs.formatOutput(fieldsetLegnedMsg, errorArray);
+        	    }, 
+        	    /**
+                     * Gets all radio buttons, then traverses up the tree to find if they are in a fieldset
+                     * @returns Sring - Returns a string representation of the errors
+                     */
+        	    checkRadioButtonsInFieldSet : function(){
+        		 var radioButtonFieldSetMsg = "Radio button and checkbox should group by fieldset and legend elements. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/content-structure-separation.html.";
+        		 var accessAideFuncs = aura.devToolService.accessbilityAide;
+        		 var inputTags = document.getElementsByTagName('input');
+        		 var errorArray = [];
+        		 var inputTag = null;
+        		 
+         		 for(var i =0; i<inputTags.length; i++){ 
+        		     inputTag = inputTags[i];
+        		     if(inputTag.getAttribute('type').toLowerCase() == "radio"){
+        		          if(!accessAideFuncs.checkForParentMatchesTag(inputTag, "FIELDSET")){
+        		              errorArray.push(inputTag);
+        		          }
+        		     }
+        		  }
 
+        	         return accessAideFuncs.formatOutput(radioButtonFieldSetMsg, errorArray);
+        	    },
+        	    /**
+                     * Verifys that all inputs have a label
+                     * @returns Sring - Returns a string representation of the errors
+                     */
+        	    checkInputHasLabel : function() {
+        		var inputLabelMsg   = "A label element must be directly before or after the input controls, and the for attribute of label must match the id attribute of the input controls. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/minimize-error.html.";
+        		var accessAideFuncs = aura.devToolService.accessbilityAide;
+        		var inputTextTags   = document.getElementsByTagName('input');
+         		var textAreaTags    = document.getElementsByTagName('textarea');
+                        var selectTags      = document.getElementsByTagName('select');
+                        var lbls = document.getElementsByTagName("LABEL");  
+                        var errorArray = [];
+                        
+                        errorArray = errorArray.concat(accessAideFuncs.inputLabelAid(lbls, inputTextTags));
+                        errorArray = errorArray.concat(accessAideFuncs.inputLabelAid(lbls, textAreaTags));
+                        errorArray = errorArray.concat(accessAideFuncs.inputLabelAid(lbls, selectTags));
+                                  	        
+        	        return accessAideFuncs.formatOutput(inputLabelMsg, errorArray);
+        	    }
+        },
+        checkAccessibility : function(){
+            var functions = aura.devToolService.verifyAccessibility;
+            var result = [];
+            
+            for(var funcNames in functions){
+        	result.push(functions[funcNames]());
+            }
+            return result.join("");
+        },
         help : function(){
             var ret = [];
             ret.push("\n COQL Usage");

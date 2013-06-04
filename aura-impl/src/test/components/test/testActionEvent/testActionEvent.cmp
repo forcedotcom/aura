@@ -16,15 +16,18 @@
 
 -->
 <aura:component controller="java://org.auraframework.impl.java.controller.JavaTestController">
-    <aura:attribute name="eventName" type="String"/>
-    <aura:attribute name="eventParamName" type="String"/>
+    <aura:attribute name="eventName" type="String" description="Name of event to associate with the exception in server action. GenericEventException will encapsulate this event"/>
+    <aura:attribute name="eventParamName" type="String" description="Parameter to set on the exception"/>
     <aura:attribute name="eventParamValue" type="String"/>
     <aura:attribute name="response" type="Aura.Action"/>
     <aura:attribute name="data" type="String" visibility="private" />
     <aura:attribute name="event" type="String" visibility="private" />
+    
     <aura:registerEvent name="local" type="test:testActionEventEvent"/>
     <aura:handler name="local" action="{!c.showLocalEvent}"/>
+    
     <aura:handler event="aura:systemError" action="{!c.showSystemErrorEvent}"/>
+    
     <ui:button aura:id="trigger" label="fire!" press="{!c.fireEvent}"/>
     <div aura:id="eventType">{!v.event}</div>
     <div aura:id="eventData">{!v.data}</div>

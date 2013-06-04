@@ -14,14 +14,26 @@
  * limitations under the License.
  */
 ({
-    onInit: function(cmp, event, helper) {    	 
-    	helper.init(cmp);
-    },       
+	onInit : function(cmp, evt, helper) {
+		helper.init(cmp);
+	},
+	
+	onPageComponentsChanged: function(cmp, evt, helper) {
+    	helper.initPages(cmp);    	
+    },
+  
+    
+    /**
+     * Handle scrollStart event coming from scroller
+     */
+    onScrollMove : function(cmp, evt, helper) {
+    	helper.handleScrollMove(cmp, evt);
+    },
     
     /**
      * Handle scrollEnd event coming from scroller
      */
-    onScrollEnd : function(cmp, evt, helper){  	
+    onScrollEnd : function(cmp, evt, helper) {  	
     	helper.handleScrollEnd(cmp, evt);
     },
     
@@ -29,14 +41,15 @@
      * Handle scroller refreshed event
      */
     onScrollerRefreshed: function(cmp, evt, helper) {
-    	if (!cmp._isSelectDefaultPageFired) {    		
+    	if (!cmp._isSelectDefaultPageFired) {
+    		//fire selectDefaultPage only after the the scroller has initialized and ready
     		var e = cmp.getEvent("selectDefaultPage");
     		cmp._isSelectDefaultPageFired = true;
     		
     		e.fire();
     	}
     },
-    
+     
     /**
      * Handle window resize event
      */      
@@ -50,7 +63,8 @@
     pagerClicked: function (cmp, evt, helper) {    	
         var pageIndex = evt.getParam("pageIndex");
         
-        helper.selectPage(cmp, pageIndex);        
+        helper.handlePagerClicked(cmp, pageIndex);
+        
         if (evt.preventDefault) evt.preventDefault();
     },
 
@@ -68,20 +82,18 @@
     	helper.selectPage(cmp, evt.getParam("pageIndex"));
     },
     
-    selectDefaultPage: function (cmp, evt, helper) {    	
-        var pageCmps = helper.getPageComponents(cmp),
-        	defaultPage = cmp.get('v.defaultPage'),
-        	pageToSelect = 0;
-     
-        if (defaultPage) {
-        	pageToSelect = defaultPage;
-        } else {        
-	        for (var i = 0; i < pageCmps.length; i++) {
-	            if (pageCmps[i].isDefault) {
-	            	pageToSelect = i;
-	            }
-	        }
-        }
-        helper.selectPage(cmp, pageToSelect, 0);        
+    selectDefaultPage: function (cmp, evt, helper) {
+    	if (cmp.isRendered()) {
+    		helper.selectDefaultPage(cmp, evt);
+    	} else {
+    		if (cmp._selectDefaultPageTimer) {
+    			clearTimeout(cmp._selectDefaultPageTimer);
+    			cmp._selectDefaultPageTimer = null;
+    		}    		
+    		cmp._selectDefaultPageTimer = setTimeout(function(){
+    			cmp._selectDefaultPageTimer = null;
+				helper.selectDefaultPage(cmp, evt);
+			}, 0);
+    	}
     }
 })

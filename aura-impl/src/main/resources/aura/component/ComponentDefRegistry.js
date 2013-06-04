@@ -81,14 +81,14 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
         if (useLocalStorage) {
             // Write through of local storage cacheable componentDefs
             try {
-                this.writeToCache(descriptor, config, mark);
+                this.writeToCache(descriptor, config);
             } catch (e) {
                 // Clear localStorage and try one more time to write through
                 localStorage.clear();
                 $A.endMark("Cleared localStorage (out of space) ");
 
                 try {
-                    this.writeToCache(descriptor, config, mark);
+                    this.writeToCache(descriptor, config);
                 } catch(e2) {
                     // Nothing we can do at this point - give up.
                 }
@@ -136,9 +136,8 @@ ComponentDefRegistry.prototype.getConfigFromLocalCache = function(descriptor) {
  * Updates the local cache catalog and writes out the componentDef.
  * @param {Object} descriptor
  * @param {Object} config
- * @param {Object} mark
  */
-ComponentDefRegistry.prototype.writeToCache = function(descriptor, config, mark) {
+ComponentDefRegistry.prototype.writeToCache = function(descriptor, config) {
     if (this.isLocalStorageAvailable) {
         // Update the catalog
         var catalog = this.getLocalCacheCatalog();

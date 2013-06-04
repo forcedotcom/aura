@@ -85,7 +85,8 @@
 	    this.assertAfterGet(cmp, storage, "key2", function(){
 		var item = cmp["key2"];
 		$A.test.assertDefined(item);
-		$A.test.assertTrue(storage.getSize()>=2 && storage.getSize()<2.002);		
+		$A.test.assertTrue(storage.getSize()>=2 && storage.getSize()<2.002,
+                                   "Expected value of approx. 2, got: "+storage.getSize());
 	    });
 	}
 	]
@@ -167,7 +168,7 @@
 		//Verify that original action is usable
 		$A.test.assertEquals("SUCCESS", a.getState())
 		$A.test.assertDefined(a.getReturnValue);
-		var newCmp = $A.newCmp(a.getReturnValue());
+		var newCmp = $A.newCmpDeprecated(a.getReturnValue());
 		$A.test.assertEquals("markup://auraStorageTest:teamFacet", newCmp.getDef().getDescriptor().toString());
 		storage.put("actionResponse", a);
 	    });
@@ -180,7 +181,7 @@
 				var item = cmp["actionResponse"];
 				$A.test.assertEquals("SUCCESS", item.getState());
 				$A.test.assertDefined(item.getReturnValue);
-				var newCmp = $A.newCmp(item.getReturnValue());
+				var newCmp = $A.newCmpDeprecated(item.getReturnValue());
 				$A.test.assertEquals("markup://auraStorageTest:teamFacet", newCmp.getDef().getDescriptor().toString());*/
 			});
 	}

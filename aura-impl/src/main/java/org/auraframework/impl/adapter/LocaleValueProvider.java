@@ -15,32 +15,88 @@
  */
 package org.auraframework.impl.adapter;
 
+import java.text.*;
+import java.util.Locale;
 import java.util.Map;
 
+import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.auraframework.util.AuraLocale;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 
 public class LocaleValueProvider implements GlobalValueProvider {
+    public static String LANGUAGE = "language";
+    public static String COUNTRY = "country";
+    public static String VARIANT = "variant";
+    public static String NUMBER_FORMAT = "numberformat";
+    public static String PERCENT_FORMAT = "percentformat";
+    public static String CURRENCY_FORMAT = "currencyformat";
+// TODO: add date format
+//    public static String DATE_FORMAT = "dateformat";
+    public static String TIME_ZONE = "timezone";
+    public static String TIME_ZONE_FILE_NAME = "timezoneFileName";
+    public static String CURRENCY_CODE = "currency_code";
+
+    // symbols
+    public static String DECIMAL = "decimal";
+    public static String GROUPING = "grouping";
+    public static String CURRENCY = "currency";
+    
+    private final Map<String, Object> data;
 
     public LocaleValueProvider() {
+        Builder<String, Object> builder = ImmutableMap.builder();
+        
+        AuraLocale al = Aura.getLocalizationAdapter().getAuraLocale();
+        Locale lang = al.getLanguageLocale();
+        builder.put(LANGUAGE, lang.getLanguage());
+        builder.put(COUNTRY, lang.getCountry());
+        builder.put(VARIANT, lang.getVariant());
+        builder.put(TIME_ZONE, al.getTimeZone().getID());
+        builder.put(TIME_ZONE_FILE_NAME, al.getTimeZone().getID().replace("/", "-"));
+        
+        NumberFormat nf = NumberFormat.getNumberInstance(al.getNumberLocale());
+        if (!(nf instanceof DecimalFormat)) {
+            throw new AuraRuntimeException("Expected DecimalFormat, but found " + nf.getClass().getName());
+        }
+        DecimalFormat df = (DecimalFormat) nf;
+        builder.put(NUMBER_FORMAT, df.toPattern());
+        DecimalFormatSymbols dfs = df.getDecimalFormatSymbols();
+        builder.put(DECIMAL, dfs.getDecimalSeparator());
+        builder.put(GROUPING, dfs.getGroupingSeparator());
+        
+        nf = NumberFormat.getPercentInstance(al.getNumberLocale());
+        if (!(nf instanceof DecimalFormat)) {
+            throw new AuraRuntimeException("Expected DecimalFormat, but found " + nf.getClass().getName());
+        }
+        DecimalFormat pf = (DecimalFormat) nf;
+        builder.put(PERCENT_FORMAT, pf.toPattern());
+        
+        nf = NumberFormat.getCurrencyInstance(al.getCurrencyLocale());
+        if (!(nf instanceof DecimalFormat)) {
+            throw new AuraRuntimeException("Expected DecimalFormat, but found " + nf.getClass().getName());
+        }
+        DecimalFormat cf = (DecimalFormat) nf;
+        builder.put(CURRENCY_FORMAT, cf.toPattern());
+        DecimalFormatSymbols cdfs = cf.getDecimalFormatSymbols();
+        builder.put(CURRENCY_CODE, cdfs.getCurrency().getCurrencyCode());
+        builder.put(CURRENCY, cdfs.getCurrencySymbol());
+
+        data = builder.build();
     }
 
     @Override
     public Object getValue(PropertyReference expr) {
-        return null;
-        // Access in the form of $L10N.number.currency
-        // This probably breaks down quite a bit when referring
-        // to particular local information like days of the week.
-        // List<String> parts = expr.getList();
-
-        // Generalize the retrieval of date formats.
-        // return Aura.getLocalizationAdapter().getFormat(parts.get(0),
-        // parts.get(1));
+        return getData().get(expr.getRoot());
     }
 
     @Override
@@ -50,32 +106,23 @@ public class LocaleValueProvider implements GlobalValueProvider {
 
     @Override
     public DefDescriptor<TypeDef> getReturnTypeDef() {
-        // If we access $L10N.time, would it return a DateTimeFormat?
-        // If we access $L10N.percent it would be... NumberFormat?
-
-        // Assuming a format string at the moment.
         return DefDescriptorImpl.getInstance("String", TypeDef.class);
     }
 
     @Override
     public void validate(PropertyReference expr) throws InvalidExpressionException {
-        // Verify that the section and format exists?
-        return;
+        if (expr.size() != 1 || !getData().containsKey(expr.getRoot())) {
+            throw new InvalidExpressionException("No property on $Locale for key: " + expr, expr.getLocation());
+        }
     }
 
     @Override
     public boolean isEmpty() {
-        // Would it ever make sense for this to be empty?
-        // Seems like that would mean we have no culture defined
-        // which I figure we would just default to English.
         return false;
     }
 
     @Override
     public Map<String, ?> getData() {
-        return null;
-        // Get a serializable object that contains all the information
-        // for the client to access the format strings.
-        // return Aura.getLocalizationAdapter().getLocale();
+        return data;
     }
 }

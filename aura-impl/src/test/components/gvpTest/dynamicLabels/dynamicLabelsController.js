@@ -5,7 +5,7 @@
             "name" : 'gvpTest:newLabels'
         });
         a.setCallback(cmp,function(a){
-            var newCmp = $A.newCmp(a.getReturnValue());
+            var newCmp = $A.newCmpDeprecated(a.getReturnValue());
     	    cmp.find("container").getValue('v.body').push(newCmp);
         });
         a.runAfter(a);

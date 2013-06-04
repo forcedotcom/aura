@@ -32,8 +32,7 @@
  * @param {Object}
  *            cmp The component associated with the Action.
  */
-var Action = function Action(def, method, paramDefs, cmp) {
-
+var Action = function Action(def, method, paramDefs, background, cmp) {
     this.def = def;
     this.meth = method;
     this.paramDefs = paramDefs;
@@ -41,6 +40,7 @@ var Action = function Action(def, method, paramDefs, cmp) {
     this.params = {};
     this.state = "NEW";
     this.callbacks = {};
+    this.background = background;
 };
 
 Action.prototype.nextActionId = 1;
@@ -134,8 +134,15 @@ Action.prototype.getComponent = function() {
  *            scope The scope in which the function is executed.
  * @param {Function}
  *            callback The callback function to run for each controller.
+ * @param {String=}
+ * 	      name The action state for which the callback is to be associated with.
  */
 Action.prototype.setCallback = function(scope, callback, name) {
+    if(!$A.util.isFunction(callback)){
+        $A.error("Action callback should be a function");
+        return;
+    }
+    //If name is undefined or specified as "ALL", then apply same callback in all cases
     if (name === undefined || name === "ALL") {
         this.callbacks["SUCCESS"] = {fn:callback, s:scope};
         this.callbacks["ERROR"] = {fn:callback, s:scope};
@@ -232,6 +239,23 @@ Action.prototype.getError = function() {
 };
 
 /**
+ * Returns true if the actions should be enqueued in the background, false if it should be run 
+ * in the foreground.
+ * @public
+ */
+Action.prototype.isBackground = function() {
+    return this.background === true;
+};
+
+/**
+ * Set to true of the action should be enqueued when run instead of running in the foreground.
+ * @param {boolean} background
+ */
+Action.prototype.setBackground = function(background) {
+    this.background = background;
+};
+
+/**
  * Adds the server-side action to the queue. Checks that the event is
  * server-side before enqueuing. For client-side Action, use <code>run()</code>
  * instead.
@@ -311,6 +335,7 @@ Action.prototype.complete = function(response) {
                     var err = response["error"][i];
                     if (err["exceptionEvent"]) {
                         fired = true;
+                        //Fire the event
                         this.parseAndFireEvent(err["event"], this.getComponent());
                     } else {
                         newErrors.push(err);
@@ -322,6 +347,7 @@ Action.prototype.complete = function(response) {
                 response["error"] = newErrors;
             }
             if (this.cmp === undefined || this.cmp.isValid()) {
+        	//If there is a callback for the action's current state, invoke that too 
                 var cb = this.callbacks[this.getState()];
 
                 if (cb) {
@@ -568,9 +594,14 @@ Action.prototype.getStorage = function() {
     return $A.storageService.getStorage("actions");
 };
 
+/**
+ * Use the event object in the action's response and fire event.
+ */
 Action.prototype.parseAndFireEvent = function(evtObj) {
     var descriptor = evtObj["descriptor"];
-
+    
+    //If the current component has registered to fire the event, 
+    //then create the event object and associate it with this component(make it the source)
     var evt = this.getComponent().getEventByDescriptor(descriptor);
     if (evt !== null) {
         if (evtObj["attributes"]) {
@@ -578,6 +609,8 @@ Action.prototype.parseAndFireEvent = function(evtObj) {
         }
         evt.fire();
     } else {
+	//Else create the event using ClientService and fire it. Usually the case for APPLICATION events.
+	//If the event is a COMPONENT event, it is fired anyway but has no effect because its an orphan(without source)
         $A.clientService.parseAndFireEvent(evtObj);
     }
 };

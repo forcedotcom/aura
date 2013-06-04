@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -29,6 +30,7 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.auraframework.Aura;
 
 import org.auraframework.def.ApplicationDef;
@@ -81,7 +83,10 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * @throws Exception
      */
     protected void assertUrlResponse(String msg, String url, int statusCode) throws Exception {
-        HttpResponse httpResponse = performGet(new URI(null, url, null).toString());
+        HttpGet get = obtainGetMethod(new URI(null, url, null).toString());
+        HttpResponse httpResponse = perform(get);
+        EntityUtils.consume(httpResponse.getEntity());
+        get.releaseConnection();
         int status = getStatusCode(httpResponse);
         assertEquals(msg, statusCode, status);
     }
@@ -99,33 +104,42 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     }
 
     /**
-     * Adds cookie
+     * Adds cookie with name and value
      *
-     * @param name
-     * @param value
+     * @param name cookie name
+     * @param value cookie value
      * @throws Exception
      */
     protected void addCookie(String name, String value) throws Exception {
-        BasicClientCookie cookie = makeCookie(getHost(), name, value, "/");
-        getCookieStore().addCookie(cookie);
+        BasicClientCookie cookie = makeCookie(name, value);
+        addCookie(cookie);
     }
 
     /**
      * Adds cookie to httpclient cookie store
-     * @param domain
-     * @param name
-     * @param value
-     * @param path
+     * @param domain cookie domain
+     * @param name cookie name
+     * @param value cookie value
+     * @param path cookie path
      * @throws Exception
      */
     protected void addCookie(String domain, String name, String value, String path) throws Exception {
         BasicClientCookie cookie = makeCookie(domain, name, value, path);
+        addCookie(cookie);
+    }
+
+    /**
+     * Adds cookie to httpclient cookie store
+     * @param cookie cookie
+     * @throws Exception
+     */
+    protected void addCookie(Cookie cookie) throws Exception {
         getCookieStore().addCookie(cookie);
     }
 
     /**
      * Creates HttpContext with httpclient cookie store. Allows cookies to be part of specific request method.
-     * @return
+     * @return http context
      * @throws Exception
      */
     protected HttpContext getHttpCookieContext() throws Exception {
@@ -137,9 +151,9 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Checks there is no cookie in httpclient cookie store
-     * @param domain
-     * @param name
-     * @param path
+     * @param domain cookie domain
+     * @param name cookie name
+     * @param path cookie path
      * @throws Exception
      */
     protected void assertNoCookie(String domain, String name, String path) throws Exception {
@@ -153,10 +167,10 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Checks for cookie
-     * @param domain
-     * @param name
-     * @param path
-     * @param value
+     * @param domain cookie domain
+     * @param name cookie name
+     * @param value cookie value
+     * @param path cookie path
      * @throws Exception
      */
     protected void assertCookie(String domain, String name, String path, String value) throws Exception {
@@ -171,14 +185,25 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     }
 
     /**
-     * Creates cookie
-     * @param domain
-     * @param name
-     * @param value
-     * @param path
+     * Creates cookie with only provided name and value
+     * @param name cookie name
+     * @param value cookie value
      * @return
      */
-    private BasicClientCookie makeCookie(String domain, String name, String value, String path) {
+    protected BasicClientCookie makeCookie(String name, String value) throws Exception {
+        BasicClientCookie cookie = makeCookie(getHost(), name, value, "/");
+        return cookie;
+    }
+
+    /**
+     * Creates cookie
+     * @param domain cookie domain
+     * @param name cookie name
+     * @param value cookie value
+     * @param path cookie path
+     * @return
+     */
+    protected BasicClientCookie makeCookie(String domain, String name, String value, String path) {
         BasicClientCookie cookie = new BasicClientCookie(name, value);
         cookie.setDomain(domain);
         cookie.setPath(path);
@@ -196,7 +221,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Gets httpclient cookie store
-     * @return
+     * @return cookie store
      * @throws Exception
      */
     protected CookieStore getCookieStore() throws Exception {

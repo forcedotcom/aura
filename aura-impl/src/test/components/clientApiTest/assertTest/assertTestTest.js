@@ -42,6 +42,7 @@
     testAuraError : {
         test : [function(cmp) {
             try {
+                $A.test.expectAuraError("Simple text");
                 $A.error("Simple text");
                 $A.test.fail("Test setup failure, no use of the test if an exception was not thrown.");
             } catch(e) {
@@ -81,13 +82,18 @@
     testAuraErrorStackTrace : {
         test : function(cmp) {
             try {
+                $A.test.expectAuraError("Verifying stack trace present");
                 $A.error("Verifying stack trace present");
                 $A.test.fail("Test setup failure, $A.error failed to throw exception.");
             } catch(e) {
                 var message = $A.util.getElement("auraErrorMessage");
                 $A.test.assertNotNull(message, "Aura error message box did is not present after $A.error()");
-                $A.test.assertStartsWith("Verifying stack trace present\nError: stack\n    at Error",
-                    $A.test.getText(message), "Unexpected stacktrace message");
+                var msgText = $A.test.getText(message);
+                $A.test.assertStartsWith("Verifying stack trace present", msgText, "Unexpected stacktrace message");
+                //
+                // Stack traces are not consistent enough to look for content... grrr.
+                //
+                $A.test.assertTrue(msgText.length > 35, "Missing stacktrace");
             }
         }
     }

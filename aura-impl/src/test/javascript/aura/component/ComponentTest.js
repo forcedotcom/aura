@@ -14,29 +14,15 @@
  * limitations under the License.
  */
 
-//Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file 
-var exp = function(){};
+//Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
+Mocks.GetMock(Object.Global(), "exp", function(){})(function(){
+    //#import aura.component.Component
+});
 
-//#import aura.component.Component
 Function.RegisterNamespace("Test.Aura.Component");
 
 [Fixture]
 Test.Aura.Component.ComponentTest=function(){
-    //Mocks
-    var componentService = {};
-    var $A = {
-        getContext : function(){
-          return {
-            getCurrentAction : function(){
-              return {
-                getNextGlobalId : function(){},
-                getId : function(){}
-              }
-            }
-          };
-        },
-    };
-  
     [Fixture]
     function GetDef(){
       [Fact]

@@ -44,7 +44,7 @@
 				    }
 				};
 			
-			var message = $A.componentService.newComponent(componentConfig);
+			var message = $A.componentService.newComponentDeprecated(componentConfig);
 			
 			var div1 = cmp.find("div1");
 			var divBody = div1.getValue("v.body");

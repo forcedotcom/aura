@@ -98,7 +98,7 @@
 			for ( var i = 0; i < pageModels.length; i++) {
 				page = pageModels[i];
 				//create new instance of carousePage and pass pageModel to it
-				 var component=$A.componentService.newComponent({
+				 var component=$A.componentService.newComponentDeprecated({
 			            componentDef:{descriptor: 'markup://ui:carouselPage'},
 			            //page index starts with 1
 			            attributes:{values: {

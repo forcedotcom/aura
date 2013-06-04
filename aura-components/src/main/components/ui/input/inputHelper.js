@@ -143,7 +143,7 @@
         if (errorCmp && !errorCmp.getValue("v.value").compare(m)) {
             errorCmp.setValue("v.value", m);
         } else {
-            errorCmp = $A.componentService.newComponent({
+            errorCmp = $A.componentService.newComponentDeprecated({
                 "componentDef": "markup://ui:inputDefaultError",
                 "attributes": {
                     "values": {

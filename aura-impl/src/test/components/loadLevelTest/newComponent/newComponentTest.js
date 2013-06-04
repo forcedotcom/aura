@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
-     * Tests to verify AuraComponentService.newComponent() or $A.newCmpDeprecated()
+     * Tests to verify AuraComponentService.newComponentDeprecated() or $A.newCmpDeprecated()
      */
 
 ({
@@ -264,7 +264,7 @@
                                 attributes:{values:{number:{descriptor:'number', value:99}}}
                             };
             try{
-                $A.componentService.newComponent(config);
+                $A.componentService.newComponentDeprecated(config);
                 $A.test.fail('Should have failed to create component without a descriptor.');
             }catch(e){
                 $A.test.assertEquals("Assertion Failed!: ComponentDef Config required for registration : undefined",e.message);
@@ -273,7 +273,7 @@
             aura.test.setTestTimeout(15000);
             //Without fully qualified name
             var config = {componentDef:"loadLevelTest:displayNumber"};
-            var newCmp = $A.componentService.newComponent(config);
+            var newCmp = $A.componentService.newComponentDeprecated(config);
 
             $A.test.assertEquals("markup://aura:placeholder",newCmp.getDef().getDescriptor().getQualifiedName());
             cmp.getValue("v.body").push(newCmp);
@@ -282,7 +282,7 @@
         },function(cmp){
             aura.test.setTestTimeout(15000);
             //Without fully qualified name
-            var newCmp = $A.componentService.newComponent("loadLevelTest:displayBoolean");
+            var newCmp = $A.componentService.newComponentDeprecated("loadLevelTest:displayBoolean");
 
             $A.test.assertEquals("markup://aura:placeholder",newCmp.getDef().getDescriptor().getQualifiedName());
             cmp.getValue("v.body").push(newCmp);
@@ -292,16 +292,16 @@
             aura.test.setTestTimeout(15000);
             //Literal as descriptor
             try{
-                $A.componentService.newComponent('');
+                $A.componentService.newComponentDeprecated('');
                 $A.test.fail('Should have failed to create component without a descriptor.');
             }catch(e){
-                $A.test.assertTrue(e.message.indexOf("Assertion Failed!: config is required in ComponentService.newComponent(config)")===0);
+                $A.test.assertTrue(e.message.indexOf("Assertion Failed!: config is required in ComponentService.newComponentDeprecated(config)")===0);
             }
         },function(cmp){
             aura.test.setTestTimeout(15000);
             //Verify that this format for config is supported
             var config = {componentDef:{descriptor:"markup://aura:text"}};
-            var cmp = $A.componentService.newComponent(config);
+            var cmp = $A.componentService.newComponentDeprecated(config);
             $A.test.assertNotNull(cmp);
             $A.test.assertNotNull(cmp.getDef());
         }
@@ -311,7 +311,7 @@
         test:function(cmp){
             var config = {componentDef:"markup://aura:renderIf"};
                 try{
-                    $A.componentService.newComponent(config);
+                    $A.componentService.newComponentDeprecated(config);
                     $A.test.fail('Should have failed to create component without a descriptor.');
                 }catch(e){
                     $A.test.assertEquals("Missing required attribute aura:renderIf.isTrue",e.message);

@@ -15,23 +15,27 @@
  */
 ({
     fix : function(cmp, evt){
-
         var quickFix = cmp.getAttributes().getValue("quickFix");
         var ui = quickFix.getValue("ui");
         if (ui) {
-            ui = $A.services.component.newComponentDeprecated({
-                componentDef: ui.unwrap(),
-                attributes: {
-                    values: {
-                        quickFix: quickFix.unwrap()
+            $A.newCmpAsync(
+                this,
+                function(newCmp){
+                    var show = cmp.getEvent("showUI");
+                    show.setParams({
+                        ui : newCmp
+                    });
+                    show.fire();
+                },
+                {
+                    componentDef: ui.unwrap(),
+                    attributes: {
+                        values: {
+                            quickFix: quickFix.unwrap()
+                        }
                     }
                 }
-            });
-            var show = cmp.getEvent("showUI");
-            show.setParams({
-                ui : ui
-            });
-            show.fire();
+            );
         } else {
             var a = cmp.get("c.doFix");
             a.setParams({

@@ -170,10 +170,14 @@
                         title:"Column",
                         fieldName: "column"
                     }
-                var column = $A.componentService.newComponentDeprecated({
-                    "componentDef": "markup://ui:column",
-                    "attributes": {
-                        "values": attributes
+                    
+                $A.componentService.newComponentAsync(
+                    this,
+                    function(){},
+                    {
+                        "componentDef": "markup://ui:column",
+                        "attributes": {
+                            "values": attributes
                     }
                 });
                 $A.test.fail("Exception should have been thrown");

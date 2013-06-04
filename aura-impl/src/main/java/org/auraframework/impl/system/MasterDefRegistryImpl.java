@@ -507,10 +507,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 cc.addedPreloads = true;
                 Set<String> preloads = cc.context.getPreloads();
                 for (String preload : preloads) {
-                    DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
-                    ddb.setResource(preload);
-                    ddb.setType("APPLICATION,COMPONENT,STYLE,EVENT");
-                    ddb.build().appendDependencies(newDeps);
+                    if (!preload.contains("_")) {
+                        DependencyDefImpl.Builder ddb = new DependencyDefImpl.Builder();
+                        ddb.setResource(preload);
+                        ddb.setType("APPLICATION,COMPONENT,STYLE,EVENT");
+                        ddb.build().appendDependencies(newDeps);
+                    }
                 }
             }
             for (DefDescriptor<?> dep : newDeps) {

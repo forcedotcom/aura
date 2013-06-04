@@ -15,33 +15,31 @@
  */
 package org.auraframework.impl.root.theme;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+
 import java.util.Map;
 
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.handler.ThemeDefHandler;
-import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  * Unit tests for {@link ThemeDefHandler}.
  */
 public class ThemeDefHandlerTest extends AuraImplTestCase {
-    private static final DefDescriptor<ThemeDef> desc = DefDescriptorImpl.getInstance("fake:theme", ThemeDef.class);
-    private static final XMLParser parser = XMLParser.getInstance();
-
     public ThemeDefHandlerTest(String name) {
         super(name);
     }
 
     public void testAttributes() throws Exception {
         String src = "<aura:theme><aura:attribute name='test' type='String' default='abc'/></aura:theme>";
-        ThemeDef def = parser.parse(desc, source(src));
+        ThemeDef def = source(src);
 
         Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = def.getAttributeDefs();
         assertEquals("didn't get expected number of attributes", 1, attrs.size());
@@ -54,7 +52,7 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
     /** no type specified should be same as type=String" */
     public void testDefaultType() throws Exception {
         String src = "<aura:theme><aura:attribute name='test' default='abc'/></aura:theme>";
-        ThemeDef def = parser.parse(desc, source(src));
+        ThemeDef def = source(src);
 
         Map<DefDescriptor<AttributeDef>, AttributeDef> attrs = def.getAttributeDefs();
         assertEquals("didn't get expected number of attributes", 1, attrs.size());
@@ -66,7 +64,7 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
 
     public void testInvalidChild() throws Exception {
         try {
-            parser.parse(desc, source("<aura:theme><aura:foo/></aura:theme>"));
+            source("<aura:theme><aura:foo/></aura:theme>");
             fail("Should have thrown AuraException aura:foo isn't a valid child tag for aura:theme");
         } catch (AuraRuntimeException e) {
         }
@@ -74,14 +72,20 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
 
     public void testWithTextBetweenTag() throws Exception {
         try {
-            parser.parse(desc, source("<aura:theme>Test</aura:theme>"));
+            source("<aura:theme>Test</aura:theme>");
             fail("Should have thrown AuraException because text is between aura:theme tags");
         } catch (AuraRuntimeException e) {
         }
     }
 
+    public void testExtends() throws Exception {
+        ThemeDef def = source("<aura:theme extends=\"fake:theme\"></aura:theme>");
+        DefDescriptor<ThemeDef> expected = ThemeDefImpl.descriptor("fake:theme");
+        assertThat(def.getExtendsDescriptor(), equalTo(expected));
+    }
+
     /** utility */
-    private StringSource<ThemeDef> source(String contents) {
-        return new StringSource<ThemeDef>(desc, contents, "themeID", Format.XML);
+    private ThemeDef source(String contents) throws QuickFixException {
+        return addSourceAutoCleanup(ThemeDef.class, contents).getDef();
     }
 }

@@ -18,6 +18,7 @@ package org.auraframework.impl.root.theme;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
@@ -27,6 +28,8 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -44,10 +47,13 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
 
     private static final long serialVersionUID = 7467455857249694414L;
 
+    private final int hashCode;
+    private final DefDescriptor<ThemeDef> extendsDescriptor;
+
     public ThemeDefImpl(Builder builder) {
         super(builder);
-
-        // TODONM hash code update when extends is implemented (or anything) that makes super.hash inadequate.
+        this.extendsDescriptor = builder.extendsDescriptor;
+        this.hashCode = AuraUtil.hashCode(super.hashCode(), extendsDescriptor);
     }
 
     @Override
@@ -65,15 +71,50 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
     }
 
     @Override
+    public DefDescriptor<ThemeDef> getExtendsDescriptor() {
+        return extendsDescriptor;
+    }
+
+    @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
 
-        // check that each attribute has default specified
+        // attributes
         for (AttributeDef attribute : attributeDefs.values()) {
+            attribute.validateDefinition();
+
+            // check that each attribute has default specified
             if (attribute.getDefaultValue() == null) {
                 String msg = "Attribute %s must specify a default value. An empty string is acceptable.";
                 throw new InvalidDefinitionException(String.format(msg, attribute.getName()), getLocation());
             }
+        }
+    }
+
+    @Override
+    public void validateReferences() throws QuickFixException {
+        super.validateReferences();
+
+        if (extendsDescriptor != null) {
+            if (extendsDescriptor.equals(descriptor)) {
+                throw new InvalidDefinitionException(String.format("%s cannot extend itself", getDescriptor()),
+                        getLocation());
+            }
+            if (extendsDescriptor.getDef() == null) {
+                throw new DefinitionNotFoundException(extendsDescriptor, getLocation());
+            }
+        }
+
+        for (AttributeDef att : this.attributeDefs.values()) {
+            att.validateReferences();
+        }
+    }
+
+    @Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
+        super.appendDependencies(dependencies);
+        if (extendsDescriptor != null) {
+            dependencies.add(extendsDescriptor);
         }
     }
 
@@ -110,15 +151,19 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
     }
 
     @Override
-    public boolean equals(Object obj) {
-        // based on super.hashcode being descriptor, location, and attributedefs.
+    public int hashCode() {
+        return hashCode;
+    }
 
+    @Override
+    public boolean equals(Object obj) {
         if (obj instanceof ThemeDefImpl) {
             ThemeDefImpl other = (ThemeDefImpl) obj;
             return Objects
                     .equal(descriptor, other.descriptor)
                     && Objects.equal(location, other.location)
-                    && Objects.equal(attributeDefs, other.attributeDefs);
+                    && Objects.equal(attributeDefs, other.attributeDefs)
+                    && Objects.equal(extendsDescriptor, other.extendsDescriptor);
         }
 
         return false;
@@ -137,6 +182,8 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
      * Used to build instances of {@link ThemeDef}s.
      */
     public static class Builder extends RootDefinitionImpl.Builder<ThemeDef> {
+        public DefDescriptor<ThemeDef> extendsDescriptor;
+
         public Builder() {
             super(ThemeDef.class);
         }

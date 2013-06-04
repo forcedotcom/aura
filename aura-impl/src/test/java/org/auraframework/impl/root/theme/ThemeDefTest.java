@@ -21,16 +21,21 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+
+import com.google.common.collect.Sets;
 
 /**
  * Unit tests for {@link ThemeDef}.
@@ -84,4 +89,53 @@ public class ThemeDefTest extends AuraImplTestCase {
             assertThat(e.getMessage().contains("must specify a default value"), is(true));
         }
     }
+
+    public void testValidatesGoodExtendsRef() throws Exception {
+        String src = "<aura:theme extends=\"test:fakeTheme\"></aura:theme>";
+        ThemeDef def = addSourceAutoCleanup(ThemeDef.class, src).getDef();
+        def.validateReferences();
+    }
+
+    public void testValidatesBadExtendsRef() throws Exception {
+        try {
+            String src = "<aura:theme extends=\"test:idontexisttheme\"></aura:theme>";
+            ThemeDef def = addSourceAutoCleanup(ThemeDef.class, src).getDef();
+            def.validateReferences();
+            fail("Expected validation to fail.");
+        } catch (DefinitionNotFoundException e) {
+            assertThat(e.getMessage().contains("No THEME"), is(true));
+        }
+    }
+
+    public void testDependencies() throws Exception {
+        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+
+        String src = "<aura:theme extends=\"test:fakeTheme\"></aura:theme>";
+        ThemeDef def = addSourceAutoCleanup(ThemeDef.class, src).getDef();
+
+        def.appendDependencies(dependencies);
+
+        DefDescriptor<ThemeDef> desc = ThemeDefImpl.descriptor("test:fakeTheme");
+        assertThat(dependencies.contains(desc), is(true));
+    }
+
+    public void testExtendsItself() throws Exception {
+        DefDescriptor<ThemeDef> extendsSelf = addSourceAutoCleanup(ThemeDef.class, "");
+        StringSource<?> source = (StringSource<?>) auraTestingUtil.getSource(extendsSelf);
+        source.addOrUpdate(String.format("<aura:theme extends='%s'> </aura:theme>",
+                extendsSelf.getDescriptorName()));
+        try {
+            ThemeDef def = extendsSelf.getDef();
+            def.validateReferences();
+            fail("A theme should not be able to extend itself.");
+        } catch (InvalidDefinitionException expected) {
+            assertThat(expected.getMessage().contains("cannot extend itself"), is(true));
+        }
+    }
+
+    // test variable from parent
+
+    // test parent variable overridden
+
+    // test variable has same name? error or treat same as overridden
 }

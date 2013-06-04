@@ -16,6 +16,7 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.io.IOException;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -31,6 +32,8 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * Handler for aura:theme tags.
  * 
@@ -43,6 +46,11 @@ public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
 
     public static final String TAG = "aura:theme";
 
+    private static final String ATTRIBUTE_EXTENDS = "extends";
+
+    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_EXTENDS,
+            RootTagHandler.ATTRIBUTE_SUPPORT, RootTagHandler.ATTRIBUTE_DESCRIPTION);
+
     private final ThemeDefImpl.Builder builder = new ThemeDefImpl.Builder();
 
     public ThemeDefHandler() {
@@ -51,11 +59,29 @@ public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
 
     public ThemeDefHandler(DefDescriptor<ThemeDef> defDescriptor, Source<ThemeDef> source, XMLStreamReader xmlReader) {
         super(defDescriptor, source, xmlReader);
+        builder.setOwnHash(source.getHash());
+        builder.extendsDescriptor = null;
+    }
+
+    @Override
+    public Set<String> getAllowedAttributes() {
+        return ALLOWED_ATTRIBUTES;
     }
 
     @Override
     protected RootDefinitionBuilder<ThemeDef> getBuilder() {
         return builder;
+    }
+
+    @Override
+    protected void readAttributes() throws QuickFixException {
+        super.readAttributes();
+
+        // extends
+        String parent = getAttributeValue(ATTRIBUTE_EXTENDS);
+        if (parent != null) {
+            builder.extendsDescriptor = DefDescriptorImpl.getInstance(parent.trim(), ThemeDef.class);
+        }
     }
 
     @Override
@@ -91,7 +117,6 @@ public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
 
     @Override
     public void writeElement(ThemeDef def, Appendable out) throws IOException {
-        // ?
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(); // ?
     }
 }

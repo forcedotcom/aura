@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.css;
 
+import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImplTestCase;
@@ -22,7 +23,9 @@ import org.auraframework.impl.css.parser.CSSParser;
 import org.auraframework.impl.css.parser.StyleParser;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Client;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.StyleParserException;
+import org.junit.Test;
 
 /**
  * This class tests the CSS validation in place for Aura Components. Aura components can have a .css file specified in
@@ -107,7 +110,7 @@ public class StyleParserTest extends AuraImplTestCase {
             fail("Should have caught the bad css");
         } catch (StyleParserException expected) {
             assertTrue("Incorrect message in StyleParserException",
-                    expected.getMessage().contains("Parse error in testTestInValidCSS at line 40 column 1"));
+                    expected.getMessage().contains("Encountered \" \".\" \". \"\" at line 40, column 1."));
         }
     }
 
@@ -167,7 +170,7 @@ public class StyleParserTest extends AuraImplTestCase {
             fail("Exception not thrown for some set of invalid CSS rules!");
         } catch (StyleParserException expected) {
             assertTrue("Incorrect message in StyleParserException", expected.getMessage().contains(
-                    "Parse error in testTestStyleNamespaceTokenInvalidCSS at line 76 column 11"));
+                    "Encountered \" \"~\" \"~ \"\" at line 80, column 1."));
         }
     }
 
@@ -196,7 +199,7 @@ public class StyleParserTest extends AuraImplTestCase {
             fail("Exception not thrown for some set of invalid CSS rules!");
         } catch (StyleParserException expected) {
             assertTrue("Incorrect message in StyleParserException", expected.getMessage().contains(
-                    "Parse error in testTestStyleNamespaceInvalidConditions at line 55 column 1"));
+                    "Encountered \" <S> \"  \"\" at line 49, column 4."));
         }
     }
 
@@ -226,8 +229,59 @@ public class StyleParserTest extends AuraImplTestCase {
                     .getMessage()
                     .toString()
                     .startsWith(
-                            "Issue(s) found by Parser:CSS selectors must include "
-                                    + "component class: \"testTestTemplateCss\" in testTestTemplateCss"));
+                            "Issue(s) found by Parser: (components_aura_impl/test/testTemplateCss/testTemplateCss.css \n"+
+                            "\tCSS selectors must include component class: \".testTestTemplateCss\" (line 1, col 1)"));
+        }
+    }
+
+    @Test
+    public void _testPerformance() throws Exception {
+        /*
+            List<Long> oldTimes = Lists.newArrayList();
+            List<Long> newTimes = Lists.newArrayList();
+            List<Integer> lineCount = Lists.newArrayList();
+            DefDescriptor<StyleDef> desc = Aura.getDefinitionService().getDefDescriptor("ui.button", StyleDef.class);
+            Source<StyleDef> source = Aura.getContextService().getCurrentContext().getDefRegistry().getSource(desc);
+
+            String code = source.getContents();
+            StyleParserResultHolder holder = null;
+
+            for(int k=0;k<1;k++){
+                if(k>0){
+                    code = code + code;
+                }
+                int count = 2;
+                long old = 0l;
+                long newer = 0l;
+                for(int i=0;i<count;i++){
+                    long start = System.currentTimeMillis();
+                    holder = new CSSParser2("ui", true, ".uiButton", code, StyleParser.allowedConditions).parse();
+                    long one = System.currentTimeMillis();
+                    new CSSParser("ui", true, ".uiButton", code, StyleParser.allowedConditions).parse();
+                    long two = System.currentTimeMillis();
+                    if(i > 0){
+                        newer += one - start;
+                        old += two - one;
+                    }
+                }
+                newTimes.add(newer/count);
+                oldTimes.add(old/count);
+                lineCount.add(code.split("\n").length);
+            }
+            System.out.println(newTimes);
+            System.out.println(oldTimes);
+            System.out.println(lineCount);
+            holder.getDefaultCss();
+            //System.out.println(holder.getDefaultCss());
+         */
+    }
+
+    public void testInvalidCSS() throws Exception{
+        try{
+            Aura.getDefinitionService().getDefinition("auratest.invalidCss", StyleDef.class);
+            fail("Expected exception.");
+        }catch(QuickFixException e){
+            goldFileText(e.getMessage());
         }
     }
 }

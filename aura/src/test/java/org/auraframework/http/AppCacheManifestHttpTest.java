@@ -25,7 +25,6 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.protocol.HttpContext;
 import org.auraframework.controller.java.ServletConfigController;
@@ -310,10 +309,10 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
 
         get.releaseConnection();
     }
-    
+
     /**
      * GET app cache manifest for app with additional URLs specified using a controller action
-     * returns a full manifest containing the additional URLs returned by controller. 
+     * returns a full manifest containing the additional URLs returned by controller.
      */
     public void testGetManifestForAppWithAdditionalAppCacheURLs() throws Exception {
         System.setProperty(CoreProtocolPNames.USER_AGENT, APPCACHE_SUPPORTED_USERAGENT);
@@ -341,16 +340,16 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
      *  Should we do something to signal that something went wrong, you might not have resources that you asked for?
      */
     public void _testGetManifestWhenAdditionalAppCacheUrlsActionBarfs() throws Exception{
-        String values[] = {"{!c.throwException}", //Action throws exception 
-                            "{!c.getString}", //Action returns literal instead of List<String>
-                            "{!v.attr}", //A expression that refers to attribute instead of action
-                            "/auraFW/resources/aura/resetCSS.css"};
-        
-        String appMarkup = String.format(baseApplicationTag,"useAppcache=\"true\" render=\"client\"  preload=\"appCache\" "+ 
-                            "securityProvider=\"java://org.auraframework.java.securityProvider.LaxSecurityProvider\" "+ 
-                            " controller=\"java://org.auraframework.impl.java.controller.TestController\" "+
-                            "additionalAppCacheURLs=\"%s\"", "");
-        
+        String values[] = {"{!c.throwException}", //Action throws exception
+                "{!c.getString}", //Action returns literal instead of List<String>
+                "{!v.attr}", //A expression that refers to attribute instead of action
+        "/auraFW/resources/aura/resetCSS.css"};
+
+        String appMarkup = String.format(baseApplicationTag,"useAppcache=\"true\" render=\"client\"  preload=\"appCache\" "+
+                "securityProvider=\"java://org.auraframework.java.securityProvider.LaxSecurityProvider\" "+
+                " controller=\"java://org.auraframework.impl.java.controller.TestController\" "+
+                "additionalAppCacheURLs=\"%s\"", "");
+
         for(String value: values){
             DefDescriptor<ApplicationDef> desc= addSourceAutoCleanup(ApplicationDef.class, String.format(appMarkup,value));
             System.setProperty(CoreProtocolPNames.USER_AGENT, APPCACHE_SUPPORTED_USERAGENT);
@@ -361,7 +360,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
             int statusCode = getStatusCode(httpResponse);
             get.releaseConnection();
 
-            assertEquals("Expected to fail manifest fetching. additionalAppCacheUrls:"+value, 
+            assertEquals("Expected to fail manifest fetching. additionalAppCacheUrls:"+value,
                     HttpStatus.SC_NOT_FOUND, statusCode);
 
             String serializedContextFragment = AuraTextUtil.urlencode(String

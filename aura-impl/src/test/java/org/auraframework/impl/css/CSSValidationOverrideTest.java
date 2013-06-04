@@ -53,7 +53,7 @@ public class CSSValidationOverrideTest extends AuraImplTestCase {
                         "}" +
                         ".xyLabel {" +
                         "padding-right: 5px;" +
-                        "}");
+                "}");
     }
 
     /**
@@ -85,7 +85,7 @@ public class CSSValidationOverrideTest extends AuraImplTestCase {
                 assertTrue(
                         "Unexpected error message in StyleParserException",
                         expected.getMessage().contains(
-                                "Issue(s) found by Parser:CSS selectors must include component class:"));
+                                "CSS selectors must include component class:"));
             }
         } catch (QuickFixException e) {
             fail("Test setup failed. Looking for component test.testInValidCSS with invalid CSS");

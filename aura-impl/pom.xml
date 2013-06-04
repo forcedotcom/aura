@@ -57,10 +57,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.auraframework.external</groupId>
-            <artifactId>closure-stylesheets</artifactId>
-        </dependency>
-        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>
@@ -77,6 +73,18 @@
             <artifactId>rhino</artifactId>
             <scope>test</scope>
         </dependency>
+		<dependency>
+		  <groupId>com.phloc</groupId>
+		  <artifactId>phloc-css</artifactId>
+		</dependency>
+		<dependency>
+		  <groupId>commons-io</groupId>
+		  <artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-nop</artifactId>
+		</dependency>
     </dependencies>
     <properties>
         <aura.home>${basedir}/..</aura.home>

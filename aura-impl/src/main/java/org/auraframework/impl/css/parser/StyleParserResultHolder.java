@@ -17,9 +17,11 @@ package org.auraframework.impl.css.parser;
 
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.def.ComponentDefRef;
 import org.auraframework.system.Client;
 
 public class StyleParserResultHolder {
@@ -27,6 +29,7 @@ public class StyleParserResultHolder {
     private final Map<Client.Type, String> browserCssMap = new EnumMap<Client.Type, String>(Client.Type.class);
     private Set<String> imageURLs;
     private Set<String> foundConditions;
+    private List<ComponentDefRef> components;
 
     public String getDefaultCss() {
         return defaultCss;
@@ -66,5 +69,13 @@ public class StyleParserResultHolder {
             }
             this.imageURLs.add(imageURL);
         }
+    }
+
+    public void setComponents(List<ComponentDefRef> components) {
+        this.components = components;
+    }
+
+    public List<ComponentDefRef> getComponents() {
+        return components;
     }
 }

@@ -32,7 +32,6 @@ import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
@@ -90,8 +89,8 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
 
         String type = getAttributeValue(ATTRIBUTE_TYPE);
-        if (type == null && getDefaultType().isPresent()) {
-            type = getDefaultType().get();
+        if (type == null) {
+            type = "String"; // default to string
         }
         builder.setTypeDefDescriptor(DefDescriptorImpl.getInstance(type, TypeDef.class));
 
@@ -161,9 +160,4 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     @Override
     public void writeElement(AttributeDefImpl def, Appendable out) {
     }
-
-    public Optional<String> getDefaultType() {
-        return Optional.absent();
-    }
-
 }

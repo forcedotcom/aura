@@ -23,7 +23,6 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -54,10 +53,5 @@ public class ThemeAttributeDefHandler<P extends RootDefinition> extends Attribut
             String msg = "Default value is required (empty strings are acceptable)";
             throw new AuraRuntimeException(msg, this.getLocation());
         }
-    }
-
-    @Override
-    public Optional<String> getDefaultType() {
-        return Optional.of("String");
     }
 }

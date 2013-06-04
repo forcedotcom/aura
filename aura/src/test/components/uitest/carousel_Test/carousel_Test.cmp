@@ -75,8 +75,8 @@
 	 			
 	 		</ui:carouselPage>
 	 		<ui:carouselPage aura:id="c1-updateOutput">
-	 			<ui:button aura:id="btnUpdateOutput" press="{!c.updateOutput}" label="update output"/>
-	 			<div><ui:outputText aura:id="output" value="i have something to say..."/></div>
+	 			<ui:button aura:id="btnUpdateOutput" press="{!c.updateOutput}" label="update output"/><br/>
+	 			<ui:outputText aura:id="output" value="i have something to say..."/>
 	 		</ui:carouselPage>
  		</aura:set>
  	</ui:carousel>

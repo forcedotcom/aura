@@ -14,23 +14,9 @@
  * limitations under the License.
  */
 {		
-	rerender: function(cmp, helper) {
-
-		var pageComponents = cmp.getValue('v.pageComponents');
-					
-		if (pageComponents && pageComponents.isDirty()) {			
-			helper.initPages(cmp);
-			helper.initPageIndicator(cmp);
-		}
-		return this.superRerender();
-	},
-	
 	afterRender: function(cmp, helper) {
-		this.superAfterRender();
-		
+		this.superAfterRender();		
 		//update size in case carousel width is not specified
-		helper.updateSize(cmp);
-		var e = cmp.getEvent("selectDefaultPage");			
-		e.fire();		
+		helper.updateSize(cmp);				
 	}
 }

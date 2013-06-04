@@ -14,21 +14,26 @@
  * limitations under the License.
  */
 ({
-    onInit: function(cmp, event, helper) {
-    	helper.init(cmp);
-    },       
+	onInit : function(cmp, evt, helper) {
+		helper.init(cmp);
+	},
+	
+	onPageComponentsChanged: function(cmp, evt, helper) {
+    	helper.initPages(cmp);    	
+    },
+  
     
     /**
      * Handle scrollStart event coming from scroller
      */
-    onScrollMove : function(cmp, evt, helper){
+    onScrollMove : function(cmp, evt, helper) {
     	helper.handleScrollMove(cmp, evt);
     },
     
     /**
      * Handle scrollEnd event coming from scroller
      */
-    onScrollEnd : function(cmp, evt, helper){  	
+    onScrollEnd : function(cmp, evt, helper) {  	
     	helper.handleScrollEnd(cmp, evt);
     },
     
@@ -44,8 +49,7 @@
     		e.fire();
     	}
     },
-      
-    
+     
     /**
      * Handle window resize event
      */      

@@ -81,8 +81,7 @@ public class NonCachingDefRegistryImpl<T extends Definition> extends DefRegistry
     }
 
     @Override
-    public void markValid(DefDescriptor<T> descriptor, T def) {
-        factory.synchronize(def);
-        super.markValid(descriptor, def);
+    public boolean isCacheable() {
+        return false;
     }
 }

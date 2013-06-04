@@ -21,7 +21,9 @@
         test:function(cmp){
             var testCmp = cmp.find('ISOStringFromJava');
             aura.test.assertNotNull(testCmp);
-            aura.test.assertEquals('10/23/2004 16:30:00 +00:00', $A.test.getText(testCmp.find('span').getElement()), "Failed to display DateTime from Java model");
+            aura.test.addWaitFor(true, function(){return $A.test.getText(testCmp.find('span').getElement()).length > 0;},function(){
+                aura.test.assertEquals('10/23/2004 16:30:00 +00:00', $A.test.getText(testCmp.find('span').getElement()), "Failed to display DateTime from Java model");
+            });
         }
     },
     /**
@@ -29,9 +31,11 @@
      */
     testCalendarValueWithTimeZoneOverride:{
         test:function(cmp){
-        var testCmp = cmp.find('ISOStringFromJavaWithTZOverride');
-        aura.test.assertNotNull(testCmp);
-        aura.test.assertEquals('2004-10-23 09:30:00', $A.test.getText(testCmp.find('span').getElement()), "Failed to display DateTime from Java model");
+            var testCmp = cmp.find('ISOStringFromJavaWithTZOverride');
+            aura.test.assertNotNull(testCmp);
+            aura.test.addWaitFor(true, function(){return $A.test.getText(testCmp.find('span').getElement()).length > 0;},function(){
+                aura.test.assertEquals('2004-10-23 09:30:00', $A.test.getText(testCmp.find('span').getElement()), "Failed to display DateTime from Java model");
+            });
         }
     }
 })

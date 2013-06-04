@@ -13,13 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    testNonDateTimeJavaObj:{
-        test:function(cmp){
-            var testCmp = cmp.find('NumericValueFromJava');
-            aura.test.addWaitFor(true, function(){return $A.test.getText(testCmp.find('span').getElement()).length > 0;},function(){
-                aura.test.assertEquals("9/23/04 11:30", $A.test.getText(testCmp.find('span').getElement()), "Value should be able to work with a numeric value");
-            });
-        }
+{
+    toggleView: function(cmp, event) {
+        var val = cmp.getValue("v.expanded");
+        val.setValue(!val.getValue());
     }
-})
+}

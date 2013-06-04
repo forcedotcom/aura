@@ -710,9 +710,13 @@
 					if (that.options.onScrollStart)
 						that.options.onScrollStart.call(that, e);
 
-					that._bind(MOVE_EV, window);
-					that._bind(END_EV, window);
-					that._bind(CANCEL_EV, window);
+					if (!e.isEventHandledByScroller) {
+						//bind the following events only to the first scroller that handles the start_ev when scrollers are nested
+						that._bind(MOVE_EV, window);
+						that._bind(END_EV, window);
+						that._bind(CANCEL_EV, window);
+						e.isEventHandledByScroller = true;
+					}
 				},
 
 				_move : function(e) {
@@ -803,6 +807,8 @@
 				},
 
 				_end : function(e) {
+					delete e.isEventHandledByScroller;
+					
 					if (hasTouch && e.touches.length !== 0)
 						return;
 

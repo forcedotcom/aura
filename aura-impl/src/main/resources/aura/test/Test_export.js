@@ -42,6 +42,7 @@ exp(p,
     "getErrors", p.getErrors,
     "addCleanup", p.addCleanup,
     "expectAuraError", p.expectAuraError,
+    "expectAuraWarning", p.expectAuraWarning,
     "getAuraErrorMessage", p.getAuraErrorMessage,
     
     // DOM

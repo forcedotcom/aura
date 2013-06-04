@@ -24,9 +24,12 @@ var priv = {
         completed : {}, // A map of action name to boolean for 'named' actions that have been queued
         complete : -1, // -1:uninitialized, 0:complete, 1:tearing down, 2:running, 3+:waiting
         errors : [],
+        preErrors : [],
+        preWarnings : [],
+        expectedErrors : [],
+        expectedWarnings : [],
         timeoutTime : 0,
         appCacheEvents : [], // AppCache events in order, as they are picked up
-        expectAuraError : false, //Expect error message in auraError div, these messages are created when $A.error() is called
 
         handleAppcacheChecking : function() {
             priv.appCacheEvents.push("checking");
@@ -46,6 +49,32 @@ var priv = {
 
         handleAppcacheError: function() {
             priv.appCacheEvents.push("error");
+        },
+
+        putMessage: function(pre, expected, msg) {
+            for (var i in expected) {
+                if (msg.indexOf(expected[i]) === 0) {
+                    delete expected[i];
+                    return true;
+                }
+            }
+            if (pre !== null) {
+                pre.push(msg);
+                return true;
+            }
+            return false;
+        },
+
+        expectMessage: function(pre, expected, msg) {
+            if (pre !== null) {
+                for (var i in pre) {
+                    if (pre[i].indexOf(msg) === 0) {
+                        delete pre[i];
+                        return;
+                    }
+                }
+            }
+            expected.push(msg);
         }
 };
 
@@ -79,12 +108,19 @@ window.onerror = (function(){
  * @private
  */
 function logError(msg, e){
-    var p, err = { "message": msg + ": " + (e.message || e.toString()) };
-    for (p in e){
-        if(p=="message"){
-            continue;
+    var err;
+    var p;
+
+    if (e) {
+        err = { "message": msg + ": " + (e.message || e.toString()) };
+        for (p in e){
+            if(p=="message"){
+                continue;
+            }
+            err[p] = "" + e[p];
         }
-        err[p] = "" + e[p];
+    } else {
+        err = { "message": msg };
     }
     priv.errors.push(err);
 }
@@ -110,6 +146,8 @@ function run(name, code, count){
 
     /** @inner */
     var doTearDown = function() {
+        var i;
+
         // check if already tearing down
         if(priv.complete > 1){
             priv.complete = 1;
@@ -117,7 +155,6 @@ function run(name, code, count){
             return;
         }
         try {
-            var i;
             for (i = 0; i < priv.cleanups.length; i++) {
                 priv.cleanups[i]();
             }
@@ -137,6 +174,8 @@ function run(name, code, count){
     
     /** @inner */
     var continueWhenReady = function() {
+        var i;
+
         if(priv.complete < 2){
             return;
         }
@@ -181,7 +220,8 @@ function run(name, code, count){
                     if(exp === act){
                         var callback = priv.waits[0].callback;
                         if(callback){
-                            //Set the suite as scope for callback function. Helpful to expose test suite as 'this' in callbacks for addWaitFor
+                            //Set the suite as scope for callback function.
+                            //Helpful to expose test suite as 'this' in callbacks for addWaitFor
                             callback.call(suite);
                         }
                         priv.waits.shift();
@@ -189,12 +229,36 @@ function run(name, code, count){
                     }else{
                         setTimeout(continueWhenReady, 200);
                     }
-                }else if(stages.length === 0){
-                    doTearDown();
-                }else{
-                    priv.lastStage = stages.shift();
-                    priv.lastStage.call(suite, cmp);
-                    setTimeout(continueWhenReady, 1);
+                } else {
+                    if (priv.expectedErrors.length > 0) {
+                        for (i in priv.expectedErrors) {
+                            logError("Did not recieve expected error:"+priv.expectedErrors[i]);
+                        }
+                    }
+                    if (priv.expectedWarnings.length > 0) {
+                        for (i in priv.expectedWarnings) {
+                            logError("Did not recieve expected warning:"+priv.expectedWarnings[i]);
+                        }
+                    }
+                    if (stages.length === 0){
+                        doTearDown();
+                    } else {
+                        priv.lastStage = stages.shift();
+                        priv.lastStage.call(suite, cmp);
+                        setTimeout(continueWhenReady, 1);
+                    }
+                    if (priv.preErrors !== null && priv.preErrors.length > 0) {
+                        for (i in priv.preErrors) {
+                            logError("Recieved unexpected error:"+priv.preErrors[i]);
+                        }
+                    }
+                    priv.preErrors = null;
+                    if (priv.preWarnings !== null && priv.preWarnings.length > 0) {
+                        for (i in priv.preWarnings) {
+                            $A.log("Recieved unexpected warning:"+priv.preWarnings[i]);
+                        }
+                    }
+                    priv.preWarnings = null;
                 }
             }
         }catch(e){

@@ -18,18 +18,18 @@
     testDefaultAttributes:{
         test:function(cmp){
             var imgElement = cmp.getElement();
-            aura.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element.")
-            aura.test.assertTrue(this.endsWith(imgElement.src, '/auraFW/resources/aura/s.gif'), "Expected src to be '/auraFW/resources/aura/s.gif' by default");
-            aura.test.assertUndefinedOrNull(cmp.find('link'), 'By default there should be no link on the image.');
+            $A.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element.")
+            $A.test.assertTrue(this.endsWith(imgElement.src, '/auraFW/resources/aura/s.gif'), "Expected src to be '/auraFW/resources/aura/s.gif' by default");
+            $A.test.assertUndefinedOrNull(cmp.find('link'), 'By default there should be no link on the image.');
         }
     },
     testImageOnly:{
         attributes : {src: '/auraFW/resources/aura/auralogo.png'},
         test: function(cmp){
             var imgElement = cmp.getElement();
-            aura.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element.")
-            aura.test.assertTrue(this.endsWith(imgElement.src, '/auraFW/resources/aura/auralogo.png'), "Failed to display specified image source.");
-            aura.test.assertUndefinedOrNull(cmp.find('link'), 'By default there should be no link on the image.');
+            $A.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element.")
+            $A.test.assertTrue(this.endsWith(imgElement.src, '/auraFW/resources/aura/auralogo.png'), "Failed to display specified image source.");
+            $A.test.assertUndefinedOrNull(cmp.find('link'), 'By default there should be no link on the image.');
         }
 
     },
@@ -37,15 +37,15 @@
         attributes : {src: '/auraFW/resources/aura/auralogo.png', href: 'http://www.salesforce.com'},
         test: function(cmp){
             var linkElement = cmp.find('link').getElement();
-            aura.test.assertTrue($A.test.isInstanceOfAnchorElement(linkElement), "Expected to see a anchor element.")
-            aura.test.assertTrue(aura.test.contains(linkElement.href,'http://www.salesforce.com'), linkElement.href + " Expected a link with specified address.")
-            aura.test.assertEquals('_self',linkElement.target, "Expected target to be _self by default.")
+            $A.test.assertTrue($A.test.isInstanceOfAnchorElement(linkElement), "Expected to see a anchor element.")
+            $A.test.assertTrue($A.test.contains(linkElement.href,'http://www.salesforce.com'), linkElement.href + " Expected a link with specified address.")
+            $A.test.assertEquals('_self',linkElement.target, "Expected target to be _self by default.")
             
-            aura.test.assertEquals(1, linkElement.childElementCount || linkElement.children.length); //IE8 and below don't have childElementCount
+            $A.test.assertEquals(1, linkElement.childElementCount || linkElement.children.length); //IE8 and below don't have childElementCount
 
             var imgElement = linkElement.children[0];
-            aura.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element embedded in the anchor tag.")
-            aura.test.assertTrue(this.endsWith(imgElement.src, '/auraFW/resources/aura/auralogo.png'), "Failed to display specified image source.");
+            $A.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element embedded in the anchor tag.")
+            $A.test.assertTrue(this.endsWith(imgElement.src, '/auraFW/resources/aura/auralogo.png'), "Failed to display specified image source.");
 
         }
     },
@@ -53,24 +53,24 @@
         attributes : {src: '/auraFW/resources/aura/images/bug.png', href: 'http://www.salesforce.com', linkClass:'logo', alt:'Company', target:'_top'},
         test: function(cmp){
             var linkElement = cmp.find('link').getElement();
-            aura.test.assertTrue($A.test.isInstanceOfAnchorElement(linkElement), "Expected to see a anchor element.")
-            aura.test.assertTrue(aura.test.contains(linkElement.href,'http://www.salesforce.com'), linkElement.href + " Expected a link with specified address.")
-            aura.test.assertEquals('_top',linkElement.target, "Expected target to be _top.")
-            aura.test.assertNotEquals(linkElement.className.indexOf('logo'), -1, "Expected link element to have specified class selector.");
+            $A.test.assertTrue($A.test.isInstanceOfAnchorElement(linkElement), "Expected to see a anchor element.")
+            $A.test.assertTrue($A.test.contains(linkElement.href,'http://www.salesforce.com'), linkElement.href + " Expected a link with specified address.")
+            $A.test.assertEquals('_top',linkElement.target, "Expected target to be _top.")
+            $A.test.assertNotEquals(linkElement.className.indexOf('logo'), -1, "Expected link element to have specified class selector.");
 
             var imgElement = linkElement.children[0];
-            aura.test.assertTrue(this.endsWith(imgElement.src, '/auraFW/resources/aura/images/bug.png'), "Failed to display specified image source.");
-            aura.test.assertEquals('Company', imgElement.alt, "Expected to see alt text on image element.");
-            aura.test.assertEquals(-1, imgElement.className.indexOf('logo'));
+            $A.test.assertTrue(this.endsWith(imgElement.src, '/auraFW/resources/aura/images/bug.png'), "Failed to display specified image source.");
+            $A.test.assertEquals('Company', imgElement.alt, "Expected to see alt text on image element.");
+            $A.test.assertEquals(-1, imgElement.className.indexOf('logo'));
         }
     },
     
     testInformationImageTypeWithAltText:{
     	attributes : {imageType:'informational', alt:'Company'},
         test: function(cmp){
-        	var imgElement = cmp.getElement();
-            aura.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element.")
-            aura.test.assertEquals('Company', imgElement.alt, "Expected to see alt text on image element.");
+            var imgElement = cmp.getElement();
+            $A.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element.")
+            $A.test.assertEquals('Company', imgElement.alt, "Expected to see alt text on image element.");
         }
     },
     
@@ -78,9 +78,12 @@
     	exceptionsAllowedDuringInit : ["\"alt\" attribute should not be empty for informational image"],
     	attributes : {imageType:'informational'},
         test: function(cmp){
-        	var message = aura.util.getElement("auraErrorMessage");
-    		var errorMessage = "\"alt\" attribute should not be empty for informational image";
-        	aura.test.assertTrue(aura.test.contains(aura.test.getText(message),errorMessage), "Expected " + errorMessage);
+            // Note the missing colon here compared to below.
+            var errorMessage = "component: 1:1.1 \"alt\" attribute should not be empty for informational image";
+            $A.test.expectAuraError(errorMessage);
+            var screenError = $A.test.getAuraErrorMessage();
+            $A.test.assertTrue($A.test.contains(screenError, errorMessage),
+                               "Expected '" + errorMessage+"', Got:'"+screenError+"'");
         }
     },
     
@@ -88,17 +91,19 @@
     	exceptionsAllowedDuringInit : ["\"alt\" attribute should be empty for decorative image"],
     	attributes : {imageType:'decorative', alt:'Company'},
         test: function(cmp){
-        	var message = aura.util.getElement("auraErrorMessage");
-    		var errorMessage = "\"alt\" attribute should be empty for decorative image";
-    		aura.test.assertTrue(aura.test.contains(aura.test.getText(message),errorMessage), "Expected " + errorMessage);
+            var errorMessage = "component: 1:1.1: \"alt\" attribute should be empty for decorative image";
+            $A.test.expectAuraError(errorMessage);
+            var screenError = $A.test.getAuraErrorMessage();
+            $A.test.assertTrue($A.test.contains(screenError, errorMessage),
+                               "Expected '" + errorMessage+"', Got:'"+screenError+"'");
         }
     },
     
     testDecorativeImageTypeWithoutAltText:{
     	attributes : {imageType:'decorative'},
         test: function(cmp,action){
-        	var imgElement = cmp.getElement();
-            aura.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element.")
+            var imgElement = cmp.getElement();
+            $A.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element.")
         }
     },
     
@@ -106,14 +111,14 @@
     _testAccessibility:{
         test:function(cmp){
             var imgElement = cmp.getElement();
-            aura.test.assertTrue($A.test.isInstanceOfImageElement(imgElement))
-            aura.test.assertEquals("",imgElement.alt, "Expected a empty alt text for all image tags.");
+            $A.test.assertTrue($A.test.isInstanceOfImageElement(imgElement))
+            $A.test.assertEquals("",imgElement.alt, "Expected a empty alt text for all image tags.");
             cmp.getAttributes().setValue("alt",'Help Accessibility');
             cmp.getAttributes().setValue("src",'http://www.google.com/intl/en_com/images/srpr/logo3w.png');
             $A.renderingService.rerender(cmp);
 
             imgElement = cmp.getElement();
-            aura.test.assertEquals("Help Accessibility",imgElement.alt, "Expected alt text for the image element.");
+            $A.test.assertEquals("Help Accessibility",imgElement.alt, "Expected alt text for the image element.");
         }
     },
     endsWith:function(str, suffix){

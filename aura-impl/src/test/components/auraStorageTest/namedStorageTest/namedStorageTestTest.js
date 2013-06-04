@@ -49,32 +49,16 @@
 
     testCreateDuplicateNamedStores : {
 	test : function(cmp) {
-	    var foo = $A.storageService.initStorage("foo", false, true, 100,
-		    200, 300, true, true);
-	    try {
-		// This should fail with a duplicate store exception
-		var foo2 = $A.storageService.initStorage("foo", false, true,
-			100, 200, 300, true, true);
-		$A.test.fail("Expected exception was not thrown!");
-	    } catch (e) {
-		$A.test.assertTrue(e.message
-			.indexOf("Storage named 'foo' already exists!") == 0,
-			e.message);
-	    }
-	    try {
-		// Try creating with same name but different adapter type
-		// (persistent-true, secure-true)
-		var foo3 = $A.storageService.initStorage("foo", true, true, 10,
-			20, 30, true, true)
-		$A.test
-			.fail("Expected exception - cannot reuse storage name even if adapter type is different.")
-	    } catch (e) {
-		$A.test.assertTrue(e.message
-			.indexOf("Storage named 'foo' already exists!") == 0,
-			e.message);
-	    }
+	    var foo = $A.storageService.initStorage("foo", false, true, 100, 200, 300, true, true);
+
+            $A.test.expectAuraError("Storage named 'foo' already exists!");
+            var foo2 = $A.storageService.initStorage("foo", false, true, 100, 200, 300, true, true);
+
+            $A.test.expectAuraError("Storage named 'foo' already exists!");
+            var foo3 = $A.storageService.initStorage("foo", true, true, 10, 20, 30, true, true)
 	}
     },
+
     testNamedStorageInTemplate : {
 	test : function(cmp) {
 	    var actions = $A.storageService.getStorage("actions");
@@ -94,8 +78,8 @@
 	}
     },
     /**
-	 * Test case to verify the behavior of $A.storageService.getStorage()
-	 */
+     * Test case to verify the behavior of $A.storageService.getStorage()
+     */
     testGetStorageApi:{
 	test: function(cmp){
 	    $A.test.assertFalsy($A.storageService.getStorage());
@@ -106,10 +90,10 @@
 	}
     },
     /**
-	 * Test case to verify the behavior of $A.storageService.initStorage()
-	 * function(name, persistent, secure, maxSize, defaultExpiration,
-	 * defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit)
-	 */
+     * Test case to verify the behavior of $A.storageService.initStorage()
+     * function(name, persistent, secure, maxSize, defaultExpiration,
+     * defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit)
+     */
     // TODO W-1560185 - Validation needed
     _testInitStorage:{
 	test:[function(cmp){ 

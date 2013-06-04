@@ -32,7 +32,7 @@
  		var carousel = cmp.find("manyPageCarousel");
  		var pages = [];
  		for (var i=0; i<10; i++){
- 			var page = $A.componentService.newComponent({
+ 			var page = $A.componentService.newComponentDeprecated({
 			            "componentDef" : "markup://ui:carouselPage",
 			            "attributes" : {
 			            	"values" : {

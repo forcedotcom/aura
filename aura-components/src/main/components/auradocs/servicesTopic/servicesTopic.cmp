@@ -20,7 +20,7 @@
 
     <p> Aura provides a set of client-side services that helps you develop apps faster. 
     You can call these services from your JavaScript code, using the syntax <code>$A.&lt;service&gt;.&lt;method&gt;</code>. 
-    For example, use <code>$A.componentService.newComponent()</code> to create a component dynamically. 
+    For example, use <code>$A.componentService.newComponentDeprecated()</code> to create a component dynamically. 
     See <auradocs:topicLink topic ="dynamicCmp">Dynamically Creating a Component</auradocs:topicLink> for an example of using the component service.</p>
     <p>Here is a list of the services.</p>
 

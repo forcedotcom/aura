@@ -24,7 +24,7 @@
             var body = component.find("me").getValue("v.body");
 
             function addComponent(label, insertFunction) {
-                var c = $A.componentService.newComponent({
+                var c = $A.componentService.newComponentDeprecated({
                     componentDef: { descriptor:"markup://aura:html" },
                     attributes: {
                         values: {

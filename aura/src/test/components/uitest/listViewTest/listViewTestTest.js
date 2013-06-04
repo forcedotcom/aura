@@ -170,7 +170,7 @@
                         title:"Column",
                         fieldName: "column"
                     }
-                var column = $A.componentService.newComponent({
+                var column = $A.componentService.newComponentDeprecated({
                     "componentDef": "markup://ui:column",
                     "attributes": {
                         "values": attributes

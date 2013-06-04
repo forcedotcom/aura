@@ -79,7 +79,7 @@ var AuraComponentService = function(){
 
             var that = $A.services.component;
             for(var i=0;i<config.length;i++){
-                ret.push(that.newComponent(config[i], attributeValueProvider, localCreation, doForce));
+                ret.push(that.newComponentDeprecated(config[i], attributeValueProvider, localCreation, doForce));
             }
 
             return ret;
@@ -114,7 +114,7 @@ var AuraComponentService = function(){
          * @public
          */
         newComponentDeprecated: function(config, attributeValueProvider, localCreation, doForce){
-            aura.assert(config, "config is required in ComponentService.newComponent(config)");
+            aura.assert(config, "config is required in ComponentService.newComponentDeprecated(config)");
 
             var that = $A.services.component;
             if ($A.util.isArray(config)){
@@ -183,8 +183,9 @@ var AuraComponentService = function(){
          * @public
          */
         newComponentAsync: function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce){
-            aura.assert(config, "config is required in ComponentService.newComponent(config)");
-
+            aura.assert(config, "config is required in ComponentService.newComponentDeprecated(config)");
+            aura.assert($A.util.isFunction(callback),"newComponentAsync requires a function as the callback parameter");
+            
             var that = $A.services.component;
             if ($A.util.isArray(config)){
                 return that.newComponentArray(config, attributeValueProvider, localCreation, doForce);
@@ -203,8 +204,8 @@ var AuraComponentService = function(){
 
             if ( !def || (def && def.hasRemoteDependencies()) ) {
                 that.requestComponent(callbackScope, callback, config);
-            } else if ( $A.util.isFunction(callback) ) {
-            	var newComp = that.newComponent(config, attributeValueProvider, localCreation, doForce);
+            } else {
+            	var newComp = that.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
                 callback.call(callbackScope, newComp);
             }
 

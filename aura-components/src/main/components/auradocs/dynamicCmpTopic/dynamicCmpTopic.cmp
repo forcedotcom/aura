@@ -33,7 +33,7 @@
     action.setCallback(cmp, function(action) {
     
 	    //Create a new child component  
-	    var child = $A.componentService.newComponent(action.getReturnValue());
+	    var child = $A.componentService.newComponentDeprecated(action.getReturnValue());
 	        
 	    var div = cmp.find("div");
 	    var body = div.getValue("v.body");
@@ -43,11 +43,11 @@
 	    body.setValue(child);
     })
     </auradocs:codeblock>
-	<p>The <code>newComponent()</code> method enables you to create components on the server or on the client.
+	<p>The <code>newComponentDeprecated()</code> method enables you to create components on the server or on the client.
     <code>action.getReturnValue()</code> returns a component with its definition and attributes from a server-side controller.
     Since <code>body</code> is an <code>ArrayValue</code>, you can also insert new components using <code>push()</code>. 
     </p>
-    <auradocs:info>If the component you are dynamically creating requires a server call such as to a model or provider, <code>newComponent()</code> returns an <code>aura:placeholder</code> component.
+    <auradocs:info>If the component you are dynamically creating requires a server call such as to a model or provider, <code>newComponentDeprecated()</code> returns an <code>aura:placeholder</code> component.
     The server then returns the component to the client and replaces the placeholder.</auradocs:info>
 	
     <p>The next sample code sets the configuration attributes for the new component and creates the new component on the client.
@@ -73,7 +73,7 @@
             }
         };
     
-    var message = $A.componentService.newComponent(componentConfig);    
+    var message = $A.componentService.newComponentDeprecated(componentConfig);    
     </auradocs:codeblock>
     
     <auradocs:info>Note: You can optionally include double quotes around property names, such as <code>componentDef</code> and <code>attribute</code>, in the <code>componentConfig</code> definition.</auradocs:info>
@@ -82,11 +82,11 @@
     <auradocs:codeblock>
     var newCmpConfig = action.getReturnValue();
     newCmpConfig["localId"] = "newId";
-    var newCmp = $A.componentService.newComponent(newCmpConfig, parentCmp);    
+    var newCmp = $A.componentService.newComponentDeprecated(newCmpConfig, parentCmp);    
     </auradocs:codeblock>
 	
 	<p>In the last sample, the <code>localId</code> is set on the component after it is created and returned from the server using <code>action.getReturnValue()</code>. 
-    Additionally, <code>newComponent()</code> can take in an optional argument for the value provider. The value provider, 
+    Additionally, <code>newComponentDeprecated()</code> can take in an optional argument for the value provider. The value provider, 
     <code>parentCmp</code>, refers to the container or parent component that you want to be able to reference the new component.</p>
       
    
@@ -100,7 +100,7 @@
     Additionally, we don't recommend destroying components in cases where it may result in orphaned components. For example, if you create a component on the server that is comprised of several sub-components, you may run into issues if you keep a subset of the child components and destroy others. 
     If the components depend on the local ID of one of the destroyed components, you are likely to get an error. Destroy the remaining components when are finish using them to avoid memory leaks.</p>
 
-    <auradocs:info><code>newLocalComponent()</code> is deprecated and has been replaced by <code>newComponent()</code>. See the <a href="#reference?topic=api:AuraComponentService">JavaScript API reference</a> for a full list of methods.</auradocs:info>
+    <auradocs:info><code>newLocalComponent()</code> is deprecated and has been replaced by <code>newComponentDeprecated()</code>. See the <a href="#reference?topic=api:AuraComponentService">JavaScript API reference</a> for a full list of methods.</auradocs:info>
 	  
     <p><b>See also:</b><br/>
       <auradocs:topicLink topic="helloActions">Client-Side Controllers</auradocs:topicLink><br/>

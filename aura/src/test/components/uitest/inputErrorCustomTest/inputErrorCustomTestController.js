@@ -26,7 +26,7 @@
          
             // uncomment after bug: W-1412621
             /*
-            errorCmp = $A.componentService.newComponent({
+            errorCmp = $A.componentService.newComponentDeprecated({
                 "componentDef": "markup://ui:inputDefaultError",
                 "attributes": {
                     "values": {

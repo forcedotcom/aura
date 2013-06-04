@@ -22,7 +22,7 @@
         	
         	// bug W-1427153
         	//Making sure that globalId for client side component ends with 'c'
-            newCmp = $A.componentService.newComponent({
+            newCmp = $A.componentService.newComponentDeprecated({
                 "componentDef": "markup://ifTest:testIf"
             });
             var reg = /:c/; 

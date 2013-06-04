@@ -28,7 +28,7 @@
         var ivp = $A.expressionService.createPassthroughValue(extraProviders, atts.getValueProvider());
         for (var j = 0; j < body.getLength(); j++) {
             var cdr = body.get(j);
-            ret.push($A.componentService.newComponent(cdr, ivp, false, doForce));
+            ret.push($A.componentService.newComponentDeprecated(cdr, ivp, false, doForce));
         }
         return ret;
     },

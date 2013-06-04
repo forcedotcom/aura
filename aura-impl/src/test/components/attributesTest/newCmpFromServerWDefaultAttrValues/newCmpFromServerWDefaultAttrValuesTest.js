@@ -16,7 +16,7 @@
 ({
     testNewComponentFromServerWithDefaultValues:{
         test:function(cmp){
-            cmp.getValue("v.body").push($A.componentService.newComponent("attributesTest:defaultValue"));
+            cmp.getValue("v.body").push($A.componentService.newComponentDeprecated("attributesTest:defaultValue"));
             $A.eventService.finishFiring();
 
             var body = cmp.get('v.body');

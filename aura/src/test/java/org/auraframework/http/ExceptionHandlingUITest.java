@@ -314,7 +314,8 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     /**
      * Default handler for ClientOutOfSync will reload the page.
      */
-    public void testClientOutOfSyncDefaultHandler() throws Exception {
+    // FIXME: W-1690920 (flapper)
+    public void _testClientOutOfSyncDefaultHandler() throws Exception {
         open("/updateTest/updateWithoutHandling.cmp?text=initial");
 
         // make a client-side change to the page

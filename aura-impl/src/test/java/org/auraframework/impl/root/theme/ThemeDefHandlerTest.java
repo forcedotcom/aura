@@ -39,7 +39,7 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
         super(name);
     }
 
-    public void testValidThemeDef() throws Exception {
+    public void testAttributes() throws Exception {
         String src = "<aura:theme><aura:attribute name='test' type='String' default='abc'/></aura:theme>";
         ThemeDef def = parser.parse(desc, source(src));
 
@@ -64,16 +64,6 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
         assertEquals("incorrect value for attribute", "abc", attrs.get(attr).getDefaultValue().getValue());
     }
 
-    public void testMissingDefault() throws Exception {
-        try {
-            String src = "<aura:theme><aura:attribute name='test' type='String'/></aura:theme>";
-            parser.parse(desc, source(src));
-            fail("expected the 'default' attribute to be mandatory");
-        } catch (AuraRuntimeException e) {
-            assertTrue(e.getMessage().contains("Default value is required"));
-        }
-    }
-
     public void testInvalidChild() throws Exception {
         try {
             parser.parse(desc, source("<aura:theme><aura:foo/></aura:theme>"));
@@ -87,17 +77,6 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
             parser.parse(desc, source("<aura:theme>Test</aura:theme>"));
             fail("Should have thrown AuraException because text is between aura:theme tags");
         } catch (AuraRuntimeException e) {
-        }
-    }
-
-    /** required attribute not currently applicable */
-    public void testUsingRequiredAttribute() throws Exception {
-        try {
-            String src = "<aura:theme><aura:attribute name='test' type='String' required='true'/></aura:theme>";
-            parser.parse(desc, source(src));
-            fail("Should have thrown AuraException for invalid attributes");
-        } catch (AuraRuntimeException e) {
-            assertTrue(e.getMessage().contains("Invalid attribute"));
         }
     }
 

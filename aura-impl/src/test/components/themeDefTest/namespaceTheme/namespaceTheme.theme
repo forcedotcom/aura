@@ -1,4 +1,0 @@
-<aura:theme description="global theme">
-    <aura:attribute name="color" type="String" default="#222222"/>
-    <aura:attribute name="margin" type="String" default="10px"/>
-</aura:theme>

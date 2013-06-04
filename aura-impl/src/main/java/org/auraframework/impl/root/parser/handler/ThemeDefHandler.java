@@ -62,7 +62,7 @@ public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
-            AttributeDefImpl def = new ThemeAttributeDefHandler<ThemeDef>(this, xmlReader, source).getElement();
+            AttributeDefImpl def = new AttributeDefHandler<ThemeDef>(this, xmlReader, source).getElement();
             builder.addAttributeDef(DefDescriptorImpl.getInstance(def.getName(), AttributeDef.class), def);
         } else {
             error("Found unexpected tag %s", tag);

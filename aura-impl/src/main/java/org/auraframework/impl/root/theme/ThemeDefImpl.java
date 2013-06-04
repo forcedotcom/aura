@@ -27,6 +27,8 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 import com.google.common.base.Objects;
@@ -60,6 +62,19 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
         assert defaultValue != null : "default values should be set";
 
         return Optional.of(defaultValue.getValue().toString());
+    }
+
+    @Override
+    public void validateDefinition() throws QuickFixException {
+        super.validateDefinition();
+
+        // check that each attribute has default specified
+        for (AttributeDef attribute : attributeDefs.values()) {
+            if (attribute.getDefaultValue() == null) {
+                String msg = "Attribute %s must specify a default value. An empty string is acceptable.";
+                throw new InvalidDefinitionException(String.format(msg, attribute.getName()), getLocation());
+            }
+        }
     }
 
     @Override

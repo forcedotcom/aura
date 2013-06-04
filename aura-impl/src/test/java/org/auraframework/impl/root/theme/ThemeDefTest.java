@@ -15,6 +15,11 @@
  */
 package org.auraframework.impl.root.theme;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+
 import java.util.Map;
 
 import org.auraframework.Aura;
@@ -23,50 +28,60 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 /**
  * Unit tests for {@link ThemeDef}.
  */
 public class ThemeDefTest extends AuraImplTestCase {
+    private static final String src = "<aura:theme>" +
+            "<aura:attribute name=\"color\" default=\"#222\"/>" +
+            "<aura:attribute name=\"margin\" default=\"10px\"/>" +
+            "</aura:theme>";
+
     public ThemeDefTest(String name) {
         super(name);
     }
 
     public void testGetSource() {
         MasterDefRegistry reg = Aura.getContextService().getCurrentContext().getDefRegistry();
-        DefinitionService defService = Aura.getDefinitionService();
-        DefDescriptor<ThemeDef> descriptor = defService.getDefDescriptor("themeDefTest:namespaceTheme", ThemeDef.class);
-        Source<ThemeDef> src = reg.getSource(descriptor);
+        Source<ThemeDef> src = reg.getSource(vendor.getThemeDefDescriptor());
         assertNotNull(src);
     }
 
     public void testAttributes() throws Exception {
-        DefinitionService defService = Aura.getDefinitionService();
-        ThemeDef def = defService.getDefinition("themeDefTest:namespaceTheme", ThemeDef.class);
-
+        ThemeDef def = addSourceAutoCleanup(ThemeDef.class, src).getDef();
         Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = def.getAttributeDefs();
 
-        assertEquals("expected theme def to contain 2 attributes", attributes.size(), 2);
+        assertThat(attributes.size(), is(2));
 
         DefDescriptor<AttributeDef> color = DefDescriptorImpl.getInstance("color", AttributeDef.class);
         DefDescriptor<AttributeDef> margin = DefDescriptorImpl.getInstance("margin", AttributeDef.class);
 
-        assertNotNull("expected theme def to contain color attribute", attributes.get(color));
-        assertNotNull("expected theme def to contain margin attribute", attributes.get(margin));
+        assertThat(attributes.get(color), notNullValue());
+        assertThat(attributes.get(margin), notNullValue());
     }
 
     public void testVariablePresent() throws Exception {
-        DefinitionService defService = Aura.getDefinitionService();
-        ThemeDef def = defService.getDefinition("themeDefTest:namespaceTheme", ThemeDef.class);
-        assertEquals("expected theme def variable value to be correct", "#222222", def.variable("color").get());
+        ThemeDef def = addSourceAutoCleanup(ThemeDef.class, src).getDef();
+        assertThat(def.variable("color").get(), equalTo("#222"));
     }
 
     public void testVariableAbsent() throws Exception {
-        DefinitionService defService = Aura.getDefinitionService();
-        ThemeDef def = defService.getDefinition("themeDefTest:namespaceTheme", ThemeDef.class);
-        assertFalse("expected theme def variable value to be absent", def.variable("font").isPresent());
+        ThemeDef def = addSourceAutoCleanup(ThemeDef.class, src).getDef();
+        assertThat(def.variable("font").isPresent(), is(false));
+    }
+
+    public void testValidateDefaultsPresent() throws Exception {
+        try {
+            String src = "<aura:theme><aura:attribute name='test' type='String'/></aura:theme>";
+            DefDescriptor<ThemeDef> def = addSourceAutoCleanup(ThemeDef.class, src);
+            def.getDef().validateDefinition();
+            fail("expected the 'default' attribute to be mandatory");
+        } catch (InvalidDefinitionException e) {
+            assertThat(e.getMessage().contains("must specify a default value"), is(true));
+        }
     }
 }

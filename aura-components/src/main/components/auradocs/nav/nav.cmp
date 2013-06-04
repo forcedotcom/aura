@@ -18,7 +18,7 @@
 <aura:component>
     <aura:handler event="auradocs:locationChange" action="{!c.handleLocationChange}" />
     <nav role="navigation" class="navbar">
-        <h1 class="logo"><a href="#">Aura</a><small>documentation</small></h1>
+        <h1 class="logo"> <a href="#"><ui:image src="/auraFW/resources/aura/images/aura.png" alt="Aura" /></a><small>documentation</small></h1>
         <ul class="navList">
             <!--<li><a href="#">About</a></li>-->
             <li aura:id="help"><auradocs:navLink location="help">Help</auradocs:navLink></li>

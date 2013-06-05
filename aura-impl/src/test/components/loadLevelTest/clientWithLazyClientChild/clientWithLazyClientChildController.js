@@ -16,17 +16,38 @@
 ({
     makeClient : function(cmp){
         cmp.find("status").getElement().innerHTML = "";
-        cmp.getValue("v.body").push($A.newCmpDeprecated("markup://loadLevelTest:clientComponent"));
+        $A.componentService.newComponentAsync(
+            this,
+            function(newCmp){
+                cmp.getValue("v.body").push(newCmp);
+            },
+            "markup://loadLevelTest:clientComponent"
+        );
     },
 
     makeServer : function(cmp){
         cmp.find("status").getElement().innerHTML = "";
-        cmp.getValue("v.body").push($A.newCmpDeprecated("markup://loadLevelTest:serverComponent"));
+        $A.componentService.newComponentAsync(
+            this,
+            function(newCmp){
+                cmp.getValue("v.body").push(newCmp);
+            },
+            "markup://loadLevelTest:serverComponent"
+        );
     },
 
     makeExclusiveServer : function(cmp){
         cmp.find("status").getElement().innerHTML = "";
-        cmp.getValue("v.body").push($A.newCmpDeprecated({componentDef : "markup://loadLevelTest:serverComponent", load : "EXCLUSIVE"}));
+        $A.componentService.newComponentAsync(
+            this,
+            function(newCmp){
+                cmp.getValue("v.body").push(newCmp);
+            },
+            {
+                componentDef : "markup://loadLevelTest:serverComponent",
+                load : "EXCLUSIVE"
+            }
+        );
     },
 
     waiting : function(cmp){

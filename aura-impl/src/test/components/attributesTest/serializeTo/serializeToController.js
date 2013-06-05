@@ -15,7 +15,12 @@
  */
 ({
     newComponent : function(cmp, evt, helper){
-        var newcmp = $A.services.component.newComponentDeprecated({
+        $A.newCmpAsync(
+            this,
+            function (newcmp) {
+                cmp.find("target").getValue("v.body").setValue(newcmp);
+            },
+            {
                 "componentDef" : "markup://attributesTest:serializeTo",
                 "attributes" : {
                     "values" : {
@@ -27,7 +32,7 @@
                         noneDefault : "strikeout again"
                     }
                 }
-            });
-        cmp.find("target").getValue("v.body").setValue(newcmp);
+            }
+        )
     }
 })

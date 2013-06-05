@@ -15,6 +15,12 @@
  */
 ({
     createComponentAndPushToBody:function(cmp, config){
-        cmp.getValue("v.body").push($A.componentService.newComponentDeprecated(config));
+        $A.newCmpAsync(
+            this,
+            function(newCmp){
+                cmp.getValue("v.body").push(newCmp);
+            },
+            config
+        );
     }
 })

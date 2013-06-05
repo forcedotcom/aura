@@ -18,13 +18,10 @@
         test: [
             function(cmp){
 
-                //cmp.find("btn").get("e.press").fire();
-
                 var a = cmp.get("c.showOutputCmp");
                 $A.run(function() {
                     a.run();
                 });
-
 
                 $A.test.addWaitFor(
                     true,
@@ -45,7 +42,6 @@
                 $A.run(function() {
                     a.run();
                 });
-
 
                 $A.test.addWaitFor(
                     true,

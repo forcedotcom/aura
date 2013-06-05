@@ -79,9 +79,10 @@ public class ThemeDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testExtends() throws Exception {
-        ThemeDef def = source("<aura:theme extends=\"fake:theme\"></aura:theme>");
-        DefDescriptor<ThemeDef> expected = ThemeDefImpl.descriptor("fake:theme");
-        assertThat(def.getExtendsDescriptor(), equalTo(expected));
+        DefDescriptor<ThemeDef> desc = vendor.getThemeDefDescriptor();
+        String src = "<aura:theme extends=\"%s\"></aura:theme>";
+        ThemeDef def = source(String.format(src, desc.getDescriptorName()));
+        assertThat(def.getExtendsDescriptor(), equalTo(desc));
     }
 
     /** utility */

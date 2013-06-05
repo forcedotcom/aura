@@ -16,6 +16,8 @@
 package org.auraframework.impl.root.theme;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +39,7 @@ import org.auraframework.util.json.Json;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * Implementation for {@link ThemeDef}.
@@ -44,20 +47,21 @@ import com.google.common.collect.Lists;
  * @author nmcwilliams
  */
 public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeDef {
-
-    private static final long serialVersionUID = 7467455857249694414L;
+    private static final long serialVersionUID = -7900230831915100535L;
 
     private final int hashCode;
     private final DefDescriptor<ThemeDef> extendsDescriptor;
+    private final Set<AttributeDefRef> overrides;
 
     public ThemeDefImpl(Builder builder) {
         super(builder);
         this.extendsDescriptor = builder.extendsDescriptor;
-        this.hashCode = AuraUtil.hashCode(super.hashCode(), extendsDescriptor);
+        this.overrides = AuraUtil.immutableSet(builder.overrides);
+        this.hashCode = AuraUtil.hashCode(super.hashCode(), extendsDescriptor, overrides);
     }
 
     @Override
-    public Optional<String> variable(String name) {
+    public Optional<String> variable(String name) throws QuickFixException {
         AttributeDef attributeDef = getAttributeDefs().get(DefDescriptorImpl.getInstance(name, AttributeDef.class));
 
         if (attributeDef == null) {
@@ -76,6 +80,11 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
     }
 
     @Override
+    public Set<AttributeDefRef> getOverrides() {
+        return overrides;
+    }
+
+    @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
 
@@ -85,9 +94,14 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
 
             // check that each attribute has default specified
             if (attribute.getDefaultValue() == null) {
-                String msg = "Attribute %s must specify a default value. An empty string is acceptable.";
+                String msg = "Attribute '%s' must specify a default value. An empty string is acceptable.";
                 throw new InvalidDefinitionException(String.format(msg, attribute.getName()), getLocation());
             }
+        }
+
+        // overrides
+        for (AttributeDefRef override : overrides) {
+            override.validateDefinition();
         }
     }
 
@@ -95,18 +109,39 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
 
+        // extends
         if (extendsDescriptor != null) {
             if (extendsDescriptor.equals(descriptor)) {
-                throw new InvalidDefinitionException(String.format("%s cannot extend itself", getDescriptor()),
-                        getLocation());
+                String msg = "%s cannot extend itself";
+                throw new InvalidDefinitionException(String.format(msg, getDescriptor()), getLocation());
             }
             if (extendsDescriptor.getDef() == null) {
                 throw new DefinitionNotFoundException(extendsDescriptor, getLocation());
             }
         }
 
+        // attributes
         for (AttributeDef att : this.attributeDefs.values()) {
             att.validateReferences();
+        }
+
+        // overrides
+        for (AttributeDefRef override : overrides) {
+            override.validateReferences();
+
+            String msg = "Attribute '%s' is not inherited.";
+            DefDescriptor<AttributeDef> desc = override.getDescriptor();
+
+            // ensure it is actually overriding something
+            if (extendsDescriptor == null) {
+                throw new InvalidDefinitionException(String.format(msg, desc.getName()), getLocation());
+            } else {
+                ThemeDef parent = extendsDescriptor.getDef();
+                AttributeDef overridden = parent.getAttributeDefs().get(desc);
+                if (overridden == null) {
+                    throw new InvalidDefinitionException(String.format(msg, desc.getName()), getLocation());
+                }
+            }
         }
     }
 
@@ -146,7 +181,15 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
     }
 
     @Override
-    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() {
+    public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
+        // self and parent attributes
+        Map<DefDescriptor<AttributeDef>, AttributeDef> ret = new LinkedHashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        if (extendsDescriptor != null) {
+            ret.putAll(extendsDescriptor.getDef().getAttributeDefs());
+            ret.putAll(attributeDefs);
+            return Collections.unmodifiableMap(ret);
+        }
+
         return attributeDefs;
     }
 
@@ -163,7 +206,8 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
                     .equal(descriptor, other.descriptor)
                     && Objects.equal(location, other.location)
                     && Objects.equal(attributeDefs, other.attributeDefs)
-                    && Objects.equal(extendsDescriptor, other.extendsDescriptor);
+                    && Objects.equal(extendsDescriptor, other.extendsDescriptor)
+                    && Objects.equal(overrides, other.overrides);
         }
 
         return false;
@@ -183,6 +227,7 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
      */
     public static class Builder extends RootDefinitionImpl.Builder<ThemeDef> {
         public DefDescriptor<ThemeDef> extendsDescriptor;
+        public Set<AttributeDefRef> overrides = Sets.newHashSet();
 
         public Builder() {
             super(ThemeDef.class);
@@ -192,6 +237,9 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
         public ThemeDefImpl build() {
             return new ThemeDefImpl(this);
         }
-    }
 
+        public void addOverride(AttributeDefRef ref) {
+            overrides.add(ref);
+        }
+    }
 }

@@ -15,6 +15,10 @@
  */
 package org.auraframework.def;
 
+import java.util.Set;
+
+import org.auraframework.throwable.quickfix.QuickFixException;
+
 import com.google.common.base.Optional;
 
 /**
@@ -28,15 +32,21 @@ public interface ThemeDef extends RootDefinition {
     DefDescriptor<ThemeDef> getDescriptor();
 
     /**
+     * Gets the value of a variable.
+     * 
+     * @param name Name of the variable/attribute.
+     * @throws QuickFixException if a parent descriptor does not exist
+     * @returns The variable value, or {@link Optional#absent()} if no variable exists for the given name.
+     */
+    Optional<String> variable(String name) throws QuickFixException;
+
+    /**
      * Gets the descriptor of the {@link ThemeDef} this one extends, or null if not specified.
      */
     DefDescriptor<ThemeDef> getExtendsDescriptor();
 
     /**
-     * Gets the value of a variable.
-     * 
-     * @param name Name of the variable/attribute.
-     * @returns The variable value, or {@link Optional#absent()} if no variable exists for the given name.
+     * Gets the set of overridden attributes.
      */
-    Optional<String> variable(String name);
+    Set<AttributeDefRef> getOverrides();
 }

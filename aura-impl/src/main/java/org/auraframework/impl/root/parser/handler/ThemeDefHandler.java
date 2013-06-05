@@ -33,6 +33,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 /**
  * Handler for aura:theme tags.
@@ -61,6 +62,7 @@ public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
         super(defDescriptor, source, xmlReader);
         builder.setOwnHash(source.getHash());
         builder.extendsDescriptor = null;
+        builder.overrides = Sets.newHashSet();
     }
 
     @Override
@@ -90,6 +92,8 @@ public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
         if (AttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
             AttributeDefImpl def = new AttributeDefHandler<ThemeDef>(this, xmlReader, source).getElement();
             builder.addAttributeDef(DefDescriptorImpl.getInstance(def.getName(), AttributeDef.class), def);
+        } else if (AttributeDefRefHandler.TAG.equalsIgnoreCase(tag)) {
+            builder.addOverride(new AttributeDefRefHandler<ThemeDef>(this, xmlReader, source).getElement());
         } else {
             error("Found unexpected tag %s", tag);
         }

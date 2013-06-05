@@ -23,10 +23,10 @@ import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ComponentDefRef.Load;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition.Visibility;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.root.component.ComponentDefRefImpl.Builder;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -54,7 +54,7 @@ public class ComponentDefRefImplUnitTest extends
 
     public void testValidateReferencesPrivateAttribute() throws Exception {
         setupValidateReferences();
-        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        testAuraContext = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
         this.location = new Location("root", 0);
         ComponentDef rootDef = this.descriptor.getDef();
 
@@ -79,7 +79,7 @@ public class ComponentDefRefImplUnitTest extends
 
     public void testValidateReferencesPublicAttribute() throws Exception {
         setupValidateReferences();
-        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        testAuraContext = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
         this.location = new Location("root", 0);
         ComponentDef rootDef = this.descriptor.getDef();
 
@@ -94,9 +94,9 @@ public class ComponentDefRefImplUnitTest extends
         this.attributeValues = ImmutableMap.of(attrDesc, attrRef);
 
         Mockito.verifyZeroInteractions(attrRef);
-        
+
         buildDefinition().validateReferences();
-        
+
         Mockito.verify(attrRef).parseValue(attrType);
         Mockito.verify(attrRef).validateReferences();
     }

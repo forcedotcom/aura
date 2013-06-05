@@ -17,10 +17,12 @@ package org.auraframework.impl.system;
 
 import java.util.Map;
 
+import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.Definition.Visibility;
 import org.auraframework.impl.system.DefinitionImpl.RefBuilderImpl;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.test.UnitTestCase;
@@ -45,6 +47,8 @@ public abstract class DefinitionImplUnitTest<I extends DefinitionImpl<D>, D exte
     @Mock
     protected Hash sourceHash;
     protected String ownHash;
+
+    protected AuraContext testAuraContext;
 
     public DefinitionImplUnitTest(String name) {
         super(name);
@@ -173,6 +177,13 @@ public abstract class DefinitionImplUnitTest<I extends DefinitionImpl<D>, D exte
     public void testValidateReferences() throws Exception {
         setupValidateReferences();
         buildDefinition().validateReferences();
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        if (testAuraContext != null) {
+            Aura.getContextService().endContext();
+        }
     }
 
     protected void setupValidateReferences() throws Exception {

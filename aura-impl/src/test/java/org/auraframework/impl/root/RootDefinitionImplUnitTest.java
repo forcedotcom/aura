@@ -25,9 +25,6 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.def.RootDefinition.SupportLevel;
 import org.auraframework.impl.root.RootDefinitionImpl.Builder;
 import org.auraframework.impl.system.DefinitionImplUnitTest;
-import org.mockito.Mockito;
-
-import com.google.common.collect.ImmutableList;
 
 public abstract class RootDefinitionImplUnitTest<I extends RootDefinitionImpl<D>, D extends RootDefinition, B extends Builder<D>>
         extends DefinitionImplUnitTest<I, D, D, B> {

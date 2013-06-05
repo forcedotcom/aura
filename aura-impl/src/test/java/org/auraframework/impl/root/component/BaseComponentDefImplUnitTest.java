@@ -203,7 +203,7 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
         super.setupValidateReferences();
         this.interfaces = Sets.newHashSet();
         this.interfaces.add(BaseComponentDefImpl.ROOT_MARKER);
-        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
+        testAuraContext = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Access.AUTHENTICATED);
     }
 
     @Override

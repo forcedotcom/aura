@@ -15,15 +15,13 @@
  */
 package org.auraframework.impl.root.component.attributes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.ComponentDefRefArray;
+import org.auraframework.impl.type.ComponentDefRefArrayTypeDef;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;

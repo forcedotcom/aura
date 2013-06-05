@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.root.component;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,8 @@ import org.auraframework.def.ComponentDefRef;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonSerializable;
 
 import com.google.common.collect.Lists;
 
@@ -30,7 +33,7 @@ import com.google.common.collect.Lists;
  *
  * @since 0.22
  */
-public class ComponentDefRefArray {
+public class ComponentDefRefArray implements JsonSerializable {
     private final List<ComponentDefRef> cdrs;
     private final BaseComponent<?, ?> vp;
 
@@ -43,22 +46,27 @@ public class ComponentDefRefArray {
         return this.cdrs;
     }
 
-    public List<Component> newInstance() throws QuickFixException {
-        return newInstance(null);
+    public List<Component> newInstance(BaseComponent<?, ?> fallbackValueProvider) throws QuickFixException {
+        return newInstance(fallbackValueProvider, null);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public List<Component> newInstance(Map<String, Object> extraProviders) throws QuickFixException {
+    public List<Component> newInstance(BaseComponent<?, ?> fallbackValueProvider, Map<String, Object> extraProviders) throws QuickFixException {
         List<Component> components = Lists.newArrayListWithExpectedSize(cdrs.size());
-        BaseComponent<?, ?> valueProvider = this.vp;
+        BaseComponent<?, ?> valueProvider = this.vp != null ? this.vp : fallbackValueProvider;
         if (extraProviders != null) {
             // TODO: rename this thing
-            valueProvider = new IterationValueProvider(vp, extraProviders);
+            valueProvider = new IterationValueProvider(valueProvider, extraProviders);
         }
         for (ComponentDefRef cdr : this.cdrs) {
             // only foreach returns a list, once that is gone get rid of get(0)
             components.add(cdr.newInstance(valueProvider).get(0));
         }
         return components;
+    }
+
+    @Override
+    public void serialize(Json json) throws IOException {
+        json.writeArray(cdrs);
     }
 }

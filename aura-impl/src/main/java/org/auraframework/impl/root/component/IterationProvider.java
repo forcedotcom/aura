@@ -75,7 +75,7 @@ public class IterationProvider implements ComponentConfigProvider {
                     providers.put(indexVar, i);
                 }
                 // realbody ends up dirty, don't need it to be
-                components.addAll(body.newInstance(providers));
+                components.addAll(body.newInstance(atts.getValueProvider(), providers));
             }
         }
         return cc;

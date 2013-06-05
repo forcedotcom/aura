@@ -29,7 +29,7 @@
         for (var j = 0; j < body.getLength(); j++) {
             var cdr = body.get(j);
             if (!ivp) {
-                ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider);
+                ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || atts.getValueProvider());
             }
             ret.push($A.componentService.newComponentDeprecated(cdr, ivp, false, doForce));
         }

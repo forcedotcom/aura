@@ -25,12 +25,10 @@
 	    var bogusGauge = cmp.find("bogusGauge");
 	    $A.test.assertTruthy(bogusGauge);
 	    $A.test.assertFalse(bogusGauge.get('v.enabled'))
-	    $A.test.assertFalsy(bogusGauge.find('stamp'));
 	    
 	    var noName = cmp.find("noName");
 	    $A.test.assertTruthy(noName);
 	    $A.test.assertFalse(noName.get('v.enabled'))
-	    $A.test.assertFalsy(noName.find('stamp'));
 	}
     }
 

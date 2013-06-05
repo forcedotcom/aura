@@ -53,7 +53,7 @@ public class IfProvider implements ComponentConfigProvider {
             // System.err.println("fiction " + component.getGlobalId());
         }
         if (facet != null) {
-            components.addAll(facet.newInstance());
+            components.addAll(facet.newInstance(atts.getValueProvider()));
         }
         return cc;
     }

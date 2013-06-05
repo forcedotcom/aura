@@ -39,7 +39,7 @@ import org.auraframework.util.json.Json;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Maps;
 
 /**
  * Implementation for {@link ThemeDef}.
@@ -51,37 +51,50 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
 
     private final int hashCode;
     private final DefDescriptor<ThemeDef> extendsDescriptor;
-    private final Set<AttributeDefRef> overrides;
+    public final Map<DefDescriptor<AttributeDef>, AttributeDefRef> overrides;
 
     public ThemeDefImpl(Builder builder) {
         super(builder);
         this.extendsDescriptor = builder.extendsDescriptor;
-        this.overrides = AuraUtil.immutableSet(builder.overrides);
+        this.overrides = AuraUtil.immutableMap(builder.overrides);
         this.hashCode = AuraUtil.hashCode(super.hashCode(), extendsDescriptor, overrides);
     }
 
     @Override
     public Optional<String> variable(String name) throws QuickFixException {
-        AttributeDef attributeDef = getAttributeDefs().get(DefDescriptorImpl.getInstance(name, AttributeDef.class));
+        // first check overrides
+        Optional<String> found = asOverridden(name);
 
-        if (attributeDef == null) {
-            return Optional.absent();
+        // if not there check own attributes
+        if (!found.isPresent()) {
+            found = fromSelf(name);
         }
 
-        AttributeDefRef defaultValue = attributeDef.getDefaultValue();
-        assert defaultValue != null : "default values should be set";
+        // if not there then check parent
+        if (!found.isPresent()) {
+            found = fromParent(name);
+        }
 
-        return Optional.of(defaultValue.getValue().toString());
+        return found;
+    }
+
+    private Optional<String> asOverridden(String name) {
+        AttributeDefRef ref = overrides.get(DefDescriptorImpl.getInstance(name, AttributeDef.class));
+        return ref == null ? Optional.<String> absent() : Optional.of(ref.getValue().toString());
+    }
+
+    private Optional<String> fromSelf(String name) {
+        AttributeDef attr = attributeDefs.get(DefDescriptorImpl.getInstance(name, AttributeDef.class));
+        return attr == null ? Optional.<String> absent() : Optional.of(attr.getDefaultValue().getValue().toString());
+    }
+
+    private Optional<String> fromParent(String name) throws QuickFixException {
+        return extendsDescriptor == null ? Optional.<String> absent() : extendsDescriptor.getDef().variable(name);
     }
 
     @Override
     public DefDescriptor<ThemeDef> getExtendsDescriptor() {
         return extendsDescriptor;
-    }
-
-    @Override
-    public Set<AttributeDefRef> getOverrides() {
-        return overrides;
     }
 
     @Override
@@ -100,7 +113,7 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
         }
 
         // overrides
-        for (AttributeDefRef override : overrides) {
+        for (AttributeDefRef override : overrides.values()) {
             override.validateDefinition();
         }
     }
@@ -111,12 +124,25 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
 
         // extends
         if (extendsDescriptor != null) {
+            // check if it exists
+            if (extendsDescriptor.getDef() == null) {
+                throw new DefinitionNotFoundException(extendsDescriptor, getLocation());
+            }
+
+            // can't extend itself
             if (extendsDescriptor.equals(descriptor)) {
                 String msg = "%s cannot extend itself";
                 throw new InvalidDefinitionException(String.format(msg, getDescriptor()), getLocation());
             }
-            if (extendsDescriptor.getDef() == null) {
-                throw new DefinitionNotFoundException(extendsDescriptor, getLocation());
+
+            // ensure no circular hierarchy
+            String msg = "%s cannot through its parent eventually refer back to itself.";
+            DefDescriptor<ThemeDef> current = extendsDescriptor;
+            while (current != null) {
+                if (current.equals(descriptor)) {
+                    throw new InvalidDefinitionException(String.format(msg, descriptor), getLocation());
+                }
+                current = current.getDef().getExtendsDescriptor();
             }
         }
 
@@ -126,7 +152,7 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
         }
 
         // overrides
-        for (AttributeDefRef override : overrides) {
+        for (AttributeDefRef override : overrides.values()) {
             override.validateReferences();
 
             String msg = "Attribute '%s' is not inherited.";
@@ -227,7 +253,7 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
      */
     public static class Builder extends RootDefinitionImpl.Builder<ThemeDef> {
         public DefDescriptor<ThemeDef> extendsDescriptor;
-        public Set<AttributeDefRef> overrides = Sets.newHashSet();
+        public Map<DefDescriptor<AttributeDef>, AttributeDefRef> overrides = Maps.newHashMap();
 
         public Builder() {
             super(ThemeDef.class);
@@ -239,7 +265,7 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
         }
 
         public void addOverride(AttributeDefRef ref) {
-            overrides.add(ref);
+            overrides.put(ref.getDescriptor(), ref);
         }
     }
 }

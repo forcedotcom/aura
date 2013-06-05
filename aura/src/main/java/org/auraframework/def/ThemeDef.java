@@ -15,8 +15,6 @@
  */
 package org.auraframework.def;
 
-import java.util.Set;
-
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.base.Optional;
@@ -44,9 +42,4 @@ public interface ThemeDef extends RootDefinition {
      * Gets the descriptor of the {@link ThemeDef} this one extends, or null if not specified.
      */
     DefDescriptor<ThemeDef> getExtendsDescriptor();
-
-    /**
-     * Gets the set of overridden attributes.
-     */
-    Set<AttributeDefRef> getOverrides();
 }

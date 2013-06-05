@@ -33,7 +33,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Maps;
 
 /**
  * Handler for aura:theme tags.
@@ -62,7 +62,7 @@ public class ThemeDefHandler extends RootTagHandler<ThemeDef> {
         super(defDescriptor, source, xmlReader);
         builder.setOwnHash(source.getHash());
         builder.extendsDescriptor = null;
-        builder.overrides = Sets.newHashSet();
+        builder.overrides = Maps.newHashMap();
     }
 
     @Override

@@ -184,14 +184,6 @@
 
             self.FastClick.clickbusterCoordinates = [];
             $A.util.on(document, "click", onClickBuster, true);
-
-            // Need this otherwise the browser eats the event
-            $A.util.on(document, "touchmove", function (e) {
-                var target = e.target.nodeName.toLowerCase();
-                if ("textarea" != target) {  // without this, textarea is not scrollable
-                    e.preventDefault();
-                } 
-            }, false);
         }
     },
 

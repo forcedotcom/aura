@@ -19,11 +19,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.ExpressionType;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.instance.ValueProvider;
+import org.auraframework.instance.ValueProviderType;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -58,7 +61,18 @@ public class PropertyReferenceImpl implements PropertyReference {
 
     @Override
     public Object evaluate(ValueProvider vp) throws QuickFixException {
-        return vp.getValue(this);
+        Object ret = null;
+        if(vp != null){
+            ret = vp.getValue(this);
+        }else{
+            String root = getRoot();
+            AuraContext lc = Aura.getContextService().getCurrentContext();
+            ValueProviderType vpt = ValueProviderType.getTypeByPrefix(root);
+            if (vpt != null) {
+                ret = lc.getGlobalProviders().get(vpt).getValue(getStem());
+            }
+        }
+        return ret;
     }
 
     @Override

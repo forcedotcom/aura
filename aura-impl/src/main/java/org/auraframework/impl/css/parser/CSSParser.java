@@ -27,12 +27,20 @@ import org.auraframework.Aura;
 import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.NamespaceDef;
+import org.auraframework.def.StyleDef;
+import org.auraframework.expression.Expression;
 import org.auraframework.http.AuraBaseServlet;
+import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.Client;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraException;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.StyleParserException;
@@ -316,11 +324,15 @@ public class CSSParser extends DefaultCSSVisitor {
     }
 
     private String validateConditional(CSSMediaExpression exp){
-        String value = exp.getValue().getAsCSSString(writerSettings, 0).toUpperCase();
-        if (!allowedConditions.contains(value)) {
-            throw new AuraRuntimeException("Unknown browser: [" + value + "]. The allowed conditionals are: " + allowedConditions);
+        CSSExpression val = exp.getValue();
+        if(val != null){
+            String value = val.getAsCSSString(writerSettings, 0).toUpperCase();
+            if (!allowedConditions.contains(value)) {
+                throw new AuraRuntimeException("Unknown browser: [" + value + "]. The allowed conditionals are: " + allowedConditions);
+            }
+            return value;
         }
-        return value;
+        return null;
     }
 
     @Override
@@ -362,29 +374,35 @@ public class CSSParser extends DefaultCSSVisitor {
                 CSSMediaExpression exp = query.getMediaExpression(j);
 
                 String feature = exp.getFeature();
+                String value = validateConditional(exp);
+                Expression expression = null;
+                if(value != null){
+                    Location l = new Location(componentClass, exp.getSourceLocation().getFirstTokenBeginLineNumber(), exp.getSourceLocation().getFirstTokenBeginColumnNumber(),-1);
+                    try {
+                        expression = AuraImpl.getExpressionAdapter().buildExpression("$Browser.is"+value, l);
+                    } catch (AuraValidationException e) {
+                        throw new AuraRuntimeException(e, l);
+                    }
+                }
+
                 if(feature.equalsIgnoreCase(CONDITIONAL_IF)){
-                    String value = validateConditional(exp);
+
                     addTextCDR();
                     ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
                     conditionalBuilder.push(builder);
-                    value.toString();
-                    //FIXME
-                    builder.setAttribute("isTrue", false);
+
+                    builder.setAttribute("isTrue", expression);
                     builder.setDescriptor("aura:if");
                 }else if(feature.equalsIgnoreCase(CONDITIONAL_ELSEIF)){
-                    String value = validateConditional(exp);
                     addTextCDR();
                     ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
                     conditionalBuilder.push(builder);
-                    value.toString();
-                    //FIXME
-                    builder.setAttribute("isTrue", true);
+                    builder.setAttribute("isTrue", expression);
                     builder.setDescriptor("aura:if");
                 }else if(feature.equalsIgnoreCase(CONDITIONAL_ELSE)){
                     addTextCDR();
                     ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
                     conditionalBuilder.push(builder);
-                    //FIXME
                     builder.setAttribute("isTrue", true);
                     builder.setDescriptor("aura:if");
                 }else{
@@ -418,4 +436,21 @@ public class CSSParser extends DefaultCSSVisitor {
             errors.add(ex);
         }
     };
+
+    public static void main(String[] args) {
+        try{
+            AuraContext context = Aura.getContextService().startContext(Mode.DEV, Format.JSON, Access.AUTHENTICATED);
+            context.setClient(new Client("Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)"));
+
+            System.out.println(Aura.getDefinitionService().getDefinition("ui.button", StyleDef.class).getCode());
+        } catch (DefinitionNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (QuickFixException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }finally{
+            Aura.getContextService().endContext();
+        }
+    }
 }

@@ -15,21 +15,33 @@
  */
 package org.auraframework.impl.adapter.format.html.offline;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.StyleDef;
 import org.auraframework.http.AuraResourceServlet;
 import org.auraframework.http.AuraServlet;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.Component;
-import org.auraframework.service.*;
-import org.auraframework.system.*;
-import org.auraframework.system.AuraContext.*;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.InstanceService;
+import org.auraframework.service.RenderingService;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.AuraContext.Access;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.IOUtil;
@@ -148,8 +160,7 @@ public class ApplicationDefOfflineHTMLFormatAdapter extends OfflineHTMLFormatAda
 
             DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
             if (styleDefDesc != null) {
-                Client.Type type = context.getClient().getType();
-                attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode(type));
+                attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode());
             }
 
             attributes.put("autoInitialize", false);

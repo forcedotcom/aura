@@ -35,7 +35,10 @@ import static org.auraframework.impl.util.UserAgent.CHROME;
 import static org.auraframework.impl.util.UserAgent.OTHER_WEBKIT;
 import static org.auraframework.impl.util.UserAgent.SAFARI;
 
-// user-agent parser to provide browser information 
+
+
+
+// user-agent parser to provide browser information
 public class BrowserInfo {
 
     /**
@@ -56,6 +59,13 @@ public class BrowserInfo {
     private int platformType;
     private boolean isIPad;
     private boolean isIPhone;
+    private boolean isWebkit;
+    private boolean isFirefox;
+    private boolean isIE6;
+    private boolean isIE7;
+    private boolean isIE8;
+    private boolean isIE9;
+    private boolean isIE10;
 
     public static final String TOUCH_CONTAINER = "SalesforceTouchContainer";
 
@@ -95,6 +105,34 @@ public class BrowserInfo {
         return formFactor;
     }
 
+    public boolean isFirefox() {
+        return isFirefox;
+    }
+
+    public boolean isWebkit() {
+        return isWebkit;
+    }
+
+    public boolean isIE6() {
+        return isIE6;
+    }
+
+    public boolean isIE7() {
+        return isIE7;
+    }
+
+    public boolean isIE8() {
+        return isIE8;
+    }
+
+    public boolean isIE9() {
+        return isIE9;
+    }
+
+    public boolean isIE10() {
+        return isIE10;
+    }
+
     private void parseUserAgent() {
         // set initial values
         isTablet = false;
@@ -102,6 +140,9 @@ public class BrowserInfo {
         isAndroid = false;
         isIPad = false;
         isIPhone = false;
+        isWebkit = false;
+        isFirefox = false;
+
         formFactor = "";
         platformType = 0;
         browserType = 0;
@@ -118,8 +159,39 @@ public class BrowserInfo {
         isAndroid = isPlatformAndroid();
         isIPad = isPlatformIPad();
         isIPhone = isPlatformIPhone();
+        isWebkit = isBrowserWebkit();
+        isFirefox = isBrowserFirefox();
+        isIE6 = isBrowserIE6();
+        isIE7 = isBrowserIE7();
+        isIE8 = isBrowserIE8();
+        isIE9 = isBrowserIE9();
+        isIE10 = isBrowserIE10();
         formFactor = getHardwareFormFactor().toString();
-        ;
+
+    }
+
+    private boolean isBrowserIE10() {
+        return isBrowser(UserAgent.IE, 10);
+    }
+
+    private boolean isBrowserIE9() {
+        return isBrowser(UserAgent.IE, 9);
+    }
+
+    private boolean isBrowserIE8() {
+        return isBrowser(UserAgent.IE, 8);
+    }
+
+    private boolean isBrowserIE7() {
+        return isBrowser(UserAgent.IE, 7);
+    }
+
+    private boolean isBrowserIE6() {
+        return isBrowser(UserAgent.IE, 6);
+    }
+
+    private boolean isBrowserFirefox() {
+        return isBrowser(UserAgent.FIREFOX);
     }
 
     /**
@@ -414,7 +486,7 @@ public class BrowserInfo {
      * @return true if mobile
      */
     public boolean isMobileClient() {
-        // TODO: see if this can be replaced by Browser.isBrowserMobile()
+        // TODO: see if this can be replaced by Browser . isBrowserMobile()
         // It is easier to maintain with no third party dependencies and ~7x
         // faster.
         return isMobileClient(userAgentString);

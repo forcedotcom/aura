@@ -181,11 +181,10 @@ public class StyleParserTest extends AuraImplTestCase {
     public void testStyleNamespaceTrueConditions() throws Exception {
         DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceTrueConditions",
                 StyleDef.class);
-
-        Client client = new Client("chrome");
+        Aura.getContextService().getCurrentContext().setClient(new Client("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1468.0 Safari/537.36"));
         StyleDef style = descriptor.getDef();
         assertTrue(style.getName().equals("testStyleNamespaceTrueConditions"));
-        goldFileText(style.getCode(client.getType()));
+        goldFileText(style.getCode());
     }
 
     /**
@@ -228,9 +227,8 @@ public class StyleParserTest extends AuraImplTestCase {
             assertTrue("Incorrect message in StyleParserException", e
                     .getMessage()
                     .toString()
-                    .startsWith(
-                            "Issue(s) found by Parser: (components_aura_impl/test/testTemplateCss/testTemplateCss.css \n"+
-                            "\tCSS selectors must include component class: \".testTestTemplateCss\" (line 1, col 1)"));
+                    .endsWith(
+                            "CSS selectors must include component class: \".testTestTemplateCss\" (line 1, col 1)\n"));
         }
     }
 
@@ -281,7 +279,12 @@ public class StyleParserTest extends AuraImplTestCase {
             Aura.getDefinitionService().getDefinition("auratest.invalidCss", StyleDef.class);
             fail("Expected exception.");
         }catch(QuickFixException e){
-            goldFileText(e.getMessage());
+            String[] errors = e.getMessage().split("\n");
+            StringBuffer sb = new StringBuffer();
+            for(int i=1;i<errors.length;i++){
+                sb.append(errors[i]);
+            }
+            goldFileText(sb.toString());
         }
     }
 }

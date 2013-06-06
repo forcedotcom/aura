@@ -13,11 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@def MYVAR '/auraFW/resources/qa/images/auralogo.png?myvar';
-@def MYURL url(/auraFW/resources/qa/images/auralogo.png?myurl);
-@defmixin mixbackground(URL){
-    background: URL;
-}
 
 .appCacheNopreload.background {
     background: url(/auraFW/resources/qa/images/s.gif) 0 0 no-repeat;
@@ -83,19 +78,6 @@
 
 .appCacheNopreload.myurl {
     background: MYURL 0 0 no-repeat;
-}
-
-/* not currenty supported */
-.appCacheNopreload.mymixin {
-    @mixin mixbackground('/auraFW/resources/qa/images/auralogo.png?mymixin');
-}
-
-.appCacheNopreload.emptyurl {
-    background: url() 0 0 no-repeat;
-}
-
-.appCacheNopreload.emptyurl {
-    background: url() 0 0 no-repeat;
 }
 
 .appCacheNopreload.queryonlyurl {

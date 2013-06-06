@@ -45,7 +45,7 @@ var AuraClientService = function() {
                 }
 
                 // Why is this happening in the ClientService? --JT
-                var component = componentService.newComponent(config, null, false, true);
+                var component = componentService.newComponentDeprecated(config, null, false, true);
 
                 $A.endMark("Initial Component Created");
 
@@ -345,7 +345,7 @@ var AuraClientService = function() {
                 componentConfig["localId"] = localId;
 
                 var root = $A.getRoot();
-                var c = $A.componentService.newComponent(componentConfig, root);
+                var c = $A.componentService.newComponentDeprecated(componentConfig, root);
 
                 if (!errors) {
                     // Wire up event handlers

@@ -44,13 +44,13 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
      */
     public static final String TAG = "aura:attribute";
 
-    protected static final String ATTRIBUTE_DEFAULT = "default";
-    protected static final String ATTRIBUTE_REQUIRED = "required";
-    protected static final String ATTRIBUTE_TYPE = "type";
-    protected static final String ATTRIBUTE_NAME = "name";
-    protected static final String ATTRIBUTE_DESCRIPTION = "description";
-    protected static final String ATTRIBUTE_SERIALIZE_TO = "serializeTo";
-    protected static final String ATTRIBUTE_VISIBILITY = "visibility";
+    private static final String ATTRIBUTE_DEFAULT = "default";
+    private static final String ATTRIBUTE_REQUIRED = "required";
+    private static final String ATTRIBUTE_TYPE = "type";
+    private static final String ATTRIBUTE_NAME = "name";
+    private static final String ATTRIBUTE_DESCRIPTION = "description";
+    private static final String ATTRIBUTE_SERIALIZE_TO = "serializeTo";
+    private static final String ATTRIBUTE_VISIBILITY = "visibility";
 
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_DEFAULT, ATTRIBUTE_REQUIRED,
             ATTRIBUTE_TYPE, ATTRIBUTE_NAME, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_SERIALIZE_TO, ATTRIBUTE_VISIBILITY);
@@ -66,7 +66,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     }
 
     /**
-     * @param xmlReader The XMLStreamReader that the handler should read from. It expected to be queued up the
+     * @param xmlReader The XMLStreamReader that the handler should read from. It is expected to be queued up to the
      *            appropriate position before getElement() is invoked.
      */
     public AttributeDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
@@ -97,7 +97,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         String serializeTo = getAttributeValue(ATTRIBUTE_SERIALIZE_TO);
         if (serializeTo != null) {
             try {
-                builder.setSerializeTo(AttributeDef.SerializeToType.valueOf(serializeTo.toUpperCase()));
+                builder.setSerializeTo(AttributeDef.SerializeToType.valueOf(serializeTo.trim().toUpperCase()));
             } catch (IllegalArgumentException iae) {
                 builder.setSerializeTo(AttributeDef.SerializeToType.INVALID);
             }
@@ -106,7 +106,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         String visibility = getAttributeValue(ATTRIBUTE_VISIBILITY);
         if (visibility != null) {
             try {
-                builder.setVisibility(AttributeDef.Visibility.valueOf(visibility.toUpperCase()));
+                builder.setVisibility(AttributeDef.Visibility.valueOf(visibility.trim().toUpperCase()));
             } catch (IllegalArgumentException iae) {
                 builder.setVisibility(AttributeDef.Visibility.INVALID);
             }

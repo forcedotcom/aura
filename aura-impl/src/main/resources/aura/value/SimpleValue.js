@@ -45,7 +45,7 @@ SimpleValue.prototype.auraType = "Value";
  * committed or not.
  */
 SimpleValue.prototype.getValue = function() {
-    return this.dirty ? this.newValue : this.value;
+    return this.value;
 
 };
 
@@ -54,18 +54,6 @@ SimpleValue.prototype.getValue = function() {
  */
 SimpleValue.prototype.unwrap = function() {
     return this.getValue();
-};
-
-/**
- * @private
- */
-SimpleValue.prototype.getEventDispatcher = function() {
-    var ret = this.eventDispatcher;
-    if (ret === undefined) {
-        ret = {};
-        this.eventDispatcher = ret;
-    }
-    return ret;
 };
 
 /**
@@ -102,10 +90,24 @@ SimpleValue.prototype.isDefined = function() {
 };
 
 /**
- * Always returns the last wrapped value that was committed.
+ * @private
+ */
+SimpleValue.prototype.getEventDispatcher = function() {
+    var ret = this.eventDispatcher;
+    if (ret === undefined) {
+        ret = {};
+        this.eventDispatcher = ret;
+    }
+    return ret;
+};
+
+/**
+ * Always returns the last wrapped value that was committed.  So, at rest,
+ * this returns this.value, but if there is an uncommitted value (indicated
+ * by the presence of this.oldValue), it instead returns this.oldValue.
  */
 SimpleValue.prototype.getPreviousValue = function() {
-    return this.value;
+    return (this.hasOwnProperty('oldValue')) ? this.oldValue : this.value;
 };
 
 /**
@@ -115,9 +117,10 @@ SimpleValue.prototype.getPreviousValue = function() {
  */
 SimpleValue.prototype.setValue = function(v, skipChange) {
     this.makeDirty();
-    this.newValue = v;
+    this.oldValue = this.value;
+    this.value = v;
     if (!skipChange) {
-    	this.fire("change");	
+        this.fire("change");
     }
 };
 
@@ -127,7 +130,6 @@ SimpleValue.prototype.setValue = function(v, skipChange) {
 SimpleValue.prototype.makeDirty = function() {
     if (!this.dirty) {
         this.dirty = true;
-        this.newValue = this.value;
         if (this.owner) {
             $A.renderingService.addDirtyValue(this);
         }
@@ -168,8 +170,12 @@ SimpleValue.prototype.isExpression = function() {
  */
 SimpleValue.prototype.commit = function(clean) {
     if (this.isDirty()) {
-        this.value = this.newValue;
-        this.rollback(clean);
+        delete this.oldValue;
+        delete this.dirty;
+        if (!clean && this.owner) {
+            // was called by user directly
+            $A.renderingService.removeDirtyValue(this);
+        }
     }
 };
 
@@ -180,31 +186,25 @@ SimpleValue.prototype.commit = function(clean) {
  */
 SimpleValue.prototype.rollback = function(clean) {
     if (this.isDirty()) {
-        delete this.newValue;
-        delete this.dirty;
-        if (!clean && this.owner) {
-            // was called by user directly
-            $A.renderingService.removeDirtyValue(this);
-        }
+        this.value = this.oldValue;
+        this.commit(clean);
     }
 };
 
 /**
  * Sets the value as valid or not. Clears errors if set to valid.
- * @param {Boolean} status Make the value valid (true) or not (false).
+ * @param {Boolean} status Make the value valid (true) or not (anything else).
  */
 SimpleValue.prototype.setValid = function(status) {
+    if (status != this.isValid()) {
+        this.makeDirty();  // if we're changing valid state, we're dirty
+    }
     if (status === true) {
         delete this.invalid;
+        delete this.errors;   // clean out errors
     } else {
-        this.invalid = status;
+        this.invalid = true;
     }
-
-    if (!this.invalid) {
-        delete this.errors; // clean out errors
-    }
-
-    this.setValue(this.newValue ? this.newValue : this.value);
 };
 
 /**

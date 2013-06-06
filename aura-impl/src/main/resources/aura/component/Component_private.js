@@ -264,7 +264,7 @@ var ComponentPriv = (function(){ // Scoping priv
                 this.delegateValueProvider = config;
             }
             if (!this.delegateValueProvider) {
-                this.delegateValueProvider = componentService.newComponent(config, null, localCreation, true);
+                this.delegateValueProvider = componentService.newComponentDeprecated(config, null, localCreation, true);
             }
         }
     };
@@ -341,7 +341,7 @@ var ComponentPriv = (function(){ // Scoping priv
             superAttributes["valueProvider"] = attributeValueProvider;
             superConfig["attributes"] = superAttributes;
 
-            this.superComponent = componentService.newComponent(superConfig, null, localCreation, true);
+            this.superComponent = componentService.newComponentDeprecated(superConfig, null, localCreation, true);
         }
 
         if (this.superComponent) {

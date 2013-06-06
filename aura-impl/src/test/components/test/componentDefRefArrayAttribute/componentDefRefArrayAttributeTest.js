@@ -20,13 +20,11 @@
         }]
     },
 
-
     /**
      * Ensure that the attribute of type ComponentDefRef[] doesn't get instantiated, like it would if it was of type Component[]
      * And then make sure it can be instantiated.
      */
     testValue : {
-
         test : [
             function(cmp){
                 var value = cmp.getValue("v.cdrs");
@@ -39,10 +37,15 @@
                 $A.test.assertTrue(value.componentDef !== undefined);
                 $A.test.assertEquals("markup://ui:button", value.componentDef.descriptor);
                 //construct it.
-                value = $A.newCmpDeprecated(value);
-                $A.test.assertEquals("Component", value.auraType);
-                $A.test.assertEquals("markup://ui:button", value.getDef().getDescriptor().toString());
-                $A.test.assertEquals("hi", value.get("v.label"));
+                $A.componentService.newComponentAsync(
+                    this,
+                    function(newCmp){
+                        $A.test.assertEquals("Component", newCmp.auraType);
+                        $A.test.assertEquals("markup://ui:button", newCmp.getDef().getDescriptor().toString());
+                        $A.test.assertEquals("hi", newCmp.get("v.label"));
+                    },
+                    value
+                );
             }
         ]
     }

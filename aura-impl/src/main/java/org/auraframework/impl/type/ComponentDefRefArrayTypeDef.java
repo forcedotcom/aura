@@ -24,6 +24,7 @@ import java.util.Set;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
+import org.auraframework.impl.root.component.ComponentDefRefArray;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.BaseComponent;
@@ -31,9 +32,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 /**
- * typedef that allows for defrefs to be passed around without being
- * automatically instantiated
- * 
+ * typedef that allows for defrefs to be passed around without being automatically instantiated
  * 
  * @since 0.0.234
  */
@@ -79,9 +78,12 @@ public class ComponentDefRefArrayTypeDef extends DefinitionImpl<TypeDef> impleme
         return ComponentDefRef[].class;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object initialize(Object config, BaseComponent<?, ?> valueProvider) throws QuickFixException {
-        // doesn't instantiate anything
+        if (config != null && config instanceof List) {
+            return new ComponentDefRefArray((List<ComponentDefRef>)config, valueProvider);
+        }
         return config;
     }
 

@@ -77,7 +77,7 @@
      */
     testNewComponentFiresInit:{
         test:function(cmp){
-            cmp.getValue("v.body").push($A.componentService.newComponent({componentDef:"markup://valueChange:newComponentInit"}
+            cmp.getValue("v.body").push($A.componentService.newComponentDeprecated({componentDef:"markup://valueChange:newComponentInit"}
                                                                         ));
             $A.services.event.finishFiring();
 

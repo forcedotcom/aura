@@ -16,6 +16,6 @@
 
 -->
 <aura:component render="client">
-    <ui:button aura:id="newComponent" label="newComponent" press="{!c.newComponent}"/>
+    <ui:button aura:id="newComponent" label="newComponentContainer" press="{!c.newComponent}"/>
     <div aura:id="target"/>
 </aura:component>

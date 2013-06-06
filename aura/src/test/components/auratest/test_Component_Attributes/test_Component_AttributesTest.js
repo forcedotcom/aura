@@ -93,7 +93,6 @@
             //Commit a value
             component.getAttributes().getValue('label').commit();
             aura.test.assertTrue(component.getAttributes().getValue('label').getPreviousValue()==="newString", "Value was not committed");
-
         }
 
     },

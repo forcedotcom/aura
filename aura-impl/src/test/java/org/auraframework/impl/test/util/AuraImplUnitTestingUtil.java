@@ -282,7 +282,6 @@ public class AuraImplUnitTestingUtil {
 	public DefDescriptor<EventDef> getEventDefDescriptor() {
 		return DefDescriptorImpl.getInstance("test:anevent", EventDef.class);
 	}
-
 	public DefDescriptor<EventDef> getParentEventDefDescriptor() {
 		return DefDescriptorImpl
 				.getInstance("test:parentEvent", EventDef.class);

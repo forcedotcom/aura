@@ -32,7 +32,7 @@ public class JavascriptValueDef extends DefinitionImpl<ValueDef> implements Valu
 
     protected JavascriptValueDef(String name, DefDescriptor<TypeDef> typeDescriptor, Object defaultValue,
             Location location) {
-        super(null, location);
+        super(null, location, null);
         this.name = name;
         this.typeDescriptor = typeDescriptor;
         this.defaultValue = defaultValue;

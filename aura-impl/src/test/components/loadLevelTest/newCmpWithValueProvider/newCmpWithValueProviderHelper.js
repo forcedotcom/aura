@@ -15,6 +15,6 @@
  */
 ({
     createComponentAndPushToBody:function(cmp, config, attributeValueProvider){
-        cmp.getValue("v.body").push($A.componentService.newComponent(config, attributeValueProvider));
+        cmp.getValue("v.body").push($A.componentService.newComponentDeprecated(config, attributeValueProvider));
     }
 })

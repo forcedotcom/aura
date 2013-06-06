@@ -130,7 +130,7 @@ AttributeDefSet.prototype.createAttribute = function(config, def, component, val
         v["valueProviders"] = {};
         v["valueProviders"][varName] = item;
 
-        var cmp = componentService.newComponent(v, valueProvider, localCreation, true);
+        var cmp = componentService.newComponentDeprecated(v, valueProvider, localCreation, true);
 
         delete v["attributes"]["values"][varName];
         delete v["valueProviders"];
@@ -141,7 +141,7 @@ AttributeDefSet.prototype.createAttribute = function(config, def, component, val
     var noInstantiate = def.getTypeDefDescriptor() === "aura://Aura.ComponentDefRef[]";
     var valueConfig;
     if (config && config["componentDef"]) {
-        valueConfig = componentService.newComponent(config, null, localCreation, true);
+        valueConfig = componentService.newComponentDeprecated(config, null, localCreation, true);
     } else if (aura.util.isArray(config)) {
         valueConfig = [];
 
@@ -158,9 +158,10 @@ AttributeDefSet.prototype.createAttribute = function(config, def, component, val
                     }
                 } else {
                     if (noInstantiate && !forceInstantiate) {
+                        v["valueProvider"] = valueProvider;
                         valueConfig.push(new SimpleValue(v, def, component));
                     } else {
-                        valueConfig.push(componentService.newComponent(v, valueProvider, localCreation, true));
+                        valueConfig.push(componentService.newComponentDeprecated(v, valueProvider, localCreation, true));
                     }
                 }
 

@@ -89,7 +89,7 @@ var AuraRenderingService = function AuraRenderingService(){
 
                 if (!cmp["getDef"]) {
                     // If someone passed a config in, construct it.
-                    cmp = $A.componentService.newComponent(cmp, null, false, true);
+                    cmp = $A.componentService.newComponentDeprecated(cmp, null, false, true);
 
                     // And put the constructed component back into the array.
                     array[x] = cmp;

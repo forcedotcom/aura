@@ -5,8 +5,13 @@
             "name" : 'gvpTest:newLabels'
         });
         a.setCallback(cmp,function(a){
-            var newCmp = $A.newCmpDeprecated(a.getReturnValue());
-    	    cmp.find("container").getValue('v.body').push(newCmp);
+            $A.componentService.newComponentAsync(
+                this,
+                function(newCmp){
+                    cmp.find("container").getValue('v.body').push(newCmp);
+                },
+                a.getReturnValue()
+            );
         });
         a.runAfter(a);
     }

@@ -155,8 +155,9 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
                             getLocation());
                 }
             } else {
-                if(attributeDef.getVisibility() == Visibility.PRIVATE){
-                    throw new InvalidDefinitionException(String.format(" Attribute '%s' is specified as Private ",attributeDef.getDescriptor()),attributeDef.getLocation());
+                if (attributeDef.getVisibility() == Visibility.PRIVATE) {
+                    throw new InvalidDefinitionException(String.format("Attribute '%s' is specified as private",
+                            attributeDef.getDescriptor()), getLocation());
                 }
                 // so it was an attribute, make sure to parse it
                 entry.getValue().parseValue(attributeDef.getTypeDef());

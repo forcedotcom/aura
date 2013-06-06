@@ -198,7 +198,7 @@ var AuraLayoutService = function(){
                                 $A.endMark("Container Action Callback Initiated");
                                 if (a.getState() === "SUCCESS") {
                                     var ret = a.getReturnValue();
-                                    layoutService.layoutCallback(ret ? componentService.newComponent(ret, null, false, true) : null, item, layout, params, noTrack);
+                                    layoutService.layoutCallback(ret ? componentService.newComponentDeprecated(ret, null, false, true) : null, item, layout, params, noTrack);
                                 } else {
                                 if(!layoutErrorFired){
                                     var evt = $A.get("e.aura:layoutFailed");

@@ -22,7 +22,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.FakeRegistry;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 /**
@@ -58,12 +57,12 @@ public class RegisterEventDefTest extends AuraImplTestCase {
                 vendor.makeLocation("filename1", 5, 5, 0)));
     }
 
-    public void testValidate() throws Exception {
+    public void testValidateDefinition() throws Exception {
         RegisterEventDefImpl def = vendor.makeRegisterEventDefWithNulls(null, true, null);
         try {
             def.validateDefinition();
-            fail("Should have thrown AuraException for null EventDefDescriptor");
-        } catch (AuraRuntimeException expected) {
+            fail("Should have thrown InvalidDefinitionException for null EventDefDescriptor");
+        } catch (InvalidDefinitionException expected) {
             // expected
         }
     }

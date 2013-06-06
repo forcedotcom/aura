@@ -106,7 +106,7 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 			
 			var mockAura = Mocks.GetMock(Object.Global(), "$A", Stubs.GetObject({}, {
 				componentService : {
-					newComponent : function(component, locationCreation, doForce) {return expected;}
+					newComponentDeprecated : function(component, locationCreation, doForce) {return expected;}
 				}
 			}));
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {

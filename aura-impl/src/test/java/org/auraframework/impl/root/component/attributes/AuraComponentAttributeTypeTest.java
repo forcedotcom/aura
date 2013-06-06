@@ -15,13 +15,13 @@
  */
 package org.auraframework.impl.root.component.attributes;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.root.component.ComponentDefRefArray;
+import org.auraframework.impl.type.ComponentDefRefArrayTypeDef;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -52,9 +52,9 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
         assertNotNull("Failed to create component with Aura.ComponentDefRef[] type attribute.", cmp);
         Object value = cmp.getAttributes().getValue("attr");
         assertNotNull(value);
-        assertTrue(value instanceof ArrayList);
-        @SuppressWarnings("unchecked")
-        ArrayList<ComponentDefRef> cmpDefRefs = (ArrayList<ComponentDefRef>) value;
+        assertTrue(value instanceof ComponentDefRefArray);
+        ComponentDefRefArray cdra = (ComponentDefRefArray) value;
+        List<ComponentDefRef> cmpDefRefs = cdra.getList();
         assertEquals("Unexpected items in componentDefRef array attribute", 2, cmpDefRefs.size());
         // assertTrue(cmpDefRefs.get(0) instanceof ComponentDefRef);
         // assertTrue(cmpDefRefs.get(1) instanceof ComponentDefRef);
@@ -108,9 +108,9 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
         assertNotNull(cmp);
         Object value = cmp.getAttributes().getValue("attr");
         assertNotNull(value);
-        assertTrue(value instanceof ArrayList);
-        @SuppressWarnings("unchecked")
-        ArrayList<ComponentDefRef> cmpDefRefs = (ArrayList<ComponentDefRef>) value;
+        assertTrue(value instanceof ComponentDefRefArray);
+        ComponentDefRefArray cdra = (ComponentDefRefArray) value;
+        List<ComponentDefRef> cmpDefRefs = cdra.getList();
         ComponentDefRef ref = cmpDefRefs.get(0);
         assertEquals("Failed to use attribute value of outer component in ComponentDefRef array items.", "auraemulp",
                 ref.newInstance(cmp).get(0).getAttributes().getValue("value"));

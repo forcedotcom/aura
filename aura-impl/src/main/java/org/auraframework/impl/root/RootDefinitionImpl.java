@@ -47,7 +47,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
 
     protected RootDefinitionImpl(Builder<T> builder) {
         super(builder);
-        if (builder.attributeDefs.size() == 0) {
+        if (builder.attributeDefs == null || builder.attributeDefs.size() == 0) {
             this.attributeDefs = ImmutableMap.of();
         } else {
             this.attributeDefs = Collections

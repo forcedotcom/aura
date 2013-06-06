@@ -16,7 +16,7 @@
 
 -->
 <aura:component support="BETA" implements="aura:rootComponent"
-    provider="java://org.auraframework.components.aura.IfProvider, js://aura.if"
+    provider="java://org.auraframework.impl.root.component.IfProvider, js://aura.if"
     renderer="java://org.auraframework.components.aura.ProvidedBodyRenderer, js://aura.providedBody"
     description="Conditionally instantiates and renders either the body or the components in the else attribute.">
 <aura:attribute name="isTrue" type="Boolean" required="true" description="An expression that must be fulfilled in order to display the body."/>

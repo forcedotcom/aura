@@ -173,8 +173,8 @@ public abstract class UnitTestCase extends TestCase {
     }
 
     /**
-     * Get a resource file for use in tests. If resource is not loaded from the
-     * filesystem, write it to a temp file and use that.
+     * Get a resource file for use in tests. If resource is not loaded from the filesystem, write it to a temp file and
+     * use that.
      * 
      * @param resourceName
      * @return File containing the resource content
@@ -216,6 +216,32 @@ public abstract class UnitTestCase extends TestCase {
         return tempFile;
     }
 
+    protected void assertExceptionType(Throwable t, Class<? extends Throwable> clazz) {
+        assertEquals("Unexpected exception type", clazz, t.getClass());
+    }
+
+    protected void assertExceptionMessage(Throwable t, Class<? extends Throwable> clazz, String message) {
+        assertExceptionType(t, clazz);
+        assertEquals("Unexpected message", message, t.getMessage());
+    }
+
+    protected void assertExceptionMessageStartsWith(Throwable t, Class<? extends Throwable> clazz,
+            String messageStartsWith) {
+        assertExceptionType(t, clazz);
+        assertEquals("Unexpected start of message", messageStartsWith,
+                t.getMessage().substring(0, messageStartsWith.length()));
+    }
+
+    protected void assertExceptionMessageEndsWith(Throwable t, Class<? extends Throwable> clazz,
+            String messageEndsWith) {
+        assertExceptionType(t, clazz);
+        String message = t.getMessage();
+        if (message == null || !message.endsWith(messageEndsWith)) {
+            fail(String.format("Unexpected end of message.  Expected message ending with: [%s], but got message: [%s]",
+                    messageEndsWith, message));
+        }
+    }
+
     // add annotation's value to current Set
     private void addLabels(Set<String> labels, TestLabels anno) {
         if (anno != null) {
@@ -247,10 +273,9 @@ public abstract class UnitTestCase extends TestCase {
     }
 
     /**
-     * Get a Set of Strings parsed from whitespace delimited TestLabels
-     * annotation values from the current test method and test class hierarchy.
-     * This will include only the current method's annotation and not those of
-     * any methods it happens to override.
+     * Get a Set of Strings parsed from whitespace delimited TestLabels annotation values from the current test method
+     * and test class hierarchy. This will include only the current method's annotation and not those of any methods it
+     * happens to override.
      */
     public Set<String> getTestLabels() {
         Class<?> clazz = getClass();

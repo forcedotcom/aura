@@ -43,14 +43,14 @@ public class JavaValueDef extends DefinitionImpl<ValueDef> implements ValueDef {
     private final Method getter;
 
     public JavaValueDef(String name, DefDescriptor<TypeDef> typeDescriptor, Location location) {
-        super(null, location);
+        super(null, location, null);
         this.name = name;
         this.typeDescriptor = typeDescriptor;
         this.getter = null;
     }
 
     public JavaValueDef(String name, Method getter, DefDescriptor<TypeDef> typeDescriptor, Location location) {
-        super(null, location);
+        super(null, location, null);
         this.name = name;
         this.getter = getter;
         this.typeDescriptor = typeDescriptor;

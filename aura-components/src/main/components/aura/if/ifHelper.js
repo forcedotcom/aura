@@ -28,7 +28,7 @@
         var realbody = [];
         for (var i = 0, length = facet.getLength(); i < length; i++) {
             var cdr = facet.get(i);
-            var cmps = $A.componentService.newComponent(cdr, atts.getValueProvider(), false, doForce);
+            var cmps = $A.componentService.newComponentDeprecated(cdr, cdr.valueProvider || atts.getValueProvider(), false, doForce);
             if ($A.util.isArray(cmps)) {
                 throw new Error("foreach inside of an if doesn't work yet");
             } else {

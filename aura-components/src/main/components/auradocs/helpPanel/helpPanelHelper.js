@@ -23,7 +23,7 @@
                     }
                 }};
        try {
-           var topicPanel = $A.componentService.newComponent(config, null, true, true);
+           var topicPanel = $A.componentService.newComponentDeprecated(config, null, true, true);
            cmp.setValue('{!v.topicPanel}', [topicPanel]);
        } catch (e) {
            // Handle the catch-all scenario.

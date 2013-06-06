@@ -1,0 +1,54 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component controller="js://auraadmin.cacheView">
+    <aura:attribute name="name" type="String" required="true" />
+    <aura:attribute name="expanded" type="boolean" default="false" />
+    <aura:attribute name="showDefs" type="boolean" default="false" />
+    <aura:attribute name="data" type="Map" required="true" />
+    <div>
+        <div class="title">{!v.name}</div>
+        Hits: {!v.data.hitCount} ({!v.hitRate})<br />
+        Misses: {!v.data.missCount} ({!v.missRate})<br />
+        Requests: {!v.data.requestCount}<br />
+        Evictions: {!v.data.evictionCount}<br />
+        <aura:if isTrue="{!v.showDefs}">
+            <div class="buttons">
+                <button class="viewButton" onclick="{!c.toggleView}">{!v.expanded ? 'Hide' : 'View'} entries</button>
+            </div>
+        </aura:if>
+    </div>
+    <aura:renderIf isTrue="{!v.expanded}">
+        <table>
+            <tr>
+                <th class="deftype">Definition Type</th>
+                <th>Descriptor</th>
+                <th>Class</th>
+                <th>Location</th>
+            </tr>
+            <aura:iteration var="def" items="{!v.data.defs}">
+                <tr>
+                    <td class="deftype">{!def.type}</td>
+                    <td>{!def.descriptor}</td>
+                    <td>{!def.class}</td>
+                    <td>{!def.location}</td>
+                </tr>
+            </aura:iteration>
+        </table>
+    </aura:renderIf>
+</aura:component>
+

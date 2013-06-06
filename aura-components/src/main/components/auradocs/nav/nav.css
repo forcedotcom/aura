@@ -18,13 +18,21 @@
 	top:0;
 	left:0;
 	right:0;
-	height: 60px;
+	height: 65px;
 	display: inline-block;
 	padding:0;
 	margin: 0;
-	background-color: #424951;
+	/*background-color: #424951;*/
+    background-color: #fafafa;
+    background-image: -moz-linear-gradient(top, #495058, #444);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#495058), to(#444));
+    background-image: -webkit-linear-gradient(top, #495058, #444);
+    background-image: -o-linear-gradient(top, #495058, #444);
+    background-image: linear-gradient(to bottom, #495058, #444);
+    background-repeat: repeat-x;
 	font-family: "runda", sans-serif;
 	min-width: 500px;
+	padding-bottom: 2px;
 }
 
 .THIS .logo{
@@ -51,7 +59,7 @@
 	position: absolute;
 	top: 0;
 	right: 50px;
-	bottom: 0;
+	bottom: 5px;
 	list-style: none;
 	margin: 0;
 }
@@ -67,16 +75,19 @@
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
-	height: 60px;
+	height: 44px;
+	margin: 12px auto 12px auto;
 }
 
 .THIS li > a{
 	color: #fff;
-	font-size: 17px;
+	font-size: 14px;
+	padding-bottom: 5px;
 }
 
 .THIS li[active=true] {
-	background-color: #2d3035;
+	background-color: #000;
+    border-radius: 8px;
 }
 
 .THIS .spinner{

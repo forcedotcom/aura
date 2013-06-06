@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 ({
-	output : function(cmp, name, msg) {
-		var oldOutput = cmp.getValue("v."+name).getValue() + "\n";
+	output : function(cmp, name, msg, purgeOldData) {
+		var oldOutput = "";
+		debugger;
+		if(purgeOldData === true){
+		    oldOutput = cmp.getValue("v."+name).getValue() + "\n";
+		}
+		
 		cmp.getValue("v."+name).setValue(oldOutput + msg);
 		$A.rerender(cmp);
 	},

@@ -6,7 +6,7 @@
 			//no-op
 		});
 		
-		serverAction.runAfter(serverAction);
+		$A.enqueueAction(serverAction);
 	},
 	cExecuteInForegroundWithReturn : function(component) {
 		var serverAction = component.get("c.executeInForegroundWithReturn");
@@ -15,7 +15,7 @@
 			//no-op
 		});
 		
-		serverAction.runAfter(serverAction);
+		$A.enqueueAction(serverAction);
 	},
 	cExecuteInBackground : function(component) {
 		var serverAction = component.get("c.executeInBackground");
@@ -24,7 +24,7 @@
 			//no-op
 		});
 		
-		serverAction.runAfter(serverAction);
+		$A.enqueueAction(serverAction);
 	},
 	cExecuteInBackgroundWithReturn : function(component) {
 		var serverAction = component.get("c.executeInBackgroundWithReturn");
@@ -34,7 +34,7 @@
 			//no-op
 		});
 		
-		serverAction.runAfter(serverAction);
+		$A.enqueueAction(serverAction);
 	},
 	clientSideAction : function(component) {
 	    //foo

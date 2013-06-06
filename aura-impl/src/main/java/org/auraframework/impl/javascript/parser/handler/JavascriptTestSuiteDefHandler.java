@@ -75,6 +75,21 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
             return null;
         }
     }
+    
+    private Set<Definition> parseMocks(DefDescriptor<? extends BaseComponentDef> compDesc, List<Object> jsList)
+            throws QuickFixException {
+        Set<Definition> mocks = Sets.newHashSet();
+        if (jsList != null && !jsList.isEmpty()) {
+            for (Object jsItem : jsList) {
+                @SuppressWarnings("unchecked")
+                Definition mockDef = parseMock(compDesc, (Map<String, Object>)jsItem);
+                if (mockDef != null) {
+                    mocks.add(mockDef);
+                }
+            }
+        }
+        return mocks;
+    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -83,8 +98,14 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
         builder.setLocation(getLocation());
         builder.caseDefs = new ArrayList<TestCaseDef>();
 
-        Map<String, Object> defaultAttributes = (Map<String, Object>) map.get("attributes");
-        List<String> browserListForTestSet = (List<String>) (List<?>) map.get("browsers");
+        DefDescriptor<? extends BaseComponentDef> compDesc = DefDescriptorImpl
+                .getAssociateDescriptor(descriptor, ComponentDef.class,
+                        DefDescriptor.MARKUP_PREFIX);
+
+        Map<String, Object> suiteAttributes = (Map<String, Object>) map.get("attributes");
+        List<String> suiteBrowsers = (List<String>) (List<?>) map.get("browsers");
+        Set<Definition> suiteMocks = parseMocks(compDesc, (List<Object>) map.get("mocks"));
+        
         for (Entry<String, Object> entry : map.entrySet()) {
             String key = entry.getKey();
             if (key.startsWith("test")) {
@@ -108,8 +129,8 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                 Map<String, Object> caseAttributes = (Map<String, Object>) value
                         .get("attributes");
                 Map<String, Object> attributes = Maps.newHashMap();
-                if (defaultAttributes != null) {
-                    attributes.putAll(defaultAttributes);
+                if (suiteAttributes != null) {
+                    attributes.putAll(suiteAttributes);
                 }
                 if (caseAttributes != null) {
                     attributes.putAll(caseAttributes);
@@ -120,20 +141,17 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                 Set<String> labels = labelsList == null ? Collections.EMPTY_SET
                         : Sets.newHashSet(labelsList);
 
-                List<String> browserListForTestCase = (List<String>) (List<?>) value
+                List<String> caseBrowsers = (List<String>) (List<?>) value
                         .get("browsers");
-                Set<String> browsers = browserListForTestCase == null ? (browserListForTestSet == null ? Collections.EMPTY_SET
-                        : Sets.newHashSet(browserListForTestSet))
-                        : Sets.newHashSet(browserListForTestCase);
+                Set<String> browsers = caseBrowsers == null ? (suiteBrowsers == null ? Collections.EMPTY_SET
+                        : Sets.newHashSet(suiteBrowsers))
+                        : Sets.newHashSet(caseBrowsers);
 
                 List<String> exceptionsAllowedDuringInitList = (List<String>) (List<?>) value
                         .get("exceptionsAllowedDuringInit");
                 Set<String> exceptionsAllowedDuringInit = exceptionsAllowedDuringInitList == null ? Collections.EMPTY_SET
                         : Sets.newHashSet(exceptionsAllowedDuringInitList);
 
-                DefDescriptor<? extends BaseComponentDef> compDesc = DefDescriptorImpl
-                        .getAssociateDescriptor(descriptor, ComponentDef.class,
-                                DefDescriptor.MARKUP_PREFIX);
                 if (compDesc == null || !compDesc.exists()) {
                     compDesc = DefDescriptorImpl.getAssociateDescriptor(
                             descriptor, ApplicationDef.class,
@@ -141,18 +159,25 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                 }
                 DefType defType = compDesc.getDefType();
 
-                Set<Definition> mocks = Sets.newHashSet();
-                List<Object> jsList = (List<Object>) value.get("mocks");
-                if (jsList != null && !jsList.isEmpty()) {
-                    for (Object jsItem : jsList) {
-                        Definition mockDef = parseMock(compDesc,
-                                (Map<String, Object>) jsItem);
-                        if (mockDef != null) {
-                            mocks.add(mockDef);
-                        }
-                    }
-                }
+                Set<Definition> caseMocks = parseMocks(compDesc, (List<Object>)value.get("mocks"));
 
+                Set<Definition> mocks;
+                if (suiteMocks.isEmpty()) {
+                    mocks = caseMocks;
+                } else if (caseMocks.isEmpty()) {
+                    mocks = suiteMocks;
+                } else {
+                    // must merge suite-level and case-level mocks
+                    Map<DefDescriptor<?>, Definition> temp = Maps.newHashMap();
+                    for (Definition def : suiteMocks) {
+                        temp.put(def.getDescriptor(), def);
+                    }
+                    for (Definition def : caseMocks) {
+                        temp.put(def.getDescriptor(), def);
+                    }
+                    mocks = Sets.newHashSet(temp.values());
+                }
+                
                 builder.caseDefs.add(new JavascriptTestCaseDef(descriptor, key, null, attributes, defType, labels,
                         browsers, mocks, exceptionsAllowedDuringInit));
             }

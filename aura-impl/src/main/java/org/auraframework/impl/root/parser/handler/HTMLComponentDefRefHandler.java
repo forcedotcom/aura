@@ -24,7 +24,7 @@ import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.HtmlTag;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.AttributeDefRefImpl;
-import org.auraframework.impl.root.component.HTMLDefRef;
+import org.auraframework.impl.root.component.HTMLDefRefBuilderImpl;
 import org.auraframework.system.Source;
 
 import com.google.common.collect.ImmutableSet;
@@ -34,7 +34,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class HTMLComponentDefRefHandler<P extends RootDefinition> extends ComponentDefRefHandler<P> {
 
-    protected HTMLDefRef.Builder htmlBuilder = new HTMLDefRef.Builder();
+    protected HTMLDefRefBuilderImpl htmlBuilder = new HTMLDefRefBuilderImpl();
 
     protected HTMLComponentDefRefHandler(RootTagHandler<P> parentHandler, String tag, XMLStreamReader xmlReader,
             Source<?> source) {

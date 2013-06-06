@@ -19,7 +19,7 @@
         var attStr = cmp.get("v.newAttributes");
         var atts = eval("false||"+attStr);
         var config = { componentDef:desc, attributes:{ values:atts } };
-        var newcmp = $A.componentService.newComponent(config, null, true, false);
+        var newcmp = $A.componentService.newComponentDeprecated(config, null, true, false);
         cmp.getValue("v.body").insert(0, newcmp);
     }
 })

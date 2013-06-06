@@ -23,9 +23,7 @@
    	
 	init : function(cmp) {		
 		this.initSize(cmp);
-		this.initPages(cmp);
-		this.initScroller(cmp);		
-		this.initPageIndicator(cmp);		 
+		this.initPages(cmp);		
 	},
 				
 	initSize : function(cmp) {
@@ -68,14 +66,18 @@
 	
 	initPages: function(cmp) {
 		var pageModels = this.getPageModels(cmp),
-			pageCmps = this.getPageComponents(cmp),
-			pageContainer = cmp.find('pageContainer'),
+			pageCmps = this.getPageComponents(cmp),			
 			isContinuousFlow = cmp.get('v.continuousFlow'), 
 			isVisible = isContinuousFlow || !this.SHOW_SELECTED_PAGE_ONLY,
 			page, snap = this.getSnap(cmp),			
-			pages = [];			  
-		
+			pages = [];	
+				
 		if (pageCmps && pageCmps.length > 0) {
+			//TODO: need a better solution to handle iteration inside the pageComponents
+			if (pageCmps[0].isInstanceOf('aura:iteration')) {				
+				pageCmps = pageCmps[0].get('v.realBody');
+			}
+			
 			for ( var i = 0; i < pageCmps.length; i++) {
 				page = pageCmps[i];
 				//append page components to page container body
@@ -91,14 +93,12 @@
 					pages.push(page);
 				}
 			}
-			var body = pageContainer.getValue('v.body');
-			body.destroy();
-			body.setValue(pages);			
+			cmp.getValue('v.pageComponents').setValue(pages, true);
 		} else if (pageModels.length > 0) {
 			for ( var i = 0; i < pageModels.length; i++) {
 				page = pageModels[i];
 				//create new instance of carousePage and pass pageModel to it
-				 var component=$A.componentService.newComponent({
+				 var component=$A.componentService.newComponentDeprecated({
 			            componentDef:{descriptor: 'markup://ui:carouselPage'},
 			            //page index starts with 1
 			            attributes:{values: {
@@ -113,11 +113,11 @@
 			        },null,true);
 				 pages.push(component);
 			}			
-			var body = pageContainer.getValue('v.body');
-			body.destroy();
-			body.setValue(pages);			 
-			cmp.getValue('v.pageComponents').setValue(pages);
-		}		
+			cmp.getValue('v.pageComponents').setValue(pages, true);
+		}
+		
+		this.initPageIndicator(cmp);
+		this.initScroller(cmp);
 	},	
 	
 	initPageIndicator : function(cmp) {		
@@ -142,7 +142,7 @@
 	/**
 	 * Update carousel and page size if carousel width is not pre-defined
 	 */
-	updateSize: function(cmp) {
+	updateSize: function(cmp) {		
 		var origWidth = cmp.get('v.width'),
 			origHeight = cmp.get('v.height');
 	
@@ -159,7 +159,7 @@
 				var e = pages[i].get('e.updateSize');
 				e.setParams({pageSize: parentSize});
 				e.fire();					
-			}				
+			}
 		}
 	},
 	
@@ -175,6 +175,7 @@
 		
 		return {width: width, height: height}
 	},
+		 
 	
 	/**
 	 * Update page content
@@ -265,7 +266,7 @@
 	/**
 	 * Handle scroll event 
 	 */
-	handleScrollEnd: function(cmp, evt) {
+	handleScrollEnd: function(cmp, evt) {		
 		var scroller = this.getScroller(cmp),
 			//scroller page starts with 0
 			currentPageX = scroller.currPageX + 1,			
@@ -281,7 +282,9 @@
 			return;
 		}
 		
+		
 		this.pageSelected(cmp, currentPageX);
+		
 		
 		if (cmp._pageToHide) {
 			//it has scrolled to the next page, need to hide the previous page
@@ -338,9 +341,9 @@
 		}
 
 		var curPageCmp = this.getPageComponentFromIndex(cmp, pageIndex);
-		if (curPageCmp) {
+		if (curPageCmp && curPageCmp.isRendered()) {
 			var prePageCmp = this.getPageComponentFromIndex(cmp, prevSelectedPage);
-			
+
 			cmp.getAttributes().setValue('priv_currentPage', pageIndex);
 			
 			this.firePageSelectedEventToPage(prePageCmp, pageIndex);
@@ -433,7 +436,7 @@
 	
 	getPageIndicatorsComponent : function(cmp) {
 		var indicators = cmp.get('v.indicators');
-		return cmp.get('v.continuousFlow') != true && indicators ? indicators[0].find({ instancesOf : "ui:carouselPageIndicator" })[0] : null;
+		return cmp.get('v.continuousFlow') != true && indicators ? indicators[0] : null;
 	},
 	 
 	getScroller : function(cmp) {		

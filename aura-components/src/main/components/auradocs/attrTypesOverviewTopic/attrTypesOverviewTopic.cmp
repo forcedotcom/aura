@@ -42,7 +42,7 @@
               <tr>
                      <td><code>default</code></td>
                      <td>String</td>
-                     <td>The default value to use for the attribute, which can be overwritten as needed. See <auradocs:topicLink topic="valueObjects">Value Objects</auradocs:topicLink> to learn how to access and set values.</td>
+                     <td>The default value to use for the attribute, which can be overwritten as needed. See <auradocs:topicLink topic="valueObjects">Value Objects</auradocs:topicLink> to learn how to access and set values. You can't use an expression to set the default value of an attribute. Instead, to set a dynamic default, use an <auradocs:topicLink topic="initHandler">init event</auradocs:topicLink>.</td>
               </tr>
               <tr>
                      <td><code>required</code></td>

@@ -25,10 +25,13 @@
         if (indexVar) {
             extraProviders[indexVar] = $A.expressionService.create(null, index);
         }
-        var ivp = $A.expressionService.createPassthroughValue(extraProviders, atts.getValueProvider());
+        var ivp;
         for (var j = 0; j < body.getLength(); j++) {
             var cdr = body.get(j);
-            ret.push($A.componentService.newComponent(cdr, ivp, false, doForce));
+            if (!ivp) {
+                ivp = $A.expressionService.createPassthroughValue(extraProviders, cdr.valueProvider || atts.getValueProvider());
+            }
+            ret.push($A.componentService.newComponentDeprecated(cdr, ivp, false, doForce));
         }
         return ret;
     },

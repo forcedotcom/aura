@@ -45,7 +45,7 @@ var AuraClientService = function() {
                 }
 
                 // Why is this happening in the ClientService? --JT
-                var component = componentService.newComponent(config, null, false, true);
+                var component = componentService.newComponentDeprecated(config, null, false, true);
 
                 $A.endMark("Initial Component Created");
 
@@ -345,7 +345,7 @@ var AuraClientService = function() {
                 componentConfig["localId"] = localId;
 
                 var root = $A.getRoot();
-                var c = $A.componentService.newComponent(componentConfig, root);
+                var c = $A.componentService.newComponentDeprecated(componentConfig, root);
 
                 if (!errors) {
                     // Wire up event handlers
@@ -397,6 +397,8 @@ var AuraClientService = function() {
          * @param {Boolean} exclusive run this action as an exclusive action.
          */
         enqueueAction : function(action, background, exclusive) {
+            $A.assert(!$A.util.isUndefinedOrNull(action), "EnqueueAction() cannot be called on an undefined or null action.");
+            $A.assert(!$A.util.isUndefined(action.auraType)&& action.auraType==="Action", "Cannot call EnqueueAction() with a non Action parameter.");
             //
             // FIXME: W-1652115 We need to enable this.
             //

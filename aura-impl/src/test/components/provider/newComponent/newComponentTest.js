@@ -101,7 +101,7 @@
         test:function(cmp){
             var config = { componentDef:"markup://provider:clientProvider", attributes:{ values:{ value:'arrested:development'} } };
             try{
-                $A.componentService.newComponent(config, null, true, false);
+                $A.componentService.newComponentDeprecated(config, null, true, false);
             } catch (e){
                 $A.test.assertEquals("Assertion Failed!: DefDescriptor config undefined : undefined", e.message);
                 return;
@@ -116,7 +116,7 @@
     testClientProvidedNullDescriptor:{
         test:function(cmp){
             var config = { componentDef:"markup://provider:clientProvider", attributes:{ values:{ value:null} } };
-            var creation = $A.componentService.newComponent(config, null, true, false);
+            var creation = $A.componentService.newComponentDeprecated(config, null, true, false);
             $A.test.assertEquals("markup://provider:clientProvider", creation.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals(null, creation.getAttributes().get("value"));
         }
@@ -128,7 +128,7 @@
     testClientProvidedUndefinedDescriptor:{
         test:function(cmp){
             var config = { componentDef:"markup://provider:clientProvider", attributes:{ values:{ value:undefined} } };
-            var creation = $A.componentService.newComponent(config, null, true, false);
+            var creation = $A.componentService.newComponentDeprecated(config, null, true, false);
             $A.test.assertEquals("markup://provider:clientProvider", creation.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals(undefined, creation.getAttributes().get("value"));
         }

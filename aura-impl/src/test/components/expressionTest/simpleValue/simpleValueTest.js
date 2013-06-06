@@ -28,7 +28,7 @@
 			"2: At initialization, both getValue and previousValue should reflect same value");
 		//Set value to FALSE
 		valueObj.getValue("boolean").setValue(false);
-    
+
 		$A.test.assertTrue(valueObj.getValue("boolean").getPreviousValue(), "Before commit, getPreviousValue should not reflect new value");
 		$A.test.assertFalse(valueObj.getValue("boolean").getValue(), "getValue should reflect latest value");
 		$A.test.assertTrue(valueObj.getValue("boolean").isDirty(),"Dirty Flag not set after setvalue")
@@ -36,12 +36,12 @@
 		valueObj.getValue("boolean").rollback();
 		$A.test.assertFalse(valueObj.getValue("boolean").isDirty(),"Dirty Flag not set after rollback")
 		$A.test.assertTrue(valueObj.getValue("boolean").getValue(), "On Rollback, both getValue and previousValue should reflect same value");
-		$A.test.assertTrue(valueObj.getValue("boolean").getPreviousValue(), "2: At initialization, both getValue and previousValue should reflect same value");
+		$A.test.assertTrue(valueObj.getValue("boolean").getPreviousValue(), "2: After rollback, both getValue and previousValue should reflect same value");
 		
 		//Set to FALSE and COMMIT the value
 		valueObj.getValue("boolean").setValue(false);
 		valueObj.getValue("boolean").commit();
-		$A.test.assertFalse(valueObj.getValue("boolean").isDirty(),"Dirty Flag not set after commit")
+		$A.test.assertFalse(valueObj.getValue("boolean").isDirty(),"Dirty Flag not set after commit");
 		$A.test.assertFalse(valueObj.getValue("boolean").getPreviousValue(), "After commit, getPreviouValue should reflect new value");
 		$A.test.assertFalse(valueObj.getValue("boolean").getValue(), "getValue should reflect latest value");
 	}
@@ -59,7 +59,7 @@
 		valueObj.getValue("boolean").setValue(false);
 		$A.test.assertFalse(valueObj.getValue("boolean").getValue(), "Boolean: Failed to get most recent value");
 		
-		//Try setting Interger Values
+		//Try setting Integer Values
 		$A.test.assertEquals(123, valueObj.getValue("integer").getValue(), "Integer: Failed to initialize the value object");
 		valueObj.getValue("integer").setValue(789);
 		$A.test.assertEquals(789,valueObj.getValue("integer").getValue(), "Integer: Failed to get most recent value");

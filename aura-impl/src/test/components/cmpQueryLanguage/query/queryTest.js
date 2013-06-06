@@ -65,7 +65,7 @@
         test:function(cmp){
             var result = $A.getQueryStatement().query();
             this.verifyQueryResultCount(result, 2);
-            cmp.getValue("v.body").push($A.componentService.newComponent({componentDef:"markup://aura:text", localId:"txt_Id"}, cmp));
+            cmp.getValue("v.body").push($A.componentService.newComponentDeprecated({componentDef:"markup://aura:text", localId:"txt_Id"}, cmp));
 
             result = $A.getQueryStatement().query();
             this.verifyQueryResultCount(result, 3);

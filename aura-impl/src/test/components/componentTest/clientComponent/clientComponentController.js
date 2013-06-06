@@ -1,36 +1,42 @@
 ({
     showOutputCmp: function(cmp) {
-
         $A.componentService.newComponentAsync(
-	        function(newCmp) {
-	            cmp.getValue("v.outputValue").setValue(newCmp.getValue("v.value").value);
-	        },
-	        this,
-	        {
-            componentDef: {
-                descriptor: "ui:outputNumber"
+            this,
+            function(newCmp) {
+                cmp.getValue("v.outputValue").setValue(newCmp.getValue("v.value").value);
             },
-            attributes: {
-                value: 6
-            }
-        }, null, null, null);
+            {
+                componentDef: {
+                    descriptor: "ui:outputNumber"
+                },
+                attributes: {
+                    values: {
+                        value: 6
+                    }
+                }
+            },
+            null, null, null
+        );
     },
 
     addOutputCurrency: function(cmp) {
         $A.componentService.newComponentAsync(
+            this,
             function(newCmp) {
                 cmp.getValue("v.body").push(newCmp);
             },
-            this,
             {
-            componentDef: {
-                descriptor: "ui:outputCurrency"
+                componentDef: {
+                    descriptor: "ui:outputCurrency"
+                },
+                attributes: {
+                    values: {
+                        value: 3,
+                        currencyCode: "GBP"
+                    }
+                }
             },
-            attributes: {
-                value: 3,
-                currencyCode: "GBP"
-            }
-        }, null, null, null
+            null, null, null
         );
     }
 });

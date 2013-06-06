@@ -104,7 +104,7 @@
                        eventParamName:"msg",
                        eventParamValue:"foo!" },
         test: function(cmp){
-            $A.test.expectAuraError(true);
+            $A.test.expectAuraError("org.auraframework.throwable.quickfix.DefinitionNotFoundException");
             cmp.find("trigger").get("e.press").fire();
             $A.test.addWaitFor(
                     true,

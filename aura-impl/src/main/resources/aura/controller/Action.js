@@ -135,11 +135,11 @@ Action.prototype.getComponent = function() {
  * @param {Function}
  *            callback The callback function to run for each controller.
  * @param {String=}
- * 	      name The action state for which the callback is to be associated with.		           
+ * 	      name The action state for which the callback is to be associated with.
  */
 Action.prototype.setCallback = function(scope, callback, name) {
     if(!$A.util.isFunction(callback)){
-	$A.error("Action callback should be a function");
+        $A.error("Action callback should be a function");
         return;
     }
     //If name is undefined or specified as "ALL", then apply same callback in all cases

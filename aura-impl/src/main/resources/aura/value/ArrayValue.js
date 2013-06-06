@@ -572,7 +572,7 @@ ArrayValue.prototype.rerender = function(suppliedReferenceNode, appendChild, ins
 
             if (!item["getDef"]) {
                 // If someone passed a config in, construct it.
-                item = $A.componentService.newComponent(item, null, false, true);
+                item = $A.componentService.newComponentDeprecated(item, null, false, true);
 
                 // And put the constructed component back into the array.
                 array[j] = item;

@@ -536,51 +536,58 @@ $A.ns.Aura.prototype.finishInit = function(doNotCallJiffyOnLoad) {
  *    expected failure in the initial render of the page, before any particular
  *    test is running, so no test annotation is going to work.
  */
-$A.ns.Aura.prototype.error = function(e, stopTest) {
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    $A.log(e.stack || e);
-    //#end
-    if (stopTest === undefined) {
-        stopTest = true;
-    }
-    var str = "";
+$A.ns.Aura.prototype.error = function(e) {
+    var msg = null;
+    var logMsg = null;
+
     if ($A.util.isString(e)) {
-        str = e;
-        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-        try {
-            throw Error("stack")
-        } catch (getstack) {
-            str = e + "\n" + getstack.stack;
-            $A.log(getstack.stack);
+        logMsg = e;
+        msg = e;
+        e = null;
+    } else if (!$A.util.isObject(e) && !$A.util.isError(e)) {
+        logMsg = "Unrecognized parameter to aura.error";
+        msg = "Internal Error";
+    } else {
+        logMsg = null;
+        if (!$A.util.isUndefinedOrNull(e.message)) {
+            msg = e.message;
+        } else {
+            msg = "Unknown Error";
         }
-        //#end
-    } else if ($A.util.isObject(e) || $A.util.isError(e)) {
-        // we treat error objects differently from object object, isObject means is it a map
+    }
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    var stack = this.getStackTrace(e);
+    $A.logInternal("Error", logMsg, e, stack);
+    if ($A.util.isObject(e)) {
         for(var k in e) {
             try {
                 var val = e[k];
 
                 if ($A.util.isString(val)) {
-                    str = str + '\n' + val;
+                    msg = msg + '\n' + val;
                 }
             } catch (e2) {
                 // Ignore serialization errors
             }
         }
-        if (!str) {
-            str = e.message + e.stack;
-        }
-    } else {
-        $A.log("Unrecognized parameter to aura.error", e);
-        return;
     }
-    $A.message(str);
-
-    if ($A.test && stopTest && !$A.test.isExpectingAuraError()) {
-        $A.test.fail(str);
+    if (stack) {
+        msg = msg+"\n"+stack.join("\n");
+    }
+    //#end
+    $A.message(msg);
+    if ($A.test) {
+        $A.test.auraError(msg);
     }
     if (!$A.initialized) {
         $A["hasErrors"] = true;
+    }
+};
+
+$A.ns.Aura.prototype.warning = function(w) {
+    $A.logInternal("Warning: ",w, null, this.getStackTrace(null));
+    if ($A.test) {
+        $A.test.auraWarning(str);
     }
 };
 
@@ -721,6 +728,84 @@ $A.ns.Aura.prototype.userAssert = function(condition, msg) {
     $A.assert(condition, msg);
 };
 
+$A.ns.Aura.prototype.stringVersion = function(logMsg, error, trace) {
+    var stringVersion = logMsg;
+    if (!$A.util.isUndefinedOrNull(error) && !$A.util.isUndefinedOrNull(error.message)) {
+        stringVersion += " : " + error.message;
+        if ($A.util.isObject(error)) {
+        }
+    }
+    if (!$A.util.isUndefinedOrNull(trace)) {
+        stringVersion += "\nStack: " + trace.join("\n");
+    }
+    return stringVersion;
+};
+
+/**
+ * Log something: for internal use only..
+ *
+ * Currently, this logs to the JavaScript console if it is available, and does not throw errors otherwise.
+ *
+ *  If both value and error are passed in, value shows up in the console as a group with value logged within the group.
+ *  If only value is passed in, value is logged without grouping.
+ *  <p>For example, <code>$A.log(action.getError());</code> logs the error from an action.</p>
+ * @public
+ * @param {Object} value The first object to log.
+ * @param {Object} error The error messages to be logged in the stack trace.
+ */
+$A.ns.Aura.prototype.logInternal = function(type, message, error, trace) {
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    var logMsg = type + ": ";
+    var stringVersion = null;
+
+    if (!$A.util.isUndefinedOrNull(message)) {
+        stringVersion += " : " + message;
+    }
+    if (!$A.util.isUndefinedOrNull(error) && !$A.util.isUndefinedOrNull(error.message)) {
+        stringVersion += " : " + error.message;
+    }
+    if (window["console"]) {
+        var console = window["console"];
+        if (console["group"]) {
+            console["group"](logMsg);
+            if (!$A.util.isUndefinedOrNull(error)) {
+                console["debug"](error);
+            } else {
+                console["debug"](message);
+            }
+            if (trace) {
+                console["group"]("stack");
+                for ( var i = 0; i < trace.length; i++) {
+                    console["debug"](trace[i]);
+                }
+                console["groupEnd"]();
+            }
+            console["groupEnd"]();
+        } else {
+            stringVersion = this.stringVersion(logMsg, error, trace);
+            if (console["debug"]) {
+                console["debug"](stringVersion);
+            } else if (console["log"]) {
+                console["log"](stringVersion);
+            }
+        }
+    }
+    
+    // sending logging info to debug tool if enabled
+    if(!$A.util.isUndefinedOrNull($A.util.getDebugToolComponent())) {
+        if ($A.util.isUndefinedOrNull(stringVersion)) {
+            if ($A.util.isUndefinedOrNull(trace)) {
+                trace = this.getStackTrace(error);
+            }
+            stringVersion = this.stringVersion(logMsg, error, trace);
+        }
+    	var debugLogEvent = $A.util.getDebugToolsAuraInstance().get("e.aura:debugLog");
+	debugLogEvent.setParams({"type" : "console", "message" : stringVersion});
+    	debugLogEvent.fire();
+    }
+    //#end
+};
+
 /**
  *  Log something.  Currently, this logs to the JavaScript console if it is available, and does not throw errors otherwise.
  *  If both value and error are passed in, value shows up in the console as a group with value logged within the group.
@@ -731,51 +816,11 @@ $A.ns.Aura.prototype.userAssert = function(condition, msg) {
  * @param {Object} error The error messages to be logged in the stack trace.
  */
 $A.ns.Aura.prototype.log = function(value, error) {
-    if (window["console"]) {
-        if (this.util.isError(value) && value.stack) {
-            value = value.stack;
-        }
-        var console = window["console"];
-        if (error !== undefined && console["group"]) {
-            console["group"](value);
-            console["debug"](error);
-            var trace = this.getStackTrace(error);
-            if (trace) {
-                console["group"]("stack");
-                for ( var i = 0; i < trace.length; i++) {
-                    console["debug"](trace[i]);
-                }
-                console["groupEnd"]();
-            }
-            console["groupEnd"]();
-        } else if (console){
-            if (error) {
-                value += "\n" + error.message;
-            }
-
-            if (console["debug"]) {
-                console["debug"](value);
-            } else if (console["log"]) {
-                console["log"](value);
-            }
-        }
+    if (this.util.isError(value)) {
+        error = value;
+        value = error.message;
     }
-    
-    //#if {"excludeModes" : ["PRODUCTION"]}
-    // sending logging info to debug tool if enabled
-    if(!$A.util.isUndefinedOrNull($A.util.getDebugToolComponent())) {
-    	var output = value;
-    	if (!$A.util.isUndefinedOrNull(error)) {
-    		output += "\nError: " + error;
-    		if (!$A.util.isUndefinedOrNull(trace)) {
-    			output += "\nStack: " + trace.join("\n");
-    		}
-    	}
-    	var debugLogEvent = $A.util.getDebugToolsAuraInstance().get("e.aura:debugLog");
-    	debugLogEvent.setParams({"type" : "console", "message" : output});
-    	debugLogEvent.fire();
-    }
-    //#end
+    this.logInternal("Info", value, error, false);
 };
 
 /**
@@ -822,16 +867,30 @@ $A.ns.Aura.prototype.rpad = function(str, padString, length) {
 };
 
 /**
- * Returns the stack trace, including the functions on the stack. Values are not logged.
+ * Returns the stack trace, including the functions on the stack if available (Error object varies across browsers).
+ * Values are not logged.
  *
  * @private
  */
-$A.ns.Aura.prototype.getStackTrace = function(e) {
-    if (e.stack) {
+$A.ns.Aura.prototype.getStackTrace = function(e, remove) {
+    if (!remove) {
+        remove = 0;
+    }
+    if (!e || !(e.stack)) {
+        try {
+            throw new Error("foo");
+        } catch (f) {
+            e = f;
+            remove += 2;
+        }
+    }
+    if (e && e.stack) {
         var ret = e.stack.replace(/(?:\n@:0)?\s+$/m, '');
         ret = ret.replace(new RegExp('^\\(', 'gm'), '{anonymous}(');
         ret = ret.split("\n");
-
+        if (remove !== 0) {
+            ret.splice(0,remove);
+        }
         return ret;
     }
     return null;

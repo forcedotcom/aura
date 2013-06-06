@@ -26,15 +26,11 @@ public class AttributeImplTest extends AuraImplTestCase {
     public void testAttribute() throws Exception {
         Attribute testAttribute = vendor.makeAttribute("testAttribute");
         assertNotNull(testAttribute);
-
-        Attribute testFakeAttribute = vendor.makeAttribute("fakeTestAttribute");
-        assertNotNull(testFakeAttribute);
     }
 
     public void testGetName() throws Exception {
         Attribute testAttribute = vendor.makeAttribute("testAttribute");
         assertEquals("testAttribute", testAttribute.getName());
-        assertEquals("fakeTestAttribute", vendor.makeAttribute("fakeTestAttribute").getName());
     }
 
     public void testSetAndGetValue() throws Exception {

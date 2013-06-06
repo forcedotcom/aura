@@ -35,7 +35,7 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
             Map<String, Object> attributes, DefType defType, Set<String> testLabels, Set<String> browsers,
             Set<Definition> mocks, Set<String> exceptionsAllowedDuringInit) {
         super(DefDescriptorImpl.getInstance(suiteDescriptor.getQualifiedName() + "/" + DefType.TESTCASE + "$" + name,
-                TestCaseDef.class), location);
+                TestCaseDef.class), location, null);
         this.attributes = AuraUtil.immutableMap(attributes);
         this.defType = defType;
         this.testLabels = AuraUtil.immutableSet(testLabels);

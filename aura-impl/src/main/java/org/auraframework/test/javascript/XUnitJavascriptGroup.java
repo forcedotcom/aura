@@ -20,13 +20,15 @@ import java.io.IOException;
 import java.util.EnumSet;
 
 import org.auraframework.impl.util.AuraImplFiles;
-import org.auraframework.util.javascript.directive.*;
+import org.auraframework.util.javascript.directive.DirectiveBasedJavascriptGroup;
+import org.auraframework.util.javascript.directive.DirectiveType;
+import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
 
 import com.google.common.collect.ImmutableList;
 
 public class XUnitJavascriptGroup extends DirectiveBasedJavascriptGroup {
     public static final ImportDirectiveType importType = new ImportDirectiveType();
-    public static final ImmutableList<DirectiveType<?>> DIRECTIVES = ImmutableList.<DirectiveType<?>>of(importType);
+    public static final ImmutableList<DirectiveType<?>> DIRECTIVES = ImmutableList.<DirectiveType<?>> of(importType);
     private static final File auraGroupRoot = AuraImplFiles.AuraJavascriptSourceDirectory.asFile();
 
     public XUnitJavascriptGroup(String name, File root, String start) throws IOException {
@@ -35,9 +37,9 @@ public class XUnitJavascriptGroup extends DirectiveBasedJavascriptGroup {
 
     @Override
     public File addFile(String s) throws IOException {
-        if(getStartFile() == null){
+        if (getStartFile() == null) {
             return super.addFile(s);
-        }else{
+        } else {
             File f = new File(auraGroupRoot, s);
             addFile(f);
             return f;

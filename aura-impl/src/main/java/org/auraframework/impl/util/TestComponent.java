@@ -275,7 +275,6 @@ public final class TestComponent implements ComponentDef {
 
     @Override
     public Visibility getVisibility() {
-
         return Visibility.PUBLIC;
     }
 }

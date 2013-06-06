@@ -14,14 +14,12 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 
--->
-	  
-		    	
+-->    	
 <aura:component>
 <div> 	
- 	<ui:carousel width="450" height="450" class="myclass">
+ 	<ui:carousel aura:id="carousel1" width="450" height="450" class="myclass">
  		<aura:set attribute="pageComponents">
-	 		<ui:carouselPage>
+	 		<ui:carouselPage aura:id="c1-p1">
 	 			<ui:carouselPageItem label="New Post 1" class="entity-post" />
 	 			<ui:carouselPageItem label="Task 1" class="entity-task" />
 	 			<ui:carouselPageItem label="New Opportunity 1" class="entity-opportunity" />	
@@ -29,7 +27,7 @@
 	 			<ui:carouselPageItem label="File 1" class="entity-file" />
 	 			<ui:carouselPageItem label="Post a New Poll 1" class="entity-poll" />
 	 		</ui:carouselPage>
-	 		<ui:carouselPage>
+	 		<ui:carouselPage aura:id="c1-p2" isDefault="{!true}">
 	 			<ui:carouselPageItem label="New Post 2" class="entity-post" />
 	 			<ui:carouselPageItem label="Task 2" class="entity-task" />
 	 			<ui:carouselPageItem label="New Opportunity 2" class="entity-opportunity" />	
@@ -37,20 +35,184 @@
 	 			<ui:carouselPageItem label="File 2" class="entity-file" />
 	 			<ui:carouselPageItem label="Post a New Poll 2" class="entity-poll" />
 	 		</ui:carouselPage>
-	 		<ui:carouselPage>
-	 			<ui:carouselPageItem label="New Post 3" class="entity-post" />
-	 			<ui:carouselPageItem label="Task 3" class="entity-task" />
-	 			<ui:carouselPageItem label="New Opportunity 3" class="entity-opportunity" />	
-	 			<ui:carouselPageItem label="Thank Someone 3" class="entity-thanks" />
-	 			<ui:carouselPageItem label="File 3" class="entity-file" />
-	 			<ui:carouselPageItem label="Post a New Poll 3" class="entity-poll" />
+	 		<ui:carouselPage aura:id="c1-pageWithLongString" title="PAGE 3">
+	 			{!m.longStr}
 	 		</ui:carouselPage>
-	 		<ui:carouselPage>
-	 			<h1> Page 4 </h1>
+	 		<ui:carouselPage aura:id="c1-bigImage">
+	 			<ui:image src="/auraFW/resources/aura/images/auraNoteDemo.png"/>
+	 		</ui:carouselPage>
+	 		<ui:carouselPage aura:id="c1-mixContent">
+	 			<h1>Welcome to this page!</h1>
+	 			<ui:carouselPageItem label="Carousel Page Item"/>
+	 			<div>
+	 				<ui:image src="/auraFW/resources/aura/images/hula.gif"/> This is an ui:carousel page to demo the exciting ui:carousel components. Enjoy!
+	 			</div>
+	 			<div>
+	 				<p>Here are some random components</p>
+	 				<ui:inputCheckbox label="a checkbox"/><br/>
+	 				<ui:inputNumber label="enter a number"/><br/>
+	 				<ui:outputText value="hello, i'm an output text component"/><br/>
+	 			</div>
+	 			<table>
+	 				<tr>
+	 					<td>apple</td>
+	 					<td>2</td>
+	 					<td>red</td>
+	 				</tr>
+	 				<tr>
+	 					<td>orange</td>
+	 					<td>1</td>
+	 					<td>orange</td>
+	 				</tr>
+	 				<tr>
+	 					<td>banana</td>
+	 					<td>6</td>
+	 					<td>yellow</td>
+	 				</tr>
+	 			</table>	 			
+	 		</ui:carouselPage>
+	 		<ui:carouselPage aura:id="c1-empty">
+	 			
+	 		</ui:carouselPage>
+	 		<ui:carouselPage aura:id="c1-updateOutput">
+	 			<ui:button aura:id="btnUpdateOutput" press="{!c.updateOutput}" label="update output"/>
+	 			<div><ui:outputText aura:id="output" value="i have something to say..."/></div>
 	 		</ui:carouselPage>
  		</aura:set>
  	</ui:carousel>
 </div> 	
 
+
+<br/><br/>Carousel2<br/><br/>
+<ui:carousel aura:id="carousel2" width="450" height="450">
+	<aura:set attribute="pageComponents">
+ 		<ui:carouselPage>
+ 			<p>Press button to rerender this carousel with a new carousel that has 100 pages.<br/>
+ 				This component will be usefull to test<br/>
+ 				<ul>
+ 					<li>One tab carousel</li>
+ 					<li>Carousel rerendering</li>
+ 				</ul>
+ 			</p>
+ 			<ui:button aura:id="btnCreatePages" press="{!c.addManyPgCarousel}" label="create pages"/>
+ 		</ui:carouselPage>
+	</aura:set>
+</ui:carousel>
+
+<br/><br/>Navigation on Bottom<br/><br/>
+<ui:carousel aura:id="carouselNavBottom" width="450" height="450" pageIndicatorPosition="bottom">
+	<aura:set attribute="pageComponents">
+ 		<ui:carouselPage aura:id="cnb-p1">
+ 			page 1
+ 		</ui:carouselPage>
+ 		<ui:carouselPage aura:id="cnb-p2">
+ 			page 2
+ 		</ui:carouselPage>
+ 		<ui:carouselPage aura:id="cnb-p3">
+ 			page 3
+ 		</ui:carouselPage>
+	</aura:set>
+</ui:carousel>
+
+<br/><br/>Carousel That Overrides isDefalut<br/><br/>
+<ui:carousel aura:id="carouselDefaultOverride" width="450" height="450" title="Im A Carousel" defaultPage="3">
+	<aura:set attribute="pageComponents">
+ 		<ui:carouselPage title="Im Page 1">
+ 			<ui:outputText aura:id="cdo-p1-output" value="page 1"/>
+ 		</ui:carouselPage>
+ 		<ui:carouselPage title="Im Page 2" isDefault="{!true}">
+ 			<ui:outputText aura:id="cdo-p2-output" value="page 2"/>
+ 		</ui:carouselPage>
+ 		<ui:carouselPage title="Im Page 3">
+ 			<ui:outputText aura:id="cdo-p3-output" value="page 3"/>
+ 		</ui:carouselPage>
+	</aura:set>
+</ui:carousel>
+
+
+<br/><br/>Carousel with Max Pages<br/><br/>
+<ui:carousel aura:id="carouselMaxPages" width="450" height="450">
+	<aura:set attribute="pageComponents">
+		<aura:iteration items="{!m.pageList}" var="page"> 
+			<ui:carouselPage>
+				{!page}
+			</ui:carouselPage>
+		</aura:iteration>
+	</aura:set>
+</ui:carousel>
+
+
+<br/><br/>Carousel within another Carousel<br/><br/>
+<ui:carousel aura:id="carouselInCarousel" width="450" height="450">
+	<aura:set attribute="pageComponents">
+		<ui:carouselPage aura:id="cinc-p1">
+ 			<ui:carousel aura:id="childCarousel-smaller" width="100" height="100">
+				<aura:set attribute="pageComponents">
+			 		<ui:carouselPage aura:id="childCarousel-smaller-p1">
+			 			<p>Child carousel #1 which is smaller <br/> Page #1</p>
+			 		</ui:carouselPage>
+			 		<ui:carouselPage aura:id="childCarousel-smaller-p2">
+			 			<p>Child carousel #1 which is smaller <br/> Page #2</p>
+			 		</ui:carouselPage>
+			 		<ui:carouselPage aura:id="childCarousel-smaller-p3">
+			 			<p>Child carousel #1 which is smaller <br/> Page #3</p>
+			 		</ui:carouselPage>
+				</aura:set>
+			</ui:carousel>
+	 	</ui:carouselPage>
+	 	<ui:carouselPage aura:id="cinc-p2">
+ 			<ui:carousel aura:id="childCarousel-sameDim" width="450" height="450">
+				<aura:set attribute="pageComponents">
+			 		<ui:carouselPage aura:id="childCarousel-sameDim-p1">
+			 			<p>Child carousel #2 which has same dimentions <br/> Page #1</p>
+			 		</ui:carouselPage>
+			 		<ui:carouselPage aura:id="childCarousel-sameDim-p2">
+			 			<p>Child carousel #2 which has same dimentions <br/> Page #2</p>
+			 		</ui:carouselPage>
+			 		<ui:carouselPage aura:id="childCarousel-sameDim-p3">
+			 			<p>Child carousel #2 which has same dimentions <br/> Page #3</p>
+			 		</ui:carouselPage>
+				</aura:set>
+			</ui:carousel>
+	 	</ui:carouselPage>
+	 	<ui:carouselPage aura:id="cinc-p3">
+ 			<ui:carousel aura:id="childCarousel-larger" width="600" height="600">
+				<aura:set attribute="pageComponents">
+			 		<ui:carouselPage aura:id="childCarousel-larger-p1">
+			 			<p>Child carousel #3 which is larger <br/> Page #1</p>
+			 		</ui:carouselPage>
+			 		<ui:carouselPage aura:id="childCarousel-larger-p2">
+			 			<p>Child carousel #3 which is larger <br/> Page #2</p>
+			 		</ui:carouselPage>
+			 		<ui:carouselPage aura:id="childCarousel-larger-p3">
+			 			<p>Child carousel #3 which is larger <br/> Page #3</p>
+			 		</ui:carouselPage>
+				</aura:set>
+			</ui:carousel>
+	 	</ui:carouselPage>
+	 </aura:set>
+</ui:carousel>
+
+
+<br/><br/>Continous Flow<br/><br/>
+<ui:carousel aura:id="carouselContinousFlow" width="450" height="450" continuousFlow="{!true}">
+	<aura:set attribute="pageComponents">
+ 		<ui:carouselPage>
+ 			<ui:outputText aura:id="ccf-p1-output" value="page 1"/>
+ 		</ui:carouselPage>
+ 		<ui:carouselPage>
+ 			<ui:outputText aura:id="ccf-p2-output" value="page 2"/>
+ 		</ui:carouselPage>
+ 		<ui:carouselPage>
+ 			<ui:outputText aura:id="ccf-p3-output" value="page 3"/>
+ 		</ui:carouselPage>
+	</aura:set>
+</ui:carousel>
+
+
+<br/><br/>Empty Carousel<br/><br/>
+<ui:carousel aura:id="emptyCarousel" width="450" height="450" title="EMPTY CAROUSEL">
+	<p>This is a carousel without any carouselPages hear me roar!</p>
+</ui:carousel>
 
 </aura:component>

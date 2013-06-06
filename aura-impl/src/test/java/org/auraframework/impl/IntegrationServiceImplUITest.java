@@ -66,8 +66,8 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     }
 
     /**
-     * Verify using IntegrationService to inject a simple component with a Java
-     * model, Javascript Controller and Java Controller.
+     * Verify using IntegrationService to inject a simple component with a Java model, Javascript Controller and Java
+     * Controller.
      */
     public void testSimpleComponentWithModelAndController() throws Exception {
         DefDescriptor<ComponentDef> cmpToInject = setupSimpleComponentWithModelAndController();
@@ -113,16 +113,16 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                                 cmpDesc.getName()), ControllerDef.class);
         auraTestingUtil.addSourceAutoCleanup(jsControllerdesc, "{" + "handleClick:function(cmp){"
                 + "var a = cmp.get('c.getString');"
-                + "a.setCallback(cmp,function(a){" + "cmp.find('dataFromController').getValue('v.body').push("
-                + "$A.newCmpDeprecated({componentDef: 'markup://aura:text'," + "attributes:{"
-                + "values:{value:a.getReturnValue()}" + "}" + "}));" + "});"
-                + "$A.enqueueAction(a);" + "}" + "}");
+                + "a.setCallback(cmp,function(a){ "
+                + "$A.componentService.newComponentAsync("
+                + "this, function(newCmp){cmp.find('dataFromController').getValue('v.body').push(newCmp);},"
+                + "{componentDef: 'markup://aura:text', attributes:{ values:{ value: a.getReturnValue() }}}"
+                + ")}); $A.enqueueAction(a);}}");
         return cmpDesc;
     }
 
     /**
-     * Verify use of integration service to inject a component and initialize
-     * various types of attributes.
+     * Verify use of integration service to inject a component and initialize various types of attributes.
      */
     public void testAttributesInitialization() throws Exception {
         String attributeMarkup = "<aura:attribute name='strAttr' type='String'/>"
@@ -176,8 +176,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     }
 
     /**
-     * Verify use of integration service to inject a component and initialize a
-     * Aura.Component[] type attribute.
+     * Verify use of integration service to inject a component and initialize a Aura.Component[] type attribute.
      * 
      * @throws Exception
      */
@@ -219,8 +218,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     }
 
     /**
-     * Verify the behavior of injectComponent when the placeholder specified is
-     * missing.
+     * Verify the behavior of injectComponent when the placeholder specified is missing.
      */
     public void testMissingPlaceholder() throws Exception {
         DefDescriptor<ComponentDef> cmpToInject = auraTestingUtil.addSourceAutoCleanup(ComponentDef.class,
@@ -241,8 +239,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     }
 
     /**
-     * Verify that specifying localId(aura:id) for an injected component is
-     * allowed.
+     * Verify that specifying localId(aura:id) for an injected component is allowed.
      */
     public void testMissingLocalId() throws Exception {
         DefDescriptor<ComponentDef> cmpToInject = Aura.getDefinitionService().getDefDescriptor("aura:text",
@@ -260,8 +257,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     }
 
     /**
-     * Verify that exceptions that happen during component instance creation are
-     * surfaced on the page.
+     * Verify that exceptions that happen during component instance creation are surfaced on the page.
      */
     public void testExceptionDuringComponentInitialization() throws Exception {
         DefDescriptor<ComponentDef> cmpWithReqAttr = addSourceAutoCleanup(ComponentDef.class,
@@ -277,8 +273,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     }
 
     /**
-     * Verify that using multiple integration objects on page does not duplicate
-     * Aura Framework injection.
+     * Verify that using multiple integration objects on page does not duplicate Aura Framework injection.
      */
     @Ignore("W-1498404")
     public void testMultipleIntegrationObjectsOnSamePage() throws Exception {
@@ -318,8 +313,8 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     }
 
     /**
-     * LayoutService is not initialized for a page which is using Integration service.
-     * This test verifies that calling LayoutService APIs don't cause Javascript Errors on the page.
+     * LayoutService is not initialized for a page which is using Integration service. This test verifies that calling
+     * LayoutService APIs don't cause Javascript Errors on the page.
      */
     @Ignore("W-1506261")
     public void testLayoutServiceAPIs() throws Exception {
@@ -346,11 +341,10 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     }
 
     /**
-     * HistoryService is not initialized for a page which is using Integration service.
-     * This test verifies that calling HistoryService APIs don't cause Javascript Errors on the page.
-     * HistoryService initialization takes care of attaching a event handler for # changes in the URL.
-     * In case of integration service, this initialization is skipped. So changing url #
-     * should not fire aura:locationChange event
+     * HistoryService is not initialized for a page which is using Integration service. This test verifies that calling
+     * HistoryService APIs don't cause Javascript Errors on the page. HistoryService initialization takes care of
+     * attaching a event handler for # changes in the URL. In case of integration service, this initialization is
+     * skipped. So changing url # should not fire aura:locationChange event
      */
     public void testHistoryServiceAPIs() throws Exception {
         String expectedTxt = "";
@@ -393,8 +387,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     }
 
     /**
-     * Utility method to obtain the required markup of the integration stub
-     * component.
+     * Utility method to obtain the required markup of the integration stub component.
      */
     private String getIntegrationStubMarkup(String javaRenderer, Boolean attributeMap, Boolean placeHolder,
             Boolean localId) {
@@ -412,8 +405,8 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     }
 
     /**
-     * Pass the descriptor and attributes map of the component to be injected to
-     * a Stub component. Open the stub component using webdriver.
+     * Pass the descriptor and attributes map of the component to be injected to a Stub component. Open the stub
+     * component using webdriver.
      */
     private void openIntegrationStub(DefDescriptor<ComponentDef> stub, DefDescriptor<ComponentDef> toInject,
             Map<String, Object> attributeMap,

@@ -28,7 +28,7 @@ var AuraSerializationService = function(){
 
 
             $A.endMark("resolvedRefs");
-            var ret = $A.componentService.newComponent(config, null, false, true);
+            var ret = $A.componentService.newComponentDeprecated(config, null, false, true);
             $A.endMark("constructedComponent");
             return ret;
         }

@@ -316,7 +316,7 @@
     },
 
     generateComponent:function(type,attributes,events){
-        var component=$A.componentService.newComponent({
+        var component=$A.componentService.newComponentDeprecated({
             componentDef:{descriptor:(type.indexOf('://')==-1?"markup://":'')+type},
             attributes:{values:attributes}
         },null,true);

@@ -15,7 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.impl.java.controller.TestController">
-    <actionChain:chainLocalActions aura:id='facet'/>
-    <aura:registerevent name="press" type="ui:press"/>
+<aura:component>
+    <ui:outputDateTime value="2013-05-07T00:17:08.997Z"  timezone="Europe/Berlin" langLocale="de"/>
 </aura:component>

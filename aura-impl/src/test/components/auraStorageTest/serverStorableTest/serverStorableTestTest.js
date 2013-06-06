@@ -252,12 +252,17 @@
     		var action = cmp.get("c.getComponent");
 			action.setParams({testName: "testComponentsFromStoredServerAction"});
     		action.setStorable();
-    		action.setCallback(cmp, function(a){
-    			var newComponent = $A.newCmpDeprecated(a.getReturnValue());
-                cmp.find("facet").getValue("v.body").clear();
-                //Insert newly fetched component
-                cmp.find("facet").getValue("v.body").push(newComponent);
-    		});
+            action.setCallback(cmp, function(a){
+                $A.newCmpAsync(
+                        this,
+                        function(newComponent){
+                            cmp.find("facet").getValue("v.body").clear();
+                            //Insert newly fetched component
+                            cmp.find("facet").getValue("v.body").push(newComponent);
+                        },
+                        a.getReturnValue()
+                );
+            });
     		$A.enqueueAction(action);
     		$A.eventService.finishFiring();
     		$A.test.addWaitFor("SUCCESS", function(){return action.getState()},
@@ -275,9 +280,14 @@
     		dupAction.setParams({testName: "testComponentsFromStoredServerAction"});
     		dupAction.setStorable();
     		dupAction.setCallback(cmp, function(a){
-    			var secondNewComponent = $A.newCmpDeprecated(a.getReturnValue());
-    			//push newly fetched component
-                cmp.find("facet").getValue("v.body").push(secondNewComponent);
+                $A.newCmpAsync(
+                        this,
+                        function(secondNewComponent){
+                            //push newly fetched component
+                            cmp.find("facet").getValue("v.body").push(secondNewComponent);
+                        },
+                        a.getReturnValue()
+                );
     		});
     		$A.enqueueAction(dupAction);
     		$A.eventService.finishFiring();

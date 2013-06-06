@@ -130,17 +130,34 @@ AttributeSet.prototype.getComponentValueProvider = function() {
 
 /**
  * Merge data from two given objects.
- * @param {Object} yourMap The source map.
- * @param {Object} overwrite The map which overwrites the source map with its values
- * and insert new ones if they don't already exist in the source map.
+ * @param {Object} yourMap The map to merge with this AttributeSet.
+ * @param {Object} overwrite - should identical values in yourMap overwrite existing values
+ * and insert new ones if they don't already exist in this AttributeSet.
  */
 AttributeSet.prototype.merge = function(yourMap, overwrite) {
     var my = this.values.value;
     var keys = yourMap.value;
+
     for (var key in keys) {
         var yourvalue = yourMap.getValue(key);
         if (overwrite || !(key in my)) {
             my[key] = yourvalue;
+        }
+    }
+};
+
+/**
+ * Merge data from a simple collection of attribute values, treated as expressions.
+ * @param {Object} yourValues The map to merge with this AttributeSet.
+ * @param {Object} overwrite - should identical values in yourMap overwrite existing values
+ * and insert new ones if they don't already exist in this AttributeSet.
+ */
+AttributeSet.prototype.mergeValues = function(yourValues, overwrite) {
+    var my = this.values.value;
+    for (var key in yourValues) {
+        var yourvalue = yourValues[key];
+        if (overwrite || !(key in my)) {
+            this.getValue(key).setValue(yourvalue);
         }
     }
 };

@@ -35,77 +35,67 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-public class HTMLDefRef extends ComponentDefRefImpl {
-
-    private static final long serialVersionUID = -957235808680675063L;
-    // private static final Optimizer optimizer = new Optimizer();
+public class HTMLDefRefBuilderImpl extends ComponentDefRefImpl.Builder implements HtmlDefRefBuilder  {
 
     public static final DefDescriptor<ComponentDef> HTML_DESC = DefDescriptorImpl.getInstance("aura:html",
-            ComponentDef.class);
+        ComponentDef.class);
 
-    public HTMLDefRef(Builder builder) {
-        super(builder);
+    private final Map<DefDescriptor<AttributeDef>, Object> htmlAttributes = Maps.newHashMap();
+
+    public HTMLDefRefBuilderImpl() {
+        this.lockDescriptor(HTML_DESC);
+        this.setComponentAttribute("HTMLAttributes", htmlAttributes);
     }
 
-    public static class Builder extends ComponentDefRefImpl.Builder implements HtmlDefRefBuilder {
-
-        private final Map<DefDescriptor<AttributeDef>, Object> htmlAttributes = Maps.newHashMap();
-
-        public Builder() {
-            this.lockDescriptor(HTML_DESC);
-            this.setComponentAttribute("HTMLAttributes", htmlAttributes);
+    @Override
+    public HTMLDefRefBuilderImpl setTag(String tag) {
+        if (!tag.equalsIgnoreCase(HtmlTag.HTML_TAG)) {
+            setComponentAttribute("tag", tag);
         }
-
-        @Override
-        public Builder setTag(String tag) {
-            if (!tag.equalsIgnoreCase(HtmlTag.HTML_TAG)) {
-                setComponentAttribute("tag", tag);
-            }
-            return this;
-        }
-
-        @Override
-        public Builder setComponentAttribute(String key, Object value) {
-            AttributeDefRefImpl.Builder valueBuilder = new AttributeDefRefImpl.Builder();
-            valueBuilder.setDescriptor(DefDescriptorImpl.getInstance(key, AttributeDef.class));
-            valueBuilder.setValue(value);
-
-            AttributeDefRef adr = valueBuilder.build();
-            super.setAttribute(adr.getDescriptor(), adr);
-            return this;
-        }
-
-        @Override
-        public Builder setAttribute(DefDescriptor<AttributeDef> key, AttributeDefRef value) {
-            //
-            // Automatically push system attributes up to the component
-            // attributes.
-            //
-            if ("aura".equalsIgnoreCase(key.getNamespace())) {
-                super.setAttribute(key, value);
-            } else if ("tag".equalsIgnoreCase(key.getName())) {
-                setComponentAttribute(key.getName(), value.getValue());
-            } else {
-                //
-                // FIXME: we should warn about non-null namespaces.
-                //
-                htmlAttributes.put(key, value.getValue());
-            }
-            return this;
-        }
-
-        @Override
-        public ComponentDefRef build() {
-            // Builder optimizedBuilder = optimizer.optimize(this);
-            return new HTMLDefRef(this);
-        }
+        return this;
     }
 
-    protected static class Optimizer implements DefBuilderOptimizer<Builder> {
+    @Override
+    public HTMLDefRefBuilderImpl setComponentAttribute(String key, Object value) {
+        AttributeDefRefImpl.Builder valueBuilder = new AttributeDefRefImpl.Builder();
+        valueBuilder.setDescriptor(DefDescriptorImpl.getInstance(key, AttributeDef.class));
+        valueBuilder.setValue(value);
+
+        AttributeDefRef adr = valueBuilder.build();
+        super.setAttribute(adr.getDescriptor(), adr);
+        return this;
+    }
+
+    @Override
+    public HTMLDefRefBuilderImpl setAttribute(DefDescriptor<AttributeDef> key, AttributeDefRef value) {
+        //
+        // Automatically push system attributes up to the component
+        // attributes.
+        //
+        if ("aura".equalsIgnoreCase(key.getNamespace())) {
+            super.setAttribute(key, value);
+        } else if ("tag".equalsIgnoreCase(key.getName())) {
+            setComponentAttribute(key.getName(), value.getValue());
+        } else {
+            //
+            // FIXME: we should warn about non-null namespaces.
+            //
+            htmlAttributes.put(key, value.getValue());
+        }
+        return this;
+    }
+
+    @Override
+    public ComponentDefRef build() {
+        // Builder optimizedBuilder = optimizer.optimize(this);
+        return new ComponentDefRefImpl(this);
+    }
+
+    protected static class Optimizer implements DefBuilderOptimizer<HTMLDefRefBuilderImpl> {
 
         @Override
         @SuppressWarnings("unchecked")
-        public Builder optimize(Builder builder) {
+        public HTMLDefRefBuilderImpl optimize(HTMLDefRefBuilderImpl builder) {
             DefDescriptor<AttributeDef> bodyDesc = DefDescriptorImpl.getInstance("body", AttributeDef.class);
             DefDescriptor<AttributeDef> tagDesc = DefDescriptorImpl.getInstance("tag", AttributeDef.class);
             DefDescriptor<ComponentDef> textDesc = DefDescriptorImpl.getInstance("aura:text", ComponentDef.class);
@@ -115,7 +105,7 @@ public class HTMLDefRef extends ComponentDefRefImpl {
             boolean pureHTML = true;
             if (bodyRef != null) {
                 for (ComponentDefRef cdr : (List<ComponentDefRef>) bodyRef.getValue()) {
-                    if (cdr.getClass().equals(HTMLDefRef.class)) {
+                    if (cdr.getClass().equals(HTMLDefRefBuilderImpl.class)) {
                         if (cdr.getAttributeDefRef("markup") == null) {
                             pureHTML = false;
                             break;
@@ -167,7 +157,7 @@ public class HTMLDefRef extends ComponentDefRefImpl {
                 add(markup, ">");
                 if (bodyRef != null) {
                     for (ComponentDefRef cdr : (List<ComponentDefRef>) bodyRef.getValue()) {
-                        if (cdr.getClass().equals(HTMLDefRef.class)) {
+                        if (cdr.getClass().equals(HTMLDefRefBuilderImpl.class)) {
                             for (Object childMarkup : (List<Object>) cdr.getAttributeDefRef("markup").getValue()) {
                                 add(markup, childMarkup);
                             }

@@ -73,7 +73,7 @@
     testEmptyFormat:{
         attributes: {value : '2004-09-23T16:30:00.000Z', langLocale: 'en', timezone: 'GMT'},
         test:function(component){
-            aura.test.assertEquals("2004-09-23 16:30", $A.test.getText(component.find('span').getElement()), "Incorrect date/time format.");
+            aura.test.assertEquals("Sep 23, 2004 4:30:00 PM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time format.");
         }
     },
     

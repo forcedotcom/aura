@@ -15,12 +15,13 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" implements="ui:inputDateComponent" extensible="true" support="BETA" description="An input field for entering a date as specified by the format attribute.">
-    <aura:attribute name="format" type="String" default="YYYY-MM-DD" description="The date format (pattern letters are defined in java.text.SimpleDateFormat) in user's locale."/>
-    <aura:attribute name="placeholder" type="String" default="YYYY-MM-DD" description="The hint for the date input format."/>
+<aura:component extends="ui:input" implements="ui:inputDateComponent" extensible="true" support="BETA" description="An input field for entering a date as specified by the format attribute."> 
+    <aura:attribute name="placeholder" type="String" description="The hint for the date input format."/>
     <aura:set attribute="updateOn" value="blur"/>
         
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="change" value="{!v.format}" action="{!c.formatChange}"/>
+    <aura:handler name="change" value="{!v.langLocale}" action="{!c.langLocaleChange}"/>
     
     <input aura:id="inputText" id="{!v.domId}" class="{!v.class}" type="text" placeholder="{!v.placeholder}"/>
     <aura:if isTrue="{!v.displayDatePicker}">

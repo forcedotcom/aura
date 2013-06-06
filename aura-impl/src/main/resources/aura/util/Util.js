@@ -1099,10 +1099,16 @@ $A.ns.Util.prototype.contains = function(container, element) {
  */
 $A.ns.Util.prototype.squash = function(event, preventDefault) {
     event = event || window.event;
-    event.stopPropagation();
+    if(event.stopPropagation) {
+    	event.stopPropagation();
+	}
     event.cancelBubble = true;
+
     if (preventDefault) {
-        event.preventDefault();
+        if(event.preventDefault) {
+        	event.preventDefault();
+		}
+		event.returnValue = false;
     }
 };
 

@@ -18,8 +18,8 @@
 		helper.init(cmp);
 	},
 	
-	onPageComponentsChanged: function(cmp, evt, helper) {
-    	helper.initPages(cmp);    	
+	onPageComponentsChanged: function(cmp, evt, helper) {		
+    	helper.initPages(cmp); 
     },
   
     
@@ -40,14 +40,10 @@
     /**
      * Handle scroller refreshed event
      */
-    onScrollerRefreshed: function(cmp, evt, helper) {
-    	if (!cmp._isSelectDefaultPageFired) {
-    		//fire selectDefaultPage only after the the scroller has initialized and ready
-    		var e = cmp.getEvent("selectDefaultPage");
-    		cmp._isSelectDefaultPageFired = true;
-    		
-    		e.fire();
-    	}
+    onScrollerRefreshed: function(cmp, evt, helper) {    	
+		//fire selectDefaultPage only after the the scroller has initialized and ready
+		var e = cmp.getEvent("selectDefaultPage");
+		e.fire();    	
     },
      
     /**
@@ -82,7 +78,7 @@
     	helper.selectPage(cmp, evt.getParam("pageIndex"));
     },
     
-    selectDefaultPage: function (cmp, evt, helper) {
+    selectDefaultPage: function (cmp, evt, helper) {   	
     	if (cmp.isRendered()) {
     		helper.selectDefaultPage(cmp, evt);
     	} else {

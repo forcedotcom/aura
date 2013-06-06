@@ -53,6 +53,12 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 								actual = value;
 							}
 						};
+					} else if (expression === "v.priv_currentPage") {
+						return {
+							setValue : function(value) {
+								actual = -1;
+							}
+						};
 					}
 				},
 				_width : 450
@@ -97,6 +103,12 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 						return {
 							setValue : function(value, boolean) {
 								actual = value;
+							}
+						};
+					} else if (expression === "v.priv_currentPage") {
+						return {
+							setValue : function(value) {
+								actual = -1;
 							}
 						};
 					}
@@ -148,6 +160,9 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 							actual=true;
 						}
 					};
+				},
+				showAllPages : function(value) {
+					return true;
 				}
 			});
 			
@@ -198,7 +213,14 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 			var expected = 1;
 			
 			var targetComponent = {
-				get : function(expression) {return expected;}
+				get : function(expression) {
+					if (expression === 'v.priv_currentPage') {
+						//currentPage is set only after page is selected, default to -1;
+						return -1;
+					} else {
+						return expected;
+					}
+				}
 			};
 			
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {

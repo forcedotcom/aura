@@ -15,8 +15,17 @@
  */
 {		
 	afterRender: function(cmp, helper) {
-		this.superAfterRender();		
+		this.superAfterRender();
 		//update size in case carousel width is not specified
-		helper.updateSize(cmp);				
+		helper.updateSize(cmp);
+	},
+	
+	rerender: function(cmp, helper) { 
+		this.superRerender();
+		
+		var pageCmps = cmp.getValue('v.pageComponents');
+		if (pageCmps.isDirty()) {            
+            $A.get("e.ui:updateSize").fire();  
+		}	
 	}
 }

@@ -17,7 +17,7 @@
 -->
 <aura:component model="java://org.auraframework.docs.HtmlTagsModel">
 
-    <p>HTML tags are implemented as Aura components. The majority of HTML5 tags are supported.</p>
+    <p>HTML tags are implemented as Aura components. The majority of HTML5 tags are supported. We recommend that you use Aura components in preference to HTML tags such as <code>&lt;button&gt;</code> and <code>&lt;img&gt;</code>. See <auradocs:topicLink topic="access">Accessibility Considerations</auradocs:topicLink> for a full list of recommendations.</p>
     
     <p>Note that you must use strict <a href="http://www.w3.org/TR/xhtml1/" target="_blank">XHTML</a>. For example, use <code>&lt;br/&gt;</code> instead of <code>&lt;br&gt;</code>.</p>
     

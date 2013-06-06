@@ -194,7 +194,7 @@ public class StringSourceLoader implements SourceLoader {
         sourceMap.put(descriptor, source);
 
         // notify source listeners of change
-        Aura.getDefinitionService().onSourceChanged(null, event);
+        Aura.getDefinitionService().onSourceChanged(descriptor, event);
 
         return source;
     }
@@ -215,7 +215,7 @@ public class StringSourceLoader implements SourceLoader {
         }
 
         // notify source listeners of change
-        Aura.getDefinitionService().onSourceChanged(null, SourceMonitorEvent.deleted);
+        Aura.getDefinitionService().onSourceChanged(descriptor, SourceMonitorEvent.deleted);
 
     }
 

@@ -15,6 +15,6 @@
  */
 ({
     afterRender : function(cmp, helper){
-    	helper.startTests(cmp);
+    	helper.runNextTest(cmp);
     }
 })

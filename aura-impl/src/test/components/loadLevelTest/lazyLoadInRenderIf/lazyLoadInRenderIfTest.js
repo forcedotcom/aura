@@ -39,9 +39,7 @@
             var helper = cmp.getDef().getHelper();
 
             // Flip the renderIf flag to lazy load components in else section
-            $A.services.event.startFiring(true);
-            cmp.getAttributes().setValue('flip', false);
-            $A.services.event.finishFiring();
+            $A.run(function () { cmp.getAttributes().setValue('flip', false); });
 
             $A.test.assertFalse(cmp.find('nonLazyRenderIfDiv').isRendered(), "renderIf section is rendered");
             $A.test.assertTrue(cmp.find('nonLazyElseDiv').isRendered(), "else section is not rendered");

@@ -585,10 +585,10 @@ $A.ns.Aura.prototype.error = function(e) {
 };
 
 $A.ns.Aura.prototype.warning = function(w) {
-    $A.logInternal("Warning: ",w, null, this.getStackTrace(null));
-    if ($A.test) {
-        $A.test.auraWarning(str);
+    if ($A.test && $A.test.auraWarning(w)) {
+        return;
     }
+    $A.logInternal("Warning: ",w, null, this.getStackTrace(null));
 };
 
 /**
@@ -668,9 +668,9 @@ $A.ns.Aura.prototype.unwrap = function(val) {
 $A.ns.Aura.prototype.run = function(func) {
     $A.assert(func && $A.util.isFunction(func), "The parameter 'func' for $A.run() must be a function!");
 
-    $A.services.event.startFiring("$A.run()");
+    $A.services.client.pushStack("$A.run()");
     var ret = func();
-    $A.services.event.finishFiring("$A.run()");
+    $A.services.client.popStack("$A.run()");
     return ret;
 };
 
@@ -917,6 +917,7 @@ $A.ns.Aura.prototype.mark = (function() {
         return window["Perf"]["mark"];
     } else {
         return function() {
+            return $A;
         };
     }
 })();

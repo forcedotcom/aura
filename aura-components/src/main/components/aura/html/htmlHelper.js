@@ -209,12 +209,10 @@
             }
         }
 
-        $A.services.event.startFiring(eventName);
-
-        var action = $A.expressionService.get(valueProvider, valueExpression);
-        action.run(event);
-
-        $A.services.event.finishFiring(eventName);
+        $A.run(function () {
+                var action = $A.expressionService.get(valueProvider, valueExpression);
+                action.run(event);
+            })
     },
 
     canHaveBody : function(component) {
@@ -270,9 +268,7 @@
             if (name.toLowerCase() === "href" && ret.tagName && ret.tagName.toLowerCase() === "a" && value && (isHash || this.supportsTouchEvents())) {
                 this.createFastClickHandler(ret, function() {
                     if (isHash) {
-                        $A.services.event.startFiring("click");
-                        $A.historyService.set(value.substring(1));
-                        $A.services.event.finishFiring("click");
+                        $A.run(function () { $A.historyService.set(value.substring(1)); })
                     } else {
                         // Make sure that non-hash style hrefs work fine even when fast clicking is engaged
                         var HTMLAttributes = component.getValue("v.HTMLAttributes");

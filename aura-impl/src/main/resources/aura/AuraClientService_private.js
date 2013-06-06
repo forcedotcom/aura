@@ -16,6 +16,7 @@
 /*jslint sub: true */
 var priv = {
     token : null,
+    auraStack : [],
     host : "",
     requestQueue : [],
     inRequest : false,
@@ -220,7 +221,11 @@ var priv = {
         var queue = this.requestQueue;
 
         var errors = [];
-        $A.eventService.startFiring("actionCallback");
+        if (this.auraStack.length > 0) {
+            $A.error("Action callback called on non-empty stack "+this.auraStack);
+            this.auraStack = [];
+        }
+        $A.clientService.pushStack("actionCallback");
         if (responseMessage) {
             var token = responseMessage["token"];
             if (token) {
@@ -309,7 +314,7 @@ var priv = {
                 actionGroup.status = "done";
             }
         }
-        $A.eventService.finishFiring("actionCallback");
+        $A.clientService.popStack("actionCallback");
 
         this.inRequest = false;
         priv.fireDoneWaiting();

@@ -1,0 +1,93 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="auradocs:topicPanel">
+    <aura:set attribute="title" value="Storable Server-Side Actions"/>
+<p>A server-side controller action can have its response stored in the cache by the Aura framework. In this case, the action response returned by the server-side controller is saved in an internal Aura-provided storage named <code>actions</code>. This stored response is returned on subsequent calls to the same server-side action instead of the response from the server-side controller, as long as the stored response hasn't expired. If the stored response has reached its expiration time, a new response is retrieved from the server-side controller and is stored in the <code>actions</code> storage for subsequent calls. Note that only successful actions, actions on which <code>getState</code> returns <code>"SUCCESS"</code>, are stored.</p>
+
+<p>To mark a server-side action as storable, call the <code>setStorable</code> JavaScript API on the action, as follows.</p>
+<auradocs:codeblock>
+a.setStorable();
+</auradocs:codeblock><br/>
+
+<p>The <code>setStorable</code> function takes an optional parameter, which is a configuration map of key/value pairs representing the storage options and values to set. You can set only the following properties:</p>
+<ul>
+    <li><code>ignoreExisting</code>: If set to true, specifies that the stored item should be refreshed with a newly retrieved value, regardless of whether the item has expired or not.</li>
+    <li><code>refresh</code>: Overrides the item's autorefresh interval.</li>
+</ul>
+
+<p>Pass this configuration map into <code>setStorable</code> to set the storage options for the action response. For example, the following marks an action as storable, forces a refresh next time the action is called, and overrides the autorefresh interval to 10 seconds.</p>
+
+<auradocs:codeblock>
+a.setStorable({
+    "ignoreExisting": true,
+    "refresh": 10
+});
+</auradocs:codeblock><br/>
+
+<p>This next example shows how to use <code>setStorable</code> to cause the server-side action response to be stored. An example markup for a button with a client-side controller action is provided. This client-side action calls a server-side action, as shown in the JavaScript controller function. Next, the action is marked as storable and is run. The server-side action return value is obtained in the callback.</p>
+
+<p>This is the component markup that initializes the actions storage and contains a button.</p>
+<auradocs:codeblock>
+&lt;aura:component render="client" extensible="true" 
+ controller="java://org.auraframework.impl.java.controller.AuraStorageTestController" 
+ implements="auraStorage:refreshObserver">
+            
+    &lt;auraStorage:init debugLoggingEnabled="true"
+                         name="actions" 
+                         secure="true" 
+                         persistent="false"
+                         clearStorageOnInit="true"
+                         defaultExpiration="50" 
+                         defaultAutoRefreshInterval="60" />
+
+    &lt;ui:button label="Run action at Server and mark as storable" press="<aura:text value="{!"/>c.runActionAtServerAndStore}" 
+     aura:id="ForceActionAtServer"/>
+
+&lt;/aura:component>
+</auradocs:codeblock><br/>
+
+<p>This is the JavaScript client-side controller associated with the component.</p>
+<auradocs:codeblock>
+runActionAtServerAndStore:function(cmp, evt, helper){
+    // Get server-side action 
+    var a = cmp.get("c.fetchDataRecord");
+    
+    // Set server-size action as storable
+    a.setStorable();
+    
+    a.setCallback(cmp, function(a){        
+        var returnValue = a.getReturnValue();
+    });
+    
+    // Run server-side action
+    $A.enqueueAction(a);
+},
+</auradocs:codeblock><br/>
+
+<p>You can also check whether an action response originates from storage by calling <code>isFromStorage</code> on the action object in the callback function of the JavaScript controller.</p> 
+
+
+<p>For a detailed description of the JavaScript API for <code>AuraStorageService</code> and <code>AuraStorage</code>, see 
+    <auradocs:topicLink topic="api:AuraStorageService">AuraStorageService</auradocs:topicLink> and 
+    <auradocs:topicLink topic="api:AuraStorage">AuraStorage</auradocs:topicLink>.</p>
+    
+<p><b>See also:</b><br/>    
+    <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink><br/>
+    <auradocs:referenceTopicLink topic="api:Action">Action Type</auradocs:referenceTopicLink>
+</p>
+</aura:component>

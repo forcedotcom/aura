@@ -24,11 +24,11 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
+import org.auraframework.def.AttributeDef.SerializeToType;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.AttributeDef.SerializeToType;
 import org.auraframework.def.Definition.Visibility;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImplTestCase;
@@ -192,13 +192,8 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testTypeMissing() throws Exception {
-        AttributeDefHandler<ComponentDef> adHandler = getHandler("<aura:attribute name='type'/>");
-        try {
-            adHandler.getElement();
-            fail("Expected Exception to be thrown when attribute is missing");
-        } catch (Throwable t) {
-            assertExceptionMessage(t, AuraRuntimeException.class, "descriptor is null");
-        }
+        AttributeDefImpl adHandler = getElement("<aura:attribute name='type'/>");
+        assertEquals("String", adHandler.getTypeDef().getName());
     }
 
     public void testTypeEmptyString() throws Exception {

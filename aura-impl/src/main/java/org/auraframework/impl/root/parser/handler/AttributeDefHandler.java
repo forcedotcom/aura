@@ -85,9 +85,14 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         builder.setParentDescriptor(getParentHandler().getDefDescriptor());
         builder.setDescriptor(DefDescriptorImpl.getInstance(name, AttributeDef.class));
         builder.setLocation(getLocation());
-        builder.setTypeDefDescriptor(DefDescriptorImpl.getInstance(getAttributeValue(ATTRIBUTE_TYPE), TypeDef.class));
         builder.setRequired(getBooleanAttributeValue(ATTRIBUTE_REQUIRED));
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
+
+        String type = getAttributeValue(ATTRIBUTE_TYPE);
+        if (type == null) {
+            type = "String"; // default to string
+        }
+        builder.setTypeDefDescriptor(DefDescriptorImpl.getInstance(type, TypeDef.class));
 
         String serializeTo = getAttributeValue(ATTRIBUTE_SERIALIZE_TO);
         if (serializeTo != null) {

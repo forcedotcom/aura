@@ -83,15 +83,14 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             .concurrencyLevel(20).initialCapacity(512).maximumSize(1024 * 10).build();
 
     /**
-     * Pattern for tag descriptors : foo:bar Group 0 = QName = foo:bar Group 1 =
-     * prefix Group 2 = namespace = foo Group 3 = name = bar prefix = null
+     * Pattern for tag descriptors : foo:bar Group 0 = QName = foo:bar Group 1 = prefix Group 2 = namespace = foo Group
+     * 3 = name = bar prefix = null
      */
     private static final Pattern TAG_PATTERN = Pattern.compile("(?:([\\w\\*]+)://)?(?:([\\w\\*]+):)?([\\w\\$\\*]+)");
 
     /**
-     * Pattern for class descriptors: java://foo.bar.baz Group 0 = QName =
-     * java://foo.bar.baz Group 1 = prefix = java Group 2 = namespace = foo.bar
-     * Group 3 = name = baz
+     * Pattern for class descriptors: java://foo.bar.baz Group 0 = QName = java://foo.bar.baz Group 1 = prefix = java
+     * Group 2 = namespace = foo.bar Group 3 = name = baz
      */
     private static final Pattern CLASS_PATTERN = Pattern
             .compile("\\A(?:([\\w\\*]+)://)?((?:[\\w\\*]|\\.)*?)?\\.?+([\\w,$\\*]*?(?:\\[\\])?)(<[\\w.,(<[\\w.,]+>)]+>)?\\z");
@@ -192,6 +191,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case DOCUMENTATION:
             case LAYOUTS:
             case NAMESPACE:
+            case THEME:
                 Matcher tagMatcher = TAG_PATTERN.matcher(qualifiedName);
                 if (tagMatcher.matches()) {
                     prefix = tagMatcher.group(1);
@@ -325,13 +325,10 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     }
 
     /**
-     * FIXME: this method is ambiguous about wanting a qualified, simple, or
-     * descriptor name.
+     * FIXME: this method is ambiguous about wanting a qualified, simple, or descriptor name.
      * 
-     * @param name The simple String representation of the instance requested
-     *            ("foo:bar" or "java://foo.Bar")
-     * @param defClass The Interface's Class for the DefDescriptor being
-     *            requested.
+     * @param name The simple String representation of the instance requested ("foo:bar" or "java://foo.Bar")
+     * @param defClass The Interface's Class for the DefDescriptor being requested.
      * @return An instance of a AuraDescriptor for the provided tag
      */
     public static <E extends Definition> DefDescriptor<E> getInstance(String name, Class<E> defClass) {
@@ -390,9 +387,8 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     }
 
     /**
-     * Compares one {@link DefDescriptor} to another. Sorting uses (only) the
-     * qualified name, case insensitively. Per {@link Comparable}'s spec, throws
-     * {@link ClassCastException} if {@code arg} is not a {@code DefDescriptor}.
+     * Compares one {@link DefDescriptor} to another. Sorting uses (only) the qualified name, case insensitively. Per
+     * {@link Comparable}'s spec, throws {@link ClassCastException} if {@code arg} is not a {@code DefDescriptor}.
      */
     @Override
     public int compareTo(DefDescriptor<?> other) {
@@ -400,10 +396,9 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
     }
 
     /**
-     * Helper method for various {@link DefDescriptor} subclasses to implement
-     * {@link #compareTo(DefDescriptor)}, since interfaces aren't allowed to
-     * have static methods, and since {@code DefDescriptor} is an interface
-     * rather than an abstract class.
+     * Helper method for various {@link DefDescriptor} subclasses to implement {@link #compareTo(DefDescriptor)}, since
+     * interfaces aren't allowed to have static methods, and since {@code DefDescriptor} is an interface rather than an
+     * abstract class.
      */
     public static int compare(DefDescriptor<?> dd1, DefDescriptor<?> dd2) {
         int value;

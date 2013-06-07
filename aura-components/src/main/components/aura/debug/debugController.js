@@ -20,12 +20,16 @@
 		var output = event.getParam("message");
 		
 		if (type === "event") {
-			outputTab = "eventData";
+			helper.output(cmp, "eventData", output);
 		} else {
-			outputTab = "consoleData";
+			if (type === "Warning") {
+				helper.output(cmp, "warningsData", output);
+			} else if (type === "Error") {
+				helper.output(cmp, "errorsData", output);
+			}
+			// also log everything to console
+			helper.output(cmp, "consoleData", output);
 		}
-		
-		helper.output(cmp, outputTab, output);
 	},
 	
 	errorEventListener : function(cmp, event, helper) {
@@ -76,9 +80,9 @@
 		}
 		helper.output(cmp, "cmpData", output);
 	},
+	
 	checkAccessibility : function(cmp, event, helper){	
-	    debugger;
-	        var array = opener.$A.devToolService.checkAccessibility();
+	    var array = opener.$A.devToolService.checkAccessibility();
 		helper.output(cmp, "accessibilityData", array, true);
 	}
 })

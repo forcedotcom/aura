@@ -16,9 +16,7 @@
 package org.auraframework.impl.css.parser;
 
 import java.nio.charset.Charset;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Pattern;
@@ -26,10 +24,8 @@ import java.util.regex.Pattern;
 import org.auraframework.Aura;
 import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.def.ComponentDefRef;
-import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.expression.Expression;
-import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.system.AuraContext;
@@ -45,15 +41,12 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.StyleParserException;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.phloc.css.ECSSVersion;
 import com.phloc.css.ICSSWriterSettings;
 import com.phloc.css.decl.CSSDeclaration;
 import com.phloc.css.decl.CSSExpression;
-import com.phloc.css.decl.CSSExpressionMemberFunction;
-import com.phloc.css.decl.CSSExpressionMemberTermSimple;
-import com.phloc.css.decl.CSSExpressionMemberTermURI;
 import com.phloc.css.decl.CSSFontFaceRule;
 import com.phloc.css.decl.CSSKeyframesBlock;
 import com.phloc.css.decl.CSSKeyframesRule;
@@ -62,13 +55,10 @@ import com.phloc.css.decl.CSSMediaQuery;
 import com.phloc.css.decl.CSSMediaRule;
 import com.phloc.css.decl.CSSPageRule;
 import com.phloc.css.decl.CSSSelector;
-import com.phloc.css.decl.CSSSelectorSimpleMember;
 import com.phloc.css.decl.CSSStyleRule;
 import com.phloc.css.decl.CSSSupportsRule;
 import com.phloc.css.decl.CSSViewportRule;
 import com.phloc.css.decl.CascadingStyleSheet;
-import com.phloc.css.decl.ICSSExpressionMember;
-import com.phloc.css.decl.ICSSSelectorMember;
 import com.phloc.css.decl.visit.CSSVisitor;
 import com.phloc.css.decl.visit.DefaultCSSVisitor;
 import com.phloc.css.handler.ICSSParseExceptionHandler;
@@ -81,33 +71,35 @@ import com.phloc.css.writer.CSSWriterSettings;
  */
 public class CSSParser extends DefaultCSSVisitor {
 
-    private static final String THIS_NAMESPACE = ".THIS";
+    public static final String ISSUE_MESSAGE = "Issue(s) found by Parser:";
+
     private static final String CONDITIONAL_IF = "aura-if";
     private static final String CONDITIONAL_ELSEIF = "aura-elseif";
     private static final String CONDITIONAL_ELSE = "aura-else";
-    private static final HashSet<String> NON_REFINERS = Sets.newHashSet(" ", ":", ">", "+", "|");
-    public static final String ISSUE_MESSAGE = "Issue(s) found by Parser:";
     private static final Pattern IF_PATTERN = Pattern.compile("@if[\\s\\(]+([^{\\s\\)]*)[\\s\\)\\{]*");
-    private static final String IF_REPLACEMENT = "@media ("+CONDITIONAL_IF+":$1){";
+    private static final String IF_REPLACEMENT = "@media (" + CONDITIONAL_IF + ":$1){";
     private static final Pattern ELSEIF_PATTERN = Pattern.compile("@elseif[\\s\\(]+([^{\\s\\)]*)[\\s\\)\\{]*");
-    private static final String ELSEIF_REPLACEMENT = "@media ("+CONDITIONAL_ELSEIF+":$1){";
+    private static final String ELSEIF_REPLACEMENT = "@media (" + CONDITIONAL_ELSEIF + ":$1){";
     private static final Pattern ELSE_PATTERN = Pattern.compile("@else[\\s\\{]*");
-    private static final String ELSE_REPLACEMENT = "@media ("+CONDITIONAL_ELSE+"){";
+    private static final String ELSE_REPLACEMENT = "@media (" + CONDITIONAL_ELSE + "){";
 
-    private final boolean validateNamespace;
-    private final String componentClass;
-    private final String namespace;
     private final String contents;
-    private final Set<String> allowedConditions;
-    private Map<String, String> nsDefs = null;
-    private StyleParserResultHolder resultHolder;
-    private ICSSParseExceptionHandler errorHandler;
-    private List<Exception> errors;
-    private final List<ComponentDefRef> components = Lists.newArrayList();
-    private final StringBuffer sb = new StringBuffer();
-    private final ICSSWriterSettings writerSettings = new CSSWriterSettings(ECSSVersion.CSS30).setOptimizedOutput(!Aura.getContextService().getCurrentContext().getMode().isDevMode());
-    private final Stack<ComponentDefRefImpl.Builder> conditionalBuilder = new Stack<ComponentDefRefImpl.Builder>();
     private final String filename;
+    private final String componentClass;
+    private final Set<String> allowedConditions;
+    private final StringBuffer sb = new StringBuffer();
+    private final List<Exception> errors = Lists.newArrayList();
+    private final List<ComponentDefRef> components = Lists.newArrayList();
+    private final List<ComponentDefRef> componentsBuffer = Lists.newArrayList();
+    private final ICSSParseExceptionHandler errorHandler = new ErrorHandler();
+    private final StyleParserResultHolder resultHolder = new StyleParserResultHolder();
+    private final Stack<ComponentDefRefImpl.Builder> conditionalBuilder = new Stack<ComponentDefRefImpl.Builder>();
+    private final ICSSWriterSettings writerSettings = new CSSWriterSettings(ECSSVersion.CSS30).setOptimizedOutput(!Aura
+            .getContextService().getCurrentContext().getMode().isDevMode());
+
+    private final List<Rework<CSSSelector>> selectorRework;
+    private final List<Rework<CSSDeclaration>> declarationRework;
+    private final List<DynamicRework<CSSDeclaration>> dynDeclarationRework;
 
     /**
      * @param namespace
@@ -115,36 +107,50 @@ public class CSSParser extends DefaultCSSVisitor {
      */
     public CSSParser(String namespace, boolean validateNamespace, String componentClass, String contents,
             Set<String> allowedConditions, String filename) {
-        this.validateNamespace = validateNamespace;
+        this.filename = filename;
         this.componentClass = componentClass;
-        this.namespace = namespace;
         this.contents = preProcess(contents);
         this.allowedConditions = allowedConditions;
-        this.filename = filename;
+
+        this.selectorRework = ImmutableList.<Rework<CSSSelector>> of(
+                new ReworkClassName(componentClass, validateNamespace));
+
+        this.declarationRework = ImmutableList.of(
+                new ReworkNamespaceConstants(namespace),
+                new ReworkImageUrls(resultHolder));
+
+        this.dynDeclarationRework = ImmutableList.of();
     }
 
     /**
-     * Not thread safe.
+     * Not thread safe. Call only once.
+     * 
+     * @see #results()
      */
-    public StyleParserResultHolder parse() throws QuickFixException {
-        errorHandler = new ErrorHandler();
-        resultHolder = new StyleParserResultHolder();
-        errors = Lists.newArrayList();
+    public CSSParser parse() throws QuickFixException {
+        CascadingStyleSheet css = CSSReader.readFromString(contents, Charset.forName("utf-8"), ECSSVersion.CSS30,
+                errorHandler);
 
-        CascadingStyleSheet css = CSSReader.readFromString(contents, Charset.forName("utf-8"), ECSSVersion.CSS30, errorHandler);
-
-
-
-        if(css != null){
+        if (css != null) {
             CSSVisitor.visitCSS(css, this);
-
-            addTextCDR();
+            flush();
         }
 
-        if(errors.size() > 0){
+        if (errors.size() > 0) {
             throw new StyleParserException(formatErrors(), null);
         }
+
         resultHolder.setComponents(components);
+
+        return this;
+    }
+
+    /**
+     * Gets the results of parsing. Call {@link #parse()} before this.
+     * 
+     * @see StyleParserResultHolder
+     */
+    public StyleParserResultHolder results() {
         return resultHolder;
     }
 
@@ -154,8 +160,8 @@ public class CSSParser extends DefaultCSSVisitor {
         for (Exception error : errors) {
             sb.append('\t');
             sb.append(error.getMessage());
-            if(error instanceof AuraException){
-                Location l = ((AuraException)error).getLocation();
+            if (error instanceof AuraException) {
+                Location l = ((AuraException) error).getLocation();
                 sb.append(" (line ");
                 sb.append(l.getLine());
                 sb.append(", col ");
@@ -167,149 +173,171 @@ public class CSSParser extends DefaultCSSVisitor {
         return sb.toString();
     }
 
-    private String preProcess(String contents){
+    private String preProcess(String contents) {
         contents = IF_PATTERN.matcher(contents).replaceAll(IF_REPLACEMENT);
         contents = ELSEIF_PATTERN.matcher(contents).replaceAll(ELSEIF_REPLACEMENT);
         contents = ELSE_PATTERN.matcher(contents).replaceAll(ELSE_REPLACEMENT);
         return contents;
     }
 
-    private void verifyAndReplaceComponentClass(CSSStyleRule rule){
-        for(CSSSelector selector : rule.getAllSelectors()){
-            boolean found = false;
-            boolean replacement = false;
-            boolean illegal = false;
-            List<ICSSSelectorMember> replacementMembers = Lists.newArrayList();
-            for(int i=0;i<selector.getMemberCount();i++){
-                ICSSSelectorMember member = selector.getMemberAtIndex(i);
-                String name = member.getAsCSSString(writerSettings, 0);
-                if(!found && NON_REFINERS.contains(name)){
-                    illegal = true;
-                }
-                if(name.equals(THIS_NAMESPACE)){
-                    replacement = true;
-                    found = true;
-                    replacementMembers.add(new CSSSelectorSimpleMember(componentClass));
-                }else{
-                    if(name.equals(componentClass)){
-                        found = true;
-                    }
-                    replacementMembers.add(member);
-                }
-
-
-            }
-            if(validateNamespace && (!found || illegal)){
-                Location l = new Location(componentClass, selector.getSourceLocation().getFirstTokenBeginLineNumber(), selector.getSourceLocation().getFirstTokenBeginColumnNumber(),-1);
-                errors.add(new StyleParserException("CSS selectors must include component class: \"" + componentClass + "\"", l));
-            }
-            if(replacement){
-
-
-                while(selector.getMemberCount()>0){
-                    selector.removeMember(0);
-                }
-
-                for(int i=0;i<replacementMembers.size();i++){
-                    selector.addMember(replacementMembers.get(i));
-                }
-            }
-        }
-    }
-
-    private String resolveToken(String key){
-        String ret = null;
-        try {
-            if(nsDefs == null){
-                NamespaceDef namespaceDef = Aura.getDefinitionService().getDefinition(namespace, NamespaceDef.class);
-                nsDefs = namespaceDef.getStyleTokens();
-            }
-            if(nsDefs.containsKey(key)){
-                ret = nsDefs.get(key);
-            }
-        } catch (DefinitionNotFoundException dnfe) {
-            // ignore.
-        } catch(QuickFixException e){
-            throw new AuraRuntimeException(e);
-        }
-        return ret;
-    }
-
-    private ICSSExpressionMember replaceMemberTokens(ICSSExpressionMember member){
-        if(member instanceof CSSExpressionMemberFunction){
-            CSSExpressionMemberFunction func = (CSSExpressionMemberFunction)member;
-            CSSExpression expr = func.getExpression();
-            List<ICSSExpressionMember> newMembers = Lists.newArrayList();
-            for(int k=0;k<expr.getMemberCount();k++){
-                newMembers.add(replaceMemberTokens(expr.getMemberAtIndex(k)));
-            }
-            while(expr.getMemberCount() > 0){
-                expr.removeMember(0);
-            }
-            for(int j=0;j<newMembers.size();j++){
-                expr.addMember(newMembers.get(j));
-            }
-        }else if(member instanceof CSSExpressionMemberTermURI){
-            CSSExpressionMemberTermURI uri = (CSSExpressionMemberTermURI)member;
-            String url = uri.getURIString();
-            url = url.trim().replaceAll("(^['\"])|(['\"]$)", "");
-            if (url.startsWith("/") && shouldAddCacheBuster()) {
-                url = AuraBaseServlet.addCacheBuster(url);
-            }
-            resultHolder.addImageURL(url);
-            return new CSSExpressionMemberTermURI(url);
-        }else{
-
-            String value = member.getAsCSSString(writerSettings, 0);
-            if(value.matches("[A-Z]+")){
-                String val = resolveToken(value);
-                if(val != null){
-                    return new CSSExpressionMemberTermSimple(val);
-                }
-            }
-        }
-        return member;
-    }
-
-    private void replaceNamespaceTokens(CSSStyleRule rule){
-
-        for(int i=0;i<rule.getDeclarationCount();i++){
-            CSSDeclaration decl = rule.getDeclarationAtIndex(i);
-            CSSExpression expr = decl.getExpression();
-            List<ICSSExpressionMember> newMembers = Lists.newArrayList();
-            for(int j=0;j<expr.getMemberCount();j++){
-                ICSSExpressionMember member = expr.getMemberAtIndex(j);
-
-                newMembers.add(replaceMemberTokens(member));
-            }
-            while(expr.getMemberCount() > 0){
-                expr.removeMember(0);
-            }
-            for(int j=0;j<newMembers.size();j++){
-                expr.addMember(newMembers.get(j));
-            }
-        }
-    }
-
-    private boolean shouldAddCacheBuster() {
-        return Aura.getConfigAdapter().isAuraJSStatic()
-                && Aura.getContextService().getCurrentContext().getMode() != Mode.DEV;
-    }
-
     @Override
     public void onBeginStyleRule(CSSStyleRule rule) {
+        // perform static selector rework, then append selector content
+        List<CSSSelector> reworkedSelectors = reworkSelectors(rule);
+        for (int i = 0; i < reworkedSelectors.size(); i++) {
+            if (i != 0) {
+                addText(",");
+            }
+            addOrBuffer(reworkedSelectors.get(i));
+        }
 
-        verifyAndReplaceComponentClass(rule);
-        replaceNamespaceTokens(rule);
+        // add opening declaration bracket
+        addText("{");
 
-        addText(rule.getAsCSSString(writerSettings, 0));
+        // perform static declaration rework, then append declaration content
+        List<CSSDeclaration> reworkedDeclarations = reworkDeclarations(rule);
+        for (int i = 0; i < reworkedDeclarations.size(); i++) {
+            if (i != 0) {
+                addText(";");
+            }
+            addOrBuffer(reworkedDeclarations.get(i));
+        }
+
+        // add closing declaration bracket
+        addText("}");
     }
 
-    private void addText(String code){
+    /**
+     * Performs all registered selector {@link Rework} operations on the selectors in the given rule.
+     * 
+     * Note that this does not fully update the original rule's selectors list! If an existing selector is changed this
+     * will be reflected properly, however any selectors that are added or removed will not be reflected in the original
+     * rule. This can be easily done if needed, but since we are handling the print ourselves there is currently no need
+     * to perform this extra step.
+     * 
+     * @param rule The rule containing the selectors to rework.
+     * @return All reworked selectors. Note that some of the original selectors may have been removed or new ones added.
+     */
+    private List<CSSSelector> reworkSelectors(CSSStyleRule rule) {
+        List<CSSSelector> selectors = Lists.newArrayList(rule.getAllSelectors());
+
+        for (Rework<CSSSelector> rework : selectorRework) {
+            List<CSSSelector> reworkedSelectors = Lists.newArrayList();
+            for (CSSSelector selector : selectors) {
+                rework.perform(selector, reworkedSelectors, errors);
+            }
+            selectors = reworkedSelectors;
+        }
+
+        return selectors;
+    }
+
+    /**
+     * Performs all registered declaration {@link Rework} operations on the declarations in the given rule.
+     * 
+     * Note that this does not fully update the original rule's declaration list! If an existing declaration is changed
+     * this will be reflected properly, however any selectors that are added or removed will not be reflected in the
+     * original rule. This can be easily done if needed, but since we are handing the print ourselves there is currently
+     * no need to perform this extra step.
+     * 
+     * @param rule The rule containing the declarations to rework.
+     * @return All reworked declarations. Note that some of the original declarations may have been removed or new ones
+     *         added.
+     */
+    private List<CSSDeclaration> reworkDeclarations(CSSStyleRule rule) {
+        List<CSSDeclaration> declarations = Lists.newArrayList(rule.getAllDeclarations());
+
+        for (Rework<CSSDeclaration> rework : declarationRework) {
+            List<CSSDeclaration> reworkedDeclarations = Lists.newArrayList();
+            for (CSSDeclaration declaration : declarations) {
+                rework.perform(declaration, reworkedDeclarations, errors);
+            }
+            declarations = reworkedDeclarations;
+        }
+
+        return declarations;
+    }
+
+    /**
+     * Adds the selector contents to the output.
+     * 
+     * If we ever need to we can handle dynamic selector rework here, similar to {@link #addOrBuffer(CSSDeclaration)} .
+     * 
+     * @param selector Add the content from this selector.
+     */
+    private void addOrBuffer(CSSSelector selector) {
+        addText(selector.getAsCSSString(writerSettings, 0));
+    }
+
+    /**
+     * Adds the declaration content to the output.
+     * 
+     * If this declaration is a match for registered {@link DynamicRework} we will add all previous text content in the
+     * string buffer (see {@link #addText(String)}) to the components buffer as a text component, then add the
+     * {@link DynamicRework}'s {@link ComponentDefRef} to the components buffer as well.
+     * 
+     * @param declaration Add the content from this declaration.
+     */
+    private void addOrBuffer(CSSDeclaration declaration) {
+        ComponentDefRef cmp = getComponentReplacement(declaration);
+        if (cmp != null) {
+            bufferTextCDR();
+            componentsBuffer.add(cmp);
+        } else {
+            addText(declaration.getAsCSSString(writerSettings, 0));
+        }
+    }
+
+    /**
+     * Checks all registered declaration {@link DynamicRework} for a match with the given declaration. The first
+     * {@link DynamicRework} to match will have it's {@link ComponentDefRef} returned (thus rework order may be
+     * important).
+     * 
+     * @param declaration Perform rework on this declaration.
+     * @return The {@link ComponentDefRef} for the rework, or null if no registered {@link DynamicRework} matches.
+     */
+    private ComponentDefRef getComponentReplacement(CSSDeclaration declaration) {
+        for (DynamicRework<CSSDeclaration> rework : dynDeclarationRework) {
+            ComponentDefRef cmp = rework.perform(declaration, errors);
+            if (cmp != null) {
+                return cmp;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Adds some text to the string buffer.
+     * 
+     * @param code The text to add.
+     */
+    private void addText(String code) {
         sb.append(code);
     }
 
-    private ComponentDefRef createTextCDR(){
+    /**
+     * Adds all text in the string buffer as a text component.
+     */
+    private void addTextCDR() {
+        if (sb.length() > 0) {
+            components.add(createTextCDR());
+        }
+    }
+
+    /**
+     * Adds all text in the string buffer as a text component to the buffered components list.
+     */
+    private void bufferTextCDR() {
+        if (sb.length() > 0) {
+            componentsBuffer.add(createTextCDR());
+        }
+    }
+
+    /**
+     * Creates a text component with the contents from the string buffer. The buffer is then reset.
+     */
+    private ComponentDefRef createTextCDR() {
         ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
         builder.setDescriptor("aura:text");
         builder.setAttribute("value", sb.toString());
@@ -317,18 +345,23 @@ public class CSSParser extends DefaultCSSVisitor {
         return builder.build();
     }
 
-    private void addTextCDR(){
-        if(sb.length() > 0){
-            components.add(createTextCDR());
-        }
+    /**
+     * Appends components in the components buffer to the components list, then appends any text in the string buffer as
+     * a text component to the components list.
+     */
+    private void flush() {
+        components.addAll(componentsBuffer);
+        componentsBuffer.clear();
+        addTextCDR();
     }
 
-    private String validateConditional(CSSMediaExpression exp){
+    private String validateConditional(CSSMediaExpression exp) {
         CSSExpression val = exp.getValue();
-        if(val != null){
+        if (val != null) {
             String value = val.getAsCSSString(writerSettings, 0).toUpperCase();
             if (!allowedConditions.contains(value)) {
-                throw new AuraRuntimeException("Unknown browser: [" + value + "]. The allowed conditionals are: " + allowedConditions);
+                throw new AuraRuntimeException("Unknown browser: [" + value + "]. The allowed conditionals are: "
+                        + allowedConditions);
             }
             return value;
         }
@@ -367,45 +400,45 @@ public class CSSParser extends DefaultCSSVisitor {
 
     @Override
     public void onBeginMediaRule(CSSMediaRule rule) {
-        for(int i=0;i<rule.getMediaQueryCount();i++){
+        for (int i = 0; i < rule.getMediaQueryCount(); i++) {
             CSSMediaQuery query = rule.getMediaQueryAtIndex(i);
 
-            for(int j=0;j<query.getMediaExpressionCount();j++){
+            for (int j = 0; j < query.getMediaExpressionCount(); j++) {
                 CSSMediaExpression exp = query.getMediaExpression(j);
 
                 String feature = exp.getFeature();
                 String value = validateConditional(exp);
                 Expression expression = null;
-                if(value != null){
-                    Location l = new Location(componentClass, exp.getSourceLocation().getFirstTokenBeginLineNumber(), exp.getSourceLocation().getFirstTokenBeginColumnNumber(),-1);
+                if (value != null) {
+                    Location l = new Location(componentClass, exp.getSourceLocation().getFirstTokenBeginLineNumber(),
+                            exp.getSourceLocation().getFirstTokenBeginColumnNumber(), -1);
                     try {
-                        expression = AuraImpl.getExpressionAdapter().buildExpression("$Browser.is"+value, l);
+                        expression = AuraImpl.getExpressionAdapter().buildExpression("$Browser.is" + value, l);
                     } catch (AuraValidationException e) {
                         throw new AuraRuntimeException(e, l);
                     }
                 }
 
-                if(feature.equalsIgnoreCase(CONDITIONAL_IF)){
-
-                    addTextCDR();
+                if (feature.equalsIgnoreCase(CONDITIONAL_IF)) {
+                    flush();
                     ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
                     conditionalBuilder.push(builder);
 
                     builder.setAttribute("isTrue", expression);
                     builder.setDescriptor("aura:if");
-                }else if(feature.equalsIgnoreCase(CONDITIONAL_ELSEIF)){
-                    addTextCDR();
+                } else if (feature.equalsIgnoreCase(CONDITIONAL_ELSEIF)) {
+                    flush();
                     ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
                     conditionalBuilder.push(builder);
                     builder.setAttribute("isTrue", expression);
                     builder.setDescriptor("aura:if");
-                }else if(feature.equalsIgnoreCase(CONDITIONAL_ELSE)){
-                    addTextCDR();
+                } else if (feature.equalsIgnoreCase(CONDITIONAL_ELSE)) {
+                    flush();
                     ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
                     conditionalBuilder.push(builder);
                     builder.setAttribute("isTrue", true);
                     builder.setDescriptor("aura:if");
-                }else{
+                } else {
                     addText(rule.getAsCSSString(writerSettings, 0));
                 }
             }
@@ -414,14 +447,15 @@ public class CSSParser extends DefaultCSSVisitor {
 
     @Override
     public void onEndMediaRule(CSSMediaRule rule) {
-        List<ComponentDefRef> body = Lists.newArrayList(createTextCDR());
         ComponentDefRefBuilder builder = conditionalBuilder.pop();
-        builder.setAttribute("body", body);
+        bufferTextCDR();
+        builder.setAttribute("body", Lists.newArrayList(componentsBuffer));
+        componentsBuffer.clear();
         try {
             ComponentDefRef cdr = builder.build();
-            if(conditionalBuilder.isEmpty()){
+            if (conditionalBuilder.isEmpty()) {
                 components.add(cdr);
-            }else{
+            } else {
                 conditionalBuilder.peek().setAttribute("else", cdr);
             }
         } catch (QuickFixException e) {
@@ -429,7 +463,7 @@ public class CSSParser extends DefaultCSSVisitor {
         }
     }
 
-    private class ErrorHandler implements ICSSParseExceptionHandler{
+    private class ErrorHandler implements ICSSParseExceptionHandler {
 
         @Override
         public void onException(ParseException ex) {
@@ -438,7 +472,7 @@ public class CSSParser extends DefaultCSSVisitor {
     };
 
     public static void main(String[] args) {
-        try{
+        try {
             AuraContext context = Aura.getContextService().startContext(Mode.DEV, Format.JSON, Access.AUTHENTICATED);
             context.setClient(new Client("Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)"));
 
@@ -449,7 +483,7 @@ public class CSSParser extends DefaultCSSVisitor {
         } catch (QuickFixException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }finally{
+        } finally {
             Aura.getContextService().endContext();
         }
     }

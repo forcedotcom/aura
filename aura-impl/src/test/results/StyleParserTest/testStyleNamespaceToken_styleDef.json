@@ -2,7 +2,7 @@
   "serId":1,
   "value":{
     "descriptor":"css://test.testStyleNamespaceToken",
-    "code":".testTestStyleNamespaceToken{color:green;}.testTestStyleNamespaceToken menu{color:red;}.testTestStyleNamespaceToken otherMenu{color:black;}@-webkit-keyframes something{from{-webkit-transform:rotate(0);}to{-webkit-transform:rotate(720deg);}}from{-webkit-transform:rotate(0);}to{-webkit-transform:rotate(720deg);}.testTestStyleNamespaceToken .mobilePanel button:active,.testTestStyleNamespaceToken .mobilePanel .actionMenu:active,.testTestStyleNamespaceToken .uiButton.default:active{background-color:#39bbe4;color:#fff;text-shadow:none;-webkit-box-shadow:none;}",
+    "code":".testTestStyleNamespaceToken{color:green}.testTestStyleNamespaceToken menu{color:red}.testTestStyleNamespaceToken otherMenu{color:black}@-webkit-keyframes something{from{-webkit-transform:rotate(0);}to{-webkit-transform:rotate(720deg);}}from{-webkit-transform:rotate(0);}to{-webkit-transform:rotate(720deg);}.testTestStyleNamespaceToken .mobilePanel button:active,.testTestStyleNamespaceToken .mobilePanel .actionMenu:active,.testTestStyleNamespaceToken .uiButton.default:active{background-color:#39bbe4;color:#fff;text-shadow:none;-webkit-box-shadow:none}",
     "className":".testTestStyleNamespaceToken"
   }
 }

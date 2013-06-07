@@ -66,7 +66,8 @@ public class StyleParser implements Parser {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws StyleParserException, QuickFixException {
+    public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws StyleParserException,
+            QuickFixException {
 
         if (descriptor.getDefType() == DefType.STYLE) {
             String className = "." + descriptor.getNamespace() + AuraTextUtil.initCap(descriptor.getName());
@@ -85,7 +86,7 @@ public class StyleParser implements Parser {
             }
 
             StyleParserResultHolder resultHolder;
-            resultHolder = parser.parse();
+            resultHolder = parser.parse().results();
             builder.setComponents(resultHolder.getComponents());
             builder.setOwnHash(source.getHash());
 

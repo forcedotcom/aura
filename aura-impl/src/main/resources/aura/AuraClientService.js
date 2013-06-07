@@ -182,13 +182,103 @@ var AuraClientService = function() {
                     $A.measure("Completed Component Callback", "Sending XHR " + $A.getContext().getNum());
                 });
 
-                $A.services.event.startFiring("loadComponent");
-
-                $A.enqueueAction(action);
-
-                $A.services.event.finishFiring("loadComponent");
+                clientService.pushStack("loadComponent");
+                clientService.enqueueAction(action);
+                clientService.popStack("loadComponent");
             });
         },
+
+        /**
+         * Check to see if we are inside the aura processing 'loop'.
+         */
+        inAuraLoop : function() {
+            return priv.auraStack.length > 0;
+        },
+
+        /**
+         * Check to see if a public pop should be allowed.
+         *
+         * We allow a public pop if the name was pushed, or if there is nothing
+         * on the stack.
+         *
+         * @param name the name of the public 'pop' that will happen.
+         * @return true if the pop should be allowed.
+         */
+        checkPublicPop : function(name) {
+            if (priv.auraStack.length > 0) {
+                return priv.auraStack[priv.auraStack.length-1] === name;
+            }
+            //
+            // Allow public pop calls on an empty stack for now.
+            //
+            return true;
+        },
+
+        /**
+         * Push a new name on the stack.
+         *
+         * @param name the name of the item to push.
+         */
+        pushStack : function(name) {
+            //#if {"modes" : ["PTEST"]}
+            // to only profile the transactions and not the initial page load
+            if (event == "onclick") {
+                // clear out existing timers
+                $A.removeStats();
+                $A.getContext().clearTransactionName();
+                // start a Jiffy transaction
+                $A.startTransaction($A.getContext().incrementTransaction());
+            }
+            //#end
+            priv.auraStack.push(name);
+        },
+
+        /**
+         * Pop an item off the stack.
+         *
+         * The name of the item must match the previously pushed. If this is the last
+         * item on the stack we do post processing, which involves sending actions to
+         * the server.
+         *
+         * @param name the name of the last item pushed.
+         */
+        popStack : function(name) {
+            var count = 0;
+            var lastName;
+
+            if (priv.auraStack.length > 0) {
+                lastName = priv.auraStack.pop();
+                if (lastName !== name) {
+                    $A.error("Broken stack: popped "+lastName+" expected "+name+", stack = "+priv.auraStack);
+                }
+            } else {
+                $A.warning("Pop from empty stack");
+            }
+            if (priv.auraStack.length === 0) {
+                //
+                // FIXME: W-1652120
+                //
+                // Weird compatibility stuff. We are sometimes called with nothing on the stack,
+                // so, rather than work too hard on this, just push two things on the stack so
+                // that even under those conditions we will not do the wrong thing.
+                //
+                priv.auraStack.push("$A.clientServices.popStack");
+                priv.auraStack.push("$A.clientServices.popStack");
+                clientService.processActions();
+                done = !$A["finishedInit"];
+                while (!done && count <= 15) {
+                    $A.renderingService.rerenderDirty();
+                    done = !clientService.processActions();
+                    count += 1;
+                    if (count > 14) {
+                        $A.error("finishFiring has not completed after 10 loops");
+                    }
+                }
+                // Force our stack to nothing.
+                priv.auraStack = [];
+            }
+        },
+
 
         /**
          * Perform a hard refresh.

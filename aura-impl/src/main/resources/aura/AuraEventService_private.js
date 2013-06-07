@@ -17,7 +17,6 @@
 var priv = {
     registry : new EventDefRegistry(),
     eventDispatcher : {},
-    eventStack : [],
 
     qualifyEventName : function(event) {
         if(event.indexOf("://") == -1){

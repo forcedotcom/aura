@@ -455,7 +455,9 @@ var Test = function(){
         auraWarning : function(w) {
             if (!priv.putMessage(priv.preWarnings, priv.expectedWarnings, w)) {
                 $A.log("Unexpected warning: "+w);
+                return false;
             }
+            return true;
         },
 
         /**

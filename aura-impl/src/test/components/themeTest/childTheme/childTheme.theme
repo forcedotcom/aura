@@ -1,0 +1,4 @@
+<aura:theme extends="themeTest:baseTheme">
+  <aura name="padding" default="3px" />
+  <aura:set attribute="color" value="yellow" />
+</aura:theme>

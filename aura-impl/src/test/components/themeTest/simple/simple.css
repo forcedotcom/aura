@@ -1,0 +1,5 @@
+.THIS {
+	color: theme('themeTest.baseTheme.color');
+	padding: 5px 7px;
+	margin: theme('themeTest.baseTheme.margin');
+}

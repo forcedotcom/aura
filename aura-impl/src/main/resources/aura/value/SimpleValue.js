@@ -25,14 +25,34 @@
 function SimpleValue(config, def, component) {
     $A.assert(!config || config.auraType !== this.auraType);
 
+    /** Initial value of the simple value.  Please be a simple type! */
     this.value = config;
+
+    /** Optional component "owning" this value. */
     this.owner = component;
 
+    /** DefDescriptor name for the value. */
+    this.name = undefined;
 //#if {"modes" : ["DEVELOPMENT"]}
     if (def) {
+        /** Name of this object */
         this.name = def.getDescriptor().getQualifiedName();
     }
+    
 //#end
+
+    /** Set "true" during a change. */
+    this.dirty = false;
+
+    /** During a change, holds the old value in case of rollback. */
+    this.oldValue = undefined;
+
+    /** Validity of value */
+    this.invalid = false;
+
+    /** Errors. */
+    this.errors = undefined;
+
 //#if {"modes" : ["STATS"]}
     valueFactory.index(this);
 //#end
@@ -46,7 +66,6 @@ SimpleValue.prototype.auraType = "Value";
  */
 SimpleValue.prototype.getValue = function() {
     return this.value;
-
 };
 
 /**
@@ -58,6 +77,7 @@ SimpleValue.prototype.unwrap = function() {
 
 /**
  * Merges the passed in value.
+ *
  * @param {Object} sv - The value to overwrite.
  * @param {Boolean} overwrite - If overwrite is false, this method only does a type check for the sv argument
  *  and throws an error if it's not a SimpleValue.
@@ -107,12 +127,13 @@ SimpleValue.prototype.getEventDispatcher = function() {
  * by the presence of this.oldValue), it instead returns this.oldValue.
  */
 SimpleValue.prototype.getPreviousValue = function() {
-    return (this.hasOwnProperty('oldValue')) ? this.oldValue : this.value;
+    return this.isDirty() ? this.oldValue : this.value;
 };
 
 /**
  * Sets the wrapped value. This causes isDirty to return true until commit() is
  * called.
+ *
  * @param {Object} v The value to be set.
  */
 SimpleValue.prototype.setValue = function(v, skipChange) {
@@ -170,8 +191,8 @@ SimpleValue.prototype.isExpression = function() {
  */
 SimpleValue.prototype.commit = function(clean) {
     if (this.isDirty()) {
-        delete this.oldValue;
-        delete this.dirty;
+        this.oldValue = undefined;
+        this.dirty = false;
         if (!clean && this.owner) {
             // was called by user directly
             $A.renderingService.removeDirtyValue(this);
@@ -182,6 +203,7 @@ SimpleValue.prototype.commit = function(clean) {
 /**
  * Removes the current uncommitted value, if there is one. isDirty() will return
  * false after this is called.
+ *
  * @param {Object} clean - Do not use this internal-only parameter
  */
 SimpleValue.prototype.rollback = function(clean) {
@@ -193,6 +215,7 @@ SimpleValue.prototype.rollback = function(clean) {
 
 /**
  * Sets the value as valid or not. Clears errors if set to valid.
+ *
  * @param {Boolean} status Make the value valid (true) or not (anything else).
  */
 SimpleValue.prototype.setValid = function(status) {
@@ -200,8 +223,8 @@ SimpleValue.prototype.setValid = function(status) {
         this.makeDirty();  // if we're changing valid state, we're dirty
     }
     if (status === true) {
-        delete this.invalid;
-        delete this.errors;   // clean out errors
+        this.invalid = false;
+        this.errors = undefined;   // clean out errors
     } else {
         this.invalid = true;
     }
@@ -211,7 +234,7 @@ SimpleValue.prototype.setValid = function(status) {
  * Returns whether this value is valid.
  */
 SimpleValue.prototype.isValid = function() {
-    return $A.util.isUndefined(this.invalid);
+    return !this.invalid;
 };
 
 /**
@@ -219,18 +242,17 @@ SimpleValue.prototype.isValid = function() {
  * @param {Array|Object} messages The messages to be added.
  */
 SimpleValue.prototype.addErrors = function(messages) {
-    var that = this;
     if (messages) {
-        if ($A.util.isUndefined(that.errors)) {
-            that.errors = [];
+        if ($A.util.isUndefined(this.errors)) {
+            this.errors = [];
         }
 
         if ($A.util.isArray(messages)) {
         	for(var i=0; i< messages.length; i++){
-        		that.errors.push(messages[i]);
+        		this.errors.push(messages[i]);
         	}
         } else {
-            that.errors.push(messages);
+            this.errors.push(messages);
         }
     }
 };
@@ -239,7 +261,7 @@ SimpleValue.prototype.addErrors = function(messages) {
  * Clears the error messages.
  */
 SimpleValue.prototype.clearErrors = function() {
-    delete this.errors;
+    this.errors = undefined;
 };
 
 /**
@@ -268,11 +290,11 @@ SimpleValue.prototype.destroy = function(async) {
         val.destroy(async);
     }
 
-    delete this.handlers;
-    delete this.value;
-    delete this.newValue;
-    delete this.invalid;
-    delete this.errors;
+    this.handlers = undefined;
+    this.value = undefined;
+    this.newValue = undefined;
+    this.invalid = undefined;
+    this.errors = undefined;
 };
 
 /**

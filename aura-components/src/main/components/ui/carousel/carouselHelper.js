@@ -321,7 +321,11 @@
 		}
 	},
 	
-	hideAllUnselectedPages: function(cmp, selectPage) {		
+	hideAllUnselectedPages: function(cmp, selectPage) {
+		if (cmp.get('v.continuousFlow')) {
+			return;
+		}
+		
 		var pages = this.getPageComponents(cmp);
 		for (var i=1; i<= pages.length; i++) {			
 			if (i != selectPage) {

@@ -738,7 +738,7 @@ $A.ns.Util.prototype.on(window, "beforeunload", function(event) {
         priv.isUnloading = true;
         priv.requestQueue = [];
     }
-}; 
+}); 
 
 $A.ns.Util.prototype.on(window, "load", function(event) {
     // Lazy load data-src scripts

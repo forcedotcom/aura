@@ -15,8 +15,10 @@
  */
 ({
     getLocallyCreatedComponent:function(cmp){
-        cmp.find("create").get("e.press").fire();
-        var body = cmp.get("v.body");
+        $A.run(function(){
+            cmp.get('c.createComponent').run();
+        });
+        var body = cmp.get('v.body');
         $A.test.assertEquals(1, body.length);
         $A.test.assertEquals(true, body[0].isRendered());
         return body[0];
@@ -101,12 +103,11 @@
         test:function(cmp){
             var config = { componentDef:"markup://provider:clientProvider", attributes:{ values:{ value:'arrested:development'} } };
             try{
-                $A.componentService.newComponentDeprecated(config, null, true, false);
+                $A.componentService.newComponentAsync(this, function(){}, config, null, true, false);
+                $A.test.fail("Expected error to be thrown during new component creation");
             } catch (e){
                 $A.test.assertEquals("Assertion Failed!: DefDescriptor config undefined : undefined", e.message);
-                return;
             }
-            throw new Error("Expected an error");
         }
     },
 
@@ -116,9 +117,14 @@
     testClientProvidedNullDescriptor:{
         test:function(cmp){
             var config = { componentDef:"markup://provider:clientProvider", attributes:{ values:{ value:null} } };
-            var creation = $A.componentService.newComponentDeprecated(config, null, true, false);
-            $A.test.assertEquals("markup://provider:clientProvider", creation.getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals(null, creation.getAttributes().get("value"));
+            $A.componentService.newComponentAsync(
+                this,
+                function(newCmp){
+                    $A.test.assertEquals("markup://provider:clientProvider", newCmp.getDef().getDescriptor().getQualifiedName());
+                    $A.test.assertEquals(null, newCmp.getAttributes().get("value"));
+                },
+                config, null, true, false
+            );
         }
     },
 
@@ -128,9 +134,14 @@
     testClientProvidedUndefinedDescriptor:{
         test:function(cmp){
             var config = { componentDef:"markup://provider:clientProvider", attributes:{ values:{ value:undefined} } };
-            var creation = $A.componentService.newComponentDeprecated(config, null, true, false);
-            $A.test.assertEquals("markup://provider:clientProvider", creation.getDef().getDescriptor().getQualifiedName());
-            $A.test.assertEquals(undefined, creation.getAttributes().get("value"));
+            $A.componentService.newComponentAsync(
+                this,
+                function(newCmp){
+                    $A.test.assertEquals("markup://provider:clientProvider", newCmp.getDef().getDescriptor().getQualifiedName());
+                    $A.test.assertEquals(undefined, newCmp.getAttributes().get("value"));
+                },
+                config, null, true, false
+            );
         }
     }
 })

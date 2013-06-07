@@ -19,9 +19,9 @@
      */
     testValueProviderForPreloadedDef:{
         test:function(cmp){
-            var action = cmp.get('c.createCmpWithPreloadedDef');
-            action.run();
-            $A.eventService.finishFiring();
+            $A.run(function(){
+                cmp.get('c.createCmpWithPreloadedDef').run();
+            });
 
             var body = cmp.get('v.body');
             $A.test.assertEquals(1,body.length);
@@ -34,15 +34,16 @@
             $A.test.assertEquals("markup://aura:text", newTextCmp.getDef().getDescriptor().getQualifiedName());
         }
     },
+
     /**
      * Create a new component whose definition was already preloaded and provide a custom attribute value provider.
-     * W-1308292 - Passing localId in config for newCmp will invoke the fix
+     * Automation for W-1308292 - Passing localId in config for newCmp will invoke the fix
      */
     testPassThroughValueAsValueProvider:{
         test:function(cmp){
-            var action = cmp.get('c.createCmpWithPassthroughValue');
-            action.run();
-            $A.eventService.finishFiring();
+            $A.run(function(){
+                cmp.get('c.createCmpWithPassthroughValue').run();
+            });
 
             //Verify that local ID can be used to find the component
             var newTextCmp = cmp.find("txt_Id");
@@ -53,90 +54,64 @@
             $A.test.assertEquals("Washington", $A.test.getText(newTextCmp.getElement()));
         }
     },
+
     /**
      * Create a component whose definition is not available at the client.
      * This definition would be fetched at the server.
      */
-    //TODO W-1320697
+    // TODO(W-1320697): Specifying expressions as attribute value for new component does not work
     _testValueProviderForDefFetchedFromServer:{
         attributes:{numberAttribute:999},
         test: function(cmp){
-            var action = cmp.get('c.createCmpByFetchingDefFromServer');
-            action.run();
-            $A.eventService.finishFiring();
+            $A.run(function(){
+                cmp.get('c.createCmpByFetchingDefFromServer').run();
+            });
 
-            var body = cmp.get('v.body');
-            $A.test.assertEquals("markup://aura:placeholder", body[0].getDef().getDescriptor().getQualifiedName(),
-                    "Expected component to be initially represented by a placeholder.");
-
-            //Wait till placeholder is replaced by actual component that was specified in newCmp()
-            this.assertAfterLazyLoading(body[0],"markup://loadLevelTest:displayNumber",
-                    function(){
-                        var numberCmp = this.extractCmpFromPlaceholder(body[0],"markup://loadLevelTest:displayNumber");
-
-                        $A.test.assertEquals(999,numberCmp.get('v.number'), "Failed to pass attribute values to placeholder");
+            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+                var numberCmp = body[0];
+                $A.test.assertEquals("markup://loadLevelTest:displayNumber", numberCmp.getDef().getDescriptor().getQualifiedName(),
+                        "Failed to create new component: markup://loadLevelTest:displayNumber");
+                $A.test.assertEquals(999,numberCmp.get('v.number'), "Failed to pass attribute values to placeholder");
                         $A.test.assertEquals("999",$A.test.getTextByComponent(numberCmp), "Failed to pass attribute values to placeholder");
 
-                        /**W-1318095 - Verify that new Component was provided the local id specified in config
-                        $A.test.assertTruthy(cmp.find("num_Id"));
-                        $A.test.assertEquals(numberCmp, cmp.find("num_Id"));*/
-                    });
+                /**W-1318095 - Verify that new Component was provided the local id specified in config
+                $A.test.assertTruthy(cmp.find("num_Id"));
+                $A.test.assertEquals(numberCmp, cmp.find("num_Id"));*/
+            });
         }
     },
 
-    /**
-     * Wait till the placeholder is replaced by actual component and call the callback function.
-     */
-    assertAfterLazyLoading:function(placeholder, expectedComponent, callback){
-        var extractCmpFromPlaceholder = this.extractCmpFromPlaceholder;
-        $A.test.addWaitFor(true,
-                function(){
-                        return !!extractCmpFromPlaceholder(placeholder,expectedComponent);
-                },callback);
-    },
-    /**
-     * The target component to be loaded is inserted into the body of the placeholder.
-     * This function return the component when its found in the body of the placeholder else it returns nothing.
-     */
-    extractCmpFromPlaceholder:function(placeholder, cmpName){
-        var body = placeholder.get("v.body");
-        var ret;
-        if(body.forEach){
-            body.forEach(function(key){
-                if(key.auraType && key.auraType === 'Component' && key.getDef().getDescriptor().getQualifiedName()===cmpName)
-                    ret= key;
-            });
-        }
-        return ret;
-    },
     /**
      * Use empty value provider and make sure it is either caught or throws a useful JS error.
      */
-    //W-1320706
+    // TODO(W-1320706): Specifying bad attribute value providers should give a more informative message to user
     _testEmptyValueProvider:{
         test:function(cmp){
-            var action = cmp.get('c.createCmpWithEmptyValueProvider');
-            action.run();
             try{
-            $A.eventService.finishFiring();
-            //Look at the c.createCmpWithEmptyValueProvider, it is providing {} as attribute value provider
-            $A.test.fail("Should have failed to resolve value provider for new component.");
+                $A.run(function(){
+                    cmp.get('c.createCmpWithEmptyValueProvider').run();
+                });
+                
+                //Look at the c.createCmpWithEmptyValueProvider, it is providing {} as attribute value provider
+                $A.test.fail("Should have failed to resolve value provider for new component.");
             }catch(e){
                 //W-1320706 Informative error message
                 $A.test.assertEquals("TypeError: Object #<Object> has no method 'getValue'", e.toString());
             }
         }
     },
+
     /**
      * Use undefined as value provider and make sure it is either caught or throws a useful JS error.
      */
-    //W-1320706
+    // TODO(W-1320706): Specifying bad attribute value providers should give a more informative message to user
     _testUndefinedAsValueProvider:{
         test:function(cmp){
-            var action = cmp.get('c.createCmpWithUndefinedValueProvider');
-            action.run();
+            
             try{
-                $A.eventService.finishFiring();
+                $A.run(function(){
+                    cmp.get('c.createCmpWithUndefinedValueProvider').run();
+                });
                 //Look at the c.createCmpWithUndefinedValueProvider, it is providing undefined as attribute value provider
                 $A.test.fail("Should have failed to resolve value provider for new component.");
             }catch(e){
@@ -145,15 +120,16 @@
             }
         }
     },
+
     /**
      * Use undefined as value provider, but the new component has no references to the value provider.
      * The attributes of new component has no reference to attributes of the parent component.
      */
     testNewComponentWithoutDependenceOnAVP:{
         test:function(cmp){
-            var action = cmp.get('c.createCmpWithNoRequirementForAVP');
-            action.run();
-            $A.eventService.finishFiring();
+            $A.run(function(){
+                cmp.get('c.createCmpWithNoRequirementForAVP').run();
+            });
 
             var body = cmp.get('v.body');
             $A.test.assertEquals(1,body.length);

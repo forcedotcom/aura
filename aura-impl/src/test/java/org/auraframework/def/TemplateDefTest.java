@@ -20,6 +20,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.handler.XMLHandler.InvalidSystemAttributeException;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.junit.Ignore;
 
 /**
@@ -44,7 +45,7 @@ public class TemplateDefTest extends AuraImplTestCase {
             DefDescriptor<ComponentDef> expectedTemplate, String msg) throws Exception {
         expectedTemplate = (expectedTemplate == null
                 ? Aura.getDefinitionService().getDefDescriptor("aura:template", ComponentDef.class)
-                : expectedTemplate);
+                        : expectedTemplate);
         DefDescriptor<? extends BaseComponentDef> desc = addSourceAutoCleanup(c, markup);
         BaseComponentDef def = desc.getDef();
         assertEquals(msg, expectedTemplate, def.getTemplateDef().getDescriptor());
@@ -52,18 +53,18 @@ public class TemplateDefTest extends AuraImplTestCase {
 
     public void testCustomTemplate() throws Exception {
         DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class,
-                String.format(baseComponentTag, "", ""));
+                String.format(baseComponentTag, "isTemplate='true'", ""));
         assertTemplate(
                 ComponentDef.class,
                 String.format(baseComponentTag,
                         String.format("template='%s:%s'", template.getNamespace(), template.getName()), ""),
-                template, "Failed to register a custom template for a component");
+                        template, "Failed to register a custom template for a component");
 
         assertTemplate(
                 ApplicationDef.class,
                 String.format(baseApplicationTag,
                         String.format("template='%s:%s'", template.getNamespace(), template.getName()), ""),
-                template, "Failed to register a custom template for an application");
+                        template, "Failed to register a custom template for an application");
     }
 
     public void testIsTemplateAttribute() throws Exception {
@@ -117,7 +118,7 @@ public class TemplateDefTest extends AuraImplTestCase {
     /**
      * Verify that only components marked as 'isTemplate=true' can be used as templates.
      */
-    @Ignore("W-1545479")
+
     public void testIsTemplateAttributeRequired() {
         DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "isTemplate='true'", ""));
@@ -141,7 +142,7 @@ public class TemplateDefTest extends AuraImplTestCase {
             cmp.getDef();
             fail("Should have failed to use a template marked with isTemplate='false'");
         } catch (Exception expected) {
-            checkExceptionFull(expected, AuraRuntimeException.class,
+            assertExceptionMessageEndsWith(expected, AuraRuntimeException.class,
                     "Non template component specified for template attribute");
         }
     }
@@ -149,7 +150,6 @@ public class TemplateDefTest extends AuraImplTestCase {
     /**
      * A template cannot be abstract because if it is, it cannot be instantiated directly and that is not good.
      */
-    @Ignore("W-1545480")
     public void testTemplateCannotBeAbstract() {
         DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "isTemplate='true' abstract='true'", ""));
@@ -157,7 +157,7 @@ public class TemplateDefTest extends AuraImplTestCase {
             Aura.getInstanceService().getInstance(template);
             fail("Template components cannot be abstract.");
         } catch (Exception expected) {
-            checkExceptionFull(expected, AuraRuntimeException.class, "Template cannot be abstract.");
+            assertExceptionMessageStartsWith(expected, InvalidDefinitionException.class,"Template cannot be abstract.");
         }
     }
 

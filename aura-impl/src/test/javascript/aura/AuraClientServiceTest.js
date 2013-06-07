@@ -60,6 +60,7 @@ Test.Aura.AuraClientServiceTest = function(){
 		    setExclusive : function(param){
 			actual = param;
 		    },
+		    isAbortable : function() { return false; },
 		    getDef : function(){
 			return {isClientAction:function(){return true;}};
 		    },
@@ -95,8 +96,9 @@ Test.Aura.AuraClientServiceTest = function(){
 		    setExclusive : function(param){
 			actual = false;
 		    },
+		    isAbortable : function(){ return false; },
 		    getDef : function(){
-			return {isClientAction:function(){return true;}};
+				return {isClientAction:function(){return true;}};
 		    },
 		    run : function(){
 			
@@ -128,6 +130,7 @@ Test.Aura.AuraClientServiceTest = function(){
 	    });
 	    var action = {
 		    setExclusive : function(){},
+		    isAbortable : function(){ return false; },
 		    getDef : function(){
 			return {isClientAction:function(){return true;}};
 		    },
@@ -161,6 +164,7 @@ Test.Aura.AuraClientServiceTest = function(){
 	    });
 	    var action = {
 		    setExclusive : function(){},
+		    isAbortable : function(){ return false; },
 		    getDef : function(){
 			return {isClientAction:function(){return false;}};
 		    },
@@ -179,6 +183,75 @@ Test.Aura.AuraClientServiceTest = function(){
 	    Assert.Equal(action, target.priv.actionQueue[0]);
 	}
 	
+    [Fact]
+    function AbortableActionsAreCleared(){
+        //Arrange
+        var target;
+        var numAbortedCorrectly = 0;
+        var numAbortedIncorrectly = 0;
+        var abortable = {
+                setExclusive : function(){},
+                isAbortable : function(){ return true; },
+                getDef : function(){
+                return {isClientAction:function(){return false;}, isServerAction:function(){return true;}};
+                },
+                abort : function() {
+                    numAbortedCorrectly++;
+                },
+                run : function(){},
+                auraType : "Action"
+            };
+        var action = {
+                setExclusive : function(){},
+                isAbortable : function(){ return false; },
+                getDef : function(){
+                return {isClientAction:function(){return false;}, isServerAction:function(){return true;}};
+                },
+                abort : function() {
+                    numAbortedIncorrectly++;
+                },
+                run : function(){},
+                auraType : "Action"
+            };
+        
+        mockOnLoadUtil(function(){
+        target = new AuraClientService();
+        });
+        target.processActions = function() {};
+        var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+        assert : function(){},
+        util : {isUndefined: function(){},
+                isUndefinedOrNull: function(){}
+        },
+        mark : function(){}
+        });
+        //Act
+        mockAuraUtil(function(){
+            target.pushStack("AbortableActionsAreCleared.1");
+            target.enqueueAction(action, undefined, undefined);
+            target.enqueueAction(abortable, undefined, undefined); //will be pruned
+            target.enqueueAction(abortable, undefined, undefined); //will be pruned
+            target.enqueueAction(action, undefined, undefined);
+            target.popStack("AbortableActionsAreCleared.1");
+            target.pushStack("AbortableActionsAreCleared.2");
+            target.enqueueAction(action, undefined, undefined);
+            target.enqueueAction(abortable, undefined, undefined); //will be kept
+            target.enqueueAction(abortable, undefined, undefined); //will be kept
+            target.enqueueAction(action, undefined, undefined);
+            target.popStack("AbortableActionsAreCleared.2");
+        });
+        //Assert
+        Assert.Equal(6, target.priv.actionQueue.length);
+        Assert.Equal(0, numAbortedIncorrectly);
+        Assert.Equal(2, numAbortedCorrectly);
+        Assert.False(target.priv.actionQueue[0].isAbortable(), "First actions should not be abortable");
+        Assert.False(target.priv.actionQueue[1].isAbortable(), "Second actions should not be abortable");
+        Assert.False(target.priv.actionQueue[2].isAbortable(), "Third actions should not be abortable");
+        Assert.True(target.priv.actionQueue[3].isAbortable(), "Fourth actions should be abortable");
+        Assert.True(target.priv.actionQueue[4].isAbortable(), "Fifth actions should be abortable");
+        Assert.False(target.priv.actionQueue[5].isAbortable(), "Sixth actions should not be abortable");
+    }
+    
 	[Fact]
 	function ThrowsIfActionParamIsUndefined(){
 	    //Arrange

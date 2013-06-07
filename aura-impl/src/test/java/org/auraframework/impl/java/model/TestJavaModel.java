@@ -40,7 +40,8 @@ public class TestJavaModel {
         inputOptions.add(new InputOption("Option1", "Opt1", false, "option1"));
         inputOptions.add(new InputOption("Option2", "Opt2", true, "option2"));
         inputOptions.add(new InputOption("Option3", "Opt3", false, "option3"));
-
+        inputOptions.add(new InputOption("Option4", "Opt4", false, "option4", true));
+        
         moreInputOptions.add(new InputOption("Option4", "Opt4", false, "val4"));
         moreInputOptions.add(new InputOption("Option5", "Opt5", false, "val5"));
         moreInputOptions.add(new InputOption("Option6", "Opt6", false, "val6"));

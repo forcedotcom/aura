@@ -25,6 +25,7 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -32,8 +33,8 @@ import org.openqa.selenium.WebElement;
 /**
  * Tests to verify that users can add missing attributes to components via QuickFixes through the browser.
  */
-// TODO(W-1589052): Unadaptable since does not function properly when running from jars
-@UnAdaptableTest
+@UnAdaptableTest("W-1589052: requires filesystem (not jars)")
+@ThreadHostileTest("QuicFixUITestUtil.deleteFiles")
 public class CreateAttributeQuickFixUITest extends WebDriverTestCase {
     private final QuickFixUITestUtil util = new QuickFixUITestUtil(this);
     private final DefDescriptor<ComponentDef> defDescriptor = Aura.getDefinitionService().getDefDescriptor(

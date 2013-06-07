@@ -18,6 +18,7 @@ package org.auraframework.components.ui;
 import java.util.List;
 
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -143,7 +144,7 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
             verifyOptionDeselected("Option3");
 
             // deselect
-            if (checkBrowserType("IE10")) {
+            if (BrowserType.IE10.equals(getBrowserType())) {
                 focusSelectElement();
             }
             deselectOption("Option2");
@@ -196,7 +197,7 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
      * select element corrupts selected/unselected options so we need to preserve the state
      */
     private void focusSelectElement() {
-        if (checkBrowserType("IE10")) {
+        if (BrowserType.IE10.equals(getBrowserType())) {
             List<WebElement> selectedOptions = inputSelect.getAllSelectedOptions();
             selectElement.click();
 

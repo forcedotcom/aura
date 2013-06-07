@@ -15,15 +15,12 @@
  */
 package org.auraframework.http;
 
-import java.io.File;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
@@ -45,11 +42,6 @@ import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.controller.TestLoggingAdapterController;
 import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.IOUtil;
-import org.auraframework.util.javascript.directive.DirectiveBasedJavascriptGroup;
-import org.auraframework.util.javascript.directive.DirectiveTypes;
-import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
-import org.junit.Ignore;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
@@ -67,7 +59,8 @@ import com.google.common.collect.Lists;
  * @since 0.0.224
  */
 @FreshBrowserInstance
-@ThreadHostileTest
+@ThreadHostileTest("TestLoggingAdapter not thread-safe")
+@UnAdaptableTest("Missing TestLoggingAdapter impl")
 public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     private final static String COOKIE_NAME = "%s_%s_%s_lm";
@@ -82,9 +75,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     private String appName;
     private String namespace;
     private String cmpName;
-    private Boolean originalAppCacheConfig;
-    private Source<?> source;
-    private String originalContent;
 
     public AppCacheResourcesUITest(String name) {
         super(name);
@@ -92,28 +82,11 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     @Override
-    public void perBrowserSetUp() {
-        super.perBrowserSetUp();
-        /*
-         * chrome on saucelab seems to be ok without deleting cookies, will verify this against jekins WebDriver driver
-         * = getDriver(); driver.get("/auraFW/resources/aura/s.gif");//this won't work with driver, it doesn't know
-         * where /auraFW/.. is, we can use open("...") instead driver.manage().deleteAllCookies();//
-         */
-    }
-
-    @Override
     public void setUp() throws Exception {
         super.setUp();
-        originalAppCacheConfig = ServletConfigController.setAppCacheDisabled(false);
-        namespace = "appCacheResourcesUITest" + auraTestingUtil.getNonce();
+        namespace = "appCacheResourcesUITest" + getAuraTestingUtil().getNonce();
         appName = "cacheapplication";
         cmpName = "cachecomponent";
-
-        createDef(NamespaceDef.class, String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, namespace),
-                "<aura:namespace></aura:namespace>");
-
-        createDef(StyleDef.class, String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, namespace, cmpName),
-                ".THIS {background-image: url(/auraFW/resources/qa/images/s.gif?@@@TOKEN@@@);}");
 
         DefDescriptor<ComponentDef> cmpDesc = createDef(ComponentDef.class, String.format("%s:%s", namespace, cmpName),
                 "<aura:component>" + "<aura:attribute name='output' type='String'/>"
@@ -149,97 +122,56 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                         + "<%s:%s/>" + "</aura:application>", namespace, namespace, cmpDesc.getName()));
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        // restore any modified definitions
-        if (source != null && originalContent != null) {
-            source.addOrUpdate(originalContent);
-        }
-        ServletConfigController.setAppCacheDisabled(originalAppCacheConfig);
-        super.tearDown();
-    }
-
     /**
      * Opening cached app will only query server for the manifest and the component load.
      */
-    public void runTestNoChanges(BrowserType bt) throws Exception {
-        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN,
-                TOKEN);
-        if (bt == BrowserType.SAFARI || bt == BrowserType.IPHONE || bt == BrowserType.IPAD) {
-            assertRequests(getExpectedInitialRequestsSAFARI(), logs);
-        } else if (bt == BrowserType.GOOGLECHROME) {
-            assertRequests(getExpectedInitialRequestsGOOGLECHROME(), logs);
-        } else {
-            fail("we only expect GOOGLECHROME or SAFARI for testNoChanges");
-        }
+    @TargetBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    @TestLabels("auraSanity")
+    public void testNoChanges() throws Exception {
+        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
+        assertRequests(getExpectedInitialRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
 
         // only expect a fetch for the manifest and the initAsync component load
-        logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
+        logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         List<Request> expected = Lists.newArrayList(new Request(
                 "/auraResource", null, null, "manifest", 200));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
     }
 
-    @TargetBrowsers(BrowserType.GOOGLECHROME)
-    @TestLabels("auraSanity")
-    public void _testNoChangesGOOGLECHROME() throws Exception {
-        runTestNoChanges(BrowserType.GOOGLECHROME);
-    }
-
-    @TargetBrowsers({ BrowserType.SAFARI })
-    @TestLabels("auraSanity")
-    public void testNoChangesSAFARI() throws Exception {
-        runTestNoChanges(BrowserType.SAFARI);
-    }
-
-    @TargetBrowsers({ BrowserType.IPAD })
-    @TestLabels("auraSanity")
-    public void testNoChangesIPAD() throws Exception {
-        runTestNoChanges(BrowserType.IPAD);
-    }
-
-    @TargetBrowsers({ BrowserType.IPHONE })
-    @TestLabels("auraSanity")
-    public void testNoChangesIPHONE() throws Exception {
-        runTestNoChanges(BrowserType.IPHONE);
-    }
-
     /**
      * Opening cached app that had a prior cache error will reload the app.
      */
+    @TargetBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     @TestLabels("auraSanity")
-    public void runTestCacheError(BrowserType bt) throws Exception {
-        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
-        if (bt == BrowserType.SAFARI || bt == BrowserType.IPAD || bt == BrowserType.IPHONE) {
-            assertRequests(getExpectedInitialRequestsSAFARI(), logs);
-        } else if (bt == BrowserType.GOOGLECHROME) {
-            assertRequests(getExpectedInitialRequestsGOOGLECHROME(), logs);
-        } else {
-            fail("we only expect GOOGLECHROME or SAFARI for runTestCacheError");
-        }
+    public void testCacheError() throws Exception {
+        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
+        assertRequests(getExpectedInitialRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
 
         Date expiry = new Date(System.currentTimeMillis() + 60000);
         String cookieName = getManifestCookieName();
         getDriver().manage().addCookie(
                 new Cookie(cookieName, "error", null, "/", expiry));
-        logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
+        logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
 
         expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
         expectedChange.add(new Request("/aura", namespace + ":" + appName, null, "HTML", 302)); // hard refresh
-        if (bt == BrowserType.GOOGLECHROME) {
+        switch (getBrowserType()) {
+        case GOOGLECHROME:
             expectedChange.add(new Request(3, "/auraResource", null, null, "manifest", 200));
             expectedChange.add(new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200));
-        } else if (bt == BrowserType.SAFARI || bt == BrowserType.IPAD || bt == BrowserType.IPHONE) {
+            break;
+        case SAFARI:
+        case IPAD:
+        case IPHONE:
+        default:
             expectedChange.add(new Request("/auraResource", null, null, "manifest", 200));
             expectedChange.add(new Request("/aura", namespace + ":" + appName, null, "HTML", 200));
             expectedChange.add(new Request("/auraResource", null, null, "css", 200));
             expectedChange.add(new Request("/auraResource", null, null, "js", 200));
-        } else {
-            fail("we only expect GOOGLECHROME or SAFARI for runTestCacheError");
         }
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.IDLE);
@@ -250,36 +182,10 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         assertFalse("Manifest cookie was not changed " + cookie.getValue(), "error".equals(cookie.getValue()));
     }
 
-    //disable this because different result when running all integration tests VS running alone. need to figure out why
-    @TargetBrowsers(BrowserType.GOOGLECHROME)
-    @TestLabels("auraSanity")
-    public void _testCacheErrorGOOGLECHROME() throws Exception {
-        runTestCacheError(BrowserType.GOOGLECHROME);
-    }
-
-    @TargetBrowsers({ BrowserType.SAFARI })
-    @TestLabels("auraSanity")
-    public void testCacheErrorSAFARI() throws Exception {
-        runTestCacheError(BrowserType.SAFARI);
-    }
-
-    @TargetBrowsers({ BrowserType.IPHONE })
-    @TestLabels("auraSanity")
-    public void testCacheErrorIPHONE() throws Exception {
-        runTestCacheError(BrowserType.IPHONE);
-    }
-
-    @TargetBrowsers({ BrowserType.IPAD })
-    @TestLabels("auraSanity")
-    public void testCacheErrorIPAD() throws Exception {
-        runTestCacheError(BrowserType.IPAD);
-    }
-
     /**
      * for Chrome and Safari/IPAD/IPHONE Opening uncached app that had a prior cache error will have limited caching
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI,
-            BrowserType.IPAD, BrowserType.IPHONE })
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testCacheErrorWithEmptyCache() throws Exception {
         openNoAura("/aura/application.app"); // just need a domain page to set cookie from
         Date expiry = new Date(System.currentTimeMillis() + 60000);
@@ -287,8 +193,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         getDriver().manage().addCookie(
                 new Cookie(cookieName, "error", null, "/", expiry));
 
-        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN,
-                TOKEN);
+        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
         expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
         expectedChange.add(new Request("/aura", namespace + ":" + appName, null, "HTML", 200));
@@ -306,16 +211,10 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * Manifest request limit exceeded for the time period should result in reset.
      */
-    public void runTestManifestRequestLimitExceeded(BrowserType bt)
-            throws Exception {
-        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
-        if (bt == BrowserType.SAFARI || bt == BrowserType.IPAD || bt == BrowserType.IPHONE) {
-            assertRequests(getExpectedInitialRequestsSAFARI(), logs);
-        } else if (bt == BrowserType.GOOGLECHROME) {
-            assertRequests(getExpectedInitialRequestsGOOGLECHROME(), logs);
-        } else {
-            fail("we only expect GOOGLECHROME or SAFARI for runTestManifestRequestLimitExceeded");
-        }
+    @TargetBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    public void testManifestRequestLimitExceeded() throws Exception {
+        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
+        assertRequests(getExpectedInitialRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
 
         Date expiry = new Date(System.currentTimeMillis() + 60000);
@@ -323,15 +222,20 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         Cookie cookie = getDriver().manage().getCookieNamed(cookieName);
         String timeVal = cookie.getValue().split(":")[1];
         getDriver().manage().addCookie(new Cookie(cookieName, "8:" + timeVal, null, "/", expiry));
-        logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
+        logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         List<Request> expectedChange = Lists.newArrayList();
 
         expectedChange.add(new Request("/auraResource", null, null, "manifest", 404)); // reset
         expectedChange.add(new Request("/aura", namespace + ":" + appName, null, "HTML", 302)); // hard refresh
-        if (bt == BrowserType.GOOGLECHROME) {
+        switch (getBrowserType()) {
+        case GOOGLECHROME:
             expectedChange.add(new Request(3, "/auraResource", null, null, "manifest", 200));
             expectedChange.add(new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200));
-        } else if (bt == BrowserType.SAFARI || bt == BrowserType.IPAD || bt == BrowserType.IPHONE) {
+            break;
+        case SAFARI:
+        case IPAD:
+        case IPHONE:
+        default:
             expectedChange.add(new Request("/auraResource", null, null, "manifest", 200));
             expectedChange.add(new Request("/aura", namespace + ":" + appName, null, "HTML", 200));
             expectedChange.add(new Request("/auraResource", null, null, "css", 200));
@@ -342,51 +246,19 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     /**
-     * for Chrome Manifest request limit exceeded for the time period should result in reset.
-     */
-    //disable this because different result when running all integration tests VS running alone. need to figure out why
-    @TargetBrowsers(BrowserType.GOOGLECHROME)
-    public void _testManifestRequestLimitExceededGOOGLECHROME() throws Exception {
-        runTestManifestRequestLimitExceeded(BrowserType.GOOGLECHROME);
-    }
-
-    /**
-     * for SAFARI Manifest request limit exceeded for the time period should result in reset.
-     */
-    @TargetBrowsers({ BrowserType.SAFARI })
-    public void testManifestRequestLimitExceededSAFARI() throws Exception {
-        runTestManifestRequestLimitExceeded(BrowserType.SAFARI);
-    }
-
-    /**
-     * for IPAD Manifest request limit exceeded for the time period should result in reset.
-     */
-    @TargetBrowsers({ BrowserType.IPAD })
-    public void testManifestRequestLimitExceededIPAD() throws Exception {
-        runTestManifestRequestLimitExceeded(BrowserType.IPAD);
-    }
-
-    /**
-     * for IPHONE Manifest request limit exceeded for the time period should result in reset.
-     */
-    @TargetBrowsers({ BrowserType.IPHONE })
-    public void testManifestRequestLimitExceededIPHONE() throws Exception {
-        runTestManifestRequestLimitExceeded(BrowserType.IPHONE);
-    }
-
-    /**
      * Opening cached app after namespace style change will trigger cache update.
      */
-    // Can't run on iOS because PROD modes will just cache components so changes are not picked up
-    public void runTestComponentCssChange(BrowserType bt) throws Exception {
+    @ThreadHostileTest("NamespaceDef modification affects namespace")
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    public void testComponentCssChange() throws Exception {
+        createDef(NamespaceDef.class, String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, namespace),
+                "<aura:namespace></aura:namespace>");
+
+        createDef(StyleDef.class, String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, namespace, cmpName),
+                ".THIS {background-image: url(/auraFW/resources/qa/images/s.gif?@@@TOKEN@@@);}");
+
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
-        if (bt == BrowserType.SAFARI || bt == BrowserType.IPAD || bt == BrowserType.IPHONE) {
-            assertRequests(getExpectedInitialRequestsSAFARI(), logs);
-        } else if (bt == BrowserType.GOOGLECHROME) {
-            assertRequests(getExpectedInitialRequestsGOOGLECHROME(), logs);
-        } else {
-            fail("we only expect GOOGLECHROME or SAFARI for runTestComponentCssChange");
-        }
+        assertRequests(getExpectedInitialRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
 
         // update a component's css file
@@ -394,13 +266,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         replaceToken(getTargetComponent().getStyleDescriptor(), replacement);
 
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, replacement, TOKEN);
-        if (bt == BrowserType.SAFARI || bt == BrowserType.IPAD || bt == BrowserType.IPHONE) {
-            assertRequests(getExpectedChangeRequestsSAFARI(), logs);
-        } else if (bt == BrowserType.GOOGLECHROME) {
-            assertRequests(getExpectedChangeRequestsGOOGLECHROME(), logs);
-        } else {
-            fail("we only expect GOOGLECHROME or SAFARI for runTestComponentCssChange");
-        }
+        assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
 
         logs = loadMonitorAndValidateApp(TOKEN, TOKEN, replacement, TOKEN);
@@ -410,51 +276,12 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     /**
-     * for Chrome Opening cached app after namespace style change will trigger cache update.
-     */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME })
-    public void testComponentCssChangeGOOGLECHROME() throws Exception {
-        runTestComponentCssChange(BrowserType.GOOGLECHROME);
-    }
-
-    /**
-     * for Safari Opening cached app after namespace style change will trigger cache update.
-     */
-    @TargetBrowsers({ BrowserType.SAFARI })
-    public void testComponentCssChangeSAFARI() throws Exception {
-        runTestComponentCssChange(BrowserType.SAFARI);
-    }
-
-    /**
-     * for IPAD Opening cached app after namespace style change will trigger cache update.
-     */
-    @TargetBrowsers({ BrowserType.IPAD })
-    public void testComponentCssChangeIPAD() throws Exception {
-        runTestComponentCssChange(BrowserType.IPAD);
-    }
-
-    /**
-     * for IPHONE Opening cached app after namespace style change will trigger cache update.
-     */
-    @TargetBrowsers({ BrowserType.IPHONE })
-    public void testComponentCssChangeIPHONE() throws Exception {
-        runTestComponentCssChange(BrowserType.IPHONE);
-    }
-
-    /**
      * Opening cached app after namespace controller change will trigger cache update.
      */
-    // Can't run on iOS because PROD modes will just cache components so changes are not picked up
-    public void runTestComponentJsChange(BrowserType bt) throws Exception {
-        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN,
-                TOKEN);
-        if (bt == BrowserType.SAFARI || bt == BrowserType.IPAD || bt == BrowserType.IPHONE) {
-            assertRequests(getExpectedInitialRequestsSAFARI(), logs);
-        } else if (bt == BrowserType.GOOGLECHROME) {
-            assertRequests(getExpectedInitialRequestsGOOGLECHROME(), logs);
-        } else {
-            fail("we only expect GOOGLECHROME or SAFARI for runTestComponentJsChange");
-        }
+    @TargetBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    public void testComponentJsChange() throws Exception {
+        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
+        assertRequests(getExpectedInitialRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
 
         // update a component's js controller file
@@ -468,150 +295,36 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
             }
         }
         replaceToken(desc, replacement);
-        logs = loadMonitorAndValidateApp(TOKEN, replacement, TOKEN, TOKEN);
-        if (bt == BrowserType.SAFARI || bt == BrowserType.IPAD || bt == BrowserType.IPHONE) {
-            assertRequests(getExpectedChangeRequestsSAFARI(), logs);
-        } else if (bt == BrowserType.GOOGLECHROME) {
-            assertRequests(getExpectedChangeRequestsGOOGLECHROME(), logs);
-        } else {
-            fail("we only expect GOOGLECHROME or SAFARI for runTestComponentJsChange");
-        }
+        logs = loadMonitorAndValidateApp(TOKEN, replacement, "", TOKEN);
+        assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
-        logs = loadMonitorAndValidateApp(TOKEN, replacement, TOKEN, TOKEN);
+        logs = loadMonitorAndValidateApp(TOKEN, replacement, "", TOKEN);
         List<Request> expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest", 200));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
-    }
-
-    @TargetBrowsers({ BrowserType.GOOGLECHROME })
-    public void _testComponentJsChangeGOOGLECHROME() throws Exception {
-        runTestComponentJsChange(BrowserType.GOOGLECHROME);
-    }
-
-    @TargetBrowsers({ BrowserType.SAFARI })
-    public void testComponentJsChangeSAFARI() throws Exception {
-        runTestComponentJsChange(BrowserType.SAFARI);
-    }
-
-    @TargetBrowsers({ BrowserType.IPAD })
-    public void testComponentJsChangeIPAD() throws Exception {
-        runTestComponentJsChange(BrowserType.IPAD);
-    }
-
-    @TargetBrowsers({ BrowserType.IPHONE })
-    public void testComponentJsChangeIPHONE() throws Exception {
-        runTestComponentJsChange(BrowserType.IPHONE);
     }
 
     /**
      * Opening cached app after component markup change will trigger cache update.
      */
-    // Can't run on iOS because PROD modes will just cache components so changes are not picked up
-    public void runTestComponentMarkupChange(BrowserType bt) throws Exception {
-        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
-        if (bt == BrowserType.SAFARI || bt == BrowserType.IPAD || bt == BrowserType.IPHONE) {
-            assertRequests(getExpectedInitialRequestsSAFARI(), logs);
-        } else if (bt == BrowserType.GOOGLECHROME) {
-            assertRequests(getExpectedInitialRequestsGOOGLECHROME(), logs);
-        }
-        else {
-            fail("we only expect GOOGLECHROME or SAFARI for runTestComponentMarkupChange");
-        }
+    @TargetBrowsers({ BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
+    public void testComponentMarkupChange() throws Exception {
+        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
+        assertRequests(getExpectedInitialRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
         // update markup of namespaced component used by app
         String replacement = getName() + System.currentTimeMillis();
         replaceToken(getTargetComponent().getDescriptor(), replacement);
-        logs = loadMonitorAndValidateApp(replacement, TOKEN, TOKEN, TOKEN);
-        if (bt == BrowserType.SAFARI || bt == BrowserType.IPAD || bt == BrowserType.IPHONE)
-        {
-            assertRequests(getExpectedChangeRequestsSAFARI(), logs);
-        }
-        else if (bt == BrowserType.GOOGLECHROME)
-        {
-            assertRequests(getExpectedChangeRequestsGOOGLECHROME(), logs);
-        }
-        else
-        {
-            fail("we only expect GOOGLECHROME or SAFARI for runTestComponentMarkupChange");
-        }
+        logs = loadMonitorAndValidateApp(replacement, TOKEN, "", TOKEN);
+        assertRequests(getExpectedChangeRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
-        logs = loadMonitorAndValidateApp(replacement, TOKEN, TOKEN, TOKEN);
+        logs = loadMonitorAndValidateApp(replacement, TOKEN, "", TOKEN);
         List<Request> expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest", 200));
         assertRequests(expected, logs);
         assertAppCacheStatus(Status.IDLE);
     }
 
-    @TargetBrowsers({ BrowserType.GOOGLECHROME })
-    public void _testComponentMarkupChangeGOOGLECHROME() throws Exception {
-        runTestComponentMarkupChange(BrowserType.GOOGLECHROME);
-    }
-
-    @TargetBrowsers({ BrowserType.SAFARI })
-    public void testComponentMarkupChangeSAFARI() throws Exception {
-        runTestComponentMarkupChange(BrowserType.SAFARI);
-    }
-
-    @TargetBrowsers({ BrowserType.IPAD })
-    public void testComponentMarkupChangeIPAD() throws Exception {
-        runTestComponentMarkupChange(BrowserType.IPAD);
-    }
-
-    @TargetBrowsers({ BrowserType.IPHONE })
-    public void testComponentMarkupChangeIPHONE() throws Exception {
-        runTestComponentMarkupChange(BrowserType.IPHONE);
-    }
-
-    /**
-     * Opening cached app after framework javascript change will trigger cache update.
-     */
-    // Can't run on iOS because PROD modes will just cache components so changes are not picked up
-    @TargetBrowsers({ BrowserType.GOOGLECHROME })
-    @UnAdaptableTest
-    @Ignore("Not valid when running from jars, which is most times, because framework js timestamp never changes then")
-    public void testFrameworkJsChange() throws Exception {
-        List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
-        assertRequests(getExpectedInitialRequestsGOOGLECHROME(), logs);
-        assertAppCacheStatus(Status.IDLE);
-
-        // update a framework js file
-        String replacement = getName() + System.currentTimeMillis();
-        DirectiveBasedJavascriptGroup jsGroup = new DirectiveBasedJavascriptGroup(AURA,
-                auraTestingUtil.getAuraJavascriptSourceDirectory(), "aura.test/Test.js", DirectiveTypes.DEFAULT_TYPES,
-                EnumSet.of(JavascriptGeneratorMode.TESTING, JavascriptGeneratorMode.AUTOTESTING,
-                        JavascriptGeneratorMode.TESTINGDEBUG, JavascriptGeneratorMode.AUTOTESTINGDEBUG));
-        File testJs = null;
-        String originalContent = null;
-        for (File jsFile : jsGroup.getFiles()) {
-            if ("Test.js".equals(jsFile.getName())) {
-                testJs = jsFile;
-                break;
-            }
-        }
-        try {
-            originalContent = IOUtil.readTextFile(testJs);
-            Aura.getSourceControlAdapter().writeIfDifferent(
-                    new StringBuilder(originalContent.replace(TOKEN, replacement)), testJs);
-            testJs.setLastModified(System.currentTimeMillis());
-
-            logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, replacement);
-            assertRequests(getExpectedChangeRequestsGOOGLECHROME(), logs);
-            assertAppCacheStatus(Status.IDLE);
-
-            logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, replacement);
-            List<Request> expected = Lists.newArrayList(new Request("/auraResource", null, null, "manifest", 200),
-                    new Request("/aura", namespace + ":" + appName, null, null, 200));
-            assertRequests(expected, logs);
-            assertAppCacheStatus(Status.IDLE);
-        } finally {
-            if (testJs != null) {
-                Aura.getSourceControlAdapter().writeIfDifferent(new StringBuilder(originalContent), testJs);
-                testJs.setLastModified(System.currentTimeMillis());
-            }
-        }
-    }
-
-    private <T extends Definition> DefDescriptor<T> createDef(
-            Class<T> defClass, String qualifiedName, String content) {
+    private <T extends Definition> DefDescriptor<T> createDef(Class<T> defClass, String qualifiedName, String content) {
         DefDescriptor<T> desc = Aura.getDefinitionService().getDefDescriptor(qualifiedName, defClass);
         addSourceAutoCleanup(desc, content);
         return desc;
@@ -647,8 +360,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      * @param actual : list of actual request captured by log
      * @throws Exception
      */
-    private void assertRequests(List<Request> expected, List<Request> actual)
-            throws Exception {
+    private void assertRequests(List<Request> expected, List<Request> actual) throws Exception {
         boolean failed;
 
         List<Request> unexpectedRequests = Lists.newArrayList();
@@ -715,8 +427,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      * @param cssToken The text to be found from css.
      * @param Token The text to be found from the framework.
      */
-    private List<Request> loadMonitorAndValidateApp(final String markupToken,
-            String jsToken, String cssToken, String fwToken) throws Exception {
+    private List<Request> loadMonitorAndValidateApp(final String markupToken, String jsToken, String cssToken,
+            String fwToken) throws Exception {
         TestLoggingAdapterController.beginCapture();
         open(String.format("/%s/%s.app", namespace, appName));
         auraUITestingUtil.waitForAppCacheReady();
@@ -743,8 +455,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     // replaces TOKEN found in the source file with the provided replacement
-    private void replaceToken(DefDescriptor<?> descriptor, String replacement)
-            throws Exception {
+    private void replaceToken(DefDescriptor<?> descriptor, String replacement) throws Exception {
         assertNotNull("Missing descriptor for source replacement!", descriptor);
         ContextService service = Aura.getContextService();
         AuraContext context = service.getCurrentContext();
@@ -752,8 +463,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
             context = service.startContext(Mode.SELENIUM, Format.HTML,
                     Access.AUTHENTICATED);
         }
-        source = context.getDefRegistry().getSource(descriptor);
-        originalContent = source.getContents();
+        Source<?> source = context.getDefRegistry().getSource(descriptor);
+        String originalContent = source.getContents();
         assert originalContent.contains(TOKEN);
         source.addOrUpdate(originalContent.replace(TOKEN, replacement));
     }
@@ -791,87 +502,82 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     /**
-     * For Safari Get the set of expected requests on change. These are the requests that we expect for filling the app
-     * cache. The explanation is as follows.
-     * <ul>
-     * <li>The manifest is pulled</li>
-     * <li>The browser now gets all three components, initial, css, and js</li>
-     * <li>Finally, the browser re-fetches the manifest to check contents</li>
-     * <ul>
-     * The primary difference between this and the initial requests is that we get the initial page twice
+     * Get the set of expected requests on change. These are the requests that we expect for filling the app cache.
      * 
      * @return the list of request objects, not necessarily in order.
      */
-    private List<Request> getExpectedChangeRequestsSAFARI() {
-        return ImmutableList.of(
-                new Request("/aura", namespace + ":" + appName, null, "HTML", 302), // hard refresh
-                new Request("/auraResource", null, null, "manifest", 404), // manifest out of date
-                new Request("/auraResource", null, null, "manifest", 200),
-                new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200), // rest are cache updates
-                new Request(2, "/auraResource", null, null, "css", 200),
-                new Request(2, "/auraResource", null, null, "js", 200));
+    private List<Request> getExpectedChangeRequests() {
+        switch (getBrowserType()) {
+        case GOOGLECHROME:
+            /*
+             * For Chrome Get the set of expected requests on change. These are the requests that we expect for filling
+             * the app cache. The explanation is as follows. <ul> <li>The manifest is pulled</li> <li>The browser now
+             * gets all three components, initial, css, and js</li> <li>Finally, the browser re-fetches the manifest to
+             * check contents</li> <ul> The primary difference between this and the initial requests is that we don't
+             * get the initial page twice, and we get the manifest three times... odd that. we usually only get js and
+             * css only once, but it's not stable, do see some test get them twice sometimes.
+             */
+            return ImmutableList.of(
+                    new Request("/aura", namespace + ":" + appName, null, "HTML", 302), // hard refresh
+                    new Request("/auraResource", null, null, "manifest", 404), // manifest out of date
+                    new Request(3, "/auraResource", null, null, "manifest", 200),
+                    new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200), // rest are cache updates
+                    new Request(2, "/auraResource", null, null, "css", 200),
+                    new Request(2, "/auraResource", null, null, "js", 200));
+        case SAFARI:
+        case IPHONE:
+        case IPAD:
+        default:
+            /*
+             * For iOS Get the set of expected requests on change. These are the requests that we expect for filling the
+             * app cache. The explanation is as follows. <ul> <li>The manifest is pulled</li> <li>The browser now gets
+             * all three components, initial, css, and js</li> <li>Finally, the browser re-fetches the manifest to check
+             * contents</li> <ul> The primary difference between this and the initial requests is that we get the
+             * initial page twice
+             */
+            return ImmutableList.of(
+                    new Request("/aura", namespace + ":" + appName, null, "HTML", 302), // hard refresh
+                    new Request("/auraResource", null, null, "manifest", 404), // manifest out of date
+                    new Request("/auraResource", null, null, "manifest", 200),
+                    new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200), // rest are cache updates
+                    new Request(2, "/auraResource", null, null, "css", 200),
+                    new Request(2, "/auraResource", null, null, "js", 200));
+        }
     }
 
     /**
-     * For Chrome Get the set of expected requests on change. These are the requests that we expect for filling the app
-     * cache. The explanation is as follows.
-     * <ul>
-     * <li>The manifest is pulled</li>
-     * <li>The browser now gets all three components, initial, css, and js</li>
-     * <li>Finally, the browser re-fetches the manifest to check contents</li>
-     * <ul>
-     * The primary difference between this and the initial requests is that we don't get the initial page twice, and we
-     * get the manifest three times... odd that.
-     * we usually only get js and css only once, but it's not stable, do see some test get them twice sometimes.
-     *
-     * @return the list of request objects, not necessarily in order.
-     */
-    private List<Request> getExpectedChangeRequestsGOOGLECHROME() {
-        return ImmutableList.of(
-                new Request("/aura", namespace + ":" + appName, null, "HTML", 302), // hard refresh
-                new Request("/auraResource", null, null, "manifest", 404), // manifest out of date
-                new Request(3, "/auraResource", null, null, "manifest", 200),
-                new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200), // rest are cache updates
-                new Request(2,"/auraResource", null, null, "css", 200),
-                new Request(2,"/auraResource", null, null, "js", 200));
-    }
-
-    /**
-     * For SAFARI Get the set of expected requests on change. These are the requests that we expect for filling the app
-     * cache. The explanation is as follows.
-     * <ul>
-     * <li>The manifest is pulled</li>
-     * <li>The browser now gets all three components, initial, css, and js</li>
-     * <li>Finally, the browser re-fetches the manifest to check contents</li>
-     * <ul>
-     * Note that there are also two css and js request.
+     * Get the set of expected requests on change. These are the requests that we expect for filling the app cache.
      * 
      * @return the list of request objects, not necessarily in order.
      */
-    private List<Request> getExpectedInitialRequestsSAFARI() {
-        return ImmutableList.of(new Request(1, "/aura", namespace + ":" + appName, null, "HTML", 200), new Request(1,
-                "/auraResource", null, null, "manifest", 200), new Request(2, "/auraResource", null, null, "css", 200),
-                new Request(2, "/auraResource", null, null, "js", 200));
-    }
-
-    /**
-     * For Chrome Get the set of expected initial requests. These are the requests that we expect for filling the app
-     * cache. The explanation is as follows.
-     * <ul>
-     * <li>The browser requests the initial page from the server</li>
-     * <li>The manifest is pulled</li>
-     * <li>The browser now gets all three components, initial, css, and js</li>
-     * <li>Finally, the browser re-fetches the manifest to check contents</li>
-     * <ul>
-     * Note that there are two requests for the initial page, one as the first request, and one to fill the app cache
-     * (odd, but true). There are also two manifest requests.
-     * 
-     * @return the list of request objects, not necessarily in order.
-     */
-    private List<Request> getExpectedInitialRequestsGOOGLECHROME() {
-        return ImmutableList.of(new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200), new Request(2,
-                "/auraResource", null, null, "manifest", 200), new Request("/auraResource", null, null, "css", 200),
-                new Request("/auraResource", null, null, "js", 200));
+    private List<Request> getExpectedInitialRequests() {
+        switch (getBrowserType()) {
+        case GOOGLECHROME:
+            /*
+             * For Chrome Get the set of expected initial requests. These are the requests that we expect for filling
+             * the app cache. The explanation is as follows. <ul> <li>The browser requests the initial page from the
+             * server</li> <li>The manifest is pulled</li> <li>The browser now gets all three components, initial, css,
+             * and js</li> <li>Finally, the browser re-fetches the manifest to check contents</li> <ul> Note that there
+             * are two requests for the initial page, one as the first request, and one to fill the app cache (odd, but
+             * true). There are also two manifest requests.
+             */
+            return ImmutableList.of(new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200), new Request(
+                    2, "/auraResource", null, null, "manifest", 200), new Request("/auraResource", null, null, "css",
+                    200), new Request("/auraResource", null, null, "js", 200));
+        case SAFARI:
+        case IPHONE:
+        case IPAD:
+        default:
+            /*
+             * For iOS Get the set of expected requests on change. These are the requests that we expect for filling the
+             * app cache. The explanation is as follows. <ul> <li>The manifest is pulled</li> <li>The browser now gets
+             * all three components, initial, css, and js</li> <li>Finally, the browser re-fetches the manifest to check
+             * contents</li> <ul> Note that there are also two css and js request.
+             */
+            return ImmutableList.of(new Request(1, "/aura", namespace + ":" + appName, null, "HTML", 200), new Request(
+                    1, "/auraResource", null, null, "manifest", 200), new Request(2, "/auraResource", null, null,
+                    "css", 200), new Request(2, "/auraResource", null, null, "js", 200));
+        }
     }
 
     /**
@@ -890,8 +596,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         private Map<String, String> extras = null;
         private boolean showExtras = false;
 
-        Request(int fudge, String URI, String tag, String namespaces,
-                String format, int status) {
+        Request(int fudge, String URI, String tag, String namespaces, String format, int status) {
             super();
             this.fudge = fudge;
             put("URI", URI);
@@ -903,8 +608,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
             }
         }
 
-        Request(String URI, String tag, String namespaces, String format,
-                int status) {
+        Request(String URI, String tag, String namespaces, String format, int status) {
             super();
             this.fudge = 0;
             put("URI", URI);

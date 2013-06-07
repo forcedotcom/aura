@@ -17,7 +17,6 @@ package org.auraframework.controller.java;
 
 import org.auraframework.Aura;
 import org.auraframework.http.AuraBaseServlet;
-import org.auraframework.http.AuraServlet;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.test.AuraTestCase;
 
@@ -28,8 +27,7 @@ import org.auraframework.test.AuraTestCase;
  */
 public class ServletConfigController {
     /**
-     * Set the servlet production mode configuration. Don't forget to restore
-     * config after test.
+     * Set the servlet production mode configuration. Don't forget to restore config after test.
      * 
      * @param isProduction true/false
      */
@@ -40,8 +38,7 @@ public class ServletConfigController {
     }
 
     /**
-     * Set the servlet isJar configuration. Don't forget to restore config after
-     * test.
+     * Set the servlet isJar configuration. Don't forget to restore config after test.
      * 
      * @param isAuraJSStatic true/false
      */
@@ -50,23 +47,12 @@ public class ServletConfigController {
     }
 
     /**
-     * Set the servlet application cache configuration. Don't forget to restore
-     * config after test.
+     * Set the servlet application cache configuration. Don't forget to restore config after test.
      * 
      * @param isDisabled true/false
      */
-    public static Boolean setAppCacheDisabled(@Key("isDisabled") Boolean isDisabled) {
-        String oldValue = System.getProperty(AuraServlet.DISABLE_APPCACHE_PROPERTY);
-        if (isDisabled == null) {
-            System.clearProperty(AuraServlet.DISABLE_APPCACHE_PROPERTY);
-        } else {
-            System.setProperty(AuraServlet.DISABLE_APPCACHE_PROPERTY, isDisabled.toString());
-        }
-        if (oldValue == null) {
-            return null;
-        } else {
-            return Boolean.parseBoolean(oldValue);
-        }
+    public static void setAppCacheDisabled(@Key("isDisabled") Boolean isDisabled) {
+        AuraTestCase.getMockConfigAdapter().setIsClientAppcacheEnabled(!isDisabled);
     }
 
     /**

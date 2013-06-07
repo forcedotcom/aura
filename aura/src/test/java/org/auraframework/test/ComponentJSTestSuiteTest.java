@@ -40,7 +40,6 @@ import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.annotation.WebDriverTest;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -54,7 +53,6 @@ import com.google.common.collect.Lists;
  */
 @UnAdaptableTest
 @WebDriverTest
-@ThreadHostileTest
 public class ComponentJSTestSuiteTest extends TestSuite {
 
     public static TestSuite suite() throws Exception {
@@ -236,7 +234,7 @@ public class ComponentJSTestSuiteTest extends TestSuite {
             if (mocks != null && !mocks.isEmpty()) {
                 Aura.get(TestContextAdapter.class).getTestContext()
                         .getLocalDefs().addAll(mocks);
-                auraTestingUtil.clearCachedDefs(mocks);
+                AuraTestingUtil.clearCachedDefs(mocks);
             }
 
             open(getUrl(), Mode.AUTOJSTEST);

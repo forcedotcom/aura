@@ -20,7 +20,6 @@ import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.annotation.FreshBrowserInstance;
-import org.auraframework.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
 
 /**
@@ -33,7 +32,6 @@ import org.openqa.selenium.By;
  * 
  * TODO(W-1708575): Android AppCache tests fail when running on SauceLabs
  */
-@ThreadHostileTest
 @TargetBrowsers({ BrowserType.GOOGLECHROME })
 public class AppCacheProgressBarUITest extends WebDriverTestCase {
     private final String PROGRESSEVENTSCRIPT = "var evt = new ProgressEvent('%s', {%s});"

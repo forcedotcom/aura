@@ -30,13 +30,12 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.auraframework.Aura;
 import org.auraframework.test.AuraHttpTestCase;
+import org.auraframework.test.annotation.ThreadHostileTest;
 
 /**
- * Automation to verify the implementation of AuraFrameworkServlet.
- * AuraFrameworkServlet responds to requests of pattern /auraFW/* This config is
- * stored in aura/dist/config/web.xml for aura running on jetty. In SFDC build,
- * the config is in main-sfdc/config/aura.conf AuraFrameworkServlet sets
- * resources to be cached for 45 days.
+ * Automation to verify the implementation of AuraFrameworkServlet. AuraFrameworkServlet responds to requests of pattern
+ * /auraFW/* This config is stored in aura/dist/config/web.xml for aura running on jetty. In SFDC build, the config is
+ * in main-sfdc/config/aura.conf AuraFrameworkServlet sets resources to be cached for 45 days.
  * 
  * @since 0.0.298
  */
@@ -118,7 +117,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         return statusCode;
     }
 
-    protected static HttpGet obtainNoncedGetMethod(String noncedPath, boolean fake) throws Exception {
+    protected HttpGet obtainNoncedGetMethod(String noncedPath, boolean fake) throws Exception {
         String nonce;
 
         if (fake) {
@@ -131,7 +130,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         return obtainGetMethod(realPath);
     }
 
-    protected static HttpGet obtainUidedGetMethod(String path, boolean fake) throws Exception {
+    protected HttpGet obtainUidedGetMethod(String path, boolean fake) throws Exception {
         String nonce;
 
         if (fake) {
@@ -144,9 +143,8 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Verify that AuraFrameworkServlet can handle bad resource paths. 1. Non
-     * existing resource path. 2. Empty resource path. 3. Access to root
-     * directory or directory walking.
+     * Verify that AuraFrameworkServlet can handle bad resource paths. 1. Non existing resource path. 2. Empty resource
+     * path. 3. Access to root directory or directory walking.
      */
     public void testBadResourcePaths() throws Exception {
         String[] badUrls = { "/auraFW", "/auraFW/", "/auraFW/root/",
@@ -175,8 +173,8 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Verify that incomplete resource path returns SC_NOT_FOUND(404).
-     * Subsequent requests for valid resource on the same path are successful.
+     * Verify that incomplete resource path returns SC_NOT_FOUND(404). Subsequent requests for valid resource on the
+     * same path are successful.
      * 
      * @throws Exception
      */
@@ -198,16 +196,15 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Test that AuraFrameworkServlet inspects the date header in the request
-     * and sends 200 even though If-Modified-Since header indicates
-     * that resource is not stale, but has no fwUid or nonce
+     * Test that AuraFrameworkServlet inspects the date header in the request and sends 200 even though
+     * If-Modified-Since header indicates that resource is not stale, but has no fwUid or nonce
      */
     public void testResourceCachingWithoutUidNonce() throws Exception {
 
         Calendar stamp = Calendar.getInstance();
         stamp.add(Calendar.DAY_OF_YEAR, 45);
 
-        Header[] headers = new Header[]{ new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE,
+        Header[] headers = new Header[] { new BasicHeader(HttpHeaders.IF_MODIFIED_SINCE,
                 new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").format(stamp.getTime())) };
 
         HttpGet get = obtainGetMethod(sampleBinaryResourcePath, false, headers);
@@ -215,14 +212,14 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         int statusCode = getStatusCode(httpResponse);
         String response = getResponseBody(httpResponse);
         get.releaseConnection();
-        assertEquals("Expected server to return a 200 for unexpired cache without fwUid or nonce.", HttpStatus.SC_OK, statusCode);
+        assertEquals("Expected server to return a 200 for unexpired cache without fwUid or nonce.", HttpStatus.SC_OK,
+                statusCode);
         assertNotNull(response);
     }
 
     /**
-     * Test that AuraFrameworkServlet inspects the date header in the request
-     * and sends 304(SC_NOT_MODIFIED) if the If-Modified-Since header indicates
-     * that resource is not stale.
+     * Test that AuraFrameworkServlet inspects the date header in the request and sends 304(SC_NOT_MODIFIED) if the
+     * If-Modified-Since header indicates that resource is not stale.
      */
     public void testResourceCachingWithUid() throws Exception {
 
@@ -241,8 +238,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Verify that AuraFrameworkServlet responds successfully to valid request
-     * for a binary resource.
+     * Verify that AuraFrameworkServlet responds successfully to valid request for a binary resource.
      */
     public void testRequestBinaryResourceWithNonce() throws Exception {
         HttpGet get = obtainNoncedGetMethod(sampleBinaryResourcePathWithNonce, false);
@@ -276,8 +272,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Verify that AuraFrameworkServlet responds successfully to valid request
-     * for a binary resource.
+     * Verify that AuraFrameworkServlet responds successfully to valid request for a binary resource.
      */
     public void testRequestBinaryResourceShortExpire() throws Exception {
         HttpGet get = obtainGetMethod(sampleBinaryResourcePath, false);
@@ -299,8 +294,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Verify that AuraFrameworkServlet responds successfully to valid request
-     * for a text resource.
+     * Verify that AuraFrameworkServlet responds successfully to valid request for a text resource.
      */
     public void testRequestTextResourceWithNonce() throws Exception {
         HttpGet get = obtainNoncedGetMethod(sampleTextResourcePathWithNonce, false);
@@ -323,8 +317,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Verify that AuraFrameworkServlet responds successfully to valid request
-     * for a text resource.
+     * Verify that AuraFrameworkServlet responds successfully to valid request for a text resource.
      */
     public void testRequestTextResourceShortExpire() throws Exception {
         HttpGet get = obtainGetMethod(sampleTextResourcePath);
@@ -350,8 +343,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
     }
 
     /**
-     * Verify that AuraFrameworkServlet responds successfully to valid request
-     * for a javascript resource.
+     * Verify that AuraFrameworkServlet responds successfully to valid request for a javascript resource.
      */
     public void testRequestJavascriptResourceLongExpire() throws Exception {
         HttpGet get = obtainGetMethod(sampleJavascriptResourcePath);
@@ -373,8 +365,8 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         get.releaseConnection();
     }
 
+    @ThreadHostileTest("PRODUCTION")
     public void testExistingMinifiedResource() throws Exception {
-
         getMockConfigAdapter().setIsProduction(true);
 
         HttpGet get = obtainGetMethod("/auraFW/resources/moment/moment.js");
@@ -387,8 +379,8 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         get.releaseConnection();
     }
 
+    @ThreadHostileTest("PRODUCTION")
     public void testNonExistentMinifiedResource() throws Exception {
-
         getMockConfigAdapter().setIsProduction(true);
 
         HttpGet get = obtainGetMethod("/auraFW/resources/codemirror/js/codemirror.js");

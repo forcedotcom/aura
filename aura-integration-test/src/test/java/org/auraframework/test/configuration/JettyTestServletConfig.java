@@ -77,10 +77,10 @@ public class JettyTestServletConfig implements TestServletConfig {
 
     @Override
     public HttpClient getHttpClient() {
-        // 10 minute timeout for making a connection and for waiting for data on
-        // the connection.
-        // This prevents tests from hanging in the http code, which in turn can
-        // prevent the server from exiting.
+        /*
+         * 10 minute timeout for making a connection and for waiting for data on the connection. This prevents tests
+         * from hanging in the http code, which in turn can prevent the server from exiting.
+         */
         int timeout = 10 * 60 * 1000;
 
         CookieStore cookieStore = new BasicCookieStore();

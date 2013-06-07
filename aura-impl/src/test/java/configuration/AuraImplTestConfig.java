@@ -19,11 +19,9 @@ import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.adapter.RegistryAdapter;
-import org.auraframework.impl.AuraTestingUtilImpl;
 import org.auraframework.impl.DefinitionServiceImplTest.AuraTestRegistryProviderWithNulls;
 import org.auraframework.impl.adapter.MockConfigAdapterImpl;
 import org.auraframework.impl.util.AuraImplFiles;
-import org.auraframework.test.AuraTestingUtil;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.test.TestInventory;
 import org.auraframework.test.adapter.TestContextAdapterImpl;
@@ -51,11 +49,6 @@ public class AuraImplTestConfig {
     @PrimaryImpl
     public static ConfigAdapter auraImplTestConfigAdapter() {
         return new MockConfigAdapterImpl();
-    }
-
-    @Impl
-    public static AuraTestingUtil auraImplTestUtilProvider() {
-        return new AuraTestingUtilImpl();
     }
 
     @Impl

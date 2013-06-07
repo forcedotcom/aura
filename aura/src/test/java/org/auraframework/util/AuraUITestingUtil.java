@@ -56,7 +56,7 @@ public class AuraUITestingUtil {
     public WebElement findElementAndTypeEventNameInIt(String event) {
         String locatorTemplate = "#%s > input.uiInputText.uiInput";
         String locator = String.format(locatorTemplate, event);
-        WebElement input = driver.findElement(By.cssSelector(locator));
+        WebElement input = findDomElement(By.cssSelector(locator));
         input.click(); // IE7 need to bring focus
         input.clear();
         input.sendKeys(event);

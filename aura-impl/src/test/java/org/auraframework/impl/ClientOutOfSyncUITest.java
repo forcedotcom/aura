@@ -29,9 +29,9 @@ import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.Source;
 import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -56,7 +56,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     private void updateStringSource(DefDescriptor<?> desc, String content) {
-        Source<?> src = StringSourceLoader.getInstance().getSource(desc);
+        Source<?> src = getSource(desc);
         src.addOrUpdate(content);
     }
 
@@ -101,6 +101,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         auraUITestingUtil.waitForElementText(By.cssSelector("body"), "bye", true);
     }
 
+    @ThreadHostileTest("NamespaceDef modification affects namespace")
     public void testGetClientRenderingAfterStyleChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<div id='out'>hi</div>"));
@@ -122,6 +123,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 auraUITestingUtil.findDomElement(By.cssSelector("." + className)).getCssValue("font-style"));
     }
 
+    @ThreadHostileTest("NamespaceDef modification affects namespace")
     public void testGetClientRenderingAfterNamespaceChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<div id='out'>hi</div>"));
@@ -159,7 +161,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     public void testGetClientRenderingAfterJsProviderChange() throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = StringSourceLoader.getInstance().createStringSourceDescriptor(null,
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
                 ComponentDef.class);
         DefDescriptor<?> providerDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc,
                 DefDescriptor.JAVASCRIPT_PREFIX, ProviderDef.class);
@@ -235,6 +237,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         auraUITestingUtil.waitForElementText(By.cssSelector("body"), "secret", true);
     }
 
+    @ThreadHostileTest("LayoutsDef modification affects namespace")
     public void testGetClientRenderingAfterLayoutChange() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseApplicationTag, "", "<div aura:id='xspot'/>"));
@@ -280,6 +283,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         auraUITestingUtil.waitForElementText(By.cssSelector("#sample"), "deposit", true);
     }
 
+    @ThreadHostileTest("NamespaceDef modification affects namespace")
     public void testPostAfterStyleChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent("", "<div id='out'>hi</div>");
         String className = cmpDesc.getNamespace() + StringUtils.capitalize(cmpDesc.getName());
@@ -306,11 +310,12 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 
     /**
      * A routine to do _many_ iterations of a client out of sync test.
-     *
-     * This test really shouldn't be run unless one of the tests is flapping. It lets you iterate a
-     * number of times to force a failure.... No guarantees, but without the _waitingForReload check
-     * in the trigger function, this will cause a failure in very few iterations.
+     * 
+     * This test really shouldn't be run unless one of the tests is flapping. It lets you iterate a number of times to
+     * force a failure.... No guarantees, but without the _waitingForReload check in the trigger function, this will
+     * cause a failure in very few iterations.
      */
+    @ThreadHostileTest("NamespaceDef modification affects namespace")
     public void _testPostManyAfterStyleChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent("", "<div id='out'>hi</div>");
         String className = cmpDesc.getNamespace() + StringUtils.capitalize(cmpDesc.getName());
@@ -328,23 +333,26 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         for (int i = 0; i < 1000; i++) {
             updateStringSource(styleDesc, String.format(".%s {font-style:normal;}", className));
             triggerServerAction();
-            auraUITestingUtil.waitForElementFunction(By.cssSelector("." + className), new Function<WebElement, Boolean>() {
-                @Override
-                public Boolean apply(WebElement element) {
-                    return "normal".equals(element.getCssValue("font-style"));
-                }
-            });
+            auraUITestingUtil.waitForElementFunction(By.cssSelector("." + className),
+                    new Function<WebElement, Boolean>() {
+                        @Override
+                        public Boolean apply(WebElement element) {
+                            return "normal".equals(element.getCssValue("font-style"));
+                        }
+                    });
             updateStringSource(styleDesc, String.format(".%s {font-style:italic;}", className));
             triggerServerAction();
-            auraUITestingUtil.waitForElementFunction(By.cssSelector("." + className), new Function<WebElement, Boolean>() {
-                @Override
-                public Boolean apply(WebElement element) {
-                    return "italic".equals(element.getCssValue("font-style"));
-                }
-            });
+            auraUITestingUtil.waitForElementFunction(By.cssSelector("." + className),
+                    new Function<WebElement, Boolean>() {
+                        @Override
+                        public Boolean apply(WebElement element) {
+                            return "italic".equals(element.getCssValue("font-style"));
+                        }
+                    });
         }
     }
 
+    @ThreadHostileTest("NamespaceDef modification affects namespace")
     public void testPostAfterNamespaceChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent("", "<div id='out'>hi</div>");
         String className = cmpDesc.getNamespace() + StringUtils.capitalize(cmpDesc.getName());
@@ -403,8 +411,6 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver input) {
-                auraUITestingUtil.waitForDocumentReady();
-                auraUITestingUtil.waitForAuraFrameworkReady(null);
                 return "meaningful".equals(auraUITestingUtil
                         .getEval("return window.tempVar;"));
             }
@@ -412,7 +418,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     public void testPostAfterJsProviderChange() throws Exception {
-        DefDescriptor<ComponentDef> cmpDesc = StringSourceLoader.getInstance()
+        DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil()
                 .createStringSourceDescriptor(null, ComponentDef.class);
         DefDescriptor<?> providerDesc = Aura.getDefinitionService()
                 .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,

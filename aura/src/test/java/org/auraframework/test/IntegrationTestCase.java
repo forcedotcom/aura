@@ -40,8 +40,6 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.entity.ContentType;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
@@ -51,7 +49,6 @@ import org.auraframework.def.ActionDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
@@ -64,7 +61,6 @@ import org.auraframework.test.annotation.IntegrationTest;
 import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.configuration.TestServletConfig;
 import org.auraframework.throwable.AuraExecutionException;
-import org.auraframework.util.AuraUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 
@@ -77,22 +73,11 @@ import com.google.common.collect.Maps;
  */
 @IntegrationTest
 public abstract class IntegrationTestCase extends AuraTestCase {
-    /**
-     * Note, any tests that write to the servletConfig are {@link ThreadHostileTest}.
-     */
-    protected static TestServletConfig servletConfig = AuraUtil.get(TestServletConfig.class);
-    protected final AuraTestingUtil auraTestingUtil;
+    private TestServletConfig servletConfig = null;
     private HttpClient httpClient = null;
 
     public IntegrationTestCase(String name) {
         super(name);
-        auraTestingUtil = AuraUtil.get(AuraTestingUtil.class);
-    }
-
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        auraTestingUtil.setUp();
     }
 
     @Override
@@ -101,19 +86,18 @@ public abstract class IntegrationTestCase extends AuraTestCase {
             httpClient.getConnectionManager().shutdown();
         }
         httpClient = null;
-        auraTestingUtil.tearDown();
         super.tearDown();
     }
 
     protected HttpClient getHttpClient() throws Exception {
         if (httpClient == null) {
-            httpClient = servletConfig.getHttpClient();
+            httpClient = getTestServletConfig().getHttpClient();
         }
         return httpClient;
     }
 
     protected String getCsrfToken() throws Exception {
-        return servletConfig.getCsrfToken();
+        return getTestServletConfig().getCsrfToken();
     }
 
     /**
@@ -151,6 +135,13 @@ public abstract class IntegrationTestCase extends AuraTestCase {
         return lastMod;
     }
 
+    protected TestServletConfig getTestServletConfig() {
+        if (servletConfig == null) {
+            servletConfig = Aura.get(TestServletConfig.class);
+        }
+        return servletConfig;
+    }
+
     /**
      * Given a path on the api server, return a {@link HttpGet} that has the appropriate headers and server name.
      * 
@@ -160,21 +151,23 @@ public abstract class IntegrationTestCase extends AuraTestCase {
      * @throws MalformedURLException if the path is invalid.
      * @throws URISyntaxException
      */
-    protected static HttpGet obtainGetMethod(String path) throws MalformedURLException, URISyntaxException {
+    protected HttpGet obtainGetMethod(String path) throws MalformedURLException, URISyntaxException {
         return obtainGetMethod(path, true, null);
     }
 
-    protected static HttpGet obtainGetMethod(String path, boolean followRedirects) throws MalformedURLException, URISyntaxException {
+    protected HttpGet obtainGetMethod(String path, boolean followRedirects) throws MalformedURLException,
+            URISyntaxException {
         return obtainGetMethod(path, followRedirects, null);
     }
 
-    protected static HttpGet obtainGetMethod(String path, Header[] headers) throws MalformedURLException, URISyntaxException {
+    protected HttpGet obtainGetMethod(String path, Header[] headers) throws MalformedURLException,
+            URISyntaxException {
         return obtainGetMethod(path, true, headers);
     }
 
     /**
      * Sets up get request method for httpclient. Includes ability to follow redirects and set request headers
-     *
+     * 
      * @param path
      * @param followRedirects
      * @param headers
@@ -182,20 +175,16 @@ public abstract class IntegrationTestCase extends AuraTestCase {
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
-    protected static HttpGet obtainGetMethod(String path, boolean followRedirects, Header[] headers) throws MalformedURLException,
+    protected HttpGet obtainGetMethod(String path, boolean followRedirects, Header[] headers)
+            throws MalformedURLException,
             URISyntaxException {
-        String url = servletConfig.getBaseUrl().toURI().resolve(path).toString();
-        HttpParams params = new BasicHttpParams();
-        HttpClientParams.setRedirecting(params, followRedirects);
-
-        if (System.getProperty(CoreProtocolPNames.USER_AGENT) != null) {
-            HttpProtocolParams.setUserAgent(params, System.getProperty(CoreProtocolPNames.USER_AGENT));
-        }
+        String url = getTestServletConfig().getBaseUrl().toURI().resolve(path).toString();
 
         HttpGet get = new HttpGet(url);
-        get.setParams(params);
+        HttpParams params = get.getParams();
+        HttpClientParams.setRedirecting(params, followRedirects);
 
-        if( headers != null ) {
+        if (headers != null) {
             get.setHeaders(headers);
         }
 
@@ -212,11 +201,12 @@ public abstract class IntegrationTestCase extends AuraTestCase {
      * @throws MalformedURLException if the path is invalid.
      * @throws URISyntaxException
      */
-    protected static HttpPost obtainPostMethod(String path, Map<String, String> params) throws MalformedURLException,
+    protected HttpPost obtainPostMethod(String path, Map<String, String> params) throws MalformedURLException,
             URISyntaxException, UnsupportedEncodingException {
-        HttpPost post = new HttpPost(servletConfig.getBaseUrl().toURI().resolve(path).toString());
+        HttpPost post = new HttpPost(getTestServletConfig().getBaseUrl().toURI().resolve(path)
+                .toString());
 
-        List <NameValuePair> nvps = new ArrayList<NameValuePair>();
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 
         if (params != null) {
             for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -230,6 +220,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 
     /**
      * Performs request method
+     * 
      * @param method request method
      * @return request response
      * @throws Exception
@@ -239,9 +230,9 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     }
 
     /**
-     * Performs request method with HttpContext. HttpContext typically contains cookie store with all cookies
-     * to include with request
-     *
+     * Performs request method with HttpContext. HttpContext typically contains cookie store with all cookies to include
+     * with request
+     * 
      * @param method request method
      * @param context httpcontext
      * @return request response
@@ -252,7 +243,15 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     }
 
     /**
+     * Set the desired user agent to be used in HttpClient requests from this test
+     */
+    protected void setHttpUserAgent(String userAgentString) throws Exception {
+        HttpProtocolParams.setUserAgent(getHttpClient().getParams(), userAgentString);
+    }
+
+    /**
      * Gets status code of response
+     * 
      * @param response request response
      * @return status code
      */
@@ -262,6 +261,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 
     /**
      * Gets string body of response
+     * 
      * @param response request response
      * @return response body
      * @throws IOException
@@ -273,7 +273,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 
     /**
      * Gets content type of response
-     *
+     * 
      * @param response request response
      * @return content type
      */
@@ -283,6 +283,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 
     /**
      * Gets charset of response
+     * 
      * @param response request response
      * @return charset
      */
@@ -293,24 +294,12 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 
     /**
      * Gets mime type of response
+     * 
      * @param response request response
      * @return mime type
      */
     protected static String getMimeType(HttpResponse response) {
         return getContentType(response).getMimeType();
-    }
-
-    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents) {
-        return auraTestingUtil.addSourceAutoCleanup(defClass, contents);
-    }
-
-    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents,
-            String namePrefix) {
-        return auraTestingUtil.addSourceAutoCleanup(defClass, contents, namePrefix);
-    }
-
-    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents) {
-        return auraTestingUtil.addSourceAutoCleanup(descriptor, contents);
     }
 
     /**
@@ -324,7 +313,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
                 DefType.APPLICATION.equals(desc.getDefType()) ? "app" : "cmp");
     }
 
-    public static class ServerAction implements Action {
+    public class ServerAction implements Action {
 
         private final String qualifiedName;
         private Map<String, Object> actionParams;
@@ -349,12 +338,6 @@ public abstract class IntegrationTestCase extends AuraTestCase {
             return this;
         }
 
-        public static ServerAction run(String qualifiedName, Map<String, Object> actionParams) {
-            ServerAction action = new ServerAction(qualifiedName, actionParams);
-            action.run();
-            return action;
-        }
-
         public HttpPost getPostMethod() throws Exception {
             if (post == null) {
                 Map<String, Object> message = new HashMap<String, Object>();
@@ -367,7 +350,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
                 String jsonMessage = Json.serialize(message);
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("message", jsonMessage);
-                params.put("aura.token", servletConfig.getCsrfToken());
+                params.put("aura.token", getTestServletConfig().getCsrfToken());
 
                 AuraContext context = Aura.getContextService().getCurrentContext();
                 if (context != null) {
@@ -412,7 +395,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
         public void run() throws AuraExecutionException {
             try {
                 HttpPost post = getPostMethod();
-                HttpResponse response = servletConfig.getHttpClient().execute(post);
+                HttpResponse response = getHttpClient().execute(post);
 
                 assertEquals(HttpStatus.SC_OK, getStatusCode(response));
                 rawResponse = getResponseBody(response);
@@ -468,7 +451,6 @@ public abstract class IntegrationTestCase extends AuraTestCase {
         public int getNextId() {
             return nextId++;
         }
-
 
     }
 }

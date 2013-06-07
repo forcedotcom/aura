@@ -24,12 +24,10 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.test.AuraTestingUtil;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.AuraUtil;
 import org.auraframework.util.json.Json;
 import org.junit.Ignore;
 import org.openqa.selenium.By;
@@ -45,8 +43,6 @@ import com.google.common.collect.Maps;
  */
 @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
 public class IntegrationServiceImplUITest extends WebDriverTestCase {
-    private static final AuraTestingUtil auraTestingUtil = AuraUtil.get(AuraTestingUtil.class);
-
     public IntegrationServiceImplUITest(String name) {
         super(name);
     }
@@ -105,13 +101,13 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 + "<div class='dataFromAttribute' aura:id='dataFromAttribute'>{!v.strAttribute}</div> "
                 + "<div class='dataFromModel' aura:id='dataFromModel'>{!m.firstThing}</div> "
                 + "<div class='dataFromController' aura:id='dataFromController'></div>" + "</div>";
-        DefDescriptor<ComponentDef> cmpDesc = auraTestingUtil.addSourceAutoCleanup(ComponentDef.class,
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(AuraImplTestCase.baseComponentTag, systemAttributes, bodyMarkup));
         DefDescriptor<ControllerDef> jsControllerdesc = Aura.getDefinitionService()
                 .getDefDescriptor(
                         String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, cmpDesc.getNamespace(),
                                 cmpDesc.getName()), ControllerDef.class);
-        auraTestingUtil.addSourceAutoCleanup(jsControllerdesc, "{" + "handleClick:function(cmp){"
+        addSourceAutoCleanup(jsControllerdesc, "{" + "handleClick:function(cmp){"
                 + "var a = cmp.get('c.getString');"
                 + "a.setCallback(cmp,function(a){ "
                 + "$A.componentService.newComponentAsync("
@@ -135,7 +131,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 + "<aura:attribute name='strListDefault' type='List' default='Apple,Orange'/>"
                 + "<aura:attribute name='stringArrayDefault' type='String[]' default='Melon,Berry,Grapes'/>"
                 + "<aura:attribute name='objDefault' type='Object' default='Banana'/>";
-        DefDescriptor<ComponentDef> cmpToInject = auraTestingUtil.addSourceAutoCleanup(ComponentDef.class,
+        DefDescriptor<ComponentDef> cmpToInject = addSourceAutoCleanup(ComponentDef.class,
                 String.format(AuraImplTestCase.baseComponentTag, "", attributeMarkup + attributeWithDefaultsMarkup));
 
         Map<String, Object> attributes = Maps.newHashMap();
@@ -186,7 +182,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         String attributeWithDefaultsMarkup = "<aura:attribute name='cmpsDefault' type='Aura.Component[]'>"
                 + "<div class='divDefault'>Div as default</div>"
                 + "<span class='spanDefault'>Span component as default</span>" + "</aura:attribute>{!v.cmpsDefault}";
-        DefDescriptor<ComponentDef> cmpToInject = auraTestingUtil.addSourceAutoCleanup(ComponentDef.class,
+        DefDescriptor<ComponentDef> cmpToInject = addSourceAutoCleanup(ComponentDef.class,
                 String.format(AuraImplTestCase.baseComponentTag, "", attributeMarkup + attributeWithDefaultsMarkup));
 
         DefDescriptor<ComponentDef> customStub = addSourceAutoCleanup(
@@ -221,7 +217,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      * Verify the behavior of injectComponent when the placeholder specified is missing.
      */
     public void testMissingPlaceholder() throws Exception {
-        DefDescriptor<ComponentDef> cmpToInject = auraTestingUtil.addSourceAutoCleanup(ComponentDef.class,
+        DefDescriptor<ComponentDef> cmpToInject = addSourceAutoCleanup(ComponentDef.class,
                 String.format(AuraImplTestCase.baseComponentTag, "", ""));
         DefDescriptor<ComponentDef> customStubCmp = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -318,7 +314,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
      */
     @Ignore("W-1506261")
     public void testLayoutServiceAPIs() throws Exception {
-        DefDescriptor<ComponentDef> cmpToInject = auraTestingUtil.addSourceAutoCleanup(ComponentDef.class,
+        DefDescriptor<ComponentDef> cmpToInject = addSourceAutoCleanup(ComponentDef.class,
                 String.format(AuraImplTestCase.baseComponentTag, "", "Injected Component"));
 
         openIntegrationStub(cmpToInject, null);

@@ -19,45 +19,20 @@ import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.AuraTestingUtilImpl;
-import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-/**
- * @since 0.0.84
- * @hierarchy Aura.Unit Tests.Components.LayoutItemDef
- * @priority medium
- * @userStorySyncIdOrName a07B0000000FAQ6
- */
 public class LayoutItemDefTest extends AuraImplTestCase {
-    AuraTestingUtilImpl util;
-
     public LayoutItemDefTest(String name) {
         super(name);
     }
 
-    @Override
-    public void setUp() throws QuickFixException {
-        util = new AuraTestingUtilImpl();
-        /**
-         * Aura.getContextService().startContext(AuraContext.Mode.UTEST,
-         * util.getAdditionalLoaders(),
-         */
-        Aura.getContextService().startContext(AuraContext.Mode.UTEST, AuraContext.Format.HTML,
-                AuraContext.Access.AUTHENTICATED);
-    }
-
-    @Override
-    public void tearDown() {
-        util.tearDown();
-        Aura.getContextService().endContext();
-    }
-
     public void testLayoutItemWithActionAndMarkup() throws Exception {
-        DefDescriptor<LayoutsDef> dd = util.addSourceAutoCleanup(LayoutsDef.class, "<aura:layouts default='def'>"
-                + "<aura:layout name='def'>"
-                + "<aura:layoutItem container='target' action='{!c.act}'>text</aura:layoutItem>" + "</aura:layout>"
-                + "</aura:layouts>");
+        DefDescriptor<LayoutsDef> dd = addSourceAutoCleanup(LayoutsDef.class,
+                "<aura:layouts default='def'>"
+                        + "<aura:layout name='def'>"
+                        + "<aura:layoutItem container='target' action='{!c.act}'>text</aura:layoutItem>"
+                        + "</aura:layout>"
+                        + "</aura:layouts>");
         try {
             Aura.getDefinitionService().getDefinition(dd);
             fail("Expected QuickFixException");
@@ -67,9 +42,10 @@ public class LayoutItemDefTest extends AuraImplTestCase {
     }
 
     public void testLayoutItemWithoutActionOrMarkup() throws Exception {
-        DefDescriptor<LayoutsDef> dd = util.addSourceAutoCleanup(LayoutsDef.class, "<aura:layouts default='def'>"
-                + "<aura:layout name='def'>" + "<aura:layoutItem container='target'/>" + "</aura:layout>"
-                + "</aura:layouts>");
+        DefDescriptor<LayoutsDef> dd = addSourceAutoCleanup(LayoutsDef.class,
+                "<aura:layouts default='def'>"
+                        + "<aura:layout name='def'>" + "<aura:layoutItem container='target'/>" + "</aura:layout>"
+                        + "</aura:layouts>");
         try {
             Aura.getDefinitionService().getDefinition(dd);
             fail("Expected QuickFixException");

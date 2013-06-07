@@ -27,7 +27,7 @@ import org.openqa.grid.selenium.GridLauncher;
  * @since 0.0.94
  */
 public class SeleniumServerLauncher {
-    private static String browsers = "-browser browserName=chrome,maxInstances=4 -browser browserName=firefox,maxInstances=4";
+    private static String browsers = "-browser browserName=chrome,maxInstances=%1$s -browser browserName=firefox,maxInstances=%1$s";
 
     public static void main(String args[]) throws Exception {
         final String host = "localhost";
@@ -39,7 +39,8 @@ public class SeleniumServerLauncher {
         Logger logger = Logger.getLogger(SeleniumServerLauncher.class.getName());
 
         logger.info("Launching Selenium server on port " + serverPort);
-        GridLauncher.main(String.format("-port %s %s", serverPort, browsers).split(" "));
+        GridLauncher.main(String.format("-port %s %s", serverPort, String.format(browsers, TestExecutor.NUM_THREADS + 2))
+                .split(" "));
         logger.info("Waiting for server to open port");
         waitForServer(host, serverPort);
 

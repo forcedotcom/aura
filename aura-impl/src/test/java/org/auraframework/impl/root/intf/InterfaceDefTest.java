@@ -238,7 +238,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
 
     public void testExtendsItself() throws Exception {
         DefDescriptor<InterfaceDef> extendsSelf = addSourceAutoCleanup(InterfaceDef.class, "");
-        StringSource<?> source = (StringSource<?>) auraTestingUtil.getSource(extendsSelf);
+        StringSource<?> source = (StringSource<?>) getSource(extendsSelf);
         source.addOrUpdate(String.format("<aura:interface extends='%s'> </aura:interface>",
                 extendsSelf.getDescriptorName()));
         try {

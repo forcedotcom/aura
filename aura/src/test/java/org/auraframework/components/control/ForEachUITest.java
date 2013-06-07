@@ -16,7 +16,6 @@
 package org.auraframework.components.control;
 
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -25,7 +24,6 @@ import org.openqa.selenium.WebElement;
  * Test components using ForEach loops. This is a web driver test case to check
  * for foreach rendering.
  */
-@ThreadHostileTest
 public class ForEachUITest extends WebDriverTestCase {
 
     public ForEachUITest(String name) {

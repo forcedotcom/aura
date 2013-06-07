@@ -26,7 +26,6 @@ import org.auraframework.test.annotation.ThreadHostileTest;
  * 
  * @since 0.0.302
  */
-@ThreadHostileTest
 public class ComponentQueryLanguageUITest extends WebDriverTestCase {
     public ComponentQueryLanguageUITest(String name) {
         super(name);
@@ -37,6 +36,7 @@ public class ComponentQueryLanguageUITest extends WebDriverTestCase {
      * 
      * @throws Exception
      */
+    @ThreadHostileTest("PRODUCTION")
     public void testQueryLanguageNotAvailableInprodMode() throws Exception {
         ServletConfigController.setProductionConfig(true);
         open("/test/laxSecurity.app", Mode.PROD);

@@ -29,9 +29,8 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.util.json.JsonReader;
 
 /**
- * Tests to verify AttributeSetImpl class. Component/Application instances are
- * assigned an AttributeSet. A component/application instances relies on its
- * AttributeSet to decide the value of its attributes.
+ * Tests to verify AttributeSetImpl class. Component/Application instances are assigned an AttributeSet. A
+ * component/application instances relies on its AttributeSet to decide the value of its attributes.
  * 
  * 
  * @since 138
@@ -42,8 +41,7 @@ public class AttributeSetImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify that attribute names used in expressions are not case sensitive.
-     * Attributes are used as {!v.<attrName>}
+     * Verify that attribute names used in expressions are not case sensitive. Attributes are used as {!v.<attrName>}
      */
     public void testCaseSensitivityOfAttributesInExpressions() throws Exception {
         // 1. Local attributes in a component
@@ -172,13 +170,12 @@ public class AttributeSetImplTest extends AuraImplTestCase {
      */
     public void testSerializeTo() throws Exception {
         // set has some attributes with serializeTo == BOTH
-        DefDescriptor<ComponentDef> desc = auraTestingUtil
-                .addSourceAutoCleanup(
-                        ComponentDef.class,
-                        String.format(
-                                baseComponentTag,
-                                "",
-                                "<aura:attribute name='default' type='String' default='innie'/><aura:attribute name='both' type='String' default='outie' serializeTo='BOTH'/><aura:attribute name='server' type='String' default='lint' serializeTo='SERVER'/><aura:attribute name='none' type='String' default='holy' serializeTo='NONE'/>"));
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(
+                        baseComponentTag,
+                        "",
+                        "<aura:attribute name='default' type='String' default='innie'/><aura:attribute name='both' type='String' default='outie' serializeTo='BOTH'/><aura:attribute name='server' type='String' default='lint' serializeTo='SERVER'/><aura:attribute name='none' type='String' default='holy' serializeTo='NONE'/>"));
         Component cmp = Aura.getInstanceService().getInstance(desc);
         Map<?, ?> attSet = (Map<?, ?>) new JsonReader().read(toJson(cmp.getAttributes()));
         Map<?, ?> attSetValues = (Map<?, ?>) ((Map<?, ?>) attSet.get("value")).get("values");
@@ -187,13 +184,12 @@ public class AttributeSetImplTest extends AuraImplTestCase {
         assertEquals("outie", attSetValues.get("both"));
 
         // set has no attributes with serializeTo == BOTH
-        desc = auraTestingUtil
-                .addSourceAutoCleanup(
-                        ComponentDef.class,
-                        String.format(
-                                baseComponentTag,
-                                "",
-                                "<aura:attribute name='server' type='String' default='lint' serializeTo='SERVER'/><aura:attribute name='none' type='String' default='holy' serializeTo='NONE'/>"));
+        desc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(
+                        baseComponentTag,
+                        "",
+                        "<aura:attribute name='server' type='String' default='lint' serializeTo='SERVER'/><aura:attribute name='none' type='String' default='holy' serializeTo='NONE'/>"));
         cmp = Aura.getInstanceService().getInstance(desc);
         attSet = (Map<?, ?>) new JsonReader().read(toJson(cmp.getAttributes()));
         attSetValues = (Map<?, ?>) ((Map<?, ?>) attSet.get("value")).get("values");

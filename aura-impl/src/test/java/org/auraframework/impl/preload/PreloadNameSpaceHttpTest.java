@@ -25,13 +25,11 @@ import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.annotation.TestLabels;
-import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.util.json.JsonReader;
 
 /**
  * Basic HTTP retrieve test for checking preloaded namespaces and componentDefs.
  */
-@ThreadHostileTest
 public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
     public PreloadNameSpaceHttpTest(String name) {
         super(name);

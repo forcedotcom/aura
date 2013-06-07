@@ -40,7 +40,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
  * @since 0.0.262
  */
 @UnAdaptableTest
-@ThreadHostileTest
 public class ExceptionHandlingUITest extends WebDriverTestCase {
     public ExceptionHandlingUITest(String name) {
         super(name);
@@ -126,6 +125,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     /**
      * Generic error message displayed in PRODUCTION if component provider instantiation throws.
      */
+    @ThreadHostileTest("PRODUCTION")
     public void testProdCmpProviderThrowsDuringInstantiation() throws Exception {
         setProdConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(
@@ -152,6 +152,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     /**
      * Generic error message displayed in PRODUCTION if application provider instantiation throws.
      */
+    @ThreadHostileTest("PRODUCTION")
     public void testProdAppProviderThrowsDuringInstantiation() throws Exception {
         setProdConfig();
         openRaw(getAppUrl(
@@ -172,6 +173,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     /**
      * Generic error message displayed in PRODUCTION if component provider instantiation throws.
      */
+    @ThreadHostileTest("PRODUCTION")
     public void testProdCmpProviderThrowsDuringProvide() throws Exception {
         setProdConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(
@@ -196,6 +198,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     /**
      * Generic error message displayed in PRODUCTION if component model instantiation throws.
      */
+    @ThreadHostileTest("PRODUCTION")
     public void testProdCmpModelThrowsDuringInstantiation() throws Exception {
         setProdConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(ComponentDef.class,
@@ -223,6 +226,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     /**
      * Generic error message displayed in PRODUCTION if component renderer instantiation throws.
      */
+    @ThreadHostileTest("PRODUCTION")
     public void testProdCmpRendererThrowsDuringInstantiation() throws Exception {
         setProdConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(
@@ -249,6 +253,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     /**
      * Generic error message displayed in PRODUCTION if component renderer throws.
      */
+    @ThreadHostileTest("PRODUCTION")
     public void testProdCmpRendererThrowsDuringRender() throws Exception {
         setProdConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(

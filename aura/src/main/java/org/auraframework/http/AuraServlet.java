@@ -108,7 +108,6 @@ import com.google.common.collect.Maps;
  */
 public class AuraServlet extends AuraBaseServlet {
     private static final long serialVersionUID = 2218469644108785216L;
-    public static final String DISABLE_APPCACHE_PROPERTY = "aura.noappcache";
 
     protected final static StringParam tag = new StringParam(AURA_PREFIX + "tag", 128, true);
     private static final EnumParam<DefType> defTypeParam = new EnumParam<DefType>(AURA_PREFIX + "deftype", false,

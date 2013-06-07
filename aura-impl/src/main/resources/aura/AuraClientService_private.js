@@ -733,7 +733,7 @@ var priv = {
     }
 };
 
-window.onbeforeunload = function(event) {
+$A.ns.Util.prototype.on(window, "beforeunload", function(event) {
     if (!$A.util.isIE) {
         priv.isUnloading = true;
         priv.requestQueue = [];

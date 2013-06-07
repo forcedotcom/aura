@@ -59,6 +59,7 @@ import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -69,7 +70,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
-        RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
+RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
     public static final DefDescriptor<InterfaceDef> ROOT_MARKER = DefDescriptorImpl.getInstance(
             "markup://aura:rootComponent", InterfaceDef.class);
@@ -179,6 +180,14 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         for (EventHandlerDef def : eventHandlers) {
             def.validateDefinition();
         }
+        if(this.templateDefDescriptor != null){
+            if(this.templateDefDescriptor.getDef() != null && this.templateDefDescriptor.getDef().isTemplate() != true){
+                throw new AuraRuntimeException("Non template component specified for template attribute",getLocation());
+            }
+        }
+        if(this.isAbstract() && this.isTemplate()){
+            throw new InvalidDefinitionException("Template cannot be abstract.",getLocation());
+        }
 
         // an abstract component that you can't extend is pretty useless
         if (this.isAbstract() && !this.isExtensible()) {
@@ -201,7 +210,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                         String.format(
                                 "Component %s cannot be a rootComponent and extend %s", getDescriptor(),
                                 this.extendsDescriptor),
-                        getLocation());
+                                getLocation());
             }
         }
     }
@@ -630,12 +639,12 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
             return getDescriptor().equals(other.getDescriptor())
                     && controllerDescriptors
-                            .equals(other.controllerDescriptors)
+                    .equals(other.controllerDescriptors)
                     && (modelDefDescriptor == null ? other.modelDefDescriptor == null
-                            : modelDefDescriptor
-                                    .equals(other.modelDefDescriptor))
+                    : modelDefDescriptor
+                    .equals(other.modelDefDescriptor))
                     && (extendsDescriptor == null ? other.extendsDescriptor == null
-                            : extendsDescriptor.equals(other.extendsDescriptor))
+                    : extendsDescriptor.equals(other.extendsDescriptor))
                     && events.equals(other.events)
                     && getLocation().equals(other.getLocation());
         }
@@ -730,7 +739,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     protected abstract void serializeFields(Json json) throws IOException,
-            QuickFixException;
+    QuickFixException;
 
     /**
      * @see ComponentDef#getRendererDescriptor()
@@ -839,7 +848,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     public static abstract class Builder<T extends BaseComponentDef> extends
-            RootDefinitionImpl.Builder<T> implements BaseComponentDefBuilder<T> {
+    RootDefinitionImpl.Builder<T> implements BaseComponentDefBuilder<T> {
 
         public Builder(Class<T> defClass) {
             super(defClass);
@@ -996,7 +1005,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         case APPLICATION:
             return descriptor.equals(other)
                     || (extendsDescriptor != null && getSuperDef()
-                            .isInstanceOf(other));
+                    .isInstanceOf(other));
         default:
             return false;
         }

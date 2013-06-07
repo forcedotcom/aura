@@ -42,12 +42,14 @@
 
     // run the given groups of actions and wait for all their responses before continuing
     waitForActions : function(component, actionGroups, callback) {
-        component.testCounter = actionGroups.length;
+        var testCounter = actionGroups.length;
+        $A.test.blockRequests();
         for (var i=0; i<actionGroups.length; i++){
-            $A.clientService.runActions(actionGroups[i], component, function(){component.testCounter--;});
+            $A.clientService.runActions(actionGroups[i], component, function(){testCounter--;});
         }
+        $A.test.releaseRequests();
         $A.test.runAfterIf(function() {
-            return component.testCounter == 0;
+            return testCounter == 0;
         }, callback);
     },
 

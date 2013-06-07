@@ -102,6 +102,16 @@ var Test = function(){
             priv.waits.push({ expected:expected, actual:testFunction, callback:callback , failureMessage:failureMessage});
         },
 
+        blockRequests : function () {
+            $A.eventService.startFiring("$A.test.blockRequests()");
+            $A.clientService["priv"].inRequest = true;
+        },
+
+        releaseRequests : function () {
+            $A.clientService["priv"].inRequest = false;
+            $A.eventService.finishFiring();
+        },
+
         /**
          * Add a cleanup function that is run on teardown.
          *

@@ -295,8 +295,7 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 	function WritesConfigToLocalStorageIfNotCached() {
 	    //Arrange
 	    var target = new ComponentDefRegistry();
-	    var actualStorageKey;
-	    var actualStorageEntry;
+	    var descriptor = "layout://foo:bar";
 	    target.isLocalStorageAvailable = true;
 	    target.useLocalCache = function() {
 		return true;
@@ -304,25 +303,27 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 	    target.getConfigFromLocalCache = function() {
 		return null;
 	    };
-	    target.writeToCache = function(descriptor, config) {
-		actualStorageKey = descriptor;
-		actualStorageEntry = config;
+	    var actual;
+	    target.writeToCache = function(desc, config) {
+		actual = {"descriptor" : desc, "config":config};
 	    }
 	    var newConfig = {
-		"descriptor" : "layout://foo:bar",
+		"descriptor" : descriptor,
 		"rendererDef" : {}
 	    };
-
+	    var expected = {
+		"descriptor" : descriptor,
+		"config" : newConfig
+	    }
 	    // Act
 	    mockAuraUtil(function() {
 		mockComponentDef(function() {
-		    registeredDef = target.getDef(newConfig);
+		    target.getDef(newConfig);
 		})
 	    });
 
 	    // Assert
-	    Assert.Equal("layout://foo:bar", actualStorageKey);
-	    Assert.Equal(newConfig, actualStorageEntry);
+	    Assert.Equal(expected, actual);
 	}
 
 	[Fact]
@@ -615,7 +616,7 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 	}
 
 	[Fact]
-	function UpdatesLocalStorageWithJsonEncodedDefAndCatalogIfAvailable() {
+	function UpdatesLocalStorageWithJsonEncodedDefIfAvailable() {
 	    // Arrange
 	    var storage = {};
 	    var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
@@ -656,8 +657,50 @@ Test.Aura.Component.ComponentDefRegistryTest = function() {
 	    });
 
 	    // Assert
-	    Assert.True(storage[target.cacheName][descriptor]);
 	    Assert.Equal(config, storage[target.cacheName + "." + descriptor]);
+	}
+	
+	[Fact]
+	function UpdatesLocalStorageWithCatalogIfAvailable() {
+	    // Arrange
+	    var storage = {};
+	    var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+		util : {
+		    json : {
+			encode : function(s) {
+			    return s;
+			}
+		    }
+		},
+		endMark : function() {
+		}
+	    });
+	    var mockLocalStorage = Mocks.GetMock(Object.Global(),
+		    "localStorage", {
+			setItem : function(key, value) {
+			    storage[key] = value;
+			}
+		    });
+	    var target = new ComponentDefRegistry();
+	    target.isLocalStorageAvailable = true;
+	    target.cacheName = "componetDefRegistry.catalog"
+	    target.getLocalCacheCatalog = function() {
+		return {};
+	    }
+	    var descriptor = "layout://foo:bar";
+	    var config = {};
+	    var actual;
+
+	    // Act
+	    mockAuraUtil(function() {
+		mockLocalStorage(function() {
+		    target.writeToCache(descriptor, config);
+		});
+	    });
+	    var expected = storage[target.cacheName][descriptor];
+	    
+	    // Assert
+	    Assert.True(expected);
 	}
     }
 }

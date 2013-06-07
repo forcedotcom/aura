@@ -16,7 +16,7 @@
  {
  	updateOutput : function(cmp) {
  		var outOptions = { 
- 			out1 : "i have somehting to say...",
+ 			out1 : "i have something to say...",
  			out2 : "hello!"
  		}
  		
@@ -29,24 +29,36 @@
  	},
  	
  	addManyPgCarousel : function(cmp) {
- 		var carousel = cmp.find("manyPageCarousel");
+ 		var carousel = cmp.find("carousel2");
  		var pages = [];
- 		for (var i=0; i<10; i++){
+ 		for (var i=1; i<=10; i++){
  			var page = $A.componentService.newComponentDeprecated({
-			            "componentDef" : "markup://ui:carouselPage",
+			            "componentDef" : {
+			            	"descriptor" : "markup://ui:carouselPage"
+			            },
 			            "attributes" : {
 			            	"values" : {
-			            		"pageModel":"page #"+(i+1), 
+			            		"pageModel":"", 
 			            		"pageIndex":i, 
 			            		"parent":[carousel],
-			            		"priv_visible":"true",
+			            		"priv_visible":"false",
 			            		"priv_continuousFlow": "false"
 			            	}
 			            }
+			},null,true);
+			var pageCmp = $A.componentService.newComponent({
+			            "componentDef" : {
+			            	"descriptor" : "markup://ui:outputText"
+			            },
+			            "attributes" : {
+			            	"values" : {
+			            		"value" : "page #"+i 
+			            	}
+			            }
 			});
+			page.getValue("v.body").setValue(pageCmp);
 			pages.push(page);
  		}
  		carousel.getValue("v.pageComponents").setValue(pages);
- 		//$A.rerender(carousel);
  	}
  }

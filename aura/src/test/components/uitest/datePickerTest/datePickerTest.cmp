@@ -16,6 +16,6 @@
 
 -->
 <aura:component>
-  <ui:inputDate displayDatePicker="true" class="date_input_box" placeHolder=""/>
+  <ui:inputDate displayDatePicker="true" class="date_input_box" placeHolder="" format="yyyy-MM-dd"/>
  <!--<ui:datePicker visible="true" />-->
 </aura:component>

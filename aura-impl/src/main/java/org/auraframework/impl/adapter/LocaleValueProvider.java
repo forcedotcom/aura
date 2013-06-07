@@ -37,11 +37,14 @@ public class LocaleValueProvider implements GlobalValueProvider {
     public static String LANGUAGE = "language";
     public static String COUNTRY = "country";
     public static String VARIANT = "variant";
+    public static String LANGUAGE_LOCALE = "langLocale";
+    
     public static String NUMBER_FORMAT = "numberformat";
     public static String PERCENT_FORMAT = "percentformat";
     public static String CURRENCY_FORMAT = "currencyformat";
-// TODO: add date format
-//    public static String DATE_FORMAT = "dateformat";
+    
+    public static String DATE_FORMAT = "dateformat";
+    public static String DATETIME_FORMAT = "datetimeformat";
     public static String TIME_ZONE = "timezone";
     public static String TIME_ZONE_FILE_NAME = "timezoneFileName";
     public static String CURRENCY_CODE = "currency_code";
@@ -51,16 +54,36 @@ public class LocaleValueProvider implements GlobalValueProvider {
     public static String GROUPING = "grouping";
     public static String CURRENCY = "currency";
     
+    public static String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
+    public static String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm";
+    
     private final Map<String, Object> data;
 
     public LocaleValueProvider() {
         Builder<String, Object> builder = ImmutableMap.builder();
         
         AuraLocale al = Aura.getLocalizationAdapter().getAuraLocale();
+        
         Locale lang = al.getLanguageLocale();
+        Locale dateLocale = al.getDateLocale();
+        
         builder.put(LANGUAGE, lang.getLanguage());
         builder.put(COUNTRY, lang.getCountry());
         builder.put(VARIANT, lang.getVariant());
+        builder.put(LANGUAGE_LOCALE, lang.toString());
+        
+        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, dateLocale);
+        DateFormat datetimeFormat = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, dateLocale);
+        try {
+            SimpleDateFormat sdf = (SimpleDateFormat)dateFormat;
+            SimpleDateFormat sdtf = (SimpleDateFormat)datetimeFormat;
+            builder.put(DATE_FORMAT, sdf.toPattern());
+            builder.put(DATETIME_FORMAT, sdtf.toPattern());
+        } catch (ClassCastException cce) {
+            builder.put(DATE_FORMAT, DEFAULT_DATE_FORMAT);
+            builder.put(DATETIME_FORMAT, DEFAULT_DATETIME_FORMAT);
+        }
+                
         builder.put(TIME_ZONE, al.getTimeZone().getID());
         builder.put(TIME_ZONE_FILE_NAME, al.getTimeZone().getID().replace("/", "-"));
         

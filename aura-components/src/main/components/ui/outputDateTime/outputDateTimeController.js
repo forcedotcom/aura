@@ -15,14 +15,31 @@
  */
 ({
     doInit: function(component, event, helper) {
+        // Set default attribute value
         var format = component.get("v.format");
-        if (format) {
-            format = format.replace(/y/g, "Y").replace(/d/g, "D").replace(/E/g, "d").replace(/a/g, "A"); // translate Java patterns to moment.js pattern
-            component.setValue("v.format", format);
-        } else {
-            // TODO: grab the default value of format from $Locale
-            format = "YYYY-MM-DD HH:mm";
+        if (!format) {
+            format = $A.getGlobalValueProviders().get("$Locale.datetimeformat");
         }
         component.setValue("v.format", format);
+        
+        var langLocale = component.get("v.langLocale");
+        if (!langLocale) {
+            langLocale = $A.getGlobalValueProviders().get("$Locale.langLocale");
+        }
+        component.setValue("v.langLocale", langLocale);
+        
+        var timezone = component.get("v.timezone");
+        if (!timezone) {
+            timezone = $A.getGlobalValueProviders().get("$Locale.timezone");
+        }
+        component.setValue("v.timezone", timezone);
+    },
+    
+    formatChange: function(component, event, helper) {
+        helper.normalizeFormat(component);
+    },
+    
+    langLocaleChange: function(component, event, helper) {
+        helper.normalizeLangLocale(component);
     }
 })

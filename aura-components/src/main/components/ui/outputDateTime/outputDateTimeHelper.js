@@ -35,11 +35,12 @@
         }
         var d = new Date(value);
         var timezone = component.get("v.timezone");
-        var format = component.get("v.format");
+        var format = this.getNormalizedFormat(component);
+        var langLocale = this.getNormalizedLangLocale(component);
         if (timezone == "GMT") {
             var mDate = moment.utc(d.getTime());
             if (mDate.isValid()) {
-                _helper.displayDateTime(component, mDate.lang(this.getLangLocale(component)).format(format));
+                _helper.displayDateTime(component, mDate.lang(langLocale).format(format));
             } else {
                 _helper.displayDateTime(component, "Invalid date time value");
             }
@@ -56,35 +57,23 @@
     },
     
     /**
+     * Get a normalized format string which is compatible with moment.js
+     *
+     */
+    getNormalizedFormat: function(component) {
+        if ($A.util.isUndefinedOrNull(component._format) || $A.util.isEmpty(component._format)) {
+            this.normalizeFormat(component);  
+        }
+        return component._format;
+    },
+    
+    /**
      * Get a normalized locale string which is compatible with moment.js
      *
      */
-    getLangLocale: function(component) {
-        if ($A.util.isUndefinedOrNull(component._langLocale) ||
-            $A.util.isEmpty(component._langLocale)) {
-            var lang = [];
-            var token = "";
-            var langLocale = component.get("v.langLocale");
-            if (langLocale) {
-                var index = langLocale.indexOf("_");
-                while (index > 0) {
-                    token = langLocale.substring(0, index);
-                    langLocale = langLocale.substring(index + 1);
-                    lang.push(token.toLowerCase());
-                    index = langLocale.indexOf("_");
-                }
-                langLocale = langLocale.substring(index + 1);
-                if (!$A.util.isEmpty(langLocale)) {
-                    lang.push(langLocale.toLowerCase());
-                }
-            } else {
-                lang.push("en");
-            }
-            if (lang[0] === "zh") {
-                component._langLocale = lang[0] + "-" + lang[1];
-            } else {
-                component._langLocale = lang[0];
-            }
+    getNormalizedLangLocale: function(component) {
+        if ($A.util.isUndefinedOrNull(component._langLocale) || $A.util.isEmpty(component._langLocale)) {
+            this.normalizeLangLocale(component);  
         }
         return component._langLocale;
     },
@@ -117,6 +106,50 @@
     },
     
     /**
+     * Normalize a format string in order to make it compatible with moment.js
+     *
+     */
+    normalizeFormat: function(component) {
+        var format = component.get("v.format");
+        if (!format) {
+            format = $A.getGlobalValueProviders().get("$Locale.datetimeformat");
+        }
+        component._format = format.replace(/y/g, "Y").replace(/d/g, "D").replace(/E/g, "d").replace(/a/g, "A");
+    },
+    
+    /**
+     * Normalize the locale string to moment.js compatible.
+     *
+     */
+    normalizeLangLocale: function(component) {
+        var lang = [];
+        var token = "";
+        var langLocale = component.get("v.langLocale");
+        if (!langLocale) {
+            langLocale = $A.getGlobalValueProviders().get("$Locale.langLocale");
+        }
+        
+        var index = langLocale.indexOf("_");
+        while (index > 0) {
+            token = langLocale.substring(0, index);
+            langLocale = langLocale.substring(index + 1);
+            lang.push(token.toLowerCase());
+            index = langLocale.indexOf("_");
+        }
+        
+        langLocale = langLocale.substring(index + 1);
+        if (!$A.util.isEmpty(langLocale)) {
+            lang.push(langLocale.toLowerCase());
+        }
+        
+        if (lang[0] === "zh") {
+            component._langLocale = lang[0] + "-" + lang[1];
+        } else {
+            component._langLocale = lang[0];
+        }
+    },
+    
+    /**
      * This can be overridden by extended component.
      */
     updateDisplay: function(component, d, format, timezone, defaultDisplayValue) {
@@ -130,7 +163,8 @@
         }
         var mDate = moment.utc(d.getTime() - tzOffset * 60000);
         if (mDate.isValid()) {
-            displayValue = mDate.lang(this.getLangLocale(component)).format(format);
+            var langLocale = this.getNormalizedLangLocale(component);
+            displayValue = mDate.lang(langLocale).format(format);
         } else {
             displayValue = "Invalid date time value";
         }

@@ -24,24 +24,30 @@
             var body = component.find("me").getValue("v.body");
 
             function addComponent(label, insertFunction) {
-                var c = $A.componentService.newComponentDeprecated({
-                    componentDef: { descriptor:"markup://aura:html" },
-                    attributes: {
-                        values: {
-                            tag: "div",
-                            body: [{
-                                componentDef: { descriptor:"markup://aura:text" },
-                                attributes: {
-                                    values: {
-                                        value: label
+                // Note that usually we'd want have a wait until the callback with the newly created cmp is called, but
+                // since we don't need to make a server trip the cmp is created and callback called synchronously.
+                $A.componentService.newComponentAsync(
+                    this,
+                    function(newCmp){
+                        insertFunction(body, newCmp);
+                    },
+                    {
+                        componentDef: { descriptor:"markup://aura:html" },
+                        attributes: {
+                            values: {
+                                tag: "div",
+                                body: [{
+                                    componentDef: { descriptor:"markup://aura:text" },
+                                    attributes: {
+                                        values: {
+                                            value: label
+                                        }
                                     }
-                                }
-                            }]
+                                }]
+                            }
                         }
                     }
-                });
-
-                insertFunction(body, c);
+                );
             }
 
             function iteration(values, toAdd, insertFunction) {

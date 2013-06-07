@@ -16,45 +16,51 @@
 ({  
     testEmpty: {
         attributes : {thang : ''},
-        
         test: function(component){
-        	this.whatItIs(component, "Empty string", false);
-        	
-        	// bug W-1427153
-        	//Making sure that globalId for client side component ends with 'c'
-            newCmp = $A.componentService.newComponentDeprecated({
-                "componentDef": "markup://ifTest:testIf"
+            this.whatItIs(component, "Empty string", false);
+
+            // Making sure that globalId for client side component ends with 'c'
+            var newCmp;
+            $A.newCmpAsync(
+                this,
+                function(component){
+                    newCmp = component;
+                },
+                {
+                    "componentDef": "markup://ifTest:testIf"
+                }
+            );
+            $A.eventService.finishFiring();
+            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+                var reg = /:c/; 
+                $A.test.assertNotNull(newCmp.getGlobalId().match(reg), "GlobalId for clientSide cmp should end with "
+                        + "'c' but it is" + newCmp.getGlobalId());
             });
-            var reg = /:c/; 
-            aura.test.assertNotNull(newCmp.getGlobalId().match(reg),"GlobalId for clientSide cmp should be ending with c but it is " + newCmp.getGlobalId());
         }
     },
-    
+
     testUndefined: {
-        
         test: function(component){
             this.whatItIs(component, "Undefined", false);
         }
     },
-    
+
     testTrue: {
         attributes : {thang : 'true'},
         
         test: function(component){
             this.whatItIs(component, "true", true);
-            
         }
     },
-    
+
     testFalse: {
         attributes : {thang : 'false'},
         
         test: function(component){
             this.whatItIs(component, "false", false);
-            
         }
     },
-    
+
     testLiterals: {
         
         test: function(component){
@@ -62,8 +68,8 @@
             aura.test.assertNotNull($A.test.getElementByClass("itIsLiterallyNotFalse"), "Literal true evaluated as false");
         }
     },
-    
-    // bug W-1419175
+
+    // TODO(W-1419175): onchange events don't fire across function expressions
     _testRerender: {
     	attributes : {thang : "true"},
         
@@ -74,6 +80,7 @@
             this.whatItIs(component, "Testing Rerender: false", false);
         }
     },
+
     whatItIs : function(component, name, value){
         if (!value) {
             aura.test.assertNotNull($A.test.getElementByClass("itIsFalse"), name+" didn't evaluate as false");

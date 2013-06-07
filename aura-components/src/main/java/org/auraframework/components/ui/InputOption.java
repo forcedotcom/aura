@@ -28,21 +28,27 @@ import org.auraframework.util.json.JsonSerializable;
  * 
  * @since Touch.174.3
  */
-public class InputOption implements HasLabel, HasName, HasSelected, HasValue, JsonSerializable {
+public class InputOption implements HasLabel, HasDisabled, HasName, HasSelected, HasValue, JsonSerializable {
 
     private final String label;
     private final String name;
     private final boolean selected;
     private final String value;
+    private final boolean disabled;
 
-    public InputOption(String label, String name, boolean selected, String value) {
+    public InputOption(String label, String name, boolean selected, String value, boolean disabled) {
         this.label = label;
         this.name = name;
         this.selected = selected;
         this.value = value;
+        this.disabled = disabled;
     }
 
-    /**
+    public InputOption(String label, String name, boolean selected, String value) {
+    	this(label, name, selected, value, false);
+	}
+
+	/**
      * Get the label.
      * 
      * @return the label of this option
@@ -89,13 +95,23 @@ public class InputOption implements HasLabel, HasName, HasSelected, HasValue, Js
         json.writeMapEntry("name", this.name);
         json.writeMapEntry("selected", this.selected);
         json.writeMapEntry("value", this.value);
+        json.writeMapEntry("disabled", this.disabled);
         json.writeMapEnd();
     }
 
     @Override
     public String toString() {
-        return String.format("InputOption(label[%s] name[%s] selected[%s] value[%s])", this.label, this.name,
-                this.selected, this.value);
+        return String.format("InputOption(label[%s] name[%s] selected[%s] value[%s] disabled[%s])", this.label, this.name,
+                this.selected, this.value, this.disabled);
     }
+    
+    /**
+     * Is the component disabled.
+     * @return the true if disabled, otherwise false
+     */
+	@Override
+	public boolean isDisabled() {
+		return this.disabled;
+	}
 
 }

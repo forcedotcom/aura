@@ -150,7 +150,12 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
     	[Fact]
 		function CallScrollToPageIfPageIsInRange(){
 			// Arrange
-			var targetComponent = {};
+			var targetComponent = {get : function(expression) {
+					if (expression === 'v.priv_currentPage') {
+						return -1;
+					}
+				}
+			};
 			
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
 				getPageComponents : function(value){return ["page1", "page2", "page3"];},
@@ -180,7 +185,12 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 		[Fact]
 		function SelectAPageOutOfRangeDoesNothing(){
 			// Arrange
-			var targetComponent = {};
+			var targetComponent = {get : function(expression) {
+					if (expression === 'v.priv_currentPage') {
+						return -1;
+					}
+				}
+			};
 			
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
 				getPageComponents : function(value){return ["page1", "page2", "page3"];},

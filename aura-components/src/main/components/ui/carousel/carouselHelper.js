@@ -294,7 +294,7 @@
 	 * Page is selected, delegate the event to page component
 	 */
 	pageSelected: function(cmp, pageIndex) {
-	
+
 		var prevSelectedPage = cmp.get('v.priv_currentPage');
 			
 		if (prevSelectedPage == pageIndex) {			
@@ -360,13 +360,16 @@
 	 * Selecting a page from non-scrolling events
 	 */
 	selectPage : function(cmp, pageIndex, time) {		
-		var pages = this.getPageComponents(cmp);
-		//scroller page starts with 0
-		pageIndex--;
-		if (pageIndex >= 0 && pageIndex < pages.length) {
-			this.showAllPages(cmp);
+		var pages = this.getPageComponents(cmp),
+			prevSelectedPage = cmp.get('v.priv_currentPage');
+
+		if (pageIndex > 0 && pageIndex <= pages.length && prevSelectedPage !== pageIndex) {
+
+			this.showAllPages(cmp);		 
+			
 			scroller = this.getScroller(cmp);
-			scroller.scrollToPage(pageIndex, null, time);			
+			//scroller page starts with 0
+			scroller.scrollToPage(--pageIndex, null, time);			
 		}		
 	},
 	

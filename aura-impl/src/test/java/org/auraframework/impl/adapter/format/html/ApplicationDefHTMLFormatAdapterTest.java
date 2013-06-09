@@ -152,7 +152,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
      */
     public void testCommentsInTemplateCssNotInjectedToPage() throws Exception {
         String css = "/*" + "*Multi line comment" + "*/\n" + "body{" + "background-color: #ededed;"
-                + "font-size: 13px;" + "/**Inline comment*/\n" + "line-height: 1.3;" + "}";
+                + "font-size: 13px;" + "/**Inline comment*/\n" + "line-height: 1.3" + "}";
         DefDescriptor<StyleDef> styleDef = Aura.getDefinitionService().getDefDescriptor(
                 "templateCss://string.thing" + System.currentTimeMillis() + "template", StyleDef.class);
         auraTestingUtil.addSourceAutoCleanup(styleDef, css);
@@ -173,6 +173,6 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         assertFalse("Comments were not stripped out from template CSS", body.contains("Multi line comment"));
         assertFalse("Inline comments were not stripped our from template CSS", body.contains("Inline comment"));
         assertTrue("Expected template css not found in serialized response.",
-                body.contains("<style>body{background-color:#ededed;font-size:13px;line-height:1.3;}</style>"));
+                body.contains("<style>body{background-color:#ededed;font-size:13px;line-height:1.3}</style>"));
     }
 }

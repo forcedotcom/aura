@@ -69,7 +69,7 @@ public class NamespaceDefTest extends AuraImplTestCase {
         DefinitionService defService = Aura.getDefinitionService();
         StyleDef styleDef = defService.getDefinition("namespaceDefTest.testStyleTokens", StyleDef.class);
         assertEquals(
-                ".namespaceDefTestTestStyleTokens{background-color:red;color:FOOL;border-color:black;}",
+                ".namespaceDefTestTestStyleTokens{background-color:red;color:FOOL;border-color:black}",
                 styleDef.getCode());
     }
 }

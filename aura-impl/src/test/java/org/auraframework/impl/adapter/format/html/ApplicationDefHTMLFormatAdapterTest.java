@@ -162,7 +162,7 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         String templateCss = String.format("%s://%s.%s", DefDescriptor.TEMPLATE_CSS_PREFIX, styleDef.getNamespace(),
                 styleDef.getName());
         String templateMarkup = String.format(baseComponentTag, "style='" + templateCss
-                + "'  isTemplate='true'  extends='aura:template' ", "");
+                + "'  isTemplate='false'  extends='aura:template' ", "");
         DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateMarkup);
 
         DefDescriptor<ApplicationDef> testApp = addSourceAutoCleanup(ApplicationDef.class,

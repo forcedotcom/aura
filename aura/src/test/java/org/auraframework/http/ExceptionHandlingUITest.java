@@ -314,14 +314,14 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     /**
      * Default handler for ClientOutOfSync will reload the page.
      */
-    // FIXME: W-1690920 (flapper)
-    public void _testClientOutOfSyncDefaultHandler() throws Exception {
+    public void testClientOutOfSyncDefaultHandler() throws Exception {
         open("/updateTest/updateWithoutHandling.cmp?text=initial");
 
         // make a client-side change to the page
         findDomElement(By.cssSelector(".update")).click();
         waitForElementText(findDomElement(By.cssSelector(".uiOutputText")), "modified", true, 3000);
-        assertTrue("Page was not changed after client action", isElementPresent(By.cssSelector(".reloadMarker")));
+        assertTrue("Page was not changed after client action", 
+                auraUITestingUtil.getBooleanEval("return !!document.__PageModifiedTestFlag"));
 
         // make server POST call with outdated lastmod
         findDomElement(By.cssSelector(".trigger")).click();
@@ -332,7 +332,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         wait.until(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                return !isElementPresent(By.cssSelector(".reloadMarker"));
+                return !auraUITestingUtil.getBooleanEval("return !!document.__PageModifiedTestFlag");
             }
         });
         // Wait for page to reload and aura framework initialization

@@ -1,0 +1,47 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="ui:input" support="proto">
+    <aura:attribute name="theme" type="String" default="default" description="Theme to apply to this component."/>
+    <aura:attribute name="dataProvider" type="Aura.Component[]" required="true" description="A list of data provider components"/>
+    <aura:attribute name="listOption" type="Aura.ComponentDefRef[]" required="true" description="A ComponentDefRef to use as the template for each generated option in the list."/>
+    <aura:attribute name="optionVar" type="String" required="true" description="The name by which to refer to the current data object inside of the template for each option."/>
+    
+    <aura:attribute name="header" type="Aura.Component[]" description="A facet above the rendered list, for use as a list header"/>
+    <aura:attribute name="footer" type="Aura.Component[]" description="A facet below the rendered list, for use as a list footer"/>
+    
+    <aura:registerEvent name="inputChange" type="ui:inputChange"/>
+    <aura:registerEvent name="selectListOption" type="ui:selectListOption"/>
+    
+    <aura:registerEvent name="matchText" type="ui:matchText"/>
+    <aura:handler name="matchText" action="{!c.matchText}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <ui:inputForAutocomplete aura:id="input"/>
+    
+    <ui:autocompleteList aura:id="list" 
+        dataProvider="{!v.dataProvider}" 
+        itemVar="{!v.optionVar}" 
+        itemTemplate="{!v.listOption}"
+        header="{!v.header}"
+        footer="{!v.footer}"
+        theme="{!v.theme}"
+        visible="false"
+        contentRole="listBox"
+        selectListOption="{!c.handleSelectOption}"/>
+</aura:component>

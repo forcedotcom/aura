@@ -1,0 +1,33 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="ui:interactive" extensible="true" support="beta">
+    <aura:attribute name="theme" type="String" default="default" description="Theme to apply to this component."/>
+    <aura:attribute name="displayText" type="String" description="The displayed text string for this option."/>
+    <aura:attribute name="keyword" type="String" description="The keyword to match."/>
+    
+    <aura:handler name="focus" action="{!c.handleFocus}"/>
+    
+    <aura:renderIf isTrue="{!v.body.length == 0}">
+        <li class="{!v.class + ' ' + v.theme + (v.visible == false ? ' invisible' : '')}" role="presentation">
+            <a id="{!globalId}" class="{!v.class}" aura:id="option" href="Javascript:void(0);" role="option">{!v.displayText}</a>
+        </li>
+        <aura:set attribute="else">
+            {!v.body}
+        </aura:set>
+    </aura:renderIf>
+</aura:component>

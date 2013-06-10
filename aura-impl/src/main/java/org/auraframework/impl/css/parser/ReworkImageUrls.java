@@ -32,12 +32,6 @@ import com.phloc.css.decl.ICSSExpressionMember;
  * Add cache-busters to urls.
  */
 public class ReworkImageUrls implements Rework<CSSDeclaration> {
-    private final StyleParserResultHolder resultHolder;
-
-    public ReworkImageUrls(StyleParserResultHolder resultHolder) {
-        this.resultHolder = resultHolder;
-    }
-
     @Override
     public void perform(CSSDeclaration declaration, List<CSSDeclaration> reworked, List<Exception> errors) {
         CSSExpression expr = declaration.getExpression();
@@ -80,7 +74,7 @@ public class ReworkImageUrls implements Rework<CSSDeclaration> {
             if (url.startsWith("/") && shouldAddCacheBuster()) {
                 url = AuraBaseServlet.addCacheBuster(url);
             }
-            resultHolder.addImageURL(url);
+            // resultHolder.addImageURL(url); // TODONM what was using this from StyleParserResultHolder?
             return new CSSExpressionMemberTermURI(url);
         }
         return member;

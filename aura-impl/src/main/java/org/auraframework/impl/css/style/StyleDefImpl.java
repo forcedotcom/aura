@@ -44,7 +44,6 @@ import com.google.common.collect.Maps;
 public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
 
     private static final long serialVersionUID = 7140896215068458158L;
-    public final String code;
     private final String className;
     private final Set<String> imageURLs;
     private final Set<String> validImageURLs;
@@ -52,7 +51,6 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
 
     protected StyleDefImpl(Builder builder) {
         super(builder);
-        this.code = builder.code;
         this.className = builder.className;
         if (builder.imageURLs == null) {
             this.imageURLs = Collections.emptySet();
@@ -83,10 +81,6 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
         }
     }
 
-    public List<ComponentDefRef> getComponents() {
-        return components;
-    }
-
     @Override
     public void serialize(Json json) throws IOException {
         AuraContext context = Aura.getContextService().getCurrentContext();
@@ -95,49 +89,13 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
         json.writeMapEntry("descriptor", descriptor);
         if (!preloaded) {
             // Note that if this starts to depend on anything beside the name of
-            // the type,
-            // StyleDefCSSFormatAdapter needs to know to restructure its cache
+            // the type, StyleDefCSSFormatAdapter needs to know to restructure its cache
             // keys
             String out = getCode();
             json.writeMapEntry("code", out);
         }
         json.writeMapEntry("className", className);
         json.writeMapEnd();
-    }
-
-    public static class Builder extends DefinitionImpl.BuilderImpl<StyleDef> implements StyleDefBuilder {
-
-        public Builder() {
-            super(StyleDef.class);
-        }
-
-        private String code;
-        private String className;
-        private Set<String> imageURLs;
-        private List<ComponentDefRef> components;
-
-        @Override
-        public StyleDef build() {
-            return new StyleDefImpl(this);
-        }
-
-        @Override
-        public StyleDefBuilder setImageURLs(Set<String> imageURLs) {
-            this.imageURLs = imageURLs;
-            return this;
-        }
-
-        @Override
-        public StyleDefBuilder setClassName(String className) {
-            this.className = className;
-            return this;
-        }
-
-        @Override
-        public StyleDefBuilder setComponents(List<ComponentDefRef> components) {
-            this.components = components;
-            return this;
-        }
     }
 
     @Override
@@ -166,5 +124,40 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
             return validSet;
         }
         return Collections.emptySet();
+    }
+
+    public static class Builder extends DefinitionImpl.BuilderImpl<StyleDef> implements StyleDefBuilder {
+
+        public Builder() {
+            super(StyleDef.class);
+        }
+
+        private String className;
+        private Set<String> imageURLs;
+        private List<ComponentDefRef> components;
+
+        @Override
+        public StyleDef build() {
+            return new StyleDefImpl(this);
+        }
+
+        @Override
+        public StyleDefBuilder setImageURLs(Set<String> imageURLs) {
+            this.imageURLs = imageURLs;
+            return this;
+        }
+
+        @Override
+        public StyleDefBuilder setClassName(String className) {
+            this.className = className;
+            return this;
+        }
+
+        @Override
+        public StyleDefBuilder setComponents(List<ComponentDefRef> components) {
+            this.components = components;
+            return this;
+        }
+
     }
 }

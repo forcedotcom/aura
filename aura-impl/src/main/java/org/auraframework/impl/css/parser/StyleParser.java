@@ -64,6 +64,14 @@ public class StyleParser implements Parser {
         this.doValidation = doValidation;
     }
 
+    public boolean shouldValidate(String name) {
+        if (name.toLowerCase().endsWith("template")) {
+            return false;
+        }
+        return doValidation;
+
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws StyleParserException,
@@ -75,20 +83,12 @@ public class StyleParser implements Parser {
             builder.setDescriptor((DefDescriptor<StyleDef>) descriptor);
             builder.setLocation(source.getSystemId(), source.getLastModified());
             builder.setClassName(className);
-            CSSParser parser;
-
-            if (descriptor.getName().toLowerCase().endsWith("template")) {
-                parser = new CSSParser(descriptor.getNamespace(), false, className, source.getContents(),
-                        allowedConditions, source.getSystemId());
-            } else {
-                parser = new CSSParser(descriptor.getNamespace(), doValidation, className,
-                        source.getContents(), allowedConditions, source.getSystemId());
-            }
-
-            StyleParserResultHolder resultHolder;
-            resultHolder = parser.parse().results();
-            builder.setComponents(resultHolder.getComponents());
             builder.setOwnHash(source.getHash());
+
+            CSSParser parser = new CSSParser(descriptor.getNamespace(), shouldValidate(descriptor.getName()),
+                    className, source.getContents(), allowedConditions, source.getSystemId());
+
+            builder.setComponents(parser.parse());
 
             return (D) builder.build();
         }

@@ -16,9 +16,7 @@
 {
     updateText:function(c,e,h){
         c.getValue("v.text").setValue("modified");
-        var div = document.createElement("div");
-        div.className = "reloadMarker";
-        $A.util.appendChild(div, c.getElement());
+        document.__PageModifiedTestFlag = true;
     },
 
     /**

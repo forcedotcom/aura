@@ -92,7 +92,6 @@ public class CSSParser extends DefaultCSSVisitor {
     private final List<ComponentDefRef> components = Lists.newArrayList();
     private final List<ComponentDefRef> componentsBuffer = Lists.newArrayList();
     private final ICSSParseExceptionHandler errorHandler = new ErrorHandler();
-    private final StyleParserResultHolder resultHolder = new StyleParserResultHolder();
     private final Stack<ComponentDefRefImpl.Builder> conditionalBuilder = new Stack<ComponentDefRefImpl.Builder>();
     private final ICSSWriterSettings writerSettings = new CSSWriterSettings(ECSSVersion.CSS30).setOptimizedOutput(!Aura
             .getContextService().getCurrentContext().getMode().isDevMode());
@@ -119,7 +118,7 @@ public class CSSParser extends DefaultCSSVisitor {
 
         this.declarationRework = ImmutableList.of(
                 new ReworkNamespaceConstants(namespace),
-                new ReworkImageUrls(resultHolder));
+                new ReworkImageUrls());
 
         this.dynDeclarationRework = ImmutableList.<DynamicRework<CSSDeclaration>> of(
                 themeFunction);
@@ -130,7 +129,7 @@ public class CSSParser extends DefaultCSSVisitor {
      * 
      * @see #results()
      */
-    public CSSParser parse() throws QuickFixException {
+    public List<ComponentDefRef> parse() throws QuickFixException {
         CascadingStyleSheet css = CSSReader.readFromString(contents, Charset.forName("utf-8"), ECSSVersion.CSS30,
                 errorHandler);
 
@@ -143,18 +142,7 @@ public class CSSParser extends DefaultCSSVisitor {
             throw new StyleParserException(formatErrors(), null);
         }
 
-        resultHolder.setComponents(components);
-
-        return this;
-    }
-
-    /**
-     * Gets the results of parsing. Call {@link #parse()} before this.
-     * 
-     * @see StyleParserResultHolder
-     */
-    public StyleParserResultHolder results() {
-        return resultHolder;
+        return components;
     }
 
     private String formatErrors() {

@@ -23,9 +23,9 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 /**
  * Unit tests for resolving theme function values in CSS files.
  */
-public class ThemeVariableResolutionTest extends AuraImplTestCase {
+public class ThemeResolutionTest extends AuraImplTestCase {
 
-    public ThemeVariableResolutionTest(String name) {
+    public ThemeResolutionTest(String name) {
         super(name);
     }
 
@@ -37,32 +37,43 @@ public class ThemeVariableResolutionTest extends AuraImplTestCase {
 
     /** fully qualified where the variable value is inherited */
     public void testQualifiedInherited() throws Exception {
-        fail("unimplemented");
+        DefDescriptor<StyleDef> style = get("themeTest.inherited");
+        gold(style);
     }
 
     /** fully qualified where the variable value is overridden */
     public void testQualifiedOverridden() throws Exception {
-        fail("unimplemented");
+        DefDescriptor<StyleDef> style = get("themeTest.overridden");
+        gold(style);
     }
 
     /** fully qualified where the variable value is unquoted */
-    public void testQualifiedUnquoted() throws Exception {
-        fail("unimplemented");
+    public void testQualifiedDoubleQuoted() throws Exception {
+        DefDescriptor<StyleDef> style = get("themeTest.doubleQuoted");
+        gold(style);
     }
 
     /** using the 't' alternative function name */
     public void testShorthand() throws Exception {
-        fail("unimplemented");
+        DefDescriptor<StyleDef> style = get("themeTest.shorthand");
+        gold(style);
+    }
+
+    /** using multiple themes functions in one declaration value */
+    public void testMultipleThemeFunctions() throws Exception {
+        DefDescriptor<StyleDef> style = get("themeTest.multiple");
+        gold(style);
     }
 
     /** errors when the theme does not exist */
     public void testQualifiedNonexistentTheme() throws Exception {
-        fail("unimplemented");
+        DefDescriptor<StyleDef> style = get("themeTest.badTheme");
+        System.out.println(style.getDef().getCode());
     }
 
     /** errors when the variable does not exist */
     public void testQualifiedNonexistentVariable() throws Exception {
-        fail("unimplemented");
+        DefDescriptor<StyleDef> style = get("themeTest.badVariable");
     }
 
     private DefDescriptor<StyleDef> get(String locator) {

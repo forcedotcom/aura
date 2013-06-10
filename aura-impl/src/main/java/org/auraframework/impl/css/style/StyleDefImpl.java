@@ -34,6 +34,7 @@ import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.Component;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 import com.google.common.collect.Maps;
@@ -67,6 +68,14 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         dependencies.add(Aura.getDefinitionService().getDefDescriptor(descriptor.getNamespace(),
                 NamespaceDef.class));
+
+        // TODONM themedef dependencies
+    }
+
+    @Override
+    public void validateReferences() throws QuickFixException {
+        // TODONM Auto-generated method stub
+        super.validateReferences();
     }
 
     @Override

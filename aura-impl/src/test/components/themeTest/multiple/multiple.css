@@ -1,0 +1,3 @@
+.THIS {
+    margin: theme('themeTest.marginTheme.marginTB') theme('themeTest.marginTheme.marginLR');
+}

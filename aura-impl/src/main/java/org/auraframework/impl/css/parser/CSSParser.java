@@ -101,6 +101,8 @@ public class CSSParser extends DefaultCSSVisitor {
     private final List<Rework<CSSDeclaration>> declarationRework;
     private final List<DynamicRework<CSSDeclaration>> dynDeclarationRework;
 
+    private final ReworkThemeFunction themeFunction = new ReworkThemeFunction();
+
     /**
      * @param namespace
      * @param contents the actual css
@@ -119,7 +121,8 @@ public class CSSParser extends DefaultCSSVisitor {
                 new ReworkNamespaceConstants(namespace),
                 new ReworkImageUrls(resultHolder));
 
-        this.dynDeclarationRework = ImmutableList.of();
+        this.dynDeclarationRework = ImmutableList.<DynamicRework<CSSDeclaration>> of(
+                themeFunction);
     }
 
     /**

@@ -144,6 +144,7 @@ $A.storageService.getStorage("MyStorage").clear();
     
 <p><b>See also:</b><br/>    
     <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="storableServerSideActions">Storable Server-Side Actions</auradocs:topicLink><br/>
     <auradocs:referenceTopicLink topic="api:Action">Action Type</auradocs:referenceTopicLink>
 </p>
 </aura:component>

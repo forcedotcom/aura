@@ -138,6 +138,8 @@
 
   <p><b>See also:</b><br/>
       <auradocs:topicLink topic="models">Models</auradocs:topicLink><br/>
+      <auradocs:topicLink topic="abortableActions">Abortable Actions</auradocs:topicLink><br/>
+      <auradocs:topicLink topic="storableServerSideActions">Storable Server-Side Actions</auradocs:topicLink><br/>
       <auradocs:topicLink topic="testsMockAction">Mocking Java Actions</auradocs:topicLink>
     </p>
 

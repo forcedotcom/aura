@@ -88,6 +88,7 @@ runActionAtServerAndStore:function(cmp, evt, helper){
     
 <p><b>See also:</b><br/>    
     <auradocs:topicLink topic="serverSideControllers">Server-Side Controllers</auradocs:topicLink><br/>
+    <auradocs:topicLink topic="auraStorageService">Aura Storage Service</auradocs:topicLink><br/>
     <auradocs:referenceTopicLink topic="api:Action">Action Type</auradocs:referenceTopicLink>
 </p>
 </aura:component>

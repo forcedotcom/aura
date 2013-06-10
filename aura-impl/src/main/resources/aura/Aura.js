@@ -80,6 +80,7 @@ var clientService;
 // #include aura.layouts.LayoutDef
 // #include aura.controller.ActionDef
 // #include aura.controller.Action
+// #include aura.controller.ActionCallbackGroup
 // #include aura.attribute.AttributeDef
 // #include aura.attribute.AttributeSet
 // #include aura.attribute.AttributeDefSet
@@ -816,11 +817,15 @@ $A.ns.Aura.prototype.logInternal = function(type, message, error, trace) {
  * @param {Object} error The error messages to be logged in the stack trace.
  */
 $A.ns.Aura.prototype.log = function(value, error) {
-    if (this.util.isError(value)) {
+    var trace;
+    if (this.util.isError(value) || this.util.isObject(value)) {
         error = value;
         value = error.message;
     }
-    this.logInternal("Info", value, error, false);
+    if (error) {
+        trace = this.getStackTrace(error);
+    }
+    this.logInternal("Info", value, error, trace);
 };
 
 /**
@@ -873,10 +878,12 @@ $A.ns.Aura.prototype.rpad = function(str, padString, length) {
  * @private
  */
 $A.ns.Aura.prototype.getStackTrace = function(e, remove) {
+    var stack = undefined;
+
     if (!remove) {
         remove = 0;
     }
-    if (!e || !(e.stack)) {
+    if (!e || (!e.stack && !e.get_stack)) {
         try {
             throw new Error("foo");
         } catch (f) {
@@ -884,8 +891,14 @@ $A.ns.Aura.prototype.getStackTrace = function(e, remove) {
             remove += 2;
         }
     }
+    if (e && e.get_stack) {
+        stack = e.get_stack();
+    }
     if (e && e.stack) {
-        var ret = e.stack.replace(/(?:\n@:0)?\s+$/m, '');
+        stack = e.stack;
+    }
+    if (stack) {
+        var ret = stack.replace(/(?:\n@:0)?\s+$/m, '');
         ret = ret.replace(new RegExp('^\\(', 'gm'), '{anonymous}(');
         ret = ret.split("\n");
         if (remove !== 0) {
@@ -917,7 +930,6 @@ $A.ns.Aura.prototype.mark = (function() {
         return window["Perf"]["mark"];
     } else {
         return function() {
-            return $A;
         };
     }
 })();

@@ -355,7 +355,8 @@ var AuraClientService = function() {
          * @private
          */
         runActions : function(actions, scope, callback) {
-            priv.request(actions, scope, callback);
+            var group = new ActionCallbackGroup(actions, scope, callback);
+            priv.request(actions);
         },
 
         /**
@@ -517,19 +518,11 @@ var AuraClientService = function() {
          * @private
          */
         processActions : function() {
-            var cb = function(msg) {
-                    var errors = msg["errors"];
-                    if (errors && errors.length > 0) {
-                        for(var i=0;i<errors.length;i++){
-                            aura.log(errors[i]);
-                        }
-                    }
-                };
             var count = 0;
             while (priv.actionQueue.length > 0) {
                 var actions = priv.actionQueue;
                 priv.actionQueue = [];
-                priv.request(actions, null, cb);
+                priv.request(actions);
                 count += 1;
                 if (count > 20) {
                     $A.error("Actions do not seem to be completing");

@@ -84,6 +84,8 @@ exp(p,
     "clearCompletion", p.clearCompletion,
     "getAction", p.getAction,
     "getExternalAction", p.getExternalAction,
+    "blockRequests", p.blockRequests,
+    "releaseRequests", p.releaseRequests,
 
     // events
     "addEventHandler", p.addEventHandler,

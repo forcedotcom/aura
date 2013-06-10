@@ -59,6 +59,7 @@ var clientService;
 // #include aura.util.Bitset
 // #include aura.context.AuraContext
 // #include aura.value.BaseValue
+// #include aura.value.AttributeValue
 // #include aura.value.MapValue
 // #include aura.value.ArrayValue
 // #include aura.value.SimpleValue

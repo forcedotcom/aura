@@ -23,6 +23,7 @@
  * @protected
  */
 function SimpleValue(config, def, component) {
+    $A.ns.AttributeValue.call(this);
     $A.assert(!config || config.auraType !== this.auraType);
 
     /** Initial value of the simple value.  Please be a simple type! */
@@ -56,6 +57,13 @@ function SimpleValue(config, def, component) {
 //#if {"modes" : ["STATS"]}
     valueFactory.index(this);
 //#end
+}
+
+// Copy the AttributeValue.prototype, so its methods are available:
+for (var method in $A.ns.AttributeValue.prototype) {
+    if (method != "constructor") {
+        SimpleValue.prototype[method] = $A.ns.AttributeValue.prototype[method];
+    }
 }
 
 SimpleValue.prototype.auraType = "Value";
@@ -110,18 +118,6 @@ SimpleValue.prototype.isDefined = function() {
 };
 
 /**
- * @private
- */
-SimpleValue.prototype.getEventDispatcher = function() {
-    var ret = this.eventDispatcher;
-    if (ret === undefined) {
-        ret = {};
-        this.eventDispatcher = ret;
-    }
-    return ret;
-};
-
-/**
  * Always returns the last wrapped value that was committed.  So, at rest,
  * this returns this.value, but if there is an uncommitted value (indicated
  * by the presence of this.oldValue), it instead returns this.oldValue.
@@ -138,10 +134,15 @@ SimpleValue.prototype.getPreviousValue = function() {
  */
 SimpleValue.prototype.setValue = function(v, skipChange) {
     this.makeDirty();
+    var list = null;
+    if (!skipChange) {
+        list = this.prepare("change");
+    }
     this.oldValue = this.value;
     this.value = v;
     if (!skipChange) {
-        this.fire("change");
+        this.updatePendingValue("change", v);
+        this.firePending("change", list);
     }
 };
 

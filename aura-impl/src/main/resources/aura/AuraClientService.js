@@ -222,7 +222,7 @@ var AuraClientService = function() {
         pushStack : function(name) {
             //#if {"modes" : ["PTEST"]}
             // to only profile the transactions and not the initial page load
-            if (event == "onclick") {
+            if (name == "onclick") {
                 // clear out existing timers
                 $A.removeStats();
                 $A.getContext().clearTransactionName();

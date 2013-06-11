@@ -41,7 +41,12 @@ var Action = function Action(def, method, paramDefs, background, cmp) {
     this.state = "NEW";
     this.callbacks = {};
     this.background = background;
+    this.events = [];
     this.groups = [];
+    this.components = null;
+    this.actionId = Action.prototype.nextActionId++;
+    this.id = undefined;
+    this.originalResponse = undefined;
 };
 
 Action.prototype.nextActionId = 1;
@@ -54,7 +59,7 @@ Action.prototype.auraType = "Action";
  */
 Action.prototype.getId = function() {
     if (!this.id) {
-        this.id = (Action.prototype.nextActionId++) + "." + $A.getContext().getNum();
+        this.id = this.actionId + "." + $A.getContext().getNum();
     }
 
     return this.id;
@@ -196,12 +201,12 @@ Action.prototype.wrapCallback = function(scope, callback) {
     var outerScope = scope;
     this.callbacks = {};
 
-    this.setCallback(this, function(action) {
+    this.setCallback(this, function(action, cmp) {
         var cb = nestedCallbacks[this.getState()];
         if (cb && cb.fn) {
-            cb.fn.call(cb.s, this);
+            cb.fn.call(cb.s, this, cmp);
         }
-        outerCallback.call(outerScope, this);
+        outerCallback.call(outerScope, this, cmp);
         this.callbacks = nestedCallbacks;
     });
 };
@@ -294,22 +299,49 @@ Action.prototype.runAfter = function(action) {
 };
 
 /**
- * Returns a response function if the Action is complete.
- * <p>For example, <code>this.complete({ returnValue: cmp.get("c.getAction") });</code> runs getAction after the current Action is complete.</p>
- * @private
- * @param {Object}
- *            response
+ * Update the fields from a response.
+ *
+ * @public
+ * @param {Object} response the response from the server.
+ * @return {Boolean} true if the response differes from the original response
  */
-Action.prototype.complete = function(response) {
+Action.prototype.updateFromResponse = function(response) {
     this.sanitizeStoredResponse(response);
-
     this.state = response["state"];
-    this.returnValue = response.returnValue;
-    this.error = response.error;
+    this.returnValue = response["returnValue"];
+    this.error = response["error"];
     this.storage = response["storage"];
-
-    var completeAction = true;
-    if (this.originalResponse) {
+    this.components = response["components"];
+    if (this.state === "ERROR") {
+        //
+        // Careful now. If we get back an event from the server as part of the error,
+        // we want to fire off the event. Note that this will also remove it from the
+        // list of errors, and this may leave us with an empty error list. In that case
+        // we toss in a message of 'event fired' to prevent confusion from having an
+        // error state, but no error.
+        //
+        // This code is perhaps a bit tenuous, as it attempts to reverse the mapping from
+        // event descriptor to event name in the component, giving back the first one that
+        // it finds (deep down in code). This almost violates encapsulation, but, well,
+        // not badly enough to remove it.
+        //
+        var i;
+        var newErrors = [];
+        var fired = false;
+        for (i = 0; i < response["error"].length; i++) {
+            var err = response["error"][i];
+            if (err["exceptionEvent"]) {
+                fired = true;
+                this.events.push(err["event"]);
+            } else {
+                newErrors.push(err);
+            }
+        }
+        if (fired === true && newErrors.length === 0) {
+            newErrors.push({"message":"Event fired"});
+        }
+        this.error = newErrors;
+    } else if (this.originalResponse && this.state === "SUCCESS") {
         // Compare the refresh response with the original response and only
         // complete the action if they differ
         var originalValue = $A.util.json.encode(this.originalResponse["returnValue"]);
@@ -318,105 +350,81 @@ Action.prototype.complete = function(response) {
             var originalComponents = $A.util.json.encode(this.originalResponse["components"]);
             var refreshedComponents = $A.util.json.encode(response["components"]);
             if (refreshedComponents === originalComponents) {
-                completeAction = false;
-
-                var storageService = this.getStorage();
-                storageService.log("Action.complete(): no change in refresh action response, skipping replay.", this);
-
-                this.fireRefreshEvent(this, this.getComponent(), "refreshEnd");
+                return false;
             }
         }
     }
+    return true;
+};
 
-    var context = $A.getContext();
-    var previous = context.setCurrentAction(this);
-    try {
-        var components = response["components"];
-
-        if (completeAction) {
-            // Add in any Action scoped components /or partial configs
-            if (components) {
-                context.joinComponentConfigs(components);
-            }
-
-            if (this.getState() === "ERROR") {
-                //
-                // Careful now. If we get back an event from the server as part of the error,
-                // we want to fire off the event. Note that this will also remove it from the
-                // list of errors, and this may leave us with an empty error list. In that case
-                // we toss in a message of 'event fired' to prevent confusion from having an
-                // error state, but no error.
-                //
-                // This code is perhaps a bit tenuous, as it attempts to reverse the mapping from
-                // event descriptor to event name in the component, giving back the first one that
-                // it finds (deep down in code). This almost violates encapsulation, but, well,
-                // not badly enough to remove it.
-                //
-                var i;
-                var newErrors = [];
-                var fired = false;
-                for (i = 0; i < response["error"].length; i++) {
-                    var err = response["error"][i];
-                    if (err["exceptionEvent"]) {
-                        fired = true;
-                        //Fire the event
-                        this.parseAndFireEvent(err["event"], this.getComponent());
-                    } else {
-                        newErrors.push(err);
-                    }
-                }
-                if (fired === true && newErrors.length === 0) {
-                    newErrors.push({"message":"Event fired"});
-                }
-                response["error"] = newErrors;
-            }
-            if (this.cmp === undefined || this.cmp.isValid()) {
-        	//If there is a callback for the action's current state, invoke that too 
-                var cb = this.callbacks[this.getState()];
-
-                if (cb) {
-                    cb.fn.call(cb.s, this);
-                }
+/**
+ * Get a storable response from this action.
+ *
+ * WARNING: this modifies 'this.components' so it must be used after complete() so as to not
+ * do bad things.
+ *
+ * @param {String} storageName the name of the storage to use.
+ */
+Action.prototype.getStored = function(storageName) {
+    if (this.storable && this.getState() === "SUCCESS") {
+        // Rewrite any embedded ComponentDef from object to descriptor only
+        for ( var globalId in this.components) {
+            var c = this.components[globalId];
+            if (c) {
+                var def = c["componentDef"];
+                c["componentDef"] = {
+                    "descriptor" : def["descriptor"]
+                };
             }
         }
-
-        var storage = this.getStorage();
-        if (storage && this._isStorable() && this.getState() === "SUCCESS") {
-            var storageName = storage.getName();
-            var key = this.getStorageKey();
-            if (!this.storage) {
-                // Rewrite any embedded ComponentDef from object to descriptor
-                // only
-                for ( var globalId in components) {
-                    var c = components[globalId];
-                    if (c) {
-                        var def = c["componentDef"];
-                        c["componentDef"] = {
-                            "descriptor" : def["descriptor"]
-                        };
-                    }
-                }
-
-                var stored = {
-                    "returnValue" : response.returnValue,
-                    "components" : components,
-                    "state" : "SUCCESS",
-                    "storage" : {
-                        "name" : storageName,
-                        "created" : new Date().getTime()
-                    }
-                };
-
-                storage.put(key, stored);
-            } else {
-                // Initiate auto refresh if configured to do so
-                this.refresh(response);
+        return {
+            "returnValue" : this.returnValue,
+            "components" : this.components,
+            "state" : "SUCCESS",
+            "storage" : {
+                "name" : storageName,
+                "created" : new Date().getTime()
             }
+        };
+    }
+    return null;
+};
+
+/**
+ * Returns a response function if the Action is complete.
+ * <p>For example, <code>this.complete({ returnValue: cmp.get("c.getAction") });</code> runs getAction after the current Action is complete.</p>
+ * @private
+ * @param {Object}
+ *            response
+ */
+Action.prototype.complete = function(context) {
+    var previous = context.setCurrentAction(this);
+    try {
+        // Add in any Action scoped components /or partial configs
+        if (this.components) {
+            context.joinComponentConfigs(this.components);
+        }
+
+        if (this.cmp === undefined || this.cmp.isValid()) {
+            if (this.events.length > 0) {
+                for (var x in this.events) {
+                    this.parseAndFireEvent(this.events[x], this.cmp);
+                }
+            }
+
+            //If there is a callback for the action's current state, invoke that too 
+            var cb = this.callbacks[this.getState()];
+
+            if (cb) {
+                cb.fn.call(cb.s, this, this.cmp);
+            }
+        } else {
+            this.abort();
         }
     } finally {
         context.setCurrentAction(previous);
+        this.completeGroups();
     }
-    this.completeGroups();
 };
 
 
@@ -433,6 +441,13 @@ Action.prototype.abort = function() {
  */
 Action.prototype.setAbortable = function() {
     this.abortable = true;
+};
+
+/**
+ * check if this action is a refresh.
+ */
+Action.prototype.isRefreshAction = function () {
+    return this.originalResponse !== undefined;
 };
 
 /**
@@ -545,44 +560,51 @@ Action.prototype.toJSON = function() {
 };
 
 /**
+ * Mark the current action as aborted.
+ */
+Action.prototype.abort = function() {
+    this.state = "ABORTED";
+    this.completeGroups();
+};
+
+/**
+ * Mark the current action as incomplete.
+ */
+Action.prototype.incomplete = function(context) {
+    this.state = "INCOMPLETE";
+    this.complete(context);
+    this.state = "NEW";
+};
+
+/**
  * Refreshes the Action. Used with storage.
  *
  * @private
  */
-Action.prototype.refresh = function(originalResponse) {
-    // If this action was served from storage let's automatically try to get the
-    // latest from the server too
-    var storage = this.storage;
-    if (storage) {
-        var storageService = this.getStorage();
-        var autoRefreshInterval = this.storableConfig ? this.storableConfig["refresh"] * 1000 : storageService.getDefaultAutoRefreshInterval();
+Action.prototype.getRefreshAction = function(originalResponse) {
+    var storage = originalResponse["storage"];
+    var storageService = this.getStorage();
+    var autoRefreshInterval = this.storableConfig ? this.storableConfig["refresh"] * 1000 : storageService.getDefaultAutoRefreshInterval();
 
-        // Only auto refresh if the data we have is more than
-        // v.autoRefreshInterval seconds old
-        var now = new Date().getTime();
-        var action = this;
-        if ((now - storage["created"]) > autoRefreshInterval) {
-            storageService.log("Action.refresh(): auto refresh begin", action);
+    // Only auto refresh if the data we have is more than
+    // v.autoRefreshInterval seconds old
+    var now = new Date().getTime();
+    if ((now - storage["created"]) > autoRefreshInterval) {
+        var refreshAction = this.def.newInstance(this.cmp);
 
-            var cmp = action.getComponent();
-            this.fireRefreshEvent(action, cmp, "refreshBegin");
+        storageService.log("Action.refresh(): auto refresh begin: "+this.actionId+" to "+refreshAction.actionId);
 
-            var refreshAction = action.getDef().newInstance(cmp);
-            refreshAction.callbacks = action.callbacks;
-            refreshAction.setParams(action.params);
-            refreshAction.setStorable({
-                "ignoreExisting" : true
-            });
-
-            refreshAction.sanitizeStoredResponse(originalResponse);
-            refreshAction.originalResponse = originalResponse;
-            refreshAction.wrapCallback(this, function(a) {
-                a.fireRefreshEvent(a, cmp, "refreshEnd");
-                storageService.log("Action.refresh(): auto refresh end", a);
-            });
-            $A.enqueueAction(refreshAction);
-        }
+        refreshAction.callbacks = this.callbacks;
+        refreshAction.setParams(this.params);
+        refreshAction.setStorable({
+            "ignoreExisting" : true
+        });
+        refreshAction.abortable = this.abortable;
+        refreshAction.sanitizeStoredResponse(originalResponse);
+        refreshAction.originalResponse = originalResponse;
+        return refreshAction;
     }
+    return null;
 };
 
 /**
@@ -650,19 +672,19 @@ Action.prototype.parseAndFireEvent = function(evtObj) {
 };
 
 /**
+ * Fire off a refresh event if there is a valid component listener.
+ *
  * @private
  */
-Action.prototype.fireRefreshEvent = function(action, cmp, event) {
-    if (cmp) {
-        var isRefreshObserver = cmp.isInstanceOf("auraStorage:refreshObserver");
+Action.prototype.fireRefreshEvent = function(event) {
+    //storageService.log("Action.refresh(): auto refresh: "+event+" for "+this.actionId);
+    if (this.cmp && this.cmp.isValid()) {
+        var isRefreshObserver = this.cmp.isInstanceOf("auraStorage:refreshObserver");
         if (isRefreshObserver) {
-            // If our component implements auraStorage:refreshObserver then let
-            // it know that refreshing has started
-            cmp.getEvent(event).setParams({
-                "action" : action
+            this.cmp.getEvent(event).setParams({
+                "action" : this
             }).fire();
         }
     }
 };
-
 // #include aura.controller.Action_export

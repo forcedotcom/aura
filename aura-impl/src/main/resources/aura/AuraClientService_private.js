@@ -273,10 +273,23 @@ var priv = {
                 }
 
                 try {
+                    var storage = action.getStorage();
+                    var toStore;
+                    var needUpdate = action.updateFromResponse(actionResponse);
+
                     if (!action.isAbortable() || this.newestAbortableGroup === actionGroupNumber) {
-                        action.complete(actionResponse);
+                        if (needUpdate) {
+                            action.complete($A.getContext());
+                        } 
+                        if (action.isRefreshAction()) {
+                            action.fireRefreshEvent("refreshEnd");
+                        }
                     } else {
                         action.abort();
+                    }
+                    toStore = action.getStored();
+                    if (storage && toStore) {
+                        storage.put(action.getStorageKey(), toStore);
                     }
                 } catch (e) {
                     errors.push(e);
@@ -295,10 +308,7 @@ var priv = {
                     try {
                         action = actions[m];
                         if (!action.isAbortable() || this.newestAbortableGroup === actionGroup.number) {
-                            action.complete({
-                                returnValue : null,
-                                state : "INCOMPLETE"
-                            });
+                            action.incomplete($A.getContext());
                         } else {
                             action.abort();
                         }
@@ -312,7 +322,7 @@ var priv = {
         if (errors.length > 0) {
             for(i=0;i<errors.length;i++){
                 // should this be $A.error?
-                aura.warning(errors[i]);
+                aura.log("Javascript error", errors[i]);
             }
         }
         $A.clientService.popStack("actionCallback");
@@ -389,14 +399,13 @@ var priv = {
 
                 if (actionsToComplete.length > 0) {
                     var that = this;
-                    setTimeout(function() {
-                        for ( var n = 0; n < actionsToComplete.length; n++) {
-                            var info = actionsToComplete[n];
-                            info.action.complete(info.response);
-                        }
+                    for ( var n = 0; n < actionsToComplete.length; n++) {
+                        var info = actionsToComplete[n];
+                        info.action.updateFromResponse(info.response);
+                        info.action.complete($A.getContext());
+                    }
 
-                        clientService.fireDoneWaiting();
-                    }, 300);
+                    clientService.fireDoneWaiting();
                 }
 
                 if (actionsToSend.length > 0) {
@@ -439,7 +448,13 @@ var priv = {
                     response : response
                 });
 
-                actionCollected();
+                var refresh = action.getRefreshAction(response);
+                if ($A.util.isUndefinedOrNull(refresh)) {
+                    actionCollected();
+                } else {
+                    action.fireRefreshEvent("refreshBegin");
+                    that.collectAction(refresh, actionGroup, actionsToSend, actionCollected);
+                }
             } else {
                 that.collectAction(action, actionGroup, actionsToSend, actionCollected);
             }

@@ -14,17 +14,30 @@
  * limitations under the License.
  */
 ({
+    testInitialValue:{
+        attributes : {value: '2012-09-10T14:00:00.000Z', format: 'MM/dd/yyyy HH:mm:ss', timezone: 'Europe/Berlin'},
+        test: function(cmp){
+            aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
+                var inputDateStr = cmp.find("inputText").getElement().value;
+                aura.test.assertEquals("09/10/2012 16:00:00", inputDateStr, "Incorrect initial date/time display.");
+            });
+        }
+    },
+    
     /*
      * Note: currently dateTimePicker, requires the user to manually put the time they are looking for. This test
      * is just a stub for future functionality
      */
     testInputDateTimeToday:{
-	attributes : {displayDatePicker:'true', langLocale: 'en', timezone: 'GMT'},
-	test: function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').run()
-	        var inputDateStr  = cmp.find("inputText").getElement().value;
-	        var dt            = moment().format('YYYY-MM-DD 00:00');
-    		aura.test.assertTrue(aura.test.contains(dt, inputDateStr), "Dates are not the same and they should be");
+        attributes : {displayDatePicker:'true', timezone: 'GMT', format: 'yyyy-MM-dd HH:mm'},
+        test: function(cmp){
+            cmp.find("datePicker").get('c.selectToday').run()
+            var inputDateStr  = cmp.find("inputText").getElement().value;
+            var dt            = moment().format('YYYY-MM-DD 00:00');
+            //aura.test.assertTrue(aura.test.contains(dt, inputDateStr), "Dates are not the same and they should be");
+            aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
         }
-    }
+    },
+    
+    
 })

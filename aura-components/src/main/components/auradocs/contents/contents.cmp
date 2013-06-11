@@ -126,7 +126,6 @@
                 </auradocs:contentsNode>
                 <auradocs:contentsNode text="Services">
                     <auradocs:contentsNode text="Services" id="services"/>
-                    <auradocs:contentsNode text="Aura Storage Service" id="auraStorageService" />
                 </auradocs:contentsNode>
                 <auradocs:contentsNode text="Component Tests" >
                     <auradocs:contentsNode text="Introduction" id="docTests" />
@@ -164,8 +163,12 @@
                     <auradocs:contentsNode text="Java Models" id="models" />
                     <auradocs:contentsNode text="JSON Models" id="modelsJSON" />
                     <auradocs:contentsNode text="Accessing Models in JavaScript" id="modelsAccessJavaScript" />
-                </auradocs:contentsNode>
-                <auradocs:contentsNode text="Server-Side Controllers" id="serverSideControllers" />
+                </auradocs:contentsNode>                
+                <auradocs:contentsNode text="Server-Side Controllers">
+                    <auradocs:contentsNode text="Introduction" id="serverSideControllers" />
+                    <auradocs:contentsNode text="Abortable Actions" id="abortableActions" />                                                
+                    <auradocs:contentsNode text="Storable Server-Side Actions" id="storableServerSideActions" />
+                </auradocs:contentsNode> 
                 <auradocs:contentsNode text="Server-Side Renderers" id="renderersServerSide" />
                  <auradocs:contentsNode text="Server-Side Providers" id="oodProviders" />
                 <auradocs:contentsNode text="Aura Integration Service" id="auraIntegrationService"/>
@@ -198,6 +201,7 @@
                 <auradocs:contentsNode text="Controlling Available Modes" id="modesAvailableSet" />
                 <auradocs:contentsNode text="Setting the Default Mode" id="modesSetDefault" />
             </auradocs:contentsNode>
+            <auradocs:contentsNode text="Aura Storage Service" id="auraStorageService" />
             <auradocs:contentsNode text="Component Request Lifecycle" >
                 <auradocs:contentsNode text="Introduction" id="cycleOverview" />
                 <auradocs:contentsNode text="Component Request Overview" id="cycleComp" />

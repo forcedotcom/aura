@@ -20,12 +20,13 @@
     },
 
     initDataProvider: function(component) {
-        var dataProvider = component.getValue("v.dataProvider").unwrap();
+        var dataProviders = component.getValue("v.dataProvider").unwrap();
         
-        if (dataProvider && dataProvider.length && dataProvider.length > 0) {
-            dataProvider = dataProvider[0];
-            dataProvider.addHandler("onchange", component, "c.handleDataChange");
-            component._dataProvider = dataProvider;
+        if (dataProviders && dataProviders.length && dataProviders.length > 0) {
+            for (var i = 0; i < dataProviders.length; i++) {
+                dataProviders[i].addHandler("onchange", component, "c.handleDataChange");
+            }
+            component._dataProviders = dataProviders;
         }       
     },
     
@@ -72,8 +73,13 @@
         $A.util[visible ? "addClass" : "removeClass"](component.getElement(), "loading");
     },
     
-    triggerDataProvider: function(component) {
+    triggerDataProvider: function(component, index) {
         this.showLoading(component, true);
-        component._dataProvider.get("e.provide").fire();
+        if (!index) {
+            index = 0;
+        }
+        if (index >= 0 && index < component._dataProviders.length) {
+            component._dataProviders[index].get("e.provide").fire();
+        }
     }
 })

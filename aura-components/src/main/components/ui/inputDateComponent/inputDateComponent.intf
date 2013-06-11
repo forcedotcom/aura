@@ -22,4 +22,7 @@
     <aura:attribute name="step" type="Integer" description="Specifies the legal date intervals. Works with HTML5 only."/>
     <aura:attribute name="displayDatePicker" type="Boolean" default="false" description="Indicate if ui:datePicker is displayed."/>
     <aura:attribute name="updateOn" type="String" default="blur" description="Default value is &#8220;blur&#8221;."/>
+    
+    <aura:attribute name="format" type="String" description="The java.text.SimpleDateFormat style format string."/>
+    <aura:attribute name="langLocale" type="String" description="The language locale used to format date time."/>
 </aura:interface>

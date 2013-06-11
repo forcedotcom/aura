@@ -16,6 +16,7 @@
 /*jslint sub: true */
 var priv = {
     token : null,
+    auraStack : [],
     host : "",
     requestQueue : [],
     inRequest : false,
@@ -218,9 +219,14 @@ var priv = {
     actionCallback : function(response, actionGroups, num) {
         var responseMessage = this.checkAndDecodeResponse(response);
         var queue = this.requestQueue;
+        var i;
 
         var errors = [];
-        $A.eventService.startFiring("actionCallback");
+        if (this.auraStack.length > 0) {
+            $A.error("Action callback called on non-empty stack "+this.auraStack);
+            this.auraStack = [];
+        }
+        $A.clientService.pushStack("actionCallback");
         if (responseMessage) {
             var token = responseMessage["token"];
             if (token) {
@@ -269,19 +275,16 @@ var priv = {
                 try {
                     if (!action.isAbortable() || this.newestAbortableGroup === actionGroupNumber) {
                         action.complete(actionResponse);
+                    } else {
+                        action.abort();
                     }
                 } catch (e) {
                     errors.push(e);
                 }
             }
 
-            for ( var i = 0; i < actionGroups.length; i++) {
+            for (i = 0; i < actionGroups.length; i++) {
                 actionGroup = actionGroups[i];
-
-                actionGroup.callback.call(actionGroup.scope || window, {
-                    "errors" : errors
-                });
-
                 actionGroup.status = "done";
             }
         } else if (priv.isDisconnectedOrCancelled(response) && !priv.isUnloading) {
@@ -296,20 +299,23 @@ var priv = {
                                 returnValue : null,
                                 state : "INCOMPLETE"
                             });
+                        } else {
+                            action.abort();
                         }
                     } catch (e2) {
                         errors.push(e2);
                     }
                 }
-
-                actionGroup.callback.call(actionGroup.scope || window, {
-                    "errors" : errors
-                });
-
                 actionGroup.status = "done";
             }
         }
-        $A.eventService.finishFiring("actionCallback");
+        if (errors.length > 0) {
+            for(i=0;i<errors.length;i++){
+                // should this be $A.error?
+                aura.warning(errors[i]);
+            }
+        }
+        $A.clientService.popStack("actionCallback");
 
         this.inRequest = false;
         priv.fireDoneWaiting();
@@ -358,7 +364,7 @@ var priv = {
      * Serialize requests to the aura server from this client. AuraContext.num needs to be synchronized across all
      * requests, and pending a better fix, this works around that issue.
      */
-    request : function(actions, scope, callback, exclusive) {
+    request : function(actions, exclusive) {
         $A.mark("AuraClientService.request");
         $A.mark("Action Request Prepared");
         var actionGroup = this.actionGroupCounter++;
@@ -397,8 +403,6 @@ var priv = {
                     // clientService.requestQueue reference is mutable
                     clientService.requestQueue.push({
                         actions : actionsToSend,
-                        scope : scope,
-                        callback : callback,
                         number : actionGroup,
                         exclusive : exclusive
                     });
@@ -408,25 +412,25 @@ var priv = {
             }
         };
 
+        var storage = Action.prototype.getStorage();
         for ( var i = 0; i < actions.length; i++) {
             var action = actions[i];
-            $A.assert(action.def.isServerAction(), "RunAfter() cannot be called on a client action. Use run() on a client action instead.");
+            $A.assert(action.getDef().isServerAction(), "RunAfter() cannot be called on a client action. Use run() on a client action instead.");
 
             // For cacheable actions check the storage service to see if we
             // already have a viable cached action response we can complete
             // immediately
-            var storage = Action.prototype.getStorage();
             if (action.isStorable() && storage) {
                 var key = action.getStorageKey();
 
-                storage.get(key, this.createResultCallback(action, scope, actionGroup, callback, actionsToComplete, actionsToSend, actionCollected));
+                storage.get(key, this.createResultCallback(action, actionGroup, actionsToComplete, actionsToSend, actionCollected));
             } else {
-                this.collectAction(action, scope, actionGroup, callback, actionsToSend, actionCollected);
+                this.collectAction(action, actionGroup, actionsToSend, actionCollected);
             }
         }
     },
 
-    createResultCallback : function(action, scope, actionGroup, callback, actionsToComplete, actionsToSend, actionCollected) {
+    createResultCallback : function(action, actionGroup, actionsToComplete, actionsToSend, actionCollected) {
         var that = this;
         return function(response) {
             if (response) {
@@ -437,21 +441,19 @@ var priv = {
 
                 actionCollected();
             } else {
-                that.collectAction(action, scope, actionGroup, callback, actionsToSend, actionCollected);
+                that.collectAction(action, actionGroup, actionsToSend, actionCollected);
             }
         };
     },
 
-    collectAction : function(action, scope, actionGroup, callback, actionsToSend, actionCollectedCallback) {
+    collectAction : function(action, actionGroup, actionsToSend, actionCollectedCallback) {
         if (action.isAbortable()) {
             this.newestAbortableGroup = actionGroup;
         }
 
         if (action.isExclusive()) {
             action.setExclusive(false);
-            this.request([
-                action
-            ], scope, callback, true);
+            this.request([ action ], true);
         } else {
             actionsToSend.push(action);
         }
@@ -490,6 +492,8 @@ var priv = {
                              //#end
                                 actionsToRequest.push(action);
                             }
+                        } else {
+                            action.abort();
                         }
                     }
                     actionGroup.actions = requestedActions;
@@ -728,12 +732,12 @@ var priv = {
     }
 };
 
-window.onbeforeunload = function(event) {
+$A.ns.Util.prototype.on(window, "beforeunload", function(event) {
     if (!$A.util.isIE) {
         priv.isUnloading = true;
         priv.requestQueue = [];
     }
-};
+}); 
 
 $A.ns.Util.prototype.on(window, "load", function(event) {
     // Lazy load data-src scripts

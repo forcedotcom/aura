@@ -50,7 +50,7 @@ ComponentDefRegistry.prototype.isLocalStorageAvailable= (function() {
  * @returns a ComponentDef instance from registry, or config after adding to registry.
  */
 ComponentDefRegistry.prototype.getDef = function(config, noInit) {
-    aura.assert(config, "ComponentDef Config required for registration");
+    $A.assert(config, "ComponentDef Config required for registration");
 
     // We don't re-register (or modify in any way) once we've registered
     var descriptor = config["descriptor"] || config;
@@ -103,7 +103,7 @@ ComponentDefRegistry.prototype.getDef = function(config, noInit) {
  * Use the local cache for the page session persistently when layouts are used.
  */
 ComponentDefRegistry.prototype.useLocalCache = function(descriptor) {
-    return this.isLocalStorageAvailable && descriptor.indexOf("layout://") === 0;
+    return this.isLocalStorageAvailable && !$A.util.isUndefinedOrNull(descriptor) && descriptor.indexOf("layout://") === 0;
 };
 
 /**
@@ -116,7 +116,7 @@ ComponentDefRegistry.prototype.getLocalCacheCatalog = function() {
     }
 
     var catalog = localStorage.getItem(this.cacheName);
-    return catalog ? aura.util.json.decode(catalog) : {};
+    return catalog ? $A.util.json.decode(catalog) : {};
 };
 
 /**
@@ -129,7 +129,7 @@ ComponentDefRegistry.prototype.getConfigFromLocalCache = function(descriptor) {
     }
 
     var item = localStorage.getItem(this.cacheName + "." + descriptor);
-    return item ? aura.util.json.decode(item) : null;
+    return item ? $A.util.json.decode(item) : null;
 };
 
 /**
@@ -143,10 +143,10 @@ ComponentDefRegistry.prototype.writeToCache = function(descriptor, config) {
         var catalog = this.getLocalCacheCatalog();
 
         catalog[descriptor] = true;
-        localStorage.setItem(this.cacheName, aura.util.json.encode(catalog));
+        localStorage.setItem(this.cacheName, $A.util.json.encode(catalog));
 
         // Write out the componentDef
-        localStorage.setItem(this.cacheName + "." + descriptor, aura.util.json.encode(config));
+        localStorage.setItem(this.cacheName + "." + descriptor, $A.util.json.encode(config));
 
         $A.endMark("Wrote " + descriptor);
     }

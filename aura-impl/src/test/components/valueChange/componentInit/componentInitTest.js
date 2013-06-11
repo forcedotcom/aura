@@ -77,54 +77,26 @@
      */
     testNewComponentFiresInit:{
         test:function(cmp){
-            cmp.getValue("v.body").push($A.componentService.newComponentDeprecated({componentDef:"markup://valueChange:newComponentInit"}
-                                                                        ));
+            $A.componentService.newComponentAsync(
+                this,
+                function(newCmp){
+                    cmp.getValue('v.body').push(newCmp);
+                },
+                { componentDef: "markup://valueChange:newComponentInit" }
+            );
             $A.services.event.finishFiring();
-
-            var body = cmp.get('v.body');
-            $A.test.assertEquals("markup://aura:placeholder", body[0].getDef().getDescriptor().getQualifiedName(),
-            "Expected component to be initially represented by a placeholder.");
-
-            //Wait till all specified facets marked with aura:load are replaced by actual components, and then call callbackAfterLoad()
-            this.assertAfterLazyLoading(body[0],"markup://valueChange:newComponentInit",
-                    function(){
-                        var newCmp = this.extractCmpFromPlaceholder(body[0],"markup://valueChange:newComponentInit");
-                        $A.test.assertTrue(newCmp._testNewCmpInitFlag);
-                        $A.test.assertTruthy(newCmp._testNewCmpInitEvt);
-                        var value = newCmp._testNewCmpInitEvt.getParam("value");
-                        $A.test.assertEquals("Component", value.auraType);
-                        //Verify that value parameter of event is the new component that was just created.
-                        $A.test.assertEquals(newCmp, value, "aura:valueInit was expected to provider current component as 'value' param.");
-                    });
+            
+            $A.test.addWaitFor(true, $A.test.allActionsComplete, function(){
+                var newCmp = cmp.get('v.body')[0];
+                $A.test.assertEquals("markup://valueChange:newComponentInit", newCmp.getDef().getDescriptor().getQualifiedName(),
+                        "Failed to create new component: markup://valueChange:newComponentInit");
+                $A.test.assertTrue(newCmp._testNewCmpInitFlag);
+                $A.test.assertTruthy(newCmp._testNewCmpInitEvt);
+                var value = newCmp._testNewCmpInitEvt.getParam("value");
+                $A.test.assertEquals("Component", value.auraType);
+                //Verify that value parameter of event is the new component that was just created.
+                $A.test.assertEquals(newCmp, value, "aura:valueInit was expected to provider current component as 'value' param.");
+            });
         }
-    },
-
-    /**
-     * Wait till the placeholder is replaced by actual component and call the callback function.
-     */
-    assertAfterLazyLoading:function(placeholder, expectedComponent, callback){
-        var extractCmpFromPlaceholder = this.extractCmpFromPlaceholder;
-        $A.test.addWaitFor(true,
-                function(){
-                        return !!extractCmpFromPlaceholder(placeholder,expectedComponent);
-                },callback);
-    },
-    /**
-     * The target component to be loaded is inserted into the body of the placeholder.
-     * This function return the component when its found in the body of the placeholder else it returns nothing.
-     */
-    extractCmpFromPlaceholder:function(placeholder, cmpName){
-        var body = placeholder.get("v.body");
-        var ret;
-        
-         if(body && body.length > 0){
-        	for(var key in body){
-        		if(body[key].auraType && body[key].auraType === 'Component' && body[key].getDef().getDescriptor().getQualifiedName()===cmpName){
-                    ret= body[key];
-            	}
-        	}         
-        }
-        
-        return ret;
     }
 })

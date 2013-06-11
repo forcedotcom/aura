@@ -20,7 +20,7 @@
     testDefaultFormat: {
         attributes: {value : '2004-09-23'},
         test: function(component){
-            aura.test.assertEquals("2004-09-23", $A.test.getText(component.find('span').getElement()), "Incorrect date");
+            aura.test.assertEquals("Sep 23, 2004", $A.test.getText(component.find('span').getElement()), "Incorrect date");
         }
     },
     /**
@@ -29,7 +29,7 @@
     testDefaultFormatWithBefore1970: {
         attributes: {value : '1935-04-10'},
         test: function(component){
-            aura.test.assertEquals("1935-04-10", $A.test.getText(component.find('span').getElement()), "Incorrect date");
+            aura.test.assertEquals("Apr 10, 1935", $A.test.getText(component.find('span').getElement()), "Incorrect date");
         }
     },
     /**
@@ -57,7 +57,7 @@
     testEmptyStringForFormat:{
         attributes: {value : '2004-09-23', format: ''},
         test:function(component){
-            aura.test.assertEquals("2004-09-23", $A.test.getText(component.find('span').getElement()), "Incorrect date format, should display as it is.");
+            aura.test.assertEquals("Sep 23, 2004", $A.test.getText(component.find('span').getElement()), "Incorrect date format, should use use Aura default format.");
         }
     },
 
@@ -91,6 +91,16 @@
         attributes: {value : '2004-09-23', format: 'bb'},
         test: function(component){
             aura.test.assertEquals("bb", $A.test.getText(component.find('span').getElement()), "Expected the garbage format value.");
+      }
+    },
+    
+    /**
+     * Verify behavior when 'format' attribute is assigned a garbage value.
+     */
+    testLanguageLocale: {
+        attributes: {value : '2004-09-23', format: 'MMM d, yyyy', langLocale: 'fr'},
+        test: function(component){
+            aura.test.assertEquals("sept. 23, 2004", $A.test.getText(component.find('span').getElement()), "Expected the garbage format value.");
       }
     }
 })

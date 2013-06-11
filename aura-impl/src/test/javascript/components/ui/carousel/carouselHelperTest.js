@@ -53,6 +53,12 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 								actual = value;
 							}
 						};
+					} else if (expression === "v.priv_currentPage") {
+						return {
+							setValue : function(value) {
+								actual = -1;
+							}
+						};
 					}
 				},
 				_width : 450
@@ -99,6 +105,12 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 								actual = value;
 							}
 						};
+					} else if (expression === "v.priv_currentPage") {
+						return {
+							setValue : function(value) {
+								actual = -1;
+							}
+						};
 					}
 				},
 				_width : 450
@@ -138,7 +150,12 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
     	[Fact]
 		function CallScrollToPageIfPageIsInRange(){
 			// Arrange
-			var targetComponent = {};
+			var targetComponent = {get : function(expression) {
+					if (expression === 'v.priv_currentPage') {
+						return -1;
+					}
+				}
+			};
 			
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
 				getPageComponents : function(value){return ["page1", "page2", "page3"];},
@@ -148,6 +165,9 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 							actual=true;
 						}
 					};
+				},
+				showAllPages : function(value) {
+					return true;
 				}
 			});
 			
@@ -165,7 +185,12 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 		[Fact]
 		function SelectAPageOutOfRangeDoesNothing(){
 			// Arrange
-			var targetComponent = {};
+			var targetComponent = {get : function(expression) {
+					if (expression === 'v.priv_currentPage') {
+						return -1;
+					}
+				}
+			};
 			
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
 				getPageComponents : function(value){return ["page1", "page2", "page3"];},
@@ -198,7 +223,14 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 			var expected = 1;
 			
 			var targetComponent = {
-				get : function(expression) {return expected;}
+				get : function(expression) {
+					if (expression === 'v.priv_currentPage') {
+						//currentPage is set only after page is selected, default to -1;
+						return -1;
+					} else {
+						return expected;
+					}
+				}
 			};
 			
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {

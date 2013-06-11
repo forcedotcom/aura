@@ -42,7 +42,7 @@ public class InputSelectUITest extends WebDriverTestCase {
         open("/uitest/inputSelect_OptionsInBody.cmp");
         WebElement inputSelectElement = d.findElement(By.cssSelector(selectLocator));
         final Select inputSelect = new Select(inputSelectElement);
-
+        
         // Assert element visible
         assertTrue("InputSelect not visible", inputSelectElement.isDisplayed());
 
@@ -51,6 +51,10 @@ public class InputSelectUITest extends WebDriverTestCase {
 
         // Option label
         assertEquals("The select option's label is wrong", "Ant", inputSelect.getOptions().get(5).getText());
+        
+        // Option Disabled
+        assertFalse("label 'Cockroach' should be disabled", inputSelect.getOptions().get(6).isEnabled());
+
 
         // Change selection
         inputSelectElement.click();
@@ -91,7 +95,7 @@ public class InputSelectUITest extends WebDriverTestCase {
         // Assert element visible
         assertTrue("InputSelect not visible", inputSelectElement.isDisplayed());
 
-        // Initial selected option
+        // Initial selected aoption
         List<WebElement> selectedOptions = inputSelect.getAllSelectedOptions();
         assertTrue(selectedOptions.size() == 2);
         assertTrue("Lion not in expected otpions", isOptionSelected("Lion", selectedOptions));
@@ -152,6 +156,7 @@ public class InputSelectUITest extends WebDriverTestCase {
         selectedLabels = inputSelect.getOptions();
         assertTrue("Option1 should be selected", selectedLabels.get(0).isSelected());
         assertFalse("Option2 should not be selected", selectedLabels.get(1).isSelected());
+        assertFalse("Option4 should be disabled", selectedLabels.get(3).isEnabled());
         assertEquals("InputSelect Component is not returning the selected value correctly", "option1", selectedLabels
                 .get(0).getAttribute("value"));
     }

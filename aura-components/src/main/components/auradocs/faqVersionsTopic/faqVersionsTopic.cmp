@@ -18,8 +18,8 @@
 <aura:component extends="auradocs:topicPanel">
     <aura:set attribute="title" value="What do Aura version numbers mean?"/>
 
-    <p>Aura uses version numbers that are consistent with other <a href="http://mojo.codehaus.org/versions-maven-plugin/version-rules.html">
-    Maven projects</a>. This makes it easy for projects built with Maven
+    <p>Aura uses version numbers that are consistent with other <ui:outputURL value="http://mojo.codehaus.org/versions-maven-plugin/version-rules.html" label="version rules">
+    Maven projects</ui:outputURL>. This makes it easy for projects built with Maven
     to express their dependency on Aura.</p>
 
     <p>The version number scheme is:</p>
@@ -61,7 +61,7 @@
     is newer than others with lower numbers.</p>
 
     <p>Although it will rarely be important, you can use
-    <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/org/auraframework/adapter/ConfigAdapter.html#getAuraVersion()">
-    <tt>ConfigAdapter.getAuraVersion()</tt></a> to
+    <ui:outputURL value="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/org/auraframework/adapter/ConfigAdapter.html#getAuraVersion()" label="getAuraVersion">
+    <tt>ConfigAdapter.getAuraVersion()</tt></ui:outputURL> to
     see what version of Aura is running your code.</p>
 </aura:component>

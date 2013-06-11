@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 ({
+    /**
+     * TODO::make pagination work with more than one data provider.
+     *
+     */
     handlePageChange: function(component, event, helper) {      
         var currentPage = event.getParam("currentPage");
         var pageSize = event.getParam("pageSize");

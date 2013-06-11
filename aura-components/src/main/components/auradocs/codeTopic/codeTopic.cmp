@@ -27,8 +27,8 @@
     <p>We built a simple app on the Aura framework to demonstrate its capabilities. Aura Note is a note-taking app showcasing the simplicity of building apps on Aura.</p>
 
     <p>
-        <a href="https://github.com/forcedotcom/aura-note" target="_blank">Get the source</a> |
-        <a href="http://notes.auraframework.org/auranote/notes.app" target="_blank">Visit the demo</a>
+        <ui:outputURL value="https://github.com/forcedotcom/aura-note" label="Aura Note source">Get the source</ui:outputURL> |
+        <ui:outputURL value="http://notes.auraframework.org/auranote/notes.app" label="Aura Note demo">Visit the demo</ui:outputURL>
     </p>
 
 </aura:component>

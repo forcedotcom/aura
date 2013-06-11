@@ -182,13 +182,106 @@ var AuraClientService = function() {
                     $A.measure("Completed Component Callback", "Sending XHR " + $A.getContext().getNum());
                 });
 
-                $A.services.event.startFiring("loadComponent");
-
-                $A.enqueueAction(action);
-
-                $A.services.event.finishFiring("loadComponent");
+                clientService.pushStack("loadComponent");
+                clientService.enqueueAction(action);
+                clientService.popStack("loadComponent");
             });
         },
+
+        /**
+         * Check to see if we are inside the aura processing 'loop'.
+         */
+        inAuraLoop : function() {
+            return priv.auraStack.length > 0;
+        },
+
+        /**
+         * Check to see if a public pop should be allowed.
+         *
+         * We allow a public pop if the name was pushed, or if there is nothing
+         * on the stack.
+         *
+         * @param name the name of the public 'pop' that will happen.
+         * @return true if the pop should be allowed.
+         */
+        checkPublicPop : function(name) {
+            if (priv.auraStack.length > 0) {
+                return priv.auraStack[priv.auraStack.length-1] === name;
+            }
+            //
+            // Allow public pop calls on an empty stack for now.
+            //
+            return true;
+        },
+
+        /**
+         * Push a new name on the stack.
+         *
+         * @param name the name of the item to push.
+         */
+        pushStack : function(name) {
+            //#if {"modes" : ["PTEST"]}
+            // to only profile the transactions and not the initial page load
+            if (name == "onclick") {
+                // clear out existing timers
+                $A.removeStats();
+                $A.getContext().clearTransactionName();
+                // start a Jiffy transaction
+                $A.startTransaction($A.getContext().incrementTransaction());
+            }
+            //#end
+            priv.auraStack.push(name);
+        },
+        
+        queueNeedsFiltering : false,
+
+        /**
+         * Pop an item off the stack.
+         *
+         * The name of the item must match the previously pushed. If this is the last
+         * item on the stack we do post processing, which involves sending actions to
+         * the server.
+         *
+         * @param name the name of the last item pushed.
+         */
+        popStack : function(name) {
+            var count = 0;
+            var lastName;
+
+            if (priv.auraStack.length > 0) {
+                lastName = priv.auraStack.pop();
+                if (lastName !== name) {
+                    $A.error("Broken stack: popped "+lastName+" expected "+name+", stack = "+priv.auraStack);
+                }
+            } else {
+                $A.warning("Pop from empty stack");
+            }
+            if (priv.auraStack.length === 0) {
+                //
+                // FIXME: W-1652120
+                //
+                // Weird compatibility stuff. We are sometimes called with nothing on the stack,
+                // so, rather than work too hard on this, just push two things on the stack so
+                // that even under those conditions we will not do the wrong thing.
+                //
+                priv.auraStack.push("$A.clientServices.popStack");
+                priv.auraStack.push("$A.clientServices.popStack");
+                clientService.processActions();
+                done = !$A["finishedInit"];
+                while (!done && count <= 15) {
+                    $A.renderingService.rerenderDirty();
+                    done = !clientService.processActions();
+                    count += 1;
+                    if (count > 14) {
+                        $A.error("finishFiring has not completed after 15 loops");
+                    }
+                }
+                // Force our stack to nothing.
+                priv.auraStack = [];
+                this.queueNeedsFiltering = true;
+            }
+        },
+
 
         /**
          * Perform a hard refresh.
@@ -265,7 +358,8 @@ var AuraClientService = function() {
          * @private
          */
         runActions : function(actions, scope, callback) {
-            priv.request(actions, scope, callback);
+            var group = new ActionCallbackGroup(actions, scope, callback);
+            priv.request(actions);
         },
 
         /**
@@ -408,6 +502,16 @@ var AuraClientService = function() {
             if (exclusive !== undefined) {
                 action.setExclusive(exclusive);
             }
+            
+            if (action.isAbortable()) {
+                //indicate to priv that there is a new abortable action group and any currently running group is out of date.
+                priv.newestAbortableGroup = -1;
+                if (clientService.queueNeedsFiltering) {
+                    priv.actionQueue = clientService.clearPreviousAbortableActions(priv.actionQueue);
+                    clientService.queueNeedsFiltering = false;
+                }
+            }
+            
             //
             // FIXME: W-1652118 This should not differentiate, both of these should get pushed.
             //
@@ -417,35 +521,43 @@ var AuraClientService = function() {
                 priv.actionQueue.push(action);
             }
         },
-
+        
+        clearPreviousAbortableActions : function(queue) {
+            var newQueue = [];
+            var counter;
+            for(counter = 0; counter < queue.length; counter++) {
+                if (!queue[counter].isAbortable()) {
+                    newQueue.push(queue[counter]);
+                } else {
+                    queue[counter].abort();
+                }
+            }
+            return newQueue;
+        },
+        
         /**
          * process the current set of actions, looping if needed.
          *
-         * This runs the current action set, then tries again as
-         * long as there are actions to be run.
+         * This runs the current action set.
          *
          * @private
          */
         processActions : function() {
-            var cb = function(msg) {
-                    var errors = msg["errors"];
-                    if (errors && errors.length > 0) {
-                        for(var i=0;i<errors.length;i++){
-                            aura.log(errors[i]);
-                        }
-                    }
-                };
-            var count = 0;
-            while (priv.actionQueue.length > 0) {
-                var actions = priv.actionQueue;
-                priv.actionQueue = [];
-                priv.request(actions, null, cb);
-                count += 1;
-                if (count > 20) {
-                    $A.error("Actions do not seem to be completing");
-                }
+            var actions;
+
+            //if an XHR is in flight request don't send a new request yet.
+            if (priv.inRequest) {
+                return false;
             }
-            return (count > 0);
+            
+            if (priv.actionQueue.length > 0) {
+                actions = priv.actionQueue;
+                priv.actionQueue = [];
+                priv.request(actions);
+                clientService.queueNeedsFiltering = false;
+                return true;
+            }
+            return false;
         }
 
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

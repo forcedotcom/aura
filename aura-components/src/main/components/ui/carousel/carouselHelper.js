@@ -45,7 +45,7 @@
 		cmp.getAttributes().setValue('priv_carouselStyle', carouselStyle);
 	},
 	
-	initScroller: function(cmp) {
+	initScroller: function(cmp) {		
 		var pageCmps = this.getPageComponents(cmp);			
  		 
 		if (pageCmps && pageCmps.length > 0) {				
@@ -64,13 +64,16 @@
 		}
 	},
 	
-	initPages: function(cmp) {
+	initPages: function(cmp) {		
 		var pageModels = this.getPageModels(cmp),
 			pageCmps = this.getPageComponents(cmp),			
 			isContinuousFlow = cmp.get('v.continuousFlow'), 
 			isVisible = isContinuousFlow || !this.SHOW_SELECTED_PAGE_ONLY,
 			page, snap = this.getSnap(cmp),			
 			pages = [];	
+		
+		//reset current page;
+		cmp.getValue('v.priv_currentPage').setValue(-1);
 				
 		if (pageCmps && pageCmps.length > 0) {
 			//TODO: need a better solution to handle iteration inside the pageComponents
@@ -188,12 +191,6 @@
 	},
 	
 	handlePagerClicked : function(cmp, pageIndex) {
-		var curPage = cmp.get('v.priv_currentPage');
-		if (curPage != pageIndex) {			
-			cmp._pageToHide = curPage;				
-		}
-		
-		this.showPage(cmp, pageIndex);
 		this.selectPage(cmp, pageIndex);
 	},
 	
@@ -224,9 +221,7 @@
     		// selection
             var me = this;
     		cmp._keyPageSelectionTimeout = window.setTimeout(function() {
-    			cmp._keyPageSelectionTimeout = null;
-    			cmp._pageToHide = prevPage;
-    			me.showPage(cmp, pageIndex);
+    			cmp._keyPageSelectionTimeout = null;    			
     			me.selectPage(cmp, pageIndex);    			 
     		}, this.KEY_PAGE_SELECTION_TIMEOUT_DURATION);
     		
@@ -257,9 +252,10 @@
 			}
 					
 			cmp._isScrollStartProcessed = true;
-			cmp._pageToHide = scroller.currPageX + 1;
-			
-			this.showPage(cmp, nextPage);				
+			var pages = this.getPageComponents(cmp);			
+			if (nextPage > 0 && nextPage < pages.length) {			
+				this.showPage(this.getPageComponentFromIndex(cmp, nextPage), nextPage);
+			}
 		}
 	},
 	
@@ -275,65 +271,30 @@
 		cmp._isScrollStartProcessed = false;
 
 		if (prevSelectedPage == currentPageX) {
-			//scrolled back to the same page
-			if (cmp._pageLastShown != currentPageX) {
-				this.hidePage(cmp, cmp._pageLastShown);
-			}
+			//scrolled back to the same page			 
 			return;
-		}
+		}		
 		
-		
-		this.pageSelected(cmp, currentPageX);
-		
-		
-		if (cmp._pageToHide) {
-			//it has scrolled to the next page, need to hide the previous page
-			var prevPage;
-			if (scroller.dirX == 1) {
-				//scrolling to the right
-				prevPage = currentPageX - 1;
-			} else if (scroller.dirX == -1) {
-				//scrolling to the left
-				prevPage = currentPageX + 1;
-			}
-			
-			this.hidePage(cmp, cmp._pageToHide)
-			delete cmp._pageToHide;
-		}
+		this.pageSelected(cmp, currentPageX);	 
 	},
 	
-	showPage: function(cmp, pageIndex){
-		if (cmp.get('v.continuousFlow')) {
-			return;
-		}
-		
-		var pageComponent = this.getPageComponentFromIndex(cmp, pageIndex);
-		if (pageComponent) {
-			cmp._pageLastShown = pageIndex;
-			var e = pageComponent.get('e.show');
-			e.setParams({'pageIndex' : pageIndex});
-			e.fire();
-		}
+	showPage: function(pageCmp, pageIndex){
+		var e = pageCmp.get('e.show');
+		e.setParams({'pageIndex' : pageIndex});
+		e.fire();		
 	},
 	
-	hidePage: function(cmp, pageIndex) {
-		if (cmp.get('v.continuousFlow')) {
-			return;
-		}
-		
-		var pageComponent = this.getPageComponentFromIndex(cmp, pageIndex);
-		if (pageComponent) {	 
-			var e = pageComponent.get('e.hide');
-			e.setParams({'pageIndex' : pageIndex});
-			e.fire();
-		}
+	hidePage: function(pageCmp, pageIndex) {		 
+		var e = pageCmp.get('e.hide');
+		e.setParams({'pageIndex' : pageIndex});
+		e.fire();
 	},
 	
 	/**
 	 * Page is selected, delegate the event to page component
 	 */
 	pageSelected: function(cmp, pageIndex) {
-	
+
 		var prevSelectedPage = cmp.get('v.priv_currentPage');
 			
 		if (prevSelectedPage == pageIndex) {			
@@ -344,14 +305,34 @@
 		if (curPageCmp && curPageCmp.isRendered()) {
 			var prePageCmp = this.getPageComponentFromIndex(cmp, prevSelectedPage);
 
-			cmp.getAttributes().setValue('priv_currentPage', pageIndex);
-			
+			cmp.getAttributes().setValue('priv_currentPage', pageIndex);			
 			this.firePageSelectedEventToPage(prePageCmp, pageIndex);
 			this.firePageSelectedEventToPage(curPageCmp, pageIndex);			
-			this.firePageSelectedEventToPageIndicator(cmp, curPageCmp, pageIndex);			
+			this.firePageSelectedEventToPageIndicator(cmp, curPageCmp, pageIndex);
+			
+			this.hideAllUnselectedPages(cmp, pageIndex);
 		}
 	},
 	
+	showAllPages: function(cmp) {	
+		var pages = this.getPageComponents(cmp);
+		for (var i=1; i<= pages.length; i++) {
+			this.showPage(pages[i-1], i);
+		}
+	},
+	
+	hideAllUnselectedPages: function(cmp, selectPage) {
+		if (cmp.get('v.continuousFlow')) {
+			return;
+		}
+		
+		var pages = this.getPageComponents(cmp);
+		for (var i=1; i<= pages.length; i++) {			
+			if (i != selectPage) {
+				this.hidePage(pages[i-1], i);
+			}
+		}
+	},
 	/**
 	 * Fire pageSelected event to page component
 	 */	
@@ -379,20 +360,31 @@
 	 * Selecting a page from non-scrolling events
 	 */
 	selectPage : function(cmp, pageIndex, time) {		
-		var pages = this.getPageComponents(cmp);
-		//scroller page starts with 0
-		pageIndex--;
-		if (pageIndex >= 0 && pageIndex < pages.length) {
+		var pages = this.getPageComponents(cmp),
+			prevSelectedPage = cmp.get('v.priv_currentPage');
+
+		if (pageIndex > 0 && pageIndex <= pages.length && prevSelectedPage !== pageIndex) {
+
+			this.showAllPages(cmp);		 
+			
 			scroller = this.getScroller(cmp);
-			scroller.scrollToPage(pageIndex, null, time);		 
+			//scroller page starts with 0
+			scroller.scrollToPage(--pageIndex, null, time);			
 		}		
 	},
 	
 	selectDefaultPage : function(cmp) {
-		var pageCmps = this.getPageComponents(cmp),
+		var curPage = cmp.get('v.priv_currentPage');
+		
+		if (curPage > -1) {
+			//page already selected;
+			return;
+		}
+		
+		var	pageCmps = this.getPageComponents(cmp),
 			defaultPage = cmp.get('v.defaultPage'),
-			pageToSelect = 1;
-		 
+			pageToSelect = 1;	
+				 
 		if (defaultPage) {
 			pageToSelect = defaultPage;
 		} else {

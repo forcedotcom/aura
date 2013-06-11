@@ -41,6 +41,7 @@ var Action = function Action(def, method, paramDefs, background, cmp) {
     this.state = "NEW";
     this.callbacks = {};
     this.background = background;
+    this.groups = [];
 };
 
 Action.prototype.nextActionId = 1;
@@ -80,6 +81,29 @@ Action.prototype.getNextGlobalId = function() {
  */
 Action.prototype.getDef = function() {
     return this.def;
+};
+
+/**
+ * Add a callback group for completion tracking.
+ *
+ * In the event that this action is already completed, we immediately call the completion function.
+ */
+Action.prototype.addCallbackGroup = function(group) {
+    if (this.state === "NEW") {
+        this.groups.push(group);
+    } else {
+        group.completeAction(this);
+    }
+};
+
+/**
+ * Mark this action as complete for all callback groups.
+ */
+Action.prototype.completeGroups = function() {
+    while (this.groups.length > 0) {
+        var group = this.groups.pop();
+        group.completeAction(this);
+    }
 };
 
 /**
@@ -392,6 +416,16 @@ Action.prototype.complete = function(response) {
     } finally {
         context.setCurrentAction(previous);
     }
+    this.completeGroups();
+};
+
+
+/**
+ * Mark this action as aborted.
+ */
+Action.prototype.abort = function() {
+    this.state = "ABORTED";
+    this.completeGroups();
 };
 
 /**

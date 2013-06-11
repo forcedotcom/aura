@@ -555,98 +555,98 @@
 	 * Abortable actions and caching
 	 */
 	testAbortableActions : {
-		attributes : {
-			defaultExpiration : 60,
-			defaultAutoRefreshInterval : 60
-		},
-		test : [
-				function(cmp) {
-					$A.test.setTestTimeout(30000);
-					this.resetCounter(cmp, "testAbortableAction_A");
-					this.resetCounter(cmp, "testAbortableAction_B");
-				},
-				function(cmp) {
-					cmp._testCounter = 2;
-					var abortable1 = cmp.get("c.substring");
-					abortable1.setParams({
-						testName : "testAbortableAction_A",
-						param1 : 999
-					});
-					abortable1.setStorable();
-					$A.test.assertTrue(abortable1.isAbortable(), "Storable actions should be abortable by default.")
+            attributes : {
+                defaultExpiration : 60,
+                defaultAutoRefreshInterval : 60
+            },
+            test : [
+                function(cmp) {
+                    $A.test.setTestTimeout(30000);
+                    this.resetCounter(cmp, "testAbortableAction_A");
+                    this.resetCounter(cmp, "testAbortableAction_B");
+                },
+                function(cmp) {
+                    cmp._testCounter = 2;
+                    var abortable1 = cmp.get("c.substring");
+                    abortable1.setParams({
+                            testName : "testAbortableAction_A",
+                            param1 : 999
+                        });
+                    abortable1.setStorable();
+                    $A.test.assertTrue(abortable1.isAbortable(), "Storable actions should be abortable by default.")
 
-					var abortable2 = cmp.get("c.string");
-					abortable2.setParams({
-						testName : "testAbortableAction_B",
-						param1 : 666
-					});
-					abortable2.setAbortable();
-					$A.test.assertFalse(abortable2.isStorable(),
-							"The converse is not true. Abortable does not mean its storable.")
-					abortable2.setStorable();
+                    var abortable2 = cmp.get("c.string");
+                    abortable2.setParams({
+                            testName : "testAbortableAction_B",
+                            param1 : 666
+                        });
+                    abortable2.setAbortable();
+                    $A.test.assertFalse(abortable2.isStorable(),
+                                    "The converse is not true. Abortable does not mean its storable.")
+                    abortable2.setStorable();
 
-					// Why does abortable work only in another action's
-					// callback? Gerald?
-					var a = cmp.get("c.fetchDataRecord");
-					a.setParams({
-						testName : "testSetStorableAPI"
-					});
-					a.setCallback(cmp, function(a) {
-						$A.clientService.runActions([ abortable1 ], cmp, function() {
-							cmp._testCounter--;
-						});
-						$A.clientService.runActions([ abortable2 ], cmp, function() {
-							cmp._testCounter--;
-						});
-					})
-					$A.enqueueAction(a);
-					$A.eventService.finishFiring();
+                    // Why does abortable work only in another action's
+                    // callback? Gerald?
+                    var a = cmp.get("c.fetchDataRecord");
+                    a.setParams({
+                            testName : "testSetStorableAPI"
+                        });
+                    a.setCallback(cmp, function(a) {
+                            $A.clientService.runActions([ abortable1 ], cmp, function() {
+                                    cmp._testCounter--;
+                            });
+                            $A.clientService.runActions([ abortable2 ], cmp, function() {
+                                    cmp._testCounter--;
+                            });
+                        })
+                    $A.enqueueAction(a);
+                    $A.eventService.finishFiring();
 
-					$A.test.runAfterIf(function() {
-						return cmp._testCounter == 0;
-					}, function() {
-						$A.test.assertEquals("NEW", abortable1.getState(), "Action was not aborted");
-						$A.test
-								.assertEquals("SUCCESS", abortable2.getState(),
-										"Last abortable group did not complete.");
-					});
-				},
-				function(cmp) {
-					var abortedAction = cmp.get("c.substring");
-					abortedAction.setParams({
-						testName : "testAbortableAction_A",
-						param1 : 999
-					});
-					abortedAction.setStorable();
-					$A.enqueueAction(abortedAction);
-					$A.eventService.finishFiring();
-					$A.test.addWaitFor("SUCCESS", function() {
-						return abortedAction.getState()
-					}, function() {
-						$A.test.assertFalse(abortedAction.isFromStorage(),
-								"Aborted actions should not be stored in cache");
-						$A.test.assertEquals(0, abortedAction.getReturnValue()[0],
-								"Wrong counter value seen in response");
-						$A.test.assertEquals(999, abortedAction.getReturnValue()[1]);
-					});
-				}, function(cmp) {
-					var successfulAction = cmp.get("c.string");
-					successfulAction.setParams({
-						testName : "testAbortableAction_B",
-						param1 : 666
-					});
-					successfulAction.setStorable();
-					$A.enqueueAction(successfulAction);
-					$A.eventService.finishFiring();
-					$A.test.addWaitFor("SUCCESS", function() {
-						return successfulAction.getState()
-					}, function() {
-						$A.test.assertTrue(successfulAction.isFromStorage(), "failed to fetch action from cache");
-					});
-				} ]
+                    $A.test.runAfterIf(function() {
+                        return cmp._testCounter == 0;
+                    }, function() {
+                        $A.test.assertEquals("ABORTED", abortable1.getState(), "Action was not aborted");
+                        $A.test.assertEquals("SUCCESS", abortable2.getState(),
+                            "Last abortable group did not complete.");
+                    });
+                },
+                function(cmp) {
+                    var abortedAction = cmp.get("c.substring");
+                    abortedAction.setParams({
+                            testName : "testAbortableAction_A",
+                            param1 : 999
+                        });
+                    abortedAction.setStorable();
+                    $A.enqueueAction(abortedAction);
+                    $A.eventService.finishFiring();
+                    $A.test.addWaitFor("SUCCESS", function() {
+                            return abortedAction.getState()
+                        }, function() {
+                            $A.test.assertFalse(abortedAction.isFromStorage(),
+                                "Aborted actions should not be stored in cache");
+                            $A.test.assertEquals(0, abortedAction.getReturnValue()[0],
+                                "Wrong counter value seen in response");
+                            $A.test.assertEquals(999, abortedAction.getReturnValue()[1]);
+                        });
+                }, function(cmp) {
+                    var successfulAction = cmp.get("c.string");
+                    successfulAction.setParams({
+                            testName : "testAbortableAction_B",
+                            param1 : 666
+                        });
+                    successfulAction.setStorable();
+                    $A.enqueueAction(successfulAction);
+                    $A.eventService.finishFiring();
+                    $A.test.addWaitFor("SUCCESS", function() {
+                            return successfulAction.getState()
+                        }, function() {
+                            $A.test.assertTrue(successfulAction.isFromStorage(), "failed to fetch action from cache");
+                        });
+                } ]
 	},
+
 	resetCounter : function(cmp, testName) {
-		cmp.getDef().getHelper().resetCounters(cmp, testName);
+            cmp.getDef().getHelper().resetCounters(cmp, testName);
 	},
 
 	/**
@@ -655,43 +655,47 @@
 	 * executed.
 	 */
 	testRefreshResponseSameAsStored : {
-		attributes : {
-			defaultExpiration : 60,
-			defaultAutoRefreshInterval : 0 // refresh every action
-		},
-		test : [function(cmp) {
-				cmp._testName = "testSkipReplayOnIdenticalRefresh";
-				this.resetCounter(cmp, "testSkipReplayOnIdenticalRefresh");
-				$A.test.addWaitFor(false, $A.test.isActionPending);
-			}, function(cmp) {
-				var a = $A.run(function(){
-					return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecord", {testName:cmp._testName}, function(a){a.setStorable();})
-				});
-				$A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())}, function() {
-					$A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
-					$A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
-					$A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(), function(item){cmp._originalExpiration = item.expires});
-				});
-			}, function(cmp) {
-				// reset so next response will be same as first
-				cmp._testName = "testSkipReplayOnIdenticalRefresh";
-				this.resetCounter(cmp, "testSkipReplayOnIdenticalRefresh");
-				$A.test.addWaitFor(false, $A.test.isActionPending);
-			}, function(cmp) {
-				var a = $A.run(function(){
-					return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecord", {testName:cmp._testName}, function(a){a.setStorable();})
-				});
-				$A.test.addWaitFor("2", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())}, function() {
-					$A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
-					$A.test.assertEquals("true", $A.test.getText(cmp.find("isFromStorage").getElement()));
-					$A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(), function(item){
-						if(item.expires <= cmp._originalExpiration){
-							$A.test.fail("storage expiration was not updated after refresh");
-						}
-					});
-				});
-			}
-		]
+            attributes : {
+                defaultExpiration : 60,
+                defaultAutoRefreshInterval : 0 // refresh every action
+            },
+            test : [function(cmp) {
+                    cmp._testName = "testSkipReplayOnIdenticalRefresh";
+                    this.resetCounter(cmp, "testSkipReplayOnIdenticalRefresh");
+                    $A.test.addWaitFor(false, $A.test.isActionPending);
+            }, function(cmp) {
+                var a = $A.run(function(){
+                    return cmp.getDef().getHelper()
+                        .executeAction(cmp, "c.fetchDataRecord", {testName:cmp._testName},
+                            function(a){a.setStorable();})
+                });
+                $A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
+                    function() {
+                        $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
+                        $A.test.assertEquals("false", $A.test.getText(cmp.find("isFromStorage").getElement()));
+                        $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
+                            function(item){cmp._originalExpiration = item.expires});
+                    });
+            }, function(cmp) {
+                // reset so next response will be same as first
+                cmp._testName = "testSkipReplayOnIdenticalRefresh";
+                this.resetCounter(cmp, "testSkipReplayOnIdenticalRefresh");
+                $A.test.addWaitFor(false, $A.test.isActionPending);
+            }, function(cmp) {
+                var a = $A.run(function(){
+                    return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecord", {testName:cmp._testName},
+                        function(a){a.setStorable();})
+                });
+                $A.test.addWaitFor("2", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())}, function() {
+                    $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
+                    $A.test.assertEquals("true", $A.test.getText(cmp.find("isFromStorage").getElement()));
+                    $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(), function(item){
+                            if(item.expires <= cmp._originalExpiration){
+                                    $A.test.fail("storage expiration was not updated after refresh");
+                            }
+                        });
+                });
+            } ]
 	},
 
 	/**

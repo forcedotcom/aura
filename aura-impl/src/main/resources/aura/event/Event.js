@@ -101,7 +101,8 @@ Event.prototype.fire = function() {
         // could pass around a different object instead
         aura.assert(false, "event has already been fired, silly");
     }
-    $A.services.event.startFiring(this);
+    var stackname = this.eventDef.getDescriptor().getQualifiedName();
+    $A.services.client.pushStack(stackname);
 
     this.fired = true;
     var handlers;
@@ -152,7 +153,7 @@ Event.prototype.fire = function() {
             }
         }
     }
-    $A.services.event.finishFiring();
+    $A.services.client.popStack(stackname);
     
 	//#if {"excludeModes" : ["PRODUCTION"]}
     // if we have a debug component send event info to the tool

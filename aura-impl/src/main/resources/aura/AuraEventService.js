@@ -98,62 +98,30 @@ var AuraEventService = function() {
         },
 
         /**
-         * Pushes an event to the event stack.
-         * @param {Event} event The event to start firing
+         * Pushes a marker to the event stack.
+         *
+         * Deprecated. Do not use.
+         *
+         * @param {Event} event ignored
          * @memberOf AuraEventService
-         * @private
+         * @public
          */
         startFiring : function(event) {
-            //#if {"modes" : ["PTEST"]}
-            // to only profile the transactions and not the initial page load
-            if (event == "onclick") {
-                // clear out existing timers
-                $A.removeStats();
-                $A.getContext().clearTransactionName();
-                // start a Jiffy transaction
-                $A.startTransaction($A.getContext().incrementTransaction());
-            }
-            //#end
-            priv.eventStack.push(event);
+            $A.clientService.pushStack("$A.eventServices.fire");
         },
 
         /**
-         * pull an event off the stack, and clean up if we hit top of stack.
+         * Pops a marker off if valid to do so.
          *
-         * This internal routine pops something off of the event stack, and if
-         * needed runs the queued actions, making sure that rerenderDirty is called
-         * at the very end, after everything has completed.
+         * Deprecated. Do not use.
+         *
          * @memberOf AuraEventService
-         * @private
+         * @public
          */
         finishFiring : function() {
-            var done;
-            var count = 0;
-
-            if (priv.eventStack.length <= 1) {
-                //
-                // FIXME: W-1652120
-                //
-                // Weird compatibility stuff. We are sometimes called with nothing on the stack,
-                // so, rather than work too hard on this, just push two things on the stack so
-                // that even under those conditions we will not do the wrong thing.
-                //
-                priv.eventStack.push("finishFiring");
-                priv.eventStack.push("finishFiring");
-                $A.clientService.processActions();
-                done = !$A["finishedInit"];
-                while (!done && count <= 15) {
-                    $A.renderingService.rerenderDirty();
-                    done = !$A.clientService.processActions();
-                    count += 1;
-                    if (count > 10) {
-                        $A.error("finishFiring has not completed after 10 loops");
-                    }
-                }
-                priv.eventStack.pop();
-                priv.eventStack.pop();
+            if ($A.clientService.checkPublicPop("$A.eventServices.fire")) {
+                $A.clientService.popStack("$A.eventServices.fire");
             }
-            priv.eventStack.pop();
         },
 
         /**
@@ -194,7 +162,7 @@ var AuraEventService = function() {
             return ret;
         },
         hasPendingEvents : function() {
-            return priv.eventStack.length > 0;
+            return $A.clientService.inAuraLoop();
         }
     //#end
     };

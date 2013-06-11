@@ -21,7 +21,7 @@
     <p>Application cache (AppCache) speeds up app response time and reduces server load by only downloading resources that have changed.
        It improves page loads affected by limited browser cache persistence on some devices. You can take advantage of application cache capabilities in Aura.
     </p>
-    <auradocs:info>See <a href="http://www.html5rocks.com/en/tutorials/appcache/beginner/" target="_blank">an introduction to AppCache</a> for more information.</auradocs:info>
+    <auradocs:info>See <ui:outputURL value="http://www.html5rocks.com/en/tutorials/appcache/beginner/" label="an introduction to AppCache">an introduction to AppCache</ui:outputURL> for more information.</auradocs:info>
 
 	<h3>Enabling the AppCache</h3>
     <p>Aura disables the use of AppCache by default. To enable AppCache in your application, set the <code>useAppcache="true"</code> system attribute in the <code>aura:application</code> tag.

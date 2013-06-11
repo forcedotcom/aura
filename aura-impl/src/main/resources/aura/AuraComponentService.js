@@ -205,7 +205,7 @@ var AuraComponentService = function(){
             if ( !def || (def && def.hasRemoteDependencies()) ) {
                 that.requestComponent(callbackScope, callback, config);
             } else {
-            	var newComp = that.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
+                var newComp = that.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
                 callback.call(callbackScope, newComp);
             }
         },

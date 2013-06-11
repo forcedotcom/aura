@@ -14,13 +14,37 @@
  * limitations under the License.
  */
 ({
+    testInitialValue:{
+        attributes : {displayDatePicker: 'true', value: '2012-09-10', format: 'MM/dd/yyyy'},
+        test: function(cmp){
+            var inputDateStr = cmp.find("inputText").getElement().value;
+            aura.test.assertEquals("09/10/2012", inputDateStr, "Dates are not the same and they should be");
+        }
+    },
+    
+    testDefaultFormat:{
+        attributes : {displayDatePicker: 'true', value: '2012-09-10'},
+        test: function(cmp){
+            var inputDateStr = cmp.find("inputText").getElement().value;
+            aura.test.assertEquals("Sep 10, 2012", inputDateStr, "Dates are not the same and they should be");
+        }
+    },
+    
+    testlangLocale:{
+        attributes : {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10', langLocale: 'es'},
+        test: function(cmp){
+            var inputDateStr = cmp.find("inputText").getElement().value;
+            aura.test.assertEquals("septiembre 10, 2012", inputDateStr, "Dates are not the same and they should be");
+        }
+    },
+    
     testInputDateToday:{
-	attributes : {displayDatePicker:'true'},
-	test: function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').run()
-	        var inputDateStr = cmp.find("inputText").getElement().value;
-	        var dt           = moment().format('YYYY-MM-DD');
-    		aura.test.assertTrue(aura.test.contains(dt, inputDateStr), "Dates are not the same and they should be");
+        attributes : {displayDatePicker:'true', format: 'YYYY-MM-DD'},
+        test: function(cmp){
+            cmp.find("datePicker").get('c.selectToday').run()
+            var inputDateStr = cmp.find("inputText").getElement().value;
+            var dt           = moment().format('YYYY-MM-DD');
+            aura.test.assertTrue(aura.test.contains(dt, inputDateStr), "Dates are not the same and they should be");
         }
     }
 })

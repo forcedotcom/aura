@@ -52,10 +52,13 @@ import org.auraframework.test.annotation.WebDriverTest;
 import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.AuraUtil;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Action;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.ScreenshotException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -678,6 +681,22 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             }
         }, timeoutInSecs);
     }
+    
+    /**
+     * Wait for the carousel page to change. Asserts the expectedText appears in the innerHTML of page element
+     * @param page - the next page that should be loaded on carousel.
+     * @param expectedText - the expected text on that page.
+     */
+    public void waitForCarouselPageToChange(final WebElement page, final String expectedText){
+		auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+            	String pageContent = page.getAttribute("innerHTML");
+        		return pageContent.contains(expectedText);
+            }
+        }, timeoutInSecs);
+    }
+    
     /**
      * Find first matching element in the DOM.
      */
@@ -709,5 +728,13 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      */
     protected String getText(By locator) {
         return findDomElement(locator).getText();
+    }
+    
+    public Action shiftTab() {
+    	Actions builder = new Actions(currentDriver);
+    	builder.keyDown(Keys.SHIFT)
+    		.sendKeys(Keys.TAB)
+    		.keyUp(Keys.SHIFT);
+    	return builder.build();
     }
 }

@@ -37,7 +37,7 @@
 	<p><b>See also:</b><br/>
 	    <auradocs:topicLink topic="error">Validating Fields</auradocs:topicLink><br/>
 	    <auradocs:topicLink topic="dynamicCmp">Dynamically Creating Components</auradocs:topicLink><br/>
-	    <a href="#reference?topic=api:Aura">Aura ($A) JavaScript API</a>
+	    <ui:outputURL value="#reference?topic=api:Aura" label="Aura JavaScript API">Aura ($A) JavaScript API</ui:outputURL>
 	</p>    
        
     </aura:component>

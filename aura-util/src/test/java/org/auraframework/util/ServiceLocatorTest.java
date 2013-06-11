@@ -56,7 +56,7 @@ import org.auraframework.util.sampleServices.UnimplementedService;
 @UnAdaptableTest
 public class ServiceLocatorTest extends UnitTestCase {
 
-    ServiceLocator s = ServiceLocator.get();
+    ServiceLoader s = ServiceLocator.get();
 
     /**
      * Verify that service instances are cached.

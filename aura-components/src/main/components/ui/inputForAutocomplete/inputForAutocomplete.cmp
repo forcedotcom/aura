@@ -1,0 +1,34 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component extends="ui:inputText" extensible="true" support="proto"
+    description="This component is used as input text in autocomplete.">
+    <input aura:id="txt"
+           id="{!v.domId}"
+           class="{!v.class}"
+           type="{!v.type}"
+           value="{!v.value}"
+           placeholder="{!v.placeholder}"
+           required="{!v.required}"
+           disabled="{!v.disabled}"
+           maxlength="{!v.maxlength}"
+           size="{!v.size}"
+           role="combobox"
+           aria-autocomplete="list"
+           aria-haspopup="true"
+           aria-activedescendant=""/>
+</aura:component>

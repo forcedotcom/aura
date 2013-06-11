@@ -19,11 +19,11 @@
 
     <aura:set attribute="title" value="Setting the Default Mode"/>
 
-    <p>The default mode is <code>DEV</code>. This is defined in <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/impl/adapter/ConfigAdapterImpl.html" target="_new">ConfigAdapterImpl</a>.</p>
+    <p>The default mode is <code>DEV</code>. This is defined in <ui:outputURL value="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/impl/adapter/ConfigAdapterImpl.html" label="ConfigAdapterImpl">ConfigAdapterImpl</ui:outputURL>.</p>
 
     <p>You can change the default mode to <code>PROD</code> by setting the <code>aura.production</code> Java system property to <code>true</code>. Do this by adding <code>-Daura.production=true</code> to the arguments when you are starting your server.</p>
 
-    <p>To set an alternate default mode, write a Java class that implements the <code>getDefaultMode()</code> method in <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/adapter/ConfigAdapter.html" target="_new">ConfigAdapter</a>.</p>
+    <p>To set an alternate default mode, write a Java class that implements the <code>getDefaultMode()</code> method in <ui:outputURL value="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/adapter/ConfigAdapter.html" label="ConfigAdapter">ConfigAdapter</ui:outputURL>.</p>
 
     <p>The default mode is not used if it’s not also included in the list of available modes.</p>
 

@@ -52,6 +52,8 @@ public class ServiceLocator implements ServiceLoader {
      */
     private final ConcurrentMap<Class<?>, Set<?>> setCache = new ConcurrentHashMap<Class<?>, Set<?>>();
 
+    private static ThreadLocal<ServiceLoader> alternateServiceLocator = new ThreadLocal<ServiceLoader>();
+    
     /**
      * If this is not called, then ServiceLoaderImpl is used as the only
      * ServiceLoader. If this is called, all caches will be invalidated and the
@@ -86,7 +88,11 @@ public class ServiceLocator implements ServiceLoader {
     /**
      * Get the singleton
      */
-    public static final ServiceLocator get() {
+    public static final ServiceLoader get() {
+    	ServiceLoader altInstance = alternateServiceLocator.get();
+    	if(alternateServiceLocator.get() != null){
+    		return altInstance;
+    	}
         return instance;
     }
 

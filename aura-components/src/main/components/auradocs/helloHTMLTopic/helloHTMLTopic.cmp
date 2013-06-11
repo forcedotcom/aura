@@ -22,7 +22,7 @@
 
     <h2>HTML in Components</h2>
 
-    <p>You can add HTML markup in components. Note that you must use strict <a href="http://www.w3.org/TR/xhtml1/" target="_blank">XHTML</a>. For example, use <code>&lt;br/&gt;</code> instead of <code>&lt;br&gt;</code>. You can also use HTML attributes and DOM events, such as <code>onclick</code>.
+    <p>You can add HTML markup in components. Note that you must use strict <ui:outputURL value="http://www.w3.org/TR/xhtml1/" label="XHTML">XHTML</ui:outputURL>. For example, use <code>&lt;br/&gt;</code> instead of <code>&lt;br&gt;</code>. You can also use HTML attributes and DOM events, such as <code>onclick</code>.
     </p>
 
     <auradocs:warning>Note: Aura disallows a few HTML tags deemed to be unsafe or unnecessary, like <code>&lt;applet&gt;</code> and <code>&lt;font&gt;</code>.  For a full list of supported tags, see <auradocs:topicLink topic="htmlTags">Supported HTML Tags</auradocs:topicLink>.</auradocs:warning>
@@ -35,7 +35,7 @@
 
     <p>All top-level elements in a component have a special <code>THIS</code> CSS class added to them. This, effectively, adds namespacing to CSS and helps prevent one component's CSS from blowing away another component's styling. Aura throws an error if a CSS file doesn't follow this convention.</p>
 
-    <p>Let's look at a sample <code>helloHTML.cmp</code> component. The CSS is in <code>helloHTML.css</code> and you can see it in the <code>css://style</code> tab. If you need a CSS refresher, see <a href="http://reference.sitepoint.com/css">http://reference.sitepoint.com/css</a>.</p>
+    <p>Let's look at a sample <code>helloHTML.cmp</code> component. The CSS is in <code>helloHTML.css</code> and you can see it in the <code>css://style</code> tab. If you need a CSS refresher, see <ui:outputURL value="http://reference.sitepoint.com/css">http://reference.sitepoint.com/css</ui:outputURL>.</p>
 
     <p>The top-level elements match the <code>THIS</code> class and render with a grey background.</p>
 

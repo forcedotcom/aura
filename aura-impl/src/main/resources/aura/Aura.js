@@ -80,6 +80,7 @@ var clientService;
 // #include aura.layouts.LayoutDef
 // #include aura.controller.ActionDef
 // #include aura.controller.Action
+// #include aura.controller.ActionCallbackGroup
 // #include aura.attribute.AttributeDef
 // #include aura.attribute.AttributeSet
 // #include aura.attribute.AttributeDefSet
@@ -585,10 +586,10 @@ $A.ns.Aura.prototype.error = function(e) {
 };
 
 $A.ns.Aura.prototype.warning = function(w) {
-    $A.logInternal("Warning: ",w, null, this.getStackTrace(null));
-    if ($A.test) {
-        $A.test.auraWarning(str);
+    if ($A.test && $A.test.auraWarning(w)) {
+        return;
     }
+    $A.logInternal("Warning: ",w, null, this.getStackTrace(null));
 };
 
 /**
@@ -668,9 +669,12 @@ $A.ns.Aura.prototype.unwrap = function(val) {
 $A.ns.Aura.prototype.run = function(func) {
     $A.assert(func && $A.util.isFunction(func), "The parameter 'func' for $A.run() must be a function!");
 
-    $A.services.event.startFiring("$A.run()");
-    var ret = func();
-    $A.services.event.finishFiring("$A.run()");
+    $A.services.client.pushStack("$A.run()");
+    try {
+        var ret = func();
+    } finally {
+        $A.services.client.popStack("$A.run()");
+    }
     return ret;
 };
 
@@ -816,11 +820,15 @@ $A.ns.Aura.prototype.logInternal = function(type, message, error, trace) {
  * @param {Object} error The error messages to be logged in the stack trace.
  */
 $A.ns.Aura.prototype.log = function(value, error) {
+    var trace;
     if (this.util.isError(value)) {
         error = value;
         value = error.message;
     }
-    this.logInternal("Info", value, error, false);
+    if (error) {
+        trace = this.getStackTrace(error);
+    }
+    this.logInternal("Info", value, error, trace);
 };
 
 /**
@@ -873,10 +881,12 @@ $A.ns.Aura.prototype.rpad = function(str, padString, length) {
  * @private
  */
 $A.ns.Aura.prototype.getStackTrace = function(e, remove) {
+    var stack = undefined;
+
     if (!remove) {
         remove = 0;
     }
-    if (!e || !(e.stack)) {
+    if (!e || (!e.stack && !e.get_stack)) {
         try {
             throw new Error("foo");
         } catch (f) {
@@ -884,8 +894,14 @@ $A.ns.Aura.prototype.getStackTrace = function(e, remove) {
             remove += 2;
         }
     }
+    if (e && e.get_stack) {
+        stack = e.get_stack();
+    }
     if (e && e.stack) {
-        var ret = e.stack.replace(/(?:\n@:0)?\s+$/m, '');
+        stack = e.stack;
+    }
+    if (stack) {
+        var ret = stack.replace(/(?:\n@:0)?\s+$/m, '');
         ret = ret.replace(new RegExp('^\\(', 'gm'), '{anonymous}(');
         ret = ret.split("\n");
         if (remove !== 0) {

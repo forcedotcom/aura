@@ -18,7 +18,8 @@
      * Set value to (html) textarea element.
      */
     setDomElementValue : function (component) {
-        var elem = component.find("textAreaElem").getElement();
+        var textAreaCmp = component.find("textAreaElem");
+        var elem = textAreaCmp ? textAreaCmp.getElement() : null;
         if (elem) {
             var value = component.getValue("v.value").getValue();
             if ($A.util.isUndefinedOrNull(value)) {

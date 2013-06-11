@@ -16,11 +16,11 @@
 ({
     provide: function(component, event, controller) {
         var dataProvider = component.getConcreteComponent();
-        var keyword = event.getParam("parameters").keyword;
         if (!dataProvider._loadedOnce) {
             // it is assumed this dataProvider will come fully equipped with an initial data payload in its model.
             dataProvider._loadedOnce = true;
         } else {
+            var keyword = event.getParam("parameters").keyword;
             var action = dataProvider.get("c.getItems");
             action.setParams({
                 "keyword": keyword

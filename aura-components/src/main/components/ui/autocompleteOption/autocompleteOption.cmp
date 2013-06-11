@@ -16,9 +16,10 @@
 
 -->
 <aura:component extends="ui:interactive" extensible="true" support="beta">
-    <aura:attribute name="theme" type="String" default="default" description="Theme to apply to this component."/>
     <aura:attribute name="displayText" type="String" description="The displayed text string for this option."/>
     <aura:attribute name="keyword" type="String" description="The keyword to match."/>
+    <aura:attribute name="label" type="String" required="true" description="The text displayed on the component. This attribute's value is used to do matching."/>
+    <aura:attribute name="theme" type="String" default="default" description="Theme to apply to this component."/>
     
     <aura:handler name="focus" action="{!c.handleFocus}"/>
     

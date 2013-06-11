@@ -26,7 +26,6 @@ var priv = {
     isUnloading : false,
     initDefsObservers : [],
     isDisconnected : false,
-    actionQueue : [],
 
     /**
      * Take a json (hopefully) response and decode it. If the input is invalid JSON, we try to handle it gracefully.

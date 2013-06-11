@@ -540,7 +540,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 			var actual = target.newInstance().background;
 
 			// Assert
-			Assert.Equal(expected, actual);
+			Assert.False(actual);
 		}
 
 		[ Fact ]

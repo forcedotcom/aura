@@ -62,9 +62,9 @@ public class PropertyReferenceImpl implements PropertyReference {
     @Override
     public Object evaluate(ValueProvider vp) throws QuickFixException {
         Object ret = null;
-        if(vp != null){
+        if (vp != null) {
             ret = vp.getValue(this);
-        }else{
+        } else {
             String root = getRoot();
             AuraContext lc = Aura.getContextService().getCurrentContext();
             ValueProviderType vpt = ValueProviderType.getTypeByPrefix(root);
@@ -102,6 +102,11 @@ public class PropertyReferenceImpl implements PropertyReference {
     @Override
     public String getRoot() {
         return pieces.get(0);
+    }
+
+    @Override
+    public String getLeaf() {
+        return pieces.get(pieces.size() - 1);
     }
 
     @Override
@@ -156,4 +161,5 @@ public class PropertyReferenceImpl implements PropertyReference {
             json.writeMapEnd();
         }
     }
+
 }

@@ -18,6 +18,8 @@ package org.auraframework.impl.css.parser;
 import java.util.List;
 import java.util.Set;
 
+import org.auraframework.components.aura.ThemedDeclarationRenderer;
+import org.auraframework.css.parser.ThemeValueProvider;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.system.Location;
@@ -33,15 +35,37 @@ import com.phloc.css.decl.ICSSExpressionMember;
 import com.phloc.css.writer.CSSWriterSettings;
 
 /**
+ * Reworks the custom theme function, <code>theme(...)</code> or <code>t(...)</code>, to an aura:themedDeclaration
+ * component.
  * 
+ * <p>
+ * The theme function takes one and only one argument. In most cases the theme function takes a fully qualified
+ * reference to a theme variable, for example, <code>margin: theme('myNamespace.myTheme.margin')</code>. You can also
+ * use aliases, for example, <code>margin: theme('myAlias.margin')</code>. See {@link ThemeValueProvider} for more about
+ * aliases.
+ * 
+ * <p>
+ * The argument to the theme function can also be an expression. For example, you can reference multiple values like
+ * <code>margin: theme("myAlias.marginTopBottom + ' ' +  myAlias.marginLeftRight")</code>. You can add literal text
+ * using this method too, e.g., <code>margin: theme("'0 ' + myAlias.marginLeftRight")</code>
+ * 
+ * @see ThemedDeclarationRenderer
  */
 final class ReworkThemeFunction implements DynamicRework<CSSDeclaration> {
     private static final CSSWriterSettings settings = new CSSWriterSettings(ECSSVersion.LATEST);
-    private static final String MSG = "Cannot mix theme functions with other text. " +
-            "Please rewrite to use one or more theme functions only.";
+    private static final String CANT_MIX = "Cannot mix theme functions with other text. " +
+            "Try rewriting like theme(\"'text ' + x.y.z\").";
 
+    private final String filename;
     private final Set<String> allReferences = Sets.newHashSet();
 
+    public ReworkThemeFunction(String filename) {
+        this.filename = filename;
+    }
+
+    /**
+     * Gets all references this rework has encountered thus far.
+     */
     public Set<String> getAllReferences() {
         return allReferences;
     }
@@ -57,18 +81,14 @@ final class ReworkThemeFunction implements DynamicRework<CSSDeclaration> {
 
         allReferences.addAll(references);
 
+        int line = expression.getSourceLocation().getFirstTokenBeginLineNumber();
+        int col = expression.getSourceLocation().getFirstTokenBeginColumnNumber();
+        Location l = new Location(filename, line, col, -1);
+
         if (references.size() != expression.getMemberCount()) {
             // you can't mix theme functions with plain text in declaration values.
-            // for example, "margin: 0 theme(spacingLeftRight)" would be mixing. This
-            // must be rewritten to something like "margin: theme(spacing)" or
-            // "margin: theme(spaceTopBottom) theme(spaceLeftRight)". It's not expected
-            // for this to be a big issue in practice, but if it does become an issue
-            // we can start allowing the theme function to contain raw text, for example
-            // margin: theme('0', spaceTopBottom).
-            int line = expression.getSourceLocation().getFirstTokenBeginLineNumber();
-            int col = expression.getSourceLocation().getFirstTokenBeginColumnNumber();
-            Location l = new Location(declaration.getProperty(), line, col, -1);
-            errors.add(new StyleParserException(MSG, l));
+            // for example, "margin: 0 theme(spacingLeftRight)" would be invalid mixing.
+            errors.add(new StyleParserException(CANT_MIX, l));
             return null;
         }
 
@@ -77,6 +97,7 @@ final class ReworkThemeFunction implements DynamicRework<CSSDeclaration> {
         builder.setDescriptor("aura:themedDeclaration");
         builder.setAttribute("property", declaration.getProperty());
         builder.setAttribute("references", references);
+        builder.setAttribute("location", l);
 
         return builder.build();
     }

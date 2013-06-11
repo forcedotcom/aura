@@ -15,7 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component renderer="java://org.auraframework.impl.css.parser.ThemedDeclarationRenderer">
+<aura:component renderer="java://org.auraframework.components.aura.ThemedDeclarationRenderer">
     <aura:attribute name="property" type="String" required="true"/>
     <aura:attribute name="references" type="List" required="true"/>
+    <aura:attribute name="location" type="java://org.auraframework.system.Location"/>
 </aura:component>

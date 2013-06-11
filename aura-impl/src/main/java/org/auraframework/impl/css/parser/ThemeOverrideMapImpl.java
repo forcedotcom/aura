@@ -18,8 +18,6 @@ package org.auraframework.impl.css.parser;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import org.auraframework.css.parser.ThemeOverrideMap;
 import org.auraframework.def.DefDescriptor;
@@ -45,11 +43,6 @@ public class ThemeOverrideMapImpl implements ThemeOverrideMap {
         // TODONM verify that the override is an extension of the original when extension works.
         overrides.put(original, override);
         return this;
-    }
-
-    @Override
-    public Set<Entry<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>>> entries() {
-        return map().entrySet();
     }
 
     @Override

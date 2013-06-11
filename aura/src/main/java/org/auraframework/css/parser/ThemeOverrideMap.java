@@ -16,8 +16,6 @@
 package org.auraframework.css.parser;
 
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
@@ -44,12 +42,7 @@ public interface ThemeOverrideMap {
     ThemeOverrideMap addOverride(DefDescriptor<ThemeDef> original, DefDescriptor<ThemeDef> override);
 
     /**
-     * Gets the entry set for all theme overrides.
-     */
-    Set<Entry<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>>> entries();
-
-    /**
-     * Gets a copy of the theme overrides map.
+     * Gets a <b>copy</b> of the theme overrides map.
      */
     Map<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>> map();
 

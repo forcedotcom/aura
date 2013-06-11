@@ -23,8 +23,10 @@ import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ComponentDefRefBuilder;
+import org.auraframework.css.parser.ThemeValueProvider;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
@@ -100,7 +102,7 @@ public class CSSParser extends DefaultCSSVisitor {
     private final List<Rework<CSSDeclaration>> declarationRework;
     private final List<DynamicRework<CSSDeclaration>> dynDeclarationRework;
 
-    private final ReworkThemeFunction themeFunction = new ReworkThemeFunction();
+    private final ReworkThemeFunction themeFunction;
 
     /**
      * @param namespace
@@ -112,6 +114,7 @@ public class CSSParser extends DefaultCSSVisitor {
         this.componentClass = componentClass;
         this.contents = preProcess(contents);
         this.allowedConditions = allowedConditions;
+        this.themeFunction = new ReworkThemeFunction(filename);
 
         this.selectorRework = ImmutableList.<Rework<CSSSelector>> of(
                 new ReworkClassName(componentClass, validateNamespace));
@@ -143,6 +146,15 @@ public class CSSParser extends DefaultCSSVisitor {
         }
 
         return components;
+    }
+
+    /**
+     * Get all references to {@link ThemeDef}s within the parsed CSS. Not useful unless {@link #parse()} has already
+     * been called. The references are still in the raw format... the actual descriptors can be parsed using
+     * {@link ThemeValueProvider}.
+     */
+    public Set<String> getThemeReferences() {
+        return themeFunction.getAllReferences();
     }
 
     private String formatErrors() {

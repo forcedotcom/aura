@@ -24,12 +24,14 @@ import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.StyleDefBuilder;
+import org.auraframework.css.parser.ThemeValueProvider;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.http.AuraResourceServlet;
+import org.auraframework.impl.css.parser.ThemeValueProviderImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.Component;
 import org.auraframework.system.AuraContext;
@@ -37,6 +39,8 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 /**
@@ -45,35 +49,58 @@ import com.google.common.collect.Maps;
 public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
 
     private static final long serialVersionUID = 7140896215068458158L;
+    private static final ThemeValueProvider themeProvider = new ThemeValueProviderImpl();
+
     private final String className;
     private final Set<String> imageURLs;
     private final Set<String> validImageURLs;
     private final List<ComponentDefRef> components;
+    private final Set<String> themeReferences;
 
     protected StyleDefImpl(Builder builder) {
         super(builder);
         this.className = builder.className;
+
         if (builder.imageURLs == null) {
             this.imageURLs = Collections.emptySet();
         } else {
             this.imageURLs = builder.imageURLs;
         }
         this.validImageURLs = validateImageURLs(builder.imageURLs);
-        this.components = builder.components;
+
+        if (builder.components == null) {
+            this.components = ImmutableList.of();
+        } else {
+            this.components = builder.components;
+        }
+
+        if (builder.themeReferences == null) {
+            this.themeReferences = ImmutableSet.of();
+        } else {
+            this.themeReferences = builder.themeReferences;
+        }
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) throws QuickFixException {
         dependencies.add(Aura.getDefinitionService().getDefDescriptor(descriptor.getNamespace(),
                 NamespaceDef.class));
 
-        // TODONM themedef dependencies
+        // dependencies from theme variables in the css file
+        for (String reference : themeReferences) {
+            dependencies.addAll(themeProvider.getDescriptors(reference, getLocation()));
+        }
+
     }
 
     @Override
     public void validateReferences() throws QuickFixException {
-        // TODONM Auto-generated method stub
         super.validateReferences();
+
+        // references to themedefs
+        for (String reference : themeReferences) {
+            themeProvider.getValue(reference, getLocation());
+        }
     }
 
     @Override
@@ -144,6 +171,7 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
         private String className;
         private Set<String> imageURLs;
         private List<ComponentDefRef> components;
+        private Set<String> themeReferences;
 
         @Override
         public StyleDef build() {
@@ -165,6 +193,12 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
         @Override
         public StyleDefBuilder setComponents(List<ComponentDefRef> components) {
             this.components = components;
+            return this;
+        }
+
+        @Override
+        public StyleDefBuilder setThemeReferences(Set<String> themeReferences) {
+            this.themeReferences = themeReferences;
             return this;
         }
 

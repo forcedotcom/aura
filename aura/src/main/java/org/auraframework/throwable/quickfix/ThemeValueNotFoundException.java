@@ -19,31 +19,27 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.system.Location;
 
 /**
  * Exceptions used when a variable (attribute) isn't found in a {@link ThemeDef}.
  * 
  * TODONM add quickfix action.
  */
-public class ThemeVariableNotFoundException extends AuraValidationException {
+public class ThemeValueNotFoundException extends AuraValidationException {
     private static final long serialVersionUID = -2571041901012359701L;
 
-    public ThemeVariableNotFoundException(String variable) {
-        this(variable, null);
+    public ThemeValueNotFoundException(String variable, DefDescriptor<ThemeDef> descriptor) {
+        this(variable, descriptor, null);
     }
 
-    public ThemeVariableNotFoundException(String variable, DefDescriptor<ThemeDef> descriptor) {
-        super(getMessage(checkNotNull(variable), descriptor));
+    public ThemeValueNotFoundException(String variable, DefDescriptor<ThemeDef> descriptor, Location location) {
+        super(getMessage(checkNotNull(variable), descriptor), location);
     }
 
     private static String getMessage(String variable, DefDescriptor<ThemeDef> descriptor) {
-        if (descriptor != null) {
-            String msg = "No theme variable named %s exists in theme %s";
-            return String.format(msg, variable, descriptor.getDescriptorName());
-        } else {
-            String msg = "No theme variable named %s exists";
-            return String.format(msg, variable);
-        }
+        String msg = "The attribute \"%s\" was not found on the %s %s";
+        return String.format(msg, variable, descriptor.getDefType(), descriptor.getQualifiedName());
     }
 
 }

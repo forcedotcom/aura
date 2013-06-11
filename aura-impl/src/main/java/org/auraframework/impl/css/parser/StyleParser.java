@@ -89,6 +89,7 @@ public class StyleParser implements Parser {
                     className, source.getContents(), allowedConditions, source.getSystemId());
 
             builder.setComponents(parser.parse());
+            builder.setThemeReferences(parser.getThemeReferences());
 
             return (D) builder.build();
         }

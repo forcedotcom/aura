@@ -31,4 +31,6 @@ public interface StyleDefBuilder extends DefBuilder<StyleDef, StyleDef> {
 
     StyleDefBuilder setComponents(List<ComponentDefRef> components);
 
+    StyleDefBuilder setThemeReferences(Set<String> themeReferences);
+
 }

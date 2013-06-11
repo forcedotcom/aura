@@ -47,6 +47,11 @@ import com.google.common.collect.Maps;
  * @author nmcwilliams
  */
 public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeDef {
+    private static final String NOT_INHERITED = "Attribute '%s' is not inherited.";
+    private static final String MISSING_DEFAULT = "Attribute '%s' must specify a default value. An empty string is acceptable.";
+    private static final String CIRCULAR = "%s cannot through its parent eventually refer back to itself.";
+    private static final String CANNOT_EXTEND = "%s cannot extend itself";
+
     private static final long serialVersionUID = -7900230831915100535L;
 
     private final int hashCode;
@@ -107,8 +112,7 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
 
             // check that each attribute has default specified
             if (attribute.getDefaultValue() == null) {
-                String msg = "Attribute '%s' must specify a default value. An empty string is acceptable.";
-                throw new InvalidDefinitionException(String.format(msg, attribute.getName()), getLocation());
+                throw new InvalidDefinitionException(String.format(MISSING_DEFAULT, attribute.getName()), getLocation());
             }
         }
 
@@ -131,16 +135,14 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
 
             // can't extend itself
             if (extendsDescriptor.equals(descriptor)) {
-                String msg = "%s cannot extend itself";
-                throw new InvalidDefinitionException(String.format(msg, getDescriptor()), getLocation());
+                throw new InvalidDefinitionException(String.format(CANNOT_EXTEND, getDescriptor()), getLocation());
             }
 
             // ensure no circular hierarchy
-            String msg = "%s cannot through its parent eventually refer back to itself.";
             DefDescriptor<ThemeDef> current = extendsDescriptor;
             while (current != null) {
                 if (current.equals(descriptor)) {
-                    throw new InvalidDefinitionException(String.format(msg, descriptor), getLocation());
+                    throw new InvalidDefinitionException(String.format(CIRCULAR, descriptor), getLocation());
                 }
                 current = current.getDef().getExtendsDescriptor();
             }
@@ -155,17 +157,19 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
         for (AttributeDefRef override : overrides.values()) {
             override.validateReferences();
 
-            String msg = "Attribute '%s' is not inherited.";
             DefDescriptor<AttributeDef> desc = override.getDescriptor();
 
-            // ensure it is actually overriding something
+            // verify that aura:set refers to an actual parent attribute. aura:set will be the preferred way to override
+            // a parent attribute's value. This way, if the parent attribute changes we will get an error downstream, as
+            // opposed to silently becoming disconnected.​ If you redefine the attribute it would still work, that's
+            // just not recommended.
             if (extendsDescriptor == null) {
-                throw new InvalidDefinitionException(String.format(msg, desc.getName()), getLocation());
+                throw new InvalidDefinitionException(String.format(NOT_INHERITED, desc.getName()), getLocation());
             } else {
                 ThemeDef parent = extendsDescriptor.getDef();
                 AttributeDef overridden = parent.getAttributeDefs().get(desc);
                 if (overridden == null) {
-                    throw new InvalidDefinitionException(String.format(msg, desc.getName()), getLocation());
+                    throw new InvalidDefinitionException(String.format(NOT_INHERITED, desc.getName()), getLocation());
                 }
             }
         }

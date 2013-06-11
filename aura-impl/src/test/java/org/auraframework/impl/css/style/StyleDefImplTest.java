@@ -15,18 +15,24 @@
  */
 package org.auraframework.impl.css.style;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.root.theme.ThemeDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -141,5 +147,14 @@ public class StyleDefImplTest extends AuraImplTestCase {
         DefDescriptor<NamespaceDef> nsDesc = Aura.getDefinitionService().getDefDescriptor(styleDesc.getNamespace(),
                 NamespaceDef.class);
         assertTrue("NamespaceDef missing from StyleDef dependencies", deps.contains(nsDesc));
+    }
+
+    public void testThemeDependencies() throws QuickFixException {
+        StyleDef def = DefDescriptorImpl.getInstance("themeTest.simple", StyleDef.class).getDef();
+        DefDescriptor<ThemeDef> expected = ThemeDefImpl.descriptor("themeTest:baseTheme");
+
+        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+        def.appendDependencies(dependencies);
+        assertThat(dependencies.contains(expected), is(true));
     }
 }

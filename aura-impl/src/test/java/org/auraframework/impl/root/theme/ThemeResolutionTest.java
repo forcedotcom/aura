@@ -15,10 +15,16 @@
  */
 package org.auraframework.impl.root.theme;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.StyleParserException;
+import org.auraframework.throwable.quickfix.ThemeValueNotFoundException;
 
 /**
  * Unit tests for resolving theme function values in CSS files.
@@ -67,13 +73,32 @@ public class ThemeResolutionTest extends AuraImplTestCase {
 
     /** errors when the theme does not exist */
     public void testQualifiedNonexistentTheme() throws Exception {
-        DefDescriptor<StyleDef> style = get("themeTest.badTheme");
-        System.out.println(style.getDef().getCode());
+        try {
+            get("themeTest.badTheme").getDef().getCode();
+            fail("expected to get exception");
+        } catch (DefinitionNotFoundException e) {
+            assertThat(e.getMessage().contains("No THEME"), is(true));
+        }
     }
 
     /** errors when the variable does not exist */
     public void testQualifiedNonexistentVariable() throws Exception {
-        DefDescriptor<StyleDef> style = get("themeTest.badVariable");
+        try {
+            get("themeTest.badVariable").getDef().getCode();
+            fail("expected to get exception");
+        } catch (ThemeValueNotFoundException e) {
+            assertThat(e.getMessage().contains("was not found on the THEME"), is(true));
+        }
+    }
+
+    /** errors with mixing of raw text with theme function */
+    public void testMixingRawTextWithThemeFunction() throws Exception {
+        try {
+            get("themeTest.invalidMixing").getDef().getCode();
+            fail("expected to get exception");
+        } catch (StyleParserException e) {
+            assertThat(e.getMessage().contains("Cannot mix"), is(true));
+        }
     }
 
     private DefDescriptor<StyleDef> get(String locator) {

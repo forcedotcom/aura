@@ -20,7 +20,7 @@
 
 <p>Use Java for server-side Aura code.</p>
 
-<p>Services are the API in front of Aura. The <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/Aura.html" target="_new">Aura</a> class is the entry point in Java for accessing server-side services.</p>
+<p>Services are the API in front of Aura. The <ui:outputURL value="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/Aura.html" label="Aura jenkins">Aura</ui:outputURL> class is the entry point in Java for accessing server-side services.</p>
 
 <p>Your app can contain the following types of Java files.</p>
 

@@ -125,9 +125,9 @@ public class TrivialModel throws QuickFixException {
 
   <h3>Learn More</h3>
 
-  <p>For a more in-depth example of a model that initializes its data from a database, see the <a href="https://github.com/forcedotcom/aura-note/blob/master/src/main/java/org/auraframework/demo/notes/models/NoteListModel.java" target="_new">NoteListModel class</a> in the Aura Note sample app. (Log in to GitHub if you get a 404 error.)</p>
+  <p>For a more in-depth example of a model that initializes its data from a database, see the <ui:outputURL value="https://github.com/forcedotcom/aura-note/blob/master/src/main/java/org/auraframework/demo/notes/models/NoteListModel.java" label="NoteListModel">NoteListModel class</ui:outputURL> in the Aura Note sample app. (Log in to GitHub if you get a 404 error.)</p>
 
-  <p>The associated noteList.cmp component is <a href="https://github.com/forcedotcom/aura-note/blob/master/src/main/webapp/WEB-INF/components/auranote/noteList/noteList.cmp" target="_new">here</a>.</p>
+  <p>The associated noteList.cmp component is <ui:outputURL value="https://github.com/forcedotcom/aura-note/blob/master/src/main/webapp/WEB-INF/components/auranote/noteList/noteList.cmp" label="noteList">here</ui:outputURL>.</p>
 
   <p><b>See also:</b><br/>
       <auradocs:topicLink topic="modelsAccessJavaScript">Accessing Models in JavaScript</auradocs:topicLink><br/>

@@ -35,7 +35,7 @@
     They are called before and after a test method is run.
     </p>
 
-    <auradocs:info>You can view Aura's test methods in the <a href="#reference?topic=api:Test">JavaScript API reference</a>.
+    <auradocs:info>You can view Aura's test methods in the <ui:outputURL value="#reference?topic=api:Test" label="JavaScript API">JavaScript API reference</ui:outputURL>.
     <p>You may also want to use <auradocs:topicLink topic="testsAssert">assertions</auradocs:topicLink> and <auradocs:topicLink topic="testsUtility">utility functions</auradocs:topicLink> available to you for unit testing.</p>
    </auradocs:info>
 
@@ -53,7 +53,7 @@
                 <li>To open Developer Tools on Windows and Linux, press Control - Shift - I in your Chrome browser.</li>
                 <li>To quickly find which line of code a test fails on, enable the <b>Pause on all exceptions</b> option before running the test.</li>
              </ul>
-             Learn more about how to use  breakpoints at <a href="https://developers.google.com/chrome-developer-tools/docs/scripts-breakpoints" target="_blank">Chrome Developer Tools</a>.</p>
+             Learn more about how to use  breakpoints at <ui:outputURL value="https://developers.google.com/chrome-developer-tools/docs/scripts-breakpoints" label="Chrome Developer Tools">Chrome Developer Tools</ui:outputURL>.</p>
 
      <h3>Simulating User Interactions</h3>
     <p>To simulate a user interaction, fire the associated Aura event. For example, use <code>buttonComponent.get("e.press").fire()</code> to simulate a button click event.</p>

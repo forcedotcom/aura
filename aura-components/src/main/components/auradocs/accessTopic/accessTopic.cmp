@@ -41,14 +41,9 @@
                 See <auradocs:topicLink topic="useForm">Getting User Input</auradocs:topicLink> for more information.</td>           
         </tr>
 	    <tr>
-	       <td>Images</td>
-	       <td>Use the <code>ui:image</code> component and include alternative text with informational images. 
-	           See <auradocs:topicLink topic="img">Images</auradocs:topicLink> for more information.</td>
-	    </tr>
-	    <tr>
 	       <td>Forms and fields</td>
 	       <td>Use the <code>ui:input</code> and <code>ui:output</code> components, which provide extensive <auradocs:topicLink topic="label">label</auradocs:topicLink> support.
-	       For example, use <code>ui:inputTextarea</code> in preference to the <code>select</code> tag for multi-line text input. 
+	       For example, use <code>ui:inputTextarea</code> in preference to the <code>&lt;textarea&gt;</code> tag for multi-line text input. 
 	       See <auradocs:topicLink topic="useForm">Getting User Input</auradocs:topicLink> for more information.</td> 
         </tr>
         <tr>
@@ -61,11 +56,20 @@
             For information on field-level errors, see <auradocs:topicLink topic="error">Validating Fields</auradocs:topicLink>.</td>
         </tr>
         <tr>
+           <td>Images</td>
+           <td>Use the <code>ui:image</code> component and include alternative text with informational images. 
+               See <auradocs:topicLink topic="img">Images</auradocs:topicLink> for more information.</td>
+        </tr>
+        <tr>
             <td>Links</td>
             <td>Use the <code>ui:outputURL</code> component in preference to the <code>&lt;a&gt;</code> tag.
             Example: <auradocs:codeblock>&lt;ui:outputURL value="www.google.com" label="search" /&gt;</auradocs:codeblock></td>
         </tr>
-        
+        <tr>
+            <td>Tables</td>
+            <td>Use the <code>ui:dataTable</code> component in preference to the <code>&lt;table&gt;</code> tag.
+            See <auradocs:defLink defType="component" descriptor="ui:dataTable">ui:dataTable</auradocs:defLink> for more information.</td>
+        </tr>
     </tbody>
     </table>
     <p>

@@ -19,7 +19,7 @@
 
     <aura:set attribute="title" value="Controlling Available Modes"/>
 
-    <p>You can customize the set of available modes in your application by writing a Java class that implements the <code>getAvailableModes()</code> method in <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/adapter/ConfigAdapter.html" target="_new">ConfigAdapter</a>. The default implementation in <a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/impl/adapter/ConfigAdapterImpl.html" target="_new">ConfigAdapterImpl</a> makes all modes available.</p>
+    <p>You can customize the set of available modes in your application by writing a Java class that implements the <code>getAvailableModes()</code> method in <ui:outputURL value="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/adapter/ConfigAdapter.html" label="ConfigAdapter">ConfigAdapter</ui:outputURL>. The default implementation in <ui:outputURL value="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/index.html?org/auraframework/impl/adapter/ConfigAdapterImpl.html" label="ConfigAdapterImpl">ConfigAdapterImpl</ui:outputURL> makes all modes available.</p>
 
     <p>So, if you want to use your own configuration to limit the modes in certain environments, such as a production environment, you could limit the modes to only allow <code>PROD</code> mode. This would ensure that <code>PROD</code> mode is used for all requests. The default mode is not used if it’s not also included in the list of available modes.</p>
 

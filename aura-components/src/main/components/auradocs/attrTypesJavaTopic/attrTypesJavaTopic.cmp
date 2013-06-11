@@ -23,7 +23,7 @@
 <auradocs:codeblock><![CDATA[<aura:attribute name="woof" type="java://org.docsample.Dog" />
 ]]></auradocs:codeblock>
 
-    <p>If you create a custom Java type, it must implement JsonSerializable to enable marshalling from the server to the client. For example, see <a href="https://github.com/forcedotcom/aura-note/blob/master/src/main/java/org/auraframework/demo/notes/Note.java" target="_new">Note.java</a> in the Aura Note sample app.</p>
+    <p>If you create a custom Java type, it must implement JsonSerializable to enable marshalling from the server to the client. For example, see <ui:outputURL value="https://github.com/forcedotcom/aura-note/blob/master/src/main/java/org/auraframework/demo/notes/Note.java" label="Note.java">Note.java</ui:outputURL> in the Aura Note sample app.</p>
 
     <h2>Support for Collections</h2>
 

@@ -41,7 +41,7 @@
 	<auradocs:example descriptor="auradocs:demoMessage" />
 	
 	<h3><code>ui:stamp</code></h3>
-	<p>Use <code>ui:stamp</code> to display a decorated stamp containing text. The demo below shows stamps with different <code>severity</code> attribute values. For example, the <a href="#reference">component reference</a> uses
+	<p>Use <code>ui:stamp</code> to display a decorated stamp containing text. The demo below shows stamps with different <code>severity</code> attribute values. For example, the <ui:outputURL value="#reference" label="component reference">component reference</ui:outputURL> uses
 	<code>ui:stamp</code> to denote the support level of the components.</p>
 	<auradocs:info>See the <auradocs:defLink descriptor="ui:stamp">ui:stamp</auradocs:defLink> component reference.</auradocs:info> 
 	<auradocs:example descriptor="auradocs:demoStamp" />

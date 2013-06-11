@@ -821,7 +821,7 @@ $A.ns.Aura.prototype.logInternal = function(type, message, error, trace) {
  */
 $A.ns.Aura.prototype.log = function(value, error) {
     var trace;
-    if (this.util.isError(value) || this.util.isObject(value)) {
+    if (this.util.isError(value)) {
         error = value;
         value = error.message;
     }

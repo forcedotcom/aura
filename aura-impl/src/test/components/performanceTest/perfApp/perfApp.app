@@ -37,22 +37,22 @@
 	    </table>
 	    
 	<!--Server Actions -->
-	<!--ui:button label="Simple Server action" press="{!c.simpleServerAction}"/>
+	<ui:button label="Simple Server action" press="{!c.simpleServerAction}"/>
 	<ui:button label="Server action to get Component and resolve configs" press="{!c.getComponent}"/>
-	<div aura:id='new'/-->
+	<div aura:id='new'/>
 	
 	<!--Inheritance and nesting of components -->
-	<!--performanceTest:inheritance color="{!v.color}"/-->
+	<performanceTest:inheritance color="{!v.color}"/>
 	
 	<!--Layouts and Browser History Management -->
-	<!--br/><br/>
+	<br/><br/>
 	<ui:button label="Change to Basketball layout" press="{!c.changeLayout}"/>
 	<ui:button label="Change Back to Baseball layout" press="{!c.revertLayout}"/>
 	<table>
 	<tr><td>Game:</td><td><div aura:id="game"></div></td></tr>
     <tr><td>Divisions:</td><td><div aura:id="divisions"></div></td></tr>
     <tr><td>Teams:</td><td><div aura:id="teams"></div></td></tr>
-    </table-->
+    </table>
     
     <!-- Garbage collection of DOM elements and Components-->
     <br/>

@@ -16,6 +16,7 @@
 
 -->
 <aura:component implements="ui:visible, ui:pagingInterface" extensible="true" abstract="true" support="proto">
+    <aura:attribute name="contentRole" type="String" description="Defines the role attribute of the list content."/>  
     <aura:attribute name="itemTemplate" type="Aura.ComponentDefRef[]" required="true" description="A ComponentDefRef to use as the template for each generated row in the list."/>
     <aura:attribute name="items" type="Object[]" description="An array of arbitrary map objects representing the rows of data in the list."/>
     <aura:attribute name="itemVar" type="String" required="true" description="The name by which to refer to the current data object inside of the template for each row."/>
@@ -25,10 +26,10 @@
     <aura:attribute name="footer" type="Aura.Component[]" description="A facet below the rendered list, for use as a list footer"/>
 
     <aura:handler name="init" action="{!c.init}" value="{!this}"/>
-    <div class="{!v.class}">
+    <div class="{!v.class + (v.visible == false ? ' invisible' : '')}" role="{!v.role}">
         {!v.header}
         
-        <div class="listContent">
+        <div class="listContent" role="{!v.contentRole}">
             {!v.body}
             <div class="loadingIndicator">
                 <div class="background"></div>

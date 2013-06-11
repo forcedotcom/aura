@@ -24,6 +24,7 @@
     <aura:attribute name="role" type="String" description="Defines the component to help orient the user. Use this attribute for accessibility or component description. Possible values: header, main, note, and so on."/>
     <aura:attribute name="aria-describedby" type="String" description="Identifies the HTML element (or elements) that describes the component. Use this attribute for accessibility or component description."/>
     <aura:attribute name="value" type="Object" description="References the controller class variable that is associated with the component."/>
+    <aura:attribute name="visible" type="Boolean" default="true" description="Controls the visibility of the component."/>
 
     <aura:registerEvent name="click" type="ui:click" description="The event fired when the user clicks on the component." />
     <aura:registerEvent name="dblclick" type="ui:dblclick" description="The event fired when the user double-clicks the component."/>

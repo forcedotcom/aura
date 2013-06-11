@@ -15,6 +15,20 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" description="Used to trigger providing of data from a list dataProvider.">
-    <aura:attribute name="parameters" type="Object" description="The parameters data provider can use to fetch data."/>
-</aura:event>
+<aura:component extends="ui:inputText" extensible="true" support="proto"
+    description="This component is used as input text in autocomplete.">
+    <input aura:id="txt"
+           id="{!v.domId}"
+           class="{!v.class}"
+           type="{!v.type}"
+           value="{!v.value}"
+           placeholder="{!v.placeholder}"
+           required="{!v.required}"
+           disabled="{!v.disabled}"
+           maxlength="{!v.maxlength}"
+           size="{!v.size}"
+           role="combobox"
+           aria-autocomplete="list"
+           aria-haspopup="true"
+           aria-activedescendant=""/>
+</aura:component>

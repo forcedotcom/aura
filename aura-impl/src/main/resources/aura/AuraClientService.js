@@ -232,6 +232,8 @@ var AuraClientService = function() {
             //#end
             priv.auraStack.push(name);
         },
+        
+        queueNeedsFiltering : false,
 
         /**
          * Pop an item off the stack.
@@ -271,11 +273,12 @@ var AuraClientService = function() {
                     done = !clientService.processActions();
                     count += 1;
                     if (count > 14) {
-                        $A.error("finishFiring has not completed after 10 loops");
+                        $A.error("finishFiring has not completed after 15 loops");
                     }
                 }
                 // Force our stack to nothing.
                 priv.auraStack = [];
+                this.queueNeedsFiltering = true;
             }
         },
 
@@ -499,6 +502,16 @@ var AuraClientService = function() {
             if (exclusive !== undefined) {
                 action.setExclusive(exclusive);
             }
+            
+            if (action.isAbortable()) {
+                //indicate to priv that there is a new abortable action group and any currently running group is out of date.
+                priv.newestAbortableGroup = -1;
+                if (clientService.queueNeedsFiltering) {
+                    priv.actionQueue = clientService.clearPreviousAbortableActions(priv.actionQueue);
+                    clientService.queueNeedsFiltering = false;
+                }
+            }
+            
             //
             // FIXME: W-1652118 This should not differentiate, both of these should get pushed.
             //
@@ -508,27 +521,43 @@ var AuraClientService = function() {
                 priv.actionQueue.push(action);
             }
         },
-
+        
+        clearPreviousAbortableActions : function(queue) {
+            var newQueue = [];
+            var counter;
+            for(counter = 0; counter < queue.length; counter++) {
+                if (!queue[counter].isAbortable()) {
+                    newQueue.push(queue[counter]);
+                } else {
+                    queue[counter].abort();
+                }
+            }
+            return newQueue;
+        },
+        
         /**
          * process the current set of actions, looping if needed.
          *
-         * This runs the current action set, then tries again as
-         * long as there are actions to be run.
+         * This runs the current action set.
          *
          * @private
          */
         processActions : function() {
-            var count = 0;
-            while (priv.actionQueue.length > 0) {
-                var actions = priv.actionQueue;
+            var actions;
+
+            //if an XHR is in flight request don't send a new request yet.
+            if (priv.inRequest) {
+                return false;
+            }
+            
+            if (priv.actionQueue.length > 0) {
+                actions = priv.actionQueue;
                 priv.actionQueue = [];
                 priv.request(actions);
-                count += 1;
-                if (count > 20) {
-                    $A.error("Actions do not seem to be completing");
-                }
+                clientService.queueNeedsFiltering = false;
+                return true;
             }
-            return (count > 0);
+            return false;
         }
 
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

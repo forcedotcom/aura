@@ -33,7 +33,7 @@
 
     <p>The latter syntax without <code>aura:set</code> makes more sense in this simple example. You can also use this simpler syntax in component references to set values for attributes that are inherited from parent components.</p>
 
-    <p><code>aura:set</code> is more useful when you want to set markup as the attribute value. In the <a href="https://github.com/forcedotcom/aura-note/blob/master/src/main/webapp/WEB-INF/components/auranote/notes/notes.app" target="_new">Aura Note sample app</a>, the <code>&lt;aura:set&gt;</code> tag specifies the markup for the <code>left</code> attribute of the <code>ui:block</code> element.</p>
+    <p><code>aura:set</code> is more useful when you want to set markup as the attribute value. In the <ui:outputURL value="https://github.com/forcedotcom/aura-note/blob/master/src/main/webapp/WEB-INF/components/auranote/notes/notes.app" label="Aura Note sample app">Aura Note sample app</ui:outputURL>, the <code>&lt;aura:set&gt;</code> tag specifies the markup for the <code>left</code> attribute of the <code>ui:block</code> element.</p>
 
 <auradocs:codeblock><![CDATA[<ui:block class="wrapper" aura:id="block">
     <aura:set attribute="left">

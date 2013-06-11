@@ -26,8 +26,8 @@
 
 <p>The Aura Integration Service provides a set of Java APIs that allow you to embed a component. The Java APIs are included in the following interfaces and their class implementations.</p>
 <ul>
-    <li><a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/org/auraframework/service/IntegrationService.html" target="_new">IntegrationService Interface</a> (implemented by <code>IntegrationServiceImpl</code>): Enables the creation of an integration using the <code>createIntegration()</code> method.</li>
-    <li><a href="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/org/auraframework/integration/Integration.html" target="_new">Integration Interface</a> (implemented by <code>IntegrationImpl</code>): Enables adding components using the <code>injectComponent()</code> method.</li></ul>
+    <li><ui:outputURL value="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/org/auraframework/service/IntegrationService.html" label="IntegrationService Interface">IntegrationService Interface</ui:outputURL> (implemented by <code>IntegrationServiceImpl</code>): Enables the creation of an integration using the <code>createIntegration()</code> method.</li>
+    <li><ui:outputURL value="http://jenkins.auraframework.org/view/All/job/lumen_doc/javadoc/org/auraframework/integration/Integration.html" label="Integration Interface">Integration Interface</ui:outputURL> (implemented by <code>IntegrationImpl</code>): Enables adding components using the <code>injectComponent()</code> method.</li></ul>
 
 <p>Suppose you'd like to add an Aura button inside an HTML <code>div</code> container. To do so:</p>
 <ol>

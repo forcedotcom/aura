@@ -51,7 +51,7 @@
             <tr>
                 <td><code>Decimal</code></td>
                 <td><code>&lt;aura:attribute name="totalPrice" type="Decimal" /&gt;</code></td>
-                <td><code>Decimal</code> values can contain fractional portions (digits to the right of the decimal). Maps to <a href="http://docs.oracle.com/javase/6/docs/api/java/math/BigDecimal.html" target="_new">java.math.BigDecimal</a>.
+                <td><code>Decimal</code> values can contain fractional portions (digits to the right of the decimal). Maps to <ui:outputURL value="http://docs.oracle.com/javase/6/docs/api/java/math/BigDecimal.html" label="java.math.BigDecimal">java.math.BigDecimal</ui:outputURL>.
 
                     <p><code>Decimal</code> is better than <code>Double</code> for maintaining precision for floating-point calculations. It’s preferable for currency fields.</p>
                 </td>
@@ -60,19 +60,19 @@
             <tr>
                 <td><code>Double</code></td>
                 <td><code>&lt;aura:attribute name="widthInchesFractional" type="Double" /&gt;</code></td>
-                <td><code>Double</code> values can contain fractional portions. Maps to <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Double.html" target="_new">java.lang.Double</a>. Use <code>Decimal</code> for currency fields instead.</td>
+                <td><code>Double</code> values can contain fractional portions. Maps to <ui:outputURL value="http://docs.oracle.com/javase/6/docs/api/java/lang/Double.html" label="java.lang.Double">java.lang.Double</ui:outputURL>. Use <code>Decimal</code> for currency fields instead.</td>
             </tr>
 
             <tr>
                 <td><code>Integer</code></td>
                 <td><code>&lt;aura:attribute name="numRecords" type="Integer" /&gt;</code></td>
-                <td><code>Integer</code> values can contain numbers with no fractional portion. Maps to <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Integer.html" target="_new">java.lang.Integer</a>, which defines its limits, such as maximum size.</td>
+                <td><code>Integer</code> values can contain numbers with no fractional portion. Maps to <ui:outputURL value="http://docs.oracle.com/javase/6/docs/api/java/lang/Integer.html" label="java.lang.Integer">java.lang.Integer</ui:outputURL>, which defines its limits, such as maximum size.</td>
             </tr>
 
             <tr>
                 <td><code>Long</code></td>
                 <td><code>&lt;aura:attribute name="numSwissBankAccount" type="Long" /&gt;</code></td>
-                <td><code>Long</code> values can contain numbers with no fractional portion. Maps to <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Long.html" target="_new">java.lang.Long</a>, which defines its limits, such as maximum size.
+                <td><code>Long</code> values can contain numbers with no fractional portion. Maps to <ui:outputURL value="http://docs.oracle.com/javase/6/docs/api/java/lang/Long.html" label="java.lang.Long">java.lang.Long</ui:outputURL>, which defines its limits, such as maximum size.
 
                     <p>Use this data type when you need a range of values wider than those provided by <code>Integer</code>.</p>
                 </td>

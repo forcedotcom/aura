@@ -23,13 +23,13 @@
 
  <p>Many of the commands in this quick start trigger downloads of additional Maven dependencies. If you have never used Maven before or if you are going through this quick start
     on a new machine or with a new user account, this can be slow initially. However, once the dependent artifacts are downloaded, they are cached in a local repository and subsequent commands
-    execute more quickly. See <a href="http://maven.apache.org/guides/introduction/introduction-to-archetypes.html" target="_blank">Introduction to Maven archetypes</a>. </p>
+    execute more quickly. See <ui:outputURL value="http://maven.apache.org/guides/introduction/introduction-to-archetypes.html" label="Introduction to Maven archetypes">Introduction to Maven archetypes</ui:outputURL>. </p>
 
     <h5>Prerequisites</h5>
     <p>
         <ol>
-            <li><a href="http://www.oracle.com/technetwork/java/javase/downloads/" target="_blank">JDK 1.6</a></li>
-            <li><a href="http://maven.apache.org/download.html" target="_blank">Maven 3</a></li>
+            <li><ui:outputURL value="http://www.oracle.com/technetwork/java/javase/downloads/" label="JDK 1.6">JDK 1.6</ui:outputURL></li>
+            <li><ui:outputURL value="http://maven.apache.org/download.html" label="Maven 3">Maven 3</ui:outputURL></li>
         </ol>
     </p>
 

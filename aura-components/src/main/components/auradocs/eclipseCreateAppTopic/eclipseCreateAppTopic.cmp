@@ -26,9 +26,9 @@
     <h2>Prerequisites</h2>
         <ol>
 
-            <li><a href="http://www.oracle.com/technetwork/java/javase/downloads/" target="_blank">JDK 1.6</a></li>
-            <li><a href="http://maven.apache.org/download.html" target="_blank">Maven 3</a></li>
-            <li><a href="http://www.eclipse.org/downloads/" target="_blank">Eclipse 3.7</a>, and the <a href="http://www.eclipse.org/m2e/download/" target="_blank">m2eclipse plugin</a>. Choose the Eclipse distribution for Java EE Developers. This includes JavaScript editing and other Web UI tools.</li>
+            <li><ui:outputURL value="http://www.oracle.com/technetwork/java/javase/downloads/" label="JDK 1.6">JDK 1.6</ui:outputURL></li>
+            <li><ui:outputURL value="http://maven.apache.org/download.html" label="_Maven 3">Maven 3</ui:outputURL></li>
+            <li><ui:outputURL value="http://www.eclipse.org/downloads/" label="Eclipse 3.7">Eclipse 3.7</ui:outputURL>, and the <ui:outputURL value="http://www.eclipse.org/m2e/download/" label="m2eclipse">m2eclipse plugin</ui:outputURL>. Choose the Eclipse distribution for Java EE Developers. This includes JavaScript editing and other Web UI tools.</li>
 
         </ol>
 
@@ -57,7 +57,7 @@
             <li>Click <b>Finish</b>.</li>
         </ol>
         <auradocs:info>The Artifact Id is also the name of your project as it appears in the Package Explorer. See
-        <a href="http://maven.apache.org/guides/mini/guide-naming-conventions.html" target="_blank">Guide to naming conventions</a> for examples of Group Id and Artifact Id naming conventions.</auradocs:info>
+        <ui:outputURL value="http://maven.apache.org/guides/mini/guide-naming-conventions.html" label="Guide to naming conventions">Guide to naming conventions</ui:outputURL> for examples of Group Id and Artifact Id naming conventions.</auradocs:info>
 
         <p>You should now have a new project called <code>helloWorldEclipse</code> in the Package Explorer.</p>
 

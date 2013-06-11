@@ -29,8 +29,8 @@ var Test = function(){
          * current test stage is completed but before the next stage is started.
          *
          * @description <p>Example:</p>
-         * aura.test.addWaitFor("i was updated", function(){
-         *   return element.textContent;}, function(){alert("the wait is over"});
+         * <code>aura.test.addWaitFor("i was updated", function(){<br/>
+         *   return element.textContent;}, function(){alert("the wait is over"});</code>
          *
          * @param {Object} expected
          *             The value to compare against. If expected is a function,
@@ -50,7 +50,7 @@ var Test = function(){
          * current test stage is completed but before the next stage is started.
          *
          * @description <p>Example:</p>
-         * aura.test.addWaitForAction(true, "myActionName", function() {alert("My Action Completed");});
+         * <code>aura.test.addWaitForAction(true, "myActionName", function() {alert("My Action Completed");});</code>
          *
          * @param {Object} success true if the action should succeed.
          * @param {Object} actionName the name of the action from createAction or markForCompletion
@@ -79,8 +79,8 @@ var Test = function(){
          * current test stage is completed but before the next stage is started.
          *
          * @description <p>Example:</p>
-         * aura.test.addWaitForWithFailureMessage("i was updated", function(){
-         *   return element.textContent;},"Failure Message", function(){alert("the wait is over"});
+         * <code>aura.test.addWaitForWithFailureMessage("i was updated", function(){<br/>
+         *   return element.textContent;},"Failure Message", function(){alert("the wait is over"});</code>
          *
          * @param {Object} expected
          *             The value to compare against. If expected is a function,
@@ -150,9 +150,10 @@ var Test = function(){
 
         /**
          * Get an instance of a server action that is not available to the component.
-         * e.g. $A.test.getExternalAction(cmp, "aura://ComponentController/ACTION$getComponent", 
-         * 			{name:"aura:text", attributes:{value:"valuable"}},
-         * 			function(action){alert(action.getReturnValue().attributes.values.value)})
+         * @description <p>Example:</p>
+         * <code>$A.test.getExternalAction(cmp, "aura://ComponentController/ACTION$getComponent",<br/> 
+         * 			{name:"aura:text", attributes:{value:"valuable"}},<br/>
+         * 			function(action){alert(action.getReturnValue().attributes.values.value)})</code>
          * 
          * @param {Component}
          *            The scope to run the action with, even if the action is not visible to it
@@ -203,9 +204,9 @@ var Test = function(){
         /**
          * Check to see if all the current actions have completed.
          *
-         * This uses both 'inRequest' and 'requestQueue' to determine if all
+         * This uses both <code>inRequest</code> and <code>requestQueue</code> to determine if all
          * of the queued actions have completed. Note that this is different than
-         * the old 'isActionPending' since that was subject to numerous race
+         * the old <code>isActionPending</code> since that was subject to numerous race
          * conditions.
          */
         allActionsComplete : function() {
@@ -218,7 +219,7 @@ var Test = function(){
          *
          * This sets the callback on the action to mark the action complete.
          * The action passed in may have a callback set previously, if so, that
-         * callback will be called before the action is set as complete..
+         * callback will be called before the action is set as complete.
          *
          * @param a the action to modify
          * @param name the name to use (must be unique.
@@ -241,7 +242,7 @@ var Test = function(){
         /**
          * Check to see if an action is complete.
          *
-         * If you have previously called 'markForCompletion' this
+         * If you have previously called <code>markForCompletion</code> this
          * will check that the callback has been called (and thus
          * that the action is complete). It does not check for
          * success/failure.
@@ -256,7 +257,7 @@ var Test = function(){
         /**
          * Check to see if an action was successful
          *
-         * If you have previously called 'markForCompletion' this
+         * If you have previously called <code>markForCompletion</code> this
          * will check that the callback has been called with a
          * successful completion code.
          */
@@ -270,7 +271,7 @@ var Test = function(){
         /**
          * Check to see if an action is complete.
          *
-         * If you have previously called 'markForCompletion' this
+         * If you have previously called <code>markForCompletion</code> this
          * will check that the callback has been called (and thus
          * that the action is complete). It does not check for
          * success/failure.
@@ -522,8 +523,8 @@ var Test = function(){
          * 				The message that is returned if the condition is not false
          * @description A falsey value refers to zero, an empty string, null, undefined, or false.
          * <p>Example:</p>
-         * Negative: assertFalsy("helloWorld"),
-         * Postive: assertFalsy(null)
+         * Negative: <code>assertFalsy("helloWorld")</code>,
+         * Postive: <code>assertFalsy(null)</code>
          */
         assertFalsy : function(condition, assertMessage) {
             if (condition) {
@@ -830,8 +831,8 @@ var Test = function(){
         },
 
         /**
-         * Get the text content of a DOM node. Tries "innerText" followed by
-         * "textContext", followed by "nodeValue" to take browser differences into account.
+         * Get the text content of a DOM node. Tries <code>innerText</code> followed by
+         * <code>textContext</code>, followed by <code>nodeValue</code> to take browser differences into account.
          * @param {Node} node
          * 				The node to get the text content from
          * @returns {String}

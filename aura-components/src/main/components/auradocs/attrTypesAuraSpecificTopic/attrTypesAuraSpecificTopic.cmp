@@ -67,7 +67,7 @@
 
     <auradocs:info>Note: The underlying value object for an attribute of type <code>Aura.Action</code> is <code>ActionReferenceValue</code>.</auradocs:info>
 
-    <p>The Aura Note sample app uses <code>Aura.Action</code> in the <a href="https://github.com/forcedotcom/aura-note/blob/master/src/main/webapp/WEB-INF/components/auranote/listRow/listRow.cmp" target="_new">listRow.cmp</a> component.</p>
+    <p>The Aura Note sample app uses <code>Aura.Action</code> in the <ui:outputURL value="https://github.com/forcedotcom/aura-note/blob/master/src/main/webapp/WEB-INF/components/auranote/listRow/listRow.cmp" label="listRow.cmp">listRow.cmp</ui:outputURL> component.</p>
 
     <p><b>listRow.cmp</b></p>
 
@@ -92,6 +92,6 @@
 &lt;/aura:component&gt;
 </auradocs:codeblock>
 
-    <p>The <a href="https://github.com/forcedotcom/aura-note/blob/master/src/main/webapp/WEB-INF/components/auranote/noteListRow/noteListRow.cmp" target="_new">noteListRow.cmp</a> component extends listRow.cmp and sets the value for the <code>onclick</code> attribute in <code>listRow.cmp</code> to <code><aura:text value="{!"/>c.openNote}</code>, which is a reference to an action in the client-side controller for <code>noteListRow.cmp</code>. The action is executed when a user clicks the bullet associated with <code>&lt;li onclick="<aura:text value="{!"/>v.onclick}"&gt;</code> in <code>listRow.cmp</code>.</p>
+    <p>The <ui:outputURL value="https://github.com/forcedotcom/aura-note/blob/master/src/main/webapp/WEB-INF/components/auranote/noteListRow/noteListRow.cmp" label="noteListRow.cmp">noteListRow.cmp</ui:outputURL> component extends listRow.cmp and sets the value for the <code>onclick</code> attribute in <code>listRow.cmp</code> to <code><aura:text value="{!"/>c.openNote}</code>, which is a reference to an action in the client-side controller for <code>noteListRow.cmp</code>. The action is executed when a user clicks the bullet associated with <code>&lt;li onclick="<aura:text value="{!"/>v.onclick}"&gt;</code> in <code>listRow.cmp</code>.</p>
 
 </aura:component>

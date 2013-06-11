@@ -22,6 +22,6 @@
 
     <p>If you have ever developed with JavaScript or Java Swing, you should be familiar with the idea of event-driven programming. You write handlers that respond to interface events as they occur. The events may or may not have been triggered by user interaction.</p>
 
-    <auradocs:info>It's important to understand the event-driven programming concept, as it forms the foundation for not only how users interact with your application, but also how Aura components interact with themselves.  Start by reviewing an introduction to <a href="http://en.wikipedia.org/wiki/Event-driven_programming">event-driven programming</a> and <a href="http://en.wikipedia.org/wiki/Publish/subscribe">the publish-subscribe model</a> to have an understanding of this concept.</auradocs:info>
+    <auradocs:info>It's important to understand the event-driven programming concept, as it forms the foundation for not only how users interact with your application, but also how Aura components interact with themselves.  Start by reviewing an introduction to <ui:outputURL value="http://en.wikipedia.org/wiki/Event-driven_programming" label="event-driven programming">event-driven programming</ui:outputURL> and <ui:outputURL value="http://en.wikipedia.org/wiki/Publish/subscribe" label="publish-subscribe">the publish-subscribe model</ui:outputURL> to have an understanding of this concept.</auradocs:info>
 
 </aura:component>

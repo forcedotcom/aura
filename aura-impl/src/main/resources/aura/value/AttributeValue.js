@@ -42,18 +42,20 @@
  *
  * There is a school of thought that holds this class should promote to
  * BaseValue, which is today a static utility collection used both by
- * AttributeValues and also by Component.
+ * AttributeValues and also by Component.  But let's figure it out before that...
  *
  * @protected
  * @constructor
  *
  * Several properties are undefined until used:
- * this.eventDispatcher maps event name to handlers firing at "this" level.
+ * this.eventDispatcher maps qualified event name to handlers firing at "this"
+ *     level.
  * this.parent is unset for top-level values, but points to the containing
  *     MapValue or ArrayValue for child values.
  * this.parentKey is set IFF this.parent is set, and contains the key or
  *     index of "this" child in its parent.
- * this.pending contains change events that have been prepared but not fired.
+ * this.pending contains change events that have been prepared but not fired,
+ *     indexed by qualified event name.
  */
 $A.ns.AttributeValue = function () {
    /** Containing AttributeValue, either a MapValue or an ArrayValue. */
@@ -70,6 +72,12 @@ $A.ns.AttributeValue = function () {
     * data prior to being fired.
     */
    this.pending = undefined;
+};
+
+/** Static to convert simple names to qualified. */
+$A.ns.AttributeValue.getQName = function (simpleName) {
+    var eventDef = BaseValue.getEventDef(simpleName);
+    return eventDef.getDescriptor().getQualifiedName();
 };
 
 /**
@@ -118,27 +126,27 @@ $A.ns.AttributeValue.prototype.getEventHandler = function(eventName) {
     if (!this.eventDispatcher) {
         return undefined;
     }
-    return this.eventDispatcher[name];
+    return this.eventDispatcher[$A.ns.AttributeValue.getQName(eventName)];
 };
 
 /**
- * Returns, after creating if needed, a pending event for the supplied event
- * name.
+ * Returns, after creating if needed, a pending event for the supplied
+ * qualified event name.
+ *
  * @private
  */
-$A.ns.AttributeValue.prototype.getOrMakePending = function(eventName) {
+$A.ns.AttributeValue.prototype.getOrMakePending = function(eventQName) {
     if (!this.pending) {
         this.pending = {};
     }
-    var ret = this.pending[eventName];
+    var ret = this.pending[eventQName];
     if (!ret) {
-        var eventDef = $A.ns.BaseValue.getEventDef(eventName);
-        var eventQName = eventDef.getDescriptor().getQualifiedName();
+        var eventDef = BaseValue.getEventDef(eventQName);
         ret = new Event({
             "eventDef" : eventDef,
             "eventDispatcher" : this.eventDispatcher
         });
-        this.pending[eventName] = ret;
+        this.pending[eventQName] = ret;
     }
     return ret;
 };
@@ -147,11 +155,11 @@ $A.ns.AttributeValue.prototype.getOrMakePending = function(eventName) {
  * Tests for a pending event for the supplied event name.
  * @private
  */
-$A.ns.AttributeValue.prototype.hasPending = function(eventName) {
+$A.ns.AttributeValue.prototype.hasPending = function(eventQName) {
     if (!this.pending) {
         return false;
     }
-    return this.pending[eventName] !== undefined;
+    return this.pending[eventQName] !== undefined;
 };
 
 /**
@@ -162,8 +170,9 @@ $A.ns.AttributeValue.prototype.hasPending = function(eventName) {
  * @protected
  */
 $A.ns.AttributeValue.prototype.updatePendingValue = function(eventName, value) {
-    if (this.hasPending(eventName)) {
-        this.getOrMakePending(eventName).setParams({value: value});
+    var eventQName = $A.ns.AttributeValue.getQName(eventName);
+    if (this.hasPending(eventQName)) {
+        this.getOrMakePending(eventQName).setParams({value: value});
     }
     if (this.parent) {
         var child = this;
@@ -179,8 +188,8 @@ $A.ns.AttributeValue.prototype.updatePendingValue = function(eventName, value) {
             }
             value = newValue;
 
-            if (parent.hasPending(eventName)) {
-                parent.getOrMakePending(eventName).setParams({ value: value });
+            if (parent.hasPending(eventQName)) {
+                parent.getOrMakePending(eventQName).setParams({ value: value });
             }
             parent = parent.parent;
         }
@@ -198,14 +207,15 @@ $A.ns.AttributeValue.prototype.updatePendingValue = function(eventName, value) {
  * @protected
  */
 $A.ns.AttributeValue.prototype.prepare = function(eventName) {
+    var eventQName = $A.ns.AttributeValue.getQName(eventName);
     var newEvents = [];
     var pointer = this;
     while (pointer) {
-        if (pointer.hasPending(eventName)) {
+        if (pointer.hasPending(eventQName)) {
             break;  // We're done if we reach a level that's already pending. 
         }
-        if (pointer.getEventHandler(eventName)) {
-            newEvents.append(pointer.getOrMakePending(eventName));
+        if (pointer.getEventHandler(eventQName)) {
+            newEvents.push(pointer.getOrMakePending(eventQName));
         }
         pointer = pointer.parent;
     }
@@ -224,20 +234,18 @@ $A.ns.AttributeValue.prototype.firePending = function(eventName, eventList) {
         // Walk up the tree, clearing events, until top or list is empty.  There
         // may be more pending events above this list's scope, but those aren't
         // done yet (we're just firing for some of their subvalues changing).
+        var eventQName = $A.ns.AttributeValue.getQName(eventName);
         var pointer = this;
         while (pointer && eventList) {
-            if (pointer.pending && pointer.pending[eventName] === eventList[0]) {
-                delete pointer.pending[eventName];
-                if (!pointer.pending) {
-                    delete pointer.pending;
-                }
+            if (pointer.pending && pointer.pending[eventQName] === eventList[0]) {
+                delete pointer.pending[eventQName];
             }
             pointer = pointer.parent;
         }
 
         // Now fire all the events:
         for (var event in eventList) {
-            event.fire();
+            eventList[event].fire();
         }
     }
 };

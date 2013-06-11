@@ -83,7 +83,10 @@ var BaseValue = {
      * @param {String} name The name of the Event to resolve.
      */
     getEventDef : function(name) {
-        return $A.get("e").getEventDef(BaseValue.events[name]);
+        if (BaseValue.events[name]) {
+            name = BaseValue.events[name];
+        }
+        return $A.get("e").getEventDef(name);
     },
 
     /**

@@ -141,7 +141,7 @@ SimpleValue.prototype.setValue = function(v, skipChange) {
     this.oldValue = this.value;
     this.value = v;
     if (!skipChange) {
-        this.updatePendingValue("change", v);
+        this.updatePendingValue("change", this);
         this.firePending("change", list);
     }
 };

@@ -98,23 +98,25 @@ var AuraEventService = function() {
         },
 
         /**
-         * Pushes an event to the event stack.
-         * @param {Event} event The event to start firing
+         * Pushes a marker to the event stack.
+         *
+         * Deprecated. Do not use.
+         *
+         * @param {Event} event ignored
          * @memberOf AuraEventService
-         * @private
+         * @public
          */
         startFiring : function(event) {
             $A.clientService.pushStack("$A.eventServices.fire");
         },
 
         /**
-         * pull an event off the stack, and clean up if we hit top of stack.
+         * Pops a marker off if valid to do so.
          *
-         * This internal routine pops something off of the event stack, and if
-         * needed runs the queued actions, making sure that rerenderDirty is called
-         * at the very end, after everything has completed.
+         * Deprecated. Do not use.
+         *
          * @memberOf AuraEventService
-         * @private
+         * @public
          */
         finishFiring : function() {
             if ($A.clientService.checkPublicPop("$A.eventServices.fire")) {

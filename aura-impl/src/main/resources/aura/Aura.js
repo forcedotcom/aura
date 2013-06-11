@@ -670,8 +670,11 @@ $A.ns.Aura.prototype.run = function(func) {
     $A.assert(func && $A.util.isFunction(func), "The parameter 'func' for $A.run() must be a function!");
 
     $A.services.client.pushStack("$A.run()");
-    var ret = func();
-    $A.services.client.popStack("$A.run()");
+    try {
+        var ret = func();
+    } finally {
+        $A.services.client.popStack("$A.run()");
+    }
     return ret;
 };
 

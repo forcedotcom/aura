@@ -79,10 +79,24 @@
     },  
     
     /**
+     * Verify behavior when 'langLocale' is not provided.
+     */
+    testDefaultLangLocale:{
+	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A'},
+	test: function(cmp){	        
+	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
+	        	var inputDateStr  = cmp.find("inputText").getElement().value;
+		        var dt            = '9/23/04 4:30 PM';
+	    		aura.test.assertEquals(dt, inputDateStr, "Should have used Default langLocale.");	        	
+	        });	
+        }
+    },
+    
+    /**
      * Verify behavior when 'langLocale' is assigned a empty string.
      */
     /*testEmptyStringLangLocale:{
-	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A'},
+	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A', langLocale: ''},
 	test: function(cmp){	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
@@ -95,7 +109,7 @@
     /**
      * Verify behavior when 'langLocale' is assigned garbage.
      */
-    /*testEmptyStringTimeZone:{
+    /*testInvalidLangLocale:{
  	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A', langLocale: 'xx'},	
 	test: function(cmp){	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){

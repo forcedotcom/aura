@@ -37,12 +37,16 @@ public class TimeZoneInfoController {
 
     @AuraEnabled
     public static TimeZoneInfo getTimeZoneInfo(@Key("timezoneId") String timezoneId) throws Exception {
+    	return getTimeZoneInfo(timezoneId, new Helpers());
+    }
+        
+    public static TimeZoneInfo getTimeZoneInfo(String timezoneId, Helpers helper) throws Exception {
         if (timezoneId == null) {
             return null; 
         }
         String info = cache.get(timezoneId);
         if (info == null) {
-            info = readTZInfoFromFile(timezoneId);
+            info = helper.readTZInfoFromFile(timezoneId);
             if (info != null) {
                 cache.put(timezoneId, info);
             }
@@ -50,39 +54,42 @@ public class TimeZoneInfoController {
         return new TimeZoneInfo(info);
     }
     
-    private static String readTZInfoFromFile(String timezoneId) {
-        ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
-        String suffix = timezoneId.replace("/", "-");
-        String resStr = "/aura/resources/walltime-js/olson/walltime-data_" + suffix + ".js";
-        InputStream in = resourceLoader.getResourceAsStream(resStr);
-        try {
-            return in == null ? null : formatTZInfo(IOUtil.readText(new InputStreamReader(in)));
-        } catch (IOException ioE) {
-            return null;
-        }
-    }
+    static class Helpers{
     
-    private static String formatTZInfo(String info) {
-        StringBuffer result = new StringBuffer(info);
-        int dataIndex = result.indexOf("window.WallTime.data");
-        if (dataIndex < 0) {
-            return info;
-        }
-        result = result.delete(0, dataIndex);
-        int start = result.indexOf("{");
-        if (start < 0) {
-            start = 0;
-        }
-        int autoinitIndex = result.indexOf("window.WallTime.autoinit");
-        if (autoinitIndex < 0) {
-            autoinitIndex = result.length();
-        }
-        result = result.delete(autoinitIndex, result.length());
-        int end = result.lastIndexOf("}");
-        if (end < 0) {
-            end = result.length();
-        }
-        return result.substring(start, end + 1);
+	    String readTZInfoFromFile(String timezoneId) {
+	        ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
+	        String suffix = timezoneId.replace("/", "-");
+	        String resStr = "/aura/resources/walltime-js/olson/walltime-data_" + suffix + ".js";
+	        InputStream in = resourceLoader.getResourceAsStream(resStr);
+	        try {
+	            return in == null ? null : formatTZInfo(IOUtil.readText(new InputStreamReader(in)));
+	        } catch (IOException ioE) {
+	            return null;
+	        }
+	    }
+	    
+	    private String formatTZInfo(String info) {
+	        StringBuffer result = new StringBuffer(info);
+	        int dataIndex = result.indexOf("window.WallTime.data");
+	        if (dataIndex < 0) {
+	            return info;
+	        }
+	        result = result.delete(0, dataIndex);
+	        int start = result.indexOf("{");
+	        if (start < 0) {
+	            start = 0;
+	        }
+	        int autoinitIndex = result.indexOf("window.WallTime.autoinit");
+	        if (autoinitIndex < 0) {
+	            autoinitIndex = result.length();
+	        }
+	        result = result.delete(autoinitIndex, result.length());
+	        int end = result.lastIndexOf("}");
+	        if (end < 0) {
+	            end = result.length();
+	        }
+	        return result.substring(start, end + 1);
+	    }
     }
     
     public static class TimeZoneInfo implements JsonSerializable {

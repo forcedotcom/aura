@@ -123,8 +123,50 @@
         test: function(component){
             aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
                 aura.test.assertEquals("9/24/04 12:30 上午", $A.test.getText(component.find('span').getElement()), "Incorrect formatted datetime string.");
-            });
+            });                        
 
         }
-    }
+    },
+    
+    /**
+     * Verify behavior when 'langLocale' is not provided.
+     */
+    testDefaultLangLocale:{
+	attributes : {value:'2004-09-23T16:30:00.000Z', format: 'M/dd/yy h:mm A'},
+	test: function(component){	        
+	        aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());
+		        var dt            = '9/23/04 4:30 PM';
+	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");	        	
+	        });	
+        }
+    },
+    
+    /**
+     * Verify behavior when 'langLocale' is assigned a empty string.
+     */
+    /*testEmptyStringLangLocale:{
+	attributes : {value:'2004-09-23T16:30:00.000Z', format: 'M/dd/yy h:mm A', langLocale: ''},
+	test: function(component){	        
+	        aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());
+		        var dt            = '9/23/04 4:30 PM';
+	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");	        	
+	        });	
+        }
+    }, */
+    
+    /**
+     * Verify behavior when 'langLocale' is assigned garbage.
+     */
+    /*testInvalidLangLocale:{
+ 	attributes : {value:'2004-09-23T16:30:00.000Z', format: 'M/dd/yy h:mm A', langLocale: 'xx'},	
+	test: function(component){	        
+	        aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());
+		        var dt            = '9/23/04 4:30 PM';
+	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");	        	
+	        });	
+        }
+    },*/ 
 })

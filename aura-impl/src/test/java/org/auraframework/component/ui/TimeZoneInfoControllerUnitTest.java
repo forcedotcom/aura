@@ -15,8 +15,11 @@
  */
 package org.auraframework.component.ui;
 
+import static org.mockito.Mockito.when;
+
 import org.auraframework.component.ui.TimeZoneInfoController.TimeZoneInfo;
 import org.auraframework.test.UnitTestCase;
+import org.mockito.Mock;
 
 /**
  * Unit tests for TimeZoneInfoController.java
@@ -24,41 +27,67 @@ import org.auraframework.test.UnitTestCase;
  */
 public class TimeZoneInfoControllerUnitTest extends UnitTestCase {
 	
-	public void testLATimeZoneInfo() throws Exception{
-		String timezoneId = "America/Los_Angeles";		
-		TimeZoneInfo ti = TimeZoneInfoController.getTimeZoneInfo(timezoneId);
-		assertNotNull(ti);		
-		assertTrue(ti.getInfo().contains("Los_Angeles"));
-	}	
+	@Mock
+	TimeZoneInfoController.Helpers helpers;
 	
-	public void testNYTimeZoneInfo() throws Exception{
-		String timezoneId = "America/New_York";		
-		TimeZoneInfo ti = TimeZoneInfoController.getTimeZoneInfo(timezoneId);
-		assertNotNull(ti);		
-		assertTrue(ti.getInfo().contains("New_York"));
-	}	
-	
+	/** 
+	 * Test null value
+	 */
 	public void testNullTimeZoneInfo() throws Exception{
 		TimeZoneInfo ti = TimeZoneInfoController.getTimeZoneInfo(null);
 		assertEquals(null, ti);		
 	}
 	
+	/** 
+	 * Test empty string as time zone value
+	 */
 	public void testEmptyTimeZoneInfo() throws Exception{
 		TimeZoneInfo ti = TimeZoneInfoController.getTimeZoneInfo("");
 		assertNotNull(ti);		
 		assertEquals(null, ti.getInfo());		
 	}
 	
+	/** 
+	 * Test string with slash only as time zone value
+	 */
 	public void testSlashTimeZoneInfo() throws Exception{
 		TimeZoneInfo ti = TimeZoneInfoController.getTimeZoneInfo("/");
 		assertNotNull(ti);		
 		assertEquals(null, ti.getInfo());		
 	}
 	
+	/** 
+	 * Test invalid time zone value
+	 */
 	public void testInvalidTimeZoneInfo() throws Exception{
 		String timezoneId = "America/San_Francisco";										
 		TimeZoneInfo ti = TimeZoneInfoController.getTimeZoneInfo(timezoneId);
 		assertNotNull(ti);		
 		assertEquals(null, ti.getInfo());		
 	}
+	
+	/** 
+	 * Test valid time zone value
+	 */
+	public void testLATimeZoneInfo() throws Exception{
+		String timezoneId = "America/Los_Angeles";	
+		String info = "Los_Angeles";
+		when(helpers.readTZInfoFromFile(timezoneId)).thenReturn(info);
+		TimeZoneInfo ti = TimeZoneInfoController.getTimeZoneInfo(timezoneId, helpers);
+		assertNotNull(ti);		
+		assertTrue(ti.getInfo().contains(info));
+	}	
+	
+	/** 
+	 * Test valid time zone value
+	 */
+	public void testNYTimeZoneInfo() throws Exception{
+		String timezoneId = "America/New_York";	
+		String info = "New_York";
+		when(helpers.readTZInfoFromFile(timezoneId)).thenReturn(info);
+		TimeZoneInfo ti = TimeZoneInfoController.getTimeZoneInfo(timezoneId, helpers);
+		assertNotNull(ti);		
+		assertTrue(ti.getInfo().contains(info));
+	}	
+	
 }

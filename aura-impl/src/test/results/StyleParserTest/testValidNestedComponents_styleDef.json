@@ -3,6 +3,6 @@
   "value":{
     "descriptor":"css://test.testStyleValidParent",
     "code":".testTestStyleValidParent{color:#1797c0;font-family:Arial,Helvetica,sans-serif;background:#1797c0 url(/img/alohaSkin/gradient_body.png) repeat-x;overflow:hidden;position:absolute;left:0;right:0;top:0;bottom:0;padding:0;margin:0}.testTestStyleValidParent #mask{position:absolute;right:0;left:0;top:25px;bottom:25px;margin:15px;background-color:white;opacity:.60;-moz-border-radius:20px;-webkit-border-radius:20px}.testTestStyleValidParent .east{width:200px;margin:25px;margin-top:20px;left:0}.testTestStyleValidParent .center{margin:25px;left:210px;right:0}",
-    "className":".testTestStyleValidParent"
+    "className":"testTestStyleValidParent"
   }
 }

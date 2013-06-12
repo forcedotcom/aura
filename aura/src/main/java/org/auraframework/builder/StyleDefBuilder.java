@@ -16,7 +16,6 @@
 package org.auraframework.builder;
 
 import java.util.List;
-import java.util.Set;
 
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.StyleDef;
@@ -26,8 +25,6 @@ import org.auraframework.def.StyleDef;
 public interface StyleDefBuilder extends DefBuilder<StyleDef, StyleDef> {
 
     StyleDefBuilder setClassName(String className);
-
-    StyleDefBuilder setImageURLs(Set<String> imageURLs);
 
     StyleDefBuilder setComponents(List<ComponentDefRef> components);
 

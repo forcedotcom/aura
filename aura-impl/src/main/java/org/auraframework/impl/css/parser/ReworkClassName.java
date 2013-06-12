@@ -41,7 +41,7 @@ public class ReworkClassName implements Rework<CSSSelector> {
     private final boolean validate;
 
     public ReworkClassName(String componentClass, boolean validate) {
-        this.componentClass = componentClass;
+        this.componentClass = "." + componentClass;
         this.validate = validate;
     }
 

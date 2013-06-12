@@ -78,7 +78,7 @@ public class StyleParser implements Parser {
             QuickFixException {
 
         if (descriptor.getDefType() == DefType.STYLE) {
-            String className = "." + descriptor.getNamespace() + AuraTextUtil.initCap(descriptor.getName());
+            String className = descriptor.getNamespace() + AuraTextUtil.initCap(descriptor.getName());
             StyleDefImpl.Builder builder = new StyleDefImpl.Builder();
             builder.setDescriptor((DefDescriptor<StyleDef>) descriptor);
             builder.setLocation(source.getSystemId(), source.getLastModified());

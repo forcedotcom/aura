@@ -59,7 +59,7 @@
                     "value":{
                       "descriptor":"css://test.parent",
                       "code":"",
-                      "className":".testParent"
+                      "className":"testParent"
                     }
                   },
                   "superDef":{

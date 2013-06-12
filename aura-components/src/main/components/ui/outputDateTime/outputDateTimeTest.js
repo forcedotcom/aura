@@ -18,7 +18,7 @@
      * Verify behavior when 'Value' attribute is assigned an empty string.
      */
     testEmptyStringValue: {
-        attributes: {value: '', langLocale: 'en', timezone: 'GMT'},
+        attributes: {value: ''},
         test: function(component){
             aura.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Expected an empty span.");
         }
@@ -28,57 +28,12 @@
      * Verify behavior when 'Value' attribute is assigned a Garbage value.
      */
     testInvalidValue: {
-        attributes: {value: 'cornholio', langLocale: 'en', timezone: 'GMT'},
+        attributes: {value: 'cornholio'},
         test: function(component){
             aura.test.assertEquals("Invalid date time value", $A.test.getText(component.find('span').getElement()), "Value must be an ISO8601-formatted string or a number of milliseconds from Epoch.");
         }
     },
-
-    /**
-     * Verify behavior when 'timezone' attribute is assigned an empty string.
-     */
-    testEmptyStringForTimeZone:{
-        attributes: {value: '2004-09-23T16:30:00.000Z', timezone: '', format: 'M/dd/yy h:mm A', langLocale: 'en'},
-        test: function(component){
-        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-        		aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used GMT as default timezone.");
-        	});
-        }
-    },
     
-    /**
-     * Verify behavior when 'timezone' is assigned a valid time zone.
-     */
-    testTimezoneByCity: {
-        attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'America/New_York', format: 'M/dd/yy h:mm A', langLocale: 'en'},
-        test: function(component){
-        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-        		aura.test.assertEquals("9/23/04 12:30 PM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time, failed to use specified timezone");
-        	});
-      }
-    },
-    
-    testTimezoneObeysDayLightSaving: {
-        attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'America/Los_Angeles', format: 'M/dd/yy h:mm A', langLocale: 'en'},
-        test: function(component){
-        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-        		aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time, failed to recognize that timezone has Daylight saving in effect.");
-        	});
-      }
-    },
-    
-    /**
-     * Verify behavior when 'timezone' attribute is assigned a garbage value.
-     */
-    testInvalidTimezoneIsIgnored: {
-        attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'sasquatch', format: 'M/dd/yy h:mm A', langLocale: 'en'},
-        test: function(component){
-        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-        		aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used GMT timezone.");
-        	});
-        }
-    },
-
     /**
      * Verify behavior when 'format' attribute is assigned an empty string.
      */
@@ -132,11 +87,11 @@
      * Verify behavior when 'langLocale' is not provided.
      */
     testDefaultLangLocale:{
-	attributes : {value:'2004-09-23T16:30:00.000Z', format: 'M/dd/yy h:mm A'},
+	attributes : {value:'2004-09-23T16:30:00.000Z'},
 	test: function(component){	        
 	        aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
 	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());
-		        var dt            = '9/23/04 4:30 PM';
+		        var dt            = 'Sep 23, 2004 9:30:00 AM';
 	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");	        	
 	        });	
         }
@@ -145,28 +100,74 @@
     /**
      * Verify behavior when 'langLocale' is assigned a empty string.
      */
-    /*testEmptyStringLangLocale:{
-	attributes : {value:'2004-09-23T16:30:00.000Z', format: 'M/dd/yy h:mm A', langLocale: ''},
+    testEmptyStringLangLocale:{
+	attributes : {value:'2004-09-23T16:30:00.000Z', langLocale: ''},
 	test: function(component){	        
 	        aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
 	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());
-		        var dt            = '9/23/04 4:30 PM';
+		        var dt            = 'Sep 23, 2004 9:30:00 AM';
 	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");	        	
 	        });	
         }
-    }, */
+    },
     
     /**
      * Verify behavior when 'langLocale' is assigned garbage.
      */
     /*testInvalidLangLocale:{
- 	attributes : {value:'2004-09-23T16:30:00.000Z', format: 'M/dd/yy h:mm A', langLocale: 'xx'},	
+ 	attributes : {value:'2004-09-23T16:30:00.000Z', langLocale: 'kk'},	
 	test: function(component){	        
 	        aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
 	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());
-		        var dt            = '9/23/04 4:30 PM';
+		        var dt            = 'Sep 23, 2004 9:30:00 AM';
 	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");	        	
 	        });	
         }
-    },*/ 
+    },*/
+    
+    /**
+     * Verify behavior when 'timezone' attribute is assigned an empty string.
+     */
+    testEmptyStringForTimeZone:{
+        attributes: {value: '2004-09-23T16:30:00.000Z', timezone: '', format: 'M/dd/yy h:mm A', langLocale: 'en'},
+        test: function(component){
+        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+        		aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
+        	});
+        }
+    },
+    
+    /**
+     * Verify behavior when 'timezone' is assigned a valid time zone.
+     */
+    testTimezoneByCity: {
+        attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'America/New_York', format: 'M/dd/yy h:mm A', langLocale: 'en'},
+        test: function(component){
+        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+        		aura.test.assertEquals("9/23/04 12:30 PM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time, failed to use specified timezone");
+        	});
+      }
+    },
+    
+    testTimezoneObeysDayLightSaving: {
+        attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'America/Los_Angeles', format: 'M/dd/yy h:mm A', langLocale: 'en'},
+        test: function(component){
+        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+        		aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time, failed to recognize that timezone has Daylight saving in effect.");
+        	});
+      }
+    }
+    
+    /**
+     * Verify behavior when 'timezone' attribute is assigned a garbage value.
+     */
+    /*testInvalidTimezoneIsIgnored: {
+        attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'sasquatch', format: 'M/dd/yy h:mm A', langLocale: 'en'},
+        test: function(component){
+        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+        		aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Should have used default timezone.");
+        	});
+        }
+    }*/
+
 })

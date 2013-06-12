@@ -22,6 +22,9 @@
         }
     },
     
+    /**
+     * Verify behavior when 'format' attribute is not assigned a value.
+     */
     testDefaultFormat:{
         attributes : {displayDatePicker: 'true', value: '2012-09-10'},
         test: function(cmp){
@@ -30,7 +33,45 @@
         }
     },
     
-    testlangLocale:{
+    /**
+     * Verify behavior when 'format' attribute is assigned an empty string.
+     */
+	testEmptyFormat:{
+	attributes : {displayDatePicker:'true', value: '2012-09-10', format: ''},
+	test: function(cmp){	        
+	        var inputDateStr = cmp.find("inputText").getElement().value;	        
+    		aura.test.assertEquals("Sep 10, 2012", inputDateStr, "Dates are not the same and they should be");
+        }
+    },
+    
+    /**
+     * Verify behavior when 'format' attribute is assigned a garbage value.
+     */
+	testInvalidFormat:{
+	attributes : {displayDatePicker:'true', format: 'KKKKKK'},
+	test: function(cmp){			
+	        cmp.find("datePicker").get('c.selectToday').run();
+	        var inputDateStr = cmp.find("inputText").getElement().value;
+	        var dt           = moment().format('KKKKKK');
+    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
+        }
+    },
+    
+    /**
+     * Verify behavior when 'langLocale' attribute is not assigned a value.
+     */
+    testDefaultLangLocale:{
+        attributes : {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10'},
+        test: function(cmp){
+            var inputDateStr = cmp.find("inputText").getElement().value;
+            aura.test.assertEquals("September 10, 2012", inputDateStr, "Dates are not the same and they should be");
+        }
+    },
+    
+    /**
+     * Verify behavior when 'langLocale' attribute is assigned a different value.
+     */
+    testLangLocale:{
         attributes : {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10', langLocale: 'es'},
         test: function(cmp){
             var inputDateStr = cmp.find("inputText").getElement().value;
@@ -38,64 +79,52 @@
         }
     },
     
-    testInputDateToday:{
-        attributes : {displayDatePicker:'true', format: 'YYYY-MM-DD'},
+    /**
+     * Verify behavior when 'langLocale' attribute is not assigned an empty string.
+     */
+    testEmptyLangLocale:{
+        attributes : {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10', langLocale: ''},
         test: function(cmp){
-            cmp.find("datePicker").get('c.selectToday').run()
             var inputDateStr = cmp.find("inputText").getElement().value;
-            var dt           = moment().format('YYYY-MM-DD');
-            aura.test.assertTrue(aura.test.contains(dt, inputDateStr), "Dates are not the same and they should be");
+            aura.test.assertEquals("September 10, 2012", inputDateStr, "Dates are not the same and they should be");
+        }
     },
-
-	/**
-     * Verify behavior when 'format' is given a valid date format.
+    
+    /**
+     * Verify behavior when 'langLocale' attribute is not assigned an invalid value.
      */
-	testTodayInEuropeFormat:{
-	attributes : {displayDatePicker:'true', format: 'DD-MM-YYYY'},
+    /*testInvalidLangLocale:{
+        attributes : {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10', langLocale: 'xx'},
+        test: function(cmp){
+            var inputDateStr = cmp.find("inputText").getElement().value;
+            aura.test.assertEquals("September 10, 2012", inputDateStr, "Dates are not the same and they should be");
+        }
+    },*/
+       
+	/**
+     * Verify behavior of Today() with default 'format' value.
+     */
+	testToday:{
+	attributes : {displayDatePicker:'true'},
 	test: function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').run()
+	        cmp.find("datePicker").get('c.selectToday').run();
 	        var inputDateStr = cmp.find("inputText").getElement().value;
-	        var dt           = moment().format('DD-MM-YYYY');
+	        var dt           = moment().format('MMM DD, YYYY');
     		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
         }
     },
 
 	/**
-     * Verify behavior when 'format' is given a valid date format.
+     * Verify behavior of Today() when 'format' is assigned a valid value.
      */
-	testMonthNameInFormat:{
-	attributes : {displayDatePicker:'true', format: 'MMMM DD,YYYY'},
+	testTodayDifferentFormat:{
+	attributes : {displayDatePicker:'true', format: 'DD/MM/YYYY'},
 	test: function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').run()
+	        cmp.find("datePicker").get('c.selectToday').run();
 	        var inputDateStr = cmp.find("inputText").getElement().value;
-	        var dt           = moment().format('MMMM DD,YYYY');
+	        var dt           = moment().format('DD/MM/YYYY');
     		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
         }
-    },
-
-	/**
-     * Verify behavior when 'format' attribute is assigned an empty string.
-     */
-	testEmptyStringForFormat:{
-	attributes : {displayDatePicker:'true', format: ''},
-	test: function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').run()
-	        var inputDateStr = cmp.find("inputText").getElement().value;
-	        var dt           = moment().format('YYYY-MM-DD');
-    		aura.test.assertTrue(aura.test.contains(inputDateStr, dt), "Dates are not the same and they should be");
-        }
-    },
-
-	/**
-     * Verify behavior when 'format' attribute is assigned a garbage value.
-     */
-	testInvalidFormat:{
-	attributes : {displayDatePicker:'true', format: 'KKKKKK'},
-	test: function(cmp){			
-	        cmp.find("datePicker").get('c.selectToday').run()
-	        var inputDateStr = cmp.find("inputText").getElement().value;
-	        var dt           = moment().format('KKKKKK');
-    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
-        }
-    }
+    }	
+        
 })

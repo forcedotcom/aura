@@ -108,12 +108,11 @@
      * Verify behavior when 'langLocale' is assigned garbage.
      */
     /*testInvalidLangLocale:{
- 	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A', langLocale: 'xx'},	
+ 	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', langLocale: 'xx'},	
 	test: function(cmp){	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
-	        	var inputDateStr  = cmp.find("inputText").getElement().value;
-		        var dt            = '9/23/04 9:30 AM';
-	    		aura.test.assertEquals(dt, inputDateStr, "Should have used Default langLocale.");	        	
+	        	var inputDateStr  = cmp.find("inputText").getElement().value;		        
+	    		aura.test.assertEquals("Sep 23, 2004 9:30:00 AM", inputDateStr, "Should have used Default langLocale.");	        	
 	        });	
         }
     },*/ 
@@ -238,11 +237,11 @@
      * Verify a value in other language.
      */
 	testLanguage:{
-	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A', langLocale: 'zh_CN', timezone: 'Asia/Shanghai'},
+	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', langLocale: 'fr'},
 	test: function(cmp){			
 			aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;		        
-		        var dt            = '9/24/04 12:30 \u4e0a\u5348';
+		        var dt            = 'sept. 23, 2004 9:30:00 AM';
 	    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");	        	
 	        });				        
         }

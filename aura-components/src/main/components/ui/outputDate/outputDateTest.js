@@ -95,12 +95,42 @@
     },
     
     /**
-     * Verify behavior when 'format' attribute is assigned a garbage value.
+     * Verify behavior when 'langLocale' attribute is assigned a value.
      */
-    testLanguageLocale: {
+    testDefaultLangLocale: {
+        attributes: {value : '2004-09-23', format: 'MMMM d, yyyy'},
+        test: function(component){
+            aura.test.assertEquals("September 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
+      }
+    },
+    
+    /**
+     * Verify behavior when 'langLocale' attribute is assigned a value.
+     */
+    testLangLocale: {
         attributes: {value : '2004-09-23', format: 'MMM d, yyyy', langLocale: 'fr'},
         test: function(component){
-            aura.test.assertEquals("sept. 23, 2004", $A.test.getText(component.find('span').getElement()), "Expected the garbage format value.");
+            aura.test.assertEquals("sept. 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
       }
+    },
+    
+    /**
+     * Verify behavior when 'langLocale' attribute is assigned an empty string.
+     */
+    testEmptyLangLocale:{
+        attributes: {value : '2004-09-23', format: 'MMMM d, yyyy', langLocale: ''},
+        test:function(component){
+            aura.test.assertEquals("September 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
+        }
     }
+    
+    /**
+     * Verify behavior when 'langLocale' attribute is assigned an invalid value.
+     */
+    /*testInvalidLangLocale:{
+        attributes: {value : '2004-09-23', format: 'MMMM d, yyyy', langLocale: 'xx'},
+        test:function(component){
+            aura.test.assertEquals("September 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
+        }
+    }*/
 })

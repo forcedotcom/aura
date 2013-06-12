@@ -27,6 +27,7 @@ import org.auraframework.system.Location;
  * TODONM add quickfix action.
  */
 public class ThemeValueNotFoundException extends AuraValidationException {
+    private static final String MSG = "The attribute \"%s\" was not found on the %s %s";
     private static final long serialVersionUID = -2571041901012359701L;
 
     public ThemeValueNotFoundException(String variable, DefDescriptor<ThemeDef> descriptor) {
@@ -38,8 +39,7 @@ public class ThemeValueNotFoundException extends AuraValidationException {
     }
 
     private static String getMessage(String variable, DefDescriptor<ThemeDef> descriptor) {
-        String msg = "The attribute \"%s\" was not found on the %s %s";
-        return String.format(msg, variable, descriptor.getDefType(), descriptor.getQualifiedName());
+        return String.format(MSG, variable, descriptor.getDefType(), descriptor.getQualifiedName());
     }
 
 }

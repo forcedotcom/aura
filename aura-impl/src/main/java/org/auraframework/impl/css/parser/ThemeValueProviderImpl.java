@@ -155,7 +155,7 @@ public class ThemeValueProviderImpl implements ThemeValueProvider {
      * 
      * @throws AuraValidationException
      */
-    public static Expression getExpression(String reference, Location location) throws AuraValidationException {
+    private static Expression getExpression(String reference, Location location) throws AuraValidationException {
         checkNotNull(reference, "reference cannot be null");
         reference = formatReference(reference, location);
         return AuraImpl.getExpressionAdapter().buildExpression(reference, location);

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.builder.ThemeDefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.DefDescriptor;
@@ -255,7 +256,7 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
     /**
      * Used to build instances of {@link ThemeDef}s.
      */
-    public static class Builder extends RootDefinitionImpl.Builder<ThemeDef> {
+    public static class Builder extends RootDefinitionImpl.Builder<ThemeDef> implements ThemeDefBuilder {
         public DefDescriptor<ThemeDef> extendsDescriptor;
         public Map<DefDescriptor<AttributeDef>, AttributeDefRef> overrides = Maps.newHashMap();
 
@@ -264,12 +265,19 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
         }
 
         @Override
+        public void setExtendsDescriptor(DefDescriptor<ThemeDef> extendsDescriptor) {
+            this.extendsDescriptor = extendsDescriptor;
+        }
+
+        @Override
+        public void addOverride(AttributeDefRef ref) {
+            overrides.put(ref.getDescriptor(), ref);
+        }
+
+        @Override
         public ThemeDefImpl build() {
             return new ThemeDefImpl(this);
         }
 
-        public void addOverride(AttributeDefRef ref) {
-            overrides.put(ref.getDescriptor(), ref);
-        }
     }
 }

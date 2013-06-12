@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -161,7 +162,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     private final RegistryTrie delegateRegistries;
 
-    private final Map<DefDescriptor<?>, Definition> defs = Maps.newHashMap();
+    private final Map<DefDescriptor<? extends Definition>, Definition> defs = Maps.newHashMap();
 
     private DefDescriptor<?> compilingDescriptor = null;
 
@@ -597,7 +598,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * @param descriptor the descriptor that we wish to compile.
      */
     protected <D extends Definition> D compileDef(DefDescriptor<D> descriptor,
-            Map<DefDescriptor<?>, Definition> dependencies) throws QuickFixException {
+            Map<DefDescriptor<? extends Definition>, Definition> dependencies) throws QuickFixException {
         Set<DefDescriptor<?>> next = Sets.newHashSet();
         CompileContext cc = new CompileContext(dependencies);
         D def;
@@ -664,7 +665,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         DefDescriptor<?> lastCompiling = compilingDescriptor;
         try {
             compilingDescriptor = descriptor;
-            Map<DefDescriptor<?>, Definition> dds = Maps.newTreeMap();
+            Map<DefDescriptor<? extends Definition>, Definition> dds = Maps.newTreeMap();
             Definition def = compileDef(descriptor, dds);
             DependencyEntry de;
             String uid;
@@ -1217,14 +1218,53 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 }
             }
             // lastly, clear MDR's static caches
-            depsCache.invalidateAll();
-            defsCache.invalidateAll();
-            existsCache.invalidateAll();
+            invalidateStaticCaches(source);
 
         } catch (InterruptedException e) {
         } finally {
             if (haveLock) {
                 wLock.unlock();
+            }
+        }
+    }
+
+    private static void invalidateStaticCaches(DefDescriptor<?> descriptor) {
+
+        depsCache.invalidateAll();
+
+        if (descriptor == null) {
+            defsCache.invalidateAll();
+            existsCache.invalidateAll();
+        } else {
+            defsCache.invalidate(descriptor);
+            existsCache.invalidate(descriptor);
+
+            // invalidate all DDs with the same namespace if its a namespace DD
+            if (descriptor.getDefType() == DefType.NAMESPACE) {
+                invalidateScope(descriptor, true, false);
+            }
+
+            if(descriptor.getDefType() == DefType.LAYOUTS) {
+                invalidateScope(descriptor, true, true);
+            }
+        }
+    }
+
+    private static void invalidateScope(DefDescriptor<?> descriptor, boolean clearNamespace, boolean clearName) {
+        final ConcurrentMap<DefDescriptor<?>, Optional<? extends Definition>> defsMap = defsCache.asMap();
+        final String namespace = descriptor.getNamespace();
+        final String name = descriptor.getName();
+
+        for (DefDescriptor<?> dd : defsMap.keySet()) {
+            boolean sameNamespace = namespace.equals(dd.getNamespace());
+            boolean sameName = name.equals(dd.getName());
+            boolean shouldClear = (clearNamespace && clearName) ?
+                (clearNamespace && sameNamespace) && (clearName && sameName) :
+                (clearNamespace && sameNamespace) || (clearName && sameName) ;
+
+            if (shouldClear) {
+                defsCache.invalidate(dd);
+                existsCache.invalidate(dd);
             }
         }
     }

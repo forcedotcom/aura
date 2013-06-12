@@ -36,7 +36,7 @@ import com.google.common.collect.Lists;
 
 /**
  * This class has automation to verify behavior of
- * {@link aura.impl.system.CachingDefRegistryImpl} . ThreadHostile due to cache
+ * {@link CachingDefRegistryImpl} . ThreadHostile due to cache
  * filling assumptions.
  */
 @ThreadHostileTest
@@ -101,8 +101,9 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         // Fetch definition in TEST mode
         Aura.getContextService().startContext(Mode.UTEST, null, Format.JSON, Access.AUTHENTICATED);
         appWithNoLayout = definitionService.getDefinition(appDesc);
+        DefDescriptor<LayoutsDef> layoutDef = appWithNoLayout.getLayoutsDefDescriptor();
         assertNotNull("Test failed to retrieve definition of an application.", appWithNoLayout);
-        assertNotNull("Fetching definition is TESt mode should have noticed the new layout file.",
+        assertNotNull("Fetching definition is TEST mode should have noticed the new layout file.",
                 appWithNoLayout.getLayoutsDefDescriptor());
         assertNotNull("Failed to read definition from new layout file.", appWithNoLayout.getLayoutsDefDescriptor()
                 .getDef());

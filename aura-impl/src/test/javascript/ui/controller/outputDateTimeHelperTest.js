@@ -92,6 +92,14 @@ Test.Ui.OutputDateTime.HelperTest = function(){
     [Fixture]
     function formatDateTime(){			
 			
+    	var mockGetNormalizedFormat = Mocks.GetMock(targetHelper, "getNormalizedFormat", function(exp){				
+			return exp;			
+        });		
+		
+		var mockGetNormalizedLangLocale = Mocks.GetMock(targetHelper, "getNormalizedLangLocale", function(exp){				
+			return exp;			
+        });		
+		
         [Fact]
         function emptyValue(){
         	// Arrange
@@ -122,17 +130,13 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 				displayDateTime:function(component, displayValue){
 					actual = displayValue;					
 				}				
-			};													
+			};																			
 			
-			var mockMoment = Mocks.GetMock(Object.Global(), "moment",{
+			/*var mockMoment = Mocks.GetMock(Object.Global(), "moment",{
 				utc:function(time){
 					return targetTime;
 				}
-			});						
-			
-			var mockGetLangLocale = Mocks.GetMock(targetHelper, "getLangLocale", function(){				
-				return "en";			
-	        });					
+			});												
 			
 			var targetTime={
 				isValid:function(){
@@ -146,7 +150,7 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 						}
 					};
 				}
-			}											
+			}*/											
 			
             // Act
 			targetHelper.formatDateTime(targetComponent);
@@ -187,7 +191,7 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 				displayDateTime:function(component, displayValue){
 					actual = displayValue;					
 				}				
-			};													
+			};							
 			
 			var mockMoment = Mocks.GetMock(Object.Global(), "moment",{
 				utc:function(time){
@@ -202,8 +206,13 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 			};																				
 
             // Act
-			mockMoment(function(){				
-            	targetHelper.formatDateTime(targetComponent);                
+						
+			mockGetNormalizedFormat(function(){
+				mockGetNormalizedLangLocale(function(){
+					mockMoment(function(){				
+						targetHelper.formatDateTime(targetComponent);
+					});			
+				});			
             });			
 
             // Assert
@@ -262,17 +271,15 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 						}
 					};
 				}
-			};	
-			
-			var mockGetLangLocale = Mocks.GetMock(targetHelper, "getLangLocale", function(){				
-				return "en";			
-	        });																
+			};																
 
             // Act
-			mockMoment(function(){
-				mockGetLangLocale(function(){
-                	targetHelper.formatDateTime(targetComponent);
-                });
+			mockGetNormalizedFormat(function(){
+				mockGetNormalizedLangLocale(function(){
+					mockMoment(function(){						
+						targetHelper.formatDateTime(targetComponent);						
+					});
+				});
             });			
 
             // Assert
@@ -332,20 +339,18 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 					};
 				}
 			};	
-			
-			var mockGetLangLocale = Mocks.GetMock(targetHelper, "getLangLocale", function(){				
-				return "en";			
-	        });										
-			
+															
 			var mockWallTime = Mocks.GetMock(Object.Global(), "WallTime",{
 				zones:[true,false]
 			});																																	
 
             // Act
-			mockMoment(function(){
-				mockGetLangLocale(function(){
-					mockWallTime(function(){						
-						targetHelper.formatDateTime(targetComponent);						
+			mockGetNormalizedFormat(function(){
+				mockGetNormalizedLangLocale(function(){
+					mockMoment(function(){						
+						mockWallTime(function(){						
+							targetHelper.formatDateTime(targetComponent);	
+						});						
 					});
                 });
             });			
@@ -407,11 +412,7 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 					};
 				}
 			};	
-			
-			var mockGetLangLocale = Mocks.GetMock(targetHelper, "getLangLocale", function(){				
-				return "en";			
-	        });										
-			
+						
 			var mockWallTime = Mocks.GetMock(Object.Global(), "WallTime",{
 				zones:[true,false]
 			});		
@@ -421,50 +422,322 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 			});										
 
             // Act
-			mockMoment(function(){
-				mockGetLangLocale(function(){
-					mockWallTime(function(){
-						mockGetTimeZoneInfo(function(){
-							targetHelper.formatDateTime(targetComponent);
-						});
+			mockGetNormalizedFormat(function(){
+				mockGetNormalizedLangLocale(function(){
+					mockMoment(function(){						
+						mockWallTime(function(){
+							mockGetTimeZoneInfo(function(){
+								targetHelper.formatDateTime(targetComponent);
+							});
+						});		                
 					});
-                });
+				});
             });			
 
             // Assert
             Assert.Equal(expected, actual);
         }                 
     }     
-    
+        
     [Fixture]
-    function getLangLocale(){			
-			
-        [Fact]
-        function UsingNameAttribute(){
+    function getNormalizedFormat(){		
+    	    	    	
+    	[Fact]
+        function UsingNullAttribute(){
         	// Arrange
-        	var expected = "en";
+        	var expected = "YYYY-MM-DD HH:mm";
         	
 			var targetComponent={
-				_langLocale:expected								
+				_format:null
 			};		
 			
-			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                
-                util: {
-                	isUndefinedOrNull: function() { return false; },
-                	isEmpty: function() { return false; }
-                }
-            });
+			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+				util: {   
+					isUndefinedOrNull: function() { return true; },
+	            	isEmpty: function() { return false; }	            	
+	            }
+	        });
+			
+			var mockNormalizeFormat = Mocks.GetMock(targetHelper, "normalizeFormat", function(exp){				
+				targetComponent._format = expected;			
+	        });	
 									
-			var actual;
+			var actual;			
             // Act
 			mockContext(function(){
-				actual = targetHelper.getLangLocale(targetComponent);
+				mockNormalizeFormat(function(){
+					targetHelper.getNormalizedFormat(targetComponent);
+					actual = targetComponent._format;
+				});
+			});
+
+            // Assert
+            Assert.Equal(expected, actual);            
+        }    
+    
+        [Fact]
+        function UsingEmptyAttribute(){
+        	// Arrange
+        	var expected = "YYYY-MM-DD HH:mm";
+        	
+			var targetComponent={
+				_format:''
+			};	
+			
+			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+				util: {   					
+					isUndefinedOrNull: function() { return false; },
+	            	isEmpty: function() { return true; }
+	            }
+	        });
+			
+			var mockNormalizeFormat = Mocks.GetMock(targetHelper, "normalizeFormat", function(exp){				
+				targetComponent._format = expected;			
+	        });	
+									
+			var actual;			
+            // Act
+			mockContext(function(){
+				mockNormalizeFormat(function(){
+					targetHelper.getNormalizedFormat(targetComponent);
+					actual = targetComponent._format;
+				});
 			});
 
             // Assert
             Assert.Equal(expected, actual);            
         }
         
+        [Fact]
+        function UsingAttribute(){
+        	// Arrange
+        	var expected = "YYYY-MM-DD HH:mm";
+        	
+			var targetComponent={
+				_format:expected
+			};	
+			
+			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+				util: {   	
+					isUndefinedOrNull: function() { return false; },
+	            	isEmpty: function() { return false; }
+	            }
+	        });						
+									
+			var actual;			
+            // Act
+			mockContext(function(){				
+				targetHelper.getNormalizedFormat(targetComponent);
+				actual = targetComponent._format;				
+			});
+
+            // Assert
+            Assert.Equal(expected, actual);            
+        }
+    }
+    
+    [Fixture]
+    function getNormalizedLangLocale(){		
+    	    	      	
+    	[Fact]
+        function UsingNullAttribute(){
+        	// Arrange
+        	var expected = "en";
+        	
+			var targetComponent={
+				_langLocale:null
+			};	
+			
+			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+				util: {   
+					isUndefinedOrNull: function() { return true; },
+	            	isEmpty: function() { return false; }	            	
+	            }
+	        });
+			
+			var mockNormalizeLangLocale = Mocks.GetMock(targetHelper, "normalizeLangLocale", function(exp){				
+				targetComponent._langLocale = expected;			
+	        });	
+									
+			var actual;			
+            // Act
+			mockContext(function(){
+				mockNormalizeLangLocale(function(){
+					targetHelper.getNormalizedLangLocale(targetComponent);
+					actual = targetComponent._langLocale;
+				});
+			});
+
+            // Assert
+            Assert.Equal(expected, actual);            
+        }
+		    	    	
+        [Fact]
+        function UsingEmptyAttribute(){
+        	// Arrange
+        	var expected = "en";
+        	
+			var targetComponent={
+				_langLocale:''
+			};	
+			
+			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+				util: {   					
+					isUndefinedOrNull: function() { return false; },
+	            	isEmpty: function() { return true; }
+	            }
+	        });
+			
+			var mockNormalizeLangLocale = Mocks.GetMock(targetHelper, "normalizeLangLocale", function(exp){				
+				targetComponent._langLocale = expected;			
+	        });	
+									
+			var actual;			
+            // Act
+			mockContext(function(){
+				mockNormalizeLangLocale(function(){
+					targetHelper.getNormalizedLangLocale(targetComponent);
+					actual = targetComponent._langLocale;
+				});
+			});
+
+            // Assert
+            Assert.Equal(expected, actual);            
+        }
+        
+        [Fact]
+        function UsingAttribute(){
+        	// Arrange
+        	var expected = "en";
+        	
+			var targetComponent={
+				_langLocale:expected
+			};	
+			
+			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+				util: {   					
+					isUndefinedOrNull: function() { return false; },
+	            	isEmpty: function() { return false; }
+	            }
+	        });						
+									
+			var actual;			
+            // Act
+			mockContext(function(){				
+				targetHelper.getNormalizedLangLocale(targetComponent);
+				actual = targetComponent._langLocale;				
+			});
+
+            // Assert
+            Assert.Equal(expected, actual);            
+        }
+    }
+        
+    [Fixture]
+    function normalizeFormat(){
+    	    	    	
+    	[Fact]
+        function EmptyString(){
+        	// Arrange        	     
+        	var expected = "YYYY-MM-DD HH:mm";
+        	var actual;
+			var targetComponent={
+				_format:'',
+				get:function(expression){
+					if(expression=="v.format")return "";
+				},
+				
+				setValue:function(expression, value){
+					if(expression=="v.format")actual = value;
+				}
+			};			
+			
+			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+	            getGlobalValueProviders: function(){
+	    			return {
+	    				get: function(expression){			    					
+	    					if(expression=="$Locale.datetimeformat")return "YYYY-MM-DD HH:mm";    					
+	    				}
+	    			}
+	            }
+	        });
+
+            // Act			
+			mockContext(function(){
+				targetHelper.normalizeFormat(targetComponent);
+				actual = targetComponent._format;
+			});			
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+    	
+        [Fact]
+        function StringNeedingNormalization(){
+        	// Arrange        	     
+        	var expected = "YYYY-MM-DD HH:mm";
+        	var actual;
+			var targetComponent={
+				_format:'',
+				get:function(expression){
+					if(expression=="v.format")return "yyyy-MM-dd HH:mm";
+				},
+				
+				setValue:function(expression, value){
+					if(expression=="v.format")actual = value;
+				}
+			};									
+
+            // Act					
+			targetHelper.normalizeFormat(targetComponent);	
+			actual = targetComponent._format;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        function NormalizedString(){
+        	// Arrange        	    
+        	var expected = "YYYY-MM-DD HH:mm";
+        	var actual;
+			var targetComponent={
+				_format:'',
+				get:function(expression){
+					if(expression=="v.format")return expected;
+				},
+				
+				setValue:function(expression, value){
+					if(expression=="v.format")actual = value;
+				}
+			};									                     
+
+            // Act			
+			targetHelper.normalizeFormat(targetComponent);	
+			actual = targetComponent._format;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }                
+                
+    }
+    
+    [Fixture]
+    function normalizeLangLocale(){		
+    	
+    	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
+			util: {                	
+            	isEmpty: function() { return false; }
+            },
+			getGlobalValueProviders: function(){
+    			return {
+    				get: function(expression){			    					
+    					if(expression=="$Locale.langLocale")return "en";    					
+    				}
+    			}
+            }
+        });
+		    	    	
         [Fact]
         function UsingEmptyAttribute(){
         	// Arrange
@@ -475,19 +748,13 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 				get:function(expression){					
 					if(expression=="v.langLocale")return '';
 				}	
-			};		
-			
-			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                
-                util: {
-                	isUndefinedOrNull: function() { return true; },
-                	isEmpty: function() { return false; }
-                }
-            });
+			};								
 									
 			var actual;
             // Act
 			mockContext(function(){
-				actual = targetHelper.getLangLocale(targetComponent);
+				targetHelper.normalizeLangLocale(targetComponent);
+				actual = targetComponent._langLocale;
 			});
 
             // Assert
@@ -504,19 +771,13 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 				get:function(expression){					
 					if(expression=="v.langLocale")return expected;
 				}	
-			};		
-			
-			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                
-                util: {
-                	isUndefinedOrNull: function() { return true; },
-                	isEmpty: function() { return false; }
-                }
-            });
+			};					
 									
 			var actual;
             // Act
 			mockContext(function(){
-				actual = targetHelper.getLangLocale(targetComponent);
+				targetHelper.normalizeLangLocale(targetComponent);
+				actual = targetComponent._langLocale;
 			});
 
             // Assert
@@ -534,18 +795,12 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 					if(expression=="v.langLocale")return "zh_CN";
 				}	
 			};		
-			
-			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                
-                util: {
-                	isUndefinedOrNull: function() { return true; },
-                	isEmpty: function() { return false; }
-                }
-            });
 									
 			var actual;
             // Act
 			mockContext(function(){
-				actual = targetHelper.getLangLocale(targetComponent);
+				targetHelper.normalizeLangLocale(targetComponent);
+				actual = targetComponent._langLocale;
 			});
 
             // Assert
@@ -563,18 +818,12 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 					if(expression=="v.langLocale")return "en_us";
 				}	
 			};		
-			
-			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                
-                util: {
-                	isUndefinedOrNull: function() { return true; },
-                	isEmpty: function() { return false; }
-                }
-            });
-									
+								
 			var actual;
             // Act
 			mockContext(function(){
-				actual = targetHelper.getLangLocale(targetComponent);
+				targetHelper.normalizeLangLocale(targetComponent);
+				actual = targetComponent._langLocale;
 			});
 
             // Assert
@@ -591,19 +840,13 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 				get:function(expression){					
 					if(expression=="v.langLocale")return "a_b_c";
 				}	
-			};		
-			
-			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                
-                util: {
-                	isUndefinedOrNull: function() { return true; },
-                	isEmpty: function() { return false; }
-                }
-            });
+			};								
 									
 			var actual;
             // Act
 			mockContext(function(){
-				actual = targetHelper.getLangLocale(targetComponent);
+				targetHelper.normalizeLangLocale(targetComponent);
+				actual = targetComponent._langLocale;
 			});
 
             // Assert
@@ -621,18 +864,12 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 					if(expression=="v.langLocale")return "zh_CN_dummy_foo";
 				}	
 			};		
-			
-			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                
-                util: {
-                	isUndefinedOrNull: function() { return true; },
-                	isEmpty: function() { return false; }
-                }
-            });
-									
+								
 			var actual;
             // Act
 			mockContext(function(){
-				actual = targetHelper.getLangLocale(targetComponent);
+				targetHelper.normalizeLangLocale(targetComponent);
+				actual = targetComponent._langLocale;
 			});
 
             // Assert
@@ -726,6 +963,22 @@ Test.Ui.OutputDateTime.HelperTest = function(){
     [Fixture]
     function updateDisplay(){  
     	
+    	var mockWallTime = Mocks.GetMock(Object.Global(), "WallTime",{
+			UTCToWallTime:function(d, timezone){
+				return tzDate;
+			}
+		});	
+		
+		var tzDate={
+			getTimezoneOffset:function(){
+				return 1;
+			}
+		};		
+		
+    	var mockGetNormalizedLangLocale = Mocks.GetMock(targetHelper, "getNormalizedLangLocale", function(){				
+			return "en";			
+        });
+    	
     	[Fact]
         function invalidDate(){
         	// Arrange
@@ -781,35 +1034,18 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 					};
 				}
 			};						
-        	
-			var mockWallTime = Mocks.GetMock(Object.Global(), "WallTime",{
-				UTCToWallTime:function(d, timezone){
-					return tzDate;
-				}
-			});	
-			
-			var tzDate={
-				getTimezoneOffset:function(){
-					return 1;
-				}
-			};	
-			
-			var mockGetLangLocale = Mocks.GetMock(targetHelper, "getLangLocale", function(){				
-				return "en";			
-	        });	
-			
+        				
             // Act
 			mockMoment(function(){
 				mockWallTime(function(){
-					mockGetLangLocale(function(){
+					mockGetNormalizedLangLocale(function(){
 						targetHelper.updateDisplay(targetComponent, d, tagetFormat, targetTimezone, defaultValue);
 					});
 				});
 			});	
 
             // Assert
-            Assert.Equal(expected, actual);
-            
+            Assert.Equal(expected, actual);            
         }
     	
         [Fact]
@@ -868,34 +1104,17 @@ Test.Ui.OutputDateTime.HelperTest = function(){
 				}
 			};						
         	
-			var mockWallTime = Mocks.GetMock(Object.Global(), "WallTime",{
-				UTCToWallTime:function(d, timezone){
-					return tzDate;
-				}
-			});	
-			
-			var tzDate={
-				getTimezoneOffset:function(){
-					return 1;
-				}
-			};	
-			
-			var mockGetLangLocale = Mocks.GetMock(targetHelper, "getLangLocale", function(){				
-				return "en";			
-	        });	
-			
             // Act
 			mockMoment(function(){
 				mockWallTime(function(){
-					mockGetLangLocale(function(){
+					mockGetNormalizedLangLocale(function(){
 						targetHelper.updateDisplay(targetComponent, d, tagetFormat, targetTimezone, defaultValue);
 					});
 				});
 			});	
 
             // Assert
-            Assert.Equal(expected, actual);
-            
+            Assert.Equal(expected, actual);            
         }
     }
 }

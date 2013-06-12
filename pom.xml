@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <name>Aura Framework</name>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.auraframework</groupId>
     <artifactId>aura-framework</artifactId>
-    <version>0.33-SNAPSHOT</version>
+    <version>0.34-SNAPSHOT</version>
     <packaging>pom</packaging>
     <organization>
         <url>http://www.auraframework.org</url>
@@ -38,13 +37,13 @@
             <url>http://maven.auraframework.org/libs-release</url>
         </repository>
         <repository>
-            <snapshots/>
+            <snapshots />
             <id>jenkins-build-artifacts</id>
             <name>jenkins-build-artifacts</name>
             <url>http://maven.auraframework.org/jenkins-build-artifacts</url>
         </repository>
         <repository>
-            <snapshots/>
+            <snapshots />
             <id>snapshots</id>
             <name>libs-snapshot</name>
             <url>http://maven.auraframework.org/libs-snapshot</url>
@@ -74,7 +73,7 @@
             <url>http://maven.auraframework.org/plugins-release</url>
         </pluginRepository>
         <pluginRepository>
-            <snapshots/>
+            <snapshots />
             <id>snapshots</id>
             <name>plugins-snapshot</name>
             <url>http://maven.auraframework.org/plugins-snapshot</url>
@@ -133,73 +132,73 @@
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.34-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.34-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-util</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.34-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-util</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.34-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.34-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.34-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl-expression</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.34-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl-expression</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.34-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-components</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.34-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-tools</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.34-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-resources</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.34-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-integration-test</artifactId>
                 <type>test-jar</type>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.34-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>auradocs-integration-test</artifactId>
                 <type>test-jar</type>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.34-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -618,16 +617,16 @@
                                 <target>
                                     <path id="definitions">
                                         <fileset dir="src/test/components">
-                                            <include name="**/*.cmp"/>
-                                            <include name="**/*.intf"/>
-                                            <include name="**/*.evt"/>
-                                            <include name="**/*.app"/>
-                                            <include name="**/*.css"/>
-                                            <include name="**/*Test.js"/>
+                                            <include name="**/*.cmp" />
+                                            <include name="**/*.intf" />
+                                            <include name="**/*.evt" />
+                                            <include name="**/*.app" />
+                                            <include name="**/*.css" />
+                                            <include name="**/*Test.js" />
                                         </fileset>
                                     </path>
                                     <pathconvert property="definitionList" refid="definitions" pathsep=",">
-                                        <regexpmapper from=".*/([^/]*)/[^/]*/(.*)" to="\1:\2"/>
+                                        <regexpmapper from=".*/([^/]*)/[^/]*/(.*)" to="\1:\2" />
                                     </pathconvert>
                                     <echo file="target/src-gen/test/components/.index">${definitionList}</echo>
                                 </target>
@@ -643,16 +642,16 @@
                                 <target>
                                     <path id="definitions">
                                         <fileset dir="src/main/components">
-                                            <include name="**/*.cmp"/>
-                                            <include name="**/*.intf"/>
-                                            <include name="**/*.evt"/>
-                                            <include name="**/*.app"/>
-                                            <include name="**/*.css"/>
-                                            <include name="**/*Test.js"/>
+                                            <include name="**/*.cmp" />
+                                            <include name="**/*.intf" />
+                                            <include name="**/*.evt" />
+                                            <include name="**/*.app" />
+                                            <include name="**/*.css" />
+                                            <include name="**/*Test.js" />
                                         </fileset>
                                     </path>
                                     <pathconvert property="definitionList" refid="definitions" pathsep=",">
-                                        <regexpmapper from=".*/([^/]*)/[^/]*/(.*)" to="\1:\2"/>
+                                        <regexpmapper from=".*/([^/]*)/[^/]*/(.*)" to="\1:\2" />
                                     </pathconvert>
                                     <echo file="target/src-gen/main/components/.index">${definitionList}</echo>
                                 </target>
@@ -733,7 +732,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <execute/>
+                                        <execute />
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
@@ -787,7 +786,7 @@
                         <configuration>
                             <target>
                                 <propertyfile file="version.properties">
-                                    <entry key="aura.version" value="${project.version}${suffix}"/>
+                                    <entry key="aura.version" value="${project.version}${suffix}" />
                                 </propertyfile>
                             </target>
                         </configuration>

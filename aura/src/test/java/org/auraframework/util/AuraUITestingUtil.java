@@ -31,6 +31,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -167,6 +168,15 @@ public class AuraUITestingUtil {
      */
     public Object getEval(final String javascript, Object... args) {
         /**
+         * Wrapping the javascript on the native Android browser is broken. By not using the wrapper we won't catch any
+         * javascript errors here, but on passing cases this should behave the same functionally. See W-1481593.
+         */
+        if (driver instanceof RemoteWebDriver
+                && ((RemoteWebDriver) driver).getCapabilities().getBrowserName().equals("android")) {
+            return getRawEval(javascript, args);
+        }
+
+        /**
          * Wrap the given javascript to evaluate and then check for any collected errors. Then, return the result and
          * errors back to the WebDriver. We must return as an array because
          * {@link JavascriptExecutor#executeScript(String, Object...) cannot handle Objects as return values."
@@ -257,10 +267,10 @@ public class AuraUITestingUtil {
      * account.
      * 
      */
-	public String getActiveElementText() {
-		return (String) getEval("return $A.test.getActiveElementText()");
-	}
-	
+    public String getActiveElementText() {
+        return (String) getEval("return $A.test.getActiveElementText()");
+    }
+
     /**
      * Check for uncaught Aura or Javascript errors after executing a particular WebDriver function.
      * 
@@ -288,7 +298,7 @@ public class AuraUITestingUtil {
     public void assertNoQuickFixMessage(Set<String> exceptForThese) {
         String auraErrorMsg = getQuickFixMessage();
         if (!auraErrorMsg.isEmpty()) {
-            if(exceptForThese != null){
+            if (exceptForThese != null) {
                 // Compare against any expected failures
                 for (String allowedException : exceptForThese) {
                     if (auraErrorMsg.contains(allowedException)) {
@@ -343,7 +353,6 @@ public class AuraUITestingUtil {
         return getBooleanEval("return window.$A ? window.$A.finishedInit === true : false;");
     }
 
-
     /**
      * Wait until the provided Function returns true or non-null. Any uncaught javascript errors will trigger an
      * AssertionFailedError.
@@ -361,10 +370,10 @@ public class AuraUITestingUtil {
         return wait.until(addErrorCheck(function));
     }
 
-    public void waitForAuraInit(){
+    public void waitForAuraInit() {
         waitForAuraInit(null);
     }
-    
+
     /**
      * Wait until Aura has finished initialization or encountered an error.
      */
@@ -413,8 +422,8 @@ public class AuraUITestingUtil {
             @Override
             public Boolean apply(WebDriver d) {
                 return getBooleanEval("var cache=window.applicationCache;"
-                                + "return $A.util.isUndefinedOrNull(cache) || "
-                                + "(cache.status===cache.UNCACHED)||(cache.status===cache.IDLE)||(cache.status===cache.OBSOLETE);");
+                        + "return $A.util.isUndefinedOrNull(cache) || "
+                        + "(cache.status===cache.UNCACHED)||(cache.status===cache.IDLE)||(cache.status===cache.OBSOLETE);");
             }
         });
     }
@@ -465,6 +474,6 @@ public class AuraUITestingUtil {
 
     public void assertAccessible() {
         getEval("$A.test.assertAccessible()");
-       
+
     }
 }

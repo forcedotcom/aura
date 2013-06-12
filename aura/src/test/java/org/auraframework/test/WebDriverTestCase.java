@@ -573,6 +573,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     {
         return currentBrowserType.toString().equals(browserName);
     }
+
     /**
      * Wait for a specified amount of time.
      */
@@ -659,44 +660,48 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     /**
-     * Overriding wait to wait until the dialog box closes, Since we are using the class variable
-     * to check for the Dialog box, it changes from dialog  modal medium uiDialog slideUp -> dialog  modal medium uiDialog->
-     * dialog hidden modal medium uiDialog (this is the state that we want to make sure to grab)
+     * Overriding wait to wait until the dialog box closes, Since we are using the class variable to check for the
+     * Dialog box, it changes from dialog modal medium uiDialog slideUp -> dialog modal medium uiDialog-> dialog hidden
+     * modal medium uiDialog (this is the state that we want to make sure to grab)
      * 
-     *   @param selector                way to find componenet (ex: "div[class*='dialog']")
-     *   @param attr                    components attribute that we want to find
-     *   @param itemInAttr              Keyword that we are looking for in the attribute  
-     *   @param useBangOperator        Whether we want to use the bang operator or not
+     * @param selector way to find componenet (ex: "div[class*='dialog']")
+     * @param attr components attribute that we want to find
+     * @param itemInAttr Keyword that we are looking for in the attribute
+     * @param useBangOperator Whether we want to use the bang operator or not
      */
-    public void waitForComponentToChangeStatus(final String selectorToFindCmp, final String attr, final String itemAttrShouldContain, final boolean useBangOperator){
+    public void waitForComponentToChangeStatus(final String selectorToFindCmp, final String attr,
+            final String itemAttrShouldContain, final boolean useBangOperator) {
         auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-                if(useBangOperator){
-                    return !d.findElement(By.cssSelector(selectorToFindCmp)).getAttribute(attr).contains(itemAttrShouldContain);
+                if (useBangOperator) {
+                    return !d.findElement(By.cssSelector(selectorToFindCmp)).getAttribute(attr)
+                            .contains(itemAttrShouldContain);
                 }
-                else{
-                    return d.findElement(By.cssSelector(selectorToFindCmp)).getAttribute(attr).contains(itemAttrShouldContain);
+                else {
+                    return d.findElement(By.cssSelector(selectorToFindCmp)).getAttribute(attr)
+                            .contains(itemAttrShouldContain);
                 }
             }
         }, timeoutInSecs);
     }
-    
+
     /**
      * Wait for the carousel page to change. Asserts the expectedText appears in the innerHTML of page element
+     * 
      * @param page - the next page that should be loaded on carousel.
      * @param expectedText - the expected text on that page.
      */
-    public void waitForCarouselPageToChange(final WebElement page, final String expectedText){
-		auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+    public void waitForCarouselPageToChange(final WebElement page, final String expectedText) {
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-            	String pageContent = page.getAttribute("innerHTML");
-        		return pageContent.contains(expectedText);
+                String pageContent = page.getAttribute("innerHTML");
+                return pageContent.contains(expectedText);
             }
         }, timeoutInSecs);
     }
-    
+
     /**
      * Find first matching element in the DOM.
      */
@@ -729,12 +734,12 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     protected String getText(By locator) {
         return findDomElement(locator).getText();
     }
-    
+
     public Action shiftTab() {
-    	Actions builder = new Actions(currentDriver);
-    	builder.keyDown(Keys.SHIFT)
-    		.sendKeys(Keys.TAB)
-    		.keyUp(Keys.SHIFT);
-    	return builder.build();
+        Actions builder = new Actions(currentDriver);
+        builder.keyDown(Keys.SHIFT)
+                .sendKeys(Keys.TAB)
+                .keyUp(Keys.SHIFT);
+        return builder.build();
     }
 }

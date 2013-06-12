@@ -3,6 +3,6 @@
   "value":{
     "descriptor":"css://test.testTwoCSSFiles",
     "code":".testTestTwoCSSFiles .requiredLegend{color:#000;font-weight:normal;float:right}",
-    "className":".testTestTwoCSSFiles"
+    "className":"testTestTwoCSSFiles"
   }
 }

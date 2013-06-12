@@ -16,8 +16,6 @@
 package org.auraframework.impl.css.style;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +27,6 @@ import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.http.AuraResourceServlet;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.Component;
 import org.auraframework.system.AuraContext;
@@ -44,20 +41,13 @@ import com.google.common.collect.Maps;
 public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
 
     private static final long serialVersionUID = 7140896215068458158L;
+
     private final String className;
-    private final Set<String> imageURLs;
-    private final Set<String> validImageURLs;
     private final List<ComponentDefRef> components;
 
     protected StyleDefImpl(Builder builder) {
         super(builder);
         this.className = builder.className;
-        if (builder.imageURLs == null) {
-            this.imageURLs = Collections.emptySet();
-        } else {
-            this.imageURLs = builder.imageURLs;
-        }
-        this.validImageURLs = validateImageURLs(builder.imageURLs);
         this.components = builder.components;
     }
 
@@ -103,29 +93,6 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
         return className;
     }
 
-    @Override
-    public Set<String> getImageURLs() {
-        return imageURLs;
-    }
-
-    @Override
-    public Set<String> getValidImageURLs() {
-        return validImageURLs;
-    }
-
-    private Set<String> validateImageURLs(Set<String> images) {
-        if (images != null) {
-            Set<String> validSet = new HashSet<String>(images.size());
-            for (String imgURL : images) {
-                if (AuraResourceServlet.isResourceLocallyAvailable(imgURL)) {
-                    validSet.add(imgURL);
-                }
-            }
-            return validSet;
-        }
-        return Collections.emptySet();
-    }
-
     public static class Builder extends DefinitionImpl.BuilderImpl<StyleDef> implements StyleDefBuilder {
 
         public Builder() {
@@ -133,18 +100,11 @@ public class StyleDefImpl extends DefinitionImpl<StyleDef> implements StyleDef {
         }
 
         private String className;
-        private Set<String> imageURLs;
         private List<ComponentDefRef> components;
 
         @Override
         public StyleDef build() {
             return new StyleDefImpl(this);
-        }
-
-        @Override
-        public StyleDefBuilder setImageURLs(Set<String> imageURLs) {
-            this.imageURLs = imageURLs;
-            return this;
         }
 
         @Override

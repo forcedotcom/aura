@@ -74,7 +74,7 @@ public class ReworkImageUrls implements Rework<CSSDeclaration> {
             if (url.startsWith("/") && shouldAddCacheBuster()) {
                 url = AuraBaseServlet.addCacheBuster(url);
             }
-            // resultHolder.addImageURL(url); // TODONM what was using this from StyleParserResultHolder?
+
             return new CSSExpressionMemberTermURI(url);
         }
         return member;

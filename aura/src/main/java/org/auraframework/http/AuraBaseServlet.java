@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -39,7 +38,6 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.StyleDef;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
@@ -64,17 +62,15 @@ public abstract class AuraBaseServlet extends HttpServlet {
     public static final String CSRF_PROTECT = "while(1);\n";
 
     /**
-     * "Short" pages (such as manifest cookies and AuraFrameworkServlet pages)
-     * expire in 1 day.
+     * "Short" pages (such as manifest cookies and AuraFrameworkServlet pages) expire in 1 day.
      */
     public static final long SHORT_EXPIRE_SECONDS = 24L * 60 * 60;
     public static final long SHORT_EXPIRE = SHORT_EXPIRE_SECONDS * 1000;
 
     /**
-     * "Long" pages (such as resources and cached HTML templates) expire in 45
-     * days. We also use this to "pre-expire" no-cache pages, setting their
-     * expiration a month and a half into the past for user agents that don't
-     * understand Cache-Control: no-cache.
+     * "Long" pages (such as resources and cached HTML templates) expire in 45 days. We also use this to "pre-expire"
+     * no-cache pages, setting their expiration a month and a half into the past for user agents that don't understand
+     * Cache-Control: no-cache.
      */
     public static final long LONG_EXPIRE = 45 * SHORT_EXPIRE;
     public static final String UTF_ENCODING = "UTF-8";
@@ -169,12 +165,11 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     /**
      * Handle an exception in the servlet.
-     *
-     * This routine shold be called whenever an exception has surfaced to the
-     * top level of the servlet. It should not be overridden unless Aura is
-     * entirely subsumed. Most special cases can be handled by the Aura user by
-     * implementing {@link ExceptionAdapter ExceptionAdapter}.
-     *
+     * 
+     * This routine shold be called whenever an exception has surfaced to the top level of the servlet. It should not be
+     * overridden unless Aura is entirely subsumed. Most special cases can be handled by the Aura user by implementing
+     * {@link ExceptionAdapter ExceptionAdapter}.
+     * 
      * @param t the throwable to write out.
      * @param quickfix is this exception a valid quick-fix
      * @param context the aura context.
@@ -241,9 +236,10 @@ public abstract class AuraBaseServlet extends HttpServlet {
                     // on every mis-spelled app. In this case we simply send a 404 and bolt.
                     //
                     if (mappedEx instanceof DefinitionNotFoundException) {
-                        DefinitionNotFoundException dnfe = (DefinitionNotFoundException)mappedEx;
+                        DefinitionNotFoundException dnfe = (DefinitionNotFoundException) mappedEx;
 
-                        if (dnfe.getDescriptor() != null && dnfe.getDescriptor().equals(context.getApplicationDescriptor())) {
+                        if (dnfe.getDescriptor() != null
+                                && dnfe.getDescriptor().equals(context.getApplicationDescriptor())) {
                             send404(request, response);
                             return;
                         }
@@ -357,8 +353,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     /**
      * Gets the UID for the application descriptor of the current context, or {@code null} if there is no application
-     * (probably because of a compile
-     * error).
+     * (probably because of a compile error).
      */
     public static String getContextAppUid() {
         DefinitionService definitionService = Aura.getDefinitionService();
@@ -467,42 +462,11 @@ public abstract class AuraBaseServlet extends HttpServlet {
             ret.add(defs.toString());
         }
 
-
         if (mode == Mode.PTEST) {
             ret.add(config.getJiffyCSSURL());
         }
 
         return ret;
-    }
-
-    public static Set<String> getImages() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        Set<String> namespaces = context.getPreloads();
-        Set<String> imgURLs = new TreeSet<String>();
-
-        try {
-            DefinitionService definitionService = Aura.getDefinitionService();
-            for (String namespace : namespaces) {
-                DefDescriptor<StyleDef> matcher = definitionService.getDefDescriptor(
-                        String.format("css://%s.*", namespace), StyleDef.class);
-                Set<DefDescriptor<StyleDef>> descriptors = definitionService.find(matcher);
-
-                for (DefDescriptor<StyleDef> descriptor : descriptors) {
-                    if (!descriptor.getName().toLowerCase().endsWith("template")) {
-                        StyleDef def = descriptor.getDef();
-                        if (def != null) {
-                            Set<String> imgs = def.getValidImageURLs();
-                            if (imgs != null && imgs.size() > 0) {
-                                imgURLs.addAll(imgs);
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new AuraRuntimeException(e);
-        }
-        return imgURLs;
     }
 
     public static List<String> getBaseScripts() throws QuickFixException {

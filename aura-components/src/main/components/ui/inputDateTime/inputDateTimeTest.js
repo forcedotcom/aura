@@ -28,7 +28,7 @@
      * Verify behavior when 'Value' attribute is assigned an empty string.
      */  
     testEmptyStringValue: {
-        attributes: {value: '', langLocale: 'en'},
+        attributes: {value: ''},
         test: function(cmp){        	
 			var inputDateStr  = cmp.find("inputText").getElement().value;	        
     		aura.test.assertEquals('', inputDateStr, "Expected an empty inputText.");			
@@ -39,7 +39,7 @@
      * Verify behavior when 'Value' attribute is assigned a Garbage value.
      */
     testInvalidValue: {
-        attributes: {value: 'cornholio', langLocale: 'en'},
+        attributes: {value: 'cornholio'},
         test: function(cmp){
         	aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 				var inputDateStr  = cmp.find("inputText").getElement().value;		        
@@ -52,13 +52,13 @@
      * Verify behavior when 'timezone' attribute is assigned a garbage value.
      */
     testInvalidTimeZone:{
-	attributes : {displayDatePicker:'true', langLocale: 'en', timezone: 'dummy'},
+	attributes : {displayDatePicker:'true', timezone: 'dummy'},
 	test: function(cmp){
 	        cmp.find("datePicker").get('c.selectToday').run();
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
-		        var dt            = moment().format('YYYY-MM-DD 00:00');
-	    		aura.test.assertEquals(dt, inputDateStr, "Should have used GMT timezone.");	        	
+		        var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
+	    		aura.test.assertEquals(dt, inputDateStr, "Should have used default timezone.");	        	
 	        });	        
         }
     },        
@@ -67,13 +67,13 @@
      * Verify behavior when 'timezone' is assigned a empty string.
      */
     testEmptyStringTimeZone:{
-	attributes : {displayDatePicker:'true', langLocale: 'en', timezone: ''},
+	attributes : {displayDatePicker:'true', timezone: ''},
 	test: function(cmp){
 	        cmp.find("datePicker").get('c.selectToday').run();
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
-		        var dt            = moment().format('YYYY-MM-DD 00:00');
-	    		aura.test.assertEquals(dt, inputDateStr, "Should have used GMT timezone.");	        	
+	        	var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
+	    		aura.test.assertEquals(dt, inputDateStr, "Should have used default timezone.");	        	
 	        });	
         }
     },  
@@ -82,12 +82,11 @@
      * Verify behavior when 'langLocale' is not provided.
      */
     testDefaultLangLocale:{
-	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A'},
+	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true'},
 	test: function(cmp){	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
-	        	var inputDateStr  = cmp.find("inputText").getElement().value;
-		        var dt            = '9/23/04 4:30 PM';
-	    		aura.test.assertEquals(dt, inputDateStr, "Should have used Default langLocale.");	        	
+	        	var inputDateStr  = cmp.find("inputText").getElement().value;		        
+	    		aura.test.assertEquals("Sep 23, 2004 9:30:00 AM", inputDateStr, "Should have used Default langLocale.");	        	
 	        });	
         }
     },
@@ -95,16 +94,15 @@
     /**
      * Verify behavior when 'langLocale' is assigned a empty string.
      */
-    /*testEmptyStringLangLocale:{
-	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A', langLocale: ''},
+    testEmptyStringLangLocale:{
+	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', langLocale: ''},
 	test: function(cmp){	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
-	        	var inputDateStr  = cmp.find("inputText").getElement().value;
-		        var dt            = '9/23/04 4:30 PM';
-	    		aura.test.assertEquals(dt, inputDateStr, "Should have used Default langLocale.");	        	
+	        	var inputDateStr  = cmp.find("inputText").getElement().value;		        
+	    		aura.test.assertEquals("Sep 23, 2004 9:30:00 AM", inputDateStr, "Should have used Default langLocale.");	        	
 	        });	
         }
-    }, */
+    },
     
     /**
      * Verify behavior when 'langLocale' is assigned garbage.
@@ -114,7 +112,7 @@
 	test: function(cmp){	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
-		        var dt            = '9/23/04 4:30 PM';
+		        var dt            = '9/23/04 9:30 AM';
 	    		aura.test.assertEquals(dt, inputDateStr, "Should have used Default langLocale.");	        	
 	        });	
         }
@@ -124,11 +122,11 @@
      * Verify behavior when 'format' attribute is assigned an empty string.
      */
     testEmptyFormat:{
-        attributes: {value : '2004-09-23T16:30:00.000Z', langLocale: 'en', format: '', timezone: 'GMT'},
+        attributes: {value : '2004-09-23T16:30:00.000Z', format: ''},
         test:function(cmp){
         	aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
         		var inputDateStr  = cmp.find("inputText").getElement().value;
-        		aura.test.assertEquals("2004-09-23T16:30:00+00:00", inputDateStr, "Incorrect date/time format.");
+        		aura.test.assertEquals("Sep 23, 2004 9:30:00 AM", inputDateStr, "Incorrect date/time format.");
         	});
         }
     },
@@ -137,7 +135,7 @@
      * Verify behavior when 'format' attribute is assigned a garbage value.
      */
     testInvalidFormat: {
-        attributes: {value : '2004-09-23T16:30:00.000Z', langLocale: 'en', format: 'cornoio', timezone: 'GMT'},
+        attributes: {value : '2004-09-23T16:30:00.000Z', format: 'cornoio'},
         test: function(cmp){
         	aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
         		var inputDateStr  = cmp.find("inputText").getElement().value;
@@ -154,12 +152,12 @@
     /**
      * Verify Today in default time zone.
      */
-    testTodayInDefaultTimeZone:{
+    testTodayInGMT:{
 	attributes : {displayDatePicker:'true', timezone: 'GMT'},
 	test: function(cmp){				
 	        cmp.find("datePicker").get('c.selectToday').run();
 	        var inputDateStr  = cmp.find("inputText").getElement().value;
-	        var dt            = moment().format('YYYY-MM-DD 00:00');
+	        var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
     		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
         }
     },
@@ -168,12 +166,12 @@
      * Verify Today in LA time zone.
      */
     testTodayInLosAngeles:{
-	attributes : {displayDatePicker:'true', langLocale: 'en', timezone: 'America/Los_Angeles'},
+	attributes : {displayDatePicker:'true'},
 	test: function(cmp){
 	        cmp.find("datePicker").get('c.selectToday').run();
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
-		        var dt            = moment().subtract('days',1).format('YYYY-MM-DD 17:00');
+	        	var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
 	    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");	        	
 	        });			
         }
@@ -183,12 +181,12 @@
      * Verify Today in NY time zone.
      */
     testTodayInNewYork:{
-	attributes : {displayDatePicker:'true', langLocale: 'en', timezone: 'America/New_York'},
+	attributes : {displayDatePicker:'true', timezone: 'America/New_York'},
 	test: function(cmp){
 	        cmp.find("datePicker").get('c.selectToday').run();	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;
-		        var dt            = moment().subtract('days',1).format('YYYY-MM-DD 20:00');
+	        	var dt            = moment().format('MMM DD, YYYY') + " 12:00:00 AM";
 	    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");	        	
 	        });	        	        
         }
@@ -197,8 +195,8 @@
     /**
      * Verify a value in default time zone.
      */
-	testTimeInDefaultTimeZone:{
-	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A', langLocale: 'en', timezone: 'GMT'},
+	testTimeInGMT:{
+	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A', timezone: 'GMT'},
 	test: function(cmp){				
 			aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 				var inputDateStr  = cmp.find("inputText").getElement().value;
@@ -211,8 +209,8 @@
     /**
      * Verify a value in LA time zone.
      */
-	testTimeInLosAngeles:{
-	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A', langLocale: 'en', timezone: 'America/Los_Angeles'},
+    testTimeInDefaultTimeZone:{
+	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A'},
 	test: function(cmp){
 			aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 		        var inputDateStr  = cmp.find("inputText").getElement().value;
@@ -220,27 +218,13 @@
 	    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
 			});
         }
-    },
-    
-    /**
-     * Verify a value in LA time zone.
-     */
-	testTimeInLosAngeles11:{
-	attributes : {value:'2013-05-31T00:00:00.000Z', displayDatePicker:'true', format: 'YYYY-MM-dd HH:mm', langLocale: 'en', timezone: 'America/Los_Angeles'},
-	test: function(cmp){
-			aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
-		        var inputDateStr  = cmp.find("inputText").getElement().value;
-		        var dt            = '2013-05-30 17:00';
-	    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
-			});
-        }
-    },
+    },       
 
     /**
      * Verify a value in NY time zone.
      */
 	testTimeInNewYork:{
-	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A', langLocale: 'en', timezone: 'America/New_York'},
+	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A', timezone: 'America/New_York'},
 	test: function(cmp){				
 			aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 		        var inputDateStr  = cmp.find("inputText").getElement().value;

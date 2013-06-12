@@ -18,8 +18,7 @@ Function.RegisterNamespace("Test.Ui.OutputDateTime");
 
 [Fixture]
 Test.Ui.OutputDateTime.ControllerTest = function(){
-	var targetController;
-	var expectedFormat = "YYYY-MM-DD HH:mm";
+	var targetController;	
 	
 	var targetEvent={					
 	};
@@ -32,67 +31,162 @@ Test.Ui.OutputDateTime.ControllerTest = function(){
 		targetController=result;
 	});
 	
+	var mockContext = Mocks.GetMock(Object.Global(), "$A", {                
+		getGlobalValueProviders: function(){
+			return {
+				get: function(expression){			
+					if(expression=="$Locale.datetimeformat")return "YYYY-MM-DD HH:mm";
+					if(expression=="$Locale.langLocale")return "en";
+					if(expression=="$Locale.timezone")return "GMT";
+				}
+			}
+        }
+    });
+	
     [Fixture]
-    function doInit(){
-        [Fact]
-        function FormatGetsChanged(){
-        	// Arrange        	        	
-			var targetComponent={
-				get:function(expression){
-					if(expression=="v.format")return "yyyy-MM-dd HH:mm";
-				},
-				
-				setValue:function(expression, value){
-					if(expression=="v.format")actualFormat = value;
-				}
-			};									                        
-
-            // Act
-            targetController.doInit(targetComponent, targetEvent, targetHelper);
-
-            // Assert
-            Assert.Equal(expectedFormat, actualFormat);
-        }
-        
-        [Fact]
-        function FormatStaysSame(){
-        	// Arrange        	        	
-			var targetComponent={
-				get:function(expression){
-					if(expression=="v.format")return expectedFormat;
-				},
-				
-				setValue:function(expression, value){
-					if(expression=="v.format")actualFormat = value;
-				}
-			};									                     
-
-            // Act
-            targetController.doInit(targetComponent, targetEvent, targetHelper);
-
-            // Assert
-            Assert.Equal(expectedFormat, actualFormat);
-        }
-        
-        [Fact]
+    function doInit(){    	
+    	[Fact]
         function EmptyFormat(){
         	// Arrange
+        	var expected = "YYYY-MM-DD HH:mm";
+        	var actual;
 			var targetComponent={
 				get:function(expression){
 					if(expression=="v.format")return "";
 				},
 				
 				setValue:function(expression, value){
-					if(expression=="v.format")actualFormat = value;
+					if(expression=="v.format")actual = value;
 				}
 			};
 									                     
             // Act
-            targetController.doInit(targetComponent, targetEvent, targetHelper);
+			mockContext(function(){
+				targetController.doInit(targetComponent, targetEvent, targetHelper);
+			});
 
             // Assert
-            Assert.Equal(expectedFormat, actualFormat);
+            Assert.Equal(expected, actual);
         }
-                
-    }
+    	
+    	[Fact]
+        function ValidFormat(){
+        	// Arrange
+        	var expected = "YYYY-MM-DD HH:mm";
+        	var actual;
+			var targetComponent={
+				get:function(expression){
+					if(expression=="v.format")return expected;
+				},
+				
+				setValue:function(expression, value){
+					if(expression=="v.format")actual = value;
+				}
+			};
+									                     
+            // Act
+			mockContext(function(){
+				targetController.doInit(targetComponent, targetEvent, targetHelper);
+			});
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+    	
+    	[Fact]
+        function EmptyLangLocale(){
+        	// Arrange
+        	var expected = "en";
+        	var actual;
+			var targetComponent={
+				get:function(expression){
+					if(expression=="v.langLocale")return "";
+				},
+				
+				setValue:function(expression, value){
+					if(expression=="v.langLocale")actual = value;
+				}
+			};
+									                     
+            // Act
+			mockContext(function(){
+				targetController.doInit(targetComponent, targetEvent, targetHelper);
+			});
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+    	
+    	[Fact]
+        function ValidLangLocale(){
+        	// Arrange
+        	var expected = "en";
+        	var actual;
+			var targetComponent={
+				get:function(expression){
+					if(expression=="v.langLocale")return expected;
+				},
+				
+				setValue:function(expression, value){
+					if(expression=="v.langLocale")actual = value;
+				}
+			};
+									                     
+            // Act
+			mockContext(function(){
+				targetController.doInit(targetComponent, targetEvent, targetHelper);
+			});
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+    	
+    	[Fact]
+        function EmptyTimeZone(){
+        	// Arrange
+        	var expected = "GMT";
+        	var actual;
+			var targetComponent={
+				get:function(expression){
+					if(expression=="v.timezone")return "";
+				},
+				
+				setValue:function(expression, value){
+					if(expression=="v.timezone")actual = value;
+				}
+			};
+									                     
+            // Act
+			mockContext(function(){
+				targetController.doInit(targetComponent, targetEvent, targetHelper);
+			});
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+    	
+    	[Fact]
+        function ValidTimeZone(){
+        	// Arrange
+        	var expected = "GMT";
+        	var actual;
+			var targetComponent={
+				get:function(expression){
+					if(expression=="v.timezone")return expected;
+				},
+				
+				setValue:function(expression, value){
+					if(expression=="v.timezone")actual = value;
+				}
+			};
+									                     
+            // Act
+			mockContext(function(){
+				targetController.doInit(targetComponent, targetEvent, targetHelper);
+			});
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+    }    	
 }

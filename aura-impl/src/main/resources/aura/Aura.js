@@ -928,14 +928,7 @@ $A.ns.Aura.prototype.trace = function() {
  * @public
  * @function
  */
-$A.ns.Aura.prototype.mark = (function() {
-    if (window["Perf"]) {
-        return window["Perf"]["mark"];
-    } else {
-        return function() {
-        };
-    }
-})();
+$A.ns.Aura.prototype.mark = window["Perf"] ? window["Perf"]["mark"] : function(){ return this; };
 
 /**
  * Map through to Jiffy.measure if Jiffy is loaded, otherwise a no-op.

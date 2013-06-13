@@ -105,6 +105,24 @@
         $A.enqueueAction(a);
     },
     
+    getWallDateTime: function(d, timezone) {
+        var tzOffset = 0;
+        try {
+            var tzDate = WallTime.UTCToWallTime(d, timezone);
+            tzOffset = tzDate.getTimezoneOffset();
+        } catch (e) {
+            // The timezone id is invalid or for some reason, we can't get timezone info.
+            // use default timezone
+            timezone = $A.getGlobalValueProviders().get("$Locale.timezone");
+            try {
+                var tzDate = WallTime.UTCToWallTime(d, timezone);
+                tzOffset = tzDate.getTimezoneOffset();
+            } catch (ee) {}
+        }
+        var mDate = moment.utc(d.getTime() - tzOffset * 60000);
+        return mDate.toDate();
+    },
+    
     /**
      * Normalize a format string in order to make it compatible with moment.js
      *
@@ -160,14 +178,8 @@
      */
     updateDisplay: function(component, d, format, timezone, defaultDisplayValue) {
         var displayValue = defaultDisplayValue;
-        var tzOffset = 0;
-        try {
-            var tzDate = WallTime.UTCToWallTime(d, timezone);
-            tzOffset = tzDate.getTimezoneOffset();
-        } catch (e) {
-            // The timezone id is invalid or for some reason, we can't get timezone info.
-        }
-        var mDate = moment.utc(d.getTime() - tzOffset * 60000);
+        var wallDate = this.getWallDateTime(d, timezone);
+        var mDate = moment.utc(wallDate);
         if (mDate.isValid()) {
             var langLocale = this.getNormalizedLangLocale(component);
             displayValue = mDate.lang(langLocale).format(format);

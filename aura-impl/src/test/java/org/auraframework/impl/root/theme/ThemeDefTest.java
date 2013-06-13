@@ -122,6 +122,21 @@ public class ThemeDefTest extends AuraImplTestCase {
         assertThat(dependencies.contains(vendor.getThemeDefDescriptor()), is(true));
     }
 
+    /** adds cross referenced themes as dependencies */
+    public void testDependenciesForCrossReferences() throws Exception {
+        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+
+        String src1 = "<aura:theme><aura:attribute name=\"abc\" default=\"1\"/></aura:theme>";
+        ThemeDef def1 = source(src1);
+        DefDescriptor<ThemeDef> descriptor = def1.getDescriptor();
+
+        String src2 = "<aura:theme><aura:attribute name=\"xyz\" default=\"{!%s.%s.abc}\"/></aura:theme>";
+        ThemeDef def2 = source(String.format(src2, descriptor.getNamespace(), descriptor.getName()));
+
+        def2.appendDependencies(dependencies);
+        assertThat(dependencies.contains(descriptor), is(true));
+    }
+
     /** cannot extend itself */
     public void testCantExtendItself() throws Exception {
         DefDescriptor<ThemeDef> extendsSelf = addSourceAutoCleanup(ThemeDef.class, "");
@@ -182,7 +197,7 @@ public class ThemeDefTest extends AuraImplTestCase {
 
     /** ensure variable function works */
     public void testVariablePresent() throws Exception {
-        assertThat(source(sample).variable("one").get(), equalTo("1"));
+        assertThat(source(sample).variable("one").get().toString(), equalTo("1"));
     }
 
     /** ensure variable function works */
@@ -192,19 +207,19 @@ public class ThemeDefTest extends AuraImplTestCase {
 
     /** correctly gets variable defined on a parent */
     public void testVariableFromParent() throws QuickFixException {
-        assertThat(sourceWithParent(sampleChild).variable("color").get(), equalTo("#ffcc00"));
+        assertThat(sourceWithParent(sampleChild).variable("color").get().toString(), equalTo("#ffcc00"));
     }
 
     /** correctly uses overridden variable value */
     public void testVariableIsOverridden() throws Exception {
-        assertThat(sourceWithParent(sampleOverridden).variable("color").get(), equalTo("newcolor"));
+        assertThat(sourceWithParent(sampleOverridden).variable("color").get().toString(), equalTo("newcolor"));
     }
 
     /** redefine an attribute on the child that exists already on a parent */
     public void testRedefinedAttributed() throws Exception {
         // redefining a variable is highly unrecommended. aura:set should be used instead.
         // however, there isn't a good place to test for this so it's still expected to work.
-        assertThat(sourceWithParent(sampleRedefined).variable("color").get(), equalTo("newcolor"));
+        assertThat(sourceWithParent(sampleRedefined).variable("color").get().toString(), equalTo("newcolor"));
     }
 
     /** utility */

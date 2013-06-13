@@ -75,11 +75,16 @@ public class ThemeValueProviderImpl implements ThemeValueProvider {
         checkNotNull(reference, "reference cannot be null");
 
         DefDescriptor<ThemeDef> descriptor = checkOverridden(getDescriptor(reference));
-        Optional<String> value = descriptor.getDef().variable(reference.getLeaf());
+        Optional<Object> value = descriptor.getDef().variable(reference.getLeaf());
 
         // throw a quick fix exception if value doesn't exist
         if (!value.isPresent()) {
             throw new ThemeValueNotFoundException(reference.getLeaf(), descriptor, reference.getLocation());
+        }
+
+        // check for cross references (expressions)
+        if (value.get() instanceof PropertyReference) {
+            return getValue((PropertyReference) value.get());
         }
 
         return value.get();

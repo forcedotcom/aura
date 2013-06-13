@@ -457,8 +457,6 @@ $A.ns.Aura.prototype.init = function(config, token, context, container, doNotIni
 $A.ns.Aura.prototype.initPriv = function(config, token, container, doNotInitializeServices, doNotCallJiffyOnLoad) {
     if (!$A["hasErrors"]) {
         $A.mark("ClientService.init");
-        $A.mark("LayoutService.init");
-        $A.mark("HistoryService.init");
 
         clientService.init(config, token, function(cmp) {
             $A.endMark("ClientService.init");
@@ -466,9 +464,11 @@ $A.ns.Aura.prototype.initPriv = function(config, token, container, doNotInitiali
 
             if (!$A.initialized) {
                 if (!doNotInitializeServices) {
+                    $A.mark("LayoutService.init");
                     $A.layoutService.init(cmp);
                     $A.endMark("LayoutService.init");
 
+                    $A.mark("HistoryService.init");
                     $A.historyService.init();
                     $A.endMark("HistoryService.init");
                 }

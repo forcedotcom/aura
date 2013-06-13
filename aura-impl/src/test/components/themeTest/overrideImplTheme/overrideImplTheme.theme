@@ -1,0 +1,3 @@
+<aura:theme extends="themeTest:overrideInterfaceTheme">
+  <aura:set attribute="display" value="inline-block" />
+</aura:theme>

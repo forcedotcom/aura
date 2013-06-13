@@ -19,11 +19,16 @@ import java.io.IOException;
 import java.util.List;
 
 import org.auraframework.Aura;
+import org.auraframework.css.parser.ThemeOverrideMap;
 import org.auraframework.css.parser.ThemeValueProvider;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Renderer;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -39,9 +44,10 @@ public class ThemedDeclarationRenderer implements Renderer {
     @Override
     @SuppressWarnings("unchecked")
     public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
-        // TODONM get override map from context current app
 
-        ThemeValueProvider provider = Aura.getStyleAdapter().getThemeValueProvider();
+        ApplicationDef app = currentApp();
+        ThemeOverrideMap overrides = (app == null) ? null : app.getThemeOverrides();
+        ThemeValueProvider provider = Aura.getStyleAdapter().getThemeValueProvider(overrides, null);
 
         // get data from component
         String property = component.getAttributes().getValue("property").toString();
@@ -50,7 +56,6 @@ public class ThemedDeclarationRenderer implements Renderer {
 
         // gather values. there can be multiple values if there were multiple theme functions in the declaration value.
         List<String> resolved = Lists.newArrayList();
-
         for (String reference : references) {
             resolved.add(provider.getValue(reference, location).toString());
         }
@@ -60,5 +65,24 @@ public class ThemedDeclarationRenderer implements Renderer {
 
         // output each value
         out.append(Joiner.on(" ").join(resolved));
+    }
+
+    /**
+     * Finds the current app from the context, if present.
+     * 
+     * @return The current app, or null if not set (or if the current "app" is a component)
+     */
+    private ApplicationDef currentApp() throws QuickFixException {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        DefDescriptor<? extends BaseComponentDef> descriptor = context.getApplicationDescriptor();
+
+        if (descriptor == null) {
+            return null;
+        }
+
+        BaseComponentDef def = descriptor.getDef();
+
+        // check that it's actually an application, not a component
+        return (def instanceof ApplicationDef) ? (ApplicationDef) def : null;
     }
 }

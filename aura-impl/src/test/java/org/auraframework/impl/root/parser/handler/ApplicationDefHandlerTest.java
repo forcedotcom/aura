@@ -15,11 +15,16 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.parser.XMLParser;
@@ -28,6 +33,8 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+
+import com.google.common.base.Optional;
 
 public class ApplicationDefHandlerTest extends AuraImplTestCase {
     XMLStreamReader xmlReader;
@@ -101,6 +108,29 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
         } catch (InvalidDefinitionException expected) {
             assertTrue("Unexpected message " + expected.getMessage(),
                     expected.getMessage().equals("Illegal namespace in ?"));
+        }
+    }
+
+    public void testThemeOverrides() throws Exception {
+        DefDescriptor<ThemeDef> parent = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
+        DefDescriptor<ThemeDef> child = addSourceAutoCleanup(ThemeDef.class,
+                String.format("<aura:theme extends=\"%s\"></aura:theme>", parent.getDescriptorName()));
+
+        String src = String.format("<aura:application themeOverrides=\"%s=%s\"></aura:application>",
+                parent.getDescriptorName(), child.getDescriptorName());
+
+        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
+
+        Optional<DefDescriptor<ThemeDef>> override = app.getDef().getThemeOverrides().getOverride(parent);
+        assertThat(override.get(), equalTo(child));
+    }
+
+    public void testMalformedThemeOverrideString() {
+        try {
+            addSourceAutoCleanup(ApplicationDef.class,
+                    "<aura:application themeOverrides=\"test:fakeTheme\"></aura:application>");
+        } catch (AuraRuntimeException e) {
+            assertThat(e.getMessage().contains("Invalid themeOverrides format"), is(true));
         }
     }
 

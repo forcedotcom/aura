@@ -14,44 +14,51 @@
  * limitations under the License.
  */
 ({
-	throwErrorForKicks: function(cmp) {
-		// this sample always throws an error
-		var hasPerm = false;
-		try {
-		    if (!hasPerm) {
-		        throw new Error("You don't have permission to edit this record.");
-		    }
-		}
-		catch (e) {
-		    // config for a dynamic ui:message component
-			var componentConfig = {
-				    componentDef : "markup://ui:message",
-				    attributes : {
-				        values : {
-				            title : "Sample Thrown Error",
-				            severity : "error",
-				            body : [
-				                {
-				                    componentDef : "markup://ui:outputText",
-				                    attributes : {
-				                        values : {
-				                            value : e.message
-				                        }
-				                    }
-				                }
-				            ]
-				        }
-				    }
-				};
-			
-			var message = $A.componentService.newComponentDeprecated(componentConfig);
-			
-			var div1 = cmp.find("div1");
-			var divBody = div1.getValue("v.body");
-			
-			// Destroy existing body and replace it with the dynamic component
-			divBody.destroy();
-			divBody.setValue(message);			
-		}
-	}
+    throwErrorForKicks: function(cmp) {
+        // this sample always throws an error
+        var hasPerm = false;
+        try {
+            if (!hasPerm) {
+                throw new Error("You don't have permission to edit this record.");
+            }
+        }
+        catch (e) {
+            // config for a dynamic ui:message component
+            var componentConfig = {
+                componentDef : "markup://ui:message",
+                attributes : {
+                    values : {
+                        title : "Sample Thrown Error",
+                        severity : "error",
+                        body : [
+                            {
+                                componentDef : "markup://ui:outputText",
+                                attributes : {
+                                    values : {
+                                        value : e.message
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            };
+
+            $A.componentService.newComponentAsync(
+                this,
+                function(message) {
+                    var div1 = cmp.find("div1");
+                    var divBody = div1.getValue("v.body");
+                    
+                    // Destroy existing body and replace it with the dynamic component
+                    divBody.destroy();
+                    divBody.setValue(message);
+                },
+                componentConfig
+            );
+            
+            
+
+        }
+    }
 })

@@ -22,17 +22,23 @@
                         'topic' : topic
                     }
                 }};
-       try {
-           var topicPanel = $A.componentService.newComponentDeprecated(config, null, true, true);
-           cmp.setValue('{!v.topicPanel}', [topicPanel]);
-       } catch (e) {
-           // Handle the catch-all scenario.
-           if(topic !== 'welcome') {
-               console.log("Got a non-existent topic. Falling back to the welcome topic");
-               setTopicPanelFacet(cmp, 'welcome');
-           } else {
-               console.log("Unable to get the welcome topic.");
-           }
-       }
+        
+       $A.componentService.newComponentAsync(
+          this,
+          function(topicPanel) {  
+              try {
+                  cmp.setValue('{!v.topicPanel}', [topicPanel]);
+                  } catch (e) {
+                  // Handle the catch-all scenario.
+                      if(topic !== 'welcome') {
+                           console.log("Got a non-existent topic. Falling back to the welcome topic");
+                           setTopicPanelFacet(cmp, 'welcome');
+                           } else {
+                       console.log("Unable to get the welcome topic.");
+                  }
+              }
+          },
+          config, null, true, true
+          );
     }
 });

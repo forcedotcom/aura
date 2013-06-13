@@ -18,9 +18,9 @@
      * Adds an event handler for input specific DOM event for which this input has a Aura-equivalent handler
      */
     addInputDomEvents : function(component) {
-    	var events = ["input", "change", "paste", "copy", "cut"];
-    	
-    	for (var i=0, len=events.length; i < len; i++) {
+        var events = ["input", "change", "paste", "copy", "cut"];
+        
+        for (var i=0, len=events.length; i < len; i++) {
             if (component.hasEventHandler(events[i])) {
                 this.addDomHandler(component, events[i]);
             }    		
@@ -143,15 +143,20 @@
         if (errorCmp && !errorCmp.getValue("v.value").compare(m)) {
             errorCmp.setValue("v.value", m);
         } else {
-            errorCmp = $A.componentService.newComponentDeprecated({
+            $A.componentService.newComponentAsync(
+                this,
+                function(errorCmp) {
+                    component.setValue("v.errorComponent", errorCmp);
+                },
+                {
                 "componentDef": "markup://ui:inputDefaultError",
                 "attributes": {
-                    "values": {
-                        "value" : m
-                    }
-                }
-            });
-            component.setValue("v.errorComponent", errorCmp);
+                        "values": {
+                            "value" : m
+                        }
+                	}
+            	}
+            );
         }
     },
 
@@ -202,16 +207,15 @@
     },
     
     setAttribute: function(cmp, attr) {
-    	var attrs = cmp.getAttributes(),			
-			concreteCmp = cmp.getConcreteComponent(),
-			parentCmp = concreteCmp.getSuper();
-    	
-			concreteCmp.getAttributes().setValue(attr.key, attr.value);
-			//need to traverse up the hierarchy and set the attributes, since attribute lookup is not hierarchical once initialized
-			while(parentCmp) {
-				parentCmp.getAttributes().setValue(attr.key, attr.value);
-				parentCmp = parentCmp.getSuper();
-			} 
-		}
+        var attrs = cmp.getAttributes(),			
+        concreteCmp = cmp.getConcreteComponent(),
+        parentCmp = concreteCmp.getSuper();
+        
+        concreteCmp.getAttributes().setValue(attr.key, attr.value);
+        //need to traverse up the hierarchy and set the attributes, since attribute lookup is not hierarchical once initialized
+        while(parentCmp) {
+        	parentCmp.getAttributes().setValue(attr.key, attr.value);
+        	parentCmp = parentCmp.getSuper();
+        } 
     }
 })

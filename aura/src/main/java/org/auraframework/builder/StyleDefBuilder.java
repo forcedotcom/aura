@@ -16,6 +16,7 @@
 package org.auraframework.builder;
 
 import java.util.List;
+import java.util.Set;
 
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.StyleDef;

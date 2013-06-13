@@ -680,6 +680,19 @@ Test.Aura.Controller.ActionTest = function(){
             // Assert
             Assert.False(actual);
         }
+
+        [Fact]
+        function ReturnsFalseIfBackgroundNotTrue(){
+            //Arrange
+            var target = new Action();
+            target.background = "true";
+
+            // Act
+            var actual = target.isBackground();
+
+            // Assert
+            Assert.False(actual);
+        }
     }
 
     [Fixture]

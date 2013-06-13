@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.36-SNAPSHOT</version>
+        <version>0.36</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
@@ -203,10 +203,7 @@
                                        <echo>Executing tests</echo>
 		                               <switch value="${xunit.js.engine}">
 			                               <case value="rhino">
-												<java classname="org.mozilla.javascript.tools.shell.Main"
-													classpathref="maven.test.classpath" fork="true"
-													failonerror="false" resultproperty="xunit.returnvalue"
-													output="${project.build.directory}/xunitjs/rawresults.xml">
+												<java classname="org.mozilla.javascript.tools.shell.Main" classpathref="maven.test.classpath" fork="true" failonerror="false" resultproperty="xunit.returnvalue" output="${project.build.directory}/xunitjs/rawresults.xml">
 													<jvmarg value="-Daura.home=${basedir}/.." />
 													<arg value="${xunit.js.console}" />
 													<arg value="/output:xml" />
@@ -219,14 +216,12 @@
 			                               </default>
 		                               </switch>
                                        <echo>Generating test report</echo>
-                                       <xslt in="${project.build.directory}/xunitjs/rawresults.xml"
-                                             out="${project.build.directory}/xunitjs/results.xml"
-                                             style="${basedir}/src/test/tools/xUnit/junit.xsl" />
+                                       <xslt in="${project.build.directory}/xunitjs/rawresults.xml" out="${project.build.directory}/xunitjs/results.xml" style="${basedir}/src/test/tools/xUnit/junit.xsl" />
                                        <echo>Test report completed: ${project.build.directory}/xunitjs/results.xml</echo>
                                        <fail message="There were xUnit.js test failures.">
                                             <condition>
                                                 <not>
-                                                    <equals arg1="0" arg2="${xunit.returnvalue}"/>
+                                                    <equals arg1="0" arg2="${xunit.returnvalue}" />
                                                 </not>
                                             </condition>
                                        </fail>

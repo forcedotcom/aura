@@ -92,10 +92,16 @@
             lang.push(langLocale.toLowerCase());
         }
         
-        if (lang[0] === "zh") {
-            component._langLocale = lang[0] + "-" + lang[1];
-        } else {
-            component._langLocale = lang[0];
+        component._langLocale = lang[0];
+        if (lang[1]) {
+            var langAndCountry = lang[0] + "-" + lang[1];
+            if (moment.langData(langAndCountry)) {
+                component._langLocale = langAndCountry;
+            }
+        }
+        
+        if (!moment.langData(component._langLocale)) {
+            component._langLocale = "en";
         }
     }
 })

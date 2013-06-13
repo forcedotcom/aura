@@ -59,6 +59,7 @@ var clientService;
 // #include aura.util.Bitset
 // #include aura.context.AuraContext
 // #include aura.value.BaseValue
+// #include aura.value.AttributeValue
 // #include aura.value.MapValue
 // #include aura.value.ArrayValue
 // #include aura.value.SimpleValue
@@ -928,14 +929,7 @@ $A.ns.Aura.prototype.trace = function() {
  * @public
  * @function
  */
-$A.ns.Aura.prototype.mark = (function() {
-    if (window["Perf"]) {
-        return window["Perf"]["mark"];
-    } else {
-        return function() {
-        };
-    }
-})();
+$A.ns.Aura.prototype.mark = window["Perf"] ? window["Perf"]["mark"] : function(){ return this; };
 
 /**
  * Map through to Jiffy.measure if Jiffy is loaded, otherwise a no-op.

@@ -18,17 +18,16 @@
         var dataProvider = component.getConcreteComponent();
         var keyword = event.getParam("parameters").keyword;
         
-            var action = dataProvider.get("c.getItems");
-            action.setParams({
-                "keyword": keyword
-            });
-            action.setCallback(this, function(action) {
-                if (action.getState() === "SUCCESS") {
-                    var result = action.getReturnValue();                    
-                    this.fireDataChangeEvent(dataProvider, result); 
-                }
-            });
-            $A.enqueueAction(action);
-        
+        var action = dataProvider.get("c.getItems");
+        action.setParams({
+            "keyword": keyword
+        });
+        action.setCallback(this, function(action) {
+            if (action.getState() === "SUCCESS") {
+                var result = action.getReturnValue();                    
+                this.fireDataChangeEvent(dataProvider, result); 
+            }
+        });
+        $A.enqueueAction(action);
     }
 })

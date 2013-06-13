@@ -23,12 +23,17 @@
     <aura:attribute name="resizable" type="Boolean" default="true" description="Specifies whether or not the textarea should be resizable.  Defaults to true."/>
     <aura:handler name="change" value="{!v.value}" action="{!c.valueChange}"/>
     
-    <textarea aura:id="textAreaElem"
-    		  id="{!v.domId}"
-    		  class="{!v.class+(v.resizable?'':' noresize')}"
-			  cols="{!v.cols}"
-			  rows="{!v.rows}"
-			  disabled="{!v.disabled}"
-			  readonly="{!v.readonly}"
-			  placeholder="{!v.placeholder}"/>
+    <aura:renderif isTrue="{!v.body.length == 0}">
+        <textarea aura:id="textAreaElem"
+            id="{!v.domId}"
+            class="{!v.class+(v.resizable?'':' noresize')}"
+            cols="{!v.cols}"
+            rows="{!v.rows}"
+            disabled="{!v.disabled}"
+            readonly="{!v.readonly}"
+            placeholder="{!v.placeholder}"/>
+        <aura:set attribute="else">
+            {!v.body}
+        </aura:set>
+    </aura:renderif>
 </aura:component>

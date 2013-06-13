@@ -24,12 +24,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.vfs2.FileChangeEvent;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
 import org.apache.commons.vfs2.VFS;
 import org.apache.commons.vfs2.impl.DefaultFileMonitor;
 import org.apache.log4j.Logger;
+import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
@@ -37,6 +39,7 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.source.BaseSourceLoader;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
+import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.IOUtil;
 
@@ -47,7 +50,7 @@ import com.google.common.collect.Maps;
 public class FileSourceLoader extends BaseSourceLoader {
 
     private static final EnumMap<DefType, FileFilter> filters = new EnumMap<DefType, FileFilter>(DefType.class);
-    private static final Logger logger = Logger.getLogger("FileSourceLoader");
+    private static final Logger logger = Logger.getLogger(FileSourceLoader.class);
     protected final File base;
     // Tests create loaders like crazy, which takes time to scan for namespaces,
     // so this caches that mapping.
@@ -63,13 +66,13 @@ public class FileSourceLoader extends BaseSourceLoader {
     private static FileSystemManager fileMonitorManager;
     private static DefaultFileMonitor fileMonitor;
     private static Set<String> monitoredDirs = new HashSet<String>();
+    private static final FileSourceListener fileListener = new FileSourceListener();
 
     static {
         try {
             // set up source file monitoring
             fileMonitorManager = VFS.getManager();
-            fileMonitor = new DefaultFileMonitor(
-                    new FileSourceListener());
+            fileMonitor = new DefaultFileMonitor(fileListener);
 
             // monitor the base and all child directories
             fileMonitor.start();
@@ -107,7 +110,7 @@ public class FileSourceLoader extends BaseSourceLoader {
      * 
      * @param dirName - name of a root directory to monitor
      */
-    private static synchronized void registerDirMonitor(String dirName)
+    private synchronized void registerDirMonitor(String dirName)
     {
         if (fileMonitorManager == null || fileMonitor == null)
             return;
@@ -119,6 +122,7 @@ public class FileSourceLoader extends BaseSourceLoader {
             logger.info("Added file monitor for directory " + dirName);
             fileMonitor.setRecursive(true);
             fileMonitor.addFile(listendir);
+            fileListener.addLoader(listendir.toString(), this);
         } catch (Exception ex) {
             // eat error - monitoring simply won't happen for requested dir, but should never occur
         }
@@ -255,6 +259,77 @@ public class FileSourceLoader extends BaseSourceLoader {
         }
 
         return file;
+    }
+
+    /**
+     * Finds matching DefDescriptors from path of file that changed. If matches found, clear those descriptors.
+     * Otherwise, clear all cache by passing nul into
+     * {@link org.auraframework.impl.DefinitionServiceImpl#onSourceChanged}
+     *
+     * @param event file change event
+     * @param smEvent file event
+     */
+    public void notifySourceChanges(FileChangeEvent event, SourceListener.SourceMonitorEvent smEvent) {
+
+        String filePath = event.getFile().toString();
+
+        Set<DefDescriptor<?>> matches = find(filePath);
+        if ( matches.size() > 0 ) {
+            for ( DefDescriptor<?> def : matches ) {
+                logger.debug("Invalidating: " + def.getQualifiedName());
+                onSourceChanged(def, smEvent);
+            }
+        } else {
+            logger.debug("No DefDescriptors found. Invalidating all cache.");
+            onSourceChanged(null, smEvent);
+        }
+
+    }
+
+    /**
+     * Used to allow method call validation and matching in tests.
+     *
+     * @param defDescriptor definition descriptor
+     * @param smEvent file change event
+     */
+    public void onSourceChanged(DefDescriptor<?> defDescriptor, SourceListener.SourceMonitorEvent smEvent) {
+        Aura.getDefinitionService().onSourceChanged(defDescriptor, smEvent);
+    }
+
+    /**
+     * Creates {@link DescriptorFilter} to find matches based on file path
+     *
+     * @param filePath path of file
+     * @return set of descriptors
+     */
+    public Set<DefDescriptor<?>> find(String filePath) {
+        DescriptorFilter filter = getDescripterFilter(filePath);
+        return find(filter);
+    }
+
+    /**
+     * Creates {@link DescriptorFilter} from path of file
+     *
+     * @param filePath path of file
+     * @return definition filter
+     */
+    private DescriptorFilter getDescripterFilter(String filePath) {
+        String matchFormat = "%s://%s";
+        String prefix = "*";
+        String name;
+        filePath = filePath.replaceAll("\\\\", "/");
+
+        if (filePath.endsWith(".java")) {
+            // broad attempt to get anything matching class name of java file
+            // this will end up clearing all cache on java file changes
+            // because no java:// descriptors will be found.
+            name = "*" + filePath.substring(filePath.lastIndexOf("/") + 1, filePath.lastIndexOf("."));
+        } else {
+            String paths[] = filePath.split("/");
+            name = paths[paths.length - 3] + ":" + paths[paths.length - 2];
+        }
+
+        return new DescriptorFilter(String.format(matchFormat, prefix, name));
     }
 
     private static class SourceFileFilter implements FileFilter {

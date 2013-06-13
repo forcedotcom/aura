@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.auraframework</groupId>
     <artifactId>aura-framework</artifactId>
-    <version>0.33-SNAPSHOT</version>
+    <version>0.36-SNAPSHOT</version>
     <packaging>pom</packaging>
     <organization>
         <url>http://www.auraframework.org</url>
@@ -49,9 +49,9 @@
             <url>http://maven.auraframework.org/libs-snapshot</url>
         </repository>
         <repository>
-           <id>ext-release</id>
-           <name>Releases of external dependencies</name>
-           <url>http://maven.auraframework.org/ext-release-local</url>
+            <id>ext-release</id>
+            <name>Releases of external dependencies</name>
+            <url>http://maven.auraframework.org/ext-release-local</url>
         </repository>
         <repository>
             <id>jsdoctk1</id>
@@ -123,8 +123,8 @@
         <connection>scm:git:git@github.com:forcedotcom/lumen-beta.git</connection>
         <url>scm:git:git@github.com:forcedotcom/lumen-beta.git</url>
         <developerConnection>scm:git:git@github.com:forcedotcom/lumen-beta.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -135,80 +135,80 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <scope>test</scope>
-            </dependency>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.36-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.36-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-util</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.36-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-util</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.36-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.36-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.36-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl-expression</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.36-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-impl-expression</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.36-SNAPSHOT</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-components</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.36-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-tools</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.36-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-resources</artifactId>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.36-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-integration-test</artifactId>
                 <type>test-jar</type>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.36-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>auradocs-integration-test</artifactId>
                 <type>test-jar</type>
-                <version>0.33-SNAPSHOT</version>
+                <version>0.36-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -303,7 +303,7 @@
             <dependency>
                 <groupId>org.seleniumhq.selenium</groupId>
                 <artifactId>selenium-firefox-driver</artifactId>
-            	<version>2.29.0</version>
+                <version>2.29.0</version>
             </dependency>
             <dependency>
                 <groupId>net.sourceforge.pjl-comp-filter</groupId>

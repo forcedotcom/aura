@@ -166,6 +166,12 @@
             tzOffset = tzDate.getTimezoneOffset();
         } catch (e) {
             // The timezone id is invalid or for some reason, we can't get timezone info.
+            // use default timezone
+            timezone = $A.getGlobalValueProviders().get("$Locale.timezone");
+            try {
+                var tzDate = WallTime.UTCToWallTime(d, timezone);
+                tzOffset = tzDate.getTimezoneOffset();
+            } catch (ee) {}
         }
         var mDate = moment.utc(d.getTime() - tzOffset * 60000);
         return mDate.toDate();

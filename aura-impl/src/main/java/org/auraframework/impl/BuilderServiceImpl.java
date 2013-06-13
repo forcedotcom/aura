@@ -19,11 +19,14 @@ import org.auraframework.builder.ApplicationDefBuilder;
 import org.auraframework.builder.ComponentDefBuilder;
 import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.builder.StyleDefBuilder;
+import org.auraframework.builder.ThemeDefBuilder;
 import org.auraframework.impl.css.style.StyleDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
+import org.auraframework.impl.root.theme.ThemeDefImpl;
 import org.auraframework.service.BuilderService;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  */
@@ -51,6 +54,11 @@ public class BuilderServiceImpl implements BuilderService {
     @Override
     public StyleDefBuilder getStyleDefBuilder() {
         return new StyleDefImpl.Builder();
+    }
+
+    @Override
+    public ThemeDefBuilder getThemeDefBuilder() throws QuickFixException {
+        return new ThemeDefImpl.Builder();
     }
 
 }

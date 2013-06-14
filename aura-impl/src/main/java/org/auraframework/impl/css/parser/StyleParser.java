@@ -85,8 +85,9 @@ public class StyleParser implements Parser {
             builder.setClassName(className);
             builder.setOwnHash(source.getHash());
 
-            CSSParser parser = new CSSParser(descriptor.getNamespace(), shouldValidate(descriptor.getName()),
-                    className, source.getContents(), allowedConditions, source.getSystemId());
+            CSSParser parser = new CSSParser(descriptor.getNamespace(), descriptor.getName(),
+                    shouldValidate(descriptor.getName()), className, source.getContents(), allowedConditions,
+                    source.getSystemId());
 
             builder.setComponents(parser.parse());
             builder.setThemeReferences(parser.getThemeReferences());

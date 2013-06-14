@@ -22,7 +22,6 @@ import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.instance.ValueProvider;
 import org.auraframework.system.Location;
-import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -72,8 +71,23 @@ public interface ThemeValueProvider extends ValueProvider {
      * Similar to {@link #getDescriptor(PropertyReference)}, except it takes a string. Returns a set because there might
      * be multiple descriptors in the reference.
      * 
-     * @throws AuraValidationException
+     * @param reference Find the descriptors in this reference.
+     * @param location The location of the reference in the source.
+     * 
+     * @throws QuickFixException
      */
     Set<DefDescriptor<ThemeDef>> getDescriptors(String reference, Location location) throws QuickFixException;
 
+    /**
+     * Similar to {@link #getDescriptors(String, Location)}, except this will allow you to only get qualified
+     * descriptors (i.e., to ignore aliases).
+     * 
+     * @param reference Find the descriptors in this reference.
+     * @param location The location of the reference in the source.
+     * @param qualifiedOnly Specify true to only return qualified references.
+     * 
+     * @throws QuickFixException
+     */
+    Set<DefDescriptor<ThemeDef>> getDescriptors(String reference, Location location, boolean qualifiedOnly)
+            throws QuickFixException;
 }

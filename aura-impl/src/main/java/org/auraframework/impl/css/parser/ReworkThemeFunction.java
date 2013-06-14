@@ -21,6 +21,7 @@ import java.util.Set;
 import org.auraframework.components.aura.ThemedDeclarationRenderer;
 import org.auraframework.css.parser.ThemeValueProvider;
 import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.StyleDef;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.StyleParserException;
@@ -57,9 +58,18 @@ final class ReworkThemeFunction implements DynamicRework<CSSDeclaration> {
             "Try rewriting like theme(\"'text ' + x.y.z\").";
 
     private final String filename;
+    private final String name;
+    private final String namespace;
     private final Set<String> allReferences = Sets.newHashSet();
 
-    public ReworkThemeFunction(String filename) {
+    /**
+     * @param namespace Namespace of the {@link StyleDef}
+     * @param name Name of the {@link StyleDef}.
+     * @param filename Filename of the css file (for error reporting).
+     */
+    public ReworkThemeFunction(String namespace, String name, String filename) {
+        this.namespace = namespace;
+        this.name = name;
         this.filename = filename;
     }
 
@@ -95,6 +105,8 @@ final class ReworkThemeFunction implements DynamicRework<CSSDeclaration> {
         ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
 
         builder.setDescriptor("aura:themedDeclaration");
+        builder.setAttribute("namespace", namespace);
+        builder.setAttribute("name", name);
         builder.setAttribute("property", declaration.getProperty());
         builder.setAttribute("references", references);
         builder.setAttribute("location", l);

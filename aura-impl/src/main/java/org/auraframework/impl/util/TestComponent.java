@@ -37,6 +37,7 @@ import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.StyleDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.system.Location;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -230,7 +231,7 @@ public final class TestComponent implements ComponentDef {
     }
 
     @Override
-    public <D extends Definition> D getSubDefinition( SubDefDescriptor<D, ?> descriptor) {
+    public <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> descriptor) {
         return null;
     }
 
@@ -276,5 +277,10 @@ public final class TestComponent implements ComponentDef {
     @Override
     public Visibility getVisibility() {
         return Visibility.PUBLIC;
+    }
+
+    @Override
+    public Map<String, DefDescriptor<ThemeDef>> getThemeAliases() {
+        return null;
     }
 }

@@ -1,0 +1,2 @@
+<aura:component themeAlias="var=themeTest:baseTheme">
+</aura:component>

@@ -131,6 +131,14 @@ public class ThemeValueProviderTest extends AuraImplTestCase {
         assertThat(Iterables.get(dds, 1, null), is(expected2));
     }
 
+    /** check that get qualified descriptors only will not throw an exception on aliases */
+    public void testGetDescriptorsIgnoreAliases() throws QuickFixException {
+        String nonsensical = "var.color";
+        Set<DefDescriptor<ThemeDef>> dds = provider().getDescriptors(nonsensical, null, true);
+        assertThat(dds.isEmpty(), is(true));
+        // and also no exceptions
+    }
+
     public void testCrossReferenceSelf() throws QuickFixException {
         String val = provider().getValue("themeTest.crossReferencingTheme.errorColor", null).toString();
         assertThat(val, is("#ff0000"));
@@ -153,7 +161,7 @@ public class ThemeValueProviderTest extends AuraImplTestCase {
 
     /** utility */
     public static ThemeValueProvider aliased() {
-        return new ThemeValueProviderImpl(null, ImmutableMap.of("var", "test:fakeTheme"));
+        return new ThemeValueProviderImpl(null, ImmutableMap.of("var", ThemeDefImpl.descriptor("test:fakeTheme")));
     }
 
     /** utility */

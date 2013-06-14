@@ -33,10 +33,13 @@ import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
 import org.auraframework.test.AuraTestingUtil;
+import org.auraframework.throwable.AuraRuntimeException;
 
 import com.google.common.collect.Sets;
 
 public class AuraTestingUtilImpl implements AuraTestingUtil {
+    public static final long CACHE_CLEARING_TIMEOUT_SECS = 60;
+
     private final Set<DefDescriptor<?>> cleanUpDds = Sets.newHashSet();
     private static AtomicLong nonce = new AtomicLong(System.currentTimeMillis());
 
@@ -127,6 +130,7 @@ public class AuraTestingUtilImpl implements AuraTestingUtil {
         final CountDownLatch latch = new CountDownLatch(cached.size());
         SourceListener listener = new SourceListener() {
             private Set<DefDescriptor<?>> descriptors = Sets.newHashSet(cached);
+
             @Override
             public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event) {
                 if (descriptors.remove(source)) {
@@ -141,6 +145,10 @@ public class AuraTestingUtilImpl implements AuraTestingUtil {
         for (DefDescriptor<?> desc : cached) {
             definitionService.onSourceChanged(desc, SourceMonitorEvent.changed);
         }
-        latch.await(30, TimeUnit.SECONDS);
+        if (!latch.await(CACHE_CLEARING_TIMEOUT_SECS, TimeUnit.SECONDS)) {
+            throw new AuraRuntimeException(String.format(
+                    "Timed out after %s seconds waiting for cached Aura definitions to clear: %s",
+                    CACHE_CLEARING_TIMEOUT_SECS, defs));
+        }
     }
 }

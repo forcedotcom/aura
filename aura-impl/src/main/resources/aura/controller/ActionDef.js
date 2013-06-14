@@ -15,93 +15,102 @@
  */
 /*jslint sub: true*/
 /**
- * @namespace The Action Definition including the name, descriptor, action type, method, and parameter definitions.
- * An ActionDef instance is created as part of the ControllerDef initialization.
- *
+ * @namespace The Action Definition including the name, descriptor, action type, method, and parameter definitions. An
+ *            ActionDef instance is created as part of the ControllerDef initialization.
+ * 
  * @constructor
- * @param {Object} config
+ * @param {Object}
+ *            config
  */
-function ActionDef(config){
-    this.name = config["name"];
-    this.descriptor = config["descriptor"];
-    this.actionType = config["actionType"];
-    this.meth = null;
-    this.paramDefs = {};
+function ActionDef(config) {
+	this.name = config["name"];
+	this.descriptor = config["descriptor"];
+	this.actionType = config["actionType"];
+	this.meth = null;
+	this.paramDefs = {};
 
-    if (this.actionType === "SERVER") {
-        this.returnType = new ValueDef(config["returnType"]);
+	if (this.actionType === "SERVER") {
+		this.returnType = new ValueDef(config["returnType"]);
 
-        var params = config["params"];
-        for(var i=0;i<params.length;i++){
-            var paramConfig = params[i];
-            var param = new ValueDef(paramConfig);
-            this.paramDefs[param.getName()] = param;
-        }
-        this.background = config["background"];
-    }
+		var params = config["params"];
+		if (!!params && $A.util.isArray(params)) {
+			for ( var i = 0; i < params.length; i++) {
+				var paramConfig = params[i];
+				var param = new ValueDef(paramConfig);
+				this.paramDefs[param.getName()] = param;
+			}
+		}
+		this.background = config["background"];
+	}
 
-    if (this.actionType === "CLIENT") {
-        try {
-            this.meth = aura.util.json.decodeString(config["code"]);
-        } catch (e) {
-            aura.log(config["code"], e);
-        }
-    }
+	if (this.actionType === "CLIENT") {
+		try {
+			this.meth = $A.util.json.decodeString(config["code"]);
+		} catch (e) {
+			$A.log(config["code"], e);
+		}
+	}
 }
 
 ActionDef.prototype.auraType = "ActionDef";
 
 /**
- * Gets the name of this Action.
- * The name is the unique identifier that the component can use to call this Action.
+ * Gets the name of this Action. The name is the unique identifier that the component can use to call this Action.
+ * 
  * @returns {String}
  */
-ActionDef.prototype.getName = function(){
-    return this.name;
+ActionDef.prototype.getName = function() {
+	return this.name;
 };
 
 /**
  * Gets the Action Descriptor.
+ * 
  * @private
  * @returns {Object}
  */
-ActionDef.prototype.getDescriptor = function(){
-    return this.descriptor;
+ActionDef.prototype.getDescriptor = function() {
+	return this.descriptor;
 };
 
 /**
  * Gets the Action type, which can either be "CLIENT" or "SERVER".
+ * 
  * @private
  * @returns {String} Possible values are "CLIENT" or "SERVER".
  */
-ActionDef.prototype.getActionType = function(){
-    return this.actionType;
+ActionDef.prototype.getActionType = function() {
+	return this.actionType;
 };
 
 /**
  * Returns true if the Action type is client-side, or false otherwise.
+ * 
  * @returns {Boolean}
  */
-ActionDef.prototype.isClientAction = function(){
-    return this.actionType === "CLIENT";
+ActionDef.prototype.isClientAction = function() {
+	return this.actionType === "CLIENT";
 };
 
 /**
  * Returns true if the Action type is server-side, or false otherwise.
+ * 
  * @returns {Boolean}
  */
-ActionDef.prototype.isServerAction = function(){
-    return this.actionType === "SERVER";
+ActionDef.prototype.isServerAction = function() {
+	return this.actionType === "SERVER";
 };
 
 /**
  * Returns a new Action instance.
+ * 
  * @private
- * @param {Object} cmp The component associated with the Action.
+ * @param {Object}
+ *            cmp The component associated with the Action.
  * @returns {Action}
  */
-ActionDef.prototype.newInstance = function(cmp){
-    return new Action(this, this.meth, this.paramDefs, this.background, cmp);
+ActionDef.prototype.newInstance = function(cmp) {
+	return new Action(this, this.meth, this.paramDefs, this.background, cmp);
 };
 
-//#include aura.controller.ActionDef_export
+// #include aura.controller.ActionDef_export

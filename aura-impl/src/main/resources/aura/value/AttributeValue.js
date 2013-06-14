@@ -231,6 +231,8 @@ $A.ns.AttributeValue.prototype.prepare = function(eventName) {
  */
 $A.ns.AttributeValue.prototype.firePending = function(eventName, eventList) {
     if (eventList) {
+    	$A.assert($A.util.isArray(eventList), "Expected a list of events, but instead got: " + eventList);
+    	
         // Walk up the tree, clearing events, until top or list is empty.  There
         // may be more pending events above this list's scope, but those aren't
         // done yet (we're just firing for some of their subvalues changing).
@@ -244,8 +246,8 @@ $A.ns.AttributeValue.prototype.firePending = function(eventName, eventList) {
         }
 
         // Now fire all the events:
-        for (var event in eventList) {
-            eventList[event].fire();
+        for (var i=0; i< eventList.length; i++) {
+            eventList[i].fire();
         }
     }
 };

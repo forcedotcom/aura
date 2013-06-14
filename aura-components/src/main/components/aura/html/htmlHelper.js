@@ -193,21 +193,28 @@
         var ownerComponent = $A.componentService.getRenderingComponentForElement(element);
         var attributes = ownerComponent.getAttributes();
         var valueProvider = attributes.getValueProvider();
-        
+
         var htmlAttributes = attributes.getValue("HTMLAttributes");
         var valueExpression = htmlAttributes.getValue(eventName);
-        
+
         if (eventName === "ontouchend") {
-        	// Validate that either onclick or ontouchend is wired up to an action never both simultaneously
+            // Validate that either onclick or ontouchend is wired up to an action never both simultaneously
             var onclickExpression = htmlAttributes.getValue("onclick");
             if (onclickExpression.isDefined()) {
-            	if (!valueExpression.isDefined()) {
-    	            // Map from touch event to onclick
-                	valueExpression = onclickExpression;
-    	            eventName = "onclick";
-            	}
+                if (!valueExpression.isDefined()) {
+                    // Map from touch event to onclick
+                    valueExpression = onclickExpression;
+                    eventName = "onclick";
+                }
             }
         }
+
+        //start a new transaction
+
+        if(eventName == "onclick") {
+            $A.services.client._initTransaction();
+        }
+
 
         $A.run(function () {
                 var action = $A.expressionService.get(valueProvider, valueExpression);
@@ -245,23 +252,23 @@
             // ve is either an expression (and needs to be evaluated by
             // the expressionService), or a literal
             if (ve && ve.isExpression) {
-            	if (ve.isExpression()) {
-	                value = $A.expressionService.getValue(valueProvider, ve);
-	
-	                // get the actual value from the Value object (if it's not null)
-	                if (value && value.auraType === "Value") {
-	                    if (aura.util.arrayIndexOf(this.SPECIAL_BOOLEANS, name.toLowerCase()) > -1) {
-	                        // TODO: values should someday know their type and do the right thing with getValue()
-	                        value = value.getBooleanValue();
-	                    } else {
-	                        value = value.getValue();
-	                    }
-	                }
-            	} else {
+                if (ve.isExpression()) {
+                    value = $A.expressionService.getValue(valueProvider, ve);
+
+                    // get the actual value from the Value object (if it's not null)
+                    if (value && value.auraType === "Value") {
+                        if (aura.util.arrayIndexOf(this.SPECIAL_BOOLEANS, name.toLowerCase()) > -1) {
+                            // TODO: values should someday know their type and do the right thing with getValue()
+                            value = value.getBooleanValue();
+                        } else {
+                            value = value.getValue();
+                        }
+                    }
+                } else {
                     value = ve.getValue();
-            	}
+                }
             } else{
-            	value = ve; 
+                value = ve;
             }
 
             var isHash = value && value.indexOf && value.indexOf("#") === 0;
@@ -297,23 +304,23 @@
                 ret.setAttribute(name, value);
             } else if (aura.util.arrayIndexOf(this.SPECIAL_BOOLEANS, name.toLowerCase()) > -1) {
                 // handle the boolean attributes for whom presence implies truth
-            	var casedName = this.caseAttribute(name);
+                var casedName = this.caseAttribute(name);
                 if (value === false) {
                     ret.removeAttribute(casedName);
                 } else {
                     ret.setAttribute(casedName, name);
-                    
+
                     // Support for IE's weird handling of checked
                     if (casedName === "checked"){
-                    	ret.setAttribute("defaultChecked", true);
-                	}
+                        ret.setAttribute("defaultChecked", true);
+                    }
                 }
             } else {
                 // as long as we have a valid value at this point, set
                 // it as an attribute on the DOM node
                 // IE renders null value as string "null" for input (text) element, we have to work around that.
                 if (!aura.util.isUndefined(value) && !($A.util.isIE && this.isInputNullValue(ret.tagName, name, value))) {
-                	var casedAttribute = this.caseAttribute(name);
+                    var casedAttribute = this.caseAttribute(name);
                     var lowerName = name.toLowerCase();
                     if (lowerName === "type" || lowerName === "href" || lowerName === "style" || lowerName.indexOf("data-") === 0) { // special case we have to use "setAttribute"
                         ret.setAttribute(casedAttribute, value);
@@ -324,7 +331,7 @@
             }
         }
     },
-    
+
     isInputNullValue: function(tagName, attributeName, value) {
         if (tagName && attributeName) {
             return tagName.toLowerCase() === "input" && attributeName.toLowerCase() === "value" && value === null;

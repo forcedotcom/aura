@@ -238,8 +238,20 @@ var AuraClientService = function() {
          * @param name the name of the item to push.
          */
         pushStack : function(name) {
+            //#if {"modes" : ["PTEST"]}
+            // to only profile the transactions and not the initial page load
+            if (name == "onclick") {
+                // clear out existing timers
+                $A.removeStats();
+                $A.getContext().clearTransactionName();
+                // start a Jiffy transaction
+                $A.startTransaction($A.getContext().incrementTransaction());
+            }
+            //#end
             priv.auraStack.push(name);
         },
+        
+        queueNeedsFiltering : false,
 
         /**
          * Pop an item off the stack.
@@ -279,48 +291,15 @@ var AuraClientService = function() {
                     done = !clientService.processActions();
                     count += 1;
                     if (count > 14) {
-                        $A.error("finishFiring has not completed after 10 loops");
+                        $A.error("finishFiring has not completed after 15 loops");
                     }
                 }
                 // Force our stack to nothing.
                 priv.auraStack = [];
+                this.queueNeedsFiltering = true;
             }
         },
 
-        /**
-         * Register a new transaction.This clears out the previously set times (of previous transaction),
-         * clears the transactionName
-         * and triggers a new transaction.
-         *
-         * @private
-         */
-        registerTransaction: function() {
-            //#if {"modes" : ["PTEST"]}
-            // to only profile the transactions and not the initial page load
-                // clear out existing timers
-                $A.removeStats();
-                $A.getContext().clearTransactionName();
-                // start a Jiffy transaction
-                $A.startTransaction($A.getContext().incrementTransaction());
-            //#end
-        },
-
-        /**
-         * Unregister an existing transaction. This ends the current transaction and
-         * updates the transaction name to include all actions.
-         * It also sets the beaconData to piggyback on the next XHR call.
-         *
-         * @private
-         */
-        unregisterTransaction: function() {
-            // end the previously started transaction
-            $A.endTransaction($A.getContext().getTransaction());
-            // set the transaction using #hashtag from the URL and the
-            // concatenated action names as the unique ID
-            $A.updateTransaction("txn_" + $A.getContext().getTransaction(), "txn_" + $A.historyService.get()["token"] + $A.getContext().getTransactionName());
-            // update the vars and set the beaconData to piggyback on the next XHR call
-            $A.setBeaconData($A.toJson());
-        },
 
         /**
          * Perform a hard refresh.
@@ -541,6 +520,16 @@ var AuraClientService = function() {
             if (exclusive !== undefined) {
                 action.setExclusive(exclusive);
             }
+            
+            if (action.isAbortable()) {
+                //indicate to priv that there is a new abortable action group and any currently running group is out of date.
+                priv.newestAbortableGroup = -1;
+                if (clientService.queueNeedsFiltering) {
+                    priv.actionQueue = clientService.clearPreviousAbortableActions(priv.actionQueue);
+                    clientService.queueNeedsFiltering = false;
+                }
+            }
+            
             //
             // FIXME: W-1652118 This should not differentiate, both of these should get pushed.
             //
@@ -550,27 +539,43 @@ var AuraClientService = function() {
                 priv.actionQueue.push(action);
             }
         },
-
+        
+        clearPreviousAbortableActions : function(queue) {
+            var newQueue = [];
+            var counter;
+            for(counter = 0; counter < queue.length; counter++) {
+                if (!queue[counter].isAbortable()) {
+                    newQueue.push(queue[counter]);
+                } else {
+                    queue[counter].abort();
+                }
+            }
+            return newQueue;
+        },
+        
         /**
          * process the current set of actions, looping if needed.
          *
-         * This runs the current action set, then tries again as
-         * long as there are actions to be run.
+         * This runs the current action set.
          *
          * @private
          */
         processActions : function() {
-            var count = 0;
-            while (priv.actionQueue.length > 0) {
-                var actions = priv.actionQueue;
+            var actions;
+
+            //if an XHR is in flight request don't send a new request yet.
+            if (priv.inRequest) {
+                return false;
+            }
+            
+            if (priv.actionQueue.length > 0) {
+                actions = priv.actionQueue;
                 priv.actionQueue = [];
                 priv.request(actions);
-                count += 1;
-                if (count > 20) {
-                    $A.error("Actions do not seem to be completing");
-                }
+                clientService.queueNeedsFiltering = false;
+                return true;
             }
-            return (count > 0);
+            return false;
         }
 
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

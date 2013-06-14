@@ -89,15 +89,15 @@ var priv = {
         // we have further problems...
         //
         if ((response["status"] != 200)
-                || (text.length > 9 && text.charAt(text.length - 9) == "/" &&
-                            text.charAt(text.length - 8) == "*" &&
-                            text.charAt(text.length - 7) == "E" &&
-                            text.charAt(text.length - 6) == "R" &&
-                            text.charAt(text.length - 5) == "R" &&
-                            text.charAt(text.length - 4) == "O" &&
-                            text.charAt(text.length - 3) == "R" &&
-                            text.charAt(text.length - 2) == "*" &&
-                            text.charAt(text.length - 1) == "/")) {
+                || (text.length > 9 && text.charAt(text.length - 9) == "/" && 
+            				text.charAt(text.length - 8) == "*" && 
+            				text.charAt(text.length - 7) == "E" && 
+            				text.charAt(text.length - 6) == "R" && 
+            				text.charAt(text.length - 5) == "R" && 
+            				text.charAt(text.length - 4) == "O" && 
+            				text.charAt(text.length - 3) == "R" && 
+            				text.charAt(text.length - 2) == "*" && 
+            				text.charAt(text.length - 1) == "/")) {
             if (response["status"] == 200) {
                 // if we encountered an exception once the response was committed
                 // ignore the malformed JSON
@@ -342,7 +342,14 @@ var priv = {
             // the detail, so skip this for next time
             // a bit of a hack to capture the getDetail action as well
             if (queueCopy[0].actions[0].getDef().name.indexOf("Overview") == -1 && (queueCopy[0].actions[0].getDef().name.indexOf("List") == -1 || queueCopy[0].actions[0].getDef().name.indexOf("RelatedList") !== -1)) {
-               $A.clientService.unregisterTransaction();
+                // end the previously started transaction
+                $A.endTransaction($A.getContext().getTransaction());
+                // set the transaction using #hashtag from the URL and the
+                // concatenated action names as the unique ID
+                var tokenJson = $A.historyService.get();
+                $A.updateTransaction("txn_" + $A.getContext().getTransaction(), "txn_" + tokenJson["token"] + $A.getContext().getTransactionName());
+                // update the vars and set the beaconData to piggyback on the next XHR call
+                $A.setBeaconData($A.toJson());
             }
         }
         //#end
@@ -405,14 +412,14 @@ var priv = {
             }
         };
 
+        var storage = Action.prototype.getStorage();
         for ( var i = 0; i < actions.length; i++) {
             var action = actions[i];
-            $A.assert(action.def.isServerAction(), "RunAfter() cannot be called on a client action. Use run() on a client action instead.");
+            $A.assert(action.getDef().isServerAction(), "RunAfter() cannot be called on a client action. Use run() on a client action instead.");
 
             // For cacheable actions check the storage service to see if we
             // already have a viable cached action response we can complete
             // immediately
-            var storage = Action.prototype.getStorage();
             if (action.isStorable() && storage) {
                 var key = action.getStorageKey();
 
@@ -730,7 +737,7 @@ $A.ns.Util.prototype.on(window, "beforeunload", function(event) {
         priv.isUnloading = true;
         priv.requestQueue = [];
     }
-});
+}); 
 
 $A.ns.Util.prototype.on(window, "load", function(event) {
     // Lazy load data-src scripts

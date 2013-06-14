@@ -27,6 +27,5 @@ exp(clientService,
     "hardRefresh", clientService.hardRefresh,
     "setOutdated", clientService.setOutdated,
     "injectComponent", clientService.injectComponent,
-    "isConnected", clientService.isConnected,
-    "_initTransaction", clientService.registerTransaction
+    "isConnected", clientService.isConnected
 );

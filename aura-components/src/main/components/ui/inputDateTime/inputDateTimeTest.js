@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 ({
+	/*
+     * Note: currently dateTimePicker, requires the user to manually put the time they are looking for. The
+     * following tests are just a stub for future functionality.
+     */	  
+	
     testInitialValue:{
         attributes : {value: '2012-09-10T14:00:00.000Z', format: 'MM/dd/yyyy HH:mm:ss', timezone: 'Europe/Berlin'},
         test: function(cmp){
@@ -51,7 +56,7 @@
     /**
      * Verify behavior when 'timezone' attribute is assigned a garbage value.
      */
-    testInvalidTimeZone:{
+    /*testInvalidTimeZone:{
 	attributes : {displayDatePicker:'true', timezone: 'dummy'},
 	test: function(cmp){
 	        cmp.find("datePicker").get('c.selectToday').run();
@@ -61,7 +66,20 @@
 	    		aura.test.assertEquals(dt, inputDateStr, "Should have used default timezone.");	        	
 	        });	        
         }
-    },        
+    },*/   
+    
+    /**
+     * Verify behavior when 'timezone' attribute is assigned a garbage value.
+     */
+    testInvalidTimeZoneUsingValue:{
+	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', timezone: 'dummy'},
+	test: function(cmp){	        
+	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
+	        	var inputDateStr  = cmp.find("inputText").getElement().value;		        
+	    		aura.test.assertEquals("Sep 23, 2004 9:30:00 AM", inputDateStr, "Should have used default timezone.");	        	
+	        });	        
+        }
+    },   
 
     /**
      * Verify behavior when 'timezone' is assigned a empty string.
@@ -107,7 +125,7 @@
     /**
      * Verify behavior when 'langLocale' is assigned garbage.
      */
-    /*testInvalidLangLocale:{
+    testInvalidLangLocale:{
  	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', langLocale: 'xx'},	
 	test: function(cmp){	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
@@ -115,7 +133,7 @@
 	    		aura.test.assertEquals("Sep 23, 2004 9:30:00 AM", inputDateStr, "Should have used Default langLocale.");	        	
 	        });	
         }
-    },*/ 
+    }, 
     
     /**
      * Verify behavior when 'format' attribute is assigned an empty string.
@@ -141,12 +159,7 @@
         		aura.test.assertEquals("cornoio", inputDateStr, "Invalid pattern character is output as it is.");
         	});
       }
-    },
-    
-    /*
-     * Note: currently dateTimePicker, requires the user to manually put the time they are looking for. The
-     * following tests are just a stub for future functionality.
-     */	  
+    },        
 	
     /**
      * Verify Today in default time zone.

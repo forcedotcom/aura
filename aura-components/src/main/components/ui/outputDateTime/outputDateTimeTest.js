@@ -114,7 +114,7 @@
     /**
      * Verify behavior when 'langLocale' is assigned garbage.
      */
-    /*testInvalidLangLocale:{
+    testInvalidLangLocale:{
  	attributes : {value:'2004-09-23T16:30:00.000Z', langLocale: 'kk'},	
 	test: function(component){	        
 	        aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
@@ -123,7 +123,7 @@
 	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");	        	
 	        });	
         }
-    },*/
+    },
     
     /**
      * Verify behavior when 'timezone' attribute is assigned an empty string.
@@ -156,18 +156,18 @@
         		aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time, failed to recognize that timezone has Daylight saving in effect.");
         	});
       }
-    }
+    },
     
     /**
      * Verify behavior when 'timezone' attribute is assigned a garbage value.
      */
-    /*testInvalidTimezoneIsIgnored: {
+    testInvalidTimezone: {
         attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'sasquatch', format: 'M/dd/yy h:mm A', langLocale: 'en'},
         test: function(component){
         	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
         		aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Should have used default timezone.");
         	});
         }
-    }*/
+    }
 
 })

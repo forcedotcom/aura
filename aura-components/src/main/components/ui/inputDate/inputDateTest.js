@@ -93,13 +93,13 @@
     /**
      * Verify behavior when 'langLocale' attribute is not assigned an invalid value.
      */
-    /*testInvalidLangLocale:{
+    testInvalidLangLocale:{
         attributes : {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10', langLocale: 'xx'},
         test: function(cmp){
             var inputDateStr = cmp.find("inputText").getElement().value;
             aura.test.assertEquals("September 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
-    },*/
+    },
        
 	/**
      * Verify behavior of Today() with default 'format' value.

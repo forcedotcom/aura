@@ -122,15 +122,15 @@
         test:function(component){
             aura.test.assertEquals("September 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
         }
-    }
+    },
     
     /**
      * Verify behavior when 'langLocale' attribute is assigned an invalid value.
      */
-    /*testInvalidLangLocale:{
+    testInvalidLangLocale:{
         attributes: {value : '2004-09-23', format: 'MMMM d, yyyy', langLocale: 'xx'},
         test:function(component){
             aura.test.assertEquals("September 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
         }
-    }*/
+    }
 })

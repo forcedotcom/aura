@@ -65,24 +65,28 @@ public class FileSourceListener implements FileListener {
             FileChangeEvent event,
             SourceListener.SourceMonitorEvent sEvent) {
 
-        String filePath = event.getFile().toString();
-        FileSourceLoader loader = null;
-
-        logger.info("File changed: " + filePath);
-
-        for (String dir : loaderMap.keySet()) {
-            if (filePath.startsWith(dir)) {
-                loader = loaderMap.get(dir);
-                break;
-            }
-        }
-
-        if (loader != null) {
-            loader.notifySourceChanges(event, sEvent);
-        } else {
-            logger.debug("No loader found. Invalidating all cache.");
-            notifyInvalidateAll(sEvent);
-        }
+//        String filePath = event.getFile().toString();
+//        FileSourceLoader loader = null;
+//
+//        logger.info("File changed: " + filePath);
+//
+//        for (String dir : loaderMap.keySet()) {
+//            if (filePath.startsWith(dir)) {
+//                loader = loaderMap.get(dir);
+//                break;
+//            }
+//        }
+//
+//        if (loader != null) {
+//            loader.notifySourceChanges(event, sEvent);
+//        } else {
+//            logger.debug("No loader found. Invalidating all cache.");
+//            notifyInvalidateAll(sEvent);
+//        }
+    	
+    	// Reverting to clearing all cache so that work on SFDC can continue.
+    	logger.info("File changed: " + event.getFile().toString());
+    	notifyInvalidateAll(sEvent);
     }
 
     /**

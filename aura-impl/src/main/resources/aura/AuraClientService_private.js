@@ -351,14 +351,7 @@ var priv = {
             // the detail, so skip this for next time
             // a bit of a hack to capture the getDetail action as well
             if (queueCopy[0].actions[0].getDef().name.indexOf("Overview") == -1 && (queueCopy[0].actions[0].getDef().name.indexOf("List") == -1 || queueCopy[0].actions[0].getDef().name.indexOf("RelatedList") !== -1)) {
-                // end the previously started transaction
-                $A.endTransaction($A.getContext().getTransaction());
-                // set the transaction using #hashtag from the URL and the
-                // concatenated action names as the unique ID
-                var tokenJson = $A.historyService.get();
-                $A.updateTransaction("txn_" + $A.getContext().getTransaction(), "txn_" + tokenJson["token"] + $A.getContext().getTransactionName());
-                // update the vars and set the beaconData to piggyback on the next XHR call
-                $A.setBeaconData($A.toJson());
+                $A.clientService.unregisterTransaction();
             }
         }
         //#end

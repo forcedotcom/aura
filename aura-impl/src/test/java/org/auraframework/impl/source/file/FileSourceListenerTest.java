@@ -74,17 +74,17 @@ public class FileSourceListenerTest extends UnitTestCase {
 
     public void testCreateEvent() throws Exception {
         listener.fileCreated(createEvent);
-        //verify(loader1).notifySourceChanges(createEvent, SourceListener.SourceMonitorEvent.created);
+        verify(loader1).notifySourceChanges(createEvent, SourceListener.SourceMonitorEvent.created);
     }
 
     public void testDeleteEvent() throws Exception {
         listener.fileDeleted(deleteEvent);
-        //verify(loader1).notifySourceChanges(deleteEvent, SourceListener.SourceMonitorEvent.deleted);
+        verify(loader1).notifySourceChanges(deleteEvent, SourceListener.SourceMonitorEvent.deleted);
     }
 
     public void testChangeEvent() throws Exception {
         listener.fileChanged(changeEvent);
-        //verify(loader2).notifySourceChanges(changeEvent, SourceListener.SourceMonitorEvent.changed);
+        verify(loader2).notifySourceChanges(changeEvent, SourceListener.SourceMonitorEvent.changed);
     }
 
     public void testInvalidateAll() throws Exception {

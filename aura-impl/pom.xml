@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.38-SNAPSHOT</version>
+        <version>0.38</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
@@ -217,9 +217,7 @@
 			                               </default>
 		                               </switch>
                                        <echo>Generating test report</echo>
-                                       <xslt in="${project.build.directory}/xunitjs/rawresults.xml"
-                                             out="${xunit.js.report}"
-                                             style="${basedir}/src/test/tools/xUnit/junit.xsl" />
+                                       <xslt in="${project.build.directory}/xunitjs/rawresults.xml" out="${xunit.js.report}" style="${basedir}/src/test/tools/xUnit/junit.xsl" />
                                        <echo>Test report completed: ${xunit.js.report}</echo>
                                        <fail message="There were xUnit.js test failures.">
                                             <condition>

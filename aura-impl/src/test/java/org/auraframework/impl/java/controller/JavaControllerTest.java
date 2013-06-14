@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.auraframework.Aura;
+import org.auraframework.def.ActionDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -33,9 +34,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 /**
  * Automation for java Controllers.
- * 
- * @hierarchy Aura.Unit Tests.Components.Controller.Java Controller
- * @priority high
  */
 public class JavaControllerTest extends AuraImplTestCase {
     public JavaControllerTest(String name) {
@@ -79,13 +77,11 @@ public class JavaControllerTest extends AuraImplTestCase {
 
     /**
      * Verify that class level annotation is required for a java Controller.
-     * 
-     * @userStory a07B0000000FAmj
      */
     public void testClassLevelAnnotationForJavaController() throws Exception {
         assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerWithoutAnnotation",
                 InvalidDefinitionException.class, "@Controller annotation is required on all Controllers.",
-        "org.auraframework.impl.java.controller.TestControllerWithoutAnnotation");
+                "org.auraframework.impl.java.controller.TestControllerWithoutAnnotation");
     }
 
     /**
@@ -94,7 +90,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     public void testMissingKeyAnnotation() throws Exception {
         assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerMissingKey",
                 InvalidDefinitionException.class, "@Key annotation is required on all action parameters",
-        "org.auraframework.impl.java.controller.TestControllerMissingKey.appendStrings");
+                "org.auraframework.impl.java.controller.TestControllerMissingKey.appendStrings");
     }
 
     /**
@@ -118,7 +114,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     public void testNonStaticAction() throws Exception {
         assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerWithNonStaticAction",
                 InvalidDefinitionException.class, "Actions must be public static methods",
-        "org.auraframework.impl.java.controller.TestControllerWithNonStaticAction.appendStrings");
+                "org.auraframework.impl.java.controller.TestControllerWithNonStaticAction.appendStrings");
     }
 
     public void testActionNoParameters() throws Exception {
@@ -132,9 +128,9 @@ public class JavaControllerTest extends AuraImplTestCase {
         checkPassAction(controller, "doSomething", hasOne, State.SUCCESS, null);
         checkPassAction(controller, "getString", empty, State.SUCCESS, "TestController");
         checkFailAction(controller, "throwException", empty, State.ERROR, AuraExecutionException.class,
-        "java://org.auraframework.impl.java.controller.TestController: java.lang.RuntimeException: intentionally generated");
+                "java://org.auraframework.impl.java.controller.TestController: java.lang.RuntimeException: intentionally generated");
         checkFailAction(controller, "imNotHere", empty, State.ERROR, InvalidDefinitionException.class,
-        "No action found");
+                "No action found");
     }
 
     /**
@@ -158,12 +154,12 @@ public class JavaControllerTest extends AuraImplTestCase {
 
         args.clear();
         checkFailAction(controller, "sumValues", args, State.ERROR, AuraExecutionException.class,
-        "java://org.auraframework.impl.java.controller.TestControllerWithParameters: java.lang.NullPointerException");
+                "java://org.auraframework.impl.java.controller.TestControllerWithParameters: java.lang.NullPointerException");
 
         args.put("a", "x");
         args.put("b", "y");
         checkFailAction(controller, "sumValues", args, State.ERROR, AuraUnhandledException.class,
-        "Invalid value for a: java://java.lang.Integer");
+                "Invalid value for a: java://java.lang.Integer");
 
         args.put("a", "1");
         args.put("b", "2");
@@ -175,7 +171,7 @@ public class JavaControllerTest extends AuraImplTestCase {
      */
     public void testControllerNotFound() throws Exception {
         DefDescriptor<ComponentDef> dd = addSourceAutoCleanup(ComponentDef.class,
-        "<aura:component controller='java://goats'/>");
+                "<aura:component controller='java://goats'/>");
         try {
             Aura.getInstanceService().getInstance(dd);
             fail("Expected DefinitionNotFoundException");
@@ -188,13 +184,13 @@ public class JavaControllerTest extends AuraImplTestCase {
     public void testDuplicateAction() throws Exception {
         assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerWithDuplicateAction",
                 InvalidDefinitionException.class, "Duplicate action appendStrings",
-        "org.auraframework.impl.java.controller.TestControllerWithDuplicateAction");
+                "org.auraframework.impl.java.controller.TestControllerWithDuplicateAction");
     }
 
     /**
      * Tests to verify the APIs on Action to mark actions as storable.
      */
-    public void testStorable() throws Exception{
+    public void testStorable() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.TestController");
         Action freshAction = controller.createAction("getString", null);
 
@@ -210,5 +206,32 @@ public class JavaControllerTest extends AuraImplTestCase {
         assertTrue("Failed to mark a action as storable.", action.isStorable());
         action.run();
         assertTrue("Storable action was unmarked during execution", action.isStorable());
+    }
+
+    /**
+     * Action without annotation is not backgroundable
+     */
+    public void testJavaActionDefIsBackgroundWithoutAnnotation() throws Exception {
+        ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.ParallelActionTestController");
+        ActionDef actionDef = controller.getActionDefs().get("executeInForeground");
+        assertTrue("Expected an instance of JavaActionDef", actionDef instanceof JavaActionDef);
+        assertFalse("ActionDefs should not be backgroundable without BackgroundAction annotation",
+                ((JavaActionDef) actionDef).isBackground());
+    }
+
+    /**
+     * Action without annotation is not backgroundable
+     */
+    public void testJavaActionDefIsBackgroundWithAnnotation() throws Exception {
+        ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.ParallelActionTestController");
+        ActionDef actionDef = controller.getActionDefs().get("executeInBackground");
+        assertTrue("Expected an instance of JavaActionDef", actionDef instanceof JavaActionDef);
+        assertTrue("ActionDefs should be backgroundable with BackgroundAction annotation",
+                ((JavaActionDef) actionDef).isBackground());
+    }
+
+    public void testSerialize() throws Exception {
+        ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.ParallelActionTestController");
+        serializeAndGoldFile(controller);
     }
 }

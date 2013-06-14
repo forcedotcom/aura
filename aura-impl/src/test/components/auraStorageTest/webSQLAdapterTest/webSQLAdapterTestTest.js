@@ -85,8 +85,10 @@
 	    this.assertAfterGet(cmp, storage, "key2", function(){
 		var item = cmp["key2"];
 		$A.test.assertDefined(item);
-		$A.test.assertTrue(storage.getSize()>=2 && storage.getSize()<2.002,
-                                   "Expected value of approx. 2, got: "+storage.getSize());
+        //waitFor size to change as an attempt to fix flappiness on autobuilds
+        $A.test.addWaitForWithFailureMessage(true, function(){
+            return storage.getSize()>=2 && storage.getSize()<2.002;
+        }, "Expected value of approx. 2, got: "+storage.getSize());
 	    });
 	}
 	]

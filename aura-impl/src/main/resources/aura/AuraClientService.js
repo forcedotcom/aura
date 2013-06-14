@@ -165,7 +165,9 @@ var AuraClientService = function() {
                 var method = defType === "APPLICATION" ? "getApplication" : "getComponent";
                 var action = $A.get("c.aura://ComponentController." + method);
 
-                action.setStorable();
+                action.setStorable({
+                	"ignoreExisting" : true
+            	});
 
                 action.setParams({
                     name : tag,
@@ -173,8 +175,24 @@ var AuraClientService = function() {
                 });
 
                 action.setCallback(this, function(a) {
-                    if (a.getState() === "SUCCESS") {
+                	var state = a.getState();
+                    if (state === "SUCCESS") {
                         callback(a.getReturnValue());
+                    } else if (state === "INCOMPLETE"){
+                    	// Use a stored response if one exists
+                        var storage = Action.prototype.getStorage();
+                        if (storage) {
+                            var key = action.getStorageKey();
+                            storage.get(key, function(actionResponse) {
+                            	if (actionResponse) {
+                                    storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE using stored action response.", [action, actionResponse]);
+
+                            		action.complete(actionResponse);
+                            	} else {
+                                    $A.error("Unable to load application.");
+                            	}
+                            });
+                        }
                     } else {
                         $A.error(a.getError()[0].message);
                     }

@@ -18,36 +18,49 @@
         var v = cmp.getValue(cmp.get("v.whichArray"));
         if (!v) { return; }
         var array = v.unwrap();
-        array.push($A.componentService.newComponentDeprecated({
-            "componentDef": {
-                "descriptor": "markup://aura:text"
+        
+        $A.componentService.newComponentAsync(
+            this,
+            function (newcmp) {
+                array.push(newcmp);
+                v.setValue(array);
             },
-
-            "attributes": {
-                "values": {
-                    "value": "PUSHED."
+            {
+                "componentDef": {
+                    "descriptor": "markup://aura:text"
+                },
+                
+                "attributes": {
+                    "values": {
+                    	"value": "PUSHED."
+                    }
                 }
             }
-        }));
-        v.setValue(array);
+    );
     },
 
     pushComponent : function(cmp) {
         var v = cmp.getValue(cmp.get("v.whichArray"));
         if (!v) { return; }
         var array = v.unwrap();
-        array.push($A.componentService.newComponentDeprecated({
-            "componentDef": {
-                "descriptor": "markup://auratest:rerenderChild"
+        $A.componentService.newComponentAsyn(
+            this,
+            function (newcmp) {
+                array.push(newcmp);
+                v.setValue(array);
             },
+            {
+                "componentDef": {
+                    "descriptor": "markup://auratest:rerenderChild"
+                 },
 
-            "attributes": {
-                "values": {
-                    "title": new Date().getTime()
+                "attributes": {
+                    "values": {
+                        "title": new Date().getTime()
+                    }
                 }
             }
-        }));
-        v.setValue(array);
+        );
     },
 
     pop : function(cmp) {

@@ -237,21 +237,16 @@
     },
     
     updateGlobalEventListeners: function(component) {
-        var concretCmp = component.getConcreteComponent();
-        var visible = concretCmp.get("v.visible");
-        if (visible === true) {
-            $A.util.on(document.body, this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
-            $A.util.on(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));
+        var concreteCmp = component.getConcreteComponent();
+        var visible = concreteCmp.get("v.visible");
+        if (!concreteCmp._clickStart) {
+            concreteCmp._clickStart = concreteCmp.addDocumentLevelHandler(this.getOnClickEventProp("onClickStartEvent"),
+                this.getOnClickStartFunction(component), visible);
+            concreteCmp._clickEnd = concreteCmp.addDocumentLevelHandler(this.getOnClickEventProp("onClickEndEvent"),
+                this.getOnClickEndFunction(component), visible);
         } else {
-            if (document.body.removeEventListener) {
-                document.body.removeEventListener(this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component), false);
-                document.body.removeEventListener(this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component), false);
-            } else {
-                if (document.body.detachEvent) {
-                    document.body.detachEvent('on' + this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
-                    document.body.detachEvent('on' + this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));
-                }
-            }
+            concreteCmp._clickStart.setEnabled(visible);
+            concreteCmp._clickEnd.setEnabled(visible);
         }
     },
     

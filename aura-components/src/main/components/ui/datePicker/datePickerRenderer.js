@@ -42,28 +42,6 @@
     },
     
     unrender: function(component, helper) {
-        if (helper.getOnClickEventProp.cache && 
-            helper.getOnClickEventProp.cache.onClickStartEvent && 
-            component._onClickStartFunc) {
-            if (document.body.removeEventListener) {
-                document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickStartEvent, component._onClickStartFunc, false);
-            } else {
-                if (document.body.detachEvent) {
-                    document.body.detachEvent('on' + helper.getOnClickEventProp.cache.onClickStartEvent, component._onClickStartFunc);
-                }
-            }
-        }
-        if (helper.getOnClickEventProp.cache &&
-            helper.getOnClickEventProp.cache.onClickEndEvent && 
-            component._onClickEndFunc) {
-            if (document.body.removeEventListener) {
-                document.body.removeEventListener(helper.getOnClickEventProp.cache.onClickEndEvent, component._onClickEndFunc, false);
-            } else {
-                if (document.body.detachEvent) {
-                    document.body.detachEvent('on' + helper.getOnClickEventProp.cache.onClickEndEvent, component._onClickEndFunc);
-                }
-            }
-        }
         this.superUnrender();
     }
 })

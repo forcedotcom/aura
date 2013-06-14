@@ -29,6 +29,7 @@ var ComponentPriv = (function(){ // Scoping priv
         this.valueProviders = undefined;
         this.actionRefs = undefined;
         this.eventDispatcher = undefined;
+        this.docLevelHandlers = undefined;
 
         // create the globally unique id for this component
         this.setupGlobalId(config["globalId"], localCreation);

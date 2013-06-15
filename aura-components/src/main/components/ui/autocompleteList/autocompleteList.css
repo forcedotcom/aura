@@ -22,6 +22,14 @@
     z-index: 1;
 }
 
+.THIS ul {
+    display: none;
+}
+
+.THIS ul.visible {
+    display: block;
+}
+
 .THIS .listContent ul {
     list-style: none;
     margin: 0px; 

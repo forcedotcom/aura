@@ -27,6 +27,10 @@
         helper.handleKeydown(component, event);
     },
     
+    handleListHighlight: function(component, event, helper) {
+        helper.handleListHighlight(component, event);
+    },
+    
     handleMouseover: function(component, event, helper) {
         var targetCmp = helper.getEventSourceComponent(component, event);
         var focusEvent = targetCmp.get("e.focus");

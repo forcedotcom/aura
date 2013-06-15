@@ -18,6 +18,7 @@
         var inputCmp = component.find("input");
         if (inputCmp) {
             inputCmp.addHandler("input", component, "c.handleInputChange"); // Later on we need to make it work on older browsers too.
+            inputCmp.addHandler("keydown", component, "c.handleKeyAction");
         }
     },
     
@@ -31,6 +32,10 @@
         inputChangeEvt.fire();
     },
     
+    handleKeyAction: function(component, event, helper) {
+        helper.handleKeyAction(component, event);
+    },
+    
     handleSelectOption: function(component, event, helper) {
         var optionSelectEvt = component.get("e.selectListOption");
         optionSelectEvt.setParams({
@@ -42,5 +47,6 @@
     matchText: function(component, event, helper) {
         var listCmp = component.find("list");
         listCmp.setValue("v.keyword", event.getParam("keyword"));
+        listCmp.setValue("v.visible", true);
     }
 })

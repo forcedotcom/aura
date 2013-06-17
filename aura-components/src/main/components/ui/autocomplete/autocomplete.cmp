@@ -50,5 +50,6 @@
         theme="{!v.theme}"
         visible="false"
         contentRole="listBox"
-        selectListOption="{!c.handleSelectOption}"/>
+        selectListOption="{!c.handleSelectOption}"
+        updateActiveOption="{!c.updateActiveOption}"/>
 </aura:component>

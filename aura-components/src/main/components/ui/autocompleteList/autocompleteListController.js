@@ -27,15 +27,33 @@
         helper.handleKeydown(component, event);
     },
     
+    handleListHighlight: function(component, event, helper) {
+        helper.handleListHighlight(component, event);
+    },
+    
     handleMouseover: function(component, event, helper) {
         var targetCmp = helper.getEventSourceComponent(component, event);
         var focusEvent = targetCmp.get("e.focus");
         if (focusEvent) {
             focusEvent.fire();
         }
+        helper.updateActiveElement(component, targetCmp); 
     },
     
     matchText: function(component, event, helper) {
         helper.matchText(component, event.getParam("keyword"));
+    },
+    
+    visibleChange: function(component, event, helper) {
+        var visible = component.get("v.visible");
+        if (visible === false) { // auto complete list is hidden.
+            var updateActiveEvt = component.get("e.updateActiveOption");
+            if (updateActiveEvt) {
+                updateActiveEvt.setParams({
+                    id: ""
+                })
+                updateActiveEvt.fire();
+            }
+        }
     }
 })

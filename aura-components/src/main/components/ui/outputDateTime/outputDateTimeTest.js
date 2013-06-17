@@ -91,7 +91,7 @@
 	test: function(component){	        
 	        aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
 	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());
-		        var dt            = 'Sep 23, 2004 9:30:00 AM';
+		        var dt            = 'Sep 23, 2004 4:30:00 PM';
 	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");	        	
 	        });	
         }
@@ -105,7 +105,7 @@
 	test: function(component){	        
 	        aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
 	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());
-		        var dt            = 'Sep 23, 2004 9:30:00 AM';
+		        var dt            = 'Sep 23, 2004 4:30:00 PM';
 	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");	        	
 	        });	
         }
@@ -119,7 +119,7 @@
 	test: function(component){	        
 	        aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
 	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());
-		        var dt            = 'Sep 23, 2004 9:30:00 AM';
+		        var dt            = 'Sep 23, 2004 4:30:00 PM';
 	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");	        	
 	        });	
         }
@@ -132,7 +132,7 @@
         attributes: {value: '2004-09-23T16:30:00.000Z', timezone: '', format: 'M/dd/yy h:mm A', langLocale: 'en'},
         test: function(component){
         	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-        		aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
+        		aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
         	});
         }
     },
@@ -165,7 +165,7 @@
         attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'sasquatch', format: 'M/dd/yy h:mm A', langLocale: 'en'},
         test: function(component){
         	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-        		aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Should have used default timezone.");
+        		aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used default timezone.");
         	});
         }
     }

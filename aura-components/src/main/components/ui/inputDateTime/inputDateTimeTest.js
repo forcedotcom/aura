@@ -76,7 +76,7 @@
 	test: function(cmp){	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;		        
-	    		aura.test.assertEquals("Sep 23, 2004 9:30:00 AM", inputDateStr, "Should have used default timezone.");	        	
+	    		aura.test.assertEquals("Sep 23, 2004 4:30:00 PM", inputDateStr, "Should have used default timezone.");	        	
 	        });	        
         }
     },   
@@ -104,7 +104,7 @@
 	test: function(cmp){	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;		        
-	    		aura.test.assertEquals("Sep 23, 2004 9:30:00 AM", inputDateStr, "Should have used Default langLocale.");	        	
+	    		aura.test.assertEquals("Sep 23, 2004 4:30:00 PM", inputDateStr, "Should have used Default langLocale.");	        	
 	        });	
         }
     },
@@ -117,7 +117,7 @@
 	test: function(cmp){	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;		        
-	    		aura.test.assertEquals("Sep 23, 2004 9:30:00 AM", inputDateStr, "Should have used Default langLocale.");	        	
+	    		aura.test.assertEquals("Sep 23, 2004 4:30:00 PM", inputDateStr, "Should have used Default langLocale.");	        	
 	        });	
         }
     },
@@ -130,7 +130,7 @@
 	test: function(cmp){	        
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;		        
-	    		aura.test.assertEquals("Sep 23, 2004 9:30:00 AM", inputDateStr, "Should have used Default langLocale.");	        	
+	    		aura.test.assertEquals("Sep 23, 2004 4:30:00 PM", inputDateStr, "Should have used Default langLocale.");	        	
 	        });	
         }
     }, 
@@ -143,7 +143,7 @@
         test:function(cmp){
         	aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
         		var inputDateStr  = cmp.find("inputText").getElement().value;
-        		aura.test.assertEquals("Sep 23, 2004 9:30:00 AM", inputDateStr, "Incorrect date/time format.");
+        		aura.test.assertEquals("Sep 23, 2004 4:30:00 PM", inputDateStr, "Incorrect date/time format.");
         	});
         }
     },
@@ -221,8 +221,8 @@
     /**
      * Verify a value in LA time zone.
      */
-    testTimeInDefaultTimeZone:{
-	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A'},
+    testTimeInLA:{
+	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A', timezone: 'America/Los_Angeles'},
 	test: function(cmp){
 			aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 		        var inputDateStr  = cmp.find("inputText").getElement().value;
@@ -254,7 +254,7 @@
 	test: function(cmp){			
 			aura.test.addWaitFor(true, function(){return cmp.find("inputText").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputText").getElement().value;		        
-		        var dt            = 'sept. 23, 2004 9:30:00 AM';
+		        var dt            = 'sept. 23, 2004 4:30:00 PM';
 	    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");	        	
 	        });				        
         }

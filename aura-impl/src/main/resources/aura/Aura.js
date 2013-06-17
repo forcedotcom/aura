@@ -590,7 +590,7 @@ $A.ns.Aura.prototype.warning = function(w) {
     if ($A.test && $A.test.auraWarning(w)) {
         return;
     }
-    $A.logInternal("Warning: ",w, null, this.getStackTrace(null));
+    $A.logInternal("Warning",w, null, this.getStackTrace(null));
 };
 
 /**
@@ -805,7 +805,7 @@ $A.ns.Aura.prototype.logInternal = function(type, message, error, trace) {
             stringVersion = this.stringVersion(logMsg, error, trace);
         }
     	var debugLogEvent = $A.util.getDebugToolsAuraInstance().get("e.aura:debugLog");
-	debugLogEvent.setParams({"type" : "console", "message" : stringVersion});
+		debugLogEvent.setParams({"type" : type, "message" : stringVersion});
     	debugLogEvent.fire();
     }
     //#end

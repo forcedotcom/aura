@@ -20,6 +20,7 @@
 															   NOTE: need to disable pop up blocker for debugtool to work.">
 	
 	<aura:attribute name="errorsData" type="String" default=""/>
+	<aura:attribute name="warningsData" type="String" default=""/>
 	<aura:attribute name="cmpData" type="String" default=""/> <!-- to see additional stats use aura.mode=STATS -->
 	<aura:attribute name="eventData" type="String" default=""/>
 	<aura:attribute name="storageData" type="String" default="0 K ()"/>
@@ -35,16 +36,17 @@
 		
 		<ui:tabset>
 	    	<ui:tab aura:id="errorsTab" title="Errors"><pre>{!v.errorsData}</pre></ui:tab>
+	    	<ui:tab aura:id="warningsTab" title="Warnings"><pre>{!v.warningsData}</pre></ui:tab>
         	<ui:tab aura:id="cmpTab" title="Components" activated="{!c.cmpStats}">
         		<a onclick="{!c.cmpStats}"><ui:image src="/auraFW/resources/aura/images/refresh.png"/></a>
         		<pre>{!v.cmpData}</pre>
         	</ui:tab>
         	<ui:tab aura:id="eventTab" title="Events"><pre>{!v.eventData}</pre></ui:tab>
         	<ui:tab aura:id="storageTab" title="Storage"><div aura:id="storageInfo"><pre>{!v.storageData}</pre></div></ui:tab>
-        	<ui:tab aura:id="consoleTab" title="Console"><pre>{!v.consoleData}</pre></ui:tab>
-        	<ui:tab aura:id="CheckAccessibility" title="Accessibility" activated="{!c.checkAccessibility}">
+        	<ui:tab aura:id="accessibilityTab" title="Accessibility" activated="{!c.checkAccessibility}">
                 <pre>{!v.accessibilityData}</pre>
             </ui:tab>
+            <ui:tab aura:id="consoleTab" title="Console"><pre>{!v.consoleData}</pre></ui:tab>
    		</ui:tabset>
 		
 	</div>

@@ -57,10 +57,19 @@
     
     setFocusToLastItem: function(component) {
         var list = component.find("list");
-        var focusEvent = list.get("e.listFocus");
+        var focusEvent = list.get("e.listHighlight");
         focusEvent.setParams({
             activeIndex: -1
         });
         focusEvent.fire();
+    },
+    
+    updateActiveOption: function(component, event) {
+        var inputCmp = component.find("input");
+        var elem = inputCmp ? inputCmp.getElement() : null;
+        if (elem) {
+            var id = event.getParam("id");
+            elem.setAttribute("aria-activedescendant", id);
+        }
     }
 })

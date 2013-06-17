@@ -100,6 +100,7 @@
                 if (focusEvent) {
                     focusEvent.fire();
                 }
+                this.updateActiveElement(component)
             }
         }
     },
@@ -131,6 +132,7 @@
             }
         }
         component.setValue("v.items", items);
+        this.toggleListVisibility(component, items);
     },
     
     setFocusToNextItem: function(component, event) {
@@ -147,11 +149,13 @@
                 }
             }
             if (nextIndex >= 0 && nextIndex < iters.getLength()) {
-                var focusEvent = iters.getValue(nextIndex).get("e.focus");
+                var optionComponent = iters.getValue(nextIndex);
+                var focusEvent = optionComponent.get("e.focus");
                 if (focusEvent) {
                     focusEvent.fire();
                 }
             }
+            this.updateActiveElement(component);
         }
     },
     
@@ -169,11 +173,35 @@
                 }
             }
             if (prevIndex >= 0 && prevIndex < iters.getLength()) {
-                var focusEvent = iters.getValue(prevIndex).get("e.focus");
+                var optionComponent = iters.getValue(prevIndex);
+                var focusEvent = optionComponent.get("e.focus");
                 if (focusEvent) {
                     focusEvent.fire();
                 }
+                this.updateActiveElement(component);
             }
+        }
+    },
+    
+    toggleListVisibility: function(component, items) {
+        var hasVisibleOption = false;
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].visible === true) {
+                hasVisibleOption = true;
+                break;
+            }
+        }
+        component.setValue("v.visible", hasVisibleOption);
+    },
+    
+    updateActiveElement: function(component) {
+        var elem = document.activeElement;
+        var updateActiveEvt = component.get("e.updateActiveOption");
+        if (elem && updateActiveEvt) {
+            updateActiveEvt.setParams({
+                id: elem.id
+            })
+            updateActiveEvt.fire();
         }
     }
 })

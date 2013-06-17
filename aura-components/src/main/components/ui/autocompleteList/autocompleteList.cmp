@@ -23,6 +23,7 @@
     
     <aura:registerEvent name="listHighlight" type="ui:listHighlight"/>
     <aura:registerEvent name="selectListOption" type="ui:selectListOption"/>
+    <aura:registerEvent name="updateActiveOption" type="ui:updateActiveOption"/>
     
     <aura:handler name="listHighlight" action="{!c.handleListHighlight}"/>
     <aura:handler name="mouseover" action="{!c.handleMouseover}"/>

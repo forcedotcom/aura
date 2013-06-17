@@ -19,6 +19,15 @@
         if (inputCmp) {
             inputCmp.addHandler("input", component, "c.handleInputChange"); // Later on we need to make it work on older browsers too.
             inputCmp.addHandler("keydown", component, "c.handleKeyAction");
+            inputCmp.addHandler("focus", component, "c.handleFocus");
+        }
+    },
+    
+    handleFocus: function(component, event, helper) {
+        var inputCmp = event.getSource();
+        var elem = inputCmp ? inputCmp.getElement() : null;
+        if (elem) {
+            elem.setAttribute("aria-activedescendant", "");
         }
     },
     
@@ -44,9 +53,17 @@
         optionSelectEvt.fire();
     },
     
+    handleUpdateActiveOption: function(component, event, helper) {
+        helper.updateActiveOption(component, event);
+    },
+    
     matchText: function(component, event, helper) {
         var listCmp = component.find("list");
         listCmp.setValue("v.keyword", event.getParam("keyword"));
         listCmp.setValue("v.visible", true);
+    },
+    
+    updateActiveOption: function(component, event, helper) {
+        helper.updateActiveOption(component, event);
     }
 })

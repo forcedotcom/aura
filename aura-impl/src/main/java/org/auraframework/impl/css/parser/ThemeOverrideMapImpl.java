@@ -21,12 +21,13 @@ import java.util.Map.Entry;
 import org.auraframework.css.parser.ThemeOverrideMap;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Implementation of {@link ThemeOverrideMap}.
@@ -36,6 +37,7 @@ public class ThemeOverrideMapImpl implements ThemeOverrideMap {
 
     private final Map<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>> overrides;
     private final Location location;
+    private final int hashCode;
 
     /**
      * Creates a new {@link ThemeOverrideMap} with the given overrides.
@@ -50,8 +52,9 @@ public class ThemeOverrideMapImpl implements ThemeOverrideMap {
      * @param location The location of where the overrides are defined, to be used for error reporting.
      */
     public ThemeOverrideMapImpl(Map<DefDescriptor<ThemeDef>, DefDescriptor<ThemeDef>> overrides, Location location) {
-        this.overrides = ImmutableMap.copyOf(overrides);
         this.location = location;
+        this.overrides = AuraUtil.immutableMap(overrides);
+        this.hashCode = AuraUtil.hashCode(this.overrides);
     }
 
     @Override
@@ -84,6 +87,20 @@ public class ThemeOverrideMapImpl implements ThemeOverrideMap {
 
         // it doesn't override,so throw an exception
         throw new AuraRuntimeException(String.format(MSG, override, original), location);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ThemeOverrideMapImpl) {
+            final ThemeOverrideMapImpl that = (ThemeOverrideMapImpl) obj;
+            return Objects.equal(this.overrides, that.overrides);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return hashCode;
     }
 
 }

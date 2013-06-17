@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.css.parser.ThemeValueProvider;
 import org.auraframework.builder.ThemeDefBuilder;
+import org.auraframework.css.parser.ThemeValueProvider;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.DefDescriptor;
@@ -224,12 +224,10 @@ public class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements ThemeD
         // validate cross references (from expressions)
         ThemeValueProvider themeProvider = Aura.getStyleAdapter().getThemeValueProvider();
         for (PropertyReference ref : expressionRefs) {
-            if (ref.getRoot().equals("this")) {
-                continue;
+            if (!ref.getRoot().equals("this")) {
+                themeProvider.getDescriptor(ref).getDef().validateReferences();
+                themeProvider.getValue(ref); // will validate variable
             }
-
-            themeProvider.getDescriptor(ref).getDef().validateReferences();
-            themeProvider.getValue(ref); // will validate variable
         }
     }
 

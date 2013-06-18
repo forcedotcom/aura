@@ -26,6 +26,7 @@ import org.auraframework.def.ThemeDef;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -52,7 +53,14 @@ public class ThemedDeclarationRenderer implements Renderer {
         // gather values. there can be multiple values if there were multiple theme functions in the declaration value.
         List<String> resolved = Lists.newArrayList();
         for (String reference : references) {
-            resolved.add(provider.getValue(reference, location).toString());
+            String value = provider.getValue(reference, location).toString();
+
+            // for any empty values, we don't output the declaration at all
+            if (AuraTextUtil.isNullOrEmpty(value)) {
+                return;
+            }
+
+            resolved.add(value);
         }
 
         // output property name

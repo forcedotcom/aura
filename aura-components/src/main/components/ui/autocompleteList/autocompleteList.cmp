@@ -18,6 +18,7 @@
 <aura:component extends="ui:abstractList" support="proto"
     provider="java://org.auraframework.component.ui.ListProvider, js://ui.list">
     
+    <aura:attribute name="elementsToIgnoreClicking" type="Object" description="The DOM elements to ignore when we handle clicking outside."/>
     <aura:attribute name="keyword" type="String" description="The keyword used to match list options."/>
     <aura:attribute name="theme" type="String" default="default" description="Theme to apply to this component."/>
     
@@ -25,6 +26,7 @@
     <aura:registerEvent name="selectListOption" type="ui:selectListOption"/>
     <aura:registerEvent name="updateActiveOption" type="ui:updateActiveOption"/>
     
+    <aura:handler name="change" value="{!v.visible}" action="{!c.visibleChange}"/>
     <aura:handler name="listHighlight" action="{!c.handleListHighlight}"/>
     <aura:handler name="mouseover" action="{!c.handleMouseover}"/>
 

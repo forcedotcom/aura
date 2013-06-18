@@ -16,13 +16,19 @@
 ({
 	output : function(cmp, name, msg, purgeOldData) {
 		var oldOutput = "";
-		debugger;
-		if(purgeOldData === true){
+		if(purgeOldData !== true){
 		    oldOutput = cmp.getValue("v."+name).getValue() + "\n";
 		}
 		
 		cmp.getValue("v."+name).setValue(oldOutput + msg);
 		$A.rerender(cmp);
+		this.scrollToBottom(cmp, name);
+	},
+	
+	scrollToBottom : function(cmp, name) {
+		var tabBody = cmp.find(name.replace("Data", "Tab")).find("tabBody");
+		var elem = tabBody.getElement();
+		elem.scrollTop = elem.scrollHeight;
 	},
 	
 	getAuraStats : function(cmp, viewName) {

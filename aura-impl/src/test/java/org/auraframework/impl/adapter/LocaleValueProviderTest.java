@@ -26,8 +26,9 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.system.AuraContext;
+import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
-
+@UnAdaptableTest
 public class LocaleValueProviderTest extends AuraImplTestCase {
 
     public LocaleValueProviderTest(String name) {

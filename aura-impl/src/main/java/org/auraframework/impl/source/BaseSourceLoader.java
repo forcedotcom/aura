@@ -45,6 +45,9 @@ public abstract class BaseSourceLoader implements SourceLoader {
         extensions.put(DefType.LAYOUTS, "Layouts.xml");
         extensions.put(DefType.NAMESPACE, ".xml");
         extensions.put(DefType.THEME, ".theme");
+        extensions.put(DefType.RENDERER, "Renderer.js");
+        extensions.put(DefType.CONTROLLER, "Controller.js");
+        extensions.put(DefType.HELPER, "Helper.js");
         extensions.put(DefType.TESTSUITE, "Test.js");
     }
 
@@ -98,7 +101,10 @@ public abstract class BaseSourceLoader implements SourceLoader {
         String qname;
         if (defType == DefType.STYLE) {
             qname = String.format("css://%s.%s", namespace, name);
-        } else if (defType == DefType.TESTSUITE) {
+        } else if (defType == DefType.TESTSUITE ||
+                defType == DefType.CONTROLLER ||
+                defType == DefType.HELPER ||
+                defType == DefType.RENDERER) {
             qname = String.format("js://%s.%s", namespace, name);
         } else {
             qname = String.format("markup://%s:%s", namespace, name);

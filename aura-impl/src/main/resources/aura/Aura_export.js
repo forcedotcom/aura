@@ -20,6 +20,7 @@ $A.ns.Aura.prototype["initAsync"] = $A.ns.Aura.prototype.initAsync;
 $A.ns.Aura.prototype["initConfig"] = $A.ns.Aura.prototype.initConfig;
 $A.ns.Aura.prototype["init"] = $A.ns.Aura.prototype.init;
 $A.ns.Aura.prototype["error"] = $A.ns.Aura.prototype.error;
+$A.ns.Aura.prototype["warning"] = $A.ns.Aura.prototype.warning;
 $A.ns.Aura.prototype["message"] = $A.ns.Aura.prototype.message;
 $A.ns.Aura.prototype["enqueueAction"] = $A.ns.Aura.prototype.enqueueAction;
 $A.ns.Aura.prototype["get"] = $A.ns.Aura.prototype.get;

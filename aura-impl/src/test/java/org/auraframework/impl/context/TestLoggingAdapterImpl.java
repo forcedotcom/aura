@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.logging;
+package org.auraframework.impl.context;
+import java.util.*;
 
-import java.util.List;
-import java.util.Map;
-
-import org.auraframework.impl.context.LoggingContextImpl;
+import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.system.LoggingContext;
 import org.auraframework.test.adapter.TestLoggingAdapter;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Hook into logger so we can do some basic request monitoring in tests, as
@@ -35,10 +37,32 @@ public class TestLoggingAdapterImpl implements TestLoggingAdapter {
     private static ThreadLocal<LoggingContext> currentContext = new ThreadLocal<LoggingContext>();
     private final List<Map<String, Object>> logs = Lists.newLinkedList();
     private boolean isCapturing = false;
+    
+    protected LoggingAdapter delegate;
 
+    public TestLoggingAdapterImpl(LoggingAdapter delegate) {
+        this.delegate = delegate;
+    }
+    
     @Override
     public LoggingContext establish() {
-        LoggingContext lc = new TestLoggingContextImpl();
+        LoggingContext lc = delegate.establish();
+        if (lc instanceof LoggingContextImpl) {
+            LoggingContextImpl mock = (LoggingContextImpl)Mockito.spy(lc);
+            Mockito.doAnswer(new Answer<Void>() {
+                @SuppressWarnings("unchecked")
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+	                if (isCapturing) {
+		                Map<String, Object> arg = (Map<String, Object>)invocation.getArguments()[0];
+		                logs.add(Maps.newHashMap(arg));
+	                }
+	                invocation.callRealMethod();
+	                return null;
+                }
+            }).when(mock).log(Mockito.<Map<String, Object>> any());
+            lc = mock;
+        }
         currentContext.set(lc);
         return lc;
     }
@@ -50,7 +74,8 @@ public class TestLoggingAdapterImpl implements TestLoggingAdapter {
 
     @Override
     public void release() {
-        currentContext.set(null);
+        delegate.release();
+            currentContext.set(null);
     }
 
     @Override
@@ -76,15 +101,5 @@ public class TestLoggingAdapterImpl implements TestLoggingAdapter {
     @Override
     public void clear() {
         logs.clear();
-    }
-
-    private class TestLoggingContextImpl extends LoggingContextImpl {
-        @Override
-        protected void log(Map<String, Object> valueMap) {
-            if (isCapturing) {
-                logs.add(valueMap);
-            }
-            super.log(valueMap);
-        }
     }
 }

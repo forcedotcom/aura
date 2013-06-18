@@ -1240,12 +1240,13 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             defsCache.invalidate(descriptor);
             existsCache.invalidate(descriptor);
 
-            // invalidate all DDs with the same namespace if its a namespace DD
             if (descriptor.getDefType() == DefType.NAMESPACE) {
+            	// invalidate all DDs with the same namespace if its a namespace DD
                 invalidateScope(descriptor, true, false);
             }
 
             if(descriptor.getDefType() == DefType.LAYOUTS) {
+                // find and clear all descriptors with the same namespace and name
                 invalidateScope(descriptor, true, true);
             }
         }

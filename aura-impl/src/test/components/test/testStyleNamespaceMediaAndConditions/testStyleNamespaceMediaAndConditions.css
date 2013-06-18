@@ -1,0 +1,17 @@
+@if (WEBKIT) {
+    .THIS .color {
+        background-color: red;
+    }
+}
+
+@media screen and (max-width: 320px) { 
+    .THIS{
+        margin: auto;
+    }
+}
+
+@if (WEBKIT) {
+    .THIS .color {
+        color: yellow;
+    }
+}

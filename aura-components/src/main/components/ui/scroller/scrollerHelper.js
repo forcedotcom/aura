@@ -201,7 +201,9 @@
 			var that = this;
 			if (images.length > 0) {
 				var imageLoadTimeoutCallback = $A.util.createTimeoutCallback(function() {
-					that.refreshScroller(component);
+				    if (component.isValid()) {
+				        that.refreshScroller(component);
+				    }
 				}, 400);
 
 				for ( var n = 0; n < images.length; n++) {

@@ -2,10 +2,12 @@
     /**
      * Verify the correct AppCache events are received and are in the right order, without an error event.  This case
      * covers when we have not seen the page before and must download resources.
+     * 
+     * TODO(W-1708575): Android AppCache tests fail when running on SauceLabs
      */
     testAppCacheEvents: {
-        // AppCache not supported on IE < 10. Firefox displays a popup asking permission to use AppCache.
-        browsers:["-FIREFOX","-IE7","-IE8","-IE9"],
+        // AppCache only supported on WebKit browsers
+        browsers:["-FIREFOX","-IE7","-IE8","-IE9", "-IE10", "-ANDROID_PHONE", "-ANDROID_TABLET"],
         test: function(component){
             var appCacheEvents = $A.test.getAppCacheEvents();
             var lastEvent = appCacheEvents.length - 1;

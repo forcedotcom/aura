@@ -17,13 +17,12 @@ package org.auraframework.throwable.quickfix;
 
 import java.io.File;
 
-import org.auraframework.system.SourceListener;
-
 import junit.framework.Assert;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.Source;
+import org.auraframework.system.SourceListener;
 import org.auraframework.test.WebDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -83,7 +82,8 @@ public class QuickFixUITestUtil {
             @Override
             public Boolean apply(WebDriver d) {
                 String elementText = testCase.getDriver().findElement(elementSelector).getText();
-                return elementText.contains(text);
+                // Android emulator messes up case, but displays correct message
+                return elementText.toLowerCase().contains(text.toLowerCase());
             }
         });
     }

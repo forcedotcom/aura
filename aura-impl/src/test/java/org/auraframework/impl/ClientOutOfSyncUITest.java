@@ -60,23 +60,23 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         src.addOrUpdate(content);
     }
 
-	private DefDescriptor<ComponentDef> setupTriggerComponent(String attrs,
-			String body) {
-		DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
-				ComponentDef.class,
-				String.format(
-						baseComponentTag,
-						"controller='java://org.auraframework.impl.java.controller.JavaTestController' "
-								+ attrs,
-						"<button onclick='{!c.post}'>post</button>" + body));
-		DefDescriptor<?> controllerDesc = Aura.getDefinitionService()
-				.getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
-						ControllerDef.class);
-		addSourceAutoCleanup(
-				controllerDesc,
-				"{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});$A.enqueueAction(a);}}");
-		return cmpDesc;
-	}
+    private DefDescriptor<ComponentDef> setupTriggerComponent(String attrs,
+            String body) {
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(
+                        baseComponentTag,
+                        "controller='java://org.auraframework.impl.java.controller.JavaTestController' "
+                                + attrs,
+                        "<button onclick='{!c.post}'>post</button>" + body));
+        DefDescriptor<?> controllerDesc = Aura.getDefinitionService()
+                .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
+                        ControllerDef.class);
+        addSourceAutoCleanup(
+                controllerDesc,
+                "{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});$A.enqueueAction(a);}}");
+        return cmpDesc;
+    }
 
     private void triggerServerAction() {
         auraUITestingUtil.findDomElement(By.cssSelector("button")).click();
@@ -320,77 +320,77 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         });
     }
 
-	public void testPostAfterJsControllerChange() throws Exception {
-		DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
-				ComponentDef.class,
-				String.format(
-						baseComponentTag,
-						"controller='java://org.auraframework.impl.java.controller.JavaTestController'",
-						"<button onclick='{!c.post}'>post</button><div id='click' onclick='{!c.clicked}'>click</div>"));
-		DefDescriptor<?> controllerDesc = Aura.getDefinitionService()
-				.getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
-						ControllerDef.class);
-		addSourceAutoCleanup(
-				controllerDesc,
-				"{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});$A.enqueueAction(a);},clicked:function(){window.tempVar='inconsequential'}}");
-		open(cmpDesc);
-		assertNull(auraUITestingUtil.getEval("return window.tempVar;"));
-		auraUITestingUtil.findDomElement(By.cssSelector("#click")).click();
-		assertEquals("inconsequential",
-				auraUITestingUtil.getEval("return window.tempVar;"));
-		updateStringSource(
-				controllerDesc,
-				"{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});$A.enqueueAction(a);},clicked:function(){window.tempVar='meaningful'}}");
-		triggerServerAction();
-		// wait for page to reload by checking that our tempVar is undefined
-		// again
-		auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
-			@Override
-			public Boolean apply(WebDriver input) {
-				return (Boolean) auraUITestingUtil
-						.getEval("return !window.tempVar;");
-			}
-		});
-		auraUITestingUtil.findDomElement(By.cssSelector("#click")).click();
-		auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
-			@Override
-			public Boolean apply(WebDriver input) {
-				return "meaningful".equals(auraUITestingUtil
-						.getEval("return window.tempVar;"));
-			}
-		});
-	}
+    public void testPostAfterJsControllerChange() throws Exception {
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(
+                        baseComponentTag,
+                        "controller='java://org.auraframework.impl.java.controller.JavaTestController'",
+                        "<button onclick='{!c.post}'>post</button><div id='click' onclick='{!c.clicked}'>click</div>"));
+        DefDescriptor<?> controllerDesc = Aura.getDefinitionService()
+                .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
+                        ControllerDef.class);
+        addSourceAutoCleanup(
+                controllerDesc,
+                "{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});$A.enqueueAction(a);},clicked:function(){window.tempVar='inconsequential'}}");
+        open(cmpDesc);
+        assertNull(auraUITestingUtil.getEval("return window.tempVar;"));
+        auraUITestingUtil.findDomElement(By.cssSelector("#click")).click();
+        assertEquals("inconsequential",
+                auraUITestingUtil.getEval("return window.tempVar;"));
+        updateStringSource(
+                controllerDesc,
+                "{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});$A.enqueueAction(a);},clicked:function(){window.tempVar='meaningful'}}");
+        triggerServerAction();
+        // wait for page to reload by checking that our tempVar is undefined
+        // again
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver input) {
+                return (Boolean) auraUITestingUtil
+                        .getEval("return !window.tempVar;");
+            }
+        });
+        auraUITestingUtil.findDomElement(By.cssSelector("#click")).click();
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver input) {
+                return "meaningful".equals(auraUITestingUtil
+                        .getEval("return window.tempVar;"));
+            }
+        });
+    }
 
-	public void testPostAfterJsProviderChange() throws Exception {
-		DefDescriptor<ComponentDef> cmpDesc = StringSourceLoader.getInstance()
-				.createStringSourceDescriptor(null, ComponentDef.class);
-		DefDescriptor<?> providerDesc = Aura.getDefinitionService()
-				.getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
-						ProviderDef.class);
-		addSourceAutoCleanup(
-				cmpDesc,
-				String.format(
-						baseComponentTag,
-						String.format(
-								"controller='java://org.auraframework.impl.java.controller.JavaTestController' provider='%s'",
-								providerDesc.getQualifiedName()),
-						"<button onclick='{!c.post}'>post</button><aura:attribute name='given' type='string' default=''/><div id='result'>{!v.given}</div>"));
-		DefDescriptor<?> controllerDesc = Aura.getDefinitionService()
-				.getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
-						ControllerDef.class);
-		addSourceAutoCleanup(
-				controllerDesc,
-				"{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});$A.enqueueAction(a);}}");
-		addSourceAutoCleanup(providerDesc,
-				"({provide:function(){return {attributes:{'given':'silver spoon'}};}})");
-		open(cmpDesc);
-		assertEquals("silver spoon", getText(By.cssSelector("#result")));
-		updateStringSource(providerDesc,
-				"({provide:function(){return {attributes:{'given':'golden egg'}};}})");
-		triggerServerAction();
-		auraUITestingUtil.waitForElementText(By.cssSelector("#result"),
-				"golden egg", true);
-	}
+    public void testPostAfterJsProviderChange() throws Exception {
+        DefDescriptor<ComponentDef> cmpDesc = StringSourceLoader.getInstance()
+                .createStringSourceDescriptor(null, ComponentDef.class);
+        DefDescriptor<?> providerDesc = Aura.getDefinitionService()
+                .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
+                        ProviderDef.class);
+        addSourceAutoCleanup(
+                cmpDesc,
+                String.format(
+                        baseComponentTag,
+                        String.format(
+                                "controller='java://org.auraframework.impl.java.controller.JavaTestController' provider='%s'",
+                                providerDesc.getQualifiedName()),
+                        "<button onclick='{!c.post}'>post</button><aura:attribute name='given' type='string' default=''/><div id='result'>{!v.given}</div>"));
+        DefDescriptor<?> controllerDesc = Aura.getDefinitionService()
+                .getDefDescriptor(cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX,
+                        ControllerDef.class);
+        addSourceAutoCleanup(
+                controllerDesc,
+                "{post:function(c){var a=c.get('c.getString');a.setParams({param:'dummy'});$A.enqueueAction(a);}}");
+        addSourceAutoCleanup(providerDesc,
+                "({provide:function(){return {attributes:{'given':'silver spoon'}};}})");
+        open(cmpDesc);
+        assertEquals("silver spoon", getText(By.cssSelector("#result")));
+        updateStringSource(providerDesc,
+                "({provide:function(){return {attributes:{'given':'golden egg'}};}})");
+        triggerServerAction();
+        auraUITestingUtil.waitForElementText(By.cssSelector("#result"),
+                "golden egg", true);
+    }
 
     public void testPostAfterJsHelperChange() throws Exception {
         DefDescriptor<?> helperDesc = addSourceAutoCleanup(HelperDef.class, "({getHelp:function(){return 'simply';}})");
@@ -439,9 +439,10 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver input) {
-                return "kaboom".equals(auraUITestingUtil.getEval(String
-                        .format("var e= window.$A && $A.getEvt('%s');return e && e.getDef().getAttributeDefs().explode.defaultValue.value;",
-                                eventDesc.getDescriptorName())));
+                String eval = String
+                        .format("return ((window.$A && $A.getEvt('%s')) && (window.$A && $A.getEvt('%s')).getDef().getAttributeDefs().explode.defaultValue.value);",
+                                eventDesc.getDescriptorName(), eventDesc.getDescriptorName());
+                return "kaboom".equals(auraUITestingUtil.getEval(eval));
             }
         });
     }
@@ -461,7 +462,6 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         triggerServerAction();
         auraUITestingUtil.waitForElementText(By.cssSelector("#target"), "secret", true);
     }
-
 
     public void testPostAfterDependencyChange() throws Exception {
         final DefDescriptor<?> depDesc = addSourceAutoCleanup(ComponentDef.class,

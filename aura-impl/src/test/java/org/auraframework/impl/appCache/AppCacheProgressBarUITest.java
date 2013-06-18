@@ -24,13 +24,17 @@ import org.auraframework.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
 
 /**
- * UI automation for AppCache implementation. ThreadHostile because simultaneous loads of the testApp will interfere
- * with progress bar loading. 
- * these test are excluded from SAFARI5, FIREFOX, IE10,7,8,9, Iphone, Ipad for js
- * parser error : Event ProgressEvent is not supported (SAFARI6 support event progressevent though)
+ * UI automation for AppCache implementation.
+ * 
+ * ThreadHostile because simultaneous loads of the testApp will interfere with progress bar loading.
+ * 
+ * AppCache tests are only for webkit browsers. Excluded from Safari5, iOS for not supporting ProgressEvent. Note that
+ * Safari6 should support ProgressEvent.
+ * 
+ * TODO(W-1708575): Android AppCache tests fail when running on SauceLabs
  */
 @ThreadHostileTest
-@TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
+@TargetBrowsers({ BrowserType.GOOGLECHROME })
 public class AppCacheProgressBarUITest extends WebDriverTestCase {
     private final String PROGRESSEVENTSCRIPT = "var evt = new ProgressEvent('%s', {%s});"
             + "window.applicationCache.dispatchEvent(evt);";

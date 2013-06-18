@@ -65,6 +65,7 @@ exp(p,
     "isInstanceOfButtonElement", p.isInstanceOfButtonElement,
     "isInstanceOfImageElement", p.isInstanceOfImageElement,
     "isInstanceOfDivElement", p.isInstanceOfDivElement,
+    "isInstanceOfSpanElement", p.isInstanceOfSpanElement,
     "isInstanceOf", p.isInstanceOf,
     "getElementAttributeValue", p.getElementAttributeValue,
     

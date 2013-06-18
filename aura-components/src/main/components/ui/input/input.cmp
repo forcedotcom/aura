@@ -41,15 +41,19 @@
     <aura:handler name="init" value="{!this}" action="{!c.init}" />	
     <aura:attribute name="domId" type="String" description="DOM id of the input element. By default, this attribute resolved to the globalId of the component to avoid id collision." />
     
-    <aura:attribute name="requiredIndicator" type="Aura.Component[]" description="A component that displays the indicator for the required field.">
-    	<aura:if isTrue="{!v.required}">
-    		<span class="{!v.requiredIndicatorClass}">*</span>
-    	</aura:if>    	
+    <aura:attribute name="requiredIndicator" type="Object[]" description="A component that displays the indicator for the required field.">    	 
+		<span class="{!v.requiredIndicatorClass}">*</span>    	 
     </aura:attribute>    
     	 
 	<aura:if isTrue="{!v.label != null &amp;&amp; (v.labelPosition == 'top' || v.labelPosition == 'left')}">
 		<div>
-			<ui:label label="{!v.label}" requiredIndicator="{!v.requiredIndicator}" class="{!v.labelClass + ' uiLabel-' + v.labelPosition}" for="{!v.domId}" labelDisplay="{!v.labelPosition != 'hidden'}" />
+			<ui:label label="{!v.label}" class="{!v.labelClass + ' uiLabel-' + v.labelPosition}" for="{!v.domId}" labelDisplay="{!v.labelPosition != 'hidden'}">
+				<aura:set attribute="requiredIndicator">
+					<aura:if isTrue="{!v.required}">
+						{!v.requiredIndicator}
+					</aura:if>					
+				</aura:set>
+			</ui:label>				 	
 			{!v.body}
 			{!v.errorComponent}
 		</div> 
@@ -58,7 +62,13 @@
     	<aura:if isTrue="{!v.label != null &amp;&amp; (v.labelPosition == 'bottom' || v.labelPosition == 'right')}">
 			<div>
 				{!v.body}
-				<ui:label label="{!v.label}" requiredIndicator="{!v.requiredIndicator}" class="{!v.labelClass + ' uiLabel-' + v.labelPosition}" for="{!v.domId}" labelDisplay="{!v.labelPosition != 'hidden'}"/>
+				<ui:label label="{!v.label}" class="{!v.labelClass + ' uiLabel-' + v.labelPosition}" for="{!v.domId}" labelDisplay="{!v.labelPosition != 'hidden'}">
+					<aura:set attribute="requiredIndicator">
+						<aura:if isTrue="{!v.required}">
+							{!v.requiredIndicator}
+						</aura:if>					
+					</aura:set>
+				</ui:label>
 				{!v.errorComponent}
 		    </div>
 		    

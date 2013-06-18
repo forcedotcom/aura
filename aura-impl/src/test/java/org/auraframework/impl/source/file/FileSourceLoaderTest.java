@@ -43,7 +43,7 @@ import static org.mockito.Mockito.*;
 
 public class FileSourceLoaderTest extends AuraImplTestCase {
 
-    @Captor private ArgumentCaptor<DefDescriptor<?>> DefDescriptorCaptor;
+    @Captor private ArgumentCaptor<DefDescriptor<?>> defDescriptorCaptor;
 
     public FileSourceLoaderTest(String name) {
         super(name);
@@ -183,16 +183,10 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
 
         // verifies found DD
         loader.notifySourceChanges(validChangeEvent, SourceListener.SourceMonitorEvent.changed);
-        verify(loader, times(2)).onSourceChanged(DefDescriptorCaptor.capture(), eq(SourceListener.SourceMonitorEvent.changed));
-
-        List<DefDescriptor<?>> capturedDefDescriptors = DefDescriptorCaptor.getAllValues();
-        List<String> qualifiedNames = new ArrayList<String>();
-        for( DefDescriptor defs : capturedDefDescriptors ) {
-            qualifiedNames.add(defs.getQualifiedName());
-        }
-        assertEquals(2, qualifiedNames.size());
-        assertTrue(qualifiedNames.contains("markup://gvpTest:labelProvider"));
-        assertTrue(qualifiedNames.contains("js://gvpTest.labelProvider"));
+        verify(loader, atLeastOnce()).onSourceChanged(defDescriptorCaptor.capture(), eq(SourceListener.SourceMonitorEvent.changed));
+        
+        assertEquals("gvpTest", defDescriptorCaptor.getValue().getNamespace());
+        assertEquals("labelProvider", defDescriptorCaptor.getValue().getName());
 
     }
 
@@ -209,9 +203,9 @@ public class FileSourceLoaderTest extends AuraImplTestCase {
 
         //verifies no DDs found, flush it all with null
         loader.notifySourceChanges(invalidChangeEvent, SourceListener.SourceMonitorEvent.created);
-        verify(loader, atLeastOnce()).onSourceChanged(DefDescriptorCaptor.capture(), eq(SourceListener.SourceMonitorEvent.created));
+        verify(loader, atLeastOnce()).onSourceChanged(defDescriptorCaptor.capture(), eq(SourceListener.SourceMonitorEvent.created));
 
-        assertNull(DefDescriptorCaptor.getValue());
+        assertNull(defDescriptorCaptor.getValue());
 
     }
 

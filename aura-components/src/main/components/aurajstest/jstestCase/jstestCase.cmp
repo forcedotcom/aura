@@ -36,7 +36,7 @@
         </section>
         <section class="results">
             <h1>Results</h1>
-            <p aura:id="results"></p>
+            <div aura:id="results"></div>
         </section>
     </aura:set>
 

@@ -21,14 +21,17 @@
     <aura:attribute name="keyword" type="String" description="The keyword used to match list options."/>
     <aura:attribute name="theme" type="String" default="default" description="Theme to apply to this component."/>
     
+    <aura:registerEvent name="listHighlight" type="ui:listHighlight"/>
     <aura:registerEvent name="selectListOption" type="ui:selectListOption"/>
+    <aura:registerEvent name="updateActiveOption" type="ui:updateActiveOption"/>
     
+    <aura:handler name="listHighlight" action="{!c.handleListHighlight}"/>
     <aura:handler name="mouseover" action="{!c.handleMouseover}"/>
 
-    <ul aura:id="list" class="{!v.class+' '+v.theme}" role="presentation" 
+    <ul aura:id="list" class="{!v.class+' '+v.theme+(v.visible == true ? ' visible':'')}" role="presentation" 
         onclick="{!c.handleClick}"
         onmouseover="{!c.handleMouseover}"
         onkeydown="{!c.handleKeydown}">
-        <aura:iteration items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}"/>
+        <aura:iteration aura:id="iter" items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}"/>
     </ul>
 </aura:component>

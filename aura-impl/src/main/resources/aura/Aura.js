@@ -457,8 +457,6 @@ $A.ns.Aura.prototype.init = function(config, token, context, container, doNotIni
 $A.ns.Aura.prototype.initPriv = function(config, token, container, doNotInitializeServices, doNotCallJiffyOnLoad) {
     if (!$A["hasErrors"]) {
         $A.mark("ClientService.init");
-        $A.mark("LayoutService.init");
-        $A.mark("HistoryService.init");
 
         clientService.init(config, token, function(cmp) {
             $A.endMark("ClientService.init");
@@ -466,9 +464,11 @@ $A.ns.Aura.prototype.initPriv = function(config, token, container, doNotInitiali
 
             if (!$A.initialized) {
                 if (!doNotInitializeServices) {
+                    $A.mark("LayoutService.init");
                     $A.layoutService.init(cmp);
                     $A.endMark("LayoutService.init");
 
+                    $A.mark("HistoryService.init");
                     $A.historyService.init();
                     $A.endMark("HistoryService.init");
                 }
@@ -590,7 +590,7 @@ $A.ns.Aura.prototype.warning = function(w) {
     if ($A.test && $A.test.auraWarning(w)) {
         return;
     }
-    $A.logInternal("Warning: ",w, null, this.getStackTrace(null));
+    $A.logInternal("Warning",w, null, this.getStackTrace(null));
 };
 
 /**
@@ -805,7 +805,7 @@ $A.ns.Aura.prototype.logInternal = function(type, message, error, trace) {
             stringVersion = this.stringVersion(logMsg, error, trace);
         }
     	var debugLogEvent = $A.util.getDebugToolsAuraInstance().get("e.aura:debugLog");
-	debugLogEvent.setParams({"type" : "console", "message" : stringVersion});
+		debugLogEvent.setParams({"type" : type, "message" : stringVersion});
     	debugLogEvent.fire();
     }
     //#end

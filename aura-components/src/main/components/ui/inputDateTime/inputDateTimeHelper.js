@@ -166,6 +166,12 @@
             tzOffset = tzDate.getTimezoneOffset();
         } catch (e) {
             // The timezone id is invalid or for some reason, we can't get timezone info.
+            // use default timezone
+            timezone = $A.getGlobalValueProviders().get("$Locale.timezone");
+            try {
+                var tzDate = WallTime.UTCToWallTime(d, timezone);
+                tzOffset = tzDate.getTimezoneOffset();
+            } catch (ee) {}
         }
         var mDate = moment.utc(d.getTime() - tzOffset * 60000);
         return mDate.toDate();
@@ -209,10 +215,16 @@
             lang.push(langLocale.toLowerCase());
         }
         
-        if (lang[0] === "zh") {
-            component._langLocale = lang[0] + "-" + lang[1];
-        } else {
-            component._langLocale = lang[0];
+        component._langLocale = lang[0];
+        if (lang[1]) {
+            var langAndCountry = lang[0] + "-" + lang[1];
+            if (moment.langData(langAndCountry)) {
+                component._langLocale = langAndCountry;
+            }
+        }
+        
+        if (!moment.langData(component._langLocale)) {
+            component._langLocale = "en";
         }
     },
     

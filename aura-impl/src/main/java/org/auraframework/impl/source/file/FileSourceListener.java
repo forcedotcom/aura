@@ -83,6 +83,7 @@ public class FileSourceListener implements FileListener {
             logger.debug("No loader found. Invalidating all cache.");
             notifyInvalidateAll(sEvent);
         }
+    	
     }
 
     /**

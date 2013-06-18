@@ -896,7 +896,7 @@ var Test = function(){
          * 				The CSS property value of the specified DOMElement
          */
         getStyle : function(elem, style){
-            var val = "";
+        	var val = "";
             if(document.defaultView && document.defaultView.getComputedStyle){
                 val = document.defaultView.getComputedStyle(elem, "").getPropertyValue(style);
             }
@@ -1101,6 +1101,10 @@ var Test = function(){
 
         isInstanceOfDivElement: function(element){
             return aura.test.isInstanceOf(element, window.HTMLDivElement, "div");
+        },
+        
+        isInstanceOfSpanElement: function(element){
+            return aura.test.isInstanceOf(element, window.HTMLSpanElement, "span");
         },
 
         isInstanceOf: function(element, elementType, tag){

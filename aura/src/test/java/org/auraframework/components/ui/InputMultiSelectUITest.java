@@ -24,7 +24,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 public class InputMultiSelectUITest extends WebDriverTestCase {
-    private final String[] URL = new String[]{"/uitest/inputMultiSelectTest.cmp", "/uitest/inputMultiSelectNestedOptionsTest.cmp"};
+    private final String[] URL = new String[] { "/uitest/inputMultiSelectTest.cmp",
+            "/uitest/inputMultiSelectNestedOptionsTest.cmp" };
     private Select inputSelect;
     private WebElement selectElement;
     private WebElement submit;
@@ -93,8 +94,8 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
      * Select one. Choose one option. Deselect one. Deselect one option.
      */
     public void testInputSelectSingle() throws Exception {
-    	for (int i=0; i < URL.length; i++) {
-    		openTestPage(i);
+        for (int i = 0; i < URL.length; i++) {
+            openTestPage(i);
 
             // select
             focusSelectElement();
@@ -118,85 +119,91 @@ public class InputMultiSelectUITest extends WebDriverTestCase {
             waitForElementTextPresent(output, "option3");
             verifyOptionSelected("Option3");
             verifyOptionDeselected("Option1");
-            verifyOptionDeselected("Option2");	
-    	}
+            verifyOptionDeselected("Option2");
+        }
     }
 
     /**
-     * Select multiple. Choose multiple options. Deselect multiple. Deselect
-     * multiple options.
+     * Select multiple. Choose multiple options. Deselect multiple. Deselect multiple options.
      */
     public void testInputSelectDeselectMultiple() throws Exception {
-    	for (int i=0; i < URL.length; i++) {
-	        openTestPage(i);
-	
-	        // select multiple
-	        focusSelectElement();
-	        selectOption("Option1");
-	        selectOption("Option2");
-	        verifyOptionDeselected("Option3");
-	
-	        submit.click();
-	        waitForElementTextPresent(output, "option1;option2");
-	        verifyOptionSelected("Option1");
-	        verifyOptionSelected("Option2");
-	        verifyOptionDeselected("Option3");
-	
-	        // deselect
-	        focusSelectElement();
-	        deselectOption("Option2");
-	        verifyOptionSelected("Option1");
-	
-	        submit.click();
-	        waitForElementTextPresent(output, "option1");
-	        verifyOptionSelected("Option1");
-	        verifyOptionDeselected("Option2");
-    	}
+        for (int i = 0; i < URL.length; i++) {
+            openTestPage(i);
+
+            // select multiple
+            focusSelectElement();
+            selectOption("Option1");
+            selectOption("Option2");
+            verifyOptionDeselected("Option3");
+
+            submit.click();
+            waitForElementTextPresent(output, "option1;option2");
+            verifyOptionSelected("Option1");
+            verifyOptionSelected("Option2");
+            verifyOptionDeselected("Option3");
+
+            // deselect
+            if (checkBrowserType("IE10")) {
+                focusSelectElement();
+            }
+            deselectOption("Option2");
+            verifyOptionSelected("Option1");
+
+            submit.click();
+            waitForElementTextPresent(output, "option1");
+            verifyOptionSelected("Option1");
+            verifyOptionDeselected("Option2");
+        }
     }
 
     /**
      * Select all. Select all options. Deselect all. Deselect all options.
      */
     public void testInputSelectDeselectAll() throws Exception {
-    	for (int i=0; i < URL.length; i++) {
-	        openTestPage(i);
-	
-	        // select all
-	        focusSelectElement();
-	        selectOption("Option1");
-	        selectOption("Option2");
-	        selectOption("Option3");
-	
-	        submit.click();
-	        waitForElementTextPresent(output, "option1;option2;option3");
-	        verifyOptionSelected("Option1");
-	        verifyOptionSelected("Option2");
-	        verifyOptionSelected("Option3");
-	
-	        // deselect all
-	        inputSelect.deselectAll();
-	        verifyOptionDeselected("Option1");
-	        verifyOptionDeselected("Option2");
-	        verifyOptionDeselected("Option3");
-	
-	        submit.click();
-	        waitForElementTextPresent(output, "");
-	        verifyOptionDeselected("Option1");
-	        verifyOptionDeselected("Option2");
-	        verifyOptionDeselected("Option3");
-    	}
+        for (int i = 0; i < URL.length; i++) {
+            openTestPage(i);
+
+            // select all
+            focusSelectElement();
+            selectOption("Option1");
+            selectOption("Option2");
+            selectOption("Option3");
+
+            submit.click();
+            waitForElementTextPresent(output, "option1;option2;option3");
+            verifyOptionSelected("Option1");
+            verifyOptionSelected("Option2");
+            verifyOptionSelected("Option3");
+
+            // deselect all
+            deselectOption("Option1");
+            deselectOption("Option2");
+            deselectOption("Option3");
+            verifyOptionDeselected("Option1");
+            verifyOptionDeselected("Option2");
+            verifyOptionDeselected("Option3");
+
+            submit.click();
+            waitForElementTextPresent(output, "");
+            verifyOptionDeselected("Option1");
+            verifyOptionDeselected("Option2");
+            verifyOptionDeselected("Option3");
+        }
     }
 
+    /**
+     * Only for IE10 we need to explicitly bring focus on to select input. selectBy() does not do it. But clicking on
+     * select element corrupts selected/unselected options so we need to preserve the state
+     */
     private void focusSelectElement() {
-        // Only for IE10 we need to explicitly bring focus on to select input
-        // selectBy() does not do it. But clicking on select element corrupts
-        // selected/unselected options so we need to preserve the state
-        List<WebElement> selectedOptions = inputSelect.getAllSelectedOptions();
-        selectElement.click();
+        if (checkBrowserType("IE10")) {
+            List<WebElement> selectedOptions = inputSelect.getAllSelectedOptions();
+            selectElement.click();
 
-        inputSelect.deselectAll();
-        for (int i = 0; i < selectedOptions.size(); i++) {
-            inputSelect.selectByVisibleText(selectedOptions.get(i).getText());
+            inputSelect.deselectAll();
+            for (int i = 0; i < selectedOptions.size(); i++) {
+                inputSelect.selectByVisibleText(selectedOptions.get(i).getText());
+            }
         }
     }
 }

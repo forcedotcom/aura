@@ -18,9 +18,9 @@
      * Adds an event handler for input specific DOM event for which this input has a Aura-equivalent handler
      */
     addInputDomEvents : function(component) {
-    	var events = ["input", "change", "paste", "copy", "cut"];
-    	
-    	for (var i=0, len=events.length; i < len; i++) {
+        var events = ["input", "change", "paste", "copy", "cut"];
+        
+        for (var i=0, len=events.length; i < len; i++) {
             if (component.hasEventHandler(events[i])) {
                 this.addDomHandler(component, events[i]);
             }    		
@@ -28,29 +28,41 @@
 
         var updateOn = this.getUpdateOn(component);
         if (updateOn) {
-            var handledEvents = this.getHandledDOMEvents(component);
-            if (handledEvents[updateOn] !== true) {
-                this.addDomHandler(component, updateOn);
-            }
+        	
+        	var handledEvents = this.getHandledDOMEvents(component);
+        	for (var j=0, lenj=updateOn.length; j < lenj; j++) {
+	            if (handledEvents[updateOn[j]] !== true) {
+	                this.addDomHandler(component, updateOn[j]);
+	            }
+        	}
+            
         }
     },
 
     /**
-     * Returns the lower-case event name on which this input should update its bound value object
+     * Returns the array of lower-case event names on which this input should update its bound value object
      */
-    getUpdateOn : function(component){
+    getUpdateOn : function(component) {
+    	var ret = [];
         var updateOn = component.get("v.updateOn");
-        if(!updateOn) return;
-        updateOn = updateOn.toLowerCase();
+        
+        if(!updateOn) {
+        	return ret;
+    	}
+        
+        updateOn = updateOn.toLowerCase().split(/[\W,]+/); // split on whitespace or commas
 
         var domEvents = this.getDomEvents(component);
-        for(var i=0,len=domEvents.length; i<len; i++){
-            if(domEvents[i].toLowerCase()===updateOn){
-                return updateOn;
+        for(var i=0, len=domEvents.length; i < len; i++){
+        	for (var j=0, lenj=updateOn.length; j < lenj; j++) {
+		        if(domEvents[i].toLowerCase()===updateOn[j]){
+		            ret.push(updateOn[j]);
+	            }
             }
         }
+        
         // fall back on the default updateOn value if an invalid one is supplied
-        return component.getDef().getAttributeDefs().getDef("updateOn").getDefault();
+        return (ret.length > 0) ? ret : component.getDef().getAttributeDefs().getDef("updateOn").getDefault(); 
     },
 
     /**
@@ -98,8 +110,8 @@
         var helper = component.getDef().getHelper();
         var updateOn = helper.getUpdateOn(component);
 
-        // if this is the event we're supposed to update on, call this component's update implementation
-        if (event.type === updateOn) {
+        // if this is an event we're supposed to update on, call this component's update implementation
+        if ($A.util.arrayIndexOf(updateOn, event.type) > -1) {
             helper.doUpdate(component, helper.getDomElementValue(element));
         }
     },
@@ -143,15 +155,20 @@
         if (errorCmp && !errorCmp.getValue("v.value").compare(m)) {
             errorCmp.setValue("v.value", m);
         } else {
-            errorCmp = $A.componentService.newComponentDeprecated({
+            $A.componentService.newComponentAsync(
+                this,
+                function(errorCmp) {
+                    component.setValue("v.errorComponent", errorCmp);
+                },
+                {
                 "componentDef": "markup://ui:inputDefaultError",
                 "attributes": {
-                    "values": {
-                        "value" : m
-                    }
-                }
-            });
-            component.setValue("v.errorComponent", errorCmp);
+                        "values": {
+                            "value" : m
+                        }
+                	}
+            	}
+            );
         }
     },
 
@@ -202,16 +219,15 @@
     },
     
     setAttribute: function(cmp, attr) {
-    	var attrs = cmp.getAttributes(),			
-			concreteCmp = cmp.getConcreteComponent(),
-			parentCmp = concreteCmp.getSuper();
-    	
-			concreteCmp.getAttributes().setValue(attr.key, attr.value);
-			//need to traverse up the hierarchy and set the attributes, since attribute lookup is not hierarchical once initialized
-			while(parentCmp) {
-				parentCmp.getAttributes().setValue(attr.key, attr.value);
-				parentCmp = parentCmp.getSuper();
-			} 
-		}
+        var attrs = cmp.getAttributes(),			
+        concreteCmp = cmp.getConcreteComponent(),
+        parentCmp = concreteCmp.getSuper();
+        
+        concreteCmp.getAttributes().setValue(attr.key, attr.value);
+        //need to traverse up the hierarchy and set the attributes, since attribute lookup is not hierarchical once initialized
+        while(parentCmp) {
+        	parentCmp.getAttributes().setValue(attr.key, attr.value);
+        	parentCmp = parentCmp.getSuper();
+        } 
     }
 })

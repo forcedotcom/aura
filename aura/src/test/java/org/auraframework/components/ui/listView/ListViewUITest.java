@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.auraframework.test.WebDriverTestCase;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -233,14 +232,12 @@ public class ListViewUITest extends WebDriverTestCase {
      * @return true if the variable is present, false otherwise
      */
     private boolean isGlobalVariableDefinedInWindow(String variableName) {
-        JavascriptExecutor js = (JavascriptExecutor) this.getDriver();
-        return (Boolean) js.executeScript("if(typeof " + variableName
-                + " === 'undefined'){return false;}else{return true;}");
+        String script = "return !(typeof " + variableName + " === 'undefined')";
+        return (Boolean) auraUITestingUtil.getRawEval(script);
     }
 
     /**
-     * Check whether an html element with some particular text is a child of
-     * another element
+     * Check whether an html element with some particular text is a child of another element
      * 
      * @param tagName tag of element we are looking for
      * @param parentElement parent of the element we are looking for
@@ -259,8 +256,7 @@ public class ListViewUITest extends WebDriverTestCase {
     }
 
     /**
-     * Given a list of WebElements, get a new list containing the text from each
-     * element
+     * Given a list of WebElements, get a new list containing the text from each element
      * 
      * @param elements list of WebElements
      * @return list containing text from each element
@@ -277,8 +273,7 @@ public class ListViewUITest extends WebDriverTestCase {
      * Get a presumably empty listview's empty message
      * 
      * @param tableElement main element of listview
-     * @return the text that appears in the canonical empty listview message
-     *         location
+     * @return the text that appears in the canonical empty listview message location
      */
     private String getEmptyLisViewMessage(WebElement tableElement) {
         WebElement tBodyElement = tableElement.findElement(By.tagName("tbody"));
@@ -301,8 +296,8 @@ public class ListViewUITest extends WebDriverTestCase {
     }
 
     /**
-     * Given an element corresponding to a row, return a list of the header or
-     * cell elements in the order in which they appear
+     * Given an element corresponding to a row, return a list of the header or cell elements in the order in which they
+     * appear
      * 
      * @param rowElement a thead, tbody, or tfoot row element
      * @param cellTagName tag name of the cell type ('td' or 'th')

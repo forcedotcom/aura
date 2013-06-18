@@ -44,6 +44,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.StyleParserException;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.phloc.css.ECSSVersion;
 import com.phloc.css.ICSSWriterSettings;
@@ -84,6 +85,8 @@ public class CSSParser extends DefaultCSSVisitor {
     private static final String ELSEIF_REPLACEMENT = "@media (" + CONDITIONAL_ELSEIF + ":$1){";
     private static final Pattern ELSE_PATTERN = Pattern.compile("@else[\\s\\{]*");
     private static final String ELSE_REPLACEMENT = "@media (" + CONDITIONAL_ELSE + "){";
+    private static final Set<String> CUSTOM_FEATURES = ImmutableSet.of(CONDITIONAL_IF, CONDITIONAL_ELSEIF,
+            CONDITIONAL_ELSE);
 
     private final String contents;
     private final String filename;
@@ -401,55 +404,93 @@ public class CSSParser extends DefaultCSSVisitor {
         addText(rule.getAsCSSString(writerSettings, 0));
     }
 
+    /**
+     * We distinguish between regular media queries and our "fake" media queries used for conditionals. Anything with
+     * not exactly one query and one expression is treated like a normal media query, and the contents are output as-is.
+     * Anything not matching one of our custom "feature" names is also treated like a normal media query and output
+     * as-is.
+     */
     @Override
     public void onBeginMediaRule(CSSMediaRule rule) {
-        for (int i = 0; i < rule.getMediaQueryCount(); i++) {
-            CSSMediaQuery query = rule.getMediaQueryAtIndex(i);
+        // our custom conditionals should have only one query
+        if (rule.getMediaQueryCount() != 1) {
+            addText(getMediaQueryOpen(rule));
+            return;
+        }
 
-            for (int j = 0; j < query.getMediaExpressionCount(); j++) {
-                CSSMediaExpression exp = query.getMediaExpression(j);
+        CSSMediaQuery query = rule.getMediaQueryAtIndex(0);
 
-                String feature = exp.getFeature();
-                String value = validateConditional(exp);
-                Expression expression = null;
-                if (value != null) {
-                    Location l = new Location(componentClass, exp.getSourceLocation().getFirstTokenBeginLineNumber(),
-                            exp.getSourceLocation().getFirstTokenBeginColumnNumber(), -1);
-                    try {
-                        expression = AuraImpl.getExpressionAdapter().buildExpression("$Browser.is" + value, l);
-                    } catch (AuraValidationException e) {
-                        throw new AuraRuntimeException(e, l);
-                    }
-                }
+        // our custom conditionals should have only one expression
+        if (query.getMediaExpressionCount() != 1) {
+            addText(getMediaQueryOpen(rule));
+            return;
+        }
 
-                if (feature.equalsIgnoreCase(CONDITIONAL_IF)) {
-                    flush();
-                    ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
-                    conditionalBuilder.push(builder);
+        CSSMediaExpression exp = query.getMediaExpression(0);
+        String feature = exp.getFeature();
 
-                    builder.setAttribute("isTrue", expression);
-                    builder.setDescriptor("aura:if");
-                } else if (feature.equalsIgnoreCase(CONDITIONAL_ELSEIF)) {
-                    flush();
-                    ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
-                    conditionalBuilder.push(builder);
-                    builder.setAttribute("isTrue", expression);
-                    builder.setDescriptor("aura:if");
-                } else if (feature.equalsIgnoreCase(CONDITIONAL_ELSE)) {
-                    flush();
-                    ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
-                    conditionalBuilder.push(builder);
-                    builder.setAttribute("isTrue", true);
-                    builder.setDescriptor("aura:if");
-                } else {
-                    addText(rule.getAsCSSString(writerSettings, 0));
-                }
+        // check against our known conditional "feature" names
+        if (!CUSTOM_FEATURES.contains(feature)) {
+            addText(getMediaQueryOpen(rule));
+            return;
+        }
+
+        // we have now confirmed that this is an aura conditional.
+        String value = validateConditional(exp);
+        Expression expression = null;
+
+        if (value != null) {
+            Location l = new Location(componentClass, exp.getSourceLocation().getFirstTokenBeginLineNumber(),
+                    exp.getSourceLocation().getFirstTokenBeginColumnNumber(), -1);
+            try {
+                expression = AuraImpl.getExpressionAdapter().buildExpression("$Browser.is" + value, l);
+            } catch (AuraValidationException e) {
+                throw new AuraRuntimeException(e, l);
             }
         }
+
+        flush();
+
+        ComponentDefRefImpl.Builder builder = new ComponentDefRefImpl.Builder();
+        builder.setDescriptor("aura:if");
+        conditionalBuilder.push(builder);
+
+        if (feature.equalsIgnoreCase(CONDITIONAL_IF)) {
+            builder.setAttribute("isTrue", expression);
+        } else if (feature.equalsIgnoreCase(CONDITIONAL_ELSEIF)) {
+            builder.setAttribute("isTrue", expression);
+        } else if (feature.equalsIgnoreCase(CONDITIONAL_ELSE)) {
+            builder.setAttribute("isTrue", true);
+        } else {
+            // should never get here unless the code in this class itself is screwed up
+            throw new AuraRuntimeException("Feature name missing from known set of conditionals in CSS Parser.");
+        }
+
+    }
+
+    /** Gets the media query text up until and including the opening brace */
+    private String getMediaQueryOpen(CSSMediaRule rule) {
+        StringBuilder builder = new StringBuilder(32);
+        builder.append("@media ");
+
+        for (int i = 0; i < rule.getMediaQueryCount(); i++) {
+            if (i != 0) {
+                builder.append(",");
+            }
+            builder.append(rule.getMediaQueryAtIndex(i).getAsCSSString(writerSettings, 0));
+        }
+
+        builder.append("{");
+        return builder.toString();
     }
 
     @Override
     public void onEndMediaRule(CSSMediaRule rule) {
+        if (conditionalBuilder.isEmpty()) {
+            addText("}"); // close the media query
+            return;
+        }
+
         ComponentDefRefBuilder builder = conditionalBuilder.pop();
         bufferTextCDR();
         builder.setAttribute("body", Lists.newArrayList(componentsBuffer));

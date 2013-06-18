@@ -186,6 +186,19 @@ public class StyleParserTest extends AuraImplTestCase {
         assertTrue(style.getName().equals("testStyleNamespaceTrueConditions"));
         goldFileText(style.getCode());
     }
+    
+    /**
+     * Tests that media blocks don't trip up the parser
+     */
+    public void testStyleNamespaceMediaAndConditions() throws Exception {
+        DefDescriptor<StyleDef> descriptor = DefDescriptorImpl.getInstance("test.testStyleNamespaceMediaAndConditions",
+                StyleDef.class);
+        Aura.getContextService().getCurrentContext().setClient(new Client("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1468.0 Safari/537.36"));
+        StyleDef style = descriptor.getDef();
+        assertTrue(style.getName().equals("testStyleNamespaceMediaAndConditions"));
+        goldFileText(style.getCode());
+    }
+    
 
     /**
      * Tests for invalid values as part of browser conditionals.

@@ -17,6 +17,7 @@ package org.auraframework.impl.css.parser;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
 import org.auraframework.def.NamespaceDef;
@@ -38,7 +39,8 @@ import com.phloc.css.writer.CSSWriterSettings;
  * Perform namespace.xml variable substitutions.
  */
 public class ReworkNamespaceConstants implements Rework<CSSDeclaration> {
-    private static final ICSSWriterSettings settings = new CSSWriterSettings(ECSSVersion.LATEST);
+    private static final ICSSWriterSettings SETTINGS = new CSSWriterSettings(ECSSVersion.LATEST);
+    private static final Pattern PATTERN = Pattern.compile("[A-Z][A-Z0-9_]+");
 
     private final String namespace;
     private Map<String, String> nsDefs = null;
@@ -83,8 +85,8 @@ public class ReworkNamespaceConstants implements Rework<CSSDeclaration> {
                 expr.addMember(newMembers.get(j));
             }
         } else {
-            String value = member.getAsCSSString(settings, 0);
-            if (value.matches("[A-Z]+")) {
+            String value = member.getAsCSSString(SETTINGS, 0);
+            if (PATTERN.matcher(value).matches()) {
                 String val = resolveToken(value);
                 if (val != null) {
                     return new CSSExpressionMemberTermSimple(val);

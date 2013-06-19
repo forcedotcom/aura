@@ -98,8 +98,7 @@ public class CSSParser extends DefaultCSSVisitor {
     private final List<ComponentDefRef> componentsBuffer = Lists.newArrayList();
     private final ICSSParseExceptionHandler errorHandler = new ErrorHandler();
     private final Stack<ComponentDefRefImpl.Builder> conditionalBuilder = new Stack<ComponentDefRefImpl.Builder>();
-    private final ICSSWriterSettings writerSettings = new CSSWriterSettings(ECSSVersion.CSS30).setOptimizedOutput(!Aura
-            .getContextService().getCurrentContext().getMode().isDevMode());
+    private final ICSSWriterSettings writerSettings = createWriterSettings();
 
     private final List<Rework<CSSSelector>> selectorRework;
     private final List<Rework<CSSDeclaration>> declarationRework;
@@ -376,39 +375,44 @@ public class CSSParser extends DefaultCSSVisitor {
 
     @Override
     public void onBeginFontFaceRule(CSSFontFaceRule rule) {
+        // currently no support for any rework (e.g., theme function)
         addText(rule.getAsCSSString(writerSettings, 0));
     }
 
     @Override
     public void onBeginKeyframesBlock(CSSKeyframesBlock rule) {
-        addText(rule.getAsCSSString(writerSettings, 0));
+        // handled already with onBeginKeyframesRule
+        // addText(rule.getAsCSSString(writerSettings, 0));
     }
 
     @Override
     public void onBeginKeyframesRule(CSSKeyframesRule rule) {
+        // currently no support for any rework (e.g., theme function)
         addText(rule.getAsCSSString(writerSettings, 0));
     }
 
     @Override
     public void onBeginPageRule(CSSPageRule rule) {
+        // currently no support for any rework (e.g., theme function)
         addText(rule.getAsCSSString(writerSettings, 0));
     }
 
     @Override
     public void onBeginSupportsRule(CSSSupportsRule rule) {
+        // currently no support for any rework (e.g., theme function)
         addText(rule.getAsCSSString(writerSettings, 0));
     }
 
     @Override
     public void onBeginViewportRule(CSSViewportRule rule) {
+        // currently no support for any rework (e.g., theme function)
         addText(rule.getAsCSSString(writerSettings, 0));
     }
 
     /**
      * We distinguish between regular media queries and our "fake" media queries used for conditionals. Anything with
-     * not exactly one query and one expression is treated like a normal media query, and the contents are output as-is.
-     * Anything not matching one of our custom "feature" names is also treated like a normal media query and output
-     * as-is.
+     * not exactly one query and one expression is treated like a normal media query, and the contents are output
+     * normally. Anything not matching one of our custom "feature" names is also treated like a normal media query.
      */
     @Override
     public void onBeginMediaRule(CSSMediaRule rule) {
@@ -508,18 +512,27 @@ public class CSSParser extends DefaultCSSVisitor {
     }
 
     private class ErrorHandler implements ICSSParseExceptionHandler {
-
         @Override
         public void onException(ParseException ex) {
             errors.add(ex);
         }
     };
 
+    private static ICSSWriterSettings createWriterSettings() {
+        return new CSSWriterSettings(ECSSVersion.CSS30)
+                // normally this would consult the current mode from context, however since everything else in this
+                // class is outputting optimized content irrespective of the mode, there's no point in doing otherwise
+                // here. A future task may be to change this setting and this class to pretty print in dev mode.
+                .setOptimizedOutput(true)
+                // phloc doesn't preserve whether the url is quoted or unquoted. Globally deciding one or the other
+                // is error prone. Thus we are forced to add sub-par logic to handle this in ReworkImageUrls.java
+                .setQuoteURLs(false);
+    }
+
     public static void main(String[] args) {
         try {
             AuraContext context = Aura.getContextService().startContext(Mode.DEV, Format.JSON, Access.AUTHENTICATED);
             context.setClient(new Client("Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)"));
-
             System.out.println(Aura.getDefinitionService().getDefinition("ui.button", StyleDef.class).getCode());
         } catch (DefinitionNotFoundException e) {
             // TODO Auto-generated catch block

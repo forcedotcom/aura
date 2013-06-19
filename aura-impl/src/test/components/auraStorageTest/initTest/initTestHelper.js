@@ -38,9 +38,8 @@
         var a = cmp.get("c.fetchDataRecord");
         a.setParams({testName : "testSetStorableAPI"});
         a.setStorable();
-        $A.enqueueAction(a);
         $A.test.markForCompletion(a, "testSetStorableAPIStage2");
-        $A.eventService.finishFiring();
+        $A.run(function() { $A.enqueueAction(a); });
         $A.test.addWaitForAction(true, 
             "testSetStorableAPIStage2",
             function(){
@@ -55,8 +54,7 @@
         var aSecond = cmp.get("c.fetchDataRecord");
         aSecond.setParams({testName : "testSetStorableAPI"});
         aSecond.setStorable();
-        $A.enqueueAction(aSecond);
-        $A.eventService.finishFiring();
+        $A.run(function() { $A.enqueueAction(aSecond); });
         $A.test.addWaitFor("SUCCESS", 
             function(){return aSecond.getState()},
             function(){
@@ -87,11 +85,10 @@
                 aThird.setParams({testName : "testSetStorableAPI"});
                 //Keeping the auto refresh time to 0, helps testing the override
                 aThird.setStorable({"refresh": 0});
-                $A.enqueueAction(aThird);
                 requestTime = new Date().getTime();
                 //Make sure we haven't reached the autorefresh timeout already. Default is set to 60, so 30 is quite conservative
                 $A.test.assertTrue( ((requestTime-cmp._requestStoredTime)/1000<30), "Test setup failure, increase defaultAutoRefreshInterval time.");
-                $A.eventService.finishFiring();
+                $A.run(function() { $A.enqueueAction(aThird); });
                 $A.test.addWaitFor("SUCCESS", 
                     function(){return aThird.getState()},
                     function(){
@@ -129,8 +126,7 @@
                 var aFourth = cmp.get("c.fetchDataRecord");
                 aFourth.setParams({testName : "testSetStorableAPI"});
                 aFourth.setStorable();
-                $A.enqueueAction(aFourth);
-                $A.eventService.finishFiring();
+                $A.run(function() { $A.enqueueAction(aFourth); });
                 $A.test.addWaitFor("SUCCESS", 
                     function(){return aFourth.getState()},
                     function(){
@@ -152,8 +148,7 @@
         var a = cmp.get("c.fetchDataRecord");
         a.setParams({testName : "testCacheExpiration"});
         a.setStorable();
-        $A.enqueueAction(a);
-        $A.eventService.finishFiring();
+        $A.run(function() { $A.enqueueAction(a); });
         $A.test.addWaitFor(false, 
             $A.test.isActionPending,
             function(){
@@ -179,8 +174,7 @@
         var aSecond = cmp.get("c.fetchDataRecord");
         aSecond.setParams({testName : "testCacheExpiration"});
         aSecond.setStorable();
-        $A.enqueueAction(aSecond);
-        $A.eventService.finishFiring();
+        $A.run(function() { $A.enqueueAction(aSecond); });
         $A.test.addWaitFor("SUCCESS", 
             function(){return aSecond.getState()},
             function(){
@@ -198,8 +192,7 @@
         var a = cmp.get("c.substring");
         a.setParams({testName : "testActionKeyOverloading", param1 : 999});
         a.setStorable();
-        $A.enqueueAction(a);
-        $A.eventService.finishFiring();
+        $A.run(function() { $A.enqueueAction(a); });
         $A.test.addWaitFor(false, $A.test.isActionPending,
             function(){
                 $A.test.assertFalse(a.isFromStorage(), "Failed to excute action at server");
@@ -212,8 +205,7 @@
         var a = cmp.get("c.string");
         a.setParams({testName : "testActionKeyOverloading", param1 : 999});
         a.setStorable();
-        $A.enqueueAction(a);
-        $A.eventService.finishFiring();
+        $A.run(function() { $A.enqueueAction(a); });
         $A.test.addWaitFor(false, $A.test.isActionPending,
             function(){
                 $A.test.assertFalse(a.isFromStorage(), "should not have fetched from cache");
@@ -226,8 +218,7 @@
         var a = cmp.get("c.string");
         a.setParams({testName : "testActionKeyOverloading", param1 : 9999});
         a.setStorable();
-        $A.enqueueAction(a);
-        $A.eventService.finishFiring();
+        $A.run(function() { $A.enqueueAction(a); });
         $A.test.addWaitFor(false, $A.test.isActionPending,
             function(){
                 $A.test.assertFalse(a.isFromStorage(), "Failed to excute action at server");
@@ -245,19 +236,20 @@
     },
     testActionGroupingStage2:function(cmp){
         //2 Stored actions
-        var a1 = cmp.get("c.substring");
-        a1.setParams({testName : "testActionGrouping_A", param1 : 999});
-        a1.setStorable();
-        $A.enqueueAction(a1);
-        var b1 = cmp.get("c.string");
-        b1.setParams({testName : "testActionGrouping_B", param1 : 666});
-        b1.setStorable();
-        $A.enqueueAction(b1);
-        //1 Unstored action
-        var notStored = cmp.get("c.fetchDataRecord");
-        notStored.setParams({testName : "testActionGrouping_notStored"});
-        $A.enqueueAction(notStored);
-        $A.eventService.finishFiring();
+        $A.run(function() {
+                var a1 = cmp.get("c.substring");
+                a1.setParams({testName : "testActionGrouping_A", param1 : 999});
+                a1.setStorable();
+                $A.enqueueAction(a1);
+                var b1 = cmp.get("c.string");
+                b1.setParams({testName : "testActionGrouping_B", param1 : 666});
+                b1.setStorable();
+                $A.enqueueAction(b1);
+                //1 Unstored action
+                var notStored = cmp.get("c.fetchDataRecord");
+                notStored.setParams({testName : "testActionGrouping_notStored"});
+                $A.enqueueAction(notStored);
+            });
         $A.test.addWaitFor(false, $A.test.isActionPending);
     },
     testActionGroupingStage3:function(cmp){
@@ -265,8 +257,7 @@
         var a2 = cmp.get("c.substring");
         a2.setParams({testName : "testActionGrouping_A", param1 : 999});
         a2.setStorable();
-        $A.enqueueAction(a2);
-        $A.eventService.finishFiring();
+        $A.run(function() { $A.enqueueAction(a2); });
         $A.test.addWaitFor("SUCCESS", function(){return a2.getState()},
             function(){
                 $A.log($A.storageService.getStorage("actions"));
@@ -284,8 +275,7 @@
         //Run a action which was previously not marked to be stored and group it with the one above
         var notStoredAgain = cmp.get("c.fetchDataRecord");
         notStoredAgain.setParams({testName : "testActionGrouping_notStored"});
-        $A.enqueueAction(notStoredAgain);
-        $A.eventService.finishFiring();
+        $A.run(function() { $A.enqueueAction(notStoredAgain); });
         $A.test.addWaitFor("SUCCESS", function(){return b2.getState()},
             function(){
                 $A.test.assertTrue(b2.isFromStorage(), "failed to fetch action from cache");

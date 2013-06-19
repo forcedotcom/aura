@@ -49,7 +49,7 @@
         }
         $A.test.releaseRequests();
         $A.test.runAfterIf(function() {
-            return testCounter == 0;
+            return testCounter === 0;
         }, callback);
     },
 

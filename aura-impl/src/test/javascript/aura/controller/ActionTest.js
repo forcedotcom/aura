@@ -37,6 +37,42 @@ Test.Aura.Controller.ActionTest = function(){
             // Assert
             Assert.Equal(expected, actual);
         }
+
+        [Fact]
+        function SetsActionId(){
+            // Arrange
+            var targetNextActionId = 123;
+            var expected = 123;
+            var target;
+
+            var mockActionId = Mocks.GetMock(Action.prototype, "nextActionId", targetNextActionId);
+
+            // Act
+            mockActionId(function(){
+                target = new Action();
+            });
+            var actual = target.actionId;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        function IncrementsNextActionId(){
+            // Arrange
+            var targetNextActionId = 123;
+            var expected = targetNextActionId+1;
+            var target;
+
+            Action.prototype.nextActionId = targetNextActionId;
+
+            // Act
+            target = new Action();
+            var actual = Action.prototype.nextActionId;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
     }
 
     [Fixture]
@@ -58,10 +94,12 @@ Test.Aura.Controller.ActionTest = function(){
         [Fact]
         function ConstructsIdIfNotSet(){
             // Arrange
-            var targetNextActionId = 123;
+            var targetActionId = "expectedActionId";
             var targetContextNum = "expectedContextNum";
-            var expected = String.Format("{0}.{1}", targetNextActionId, targetContextNum);
+            var expected = String.Format("{0}.{1}", targetActionId, targetContextNum);
             var target = new Action();
+
+            target.actionId = targetActionId;
             var mockContext = Mocks.GetMock(Object.Global(), "$A", {
                 getContext: function(){
                     return {
@@ -71,14 +109,11 @@ Test.Aura.Controller.ActionTest = function(){
                     };
                 }
             });
-            var mockActionId = Mocks.GetMock(Action.prototype, "nextActionId", targetNextActionId);
             var actual;
 
             // Act
             mockContext(function(){
-                mockActionId(function(){
-                    actual = target.getId();
-                });
+                actual = target.getId();
             });
 
             // Assert
@@ -92,6 +127,8 @@ Test.Aura.Controller.ActionTest = function(){
             var targetContextNum = "expectedContextNum";
             var expected = String.Format("{0}.{1}", targetNextActionId, targetContextNum);
             var target = new Action();
+            target.actionId = targetNextActionId;
+
             var mockContext = Mocks.GetMock(Object.Global(), "$A", {
                 getContext: function(){
                     return {
@@ -101,46 +138,12 @@ Test.Aura.Controller.ActionTest = function(){
                     };
                 }
             });
-            var mockActionId = Mocks.GetMock(Action.prototype, "nextActionId", targetNextActionId);
 
             // Act
             mockContext(function(){
-                mockActionId(function(){
-                    target.getId();
-                });
+                target.getId();
             });
             var actual = target.id;
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function IncrementsActionIdAfterUse(){
-            // Arrange
-            var targetNextActionId = 123;
-            var targetContextNum = "expectedContextNum";
-            var expected = targetNextActionId + 1;
-            var target = new Action();
-            var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-                getContext: function(){
-                    return {
-                        getNum: function(){
-                            return targetContextNum;
-                        }
-                    };
-                }
-            });
-            var mockActionId = Mocks.GetMock(Action.prototype, "nextActionId", targetNextActionId);
-            var actual;
-
-            // Act
-            mockContext(function(){
-                mockActionId(function(){
-                    target.getId();
-                    actual = target.nextActionId;
-                });
-            });
 
             // Assert
             Assert.Equal(expected, actual);
@@ -416,7 +419,7 @@ Test.Aura.Controller.ActionTest = function(){
                 outerCallbackFlag = true;
             }
             var target = new Action();
-            target.getState = function() { return "STATE"; };
+            target.state = "STATE";
             target.callbacks = {
                 "STATE": {
                     "fn": function(scope, callback) {
@@ -812,6 +815,59 @@ Test.Aura.Controller.ActionTest = function(){
     }
 
     [Fixture]
+    function GetStored(){
+        [Fact]
+        function NullIfNotSuccessfull(){
+            // Arrange
+            var target = new Action();
+            target.storable = true;
+            target.returnValue = "NONE";
+            target.state = "FAILURE";
+
+            // Act
+            var stored = target.getStored("bogus");
+
+            // Assert
+            Assert.Equal(null, stored);
+        }
+
+        [Fact]
+        function NullIfNotStorable(){
+            // Arrange
+            var target = new Action();
+            target.storable = false;
+            target.returnValue = "NONE";
+            target.state = "SUCCESS";
+
+            // Act
+            var stored = target.getStored("bogus");
+
+            // Assert
+            Assert.Equal(null, stored);
+        }
+
+        [Fact]
+        function ValuesFromResponse(){
+            // Arrange
+            var target = new Action();
+            target.storable = true;
+            target.returnValue = "NONE";
+            target.state = "SUCCESS";
+            target.components = {};
+
+            // Act
+            var stored = target.getStored("bogus");
+
+            // Assert
+            Assert.Equal("NONE", stored["returnValue"]);
+            Assert.Equal({}, stored["components"]);
+            Assert.Equal("SUCCESS", stored["state"]);
+            Assert.Equal("bogus", stored["storage"]["name"]);
+            //time is harder.
+        }
+    }
+
+    [Fixture]
     function Complete(){
         /**
          * Action.complete() is a very large function and would be easier to test if it was broken up into smaller
@@ -821,17 +877,10 @@ Test.Aura.Controller.ActionTest = function(){
         [Fact]
         function CallsActionCallbackIfCmpIsValid(){
             // Arrange
-            var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-                getContext: function(){
-                    return {
-                        setCurrentAction: function(){}
-                    }
-                }
-            });
             var target = new Action();
             target.sanitizeStoredResponse = function(){};
             delete target.originalResponse;
-            target.getState = function(){ return "NOTERRORSTATE" };
+            target.state = "NOTERRORSTATE";
             target.cmp = {
                 isValid: function(){ return true; }
             };
@@ -846,9 +895,7 @@ Test.Aura.Controller.ActionTest = function(){
             var actual = false;
 
             // Act
-            mockContext(function(){
-                target.complete({});
-            })
+            target.complete({setCurrentAction: function(){}});
 
             // Assert
             Assert.True(actual);
@@ -1326,155 +1373,9 @@ Test.Aura.Controller.ActionTest = function(){
         }
     }
 
-    [Fixture]
-    function Refresh(){
-        [Fact]
-        function EnqueuesRefreshAction(){
-            // Arrange
-            var target = new Action();
-            target.storage = {
-                created: 0
-            };
-            target.getStorage = function(){
-                return {
-                    log: function(){}
-                }
-            };
-            target.storableConfig = {
-                refresh: 1 // autoRefreshInterval will be this value times 1000
-            };
-            target.getComponent = function(){};
-            target.fireRefreshEvent = function(){};
-            var refreshAction = {
-                setParams: function(){},
-                setStorable: function(){},
-                sanitizeStoredResponse: function(){},
-                wrapCallback: function(){}
-            }
-            target.getDef = function() {
-                return {
-                    newInstance: function(){
-                        return refreshAction;
-                    }
-                }
-            }
-            var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-                enqueueAction: function(){
-                    actual = true;
-                }
-            });
-            var actual = false;
-
-            // Act
-            mockContext(function(){
-                target.refresh("");
-            });
-
-            // Assert
-            Assert.True(actual);
-        }
-
-        [Fact,Skip("Trouble mocking Date().getTime(). Replace 'EnqueuesRefreshAction' Fact when fixed")]
-        function EnqueuesRefreshActionMockDate(){
-            // Arrange
-            var target = new Action();
-            target.storage = {
-                created: 0
-            };
-            target.getStorage = function(){
-                return {
-                    log: function(){}
-                }
-            };
-            target.storableConfig = {
-                refresh: 0 // autoRefreshInterval will be this value times 1000
-            };
-            target.getComponent = function(){};
-            target.fireRefreshEvent = function(){};
-            var refreshAction = {
-                setParams: function(){},
-                setStorable: function(){},
-                sanitizeStoredResponse: function(){},
-                wrapCallback: function(){}
-            }
-            target.getDef = function() {
-                return {
-                    newInstance: function(){
-                        return refreshAction;
-                    }
-                }
-            }
-            var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-                enqueueAction: function(){
-                    actual = true;
-                }
-            });
-            var mockDate = Mocks.GetMock(Object.Global(), "Date", function(){
-                return {
-                    getTime: function() {
-                        return 10000;
-                    }
-                }
-            });
-            var actual = false;
-
-            // Act
-            mockContext(function(){
-                mockDate(function() {
-                    target.refresh("");
-                });
-            });
-
-            // Assert
-            Assert.True(actual);
-        }
-
-        [Fact]
-        function DoesNotEnqueueActionIfUnderRefreshInterval(){
-            // Arrange
-            var target = new Action();
-            target.storage = {
-                created: new Date().getTime() // set to current time to keep stay below refresh interval
-            };
-            target.getStorage = function(){
-                return {
-                    log: function(){}
-                }
-            };
-            target.storableConfig = {
-                refresh: 1000 // autoRefreshInterval will be this value times 1000
-            };
-            target.getComponent = function(){};
-            target.fireRefreshEvent = function(){};
-            var refreshAction = {
-                setParams: function(){},
-                setStorable: function(){},
-                sanitizeStoredResponse: function(){},
-                wrapCallback: function(){}
-            }
-            target.getDef = function() {
-                return {
-                    newInstance: function(){
-                        return refreshAction;
-                    }
-                }
-            }
-            var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-                enqueueAction: function(){
-                    actual = false;
-                }
-            });
-            var actual = true;
-
-            // Act
-            mockContext(function(){
-                target.refresh("");
-            });
-
-            // Assert
-            Assert.True(actual);
-        }
-    }
+    //[Fixture]
+    //function GetRefreshAction(){
+    //}
 
     [Fixture]
     function SanitizeStoredResponse(){
@@ -1643,7 +1544,8 @@ Test.Aura.Controller.ActionTest = function(){
             // Arrange
             var expected = "expected";
             var target = new Action();
-            var cmp = {
+            target.cmp = {
+                isValid: function(){ return true; },
                 isInstanceOf: function(param) {
                     return param === "auraStorage:refreshObserver";
                 },
@@ -1662,7 +1564,7 @@ Test.Aura.Controller.ActionTest = function(){
             var actual = null;
 
             // Act
-            target.fireRefreshEvent(null, cmp);
+            target.fireRefreshEvent("refreshBegin");
 
             // Assert
             Assert.Equal(expected, actual);

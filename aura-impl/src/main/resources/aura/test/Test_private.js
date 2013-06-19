@@ -52,9 +52,12 @@ var priv = {
         },
 
         putMessage: function(pre, expected, msg) {
-            for (var i in expected) {
+            for (var i = 0; i < expected.length; i++) {
+                if (expected[i] === undefined) {
+                    continue;
+                }
                 if (msg.indexOf(expected[i]) === 0) {
-                    delete expected[i];
+                    expected[i] = undefined;
                     return true;
                 }
             }
@@ -67,9 +70,12 @@ var priv = {
 
         expectMessage: function(pre, expected, msg) {
             if (pre !== null) {
-                for (var i in pre) {
+                for (var i = 0; i < pre.length; i++) {
+                    if (pre[i] === undefined) {
+                        continue;
+                    }
                     if (pre[i].indexOf(msg) === 0) {
-                        delete pre[i];
+                        pre[i] = undefined;
                         return;
                     }
                 }
@@ -171,6 +177,18 @@ function run(name, code, count){
             priv.complete = 0;
         }
     };
+
+    var logErrors = function(fn, label, errorArray) {
+        var i;
+
+        if (errorArray !== null && errorArray.length > 0) {
+            for (i = 0; i < errorArray.length; i++) {
+                if (errorArray[i] !== undefined) {
+                    fn(label+errorArray[i]);
+                }
+            }
+        }
+    };
     
     /** @inner */
     var continueWhenReady = function() {
@@ -230,16 +248,12 @@ function run(name, code, count){
                         setTimeout(continueWhenReady, 200);
                     }
                 } else {
-                    if (priv.expectedErrors.length > 0) {
-                        for (i in priv.expectedErrors) {
-                            logError("Did not recieve expected error:"+priv.expectedErrors[i]);
-                        }
-                    }
-                    if (priv.expectedWarnings.length > 0) {
-                        for (i in priv.expectedWarnings) {
-                            logError("Did not recieve expected warning:"+priv.expectedWarnings[i]);
-                        }
-                    }
+                    logErrors(logError, "Did not receive expected error:",priv.expectedErrors);
+                    priv.expectedErrors = [];
+
+                    logErrors(logError, "Did not receive expected warning:",priv.expectedWarnings);
+                    priv.expectedWarnings = [];
+
                     if (stages.length === 0){
                         doTearDown();
                     } else {
@@ -247,17 +261,11 @@ function run(name, code, count){
                         priv.lastStage.call(suite, cmp);
                         setTimeout(continueWhenReady, 1);
                     }
-                    if (priv.preErrors !== null && priv.preErrors.length > 0) {
-                        for (i in priv.preErrors) {
-                            logError("Recieved unexpected error:"+priv.preErrors[i]);
-                        }
-                    }
+
+                    logErrors(logError, "Received unexpected error:",priv.preErrors);
                     priv.preErrors = null;
-                    if (priv.preWarnings !== null && priv.preWarnings.length > 0) {
-                        for (i in priv.preWarnings) {
-                            $A.log("Recieved unexpected warning:"+priv.preWarnings[i]);
-                        }
-                    }
+
+                    logErrors(function(str) { $A.log(str); }, "Received unexpected warning:",priv.preWarnings);
                     priv.preWarnings = null;
                 }
             }

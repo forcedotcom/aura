@@ -26,6 +26,9 @@ var ComponentPriv = (function(){ // Scoping priv
         this.rendered = false;
         this.inUnrender = false;
         this.localId = config["localId"];
+        this.valueProviders = undefined;
+        this.actionRefs = undefined;
+        this.eventDispatcher = undefined;
 
         // create the globally unique id for this component
         this.setupGlobalId(config["globalId"], localCreation);
@@ -114,7 +117,7 @@ var ComponentPriv = (function(){ // Scoping priv
         this.setupValueEventHandlers(cmp);
 
         // clean up refs to partial config
-        delete this.partialConfig;
+        this.partialConfig = undefined;
     };
 
     ComponentPriv.prototype.nextGlobalId = function(localCreation){

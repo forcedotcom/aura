@@ -34,7 +34,7 @@
                     {!v.title}
                 </a>
             </aura:set>
-            <div class="{!'tabBody' + (v.scroll == 'true' ? ' scrolling' : '')}" aura:id="tabBody" role="tabpanel">{!v.body}</div>
+            <div class="{!'tabBody' + (v.scroll == true||v.scroll =='true' ? ' scrolling' : '')}" aura:id="tabBody" role="tabpanel">{!v.body}</div>
         </ui:vbox>
     </li>
 </aura:component>

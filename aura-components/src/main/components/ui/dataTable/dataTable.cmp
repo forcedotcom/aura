@@ -28,7 +28,7 @@
 
     <aura:if isTrue="{!v.items.length > 0}">
         <div>
-            <table class="{!(v.striped == 'true' ?'striped ':'')+v.class}" cellpadding="0" cellspacing="0" aura:id="table">
+            <table class="{!(v.striped== true||v.striped =='true' ?'striped ':'')+v.class}" cellpadding="0" cellspacing="0" aura:id="table">
                 <thead><tr aura:id="header"/></thead>
 
                 <!-- DCHASMAN For now (will be fixed once aura:public/forEach over dynamic content is fixed) body must be of the form:

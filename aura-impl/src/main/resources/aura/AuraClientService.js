@@ -277,15 +277,8 @@ var AuraClientService = function() {
                 $A.warning("Pop from empty stack");
             }
             if (priv.auraStack.length === 0) {
-                //
-                // FIXME: W-1652120
-                //
-                // Weird compatibility stuff. We are sometimes called with nothing on the stack,
-                // so, rather than work too hard on this, just push two things on the stack so
-                // that even under those conditions we will not do the wrong thing.
-                //
-                priv.auraStack.push("$A.clientServices.popStack");
-                priv.auraStack.push("$A.clientServices.popStack");
+                var tmppush = "$A.clientServices.popStack";
+                priv.auraStack.push(tmppush);
                 clientService.processActions();
                 done = !$A["finishedInit"];
                 while (!done && count <= 15) {
@@ -297,6 +290,10 @@ var AuraClientService = function() {
                     }
                 }
                 // Force our stack to nothing.
+                lastName = priv.auraStack.pop();
+                if (lastName !== tmppush) {
+                    $A.error("Broken stack: popped "+tmppush+" expected "+lastName+", stack = "+priv.auraStack);
+                }
                 priv.auraStack = [];
                 clientService.actionQueue.incrementNextActionGroupNumber();
             }

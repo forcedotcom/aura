@@ -36,11 +36,11 @@ var Action = function Action(def, method, paramDefs, background, cmp) {
     this.def = def;
     this.meth = method;
     this.paramDefs = paramDefs;
+    this.background = background;
     this.cmp = cmp;
     this.params = {};
     this.state = "NEW";
     this.callbacks = {};
-    this.background = background;
     this.events = [];
     this.groups = [];
     this.components = null;
@@ -277,11 +277,11 @@ Action.prototype.isBackground = function() {
 };
 
 /**
- * Set to true of the action should be enqueued when run instead of running in the foreground.
- * @param {boolean} background
+ * Set the action to run as a background action.  This can not be unset.  Background
+ * actions are usually long running and lower priority actions.
  */
-Action.prototype.setBackground = function(background) {
-    this.background = background;
+Action.prototype.setBackground = function() {
+    this.background = true;
 };
 
 /**

@@ -102,6 +102,14 @@ ActionDef.prototype.isServerAction = function() {
 };
 
 /**
+ * Returns true if the action is defined as background (i.e. @BackgroundAction on the java class)
+ * @returns {Boolean}
+ */
+ActionDef.prototype.isBackground = function(){
+    return this.background === true;
+};
+
+/**
  * Returns a new Action instance.
  * 
  * @private
@@ -109,8 +117,8 @@ ActionDef.prototype.isServerAction = function() {
  *            cmp The component associated with the Action.
  * @returns {Action}
  */
-ActionDef.prototype.newInstance = function(cmp) {
-	return new Action(this, this.meth, this.paramDefs, this.background, cmp);
+ActionDef.prototype.newInstance = function(cmp){
+    return new Action(this, this.meth, this.paramDefs, this.isBackground(), cmp);
 };
 
 // #include aura.controller.ActionDef_export

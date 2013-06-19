@@ -701,17 +701,16 @@ Test.Aura.Controller.ActionTest = function(){
     [Fixture]
     function SetBackground(){
         [Fact]
-        function SetsBackgroundToParam(){
+        function SetsBackgroundToTrue(){
             //Arrange
-            var expected = "expected";
             var target = new Action();
 
             // Act
-            target.setBackground(expected);
+            target.setBackground();
             var actual = target.background;
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.True(actual);
         }
     }
 

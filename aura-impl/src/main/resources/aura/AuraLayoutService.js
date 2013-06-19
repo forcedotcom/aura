@@ -252,9 +252,7 @@ var AuraLayoutService = function(){
                       *After all server actions are batched and sent to server, the response is handled in actionResponse().
                       *This 'callback' argument in AuraClientService.runActions() refers to this function.
                       */
-                    if(msg["errors"] && msg["errors"].length > 0) {
-                        $A.error(msg["errors"][0]);
-                    } else {
+                    if(!msg["errors"] || msg["errors"].length === 0) {
                         priv.fireLayoutChangeEvent();
                     }
                     $A.endMark("Layout Actions Callback Complete");

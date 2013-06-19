@@ -20,9 +20,10 @@
  * @constructor
  */
 var AuraClientService = function() {
-    // #include aura.AuraClientService_private
-	// #include aura.controller.ActionCallbackGroup
+    // #include aura.controller.ActionCallbackGroup
     // #include aura.controller.ActionQueue
+    // #include aura.controller.ActionCollector
+    // #include aura.AuraClientService_private
 
     var clientService = {
 
@@ -65,6 +66,10 @@ var AuraClientService = function() {
             }
             //#end
             delete this.init;
+        },
+
+        idle : function() {
+            return priv.foreground.idle() && priv.background.idle() && priv.actionQueue.actions.length === 0;
         },
 
         /** @private */
@@ -244,8 +249,6 @@ var AuraClientService = function() {
             priv.auraStack.push(name);
         },
         
-        actionQueue : new ActionQueue(),
-
         /**
          * Pop an item off the stack.
          *
@@ -287,7 +290,7 @@ var AuraClientService = function() {
                     $A.error("Broken stack: popped "+tmppush+" expected "+lastName+", stack = "+priv.auraStack);
                 }
                 priv.auraStack = [];
-                clientService.actionQueue.incrementNextActionGroupNumber();
+                priv.actionQueue.incrementNextTransactionId();
             }
         },
 
@@ -357,6 +360,12 @@ var AuraClientService = function() {
         /**
          * Run the actions.
          *
+         * This function effectively attempts to submit the list of actions given immediately (if
+         * there is room in the outgoing request queue). If there is no way to immediately queue
+         * the actions, they are submitted via the normal mechanism. Note that this does not change
+         * the 'transaction' associated with the current aura stack, so abortable actions might go
+         * out in two separate requests without cancelling each other.
+         *
          * @param {Object}
          *            actions
          * @param {function}
@@ -368,7 +377,15 @@ var AuraClientService = function() {
          */
         runActions : function(actions, scope, callback) {
             var group = new ActionCallbackGroup(actions, scope, callback);
-            priv.request(actions);
+            var i;
+            if (priv.foreground.start()) {
+                priv.actionQueue.bypass(actions);
+                priv.request(actions, priv.foreground);
+            } else {
+                for (i = 0; i < actions.length; i++) {
+                    priv.actionQueue.enqueue(actions[i]);
+                }
+            }
         },
 
         /**
@@ -521,7 +538,7 @@ var AuraClientService = function() {
             if (action.getDef().isClientAction()) {
                 action.runDeprecated();
             } else {
-                clientService.actionQueue.enqueue(action);
+                priv.actionQueue.enqueue(action);
             }
         },
 
@@ -569,24 +586,29 @@ var AuraClientService = function() {
          */
         processActions : function() {
             var actions;
+            var backgroundIdx;
             var backgroundAction;
             var requestSent = false;
+            var action;
 
-            //if an XHR is in flight request don't send a new request yet.
-            if (priv.inRequest) {
-                return false;
-            }
-
-            actions = clientService.actionQueue.getServerActions();
-            if (actions.length > 0) {
-                priv.request(actions);
-                requestSent = true;
+            if (priv.foreground.start()) {
+                actions = priv.actionQueue.getServerActions();
+                if (actions.length > 0) {
+                    priv.request(actions, priv.foreground);
+                    requestSent = true;
+                } else {
+                    priv.foreground.cancel();
+                }
             }
             
-            backgroundAction = clientService.actionQueue.getNextBackgroundAction();
-            if (backgroundAction !== undefined) {
-                priv.request(backgroundAction);
-                requestSent = true;
+            if (priv.background.start()) {
+                action = priv.actionQueue.getNextBackgroundAction();
+                if (action !== null) {
+                    priv.request([action], priv.background);
+                    requestSent = true;
+                } else {
+                    priv.background.cancel();
+                }
             }
             return requestSent;
         }

@@ -102,14 +102,28 @@ var Test = function(){
             priv.waits.push({ expected:expected, actual:testFunction, callback:callback , failureMessage:failureMessage});
         },
 
+        /**
+         * Block requests from being sent to the server.
+         *
+         * This routine can be used to artificially force actions to be held on the client to be sent to
+         * the server at a later date. It can be used to simulate delays in processing (or rapid action
+         * queueing on the client).
+         */
         blockRequests : function () {
-            $A.eventService.startFiring("$A.test.blockRequests()");
-            $A.clientService["priv"].inRequest = true;
+            $A.clientService["priv"].foreground.inFlight += $A.clientService["priv"].foreground.max;
+            $A.clientService["priv"].background.inFlight += $A.clientService["priv"].background.max;
         },
 
+        /**
+         * Release requests to be sent to the server.
+         *
+         * This must be called after blockRequests, otherwise it may result in unknown consequences.
+         */
         releaseRequests : function () {
-            $A.clientService["priv"].inRequest = false;
-            $A.eventService.finishFiring();
+            $A.run(function() {
+                    $A.clientService["priv"].foreground.inFlight -= $A.clientService["priv"].foreground.max;
+                    $A.clientService["priv"].background.inFlight -= $A.clientService["priv"].background.max;
+                });
         },
 
         /**
@@ -146,6 +160,28 @@ var Test = function(){
                 }
             }
             return action;
+        },
+
+        /**
+         * Run a set of actions as a transaction.
+         *
+         * This is a wrapper around runActions allowing a test to safely run a set of actions as a
+         * single transaction with a callback.
+         *
+         * @param {Array} actions a list of actions to run.
+         * @param {Object} scope the scope for the callback.
+         * @param {Function} callback the callback
+         */
+        runActionsAsTransaction: function(actions, scope, callback) {
+            $A.assert(!$A.services.client.inAuraLoop(), "runActionsAsTransaction called from inside Aura call stack");
+            $A.run(function() { $A.services.client.runActions(actions, scope, callback); });
+        },
+
+        /**
+         * enqueue an action, ensuring that it is safely inside an aura call.
+         */
+        enqueueAction: function(action) {
+            $A.run(function() { $A.enqueueAction(action); });
         },
 
         /**
@@ -198,7 +234,7 @@ var Test = function(){
          * @returns {boolean} Returns true if there are pending server actions, or false otherwise.
          */
         isActionPending : function() {
-            return $A.clientService["priv"].requestQueue.length > 0;
+            return !$A.clientService.idle();
         },
 
         /**
@@ -210,8 +246,7 @@ var Test = function(){
          * conditions.
          */
         allActionsComplete : function() {
-            return $A.clientService["priv"].requestQueue.length === 0
-                    && $A.clientService["priv"].inRequest === false;
+            return !$A.test.isActionPending();
         },
 
         /**

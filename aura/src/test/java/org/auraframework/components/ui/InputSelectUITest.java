@@ -34,7 +34,8 @@ public class InputSelectUITest extends WebDriverTestCase {
     public InputSelectUITest(String name) {
         super(name);
     }
-    @ExcludeBrowsers({ BrowserType.FIREFOX})
+
+    @ExcludeBrowsers({ BrowserType.FIREFOX })
     public void testSingleSelect() throws Exception {
         d = getDriver();
         String selectLocator = "select[class~='single']";
@@ -42,7 +43,7 @@ public class InputSelectUITest extends WebDriverTestCase {
         open("/uitest/inputSelect_OptionsInBody.cmp");
         WebElement inputSelectElement = d.findElement(By.cssSelector(selectLocator));
         final Select inputSelect = new Select(inputSelectElement);
-        
+
         // Assert element visible
         assertTrue("InputSelect not visible", inputSelectElement.isDisplayed());
 
@@ -51,15 +52,14 @@ public class InputSelectUITest extends WebDriverTestCase {
 
         // Option label
         assertEquals("The select option's label is wrong", "Ant", inputSelect.getOptions().get(5).getText());
-        
+
         // Option Disabled
         assertFalse("label 'Cockroach' should be disabled", inputSelect.getOptions().get(6).isEnabled());
-
 
         // Change selection
         inputSelectElement.click();
         inputSelect.selectByValue("Bear");
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>(){
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver input) {
                 return !inputSelect.getOptions().get(1).isSelected();
@@ -71,7 +71,7 @@ public class InputSelectUITest extends WebDriverTestCase {
 
         inputSelectElement.click();
         inputSelect.selectByValue("Dragonfly");
-        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>(){
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver input) {
                 return !inputSelect.getOptions().get(2).isSelected();
@@ -134,6 +134,8 @@ public class InputSelectUITest extends WebDriverTestCase {
         return false;
     }
 
+    // W-1712531 - Excluded on Android because can't click an options of ui:inputSelect
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testOptionsAttribute() throws Exception {
         d = getDriver();
         String selectLocator = "select[class~='uiInputSelect']";

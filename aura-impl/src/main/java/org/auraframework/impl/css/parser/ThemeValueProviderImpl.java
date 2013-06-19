@@ -48,6 +48,8 @@ public class ThemeValueProviderImpl implements ThemeValueProvider {
     private static final String MISSING_CLOSING = "Missing closing quote in theme function argument %s";
     private static final String MALFORMED = "Expected exactly 2 or 3 parts in theme function argument '%s'";
     private static final String BAD_ALIAS = "No alias named '%s' found";
+    private static final CharMatcher SINGLE_Q = CharMatcher.is('"');
+    private static final CharMatcher DOUBLE_Q = CharMatcher.is('\'');
 
     private final Optional<ThemeOverrideMap> overrides;
     private final Map<String, DefDescriptor<ThemeDef>> aliases;
@@ -136,7 +138,6 @@ public class ThemeValueProviderImpl implements ThemeValueProvider {
     public Set<DefDescriptor<ThemeDef>> getDescriptors(String reference, Location location, boolean qualifiedOnly)
             throws QuickFixException {
         checkNotNull(reference, "reference cannot be null");
-        reference = formatReference(reference, location);
 
         Set<DefDescriptor<ThemeDef>> descriptors = Sets.newHashSet();
         Set<PropertyReference> propRefs = Sets.newHashSet();
@@ -204,15 +205,13 @@ public class ThemeValueProviderImpl implements ThemeValueProvider {
      * @throws AuraRuntimeException if the reference is not enclosed with matching quotes.
      */
     private static String formatReference(String reference, Location location) {
-        CharMatcher singleQ = CharMatcher.is('"');
-        CharMatcher doubleQ = CharMatcher.is('\'');
         CharMatcher mode;
 
         // figure out if using double or single quotes
-        if (singleQ.matches(reference.charAt(0))) {
-            mode = singleQ;
-        } else if (doubleQ.matches(reference.charAt(0))) {
-            mode = doubleQ;
+        if (SINGLE_Q.matches(reference.charAt(0))) {
+            mode = SINGLE_Q;
+        } else if (DOUBLE_Q.matches(reference.charAt(0))) {
+            mode = DOUBLE_Q;
         } else {
             // unquoted
             return reference;

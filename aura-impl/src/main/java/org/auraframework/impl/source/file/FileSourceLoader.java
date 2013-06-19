@@ -275,16 +275,12 @@ public class FileSourceLoader extends BaseSourceLoader {
     public void notifySourceChanges(FileChangeEvent event, SourceListener.SourceMonitorEvent smEvent) {
 
         String filePath = event.getFile().toString();
-        
+
         Set<DefDescriptor<?>> matches = find(filePath);
-        if (matches.size() > 0) {
-            for (DefDescriptor<?> def : matches) {
+        if ( matches.size() > 0 ) {
+            for ( DefDescriptor<?> def : matches ) {
+                logger.debug("Invalidating: " + def.getQualifiedName());
                 onSourceChanged(def, smEvent);
-                if (def.getDefType() == DefType.NAMESPACE || def.getDefType() == DefType.LAYOUTS) {
-                    // namespace and layouts require broader clear which is handled
-                    // in MasterDefRegistryImpl#invalidateStaticCaches so break to reduce cycles
-                    break;
-                }
             }
         } else {
             logger.debug("No DefDescriptors found. Invalidating all cache.");

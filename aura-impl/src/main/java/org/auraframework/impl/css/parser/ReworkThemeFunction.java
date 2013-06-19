@@ -53,7 +53,7 @@ import com.phloc.css.writer.CSSWriterSettings;
  * @see ThemedDeclarationRenderer
  */
 final class ReworkThemeFunction implements DynamicRework<CSSDeclaration> {
-    private static final CSSWriterSettings settings = new CSSWriterSettings(ECSSVersion.LATEST);
+    private static final CSSWriterSettings SETTINGS = new CSSWriterSettings(ECSSVersion.LATEST);
     private static final String CANT_MIX = "Cannot mix theme functions with other text. " +
             "Try rewriting like theme(\"'text ' + x.y.z\").";
 
@@ -127,7 +127,7 @@ final class ReworkThemeFunction implements DynamicRework<CSSDeclaration> {
 
             CSSExpressionMemberFunction f = (CSSExpressionMemberFunction) member;
             if (f.getFunctionName().equals("theme") || f.getFunctionName().equals("t")) {
-                references.add(f.getExpression().getAsCSSString(settings, 0));
+                references.add(f.getExpression().getAsCSSString(SETTINGS, 0));
             }
         }
 

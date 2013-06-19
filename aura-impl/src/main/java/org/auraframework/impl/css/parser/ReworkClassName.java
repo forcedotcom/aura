@@ -36,7 +36,8 @@ import com.phloc.css.writer.CSSWriterSettings;
 public class ReworkClassName implements Rework<CSSSelector> {
     private static final String THIS_NAMESPACE = ".THIS";
     private static final HashSet<String> NON_REFINERS = Sets.newHashSet(" ", ":", ">", "+", "|");
-    private static final ICSSWriterSettings settings = new CSSWriterSettings(ECSSVersion.LATEST);
+    private static final ICSSWriterSettings SETTINGS = new CSSWriterSettings(ECSSVersion.LATEST);
+
     private final String componentClass;
     private final boolean validate;
 
@@ -54,7 +55,7 @@ public class ReworkClassName implements Rework<CSSSelector> {
 
         for (int i = 0; i < selector.getMemberCount(); i++) {
             ICSSSelectorMember member = selector.getMemberAtIndex(i);
-            String name = member.getAsCSSString(settings, 0);
+            String name = member.getAsCSSString(SETTINGS, 0);
             if (!found && NON_REFINERS.contains(name)) {
                 illegal = true;
             }

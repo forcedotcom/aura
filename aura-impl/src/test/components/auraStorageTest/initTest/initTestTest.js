@@ -794,9 +794,8 @@
                 function(){
                     $A.storageService.getStorage("actions").adapter.getItem(a.getStorageKey(),
                         function(item){
-                            if(item.expires <= cmp._originalExpiration){
-                                $A.test.fail("storage expiration was not updated after refresh");
-                            }
+                            $A.test.assertEquals(cmp._originalExpiration, item.expires,
+                                "storage expiration was not updated after refresh");
                         });
                 });
         } ]

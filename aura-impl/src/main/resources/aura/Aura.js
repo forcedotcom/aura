@@ -826,8 +826,10 @@ $A.ns.Aura.prototype.log = function(value, error) {
         error = value;
         value = error.message;
     }
-    if (error) {
+    if (this.util.isError(error)) {
         trace = this.getStackTrace(error);
+    } else if (error && error.stack) {
+        trace = error.stack;
     }
     this.logInternal("Info", value, error, trace);
 };

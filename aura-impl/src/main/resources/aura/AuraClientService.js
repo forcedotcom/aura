@@ -486,7 +486,8 @@ var AuraClientService = function() {
                 $A.afterRender(c);
             });
 
-            action.complete(actionResult);
+            action.updateFromResponse(actionResult);
+            action.complete($A.getContext());
         },
 
         /**

@@ -406,9 +406,9 @@ $A.ns.Aura.prototype.initAsync = function(config) {
  *
  * @param {Object} config The configuration attributes
  * @param {Boolean} useExisting
- * @param {Boolean=} doNotInitializeServices Set to true if Layout and History services should not be initialized, or false if
+ * @param {Boolean} doNotInitializeServices Set to true if Layout and History services should not be initialized, or false if
  * 	 they should. Defaults to true for Aura Integration Service.
- * @param {Boolean=} doNotCallJiffyOnLoad True if Jiffy.onLoad() should not be called after initialization. In case of
+ * @param {Boolean} doNotCallJiffyOnLoad True if Jiffy.onLoad() should not be called after initialization. In case of
  *       IntegrationService when aura components are embedded on the page, onLoad is called by the parent container.
  */
 $A.ns.Aura.prototype.initConfig = function(config, useExisting, doNotInitializeServices, doNotCallJiffyOnLoad) {
@@ -431,9 +431,9 @@ $A.ns.Aura.prototype.initConfig = function(config, useExisting, doNotInitializeS
  * @param {String} token
  * @param {Object} context The mode of the application or component ("DEV", "PROD", "PTEST")
  * @param {Object} container Sets the container for the component.
- * @param {Boolean=} doNotInitializeServices Set to true if Layout and History services should not be initialized, or false if
+ * @param {Boolean} doNotInitializeServices Set to true if Layout and History services should not be initialized, or false if
  * 	 they should. Defaults to true for Aura Integration Service.
- * @param {Boolean=} doNotCallJiffyOnLoad True if Jiffy.onLoad() should not be called after initialization. In case of
+ * @param {Boolean} doNotCallJiffyOnLoad True if Jiffy.onLoad() should not be called after initialization. In case of
  *       IntegrationService when aura components are embedded on the page, onLoad is called by the parent container.
  */
 $A.ns.Aura.prototype.init = function(config, token, context, container, doNotInitializeServices, doNotCallJiffyOnLoad) {
@@ -450,7 +450,7 @@ $A.ns.Aura.prototype.init = function(config, token, context, container, doNotIni
  * @param {Object} container Sets the container for the component.
  * @param {Boolean=} doNotInitializeServices True if Layout and History services should not be initialized, or false if
  *        they should. Defaults to true for Aura Integration Service.
- * @param {Boolean=} doNotCallJiffyOnLoad True if Jiffy.onLoad() should not be called after initialization. In case of
+ * @param {Boolean} doNotCallJiffyOnLoad True if Jiffy.onLoad() should not be called after initialization. In case of
  *       IntegrationService when aura components are embedded on the page, onLoad is called by the parent container.
  * @private
  */
@@ -483,7 +483,7 @@ $A.ns.Aura.prototype.initPriv = function(config, token, container, doNotInitiali
 
 /**
  * Signals that initialization has completed.
- * @param {Boolean=} doNotCallJiffyOnLoad True if Jiffy.onLoad() should not be called after initialization. In case of
+ * @param {Boolean} doNotCallJiffyOnLoad True if Jiffy.onLoad() should not be called after initialization. In case of
  *       IntegrationService when aura components are embedded on the page, onLoad is called by the parent container.
  * @private
  */
@@ -682,7 +682,7 @@ $A.ns.Aura.prototype.run = function(func) {
 /**
  * Checks the condition and if the condition is false, displays an error message.
  *
- * Displays an error message if condition is false, runs 'trace()' and stops JS execution. The
+ * Displays an error message if condition is false, runs <code>trace()</code> and stops JS execution. The
  * app will cease to function until reloaded if this is called, and errors are not caught.
  * <p>For example, <code>$A.assert(cmp.get("v.name") , "The name attribute is required.");</code> checks for the name attribute.
  *

@@ -15,9 +15,10 @@
     limitations under the License.
 
 -->
-<aura:component support="PROTO" extensible="true" description="Outputs useful debug information. To enable debug tool pass aura.debugtool=true in the url. &lt;br&#47;&gt;
-															   For component stats tab to see aditional stats use aura.mode=STATS. &lt;br&#47;&gt;
-															   NOTE: need to disable pop up blocker for debugtool to work.">
+<aura:component support="PROTO" extensible="true"
+  description="Outputs debug information. To enable the debug tool, append ?aura.debugtool=true to the URL.
+  To see additional statistics on the Components tab, append ?aura.mode=STATS to the URL.
+  You must disable popup blockers for the debug tool to work.">
 	
 	<aura:attribute name="errorsData" type="String" default=""/>
 	<aura:attribute name="warningsData" type="String" default=""/>

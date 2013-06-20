@@ -17,16 +17,19 @@
 -->
 <aura:application locationChangeEvent="test:test_LocChng_Event" >
 
-    <test:test_button label="click me" class="SimpleComponent" press="{!c.clientAction}"/>
+    <ui:button label="click me" class="SimpleComponent" press="{!c.clientAction}"/>
 
     <!--One handler for location change events fired for this component-->
     <aura:handler event="test:test_LocChng_Event" action="{!c.locationChange}"/>
 
-    <test:test_button label="Back" class="Back" press="{!c.back}"/>
-    <test:test_button label="Next" class="Next" press="{!c.next}"/>
+    <ui:button label="Back" class="Back" press="{!c.back}"/>
+    <ui:button label="Next" class="Next" press="{!c.next}"/>
     <br/>
-    <test:test_button label="Don't click me"  class="id" aura:id="display"/>
+
+    <ui:outputText value="display" class="id" aura:id="display"/>
+    <br/>
 
     <aura:attribute name="locationChangeIndicator" type="String" default="start"/>
-    <test:test_button label="{! 'Location change indicator:' + v.locationChangeIndicator}" class="{!v.locationChangeIndicator}"/>
+
+    <ui:outputText value="{! 'Location change indicator:' + v.locationChangeIndicator}" class="{!v.locationChangeIndicator}"/>
 </aura:application>

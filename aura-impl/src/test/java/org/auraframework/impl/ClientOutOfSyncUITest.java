@@ -403,6 +403,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver input) {
+                auraUITestingUtil.waitForDocumentReady();
+                auraUITestingUtil.waitForAuraFrameworkReady(null);
                 return "complicated".equals(auraUITestingUtil
                         .getEval("return window.$A && $A.getRoot() && $A.getRoot().getDef().getHelper().getHelp();"));
             }
@@ -439,6 +441,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver input) {
+                auraUITestingUtil.waitForDocumentReady();
+                auraUITestingUtil.waitForAuraFrameworkReady(null);
                 String eval = String
                         .format("return ((window.$A && $A.getEvt('%s')) && (window.$A && $A.getEvt('%s')).getDef().getAttributeDefs().explode.defaultValue.value);",
                                 eventDesc.getDescriptorName(), eventDesc.getDescriptorName());

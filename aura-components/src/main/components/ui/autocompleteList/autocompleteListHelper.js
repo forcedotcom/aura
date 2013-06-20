@@ -42,6 +42,114 @@
         return next;
     },
     
+    getOnClickEndFunction : function(component) {
+        if ($A.util.isUndefined(component._onClickEndFunc)) {
+            var helper = this;
+            var f = function(event) {
+                // ignore gestures/swipes; only run the click handler if it's a click or tap
+                var clickEndEvent;
+            
+                if (helper.getOnClickEventProp("isTouchDevice")) {
+                    var touchIdFound = false;
+                    for (var i = 0; i < event.changedTouches.length; i++) {
+                        clickEndEvent = event.changedTouches[i];
+                        if (clickEndEvent.identifier === component._onStartId) {
+                            touchIdFound = true;
+                            break;
+                        }
+                    }
+                
+                    if (helper.getOnClickEventProp("isTouchDevice") && !touchIdFound) {
+                        return;
+                    }
+                } else {
+                    clickEndEvent = event;
+                }
+            
+                var startX = component._onStartX, startY = component._onStartY;
+                var endX = clickEndEvent.clientX, endY = clickEndEvent.clientY;
+
+                if (Math.abs(endX - startX) > 0 || Math.abs(endY - startY) > 0) {
+                    return;
+                }
+            
+                var listElems = component.getElements();
+                var ignoreElements = component.get("v.elementsToIgnoreClicking");
+                var clickOutside = true;
+                if (listElems) {
+                    var ret = true;
+                    for (var i = 0; ret; i++) {
+                        ret = listElems[j];
+                        if (ret && helper.isHTMLElement(ret) && $A.util.contains(ret, event.target)) {
+                            clickOutside = false;
+                            break;
+                        }
+                    }
+                }
+                if (ignoreElements && clickOutside === true) {
+                    var ret2 = true;
+                    for (var j = 0; ret2; j++) {
+                        ret2 = ignoreElements[j];
+                        if (ret2 && helper.isHTMLElement(ret2) && $A.util.contains(ret2, event.target)) {
+                            clickOutside = false;
+                            break;
+                        }
+                    }
+                }
+                if (clickOutside === true) {
+                    // Collapse the menu
+                    component.setValue("v.visible", false);
+                }
+            };
+            component._onClickEndFunc = f;
+        }
+        return component._onClickEndFunc;
+    },
+    
+    getOnClickEventProp: function(prop) {
+        // create the cache
+        if ($A.util.isUndefined(this.getOnClickEventProp.cache)) {
+            this.getOnClickEventProp.cache = {};
+        }
+
+        // check the cache
+        var cached = this.getOnClickEventProp.cache[prop];
+        if (!$A.util.isUndefined(cached)) {
+            return cached;
+        }
+
+        // fill the cache
+        this.getOnClickEventProp.cache["isTouchDevice"] = !$A.util.isUndefined(document.ontouchstart);
+        if (this.getOnClickEventProp.cache["isTouchDevice"]) {
+            this.getOnClickEventProp.cache["onClickStartEvent"] = "touchstart";
+            this.getOnClickEventProp.cache["onClickEndEvent"] = "touchend";
+        } else {
+            this.getOnClickEventProp.cache["onClickStartEvent"] = "mousedown";
+            this.getOnClickEventProp.cache["onClickEndEvent"] = "mouseup";
+        }
+        return this.getOnClickEventProp.cache[prop];
+    },
+    
+    getOnClickStartFunction: function(component) {
+        if ($A.util.isUndefined(component._onClickStartFunc)) {
+            var helper = this;
+            var f = function(event) {
+                if (helper.getOnClickEventProp("isTouchDevice")) {
+                    var touch = event.changedTouches[0];
+                    // record the ID to ensure it's the same finger on a multi-touch device
+                    component._onStartId = touch.identifier;
+                    component._onStartX = touch.clientX;
+                    component._onStartY = touch.clientY;
+                } else {
+                    component._onStartX = event.clientX;
+                    component._onStartY = event.clientY;
+                }
+            };
+            component._onClickStartFunc = f;
+        }
+        return component._onClickStartFunc;
+    },
+    
     getPrevVisibleOption: function(iters, k) {
         var prev = iters.getLength();
         var start = k <= 0 ? iters.getLength() - 1 : k - 1;
@@ -109,6 +217,19 @@
         component.setValue("v.visible", false);
     },
     
+    /**
+     * Checks if the object is an HTML element.
+     * @param {Object} obj
+     * @returns {Boolean} True if the object is an HTMLElement object, or false otherwise.
+     */
+    isHTMLElement: function(obj) {
+        if (typeof HTMLElement === "object") {
+            return obj instanceof HTMLElement;
+        } else {
+            return typeof obj === "object" && obj.nodeType === 1 && typeof obj.nodeName==="string";
+        }
+    },
+    
     matchText: function(component) {
         var keyword = component.get("v.keyword");
         var items = component.get("v.items");
@@ -132,7 +253,10 @@
             }
         }
         component.setValue("v.items", items);
-        this.toggleListVisibility(component, items);
+        var visible = component.get("v.visible");
+        if (visible === true) {
+            this.toggleListVisibility(component, items);
+        }
     },
     
     setFocusToNextItem: function(component, event) {

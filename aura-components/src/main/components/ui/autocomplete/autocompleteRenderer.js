@@ -15,26 +15,12 @@
  */
 ({
     afterRender: function(component, helper) {
-        helper.matchText(component);
         this.superAfterRender();
+        helper.setInputElements(component);
     },
     
     rerender: function(component, helper) {
-        helper.matchText(component);
         this.superRerender();
-    },
-    
-    unrender: function(component, helper) {
-        if (helper.getOnClickEventProp.cache && 
-            helper.getOnClickEventProp.cache.onClickStartEvent && 
-            component._onClickStartFunc) {
-            $A.util.removeOn(document.body, helper.getOnClickEventProp.cache.onClickStartEvent, component._onClickStartFunc, false);
-        }
-        if (helper.getOnClickEventProp.cache &&
-            helper.getOnClickEventProp.cache.onClickEndEvent && 
-            component._onClickEndFunc) {
-            $A.util.removeOn(document.body, helper.getOnClickEventProp.cache.onClickEndEvent, component._onClickEndFunc, false);
-        }
-        this.superUnrender();
+        helper.setInputElements(component);
     }
 })

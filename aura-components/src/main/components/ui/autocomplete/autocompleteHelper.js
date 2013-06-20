@@ -64,6 +64,19 @@
         focusEvent.fire();
     },
     
+    /**
+     * Tell list component which elements it should ignore to handle collapse.
+     *
+     */
+    setInputElements: function(component) {
+        var inputCmp = component.find("input");
+        var listCmp = component.find("list");
+        if (inputCmp && listCmp) {
+            var elems = inputCmp.getElements();
+            listCmp.setValue("v.elementsToIgnoreClicking", elems);
+        }
+    },
+    
     updateActiveOption: function(component, event) {
         var inputCmp = component.find("input");
         var elem = inputCmp ? inputCmp.getElement() : null;

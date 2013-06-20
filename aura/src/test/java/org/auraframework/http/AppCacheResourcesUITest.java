@@ -184,7 +184,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     @TargetBrowsers(BrowserType.GOOGLECHROME)
     @TestLabels("auraSanity")
-    public void _testNoChangesGOOGLECHROME() throws Exception {
+    public void testNoChangesGOOGLECHROME() throws Exception {
         runTestNoChanges(BrowserType.GOOGLECHROME);
     }
 
@@ -250,10 +250,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         assertFalse("Manifest cookie was not changed " + cookie.getValue(), "error".equals(cookie.getValue()));
     }
 
-    //disable this because different result when running all integration tests VS running alone. need to figure out why
     @TargetBrowsers(BrowserType.GOOGLECHROME)
     @TestLabels("auraSanity")
-    public void _testCacheErrorGOOGLECHROME() throws Exception {
+    public void testCacheErrorGOOGLECHROME() throws Exception {
         runTestCacheError(BrowserType.GOOGLECHROME);
     }
 
@@ -344,9 +343,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     /**
      * for Chrome Manifest request limit exceeded for the time period should result in reset.
      */
-    //disable this because different result when running all integration tests VS running alone. need to figure out why
     @TargetBrowsers(BrowserType.GOOGLECHROME)
-    public void _testManifestRequestLimitExceededGOOGLECHROME() throws Exception {
+    public void testManifestRequestLimitExceededGOOGLECHROME() throws Exception {
         runTestManifestRequestLimitExceeded(BrowserType.GOOGLECHROME);
     }
 
@@ -822,7 +820,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      * <ul>
      * The primary difference between this and the initial requests is that we don't get the initial page twice, and we
      * get the manifest three times... odd that.
-     * we usually only get js and css only once, but it's not stable, do see some test get them twice sometimes. 
      * 
      * @return the list of request objects, not necessarily in order.
      */
@@ -832,8 +829,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                 new Request("/auraResource", null, null, "manifest", 404), // manifest out of date
                 new Request(3, "/auraResource", null, null, "manifest", 200),
                 new Request(2, "/aura", namespace + ":" + appName, null, "HTML", 200), // rest are cache updates
-                new Request(2,"/auraResource", null, null, "css", 200),
-                new Request(2,"/auraResource", null, null, "js", 200));
+                new Request("/auraResource", null, null, "css", 200),
+                new Request("/auraResource", null, null, "js", 200));
     }
 
     /**

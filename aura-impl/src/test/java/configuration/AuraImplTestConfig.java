@@ -21,14 +21,13 @@ import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.impl.AuraTestingUtilImpl;
 import org.auraframework.impl.DefinitionServiceImplTest.AuraTestRegistryProviderWithNulls;
-import org.auraframework.impl.LoggingAdapterImpl;
 import org.auraframework.impl.adapter.MockConfigAdapterImpl;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.test.AuraTestingUtil;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.test.TestInventory;
 import org.auraframework.test.adapter.TestContextAdapterImpl;
-import org.auraframework.impl.context.TestLoggingAdapterImpl;
+import org.auraframework.test.logging.TestLoggingAdapterImpl;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.ServiceLoaderImpl.PrimaryImpl;
@@ -62,7 +61,7 @@ public class AuraImplTestConfig {
     @Impl
     @PrimaryImpl
     public static LoggingAdapter auraImplTestLoggingAdapter() {
-        return new TestLoggingAdapterImpl(new LoggingAdapterImpl());
+        return new TestLoggingAdapterImpl();
     }
 
     @Impl

@@ -23,6 +23,8 @@
     <aura:attribute name="type" type="String" description="Specifies the input type. Possible values: button, checkbox, file, hidden, image, password, radio, reset, submit, text, textarea. Corresponds to the type attribute of the rendered HTML input element. Override type in a component that extends this component to set it to a different HTML input type."/>
     <aura:attribute name="errorComponent" type="Aura.Component[]" description="A component that displays any error messages, such as validation errors, associated with the input field."/>
 	<aura:attribute name="label" type="String" description="The text of the label component" />
+	<aura:attribute name="labelClass" type="String" default="" description="The CSS class of the label component" />
+	<aura:attribute name="requiredIndicatorClass" type="String" default="" description="The CSS class of the required indicator component" />
 	<aura:attribute name="labelPosition" type="String" default="left" description="The position in which the label should be displayed. Possible values are &quot;left&quot;, &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, and &quot;hidden&quot;. Default value is &quot;left&quot;." />
 		
     <aura:registerEvent name="change" type="ui:change" description="The event fired when the user changes the content of the input."/>
@@ -37,28 +39,45 @@
     <aura:registerEvent name="updateError" type="ui:updateError" description="The event fired to trigger the default error component and messages."/>
     <aura:handler name="updateError" action="{!c.updateDefaultError}"/>
     <aura:handler name="init" value="{!this}" action="{!c.init}" />	
-    <aura:attribute name="domId" type="String" description="DOM id of the input element. By default, this attribute resolved to the globalId of the component to avoid id collision." />    
+    <aura:attribute name="domId" type="String" description="DOM id of the input element. By default, this attribute resolved to the globalId of the component to avoid id collision." />
+    
+    <aura:attribute name="requiredIndicator" type="Object[]" description="A component that displays the indicator for the required field.">    	 
+		<span class="{!v.requiredIndicatorClass}">*</span>    	 
+    </aura:attribute>    
     	 
 	<aura:if isTrue="{!v.label != null &amp;&amp; (v.labelPosition == 'top' || v.labelPosition == 'left')}">
 		<div>
-			<ui:label label="{!v.label}" class="{!'uiLabel-' + v.labelPosition}" for="{!v.domId}" labelDisplay="{!v.labelPosition != 'hidden'}" />
+			<ui:label label="{!v.label}" class="{!v.labelClass + ' uiLabel-' + v.labelPosition}" for="{!v.domId}" labelDisplay="{!v.labelPosition != 'hidden'}">
+				<aura:set attribute="requiredIndicator">
+					<aura:if isTrue="{!v.required}">
+						{!v.requiredIndicator}
+					</aura:if>					
+				</aura:set>
+			</ui:label>				 	
 			{!v.body}
+			{!v.errorComponent}
 		</div> 
 		  
 	<aura:set attribute="else">	   
     	<aura:if isTrue="{!v.label != null &amp;&amp; (v.labelPosition == 'bottom' || v.labelPosition == 'right')}">
 			<div>
 				{!v.body}
-				<ui:label label="{!v.label}" class="{!'uiLabel-' + v.labelPosition}" for="{!v.domId}" labelDisplay="{!v.labelPosition != 'hidden'}"/>
+				<ui:label label="{!v.label}" class="{!v.labelClass + ' uiLabel-' + v.labelPosition}" for="{!v.domId}" labelDisplay="{!v.labelPosition != 'hidden'}">
+					<aura:set attribute="requiredIndicator">
+						<aura:if isTrue="{!v.required}">
+							{!v.requiredIndicator}
+						</aura:if>					
+					</aura:set>
+				</ui:label>
+				{!v.errorComponent}
 		    </div>
 		    
 		    <aura:set attribute="else">
 		    	{!v.body}
+		    	{!v.errorComponent}
 		    </aura:set>
 	    </aura:if>
 			 
 	</aura:set>
-	</aura:if>
-        
-    {!v.errorComponent}
+	</aura:if>    
 </aura:component>

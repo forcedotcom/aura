@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-Mocks.GetMock(Object.Global(), "window", {})(function() {
-    // #import aura.component.ComponentDefRegistry
-});
 Function.RegisterNamespace("Test.Aura.Component");
 
 [Fixture]
 Test.Aura.Component.ComponentDefRegistryTest = function() {
-    [Fixture]
+	Mocks.GetMock(Object.Global(), "window", {})(function() {
+		// #import aura.component.ComponentDefRegistry
+	});
+
+	[Fixture]
     function AuraType() {
 	[Fact]
 	function HasCorrectAuraType() {

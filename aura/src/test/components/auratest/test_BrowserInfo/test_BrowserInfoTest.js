@@ -45,7 +45,13 @@
             	$A.test.assertEquals(undefined, $A.get("$Browser.0"), "Unexpected property '0' found on $Browser");
             }
 	},
-	
+/**
+ * Tests were originally marked as unadaptable because the plan was not to be in sync with SFDC on Auras browserInfo Solution.
+ * Will have to go back and modify tests to make the adaptable
+ * Eric Anderson suggests: Use the existing test component and tweak it to dump the results from master and SFDC. They should be substantially similar,
+ * but if they differ, those tests should be marked as unadaptable.
+ * bug: W-1718594
+ */
     testBrowserInfoChrome : {
     	browsers:["GOOGLECHROME"],
     	testLabels : ["UnAdaptableTest"],
@@ -109,8 +115,9 @@
     		});
         }
     },
-    
+    //Marking as undaptable because SFDC does not currently support testing on IPHONE
     testBrowserInfoIPhone : {
+	testLabels : ["UnAdaptableTest"],
     	browsers:["IPHONE"],
         test : function(component) {
         	this.assertBrowserProperties(component, {

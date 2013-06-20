@@ -101,11 +101,11 @@ public class CachingDefRegistryImplTest extends AuraImplTestCase {
         // Fetch definition in TEST mode
         Aura.getContextService().startContext(Mode.UTEST, null, Format.JSON, Access.AUTHENTICATED);
         appWithNoLayout = definitionService.getDefinition(appDesc);
-        DefDescriptor<LayoutsDef> layoutDef = appWithNoLayout.getLayoutsDefDescriptor();
+        DefDescriptor<LayoutsDef> layoutDefDesc = appWithNoLayout.getLayoutsDefDescriptor();
         assertNotNull("Test failed to retrieve definition of an application.", appWithNoLayout);
         assertNotNull("Fetching definition is TEST mode should have noticed the new layout file.",
-                appWithNoLayout.getLayoutsDefDescriptor());
-        assertNotNull("Failed to read definition from new layout file.", appWithNoLayout.getLayoutsDefDescriptor()
+                layoutDefDesc);
+        assertNotNull("Failed to read definition from new layout file.", layoutDefDesc
                 .getDef());
     }
 

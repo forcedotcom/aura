@@ -32,6 +32,7 @@ import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
@@ -59,10 +60,13 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     private final List<ComponentDefRef> body = Lists.newArrayList();
     private String defaultValue = null;
 
+    private final Optional<String> defaultType;
+
     /**
      * For writing
      */
     public AttributeDefHandler() {
+        this.defaultType = Optional.absent();
     }
 
     /**
@@ -70,7 +74,13 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
      *            appropriate position before getElement() is invoked.
      */
     public AttributeDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
+        this(parentHandler, xmlReader, source, null);
+    }
+
+    public AttributeDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source,
+            String defaultType) {
         super(parentHandler, xmlReader, source);
+        this.defaultType = Optional.fromNullable(defaultType);
     }
 
     @Override
@@ -88,10 +98,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         builder.setRequired(getBooleanAttributeValue(ATTRIBUTE_REQUIRED));
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
 
-        String type = getAttributeValue(ATTRIBUTE_TYPE);
-        if (type == null) {
-            type = "String"; // default to string
-        }
+        String type = Optional.fromNullable(getAttributeValue(ATTRIBUTE_TYPE)).or(defaultType).orNull();
         builder.setTypeDefDescriptor(DefDescriptorImpl.getInstance(type, TypeDef.class));
 
         String serializeTo = getAttributeValue(ATTRIBUTE_SERIALIZE_TO);

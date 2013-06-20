@@ -192,8 +192,13 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testTypeMissing() throws Exception {
-        AttributeDefImpl adHandler = getElement("<aura:attribute name='type'/>");
-        assertEquals("String", adHandler.getTypeDef().getName());
+        AttributeDefHandler<ComponentDef> adHandler = getHandler("<aura:attribute name='type'/>");
+        try {
+            adHandler.getElement();
+            fail("Expected Exception to be thrown when attribute is missing");
+        } catch (Throwable t) {
+            assertExceptionMessage(t, AuraRuntimeException.class, "descriptor is null");
+        }
     }
 
     public void testTypeEmptyString() throws Exception {

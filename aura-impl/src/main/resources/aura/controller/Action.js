@@ -89,9 +89,9 @@ Action.prototype.getDef = function() {
 };
 
 /**
- * Add a callback group for completion tracking.
+ * Adds a callback group for completion tracking.
  *
- * In the event that this action is already completed, we immediately call the completion function.
+ * If this action is already completed, completeAction() is called.
  */
 Action.prototype.addCallbackGroup = function(group) {
     if (this.state === "NEW") {
@@ -102,7 +102,7 @@ Action.prototype.addCallbackGroup = function(group) {
 };
 
 /**
- * Mark this action as complete for all callback groups.
+ * Marks this action as complete for all callback groups.
  */
 Action.prototype.completeGroups = function() {
     while (this.groups.length > 0) {
@@ -112,8 +112,8 @@ Action.prototype.completeGroups = function() {
 };
 
 /**
- * Sets parameters for the Action. Maps key in paramDefs to config.
- * <p>For example, <code>serverAction.setParams({ "record": id });</code> sets a parameter on serverAction.</p>
+ * Sets parameters for the Action. Maps keys to <code>config</code>.
+ * <p>For example, <code>serverAction.setParams({ "record": id });</code> sets a parameter on <code>serverAction</code>.</p>
  * @param {Object}
  *            config The parameters for the Action.
  */
@@ -156,14 +156,14 @@ Action.prototype.getComponent = function() {
 /**
  * Sets the callback function that is executed after the server-side Action
  * returns. Call a server-side Action from a client-side controller
- * using callback.
+ * using <code>callback</code>.
  * <p>See Also: <a href="#help?topic=serverSideControllers">Server-Side Controllers</a></p>
  *
  * @param {Object}
  *            scope The scope in which the function is executed.
  * @param {Function}
  *            callback The callback function to run for each controller.
- * @param {String=}
+ * @param {String}
  * 	      name The action state for which the callback is to be associated with.
  */
 Action.prototype.setCallback = function(scope, callback, name) {
@@ -212,9 +212,8 @@ Action.prototype.wrapCallback = function(scope, callback) {
 };
 
 /**
- * Runs the Action. Checks that the event is client-side before running.
+ * Deprecated. Runs client-side Actions.
  * For server-side Actions, use <code>runAfter()</code> instead.
- * <p>See Also: <a href="#help?topic=helloActions">Client-Side Controllers</a></p>
  * @param {Event}
  *            evt The event that calls the Action.
  */
@@ -222,6 +221,11 @@ Action.prototype.run = function(evt) {
     this.runDeprecated(evt);
 };
 
+/**
+ * Called by run().
+ * @param {Event}
+ *            evt The event that calls the Action.
+ */
 Action.prototype.runDeprecated = function(evt) {
     $A.assert(this.def.isClientAction(), "Run() cannot be called on a server action. Use runAfter() on a server action instead.");
     this.state = "RUNNING";
@@ -277,7 +281,7 @@ Action.prototype.isBackground = function() {
 };
 
 /**
- * Set the action to run as a background action.  This can not be unset.  Background
+ * Sets the action to run as a background action.  This cannot be unset.  Background
  * actions are usually long running and lower priority actions.
  */
 Action.prototype.setBackground = function() {
@@ -285,8 +289,8 @@ Action.prototype.setBackground = function() {
 };
 
 /**
- * Adds the server-side action to the queue. Checks that the event is
- * server-side before enqueuing. For client-side Action, use <code>run()</code>
+ * Adds the server-side action to the queue. For server-side Actions only.
+ * For client-side Action, use <code>run()</code>
  * instead.
  * <p>For example,  <code>this.runAfter(serverAction);</code> runs serverAction after a callback.</p>
  *
@@ -302,8 +306,8 @@ Action.prototype.runAfter = function(action) {
  * Update the fields from a response.
  *
  * @public
- * @param {Object} response the response from the server.
- * @return {Boolean} true if the response differes from the original response
+ * @param {Object} response The response from the server.
+ * @return {Boolean} Returns true if the response differs from the original response
  */
 Action.prototype.updateFromResponse = function(response) {
     this.sanitizeStoredResponse(response);
@@ -358,10 +362,9 @@ Action.prototype.updateFromResponse = function(response) {
 };
 
 /**
- * Get a storable response from this action.
+ * Gets a storable response from this action.
  *
- * WARNING: this modifies 'this.components' so it must be used after complete() so as to not
- * do bad things.
+ * WARNING: Use after complete() since getStored() modifies <code>this.components</code>.
  *
  * @param {String} storageName the name of the storage to use.
  */
@@ -444,7 +447,7 @@ Action.prototype.setAbortable = function() {
 };
 
 /**
- * check if this action is a refresh.
+ * Checks if this action is a refresh.
  */
 Action.prototype.isRefreshAction = function () {
     return this.originalResponse !== undefined;
@@ -499,9 +502,9 @@ Action.prototype.setStorable = function(config) {
 };
 
 /**
- * Checks if the function is storable. For server-side Actions only.
+ * Returns true if the function is storable, or false otherwise. For server-side Actions only.
  *
- * @returns {Boolean} Set to true if the function is storable, or false otherwise.
+ * @returns {Boolean}
  */
 Action.prototype.isStorable = function() {
     var ignoreExisting = this.storableConfig && this.storableConfig["ignoreExisting"];
@@ -522,7 +525,8 @@ Action.prototype.getStorageKey = function() {
 };
 
 /**
- * Checks if the object is from the current storage.
+ * Returns true if a given function is from the current storage, or false otherwise.
+ * @returns {Boolean}
  */
 Action.prototype.isFromStorage = function() {
     return !$A.util.isUndefinedOrNull(this.storage);
@@ -560,7 +564,7 @@ Action.prototype.toJSON = function() {
 };
 
 /**
- * Mark the current action as aborted.
+ * Marks the current action as aborted.
  */
 Action.prototype.abort = function() {
     this.state = "ABORTED";
@@ -651,7 +655,7 @@ Action.prototype.getStorage = function() {
 };
 
 /**
- * Use the event object in the action's response and fire event.
+ * Uses the event object in the action's response and fires the event.
  */
 Action.prototype.parseAndFireEvent = function(evtObj) {
     var descriptor = evtObj["descriptor"];

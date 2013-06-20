@@ -18,7 +18,6 @@
      * Note: currently dateTimePicker, requires the user to manually put the time they are looking for. The
      * following tests are just a stub for future functionality.
      */	  
-	
     testInitialValue:{
         attributes : {value: '2012-09-10T14:00:00.000Z', format: 'MM/dd/yyyy HH:mm:ss', timezone: 'Europe/Berlin'},
         test: function(cmp){
@@ -56,7 +55,7 @@
     /**
      * Verify behavior when 'timezone' attribute is assigned a garbage value.
      */
-    /*testInvalidTimeZone:{
+    testInvalidTimeZone:{
 	attributes : {displayDatePicker:'true', timezone: 'dummy'},
 	test: function(cmp){
 	        cmp.find("datePicker").get('c.selectToday').run();
@@ -66,7 +65,7 @@
 	    		aura.test.assertEquals(dt, inputDateStr, "Should have used default timezone.");	        	
 	        });	        
         }
-    },*/   
+    },   
     
     /**
      * Verify behavior when 'timezone' attribute is assigned a garbage value.

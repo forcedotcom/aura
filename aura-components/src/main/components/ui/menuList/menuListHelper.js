@@ -101,5 +101,14 @@
                 action.run();
             }
         }
+    },
+    
+    visibleChange: function(concreteCmp) {
+        var visible = concreteCmp.get("v.visible");
+        if (visible === true) {
+            concreteCmp.get("e.menuExpand").fire();
+        } else {
+            concreteCmp.get("e.menuCollapse").fire();
+        }
     }
 })

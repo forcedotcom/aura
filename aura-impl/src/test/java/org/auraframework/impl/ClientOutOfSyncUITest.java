@@ -355,6 +355,8 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver input) {
+                auraUITestingUtil.waitForDocumentReady();
+                auraUITestingUtil.waitForAuraFrameworkReady(null);
                 return "meaningful".equals(auraUITestingUtil
                         .getEval("return window.tempVar;"));
             }

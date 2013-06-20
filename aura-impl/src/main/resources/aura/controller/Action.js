@@ -91,7 +91,7 @@ Action.prototype.getDef = function() {
 /**
  * Adds a callback group for completion tracking.
  *
- * If this action is already completed, completeAction() is called.
+ * If this action is already completed, <code>completeAction()</code> is called.
  */
 Action.prototype.addCallbackGroup = function(group) {
     if (this.state === "NEW") {

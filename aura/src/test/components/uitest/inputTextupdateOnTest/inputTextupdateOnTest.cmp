@@ -103,6 +103,6 @@ outputValue: <ui:outputText aura:id="outputValue" class="outputValue" value=""/>
 </div>
 
 <div id="inputwithLabel">
-<ui:inputText aura:id="inputwithLabel" label="inputwithLabel" value="inputwithLabel"/>
+<ui:inputText aura:id="inputwithLabel" label="inputwithLabel" value="inputwithLabel" updateOn="keyup"/>
 </div>
 </aura:component>

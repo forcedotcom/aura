@@ -514,9 +514,12 @@ $A.ns.Aura.prototype.finishInit = function(doNotCallJiffyOnLoad) {
 };
 
 /**
- * Use <code>$A.error()</code> in response to an error that prevents Aura from starting an application successfully.
- * To treat a test as successful where <code>$A.error()</code> is expected, use <code>exceptionsAllowedDuringInit</code>.
- * For example, this is useful if you are testing for components with the same name with different <code>config</code> parameters.
+ * Use <code>$A.error()</code> in response to a serious error that has no recovery path.
+ *
+ * If this occurs during a test, the test will be stopped unless you add calls to '$A.test.expectAuraError' for
+ * each error that occurs. <code>exceptionsAllowedDuringInit</code> allows server side errors to not stop the
+ * test as well.
+ *
  * @description <p>Example:</p>
  * <code>
  * testDuplicate : {<br/>
@@ -528,15 +531,7 @@ $A.ns.Aura.prototype.finishInit = function(doNotCallJiffyOnLoad) {
  * }
  * </code>
  * @public
- * @param {Error} e The error message to be returned
- * @param {Boolean} stopTest   Defaults to true, but there are some test cases
- *    where using $A.test.fail (which throws) will break initialization, and so
- *    isn't desired.
- *
- * TODO: stopTest is a kludge, and should be supported by something like test's
- *    expectedExceptionsDuringInit.  However, the case where it's useful is an
- *    expected failure in the initial render of the page, before any particular
- *    test is running, so no test annotation is going to work.
+ * @param {Error} e The error message or error object to be displayed to the user.
  */
 $A.ns.Aura.prototype.error = function(e) {
     var msg = null;
@@ -586,11 +581,21 @@ $A.ns.Aura.prototype.error = function(e) {
     }
 };
 
-$A.ns.Aura.prototype.warning = function(w) {
+/**
+ * <code>$A.warning()</code> should be used in the case where poor programming practices have been used.
+ *
+ * These warnings will not, in general, be displayed to the user, but they will appear in the console (if
+ * availiable), and in the aura debug window.
+ *
+ * @public
+ * @param {String} w The message to display.
+ * @param {Error} e an error, if any.
+ */
+$A.ns.Aura.prototype.warning = function(w, e) {
     if ($A.test && $A.test.auraWarning(w)) {
         return;
     }
-    $A.logInternal("Warning",w, null, this.getStackTrace(null));
+    $A.logInternal("Warning",w, e, this.getStackTrace(e));
 };
 
 /**
@@ -733,6 +738,11 @@ $A.ns.Aura.prototype.userAssert = function(condition, msg) {
     $A.assert(condition, msg);
 };
 
+/**
+ * Internal routine to stringify a log message.
+ *
+ * @private
+ */
 $A.ns.Aura.prototype.stringVersion = function(logMsg, error, trace) {
     var stringVersion = logMsg;
     if (!$A.util.isUndefinedOrNull(error) && !$A.util.isUndefinedOrNull(error.message)) {
@@ -749,14 +759,13 @@ $A.ns.Aura.prototype.stringVersion = function(logMsg, error, trace) {
 /**
  * Log something: for internal use only..
  *
- * Currently, this logs to the JavaScript console if it is available, and does not throw errors otherwise.
+ * This logs to both the console (if available), and to the aura debug component.
  *
- *  If both value and error are passed in, value shows up in the console as a group with value logged within the group.
- *  If only value is passed in, value is logged without grouping.
- *  <p>For example, <code>$A.log(action.getError());</code> logs the error from an action.</p>
- * @public
- * @param {Object} value The first object to log.
- * @param {Object} error The error messages to be logged in the stack trace.
+ * @private
+ * @param {String} type the type of message (error, warning, info).
+ * @param {String} message the message to display.
+ * @param {Error} an error (if truthy).
+ * @param {Array} the stack trace as an array (if truthy).
  */
 $A.ns.Aura.prototype.logInternal = function(type, message, error, trace) {
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

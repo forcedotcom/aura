@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-//Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-Mocks.GetMock(Object.Global(), "exp", function() {
-})(function() {
-	// #import aura.controller.ActionDef
-});
-
 Function.RegisterNamespace("Test.Aura.Controller");
 
 [ Fixture ]
 Test.Aura.Controller.ActionDefTest = function() {
+	// Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
+	Mocks.GetMock(Object.Global(), "exp", function() {
+	})(function() {
+		// #import aura.controller.ActionDef
+	});
+
 	[ Fixture ]
 	function Constructor() {
 		[ Fact ]
@@ -76,14 +75,6 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 		[ Fixture ]
 		function ServerActionType() {
-			var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
-				util : {
-					isArray : function(obj) {
-						return Object.prototype.toString.call(obj) === "[object Array]";
-					}
-				}
-			});
-
 			var ValueDef = function(param) {
 				return {
 					name : param,
@@ -105,11 +96,9 @@ Test.Aura.Controller.ActionDefTest = function() {
 				var actual;
 
 				// Act
-				mockAuraUtil(function() {
-					mockValueDef(function() {
-						actual = new ActionDef(config).returnType;
-					})
-				});
+				mockValueDef(function() {
+					actual = new ActionDef(config).returnType;
+				})
 
 				// Assert
 				Assert.Equal(new ValueDef(expected), actual);
@@ -120,10 +109,16 @@ Test.Aura.Controller.ActionDefTest = function() {
 				// Arrange
 				var config = {
 					actionType : "SERVER",
-					params : {
-						ignored : "ignored"
+					params : [ "ignored" ]
+				};
+				var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+					util : {
+						isArray : function(obj) {
+							return false;
+						}
 					}
-				};
+				});
+
 				var actual;
 
 				// Act
@@ -137,71 +132,81 @@ Test.Aura.Controller.ActionDefTest = function() {
 				Assert.Empty(actual);
 			}
 
-			[ Fact ]
-			function SetsEmptyParamDefsWhenParamsEmpty() {
-				// Arrange
-				var config = {
-					actionType : "SERVER",
-					params : []
-				};
-				var actual;
-
-				// Act
-				mockAuraUtil(function() {
-					mockValueDef(function() {
-						actual = new ActionDef(config).paramDefs;
-					})
+			[ Fixture ]
+			function WithParams() {
+				var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+					util : {
+						isArray : function(obj) {
+							return true;
+						}
+					}
 				});
 
-				// Assert
-				Assert.Empty(actual);
+				[ Fact ]
+				function SetsEmptyParamDefsWhenParamsEmpty() {
+					// Arrange
+					var config = {
+						actionType : "SERVER",
+						params : []
+					};
+					var actual;
+
+					// Act
+					mockAuraUtil(function() {
+						mockValueDef(function() {
+							actual = new ActionDef(config).paramDefs;
+						})
+					});
+
+					// Assert
+					Assert.Empty(actual);
+				}
+
+				[ Fact ]
+				function SetsParamDefsWhenParamsHasOne() {
+					// Arrange
+					var config = {
+						actionType : "SERVER",
+						params : [ "expected" ]
+					};
+					var actual;
+
+					// Act
+					mockAuraUtil(function() {
+						mockValueDef(function() {
+							actual = new ActionDef(config).paramDefs;
+						})
+					});
+
+					// Assert
+					Assert.Equal({
+						expected : new ValueDef("expected")
+					}, actual);
+				}
+
+				[ Fact ]
+				function SetsParamDefsWhenParamsHasTwo() {
+					// Arrange
+					var config = {
+						actionType : "SERVER",
+						params : [ "expected1", "expected2" ]
+					};
+					var actual;
+
+					// Act
+					mockAuraUtil(function() {
+						mockValueDef(function() {
+							actual = new ActionDef(config).paramDefs;
+						})
+					});
+
+					// Assert
+					Assert.Equal({
+						expected1 : new ValueDef("expected1"),
+						expected2 : new ValueDef("expected2")
+					}, actual);
+				}
 			}
-
-			[ Fact ]
-			function SetsParamDefsWhenParamsHasOne() {
-				// Arrange
-				var config = {
-					actionType : "SERVER",
-					params : [ "expected" ]
-				};
-				var actual;
-
-				// Act
-				mockAuraUtil(function() {
-					mockValueDef(function() {
-						actual = new ActionDef(config).paramDefs;
-					})
-				});
-
-				// Assert
-				Assert.Equal({
-					expected : new ValueDef("expected")
-				}, actual);
-			}
-
-			[ Fact ]
-			function SetsParamDefsWhenParamsHasTwo() {
-				// Arrange
-				var config = {
-					actionType : "SERVER",
-					params : [ "expected1", "expected2" ]
-				};
-				var actual;
-
-				// Act
-				mockAuraUtil(function() {
-					mockValueDef(function() {
-						actual = new ActionDef(config).paramDefs;
-					})
-				});
-
-				// Assert
-				Assert.Equal({
-					expected1 : new ValueDef("expected1"),
-					expected2 : new ValueDef("expected2")
-				}, actual);
-			}
-
 			[ Fact ]
 			function SetsBackground() {
 				// Arrange
@@ -213,11 +218,9 @@ Test.Aura.Controller.ActionDefTest = function() {
 				var actual;
 
 				// Act
-				mockAuraUtil(function() {
-					mockValueDef(function() {
-						actual = new ActionDef(config).background;
-					})
-				});
+				mockValueDef(function() {
+					actual = new ActionDef(config).background;
+				})
 
 				// Assert
 				Assert.Equal(expected, actual);
@@ -233,11 +236,9 @@ Test.Aura.Controller.ActionDefTest = function() {
 				var actual;
 
 				// Act
-				mockAuraUtil(function() {
-					mockValueDef(function() {
-						actual = new ActionDef(config).meth;
-					})
-				});
+				mockValueDef(function() {
+					actual = new ActionDef(config).meth;
+				})
 
 				// Assert
 				Assert.Null(actual);
@@ -530,7 +531,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 		}
 
 		[ Fact ]
-		function ReturnsActionWithBackground() {
+		function ReturnsActionWithBackgroundFalseIfDefNotTrue() {
 			// Arrange
 			var expected = "expected";
 			var target = new ActionDef({});
@@ -541,6 +542,19 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 			// Assert
 			Assert.False(actual);
+		}
+
+		[ Fact ]
+		function ReturnsActionWithBackgroundTrueIfDefTrue() {
+			// Arrange
+			var target = new ActionDef({});
+			target.background = true;
+
+			// Act
+			var actual = target.newInstance().background;
+
+			// Assert
+			Assert.True(actual);
 		}
 
 		[ Fact ]

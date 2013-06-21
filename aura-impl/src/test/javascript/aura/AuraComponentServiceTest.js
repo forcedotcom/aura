@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-//Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-Mocks.GetMock(Object.Global(), "exp", function(){})(function(){
-    //#import aura.AuraComponentService
-});
-
 Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
 Test.Aura.AuraComponentServiceTest = function(){
+	// Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
+	Mocks.GetMock(Object.Global(), "exp", function() {
+	})(function() {
+		// #import aura.AuraComponentService
+	});
+
     // Mocks necessary to create a new AuraComponentService Object
     var mockOnLoadUtil = Mocks.GetMocks(Object.Global(), {
         ComponentDefRegistry: function(){},

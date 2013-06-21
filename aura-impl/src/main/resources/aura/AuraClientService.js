@@ -492,6 +492,14 @@ var AuraClientService = function() {
         },
 
         /**
+         * Inform Aura that the the environment is offline. One source of data
+         * is native code. Immediate and future communication with the server may fail.
+         */
+        setConnectedFalse : function() {
+            priv.setConnectedFalse();
+        },
+
+        /**
          * Queue an action for execution after the current event loop has ended.
          *
          * This must be called from within an event loop!

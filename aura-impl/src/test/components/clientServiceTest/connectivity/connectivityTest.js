@@ -66,6 +66,97 @@
     },
 
     /**
+     * Test setting connected false generates connectionLost event.  Subsequent actions will succeed and generate
+     * connectionResumed event
+     */
+    testSetConnectedFalse : {
+        testLabels : ["UnAdaptableTest"],
+        attributes : { __layout : "#" },
+        test : [function(component) {
+                // we assume we start connected
+                $A.test.assertTrue($A.clientService.isConnected());            
+                $A.test.addWaitFor(true, function() { return aura.util.trim(component.get("v.eventsFired")) == "layoutChange"; });
+             }, function(component) {
+                component.find("setConnectedFalseButton").get("e.press").fire();
+                $A.test.addWaitFor(true, function() { return aura.util.trim(component.get("v.eventsFired")) == "layoutChange connectionLost"; });
+             }, function(component) {
+                $A.test.assertFalse($A.clientService.isConnected());
+                component.find("button").get("e.press").fire();
+                $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") == "SUCCESS"; });
+            }, function(component) {
+                $A.test.assertEquals("layoutChange connectionLost connectionResumed", aura.util.trim(component.get("v.eventsFired")));
+                $A.test.assertTrue($A.clientService.isConnected());
+            }]
+    },
+
+    /**
+     * Test setting connected false after disconnect does not generate connectionLost event.
+     */
+    testSetConnectedFalseAfterDisconnect : {
+        testLabels : ["UnAdaptableTest"],
+        attributes : { __layout : "#" },
+        test : [function(component) {
+                // we assume we start connected
+                $A.test.assertTrue($A.clientService.isConnected());            
+                $A.test.addWaitFor(true, function() { return aura.util.trim(component.get("v.eventsFired")) == "layoutChange"; });
+            }, function(component) {
+                $A.test.setTestTimeout(30000);
+                component.getValue("v.host").setValue("http://invalid.salesforce.com");
+                component.find("button").get("e.press").fire();
+                $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") != ""; });
+            }, function(component) {
+                $A.test.assertEquals("INCOMPLETE", component.get("v.actionStatus"));
+                $A.test.assertEquals("layoutChange connectionLost", aura.util.trim(component.get("v.eventsFired")));
+                $A.test.assertFalse($A.clientService.isConnected());
+            }, function(component) {
+                component.find("setConnectedFalseButton").get("e.press").fire();
+                $A.test.addWaitFor(true, function() { return aura.util.trim(component.get("v.eventsFired")) == "layoutChange connectionLost"; });
+            }, function(component) {
+                $A.test.assertFalse($A.clientService.isConnected());
+                component.getValue("v.host").setValue(undefined); // restore to default
+                component.find("button").get("e.press").fire();
+                $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") == "SUCCESS"; });
+            }, function(component) {
+                // ensure there are not 2 connectionLost events generated before a resume
+                $A.test.assertEquals("layoutChange connectionLost connectionResumed", aura.util.trim(component.get("v.eventsFired")));
+                $A.test.assertTrue($A.clientService.isConnected());
+            }]
+    },
+    /**
+     * Test setting connected false then disconnect does not generate connectionLost event.
+     */
+    testSetConnectedFalseThenDisconnect : {
+        testLabels : ["UnAdaptableTest"],
+        attributes : { __layout : "#" },
+        test : [function(component) {
+                // we assume we start connected
+                $A.test.assertTrue($A.clientService.isConnected());            
+                $A.test.addWaitFor(true, function() { return aura.util.trim(component.get("v.eventsFired")) == "layoutChange"; });
+            }, function(component) {
+                component.find("setConnectedFalseButton").get("e.press").fire();
+                $A.test.addWaitFor(true, function() { return aura.util.trim(component.get("v.eventsFired")) == "layoutChange connectionLost"; });
+            }, function(component) {
+                $A.test.assertFalse($A.clientService.isConnected());
+                $A.test.setTestTimeout(30000);
+                component.getValue("v.host").setValue("http://invalid.salesforce.com");
+                component.find("button").get("e.press").fire();
+                $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") != ""; });
+            }, function(component) {
+                $A.test.assertEquals("INCOMPLETE", component.get("v.actionStatus"));
+                $A.test.assertEquals("layoutChange connectionLost", aura.util.trim(component.get("v.eventsFired")));
+                $A.test.assertFalse($A.clientService.isConnected());
+            }, function(component) {
+                component.getValue("v.host").setValue(undefined); // restore to default
+                component.find("button").get("e.press").fire();
+                $A.test.addWaitFor(true, function() { return component.get("v.actionStatus") == "SUCCESS"; });
+            }, function(component) {
+                // ensure there are not 2 connectionLost events generated before a resume
+                $A.test.assertEquals("layoutChange connectionLost connectionResumed", aura.util.trim(component.get("v.eventsFired")));
+                $A.test.assertTrue($A.clientService.isConnected());
+            }]
+    },
+ 
+    /**
      * Calling server action succeeds after a prior connection failure.
      */
     testConnectionResumed : {

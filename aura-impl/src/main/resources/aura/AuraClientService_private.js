@@ -218,6 +218,7 @@ var priv = {
     actionCallback : function(response, actionGroups, num) {
         var responseMessage = this.checkAndDecodeResponse(response);
         var queue = this.requestQueue;
+        var that = this;
         var i;
 
         var errors = [];
@@ -225,106 +226,106 @@ var priv = {
             $A.error("Action callback called on non-empty stack "+this.auraStack);
             this.auraStack = [];
         }
-        $A.clientService.pushStack("actionCallback");
-        if (responseMessage) {
-            var token = responseMessage["token"];
-            if (token) {
-                priv.token = token;
-            }
+        $A.run(function() {
+                if (responseMessage) {
+                    var token = responseMessage["token"];
+                    if (token) {
+                        priv.token = token;
+                    }
 
-            var ctx = responseMessage["context"];
-            $A.getContext().join(ctx);
+                    var ctx = responseMessage["context"];
+                    $A.getContext().join(ctx);
 
-            //Look for any Client side event exceptions
-            var events = responseMessage["events"];
-            if (events) {
-                for ( var en = 0, len = events.length; en < len; en++) {
-                    $A.clientService.parseAndFireEvent(events[en]);
-                }
-            }
-
-            var actionResponses = responseMessage["actions"];
-            //Process each action and its response
-            for ( var r = 0; r < actionResponses.length; r++) {
-                var actionResponse = actionResponses[r];
-
-                var actionGroupNumber;
-                var action;
-                if (actionResponse["storable"] === true) {
-                    // Create a client side action instance to go with the
-                    // server created action response
-                    var descriptor = actionResponse["action"];
-                    var actionDef = $A.services.component.getActionDef({
-                        descriptor : descriptor
-                    });
-                    action = actionDef.newInstance();
-
-                    action.setStorable();
-                    action.setParams(actionResponse["params"]);
-
-                    actionGroupNumber = this.newestAbortableGroup;
-                } else {
-                    var groupAndAction = this.findGroupAndAction(actionGroups, actionResponse.id);
-                    aura.assert(groupAndAction, "Unable to find action for action response " + actionResponse.id);
-
-                    actionGroupNumber = groupAndAction.group.number;
-                    action = groupAndAction.action;
-                }
-
-                try {
-                    var storage = action.getStorage();
-                    var toStore;
-                    var needUpdate = action.updateFromResponse(actionResponse);
-
-                    if (!action.isAbortable() || this.newestAbortableGroup === actionGroupNumber) {
-                        if (needUpdate) {
-                            action.complete($A.getContext());
-                        } 
-                        if (action.isRefreshAction()) {
-                            action.fireRefreshEvent("refreshEnd");
+                    //Look for any Client side event exceptions
+                    var events = responseMessage["events"];
+                    if (events) {
+                        for ( var en = 0, len = events.length; en < len; en++) {
+                            $A.clientService.parseAndFireEvent(events[en]);
                         }
-                    } else {
-                        action.abort();
                     }
-                    toStore = action.getStored();
-                    if (storage && toStore) {
-                        storage.put(action.getStorageKey(), toStore);
-                    }
-                } catch (e) {
-                    errors.push(e);
-                }
-            }
 
-            for (i = 0; i < actionGroups.length; i++) {
-                actionGroup = actionGroups[i];
-                actionGroup.status = "done";
-            }
-        } else if (priv.isDisconnectedOrCancelled(response) && !priv.isUnloading) {
-            for ( var n = 0; n < actionGroups.length; n++) {
-                actionGroup = actionGroups[n];
-                actions = actionGroup.actions;
-                for ( var m = 0; m < actions.length; m++) {
-                    try {
-                        action = actions[m];
-                        if (!action.isAbortable() || this.newestAbortableGroup === actionGroup.number) {
-                            action.incomplete($A.getContext());
+                    var actionResponses = responseMessage["actions"];
+                    //Process each action and its response
+                    for ( var r = 0; r < actionResponses.length; r++) {
+                        var actionResponse = actionResponses[r];
+
+                        var actionGroupNumber;
+                        var action;
+                        if (actionResponse["storable"] === true) {
+                            // Create a client side action instance to go with the
+                            // server created action response
+                            var descriptor = actionResponse["action"];
+                            var actionDef = $A.services.component.getActionDef({
+                                descriptor : descriptor
+                            });
+                            action = actionDef.newInstance();
+
+                            action.setStorable();
+                            action.setParams(actionResponse["params"]);
+
+                            actionGroupNumber = that.newestAbortableGroup;
                         } else {
-                            action.abort();
+                            var groupAndAction = that.findGroupAndAction(actionGroups, actionResponse.id);
+                            aura.assert(groupAndAction, "Unable to find action for action response "+actionResponse.id);
+
+                            actionGroupNumber = groupAndAction.group.number;
+                            action = groupAndAction.action;
                         }
-                    } catch (e2) {
-                        errors.push(e2);
+
+                        try {
+                            var storage = action.getStorage();
+                            var toStore;
+                            var needUpdate = action.updateFromResponse(actionResponse);
+
+                            if (!action.isAbortable() || that.newestAbortableGroup === actionGroupNumber) {
+                                if (needUpdate) {
+                                    action.complete($A.getContext());
+                                } 
+                                if (action.isRefreshAction()) {
+                                    action.fireRefreshEvent("refreshEnd");
+                                }
+                            } else {
+                                action.abort();
+                            }
+                            toStore = action.getStored();
+                            if (storage && toStore) {
+                                storage.put(action.getStorageKey(), toStore);
+                            }
+                        } catch (e) {
+                            errors.push(e);
+                        }
+                    }
+
+                    for (i = 0; i < actionGroups.length; i++) {
+                        actionGroup = actionGroups[i];
+                        actionGroup.status = "done";
+                    }
+                } else if (priv.isDisconnectedOrCancelled(response) && !priv.isUnloading) {
+                    for ( var n = 0; n < actionGroups.length; n++) {
+                        actionGroup = actionGroups[n];
+                        actions = actionGroup.actions;
+                        for ( var m = 0; m < actions.length; m++) {
+                            try {
+                                action = actions[m];
+                                if (!action.isAbortable() || that.newestAbortableGroup === actionGroup.number) {
+                                    action.incomplete($A.getContext());
+                                } else {
+                                    action.abort();
+                                }
+                            } catch (e2) {
+                                errors.push(e2);
+                            }
+                        }
+                        actionGroup.status = "done";
                     }
                 }
-                actionGroup.status = "done";
-            }
-        }
-        if (errors.length > 0) {
-            for(i=0;i<errors.length;i++){
-                // should this be $A.error?
-                aura.log("Javascript error", errors[i]);
-            }
-        }
-        $A.clientService.popStack("actionCallback");
+                if (errors.length > 0) {
+                    for(i=0;i<errors.length;i++){
+                        // should this be $A.error?
+                        aura.log("Javascript error", errors[i]);
+                    }
+                }
+            }, "actionCallback");
 
         this.inRequest = false;
         priv.fireDoneWaiting();
@@ -339,7 +340,6 @@ var priv = {
         }
 
         this.requestQueue = queue;
-        var that = this;
         $A.endMark("Completed Action Callback - XHR " + num);
 
         //#if {"modes" : ["PTEST"]}

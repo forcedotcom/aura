@@ -21,6 +21,7 @@
  */
 var AuraClientService = function() {
     // #include aura.AuraClientService_private
+	// #include aura.controller.ActionCallbackGroup
     // #include aura.controller.ActionQueue
 
     var clientService = {

@@ -64,8 +64,6 @@ Test.Aura.AuraClientServiceTest = function() {
 				}
 			});
 			var action = {
-				setExclusive : function() {
-				},
 				isAbortable : function() {
 					return false;
 				},
@@ -109,8 +107,6 @@ Test.Aura.AuraClientServiceTest = function() {
 				}
 			});
 			var action = {
-				setExclusive : function() {
-				},
 				isAbortable : function() {
 					return false;
 				},
@@ -143,8 +139,6 @@ Test.Aura.AuraClientServiceTest = function() {
 			var numAbortedCorrectly = 0;
 			var numAbortedIncorrectly = 0;
 			var abortable = {
-				setExclusive : function() {
-				},
 				isAbortable : function() {
 					return true;
 				},
@@ -166,8 +160,6 @@ Test.Aura.AuraClientServiceTest = function() {
 				auraType : "Action"
 			};
 			var action = {
-				setExclusive : function() {
-				},
 				isAbortable : function() {
 					return false;
 				},
@@ -267,9 +259,9 @@ Test.Aura.AuraClientServiceTest = function() {
 		}
 
 		[ Fact ]
-		function ThrowsIfActionParamIsNull() {
+		function ThrowsIfFirstParamsAuraTypeIsNotAction() {
 			// Arrange
-			var expected = "EnqueueAction() cannot be called on an undefined or null action."
+			var expected = "Cannot call EnqueueAction() with a non Action parameter."
 			var actual;
 			mockOnLoadUtil(function() {
 				target = new AuraClientService();
@@ -282,17 +274,56 @@ Test.Aura.AuraClientServiceTest = function() {
 					}
 				},
 				util : {
-					isUndefined : function() {
+					isUndefined : function(obj) {
+						return obj === undefined;
 					},
 					isUndefinedOrNull : function(obj) {
 						return obj === undefined || obj === null;
 					}
 				}
 			});
+			var action = {
+				auraType : "Component"
+			};
 			// Act
 			mockAuraUtil(function() {
 				actual = Record.Exception(function() {
-					target.enqueueAction(null, undefined, undefined);
+					target.enqueueAction(action, undefined, undefined);
+				})
+			});
+			// Assert
+			Assert.Equal(expected, actual);
+		}
+
+		[ Fact ]
+		function ThrowsIfFirstParamIsNotRecognizedAuraType() {
+			// Arrange
+			var expected = "Cannot call EnqueueAction() with a non Action parameter."
+			var actual;
+			mockOnLoadUtil(function() {
+				target = new AuraClientService();
+			});
+			var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+				assert : function(condition, message) {
+					if (!condition) {
+						var error = new Error(message);
+						throw error;
+					}
+				},
+				util : {
+					isUndefined : function(obj) {
+						return obj === undefined;
+					},
+					isUndefinedOrNull : function(obj) {
+						return obj === undefined || obj === null;
+					}
+				}
+			});
+			var action = "FooBared";
+			// Act
+			mockAuraUtil(function() {
+				actual = Record.Exception(function() {
+					target.enqueueAction(action, undefined, undefined);
 				})
 			});
 			// Assert
@@ -369,6 +400,30 @@ Test.Aura.AuraClientServiceTest = function() {
 			});
 			// Assert
 			Assert.Equal(expected, actual);
+		}
+	}
+
+	[ Fixture ]
+	function RunActions() {
+		[ Fact ]
+		function CallsRequest() {
+			var actions = [ "expected" ];
+			var callback = function() {
+			};
+			var target;
+			mockOnLoadUtil(function() {
+				target = new AuraClientService();
+			});
+			target.priv.request = Stubs.GetMethod("param", null);
+
+			target.runActions(actions, undefined, callback);
+
+			Assert.Equal([ {
+				Arguments : {
+					param : actions
+				},
+				ReturnValue : null
+			} ], target.priv.request.Calls);
 		}
 	}
 }

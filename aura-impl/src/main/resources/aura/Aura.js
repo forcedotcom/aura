@@ -81,7 +81,6 @@ var clientService;
 // #include aura.layouts.LayoutDef
 // #include aura.controller.ActionDef
 // #include aura.controller.Action
-// #include aura.controller.ActionCallbackGroup
 // #include aura.attribute.AttributeDef
 // #include aura.attribute.AttributeSet
 // #include aura.attribute.AttributeDefSet

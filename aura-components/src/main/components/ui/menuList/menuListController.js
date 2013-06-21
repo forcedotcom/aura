@@ -52,5 +52,11 @@
             }
         }
         component.setValue("v.childMenuItems", children);
+    },
+    
+    visibleChange: function(component, event, helper) {
+        var concrete = component.getConcreteComponent();
+        var _helper = concrete.getDef().getHelper();
+        _helper.visibleChange(concrete);
     }
 })

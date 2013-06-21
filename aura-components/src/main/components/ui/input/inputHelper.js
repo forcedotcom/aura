@@ -68,8 +68,8 @@
     /**
      * Obtains the current value from the DOM element.  May be overridden by extensions.
      */
-    getDomElementValue : function (element) {
-        return element.value;
+    getDomElementValue : function (element) {    	
+    		return element.value;        
     },
 
     /**
@@ -98,22 +98,36 @@
     /**
      * Pre-process the event before we fire it.
      */
-    preEventFiring : function(component, event) {
+    preEventFiring : function(component, event) {    	
         this.handleUpdate(component, event);
     },
     
     /**
      * handle the value update.
      */
-    handleUpdate : function(component, event) {
-        var element = component.getElement();
+    handleUpdate : function(component, event) {        
         var helper = component.getDef().getHelper();
         var updateOn = helper.getUpdateOn(component);
 
         // if this is an event we're supposed to update on, call this component's update implementation
         if ($A.util.arrayIndexOf(updateOn, event.type) > -1) {
-            helper.doUpdate(component, helper.getDomElementValue(element));
+            helper.doUpdate(component, helper.getDomElementValue(this.getInputElement(component)));
         }
+    },
+    
+    /**
+     * Returns the input dom element in the component. If there are multiple input elements, only the first one is return.
+     */
+    getInputElement : function(component) {
+    	var element;
+    	if (component.get('v.label')) {
+    		var el = component.getElement();
+    		element = el.getElementsByTagName('input')[0] ||  el.getElementsByTagName('select')[0] || element;    		
+    	} else {
+    		element = component.getElement();
+    	}
+    	
+    	return element;
     },
 
     /**

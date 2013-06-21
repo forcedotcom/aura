@@ -32,8 +32,8 @@ public class LayoutItemsUITest extends WebDriverTestCase {
     }
 
     /**
-     * Verify that navigating forward and backward works when underlying
-     * LayoutsDef has multiple layoutitems per layout. Automation for W-954182
+     * Verify that navigating forward and backward works when underlying LayoutsDef has multiple layoutitems per layout.
+     * Automation for W-954182
      */
     public void testNavigationWhenLayoutHasMultipleLayoutItems() throws Exception {
         By forwardButton = By.cssSelector(".Forward_Button");
@@ -42,14 +42,14 @@ public class LayoutItemsUITest extends WebDriverTestCase {
         By removeLayoutDone = By.cssSelector(".Remove_Layout_Done");
 
         open("/layoutServiceTest/multipleLayoutItems.app");
-        
+
         // might take a while for initial layout to load
         getDriver().manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
         findDomElement(layoutDone);
         verifyExpectedResultsForInitialLayout();
 
         // subsequent layouts should NOT take that long to load
-        getDriver().manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+        getDriver().manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         findDomElement(forwardButton).click();
         findDomElement(layoutDone);
         verifyExpectedResultsForLayout1();

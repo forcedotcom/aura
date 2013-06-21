@@ -15,13 +15,9 @@
  */
 ({
 	 
-	render: function(component, helper) {
-        var attrs = component.getAttributes(),
-			domId = attrs.getValue("domId").getValue(),
-			concreteCmp = component.getConcreteComponent(),
-			parentCmp = concreteCmp.getSuper(),
-			globalId = concreteCmp.getGlobalId(),
-			labelPos = attrs.get("labelPosition");
+	render: function(component, helper) {		
+        var domId = component.get('v.domId'),						
+			globalId = component.getConcreteComponent().getGlobalId();			
         
 		if (!domId) {
 			helper.setAttribute(component, {key: 'domId', value: globalId});

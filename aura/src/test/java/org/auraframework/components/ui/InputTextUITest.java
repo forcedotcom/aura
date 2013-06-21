@@ -54,19 +54,20 @@ public class InputTextUITest extends WebDriverTestCase {
         outputDiv.click();// to simulate tab behavior for touch browsers
         value = assertModelValue(event); // value should have been updated
     }
-    
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET ,BrowserType.IPAD, BrowserType.SAFARI,BrowserType.IPHONE})
+
+    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.SAFARI,
+            BrowserType.IPHONE })
     // Change event not picked up on IOS devices
     public void testUpdateOnAttributeForNonIosAndroidDevice() throws Exception {
-    	open(TEST_CMP);
-    	WebDriver d = getDriver();
+        open(TEST_CMP);
+        WebDriver d = getDriver();
         WebElement outputDiv = d.findElement(By.id("output"));
         String eventName = "change";
         auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
         outputDiv.click();
         assertModelValue(eventName);
     }
-    
+
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testUpdateOnAttribute() throws Exception {
         open(TEST_CMP);
@@ -169,16 +170,24 @@ public class InputTextUITest extends WebDriverTestCase {
      * Different browsers support different events, so this case tests an event supported by all browsers.
      * testUpdateOnAttributeWithCertainEventsChrome() more extensively tests different event types, but only on Chrome
      * where we know they are all supported.
+     * 
+     * Note we are not using auraUITestingUtil.findElementAndTypeEventNameInIt(eventName) in this test because the
+     * Android driver sends a mousedown event when clearing the text field.
      */
     public void testUpdateOnAttributeWithCertainEventsAllBrowsers() throws Exception {
         open(TEST_CMP);
         String value = getCurrentModelValue();
-
         String eventName = "mousedown";
-        WebElement input = auraUITestingUtil.findElementAndTypeEventNameInIt(eventName);
+
+        String locatorTemplate = "#%s > input.uiInputText.uiInput";
+        String locator = String.format(locatorTemplate, eventName);
+        WebElement input = getDriver().findElement(By.cssSelector(locator));
+        input.click();
+        input.sendKeys(eventName);
+
         assertModelValue(value);
         input.click();
-        value = assertModelValue(eventName);
+        value = assertModelValue(value + eventName);
         assertDomEventSet();
     }
 
@@ -264,5 +273,29 @@ public class InputTextUITest extends WebDriverTestCase {
         Actions actions = new Actions(getDriver());
         actions.contextClick(input).perform();
         assertEquals("Right click not performed ", "2", outputValue.getText());
+    }
+    
+    /**
+     * Test Case for W-1689213
+     * @throws Exception
+     */
+    public void testInputTextWithLabel() throws Exception {
+        open(TEST_CMP);
+        WebElement div = findDomElement(By.id("inputwithLabel"));
+        WebElement input = div.findElement(By.tagName("input"));
+        WebElement outputDiv = findDomElement(By.id("output"));
+        
+        String inputAuraId = "inputwithLabel";
+        String valueExpression = auraUITestingUtil.getValueFromCmpRootExpression(inputAuraId,"v.value");
+        String defExpectedValue = (String) auraUITestingUtil.getEval(valueExpression);
+        assertEquals("Default value should be the same", inputAuraId, defExpectedValue);
+        
+        String inputText = "UpdatedText";
+        input.clear();
+        input.click();
+        input.sendKeys(inputText);
+        outputDiv.click(); // to simulate tab behavior for touch browsers
+        String expectedValue = (String) auraUITestingUtil.getEval(valueExpression);
+        assertEquals("Value of Input text shoud be updated", inputText, expectedValue);
     }
 }

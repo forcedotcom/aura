@@ -21,6 +21,7 @@
  */
 var AuraClientService = function() {
     // #include aura.AuraClientService_private
+    // #include aura.controller.ActionQueue
 
     var clientService = {
 
@@ -251,7 +252,7 @@ var AuraClientService = function() {
             priv.auraStack.push(name);
         },
         
-        queueNeedsFiltering : false,
+        actionQueue : new ActionQueue(),
 
         /**
          * Pop an item off the stack.
@@ -265,6 +266,7 @@ var AuraClientService = function() {
         popStack : function(name) {
             var count = 0;
             var lastName;
+            var done;
 
             if (priv.auraStack.length > 0) {
                 lastName = priv.auraStack.pop();
@@ -275,15 +277,8 @@ var AuraClientService = function() {
                 $A.warning("Pop from empty stack");
             }
             if (priv.auraStack.length === 0) {
-                //
-                // FIXME: W-1652120
-                //
-                // Weird compatibility stuff. We are sometimes called with nothing on the stack,
-                // so, rather than work too hard on this, just push two things on the stack so
-                // that even under those conditions we will not do the wrong thing.
-                //
-                priv.auraStack.push("$A.clientServices.popStack");
-                priv.auraStack.push("$A.clientServices.popStack");
+                var tmppush = "$A.clientServices.popStack";
+                priv.auraStack.push(tmppush);
                 clientService.processActions();
                 done = !$A["finishedInit"];
                 while (!done && count <= 15) {
@@ -295,8 +290,12 @@ var AuraClientService = function() {
                     }
                 }
                 // Force our stack to nothing.
+                lastName = priv.auraStack.pop();
+                if (lastName !== tmppush) {
+                    $A.error("Broken stack: popped "+tmppush+" expected "+lastName+", stack = "+priv.auraStack);
+                }
                 priv.auraStack = [];
-                this.queueNeedsFiltering = true;
+                clientService.actionQueue.incrementNextActionGroupNumber();
             }
         },
 
@@ -506,29 +505,14 @@ var AuraClientService = function() {
          * This must be called from within an event loop!
          *
          * @param {Action} action the action to enqueue
-         * @param {Boolean} background background this action.
-         * @param {Boolean} exclusive run this action as an exclusive action.
+         * @param {Boolean} background if true the action will be backgrounded, otherwise the value of action.isBackground() is used.
          */
-        enqueueAction : function(action, background, exclusive) {
+        enqueueAction : function(action, background) {
             $A.assert(!$A.util.isUndefinedOrNull(action), "EnqueueAction() cannot be called on an undefined or null action.");
             $A.assert(!$A.util.isUndefined(action.auraType)&& action.auraType==="Action", "Cannot call EnqueueAction() with a non Action parameter.");
-            //
-            // FIXME: W-1652115 We need to enable this.
-            //
-            //if (background !== undefined && action.isBackground() !== true) {
-            //    action.setBackground(background);
-            //}
-            if (exclusive !== undefined) {
-                action.setExclusive(exclusive);
-            }
-            
-            if (action.isAbortable()) {
-                //indicate to priv that there is a new abortable action group and any currently running group is out of date.
-                priv.newestAbortableGroup = -1;
-                if (clientService.queueNeedsFiltering) {
-                    priv.actionQueue = clientService.clearPreviousAbortableActions(priv.actionQueue);
-                    clientService.queueNeedsFiltering = false;
-                }
+
+            if (background) {
+                action.setBackground();
             }
             
             //
@@ -536,22 +520,10 @@ var AuraClientService = function() {
             //
             if (action.getDef().isClientAction()) {
                 action.run();
-            } else {
-                priv.actionQueue.push(action);
-            }
-        },
-        
-        clearPreviousAbortableActions : function(queue) {
-            var newQueue = [];
-            var counter;
-            for(counter = 0; counter < queue.length; counter++) {
-                if (!queue[counter].isAbortable()) {
-                    newQueue.push(queue[counter]);
-                } else {
-                    queue[counter].abort();
-                }
-            }
-            return newQueue;
+            } 
+            
+            
+            clientService.actionQueue.enqueue(action);
         },
         
         /**
@@ -563,20 +535,26 @@ var AuraClientService = function() {
          */
         processActions : function() {
             var actions;
+            var backgroundAction;
+            var requestSent = false;
 
             //if an XHR is in flight request don't send a new request yet.
             if (priv.inRequest) {
                 return false;
             }
-            
-            if (priv.actionQueue.length > 0) {
-                actions = priv.actionQueue;
-                priv.actionQueue = [];
+
+            actions = clientService.actionQueue.getServerActions();
+            if (actions.length > 0) {
                 priv.request(actions);
-                clientService.queueNeedsFiltering = false;
-                return true;
+                requestSent = true;
             }
-            return false;
+            
+            backgroundAction = clientService.actionQueue.getNextBackgroundAction();
+            if (backgroundAction !== undefined) {
+                priv.request(backgroundAction);
+                requestSent = true;
+            }
+            return requestSent;
         }
 
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

@@ -496,12 +496,14 @@ var AuraDevToolService = function() {
         	    /**
                      * Grabs all images tags and makes sure they have titles
                      * @returns Sring - Returns a string representation of the errors
+                     * 
+                     * Temporarily disabling this until code collab goes through
                      */
         	    checkImageTagForAlt : function(){
         		var imgAltMsg = "IMG tag must have alt attribute. Refer to http://www.w3.org/TR/UNDERSTANDING-WCAG20/text-equiv.html.";
         		var accessAideFuncs = aura.devToolService.accessbilityAide;
         		
-       		        return accessAideFuncs.formatOutput(imgAltMsg, accessAideFuncs.checkForAttrib("img","alt",""));
+       		        return "";//accessAideFuncs.formatOutput(imgAltMsg, accessAideFuncs.checkForAttrib("img","alt",""));
         	    },
         	    /**
                      * Goes through all of the fieldsets tags and makes sure that each on has a legend

@@ -47,13 +47,21 @@
     visibleChange: function(component, event, helper) {
         var visible = component.get("v.visible");
         if (visible === false) { // auto complete list is hidden.
+            // Update accessibility attributes
             var updateActiveEvt = component.get("e.updateActiveOption");
             if (updateActiveEvt) {
                 updateActiveEvt.setParams({
                     id: ""
                 })
                 updateActiveEvt.fire();
-            }
+            }            
+            // De-register list expand/collapse events
+            $A.util.removeOn(document.body, helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(component));
+            $A.util.removeOn(document.body, helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(component)); 
+        } else { // Register list expand/collapse events
+            $A.util.on(document.body, helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(component));
+            $A.util.on(document.body, helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(component)); 
         }
+         
     }
 })

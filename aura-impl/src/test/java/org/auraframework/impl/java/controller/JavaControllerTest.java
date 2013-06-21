@@ -214,7 +214,6 @@ public class JavaControllerTest extends AuraImplTestCase {
     public void testJavaActionDefIsBackgroundWithoutAnnotation() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.ParallelActionTestController");
         ActionDef actionDef = controller.getActionDefs().get("executeInForeground");
-        assertTrue("Expected an instance of JavaActionDef", actionDef instanceof JavaActionDef);
         assertFalse("ActionDefs should not be backgroundable without BackgroundAction annotation",
                 ((JavaActionDef) actionDef).isBackground());
     }
@@ -225,7 +224,6 @@ public class JavaControllerTest extends AuraImplTestCase {
     public void testJavaActionDefIsBackgroundWithAnnotation() throws Exception {
         ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.ParallelActionTestController");
         ActionDef actionDef = controller.getActionDefs().get("executeInBackground");
-        assertTrue("Expected an instance of JavaActionDef", actionDef instanceof JavaActionDef);
         assertTrue("ActionDefs should be backgroundable with BackgroundAction annotation",
                 ((JavaActionDef) actionDef).isBackground());
     }

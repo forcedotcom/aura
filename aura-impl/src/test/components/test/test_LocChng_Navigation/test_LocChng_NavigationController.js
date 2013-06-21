@@ -30,11 +30,11 @@
         var buttonTextIndex;
         //Action associated with the handler for the location change event specified for this component-> test:test_LocChng_Event
         if(event.getParam('num')){
-            //Find the button on the page where the current state will be displayed
-            var buttonText = cmp.find("display");
-            if(buttonText){
-                    buttonText.getAttributes().setValue('label',event.getParam('num'));
-                    $A.rerender(buttonText);
+            //Find the output on the page where the current state will be displayed
+            var displayText = cmp.find("display");
+            if(displayText){
+                    displayText.getAttributes().setValue('value',event.getParam('num'));
+                    $A.rerender(displayText);
             }
         }
         cmp.getAttributes().setValue('locationChangeIndicator', 'complete');

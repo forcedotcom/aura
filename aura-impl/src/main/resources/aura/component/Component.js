@@ -24,6 +24,7 @@
  */
 function Component(config, localCreation){
     this.priv = new ComponentPriv(config, this, localCreation);
+    this._destroying = false;
 }
 
 /**
@@ -101,7 +102,11 @@ Component.prototype.index = function(localId, globalId){
 Component.prototype.deIndex = function(localId, globalId){
     var priv = this.priv;
 
-    if (!this.assertValid()) {
+    //
+    // Unfortunately, there are some bizarre loops with deIndex and destroy.
+    // For the moment, we don't enforce that this is a valid component until
+    // we can track down _why_ it is being called on already destroyed components
+    if (!this.isValid()) {
         return null;
     }
 
@@ -402,7 +407,7 @@ Component.prototype.destroy = function(async){
         
         renderingService.unrender(this);
 
-        delete this.priv.elements;
+        priv.elements = undefined;
 
         priv.deIndex();
         var vp = priv.valueProviders;
@@ -446,20 +451,20 @@ Component.prototype.destroy = function(async){
             }
         }
 
+        componentService.deIndex(this);
+
         var zuper = this.getSuper();
         if(zuper){
             zuper.destroy(async);
-            delete priv.superComponent;
+            priv.superComponent = undefined;
         }
 
-        componentService.deIndex(this);
-
-        delete priv.model;
-        delete priv.attributes;
-        delete priv.valueProviders;
-        delete priv.delegateValueProvider;
-        delete priv.renderer;
-        delete priv.actionRefs;
+        priv.model = undefined;
+        priv.attributes = undefined;
+        priv.valueProviders = undefined;
+        priv.delegateValueProvider = undefined;
+        priv.renderer = undefined;
+        priv.actionRefs = undefined;
 
         var eventDispatcher = priv.getEventDispatcher();
         if (eventDispatcher) {
@@ -469,7 +474,6 @@ Component.prototype.destroy = function(async){
                     for(var j=0;j<vals.length;j++){
                         delete vals[j];
                     }
-
                     delete eventDispatcher[key];
                 }
             }
@@ -482,11 +486,12 @@ Component.prototype.destroy = function(async){
             }
         }
 
-        delete priv.valuesWithHandlers;
-        delete priv.eventDispatcher;
-        delete priv.index;
-        delete priv.componentDef;
-        delete this.priv;
+        this._destroying = false;
+        priv.valuesWithHandlers = undefined;
+        priv.eventDispatcher = undefined;
+        priv.index = undefined;
+        priv.componentDef = undefined;
+        this.priv = undefined;
         return globalId;
     }
     return null;
@@ -859,7 +864,6 @@ Component.prototype.fire = function(name) {
  * @private
  */
 Component.prototype.assertValid = function(){
-    // Maybe this should include '!this._destroying'
     var valid = !$A.util.isUndefined(this.priv);
     if (!valid) {
         $A.error("Invalid component");

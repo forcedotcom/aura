@@ -20,13 +20,9 @@
     <aura:handler event="aura:layoutChange" action="{!c.layoutDone}"/>
     <aura:handler event="aura:beforeLayoutChange" action="{!c.layoutChanging}"/>
 
-    <p>
-        <div onclick="{!c.forward}" class='Forward_Button' aura:id='Forward_Button'>Forward</div>
-        <div onclick="{!c.backward}" class='Back_Button' aura:id='Back_Button'>Back</div>
-        <div onclick="{!c.removeLayoutDone}" class='Remove_Layout_Done' aura:id='Remove_Layout_Done'>Remove Layout Done</div>
-    </p>
-    
-
+    <ui:button press="{!c.forward}" label="Forward" aura:id='Forward_Button' class='Forward_Button' />
+    <ui:button press="{!c.backward}" label="Back" aura:id='Back_Button' class='Back_Button' />
+    <ui:button press="{!c.removeLayoutDone}" label="Remove Layout Done" aura:id='Remove_Layout_Done' class='Remove_Layout_Done' />
 
     <div  class="Button1" aura:id="Button1" />
     <div  class="Button2" aura:id="Button2" />

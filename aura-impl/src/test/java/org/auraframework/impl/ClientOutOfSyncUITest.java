@@ -79,7 +79,10 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     private void triggerServerAction() {
+        auraUITestingUtil.getRawEval("document._waitingForReload = true; return true;");
         auraUITestingUtil.findDomElement(By.cssSelector("button")).click();
+        waitForCondition("return !document._waitingForReload");
+        waitForAuraFrameworkReady();
     }
 
     public void testGetServerRenderingAfterMarkupChange() throws Exception {
@@ -295,6 +298,47 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 return "normal".equals(element.getCssValue("font-style"));
             }
         });
+    }
+
+    /**
+     * A routine to do _many_ iterations of a client out of sync test.
+     *
+     * This test really shouldn't be run unless one of the tests is flapping. It lets you iterate a
+     * number of times to force a failure.... No guarantees, but without the _waitingForReload check
+     * in the trigger function, this will cause a failure in very few iterations.
+     */
+    public void _testPostManyAfterStyleChange() throws Exception {
+        DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent("", "<div id='out'>hi</div>");
+        String className = cmpDesc.getNamespace() + StringUtils.capitalize(cmpDesc.getName());
+        DefDescriptor<?> styleDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc, DefDescriptor.CSS_PREFIX,
+                StyleDef.class);
+        addSourceAutoCleanup(styleDesc, String.format(".%s {font-style:italic;}", className));
+        addSourceAutoCleanup(
+                Aura.getDefinitionService().getDefDescriptor(
+                        String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace(),
+                                DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace()), NamespaceDef.class),
+                "<aura:namespace/>");
+        open(cmpDesc);
+        assertEquals("italic",
+                auraUITestingUtil.findDomElement(By.cssSelector("." + className)).getCssValue("font-style"));
+        for (int i = 0; i < 1000; i++) {
+            updateStringSource(styleDesc, String.format(".%s {font-style:normal;}", className));
+            triggerServerAction();
+            auraUITestingUtil.waitForElementFunction(By.cssSelector("." + className), new Function<WebElement, Boolean>() {
+                @Override
+                public Boolean apply(WebElement element) {
+                    return "normal".equals(element.getCssValue("font-style"));
+                }
+            });
+            updateStringSource(styleDesc, String.format(".%s {font-style:italic;}", className));
+            triggerServerAction();
+            auraUITestingUtil.waitForElementFunction(By.cssSelector("." + className), new Function<WebElement, Boolean>() {
+                @Override
+                public Boolean apply(WebElement element) {
+                    return "italic".equals(element.getCssValue("font-style"));
+                }
+            });
+        }
     }
 
     public void testPostAfterNamespaceChange() throws Exception {

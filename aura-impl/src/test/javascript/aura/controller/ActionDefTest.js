@@ -431,6 +431,29 @@ Test.Aura.Controller.ActionDefTest = function() {
 	}
 
 	[ Fixture ]
+	function IsBackground() {
+		[ Fact ]
+		function ReturnsTrueIfBackgroundTrue() {
+			var target = new ActionDef({});
+			target.background = true;
+
+			var actual = target.isBackground();
+
+			Assert.True(actual);
+		}
+
+		[ Fact ]
+		function ReturnsFalseIfBackgroundNotTrue() {
+			var target = new ActionDef({});
+			target.background = "true";
+
+			var actual = target.isBackground();
+
+			Assert.False(actual);
+		}
+	}
+
+	[ Fixture ]
 	function IsClientAction() {
 		[ Fact ]
 		function ReturnsTrueIfActionTypeEqualsCLIENT() {
@@ -531,30 +554,16 @@ Test.Aura.Controller.ActionDefTest = function() {
 		}
 
 		[ Fact ]
-		function ReturnsActionWithBackgroundFalseIfDefNotTrue() {
-			// Arrange
+		function ReturnsActionWithBackgroundFromIsBackground() {
 			var expected = "expected";
 			var target = new ActionDef({});
-			target.background = expected;
+			target.isBackground = function() {
+				return expected;
+			};
 
-			// Act
 			var actual = target.newInstance().background;
 
-			// Assert
-			Assert.False(actual);
-		}
-
-		[ Fact ]
-		function ReturnsActionWithBackgroundTrueIfDefTrue() {
-			// Arrange
-			var target = new ActionDef({});
-			target.background = true;
-
-			// Act
-			var actual = target.newInstance().background;
-
-			// Assert
-			Assert.True(actual);
+			Assert.Equal(expected, actual);
 		}
 
 		[ Fact ]

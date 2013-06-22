@@ -41,7 +41,9 @@
 	    //Destroy existing components and replace it with the new component
 	    body.destroy();
 	    body.setValue(child);
-    })
+    });
+    
+    $A.enqueueAction(action);
     </auradocs:codeblock>
 	<p>The <code>newComponentDeprecated()</code> method enables you to create components on the server or on the client.
     <code>action.getReturnValue()</code> returns a component with its definition and attributes from a server-side controller.

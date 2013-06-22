@@ -39,13 +39,13 @@
 	 			{!m.longStr}
 	 		</ui:carouselPage>
 	 		<ui:carouselPage aura:id="c1-bigImage">
-	 			<ui:image src="/auraFW/resources/aura/images/auraNoteDemo.png"/>
+	 			<ui:image src="/auraFW/resources/aura/images/auraNoteDemo.png" imageType="decorative"/>
 	 		</ui:carouselPage>
 	 		<ui:carouselPage aura:id="c1-mixContent">
 	 			<h1>Welcome to this page!</h1>
 	 			<ui:carouselPageItem label="Carousel Page Item"/>
 	 			<div>
-	 				<ui:image src="/auraFW/resources/aura/images/hula.gif"/> This is an ui:carousel page to demo the exciting ui:carousel components. Enjoy!
+	 				<ui:image src="/auraFW/resources/aura/images/hula.gif" imageType="decorative"/> This is an ui:carousel page to demo the exciting ui:carousel components. Enjoy!
 	 			</div>
 	 			<div>
 	 				<p>Here are some random components</p>

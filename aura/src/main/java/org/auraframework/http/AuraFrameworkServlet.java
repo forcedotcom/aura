@@ -36,6 +36,7 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
     private static final long lastModified = System.currentTimeMillis();
     private static final ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
     private final static StringParam fwUIDParam = new StringParam(AURA_PREFIX + "fwuid", 0, false);
+    private static final String MINIFIED_FILE_SUFFIX = ".min";
 
     // RESOURCES_PATTERN format:
     // /required_root/optional_nonce/required_rest_of_path
@@ -169,6 +170,16 @@ public class AuraFrameworkServlet extends AuraBaseServlet {
                 } else {
                     haveUid = true;
                     matchedUid = false;
+                }
+            }
+
+            // Checks for a minified version of the external resource file
+            // Uses the minified version if in production mode.
+            if (resStr.startsWith("/aura/resources/") && Aura.getConfigAdapter().isProduction()) {
+                int extIndex = resStr.lastIndexOf(".");
+                String minFile = resStr.substring(0, extIndex) + MINIFIED_FILE_SUFFIX + resStr.substring(extIndex);
+                if (resourceLoader.getResource(minFile) != null) {
+                    in = resourceLoader.getResourceAsStream(minFile);
                 }
             }
 

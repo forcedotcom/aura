@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:interactive" extensible="true" support="beta">
+<aura:component extends="ui:interactive" extensible="true" support="beta" description="This component represents options in an ui:autocomplete component. The options are displayed when an input keyword matches an item in the data provider.">
     <aura:attribute name="displayText" type="String" description="The displayed text string for this option."/>
     <aura:attribute name="keyword" type="String" description="The keyword to match."/>
     <aura:attribute name="label" type="String" required="true" description="The text displayed on the component. This attribute's value is used to do matching."/>
